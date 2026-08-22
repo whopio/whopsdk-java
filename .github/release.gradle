@@ -1,0 +1,51 @@
+gradle.projectsLoaded {
+    gradle.rootProject { root ->
+        root.afterEvaluate {
+            root.base.archivesName = 'whop-java'
+
+            root.publishing {
+                publications {
+                    maven(MavenPublication) {
+                        groupId = root.group
+                        artifactId = 'whop-java'
+                        version = root.version
+                        from root.components.java
+
+                        pom {
+                            name = 'Whop Java SDK'
+                            description = 'The official Java SDK for the Whop API.'
+                            url = 'https://github.com/whopio/whopsdk-java'
+                            licenses {
+                                license {
+                                    name = 'Apache License, Version 2.0'
+                                    url = 'https://www.apache.org/licenses/LICENSE-2.0.txt'
+                                }
+                            }
+                            developers {
+                                developer {
+                                    id = 'whop'
+                                    name = 'Whop'
+                                    email = 'support@whop.com'
+                                    organization = 'Whop'
+                                    organizationUrl = 'https://whop.com'
+                                }
+                            }
+                            scm {
+                                url = 'https://github.com/whopio/whopsdk-java'
+                                connection = 'scm:git:https://github.com/whopio/whopsdk-java.git'
+                                developerConnection = 'scm:git:ssh://git@github.com/whopio/whopsdk-java.git'
+                            }
+                        }
+                    }
+                }
+
+                repositories {
+                    maven {
+                        name = 'bundle'
+                        url = root.layout.buildDirectory.dir('bundle')
+                    }
+                }
+            }
+        }
+    }
+}

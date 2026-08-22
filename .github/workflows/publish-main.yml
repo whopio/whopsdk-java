@@ -1,0 +1,747 @@
+name: Release
+
+on:
+  push:
+    branches: [main]
+    paths: ["gradle.properties"]
+  pull_request:
+  workflow_dispatch:
+    inputs:
+      dry_run:
+        description: "Build, sign with a throwaway key and verify the bundle without uploading"
+        type: boolean
+        default: true
+
+permissions:
+  contents: read
+
+concurrency:
+  group: publish-whop-java-${{ github.ref }}
+  cancel-in-progress: false
+
+env:
+  GROUP_ID: com.whop.api
+  ARTIFACT_ID: whop-java
+  PLACEHOLDER_VERSION: 0.0.0
+  GROUP_PATH: com/whop/api
+  VERSION_FILE: gradle.properties
+  METADATA_FILE: .fern/metadata.json
+  RESOURCE_DIR: src/main/java/com/whop/api/resources
+  MIN_RESOURCE_MODULES: "60"
+  INIT_SCRIPT: .github/release.gradle
+  BUNDLE_DIR: build/bundle
+  JAVA_VERSION: "17"
+  CENTRAL_BASE: https://repo1.maven.org/maven2
+  PORTAL_BASE: https://central.sonatype.com/api/v1/publisher
+  PUBLISHING_TYPE: AUTOMATIC
+
+jobs:
+  decide:
+    if: github.event_name == 'pull_request' || github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+    outputs:
+      release: ${{ steps.gate.outputs.release }}
+      dry: ${{ steps.gate.outputs.dry }}
+      version: ${{ steps.gate.outputs.version }}
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
+        with:
+          fetch-depth: 2
+          persist-credentials: false
+
+      - name: Write the version-regression guard
+        run: |
+          set -euo pipefail
+          cat > "${RUNNER_TEMP}/version_guard.py" <<'PY'
+          import re
+          import sys
+
+
+          def parse(raw):
+              match = re.fullmatch(r"(\d+)\.(\d+)\.(\d+)(?:[-.]([0-9A-Za-z.-]+))?", raw)
+              if match is None:
+                  raise SystemExit("unparseable version: " + raw)
+              core = tuple(int(part) for part in match.group(1, 2, 3))
+              return core, match.group(4)
+
+
+          def rank(pre):
+              if pre is None:
+                  return (1,)
+              parts = []
+              for chunk in pre.split("."):
+                  if chunk.isdigit():
+                      parts.append((0, int(chunk), ""))
+                  else:
+                      parts.append((1, 0, chunk))
+              return (0, parts)
+
+
+          candidate_core, candidate_pre = parse(sys.argv[1])
+          latest_core, latest_pre = parse(sys.argv[2])
+
+          if (candidate_core, rank(candidate_pre)) < (latest_core, rank(latest_pre)):
+              raise SystemExit(sys.argv[1] + " is behind " + sys.argv[2])
+
+          print(sys.argv[1] + " is at or ahead of " + sys.argv[2])
+          PY
+
+      - name: Self-test the version-regression guard
+        run: |
+          set -euo pipefail
+          failures=0
+
+          check() {
+            if python3 "${RUNNER_TEMP}/version_guard.py" "$1" "$2" >/dev/null 2>&1; then
+              actual=allow
+            else
+              actual=block
+            fi
+
+            if [ "$actual" = "$3" ]; then
+              echo "ok: $1 vs $2 -> $actual"
+            else
+              echo "::error::version guard: $1 vs $2 expected $3, got $actual"
+              failures=$((failures + 1))
+            fi
+          }
+
+          check 1.0.0 1.0.0 allow
+          check 1.0.1 1.0.0 allow
+          check 1.0.0 1.0.1 block
+          check 0.0.10 0.0.9 allow
+          check 0.0.9 0.0.10 block
+          check 1.2.0 1.10.0 block
+          check 1.10.0 1.2.0 allow
+          check 2.0.0 1.99.99 allow
+          check 1.0.0-rc.1 0.9.9 allow
+          check 1.0.0-rc.1 1.0.0 block
+          check 1.0.0 1.0.0-rc.1 allow
+          check 1.0.0-rc.2 1.0.0-rc.1 allow
+          check 1.0.0-rc.1 1.0.0-rc.2 block
+
+          [ "$failures" -eq 0 ]
+
+      - name: Decide whether to release
+        id: gate
+        env:
+          EVENT: ${{ github.event_name }}
+          DRY_RUN: ${{ github.event.inputs.dry_run }}
+        run: |
+          set -euo pipefail
+
+          emit() { echo "$1=$2" >> "$GITHUB_OUTPUT"; }
+
+          if [ "$EVENT" = "pull_request" ] || [ "$DRY_RUN" = "true" ]; then
+            dry=true
+          else
+            dry=false
+          fi
+          emit dry "$dry"
+          echo "event=$EVENT dry=$dry ref=$GITHUB_REF"
+
+          refuse() {
+            if [ "$dry" = "true" ]; then
+              echo "::warning::[dry] a real release would stop here: $*"
+              return 0
+            fi
+            echo "::error::$*"
+            exit 1
+          }
+
+          if [ ! -f "$VERSION_FILE" ]; then
+            echo "::notice::${VERSION_FILE} does not exist — this is not a tree this workflow can release."
+            emit release false
+            emit version ""
+            exit 0
+          fi
+
+          version=$(sed -n 's/^[[:space:]]*version[[:space:]]*=[[:space:]]*//p' "$VERSION_FILE" | head -1 | tr -d '[:space:]')
+
+          if [ -z "$version" ]; then
+            echo "::error::${VERSION_FILE} has no version property."
+            exit 1
+          fi
+
+          echo "${VERSION_FILE} version: $version"
+          emit version "$version"
+
+          if ! printf '%s' "$version" | grep -Eq '^[0-9]+\.[0-9]+\.[0-9]+([.-][0-9A-Za-z.-]+)?$'; then
+            echo "::error::'$version' is not a version this workflow will publish."
+            exit 1
+          fi
+
+          if printf '%s' "$version" | grep -qiE 'SNAPSHOT'; then
+            echo "::error::'$version' is a snapshot; the Central Portal release path does not accept snapshots."
+            exit 1
+          fi
+
+          declared_group=$(sed -n 's/^[[:space:]]*group[[:space:]]*=[[:space:]]*//p' "$VERSION_FILE" | head -1 | tr -d '[:space:]')
+          if [ "$declared_group" != "$GROUP_ID" ]; then
+            echo "::error::${VERSION_FILE} declares group '${declared_group}' but this workflow publishes '${GROUP_ID}'."
+            exit 1
+          fi
+
+          if [ "$version" = "$PLACEHOLDER_VERSION" ]; then
+            if [ "$dry" = "true" ]; then
+              echo "::notice::[dry] ${PLACEHOLDER_VERSION} is the unreleased placeholder and a real release would stop here. Continuing so this run still exercises the build, the stamps, the bundle and the signing."
+            else
+              echo "::notice::${VERSION_FILE} is still at the ${PLACEHOLDER_VERSION} placeholder; there is nothing to release. The first release is a deliberate one-line pull request that sets a real version — Maven Central never lets it be replaced."
+              emit release false
+              exit 0
+            fi
+          fi
+
+          if [ "$EVENT" = "pull_request" ]; then
+            enforce_diff=false
+          else
+            enforce_diff=true
+          fi
+
+          if git rev-parse --verify --quiet HEAD^ >/dev/null; then
+            changed=$(git diff --name-only HEAD^ HEAD)
+            body=$(git diff -U0 HEAD^ HEAD -- "$VERSION_FILE" | grep -E '^[+-]' | grep -vE '^(\+\+\+|---)' || true)
+
+            if [ -z "$body" ]; then
+              other=0
+            else
+              other=$(printf '%s\n' "$body" | grep -cvE '^[+-][[:space:]]*version[[:space:]]*=' || true)
+            fi
+
+            if [ "$changed" = "$VERSION_FILE" ] && [ "$other" -eq 0 ]; then
+              echo "HEAD changes ${VERSION_FILE}'s version property and nothing else."
+            else
+              summary="a release must change ${VERSION_FILE} and nothing but its version property. Changed: $(printf '%s' "$changed" | tr '\n' ' ')"
+              if [ "$enforce_diff" = "true" ]; then
+                refuse "$summary"
+              else
+                echo "::notice::[$EVENT] this is not a release commit, so the diff is informational: ${summary}"
+              fi
+            fi
+          else
+            echo "::notice::no HEAD^ to diff against; the only-version-changed check has nothing to compare."
+          fi
+
+          metadata_url="${CENTRAL_BASE}/${GROUP_PATH}/${ARTIFACT_ID}/maven-metadata.xml"
+          metadata_status=$(curl -sS -o "${RUNNER_TEMP}/maven-metadata.xml" -w '%{http_code}' "$metadata_url" || echo 000)
+          echo "Maven Central returned HTTP ${metadata_status} for ${metadata_url}"
+
+          latest=""
+          case "$metadata_status" in
+            200)
+              latest=$(python3 -c 'import re,sys; text=open(sys.argv[1]).read(); m=re.search(r"<release>([^<]+)</release>", text) or re.search(r"<latest>([^<]+)</latest>", text); print(m.group(1) if m else "")' "${RUNNER_TEMP}/maven-metadata.xml")
+              if [ -z "$latest" ]; then
+                refuse "maven-metadata.xml for ${GROUP_ID}:${ARTIFACT_ID} carries neither <release> nor <latest>."
+              fi
+              ;;
+            404)
+              echo "::warning::${GROUP_ID}:${ARTIFACT_ID} has never been published. Releasing ${version} claims the coordinate permanently — Maven Central does not allow deleting or replacing a released version."
+              ;;
+            *)
+              refuse "Maven Central returned HTTP ${metadata_status} for maven-metadata.xml; refusing to guess the published version."
+              ;;
+          esac
+
+          if [ -n "$latest" ]; then
+            echo "Latest on Maven Central: $latest"
+            if guard=$(python3 "${RUNNER_TEMP}/version_guard.py" "$version" "$latest" 2>&1); then
+              echo "$guard"
+            else
+              refuse "${VERSION_FILE} is at ${version} but Maven Central already has ${latest}. This branch was generated before that release; rebase or regenerate it before merging. ($guard)"
+            fi
+          fi
+
+          pom_url="${CENTRAL_BASE}/${GROUP_PATH}/${ARTIFACT_ID}/${version}/${ARTIFACT_ID}-${version}.pom"
+          pom_status=$(curl -sS -o /dev/null -w '%{http_code}' -I "$pom_url" || echo 000)
+          echo "Maven Central returned HTTP ${pom_status} for ${pom_url}"
+
+          published=unknown
+          case "$pom_status" in
+            200) published=yes ;;
+            404) published=no ;;
+            *)
+              refuse "Maven Central returned HTTP ${pom_status} for ${ARTIFACT_ID} ${version}; refusing to guess whether it is published."
+              ;;
+          esac
+
+          if [ "$dry" = "true" ]; then
+            echo "Dry run: building, signing with a throwaway key and verifying the bundle. Nothing is uploaded."
+            emit release true
+            exit 0
+          fi
+
+          if [ "$published" = "yes" ]; then
+            echo "::notice::${GROUP_ID}:${ARTIFACT_ID}:${version} is already on Maven Central; nothing to publish."
+            emit release false
+            exit 0
+          fi
+
+          emit release true
+
+  build:
+    needs: decide
+    if: needs.decide.outputs.release == 'true'
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
+        with:
+          persist-credentials: false
+
+      - name: Refuse to build a tree Fern did not fill in
+        run: |
+          set -euo pipefail
+
+          for required in build.gradle settings.gradle "$INIT_SCRIPT" "$VERSION_FILE"; do
+            if [ ! -f "$required" ]; then
+              echo "::error::${required} is missing; this tree cannot produce a release bundle."
+              exit 1
+            fi
+          done
+
+          count=$(find "$RESOURCE_DIR" -mindepth 1 -maxdepth 1 -type d 2>/dev/null | wc -l)
+          echo "${RESOURCE_DIR}: ${count} resource packages"
+          if [ "$count" -lt "$MIN_RESOURCE_MODULES" ]; then
+            echo "::error::only ${count} resource packages, expected at least ${MIN_RESOURCE_MODULES}. Fern emits an empty SDK and exits 0 when it cannot parse the spec, and a Maven Central release cannot be recalled."
+            exit 1
+          fi
+
+      - uses: actions/setup-java@b6effb05e454b25005698d916606bdc6ffcbf961
+        with:
+          distribution: temurin
+          java-version: ${{ env.JAVA_VERSION }}
+
+      - uses: gradle/actions/setup-gradle@9c971963bec38e04b3d30dcc455b5382be2fdbfb
+        with:
+          validate-wrappers: true
+
+      - name: Sync the version stamps
+        env:
+          VERSION: ${{ needs.decide.outputs.version }}
+        run: |
+          set -euo pipefail
+          python3 - "$VERSION" <<'PY'
+          import json
+          import os
+          import pathlib
+          import re
+          import sys
+
+          version = sys.argv[1]
+
+          version_file = pathlib.Path(os.environ["VERSION_FILE"])
+          text = version_file.read_text()
+          text, count = re.subn(
+              r"(?m)^([ \t]*version[ \t]*=[ \t]*).*$", r"\g<1>" + version, text, count=1
+          )
+          if count == 0:
+              raise SystemExit("::error::no version property found in " + str(version_file))
+          version_file.write_text(text)
+          print("stamped " + str(version_file))
+
+          carriers = [
+              path
+              for path in pathlib.Path("src/main").rglob("*.java")
+              if "X-Fern-SDK-Version" in path.read_text()
+          ]
+
+          if not carriers:
+              raise SystemExit(
+                  "::error::nothing under src/main carries X-Fern-SDK-Version; the published jar would report the generator's constant"
+              )
+
+          for path in carriers:
+              source = path.read_text()
+              source, hits = re.subn(
+                  r'("X-Fern-SDK-Version"\s*,\s*")[^"]*', r"\g<1>" + version, source
+              )
+              if hits == 0:
+                  raise SystemExit(
+                      "::error::" + str(path) + " names X-Fern-SDK-Version but the rewrite matched nothing; the header shape changed"
+                  )
+              path.write_text(source)
+              print("stamped " + str(path))
+
+          metadata_path = pathlib.Path(os.environ["METADATA_FILE"])
+          if metadata_path.exists():
+              metadata = json.loads(metadata_path.read_text())
+              for key in ("requestedVersion", "sdkVersion"):
+                  if key in metadata:
+                      metadata[key] = version
+              metadata_path.write_text(json.dumps(metadata, indent=2) + "\n")
+              print("stamped " + str(metadata_path))
+          PY
+
+          stale=$(grep -rn 'X-Fern-SDK-Version' src/main | grep -E '[0-9]+\.[0-9]+\.[0-9]+' | grep -Fv "$VERSION" || true)
+          if [ -n "$stale" ]; then
+            echo "::error::the source tree still reports a version other than ${VERSION}:"
+            printf '%s\n' "$stale"
+            exit 1
+          fi
+
+      - name: Test
+        run: ./gradlew --no-daemon test
+
+      - name: Stage the Maven bundle
+        run: ./gradlew --no-daemon -I "$INIT_SCRIPT" publishMavenPublicationToBundleRepository
+
+      - name: Verify the staged bundle
+        env:
+          VERSION: ${{ needs.decide.outputs.version }}
+        run: |
+          set -euo pipefail
+
+          dir="${BUNDLE_DIR}/${GROUP_PATH}/${ARTIFACT_ID}/${VERSION}"
+          if [ ! -d "$dir" ]; then
+            echo "::error::${dir} does not exist; Gradle staged the wrong coordinate."
+            find "$BUNDLE_DIR" -maxdepth 6 -type d || true
+            exit 1
+          fi
+
+          find "$BUNDLE_DIR" -name 'maven-metadata.xml*' -delete
+
+          for suffix in ".jar" "-sources.jar" "-javadoc.jar" ".pom"; do
+            file="${dir}/${ARTIFACT_ID}-${VERSION}${suffix}"
+            if [ ! -s "$file" ]; then
+              echo "::error::${file} is missing or empty. Maven Central requires the main, sources and javadoc jars plus a POM."
+              ls -l "$dir" || true
+              exit 1
+            fi
+            echo "present: $(ls -l "$file")"
+          done
+
+          pom="${dir}/${ARTIFACT_ID}-${VERSION}.pom"
+          python3 - "$pom" "$GROUP_ID" "$ARTIFACT_ID" "$VERSION" <<'PY'
+          import sys
+          import xml.etree.ElementTree as ET
+
+          pom, group, artifact, version = sys.argv[1:5]
+          ns = {"m": "http://maven.apache.org/POM/4.0.0"}
+          root = ET.parse(pom).getroot()
+
+
+          def text(tag):
+              node = root.find("m:" + tag, ns)
+              return None if node is None else (node.text or "").strip()
+
+
+          problems = []
+          for tag, expected in (("groupId", group), ("artifactId", artifact), ("version", version)):
+              if text(tag) != expected:
+                  problems.append(tag + " is " + repr(text(tag)) + ", expected " + repr(expected))
+
+          for tag in ("name", "description", "url"):
+              if not text(tag):
+                  problems.append(tag + " is empty; Maven Central rejects the deployment")
+
+          for tag in ("licenses", "developers", "scm"):
+              if root.find("m:" + tag, ns) is None:
+                  problems.append(tag + " is absent; Maven Central rejects the deployment")
+
+          if problems:
+              raise SystemExit("::error::" + "; ".join(problems))
+
+          print("POM declares " + group + ":" + artifact + ":" + version + " with the metadata Central requires")
+          PY
+
+          unzip -p "${dir}/${ARTIFACT_ID}-${VERSION}-sources.jar" com/whop/api/core/ClientOptions.java > "${RUNNER_TEMP}/ClientOptions.java"
+          if ! grep -q "\"X-Fern-SDK-Version\", \"${VERSION}\"" "${RUNNER_TEMP}/ClientOptions.java"; then
+            echo "::error::the sources jar does not report ${VERSION} on the wire."
+            grep -n 'X-Fern-SDK-Version' "${RUNNER_TEMP}/ClientOptions.java" || true
+            exit 1
+          fi
+
+          rm -rf "${RUNNER_TEMP}/jar"
+          mkdir -p "${RUNNER_TEMP}/jar"
+          unzip -q "${dir}/${ARTIFACT_ID}-${VERSION}.jar" -d "${RUNNER_TEMP}/jar"
+
+          carriers=$(grep -rlaF 'X-Fern-SDK-Version' "${RUNNER_TEMP}/jar" || true)
+          if [ -z "$carriers" ]; then
+            echo "::error::no class in the main jar names X-Fern-SDK-Version. The header moved, and the stamp step is no longer stamping what ships."
+            exit 1
+          fi
+
+          echo "compiled carriers of X-Fern-SDK-Version:"
+          printf '%s\n' "$carriers"
+
+          while IFS= read -r carrier; do
+            if ! grep -qaF "$VERSION" "$carrier"; then
+              echo "::error::${carrier} names X-Fern-SDK-Version but does not carry ${VERSION}; the published jar would report a different version on the wire."
+              exit 1
+            fi
+          done <<< "$carriers"
+
+          echo "bundle verified:"
+          find "$BUNDLE_DIR" -type f | sort
+
+      - uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a
+        with:
+          name: bundle
+          path: ${{ env.BUNDLE_DIR }}/
+          if-no-files-found: error
+          retention-days: 7
+
+  publish:
+    needs: [decide, build]
+    if: needs.decide.outputs.release == 'true'
+    runs-on: ubuntu-latest
+    environment: ${{ needs.decide.outputs.dry == 'true' && 'dry-run' || 'maven-central' }}
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c
+        with:
+          name: bundle
+          path: bundle/
+
+      - name: Refuse a dry run that can see the release credentials
+        env:
+          DRY: ${{ needs.decide.outputs.dry }}
+          HAS_PORTAL_USERNAME: ${{ secrets.MAVEN_CENTRAL_USERNAME != '' }}
+          HAS_PORTAL_PASSWORD: ${{ secrets.MAVEN_CENTRAL_PASSWORD != '' }}
+          HAS_SIGNING_KEY: ${{ secrets.MAVEN_SIGNING_KEY != '' }}
+        run: |
+          set -euo pipefail
+
+          echo "dry=${DRY} portal_username=${HAS_PORTAL_USERNAME} portal_password=${HAS_PORTAL_PASSWORD} signing_key=${HAS_SIGNING_KEY}"
+
+          if [ "$DRY" = "true" ]; then
+            if [ "$HAS_PORTAL_USERNAME" = "true" ] || [ "$HAS_PORTAL_PASSWORD" = "true" ] || [ "$HAS_SIGNING_KEY" = "true" ]; then
+              echo "::error::a dry run can read the release credentials. They must exist only as environment secrets on the maven-central environment, never as repository or organization secrets — repository secrets are handed to same-repo pull request runs, so anyone who can open a pull request could exfiltrate them."
+              exit 1
+            fi
+            echo "no release credential is reachable from this dry run."
+            exit 0
+          fi
+
+          missing=""
+          [ "$HAS_PORTAL_USERNAME" = "true" ] || missing="${missing} MAVEN_CENTRAL_USERNAME"
+          [ "$HAS_PORTAL_PASSWORD" = "true" ] || missing="${missing} MAVEN_CENTRAL_PASSWORD"
+          [ "$HAS_SIGNING_KEY" = "true" ] || missing="${missing} MAVEN_SIGNING_KEY"
+
+          if [ -n "$missing" ]; then
+            echo "::error::the maven-central environment is missing:${missing}"
+            exit 1
+          fi
+
+          echo "every release credential is present."
+
+      - name: Match the artifact against the checksums the build job staged
+        run: |
+          set -euo pipefail
+
+          checked=0
+          while IFS= read -r checksum; do
+            artifact="${checksum%.sha1}"
+            if [ ! -f "$artifact" ]; then
+              echo "::error::${checksum} has no ${artifact} beside it."
+              exit 1
+            fi
+            expected=$(tr -d '[:space:]' < "$checksum")
+            actual=$(sha1sum "$artifact" | cut -d' ' -f1)
+            if [ "$expected" != "$actual" ]; then
+              echo "::error::${artifact} is sha1:${actual} but the build job staged sha1:${expected}. Refusing to sign bytes the build job never verified."
+              exit 1
+            fi
+            checked=$((checked + 1))
+          done < <(find bundle -name '*.sha1')
+
+          if [ "$checked" -eq 0 ]; then
+            echo "::error::the downloaded bundle carries no checksums."
+            exit 1
+          fi
+          echo "${checked} artifacts match the checksums the build job staged"
+
+      - name: Sign the bundle
+        env:
+          DRY: ${{ needs.decide.outputs.dry }}
+          VERSION: ${{ needs.decide.outputs.version }}
+          SIGNING_KEY: ${{ secrets.MAVEN_SIGNING_KEY }}
+          SIGNING_PASSPHRASE: ${{ secrets.MAVEN_SIGNING_PASSPHRASE }}
+        run: |
+          set -euo pipefail
+
+          GNUPGHOME=$(mktemp -d)
+          chmod 700 "$GNUPGHOME"
+          export GNUPGHOME
+
+          if [ "$DRY" = "true" ]; then
+            echo "::warning::signing with a throwaway key generated in this runner. A real release signs with Whop's Maven Central key, and that substitution is the one thing this rehearsal cannot cover."
+            gpg --batch --pinentry-mode loopback --passphrase "" \
+              --quick-generate-key "Whop Dry Run <dry-run@invalid>" rsa3072 sign 0
+            SIGNING_PASSPHRASE=""
+          else
+            printf '%s\n' "$SIGNING_KEY" | gpg --batch --import
+          fi
+
+          fingerprint=$(gpg --list-secret-keys --with-colons | awk -F: '/^fpr:/ {print $10; exit}')
+          if [ -z "$fingerprint" ]; then
+            echo "::error::no secret key is available to sign with."
+            exit 1
+          fi
+          echo "signing with ${fingerprint}"
+
+          signed=0
+          while IFS= read -r file; do
+            gpg --batch --yes --pinentry-mode loopback --passphrase "$SIGNING_PASSPHRASE" \
+              --local-user "$fingerprint" --armor --detach-sign --output "${file}.asc" "$file"
+            signed=$((signed + 1))
+          done < <(find bundle -type f ! -name '*.asc' ! -name '*.md5' ! -name '*.sha1' ! -name '*.sha256' ! -name '*.sha512')
+
+          if [ "$signed" -eq 0 ]; then
+            echo "::error::there was nothing in the bundle to sign."
+            exit 1
+          fi
+          echo "signed ${signed} artifacts"
+
+          while IFS= read -r signature; do
+            if ! gpg --batch --verify "$signature" "${signature%.asc}" >/dev/null 2>&1; then
+              echo "::error::${signature} does not verify against ${signature%.asc}"
+              exit 1
+            fi
+          done < <(find bundle -name '*.asc')
+          echo "every signature verifies"
+
+          for suffix in ".jar" "-sources.jar" "-javadoc.jar" ".pom"; do
+            required="bundle/${GROUP_PATH}/${ARTIFACT_ID}/${VERSION}/${ARTIFACT_ID}-${VERSION}${suffix}.asc"
+            if [ ! -s "$required" ]; then
+              echo "::error::${required} is missing. Maven Central rejects a deployment whose main, sources or javadoc jar or POM is unsigned."
+              exit 1
+            fi
+          done
+
+          (cd bundle && zip -qr "${RUNNER_TEMP}/central-bundle.zip" .)
+          echo "bundle: $(ls -l "${RUNNER_TEMP}/central-bundle.zip")"
+          unzip -Z1 "${RUNNER_TEMP}/central-bundle.zip" | sort
+
+      - name: Upload the bundle to the Sonatype Central Portal
+        if: needs.decide.outputs.dry == 'false'
+        env:
+          VERSION: ${{ needs.decide.outputs.version }}
+          PORTAL_USERNAME: ${{ secrets.MAVEN_CENTRAL_USERNAME }}
+          PORTAL_PASSWORD: ${{ secrets.MAVEN_CENTRAL_PASSWORD }}
+        run: |
+          set -euo pipefail
+
+          auth=$(printf '%s:%s' "$PORTAL_USERNAME" "$PORTAL_PASSWORD" | base64 -w0)
+
+          status=$(curl -sS -o "${RUNNER_TEMP}/upload.txt" -w '%{http_code}' \
+            --request POST \
+            --header "Authorization: Bearer ${auth}" \
+            --form "bundle=@${RUNNER_TEMP}/central-bundle.zip" \
+            "${PORTAL_BASE}/upload?name=${ARTIFACT_ID}-${VERSION}&publishingType=${PUBLISHING_TYPE}" || echo 000)
+
+          if [ "$status" != "201" ]; then
+            echo "::error::the Central Portal returned HTTP ${status} for the upload."
+            cat "${RUNNER_TEMP}/upload.txt" || true
+            exit 1
+          fi
+
+          deployment=$(tr -d '[:space:]' < "${RUNNER_TEMP}/upload.txt")
+          echo "deployment=${deployment}"
+          echo "DEPLOYMENT_ID=${deployment}" >> "$GITHUB_ENV"
+
+          terminal=""
+          for attempt in $(seq 1 120); do
+            code=$(curl -sS -o "${RUNNER_TEMP}/status.json" -w '%{http_code}' \
+              --request POST \
+              --header "Authorization: Bearer ${auth}" \
+              "${PORTAL_BASE}/status?id=${deployment}" || echo 000)
+
+            if [ "$code" != "200" ]; then
+              echo "::warning::status poll ${attempt} returned HTTP ${code}"
+              sleep 15
+              continue
+            fi
+
+            state=$(python3 -c 'import json,sys; print(json.load(open(sys.argv[1])).get("deploymentState",""))' "${RUNNER_TEMP}/status.json")
+            echo "poll ${attempt}: ${state}"
+
+            case "$state" in
+              PUBLISHED)
+                terminal=PUBLISHED
+                break
+                ;;
+              FAILED)
+                terminal=FAILED
+                break
+                ;;
+              VALIDATED)
+                if [ "$PUBLISHING_TYPE" = "USER_MANAGED" ]; then
+                  terminal=VALIDATED
+                  break
+                fi
+                ;;
+            esac
+
+            sleep 15
+          done
+
+          cat "${RUNNER_TEMP}/status.json" || true
+
+          case "$terminal" in
+            PUBLISHED)
+              echo "::notice::${GROUP_ID}:${ARTIFACT_ID}:${VERSION} is published."
+              ;;
+            VALIDATED)
+              echo "::notice::deployment ${deployment} validated and is waiting for a human to release it at https://central.sonatype.com/publishing/deployments"
+              ;;
+            FAILED)
+              echo "::error::deployment ${deployment} failed validation. Dropping it so the version can be retried."
+              curl -sS -o /dev/null -w 'drop http=%{http_code}\n' \
+                --request DELETE \
+                --header "Authorization: Bearer ${auth}" \
+                "${PORTAL_BASE}/deployment/${deployment}" || true
+              exit 1
+              ;;
+            *)
+              echo "::error::deployment ${deployment} did not reach a terminal state. It is left in place — resolve it at https://central.sonatype.com/publishing/deployments before re-running, because a second upload of the same version will not supersede it."
+              exit 1
+              ;;
+          esac
+
+  tag:
+    needs: [decide, build, publish]
+    if: always() && needs.decide.outputs.dry == 'false' && needs.decide.outputs.version != ''
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
+
+      - name: Tag the published version
+        env:
+          VERSION: ${{ needs.decide.outputs.version }}
+        run: |
+          set -euo pipefail
+
+          pom_url="${CENTRAL_BASE}/${GROUP_PATH}/${ARTIFACT_ID}/${VERSION}/${ARTIFACT_ID}-${VERSION}.pom"
+
+          found=no
+          for attempt in $(seq 1 20); do
+            status=$(curl -sS -o /dev/null -w '%{http_code}' -I "$pom_url" || echo 000)
+            echo "attempt ${attempt}: HTTP ${status} for ${pom_url}"
+            if [ "$status" = "200" ]; then
+              found=yes
+              break
+            fi
+            sleep 30
+          done
+
+          if [ "$found" != "yes" ]; then
+            echo "::notice::${GROUP_ID}:${ARTIFACT_ID}:${VERSION} has not appeared on Maven Central yet; nothing to tag. Re-run this workflow once it has — this job is idempotent."
+            exit 0
+          fi
+
+          if git ls-remote --exit-code --tags origin "refs/tags/v${VERSION}" >/dev/null 2>&1; then
+            echo "v${VERSION} is already tagged."
+            exit 0
+          fi
+
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git tag -a "v${VERSION}" -m "${ARTIFACT_ID} ${VERSION}"
+
+          git push origin "refs/tags/v${VERSION}" || \
+            git ls-remote --exit-code --tags origin "refs/tags/v${VERSION}" >/dev/null
