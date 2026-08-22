@@ -1,0 +1,16 @@
+{
+  "cliVersion": "5.90.1",
+  "generatorName": "fernapi/fern-java-sdk",
+  "generatorVersion": "4.9.1",
+  "generatorConfig": {
+    "package-prefix": "com.whop.api",
+    "group": "com.whop.api",
+    "artifact": "whop-java"
+  },
+  "originGitCommit": "a26a97d2d8ee29f78819a299712fb3b4086d634e",
+  "originGitCommitIsDirty": false,
+  "invokedBy": "ci",
+  "requestedVersion": "1.0.11",
+  "ciProvider": "unknown",
+  "sdkVersion": "1.0.11"
+}
