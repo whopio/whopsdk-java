@@ -11,6 +11,15 @@ on:
         description: "Build, sign with a throwaway key and verify the bundle without uploading"
         type: boolean
         default: true
+      target:
+        description: "Which registry to release to"
+        type: choice
+        default: default
+        options:
+          - default
+          - github-packages
+          - maven-central
+          - both
 
 permissions:
   contents: read
@@ -20,12 +29,14 @@ concurrency:
   cancel-in-progress: false
 
 env:
+  RELEASE_TARGET: github-packages
   GROUP_ID: com.whop.api
   ARTIFACT_ID: whop-java
   PLACEHOLDER_VERSION: 0.0.0
   GROUP_PATH: com/whop/api
   VERSION_FILE: gradle.properties
   METADATA_FILE: .fern/metadata.json
+  STAMP_SCRIPT: .github/stamp-version.py
   RESOURCE_DIR: src/main/java/com/whop/api/resources
   MIN_RESOURCE_MODULES: "60"
   INIT_SCRIPT: .github/release.gradle
@@ -34,15 +45,23 @@ env:
   CENTRAL_BASE: https://repo1.maven.org/maven2
   PORTAL_BASE: https://central.sonatype.com/api/v1/publisher
   PUBLISHING_TYPE: AUTOMATIC
+  PACKAGES_API: https://api.github.com/orgs/whopio/packages/maven
+  PACKAGES_BASE: https://maven.pkg.github.com/whopio/whopsdk-java
 
 jobs:
   decide:
     if: github.event_name == 'pull_request' || github.ref == 'refs/heads/main'
     runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      packages: read
     outputs:
       release: ${{ steps.gate.outputs.release }}
       dry: ${{ steps.gate.outputs.dry }}
       version: ${{ steps.gate.outputs.version }}
+      target: ${{ steps.gate.outputs.target }}
+      central: ${{ steps.gate.outputs.central }}
+      packages: ${{ steps.gate.outputs.packages }}
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
         with:
@@ -127,6 +146,8 @@ jobs:
         env:
           EVENT: ${{ github.event_name }}
           DRY_RUN: ${{ github.event.inputs.dry_run }}
+          TARGET_INPUT: ${{ github.event.inputs.target }}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
           set -euo pipefail
 
@@ -138,7 +159,27 @@ jobs:
             dry=false
           fi
           emit dry "$dry"
-          echo "event=$EVENT dry=$dry ref=$GITHUB_REF"
+
+          if [ "$EVENT" = "pull_request" ]; then
+            target=both
+          elif [ -n "${TARGET_INPUT:-}" ] && [ "$TARGET_INPUT" != "default" ]; then
+            target="$TARGET_INPUT"
+          else
+            target="$RELEASE_TARGET"
+          fi
+
+          case "$target" in
+            github-packages) want_central=false; want_packages=true ;;
+            maven-central) want_central=true; want_packages=false ;;
+            both) want_central=true; want_packages=true ;;
+            *)
+              echo "::error::'${target}' is not a release target. Use github-packages, maven-central or both."
+              exit 1
+              ;;
+          esac
+
+          emit target "$target"
+          echo "event=$EVENT dry=$dry target=$target ref=$GITHUB_REF"
 
           refuse() {
             if [ "$dry" = "true" ]; then
@@ -222,56 +263,149 @@ jobs:
             echo "::notice::no HEAD^ to diff against; the only-version-changed check has nothing to compare."
           fi
 
-          metadata_url="${CENTRAL_BASE}/${GROUP_PATH}/${ARTIFACT_ID}/maven-metadata.xml"
-          metadata_status=$(curl -sS -o "${RUNNER_TEMP}/maven-metadata.xml" -w '%{http_code}' "$metadata_url" || echo 000)
-          echo "Maven Central returned HTTP ${metadata_status} for ${metadata_url}"
-
-          latest=""
-          case "$metadata_status" in
-            200)
-              latest=$(python3 -c 'import re,sys; text=open(sys.argv[1]).read(); m=re.search(r"<release>([^<]+)</release>", text) or re.search(r"<latest>([^<]+)</latest>", text); print(m.group(1) if m else "")' "${RUNNER_TEMP}/maven-metadata.xml")
-              if [ -z "$latest" ]; then
-                refuse "maven-metadata.xml for ${GROUP_ID}:${ARTIFACT_ID} carries neither <release> nor <latest>."
-              fi
-              ;;
-            404)
-              echo "::warning::${GROUP_ID}:${ARTIFACT_ID} has never been published. Releasing ${version} claims the coordinate permanently — Maven Central does not allow deleting or replacing a released version."
-              ;;
-            *)
-              refuse "Maven Central returned HTTP ${metadata_status} for maven-metadata.xml; refusing to guess the published version."
-              ;;
-          esac
-
-          if [ -n "$latest" ]; then
-            echo "Latest on Maven Central: $latest"
-            if guard=$(python3 "${RUNNER_TEMP}/version_guard.py" "$version" "$latest" 2>&1); then
+          guard_against() {
+            if guard=$(python3 "${RUNNER_TEMP}/version_guard.py" "$version" "$2" 2>&1); then
               echo "$guard"
             else
-              refuse "${VERSION_FILE} is at ${version} but Maven Central already has ${latest}. This branch was generated before that release; rebase or regenerate it before merging. ($guard)"
+              refuse "${VERSION_FILE} is at ${version} but $1 already has $2. This branch was generated before that release; rebase or regenerate it before merging. ($guard)"
             fi
+          }
+
+          central_published=unknown
+          if [ "$want_central" = "true" ]; then
+            metadata_url="${CENTRAL_BASE}/${GROUP_PATH}/${ARTIFACT_ID}/maven-metadata.xml"
+            metadata_status=$(curl -sS -o "${RUNNER_TEMP}/maven-metadata.xml" -w '%{http_code}' "$metadata_url" || echo 000)
+            echo "Maven Central returned HTTP ${metadata_status} for ${metadata_url}"
+
+            latest=""
+            case "$metadata_status" in
+              200)
+                latest=$(python3 -c 'import re,sys; text=open(sys.argv[1]).read(); m=re.search(r"<release>([^<]+)</release>", text) or re.search(r"<latest>([^<]+)</latest>", text); print(m.group(1) if m else "")' "${RUNNER_TEMP}/maven-metadata.xml")
+                if [ -z "$latest" ]; then
+                  refuse "maven-metadata.xml for ${GROUP_ID}:${ARTIFACT_ID} carries neither <release> nor <latest>."
+                fi
+                ;;
+              404)
+                echo "::warning::${GROUP_ID}:${ARTIFACT_ID} has never been published to Maven Central. Releasing ${version} claims the coordinate permanently — Maven Central does not allow deleting or replacing a released version."
+                ;;
+              *)
+                refuse "Maven Central returned HTTP ${metadata_status} for maven-metadata.xml; refusing to guess the published version."
+                ;;
+            esac
+
+            if [ -n "$latest" ]; then
+              echo "Latest on Maven Central: $latest"
+              guard_against "Maven Central" "$latest"
+            fi
+
+            pom_url="${CENTRAL_BASE}/${GROUP_PATH}/${ARTIFACT_ID}/${version}/${ARTIFACT_ID}-${version}.pom"
+            pom_status=$(curl -sS -o /dev/null -w '%{http_code}' -I "$pom_url" || echo 000)
+            echo "Maven Central returned HTTP ${pom_status} for ${pom_url}"
+
+            case "$pom_status" in
+              200) central_published=yes ;;
+              404) central_published=no ;;
+              *)
+                refuse "Maven Central returned HTTP ${pom_status} for ${ARTIFACT_ID} ${version}; refusing to guess whether it is published."
+                ;;
+            esac
           fi
 
-          pom_url="${CENTRAL_BASE}/${GROUP_PATH}/${ARTIFACT_ID}/${version}/${ARTIFACT_ID}-${version}.pom"
-          pom_status=$(curl -sS -o /dev/null -w '%{http_code}' -I "$pom_url" || echo 000)
-          echo "Maven Central returned HTTP ${pom_status} for ${pom_url}"
+          packages_published=unknown
+          if [ "$want_packages" = "true" ]; then
+            : > "${RUNNER_TEMP}/package_versions.txt"
+            page=1
+            package_status=200
 
-          published=unknown
-          case "$pom_status" in
-            200) published=yes ;;
-            404) published=no ;;
-            *)
-              refuse "Maven Central returned HTTP ${pom_status} for ${ARTIFACT_ID} ${version}; refusing to guess whether it is published."
-              ;;
-          esac
+            while :; do
+              versions_url="${PACKAGES_API}/${GROUP_ID}.${ARTIFACT_ID}/versions?per_page=100&page=${page}"
+              package_status=$(curl -sS -o "${RUNNER_TEMP}/versions.json" -w '%{http_code}' \
+                --header "Accept: application/vnd.github+json" \
+                --header "X-GitHub-Api-Version: 2022-11-28" \
+                --header "Authorization: Bearer ${GITHUB_TOKEN}" \
+                "$versions_url" || echo 000)
+              echo "GitHub Packages returned HTTP ${package_status} for ${versions_url}"
+
+              if [ "$package_status" != "200" ]; then
+                break
+              fi
+
+              count=$(python3 - "${RUNNER_TEMP}/versions.json" "${RUNNER_TEMP}/package_versions.txt" <<'PY'
+          import json
+          import sys
+
+          page = json.load(open(sys.argv[1]))
+          with open(sys.argv[2], "a") as sink:
+              for item in page:
+                  sink.write(item["name"] + "\n")
+          print(len(page))
+          PY
+              )
+
+              if [ "$count" -lt 100 ]; then
+                break
+              fi
+              page=$((page + 1))
+            done
+
+            case "$package_status" in
+              200)
+                published_versions=$(sort -u "${RUNNER_TEMP}/package_versions.txt")
+                echo "Published on GitHub Packages:"
+                printf '%s\n' "$published_versions"
+
+                if printf '%s\n' "$published_versions" | grep -Fxq "$version"; then
+                  packages_published=yes
+                else
+                  packages_published=no
+                fi
+
+                while IFS= read -r published_version; do
+                  [ -n "$published_version" ] || continue
+                  guard_against "GitHub Packages" "$published_version"
+                done <<< "$published_versions"
+                ;;
+              404)
+                packages_published=no
+                echo "::warning::${GROUP_ID}:${ARTIFACT_ID} has never been published to GitHub Packages. A 404 here is the registry saying the package does not exist — an unauthorized read answers 403 with a scope message, and this step refuses on anything that is not 200 or 404."
+                ;;
+              *)
+                refuse "the GitHub Packages API returned HTTP ${package_status} for ${GROUP_ID}.${ARTIFACT_ID}; refusing to guess whether ${version} is published."
+                ;;
+            esac
+          fi
 
           if [ "$dry" = "true" ]; then
-            echo "Dry run: building, signing with a throwaway key and verifying the bundle. Nothing is uploaded."
+            echo "Dry run: building, staging and verifying the bundle for ${target}. Nothing is uploaded."
             emit release true
+            emit central "$want_central"
+            emit packages "$want_packages"
             exit 0
           fi
 
-          if [ "$published" = "yes" ]; then
-            echo "::notice::${GROUP_ID}:${ARTIFACT_ID}:${version} is already on Maven Central; nothing to publish."
+          release_central=false
+          release_packages=false
+
+          if [ "$want_central" = "true" ]; then
+            if [ "$central_published" = "yes" ]; then
+              echo "::notice::${GROUP_ID}:${ARTIFACT_ID}:${version} is already on Maven Central; nothing to publish there."
+            else
+              release_central=true
+            fi
+          fi
+
+          if [ "$want_packages" = "true" ]; then
+            if [ "$packages_published" = "yes" ]; then
+              echo "::notice::${GROUP_ID}:${ARTIFACT_ID}:${version} is already on GitHub Packages; nothing to publish there."
+            else
+              release_packages=true
+            fi
+          fi
+
+          emit central "$release_central"
+          emit packages "$release_packages"
+
+          if [ "$release_central" = "false" ] && [ "$release_packages" = "false" ]; then
             emit release false
             exit 0
           fi
@@ -293,7 +427,7 @@ jobs:
         run: |
           set -euo pipefail
 
-          for required in build.gradle settings.gradle "$INIT_SCRIPT" "$VERSION_FILE"; do
+          for required in build.gradle settings.gradle "$INIT_SCRIPT" "$STAMP_SCRIPT" "$VERSION_FILE"; do
             if [ ! -f "$required" ]; then
               echo "::error::${required} is missing; this tree cannot produce a release bundle."
               exit 1
@@ -319,66 +453,7 @@ jobs:
       - name: Sync the version stamps
         env:
           VERSION: ${{ needs.decide.outputs.version }}
-        run: |
-          set -euo pipefail
-          python3 - "$VERSION" <<'PY'
-          import json
-          import os
-          import pathlib
-          import re
-          import sys
-
-          version = sys.argv[1]
-
-          version_file = pathlib.Path(os.environ["VERSION_FILE"])
-          text = version_file.read_text()
-          text, count = re.subn(
-              r"(?m)^([ \t]*version[ \t]*=[ \t]*).*$", r"\g<1>" + version, text, count=1
-          )
-          if count == 0:
-              raise SystemExit("::error::no version property found in " + str(version_file))
-          version_file.write_text(text)
-          print("stamped " + str(version_file))
-
-          carriers = [
-              path
-              for path in pathlib.Path("src/main").rglob("*.java")
-              if "X-Fern-SDK-Version" in path.read_text()
-          ]
-
-          if not carriers:
-              raise SystemExit(
-                  "::error::nothing under src/main carries X-Fern-SDK-Version; the published jar would report the generator's constant"
-              )
-
-          for path in carriers:
-              source = path.read_text()
-              source, hits = re.subn(
-                  r'("X-Fern-SDK-Version"\s*,\s*")[^"]*', r"\g<1>" + version, source
-              )
-              if hits == 0:
-                  raise SystemExit(
-                      "::error::" + str(path) + " names X-Fern-SDK-Version but the rewrite matched nothing; the header shape changed"
-                  )
-              path.write_text(source)
-              print("stamped " + str(path))
-
-          metadata_path = pathlib.Path(os.environ["METADATA_FILE"])
-          if metadata_path.exists():
-              metadata = json.loads(metadata_path.read_text())
-              for key in ("requestedVersion", "sdkVersion"):
-                  if key in metadata:
-                      metadata[key] = version
-              metadata_path.write_text(json.dumps(metadata, indent=2) + "\n")
-              print("stamped " + str(metadata_path))
-          PY
-
-          stale=$(grep -rn 'X-Fern-SDK-Version' src/main | grep -E '[0-9]+\.[0-9]+\.[0-9]+' | grep -Fv "$VERSION" || true)
-          if [ -n "$stale" ]; then
-            echo "::error::the source tree still reports a version other than ${VERSION}:"
-            printf '%s\n' "$stale"
-            exit 1
-          fi
+        run: python3 "$STAMP_SCRIPT" "$VERSION" "$VERSION_FILE" "$METADATA_FILE"
 
       - name: Test
         run: ./gradlew --no-daemon test
@@ -412,18 +487,19 @@ jobs:
           done
 
           pom="${dir}/${ARTIFACT_ID}-${VERSION}.pom"
-          python3 - "$pom" "$GROUP_ID" "$ARTIFACT_ID" "$VERSION" <<'PY'
+          python3 - "$pom" "$GROUP_ID" "$ARTIFACT_ID" "$VERSION" build.gradle <<'PY'
+          import re
           import sys
           import xml.etree.ElementTree as ET
 
-          pom, group, artifact, version = sys.argv[1:5]
+          pom, group, artifact, version, build_file = sys.argv[1:6]
           ns = {"m": "http://maven.apache.org/POM/4.0.0"}
           root = ET.parse(pom).getroot()
 
 
-          def text(tag):
-              node = root.find("m:" + tag, ns)
-              return None if node is None else (node.text or "").strip()
+          def text(tag, node=root):
+              found = node.find("m:" + tag, ns)
+              return None if found is None else (found.text or "").strip()
 
 
           problems = []
@@ -439,10 +515,53 @@ jobs:
               if root.find("m:" + tag, ns) is None:
                   problems.append(tag + " is absent; Maven Central rejects the deployment")
 
+          declared = {}
+          for node in root.findall("m:dependencies/m:dependency", ns):
+              key = text("groupId", node) + ":" + text("artifactId", node)
+              declared[key] = (text("version", node), text("scope", node))
+
+          print("POM dependencies:")
+          for key in sorted(declared):
+              print("  " + key + ":" + str(declared[key][0]) + " (" + str(declared[key][1]) + ")")
+
+          expected_api = re.findall(
+              r"""(?m)^\s*api\s+['"]([^'":]+):([^'":]+):([^'"]+)['"]""",
+              open(build_file).read(),
+          )
+          if not expected_api:
+              problems.append(build_file + " declares no api dependencies; the parser no longer matches")
+
+          for dep_group, dep_artifact, dep_version in expected_api:
+              key = dep_group + ":" + dep_artifact
+              if key not in declared:
+                  problems.append(
+                      key
+                      + " is an api dependency in "
+                      + build_file
+                      + " but is absent from the POM; consumers would not resolve it"
+                  )
+                  continue
+              found_version, scope = declared[key]
+              if found_version != dep_version:
+                  problems.append(key + " is " + str(found_version) + " in the POM, " + dep_version + " in " + build_file)
+              if scope != "compile":
+                  problems.append(
+                      key
+                      + " is scope "
+                      + str(scope)
+                      + " in the POM; an api dependency has to reach the consumer's compile classpath"
+                  )
+
           if problems:
               raise SystemExit("::error::" + "; ".join(problems))
 
-          print("POM declares " + group + ":" + artifact + ":" + version + " with the metadata Central requires")
+          print(
+              "POM declares "
+              + group + ":" + artifact + ":" + version
+              + " with the metadata Central requires and all "
+              + str(len(expected_api))
+              + " api dependencies at compile scope"
+          )
           PY
 
           unzip -p "${dir}/${ARTIFACT_ID}-${VERSION}-sources.jar" com/whop/api/core/ClientOptions.java > "${RUNNER_TEMP}/ClientOptions.java"
@@ -484,7 +603,7 @@ jobs:
 
   publish:
     needs: [decide, build]
-    if: needs.decide.outputs.release == 'true'
+    if: needs.decide.outputs.central == 'true'
     runs-on: ubuntu-latest
     environment: ${{ needs.decide.outputs.dry == 'true' && 'dry-run' || 'maven-central' }}
     permissions:
@@ -701,28 +820,174 @@ jobs:
               ;;
           esac
 
+  publish-github-packages:
+    needs: [decide, build]
+    if: needs.decide.outputs.packages == 'true'
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      packages: write
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
+        with:
+          persist-credentials: false
+
+      - uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c
+        with:
+          name: bundle
+          path: bundle/
+
+      - name: Refuse a run that can see the Maven Central credentials
+        env:
+          HAS_PORTAL_USERNAME: ${{ secrets.MAVEN_CENTRAL_USERNAME != '' }}
+          HAS_PORTAL_PASSWORD: ${{ secrets.MAVEN_CENTRAL_PASSWORD != '' }}
+          HAS_SIGNING_KEY: ${{ secrets.MAVEN_SIGNING_KEY != '' }}
+        run: |
+          set -euo pipefail
+
+          echo "portal_username=${HAS_PORTAL_USERNAME} portal_password=${HAS_PORTAL_PASSWORD} signing_key=${HAS_SIGNING_KEY}"
+
+          if [ "$HAS_PORTAL_USERNAME" = "true" ] || [ "$HAS_PORTAL_PASSWORD" = "true" ] || [ "$HAS_SIGNING_KEY" = "true" ]; then
+            echo "::error::this job can read the Maven Central release credentials. They belong to the maven-central environment and nothing else — this job joins no environment, so seeing them means they were created as repository or organization secrets, which GitHub hands to same-repo pull request runs."
+            exit 1
+          fi
+
+          echo "no Maven Central credential is reachable from this job."
+
+      - name: Report the coordinate and the artifact set the build job verified
+        env:
+          VERSION: ${{ needs.decide.outputs.version }}
+        run: |
+          set -euo pipefail
+
+          dir="bundle/${GROUP_PATH}/${ARTIFACT_ID}/${VERSION}"
+          echo "coordinate: ${GROUP_ID}:${ARTIFACT_ID}:${VERSION}"
+          echo "repository: ${PACKAGES_BASE}"
+          echo "artifacts:"
+          find "$dir" -type f ! -name '*.md5' ! -name '*.sha1' ! -name '*.sha256' ! -name '*.sha512' | sort
+          echo "POM:"
+          cat "${dir}/${ARTIFACT_ID}-${VERSION}.pom"
+
+      - uses: actions/setup-java@b6effb05e454b25005698d916606bdc6ffcbf961
+        with:
+          distribution: temurin
+          java-version: ${{ env.JAVA_VERSION }}
+
+      - uses: gradle/actions/setup-gradle@9c971963bec38e04b3d30dcc455b5382be2fdbfb
+        with:
+          validate-wrappers: true
+
+      - name: Sync the version stamps
+        env:
+          VERSION: ${{ needs.decide.outputs.version }}
+        run: python3 "$STAMP_SCRIPT" "$VERSION" "$VERSION_FILE" "$METADATA_FILE"
+
+      - name: Match the POM against the one the build job verified
+        env:
+          VERSION: ${{ needs.decide.outputs.version }}
+        run: |
+          set -euo pipefail
+
+          ./gradlew --no-daemon -I "$INIT_SCRIPT" generatePomFileForMavenPublication
+
+          staged="bundle/${GROUP_PATH}/${ARTIFACT_ID}/${VERSION}/${ARTIFACT_ID}-${VERSION}.pom"
+          if ! diff -u "$staged" build/publications/maven/pom-default.xml; then
+            echo "::error::this job would publish a POM the build job never verified. The build job asserts the coordinate, the Central metadata and every api dependency against the generated build.gradle; a POM that differs here means the two jobs did not see the same tree."
+            exit 1
+          fi
+
+          echo "the POM this job will publish is the one the build job verified"
+
+      - name: Rehearse the upload
+        if: needs.decide.outputs.dry == 'true'
+        env:
+          GITHUB_PACKAGES_URL: ${{ env.PACKAGES_BASE }}
+        run: |
+          set -euo pipefail
+          echo "::warning::dry run — resolving the publish task graph without uploading. The HTTP transport to ${PACKAGES_BASE} is the only part of this path a dry run cannot cover."
+          ./gradlew --no-daemon -I "$INIT_SCRIPT" publishMavenPublicationToGitHubPackagesRepository --dry-run
+
+      - name: Publish to GitHub Packages
+        if: needs.decide.outputs.dry == 'false'
+        env:
+          GITHUB_PACKAGES_URL: ${{ env.PACKAGES_BASE }}
+          GITHUB_ACTOR: ${{ github.actor }}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: ./gradlew --no-daemon -I "$INIT_SCRIPT" publishMavenPublicationToGitHubPackagesRepository
+
+      - name: Verify what the registry now serves
+        if: needs.decide.outputs.dry == 'false'
+        env:
+          VERSION: ${{ needs.decide.outputs.version }}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          set -euo pipefail
+
+          pom_url="${PACKAGES_BASE}/${GROUP_PATH}/${ARTIFACT_ID}/${VERSION}/${ARTIFACT_ID}-${VERSION}.pom"
+          status=$(curl -sSL -o "${RUNNER_TEMP}/published.pom" -w '%{http_code}' \
+            --header "Authorization: Bearer ${GITHUB_TOKEN}" "$pom_url" || echo 000)
+          echo "GitHub Packages returned HTTP ${status} for ${pom_url}"
+
+          if [ "$status" != "200" ]; then
+            echo "::error::${GROUP_ID}:${ARTIFACT_ID}:${VERSION} is not resolvable from ${PACKAGES_BASE} after the upload."
+            exit 1
+          fi
+
+          staged="bundle/${GROUP_PATH}/${ARTIFACT_ID}/${VERSION}/${ARTIFACT_ID}-${VERSION}.pom"
+          if ! diff -u "$staged" "${RUNNER_TEMP}/published.pom"; then
+            echo "::error::the POM the registry serves is not the POM the build job verified."
+            exit 1
+          fi
+
+          echo "::notice::${GROUP_ID}:${ARTIFACT_ID}:${VERSION} resolves from ${PACKAGES_BASE} and serves the POM the build job verified."
+
   tag:
-    needs: [decide, build, publish]
+    needs: [decide, build, publish, publish-github-packages]
     if: always() && needs.decide.outputs.dry == 'false' && needs.decide.outputs.version != ''
     runs-on: ubuntu-latest
     permissions:
       contents: write
+      packages: read
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
 
       - name: Tag the published version
         env:
           VERSION: ${{ needs.decide.outputs.version }}
+          TARGET: ${{ needs.decide.outputs.target }}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
           set -euo pipefail
 
-          pom_url="${CENTRAL_BASE}/${GROUP_PATH}/${ARTIFACT_ID}/${VERSION}/${ARTIFACT_ID}-${VERSION}.pom"
+          central_pom="${CENTRAL_BASE}/${GROUP_PATH}/${ARTIFACT_ID}/${VERSION}/${ARTIFACT_ID}-${VERSION}.pom"
+          packages_pom="${PACKAGES_BASE}/${GROUP_PATH}/${ARTIFACT_ID}/${VERSION}/${ARTIFACT_ID}-${VERSION}.pom"
+
+          resolvable() {
+            local status
+            if [ "$TARGET" != "maven-central" ]; then
+              status=$(curl -sSL -o /dev/null -w '%{http_code}' \
+                --header "Authorization: Bearer ${GITHUB_TOKEN}" "$packages_pom" || echo 000)
+              echo "  GitHub Packages: HTTP ${status}"
+              if [ "$status" = "200" ]; then
+                return 0
+              fi
+            fi
+
+            if [ "$TARGET" != "github-packages" ]; then
+              status=$(curl -sS -o /dev/null -w '%{http_code}' -I "$central_pom" || echo 000)
+              echo "  Maven Central: HTTP ${status}"
+              if [ "$status" = "200" ]; then
+                return 0
+              fi
+            fi
+
+            return 1
+          }
 
           found=no
           for attempt in $(seq 1 20); do
-            status=$(curl -sS -o /dev/null -w '%{http_code}' -I "$pom_url" || echo 000)
-            echo "attempt ${attempt}: HTTP ${status} for ${pom_url}"
-            if [ "$status" = "200" ]; then
+            echo "attempt ${attempt}:"
+            if resolvable; then
               found=yes
               break
             fi
@@ -730,7 +995,7 @@ jobs:
           done
 
           if [ "$found" != "yes" ]; then
-            echo "::notice::${GROUP_ID}:${ARTIFACT_ID}:${VERSION} has not appeared on Maven Central yet; nothing to tag. Re-run this workflow once it has — this job is idempotent."
+            echo "::notice::${GROUP_ID}:${ARTIFACT_ID}:${VERSION} is not resolvable from any registry this run targeted; nothing to tag. Re-run this workflow once it is — this job is idempotent."
             exit 0
           fi
 
