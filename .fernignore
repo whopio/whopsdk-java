@@ -50,9 +50,42 @@
 # LICENSE: Fern does not carry over a LICENSE, and the POM this repo publishes declares
 # Apache-2.0 — the same license the python-release and ruby-release groups pass to Fern.
 # Without this entry the first regeneration would delete the file the POM points at.
+#
+# src/main/java/com/whop/api/helpers holds the hand-written helpers in this SDK, and
+# src/test/java/com/whop/api/helpers holds their tests. Fern owns both src/main and
+# src/test, so without these two entries a regeneration prunes the helper and, separately,
+# prunes the tests that would have caught the helper going missing. Directory entries are
+# what the sibling repos use for the same job (whopsdk-ruby's lib/whop_sdk/helpers,
+# whopsdk-typescript's src/helpers, whopsdk-python's src/whop_sdk/lib), and whopsdk-ruby's
+# survived a real regeneration in whopsdk-ruby#59.
+#
+#   - WebhookVerifier / WebhookVerificationException — the webhook signature verifier. It
+#     restores the verification half of `client.webhooks.unwrap`, which the Stainless SDK
+#     shipped and Fern cannot generate: Fern generates from OpenAPI paths and `unwrap` was
+#     never a path.
+#
+# Unlike whopsdk-ruby, whopsdk-typescript and whopsdk-python, nothing about this helper has
+# to be restored from generators.yml, and that is deliberate rather than lucky.
+#
+#   - There is no entry point to re-emit. A require/import list is what those three restore
+#     with requirePaths / packageJson exports; Java resolves com.whop.api.helpers off the
+#     classpath, and the generator writes no module-info.java, no package index and no
+#     service file that would have to name the package. The jar carries it because it is
+#     under src/main/java, full stop.
+#   - There is no dependency to re-declare. Those three each pull in `standardwebhooks`,
+#     whose key handling is the reason each needed a workaround: the library base64-DECODES
+#     its key while WebhooksManager::SignWebhook HMACs with the literal bytes of the `ws_…`
+#     secret. javax.crypto.Mac, java.util.Base64 and java.security.MessageDigest are all in
+#     the JDK, so this helper computes the HMAC over the raw secret itself and needs nothing
+#     added to build.gradle — which matters, because build.gradle is Fern's and this repo
+#     deliberately keeps it that way (see release.gradle above). Jackson, the only non-JDK
+#     type in the helper's signature, is already one of the four `api` dependencies the
+#     generator writes for its own models.
 .github/workflows/ci.yml
 .github/workflows/publish-main.yml
 .github/release.gradle
 .github/stamp-version.py
 gradle.properties
 LICENSE
+src/main/java/com/whop/api/helpers
+src/test/java/com/whop/api/helpers
