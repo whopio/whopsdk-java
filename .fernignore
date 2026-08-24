@@ -1,1 +1,58 @@
-# Specify files that shouldn't be modified by Fern
+# Files Fern must not modify or delete when regenerating this repo.
+#
+# Fern prunes anything it did not generate, and it reads this file from the pull request's
+# base branch — so an entry only protects a file once it is on main.
+#
+# publish-main.yml is hand-written: it releases com.whop.api:whop-java when a merge to main
+# lands a gradle.properties version that is not yet published, and it is meant to be the
+# only publish path. It has two targets behind one set of guards — GitHub Packages
+# (whopio-internal, authenticated with the run's own GITHUB_TOKEN, no namespace to
+# register) and the Sonatype Central Portal (public, blocked on DNS verification and a
+# signing key). RELEASE_TARGET sets the default, a workflow_dispatch input overrides it,
+# and every pull request rehearses both so neither path rots while the other is the live
+# one.
+#
+# stamp-version.py is that workflow's version stamp: gradle.properties, every source file
+# carrying X-Fern-SDK-Version, and .fern/metadata.json. It is a file rather than a script
+# inlined into one job because both publish paths build the same commit and have to stamp
+# it identically.
+#
+# gradle.properties is the version of record and the release trigger. The Fern Java
+# generator writes no version and no group into build.gradle at all — `gradle properties`
+# on the delivered tree reports `version: unspecified`, an empty group and an artifact name
+# taken from the checkout directory — so without this file the project has no Maven
+# coordinate. Gradle reads `group` and `version` from gradle.properties natively, which
+# keeps the coordinate out of the generated build.gradle and lets Fern keep owning the
+# dependency list there.
+#
+# release.gradle is the Gradle init script that adds the MavenPublication: the POM (name,
+# description, url, licenses, developers, scm) that Maven Central requires, the whop-java
+# archive name, a repository that stages the bundle to build/bundle instead of uploading
+# it, and the GitHub Packages repository the internal release publishes to. Applying it
+# with -I rather than editing build.gradle means a regeneration cannot silently drop it
+# and Fern keeps ownership of the build file — including the four `api` dependencies,
+# which are the reason a real POM and not a bare jar is what has to reach consumers.
+#
+# ci.yml is hand-written for a security reason, not a stylistic one. The Fern Java
+# generator's GithubWorkflowGenerator emits a tag-gated `publish` job — `if:
+# github.event_name == 'push' && contains(github.ref, 'refs/tags/')`, running `./gradlew
+# publish` or `./gradlew sonatypeCentralUpload` with MAVEN_USERNAME, MAVEN_PASSWORD,
+# MAVEN_SIGNATURE_KID, MAVEN_SIGNATURE_SECRET_KEY and MAVEN_SIGNATURE_PASSWORD in the same
+# environment as Gradle's dependency resolution — whenever the generator is configured
+# with a Maven registry. The java-release group in the monorepo's sdks/fern/generators.yml
+# has no maven output today, so the ci.yml Fern delivered in whopsdk-java#1 is compile+test
+# only. Adding that output is the obvious next step for anyone wiring Maven publishing
+# through Fern, and it would introduce a second unreviewed publish path that also fires on
+# the tag publish-main.yml creates. Because Fern reads this file from the base branch, the
+# entry has to exist before that regeneration, not after it. Ours is the generated file
+# with the publish job that cannot appear, modernised off actions/setup-java@v1.
+#
+# LICENSE: Fern does not carry over a LICENSE, and the POM this repo publishes declares
+# Apache-2.0 — the same license the python-release and ruby-release groups pass to Fern.
+# Without this entry the first regeneration would delete the file the POM points at.
+.github/workflows/ci.yml
+.github/workflows/publish-main.yml
+.github/release.gradle
+.github/stamp-version.py
+gradle.properties
+LICENSE
