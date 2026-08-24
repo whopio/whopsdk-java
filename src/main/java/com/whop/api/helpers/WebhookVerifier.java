@@ -15,8 +15,11 @@ import javax.crypto.spec.SecretKeySpec;
  * Verifies the Standard Webhooks signature Whop sends on every webhook delivery, then parses the body.
  *
  * <pre>{@code
- * JsonNode event = WebhookVerifier.unwrap(rawBody, request.getHeaders(), System.getenv("WHOP_WEBHOOK_SECRET"));
+ * JsonNode event = WebhookVerifier.unwrap(rawBody, request.getHeaders(), webhookSigningSecret);
  * }</pre>
+ *
+ * <p>The secret is a parameter, never read from the environment: this SDK reads no environment variables, and
+ * whopsdk-java's e2e suite asserts that it reads none.</p>
  *
  * <p>This is the verification half of the {@code client.webhooks.unwrap} the Stainless-generated SDK shipped. Fern
  * generates from OpenAPI paths and {@code unwrap} was never a path, so the generated client has no equivalent. It is a
