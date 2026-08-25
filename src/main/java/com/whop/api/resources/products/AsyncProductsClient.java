@@ -36,14 +36,28 @@ public class AsyncProductsClient {
     }
 
     /**
-     * Returns a paginated list of products belonging to an account.
+     * Returns a paginated list of products. Omit <code>account_id</code> to search the public marketplace.
+     */
+    public CompletableFuture<SyncPagingIterable<ProductListItem>> list() {
+        return this.rawClient.list().thenApply(response -> response.body());
+    }
+
+    /**
+     * Returns a paginated list of products. Omit <code>account_id</code> to search the public marketplace.
+     */
+    public CompletableFuture<SyncPagingIterable<ProductListItem>> list(RequestOptions requestOptions) {
+        return this.rawClient.list(requestOptions).thenApply(response -> response.body());
+    }
+
+    /**
+     * Returns a paginated list of products. Omit <code>account_id</code> to search the public marketplace.
      */
     public CompletableFuture<SyncPagingIterable<ProductListItem>> list(ListProductsRequest request) {
         return this.rawClient.list(request).thenApply(response -> response.body());
     }
 
     /**
-     * Returns a paginated list of products belonging to an account.
+     * Returns a paginated list of products. Omit <code>account_id</code> to search the public marketplace.
      */
     public CompletableFuture<SyncPagingIterable<ProductListItem>> list(
             ListProductsRequest request, RequestOptions requestOptions) {
@@ -65,28 +79,28 @@ public class AsyncProductsClient {
     }
 
     /**
-     * Retrieves the details of an existing product. This endpoint is publicly accessible.
+     * Retrieves a product. Public — no credentials.
      */
     public CompletableFuture<Product> retrieve(String id) {
         return this.rawClient.retrieve(id).thenApply(response -> response.body());
     }
 
     /**
-     * Retrieves the details of an existing product. This endpoint is publicly accessible.
+     * Retrieves a product. Public — no credentials.
      */
     public CompletableFuture<Product> retrieve(String id, RequestOptions requestOptions) {
         return this.rawClient.retrieve(id, requestOptions).thenApply(response -> response.body());
     }
 
     /**
-     * Retrieves the details of an existing product. This endpoint is publicly accessible.
+     * Retrieves a product. Public — no credentials.
      */
     public CompletableFuture<Product> retrieve(String id, RetrieveProductsRequest request) {
         return this.rawClient.retrieve(id, request).thenApply(response -> response.body());
     }
 
     /**
-     * Retrieves the details of an existing product. This endpoint is publicly accessible.
+     * Retrieves a product. Public — no credentials.
      */
     public CompletableFuture<Product> retrieve(
             String id, RetrieveProductsRequest request, RequestOptions requestOptions) {

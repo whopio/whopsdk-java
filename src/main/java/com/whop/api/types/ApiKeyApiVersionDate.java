@@ -31,6 +31,9 @@ public final class ApiKeyApiVersionDate {
     public static final ApiKeyApiVersionDate TWO_THOUSAND_TWENTY_SIX0620 =
             new ApiKeyApiVersionDate(Value.TWO_THOUSAND_TWENTY_SIX0620, "2026-06-20");
 
+    public static final ApiKeyApiVersionDate TWO_THOUSAND_TWENTY_SIX08211 =
+            new ApiKeyApiVersionDate(Value.TWO_THOUSAND_TWENTY_SIX08211, "2026-08-21-1");
+
     public static final ApiKeyApiVersionDate TWO_THOUSAND_TWENTY_FIVE0101 =
             new ApiKeyApiVersionDate(Value.TWO_THOUSAND_TWENTY_FIVE0101, "2025-01-01");
 
@@ -130,6 +133,8 @@ public final class ApiKeyApiVersionDate {
                 return visitor.visitTwoThousandTwentySix0803();
             case TWO_THOUSAND_TWENTY_SIX0620:
                 return visitor.visitTwoThousandTwentySix0620();
+            case TWO_THOUSAND_TWENTY_SIX08211:
+                return visitor.visitTwoThousandTwentySix08211();
             case TWO_THOUSAND_TWENTY_FIVE0101:
                 return visitor.visitTwoThousandTwentyFive0101();
             case TWO_THOUSAND_TWENTY_SIX07081:
@@ -189,6 +194,8 @@ public final class ApiKeyApiVersionDate {
                 return TWO_THOUSAND_TWENTY_SIX0803;
             case "2026-06-20":
                 return TWO_THOUSAND_TWENTY_SIX0620;
+            case "2026-08-21-1":
+                return TWO_THOUSAND_TWENTY_SIX08211;
             case "2025-01-01":
                 return TWO_THOUSAND_TWENTY_FIVE0101;
             case "2026-07-08-1":
@@ -279,6 +286,8 @@ public final class ApiKeyApiVersionDate {
 
         TWO_THOUSAND_TWENTY_SIX0821,
 
+        TWO_THOUSAND_TWENTY_SIX08211,
+
         UNKNOWN
     }
 
@@ -332,6 +341,8 @@ public final class ApiKeyApiVersionDate {
         T visitTwoThousandTwentySix0814();
 
         T visitTwoThousandTwentySix0821();
+
+        T visitTwoThousandTwentySix08211();
 
         T visitUnknown(String unknownType);
     }

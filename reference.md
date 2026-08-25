@@ -2677,6 +2677,14 @@ client.adGroups().searchTargetingOptions(
     
 </dd>
 </dl>
+
+<dl>
+<dd>
+
+**specialAdCategories:** `Optional<SearchTargetingOptionsAdGroupsRequestSpecialAdCategoriesItem>` — The campaign's declared special ad categories. Under `housing`, `employment`, or `financial_products` the ad platform allows interests only, drawn from a short approved list, so results are narrowed to what such a campaign can launch with and other kinds return nothing. Blank `query` browses that approved list instead of the usual fixed lists.
+    
+</dd>
+</dl>
 </dd>
 </dl>
 
@@ -6105,6 +6113,14 @@ client.apps().list(
 <dd>
 
 **verifiedAppsOnly:** `Optional<Boolean>` — Whether to only return apps verified by Whop. Verified website templates — websites with a published web build — are included, even though websites are otherwise left out of app lists.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**recommended:** `Optional<Boolean>` — Only return apps Whop recommends (or, with `false`, only those it does not). The community blueprints gallery is the recommended slice of the public website list.
     
 </dd>
 </dl>
@@ -10030,6 +10046,169 @@ client.checkoutConfigurations().delete(
 </dl>
 </details>
 
+## Checkout Sessions
+<details><summary><code>client.checkoutSessions.create(request) -> CheckoutSession</code></summary>
+<dl>
+<dd>
+
+#### 📝 Description
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+Opens a checkout session. No credentials required. Pass exactly one of `items`, `checkout_configuration`, or `link`. The response includes `client_secret` once; later calls authenticate with it.
+</dd>
+</dl>
+</dd>
+</dl>
+
+#### 🔌 Usage
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+```java
+client.checkoutSessions().create(
+    CreateCheckoutSessionsRequest
+        .builder()
+        .build()
+);
+```
+</dd>
+</dl>
+</dd>
+</dl>
+
+#### ⚙️ Parameters
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+**affiliateCode:** `Optional<String>` — The affiliate this checkout is attributed to. Write-once — set it here or never.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**attribution:** `Optional<Map<String, Object>>` — String-to-string acquisition context. Recognized keys: `utm_source`, `utm_medium`, `utm_campaign`, `utm_term`, `utm_content`, `tracking_link_id`, `funnel_id`, `source`, `country`; anything else is dropped.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**checkoutConfiguration:** `Optional<String>` — A seller's checkout configuration (`ch_…`) to open this checkout from. Its plan, mode, affiliate code, metadata, redirect URL, 3DS level and payment method configuration seed the session; anything you also send explicitly wins.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**items:** `Optional<List<CreateCheckoutSessionsRequestItemsItem>>` — What the buyer is purchasing. Exactly one entry today — more are refused until multi-item checkout ships; the array shape is the forward contract. Alongside a `checkout_configuration` or `link` it may only name that mount's own plan, where it sets quantity.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**link:** `Optional<String>` — Any checkout link the seller has shared, resolved for you: a plan ID, a checkout configuration ID, a vanity short link (send `page_route` with it), a membership transfer code, or a checkout link the seller handed out earlier. A link that is not a checkout link is refused with a coded message rather than a bare not-found.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**metadata:** `Optional<Map<String, Optional<String>>>` — Free-form string-to-string map, at most 40 keys. Whop never interprets it.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**mode:** `Optional<CreateCheckoutSessionsRequestMode>` — Defaults to the checkout configuration's mode, then `payment`. `setup` sessions are not yet available and are refused.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**origin:** `Optional<String>` — Where this checkout is being opened from — the scheme and host of your page, with no path (`https://shop.example.com`). Ignored when the request carries a browser `Origin` header, which is used instead. Recorded against the session as acquisition context.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**pageRoute:** `Optional<String>` — The product route a vanity `link` belongs to — the `pageRoute` in the seller's shared URL.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**password:** `Optional<String>` — The password for a password-protected plan. Right, and the gate is cleared for the session's whole life; wrong or omitted, and the session still opens — it publishes a `custom_password` requirement, the answer arrives through update, and confirm refuses until it is right.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**promoCode:** `Optional<String>` — A promo code to apply to the quote.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**returnUrl:** `Optional<String>` — Where the buyer lands after an off-site payment step. Absolute https URL without credentials.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**topUpMembership:** `Optional<String>` — An existing membership (`mem_…`) this checkout pays against instead of creating a new one — the buyer pays the plan's price again onto something they already own. Ownership is checked at confirm, against the buyer who confirms: a membership they do not own is refused as not found. Cannot accompany a membership transfer link.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**trackingLinkIdsByAccount:** `Optional<Map<String, Optional<String>>>` — First-party tracking-link candidates keyed by account ID. Ignored outside Whop's hosted checkout; an explicit `attribution.tracking_link_id` wins.
+    
+</dd>
+</dl>
+</dd>
+</dl>
+
+
+</dd>
+</dl>
+</details>
+
 ## Companies
 <details><summary><code>client.companies.list() -> SyncPagingIterable&amp;lt;CompanyListItem&amp;gt;</code></summary>
 <dl>
@@ -13718,7 +13897,7 @@ client.disputes().updateEvidenceDispute(
 <dl>
 <dd>
 
-Replaces the full set of uploaded evidence documents on a dispute, beyond the four fixed evidence slots. Send the files as multipart file parts to upload and attach in one call, or reference files already stored by `id`/`direct_upload_id`. Send every document the packet should carry — up to 10, 10MB each and 25MB in total; an empty list removes them all. Accepted content types: application/pdf, application/json, image/jpeg, image/png, image/webp — any other type is rejected.
+Replaces the full set of uploaded evidence documents on a dispute, beyond the four fixed evidence slots. Upload files through `POST /files` and reference them by `id`, or send the files as multipart file parts to upload and attach in one call. Send every document the packet should carry — up to 10, 10MB each and 25MB in total; an empty list removes them all. Accepted content types: application/pdf, application/json, image/jpeg, image/png, image/webp — any other type is rejected.
 </dd>
 </dl>
 </dd>
@@ -16293,7 +16472,7 @@ client.exports().create(
 <dl>
 <dd>
 
-**filters:** `Optional<Map<String, Object>>` — Resource-specific filters. For native REST resources (`payouts`, `transfers`, `memberships`) these are the resource's own list query params; for dashboard tables they mirror the dashboard table filters.
+**filters:** `Optional<Map<String, Object>>` — Resource-specific filters. For native REST resources (`payouts`, `transfers`, `products`) these are the resource's own list query params; for dashboard tables they mirror the dashboard table filters.
     
 </dd>
 </dl>
@@ -16643,7 +16822,7 @@ client.feeMarkups().delete(
 </details>
 
 ## Files
-<details><summary><code>client.files.create(request) -> CreateFilesResponse</code></summary>
+<details><summary><code>client.files.create(request) -> File</code></summary>
 <dl>
 <dd>
 
@@ -16655,7 +16834,7 @@ client.feeMarkups().delete(
 <dl>
 <dd>
 
-Create a new file record and receive a presigned URL for uploading content to S3.
+Creates a file and returns a presigned destination to upload its bytes to. PUT the bytes to `upload_url` (single-part), or to each of `multipart_upload_urls` and then call Complete File Multipart Upload. Once the bytes land the file becomes `ready`, and its ID can be attached wherever a file is accepted — account legal documents, dispute evidence documents.
 </dd>
 </dl>
 </dd>
@@ -16673,7 +16852,7 @@ Create a new file record and receive a presigned URL for uploading content to S3
 client.files().create(
     CreateFilesRequest
         .builder()
-        .filename("filename")
+        .filename("terms.pdf")
         .build()
 );
 ```
@@ -16690,7 +16869,7 @@ client.files().create(
 <dl>
 <dd>
 
-**filename:** `String` — The name of the file including its extension (e.g., "photo.png" or "document.pdf").
+**byteSize:** `Optional<Integer>` — The file's size in bytes. Required when `multipart` is `true`. Multipart uploads support at most 10,000 parts of 5MB each (about 50 GB).
     
 </dd>
 </dl>
@@ -16698,7 +16877,23 @@ client.files().create(
 <dl>
 <dd>
 
-**visibility:** `Optional<FileVisibility>` — Controls whether the file is publicly accessible via CDN or requires authentication. Defaults to private.
+**filename:** `String` — The name of the file including its extension, e.g. `terms.pdf`.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**multipart:** `Optional<Boolean>` — Upload the file in 5MB parts. Required for files larger than 5GB; useful above ~100MB. The file must be larger than 5MB.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**visibility:** `Optional<CreateFilesRequestVisibility>` — `public` files are served via an unsigned CDN URL — use for assets anyone may see. `private` files are served via a signed, expiring URL — use for sensitive documents. Defaults to `private`.
     
 </dd>
 </dl>
@@ -16722,7 +16917,7 @@ client.files().create(
 <dl>
 <dd>
 
-Retrieves the details of an existing file.
+Retrieves a file you uploaded — poll it after uploading the bytes to see `upload_status` become `ready`. Only the creator can retrieve a file this way; a file attached to another resource is read through that resource.
 </dd>
 </dl>
 </dd>
@@ -16738,7 +16933,7 @@ Retrieves the details of an existing file.
 
 ```java
 client.files().retrieve(
-    "file_xxxxxxxxxxxxx",
+    "id",
     RetrieveFilesRequest
         .builder()
         .build()
@@ -16757,7 +16952,92 @@ client.files().retrieve(
 <dl>
 <dd>
 
-**id:** `String` — The unique identifier of the file to retrieve.
+**id:** `String` — The unique identifier of the file, prefixed `file_`.
+    
+</dd>
+</dl>
+</dd>
+</dl>
+
+
+</dd>
+</dl>
+</details>
+
+<details><summary><code>client.files.complete(id, request) -> File</code></summary>
+<dl>
+<dd>
+
+#### 📝 Description
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+Assembles the parts of a multipart upload after every part has been PUT to its presigned URL. Pass the `multipart_upload_id` from Create File and each part's `ETag` response header.
+</dd>
+</dl>
+</dd>
+</dl>
+
+#### 🔌 Usage
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+```java
+client.files().complete(
+    "id",
+    CompleteFilesRequest
+        .builder()
+        .multipartUploadId("upload-id")
+        .multipartParts(
+            Arrays.asList(
+                CompleteFilesRequestMultipartPartsItem
+                    .builder()
+                    .etag("etag-1")
+                    .partNumber(1)
+                    .build()
+            )
+        )
+        .build()
+);
+```
+</dd>
+</dl>
+</dd>
+</dl>
+
+#### ⚙️ Parameters
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+**id:** `String` — The unique identifier of the file, prefixed `file_`.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**multipartParts:** `List<CompleteFilesRequestMultipartPartsItem>` — Every uploaded part, in order.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**multipartUploadId:** `String` — The ID of the multipart upload, returned by Create File.
     
 </dd>
 </dl>
@@ -18576,7 +18856,7 @@ client.invoices().update(
 <dl>
 <dd>
 
-**lineItems:** `Optional<List<UpdateInvoicesRequestLineItemsItem>>` — Line items that break down the invoice total.
+**lineItems:** `Optional<List<UpdateInvoicesRequestLineItemsItem>>` — Line items that break down the invoice total. When provided, the sum of (quantity * unit_price) for all items must equal the plan price. Individual items may be negative to represent a credit, as long as the sum is not negative and clears the currency's minimum charge. Pass an empty list to remove the breakdown.
     
 </dd>
 </dl>
@@ -24080,7 +24360,7 @@ client.permissions().list(
 <dl>
 <dd>
 
-Returns a paginated list of plans belonging to an account, with optional filtering by visibility, type, release method, and product.
+Returns a paginated list of plans. Omit `account_id` and pass `product_ids` to list a product's public buyable plans.
 </dd>
 </dl>
 </dd>
@@ -24098,7 +24378,6 @@ Returns a paginated list of plans belonging to an account, with optional filteri
 client.plans().list(
     ListPlansRequest
         .builder()
-        .accountId("account_id")
         .releaseMethods(
             Arrays.asList("buy_now")
         )
@@ -24127,7 +24406,7 @@ client.plans().list(
 <dl>
 <dd>
 
-**accountId:** `String` — The unique identifier of the account to list plans for.
+**accountId:** `Optional<String>` — The unique identifier of the account to list plans for. Required unless `product_ids` is provided for a public product-plan read.
     
 </dd>
 </dl>
@@ -24175,7 +24454,7 @@ client.plans().list(
 <dl>
 <dd>
 
-**productIds:** `Optional<String>` — Filter to only plans belonging to these product identifiers.
+**productIds:** `Optional<String>` — Filter to only plans belonging to these product identifiers. When `account_id` is omitted, this is required and the response is publicly readable: only visible, non-invoice plans are returned.
     
 </dd>
 </dl>
@@ -24973,7 +25252,7 @@ client.plans().calculateTax(
 <dl>
 <dd>
 
-Returns a paginated list of products belonging to an account.
+Returns a paginated list of products. Omit `account_id` to search the public marketplace.
 </dd>
 </dl>
 </dd>
@@ -24991,7 +25270,6 @@ Returns a paginated list of products belonging to an account.
 client.products().list(
     ListProductsRequest
         .builder()
-        .accountId("account_id")
         .visibilities(
             Arrays.asList("visible")
         )
@@ -25014,7 +25292,7 @@ client.products().list(
 <dl>
 <dd>
 
-**accountId:** `String` — The unique identifier of the account to list products for.
+**accountId:** `Optional<String>` — The unique identifier of the account to list products for. Omit to search the public marketplace.
     
 </dd>
 </dl>
@@ -25022,7 +25300,47 @@ client.products().list(
 <dl>
 <dd>
 
-**visibilities:** `Optional<String>` — Filter to only products matching these visibility states.
+**query:** `Optional<String>` — Ranked search against product title and headline. Omit to browse by recency.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**marketplaceCategoryRoute:** `Optional<String>` — Only return marketplace products assigned to this category route, such as `trading`.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**planTypes:** `Optional<ListProductsRequestPlanTypesItem>` — Filter to products with a buyable plan of these billing models, such as `one_time` or `renewal`.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**priceMinimum:** `Optional<Double>` — Only return products whose advertised buyable plan has a displayed price of at least this amount. Recurring plans use renewal price.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**priceMaximum:** `Optional<Double>` — Only return products whose advertised buyable plan has a displayed price of at most this amount. Recurring plans use renewal price.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**visibilities:** `Optional<String>` — Filter to only products matching these visibility states. Ignored on the public marketplace list, which only returns visible products.
     
 </dd>
 </dl>
@@ -25054,7 +25372,7 @@ client.products().list(
 <dl>
 <dd>
 
-**order:** `Optional<String>` — The field to sort results by. Defaults to created_at.
+**order:** `Optional<String>` — The field to sort results by. Account lists default to `created_at`. Marketplace lists default to `discoverable_at` and accept `created_at` or `discoverable_at`. Cannot be combined with `query`.
     
 </dd>
 </dl>
@@ -25087,6 +25405,22 @@ client.products().list(
 <dd>
 
 **before:** `Optional<String>` — A cursor; returns products before this position.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**createdAfter:** `Optional<String>` — Only return products created after this ISO 8601 timestamp.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**createdBefore:** `Optional<String>` — Only return products created before this ISO 8601 timestamp.
     
 </dd>
 </dl>
@@ -25313,7 +25647,7 @@ client.products().create(
 <dl>
 <dd>
 
-Retrieves the details of an existing product. This endpoint is publicly accessible.
+Retrieves a product. Public — no credentials.
 </dd>
 </dl>
 </dd>

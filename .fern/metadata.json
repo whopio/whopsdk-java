@@ -7,10 +7,10 @@
     "group": "com.whop.api",
     "artifact": "whop-java"
   },
-  "originGitCommit": "a26a97d2d8ee29f78819a299712fb3b4086d634e",
+  "originGitCommit": "348265b135f70060c1ce43c50e4627c092de91e0",
   "originGitCommitIsDirty": false,
   "invokedBy": "ci",
-  "requestedVersion": "1.0.11",
+  "requestedVersion": "1.0.13",
   "ciProvider": "unknown",
-  "sdkVersion": "1.0.11"
+  "sdkVersion": "1.0.13"
 }

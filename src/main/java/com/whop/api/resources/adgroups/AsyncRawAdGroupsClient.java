@@ -432,6 +432,13 @@ public class AsyncRawAdGroupsClient {
             QueryStringMapper.addQueryParameter(
                     httpUrl, "location_types", request.getLocationTypes().get(), true);
         }
+        if (request.getSpecialAdCategories().isPresent()) {
+            QueryStringMapper.addQueryParameter(
+                    httpUrl,
+                    "special_ad_categories",
+                    request.getSpecialAdCategories().get(),
+                    true);
+        }
         if (requestOptions != null) {
             requestOptions.getQueryParameters().forEach((_key, _value) -> {
                 httpUrl.addQueryParameter(_key, _value);

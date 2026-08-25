@@ -640,7 +640,7 @@ public final class AdGroup {
     }
 
     /**
-     * @return Interest, behavior, and demographic targeting, using categories from the ad platform's targeting taxonomy. Entries across interests, behaviors, and demographics are OR'd together (anyone matching any entry is reached), matching Ads Manager's detailed-targeting box. Can't be combined with automatic audience targeting, and unavailable to campaigns with special_ad_categories.
+     * @return Interest, behavior, and demographic targeting, using categories from the ad platform's targeting taxonomy. Entries across interests, behaviors, and demographics are OR'd together (anyone matching any entry is reached), matching Ads Manager's detailed-targeting box. Can't be combined with automatic audience targeting. Special ad category campaigns are limited to approved interests.
      */
     @JsonProperty("detailed_targeting")
     public AdGroupDetailedTargeting getDetailedTargeting() {
@@ -1423,7 +1423,7 @@ public final class AdGroup {
 
     public interface DetailedTargetingStage {
         /**
-         * <p>Interest, behavior, and demographic targeting, using categories from the ad platform's targeting taxonomy. Entries across interests, behaviors, and demographics are OR'd together (anyone matching any entry is reached), matching Ads Manager's detailed-targeting box. Can't be combined with automatic audience targeting, and unavailable to campaigns with special_ad_categories.</p>
+         * <p>Interest, behavior, and demographic targeting, using categories from the ad platform's targeting taxonomy. Entries across interests, behaviors, and demographics are OR'd together (anyone matching any entry is reached), matching Ads Manager's detailed-targeting box. Can't be combined with automatic audience targeting. Special ad category campaigns are limited to approved interests.</p>
          */
         DevicesStage detailedTargeting(@NotNull AdGroupDetailedTargeting detailedTargeting);
     }
@@ -2331,8 +2331,8 @@ public final class AdGroup {
         }
 
         /**
-         * <p>Interest, behavior, and demographic targeting, using categories from the ad platform's targeting taxonomy. Entries across interests, behaviors, and demographics are OR'd together (anyone matching any entry is reached), matching Ads Manager's detailed-targeting box. Can't be combined with automatic audience targeting, and unavailable to campaigns with special_ad_categories.</p>
-         * <p>Interest, behavior, and demographic targeting, using categories from the ad platform's targeting taxonomy. Entries across interests, behaviors, and demographics are OR'd together (anyone matching any entry is reached), matching Ads Manager's detailed-targeting box. Can't be combined with automatic audience targeting, and unavailable to campaigns with special_ad_categories.</p>
+         * <p>Interest, behavior, and demographic targeting, using categories from the ad platform's targeting taxonomy. Entries across interests, behaviors, and demographics are OR'd together (anyone matching any entry is reached), matching Ads Manager's detailed-targeting box. Can't be combined with automatic audience targeting. Special ad category campaigns are limited to approved interests.</p>
+         * <p>Interest, behavior, and demographic targeting, using categories from the ad platform's targeting taxonomy. Entries across interests, behaviors, and demographics are OR'd together (anyone matching any entry is reached), matching Ads Manager's detailed-targeting box. Can't be combined with automatic audience targeting. Special ad category campaigns are limited to approved interests.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override

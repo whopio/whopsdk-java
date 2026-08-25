@@ -7,11 +7,14 @@ import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonValue;
 
 public final class CreateMethodsResponseSupportedPayoutMethodDeliveryType {
-    public static final CreateMethodsResponseSupportedPayoutMethodDeliveryType PAPER_CHECK =
-            new CreateMethodsResponseSupportedPayoutMethodDeliveryType(Value.PAPER_CHECK, "paper_check");
-
     public static final CreateMethodsResponseSupportedPayoutMethodDeliveryType CRYPTOCURRENCY =
             new CreateMethodsResponseSupportedPayoutMethodDeliveryType(Value.CRYPTOCURRENCY, "cryptocurrency");
+
+    public static final CreateMethodsResponseSupportedPayoutMethodDeliveryType CHECK =
+            new CreateMethodsResponseSupportedPayoutMethodDeliveryType(Value.CHECK, "check");
+
+    public static final CreateMethodsResponseSupportedPayoutMethodDeliveryType CARD =
+            new CreateMethodsResponseSupportedPayoutMethodDeliveryType(Value.CARD, "card");
 
     public static final CreateMethodsResponseSupportedPayoutMethodDeliveryType UNKNOWN =
             new CreateMethodsResponseSupportedPayoutMethodDeliveryType(Value.UNKNOWN, "unknown");
@@ -21,9 +24,6 @@ public final class CreateMethodsResponseSupportedPayoutMethodDeliveryType {
 
     public static final CreateMethodsResponseSupportedPayoutMethodDeliveryType BANK_DEPOSIT =
             new CreateMethodsResponseSupportedPayoutMethodDeliveryType(Value.BANK_DEPOSIT, "bank_deposit");
-
-    public static final CreateMethodsResponseSupportedPayoutMethodDeliveryType MASSPAY_CARD =
-            new CreateMethodsResponseSupportedPayoutMethodDeliveryType(Value.MASSPAY_CARD, "masspay_card");
 
     public static final CreateMethodsResponseSupportedPayoutMethodDeliveryType MOBILE_WALLET =
             new CreateMethodsResponseSupportedPayoutMethodDeliveryType(Value.MOBILE_WALLET, "mobile_wallet");
@@ -67,18 +67,18 @@ public final class CreateMethodsResponseSupportedPayoutMethodDeliveryType {
 
     public <T> T visit(Visitor<T> visitor) {
         switch (value) {
-            case PAPER_CHECK:
-                return visitor.visitPaperCheck();
             case CRYPTOCURRENCY:
                 return visitor.visitCryptocurrency();
+            case CHECK:
+                return visitor.visitCheck();
+            case CARD:
+                return visitor.visitCard();
             case UNKNOWN:
                 return visitor.visitUnknown();
             case HOME_DELIVERY:
                 return visitor.visitHomeDelivery();
             case BANK_DEPOSIT:
                 return visitor.visitBankDeposit();
-            case MASSPAY_CARD:
-                return visitor.visitMasspayCard();
             case MOBILE_WALLET:
                 return visitor.visitMobileWallet();
             case CASH_PICKUP:
@@ -94,18 +94,18 @@ public final class CreateMethodsResponseSupportedPayoutMethodDeliveryType {
     @JsonCreator(mode = JsonCreator.Mode.DELEGATING)
     public static CreateMethodsResponseSupportedPayoutMethodDeliveryType valueOf(String value) {
         switch (value) {
-            case "paper_check":
-                return PAPER_CHECK;
             case "cryptocurrency":
                 return CRYPTOCURRENCY;
+            case "check":
+                return CHECK;
+            case "card":
+                return CARD;
             case "unknown":
                 return UNKNOWN;
             case "home_delivery":
                 return HOME_DELIVERY;
             case "bank_deposit":
                 return BANK_DEPOSIT;
-            case "masspay_card":
-                return MASSPAY_CARD;
             case "mobile_wallet":
                 return MOBILE_WALLET;
             case "cash_pickup":
@@ -126,9 +126,9 @@ public final class CreateMethodsResponseSupportedPayoutMethodDeliveryType {
 
         MOBILE_WALLET,
 
-        MASSPAY_CARD,
+        CARD,
 
-        PAPER_CHECK,
+        CHECK,
 
         BILL,
 
@@ -148,9 +148,9 @@ public final class CreateMethodsResponseSupportedPayoutMethodDeliveryType {
 
         T visitMobileWallet();
 
-        T visitMasspayCard();
+        T visitCard();
 
-        T visitPaperCheck();
+        T visitCheck();
 
         T visitBill();
 

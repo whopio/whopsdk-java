@@ -32,6 +32,8 @@ public final class ListAppsRequest {
 
     private final Optional<Boolean> verifiedAppsOnly;
 
+    private final Optional<Boolean> recommended;
+
     private final Optional<String> query;
 
     private final Optional<ListAppsRequestOrder> order;
@@ -53,6 +55,7 @@ public final class ListAppsRequest {
             Optional<ListAppsRequestAppType> appType,
             Optional<ListAppsRequestViewType> viewType,
             Optional<Boolean> verifiedAppsOnly,
+            Optional<Boolean> recommended,
             Optional<String> query,
             Optional<ListAppsRequestOrder> order,
             Optional<ListAppsRequestDirection> direction,
@@ -65,6 +68,7 @@ public final class ListAppsRequest {
         this.appType = appType;
         this.viewType = viewType;
         this.verifiedAppsOnly = verifiedAppsOnly;
+        this.recommended = recommended;
         this.query = query;
         this.order = order;
         this.direction = direction;
@@ -105,6 +109,14 @@ public final class ListAppsRequest {
     @JsonProperty("verified_apps_only")
     public Optional<Boolean> getVerifiedAppsOnly() {
         return verifiedAppsOnly;
+    }
+
+    /**
+     * @return Only return apps Whop recommends (or, with <code>false</code>, only those it does not). The community blueprints gallery is the recommended slice of the public website list.
+     */
+    @JsonProperty("recommended")
+    public Optional<Boolean> getRecommended() {
+        return recommended;
     }
 
     /**
@@ -179,6 +191,7 @@ public final class ListAppsRequest {
                 && appType.equals(other.appType)
                 && viewType.equals(other.viewType)
                 && verifiedAppsOnly.equals(other.verifiedAppsOnly)
+                && recommended.equals(other.recommended)
                 && query.equals(other.query)
                 && order.equals(other.order)
                 && direction.equals(other.direction)
@@ -195,6 +208,7 @@ public final class ListAppsRequest {
                 this.appType,
                 this.viewType,
                 this.verifiedAppsOnly,
+                this.recommended,
                 this.query,
                 this.order,
                 this.direction,
@@ -223,6 +237,8 @@ public final class ListAppsRequest {
 
         private Optional<Boolean> verifiedAppsOnly = Optional.empty();
 
+        private Optional<Boolean> recommended = Optional.empty();
+
         private Optional<String> query = Optional.empty();
 
         private Optional<ListAppsRequestOrder> order = Optional.empty();
@@ -247,6 +263,7 @@ public final class ListAppsRequest {
             appType(other.getAppType());
             viewType(other.getViewType());
             verifiedAppsOnly(other.getVerifiedAppsOnly());
+            recommended(other.getRecommended());
             query(other.getQuery());
             order(other.getOrder());
             direction(other.getDirection());
@@ -310,6 +327,20 @@ public final class ListAppsRequest {
 
         public Builder verifiedAppsOnly(Boolean verifiedAppsOnly) {
             this.verifiedAppsOnly = Optional.ofNullable(verifiedAppsOnly);
+            return this;
+        }
+
+        /**
+         * <p>Only return apps Whop recommends (or, with <code>false</code>, only those it does not). The community blueprints gallery is the recommended slice of the public website list.</p>
+         */
+        @JsonSetter(value = "recommended", nulls = Nulls.SKIP)
+        public Builder recommended(Optional<Boolean> recommended) {
+            this.recommended = recommended;
+            return this;
+        }
+
+        public Builder recommended(Boolean recommended) {
+            this.recommended = Optional.ofNullable(recommended);
             return this;
         }
 
@@ -417,6 +448,7 @@ public final class ListAppsRequest {
                     appType,
                     viewType,
                     verifiedAppsOnly,
+                    recommended,
                     query,
                     order,
                     direction,

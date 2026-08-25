@@ -303,6 +303,10 @@ public final class GetFinancialReportResponseRowsItemLineCategory {
             new GetFinancialReportResponseRowsItemLineCategory(
                     Value.CARD_SPEND_AUTHORIZATION_HOLD, "card_spend_authorization_hold");
 
+    public static final GetFinancialReportResponseRowsItemLineCategory ACCELERATED_SETTLEMENT_FEE =
+            new GetFinancialReportResponseRowsItemLineCategory(
+                    Value.ACCELERATED_SETTLEMENT_FEE, "accelerated_settlement_fee");
+
     public static final GetFinancialReportResponseRowsItemLineCategory PAYMENT_UNRECONCILED_CLEARING =
             new GetFinancialReportResponseRowsItemLineCategory(
                     Value.PAYMENT_UNRECONCILED_CLEARING, "payment_unreconciled_clearing");
@@ -805,6 +809,10 @@ public final class GetFinancialReportResponseRowsItemLineCategory {
     public static final GetFinancialReportResponseRowsItemLineCategory CRYPTO =
             new GetFinancialReportResponseRowsItemLineCategory(Value.CRYPTO, "crypto");
 
+    public static final GetFinancialReportResponseRowsItemLineCategory PSP_ACCELERATED_SETTLEMENT_FEE =
+            new GetFinancialReportResponseRowsItemLineCategory(
+                    Value.PSP_ACCELERATED_SETTLEMENT_FEE, "psp_accelerated_settlement_fee");
+
     public static final GetFinancialReportResponseRowsItemLineCategory DISPUTE_UNRECONCILED_REVERSAL =
             new GetFinancialReportResponseRowsItemLineCategory(
                     Value.DISPUTE_UNRECONCILED_REVERSAL, "dispute_unreconciled_reversal");
@@ -1169,6 +1177,8 @@ public final class GetFinancialReportResponseRowsItemLineCategory {
                 return visitor.visitPlatformEarningSettlement();
             case CARD_SPEND_AUTHORIZATION_HOLD:
                 return visitor.visitCardSpendAuthorizationHold();
+            case ACCELERATED_SETTLEMENT_FEE:
+                return visitor.visitAcceleratedSettlementFee();
             case PAYMENT_UNRECONCILED_CLEARING:
                 return visitor.visitPaymentUnreconciledClearing();
             case ONCHAIN_WALLET_TRANSFER_OUTGOING:
@@ -1461,6 +1471,8 @@ public final class GetFinancialReportResponseRowsItemLineCategory {
                 return visitor.visitAdBudgetRelease();
             case CRYPTO:
                 return visitor.visitCrypto();
+            case PSP_ACCELERATED_SETTLEMENT_FEE:
+                return visitor.visitPspAcceleratedSettlementFee();
             case DISPUTE_UNRECONCILED_REVERSAL:
                 return visitor.visitDisputeUnreconciledReversal();
             case PLATFORM_AFFILIATE_PAYMENT_REVERSAL:
@@ -1732,6 +1744,8 @@ public final class GetFinancialReportResponseRowsItemLineCategory {
                 return PLATFORM_EARNING_SETTLEMENT;
             case "card_spend_authorization_hold":
                 return CARD_SPEND_AUTHORIZATION_HOLD;
+            case "accelerated_settlement_fee":
+                return ACCELERATED_SETTLEMENT_FEE;
             case "payment_unreconciled_clearing":
                 return PAYMENT_UNRECONCILED_CLEARING;
             case "onchain_wallet_transfer_outgoing":
@@ -2024,6 +2038,8 @@ public final class GetFinancialReportResponseRowsItemLineCategory {
                 return AD_BUDGET_RELEASE;
             case "crypto":
                 return CRYPTO;
+            case "psp_accelerated_settlement_fee":
+                return PSP_ACCELERATED_SETTLEMENT_FEE;
             case "dispute_unreconciled_reversal":
                 return DISPUTE_UNRECONCILED_REVERSAL;
             case "platform_affiliate_payment_reversal":
@@ -2122,6 +2138,8 @@ public final class GetFinancialReportResponseRowsItemLineCategory {
     }
 
     public enum Value {
+        ACCELERATED_SETTLEMENT_FEE,
+
         ACCOUNT_SETTLEMENT,
 
         AD_BALANCE_FUNDING_RECEIPT,
@@ -2452,6 +2470,8 @@ public final class GetFinancialReportResponseRowsItemLineCategory {
 
         PROMO_REVERSAL,
 
+        PSP_ACCELERATED_SETTLEMENT_FEE,
+
         PSP_ACCOUNT_UPDATER_FEE,
 
         PSP_ADJUSTED_PROCESSING_FEE,
@@ -2680,6 +2700,8 @@ public final class GetFinancialReportResponseRowsItemLineCategory {
     }
 
     public interface Visitor<T> {
+        T visitAcceleratedSettlementFee();
+
         T visitAccountSettlement();
 
         T visitAdBalanceFundingReceipt();
@@ -3009,6 +3031,8 @@ public final class GetFinancialReportResponseRowsItemLineCategory {
         T visitPlatformEarningUnreconciledClearing();
 
         T visitPromoReversal();
+
+        T visitPspAcceleratedSettlementFee();
 
         T visitPspAccountUpdaterFee();
 

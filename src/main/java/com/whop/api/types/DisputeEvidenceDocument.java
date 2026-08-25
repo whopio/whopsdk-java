@@ -16,6 +16,7 @@ import com.whop.api.core.Nullable;
 import com.whop.api.core.NullableNonemptyFilter;
 import com.whop.api.core.ObjectMappers;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
@@ -26,28 +27,68 @@ import org.jetbrains.annotations.NotNull;
 public final class DisputeEvidenceDocument {
     private final Optional<DisputeEvidenceDocumentContentType> contentType;
 
+    private final String createdAt;
+
     private final DisputeEvidenceDocumentDocumentType documentType;
 
     private final Optional<String> filename;
 
     private final String id;
 
+    private final Optional<Integer> multipartChunkSize;
+
+    private final Optional<String> multipartUploadId;
+
+    private final Optional<List<FileMultipartUrl>> multipartUploadUrls;
+
+    private final String object;
+
+    private final Optional<Integer> size;
+
+    private final Optional<Map<String, Object>> uploadHeaders;
+
+    private final DisputeEvidenceDocumentUploadStatus uploadStatus;
+
+    private final Optional<String> uploadUrl;
+
     private final Optional<String> url;
+
+    private final DisputeEvidenceDocumentVisibility visibility;
 
     private final Map<String, Object> additionalProperties;
 
     private DisputeEvidenceDocument(
             Optional<DisputeEvidenceDocumentContentType> contentType,
+            String createdAt,
             DisputeEvidenceDocumentDocumentType documentType,
             Optional<String> filename,
             String id,
+            Optional<Integer> multipartChunkSize,
+            Optional<String> multipartUploadId,
+            Optional<List<FileMultipartUrl>> multipartUploadUrls,
+            String object,
+            Optional<Integer> size,
+            Optional<Map<String, Object>> uploadHeaders,
+            DisputeEvidenceDocumentUploadStatus uploadStatus,
+            Optional<String> uploadUrl,
             Optional<String> url,
+            DisputeEvidenceDocumentVisibility visibility,
             Map<String, Object> additionalProperties) {
         this.contentType = contentType;
+        this.createdAt = createdAt;
         this.documentType = documentType;
         this.filename = filename;
         this.id = id;
+        this.multipartChunkSize = multipartChunkSize;
+        this.multipartUploadId = multipartUploadId;
+        this.multipartUploadUrls = multipartUploadUrls;
+        this.object = object;
+        this.size = size;
+        this.uploadHeaders = uploadHeaders;
+        this.uploadStatus = uploadStatus;
+        this.uploadUrl = uploadUrl;
         this.url = url;
+        this.visibility = visibility;
         this.additionalProperties = additionalProperties;
     }
 
@@ -63,6 +104,14 @@ public final class DisputeEvidenceDocument {
     }
 
     /**
+     * @return When the file was created, as an ISO 8601 timestamp.
+     */
+    @JsonProperty("created_at")
+    public String getCreatedAt() {
+        return createdAt;
+    }
+
+    /**
      * @return What kind of evidence the document is.
      */
     @JsonProperty("document_type")
@@ -71,7 +120,7 @@ public final class DisputeEvidenceDocument {
     }
 
     /**
-     * @return The uploaded file's name.
+     * @return The original filename, including its extension.
      */
     @JsonIgnore
     public Optional<String> getFilename() {
@@ -82,7 +131,7 @@ public final class DisputeEvidenceDocument {
     }
 
     /**
-     * @return The attachment's ID, prefixed <code>file_</code>.
+     * @return The file's ID, prefixed <code>file_</code>.
      */
     @JsonProperty("id")
     public String getId() {
@@ -90,7 +139,83 @@ public final class DisputeEvidenceDocument {
     }
 
     /**
-     * @return A URL to download the document.
+     * @return The byte size each part (except the last) must be. Present only on create, and only for multipart uploads.
+     */
+    @JsonIgnore
+    public Optional<Integer> getMultipartChunkSize() {
+        if (multipartChunkSize == null) {
+            return Optional.empty();
+        }
+        return multipartChunkSize;
+    }
+
+    /**
+     * @return The ID of the multipart upload, passed back to <code>complete</code>. Present only on create, and only for multipart uploads.
+     */
+    @JsonIgnore
+    public Optional<String> getMultipartUploadId() {
+        if (multipartUploadId == null) {
+            return Optional.empty();
+        }
+        return multipartUploadId;
+    }
+
+    @JsonIgnore
+    public Optional<List<FileMultipartUrl>> getMultipartUploadUrls() {
+        if (multipartUploadUrls == null) {
+            return Optional.empty();
+        }
+        return multipartUploadUrls;
+    }
+
+    /**
+     * @return The type of this object, always <code>file</code>.
+     */
+    @JsonProperty("object")
+    public String getObject() {
+        return object;
+    }
+
+    /**
+     * @return The file size in bytes. <code>null</code> until the upload has finished.
+     */
+    @JsonIgnore
+    public Optional<Integer> getSize() {
+        if (size == null) {
+            return Optional.empty();
+        }
+        return size;
+    }
+
+    /**
+     * @return Headers to send with the upload PUT. Present only on create.
+     */
+    @JsonProperty("upload_headers")
+    public Optional<Map<String, Object>> getUploadHeaders() {
+        return uploadHeaders;
+    }
+
+    /**
+     * @return Where the file is in its upload lifecycle.
+     */
+    @JsonProperty("upload_status")
+    public DisputeEvidenceDocumentUploadStatus getUploadStatus() {
+        return uploadStatus;
+    }
+
+    /**
+     * @return Presigned URL to PUT the file's bytes to. Present only on create, and only for single-part uploads.
+     */
+    @JsonIgnore
+    public Optional<String> getUploadUrl() {
+        if (uploadUrl == null) {
+            return Optional.empty();
+        }
+        return uploadUrl;
+    }
+
+    /**
+     * @return A URL to download the file: a permanent CDN URL for public files, a signed expiring URL for private ones. <code>null</code> until the upload has finished.
      */
     @JsonIgnore
     public Optional<String> getUrl() {
@@ -98,6 +223,14 @@ public final class DisputeEvidenceDocument {
             return Optional.empty();
         }
         return url;
+    }
+
+    /**
+     * @return <code>public</code> files are served via an unsigned CDN URL; <code>private</code> files via a signed, expiring URL.
+     */
+    @JsonProperty("visibility")
+    public DisputeEvidenceDocumentVisibility getVisibility() {
+        return visibility;
     }
 
     @JsonInclude(value = JsonInclude.Include.CUSTOM, valueFilter = NullableNonemptyFilter.class)
@@ -110,6 +243,36 @@ public final class DisputeEvidenceDocument {
     @JsonProperty("filename")
     private Optional<String> _getFilename() {
         return filename;
+    }
+
+    @JsonInclude(value = JsonInclude.Include.CUSTOM, valueFilter = NullableNonemptyFilter.class)
+    @JsonProperty("multipart_chunk_size")
+    private Optional<Integer> _getMultipartChunkSize() {
+        return multipartChunkSize;
+    }
+
+    @JsonInclude(value = JsonInclude.Include.CUSTOM, valueFilter = NullableNonemptyFilter.class)
+    @JsonProperty("multipart_upload_id")
+    private Optional<String> _getMultipartUploadId() {
+        return multipartUploadId;
+    }
+
+    @JsonInclude(value = JsonInclude.Include.CUSTOM, valueFilter = NullableNonemptyFilter.class)
+    @JsonProperty("multipart_upload_urls")
+    private Optional<List<FileMultipartUrl>> _getMultipartUploadUrls() {
+        return multipartUploadUrls;
+    }
+
+    @JsonInclude(value = JsonInclude.Include.CUSTOM, valueFilter = NullableNonemptyFilter.class)
+    @JsonProperty("size")
+    private Optional<Integer> _getSize() {
+        return size;
+    }
+
+    @JsonInclude(value = JsonInclude.Include.CUSTOM, valueFilter = NullableNonemptyFilter.class)
+    @JsonProperty("upload_url")
+    private Optional<String> _getUploadUrl() {
+        return uploadUrl;
     }
 
     @JsonInclude(value = JsonInclude.Include.CUSTOM, valueFilter = NullableNonemptyFilter.class)
@@ -131,15 +294,40 @@ public final class DisputeEvidenceDocument {
 
     private boolean equalTo(DisputeEvidenceDocument other) {
         return contentType.equals(other.contentType)
+                && createdAt.equals(other.createdAt)
                 && documentType.equals(other.documentType)
                 && filename.equals(other.filename)
                 && id.equals(other.id)
-                && url.equals(other.url);
+                && multipartChunkSize.equals(other.multipartChunkSize)
+                && multipartUploadId.equals(other.multipartUploadId)
+                && multipartUploadUrls.equals(other.multipartUploadUrls)
+                && object.equals(other.object)
+                && size.equals(other.size)
+                && uploadHeaders.equals(other.uploadHeaders)
+                && uploadStatus.equals(other.uploadStatus)
+                && uploadUrl.equals(other.uploadUrl)
+                && url.equals(other.url)
+                && visibility.equals(other.visibility);
     }
 
     @java.lang.Override
     public int hashCode() {
-        return Objects.hash(this.contentType, this.documentType, this.filename, this.id, this.url);
+        return Objects.hash(
+                this.contentType,
+                this.createdAt,
+                this.documentType,
+                this.filename,
+                this.id,
+                this.multipartChunkSize,
+                this.multipartUploadId,
+                this.multipartUploadUrls,
+                this.object,
+                this.size,
+                this.uploadHeaders,
+                this.uploadStatus,
+                this.uploadUrl,
+                this.url,
+                this.visibility);
     }
 
     @java.lang.Override
@@ -147,8 +335,17 @@ public final class DisputeEvidenceDocument {
         return ObjectMappers.stringify(this);
     }
 
-    public static DocumentTypeStage builder() {
+    public static CreatedAtStage builder() {
         return new Builder();
+    }
+
+    public interface CreatedAtStage {
+        /**
+         * <p>When the file was created, as an ISO 8601 timestamp.</p>
+         */
+        DocumentTypeStage createdAt(@NotNull String createdAt);
+
+        Builder from(DisputeEvidenceDocument other);
     }
 
     public interface DocumentTypeStage {
@@ -156,15 +353,34 @@ public final class DisputeEvidenceDocument {
          * <p>What kind of evidence the document is.</p>
          */
         IdStage documentType(@NotNull DisputeEvidenceDocumentDocumentType documentType);
-
-        Builder from(DisputeEvidenceDocument other);
     }
 
     public interface IdStage {
         /**
-         * <p>The attachment's ID, prefixed <code>file_</code>.</p>
+         * <p>The file's ID, prefixed <code>file_</code>.</p>
          */
-        _FinalStage id(@NotNull String id);
+        ObjectStage id(@NotNull String id);
+    }
+
+    public interface ObjectStage {
+        /**
+         * <p>The type of this object, always <code>file</code>.</p>
+         */
+        UploadStatusStage object(@NotNull String object);
+    }
+
+    public interface UploadStatusStage {
+        /**
+         * <p>Where the file is in its upload lifecycle.</p>
+         */
+        VisibilityStage uploadStatus(@NotNull DisputeEvidenceDocumentUploadStatus uploadStatus);
+    }
+
+    public interface VisibilityStage {
+        /**
+         * <p><code>public</code> files are served via an unsigned CDN URL; <code>private</code> files via a signed, expiring URL.</p>
+         */
+        _FinalStage visibility(@NotNull DisputeEvidenceDocumentVisibility visibility);
     }
 
     public interface _FinalStage {
@@ -184,7 +400,7 @@ public final class DisputeEvidenceDocument {
         _FinalStage contentType(Nullable<DisputeEvidenceDocumentContentType> contentType);
 
         /**
-         * <p>The uploaded file's name.</p>
+         * <p>The original filename, including its extension.</p>
          */
         _FinalStage filename(Optional<String> filename);
 
@@ -193,7 +409,56 @@ public final class DisputeEvidenceDocument {
         _FinalStage filename(Nullable<String> filename);
 
         /**
-         * <p>A URL to download the document.</p>
+         * <p>The byte size each part (except the last) must be. Present only on create, and only for multipart uploads.</p>
+         */
+        _FinalStage multipartChunkSize(Optional<Integer> multipartChunkSize);
+
+        _FinalStage multipartChunkSize(Integer multipartChunkSize);
+
+        _FinalStage multipartChunkSize(Nullable<Integer> multipartChunkSize);
+
+        /**
+         * <p>The ID of the multipart upload, passed back to <code>complete</code>. Present only on create, and only for multipart uploads.</p>
+         */
+        _FinalStage multipartUploadId(Optional<String> multipartUploadId);
+
+        _FinalStage multipartUploadId(String multipartUploadId);
+
+        _FinalStage multipartUploadId(Nullable<String> multipartUploadId);
+
+        _FinalStage multipartUploadUrls(Optional<List<FileMultipartUrl>> multipartUploadUrls);
+
+        _FinalStage multipartUploadUrls(List<FileMultipartUrl> multipartUploadUrls);
+
+        _FinalStage multipartUploadUrls(Nullable<List<FileMultipartUrl>> multipartUploadUrls);
+
+        /**
+         * <p>The file size in bytes. <code>null</code> until the upload has finished.</p>
+         */
+        _FinalStage size(Optional<Integer> size);
+
+        _FinalStage size(Integer size);
+
+        _FinalStage size(Nullable<Integer> size);
+
+        /**
+         * <p>Headers to send with the upload PUT. Present only on create.</p>
+         */
+        _FinalStage uploadHeaders(Optional<Map<String, Object>> uploadHeaders);
+
+        _FinalStage uploadHeaders(Map<String, Object> uploadHeaders);
+
+        /**
+         * <p>Presigned URL to PUT the file's bytes to. Present only on create, and only for single-part uploads.</p>
+         */
+        _FinalStage uploadUrl(Optional<String> uploadUrl);
+
+        _FinalStage uploadUrl(String uploadUrl);
+
+        _FinalStage uploadUrl(Nullable<String> uploadUrl);
+
+        /**
+         * <p>A URL to download the file: a permanent CDN URL for public files, a signed expiring URL for private ones. <code>null</code> until the upload has finished.</p>
          */
         _FinalStage url(Optional<String> url);
 
@@ -203,12 +468,39 @@ public final class DisputeEvidenceDocument {
     }
 
     @JsonIgnoreProperties(ignoreUnknown = true)
-    public static final class Builder implements DocumentTypeStage, IdStage, _FinalStage {
+    public static final class Builder
+            implements CreatedAtStage,
+                    DocumentTypeStage,
+                    IdStage,
+                    ObjectStage,
+                    UploadStatusStage,
+                    VisibilityStage,
+                    _FinalStage {
+        private String createdAt;
+
         private DisputeEvidenceDocumentDocumentType documentType;
 
         private String id;
 
+        private String object;
+
+        private DisputeEvidenceDocumentUploadStatus uploadStatus;
+
+        private DisputeEvidenceDocumentVisibility visibility;
+
         private Optional<String> url = Optional.empty();
+
+        private Optional<String> uploadUrl = Optional.empty();
+
+        private Optional<Map<String, Object>> uploadHeaders = Optional.empty();
+
+        private Optional<Integer> size = Optional.empty();
+
+        private Optional<List<FileMultipartUrl>> multipartUploadUrls = Optional.empty();
+
+        private Optional<String> multipartUploadId = Optional.empty();
+
+        private Optional<Integer> multipartChunkSize = Optional.empty();
 
         private Optional<String> filename = Optional.empty();
 
@@ -222,10 +514,32 @@ public final class DisputeEvidenceDocument {
         @java.lang.Override
         public Builder from(DisputeEvidenceDocument other) {
             contentType(other.getContentType());
+            createdAt(other.getCreatedAt());
             documentType(other.getDocumentType());
             filename(other.getFilename());
             id(other.getId());
+            multipartChunkSize(other.getMultipartChunkSize());
+            multipartUploadId(other.getMultipartUploadId());
+            multipartUploadUrls(other.getMultipartUploadUrls());
+            object(other.getObject());
+            size(other.getSize());
+            uploadHeaders(other.getUploadHeaders());
+            uploadStatus(other.getUploadStatus());
+            uploadUrl(other.getUploadUrl());
             url(other.getUrl());
+            visibility(other.getVisibility());
+            return this;
+        }
+
+        /**
+         * <p>When the file was created, as an ISO 8601 timestamp.</p>
+         * <p>When the file was created, as an ISO 8601 timestamp.</p>
+         * @return Reference to {@code this} so that method calls can be chained together.
+         */
+        @java.lang.Override
+        @JsonSetter("created_at")
+        public DocumentTypeStage createdAt(@NotNull String createdAt) {
+            this.createdAt = Objects.requireNonNull(createdAt, "createdAt must not be null");
             return this;
         }
 
@@ -242,19 +556,55 @@ public final class DisputeEvidenceDocument {
         }
 
         /**
-         * <p>The attachment's ID, prefixed <code>file_</code>.</p>
-         * <p>The attachment's ID, prefixed <code>file_</code>.</p>
+         * <p>The file's ID, prefixed <code>file_</code>.</p>
+         * <p>The file's ID, prefixed <code>file_</code>.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
         @JsonSetter("id")
-        public _FinalStage id(@NotNull String id) {
+        public ObjectStage id(@NotNull String id) {
             this.id = Objects.requireNonNull(id, "id must not be null");
             return this;
         }
 
         /**
-         * <p>A URL to download the document.</p>
+         * <p>The type of this object, always <code>file</code>.</p>
+         * <p>The type of this object, always <code>file</code>.</p>
+         * @return Reference to {@code this} so that method calls can be chained together.
+         */
+        @java.lang.Override
+        @JsonSetter("object")
+        public UploadStatusStage object(@NotNull String object) {
+            this.object = Objects.requireNonNull(object, "object must not be null");
+            return this;
+        }
+
+        /**
+         * <p>Where the file is in its upload lifecycle.</p>
+         * <p>Where the file is in its upload lifecycle.</p>
+         * @return Reference to {@code this} so that method calls can be chained together.
+         */
+        @java.lang.Override
+        @JsonSetter("upload_status")
+        public VisibilityStage uploadStatus(@NotNull DisputeEvidenceDocumentUploadStatus uploadStatus) {
+            this.uploadStatus = Objects.requireNonNull(uploadStatus, "uploadStatus must not be null");
+            return this;
+        }
+
+        /**
+         * <p><code>public</code> files are served via an unsigned CDN URL; <code>private</code> files via a signed, expiring URL.</p>
+         * <p><code>public</code> files are served via an unsigned CDN URL; <code>private</code> files via a signed, expiring URL.</p>
+         * @return Reference to {@code this} so that method calls can be chained together.
+         */
+        @java.lang.Override
+        @JsonSetter("visibility")
+        public _FinalStage visibility(@NotNull DisputeEvidenceDocumentVisibility visibility) {
+            this.visibility = Objects.requireNonNull(visibility, "visibility must not be null");
+            return this;
+        }
+
+        /**
+         * <p>A URL to download the file: a permanent CDN URL for public files, a signed expiring URL for private ones. <code>null</code> until the upload has finished.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
@@ -270,7 +620,7 @@ public final class DisputeEvidenceDocument {
         }
 
         /**
-         * <p>A URL to download the document.</p>
+         * <p>A URL to download the file: a permanent CDN URL for public files, a signed expiring URL for private ones. <code>null</code> until the upload has finished.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
@@ -280,7 +630,7 @@ public final class DisputeEvidenceDocument {
         }
 
         /**
-         * <p>A URL to download the document.</p>
+         * <p>A URL to download the file: a permanent CDN URL for public files, a signed expiring URL for private ones. <code>null</code> until the upload has finished.</p>
          */
         @java.lang.Override
         @JsonSetter(value = "url", nulls = Nulls.SKIP)
@@ -290,7 +640,196 @@ public final class DisputeEvidenceDocument {
         }
 
         /**
-         * <p>The uploaded file's name.</p>
+         * <p>Presigned URL to PUT the file's bytes to. Present only on create, and only for single-part uploads.</p>
+         * @return Reference to {@code this} so that method calls can be chained together.
+         */
+        @java.lang.Override
+        public _FinalStage uploadUrl(Nullable<String> uploadUrl) {
+            if (uploadUrl.isNull()) {
+                this.uploadUrl = null;
+            } else if (uploadUrl.isEmpty()) {
+                this.uploadUrl = Optional.empty();
+            } else {
+                this.uploadUrl = Optional.of(uploadUrl.get());
+            }
+            return this;
+        }
+
+        /**
+         * <p>Presigned URL to PUT the file's bytes to. Present only on create, and only for single-part uploads.</p>
+         * @return Reference to {@code this} so that method calls can be chained together.
+         */
+        @java.lang.Override
+        public _FinalStage uploadUrl(String uploadUrl) {
+            this.uploadUrl = Optional.ofNullable(uploadUrl);
+            return this;
+        }
+
+        /**
+         * <p>Presigned URL to PUT the file's bytes to. Present only on create, and only for single-part uploads.</p>
+         */
+        @java.lang.Override
+        @JsonSetter(value = "upload_url", nulls = Nulls.SKIP)
+        public _FinalStage uploadUrl(Optional<String> uploadUrl) {
+            this.uploadUrl = uploadUrl;
+            return this;
+        }
+
+        /**
+         * <p>Headers to send with the upload PUT. Present only on create.</p>
+         * @return Reference to {@code this} so that method calls can be chained together.
+         */
+        @java.lang.Override
+        public _FinalStage uploadHeaders(Map<String, Object> uploadHeaders) {
+            this.uploadHeaders = Optional.ofNullable(uploadHeaders);
+            return this;
+        }
+
+        /**
+         * <p>Headers to send with the upload PUT. Present only on create.</p>
+         */
+        @java.lang.Override
+        @JsonSetter(value = "upload_headers", nulls = Nulls.SKIP)
+        public _FinalStage uploadHeaders(Optional<Map<String, Object>> uploadHeaders) {
+            this.uploadHeaders = uploadHeaders;
+            return this;
+        }
+
+        /**
+         * <p>The file size in bytes. <code>null</code> until the upload has finished.</p>
+         * @return Reference to {@code this} so that method calls can be chained together.
+         */
+        @java.lang.Override
+        public _FinalStage size(Nullable<Integer> size) {
+            if (size.isNull()) {
+                this.size = null;
+            } else if (size.isEmpty()) {
+                this.size = Optional.empty();
+            } else {
+                this.size = Optional.of(size.get());
+            }
+            return this;
+        }
+
+        /**
+         * <p>The file size in bytes. <code>null</code> until the upload has finished.</p>
+         * @return Reference to {@code this} so that method calls can be chained together.
+         */
+        @java.lang.Override
+        public _FinalStage size(Integer size) {
+            this.size = Optional.ofNullable(size);
+            return this;
+        }
+
+        /**
+         * <p>The file size in bytes. <code>null</code> until the upload has finished.</p>
+         */
+        @java.lang.Override
+        @JsonSetter(value = "size", nulls = Nulls.SKIP)
+        public _FinalStage size(Optional<Integer> size) {
+            this.size = size;
+            return this;
+        }
+
+        @java.lang.Override
+        public _FinalStage multipartUploadUrls(Nullable<List<FileMultipartUrl>> multipartUploadUrls) {
+            if (multipartUploadUrls.isNull()) {
+                this.multipartUploadUrls = null;
+            } else if (multipartUploadUrls.isEmpty()) {
+                this.multipartUploadUrls = Optional.empty();
+            } else {
+                this.multipartUploadUrls = Optional.of(multipartUploadUrls.get());
+            }
+            return this;
+        }
+
+        @java.lang.Override
+        public _FinalStage multipartUploadUrls(List<FileMultipartUrl> multipartUploadUrls) {
+            this.multipartUploadUrls = Optional.ofNullable(multipartUploadUrls);
+            return this;
+        }
+
+        @java.lang.Override
+        @JsonSetter(value = "multipart_upload_urls", nulls = Nulls.SKIP)
+        public _FinalStage multipartUploadUrls(Optional<List<FileMultipartUrl>> multipartUploadUrls) {
+            this.multipartUploadUrls = multipartUploadUrls;
+            return this;
+        }
+
+        /**
+         * <p>The ID of the multipart upload, passed back to <code>complete</code>. Present only on create, and only for multipart uploads.</p>
+         * @return Reference to {@code this} so that method calls can be chained together.
+         */
+        @java.lang.Override
+        public _FinalStage multipartUploadId(Nullable<String> multipartUploadId) {
+            if (multipartUploadId.isNull()) {
+                this.multipartUploadId = null;
+            } else if (multipartUploadId.isEmpty()) {
+                this.multipartUploadId = Optional.empty();
+            } else {
+                this.multipartUploadId = Optional.of(multipartUploadId.get());
+            }
+            return this;
+        }
+
+        /**
+         * <p>The ID of the multipart upload, passed back to <code>complete</code>. Present only on create, and only for multipart uploads.</p>
+         * @return Reference to {@code this} so that method calls can be chained together.
+         */
+        @java.lang.Override
+        public _FinalStage multipartUploadId(String multipartUploadId) {
+            this.multipartUploadId = Optional.ofNullable(multipartUploadId);
+            return this;
+        }
+
+        /**
+         * <p>The ID of the multipart upload, passed back to <code>complete</code>. Present only on create, and only for multipart uploads.</p>
+         */
+        @java.lang.Override
+        @JsonSetter(value = "multipart_upload_id", nulls = Nulls.SKIP)
+        public _FinalStage multipartUploadId(Optional<String> multipartUploadId) {
+            this.multipartUploadId = multipartUploadId;
+            return this;
+        }
+
+        /**
+         * <p>The byte size each part (except the last) must be. Present only on create, and only for multipart uploads.</p>
+         * @return Reference to {@code this} so that method calls can be chained together.
+         */
+        @java.lang.Override
+        public _FinalStage multipartChunkSize(Nullable<Integer> multipartChunkSize) {
+            if (multipartChunkSize.isNull()) {
+                this.multipartChunkSize = null;
+            } else if (multipartChunkSize.isEmpty()) {
+                this.multipartChunkSize = Optional.empty();
+            } else {
+                this.multipartChunkSize = Optional.of(multipartChunkSize.get());
+            }
+            return this;
+        }
+
+        /**
+         * <p>The byte size each part (except the last) must be. Present only on create, and only for multipart uploads.</p>
+         * @return Reference to {@code this} so that method calls can be chained together.
+         */
+        @java.lang.Override
+        public _FinalStage multipartChunkSize(Integer multipartChunkSize) {
+            this.multipartChunkSize = Optional.ofNullable(multipartChunkSize);
+            return this;
+        }
+
+        /**
+         * <p>The byte size each part (except the last) must be. Present only on create, and only for multipart uploads.</p>
+         */
+        @java.lang.Override
+        @JsonSetter(value = "multipart_chunk_size", nulls = Nulls.SKIP)
+        public _FinalStage multipartChunkSize(Optional<Integer> multipartChunkSize) {
+            this.multipartChunkSize = multipartChunkSize;
+            return this;
+        }
+
+        /**
+         * <p>The original filename, including its extension.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
@@ -306,7 +845,7 @@ public final class DisputeEvidenceDocument {
         }
 
         /**
-         * <p>The uploaded file's name.</p>
+         * <p>The original filename, including its extension.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
@@ -316,7 +855,7 @@ public final class DisputeEvidenceDocument {
         }
 
         /**
-         * <p>The uploaded file's name.</p>
+         * <p>The original filename, including its extension.</p>
          */
         @java.lang.Override
         @JsonSetter(value = "filename", nulls = Nulls.SKIP)
@@ -363,7 +902,23 @@ public final class DisputeEvidenceDocument {
 
         @java.lang.Override
         public DisputeEvidenceDocument build() {
-            return new DisputeEvidenceDocument(contentType, documentType, filename, id, url, additionalProperties);
+            return new DisputeEvidenceDocument(
+                    contentType,
+                    createdAt,
+                    documentType,
+                    filename,
+                    id,
+                    multipartChunkSize,
+                    multipartUploadId,
+                    multipartUploadUrls,
+                    object,
+                    size,
+                    uploadHeaders,
+                    uploadStatus,
+                    uploadUrl,
+                    url,
+                    visibility,
+                    additionalProperties);
         }
 
         @java.lang.Override

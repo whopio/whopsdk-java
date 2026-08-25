@@ -185,7 +185,7 @@ public final class CreateInvoicesRequestProduct {
     }
 
     /**
-     * @return Optional line items that break down the invoice total. When provided, the sum of (quantity * unit_price) for all items must equal the plan price.
+     * @return Optional line items that break down the invoice total. When provided, the sum of (quantity * unit_price) for all items must equal the plan price. Individual items may be negative to represent a credit, as long as the sum is not negative and clears the currency's minimum charge.
      */
     @JsonIgnore
     public Optional<List<CreateInvoicesRequestProductLineItemsItem>> getLineItems() {
@@ -509,7 +509,7 @@ public final class CreateInvoicesRequestProduct {
         _FinalStage emailAddress(Nullable<String> emailAddress);
 
         /**
-         * <p>Optional line items that break down the invoice total. When provided, the sum of (quantity * unit_price) for all items must equal the plan price.</p>
+         * <p>Optional line items that break down the invoice total. When provided, the sum of (quantity * unit_price) for all items must equal the plan price. Individual items may be negative to represent a credit, as long as the sum is not negative and clears the currency's minimum charge.</p>
          */
         _FinalStage lineItems(Optional<List<CreateInvoicesRequestProductLineItemsItem>> lineItems);
 
@@ -901,7 +901,7 @@ public final class CreateInvoicesRequestProduct {
         }
 
         /**
-         * <p>Optional line items that break down the invoice total. When provided, the sum of (quantity * unit_price) for all items must equal the plan price.</p>
+         * <p>Optional line items that break down the invoice total. When provided, the sum of (quantity * unit_price) for all items must equal the plan price. Individual items may be negative to represent a credit, as long as the sum is not negative and clears the currency's minimum charge.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
@@ -917,7 +917,7 @@ public final class CreateInvoicesRequestProduct {
         }
 
         /**
-         * <p>Optional line items that break down the invoice total. When provided, the sum of (quantity * unit_price) for all items must equal the plan price.</p>
+         * <p>Optional line items that break down the invoice total. When provided, the sum of (quantity * unit_price) for all items must equal the plan price. Individual items may be negative to represent a credit, as long as the sum is not negative and clears the currency's minimum charge.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
@@ -927,7 +927,7 @@ public final class CreateInvoicesRequestProduct {
         }
 
         /**
-         * <p>Optional line items that break down the invoice total. When provided, the sum of (quantity * unit_price) for all items must equal the plan price.</p>
+         * <p>Optional line items that break down the invoice total. When provided, the sum of (quantity * unit_price) for all items must equal the plan price. Individual items may be negative to represent a credit, as long as the sum is not negative and clears the currency's minimum charge.</p>
          */
         @java.lang.Override
         @JsonSetter(value = "line_items", nulls = Nulls.SKIP)

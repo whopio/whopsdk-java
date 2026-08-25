@@ -13,24 +13,34 @@ import com.fasterxml.jackson.annotation.Nulls;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.whop.api.core.ObjectMappers;
 import com.whop.api.resources.products.types.ListProductsRequestDirection;
+import com.whop.api.resources.products.types.ListProductsRequestPlanTypesItem;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
-import org.jetbrains.annotations.NotNull;
 
 @JsonInclude(JsonInclude.Include.NON_ABSENT)
 @JsonDeserialize(builder = ListProductsRequest.Builder.class)
 public final class ListProductsRequest {
+    private final Optional<List<ListProductsRequestPlanTypesItem>> planTypes;
+
     private final Optional<List<String>> visibilities;
 
     private final Optional<List<String>> accessPassTypes;
 
     private final Optional<List<String>> labels;
 
-    private final String accountId;
+    private final Optional<String> accountId;
+
+    private final Optional<String> query;
+
+    private final Optional<String> marketplaceCategoryRoute;
+
+    private final Optional<Double> priceMinimum;
+
+    private final Optional<Double> priceMaximum;
 
     private final Optional<ListProductsRequestDirection> direction;
 
@@ -44,35 +54,61 @@ public final class ListProductsRequest {
 
     private final Optional<String> before;
 
+    private final Optional<String> createdAfter;
+
+    private final Optional<String> createdBefore;
+
     private final Map<String, Object> additionalProperties;
 
     private ListProductsRequest(
+            Optional<List<ListProductsRequestPlanTypesItem>> planTypes,
             Optional<List<String>> visibilities,
             Optional<List<String>> accessPassTypes,
             Optional<List<String>> labels,
-            String accountId,
+            Optional<String> accountId,
+            Optional<String> query,
+            Optional<String> marketplaceCategoryRoute,
+            Optional<Double> priceMinimum,
+            Optional<Double> priceMaximum,
             Optional<ListProductsRequestDirection> direction,
             Optional<String> order,
             Optional<Integer> first,
             Optional<String> after,
             Optional<Integer> last,
             Optional<String> before,
+            Optional<String> createdAfter,
+            Optional<String> createdBefore,
             Map<String, Object> additionalProperties) {
+        this.planTypes = planTypes;
         this.visibilities = visibilities;
         this.accessPassTypes = accessPassTypes;
         this.labels = labels;
         this.accountId = accountId;
+        this.query = query;
+        this.marketplaceCategoryRoute = marketplaceCategoryRoute;
+        this.priceMinimum = priceMinimum;
+        this.priceMaximum = priceMaximum;
         this.direction = direction;
         this.order = order;
         this.first = first;
         this.after = after;
         this.last = last;
         this.before = before;
+        this.createdAfter = createdAfter;
+        this.createdBefore = createdBefore;
         this.additionalProperties = additionalProperties;
     }
 
     /**
-     * @return Filter to only products matching these visibility states.
+     * @return Filter to products with a buyable plan of these billing models, such as <code>one_time</code> or <code>renewal</code>.
+     */
+    @JsonProperty("plan_types")
+    public Optional<List<ListProductsRequestPlanTypesItem>> getPlanTypes() {
+        return planTypes;
+    }
+
+    /**
+     * @return Filter to only products matching these visibility states. Ignored on the public marketplace list, which only returns visible products.
      */
     @JsonProperty("visibilities")
     public Optional<List<String>> getVisibilities() {
@@ -96,11 +132,43 @@ public final class ListProductsRequest {
     }
 
     /**
-     * @return The unique identifier of the account to list products for.
+     * @return The unique identifier of the account to list products for. Omit to search the public marketplace.
      */
     @JsonProperty("account_id")
-    public String getAccountId() {
+    public Optional<String> getAccountId() {
         return accountId;
+    }
+
+    /**
+     * @return Ranked search against product title and headline. Omit to browse by recency.
+     */
+    @JsonProperty("query")
+    public Optional<String> getQuery() {
+        return query;
+    }
+
+    /**
+     * @return Only return marketplace products assigned to this category route, such as <code>trading</code>.
+     */
+    @JsonProperty("marketplace_category_route")
+    public Optional<String> getMarketplaceCategoryRoute() {
+        return marketplaceCategoryRoute;
+    }
+
+    /**
+     * @return Only return products whose advertised buyable plan has a displayed price of at least this amount. Recurring plans use renewal price.
+     */
+    @JsonProperty("price_minimum")
+    public Optional<Double> getPriceMinimum() {
+        return priceMinimum;
+    }
+
+    /**
+     * @return Only return products whose advertised buyable plan has a displayed price of at most this amount. Recurring plans use renewal price.
+     */
+    @JsonProperty("price_maximum")
+    public Optional<Double> getPriceMaximum() {
+        return priceMaximum;
     }
 
     /**
@@ -112,7 +180,7 @@ public final class ListProductsRequest {
     }
 
     /**
-     * @return The field to sort results by. Defaults to created_at.
+     * @return The field to sort results by. Account lists default to <code>created_at</code>. Marketplace lists default to <code>discoverable_at</code> and accept <code>created_at</code> or <code>discoverable_at</code>. Cannot be combined with <code>query</code>.
      */
     @JsonProperty("order")
     public Optional<String> getOrder() {
@@ -151,6 +219,22 @@ public final class ListProductsRequest {
         return before;
     }
 
+    /**
+     * @return Only return products created after this ISO 8601 timestamp.
+     */
+    @JsonProperty("created_after")
+    public Optional<String> getCreatedAfter() {
+        return createdAfter;
+    }
+
+    /**
+     * @return Only return products created before this ISO 8601 timestamp.
+     */
+    @JsonProperty("created_before")
+    public Optional<String> getCreatedBefore() {
+        return createdBefore;
+    }
+
     @java.lang.Override
     public boolean equals(Object other) {
         if (this == other) return true;
@@ -163,31 +247,45 @@ public final class ListProductsRequest {
     }
 
     private boolean equalTo(ListProductsRequest other) {
-        return visibilities.equals(other.visibilities)
+        return planTypes.equals(other.planTypes)
+                && visibilities.equals(other.visibilities)
                 && accessPassTypes.equals(other.accessPassTypes)
                 && labels.equals(other.labels)
                 && accountId.equals(other.accountId)
+                && query.equals(other.query)
+                && marketplaceCategoryRoute.equals(other.marketplaceCategoryRoute)
+                && priceMinimum.equals(other.priceMinimum)
+                && priceMaximum.equals(other.priceMaximum)
                 && direction.equals(other.direction)
                 && order.equals(other.order)
                 && first.equals(other.first)
                 && after.equals(other.after)
                 && last.equals(other.last)
-                && before.equals(other.before);
+                && before.equals(other.before)
+                && createdAfter.equals(other.createdAfter)
+                && createdBefore.equals(other.createdBefore);
     }
 
     @java.lang.Override
     public int hashCode() {
         return Objects.hash(
+                this.planTypes,
                 this.visibilities,
                 this.accessPassTypes,
                 this.labels,
                 this.accountId,
+                this.query,
+                this.marketplaceCategoryRoute,
+                this.priceMinimum,
+                this.priceMaximum,
                 this.direction,
                 this.order,
                 this.first,
                 this.after,
                 this.last,
-                this.before);
+                this.before,
+                this.createdAfter,
+                this.createdBefore);
     }
 
     @java.lang.Override
@@ -195,371 +293,357 @@ public final class ListProductsRequest {
         return ObjectMappers.stringify(this);
     }
 
-    public static AccountIdStage builder() {
+    public static Builder builder() {
         return new Builder();
     }
 
-    public interface AccountIdStage {
-        /**
-         * <p>The unique identifier of the account to list products for.</p>
-         */
-        _FinalStage accountId(@NotNull String accountId);
-
-        Builder from(ListProductsRequest other);
-    }
-
-    public interface _FinalStage {
-        ListProductsRequest build();
-
-        _FinalStage additionalProperty(String key, Object value);
-
-        _FinalStage additionalProperties(Map<String, Object> additionalProperties);
-
-        /**
-         * <p>Filter to only products matching these visibility states.</p>
-         */
-        _FinalStage visibilities(Optional<List<String>> visibilities);
-
-        _FinalStage visibilities(List<String> visibilities);
-
-        _FinalStage visibilities(String visibilities);
-
-        /**
-         * <p>Filter to only products matching these types.</p>
-         */
-        _FinalStage accessPassTypes(Optional<List<String>> accessPassTypes);
-
-        _FinalStage accessPassTypes(List<String> accessPassTypes);
-
-        _FinalStage accessPassTypes(String accessPassTypes);
-
-        /**
-         * <p>Filter to only products carrying all of these labels. Labels are matched lowercased.</p>
-         */
-        _FinalStage labels(Optional<List<String>> labels);
-
-        _FinalStage labels(List<String> labels);
-
-        _FinalStage labels(String labels);
-
-        /**
-         * <p>The sort direction for results. Defaults to descending.</p>
-         */
-        _FinalStage direction(Optional<ListProductsRequestDirection> direction);
-
-        _FinalStage direction(ListProductsRequestDirection direction);
-
-        /**
-         * <p>The field to sort results by. Defaults to created_at.</p>
-         */
-        _FinalStage order(Optional<String> order);
-
-        _FinalStage order(String order);
-
-        /**
-         * <p>The number of products to return (default and max 100).</p>
-         */
-        _FinalStage first(Optional<Integer> first);
-
-        _FinalStage first(Integer first);
-
-        /**
-         * <p>A cursor; returns products after this position.</p>
-         */
-        _FinalStage after(Optional<String> after);
-
-        _FinalStage after(String after);
-
-        /**
-         * <p>The number of products to return from the end of the range.</p>
-         */
-        _FinalStage last(Optional<Integer> last);
-
-        _FinalStage last(Integer last);
-
-        /**
-         * <p>A cursor; returns products before this position.</p>
-         */
-        _FinalStage before(Optional<String> before);
-
-        _FinalStage before(String before);
-    }
-
     @JsonIgnoreProperties(ignoreUnknown = true)
-    public static final class Builder implements AccountIdStage, _FinalStage {
-        private String accountId;
+    public static final class Builder {
+        private Optional<List<ListProductsRequestPlanTypesItem>> planTypes = Optional.empty();
 
-        private Optional<String> before = Optional.empty();
-
-        private Optional<Integer> last = Optional.empty();
-
-        private Optional<String> after = Optional.empty();
-
-        private Optional<Integer> first = Optional.empty();
-
-        private Optional<String> order = Optional.empty();
-
-        private Optional<ListProductsRequestDirection> direction = Optional.empty();
-
-        private Optional<List<String>> labels = Optional.empty();
+        private Optional<List<String>> visibilities = Optional.empty();
 
         private Optional<List<String>> accessPassTypes = Optional.empty();
 
-        private Optional<List<String>> visibilities = Optional.empty();
+        private Optional<List<String>> labels = Optional.empty();
+
+        private Optional<String> accountId = Optional.empty();
+
+        private Optional<String> query = Optional.empty();
+
+        private Optional<String> marketplaceCategoryRoute = Optional.empty();
+
+        private Optional<Double> priceMinimum = Optional.empty();
+
+        private Optional<Double> priceMaximum = Optional.empty();
+
+        private Optional<ListProductsRequestDirection> direction = Optional.empty();
+
+        private Optional<String> order = Optional.empty();
+
+        private Optional<Integer> first = Optional.empty();
+
+        private Optional<String> after = Optional.empty();
+
+        private Optional<Integer> last = Optional.empty();
+
+        private Optional<String> before = Optional.empty();
+
+        private Optional<String> createdAfter = Optional.empty();
+
+        private Optional<String> createdBefore = Optional.empty();
 
         @JsonAnySetter
         private Map<String, Object> additionalProperties = new HashMap<>();
 
         private Builder() {}
 
-        @java.lang.Override
         public Builder from(ListProductsRequest other) {
+            planTypes(other.getPlanTypes());
             visibilities(other.getVisibilities());
             accessPassTypes(other.getAccessPassTypes());
             labels(other.getLabels());
             accountId(other.getAccountId());
+            query(other.getQuery());
+            marketplaceCategoryRoute(other.getMarketplaceCategoryRoute());
+            priceMinimum(other.getPriceMinimum());
+            priceMaximum(other.getPriceMaximum());
             direction(other.getDirection());
             order(other.getOrder());
             first(other.getFirst());
             after(other.getAfter());
             last(other.getLast());
             before(other.getBefore());
+            createdAfter(other.getCreatedAfter());
+            createdBefore(other.getCreatedBefore());
             return this;
         }
 
         /**
-         * <p>The unique identifier of the account to list products for.</p>
-         * <p>The unique identifier of the account to list products for.</p>
-         * @return Reference to {@code this} so that method calls can be chained together.
+         * <p>Filter to products with a buyable plan of these billing models, such as <code>one_time</code> or <code>renewal</code>.</p>
          */
-        @java.lang.Override
-        @JsonSetter("account_id")
-        public _FinalStage accountId(@NotNull String accountId) {
-            this.accountId = Objects.requireNonNull(accountId, "accountId must not be null");
+        @JsonSetter(value = "plan_types", nulls = Nulls.SKIP)
+        public Builder planTypes(Optional<List<ListProductsRequestPlanTypesItem>> planTypes) {
+            this.planTypes = planTypes;
+            return this;
+        }
+
+        public Builder planTypes(List<ListProductsRequestPlanTypesItem> planTypes) {
+            this.planTypes = Optional.ofNullable(planTypes);
+            return this;
+        }
+
+        public Builder planTypes(ListProductsRequestPlanTypesItem planTypes) {
+            this.planTypes = Optional.of(Collections.singletonList(planTypes));
             return this;
         }
 
         /**
-         * <p>A cursor; returns products before this position.</p>
-         * @return Reference to {@code this} so that method calls can be chained together.
+         * <p>Filter to only products matching these visibility states. Ignored on the public marketplace list, which only returns visible products.</p>
          */
-        @java.lang.Override
-        public _FinalStage before(String before) {
-            this.before = Optional.ofNullable(before);
+        @JsonSetter(value = "visibilities", nulls = Nulls.SKIP)
+        public Builder visibilities(Optional<List<String>> visibilities) {
+            this.visibilities = visibilities;
             return this;
         }
 
-        /**
-         * <p>A cursor; returns products before this position.</p>
-         */
-        @java.lang.Override
-        @JsonSetter(value = "before", nulls = Nulls.SKIP)
-        public _FinalStage before(Optional<String> before) {
-            this.before = before;
+        public Builder visibilities(List<String> visibilities) {
+            this.visibilities = Optional.ofNullable(visibilities);
             return this;
         }
 
-        /**
-         * <p>The number of products to return from the end of the range.</p>
-         * @return Reference to {@code this} so that method calls can be chained together.
-         */
-        @java.lang.Override
-        public _FinalStage last(Integer last) {
-            this.last = Optional.ofNullable(last);
-            return this;
-        }
-
-        /**
-         * <p>The number of products to return from the end of the range.</p>
-         */
-        @java.lang.Override
-        @JsonSetter(value = "last", nulls = Nulls.SKIP)
-        public _FinalStage last(Optional<Integer> last) {
-            this.last = last;
-            return this;
-        }
-
-        /**
-         * <p>A cursor; returns products after this position.</p>
-         * @return Reference to {@code this} so that method calls can be chained together.
-         */
-        @java.lang.Override
-        public _FinalStage after(String after) {
-            this.after = Optional.ofNullable(after);
-            return this;
-        }
-
-        /**
-         * <p>A cursor; returns products after this position.</p>
-         */
-        @java.lang.Override
-        @JsonSetter(value = "after", nulls = Nulls.SKIP)
-        public _FinalStage after(Optional<String> after) {
-            this.after = after;
-            return this;
-        }
-
-        /**
-         * <p>The number of products to return (default and max 100).</p>
-         * @return Reference to {@code this} so that method calls can be chained together.
-         */
-        @java.lang.Override
-        public _FinalStage first(Integer first) {
-            this.first = Optional.ofNullable(first);
-            return this;
-        }
-
-        /**
-         * <p>The number of products to return (default and max 100).</p>
-         */
-        @java.lang.Override
-        @JsonSetter(value = "first", nulls = Nulls.SKIP)
-        public _FinalStage first(Optional<Integer> first) {
-            this.first = first;
-            return this;
-        }
-
-        /**
-         * <p>The field to sort results by. Defaults to created_at.</p>
-         * @return Reference to {@code this} so that method calls can be chained together.
-         */
-        @java.lang.Override
-        public _FinalStage order(String order) {
-            this.order = Optional.ofNullable(order);
-            return this;
-        }
-
-        /**
-         * <p>The field to sort results by. Defaults to created_at.</p>
-         */
-        @java.lang.Override
-        @JsonSetter(value = "order", nulls = Nulls.SKIP)
-        public _FinalStage order(Optional<String> order) {
-            this.order = order;
-            return this;
-        }
-
-        /**
-         * <p>The sort direction for results. Defaults to descending.</p>
-         * @return Reference to {@code this} so that method calls can be chained together.
-         */
-        @java.lang.Override
-        public _FinalStage direction(ListProductsRequestDirection direction) {
-            this.direction = Optional.ofNullable(direction);
-            return this;
-        }
-
-        /**
-         * <p>The sort direction for results. Defaults to descending.</p>
-         */
-        @java.lang.Override
-        @JsonSetter(value = "direction", nulls = Nulls.SKIP)
-        public _FinalStage direction(Optional<ListProductsRequestDirection> direction) {
-            this.direction = direction;
-            return this;
-        }
-
-        @java.lang.Override
-        public _FinalStage labels(String labels) {
-            this.labels = Optional.of(Collections.singletonList(labels));
-            return this;
-        }
-
-        /**
-         * <p>Filter to only products carrying all of these labels. Labels are matched lowercased.</p>
-         * @return Reference to {@code this} so that method calls can be chained together.
-         */
-        @java.lang.Override
-        public _FinalStage labels(List<String> labels) {
-            this.labels = Optional.ofNullable(labels);
-            return this;
-        }
-
-        /**
-         * <p>Filter to only products carrying all of these labels. Labels are matched lowercased.</p>
-         */
-        @java.lang.Override
-        @JsonSetter(value = "labels", nulls = Nulls.SKIP)
-        public _FinalStage labels(Optional<List<String>> labels) {
-            this.labels = labels;
-            return this;
-        }
-
-        @java.lang.Override
-        public _FinalStage accessPassTypes(String accessPassTypes) {
-            this.accessPassTypes = Optional.of(Collections.singletonList(accessPassTypes));
-            return this;
-        }
-
-        /**
-         * <p>Filter to only products matching these types.</p>
-         * @return Reference to {@code this} so that method calls can be chained together.
-         */
-        @java.lang.Override
-        public _FinalStage accessPassTypes(List<String> accessPassTypes) {
-            this.accessPassTypes = Optional.ofNullable(accessPassTypes);
-            return this;
-        }
-
-        /**
-         * <p>Filter to only products matching these types.</p>
-         */
-        @java.lang.Override
-        @JsonSetter(value = "access_pass_types", nulls = Nulls.SKIP)
-        public _FinalStage accessPassTypes(Optional<List<String>> accessPassTypes) {
-            this.accessPassTypes = accessPassTypes;
-            return this;
-        }
-
-        @java.lang.Override
-        public _FinalStage visibilities(String visibilities) {
+        public Builder visibilities(String visibilities) {
             this.visibilities = Optional.of(Collections.singletonList(visibilities));
             return this;
         }
 
         /**
-         * <p>Filter to only products matching these visibility states.</p>
-         * @return Reference to {@code this} so that method calls can be chained together.
+         * <p>Filter to only products matching these types.</p>
          */
-        @java.lang.Override
-        public _FinalStage visibilities(List<String> visibilities) {
-            this.visibilities = Optional.ofNullable(visibilities);
+        @JsonSetter(value = "access_pass_types", nulls = Nulls.SKIP)
+        public Builder accessPassTypes(Optional<List<String>> accessPassTypes) {
+            this.accessPassTypes = accessPassTypes;
+            return this;
+        }
+
+        public Builder accessPassTypes(List<String> accessPassTypes) {
+            this.accessPassTypes = Optional.ofNullable(accessPassTypes);
+            return this;
+        }
+
+        public Builder accessPassTypes(String accessPassTypes) {
+            this.accessPassTypes = Optional.of(Collections.singletonList(accessPassTypes));
             return this;
         }
 
         /**
-         * <p>Filter to only products matching these visibility states.</p>
+         * <p>Filter to only products carrying all of these labels. Labels are matched lowercased.</p>
          */
-        @java.lang.Override
-        @JsonSetter(value = "visibilities", nulls = Nulls.SKIP)
-        public _FinalStage visibilities(Optional<List<String>> visibilities) {
-            this.visibilities = visibilities;
+        @JsonSetter(value = "labels", nulls = Nulls.SKIP)
+        public Builder labels(Optional<List<String>> labels) {
+            this.labels = labels;
             return this;
         }
 
-        @java.lang.Override
+        public Builder labels(List<String> labels) {
+            this.labels = Optional.ofNullable(labels);
+            return this;
+        }
+
+        public Builder labels(String labels) {
+            this.labels = Optional.of(Collections.singletonList(labels));
+            return this;
+        }
+
+        /**
+         * <p>The unique identifier of the account to list products for. Omit to search the public marketplace.</p>
+         */
+        @JsonSetter(value = "account_id", nulls = Nulls.SKIP)
+        public Builder accountId(Optional<String> accountId) {
+            this.accountId = accountId;
+            return this;
+        }
+
+        public Builder accountId(String accountId) {
+            this.accountId = Optional.ofNullable(accountId);
+            return this;
+        }
+
+        /**
+         * <p>Ranked search against product title and headline. Omit to browse by recency.</p>
+         */
+        @JsonSetter(value = "query", nulls = Nulls.SKIP)
+        public Builder query(Optional<String> query) {
+            this.query = query;
+            return this;
+        }
+
+        public Builder query(String query) {
+            this.query = Optional.ofNullable(query);
+            return this;
+        }
+
+        /**
+         * <p>Only return marketplace products assigned to this category route, such as <code>trading</code>.</p>
+         */
+        @JsonSetter(value = "marketplace_category_route", nulls = Nulls.SKIP)
+        public Builder marketplaceCategoryRoute(Optional<String> marketplaceCategoryRoute) {
+            this.marketplaceCategoryRoute = marketplaceCategoryRoute;
+            return this;
+        }
+
+        public Builder marketplaceCategoryRoute(String marketplaceCategoryRoute) {
+            this.marketplaceCategoryRoute = Optional.ofNullable(marketplaceCategoryRoute);
+            return this;
+        }
+
+        /**
+         * <p>Only return products whose advertised buyable plan has a displayed price of at least this amount. Recurring plans use renewal price.</p>
+         */
+        @JsonSetter(value = "price_minimum", nulls = Nulls.SKIP)
+        public Builder priceMinimum(Optional<Double> priceMinimum) {
+            this.priceMinimum = priceMinimum;
+            return this;
+        }
+
+        public Builder priceMinimum(Double priceMinimum) {
+            this.priceMinimum = Optional.ofNullable(priceMinimum);
+            return this;
+        }
+
+        /**
+         * <p>Only return products whose advertised buyable plan has a displayed price of at most this amount. Recurring plans use renewal price.</p>
+         */
+        @JsonSetter(value = "price_maximum", nulls = Nulls.SKIP)
+        public Builder priceMaximum(Optional<Double> priceMaximum) {
+            this.priceMaximum = priceMaximum;
+            return this;
+        }
+
+        public Builder priceMaximum(Double priceMaximum) {
+            this.priceMaximum = Optional.ofNullable(priceMaximum);
+            return this;
+        }
+
+        /**
+         * <p>The sort direction for results. Defaults to descending.</p>
+         */
+        @JsonSetter(value = "direction", nulls = Nulls.SKIP)
+        public Builder direction(Optional<ListProductsRequestDirection> direction) {
+            this.direction = direction;
+            return this;
+        }
+
+        public Builder direction(ListProductsRequestDirection direction) {
+            this.direction = Optional.ofNullable(direction);
+            return this;
+        }
+
+        /**
+         * <p>The field to sort results by. Account lists default to <code>created_at</code>. Marketplace lists default to <code>discoverable_at</code> and accept <code>created_at</code> or <code>discoverable_at</code>. Cannot be combined with <code>query</code>.</p>
+         */
+        @JsonSetter(value = "order", nulls = Nulls.SKIP)
+        public Builder order(Optional<String> order) {
+            this.order = order;
+            return this;
+        }
+
+        public Builder order(String order) {
+            this.order = Optional.ofNullable(order);
+            return this;
+        }
+
+        /**
+         * <p>The number of products to return (default and max 100).</p>
+         */
+        @JsonSetter(value = "first", nulls = Nulls.SKIP)
+        public Builder first(Optional<Integer> first) {
+            this.first = first;
+            return this;
+        }
+
+        public Builder first(Integer first) {
+            this.first = Optional.ofNullable(first);
+            return this;
+        }
+
+        /**
+         * <p>A cursor; returns products after this position.</p>
+         */
+        @JsonSetter(value = "after", nulls = Nulls.SKIP)
+        public Builder after(Optional<String> after) {
+            this.after = after;
+            return this;
+        }
+
+        public Builder after(String after) {
+            this.after = Optional.ofNullable(after);
+            return this;
+        }
+
+        /**
+         * <p>The number of products to return from the end of the range.</p>
+         */
+        @JsonSetter(value = "last", nulls = Nulls.SKIP)
+        public Builder last(Optional<Integer> last) {
+            this.last = last;
+            return this;
+        }
+
+        public Builder last(Integer last) {
+            this.last = Optional.ofNullable(last);
+            return this;
+        }
+
+        /**
+         * <p>A cursor; returns products before this position.</p>
+         */
+        @JsonSetter(value = "before", nulls = Nulls.SKIP)
+        public Builder before(Optional<String> before) {
+            this.before = before;
+            return this;
+        }
+
+        public Builder before(String before) {
+            this.before = Optional.ofNullable(before);
+            return this;
+        }
+
+        /**
+         * <p>Only return products created after this ISO 8601 timestamp.</p>
+         */
+        @JsonSetter(value = "created_after", nulls = Nulls.SKIP)
+        public Builder createdAfter(Optional<String> createdAfter) {
+            this.createdAfter = createdAfter;
+            return this;
+        }
+
+        public Builder createdAfter(String createdAfter) {
+            this.createdAfter = Optional.ofNullable(createdAfter);
+            return this;
+        }
+
+        /**
+         * <p>Only return products created before this ISO 8601 timestamp.</p>
+         */
+        @JsonSetter(value = "created_before", nulls = Nulls.SKIP)
+        public Builder createdBefore(Optional<String> createdBefore) {
+            this.createdBefore = createdBefore;
+            return this;
+        }
+
+        public Builder createdBefore(String createdBefore) {
+            this.createdBefore = Optional.ofNullable(createdBefore);
+            return this;
+        }
+
         public ListProductsRequest build() {
             return new ListProductsRequest(
+                    planTypes,
                     visibilities,
                     accessPassTypes,
                     labels,
                     accountId,
+                    query,
+                    marketplaceCategoryRoute,
+                    priceMinimum,
+                    priceMaximum,
                     direction,
                     order,
                     first,
                     after,
                     last,
                     before,
+                    createdAfter,
+                    createdBefore,
                     additionalProperties);
         }
 
-        @java.lang.Override
         public Builder additionalProperty(String key, Object value) {
             this.additionalProperties.put(key, value);
             return this;
         }
 
-        @java.lang.Override
         public Builder additionalProperties(Map<String, Object> additionalProperties) {
             this.additionalProperties.putAll(additionalProperties);
             return this;

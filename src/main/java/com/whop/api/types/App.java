@@ -56,6 +56,8 @@ public final class App {
 
     private final String domainId;
 
+    private final List<AppElementsUsedItem> elementsUsed;
+
     private final Optional<String> experiencePath;
 
     private final Optional<String> hostedUrl;
@@ -116,6 +118,7 @@ public final class App {
             Optional<String> description,
             Optional<String> discoverPath,
             String domainId,
+            List<AppElementsUsedItem> elementsUsed,
             Optional<String> experiencePath,
             Optional<String> hostedUrl,
             AppIcon icon,
@@ -153,6 +156,7 @@ public final class App {
         this.description = description;
         this.discoverPath = discoverPath;
         this.domainId = domainId;
+        this.elementsUsed = elementsUsed;
         this.experiencePath = experiencePath;
         this.hostedUrl = hostedUrl;
         this.icon = icon;
@@ -319,6 +323,11 @@ public final class App {
     @JsonProperty("domain_id")
     public String getDomainId() {
         return domainId;
+    }
+
+    @JsonProperty("elements_used")
+    public List<AppElementsUsedItem> getElementsUsed() {
+        return elementsUsed;
     }
 
     /**
@@ -669,6 +678,7 @@ public final class App {
                 && description.equals(other.description)
                 && discoverPath.equals(other.discoverPath)
                 && domainId.equals(other.domainId)
+                && elementsUsed.equals(other.elementsUsed)
                 && experiencePath.equals(other.experiencePath)
                 && hostedUrl.equals(other.hostedUrl)
                 && icon.equals(other.icon)
@@ -710,6 +720,7 @@ public final class App {
                 this.description,
                 this.discoverPath,
                 this.domainId,
+                this.elementsUsed,
                 this.experiencePath,
                 this.hostedUrl,
                 this.icon,
@@ -915,6 +926,12 @@ public final class App {
 
         _FinalStage discoverPath(Nullable<String> discoverPath);
 
+        _FinalStage elementsUsed(List<AppElementsUsedItem> elementsUsed);
+
+        _FinalStage addElementsUsed(AppElementsUsedItem elementsUsed);
+
+        _FinalStage addAllElementsUsed(List<AppElementsUsedItem> elementsUsed);
+
         /**
          * <p>URL path for the member-facing hub view, or <code>null</code> when not configured.</p>
          */
@@ -1108,6 +1125,8 @@ public final class App {
 
         private Optional<String> experiencePath = Optional.empty();
 
+        private List<AppElementsUsedItem> elementsUsed = new ArrayList<>();
+
         private Optional<String> discoverPath = Optional.empty();
 
         private Optional<String> description = Optional.empty();
@@ -1150,6 +1169,7 @@ public final class App {
             description(other.getDescription());
             discoverPath(other.getDiscoverPath());
             domainId(other.getDomainId());
+            elementsUsed(other.getElementsUsed());
             experiencePath(other.getExperiencePath());
             hostedUrl(other.getHostedUrl());
             icon(other.getIcon());
@@ -1810,6 +1830,30 @@ public final class App {
             return this;
         }
 
+        @java.lang.Override
+        public _FinalStage addAllElementsUsed(List<AppElementsUsedItem> elementsUsed) {
+            if (elementsUsed != null) {
+                this.elementsUsed.addAll(elementsUsed);
+            }
+            return this;
+        }
+
+        @java.lang.Override
+        public _FinalStage addElementsUsed(AppElementsUsedItem elementsUsed) {
+            this.elementsUsed.add(elementsUsed);
+            return this;
+        }
+
+        @java.lang.Override
+        @JsonSetter(value = "elements_used", nulls = Nulls.SKIP)
+        public _FinalStage elementsUsed(List<AppElementsUsedItem> elementsUsed) {
+            this.elementsUsed.clear();
+            if (elementsUsed != null) {
+                this.elementsUsed.addAll(elementsUsed);
+            }
+            return this;
+        }
+
         /**
          * <p>URL path for the discover view, or <code>null</code> when not configured.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
@@ -2176,6 +2220,7 @@ public final class App {
                     description,
                     discoverPath,
                     domainId,
+                    elementsUsed,
                     experiencePath,
                     hostedUrl,
                     icon,

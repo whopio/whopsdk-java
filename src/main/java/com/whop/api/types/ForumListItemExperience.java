@@ -21,12 +21,16 @@ import org.jetbrains.annotations.NotNull;
 public final class ForumListItemExperience {
     private final String id;
 
+    private final boolean isPublic;
+
     private final String name;
 
     private final Map<String, Object> additionalProperties;
 
-    private ForumListItemExperience(String id, String name, Map<String, Object> additionalProperties) {
+    private ForumListItemExperience(
+            String id, boolean isPublic, String name, Map<String, Object> additionalProperties) {
         this.id = id;
+        this.isPublic = isPublic;
         this.name = name;
         this.additionalProperties = additionalProperties;
     }
@@ -37,6 +41,14 @@ public final class ForumListItemExperience {
     @JsonProperty("id")
     public String getId() {
         return id;
+    }
+
+    /**
+     * @return Whether this experience is publicly visible to all users, including those without a membership.
+     */
+    @JsonProperty("is_public")
+    public boolean getIsPublic() {
+        return isPublic;
     }
 
     /**
@@ -59,12 +71,12 @@ public final class ForumListItemExperience {
     }
 
     private boolean equalTo(ForumListItemExperience other) {
-        return id.equals(other.id) && name.equals(other.name);
+        return id.equals(other.id) && isPublic == other.isPublic && name.equals(other.name);
     }
 
     @java.lang.Override
     public int hashCode() {
-        return Objects.hash(this.id, this.name);
+        return Objects.hash(this.id, this.isPublic, this.name);
     }
 
     @java.lang.Override
@@ -80,9 +92,16 @@ public final class ForumListItemExperience {
         /**
          * <p>The unique identifier for the experience.</p>
          */
-        NameStage id(@NotNull String id);
+        IsPublicStage id(@NotNull String id);
 
         Builder from(ForumListItemExperience other);
+    }
+
+    public interface IsPublicStage {
+        /**
+         * <p>Whether this experience is publicly visible to all users, including those without a membership.</p>
+         */
+        NameStage isPublic(boolean isPublic);
     }
 
     public interface NameStage {
@@ -101,8 +120,10 @@ public final class ForumListItemExperience {
     }
 
     @JsonIgnoreProperties(ignoreUnknown = true)
-    public static final class Builder implements IdStage, NameStage, _FinalStage {
+    public static final class Builder implements IdStage, IsPublicStage, NameStage, _FinalStage {
         private String id;
+
+        private boolean isPublic;
 
         private String name;
 
@@ -114,6 +135,7 @@ public final class ForumListItemExperience {
         @java.lang.Override
         public Builder from(ForumListItemExperience other) {
             id(other.getId());
+            isPublic(other.getIsPublic());
             name(other.getName());
             return this;
         }
@@ -125,8 +147,20 @@ public final class ForumListItemExperience {
          */
         @java.lang.Override
         @JsonSetter("id")
-        public NameStage id(@NotNull String id) {
+        public IsPublicStage id(@NotNull String id) {
             this.id = Objects.requireNonNull(id, "id must not be null");
+            return this;
+        }
+
+        /**
+         * <p>Whether this experience is publicly visible to all users, including those without a membership.</p>
+         * <p>Whether this experience is publicly visible to all users, including those without a membership.</p>
+         * @return Reference to {@code this} so that method calls can be chained together.
+         */
+        @java.lang.Override
+        @JsonSetter("is_public")
+        public NameStage isPublic(boolean isPublic) {
+            this.isPublic = isPublic;
             return this;
         }
 
@@ -144,7 +178,7 @@ public final class ForumListItemExperience {
 
         @java.lang.Override
         public ForumListItemExperience build() {
-            return new ForumListItemExperience(id, name, additionalProperties);
+            return new ForumListItemExperience(id, isPublic, name, additionalProperties);
         }
 
         @java.lang.Override

@@ -14,6 +14,7 @@ import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.whop.api.core.ObjectMappers;
 import com.whop.api.resources.adgroups.types.SearchTargetingOptionsAdGroupsRequestLocationTypesItem;
 import com.whop.api.resources.adgroups.types.SearchTargetingOptionsAdGroupsRequestPlatform;
+import com.whop.api.resources.adgroups.types.SearchTargetingOptionsAdGroupsRequestSpecialAdCategoriesItem;
 import com.whop.api.resources.adgroups.types.SearchTargetingOptionsAdGroupsRequestTypesItem;
 import java.util.Collections;
 import java.util.HashMap;
@@ -30,6 +31,8 @@ public final class SearchTargetingOptionsAdGroupsRequest {
 
     private final Optional<List<SearchTargetingOptionsAdGroupsRequestLocationTypesItem>> locationTypes;
 
+    private final Optional<List<SearchTargetingOptionsAdGroupsRequestSpecialAdCategoriesItem>> specialAdCategories;
+
     private final Optional<String> accountId;
 
     private final SearchTargetingOptionsAdGroupsRequestPlatform platform;
@@ -45,6 +48,7 @@ public final class SearchTargetingOptionsAdGroupsRequest {
     private SearchTargetingOptionsAdGroupsRequest(
             Optional<List<SearchTargetingOptionsAdGroupsRequestTypesItem>> types,
             Optional<List<SearchTargetingOptionsAdGroupsRequestLocationTypesItem>> locationTypes,
+            Optional<List<SearchTargetingOptionsAdGroupsRequestSpecialAdCategoriesItem>> specialAdCategories,
             Optional<String> accountId,
             SearchTargetingOptionsAdGroupsRequestPlatform platform,
             Optional<String> query,
@@ -53,6 +57,7 @@ public final class SearchTargetingOptionsAdGroupsRequest {
             Map<String, Object> additionalProperties) {
         this.types = types;
         this.locationTypes = locationTypes;
+        this.specialAdCategories = specialAdCategories;
         this.accountId = accountId;
         this.platform = platform;
         this.query = query;
@@ -75,6 +80,14 @@ public final class SearchTargetingOptionsAdGroupsRequest {
     @JsonProperty("location_types")
     public Optional<List<SearchTargetingOptionsAdGroupsRequestLocationTypesItem>> getLocationTypes() {
         return locationTypes;
+    }
+
+    /**
+     * @return The campaign's declared special ad categories. Under <code>housing</code>, <code>employment</code>, or <code>financial_products</code> the ad platform allows interests only, drawn from a short approved list, so results are narrowed to what such a campaign can launch with and other kinds return nothing. Blank <code>query</code> browses that approved list instead of the usual fixed lists.
+     */
+    @JsonProperty("special_ad_categories")
+    public Optional<List<SearchTargetingOptionsAdGroupsRequestSpecialAdCategoriesItem>> getSpecialAdCategories() {
+        return specialAdCategories;
     }
 
     /**
@@ -132,6 +145,7 @@ public final class SearchTargetingOptionsAdGroupsRequest {
     private boolean equalTo(SearchTargetingOptionsAdGroupsRequest other) {
         return types.equals(other.types)
                 && locationTypes.equals(other.locationTypes)
+                && specialAdCategories.equals(other.specialAdCategories)
                 && accountId.equals(other.accountId)
                 && platform.equals(other.platform)
                 && query.equals(other.query)
@@ -142,7 +156,14 @@ public final class SearchTargetingOptionsAdGroupsRequest {
     @java.lang.Override
     public int hashCode() {
         return Objects.hash(
-                this.types, this.locationTypes, this.accountId, this.platform, this.query, this.country, this.limit);
+                this.types,
+                this.locationTypes,
+                this.specialAdCategories,
+                this.accountId,
+                this.platform,
+                this.query,
+                this.country,
+                this.limit);
     }
 
     @java.lang.Override
@@ -189,6 +210,18 @@ public final class SearchTargetingOptionsAdGroupsRequest {
         _FinalStage locationTypes(SearchTargetingOptionsAdGroupsRequestLocationTypesItem locationTypes);
 
         /**
+         * <p>The campaign's declared special ad categories. Under <code>housing</code>, <code>employment</code>, or <code>financial_products</code> the ad platform allows interests only, drawn from a short approved list, so results are narrowed to what such a campaign can launch with and other kinds return nothing. Blank <code>query</code> browses that approved list instead of the usual fixed lists.</p>
+         */
+        _FinalStage specialAdCategories(
+                Optional<List<SearchTargetingOptionsAdGroupsRequestSpecialAdCategoriesItem>> specialAdCategories);
+
+        _FinalStage specialAdCategories(
+                List<SearchTargetingOptionsAdGroupsRequestSpecialAdCategoriesItem> specialAdCategories);
+
+        _FinalStage specialAdCategories(
+                SearchTargetingOptionsAdGroupsRequestSpecialAdCategoriesItem specialAdCategories);
+
+        /**
          * <p>Account to search on behalf of. Defaults to the authenticated account.</p>
          */
         _FinalStage accountId(Optional<String> accountId);
@@ -229,6 +262,9 @@ public final class SearchTargetingOptionsAdGroupsRequest {
 
         private Optional<String> accountId = Optional.empty();
 
+        private Optional<List<SearchTargetingOptionsAdGroupsRequestSpecialAdCategoriesItem>> specialAdCategories =
+                Optional.empty();
+
         private Optional<List<SearchTargetingOptionsAdGroupsRequestLocationTypesItem>> locationTypes = Optional.empty();
 
         private Optional<List<SearchTargetingOptionsAdGroupsRequestTypesItem>> types = Optional.empty();
@@ -242,6 +278,7 @@ public final class SearchTargetingOptionsAdGroupsRequest {
         public Builder from(SearchTargetingOptionsAdGroupsRequest other) {
             types(other.getTypes());
             locationTypes(other.getLocationTypes());
+            specialAdCategories(other.getSpecialAdCategories());
             accountId(other.getAccountId());
             platform(other.getPlatform());
             query(other.getQuery());
@@ -343,6 +380,35 @@ public final class SearchTargetingOptionsAdGroupsRequest {
         }
 
         @java.lang.Override
+        public _FinalStage specialAdCategories(
+                SearchTargetingOptionsAdGroupsRequestSpecialAdCategoriesItem specialAdCategories) {
+            this.specialAdCategories = Optional.of(Collections.singletonList(specialAdCategories));
+            return this;
+        }
+
+        /**
+         * <p>The campaign's declared special ad categories. Under <code>housing</code>, <code>employment</code>, or <code>financial_products</code> the ad platform allows interests only, drawn from a short approved list, so results are narrowed to what such a campaign can launch with and other kinds return nothing. Blank <code>query</code> browses that approved list instead of the usual fixed lists.</p>
+         * @return Reference to {@code this} so that method calls can be chained together.
+         */
+        @java.lang.Override
+        public _FinalStage specialAdCategories(
+                List<SearchTargetingOptionsAdGroupsRequestSpecialAdCategoriesItem> specialAdCategories) {
+            this.specialAdCategories = Optional.ofNullable(specialAdCategories);
+            return this;
+        }
+
+        /**
+         * <p>The campaign's declared special ad categories. Under <code>housing</code>, <code>employment</code>, or <code>financial_products</code> the ad platform allows interests only, drawn from a short approved list, so results are narrowed to what such a campaign can launch with and other kinds return nothing. Blank <code>query</code> browses that approved list instead of the usual fixed lists.</p>
+         */
+        @java.lang.Override
+        @JsonSetter(value = "special_ad_categories", nulls = Nulls.SKIP)
+        public _FinalStage specialAdCategories(
+                Optional<List<SearchTargetingOptionsAdGroupsRequestSpecialAdCategoriesItem>> specialAdCategories) {
+            this.specialAdCategories = specialAdCategories;
+            return this;
+        }
+
+        @java.lang.Override
         public _FinalStage locationTypes(SearchTargetingOptionsAdGroupsRequestLocationTypesItem locationTypes) {
             this.locationTypes = Optional.of(Collections.singletonList(locationTypes));
             return this;
@@ -398,7 +464,15 @@ public final class SearchTargetingOptionsAdGroupsRequest {
         @java.lang.Override
         public SearchTargetingOptionsAdGroupsRequest build() {
             return new SearchTargetingOptionsAdGroupsRequest(
-                    types, locationTypes, accountId, platform, query, country, limit, additionalProperties);
+                    types,
+                    locationTypes,
+                    specialAdCategories,
+                    accountId,
+                    platform,
+                    query,
+                    country,
+                    limit,
+                    additionalProperties);
         }
 
         @java.lang.Override

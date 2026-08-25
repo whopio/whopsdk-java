@@ -7,23 +7,20 @@ import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonValue;
 
 public final class ListSupportedMethodsResponseDataItemDeliveryType {
-    public static final ListSupportedMethodsResponseDataItemDeliveryType PAPER_CHECK =
-            new ListSupportedMethodsResponseDataItemDeliveryType(Value.PAPER_CHECK, "paper_check");
-
     public static final ListSupportedMethodsResponseDataItemDeliveryType CRYPTOCURRENCY =
             new ListSupportedMethodsResponseDataItemDeliveryType(Value.CRYPTOCURRENCY, "cryptocurrency");
 
-    public static final ListSupportedMethodsResponseDataItemDeliveryType UNKNOWN =
-            new ListSupportedMethodsResponseDataItemDeliveryType(Value.UNKNOWN, "unknown");
+    public static final ListSupportedMethodsResponseDataItemDeliveryType CHECK =
+            new ListSupportedMethodsResponseDataItemDeliveryType(Value.CHECK, "check");
+
+    public static final ListSupportedMethodsResponseDataItemDeliveryType CARD =
+            new ListSupportedMethodsResponseDataItemDeliveryType(Value.CARD, "card");
 
     public static final ListSupportedMethodsResponseDataItemDeliveryType HOME_DELIVERY =
             new ListSupportedMethodsResponseDataItemDeliveryType(Value.HOME_DELIVERY, "home_delivery");
 
     public static final ListSupportedMethodsResponseDataItemDeliveryType BANK_DEPOSIT =
             new ListSupportedMethodsResponseDataItemDeliveryType(Value.BANK_DEPOSIT, "bank_deposit");
-
-    public static final ListSupportedMethodsResponseDataItemDeliveryType MASSPAY_CARD =
-            new ListSupportedMethodsResponseDataItemDeliveryType(Value.MASSPAY_CARD, "masspay_card");
 
     public static final ListSupportedMethodsResponseDataItemDeliveryType MOBILE_WALLET =
             new ListSupportedMethodsResponseDataItemDeliveryType(Value.MOBILE_WALLET, "mobile_wallet");
@@ -67,25 +64,23 @@ public final class ListSupportedMethodsResponseDataItemDeliveryType {
 
     public <T> T visit(Visitor<T> visitor) {
         switch (value) {
-            case PAPER_CHECK:
-                return visitor.visitPaperCheck();
             case CRYPTOCURRENCY:
                 return visitor.visitCryptocurrency();
-            case UNKNOWN:
-                return visitor.visitUnknown();
+            case CHECK:
+                return visitor.visitCheck();
+            case CARD:
+                return visitor.visitCard();
             case HOME_DELIVERY:
                 return visitor.visitHomeDelivery();
             case BANK_DEPOSIT:
                 return visitor.visitBankDeposit();
-            case MASSPAY_CARD:
-                return visitor.visitMasspayCard();
             case MOBILE_WALLET:
                 return visitor.visitMobileWallet();
             case CASH_PICKUP:
                 return visitor.visitCashPickup();
             case BILL:
                 return visitor.visitBill();
-            case _UNKNOWN:
+            case UNKNOWN:
             default:
                 return visitor.visitUnknown(string);
         }
@@ -94,18 +89,16 @@ public final class ListSupportedMethodsResponseDataItemDeliveryType {
     @JsonCreator(mode = JsonCreator.Mode.DELEGATING)
     public static ListSupportedMethodsResponseDataItemDeliveryType valueOf(String value) {
         switch (value) {
-            case "paper_check":
-                return PAPER_CHECK;
             case "cryptocurrency":
                 return CRYPTOCURRENCY;
-            case "unknown":
-                return UNKNOWN;
+            case "check":
+                return CHECK;
+            case "card":
+                return CARD;
             case "home_delivery":
                 return HOME_DELIVERY;
             case "bank_deposit":
                 return BANK_DEPOSIT;
-            case "masspay_card":
-                return MASSPAY_CARD;
             case "mobile_wallet":
                 return MOBILE_WALLET;
             case "cash_pickup":
@@ -113,7 +106,7 @@ public final class ListSupportedMethodsResponseDataItemDeliveryType {
             case "bill":
                 return BILL;
             default:
-                return new ListSupportedMethodsResponseDataItemDeliveryType(Value._UNKNOWN, value);
+                return new ListSupportedMethodsResponseDataItemDeliveryType(Value.UNKNOWN, value);
         }
     }
 
@@ -126,17 +119,15 @@ public final class ListSupportedMethodsResponseDataItemDeliveryType {
 
         MOBILE_WALLET,
 
-        MASSPAY_CARD,
+        CARD,
 
-        PAPER_CHECK,
+        CHECK,
 
         BILL,
 
         CRYPTOCURRENCY,
 
-        UNKNOWN,
-
-        _UNKNOWN
+        UNKNOWN
     }
 
     public interface Visitor<T> {
@@ -148,15 +139,13 @@ public final class ListSupportedMethodsResponseDataItemDeliveryType {
 
         T visitMobileWallet();
 
-        T visitMasspayCard();
+        T visitCard();
 
-        T visitPaperCheck();
+        T visitCheck();
 
         T visitBill();
 
         T visitCryptocurrency();
-
-        T visitUnknown();
 
         T visitUnknown(String unknownType);
     }

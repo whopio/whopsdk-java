@@ -34,9 +34,13 @@ public final class Bounty {
 
     private final int acceptedSubmissionsPerUserLimit;
 
+    private final List<BountyActiveLivestreamFeed> activeProofLivestreamFeeds;
+
     private final double affiliateShareAmount;
 
     private final List<String> allowedCountryCodes;
+
+    private final int awaitingReviewSubmissionsCount;
 
     private final double budgetAmount;
 
@@ -49,6 +53,8 @@ public final class Bounty {
     private final String createdAt;
 
     private final BountyCurrency currency;
+
+    private final int deniedSubmissionsCount;
 
     private final String description;
 
@@ -99,14 +105,17 @@ public final class Bounty {
             int acceptedSubmissionsCount,
             int acceptedSubmissionsLimit,
             int acceptedSubmissionsPerUserLimit,
+            List<BountyActiveLivestreamFeed> activeProofLivestreamFeeds,
             double affiliateShareAmount,
             List<String> allowedCountryCodes,
+            int awaitingReviewSubmissionsCount,
             double budgetAmount,
             Optional<BountyBusinessGoalType> businessGoalType,
             Optional<String> cancelRequestedAt,
             Optional<CaptureSpec> captureSpec,
             String createdAt,
             BountyCurrency currency,
+            int deniedSubmissionsCount,
             String description,
             Optional<String> discussionExperienceId,
             Optional<String> discussionFeedId,
@@ -133,14 +142,17 @@ public final class Bounty {
         this.acceptedSubmissionsCount = acceptedSubmissionsCount;
         this.acceptedSubmissionsLimit = acceptedSubmissionsLimit;
         this.acceptedSubmissionsPerUserLimit = acceptedSubmissionsPerUserLimit;
+        this.activeProofLivestreamFeeds = activeProofLivestreamFeeds;
         this.affiliateShareAmount = affiliateShareAmount;
         this.allowedCountryCodes = allowedCountryCodes;
+        this.awaitingReviewSubmissionsCount = awaitingReviewSubmissionsCount;
         this.budgetAmount = budgetAmount;
         this.businessGoalType = businessGoalType;
         this.cancelRequestedAt = cancelRequestedAt;
         this.captureSpec = captureSpec;
         this.createdAt = createdAt;
         this.currency = currency;
+        this.deniedSubmissionsCount = deniedSubmissionsCount;
         this.description = description;
         this.discussionExperienceId = discussionExperienceId;
         this.discussionFeedId = discussionFeedId;
@@ -194,6 +206,11 @@ public final class Bounty {
         return acceptedSubmissionsPerUserLimit;
     }
 
+    @JsonProperty("active_proof_livestream_feeds")
+    public List<BountyActiveLivestreamFeed> getActiveProofLivestreamFeeds() {
+        return activeProofLivestreamFeeds;
+    }
+
     /**
      * @return What a referrer earns per accepted submission when the worker arrived through their affiliate link, in whole currency units, at the standard platform fee rate. Taken out of the worker's post-fee reward rather than added on top. <code>0</code> when the bounty pays no affiliate share, including bounties tied to no account, which cannot record a referral.
      */
@@ -205,6 +222,14 @@ public final class Bounty {
     @JsonProperty("allowed_country_codes")
     public List<String> getAllowedCountryCodes() {
         return allowedCountryCodes;
+    }
+
+    /**
+     * @return Submissions delivered and waiting on review. A subset of <code>unresolved_submissions_count</code>, which also counts attempts still in progress.
+     */
+    @JsonProperty("awaiting_review_submissions_count")
+    public int getAwaitingReviewSubmissionsCount() {
+        return awaitingReviewSubmissionsCount;
     }
 
     /**
@@ -262,6 +287,14 @@ public final class Bounty {
     @JsonProperty("currency")
     public BountyCurrency getCurrency() {
         return currency;
+    }
+
+    /**
+     * @return Submissions reviewed and turned down.
+     */
+    @JsonProperty("denied_submissions_count")
+    public int getDeniedSubmissionsCount() {
+        return deniedSubmissionsCount;
     }
 
     /**
@@ -547,14 +580,17 @@ public final class Bounty {
                 && acceptedSubmissionsCount == other.acceptedSubmissionsCount
                 && acceptedSubmissionsLimit == other.acceptedSubmissionsLimit
                 && acceptedSubmissionsPerUserLimit == other.acceptedSubmissionsPerUserLimit
+                && activeProofLivestreamFeeds.equals(other.activeProofLivestreamFeeds)
                 && affiliateShareAmount == other.affiliateShareAmount
                 && allowedCountryCodes.equals(other.allowedCountryCodes)
+                && awaitingReviewSubmissionsCount == other.awaitingReviewSubmissionsCount
                 && budgetAmount == other.budgetAmount
                 && businessGoalType.equals(other.businessGoalType)
                 && cancelRequestedAt.equals(other.cancelRequestedAt)
                 && captureSpec.equals(other.captureSpec)
                 && createdAt.equals(other.createdAt)
                 && currency.equals(other.currency)
+                && deniedSubmissionsCount == other.deniedSubmissionsCount
                 && description.equals(other.description)
                 && discussionExperienceId.equals(other.discussionExperienceId)
                 && discussionFeedId.equals(other.discussionFeedId)
@@ -585,14 +621,17 @@ public final class Bounty {
                 this.acceptedSubmissionsCount,
                 this.acceptedSubmissionsLimit,
                 this.acceptedSubmissionsPerUserLimit,
+                this.activeProofLivestreamFeeds,
                 this.affiliateShareAmount,
                 this.allowedCountryCodes,
+                this.awaitingReviewSubmissionsCount,
                 this.budgetAmount,
                 this.businessGoalType,
                 this.cancelRequestedAt,
                 this.captureSpec,
                 this.createdAt,
                 this.currency,
+                this.deniedSubmissionsCount,
                 this.description,
                 this.discussionExperienceId,
                 this.discussionFeedId,
@@ -652,7 +691,14 @@ public final class Bounty {
         /**
          * <p>What a referrer earns per accepted submission when the worker arrived through their affiliate link, in whole currency units, at the standard platform fee rate. Taken out of the worker's post-fee reward rather than added on top. <code>0</code> when the bounty pays no affiliate share, including bounties tied to no account, which cannot record a referral.</p>
          */
-        BudgetAmountStage affiliateShareAmount(double affiliateShareAmount);
+        AwaitingReviewSubmissionsCountStage affiliateShareAmount(double affiliateShareAmount);
+    }
+
+    public interface AwaitingReviewSubmissionsCountStage {
+        /**
+         * <p>Submissions delivered and waiting on review. A subset of <code>unresolved_submissions_count</code>, which also counts attempts still in progress.</p>
+         */
+        BudgetAmountStage awaitingReviewSubmissionsCount(int awaitingReviewSubmissionsCount);
     }
 
     public interface BudgetAmountStage {
@@ -673,7 +719,14 @@ public final class Bounty {
         /**
          * <p>Currency for all amounts on the bounty, as a lowercase ISO 4217 code.</p>
          */
-        DescriptionStage currency(@NotNull BountyCurrency currency);
+        DeniedSubmissionsCountStage currency(@NotNull BountyCurrency currency);
+    }
+
+    public interface DeniedSubmissionsCountStage {
+        /**
+         * <p>Submissions reviewed and turned down.</p>
+         */
+        DescriptionStage deniedSubmissionsCount(int deniedSubmissionsCount);
     }
 
     public interface DescriptionStage {
@@ -772,6 +825,12 @@ public final class Bounty {
         _FinalStage addAcceptedDeliverableTypes(BountyAcceptedDeliverableTypesItem acceptedDeliverableTypes);
 
         _FinalStage addAllAcceptedDeliverableTypes(List<BountyAcceptedDeliverableTypesItem> acceptedDeliverableTypes);
+
+        _FinalStage activeProofLivestreamFeeds(List<BountyActiveLivestreamFeed> activeProofLivestreamFeeds);
+
+        _FinalStage addActiveProofLivestreamFeeds(BountyActiveLivestreamFeed activeProofLivestreamFeeds);
+
+        _FinalStage addAllActiveProofLivestreamFeeds(List<BountyActiveLivestreamFeed> activeProofLivestreamFeeds);
 
         _FinalStage allowedCountryCodes(List<String> allowedCountryCodes);
 
@@ -894,9 +953,11 @@ public final class Bounty {
                     AcceptedSubmissionsLimitStage,
                     AcceptedSubmissionsPerUserLimitStage,
                     AffiliateShareAmountStage,
+                    AwaitingReviewSubmissionsCountStage,
                     BudgetAmountStage,
                     CreatedAtStage,
                     CurrencyStage,
+                    DeniedSubmissionsCountStage,
                     DescriptionStage,
                     GrossPaidOutAmountStage,
                     GrossRewardAmountStage,
@@ -918,11 +979,15 @@ public final class Bounty {
 
         private double affiliateShareAmount;
 
+        private int awaitingReviewSubmissionsCount;
+
         private double budgetAmount;
 
         private String createdAt;
 
         private BountyCurrency currency;
+
+        private int deniedSubmissionsCount;
 
         private String description;
 
@@ -974,6 +1039,8 @@ public final class Bounty {
 
         private List<String> allowedCountryCodes = new ArrayList<>();
 
+        private List<BountyActiveLivestreamFeed> activeProofLivestreamFeeds = new ArrayList<>();
+
         private List<BountyAcceptedDeliverableTypesItem> acceptedDeliverableTypes = new ArrayList<>();
 
         @JsonAnySetter
@@ -987,14 +1054,17 @@ public final class Bounty {
             acceptedSubmissionsCount(other.getAcceptedSubmissionsCount());
             acceptedSubmissionsLimit(other.getAcceptedSubmissionsLimit());
             acceptedSubmissionsPerUserLimit(other.getAcceptedSubmissionsPerUserLimit());
+            activeProofLivestreamFeeds(other.getActiveProofLivestreamFeeds());
             affiliateShareAmount(other.getAffiliateShareAmount());
             allowedCountryCodes(other.getAllowedCountryCodes());
+            awaitingReviewSubmissionsCount(other.getAwaitingReviewSubmissionsCount());
             budgetAmount(other.getBudgetAmount());
             businessGoalType(other.getBusinessGoalType());
             cancelRequestedAt(other.getCancelRequestedAt());
             captureSpec(other.getCaptureSpec());
             createdAt(other.getCreatedAt());
             currency(other.getCurrency());
+            deniedSubmissionsCount(other.getDeniedSubmissionsCount());
             description(other.getDescription());
             discussionExperienceId(other.getDiscussionExperienceId());
             discussionFeedId(other.getDiscussionFeedId());
@@ -1062,8 +1132,20 @@ public final class Bounty {
          */
         @java.lang.Override
         @JsonSetter("affiliate_share_amount")
-        public BudgetAmountStage affiliateShareAmount(double affiliateShareAmount) {
+        public AwaitingReviewSubmissionsCountStage affiliateShareAmount(double affiliateShareAmount) {
             this.affiliateShareAmount = affiliateShareAmount;
+            return this;
+        }
+
+        /**
+         * <p>Submissions delivered and waiting on review. A subset of <code>unresolved_submissions_count</code>, which also counts attempts still in progress.</p>
+         * <p>Submissions delivered and waiting on review. A subset of <code>unresolved_submissions_count</code>, which also counts attempts still in progress.</p>
+         * @return Reference to {@code this} so that method calls can be chained together.
+         */
+        @java.lang.Override
+        @JsonSetter("awaiting_review_submissions_count")
+        public BudgetAmountStage awaitingReviewSubmissionsCount(int awaitingReviewSubmissionsCount) {
+            this.awaitingReviewSubmissionsCount = awaitingReviewSubmissionsCount;
             return this;
         }
 
@@ -1098,8 +1180,20 @@ public final class Bounty {
          */
         @java.lang.Override
         @JsonSetter("currency")
-        public DescriptionStage currency(@NotNull BountyCurrency currency) {
+        public DeniedSubmissionsCountStage currency(@NotNull BountyCurrency currency) {
             this.currency = Objects.requireNonNull(currency, "currency must not be null");
+            return this;
+        }
+
+        /**
+         * <p>Submissions reviewed and turned down.</p>
+         * <p>Submissions reviewed and turned down.</p>
+         * @return Reference to {@code this} so that method calls can be chained together.
+         */
+        @java.lang.Override
+        @JsonSetter("denied_submissions_count")
+        public DescriptionStage deniedSubmissionsCount(int deniedSubmissionsCount) {
+            this.deniedSubmissionsCount = deniedSubmissionsCount;
             return this;
         }
 
@@ -1704,6 +1798,31 @@ public final class Bounty {
         }
 
         @java.lang.Override
+        public _FinalStage addAllActiveProofLivestreamFeeds(
+                List<BountyActiveLivestreamFeed> activeProofLivestreamFeeds) {
+            if (activeProofLivestreamFeeds != null) {
+                this.activeProofLivestreamFeeds.addAll(activeProofLivestreamFeeds);
+            }
+            return this;
+        }
+
+        @java.lang.Override
+        public _FinalStage addActiveProofLivestreamFeeds(BountyActiveLivestreamFeed activeProofLivestreamFeeds) {
+            this.activeProofLivestreamFeeds.add(activeProofLivestreamFeeds);
+            return this;
+        }
+
+        @java.lang.Override
+        @JsonSetter(value = "active_proof_livestream_feeds", nulls = Nulls.SKIP)
+        public _FinalStage activeProofLivestreamFeeds(List<BountyActiveLivestreamFeed> activeProofLivestreamFeeds) {
+            this.activeProofLivestreamFeeds.clear();
+            if (activeProofLivestreamFeeds != null) {
+                this.activeProofLivestreamFeeds.addAll(activeProofLivestreamFeeds);
+            }
+            return this;
+        }
+
+        @java.lang.Override
         public _FinalStage addAllAcceptedDeliverableTypes(
                 List<BountyAcceptedDeliverableTypesItem> acceptedDeliverableTypes) {
             if (acceptedDeliverableTypes != null) {
@@ -1735,14 +1854,17 @@ public final class Bounty {
                     acceptedSubmissionsCount,
                     acceptedSubmissionsLimit,
                     acceptedSubmissionsPerUserLimit,
+                    activeProofLivestreamFeeds,
                     affiliateShareAmount,
                     allowedCountryCodes,
+                    awaitingReviewSubmissionsCount,
                     budgetAmount,
                     businessGoalType,
                     cancelRequestedAt,
                     captureSpec,
                     createdAt,
                     currency,
+                    deniedSubmissionsCount,
                     description,
                     discussionExperienceId,
                     discussionFeedId,

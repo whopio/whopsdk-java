@@ -36,6 +36,8 @@ public final class Product {
 
     private final Optional<String> customStatementDescriptor;
 
+    private final Optional<ProductPublicPlan> defaultPlan;
+
     private final Optional<String> description;
 
     private final Optional<String> externalIdentifier;
@@ -86,6 +88,7 @@ public final class Product {
             Optional<ProductCustomCta> customCta,
             Optional<String> customCtaUrl,
             Optional<String> customStatementDescriptor,
+            Optional<ProductPublicPlan> defaultPlan,
             Optional<String> description,
             Optional<String> externalIdentifier,
             List<ProductGalleryImage> galleryImages,
@@ -113,6 +116,7 @@ public final class Product {
         this.customCta = customCta;
         this.customCtaUrl = customCtaUrl;
         this.customStatementDescriptor = customStatementDescriptor;
+        this.defaultPlan = defaultPlan;
         this.description = description;
         this.externalIdentifier = externalIdentifier;
         this.galleryImages = galleryImages;
@@ -190,7 +194,18 @@ public final class Product {
     }
 
     /**
-     * @return Written description displayed on product page.
+     * @return Buyable plan to show and check out with. The configured default when that plan is buyable, otherwise the first buyable plan in product-page order. <code>null</code> when none is buyable.
+     */
+    @JsonIgnore
+    public Optional<ProductPublicPlan> getDefaultPlan() {
+        if (defaultPlan == null) {
+            return Optional.empty();
+        }
+        return defaultPlan;
+    }
+
+    /**
+     * @return Written description displayed on the product page. <code>null</code> if none is set.
      */
     @JsonIgnore
     public Optional<String> getDescription() {
@@ -409,6 +424,12 @@ public final class Product {
     }
 
     @JsonInclude(value = JsonInclude.Include.CUSTOM, valueFilter = NullableNonemptyFilter.class)
+    @JsonProperty("default_plan")
+    private Optional<ProductPublicPlan> _getDefaultPlan() {
+        return defaultPlan;
+    }
+
+    @JsonInclude(value = JsonInclude.Include.CUSTOM, valueFilter = NullableNonemptyFilter.class)
     @JsonProperty("description")
     private Optional<String> _getDescription() {
         return description;
@@ -491,6 +512,7 @@ public final class Product {
                 && customCta.equals(other.customCta)
                 && customCtaUrl.equals(other.customCtaUrl)
                 && customStatementDescriptor.equals(other.customStatementDescriptor)
+                && defaultPlan.equals(other.defaultPlan)
                 && description.equals(other.description)
                 && externalIdentifier.equals(other.externalIdentifier)
                 && galleryImages.equals(other.galleryImages)
@@ -522,6 +544,7 @@ public final class Product {
                 this.customCta,
                 this.customCtaUrl,
                 this.customStatementDescriptor,
+                this.defaultPlan,
                 this.description,
                 this.externalIdentifier,
                 this.galleryImages,
@@ -663,7 +686,16 @@ public final class Product {
         _FinalStage customStatementDescriptor(Nullable<String> customStatementDescriptor);
 
         /**
-         * <p>Written description displayed on product page.</p>
+         * <p>Buyable plan to show and check out with. The configured default when that plan is buyable, otherwise the first buyable plan in product-page order. <code>null</code> when none is buyable.</p>
+         */
+        _FinalStage defaultPlan(Optional<ProductPublicPlan> defaultPlan);
+
+        _FinalStage defaultPlan(ProductPublicPlan defaultPlan);
+
+        _FinalStage defaultPlan(Nullable<ProductPublicPlan> defaultPlan);
+
+        /**
+         * <p>Written description displayed on the product page. <code>null</code> if none is set.</p>
          */
         _FinalStage description(Optional<String> description);
 
@@ -830,6 +862,8 @@ public final class Product {
 
         private Optional<String> description = Optional.empty();
 
+        private Optional<ProductPublicPlan> defaultPlan = Optional.empty();
+
         private Optional<String> customStatementDescriptor = Optional.empty();
 
         private Optional<String> customCtaUrl = Optional.empty();
@@ -850,6 +884,7 @@ public final class Product {
             customCta(other.getCustomCta());
             customCtaUrl(other.getCustomCtaUrl());
             customStatementDescriptor(other.getCustomStatementDescriptor());
+            defaultPlan(other.getDefaultPlan());
             description(other.getDescription());
             externalIdentifier(other.getExternalIdentifier());
             galleryImages(other.getGalleryImages());
@@ -1391,7 +1426,7 @@ public final class Product {
         }
 
         /**
-         * <p>Written description displayed on product page.</p>
+         * <p>Written description displayed on the product page. <code>null</code> if none is set.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
@@ -1407,7 +1442,7 @@ public final class Product {
         }
 
         /**
-         * <p>Written description displayed on product page.</p>
+         * <p>Written description displayed on the product page. <code>null</code> if none is set.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
@@ -1417,12 +1452,48 @@ public final class Product {
         }
 
         /**
-         * <p>Written description displayed on product page.</p>
+         * <p>Written description displayed on the product page. <code>null</code> if none is set.</p>
          */
         @java.lang.Override
         @JsonSetter(value = "description", nulls = Nulls.SKIP)
         public _FinalStage description(Optional<String> description) {
             this.description = description;
+            return this;
+        }
+
+        /**
+         * <p>Buyable plan to show and check out with. The configured default when that plan is buyable, otherwise the first buyable plan in product-page order. <code>null</code> when none is buyable.</p>
+         * @return Reference to {@code this} so that method calls can be chained together.
+         */
+        @java.lang.Override
+        public _FinalStage defaultPlan(Nullable<ProductPublicPlan> defaultPlan) {
+            if (defaultPlan.isNull()) {
+                this.defaultPlan = null;
+            } else if (defaultPlan.isEmpty()) {
+                this.defaultPlan = Optional.empty();
+            } else {
+                this.defaultPlan = Optional.of(defaultPlan.get());
+            }
+            return this;
+        }
+
+        /**
+         * <p>Buyable plan to show and check out with. The configured default when that plan is buyable, otherwise the first buyable plan in product-page order. <code>null</code> when none is buyable.</p>
+         * @return Reference to {@code this} so that method calls can be chained together.
+         */
+        @java.lang.Override
+        public _FinalStage defaultPlan(ProductPublicPlan defaultPlan) {
+            this.defaultPlan = Optional.ofNullable(defaultPlan);
+            return this;
+        }
+
+        /**
+         * <p>Buyable plan to show and check out with. The configured default when that plan is buyable, otherwise the first buyable plan in product-page order. <code>null</code> when none is buyable.</p>
+         */
+        @java.lang.Override
+        @JsonSetter(value = "default_plan", nulls = Nulls.SKIP)
+        public _FinalStage defaultPlan(Optional<ProductPublicPlan> defaultPlan) {
+            this.defaultPlan = defaultPlan;
             return this;
         }
 
@@ -1578,6 +1649,7 @@ public final class Product {
                     customCta,
                     customCtaUrl,
                     customStatementDescriptor,
+                    defaultPlan,
                     description,
                     externalIdentifier,
                     galleryImages,

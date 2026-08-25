@@ -53,11 +53,11 @@ public final class CreateExportsRequestResource {
     public static final CreateExportsRequestResource ENTRIES =
             new CreateExportsRequestResource(Value.ENTRIES, "entries");
 
-    public static final CreateExportsRequestResource MEMBERSHIPS =
-            new CreateExportsRequestResource(Value.MEMBERSHIPS, "memberships");
-
     public static final CreateExportsRequestResource TRANSFERS =
             new CreateExportsRequestResource(Value.TRANSFERS, "transfers");
+
+    public static final CreateExportsRequestResource MEMBERSHIPS =
+            new CreateExportsRequestResource(Value.MEMBERSHIPS, "memberships");
 
     public static final CreateExportsRequestResource CHILD_COMPANIES =
             new CreateExportsRequestResource(Value.CHILD_COMPANIES, "child_companies");
@@ -174,10 +174,10 @@ public final class CreateExportsRequestResource {
                 return visitor.visitShipments();
             case ENTRIES:
                 return visitor.visitEntries();
-            case MEMBERSHIPS:
-                return visitor.visitMemberships();
             case TRANSFERS:
                 return visitor.visitTransfers();
+            case MEMBERSHIPS:
+                return visitor.visitMemberships();
             case CHILD_COMPANIES:
                 return visitor.visitChildCompanies();
             case CHECKOUT_CONFIGURATIONS:
@@ -255,10 +255,10 @@ public final class CreateExportsRequestResource {
                 return SHIPMENTS;
             case "entries":
                 return ENTRIES;
-            case "memberships":
-                return MEMBERSHIPS;
             case "transfers":
                 return TRANSFERS;
+            case "memberships":
+                return MEMBERSHIPS;
             case "child_companies":
                 return CHILD_COMPANIES;
             case "checkout_configurations":
@@ -325,10 +325,6 @@ public final class CreateExportsRequestResource {
 
         FINANCIAL_ACTIVITY,
 
-        MEMBERS,
-
-        MEMBERSHIPS,
-
         PAYOUT_METHODS,
 
         PAYOUTS,
@@ -351,9 +347,13 @@ public final class CreateExportsRequestResource {
 
         WEBHOOKS,
 
+        MEMBERS,
+
         RECEIPTS,
 
         UNCLAIMED_MEMBERSHIPS,
+
+        MEMBERSHIPS,
 
         TRACKING_LINKS,
 
@@ -401,10 +401,6 @@ public final class CreateExportsRequestResource {
 
         T visitFinancialActivity();
 
-        T visitMembers();
-
-        T visitMemberships();
-
         T visitPayoutMethods();
 
         T visitPayouts();
@@ -427,9 +423,13 @@ public final class CreateExportsRequestResource {
 
         T visitWebhooks();
 
+        T visitMembers();
+
         T visitReceipts();
 
         T visitUnclaimedMemberships();
+
+        T visitMemberships();
 
         T visitTrackingLinks();
 

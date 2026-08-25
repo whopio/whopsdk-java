@@ -101,6 +101,10 @@ public class RawAppsClient {
             QueryStringMapper.addQueryParameter(
                     httpUrl, "verified_apps_only", request.getVerifiedAppsOnly().get(), false);
         }
+        if (request.getRecommended().isPresent()) {
+            QueryStringMapper.addQueryParameter(
+                    httpUrl, "recommended", request.getRecommended().get(), false);
+        }
         if (request.getQuery().isPresent()) {
             QueryStringMapper.addQueryParameter(
                     httpUrl, "query", request.getQuery().get(), false);

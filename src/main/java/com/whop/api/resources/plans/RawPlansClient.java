@@ -49,21 +49,38 @@ public class RawPlansClient {
     }
 
     /**
-     * Returns a paginated list of plans belonging to an account, with optional filtering by visibility, type, release method, and product.
+     * Returns a paginated list of plans. Omit <code>account_id</code> and pass <code>product_ids</code> to list a product's public buyable plans.
+     */
+    public WhopApiHttpResponse<SyncPagingIterable<PlanListItem>> list() {
+        return list(ListPlansRequest.builder().build());
+    }
+
+    /**
+     * Returns a paginated list of plans. Omit <code>account_id</code> and pass <code>product_ids</code> to list a product's public buyable plans.
+     */
+    public WhopApiHttpResponse<SyncPagingIterable<PlanListItem>> list(RequestOptions requestOptions) {
+        return list(ListPlansRequest.builder().build(), requestOptions);
+    }
+
+    /**
+     * Returns a paginated list of plans. Omit <code>account_id</code> and pass <code>product_ids</code> to list a product's public buyable plans.
      */
     public WhopApiHttpResponse<SyncPagingIterable<PlanListItem>> list(ListPlansRequest request) {
         return list(request, null);
     }
 
     /**
-     * Returns a paginated list of plans belonging to an account, with optional filtering by visibility, type, release method, and product.
+     * Returns a paginated list of plans. Omit <code>account_id</code> and pass <code>product_ids</code> to list a product's public buyable plans.
      */
     public WhopApiHttpResponse<SyncPagingIterable<PlanListItem>> list(
             ListPlansRequest request, RequestOptions requestOptions) {
         HttpUrl.Builder httpUrl = HttpUrl.parse(this.clientOptions.environment().getUrl())
                 .newBuilder()
                 .addPathSegments("plans");
-        QueryStringMapper.addQueryParameter(httpUrl, "account_id", request.getAccountId(), false);
+        if (request.getAccountId().isPresent()) {
+            QueryStringMapper.addQueryParameter(
+                    httpUrl, "account_id", request.getAccountId().get(), false);
+        }
         if (request.getDirection().isPresent()) {
             QueryStringMapper.addQueryParameter(
                     httpUrl, "direction", request.getDirection().get(), false);

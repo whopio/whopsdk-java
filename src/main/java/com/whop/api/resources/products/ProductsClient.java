@@ -35,14 +35,28 @@ public class ProductsClient {
     }
 
     /**
-     * Returns a paginated list of products belonging to an account.
+     * Returns a paginated list of products. Omit <code>account_id</code> to search the public marketplace.
+     */
+    public SyncPagingIterable<ProductListItem> list() {
+        return this.rawClient.list().body();
+    }
+
+    /**
+     * Returns a paginated list of products. Omit <code>account_id</code> to search the public marketplace.
+     */
+    public SyncPagingIterable<ProductListItem> list(RequestOptions requestOptions) {
+        return this.rawClient.list(requestOptions).body();
+    }
+
+    /**
+     * Returns a paginated list of products. Omit <code>account_id</code> to search the public marketplace.
      */
     public SyncPagingIterable<ProductListItem> list(ListProductsRequest request) {
         return this.rawClient.list(request).body();
     }
 
     /**
-     * Returns a paginated list of products belonging to an account.
+     * Returns a paginated list of products. Omit <code>account_id</code> to search the public marketplace.
      */
     public SyncPagingIterable<ProductListItem> list(ListProductsRequest request, RequestOptions requestOptions) {
         return this.rawClient.list(request, requestOptions).body();
@@ -63,28 +77,28 @@ public class ProductsClient {
     }
 
     /**
-     * Retrieves the details of an existing product. This endpoint is publicly accessible.
+     * Retrieves a product. Public — no credentials.
      */
     public Product retrieve(String id) {
         return this.rawClient.retrieve(id).body();
     }
 
     /**
-     * Retrieves the details of an existing product. This endpoint is publicly accessible.
+     * Retrieves a product. Public — no credentials.
      */
     public Product retrieve(String id, RequestOptions requestOptions) {
         return this.rawClient.retrieve(id, requestOptions).body();
     }
 
     /**
-     * Retrieves the details of an existing product. This endpoint is publicly accessible.
+     * Retrieves a product. Public — no credentials.
      */
     public Product retrieve(String id, RetrieveProductsRequest request) {
         return this.rawClient.retrieve(id, request).body();
     }
 
     /**
-     * Retrieves the details of an existing product. This endpoint is publicly accessible.
+     * Retrieves a product. Public — no credentials.
      */
     public Product retrieve(String id, RetrieveProductsRequest request, RequestOptions requestOptions) {
         return this.rawClient.retrieve(id, request, requestOptions).body();

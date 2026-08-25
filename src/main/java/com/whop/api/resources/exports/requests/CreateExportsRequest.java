@@ -67,7 +67,7 @@ public final class CreateExportsRequest {
     }
 
     /**
-     * @return Resource-specific filters. For native REST resources (<code>payouts</code>, <code>transfers</code>, <code>memberships</code>) these are the resource's own list query params; for dashboard tables they mirror the dashboard table filters.
+     * @return Resource-specific filters. For native REST resources (<code>payouts</code>, <code>transfers</code>, <code>products</code>) these are the resource's own list query params; for dashboard tables they mirror the dashboard table filters.
      */
     @JsonProperty("filters")
     public Optional<Map<String, Object>> getFilters() {
@@ -154,7 +154,7 @@ public final class CreateExportsRequest {
         _FinalStage columns(List<String> columns);
 
         /**
-         * <p>Resource-specific filters. For native REST resources (<code>payouts</code>, <code>transfers</code>, <code>memberships</code>) these are the resource's own list query params; for dashboard tables they mirror the dashboard table filters.</p>
+         * <p>Resource-specific filters. For native REST resources (<code>payouts</code>, <code>transfers</code>, <code>products</code>) these are the resource's own list query params; for dashboard tables they mirror the dashboard table filters.</p>
          */
         _FinalStage filters(Optional<Map<String, Object>> filters);
 
@@ -228,7 +228,7 @@ public final class CreateExportsRequest {
         }
 
         /**
-         * <p>Resource-specific filters. For native REST resources (<code>payouts</code>, <code>transfers</code>, <code>memberships</code>) these are the resource's own list query params; for dashboard tables they mirror the dashboard table filters.</p>
+         * <p>Resource-specific filters. For native REST resources (<code>payouts</code>, <code>transfers</code>, <code>products</code>) these are the resource's own list query params; for dashboard tables they mirror the dashboard table filters.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
@@ -238,7 +238,7 @@ public final class CreateExportsRequest {
         }
 
         /**
-         * <p>Resource-specific filters. For native REST resources (<code>payouts</code>, <code>transfers</code>, <code>memberships</code>) these are the resource's own list query params; for dashboard tables they mirror the dashboard table filters.</p>
+         * <p>Resource-specific filters. For native REST resources (<code>payouts</code>, <code>transfers</code>, <code>products</code>) these are the resource's own list query params; for dashboard tables they mirror the dashboard table filters.</p>
          */
         @java.lang.Override
         @JsonSetter(value = "filters", nulls = Nulls.SKIP)

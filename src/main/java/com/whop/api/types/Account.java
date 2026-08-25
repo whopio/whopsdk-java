@@ -55,6 +55,8 @@ public final class Account {
 
     private final Optional<String> email;
 
+    private final Optional<File> eula;
+
     private final List<AccountHomePreferencesItem> homePreferences;
 
     private final String id;
@@ -85,6 +87,8 @@ public final class Account {
 
     private final Optional<AccountPaymentControls> paymentControls;
 
+    private final Optional<File> privacyPolicy;
+
     private final Optional<Map<String, Object>> productTaxCode;
 
     private final Optional<List<AccountRecommendedAction>> recommendedActions;
@@ -92,6 +96,8 @@ public final class Account {
     private final boolean require2Fa;
 
     private final Optional<List<AccountRequiredAction>> requiredActions;
+
+    private final Optional<File> returnPolicy;
 
     private final String route;
 
@@ -122,6 +128,8 @@ public final class Account {
     private final Optional<AccountTaxRemittedBy> taxRemittedBy;
 
     private final Optional<AccountTaxType> taxType;
+
+    private final Optional<File> termsOfService;
 
     private final Optional<AccountThreeDsLevel> threeDsLevel;
 
@@ -156,6 +164,7 @@ public final class Account {
             String createdAt,
             Optional<String> description,
             Optional<String> email,
+            Optional<File> eula,
             List<AccountHomePreferencesItem> homePreferences,
             String id,
             Optional<AccountIndustryGroup> industryGroup,
@@ -171,10 +180,12 @@ public final class Account {
             UserSummary owner,
             Optional<AccountParent> parentAccount,
             Optional<AccountPaymentControls> paymentControls,
+            Optional<File> privacyPolicy,
             Optional<Map<String, Object>> productTaxCode,
             Optional<List<AccountRecommendedAction>> recommendedActions,
             boolean require2Fa,
             Optional<List<AccountRequiredAction>> requiredActions,
+            Optional<File> returnPolicy,
             String route,
             boolean sendCustomerEmails,
             boolean showJoinedWhops,
@@ -190,6 +201,7 @@ public final class Account {
             List<AccountTaxIdentifier> taxIdentifiers,
             Optional<AccountTaxRemittedBy> taxRemittedBy,
             Optional<AccountTaxType> taxType,
+            Optional<File> termsOfService,
             Optional<AccountThreeDsLevel> threeDsLevel,
             String title,
             Optional<Double> totalEarnedUsd,
@@ -213,6 +225,7 @@ public final class Account {
         this.createdAt = createdAt;
         this.description = description;
         this.email = email;
+        this.eula = eula;
         this.homePreferences = homePreferences;
         this.id = id;
         this.industryGroup = industryGroup;
@@ -228,10 +241,12 @@ public final class Account {
         this.owner = owner;
         this.parentAccount = parentAccount;
         this.paymentControls = paymentControls;
+        this.privacyPolicy = privacyPolicy;
         this.productTaxCode = productTaxCode;
         this.recommendedActions = recommendedActions;
         this.require2Fa = require2Fa;
         this.requiredActions = requiredActions;
+        this.returnPolicy = returnPolicy;
         this.route = route;
         this.sendCustomerEmails = sendCustomerEmails;
         this.showJoinedWhops = showJoinedWhops;
@@ -247,6 +262,7 @@ public final class Account {
         this.taxIdentifiers = taxIdentifiers;
         this.taxRemittedBy = taxRemittedBy;
         this.taxType = taxType;
+        this.termsOfService = termsOfService;
         this.threeDsLevel = threeDsLevel;
         this.title = title;
         this.totalEarnedUsd = totalEarnedUsd;
@@ -392,6 +408,17 @@ public final class Account {
             return Optional.empty();
         }
         return email;
+    }
+
+    /**
+     * @return The account's end-user license agreement document, or <code>null</code> if they have not published one.
+     */
+    @JsonIgnore
+    public Optional<File> getEula() {
+        if (eula == null) {
+            return Optional.empty();
+        }
+        return eula;
     }
 
     @JsonProperty("home_preferences")
@@ -545,6 +572,17 @@ public final class Account {
     }
 
     /**
+     * @return The account's privacy policy document, or <code>null</code> if they have not published one.
+     */
+    @JsonIgnore
+    public Optional<File> getPrivacyPolicy() {
+        if (privacyPolicy == null) {
+            return Optional.empty();
+        }
+        return privacyPolicy;
+    }
+
+    /**
      * @return Tax classification code applied by default to the account's products, with <code>id</code>, <code>name</code>, and <code>product_type</code>. <code>null</code> when no default is set.
      */
     @JsonIgnore
@@ -580,6 +618,17 @@ public final class Account {
             return Optional.empty();
         }
         return requiredActions;
+    }
+
+    /**
+     * @return The account's return policy document, or <code>null</code> if they have not published one.
+     */
+    @JsonIgnore
+    public Optional<File> getReturnPolicy() {
+        if (returnPolicy == null) {
+            return Optional.empty();
+        }
+        return returnPolicy;
     }
 
     /**
@@ -706,6 +755,17 @@ public final class Account {
             return Optional.empty();
         }
         return taxType;
+    }
+
+    /**
+     * @return The account's terms of service document, or <code>null</code> if they have not published one.
+     */
+    @JsonIgnore
+    public Optional<File> getTermsOfService() {
+        if (termsOfService == null) {
+            return Optional.empty();
+        }
+        return termsOfService;
     }
 
     /**
@@ -842,6 +902,12 @@ public final class Account {
     }
 
     @JsonInclude(value = JsonInclude.Include.CUSTOM, valueFilter = NullableNonemptyFilter.class)
+    @JsonProperty("eula")
+    private Optional<File> _getEula() {
+        return eula;
+    }
+
+    @JsonInclude(value = JsonInclude.Include.CUSTOM, valueFilter = NullableNonemptyFilter.class)
     @JsonProperty("industry_group")
     private Optional<AccountIndustryGroup> _getIndustryGroup() {
         return industryGroup;
@@ -908,6 +974,12 @@ public final class Account {
     }
 
     @JsonInclude(value = JsonInclude.Include.CUSTOM, valueFilter = NullableNonemptyFilter.class)
+    @JsonProperty("privacy_policy")
+    private Optional<File> _getPrivacyPolicy() {
+        return privacyPolicy;
+    }
+
+    @JsonInclude(value = JsonInclude.Include.CUSTOM, valueFilter = NullableNonemptyFilter.class)
     @JsonProperty("product_tax_code")
     private Optional<Map<String, Object>> _getProductTaxCode() {
         return productTaxCode;
@@ -923,6 +995,12 @@ public final class Account {
     @JsonProperty("required_actions")
     private Optional<List<AccountRequiredAction>> _getRequiredActions() {
         return requiredActions;
+    }
+
+    @JsonInclude(value = JsonInclude.Include.CUSTOM, valueFilter = NullableNonemptyFilter.class)
+    @JsonProperty("return_policy")
+    private Optional<File> _getReturnPolicy() {
+        return returnPolicy;
     }
 
     @JsonInclude(value = JsonInclude.Include.CUSTOM, valueFilter = NullableNonemptyFilter.class)
@@ -953,6 +1031,12 @@ public final class Account {
     @JsonProperty("tax_type")
     private Optional<AccountTaxType> _getTaxType() {
         return taxType;
+    }
+
+    @JsonInclude(value = JsonInclude.Include.CUSTOM, valueFilter = NullableNonemptyFilter.class)
+    @JsonProperty("terms_of_service")
+    private Optional<File> _getTermsOfService() {
+        return termsOfService;
     }
 
     @JsonInclude(value = JsonInclude.Include.CUSTOM, valueFilter = NullableNonemptyFilter.class)
@@ -1011,6 +1095,7 @@ public final class Account {
                 && createdAt.equals(other.createdAt)
                 && description.equals(other.description)
                 && email.equals(other.email)
+                && eula.equals(other.eula)
                 && homePreferences.equals(other.homePreferences)
                 && id.equals(other.id)
                 && industryGroup.equals(other.industryGroup)
@@ -1026,10 +1111,12 @@ public final class Account {
                 && owner.equals(other.owner)
                 && parentAccount.equals(other.parentAccount)
                 && paymentControls.equals(other.paymentControls)
+                && privacyPolicy.equals(other.privacyPolicy)
                 && productTaxCode.equals(other.productTaxCode)
                 && recommendedActions.equals(other.recommendedActions)
                 && require2Fa == other.require2Fa
                 && requiredActions.equals(other.requiredActions)
+                && returnPolicy.equals(other.returnPolicy)
                 && route.equals(other.route)
                 && sendCustomerEmails == other.sendCustomerEmails
                 && showJoinedWhops == other.showJoinedWhops
@@ -1045,6 +1132,7 @@ public final class Account {
                 && taxIdentifiers.equals(other.taxIdentifiers)
                 && taxRemittedBy.equals(other.taxRemittedBy)
                 && taxType.equals(other.taxType)
+                && termsOfService.equals(other.termsOfService)
                 && threeDsLevel.equals(other.threeDsLevel)
                 && title.equals(other.title)
                 && totalEarnedUsd.equals(other.totalEarnedUsd)
@@ -1072,6 +1160,7 @@ public final class Account {
                 this.createdAt,
                 this.description,
                 this.email,
+                this.eula,
                 this.homePreferences,
                 this.id,
                 this.industryGroup,
@@ -1087,10 +1176,12 @@ public final class Account {
                 this.owner,
                 this.parentAccount,
                 this.paymentControls,
+                this.privacyPolicy,
                 this.productTaxCode,
                 this.recommendedActions,
                 this.require2Fa,
                 this.requiredActions,
+                this.returnPolicy,
                 this.route,
                 this.sendCustomerEmails,
                 this.showJoinedWhops,
@@ -1106,6 +1197,7 @@ public final class Account {
                 this.taxIdentifiers,
                 this.taxRemittedBy,
                 this.taxType,
+                this.termsOfService,
                 this.threeDsLevel,
                 this.title,
                 this.totalEarnedUsd,
@@ -1333,6 +1425,15 @@ public final class Account {
 
         _FinalStage email(Nullable<String> email);
 
+        /**
+         * <p>The account's end-user license agreement document, or <code>null</code> if they have not published one.</p>
+         */
+        _FinalStage eula(Optional<File> eula);
+
+        _FinalStage eula(File eula);
+
+        _FinalStage eula(Nullable<File> eula);
+
         _FinalStage homePreferences(List<AccountHomePreferencesItem> homePreferences);
 
         _FinalStage addHomePreferences(AccountHomePreferencesItem homePreferences);
@@ -1448,6 +1549,15 @@ public final class Account {
         _FinalStage paymentControls(Nullable<AccountPaymentControls> paymentControls);
 
         /**
+         * <p>The account's privacy policy document, or <code>null</code> if they have not published one.</p>
+         */
+        _FinalStage privacyPolicy(Optional<File> privacyPolicy);
+
+        _FinalStage privacyPolicy(File privacyPolicy);
+
+        _FinalStage privacyPolicy(Nullable<File> privacyPolicy);
+
+        /**
          * <p>Tax classification code applied by default to the account's products, with <code>id</code>, <code>name</code>, and <code>product_type</code>. <code>null</code> when no default is set.</p>
          */
         _FinalStage productTaxCode(Optional<Map<String, Object>> productTaxCode);
@@ -1470,6 +1580,15 @@ public final class Account {
         _FinalStage requiredActions(List<AccountRequiredAction> requiredActions);
 
         _FinalStage requiredActions(Nullable<List<AccountRequiredAction>> requiredActions);
+
+        /**
+         * <p>The account's return policy document, or <code>null</code> if they have not published one.</p>
+         */
+        _FinalStage returnPolicy(Optional<File> returnPolicy);
+
+        _FinalStage returnPolicy(File returnPolicy);
+
+        _FinalStage returnPolicy(Nullable<File> returnPolicy);
 
         _FinalStage socialLinks(List<AccountSocialLink> socialLinks);
 
@@ -1533,6 +1652,15 @@ public final class Account {
         _FinalStage taxType(AccountTaxType taxType);
 
         _FinalStage taxType(Nullable<AccountTaxType> taxType);
+
+        /**
+         * <p>The account's terms of service document, or <code>null</code> if they have not published one.</p>
+         */
+        _FinalStage termsOfService(Optional<File> termsOfService);
+
+        _FinalStage termsOfService(File termsOfService);
+
+        _FinalStage termsOfService(Nullable<File> termsOfService);
 
         /**
          * <p>Account-level 3D Secure behavior. <code>mandate_challenge</code> requires cardholder verification on supported card payments; <code>null</code> uses the standard checkout flow.</p>
@@ -1652,6 +1780,8 @@ public final class Account {
 
         private Optional<AccountThreeDsLevel> threeDsLevel = Optional.empty();
 
+        private Optional<File> termsOfService = Optional.empty();
+
         private Optional<AccountTaxType> taxType = Optional.empty();
 
         private Optional<AccountTaxRemittedBy> taxRemittedBy = Optional.empty();
@@ -1668,11 +1798,15 @@ public final class Account {
 
         private List<AccountSocialLink> socialLinks = new ArrayList<>();
 
+        private Optional<File> returnPolicy = Optional.empty();
+
         private Optional<List<AccountRequiredAction>> requiredActions = Optional.empty();
 
         private Optional<List<AccountRecommendedAction>> recommendedActions = Optional.empty();
 
         private Optional<Map<String, Object>> productTaxCode = Optional.empty();
+
+        private Optional<File> privacyPolicy = Optional.empty();
 
         private Optional<AccountPaymentControls> paymentControls = Optional.empty();
 
@@ -1699,6 +1833,8 @@ public final class Account {
         private Optional<AccountIndustryGroup> industryGroup = Optional.empty();
 
         private List<AccountHomePreferencesItem> homePreferences = new ArrayList<>();
+
+        private Optional<File> eula = Optional.empty();
 
         private Optional<String> email = Optional.empty();
 
@@ -1741,6 +1877,7 @@ public final class Account {
             createdAt(other.getCreatedAt());
             description(other.getDescription());
             email(other.getEmail());
+            eula(other.getEula());
             homePreferences(other.getHomePreferences());
             id(other.getId());
             industryGroup(other.getIndustryGroup());
@@ -1756,10 +1893,12 @@ public final class Account {
             owner(other.getOwner());
             parentAccount(other.getParentAccount());
             paymentControls(other.getPaymentControls());
+            privacyPolicy(other.getPrivacyPolicy());
             productTaxCode(other.getProductTaxCode());
             recommendedActions(other.getRecommendedActions());
             require2Fa(other.getRequire2Fa());
             requiredActions(other.getRequiredActions());
+            returnPolicy(other.getReturnPolicy());
             route(other.getRoute());
             sendCustomerEmails(other.getSendCustomerEmails());
             showJoinedWhops(other.getShowJoinedWhops());
@@ -1775,6 +1914,7 @@ public final class Account {
             taxIdentifiers(other.getTaxIdentifiers());
             taxRemittedBy(other.getTaxRemittedBy());
             taxType(other.getTaxType());
+            termsOfService(other.getTermsOfService());
             threeDsLevel(other.getThreeDsLevel());
             title(other.getTitle());
             totalEarnedUsd(other.getTotalEarnedUsd());
@@ -2194,6 +2334,42 @@ public final class Account {
         }
 
         /**
+         * <p>The account's terms of service document, or <code>null</code> if they have not published one.</p>
+         * @return Reference to {@code this} so that method calls can be chained together.
+         */
+        @java.lang.Override
+        public _FinalStage termsOfService(Nullable<File> termsOfService) {
+            if (termsOfService.isNull()) {
+                this.termsOfService = null;
+            } else if (termsOfService.isEmpty()) {
+                this.termsOfService = Optional.empty();
+            } else {
+                this.termsOfService = Optional.of(termsOfService.get());
+            }
+            return this;
+        }
+
+        /**
+         * <p>The account's terms of service document, or <code>null</code> if they have not published one.</p>
+         * @return Reference to {@code this} so that method calls can be chained together.
+         */
+        @java.lang.Override
+        public _FinalStage termsOfService(File termsOfService) {
+            this.termsOfService = Optional.ofNullable(termsOfService);
+            return this;
+        }
+
+        /**
+         * <p>The account's terms of service document, or <code>null</code> if they have not published one.</p>
+         */
+        @java.lang.Override
+        @JsonSetter(value = "terms_of_service", nulls = Nulls.SKIP)
+        public _FinalStage termsOfService(Optional<File> termsOfService) {
+            this.termsOfService = termsOfService;
+            return this;
+        }
+
+        /**
          * <p>How tax is applied to the account's prices: <code>inclusive</code> (tax included in the listed price) or <code>exclusive</code> (tax added on top). Defaults to <code>exclusive</code> when unset; <code>null</code> only when the account has no payment connection.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
@@ -2445,6 +2621,42 @@ public final class Account {
             return this;
         }
 
+        /**
+         * <p>The account's return policy document, or <code>null</code> if they have not published one.</p>
+         * @return Reference to {@code this} so that method calls can be chained together.
+         */
+        @java.lang.Override
+        public _FinalStage returnPolicy(Nullable<File> returnPolicy) {
+            if (returnPolicy.isNull()) {
+                this.returnPolicy = null;
+            } else if (returnPolicy.isEmpty()) {
+                this.returnPolicy = Optional.empty();
+            } else {
+                this.returnPolicy = Optional.of(returnPolicy.get());
+            }
+            return this;
+        }
+
+        /**
+         * <p>The account's return policy document, or <code>null</code> if they have not published one.</p>
+         * @return Reference to {@code this} so that method calls can be chained together.
+         */
+        @java.lang.Override
+        public _FinalStage returnPolicy(File returnPolicy) {
+            this.returnPolicy = Optional.ofNullable(returnPolicy);
+            return this;
+        }
+
+        /**
+         * <p>The account's return policy document, or <code>null</code> if they have not published one.</p>
+         */
+        @java.lang.Override
+        @JsonSetter(value = "return_policy", nulls = Nulls.SKIP)
+        public _FinalStage returnPolicy(Optional<File> returnPolicy) {
+            this.returnPolicy = returnPolicy;
+            return this;
+        }
+
         @java.lang.Override
         public _FinalStage requiredActions(Nullable<List<AccountRequiredAction>> requiredActions) {
             if (requiredActions.isNull()) {
@@ -2539,6 +2751,42 @@ public final class Account {
         @JsonSetter(value = "product_tax_code", nulls = Nulls.SKIP)
         public _FinalStage productTaxCode(Optional<Map<String, Object>> productTaxCode) {
             this.productTaxCode = productTaxCode;
+            return this;
+        }
+
+        /**
+         * <p>The account's privacy policy document, or <code>null</code> if they have not published one.</p>
+         * @return Reference to {@code this} so that method calls can be chained together.
+         */
+        @java.lang.Override
+        public _FinalStage privacyPolicy(Nullable<File> privacyPolicy) {
+            if (privacyPolicy.isNull()) {
+                this.privacyPolicy = null;
+            } else if (privacyPolicy.isEmpty()) {
+                this.privacyPolicy = Optional.empty();
+            } else {
+                this.privacyPolicy = Optional.of(privacyPolicy.get());
+            }
+            return this;
+        }
+
+        /**
+         * <p>The account's privacy policy document, or <code>null</code> if they have not published one.</p>
+         * @return Reference to {@code this} so that method calls can be chained together.
+         */
+        @java.lang.Override
+        public _FinalStage privacyPolicy(File privacyPolicy) {
+            this.privacyPolicy = Optional.ofNullable(privacyPolicy);
+            return this;
+        }
+
+        /**
+         * <p>The account's privacy policy document, or <code>null</code> if they have not published one.</p>
+         */
+        @java.lang.Override
+        @JsonSetter(value = "privacy_policy", nulls = Nulls.SKIP)
+        public _FinalStage privacyPolicy(Optional<File> privacyPolicy) {
+            this.privacyPolicy = privacyPolicy;
             return this;
         }
 
@@ -2998,6 +3246,42 @@ public final class Account {
         }
 
         /**
+         * <p>The account's end-user license agreement document, or <code>null</code> if they have not published one.</p>
+         * @return Reference to {@code this} so that method calls can be chained together.
+         */
+        @java.lang.Override
+        public _FinalStage eula(Nullable<File> eula) {
+            if (eula.isNull()) {
+                this.eula = null;
+            } else if (eula.isEmpty()) {
+                this.eula = Optional.empty();
+            } else {
+                this.eula = Optional.of(eula.get());
+            }
+            return this;
+        }
+
+        /**
+         * <p>The account's end-user license agreement document, or <code>null</code> if they have not published one.</p>
+         * @return Reference to {@code this} so that method calls can be chained together.
+         */
+        @java.lang.Override
+        public _FinalStage eula(File eula) {
+            this.eula = Optional.ofNullable(eula);
+            return this;
+        }
+
+        /**
+         * <p>The account's end-user license agreement document, or <code>null</code> if they have not published one.</p>
+         */
+        @java.lang.Override
+        @JsonSetter(value = "eula", nulls = Nulls.SKIP)
+        public _FinalStage eula(Optional<File> eula) {
+            this.eula = eula;
+            return this;
+        }
+
+        /**
          * <p>Account owner email address.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
@@ -3362,6 +3646,7 @@ public final class Account {
                     createdAt,
                     description,
                     email,
+                    eula,
                     homePreferences,
                     id,
                     industryGroup,
@@ -3377,10 +3662,12 @@ public final class Account {
                     owner,
                     parentAccount,
                     paymentControls,
+                    privacyPolicy,
                     productTaxCode,
                     recommendedActions,
                     require2Fa,
                     requiredActions,
+                    returnPolicy,
                     route,
                     sendCustomerEmails,
                     showJoinedWhops,
@@ -3396,6 +3683,7 @@ public final class Account {
                     taxIdentifiers,
                     taxRemittedBy,
                     taxType,
+                    termsOfService,
                     threeDsLevel,
                     title,
                     totalEarnedUsd,
