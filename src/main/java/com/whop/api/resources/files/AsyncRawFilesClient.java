@@ -12,16 +12,14 @@ import com.whop.api.core.WhopApiApiException;
 import com.whop.api.core.WhopApiException;
 import com.whop.api.core.WhopApiHttpResponse;
 import com.whop.api.errors.BadRequestError;
-import com.whop.api.errors.ForbiddenError;
-import com.whop.api.errors.InternalServerError;
+import com.whop.api.errors.ConflictError;
 import com.whop.api.errors.NotFoundError;
-import com.whop.api.errors.TooManyRequestsError;
 import com.whop.api.errors.UnauthorizedError;
-import com.whop.api.errors.UnprocessableEntityError;
+import com.whop.api.resources.files.requests.CompleteFilesRequest;
 import com.whop.api.resources.files.requests.CreateFilesRequest;
 import com.whop.api.resources.files.requests.RetrieveFilesRequest;
-import com.whop.api.resources.files.types.CreateFilesResponse;
 import com.whop.api.types.File;
+import com.whop.api.types.V1ErrorResponse;
 import java.io.IOException;
 import java.util.concurrent.CompletableFuture;
 import okhttp3.Call;
@@ -43,16 +41,16 @@ public class AsyncRawFilesClient {
     }
 
     /**
-     * Create a new file record and receive a presigned URL for uploading content to S3.
+     * Creates a file and returns a presigned destination to upload its bytes to. PUT the bytes to <code>upload_url</code> (single-part), or to each of <code>multipart_upload_urls</code> and then call Complete File Multipart Upload. Once the bytes land the file becomes <code>ready</code>, and its ID can be attached wherever a file is accepted — account legal documents, dispute evidence documents.
      */
-    public CompletableFuture<WhopApiHttpResponse<CreateFilesResponse>> create(CreateFilesRequest request) {
+    public CompletableFuture<WhopApiHttpResponse<File>> create(CreateFilesRequest request) {
         return create(request, null);
     }
 
     /**
-     * Create a new file record and receive a presigned URL for uploading content to S3.
+     * Creates a file and returns a presigned destination to upload its bytes to. PUT the bytes to <code>upload_url</code> (single-part), or to each of <code>multipart_upload_urls</code> and then call Complete File Multipart Upload. Once the bytes land the file becomes <code>ready</code>, and its ID can be attached wherever a file is accepted — account legal documents, dispute evidence documents.
      */
-    public CompletableFuture<WhopApiHttpResponse<CreateFilesResponse>> create(
+    public CompletableFuture<WhopApiHttpResponse<File>> create(
             CreateFilesRequest request, RequestOptions requestOptions) {
         HttpUrl.Builder httpUrl = HttpUrl.parse(this.clientOptions.environment().getUrl())
                 .newBuilder()
@@ -80,7 +78,7 @@ public class AsyncRawFilesClient {
         if (requestOptions != null && requestOptions.getTimeout().isPresent()) {
             client = clientOptions.httpClientWithTimeout(requestOptions);
         }
-        CompletableFuture<WhopApiHttpResponse<CreateFilesResponse>> future = new CompletableFuture<>();
+        CompletableFuture<WhopApiHttpResponse<File>> future = new CompletableFuture<>();
         client.newCall(okhttpRequest).enqueue(new Callback() {
             @Override
             public void onResponse(@NotNull Call call, @NotNull Response response) throws IOException {
@@ -88,8 +86,7 @@ public class AsyncRawFilesClient {
                     String responseBodyString = responseBody != null ? responseBody.string() : "{}";
                     if (response.isSuccessful()) {
                         future.complete(new WhopApiHttpResponse<>(
-                                ObjectMappers.JSON_MAPPER.readValue(responseBodyString, CreateFilesResponse.class),
-                                response));
+                                ObjectMappers.JSON_MAPPER.readValue(responseBodyString, File.class), response));
                         return;
                     }
                     try {
@@ -104,29 +101,9 @@ public class AsyncRawFilesClient {
                                         ObjectMappers.JSON_MAPPER.readValue(responseBodyString, Object.class),
                                         response));
                                 return;
-                            case 403:
-                                future.completeExceptionally(new ForbiddenError(
-                                        ObjectMappers.JSON_MAPPER.readValue(responseBodyString, Object.class),
-                                        response));
-                                return;
-                            case 404:
-                                future.completeExceptionally(new NotFoundError(
-                                        ObjectMappers.JSON_MAPPER.readValue(responseBodyString, Object.class),
-                                        response));
-                                return;
-                            case 422:
-                                future.completeExceptionally(new UnprocessableEntityError(
-                                        ObjectMappers.JSON_MAPPER.readValue(responseBodyString, Object.class),
-                                        response));
-                                return;
-                            case 429:
-                                future.completeExceptionally(new TooManyRequestsError(
-                                        ObjectMappers.JSON_MAPPER.readValue(responseBodyString, Object.class),
-                                        response));
-                                return;
-                            case 500:
-                                future.completeExceptionally(new InternalServerError(
-                                        ObjectMappers.JSON_MAPPER.readValue(responseBodyString, Object.class),
+                            case 409:
+                                future.completeExceptionally(new ConflictError(
+                                        ObjectMappers.JSON_MAPPER.readValue(responseBodyString, V1ErrorResponse.class),
                                         response));
                                 return;
                         }
@@ -151,28 +128,28 @@ public class AsyncRawFilesClient {
     }
 
     /**
-     * Retrieves the details of an existing file.
+     * Retrieves a file you uploaded — poll it after uploading the bytes to see <code>upload_status</code> become <code>ready</code>. Only the creator can retrieve a file this way; a file attached to another resource is read through that resource.
      */
     public CompletableFuture<WhopApiHttpResponse<File>> retrieve(String id) {
         return retrieve(id, RetrieveFilesRequest.builder().build());
     }
 
     /**
-     * Retrieves the details of an existing file.
+     * Retrieves a file you uploaded — poll it after uploading the bytes to see <code>upload_status</code> become <code>ready</code>. Only the creator can retrieve a file this way; a file attached to another resource is read through that resource.
      */
     public CompletableFuture<WhopApiHttpResponse<File>> retrieve(String id, RequestOptions requestOptions) {
         return retrieve(id, RetrieveFilesRequest.builder().build(), requestOptions);
     }
 
     /**
-     * Retrieves the details of an existing file.
+     * Retrieves a file you uploaded — poll it after uploading the bytes to see <code>upload_status</code> become <code>ready</code>. Only the creator can retrieve a file this way; a file attached to another resource is read through that resource.
      */
     public CompletableFuture<WhopApiHttpResponse<File>> retrieve(String id, RetrieveFilesRequest request) {
         return retrieve(id, request, null);
     }
 
     /**
-     * Retrieves the details of an existing file.
+     * Retrieves a file you uploaded — poll it after uploading the bytes to see <code>upload_status</code> become <code>ready</code>. Only the creator can retrieve a file this way; a file attached to another resource is read through that resource.
      */
     public CompletableFuture<WhopApiHttpResponse<File>> retrieve(
             String id, RetrieveFilesRequest request, RequestOptions requestOptions) {
@@ -208,6 +185,90 @@ public class AsyncRawFilesClient {
                     }
                     try {
                         switch (response.code()) {
+                            case 401:
+                                future.completeExceptionally(new UnauthorizedError(
+                                        ObjectMappers.JSON_MAPPER.readValue(responseBodyString, Object.class),
+                                        response));
+                                return;
+                            case 404:
+                                future.completeExceptionally(new NotFoundError(
+                                        ObjectMappers.JSON_MAPPER.readValue(responseBodyString, Object.class),
+                                        response));
+                                return;
+                        }
+                    } catch (JsonProcessingException ignored) {
+                        // unable to map error response, throwing generic error
+                    }
+                    Object errorBody = ObjectMappers.parseErrorBody(responseBodyString);
+                    future.completeExceptionally(new WhopApiApiException(
+                            "Error with status code " + response.code(), response.code(), errorBody, response));
+                    return;
+                } catch (IOException e) {
+                    future.completeExceptionally(new WhopApiException("Network error executing HTTP request", e));
+                }
+            }
+
+            @Override
+            public void onFailure(@NotNull Call call, @NotNull IOException e) {
+                future.completeExceptionally(new WhopApiException("Network error executing HTTP request", e));
+            }
+        });
+        return future;
+    }
+
+    /**
+     * Assembles the parts of a multipart upload after every part has been PUT to its presigned URL. Pass the <code>multipart_upload_id</code> from Create File and each part's <code>ETag</code> response header.
+     */
+    public CompletableFuture<WhopApiHttpResponse<File>> complete(String id, CompleteFilesRequest request) {
+        return complete(id, request, null);
+    }
+
+    /**
+     * Assembles the parts of a multipart upload after every part has been PUT to its presigned URL. Pass the <code>multipart_upload_id</code> from Create File and each part's <code>ETag</code> response header.
+     */
+    public CompletableFuture<WhopApiHttpResponse<File>> complete(
+            String id, CompleteFilesRequest request, RequestOptions requestOptions) {
+        HttpUrl.Builder httpUrl = HttpUrl.parse(this.clientOptions.environment().getUrl())
+                .newBuilder()
+                .addPathSegments("files")
+                .addPathSegment(id)
+                .addPathSegments("complete");
+        if (requestOptions != null) {
+            requestOptions.getQueryParameters().forEach((_key, _value) -> {
+                httpUrl.addQueryParameter(_key, _value);
+            });
+        }
+        RequestBody body;
+        try {
+            body = RequestBody.create(
+                    ObjectMappers.JSON_MAPPER.writeValueAsBytes(request), MediaTypes.APPLICATION_JSON);
+        } catch (JsonProcessingException e) {
+            throw new WhopApiException("Failed to serialize request", e);
+        }
+        Request okhttpRequest = new Request.Builder()
+                .url(httpUrl.build())
+                .method("POST", body)
+                .headers(Headers.of(clientOptions.headers(requestOptions)))
+                .addHeader("Content-Type", "application/json")
+                .addHeader("Accept", "application/json")
+                .build();
+        OkHttpClient client = clientOptions.httpClient();
+        if (requestOptions != null && requestOptions.getTimeout().isPresent()) {
+            client = clientOptions.httpClientWithTimeout(requestOptions);
+        }
+        CompletableFuture<WhopApiHttpResponse<File>> future = new CompletableFuture<>();
+        client.newCall(okhttpRequest).enqueue(new Callback() {
+            @Override
+            public void onResponse(@NotNull Call call, @NotNull Response response) throws IOException {
+                try (ResponseBody responseBody = response.body()) {
+                    String responseBodyString = responseBody != null ? responseBody.string() : "{}";
+                    if (response.isSuccessful()) {
+                        future.complete(new WhopApiHttpResponse<>(
+                                ObjectMappers.JSON_MAPPER.readValue(responseBodyString, File.class), response));
+                        return;
+                    }
+                    try {
+                        switch (response.code()) {
                             case 400:
                                 future.completeExceptionally(new BadRequestError(
                                         ObjectMappers.JSON_MAPPER.readValue(responseBodyString, Object.class),
@@ -218,29 +279,14 @@ public class AsyncRawFilesClient {
                                         ObjectMappers.JSON_MAPPER.readValue(responseBodyString, Object.class),
                                         response));
                                 return;
-                            case 403:
-                                future.completeExceptionally(new ForbiddenError(
-                                        ObjectMappers.JSON_MAPPER.readValue(responseBodyString, Object.class),
-                                        response));
-                                return;
                             case 404:
                                 future.completeExceptionally(new NotFoundError(
                                         ObjectMappers.JSON_MAPPER.readValue(responseBodyString, Object.class),
                                         response));
                                 return;
-                            case 422:
-                                future.completeExceptionally(new UnprocessableEntityError(
-                                        ObjectMappers.JSON_MAPPER.readValue(responseBodyString, Object.class),
-                                        response));
-                                return;
-                            case 429:
-                                future.completeExceptionally(new TooManyRequestsError(
-                                        ObjectMappers.JSON_MAPPER.readValue(responseBodyString, Object.class),
-                                        response));
-                                return;
-                            case 500:
-                                future.completeExceptionally(new InternalServerError(
-                                        ObjectMappers.JSON_MAPPER.readValue(responseBodyString, Object.class),
+                            case 409:
+                                future.completeExceptionally(new ConflictError(
+                                        ObjectMappers.JSON_MAPPER.readValue(responseBodyString, V1ErrorResponse.class),
                                         response));
                                 return;
                         }

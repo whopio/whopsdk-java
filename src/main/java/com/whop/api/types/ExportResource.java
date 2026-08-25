@@ -45,9 +45,9 @@ public final class ExportResource {
 
     public static final ExportResource ENTRIES = new ExportResource(Value.ENTRIES, "entries");
 
-    public static final ExportResource MEMBERSHIPS = new ExportResource(Value.MEMBERSHIPS, "memberships");
-
     public static final ExportResource TRANSFERS = new ExportResource(Value.TRANSFERS, "transfers");
+
+    public static final ExportResource MEMBERSHIPS = new ExportResource(Value.MEMBERSHIPS, "memberships");
 
     public static final ExportResource CHILD_COMPANIES = new ExportResource(Value.CHILD_COMPANIES, "child_companies");
 
@@ -158,10 +158,10 @@ public final class ExportResource {
                 return visitor.visitShipments();
             case ENTRIES:
                 return visitor.visitEntries();
-            case MEMBERSHIPS:
-                return visitor.visitMemberships();
             case TRANSFERS:
                 return visitor.visitTransfers();
+            case MEMBERSHIPS:
+                return visitor.visitMemberships();
             case CHILD_COMPANIES:
                 return visitor.visitChildCompanies();
             case WITHDRAWAL_LINES:
@@ -243,10 +243,10 @@ public final class ExportResource {
                 return SHIPMENTS;
             case "entries":
                 return ENTRIES;
-            case "memberships":
-                return MEMBERSHIPS;
             case "transfers":
                 return TRANSFERS;
+            case "memberships":
+                return MEMBERSHIPS;
             case "child_companies":
                 return CHILD_COMPANIES;
             case "withdrawal_lines":
@@ -315,10 +315,6 @@ public final class ExportResource {
 
         FINANCIAL_ACTIVITY,
 
-        MEMBERS,
-
-        MEMBERSHIPS,
-
         PAYOUT_METHODS,
 
         PAYOUTS,
@@ -341,9 +337,13 @@ public final class ExportResource {
 
         WEBHOOKS,
 
+        MEMBERS,
+
         RECEIPTS,
 
         UNCLAIMED_MEMBERSHIPS,
+
+        MEMBERSHIPS,
 
         TRACKING_LINKS,
 
@@ -395,10 +395,6 @@ public final class ExportResource {
 
         T visitFinancialActivity();
 
-        T visitMembers();
-
-        T visitMemberships();
-
         T visitPayoutMethods();
 
         T visitPayouts();
@@ -421,9 +417,13 @@ public final class ExportResource {
 
         T visitWebhooks();
 
+        T visitMembers();
+
         T visitReceipts();
 
         T visitUnclaimedMemberships();
+
+        T visitMemberships();
 
         T visitTrackingLinks();
 

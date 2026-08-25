@@ -7,13 +7,15 @@ import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonValue;
 
 public final class PostWithdrawalReversedPayloadDataPayoutMethodSupportedPayoutMethodDeliveryType {
-    public static final PostWithdrawalReversedPayloadDataPayoutMethodSupportedPayoutMethodDeliveryType PAPER_CHECK =
-            new PostWithdrawalReversedPayloadDataPayoutMethodSupportedPayoutMethodDeliveryType(
-                    Value.PAPER_CHECK, "paper_check");
-
     public static final PostWithdrawalReversedPayloadDataPayoutMethodSupportedPayoutMethodDeliveryType CRYPTOCURRENCY =
             new PostWithdrawalReversedPayloadDataPayoutMethodSupportedPayoutMethodDeliveryType(
                     Value.CRYPTOCURRENCY, "cryptocurrency");
+
+    public static final PostWithdrawalReversedPayloadDataPayoutMethodSupportedPayoutMethodDeliveryType CHECK =
+            new PostWithdrawalReversedPayloadDataPayoutMethodSupportedPayoutMethodDeliveryType(Value.CHECK, "check");
+
+    public static final PostWithdrawalReversedPayloadDataPayoutMethodSupportedPayoutMethodDeliveryType CARD =
+            new PostWithdrawalReversedPayloadDataPayoutMethodSupportedPayoutMethodDeliveryType(Value.CARD, "card");
 
     public static final PostWithdrawalReversedPayloadDataPayoutMethodSupportedPayoutMethodDeliveryType UNKNOWN =
             new PostWithdrawalReversedPayloadDataPayoutMethodSupportedPayoutMethodDeliveryType(
@@ -26,10 +28,6 @@ public final class PostWithdrawalReversedPayloadDataPayoutMethodSupportedPayoutM
     public static final PostWithdrawalReversedPayloadDataPayoutMethodSupportedPayoutMethodDeliveryType BANK_DEPOSIT =
             new PostWithdrawalReversedPayloadDataPayoutMethodSupportedPayoutMethodDeliveryType(
                     Value.BANK_DEPOSIT, "bank_deposit");
-
-    public static final PostWithdrawalReversedPayloadDataPayoutMethodSupportedPayoutMethodDeliveryType MASSPAY_CARD =
-            new PostWithdrawalReversedPayloadDataPayoutMethodSupportedPayoutMethodDeliveryType(
-                    Value.MASSPAY_CARD, "masspay_card");
 
     public static final PostWithdrawalReversedPayloadDataPayoutMethodSupportedPayoutMethodDeliveryType MOBILE_WALLET =
             new PostWithdrawalReversedPayloadDataPayoutMethodSupportedPayoutMethodDeliveryType(
@@ -77,18 +75,18 @@ public final class PostWithdrawalReversedPayloadDataPayoutMethodSupportedPayoutM
 
     public <T> T visit(Visitor<T> visitor) {
         switch (value) {
-            case PAPER_CHECK:
-                return visitor.visitPaperCheck();
             case CRYPTOCURRENCY:
                 return visitor.visitCryptocurrency();
+            case CHECK:
+                return visitor.visitCheck();
+            case CARD:
+                return visitor.visitCard();
             case UNKNOWN:
                 return visitor.visitUnknown();
             case HOME_DELIVERY:
                 return visitor.visitHomeDelivery();
             case BANK_DEPOSIT:
                 return visitor.visitBankDeposit();
-            case MASSPAY_CARD:
-                return visitor.visitMasspayCard();
             case MOBILE_WALLET:
                 return visitor.visitMobileWallet();
             case CASH_PICKUP:
@@ -104,18 +102,18 @@ public final class PostWithdrawalReversedPayloadDataPayoutMethodSupportedPayoutM
     @JsonCreator(mode = JsonCreator.Mode.DELEGATING)
     public static PostWithdrawalReversedPayloadDataPayoutMethodSupportedPayoutMethodDeliveryType valueOf(String value) {
         switch (value) {
-            case "paper_check":
-                return PAPER_CHECK;
             case "cryptocurrency":
                 return CRYPTOCURRENCY;
+            case "check":
+                return CHECK;
+            case "card":
+                return CARD;
             case "unknown":
                 return UNKNOWN;
             case "home_delivery":
                 return HOME_DELIVERY;
             case "bank_deposit":
                 return BANK_DEPOSIT;
-            case "masspay_card":
-                return MASSPAY_CARD;
             case "mobile_wallet":
                 return MOBILE_WALLET;
             case "cash_pickup":
@@ -137,9 +135,9 @@ public final class PostWithdrawalReversedPayloadDataPayoutMethodSupportedPayoutM
 
         MOBILE_WALLET,
 
-        MASSPAY_CARD,
+        CARD,
 
-        PAPER_CHECK,
+        CHECK,
 
         BILL,
 
@@ -159,9 +157,9 @@ public final class PostWithdrawalReversedPayloadDataPayoutMethodSupportedPayoutM
 
         T visitMobileWallet();
 
-        T visitMasspayCard();
+        T visitCard();
 
-        T visitPaperCheck();
+        T visitCheck();
 
         T visitBill();
 

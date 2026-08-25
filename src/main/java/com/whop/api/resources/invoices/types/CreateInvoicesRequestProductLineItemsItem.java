@@ -60,7 +60,7 @@ public final class CreateInvoicesRequestProductLineItemsItem {
     }
 
     /**
-     * @return The unit price for this line item. Provided as a number in the specified currency. Eg: 10.43 for $10.43
+     * @return The unit price for this line item. Provided as a number in the specified currency. Eg: 10.43 for $10.43. Negative values represent a credit or deduction, as long as the line items still total a chargeable amount.
      */
     @JsonProperty("unit_price")
     public double getUnitPrice() {
@@ -114,7 +114,7 @@ public final class CreateInvoicesRequestProductLineItemsItem {
 
     public interface UnitPriceStage {
         /**
-         * <p>The unit price for this line item. Provided as a number in the specified currency. Eg: 10.43 for $10.43</p>
+         * <p>The unit price for this line item. Provided as a number in the specified currency. Eg: 10.43 for $10.43. Negative values represent a credit or deduction, as long as the line items still total a chargeable amount.</p>
          */
         _FinalStage unitPrice(double unitPrice);
     }
@@ -170,8 +170,8 @@ public final class CreateInvoicesRequestProductLineItemsItem {
         }
 
         /**
-         * <p>The unit price for this line item. Provided as a number in the specified currency. Eg: 10.43 for $10.43</p>
-         * <p>The unit price for this line item. Provided as a number in the specified currency. Eg: 10.43 for $10.43</p>
+         * <p>The unit price for this line item. Provided as a number in the specified currency. Eg: 10.43 for $10.43. Negative values represent a credit or deduction, as long as the line items still total a chargeable amount.</p>
+         * <p>The unit price for this line item. Provided as a number in the specified currency. Eg: 10.43 for $10.43. Negative values represent a credit or deduction, as long as the line items still total a chargeable amount.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override

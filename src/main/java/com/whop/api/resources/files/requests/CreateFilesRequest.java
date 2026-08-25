@@ -5,17 +5,14 @@ package com.whop.api.resources.files.requests;
 
 import com.fasterxml.jackson.annotation.JsonAnyGetter;
 import com.fasterxml.jackson.annotation.JsonAnySetter;
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonSetter;
 import com.fasterxml.jackson.annotation.Nulls;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
-import com.whop.api.core.Nullable;
-import com.whop.api.core.NullableNonemptyFilter;
 import com.whop.api.core.ObjectMappers;
-import com.whop.api.types.FileVisibility;
+import com.whop.api.resources.files.types.CreateFilesRequestVisibility;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
@@ -25,21 +22,39 @@ import org.jetbrains.annotations.NotNull;
 @JsonInclude(JsonInclude.Include.NON_ABSENT)
 @JsonDeserialize(builder = CreateFilesRequest.Builder.class)
 public final class CreateFilesRequest {
+    private final Optional<Integer> byteSize;
+
     private final String filename;
 
-    private final Optional<FileVisibility> visibility;
+    private final Optional<Boolean> multipart;
+
+    private final Optional<CreateFilesRequestVisibility> visibility;
 
     private final Map<String, Object> additionalProperties;
 
     private CreateFilesRequest(
-            String filename, Optional<FileVisibility> visibility, Map<String, Object> additionalProperties) {
+            Optional<Integer> byteSize,
+            String filename,
+            Optional<Boolean> multipart,
+            Optional<CreateFilesRequestVisibility> visibility,
+            Map<String, Object> additionalProperties) {
+        this.byteSize = byteSize;
         this.filename = filename;
+        this.multipart = multipart;
         this.visibility = visibility;
         this.additionalProperties = additionalProperties;
     }
 
     /**
-     * @return The name of the file including its extension (e.g., &quot;photo.png&quot; or &quot;document.pdf&quot;).
+     * @return The file's size in bytes. Required when <code>multipart</code> is <code>true</code>. Multipart uploads support at most 10,000 parts of 5MB each (about 50 GB).
+     */
+    @JsonProperty("byte_size")
+    public Optional<Integer> getByteSize() {
+        return byteSize;
+    }
+
+    /**
+     * @return The name of the file including its extension, e.g. <code>terms.pdf</code>.
      */
     @JsonProperty("filename")
     public String getFilename() {
@@ -47,19 +62,18 @@ public final class CreateFilesRequest {
     }
 
     /**
-     * @return Controls whether the file is publicly accessible via CDN or requires authentication. Defaults to private.
+     * @return Upload the file in 5MB parts. Required for files larger than 5GB; useful above ~100MB. The file must be larger than 5MB.
      */
-    @JsonIgnore
-    public Optional<FileVisibility> getVisibility() {
-        if (visibility == null) {
-            return Optional.empty();
-        }
-        return visibility;
+    @JsonProperty("multipart")
+    public Optional<Boolean> getMultipart() {
+        return multipart;
     }
 
-    @JsonInclude(value = JsonInclude.Include.CUSTOM, valueFilter = NullableNonemptyFilter.class)
+    /**
+     * @return <code>public</code> files are served via an unsigned CDN URL — use for assets anyone may see. <code>private</code> files are served via a signed, expiring URL — use for sensitive documents. Defaults to <code>private</code>.
+     */
     @JsonProperty("visibility")
-    private Optional<FileVisibility> _getVisibility() {
+    public Optional<CreateFilesRequestVisibility> getVisibility() {
         return visibility;
     }
 
@@ -75,12 +89,15 @@ public final class CreateFilesRequest {
     }
 
     private boolean equalTo(CreateFilesRequest other) {
-        return filename.equals(other.filename) && visibility.equals(other.visibility);
+        return byteSize.equals(other.byteSize)
+                && filename.equals(other.filename)
+                && multipart.equals(other.multipart)
+                && visibility.equals(other.visibility);
     }
 
     @java.lang.Override
     public int hashCode() {
-        return Objects.hash(this.filename, this.visibility);
+        return Objects.hash(this.byteSize, this.filename, this.multipart, this.visibility);
     }
 
     @java.lang.Override
@@ -94,7 +111,7 @@ public final class CreateFilesRequest {
 
     public interface FilenameStage {
         /**
-         * <p>The name of the file including its extension (e.g., &quot;photo.png&quot; or &quot;document.pdf&quot;).</p>
+         * <p>The name of the file including its extension, e.g. <code>terms.pdf</code>.</p>
          */
         _FinalStage filename(@NotNull String filename);
 
@@ -109,20 +126,36 @@ public final class CreateFilesRequest {
         _FinalStage additionalProperties(Map<String, Object> additionalProperties);
 
         /**
-         * <p>Controls whether the file is publicly accessible via CDN or requires authentication. Defaults to private.</p>
+         * <p>The file's size in bytes. Required when <code>multipart</code> is <code>true</code>. Multipart uploads support at most 10,000 parts of 5MB each (about 50 GB).</p>
          */
-        _FinalStage visibility(Optional<FileVisibility> visibility);
+        _FinalStage byteSize(Optional<Integer> byteSize);
 
-        _FinalStage visibility(FileVisibility visibility);
+        _FinalStage byteSize(Integer byteSize);
 
-        _FinalStage visibility(Nullable<FileVisibility> visibility);
+        /**
+         * <p>Upload the file in 5MB parts. Required for files larger than 5GB; useful above ~100MB. The file must be larger than 5MB.</p>
+         */
+        _FinalStage multipart(Optional<Boolean> multipart);
+
+        _FinalStage multipart(Boolean multipart);
+
+        /**
+         * <p><code>public</code> files are served via an unsigned CDN URL — use for assets anyone may see. <code>private</code> files are served via a signed, expiring URL — use for sensitive documents. Defaults to <code>private</code>.</p>
+         */
+        _FinalStage visibility(Optional<CreateFilesRequestVisibility> visibility);
+
+        _FinalStage visibility(CreateFilesRequestVisibility visibility);
     }
 
     @JsonIgnoreProperties(ignoreUnknown = true)
     public static final class Builder implements FilenameStage, _FinalStage {
         private String filename;
 
-        private Optional<FileVisibility> visibility = Optional.empty();
+        private Optional<CreateFilesRequestVisibility> visibility = Optional.empty();
+
+        private Optional<Boolean> multipart = Optional.empty();
+
+        private Optional<Integer> byteSize = Optional.empty();
 
         @JsonAnySetter
         private Map<String, Object> additionalProperties = new HashMap<>();
@@ -131,14 +164,16 @@ public final class CreateFilesRequest {
 
         @java.lang.Override
         public Builder from(CreateFilesRequest other) {
+            byteSize(other.getByteSize());
             filename(other.getFilename());
+            multipart(other.getMultipart());
             visibility(other.getVisibility());
             return this;
         }
 
         /**
-         * <p>The name of the file including its extension (e.g., &quot;photo.png&quot; or &quot;document.pdf&quot;).</p>
-         * <p>The name of the file including its extension (e.g., &quot;photo.png&quot; or &quot;document.pdf&quot;).</p>
+         * <p>The name of the file including its extension, e.g. <code>terms.pdf</code>.</p>
+         * <p>The name of the file including its extension, e.g. <code>terms.pdf</code>.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
@@ -149,44 +184,68 @@ public final class CreateFilesRequest {
         }
 
         /**
-         * <p>Controls whether the file is publicly accessible via CDN or requires authentication. Defaults to private.</p>
+         * <p><code>public</code> files are served via an unsigned CDN URL — use for assets anyone may see. <code>private</code> files are served via a signed, expiring URL — use for sensitive documents. Defaults to <code>private</code>.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
-        public _FinalStage visibility(Nullable<FileVisibility> visibility) {
-            if (visibility.isNull()) {
-                this.visibility = null;
-            } else if (visibility.isEmpty()) {
-                this.visibility = Optional.empty();
-            } else {
-                this.visibility = Optional.of(visibility.get());
-            }
-            return this;
-        }
-
-        /**
-         * <p>Controls whether the file is publicly accessible via CDN or requires authentication. Defaults to private.</p>
-         * @return Reference to {@code this} so that method calls can be chained together.
-         */
-        @java.lang.Override
-        public _FinalStage visibility(FileVisibility visibility) {
+        public _FinalStage visibility(CreateFilesRequestVisibility visibility) {
             this.visibility = Optional.ofNullable(visibility);
             return this;
         }
 
         /**
-         * <p>Controls whether the file is publicly accessible via CDN or requires authentication. Defaults to private.</p>
+         * <p><code>public</code> files are served via an unsigned CDN URL — use for assets anyone may see. <code>private</code> files are served via a signed, expiring URL — use for sensitive documents. Defaults to <code>private</code>.</p>
          */
         @java.lang.Override
         @JsonSetter(value = "visibility", nulls = Nulls.SKIP)
-        public _FinalStage visibility(Optional<FileVisibility> visibility) {
+        public _FinalStage visibility(Optional<CreateFilesRequestVisibility> visibility) {
             this.visibility = visibility;
+            return this;
+        }
+
+        /**
+         * <p>Upload the file in 5MB parts. Required for files larger than 5GB; useful above ~100MB. The file must be larger than 5MB.</p>
+         * @return Reference to {@code this} so that method calls can be chained together.
+         */
+        @java.lang.Override
+        public _FinalStage multipart(Boolean multipart) {
+            this.multipart = Optional.ofNullable(multipart);
+            return this;
+        }
+
+        /**
+         * <p>Upload the file in 5MB parts. Required for files larger than 5GB; useful above ~100MB. The file must be larger than 5MB.</p>
+         */
+        @java.lang.Override
+        @JsonSetter(value = "multipart", nulls = Nulls.SKIP)
+        public _FinalStage multipart(Optional<Boolean> multipart) {
+            this.multipart = multipart;
+            return this;
+        }
+
+        /**
+         * <p>The file's size in bytes. Required when <code>multipart</code> is <code>true</code>. Multipart uploads support at most 10,000 parts of 5MB each (about 50 GB).</p>
+         * @return Reference to {@code this} so that method calls can be chained together.
+         */
+        @java.lang.Override
+        public _FinalStage byteSize(Integer byteSize) {
+            this.byteSize = Optional.ofNullable(byteSize);
+            return this;
+        }
+
+        /**
+         * <p>The file's size in bytes. Required when <code>multipart</code> is <code>true</code>. Multipart uploads support at most 10,000 parts of 5MB each (about 50 GB).</p>
+         */
+        @java.lang.Override
+        @JsonSetter(value = "byte_size", nulls = Nulls.SKIP)
+        public _FinalStage byteSize(Optional<Integer> byteSize) {
+            this.byteSize = byteSize;
             return this;
         }
 
         @java.lang.Override
         public CreateFilesRequest build() {
-            return new CreateFilesRequest(filename, visibility, additionalProperties);
+            return new CreateFilesRequest(byteSize, filename, multipart, visibility, additionalProperties);
         }
 
         @java.lang.Override

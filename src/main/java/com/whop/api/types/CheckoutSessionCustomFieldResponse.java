@@ -17,26 +17,22 @@ import java.util.Objects;
 import org.jetbrains.annotations.NotNull;
 
 @JsonInclude(JsonInclude.Include.NON_ABSENT)
-@JsonDeserialize(builder = TransferDestinationCompany.Builder.class)
-public final class TransferDestinationCompany {
+@JsonDeserialize(builder = CheckoutSessionCustomFieldResponse.Builder.class)
+public final class CheckoutSessionCustomFieldResponse {
     private final String id;
 
-    private final String route;
-
-    private final String title;
+    private final String value;
 
     private final Map<String, Object> additionalProperties;
 
-    private TransferDestinationCompany(
-            String id, String route, String title, Map<String, Object> additionalProperties) {
+    private CheckoutSessionCustomFieldResponse(String id, String value, Map<String, Object> additionalProperties) {
         this.id = id;
-        this.route = route;
-        this.title = title;
+        this.value = value;
         this.additionalProperties = additionalProperties;
     }
 
     /**
-     * @return The unique identifier for the company.
+     * @return The plan custom field this answers, prefixed <code>field_</code> — the <code>id</code> of the matching entry published by the <code>custom_fields</code> requirement.
      */
     @JsonProperty("id")
     public String getId() {
@@ -44,25 +40,18 @@ public final class TransferDestinationCompany {
     }
 
     /**
-     * @return The URL slug for the company's store page.
+     * @return The buyer's answer, as typed.
      */
-    @JsonProperty("route")
-    public String getRoute() {
-        return route;
-    }
-
-    /**
-     * @return The display name of the company shown to customers.
-     */
-    @JsonProperty("title")
-    public String getTitle() {
-        return title;
+    @JsonProperty("value")
+    public String getValue() {
+        return value;
     }
 
     @java.lang.Override
     public boolean equals(Object other) {
         if (this == other) return true;
-        return other instanceof TransferDestinationCompany && equalTo((TransferDestinationCompany) other);
+        return other instanceof CheckoutSessionCustomFieldResponse
+                && equalTo((CheckoutSessionCustomFieldResponse) other);
     }
 
     @JsonAnyGetter
@@ -70,13 +59,13 @@ public final class TransferDestinationCompany {
         return this.additionalProperties;
     }
 
-    private boolean equalTo(TransferDestinationCompany other) {
-        return id.equals(other.id) && route.equals(other.route) && title.equals(other.title);
+    private boolean equalTo(CheckoutSessionCustomFieldResponse other) {
+        return id.equals(other.id) && value.equals(other.value);
     }
 
     @java.lang.Override
     public int hashCode() {
-        return Objects.hash(this.id, this.route, this.title);
+        return Objects.hash(this.id, this.value);
     }
 
     @java.lang.Override
@@ -90,29 +79,22 @@ public final class TransferDestinationCompany {
 
     public interface IdStage {
         /**
-         * <p>The unique identifier for the company.</p>
+         * <p>The plan custom field this answers, prefixed <code>field_</code> — the <code>id</code> of the matching entry published by the <code>custom_fields</code> requirement.</p>
          */
-        RouteStage id(@NotNull String id);
+        ValueStage id(@NotNull String id);
 
-        Builder from(TransferDestinationCompany other);
+        Builder from(CheckoutSessionCustomFieldResponse other);
     }
 
-    public interface RouteStage {
+    public interface ValueStage {
         /**
-         * <p>The URL slug for the company's store page.</p>
+         * <p>The buyer's answer, as typed.</p>
          */
-        TitleStage route(@NotNull String route);
-    }
-
-    public interface TitleStage {
-        /**
-         * <p>The display name of the company shown to customers.</p>
-         */
-        _FinalStage title(@NotNull String title);
+        _FinalStage value(@NotNull String value);
     }
 
     public interface _FinalStage {
-        TransferDestinationCompany build();
+        CheckoutSessionCustomFieldResponse build();
 
         _FinalStage additionalProperty(String key, Object value);
 
@@ -120,12 +102,10 @@ public final class TransferDestinationCompany {
     }
 
     @JsonIgnoreProperties(ignoreUnknown = true)
-    public static final class Builder implements IdStage, RouteStage, TitleStage, _FinalStage {
+    public static final class Builder implements IdStage, ValueStage, _FinalStage {
         private String id;
 
-        private String route;
-
-        private String title;
+        private String value;
 
         @JsonAnySetter
         private Map<String, Object> additionalProperties = new HashMap<>();
@@ -133,52 +113,39 @@ public final class TransferDestinationCompany {
         private Builder() {}
 
         @java.lang.Override
-        public Builder from(TransferDestinationCompany other) {
+        public Builder from(CheckoutSessionCustomFieldResponse other) {
             id(other.getId());
-            route(other.getRoute());
-            title(other.getTitle());
+            value(other.getValue());
             return this;
         }
 
         /**
-         * <p>The unique identifier for the company.</p>
-         * <p>The unique identifier for the company.</p>
+         * <p>The plan custom field this answers, prefixed <code>field_</code> — the <code>id</code> of the matching entry published by the <code>custom_fields</code> requirement.</p>
+         * <p>The plan custom field this answers, prefixed <code>field_</code> — the <code>id</code> of the matching entry published by the <code>custom_fields</code> requirement.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
         @JsonSetter("id")
-        public RouteStage id(@NotNull String id) {
+        public ValueStage id(@NotNull String id) {
             this.id = Objects.requireNonNull(id, "id must not be null");
             return this;
         }
 
         /**
-         * <p>The URL slug for the company's store page.</p>
-         * <p>The URL slug for the company's store page.</p>
+         * <p>The buyer's answer, as typed.</p>
+         * <p>The buyer's answer, as typed.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
-        @JsonSetter("route")
-        public TitleStage route(@NotNull String route) {
-            this.route = Objects.requireNonNull(route, "route must not be null");
-            return this;
-        }
-
-        /**
-         * <p>The display name of the company shown to customers.</p>
-         * <p>The display name of the company shown to customers.</p>
-         * @return Reference to {@code this} so that method calls can be chained together.
-         */
-        @java.lang.Override
-        @JsonSetter("title")
-        public _FinalStage title(@NotNull String title) {
-            this.title = Objects.requireNonNull(title, "title must not be null");
+        @JsonSetter("value")
+        public _FinalStage value(@NotNull String value) {
+            this.value = Objects.requireNonNull(value, "value must not be null");
             return this;
         }
 
         @java.lang.Override
-        public TransferDestinationCompany build() {
-            return new TransferDestinationCompany(id, route, title, additionalProperties);
+        public CheckoutSessionCustomFieldResponse build() {
+            return new CheckoutSessionCustomFieldResponse(id, value, additionalProperties);
         }
 
         @java.lang.Override

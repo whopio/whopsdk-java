@@ -2,10 +2,12 @@
 
 [![fern shield](https://img.shields.io/badge/%F0%9F%8C%BF-Built%20with%20Fern-brightgreen)](https://buildwithfern.com?utm_source=github&utm_medium=github&utm_campaign=readme&utm_source=https%3A%2F%2Fgithub.com%2Fwhopio%2Fwhopsdk-java)
 
-The Whop Java library provides convenient access to the Whop APIs from Java.
+The Whop SDK gives you typed access to the Whop API. Pass your API key to the client explicitly — the SDK reads no environment variables, so a client built without a key sends unauthenticated requests and the API answers 401.
+
 
 ## Table of Contents
 
+- [Documentation](#documentation)
 - [Reference](#reference)
 - [Usage](#usage)
 - [Environments](#environments)
@@ -18,6 +20,10 @@ The Whop Java library provides convenient access to the Whop APIs from Java.
   - [Custom Headers](#custom-headers)
   - [Access Raw Response Data](#access-raw-response-data)
 - [Contributing](#contributing)
+
+## Documentation
+
+API reference documentation is available [here](https://docs.whop.com/api-reference).
 
 ## Reference
 

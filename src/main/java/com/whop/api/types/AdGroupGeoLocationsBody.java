@@ -93,7 +93,7 @@ public final class AdGroupGeoLocationsBody {
     }
 
     /**
-     * @return ZIP and postal codes, as bare strings or objects with a key.
+     * @return ZIP and postal codes, keyed by the ad platform's location taxonomy. Meta keys these <code>COUNTRY:CODE</code>, as <code>US:78756</code> — a bare code is ambiguous, because the same one exists in several countries. TikTok takes the bare code.
      */
     @JsonProperty("zips")
     public Optional<List<AdGroupGeoLocationsBodyZipsItem>> getZips() {
@@ -235,7 +235,7 @@ public final class AdGroupGeoLocationsBody {
         }
 
         /**
-         * <p>ZIP and postal codes, as bare strings or objects with a key.</p>
+         * <p>ZIP and postal codes, keyed by the ad platform's location taxonomy. Meta keys these <code>COUNTRY:CODE</code>, as <code>US:78756</code> — a bare code is ambiguous, because the same one exists in several countries. TikTok takes the bare code.</p>
          */
         @JsonSetter(value = "zips", nulls = Nulls.SKIP)
         public Builder zips(Optional<List<AdGroupGeoLocationsBodyZipsItem>> zips) {

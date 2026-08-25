@@ -5,9 +5,9 @@ package com.whop.api.resources.files;
 
 import com.whop.api.core.ClientOptions;
 import com.whop.api.core.RequestOptions;
+import com.whop.api.resources.files.requests.CompleteFilesRequest;
 import com.whop.api.resources.files.requests.CreateFilesRequest;
 import com.whop.api.resources.files.requests.RetrieveFilesRequest;
-import com.whop.api.resources.files.types.CreateFilesResponse;
 import com.whop.api.types.File;
 
 public class FilesClient {
@@ -28,44 +28,58 @@ public class FilesClient {
     }
 
     /**
-     * Create a new file record and receive a presigned URL for uploading content to S3.
+     * Creates a file and returns a presigned destination to upload its bytes to. PUT the bytes to <code>upload_url</code> (single-part), or to each of <code>multipart_upload_urls</code> and then call Complete File Multipart Upload. Once the bytes land the file becomes <code>ready</code>, and its ID can be attached wherever a file is accepted — account legal documents, dispute evidence documents.
      */
-    public CreateFilesResponse create(CreateFilesRequest request) {
+    public File create(CreateFilesRequest request) {
         return this.rawClient.create(request).body();
     }
 
     /**
-     * Create a new file record and receive a presigned URL for uploading content to S3.
+     * Creates a file and returns a presigned destination to upload its bytes to. PUT the bytes to <code>upload_url</code> (single-part), or to each of <code>multipart_upload_urls</code> and then call Complete File Multipart Upload. Once the bytes land the file becomes <code>ready</code>, and its ID can be attached wherever a file is accepted — account legal documents, dispute evidence documents.
      */
-    public CreateFilesResponse create(CreateFilesRequest request, RequestOptions requestOptions) {
+    public File create(CreateFilesRequest request, RequestOptions requestOptions) {
         return this.rawClient.create(request, requestOptions).body();
     }
 
     /**
-     * Retrieves the details of an existing file.
+     * Retrieves a file you uploaded — poll it after uploading the bytes to see <code>upload_status</code> become <code>ready</code>. Only the creator can retrieve a file this way; a file attached to another resource is read through that resource.
      */
     public File retrieve(String id) {
         return this.rawClient.retrieve(id).body();
     }
 
     /**
-     * Retrieves the details of an existing file.
+     * Retrieves a file you uploaded — poll it after uploading the bytes to see <code>upload_status</code> become <code>ready</code>. Only the creator can retrieve a file this way; a file attached to another resource is read through that resource.
      */
     public File retrieve(String id, RequestOptions requestOptions) {
         return this.rawClient.retrieve(id, requestOptions).body();
     }
 
     /**
-     * Retrieves the details of an existing file.
+     * Retrieves a file you uploaded — poll it after uploading the bytes to see <code>upload_status</code> become <code>ready</code>. Only the creator can retrieve a file this way; a file attached to another resource is read through that resource.
      */
     public File retrieve(String id, RetrieveFilesRequest request) {
         return this.rawClient.retrieve(id, request).body();
     }
 
     /**
-     * Retrieves the details of an existing file.
+     * Retrieves a file you uploaded — poll it after uploading the bytes to see <code>upload_status</code> become <code>ready</code>. Only the creator can retrieve a file this way; a file attached to another resource is read through that resource.
      */
     public File retrieve(String id, RetrieveFilesRequest request, RequestOptions requestOptions) {
         return this.rawClient.retrieve(id, request, requestOptions).body();
+    }
+
+    /**
+     * Assembles the parts of a multipart upload after every part has been PUT to its presigned URL. Pass the <code>multipart_upload_id</code> from Create File and each part's <code>ETag</code> response header.
+     */
+    public File complete(String id, CompleteFilesRequest request) {
+        return this.rawClient.complete(id, request).body();
+    }
+
+    /**
+     * Assembles the parts of a multipart upload after every part has been PUT to its presigned URL. Pass the <code>multipart_upload_id</code> from Create File and each part's <code>ETag</code> response header.
+     */
+    public File complete(String id, CompleteFilesRequest request, RequestOptions requestOptions) {
+        return this.rawClient.complete(id, request, requestOptions).body();
     }
 }

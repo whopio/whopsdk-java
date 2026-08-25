@@ -35,14 +35,28 @@ public class PlansClient {
     }
 
     /**
-     * Returns a paginated list of plans belonging to an account, with optional filtering by visibility, type, release method, and product.
+     * Returns a paginated list of plans. Omit <code>account_id</code> and pass <code>product_ids</code> to list a product's public buyable plans.
+     */
+    public SyncPagingIterable<PlanListItem> list() {
+        return this.rawClient.list().body();
+    }
+
+    /**
+     * Returns a paginated list of plans. Omit <code>account_id</code> and pass <code>product_ids</code> to list a product's public buyable plans.
+     */
+    public SyncPagingIterable<PlanListItem> list(RequestOptions requestOptions) {
+        return this.rawClient.list(requestOptions).body();
+    }
+
+    /**
+     * Returns a paginated list of plans. Omit <code>account_id</code> and pass <code>product_ids</code> to list a product's public buyable plans.
      */
     public SyncPagingIterable<PlanListItem> list(ListPlansRequest request) {
         return this.rawClient.list(request).body();
     }
 
     /**
-     * Returns a paginated list of plans belonging to an account, with optional filtering by visibility, type, release method, and product.
+     * Returns a paginated list of plans. Omit <code>account_id</code> and pass <code>product_ids</code> to list a product's public buyable plans.
      */
     public SyncPagingIterable<PlanListItem> list(ListPlansRequest request, RequestOptions requestOptions) {
         return this.rawClient.list(request, requestOptions).body();

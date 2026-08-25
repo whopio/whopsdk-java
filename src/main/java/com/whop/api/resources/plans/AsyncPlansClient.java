@@ -36,14 +36,28 @@ public class AsyncPlansClient {
     }
 
     /**
-     * Returns a paginated list of plans belonging to an account, with optional filtering by visibility, type, release method, and product.
+     * Returns a paginated list of plans. Omit <code>account_id</code> and pass <code>product_ids</code> to list a product's public buyable plans.
+     */
+    public CompletableFuture<SyncPagingIterable<PlanListItem>> list() {
+        return this.rawClient.list().thenApply(response -> response.body());
+    }
+
+    /**
+     * Returns a paginated list of plans. Omit <code>account_id</code> and pass <code>product_ids</code> to list a product's public buyable plans.
+     */
+    public CompletableFuture<SyncPagingIterable<PlanListItem>> list(RequestOptions requestOptions) {
+        return this.rawClient.list(requestOptions).thenApply(response -> response.body());
+    }
+
+    /**
+     * Returns a paginated list of plans. Omit <code>account_id</code> and pass <code>product_ids</code> to list a product's public buyable plans.
      */
     public CompletableFuture<SyncPagingIterable<PlanListItem>> list(ListPlansRequest request) {
         return this.rawClient.list(request).thenApply(response -> response.body());
     }
 
     /**
-     * Returns a paginated list of plans belonging to an account, with optional filtering by visibility, type, release method, and product.
+     * Returns a paginated list of plans. Omit <code>account_id</code> and pass <code>product_ids</code> to list a product's public buyable plans.
      */
     public CompletableFuture<SyncPagingIterable<PlanListItem>> list(
             ListPlansRequest request, RequestOptions requestOptions) {

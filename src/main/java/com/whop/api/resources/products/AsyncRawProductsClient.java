@@ -53,7 +53,22 @@ public class AsyncRawProductsClient {
     }
 
     /**
-     * Returns a paginated list of products belonging to an account.
+     * Returns a paginated list of products. Omit <code>account_id</code> to search the public marketplace.
+     */
+    public CompletableFuture<WhopApiHttpResponse<SyncPagingIterable<ProductListItem>>> list() {
+        return list(ListProductsRequest.builder().build());
+    }
+
+    /**
+     * Returns a paginated list of products. Omit <code>account_id</code> to search the public marketplace.
+     */
+    public CompletableFuture<WhopApiHttpResponse<SyncPagingIterable<ProductListItem>>> list(
+            RequestOptions requestOptions) {
+        return list(ListProductsRequest.builder().build(), requestOptions);
+    }
+
+    /**
+     * Returns a paginated list of products. Omit <code>account_id</code> to search the public marketplace.
      */
     public CompletableFuture<WhopApiHttpResponse<SyncPagingIterable<ProductListItem>>> list(
             ListProductsRequest request) {
@@ -61,14 +76,36 @@ public class AsyncRawProductsClient {
     }
 
     /**
-     * Returns a paginated list of products belonging to an account.
+     * Returns a paginated list of products. Omit <code>account_id</code> to search the public marketplace.
      */
     public CompletableFuture<WhopApiHttpResponse<SyncPagingIterable<ProductListItem>>> list(
             ListProductsRequest request, RequestOptions requestOptions) {
         HttpUrl.Builder httpUrl = HttpUrl.parse(this.clientOptions.environment().getUrl())
                 .newBuilder()
                 .addPathSegments("products");
-        QueryStringMapper.addQueryParameter(httpUrl, "account_id", request.getAccountId(), false);
+        if (request.getAccountId().isPresent()) {
+            QueryStringMapper.addQueryParameter(
+                    httpUrl, "account_id", request.getAccountId().get(), false);
+        }
+        if (request.getQuery().isPresent()) {
+            QueryStringMapper.addQueryParameter(
+                    httpUrl, "query", request.getQuery().get(), false);
+        }
+        if (request.getMarketplaceCategoryRoute().isPresent()) {
+            QueryStringMapper.addQueryParameter(
+                    httpUrl,
+                    "marketplace_category_route",
+                    request.getMarketplaceCategoryRoute().get(),
+                    false);
+        }
+        if (request.getPriceMinimum().isPresent()) {
+            QueryStringMapper.addQueryParameter(
+                    httpUrl, "price_minimum", request.getPriceMinimum().get(), false);
+        }
+        if (request.getPriceMaximum().isPresent()) {
+            QueryStringMapper.addQueryParameter(
+                    httpUrl, "price_maximum", request.getPriceMaximum().get(), false);
+        }
         if (request.getDirection().isPresent()) {
             QueryStringMapper.addQueryParameter(
                     httpUrl, "direction", request.getDirection().get(), false);
@@ -92,6 +129,18 @@ public class AsyncRawProductsClient {
         if (request.getBefore().isPresent()) {
             QueryStringMapper.addQueryParameter(
                     httpUrl, "before", request.getBefore().get(), false);
+        }
+        if (request.getCreatedAfter().isPresent()) {
+            QueryStringMapper.addQueryParameter(
+                    httpUrl, "created_after", request.getCreatedAfter().get(), false);
+        }
+        if (request.getCreatedBefore().isPresent()) {
+            QueryStringMapper.addQueryParameter(
+                    httpUrl, "created_before", request.getCreatedBefore().get(), false);
+        }
+        if (request.getPlanTypes().isPresent()) {
+            QueryStringMapper.addQueryParameter(
+                    httpUrl, "plan_types", request.getPlanTypes().get(), true);
         }
         if (request.getVisibilities().isPresent()) {
             QueryStringMapper.addQueryParameter(
@@ -266,28 +315,28 @@ public class AsyncRawProductsClient {
     }
 
     /**
-     * Retrieves the details of an existing product. This endpoint is publicly accessible.
+     * Retrieves a product. Public — no credentials.
      */
     public CompletableFuture<WhopApiHttpResponse<Product>> retrieve(String id) {
         return retrieve(id, RetrieveProductsRequest.builder().build());
     }
 
     /**
-     * Retrieves the details of an existing product. This endpoint is publicly accessible.
+     * Retrieves a product. Public — no credentials.
      */
     public CompletableFuture<WhopApiHttpResponse<Product>> retrieve(String id, RequestOptions requestOptions) {
         return retrieve(id, RetrieveProductsRequest.builder().build(), requestOptions);
     }
 
     /**
-     * Retrieves the details of an existing product. This endpoint is publicly accessible.
+     * Retrieves a product. Public — no credentials.
      */
     public CompletableFuture<WhopApiHttpResponse<Product>> retrieve(String id, RetrieveProductsRequest request) {
         return retrieve(id, request, null);
     }
 
     /**
-     * Retrieves the details of an existing product. This endpoint is publicly accessible.
+     * Retrieves a product. Public — no credentials.
      */
     public CompletableFuture<WhopApiHttpResponse<Product>> retrieve(
             String id, RetrieveProductsRequest request, RequestOptions requestOptions) {

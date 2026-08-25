@@ -29,7 +29,7 @@ public final class AdGroupGeoLocationsBodyZipsItemKey {
     }
 
     /**
-     * @return The ZIP or postal code.
+     * @return The ad platform's key for the ZIP or postal code.
      */
     @JsonProperty("key")
     public String getKey() {
@@ -68,7 +68,7 @@ public final class AdGroupGeoLocationsBodyZipsItemKey {
 
     public interface KeyStage {
         /**
-         * <p>The ZIP or postal code.</p>
+         * <p>The ad platform's key for the ZIP or postal code.</p>
          */
         _FinalStage key(@NotNull String key);
 
@@ -99,8 +99,8 @@ public final class AdGroupGeoLocationsBodyZipsItemKey {
         }
 
         /**
-         * <p>The ZIP or postal code.</p>
-         * <p>The ZIP or postal code.</p>
+         * <p>The ad platform's key for the ZIP or postal code.</p>
+         * <p>The ad platform's key for the ZIP or postal code.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override

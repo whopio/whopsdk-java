@@ -25,6 +25,7 @@ import com.whop.api.resources.cards.AsyncCardsClient;
 import com.whop.api.resources.cardtransactions.AsyncCardTransactionsClient;
 import com.whop.api.resources.chatchannels.AsyncChatChannelsClient;
 import com.whop.api.resources.checkoutconfigurations.AsyncCheckoutConfigurationsClient;
+import com.whop.api.resources.checkoutsessions.AsyncCheckoutSessionsClient;
 import com.whop.api.resources.companies.AsyncCompaniesClient;
 import com.whop.api.resources.companytokentransactions.AsyncCompanyTokenTransactionsClient;
 import com.whop.api.resources.coursechapters.AsyncCourseChaptersClient;
@@ -130,6 +131,8 @@ public class AsyncWhopApiClient {
     protected final Supplier<AsyncChatChannelsClient> chatChannelsClient;
 
     protected final Supplier<AsyncCheckoutConfigurationsClient> checkoutConfigurationsClient;
+
+    protected final Supplier<AsyncCheckoutSessionsClient> checkoutSessionsClient;
 
     protected final Supplier<AsyncCompaniesClient> companiesClient;
 
@@ -276,6 +279,7 @@ public class AsyncWhopApiClient {
         this.chatChannelsClient = Suppliers.memoize(() -> new AsyncChatChannelsClient(clientOptions));
         this.checkoutConfigurationsClient =
                 Suppliers.memoize(() -> new AsyncCheckoutConfigurationsClient(clientOptions));
+        this.checkoutSessionsClient = Suppliers.memoize(() -> new AsyncCheckoutSessionsClient(clientOptions));
         this.companiesClient = Suppliers.memoize(() -> new AsyncCompaniesClient(clientOptions));
         this.companyTokenTransactionsClient =
                 Suppliers.memoize(() -> new AsyncCompanyTokenTransactionsClient(clientOptions));
@@ -419,6 +423,10 @@ public class AsyncWhopApiClient {
 
     public AsyncCheckoutConfigurationsClient checkoutConfigurations() {
         return this.checkoutConfigurationsClient.get();
+    }
+
+    public AsyncCheckoutSessionsClient checkoutSessions() {
+        return this.checkoutSessionsClient.get();
     }
 
     public AsyncCompaniesClient companies() {

@@ -170,7 +170,7 @@ public final class UpdateInvoicesRequest {
     }
 
     /**
-     * @return Line items that break down the invoice total.
+     * @return Line items that break down the invoice total. When provided, the sum of (quantity * unit_price) for all items must equal the plan price. Individual items may be negative to represent a credit, as long as the sum is not negative and clears the currency's minimum charge. Pass an empty list to remove the breakdown.
      */
     @JsonIgnore
     public Optional<List<UpdateInvoicesRequestLineItemsItem>> getLineItems() {
@@ -615,7 +615,7 @@ public final class UpdateInvoicesRequest {
         }
 
         /**
-         * <p>Line items that break down the invoice total.</p>
+         * <p>Line items that break down the invoice total. When provided, the sum of (quantity * unit_price) for all items must equal the plan price. Individual items may be negative to represent a credit, as long as the sum is not negative and clears the currency's minimum charge. Pass an empty list to remove the breakdown.</p>
          */
         @JsonSetter(value = "line_items", nulls = Nulls.SKIP)
         public Builder lineItems(Optional<List<UpdateInvoicesRequestLineItemsItem>> lineItems) {

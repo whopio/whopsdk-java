@@ -27,6 +27,8 @@ import org.jetbrains.annotations.NotNull;
 public final class LedgerActivitySource {
     private final Optional<Double> amountFloat;
 
+    private final Optional<String> cardBrand;
+
     private final Optional<String> chain;
 
     private final Optional<String> claimUrl;
@@ -44,6 +46,12 @@ public final class LedgerActivitySource {
     private final String object;
 
     private final Optional<String> payerName;
+
+    private final Optional<Money> paymentAmount;
+
+    private final Optional<String> paymentMethodType;
+
+    private final Optional<String> paymentProcessor;
 
     private final Optional<LedgerActivitySourcePayoutDestination> payoutDestination;
 
@@ -65,6 +73,7 @@ public final class LedgerActivitySource {
 
     private LedgerActivitySource(
             Optional<Double> amountFloat,
+            Optional<String> cardBrand,
             Optional<String> chain,
             Optional<String> claimUrl,
             Optional<OffsetDateTime> createdAt,
@@ -74,6 +83,9 @@ public final class LedgerActivitySource {
             String id,
             String object,
             Optional<String> payerName,
+            Optional<Money> paymentAmount,
+            Optional<String> paymentMethodType,
+            Optional<String> paymentProcessor,
             Optional<LedgerActivitySourcePayoutDestination> payoutDestination,
             Optional<String> payoutTokenNickname,
             Optional<String> reason,
@@ -84,6 +96,7 @@ public final class LedgerActivitySource {
             Optional<String> txHash,
             Map<String, Object> additionalProperties) {
         this.amountFloat = amountFloat;
+        this.cardBrand = cardBrand;
         this.chain = chain;
         this.claimUrl = claimUrl;
         this.createdAt = createdAt;
@@ -93,6 +106,9 @@ public final class LedgerActivitySource {
         this.id = id;
         this.object = object;
         this.payerName = payerName;
+        this.paymentAmount = paymentAmount;
+        this.paymentMethodType = paymentMethodType;
+        this.paymentProcessor = paymentProcessor;
         this.payoutDestination = payoutDestination;
         this.payoutTokenNickname = payoutTokenNickname;
         this.reason = reason;
@@ -113,6 +129,17 @@ public final class LedgerActivitySource {
             return Optional.empty();
         }
         return amountFloat;
+    }
+
+    /**
+     * @return Card brand used by the payment source.
+     */
+    @JsonIgnore
+    public Optional<String> getCardBrand() {
+        if (cardBrand == null) {
+            return Optional.empty();
+        }
+        return cardBrand;
     }
 
     /**
@@ -200,6 +227,39 @@ public final class LedgerActivitySource {
             return Optional.empty();
         }
         return payerName;
+    }
+
+    /**
+     * @return Total charged by the payment source.
+     */
+    @JsonIgnore
+    public Optional<Money> getPaymentAmount() {
+        if (paymentAmount == null) {
+            return Optional.empty();
+        }
+        return paymentAmount;
+    }
+
+    /**
+     * @return Payment method used by the payment source.
+     */
+    @JsonIgnore
+    public Optional<String> getPaymentMethodType() {
+        if (paymentMethodType == null) {
+            return Optional.empty();
+        }
+        return paymentMethodType;
+    }
+
+    /**
+     * @return Processor used by the payment source.
+     */
+    @JsonIgnore
+    public Optional<String> getPaymentProcessor() {
+        if (paymentProcessor == null) {
+            return Optional.empty();
+        }
+        return paymentProcessor;
     }
 
     /**
@@ -297,6 +357,12 @@ public final class LedgerActivitySource {
     }
 
     @JsonInclude(value = JsonInclude.Include.CUSTOM, valueFilter = NullableNonemptyFilter.class)
+    @JsonProperty("card_brand")
+    private Optional<String> _getCardBrand() {
+        return cardBrand;
+    }
+
+    @JsonInclude(value = JsonInclude.Include.CUSTOM, valueFilter = NullableNonemptyFilter.class)
     @JsonProperty("chain")
     private Optional<String> _getChain() {
         return chain;
@@ -336,6 +402,24 @@ public final class LedgerActivitySource {
     @JsonProperty("payer_name")
     private Optional<String> _getPayerName() {
         return payerName;
+    }
+
+    @JsonInclude(value = JsonInclude.Include.CUSTOM, valueFilter = NullableNonemptyFilter.class)
+    @JsonProperty("payment_amount")
+    private Optional<Money> _getPaymentAmount() {
+        return paymentAmount;
+    }
+
+    @JsonInclude(value = JsonInclude.Include.CUSTOM, valueFilter = NullableNonemptyFilter.class)
+    @JsonProperty("payment_method_type")
+    private Optional<String> _getPaymentMethodType() {
+        return paymentMethodType;
+    }
+
+    @JsonInclude(value = JsonInclude.Include.CUSTOM, valueFilter = NullableNonemptyFilter.class)
+    @JsonProperty("payment_processor")
+    private Optional<String> _getPaymentProcessor() {
+        return paymentProcessor;
     }
 
     @JsonInclude(value = JsonInclude.Include.CUSTOM, valueFilter = NullableNonemptyFilter.class)
@@ -399,6 +483,7 @@ public final class LedgerActivitySource {
 
     private boolean equalTo(LedgerActivitySource other) {
         return amountFloat.equals(other.amountFloat)
+                && cardBrand.equals(other.cardBrand)
                 && chain.equals(other.chain)
                 && claimUrl.equals(other.claimUrl)
                 && createdAt.equals(other.createdAt)
@@ -408,6 +493,9 @@ public final class LedgerActivitySource {
                 && id.equals(other.id)
                 && object.equals(other.object)
                 && payerName.equals(other.payerName)
+                && paymentAmount.equals(other.paymentAmount)
+                && paymentMethodType.equals(other.paymentMethodType)
+                && paymentProcessor.equals(other.paymentProcessor)
                 && payoutDestination.equals(other.payoutDestination)
                 && payoutTokenNickname.equals(other.payoutTokenNickname)
                 && reason.equals(other.reason)
@@ -422,6 +510,7 @@ public final class LedgerActivitySource {
     public int hashCode() {
         return Objects.hash(
                 this.amountFloat,
+                this.cardBrand,
                 this.chain,
                 this.claimUrl,
                 this.createdAt,
@@ -431,6 +520,9 @@ public final class LedgerActivitySource {
                 this.id,
                 this.object,
                 this.payerName,
+                this.paymentAmount,
+                this.paymentMethodType,
+                this.paymentProcessor,
                 this.payoutDestination,
                 this.payoutTokenNickname,
                 this.reason,
@@ -475,6 +567,15 @@ public final class LedgerActivitySource {
         _FinalStage amountFloat(Double amountFloat);
 
         _FinalStage amountFloat(Nullable<Double> amountFloat);
+
+        /**
+         * <p>Card brand used by the payment source.</p>
+         */
+        _FinalStage cardBrand(Optional<String> cardBrand);
+
+        _FinalStage cardBrand(String cardBrand);
+
+        _FinalStage cardBrand(Nullable<String> cardBrand);
 
         /**
          * <p>Chain the deposit landed on, for example plasma (onchain_transaction sources only).</p>
@@ -538,6 +639,33 @@ public final class LedgerActivitySource {
         _FinalStage payerName(String payerName);
 
         _FinalStage payerName(Nullable<String> payerName);
+
+        /**
+         * <p>Total charged by the payment source.</p>
+         */
+        _FinalStage paymentAmount(Optional<Money> paymentAmount);
+
+        _FinalStage paymentAmount(Money paymentAmount);
+
+        _FinalStage paymentAmount(Nullable<Money> paymentAmount);
+
+        /**
+         * <p>Payment method used by the payment source.</p>
+         */
+        _FinalStage paymentMethodType(Optional<String> paymentMethodType);
+
+        _FinalStage paymentMethodType(String paymentMethodType);
+
+        _FinalStage paymentMethodType(Nullable<String> paymentMethodType);
+
+        /**
+         * <p>Processor used by the payment source.</p>
+         */
+        _FinalStage paymentProcessor(Optional<String> paymentProcessor);
+
+        _FinalStage paymentProcessor(String paymentProcessor);
+
+        _FinalStage paymentProcessor(Nullable<String> paymentProcessor);
 
         /**
          * <p>Payout destination display info (withdrawal sources only).</p>
@@ -634,6 +762,12 @@ public final class LedgerActivitySource {
 
         private Optional<LedgerActivitySourcePayoutDestination> payoutDestination = Optional.empty();
 
+        private Optional<String> paymentProcessor = Optional.empty();
+
+        private Optional<String> paymentMethodType = Optional.empty();
+
+        private Optional<Money> paymentAmount = Optional.empty();
+
         private Optional<String> payerName = Optional.empty();
 
         private Optional<String> fromCurrency = Optional.empty();
@@ -648,6 +782,8 @@ public final class LedgerActivitySource {
 
         private Optional<String> chain = Optional.empty();
 
+        private Optional<String> cardBrand = Optional.empty();
+
         private Optional<Double> amountFloat = Optional.empty();
 
         @JsonAnySetter
@@ -658,6 +794,7 @@ public final class LedgerActivitySource {
         @java.lang.Override
         public Builder from(LedgerActivitySource other) {
             amountFloat(other.getAmountFloat());
+            cardBrand(other.getCardBrand());
             chain(other.getChain());
             claimUrl(other.getClaimUrl());
             createdAt(other.getCreatedAt());
@@ -667,6 +804,9 @@ public final class LedgerActivitySource {
             id(other.getId());
             object(other.getObject());
             payerName(other.getPayerName());
+            paymentAmount(other.getPaymentAmount());
+            paymentMethodType(other.getPaymentMethodType());
+            paymentProcessor(other.getPaymentProcessor());
             payoutDestination(other.getPayoutDestination());
             payoutTokenNickname(other.getPayoutTokenNickname());
             reason(other.getReason());
@@ -981,6 +1121,114 @@ public final class LedgerActivitySource {
         }
 
         /**
+         * <p>Processor used by the payment source.</p>
+         * @return Reference to {@code this} so that method calls can be chained together.
+         */
+        @java.lang.Override
+        public _FinalStage paymentProcessor(Nullable<String> paymentProcessor) {
+            if (paymentProcessor.isNull()) {
+                this.paymentProcessor = null;
+            } else if (paymentProcessor.isEmpty()) {
+                this.paymentProcessor = Optional.empty();
+            } else {
+                this.paymentProcessor = Optional.of(paymentProcessor.get());
+            }
+            return this;
+        }
+
+        /**
+         * <p>Processor used by the payment source.</p>
+         * @return Reference to {@code this} so that method calls can be chained together.
+         */
+        @java.lang.Override
+        public _FinalStage paymentProcessor(String paymentProcessor) {
+            this.paymentProcessor = Optional.ofNullable(paymentProcessor);
+            return this;
+        }
+
+        /**
+         * <p>Processor used by the payment source.</p>
+         */
+        @java.lang.Override
+        @JsonSetter(value = "payment_processor", nulls = Nulls.SKIP)
+        public _FinalStage paymentProcessor(Optional<String> paymentProcessor) {
+            this.paymentProcessor = paymentProcessor;
+            return this;
+        }
+
+        /**
+         * <p>Payment method used by the payment source.</p>
+         * @return Reference to {@code this} so that method calls can be chained together.
+         */
+        @java.lang.Override
+        public _FinalStage paymentMethodType(Nullable<String> paymentMethodType) {
+            if (paymentMethodType.isNull()) {
+                this.paymentMethodType = null;
+            } else if (paymentMethodType.isEmpty()) {
+                this.paymentMethodType = Optional.empty();
+            } else {
+                this.paymentMethodType = Optional.of(paymentMethodType.get());
+            }
+            return this;
+        }
+
+        /**
+         * <p>Payment method used by the payment source.</p>
+         * @return Reference to {@code this} so that method calls can be chained together.
+         */
+        @java.lang.Override
+        public _FinalStage paymentMethodType(String paymentMethodType) {
+            this.paymentMethodType = Optional.ofNullable(paymentMethodType);
+            return this;
+        }
+
+        /**
+         * <p>Payment method used by the payment source.</p>
+         */
+        @java.lang.Override
+        @JsonSetter(value = "payment_method_type", nulls = Nulls.SKIP)
+        public _FinalStage paymentMethodType(Optional<String> paymentMethodType) {
+            this.paymentMethodType = paymentMethodType;
+            return this;
+        }
+
+        /**
+         * <p>Total charged by the payment source.</p>
+         * @return Reference to {@code this} so that method calls can be chained together.
+         */
+        @java.lang.Override
+        public _FinalStage paymentAmount(Nullable<Money> paymentAmount) {
+            if (paymentAmount.isNull()) {
+                this.paymentAmount = null;
+            } else if (paymentAmount.isEmpty()) {
+                this.paymentAmount = Optional.empty();
+            } else {
+                this.paymentAmount = Optional.of(paymentAmount.get());
+            }
+            return this;
+        }
+
+        /**
+         * <p>Total charged by the payment source.</p>
+         * @return Reference to {@code this} so that method calls can be chained together.
+         */
+        @java.lang.Override
+        public _FinalStage paymentAmount(Money paymentAmount) {
+            this.paymentAmount = Optional.ofNullable(paymentAmount);
+            return this;
+        }
+
+        /**
+         * <p>Total charged by the payment source.</p>
+         */
+        @java.lang.Override
+        @JsonSetter(value = "payment_amount", nulls = Nulls.SKIP)
+        public _FinalStage paymentAmount(Optional<Money> paymentAmount) {
+            this.paymentAmount = paymentAmount;
+            return this;
+        }
+
+        /**
          * <p>Name of the entity processing the payout (withdrawal sources only; requires payout:withdrawal:read).</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
@@ -1233,6 +1481,42 @@ public final class LedgerActivitySource {
         }
 
         /**
+         * <p>Card brand used by the payment source.</p>
+         * @return Reference to {@code this} so that method calls can be chained together.
+         */
+        @java.lang.Override
+        public _FinalStage cardBrand(Nullable<String> cardBrand) {
+            if (cardBrand.isNull()) {
+                this.cardBrand = null;
+            } else if (cardBrand.isEmpty()) {
+                this.cardBrand = Optional.empty();
+            } else {
+                this.cardBrand = Optional.of(cardBrand.get());
+            }
+            return this;
+        }
+
+        /**
+         * <p>Card brand used by the payment source.</p>
+         * @return Reference to {@code this} so that method calls can be chained together.
+         */
+        @java.lang.Override
+        public _FinalStage cardBrand(String cardBrand) {
+            this.cardBrand = Optional.ofNullable(cardBrand);
+            return this;
+        }
+
+        /**
+         * <p>Card brand used by the payment source.</p>
+         */
+        @java.lang.Override
+        @JsonSetter(value = "card_brand", nulls = Nulls.SKIP)
+        public _FinalStage cardBrand(Optional<String> cardBrand) {
+            this.cardBrand = cardBrand;
+            return this;
+        }
+
+        /**
          * <p>Withdrawal amount as a decimal number in the destination currency (withdrawal sources only; requires payout:withdrawal:read).</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
@@ -1272,6 +1556,7 @@ public final class LedgerActivitySource {
         public LedgerActivitySource build() {
             return new LedgerActivitySource(
                     amountFloat,
+                    cardBrand,
                     chain,
                     claimUrl,
                     createdAt,
@@ -1281,6 +1566,9 @@ public final class LedgerActivitySource {
                     id,
                     object,
                     payerName,
+                    paymentAmount,
+                    paymentMethodType,
+                    paymentProcessor,
                     payoutDestination,
                     payoutTokenNickname,
                     reason,

@@ -43,6 +43,8 @@ public final class LedgerActivity {
 
     private final LedgerActivityObject object;
 
+    private final Optional<LedgerActivityPayment> payment;
+
     private final OffsetDateTime postedAt;
 
     private final Optional<LedgerActivityResource> resource;
@@ -61,6 +63,7 @@ public final class LedgerActivity {
             Optional<String> ledgerAccountId,
             LedgerActivityLineType lineType,
             LedgerActivityObject object,
+            Optional<LedgerActivityPayment> payment,
             OffsetDateTime postedAt,
             Optional<LedgerActivityResource> resource,
             Optional<LedgerActivitySource> source,
@@ -74,6 +77,7 @@ public final class LedgerActivity {
         this.ledgerAccountId = ledgerAccountId;
         this.lineType = lineType;
         this.object = object;
+        this.payment = payment;
         this.postedAt = postedAt;
         this.resource = resource;
         this.source = source;
@@ -159,6 +163,17 @@ public final class LedgerActivity {
     }
 
     /**
+     * @return Payment related to this ledger activity. Included when rich resource hydration is enabled and the movement is tied to a payment.
+     */
+    @JsonIgnore
+    public Optional<LedgerActivityPayment> getPayment() {
+        if (payment == null) {
+            return Optional.empty();
+        }
+        return payment;
+    }
+
+    /**
      * @return When the activity posted to the ledger.
      */
     @JsonProperty("posted_at")
@@ -207,6 +222,12 @@ public final class LedgerActivity {
     }
 
     @JsonInclude(value = JsonInclude.Include.CUSTOM, valueFilter = NullableNonemptyFilter.class)
+    @JsonProperty("payment")
+    private Optional<LedgerActivityPayment> _getPayment() {
+        return payment;
+    }
+
+    @JsonInclude(value = JsonInclude.Include.CUSTOM, valueFilter = NullableNonemptyFilter.class)
     @JsonProperty("resource")
     private Optional<LedgerActivityResource> _getResource() {
         return resource;
@@ -239,6 +260,7 @@ public final class LedgerActivity {
                 && ledgerAccountId.equals(other.ledgerAccountId)
                 && lineType.equals(other.lineType)
                 && object.equals(other.object)
+                && payment.equals(other.payment)
                 && postedAt.equals(other.postedAt)
                 && resource.equals(other.resource)
                 && source.equals(other.source);
@@ -256,6 +278,7 @@ public final class LedgerActivity {
                 this.ledgerAccountId,
                 this.lineType,
                 this.object,
+                this.payment,
                 this.postedAt,
                 this.resource,
                 this.source);
@@ -353,6 +376,15 @@ public final class LedgerActivity {
         _FinalStage ledgerAccountId(Nullable<String> ledgerAccountId);
 
         /**
+         * <p>Payment related to this ledger activity. Included when rich resource hydration is enabled and the movement is tied to a payment.</p>
+         */
+        _FinalStage payment(Optional<LedgerActivityPayment> payment);
+
+        _FinalStage payment(LedgerActivityPayment payment);
+
+        _FinalStage payment(Nullable<LedgerActivityPayment> payment);
+
+        /**
          * <p>Resource associated with this ledger activity.</p>
          */
         _FinalStage resource(Optional<LedgerActivityResource> resource);
@@ -390,6 +422,8 @@ public final class LedgerActivity {
 
         private Optional<LedgerActivityResource> resource = Optional.empty();
 
+        private Optional<LedgerActivityPayment> payment = Optional.empty();
+
         private Optional<String> ledgerAccountId = Optional.empty();
 
         private Optional<OffsetDateTime> createdAt = Optional.empty();
@@ -414,6 +448,7 @@ public final class LedgerActivity {
             ledgerAccountId(other.getLedgerAccountId());
             lineType(other.getLineType());
             object(other.getObject());
+            payment(other.getPayment());
             postedAt(other.getPostedAt());
             resource(other.getResource());
             source(other.getSource());
@@ -560,6 +595,42 @@ public final class LedgerActivity {
         }
 
         /**
+         * <p>Payment related to this ledger activity. Included when rich resource hydration is enabled and the movement is tied to a payment.</p>
+         * @return Reference to {@code this} so that method calls can be chained together.
+         */
+        @java.lang.Override
+        public _FinalStage payment(Nullable<LedgerActivityPayment> payment) {
+            if (payment.isNull()) {
+                this.payment = null;
+            } else if (payment.isEmpty()) {
+                this.payment = Optional.empty();
+            } else {
+                this.payment = Optional.of(payment.get());
+            }
+            return this;
+        }
+
+        /**
+         * <p>Payment related to this ledger activity. Included when rich resource hydration is enabled and the movement is tied to a payment.</p>
+         * @return Reference to {@code this} so that method calls can be chained together.
+         */
+        @java.lang.Override
+        public _FinalStage payment(LedgerActivityPayment payment) {
+            this.payment = Optional.ofNullable(payment);
+            return this;
+        }
+
+        /**
+         * <p>Payment related to this ledger activity. Included when rich resource hydration is enabled and the movement is tied to a payment.</p>
+         */
+        @java.lang.Override
+        @JsonSetter(value = "payment", nulls = Nulls.SKIP)
+        public _FinalStage payment(Optional<LedgerActivityPayment> payment) {
+            this.payment = payment;
+            return this;
+        }
+
+        /**
          * <p>The ledger account (a ldgr_ identifier) this row belongs to. Present only when the response aggregates owned accounts (include_owned_accounts=true); omitted otherwise. Pair it with <code>account</code> to scope drawers and dashboard links to the owning business.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
@@ -699,6 +770,7 @@ public final class LedgerActivity {
                     ledgerAccountId,
                     lineType,
                     object,
+                    payment,
                     postedAt,
                     resource,
                     source,

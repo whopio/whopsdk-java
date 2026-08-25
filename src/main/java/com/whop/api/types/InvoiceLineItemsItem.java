@@ -79,7 +79,7 @@ public final class InvoiceLineItemsItem {
     }
 
     /**
-     * @return The unit price for this line item.
+     * @return The unit price for this line item. Negative for a credit or deduction.
      */
     @JsonProperty("unit_price")
     public double getUnitPrice() {
@@ -151,7 +151,7 @@ public final class InvoiceLineItemsItem {
 
     public interface UnitPriceStage {
         /**
-         * <p>The unit price for this line item.</p>
+         * <p>The unit price for this line item. Negative for a credit or deduction.</p>
          */
         _FinalStage unitPrice(double unitPrice);
     }
@@ -241,8 +241,8 @@ public final class InvoiceLineItemsItem {
         }
 
         /**
-         * <p>The unit price for this line item.</p>
-         * <p>The unit price for this line item.</p>
+         * <p>The unit price for this line item. Negative for a credit or deduction.</p>
+         * <p>The unit price for this line item. Negative for a credit or deduction.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override

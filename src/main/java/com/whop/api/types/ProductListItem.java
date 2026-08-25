@@ -26,7 +26,13 @@ import org.jetbrains.annotations.NotNull;
 @JsonInclude(JsonInclude.Include.NON_ABSENT)
 @JsonDeserialize(builder = ProductListItem.Builder.class)
 public final class ProductListItem {
+    private final Optional<Map<String, Object>> account;
+
     private final String createdAt;
+
+    private final Optional<ProductPublicPlan> defaultPlan;
+
+    private final Optional<String> description;
 
     private final Optional<String> externalIdentifier;
 
@@ -57,7 +63,10 @@ public final class ProductListItem {
     private final Map<String, Object> additionalProperties;
 
     private ProductListItem(
+            Optional<Map<String, Object>> account,
             String createdAt,
+            Optional<ProductPublicPlan> defaultPlan,
+            Optional<String> description,
             Optional<String> externalIdentifier,
             List<ProductGalleryImage> galleryImages,
             Optional<String> headline,
@@ -72,7 +81,10 @@ public final class ProductListItem {
             boolean verified,
             Optional<String> visibility,
             Map<String, Object> additionalProperties) {
+        this.account = account;
         this.createdAt = createdAt;
+        this.defaultPlan = defaultPlan;
+        this.description = description;
         this.externalIdentifier = externalIdentifier;
         this.galleryImages = galleryImages;
         this.headline = headline;
@@ -90,11 +102,44 @@ public final class ProductListItem {
     }
 
     /**
+     * @return Account that sells this product.
+     */
+    @JsonIgnore
+    public Optional<Map<String, Object>> getAccount() {
+        if (account == null) {
+            return Optional.empty();
+        }
+        return account;
+    }
+
+    /**
      * @return When the product was created, as an ISO 8601 timestamp.
      */
     @JsonProperty("created_at")
     public String getCreatedAt() {
         return createdAt;
+    }
+
+    /**
+     * @return Buyable plan to show and check out with. The configured default when that plan is buyable, otherwise the first buyable plan in product-page order. <code>null</code> when none is buyable.
+     */
+    @JsonIgnore
+    public Optional<ProductPublicPlan> getDefaultPlan() {
+        if (defaultPlan == null) {
+            return Optional.empty();
+        }
+        return defaultPlan;
+    }
+
+    /**
+     * @return Written description displayed on the product page. <code>null</code> if none is set.
+     */
+    @JsonIgnore
+    public Optional<String> getDescription() {
+        if (description == null) {
+            return Optional.empty();
+        }
+        return description;
     }
 
     /**
@@ -208,6 +253,24 @@ public final class ProductListItem {
     }
 
     @JsonInclude(value = JsonInclude.Include.CUSTOM, valueFilter = NullableNonemptyFilter.class)
+    @JsonProperty("account")
+    private Optional<Map<String, Object>> _getAccount() {
+        return account;
+    }
+
+    @JsonInclude(value = JsonInclude.Include.CUSTOM, valueFilter = NullableNonemptyFilter.class)
+    @JsonProperty("default_plan")
+    private Optional<ProductPublicPlan> _getDefaultPlan() {
+        return defaultPlan;
+    }
+
+    @JsonInclude(value = JsonInclude.Include.CUSTOM, valueFilter = NullableNonemptyFilter.class)
+    @JsonProperty("description")
+    private Optional<String> _getDescription() {
+        return description;
+    }
+
+    @JsonInclude(value = JsonInclude.Include.CUSTOM, valueFilter = NullableNonemptyFilter.class)
     @JsonProperty("external_identifier")
     private Optional<String> _getExternalIdentifier() {
         return externalIdentifier;
@@ -243,7 +306,10 @@ public final class ProductListItem {
     }
 
     private boolean equalTo(ProductListItem other) {
-        return createdAt.equals(other.createdAt)
+        return account.equals(other.account)
+                && createdAt.equals(other.createdAt)
+                && defaultPlan.equals(other.defaultPlan)
+                && description.equals(other.description)
                 && externalIdentifier.equals(other.externalIdentifier)
                 && galleryImages.equals(other.galleryImages)
                 && headline.equals(other.headline)
@@ -262,7 +328,10 @@ public final class ProductListItem {
     @java.lang.Override
     public int hashCode() {
         return Objects.hash(
+                this.account,
                 this.createdAt,
+                this.defaultPlan,
+                this.description,
                 this.externalIdentifier,
                 this.galleryImages,
                 this.headline,
@@ -353,6 +422,33 @@ public final class ProductListItem {
         _FinalStage additionalProperties(Map<String, Object> additionalProperties);
 
         /**
+         * <p>Account that sells this product.</p>
+         */
+        _FinalStage account(Optional<Map<String, Object>> account);
+
+        _FinalStage account(Map<String, Object> account);
+
+        _FinalStage account(Nullable<Map<String, Object>> account);
+
+        /**
+         * <p>Buyable plan to show and check out with. The configured default when that plan is buyable, otherwise the first buyable plan in product-page order. <code>null</code> when none is buyable.</p>
+         */
+        _FinalStage defaultPlan(Optional<ProductPublicPlan> defaultPlan);
+
+        _FinalStage defaultPlan(ProductPublicPlan defaultPlan);
+
+        _FinalStage defaultPlan(Nullable<ProductPublicPlan> defaultPlan);
+
+        /**
+         * <p>Written description displayed on the product page. <code>null</code> if none is set.</p>
+         */
+        _FinalStage description(Optional<String> description);
+
+        _FinalStage description(String description);
+
+        _FinalStage description(Nullable<String> description);
+
+        /**
          * <p>External identifier stored on the product for your own reference.</p>
          */
         _FinalStage externalIdentifier(Optional<String> externalIdentifier);
@@ -440,6 +536,12 @@ public final class ProductListItem {
 
         private Optional<String> externalIdentifier = Optional.empty();
 
+        private Optional<String> description = Optional.empty();
+
+        private Optional<ProductPublicPlan> defaultPlan = Optional.empty();
+
+        private Optional<Map<String, Object>> account = Optional.empty();
+
         @JsonAnySetter
         private Map<String, Object> additionalProperties = new HashMap<>();
 
@@ -447,7 +549,10 @@ public final class ProductListItem {
 
         @java.lang.Override
         public Builder from(ProductListItem other) {
+            account(other.getAccount());
             createdAt(other.getCreatedAt());
+            defaultPlan(other.getDefaultPlan());
+            description(other.getDescription());
             externalIdentifier(other.getExternalIdentifier());
             galleryImages(other.getGalleryImages());
             headline(other.getHeadline());
@@ -752,10 +857,121 @@ public final class ProductListItem {
             return this;
         }
 
+        /**
+         * <p>Written description displayed on the product page. <code>null</code> if none is set.</p>
+         * @return Reference to {@code this} so that method calls can be chained together.
+         */
+        @java.lang.Override
+        public _FinalStage description(Nullable<String> description) {
+            if (description.isNull()) {
+                this.description = null;
+            } else if (description.isEmpty()) {
+                this.description = Optional.empty();
+            } else {
+                this.description = Optional.of(description.get());
+            }
+            return this;
+        }
+
+        /**
+         * <p>Written description displayed on the product page. <code>null</code> if none is set.</p>
+         * @return Reference to {@code this} so that method calls can be chained together.
+         */
+        @java.lang.Override
+        public _FinalStage description(String description) {
+            this.description = Optional.ofNullable(description);
+            return this;
+        }
+
+        /**
+         * <p>Written description displayed on the product page. <code>null</code> if none is set.</p>
+         */
+        @java.lang.Override
+        @JsonSetter(value = "description", nulls = Nulls.SKIP)
+        public _FinalStage description(Optional<String> description) {
+            this.description = description;
+            return this;
+        }
+
+        /**
+         * <p>Buyable plan to show and check out with. The configured default when that plan is buyable, otherwise the first buyable plan in product-page order. <code>null</code> when none is buyable.</p>
+         * @return Reference to {@code this} so that method calls can be chained together.
+         */
+        @java.lang.Override
+        public _FinalStage defaultPlan(Nullable<ProductPublicPlan> defaultPlan) {
+            if (defaultPlan.isNull()) {
+                this.defaultPlan = null;
+            } else if (defaultPlan.isEmpty()) {
+                this.defaultPlan = Optional.empty();
+            } else {
+                this.defaultPlan = Optional.of(defaultPlan.get());
+            }
+            return this;
+        }
+
+        /**
+         * <p>Buyable plan to show and check out with. The configured default when that plan is buyable, otherwise the first buyable plan in product-page order. <code>null</code> when none is buyable.</p>
+         * @return Reference to {@code this} so that method calls can be chained together.
+         */
+        @java.lang.Override
+        public _FinalStage defaultPlan(ProductPublicPlan defaultPlan) {
+            this.defaultPlan = Optional.ofNullable(defaultPlan);
+            return this;
+        }
+
+        /**
+         * <p>Buyable plan to show and check out with. The configured default when that plan is buyable, otherwise the first buyable plan in product-page order. <code>null</code> when none is buyable.</p>
+         */
+        @java.lang.Override
+        @JsonSetter(value = "default_plan", nulls = Nulls.SKIP)
+        public _FinalStage defaultPlan(Optional<ProductPublicPlan> defaultPlan) {
+            this.defaultPlan = defaultPlan;
+            return this;
+        }
+
+        /**
+         * <p>Account that sells this product.</p>
+         * @return Reference to {@code this} so that method calls can be chained together.
+         */
+        @java.lang.Override
+        public _FinalStage account(Nullable<Map<String, Object>> account) {
+            if (account.isNull()) {
+                this.account = null;
+            } else if (account.isEmpty()) {
+                this.account = Optional.empty();
+            } else {
+                this.account = Optional.of(account.get());
+            }
+            return this;
+        }
+
+        /**
+         * <p>Account that sells this product.</p>
+         * @return Reference to {@code this} so that method calls can be chained together.
+         */
+        @java.lang.Override
+        public _FinalStage account(Map<String, Object> account) {
+            this.account = Optional.ofNullable(account);
+            return this;
+        }
+
+        /**
+         * <p>Account that sells this product.</p>
+         */
+        @java.lang.Override
+        @JsonSetter(value = "account", nulls = Nulls.SKIP)
+        public _FinalStage account(Optional<Map<String, Object>> account) {
+            this.account = account;
+            return this;
+        }
+
         @java.lang.Override
         public ProductListItem build() {
             return new ProductListItem(
+                    account,
                     createdAt,
+                    defaultPlan,
+                    description,
                     externalIdentifier,
                     galleryImages,
                     headline,
