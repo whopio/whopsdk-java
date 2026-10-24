@@ -4,10 +4,14 @@
 # IdentityTokens trade a cloud provider's identity token for a short-lived Whop access token and
 # renew it using only OkHttp and Jackson, which the SDK already depends on. WhopOidc is the one
 # part that touches generated code, and it depends on these generated symbols:
-#   - WhopApiClientBuilder and AsyncWhopApiClientBuilder: the protected setAuthentication hook,
-#     the async builder's protected buildClientOptions, and apiVersionDate(String).
+#   - WhopApiClientBuilder and AsyncWhopApiClientBuilder: their no-argument constructors, since
+#     WhopOidc subclasses both; apiVersionDate(String), overridden to note a pinned version; the
+#     protected setAuthentication hook, overridden; the protected setCustomHeaders hook,
+#     overridden to call super and add Api-Version-Date when none is pinned; and the async
+#     builder's protected buildClientOptions, overridden to call super and rebuild its options.
 #   - core.ClientOptions: httpClient(), Builder.from, Builder.addHeader(String, Supplier),
-#     Builder.httpClient, Builder.timeout(Optional) and Builder.build.
+#     Builder.addHeader(String, String), Builder.httpClient, Builder.timeout(Optional) and
+#     Builder.build.
 #   - core.LoggingInterceptor: the async builder drops the generated one, because rebuilding the
 #     options appends another.
 #   - types.ApiKeyApiVersionDate: its public static constants, read by reflection; the newest

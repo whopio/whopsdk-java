@@ -28,24 +28,24 @@ import okhttp3.Request;
  * <p>Unlike {@code WhopApiClient.builder()}, they send an {@code Api-Version-Date} header: the API version this SDK was
  * generated from, so responses match its types. A federated credential has no stored API version, so without the
  * header the API answers with its original 2025-01-01 shapes. Call {@code apiVersionDate(...)} to pin another version.
+ * Without one, {@code build()} looks the generated version up and throws {@link IllegalStateException} if it can't.
  */
 public final class WhopOidc {
-    static final String API_VERSION_DATE = newestGeneratedApiVersion();
+    private static final String API_VERSION_HEADER = "Api-Version-Date";
 
     private WhopOidc() {}
 
     /**
-     * The generator writes every API version the spec lists as an {@link ApiKeyApiVersionDate} constant, so the newest
-     * is the one this client was generated from and moves with each regeneration. Versions sort as strings, as the API
-     * sorts them.
+     * The generator writes every API version the spec lists as a constant of {@code versions}, such as
+     * {@link ApiKeyApiVersionDate}, so the newest is the one this client was generated from and moves with each
+     * regeneration. Versions sort as strings, as the API sorts them.
      */
-    private static String newestGeneratedApiVersion() {
-        return Arrays.stream(ApiKeyApiVersionDate.class.getFields())
-                .filter(field ->
-                        Modifier.isStatic(field.getModifiers()) && field.getType() == ApiKeyApiVersionDate.class)
+    static String newestApiVersion(Class<?> versions) {
+        return Arrays.stream(versions.getFields())
+                .filter(field -> Modifier.isStatic(field.getModifiers()) && field.getType() == versions)
                 .map(WhopOidc::versionOf)
                 .max(Comparator.naturalOrder())
-                .orElseThrow(() -> new IllegalStateException("ApiKeyApiVersionDate lists no API versions."));
+                .orElseThrow(() -> new IllegalStateException(versions.getSimpleName() + " lists no API versions."));
     }
 
     private static String versionOf(Field constant) {
@@ -61,23 +61,63 @@ public final class WhopOidc {
      * exchange throws its {@link OidcTokenException} from the call.
      */
     public static WhopApiClientBuilder clientBuilder(OidcToken token) {
+        return clientBuilder(token, ApiKeyApiVersionDate.class);
+    }
+
+    static WhopApiClientBuilder clientBuilder(OidcToken token, Class<?> apiVersions) {
         return new WhopApiClientBuilder() {
+            private boolean apiVersionPinned;
+
+            @Override
+            public WhopApiClientBuilder apiVersionDate(String apiVersionDate) {
+                apiVersionPinned = true;
+                return super.apiVersionDate(apiVersionDate);
+            }
+
             @Override
             protected void setAuthentication(ClientOptions.Builder builder) {
                 builder.addHeader("Authorization", () -> "Bearer " + token.get());
             }
-        }.apiVersionDate(API_VERSION_DATE);
+
+            @Override
+            protected void setCustomHeaders(ClientOptions.Builder builder) {
+                super.setCustomHeaders(builder);
+                if (!apiVersionPinned) {
+                    builder.addHeader(API_VERSION_HEADER, newestApiVersion(apiVersions));
+                }
+            }
+        };
     }
 
     /**
-     * An {@link AsyncWhopApiClientBuilder} whose requests carry the current access token from {@code token}. The
-     * exchange runs on OkHttp's dispatcher thread, never the caller's, and a failed exchange fails the returned future
-     * with the {@link OidcTokenException} in its cause chain.
+     * An {@link AsyncWhopApiClientBuilder} whose requests carry the current access token from {@code token}. A request
+     * waits for an exchange on OkHttp's dispatcher thread, never the caller's, and a failed exchange fails the returned
+     * future with the {@link OidcTokenException} in its cause chain.
      */
     public static AsyncWhopApiClientBuilder asyncClientBuilder(OidcToken token) {
+        return asyncClientBuilder(token, ApiKeyApiVersionDate.class);
+    }
+
+    static AsyncWhopApiClientBuilder asyncClientBuilder(OidcToken token, Class<?> apiVersions) {
         return new AsyncWhopApiClientBuilder() {
+            private boolean apiVersionPinned;
+
+            @Override
+            public AsyncWhopApiClientBuilder apiVersionDate(String apiVersionDate) {
+                apiVersionPinned = true;
+                return super.apiVersionDate(apiVersionDate);
+            }
+
             @Override
             protected void setAuthentication(ClientOptions.Builder builder) {}
+
+            @Override
+            protected void setCustomHeaders(ClientOptions.Builder builder) {
+                super.setCustomHeaders(builder);
+                if (!apiVersionPinned) {
+                    builder.addHeader(API_VERSION_HEADER, newestApiVersion(apiVersions));
+                }
+            }
 
             @Override
             protected ClientOptions buildClientOptions() {
@@ -91,7 +131,7 @@ public final class WhopOidc {
                         .timeout(Optional.empty())
                         .build();
             }
-        }.apiVersionDate(API_VERSION_DATE);
+        };
     }
 
     private static Interceptor authorization(OidcToken token) {

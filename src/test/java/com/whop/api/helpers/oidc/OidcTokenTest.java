@@ -8,6 +8,7 @@ import static org.junit.jupiter.api.Assertions.assertNotSame;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertSame;
 import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTimeoutPreemptively;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.junit.jupiter.api.Assertions.fail;
 
@@ -47,6 +48,7 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
+import java.util.concurrent.TimeoutException;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicReference;
 import okhttp3.OkHttpClient;
@@ -177,6 +179,35 @@ class OidcTokenTest {
         return assertThrows(OidcTokenException.class, token::get).getRetryAt();
     }
 
+    private static void awaitRenewal(OidcToken token) throws Exception {
+        CompletableFuture<String> renewal = token.renewal();
+        if (renewal != null) {
+            renewal.handle((accessToken, error) -> null).get(10, TimeUnit.SECONDS);
+        }
+    }
+
+    private static List<String> getConcurrently(OidcToken token, int callers) throws Exception {
+        ExecutorService pool = Executors.newFixedThreadPool(callers);
+        try {
+            CountDownLatch start = new CountDownLatch(1);
+            List<Future<String>> results = new ArrayList<>();
+            for (int i = 0; i < callers; i++) {
+                results.add(pool.submit(() -> {
+                    start.await();
+                    return token.get();
+                }));
+            }
+            start.countDown();
+            List<String> accessTokens = new ArrayList<>();
+            for (Future<String> result : results) {
+                accessTokens.add(result.get(10, TimeUnit.SECONDS));
+            }
+            return accessTokens;
+        } finally {
+            pool.shutdownNow();
+        }
+    }
+
     private static String newestGeneratedApiVersion() throws ReflectiveOperationException {
         String newest = null;
         for (ApiKeyApiVersionDate.Value value : ApiKeyApiVersionDate.Value.values()) {
@@ -235,7 +266,7 @@ class OidcTokenTest {
     }
 
     @Test
-    void reusesTheTokenUntilTwoToTenMinutesBeforeExpiryThenExchangesAFreshIdentityToken() throws IOException {
+    void reusesTheTokenUntilTwoToTenMinutesBeforeExpiryThenExchangesAFreshIdentityToken() throws Exception {
         String address = serve(
                 200,
                 "{\"access_token\":\"whop-token-1\",\"expires_in\":3600}",
@@ -256,6 +287,8 @@ class OidcTokenTest {
         assertEquals(1, recorded.size());
 
         clock.advance(Duration.ofMinutes(8).plusMillis(1));
+        assertEquals("whop-token-1", token.get());
+        awaitRenewal(token);
         assertEquals("whop-token-2", token.get());
         assertEquals(
                 "id-token-2",
@@ -263,7 +296,7 @@ class OidcTokenTest {
     }
 
     @Test
-    void aShortLivedTokenRenewsHalfwayThroughItsLifetime() throws IOException {
+    void aShortLivedTokenRenewsHalfwayThroughItsLifetime() throws Exception {
         String address = serve(
                 200,
                 "{\"access_token\":\"whop-token-1\",\"expires_in\":240}",
@@ -279,8 +312,11 @@ class OidcTokenTest {
         assertEquals("whop-token-1", token.get());
         clock.advance(Duration.ofSeconds(119));
         assertEquals("whop-token-1", token.get());
+        assertEquals(1, recorded.size());
 
         clock.advance(Duration.ofSeconds(1));
+        assertEquals("whop-token-1", token.get());
+        awaitRenewal(token);
         assertEquals("whop-token-2", token.get());
     }
 
@@ -358,26 +394,166 @@ class OidcTokenTest {
 
         responseDelayMillis = 500;
         clock.advance(Duration.ofMinutes(58));
-        ExecutorService pool = Executors.newFixedThreadPool(5);
-        CountDownLatch start = new CountDownLatch(1);
-        List<Future<String>> results = new ArrayList<>();
-        for (int i = 0; i < 5; i++) {
-            results.add(pool.submit(() -> {
-                start.await();
-                return token.get();
-            }));
-        }
-        start.countDown();
-        for (Future<String> result : results) {
-            assertEquals("whop-token-1", result.get());
-        }
-        pool.shutdown();
+        assertEquals(Collections.nCopies(5, "whop-token-1"), getConcurrently(token, 5));
+        awaitRenewal(token);
+        assertEquals("whop-token-1", token.get());
 
         assertEquals(2, recorded.size());
     }
 
     @Test
-    void aFailedRenewalKeepsReturningTheCurrentTokenAndRenewsAgainAfterTheBackoff() throws IOException {
+    void pastItsRenewalPointTheCurrentTokenReturnsAtOnceWhileASlowRenewalRuns() throws Exception {
+        String address = serve(200, TOKEN_1, TOKEN_2);
+        MutableClock clock = new MutableClock(START);
+        CountDownLatch identityRequested = new CountDownLatch(2);
+        CountDownLatch releaseIdentity = new CountDownLatch(1);
+        OidcToken token = OidcToken.builder()
+                .roleId(ROLE_ID)
+                .identityToken(() -> {
+                    identityRequested.countDown();
+                    if (identityRequested.getCount() == 0) {
+                        try {
+                            releaseIdentity.await();
+                        } catch (InterruptedException e) {
+                            Thread.currentThread().interrupt();
+                        }
+                    }
+                    return "id-token";
+                })
+                .baseUrl(address)
+                .clock(clock)
+                .build();
+        assertEquals("whop-token-1", token.get());
+
+        clock.advance(Duration.ofMinutes(58));
+        assertTimeoutPreemptively(Duration.ofSeconds(2), () -> {
+            assertEquals("whop-token-1", token.get());
+            assertTrue(identityRequested.await(2, TimeUnit.SECONDS));
+            assertEquals(Collections.nCopies(5, "whop-token-1"), getConcurrently(token, 5));
+            assertEquals("whop-token-1", token.get());
+        });
+        assertEquals(1, recorded.size());
+
+        releaseIdentity.countDown();
+        awaitRenewal(token);
+        assertEquals("whop-token-2", token.get());
+        assertEquals(2, recorded.size());
+    }
+
+    @Test
+    void aHungIdentitySourceTimesOutAtTheRenewalDeadlineAndLaterRenewalsProceed() throws Exception {
+        String address = serve(200, TOKEN_1, TOKEN_2);
+        MutableClock clock = new MutableClock(START);
+        AtomicInteger requested = new AtomicInteger();
+        CountDownLatch abandonedCallInterrupted = new CountDownLatch(1);
+        CountDownLatch release = new CountDownLatch(1);
+        CountDownLatch lateReturned = new CountDownLatch(1);
+        OidcToken token = OidcToken.builder()
+                .roleId(ROLE_ID)
+                .identityToken(() -> {
+                    if (requested.incrementAndGet() == 1) {
+                        while (release.getCount() > 0) {
+                            try {
+                                release.await();
+                            } catch (InterruptedException e) {
+                                abandonedCallInterrupted.countDown();
+                            }
+                        }
+                        lateReturned.countDown();
+                        return "late-id-token";
+                    }
+                    return "id-token";
+                })
+                .baseUrl(address)
+                .renewalTimeout(Duration.ofMillis(300))
+                .clock(clock)
+                .build();
+
+        long startedAt = System.nanoTime();
+        OidcTokenException timedOut = assertTimeoutPreemptively(
+                Duration.ofSeconds(5), () -> assertThrows(OidcTokenException.class, token::get));
+        assertTrue(TimeUnit.NANOSECONDS.toMillis(System.nanoTime() - startedAt) >= 300);
+        assertEquals("The token renewal timed out after 30 seconds.", timedOut.getMessage());
+        assertTrue(timedOut.getCause() instanceof TimeoutException, String.valueOf(timedOut.getCause()));
+        Duration backoff = assertBacksOffAboutSeconds(2, START, timedOut.getRetryAt());
+        assertTrue(abandonedCallInterrupted.await(5, TimeUnit.SECONDS));
+        assertSame(timedOut, assertThrows(OidcTokenException.class, token::get));
+        assertEquals(1, requested.get());
+
+        release.countDown();
+        assertTrue(lateReturned.await(5, TimeUnit.SECONDS));
+        pause(300);
+        assertEquals(0, recorded.size());
+
+        clock.advance(backoff);
+        assertEquals("whop-token-1", token.get());
+        assertEquals(2, requested.get());
+        assertEquals(
+                "id-token",
+                JSON.readTree(recorded.get(0).body).get("subject_token").asText());
+
+        clock.advance(Duration.ofMinutes(58));
+        assertEquals("whop-token-1", token.get());
+        awaitRenewal(token);
+        assertEquals("whop-token-2", token.get());
+        assertEquals(3, requested.get());
+        assertEquals(2, recorded.size());
+    }
+
+    @Test
+    void aHungRenewalPastTheRenewalPointKeepsTheCurrentTokenThenRenewsAfterTheBackoff() throws Exception {
+        String address = serve(200, TOKEN_1, TOKEN_2);
+        MutableClock clock = new MutableClock(START);
+        AtomicInteger requested = new AtomicInteger();
+        CountDownLatch never = new CountDownLatch(1);
+        OidcToken token = OidcToken.builder()
+                .roleId(ROLE_ID)
+                .identityToken(() -> {
+                    if (requested.incrementAndGet() == 2) {
+                        try {
+                            never.await();
+                        } catch (InterruptedException e) {
+                            throw new IllegalStateException(e);
+                        }
+                    }
+                    return "id-token";
+                })
+                .baseUrl(address)
+                .renewalTimeout(Duration.ofMillis(300))
+                .clock(clock)
+                .build();
+        assertEquals("whop-token-1", token.get());
+
+        clock.advance(Duration.ofMinutes(58));
+        assertTimeoutPreemptively(Duration.ofSeconds(1), () -> assertEquals("whop-token-1", token.get()));
+        awaitRenewal(token);
+        assertEquals("whop-token-1", token.get());
+        assertEquals(2, requested.get());
+        assertEquals(1, recorded.size());
+
+        clock.advance(Duration.ofMillis(2201));
+        assertEquals("whop-token-1", token.get());
+        awaitRenewal(token);
+        assertEquals("whop-token-2", token.get());
+        assertEquals(3, requested.get());
+        assertEquals(2, recorded.size());
+    }
+
+    @Test
+    void callersWithNoUsableTokenWaitForTheRenewalAndShareItsToken() throws Exception {
+        String address = serve(200, TOKEN_1, TOKEN_2);
+        MutableClock clock = new MutableClock(START);
+        OidcToken token = token(address, clock);
+        assertEquals("whop-token-1", token.get());
+
+        responseDelayMillis = 500;
+        clock.advance(Duration.ofMinutes(59).plusSeconds(30));
+        assertEquals(Collections.nCopies(5, "whop-token-2"), getConcurrently(token, 5));
+        assertEquals(2, recorded.size());
+    }
+
+    @Test
+    void aFailedRenewalKeepsReturningTheCurrentTokenAndRenewsAgainAfterTheBackoff() throws Exception {
         statuses.addAll(java.util.Arrays.asList(200, 503, 503, 200));
         String address = serve(200, TOKEN_1, "{}", "{}", TOKEN_2);
         MutableClock clock = new MutableClock(START);
@@ -386,26 +562,32 @@ class OidcTokenTest {
 
         clock.advance(Duration.ofMinutes(58));
         assertEquals("whop-token-1", token.get());
+        awaitRenewal(token);
         assertEquals("whop-token-1", token.get());
         assertEquals(2, recorded.size());
 
         clock.advance(Duration.ofMillis(1799));
         assertEquals("whop-token-1", token.get());
+        awaitRenewal(token);
         assertEquals(2, recorded.size());
         clock.advance(Duration.ofMillis(402));
         assertEquals("whop-token-1", token.get());
+        awaitRenewal(token);
         assertEquals(3, recorded.size());
 
         clock.advance(Duration.ofMillis(3599));
         assertEquals("whop-token-1", token.get());
+        awaitRenewal(token);
         assertEquals(3, recorded.size());
         clock.advance(Duration.ofMillis(802));
+        assertEquals("whop-token-1", token.get());
+        awaitRenewal(token);
         assertEquals("whop-token-2", token.get());
         assertEquals(4, recorded.size());
     }
 
     @Test
-    void aFailedRenewalThrowsItsErrorOnceTheTokenHasThirtySecondsLeft() throws IOException {
+    void aFailedRenewalThrowsItsErrorOnceTheTokenHasThirtySecondsLeft() throws Exception {
         statuses.addAll(java.util.Arrays.asList(200, 503));
         responseHeaders.put("Retry-After", "30");
         String address = serve(
@@ -419,6 +601,7 @@ class OidcTokenTest {
 
         clock.advance(Duration.ofSeconds(40));
         assertEquals("whop-token-1", token.get());
+        awaitRenewal(token);
         assertEquals(2, recorded.size());
         clock.advance(Duration.ofSeconds(10).minusMillis(1));
         assertEquals("whop-token-1", token.get());
@@ -436,7 +619,7 @@ class OidcTokenTest {
     }
 
     @Test
-    void theBackoffStartsAtTwoSecondsAndDoublesToAMinuteThenRestartsAfterASuccess() throws IOException {
+    void theBackoffStartsAtTwoSecondsAndDoublesToAMinuteThenRestartsAfterASuccess() throws Exception {
         for (int i = 0; i < 7; i++) {
             statuses.add(503);
         }
@@ -461,12 +644,15 @@ class OidcTokenTest {
 
         clock.advance(Duration.ofMinutes(58));
         assertEquals("whop-token-1", token.get());
+        awaitRenewal(token);
         assertEquals(9, recorded.size());
         clock.advance(Duration.ofMillis(1799));
         token.get();
+        awaitRenewal(token);
         assertEquals(9, recorded.size());
         clock.advance(Duration.ofMillis(402));
         token.get();
+        awaitRenewal(token);
         assertEquals(10, recorded.size());
     }
 
@@ -666,6 +852,40 @@ class OidcTokenTest {
     }
 
     @Test
+    void anEmptyListOfApiVersionsFailsOnlyTheBuildsThatDoNotPinOne() throws Exception {
+        String address = serve(200, TOKEN_1);
+        OidcToken token = token(address, Clock.systemUTC());
+
+        IllegalStateException unlisted =
+                assertThrows(IllegalStateException.class, () -> WhopOidc.clientBuilder(token, NoApiVersions.class)
+                        .url(address)
+                        .build());
+        assertEquals("NoApiVersions lists no API versions.", unlisted.getMessage());
+        assertThrows(IllegalStateException.class, () -> WhopOidc.asyncClientBuilder(token, NoApiVersions.class)
+                .url(address)
+                .build());
+
+        requestUserIgnoringTheResponse(WhopOidc.clientBuilder(token, NoApiVersions.class)
+                .apiVersionDate("2026-07-08")
+                .url(address)
+                .maxRetries(0)
+                .build());
+        WhopOidc.asyncClientBuilder(token, NoApiVersions.class)
+                .apiVersionDate("2026-07-08")
+                .url(address)
+                .maxRetries(0)
+                .build()
+                .users()
+                .retrieve("user_xxxxxxxxxxxxx")
+                .handle((user, error) -> null)
+                .get(10, TimeUnit.SECONDS);
+
+        assertEquals("2026-07-08", recorded.get(1).apiVersionDate);
+        assertEquals("2026-07-08", recorded.get(2).apiVersionDate);
+        assertEquals(newestGeneratedApiVersion(), WhopOidc.newestApiVersion(ApiKeyApiVersionDate.class));
+    }
+
+    @Test
     void theAsyncClientExchangesOffTheCallersThreadAndSendsTheExchangedToken() throws Exception {
         String address = serve(
                 200, "{\"access_token\":\"whop-token-1\",\"expires_in\":3600}", "{\"id\":\"user_xxxxxxxxxxxxx\"}");
@@ -778,6 +998,8 @@ class OidcTokenTest {
         assertEquals("audience=https%3A%2F%2Fexample.com", recorded.get(0).query);
         assertEquals("Google", recorded.get(0).metadataFlavor);
     }
+
+    private static final class NoApiVersions {}
 
     private static final class RequestLog implements ILogger {
         final List<String> requests = Collections.synchronizedList(new ArrayList<>());
