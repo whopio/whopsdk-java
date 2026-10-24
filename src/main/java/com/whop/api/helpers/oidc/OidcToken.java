@@ -1,12 +1,14 @@
 package com.whop.api.helpers.oidc;
 
 import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
-import com.whop.api.core.ObjectMappers;
 import java.io.IOException;
 import java.time.Clock;
 import java.time.Duration;
 import java.time.Instant;
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
 import java.util.function.Supplier;
 import okhttp3.MediaType;
@@ -19,8 +21,9 @@ import okhttp3.Response;
  * A Whop access token that comes from your cloud provider's OIDC identity token instead of an API key.
  *
  * <p>Each {@link #get()} returns the current access token. The first call exchanges an identity token for one; later
- * calls reuse it until a minute before it expires, then exchange a fresh identity token. Calls are serialized, so
- * concurrent requests share one exchange. It uses no generated client code, so it survives the client being
+ * calls reuse it until a minute before it expires, then exchange a fresh identity token. Concurrent callers share one
+ * exchange and its outcome: when it fails, each of them gets the same {@link OidcTokenException}, and the next call
+ * tries again. It uses OkHttp and Jackson rather than generated client code, so it survives the client being
  * regenerated. Build the client with {@link WhopOidc}:
  *
  * <pre>{@code
@@ -35,6 +38,7 @@ public final class OidcToken implements Supplier<String> {
     private static final String ID_TOKEN_TYPE = "urn:ietf:params:oauth:token-type:id_token";
     private static final Duration RENEW_BEFORE_EXPIRY = Duration.ofMinutes(1);
     private static final MediaType JSON = MediaType.get("application/json");
+    static final ObjectMapper JSON_MAPPER = new ObjectMapper();
 
     private final String roleId;
     private final Supplier<String> identityToken;
@@ -42,8 +46,10 @@ public final class OidcToken implements Supplier<String> {
     private final OkHttpClient http;
     private final Clock clock;
 
+    private final Object lock = new Object();
     private String current;
     private Instant renewAt = Instant.MIN;
+    private CompletableFuture<String> pending;
 
     private OidcToken(Builder builder) {
         if (builder.roleId == null || builder.roleId.isEmpty()) {
@@ -70,15 +76,53 @@ public final class OidcToken implements Supplier<String> {
 
     /** The current access token, exchanging a fresh identity token when the last one is about to expire. */
     @Override
-    public synchronized String get() {
-        if (current == null || !clock.instant().isBefore(renewAt)) {
-            exchange();
+    public String get() {
+        CompletableFuture<String> shared;
+        CompletableFuture<String> started = null;
+        synchronized (lock) {
+            if (current != null && clock.instant().isBefore(renewAt)) {
+                return current;
+            }
+            if (pending == null) {
+                started = new CompletableFuture<>();
+                pending = started;
+            }
+            shared = pending;
         }
-        return current;
+        if (started != null) {
+            try {
+                started.complete(exchange());
+            } catch (Throwable error) {
+                started.completeExceptionally(error);
+            } finally {
+                synchronized (lock) {
+                    pending = null;
+                }
+            }
+        }
+        return await(shared);
     }
 
-    private void exchange() {
-        ObjectNode body = ObjectMappers.JSON_MAPPER.createObjectNode();
+    private static String await(CompletableFuture<String> exchange) {
+        try {
+            return exchange.get();
+        } catch (ExecutionException e) {
+            Throwable cause = e.getCause();
+            if (cause instanceof RuntimeException) {
+                throw (RuntimeException) cause;
+            }
+            if (cause instanceof Error) {
+                throw (Error) cause;
+            }
+            throw new OidcTokenException("The token exchange failed.", null, null, cause);
+        } catch (InterruptedException e) {
+            Thread.currentThread().interrupt();
+            throw new OidcTokenException("Interrupted while waiting for the token exchange.", null, null, e);
+        }
+    }
+
+    private String exchange() {
+        ObjectNode body = JSON_MAPPER.createObjectNode();
         body.put("grant_type", GRANT_TYPE);
         body.put("subject_token_type", ID_TOKEN_TYPE);
         body.put("subject_token", identityToken.get());
@@ -105,8 +149,11 @@ public final class OidcToken implements Supplier<String> {
                 throw new OidcTokenException(
                         "The token exchange returned no access token.", response.code(), null, null);
             }
-            current = accessToken.asText();
-            renewAt = clock.instant().plusSeconds(expiresIn.asLong()).minus(RENEW_BEFORE_EXPIRY);
+            synchronized (lock) {
+                current = accessToken.asText();
+                renewAt = clock.instant().plusSeconds(expiresIn.asLong()).minus(RENEW_BEFORE_EXPIRY);
+            }
+            return accessToken.asText();
         } catch (IOException e) {
             throw new OidcTokenException("The token exchange request failed.", null, null, e);
         }
@@ -114,9 +161,9 @@ public final class OidcToken implements Supplier<String> {
 
     private static JsonNode parse(String body) {
         try {
-            return ObjectMappers.JSON_MAPPER.readTree(body);
+            return JSON_MAPPER.readTree(body);
         } catch (IOException e) {
-            return ObjectMappers.JSON_MAPPER.createObjectNode();
+            return JSON_MAPPER.createObjectNode();
         }
     }
 

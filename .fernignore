@@ -1,9 +1,12 @@
 # Specify files that shouldn't be modified by Fern
 
-# src/main/java/com/whop/api/helpers/oidc is the hand-written OIDC helper. OidcToken trades a
-# cloud provider's identity token for a short-lived Whop access token and renews it, and
-# WhopOidc returns the generated client builders with their setAuthentication hook overridden
-# to send it. It uses OkHttp and Jackson, which the SDK already depends on, and no generated
-# code beyond that documented hook. Its tests live beside it so a regeneration cannot prune them.
+# src/main/java/com/whop/api/helpers/oidc is the hand-written OIDC helper. OidcToken and
+# IdentityTokens trade a cloud provider's identity token for a short-lived Whop access token and
+# renew it using only OkHttp and Jackson, which the SDK already depends on. WhopOidc is the one
+# part that touches generated code: the sync builder overrides the setAuthentication hook, and
+# the async builder overrides buildClientOptions to add an OkHttp interceptor, rebuilding the
+# options with ClientOptions.Builder.from and dropping the generated LoggingInterceptor that the
+# rebuild appends again. A regeneration that renames any of these fails the helper's compile.
+# Its tests live beside it so a regeneration cannot prune them.
 src/main/java/com/whop/api/helpers/
 src/test/java/com/whop/api/helpers/

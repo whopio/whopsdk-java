@@ -1,7 +1,6 @@
 package com.whop.api.helpers.oidc;
 
 import com.fasterxml.jackson.databind.JsonNode;
-import com.whop.api.core.ObjectMappers;
 import java.io.IOException;
 import java.util.function.Supplier;
 import okhttp3.HttpUrl;
@@ -57,7 +56,7 @@ public final class IdentityTokens {
                             null,
                             null);
                 }
-                JsonNode value = ObjectMappers.JSON_MAPPER.readTree(body).path("value");
+                JsonNode value = OidcToken.JSON_MAPPER.readTree(body).path("value");
                 if (!value.isTextual()) {
                     throw new OidcTokenException(
                             "GitHub Actions returned no identity token.", response.code(), null, null);
