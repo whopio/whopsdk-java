@@ -1,7 +1,12 @@
 package com.whop.api.helpers.oidc;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertNotSame;
+import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertSame;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.junit.jupiter.api.Assertions.fail;
@@ -14,6 +19,7 @@ import com.whop.api.WhopApiClient;
 import com.whop.api.core.ILogger;
 import com.whop.api.core.LogConfig;
 import com.whop.api.core.LogLevel;
+import com.whop.api.types.ApiKeyApiVersionDate;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -24,12 +30,16 @@ import java.time.Clock;
 import java.time.Duration;
 import java.time.Instant;
 import java.time.ZoneOffset;
+import java.time.ZonedDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 import java.util.Queue;
 import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.ExecutionException;
@@ -37,6 +47,7 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicReference;
 import okhttp3.OkHttpClient;
 import org.junit.jupiter.api.AfterEach;
@@ -46,11 +57,18 @@ class OidcTokenTest {
     private static final String ROLE_ID = "aurl_xxxxxxxxxxxxx";
     private static final String NO_MATCH =
             "{\"error\":{\"type\":\"bad_request\",\"message\":\"No trust linked to this role accepts this token.\",\"code\":\"oidc_exchange_no_match\"}}";
+    private static final String TRUST_RATE_LIMITED =
+            "{\"error\":{\"type\":\"too_many_requests\",\"message\":\"Too many token exchanges for this trust. Try again in a minute.\",\"code\":\"oidc_exchange_rate_limited\"}}";
+    private static final String NETWORK_RATE_LIMITED = "{\"message\":\"You are being rate limited\"}";
+    private static final String TOKEN_1 = "{\"access_token\":\"whop-token-1\",\"expires_in\":3600}";
+    private static final String TOKEN_2 = "{\"access_token\":\"whop-token-2\",\"expires_in\":3600}";
+    private static final Instant START = Instant.parse("2026-10-23T12:00:00Z");
     private static final ObjectMapper JSON = new ObjectMapper();
 
     private HttpServer server;
     private volatile long responseDelayMillis;
     private final Queue<Integer> statuses = new ConcurrentLinkedQueue<>();
+    private final Map<String, String> responseHeaders = new ConcurrentHashMap<>();
     private final List<Recorded> recorded = Collections.synchronizedList(new ArrayList<>());
 
     private static final class Recorded {
@@ -59,14 +77,23 @@ class OidcTokenTest {
         final String query;
         final String authorization;
         final String metadataFlavor;
+        final String apiVersionDate;
         final String body;
 
-        Recorded(String method, String path, String query, String authorization, String metadataFlavor, String body) {
+        Recorded(
+                String method,
+                String path,
+                String query,
+                String authorization,
+                String metadataFlavor,
+                String apiVersionDate,
+                String body) {
             this.method = method;
             this.path = path;
             this.query = query;
             this.authorization = authorization;
             this.metadataFlavor = metadataFlavor;
+            this.apiVersionDate = apiVersionDate;
             this.body = body;
         }
     }
@@ -81,10 +108,12 @@ class OidcTokenTest {
                     exchange.getRequestURI().getRawQuery(),
                     exchange.getRequestHeaders().getFirst("Authorization"),
                     exchange.getRequestHeaders().getFirst("Metadata-Flavor"),
+                    exchange.getRequestHeaders().getFirst("Api-Version-Date"),
                     read(exchange.getRequestBody())));
             pause(responseDelayMillis);
             byte[] response = (responses.hasNext() ? responses.next() : "{}").getBytes(StandardCharsets.UTF_8);
             exchange.getResponseHeaders().add("Content-Type", "application/json");
+            responseHeaders.forEach(exchange.getResponseHeaders()::add);
             Integer next = statuses.poll();
             exchange.sendResponseHeaders(next == null ? status : next, response.length);
             try (OutputStream out = exchange.getResponseBody()) {
@@ -122,6 +151,57 @@ class OidcTokenTest {
         return fail("No " + type.getSimpleName() + " in the cause chain of " + error);
     }
 
+    private static Duration assertBacksOffAboutSeconds(long seconds, Instant failedAt, Instant retryAt) {
+        Duration backoff = Duration.between(failedAt, retryAt);
+        Duration base = Duration.ofSeconds(seconds);
+        assertFalse(backoff.compareTo(base.multipliedBy(9).dividedBy(10)) < 0, backoff + " is under 90% of " + base);
+        assertTrue(backoff.compareTo(base.multipliedBy(11).dividedBy(10)) < 0, backoff + " is 110% of " + base);
+        return backoff;
+    }
+
+    private OidcToken token(String address, Clock clock) {
+        return OidcToken.builder()
+                .roleId(ROLE_ID)
+                .identityToken(() -> "id-token")
+                .baseUrl(address)
+                .clock(clock)
+                .build();
+    }
+
+    private Instant retryAtAfterARefusal(String address, String... headerNamesAndValues) {
+        responseHeaders.clear();
+        for (int i = 0; i < headerNamesAndValues.length; i += 2) {
+            responseHeaders.put(headerNamesAndValues[i], headerNamesAndValues[i + 1]);
+        }
+        OidcToken token = token(address, new MutableClock(START));
+        return assertThrows(OidcTokenException.class, token::get).getRetryAt();
+    }
+
+    private static String newestGeneratedApiVersion() throws ReflectiveOperationException {
+        String newest = null;
+        for (ApiKeyApiVersionDate.Value value : ApiKeyApiVersionDate.Value.values()) {
+            if (value != ApiKeyApiVersionDate.Value.UNKNOWN) {
+                String version = ApiKeyApiVersionDate.class
+                        .getField(value.name())
+                        .get(null)
+                        .toString();
+                assertTrue(version.matches("\\d{4}-\\d{2}-\\d{2}(-\\d+)?"), version);
+                if (newest == null || version.compareTo(newest) > 0) {
+                    newest = version;
+                }
+            }
+        }
+        return newest;
+    }
+
+    private static void requestUserIgnoringTheResponse(WhopApiClient whop) {
+        try {
+            whop.users().retrieve("user_xxxxxxxxxxxxx");
+        } catch (RuntimeException ignored) {
+            // The test servers answer with partial users; only the request matters.
+        }
+    }
+
     @AfterEach
     void stop() {
         if (server != null) {
@@ -155,7 +235,7 @@ class OidcTokenTest {
     }
 
     @Test
-    void reusesTheTokenUntilAMinuteBeforeExpiryThenExchangesAFreshIdentityToken() throws IOException {
+    void reusesTheTokenUntilTwoToTenMinutesBeforeExpiryThenExchangesAFreshIdentityToken() throws IOException {
         String address = serve(
                 200,
                 "{\"access_token\":\"whop-token-1\",\"expires_in\":3600}",
@@ -171,15 +251,37 @@ class OidcTokenTest {
                 .build();
 
         assertEquals("whop-token-1", token.get());
-        clock.advance(Duration.ofMinutes(58));
+        clock.advance(Duration.ofMinutes(50).minusMillis(1));
         assertEquals("whop-token-1", token.get());
         assertEquals(1, recorded.size());
 
-        clock.advance(Duration.ofMinutes(2));
+        clock.advance(Duration.ofMinutes(8).plusMillis(1));
         assertEquals("whop-token-2", token.get());
         assertEquals(
                 "id-token-2",
                 JSON.readTree(recorded.get(1).body).get("subject_token").asText());
+    }
+
+    @Test
+    void aShortLivedTokenRenewsHalfwayThroughItsLifetime() throws IOException {
+        String address = serve(
+                200,
+                "{\"access_token\":\"whop-token-1\",\"expires_in\":240}",
+                "{\"access_token\":\"whop-token-2\",\"expires_in\":240}");
+        MutableClock clock = new MutableClock(Instant.parse("2026-10-23T12:00:00Z"));
+        OidcToken token = OidcToken.builder()
+                .roleId(ROLE_ID)
+                .identityToken(() -> "id-token")
+                .baseUrl(address)
+                .clock(clock)
+                .build();
+
+        assertEquals("whop-token-1", token.get());
+        clock.advance(Duration.ofSeconds(119));
+        assertEquals("whop-token-1", token.get());
+
+        clock.advance(Duration.ofSeconds(1));
+        assertEquals("whop-token-2", token.get());
     }
 
     @Test
@@ -205,14 +307,11 @@ class OidcTokenTest {
     }
 
     @Test
-    void concurrentCallersShareAFailedExchangeAndTheNextCallTriesAgain() throws Exception {
+    void concurrentCallersShareAFailedExchangeAndItsErrorUntilTheBackoffEnds() throws Exception {
         responseDelayMillis = 500;
         String address = serve(400, NO_MATCH);
-        OidcToken token = OidcToken.builder()
-                .roleId(ROLE_ID)
-                .identityToken(() -> "id-token")
-                .baseUrl(address)
-                .build();
+        MutableClock clock = new MutableClock(START);
+        OidcToken token = token(address, clock);
 
         ExecutorService pool = Executors.newFixedThreadPool(5);
         CountDownLatch start = new CountDownLatch(1);
@@ -232,12 +331,258 @@ class OidcTokenTest {
         pool.shutdown();
 
         assertEquals(1, recorded.size());
+        OidcTokenException shared = errors.get(0);
         for (OidcTokenException error : errors) {
-            assertEquals("oidc_exchange_no_match", error.getCode());
+            assertSame(shared, error);
         }
+        assertEquals("oidc_exchange_no_match", shared.getCode());
+        Duration backoff = assertBacksOffAboutSeconds(2, START, shared.getRetryAt());
 
         responseDelayMillis = 0;
+        clock.advance(backoff.minusMillis(1));
+        assertSame(shared, assertThrows(OidcTokenException.class, token::get));
+        assertEquals(1, recorded.size());
+
+        clock.advance(Duration.ofMillis(1));
+        assertNotSame(shared, assertThrows(OidcTokenException.class, token::get));
+        assertEquals(2, recorded.size());
+    }
+
+    @Test
+    void concurrentCallersShareAFailedRenewalAndKeepTheCurrentToken() throws Exception {
+        statuses.addAll(java.util.Arrays.asList(200, 503));
+        String address = serve(200, TOKEN_1, "{}");
+        MutableClock clock = new MutableClock(START);
+        OidcToken token = token(address, clock);
+        assertEquals("whop-token-1", token.get());
+
+        responseDelayMillis = 500;
+        clock.advance(Duration.ofMinutes(58));
+        ExecutorService pool = Executors.newFixedThreadPool(5);
+        CountDownLatch start = new CountDownLatch(1);
+        List<Future<String>> results = new ArrayList<>();
+        for (int i = 0; i < 5; i++) {
+            results.add(pool.submit(() -> {
+                start.await();
+                return token.get();
+            }));
+        }
+        start.countDown();
+        for (Future<String> result : results) {
+            assertEquals("whop-token-1", result.get());
+        }
+        pool.shutdown();
+
+        assertEquals(2, recorded.size());
+    }
+
+    @Test
+    void aFailedRenewalKeepsReturningTheCurrentTokenAndRenewsAgainAfterTheBackoff() throws IOException {
+        statuses.addAll(java.util.Arrays.asList(200, 503, 503, 200));
+        String address = serve(200, TOKEN_1, "{}", "{}", TOKEN_2);
+        MutableClock clock = new MutableClock(START);
+        OidcToken token = token(address, clock);
+        assertEquals("whop-token-1", token.get());
+
+        clock.advance(Duration.ofMinutes(58));
+        assertEquals("whop-token-1", token.get());
+        assertEquals("whop-token-1", token.get());
+        assertEquals(2, recorded.size());
+
+        clock.advance(Duration.ofMillis(1799));
+        assertEquals("whop-token-1", token.get());
+        assertEquals(2, recorded.size());
+        clock.advance(Duration.ofMillis(402));
+        assertEquals("whop-token-1", token.get());
+        assertEquals(3, recorded.size());
+
+        clock.advance(Duration.ofMillis(3599));
+        assertEquals("whop-token-1", token.get());
+        assertEquals(3, recorded.size());
+        clock.advance(Duration.ofMillis(802));
+        assertEquals("whop-token-2", token.get());
+        assertEquals(4, recorded.size());
+    }
+
+    @Test
+    void aFailedRenewalThrowsItsErrorOnceTheTokenHasThirtySecondsLeft() throws IOException {
+        statuses.addAll(java.util.Arrays.asList(200, 503));
+        responseHeaders.put("Retry-After", "30");
+        String address = serve(
+                200,
+                "{\"access_token\":\"whop-token-1\",\"expires_in\":80}",
+                "{}",
+                "{\"access_token\":\"whop-token-2\",\"expires_in\":80}");
+        MutableClock clock = new MutableClock(START);
+        OidcToken token = token(address, clock);
+        assertEquals("whop-token-1", token.get());
+
+        clock.advance(Duration.ofSeconds(40));
+        assertEquals("whop-token-1", token.get());
+        assertEquals(2, recorded.size());
+        clock.advance(Duration.ofSeconds(10).minusMillis(1));
+        assertEquals("whop-token-1", token.get());
+
+        clock.advance(Duration.ofMillis(1));
+        OidcTokenException error = assertThrows(OidcTokenException.class, token::get);
+        assertEquals(503, error.getStatus());
+        assertEquals(START.plusSeconds(70), error.getRetryAt());
+        assertSame(error, assertThrows(OidcTokenException.class, token::get));
+        assertEquals(2, recorded.size());
+
+        clock.advance(Duration.ofSeconds(20));
+        assertEquals("whop-token-2", token.get());
+        assertEquals(3, recorded.size());
+    }
+
+    @Test
+    void theBackoffStartsAtTwoSecondsAndDoublesToAMinuteThenRestartsAfterASuccess() throws IOException {
+        for (int i = 0; i < 7; i++) {
+            statuses.add(503);
+        }
+        statuses.addAll(java.util.Arrays.asList(200, 503, 503));
+        String address = serve(200, "{}", "{}", "{}", "{}", "{}", "{}", "{}", TOKEN_1, "{}", "{}");
+        MutableClock clock = new MutableClock(START);
+        OidcToken token = token(address, clock);
+
+        long[] seconds = {2, 4, 8, 16, 32, 60, 60};
+        for (int failures = 1; failures <= seconds.length; failures++) {
+            Instant failedAt = clock.instant();
+            OidcTokenException error = assertThrows(OidcTokenException.class, token::get);
+            assertEquals(failures, recorded.size());
+            Duration backoff = assertBacksOffAboutSeconds(seconds[failures - 1], failedAt, error.getRetryAt());
+            clock.advance(backoff.minusMillis(1));
+            assertSame(error, assertThrows(OidcTokenException.class, token::get));
+            assertEquals(failures, recorded.size());
+            clock.advance(Duration.ofMillis(1));
+        }
+        assertEquals("whop-token-1", token.get());
+        assertEquals(8, recorded.size());
+
+        clock.advance(Duration.ofMinutes(58));
+        assertEquals("whop-token-1", token.get());
+        assertEquals(9, recorded.size());
+        clock.advance(Duration.ofMillis(1799));
+        token.get();
+        assertEquals(9, recorded.size());
+        clock.advance(Duration.ofMillis(402));
+        token.get();
+        assertEquals(10, recorded.size());
+    }
+
+    @Test
+    void aRefusedExchangeWaitsAsLongAsRetryAfterOrElseRateLimitResetAsksUpToAMinute() throws IOException {
+        String address = serve(429, TRUST_RATE_LIMITED);
+        String in37Seconds = Long.toString(START.plusSeconds(37).getEpochSecond());
+
+        assertEquals(START.plusSeconds(30), retryAtAfterARefusal(address, "Retry-After", "30"));
+        assertEquals(
+                START.plusSeconds(45),
+                retryAtAfterARefusal(
+                        address,
+                        "Retry-After",
+                        DateTimeFormatter.RFC_1123_DATE_TIME.format(
+                                ZonedDateTime.ofInstant(START.plusSeconds(45), ZoneOffset.UTC))));
+        assertEquals(START.plusSeconds(37), retryAtAfterARefusal(address, "RateLimit-Reset", in37Seconds));
+        assertEquals(
+                START.plusSeconds(20),
+                retryAtAfterARefusal(address, "Retry-After", "20", "RateLimit-Reset", in37Seconds));
+        assertEquals(
+                START.plusSeconds(37),
+                retryAtAfterARefusal(address, "Retry-After", "soon", "RateLimit-Reset", in37Seconds));
+        assertEquals(START.plusSeconds(60), retryAtAfterARefusal(address, "Retry-After", "120"));
+        assertEquals(
+                START.plusSeconds(60),
+                retryAtAfterARefusal(
+                        address,
+                        "RateLimit-Reset",
+                        Long.toString(START.plusSeconds(600).getEpochSecond())));
+        assertBacksOffAboutSeconds(
+                2,
+                START,
+                retryAtAfterARefusal(
+                        address,
+                        "Retry-After",
+                        "0",
+                        "RateLimit-Reset",
+                        Long.toString(START.minusSeconds(5).getEpochSecond())));
+        assertBacksOffAboutSeconds(2, START, retryAtAfterARefusal(address));
+    }
+
+    @Test
+    void aRateLimitedExchangeIsNotRepeatedOnEveryCall() throws IOException {
+        Instant reset = START.plusSeconds(30);
+        responseHeaders.put("RateLimit-Reset", Long.toString(reset.getEpochSecond()));
+        String address = serve(429, NETWORK_RATE_LIMITED);
+        MutableClock clock = new MutableClock(START);
+        OidcToken token = token(address, clock);
+
+        for (int i = 0; i < 10; i++) {
+            OidcTokenException error = assertThrows(OidcTokenException.class, token::get);
+            assertEquals(429, error.getStatus());
+            assertEquals(reset, error.getRetryAt());
+        }
+        assertEquals(1, recorded.size());
+
+        clock.advance(Duration.ofSeconds(30).minusMillis(1));
         assertThrows(OidcTokenException.class, token::get);
+        assertEquals(1, recorded.size());
+
+        clock.advance(Duration.ofMillis(1));
+        assertThrows(OidcTokenException.class, token::get);
+        assertEquals(2, recorded.size());
+    }
+
+    @Test
+    void anIdentityTokenFailureIsCachedAsAnOidcTokenExceptionWithItsRetryTime() throws IOException {
+        String address = serve(200, TOKEN_1);
+        AtomicInteger requested = new AtomicInteger();
+        IllegalStateException unreachable = new IllegalStateException("The metadata server is unreachable.");
+        OidcToken token = OidcToken.builder()
+                .roleId(ROLE_ID)
+                .identityToken(() -> {
+                    requested.incrementAndGet();
+                    throw unreachable;
+                })
+                .baseUrl(address)
+                .clock(new MutableClock(START))
+                .build();
+
+        OidcTokenException error = assertThrows(OidcTokenException.class, token::get);
+        assertSame(unreachable, error.getCause());
+        assertBacksOffAboutSeconds(2, START, error.getRetryAt());
+        assertSame(error, assertThrows(OidcTokenException.class, token::get));
+        assertEquals(1, requested.get());
+
+        OidcTokenException refused = new OidcTokenException("The GitHub Actions identity token request failed.");
+        OidcToken github = OidcToken.builder()
+                .roleId(ROLE_ID)
+                .identityToken(() -> {
+                    throw refused;
+                })
+                .baseUrl(address)
+                .clock(new MutableClock(START))
+                .build();
+
+        OidcTokenException cached = assertThrows(OidcTokenException.class, github::get);
+        assertEquals(refused.getMessage(), cached.getMessage());
+        assertBacksOffAboutSeconds(2, START, cached.getRetryAt());
+        assertNull(refused.getRetryAt());
+        assertEquals(0, recorded.size());
+    }
+
+    @Test
+    void aSuccessfulExchangeAfterAFailureIsReusedUntilItsRenewal() throws IOException {
+        statuses.add(503);
+        String address = serve(200, "{}", TOKEN_1);
+        MutableClock clock = new MutableClock(START);
+        OidcToken token = token(address, clock);
+
+        assertEquals(503, assertThrows(OidcTokenException.class, token::get).getStatus());
+        clock.advance(Duration.ofSeconds(3));
+        assertEquals("whop-token-1", token.get());
+        clock.advance(Duration.ofMinutes(10));
+        assertEquals("whop-token-1", token.get());
         assertEquals(2, recorded.size());
     }
 
@@ -255,6 +600,7 @@ class OidcTokenTest {
         assertEquals("No trust linked to this role accepts this token.", error.getMessage());
         assertEquals(400, error.getStatus());
         assertEquals("oidc_exchange_no_match", error.getCode());
+        assertNotNull(error.getRetryAt());
     }
 
     @Test
@@ -280,15 +626,43 @@ class OidcTokenTest {
                 .maxRetries(0)
                 .build();
 
-        try {
-            whop.users().retrieve("user_xxxxxxxxxxxxx");
-        } catch (RuntimeException ignored) {
-            // The response body is not a full user; only the request matters here.
-        }
+        requestUserIgnoringTheResponse(whop);
 
         Recorded apiCall = recorded.get(1);
         assertTrue(apiCall.path.startsWith("/users/user_xxxxxxxxxxxxx"), apiCall.path);
         assertEquals("Bearer whop-token-1", apiCall.authorization);
+    }
+
+    @Test
+    void theClientsSendTheNewestApiVersionOfTheGeneratedClientUnlessTheCallerPinsAnother() throws Exception {
+        String address = serve(200, TOKEN_1);
+        OidcToken token = OidcToken.builder()
+                .roleId(ROLE_ID)
+                .identityToken(() -> "id-token")
+                .baseUrl(address)
+                .build();
+
+        requestUserIgnoringTheResponse(
+                WhopOidc.clientBuilder(token).url(address).maxRetries(0).build());
+        WhopOidc.asyncClientBuilder(token)
+                .url(address)
+                .maxRetries(0)
+                .build()
+                .users()
+                .retrieve("user_xxxxxxxxxxxxx")
+                .handle((user, error) -> null)
+                .get(10, TimeUnit.SECONDS);
+        requestUserIgnoringTheResponse(WhopOidc.clientBuilder(token)
+                .apiVersionDate("2026-07-08")
+                .url(address)
+                .maxRetries(0)
+                .build());
+
+        String newest = newestGeneratedApiVersion();
+        assertNotNull(newest);
+        assertEquals(newest, recorded.get(1).apiVersionDate);
+        assertEquals(newest, recorded.get(2).apiVersionDate);
+        assertEquals("2026-07-08", recorded.get(3).apiVersionDate);
     }
 
     @Test
@@ -426,7 +800,7 @@ class OidcTokenTest {
     }
 
     private static final class MutableClock extends Clock {
-        private Instant now;
+        private volatile Instant now;
 
         MutableClock(Instant now) {
             this.now = now;

@@ -3,10 +3,17 @@
 # src/main/java/com/whop/api/helpers/oidc is the hand-written OIDC helper. OidcToken and
 # IdentityTokens trade a cloud provider's identity token for a short-lived Whop access token and
 # renew it using only OkHttp and Jackson, which the SDK already depends on. WhopOidc is the one
-# part that touches generated code: the sync builder overrides the setAuthentication hook, and
-# the async builder overrides buildClientOptions to add an OkHttp interceptor, rebuilding the
-# options with ClientOptions.Builder.from and dropping the generated LoggingInterceptor that the
-# rebuild appends again. A regeneration that renames any of these fails the helper's compile.
-# Its tests live beside it so a regeneration cannot prune them.
+# part that touches generated code, and it depends on these generated symbols:
+#   - WhopApiClientBuilder and AsyncWhopApiClientBuilder: the protected setAuthentication hook,
+#     the async builder's protected buildClientOptions, and apiVersionDate(String).
+#   - core.ClientOptions: httpClient(), Builder.from, Builder.addHeader(String, Supplier),
+#     Builder.httpClient, Builder.timeout(Optional) and Builder.build.
+#   - core.LoggingInterceptor: the async builder drops the generated one, because rebuilding the
+#     options appends another.
+#   - types.ApiKeyApiVersionDate: its public static constants, read by reflection; the newest
+#     toString() is the Api-Version-Date the builders send, so a regeneration moves it.
+# A regeneration that renames a class or method above fails the helper's compile. Its tests live
+# beside it so a regeneration cannot prune them; they also use WhopApiClient, AsyncWhopApiClient,
+# users().retrieve, core.ILogger, core.LogConfig, core.LogLevel and ApiKeyApiVersionDate.Value.
 src/main/java/com/whop/api/helpers/
 src/test/java/com/whop/api/helpers/
