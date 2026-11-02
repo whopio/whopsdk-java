@@ -52,5 +52,18 @@ jobs:
         with:
           validate-wrappers: true
 
+      - name: Assert the hand-written helpers survived regeneration
+        run: |
+          set -euo pipefail
+          status=0
+          for dir in src/main/java/com/whop/api/helpers src/test/java/com/whop/api/helpers; do
+            grep -qxF "$dir" .fernignore || { echo "::error::$dir is not listed in .fernignore, so the next regeneration will prune it"; status=1; }
+            [ -d "$dir" ] || { echo "::error::$dir is gone: a regeneration pruned it"; status=1; }
+          done
+          for file in src/main/java/com/whop/api/helpers/WebhookVerifier.java src/test/java/com/whop/api/helpers/WebhookVerifierTest.java; do
+            [ -f "$file" ] || { echo "::error::$file is gone: a regeneration pruned it"; status=1; }
+          done
+          exit $status
+
       - name: Test
         run: ./gradlew --no-daemon test
