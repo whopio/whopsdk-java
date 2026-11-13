@@ -17,6 +17,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.sun.net.httpserver.HttpServer;
 import com.whop.api.AsyncWhopApiClient;
 import com.whop.api.WhopApiClient;
+import com.whop.api.core.Environment;
 import com.whop.api.core.ILogger;
 import com.whop.api.core.LogConfig;
 import com.whop.api.core.LogLevel;
@@ -808,7 +809,7 @@ class OidcTokenTest {
                         .identityToken(() -> "id-token")
                         .baseUrl(address)
                         .build())
-                .url(address)
+                .environment(Environment.custom().api(address).vault(address).build())
                 .maxRetries(0)
                 .build();
 
@@ -829,9 +830,9 @@ class OidcTokenTest {
                 .build();
 
         requestUserIgnoringTheResponse(
-                WhopOidc.clientBuilder(token).url(address).maxRetries(0).build());
+                WhopOidc.clientBuilder(token).environment(Environment.custom().api(address).vault(address).build()).maxRetries(0).build());
         WhopOidc.asyncClientBuilder(token)
-                .url(address)
+                .environment(Environment.custom().api(address).vault(address).build())
                 .maxRetries(0)
                 .build()
                 .users()
@@ -840,7 +841,7 @@ class OidcTokenTest {
                 .get(10, TimeUnit.SECONDS);
         requestUserIgnoringTheResponse(WhopOidc.clientBuilder(token)
                 .apiVersionDate("2026-07-08")
-                .url(address)
+                .environment(Environment.custom().api(address).vault(address).build())
                 .maxRetries(0)
                 .build());
 
@@ -858,21 +859,21 @@ class OidcTokenTest {
 
         IllegalStateException unlisted =
                 assertThrows(IllegalStateException.class, () -> WhopOidc.clientBuilder(token, NoApiVersions.class)
-                        .url(address)
+                        .environment(Environment.custom().api(address).vault(address).build())
                         .build());
         assertEquals("NoApiVersions lists no API versions.", unlisted.getMessage());
         assertThrows(IllegalStateException.class, () -> WhopOidc.asyncClientBuilder(token, NoApiVersions.class)
-                .url(address)
+                .environment(Environment.custom().api(address).vault(address).build())
                 .build());
 
         requestUserIgnoringTheResponse(WhopOidc.clientBuilder(token, NoApiVersions.class)
                 .apiVersionDate("2026-07-08")
-                .url(address)
+                .environment(Environment.custom().api(address).vault(address).build())
                 .maxRetries(0)
                 .build());
         WhopOidc.asyncClientBuilder(token, NoApiVersions.class)
                 .apiVersionDate("2026-07-08")
-                .url(address)
+                .environment(Environment.custom().api(address).vault(address).build())
                 .maxRetries(0)
                 .build()
                 .users()
@@ -898,7 +899,7 @@ class OidcTokenTest {
                         })
                         .baseUrl(address)
                         .build())
-                .url(address)
+                .environment(Environment.custom().api(address).vault(address).build())
                 .maxRetries(0)
                 .build();
 
@@ -927,7 +928,7 @@ class OidcTokenTest {
                         .identityToken(() -> "id-token")
                         .baseUrl(address)
                         .build())
-                .url(address)
+                .environment(Environment.custom().api(address).vault(address).build())
                 .maxRetries(1)
                 .logging(LogConfig.builder()
                         .level(LogLevel.DEBUG)
@@ -955,7 +956,7 @@ class OidcTokenTest {
                         .identityToken(() -> "id-token")
                         .baseUrl(address)
                         .build())
-                .url(address)
+                .environment(Environment.custom().api(address).vault(address).build())
                 .maxRetries(0)
                 .build();
 
