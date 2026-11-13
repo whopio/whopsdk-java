@@ -134,7 +134,6 @@ public final class CreateShipmentsRequest {
 
         private Optional<String> accountId = Optional.empty();
 
-        @JsonAnySetter
         private Map<String, Object> additionalProperties = new HashMap<>();
 
         private Builder() {}
@@ -149,7 +148,6 @@ public final class CreateShipmentsRequest {
 
         /**
          * <p>The payment to attach the shipment to, prefixed <code>pay_</code>.</p>
-         * <p>The payment to attach the shipment to, prefixed <code>pay_</code>.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
@@ -160,7 +158,6 @@ public final class CreateShipmentsRequest {
         }
 
         /**
-         * <p>The carrier-assigned tracking number.</p>
          * <p>The carrier-assigned tracking number.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
@@ -194,6 +191,16 @@ public final class CreateShipmentsRequest {
         @java.lang.Override
         public CreateShipmentsRequest build() {
             return new CreateShipmentsRequest(accountId, paymentId, trackingNumber, additionalProperties);
+        }
+
+        @JsonAnySetter
+        private void putAdditionalPropertyFromJson(String key, Object value) {
+            if (key.equalsIgnoreCase("account_id")
+                    || key.equalsIgnoreCase("payment_id")
+                    || key.equalsIgnoreCase("tracking_number")) {
+                return;
+            }
+            this.additionalProperties.put(key, value);
         }
 
         @java.lang.Override

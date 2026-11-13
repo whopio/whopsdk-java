@@ -35,21 +35,22 @@ public class ExperiencesClient {
     }
 
     /**
-     * Returns a paginated list of experiences belonging to a company, with optional filtering by product and app.
+     * Lists the experiences in an account, optionally filtered to those attached to one product or powered by one app.
      */
     public SyncPagingIterable<ExperienceListItem> list(ListExperiencesRequest request) {
         return this.rawClient.list(request).body();
     }
 
     /**
-     * Returns a paginated list of experiences belonging to a company, with optional filtering by product and app.
+     * Lists the experiences in an account, optionally filtered to those attached to one product or powered by one app.
      */
     public SyncPagingIterable<ExperienceListItem> list(ListExperiencesRequest request, RequestOptions requestOptions) {
         return this.rawClient.list(request, requestOptions).body();
     }
 
     /**
-     * Required permissions:
+     * Creates an experience for an account, powered by an app such as courses, forums, or chat. Attach it to a product with <code>POST /experiences/:id/attach</code> to give that product's customers access.
+     * <p>Required permissions:</p>
      * <ul>
      * <li><code>experience:create</code></li>
      * </ul>
@@ -59,7 +60,8 @@ public class ExperiencesClient {
     }
 
     /**
-     * Required permissions:
+     * Creates an experience for an account, powered by an app such as courses, forums, or chat. Attach it to a product with <code>POST /experiences/:id/attach</code> to give that product's customers access.
+     * <p>Required permissions:</p>
      * <ul>
      * <li><code>experience:create</code></li>
      * </ul>
@@ -97,7 +99,8 @@ public class ExperiencesClient {
     }
 
     /**
-     * Required permissions:
+     * Deletes an experience and detaches it from every product, removing customer access to it. Returns <code>true</code> on success.
+     * <p>Required permissions:</p>
      * <ul>
      * <li><code>experience:delete</code></li>
      * </ul>
@@ -107,7 +110,8 @@ public class ExperiencesClient {
     }
 
     /**
-     * Required permissions:
+     * Deletes an experience and detaches it from every product, removing customer access to it. Returns <code>true</code> on success.
+     * <p>Required permissions:</p>
      * <ul>
      * <li><code>experience:delete</code></li>
      * </ul>
@@ -117,7 +121,8 @@ public class ExperiencesClient {
     }
 
     /**
-     * Required permissions:
+     * Deletes an experience and detaches it from every product, removing customer access to it. Returns <code>true</code> on success.
+     * <p>Required permissions:</p>
      * <ul>
      * <li><code>experience:delete</code></li>
      * </ul>
@@ -127,7 +132,8 @@ public class ExperiencesClient {
     }
 
     /**
-     * Required permissions:
+     * Deletes an experience and detaches it from every product, removing customer access to it. Returns <code>true</code> on success.
+     * <p>Required permissions:</p>
      * <ul>
      * <li><code>experience:delete</code></li>
      * </ul>
@@ -137,7 +143,8 @@ public class ExperiencesClient {
     }
 
     /**
-     * Required permissions:
+     * Updates an experience's name, logo, visibility, or notification setting, or moves it to another section or position.
+     * <p>Required permissions:</p>
      * <ul>
      * <li><code>experience:update</code></li>
      * </ul>
@@ -147,7 +154,8 @@ public class ExperiencesClient {
     }
 
     /**
-     * Required permissions:
+     * Updates an experience's name, logo, visibility, or notification setting, or moves it to another section or position.
+     * <p>Required permissions:</p>
      * <ul>
      * <li><code>experience:update</code></li>
      * </ul>
@@ -157,7 +165,8 @@ public class ExperiencesClient {
     }
 
     /**
-     * Required permissions:
+     * Updates an experience's name, logo, visibility, or notification setting, or moves it to another section or position.
+     * <p>Required permissions:</p>
      * <ul>
      * <li><code>experience:update</code></li>
      * </ul>
@@ -167,7 +176,8 @@ public class ExperiencesClient {
     }
 
     /**
-     * Required permissions:
+     * Updates an experience's name, logo, visibility, or notification setting, or moves it to another section or position.
+     * <p>Required permissions:</p>
      * <ul>
      * <li><code>experience:update</code></li>
      * </ul>
@@ -177,7 +187,7 @@ public class ExperiencesClient {
     }
 
     /**
-     * Attach an experience to a product, making it accessible to the product's customers.
+     * Attaches an experience to a product, giving the product's customers access to it.
      * <p>Required permissions:</p>
      * <ul>
      * <li><code>experience:attach</code></li>
@@ -188,7 +198,7 @@ public class ExperiencesClient {
     }
 
     /**
-     * Attach an experience to a product, making it accessible to the product's customers.
+     * Attaches an experience to a product, giving the product's customers access to it.
      * <p>Required permissions:</p>
      * <ul>
      * <li><code>experience:attach</code></li>
@@ -199,7 +209,7 @@ public class ExperiencesClient {
     }
 
     /**
-     * Detach an experience from a product, removing customer access to it through that product.
+     * Detaches an experience from a product, removing customer access to it through that product.
      * <p>Required permissions:</p>
      * <ul>
      * <li><code>experience:detach</code></li>
@@ -210,7 +220,7 @@ public class ExperiencesClient {
     }
 
     /**
-     * Detach an experience from a product, removing customer access to it through that product.
+     * Detaches an experience from a product, removing customer access to it through that product.
      * <p>Required permissions:</p>
      * <ul>
      * <li><code>experience:detach</code></li>
@@ -221,9 +231,7 @@ public class ExperiencesClient {
     }
 
     /**
-     * Duplicates an existing experience. The name will be copied, unless provided. The new experience will be attached to the same products as the original experience.
-     * If duplicating a Forum or Chat experience, the new experience will have the same settings as the original experience, e.g. who can post, who can comment, etc.
-     * No content, e.g. posts, messages, lessons from within the original experience will be copied.
+     * Duplicates an experience and attaches the copy to the same products as the original. Forum and chat copies keep the original's settings, such as who can post or comment. No content, such as posts, messages, or lessons, is copied.
      * <p>Required permissions:</p>
      * <ul>
      * <li><code>experience:create</code></li>
@@ -234,9 +242,7 @@ public class ExperiencesClient {
     }
 
     /**
-     * Duplicates an existing experience. The name will be copied, unless provided. The new experience will be attached to the same products as the original experience.
-     * If duplicating a Forum or Chat experience, the new experience will have the same settings as the original experience, e.g. who can post, who can comment, etc.
-     * No content, e.g. posts, messages, lessons from within the original experience will be copied.
+     * Duplicates an experience and attaches the copy to the same products as the original. Forum and chat copies keep the original's settings, such as who can post or comment. No content, such as posts, messages, or lessons, is copied.
      * <p>Required permissions:</p>
      * <ul>
      * <li><code>experience:create</code></li>
@@ -247,9 +253,7 @@ public class ExperiencesClient {
     }
 
     /**
-     * Duplicates an existing experience. The name will be copied, unless provided. The new experience will be attached to the same products as the original experience.
-     * If duplicating a Forum or Chat experience, the new experience will have the same settings as the original experience, e.g. who can post, who can comment, etc.
-     * No content, e.g. posts, messages, lessons from within the original experience will be copied.
+     * Duplicates an experience and attaches the copy to the same products as the original. Forum and chat copies keep the original's settings, such as who can post or comment. No content, such as posts, messages, or lessons, is copied.
      * <p>Required permissions:</p>
      * <ul>
      * <li><code>experience:create</code></li>
@@ -260,9 +264,7 @@ public class ExperiencesClient {
     }
 
     /**
-     * Duplicates an existing experience. The name will be copied, unless provided. The new experience will be attached to the same products as the original experience.
-     * If duplicating a Forum or Chat experience, the new experience will have the same settings as the original experience, e.g. who can post, who can comment, etc.
-     * No content, e.g. posts, messages, lessons from within the original experience will be copied.
+     * Duplicates an experience and attaches the copy to the same products as the original. Forum and chat copies keep the original's settings, such as who can post or comment. No content, such as posts, messages, or lessons, is copied.
      * <p>Required permissions:</p>
      * <ul>
      * <li><code>experience:create</code></li>

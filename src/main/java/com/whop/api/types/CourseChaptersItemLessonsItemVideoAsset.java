@@ -133,7 +133,6 @@ public final class CourseChaptersItemLessonsItemVideoAsset {
 
         private Optional<String> signedThumbnailPlaybackToken = Optional.empty();
 
-        @JsonAnySetter
         private Map<String, Object> additionalProperties = new HashMap<>();
 
         private Builder() {}
@@ -223,6 +222,16 @@ public final class CourseChaptersItemLessonsItemVideoAsset {
         public CourseChaptersItemLessonsItemVideoAsset build() {
             return new CourseChaptersItemLessonsItemVideoAsset(
                     durationSeconds, signedPlaybackId, signedThumbnailPlaybackToken, additionalProperties);
+        }
+
+        @JsonAnySetter
+        private void putAdditionalPropertyFromJson(String key, Object value) {
+            if (key.equalsIgnoreCase("duration_seconds")
+                    || key.equalsIgnoreCase("signed_playback_id")
+                    || key.equalsIgnoreCase("signed_thumbnail_playback_token")) {
+                return;
+            }
+            this.additionalProperties.put(key, value);
         }
 
         public Builder additionalProperty(String key, Object value) {

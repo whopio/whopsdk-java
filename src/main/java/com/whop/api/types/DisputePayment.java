@@ -128,7 +128,7 @@ public final class DisputePayment {
     }
 
     /**
-     * @return The instrument this payment was made with, shaped for display: the method type, a buyer-facing name, the standard icon set, and the card facts when it was a card. Null when the payment names no method.
+     * @return The instrument this payment was made with, shaped for display: the method type, a buyer-facing name, the standard icon set, and the card facts, including the network transaction id the account uses for the card, when it was a card. Null when the payment names no method.
      */
     @JsonIgnore
     public Optional<PaymentInstrument> getPaymentInstrument() {
@@ -150,7 +150,8 @@ public final class DisputePayment {
     }
 
     /**
-     * @return The processor that handled the payment, such as <code>stripe</code>.
+     * @return Deprecated: no longer populated. Always <code>null</code>.
+     * DEPRECATED: No longer populated. Always null.
      */
     @JsonIgnore
     public Optional<String> getPaymentProcessor() {
@@ -308,7 +309,7 @@ public final class DisputePayment {
         _FinalStage currency(Nullable<String> currency);
 
         /**
-         * <p>The instrument this payment was made with, shaped for display: the method type, a buyer-facing name, the standard icon set, and the card facts when it was a card. Null when the payment names no method.</p>
+         * <p>The instrument this payment was made with, shaped for display: the method type, a buyer-facing name, the standard icon set, and the card facts, including the network transaction id the account uses for the card, when it was a card. Null when the payment names no method.</p>
          */
         _FinalStage paymentInstrument(Optional<PaymentInstrument> paymentInstrument);
 
@@ -326,7 +327,8 @@ public final class DisputePayment {
         _FinalStage paymentMethodType(Nullable<String> paymentMethodType);
 
         /**
-         * <p>The processor that handled the payment, such as <code>stripe</code>.</p>
+         * <p>Deprecated: no longer populated. Always <code>null</code>.
+         * DEPRECATED: No longer populated. Always null.</p>
          */
         _FinalStage paymentProcessor(Optional<String> paymentProcessor);
 
@@ -355,7 +357,6 @@ public final class DisputePayment {
 
         private Optional<Double> amount = Optional.empty();
 
-        @JsonAnySetter
         private Map<String, Object> additionalProperties = new HashMap<>();
 
         private Builder() {}
@@ -376,7 +377,6 @@ public final class DisputePayment {
 
         /**
          * <p>When the payment was made, as an ISO 8601 timestamp.</p>
-         * <p>When the payment was made, as an ISO 8601 timestamp.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
@@ -388,7 +388,6 @@ public final class DisputePayment {
 
         /**
          * <p>Payment ID, prefixed <code>pay_</code>.</p>
-         * <p>Payment ID, prefixed <code>pay_</code>.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
@@ -399,7 +398,8 @@ public final class DisputePayment {
         }
 
         /**
-         * <p>The processor that handled the payment, such as <code>stripe</code>.</p>
+         * <p>Deprecated: no longer populated. Always <code>null</code>.
+         * DEPRECATED: No longer populated. Always null.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
@@ -415,7 +415,8 @@ public final class DisputePayment {
         }
 
         /**
-         * <p>The processor that handled the payment, such as <code>stripe</code>.</p>
+         * <p>Deprecated: no longer populated. Always <code>null</code>.
+         * DEPRECATED: No longer populated. Always null.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
@@ -425,7 +426,8 @@ public final class DisputePayment {
         }
 
         /**
-         * <p>The processor that handled the payment, such as <code>stripe</code>.</p>
+         * <p>Deprecated: no longer populated. Always <code>null</code>.
+         * DEPRECATED: No longer populated. Always null.</p>
          */
         @java.lang.Override
         @JsonSetter(value = "payment_processor", nulls = Nulls.SKIP)
@@ -471,7 +473,7 @@ public final class DisputePayment {
         }
 
         /**
-         * <p>The instrument this payment was made with, shaped for display: the method type, a buyer-facing name, the standard icon set, and the card facts when it was a card. Null when the payment names no method.</p>
+         * <p>The instrument this payment was made with, shaped for display: the method type, a buyer-facing name, the standard icon set, and the card facts, including the network transaction id the account uses for the card, when it was a card. Null when the payment names no method.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
@@ -487,7 +489,7 @@ public final class DisputePayment {
         }
 
         /**
-         * <p>The instrument this payment was made with, shaped for display: the method type, a buyer-facing name, the standard icon set, and the card facts when it was a card. Null when the payment names no method.</p>
+         * <p>The instrument this payment was made with, shaped for display: the method type, a buyer-facing name, the standard icon set, and the card facts, including the network transaction id the account uses for the card, when it was a card. Null when the payment names no method.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
@@ -497,7 +499,7 @@ public final class DisputePayment {
         }
 
         /**
-         * <p>The instrument this payment was made with, shaped for display: the method type, a buyer-facing name, the standard icon set, and the card facts when it was a card. Null when the payment names no method.</p>
+         * <p>The instrument this payment was made with, shaped for display: the method type, a buyer-facing name, the standard icon set, and the card facts, including the network transaction id the account uses for the card, when it was a card. Null when the payment names no method.</p>
          */
         @java.lang.Override
         @JsonSetter(value = "payment_instrument", nulls = Nulls.SKIP)
@@ -663,6 +665,22 @@ public final class DisputePayment {
                     paymentMethodType,
                     paymentProcessor,
                     additionalProperties);
+        }
+
+        @JsonAnySetter
+        private void putAdditionalPropertyFromJson(String key, Object value) {
+            if (key.equalsIgnoreCase("amount")
+                    || key.equalsIgnoreCase("card_brand")
+                    || key.equalsIgnoreCase("card_last4")
+                    || key.equalsIgnoreCase("created_at")
+                    || key.equalsIgnoreCase("currency")
+                    || key.equalsIgnoreCase("id")
+                    || key.equalsIgnoreCase("payment_instrument")
+                    || key.equalsIgnoreCase("payment_method_type")
+                    || key.equalsIgnoreCase("payment_processor")) {
+                return;
+            }
+            this.additionalProperties.put(key, value);
         }
 
         @java.lang.Override

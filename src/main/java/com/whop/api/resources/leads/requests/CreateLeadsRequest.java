@@ -24,7 +24,7 @@ import org.jetbrains.annotations.NotNull;
 @JsonInclude(JsonInclude.Include.NON_ABSENT)
 @JsonDeserialize(builder = CreateLeadsRequest.Builder.class)
 public final class CreateLeadsRequest {
-    private final String companyId;
+    private final String accountId;
 
     private final Optional<Map<String, Object>> metadata;
 
@@ -37,13 +37,13 @@ public final class CreateLeadsRequest {
     private final Map<String, Object> additionalProperties;
 
     private CreateLeadsRequest(
-            String companyId,
+            String accountId,
             Optional<Map<String, Object>> metadata,
             Optional<String> productId,
             Optional<String> referrer,
             Optional<String> userId,
             Map<String, Object> additionalProperties) {
-        this.companyId = companyId;
+        this.accountId = accountId;
         this.metadata = metadata;
         this.productId = productId;
         this.referrer = referrer;
@@ -54,9 +54,9 @@ public final class CreateLeadsRequest {
     /**
      * @return The unique identifier of the company to create the lead for, starting with 'biz_'.
      */
-    @JsonProperty("company_id")
-    public String getCompanyId() {
-        return companyId;
+    @JsonProperty("account_id")
+    public String getAccountId() {
+        return accountId;
     }
 
     /**
@@ -139,7 +139,7 @@ public final class CreateLeadsRequest {
     }
 
     private boolean equalTo(CreateLeadsRequest other) {
-        return companyId.equals(other.companyId)
+        return accountId.equals(other.accountId)
                 && metadata.equals(other.metadata)
                 && productId.equals(other.productId)
                 && referrer.equals(other.referrer)
@@ -148,7 +148,7 @@ public final class CreateLeadsRequest {
 
     @java.lang.Override
     public int hashCode() {
-        return Objects.hash(this.companyId, this.metadata, this.productId, this.referrer, this.userId);
+        return Objects.hash(this.accountId, this.metadata, this.productId, this.referrer, this.userId);
     }
 
     @java.lang.Override
@@ -156,15 +156,15 @@ public final class CreateLeadsRequest {
         return ObjectMappers.stringify(this);
     }
 
-    public static CompanyIdStage builder() {
+    public static AccountIdStage builder() {
         return new Builder();
     }
 
-    public interface CompanyIdStage {
+    public interface AccountIdStage {
         /**
          * <p>The unique identifier of the company to create the lead for, starting with 'biz_'.</p>
          */
-        _FinalStage companyId(@NotNull String companyId);
+        _FinalStage accountId(@NotNull String accountId);
 
         Builder from(CreateLeadsRequest other);
     }
@@ -214,8 +214,8 @@ public final class CreateLeadsRequest {
     }
 
     @JsonIgnoreProperties(ignoreUnknown = true)
-    public static final class Builder implements CompanyIdStage, _FinalStage {
-        private String companyId;
+    public static final class Builder implements AccountIdStage, _FinalStage {
+        private String accountId;
 
         private Optional<String> userId = Optional.empty();
 
@@ -225,14 +225,13 @@ public final class CreateLeadsRequest {
 
         private Optional<Map<String, Object>> metadata = Optional.empty();
 
-        @JsonAnySetter
         private Map<String, Object> additionalProperties = new HashMap<>();
 
         private Builder() {}
 
         @java.lang.Override
         public Builder from(CreateLeadsRequest other) {
-            companyId(other.getCompanyId());
+            accountId(other.getAccountId());
             metadata(other.getMetadata());
             productId(other.getProductId());
             referrer(other.getReferrer());
@@ -242,13 +241,12 @@ public final class CreateLeadsRequest {
 
         /**
          * <p>The unique identifier of the company to create the lead for, starting with 'biz_'.</p>
-         * <p>The unique identifier of the company to create the lead for, starting with 'biz_'.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
-        @JsonSetter("company_id")
-        public _FinalStage companyId(@NotNull String companyId) {
-            this.companyId = Objects.requireNonNull(companyId, "companyId must not be null");
+        @JsonSetter("account_id")
+        public _FinalStage accountId(@NotNull String accountId) {
+            this.accountId = Objects.requireNonNull(accountId, "accountId must not be null");
             return this;
         }
 
@@ -398,7 +396,19 @@ public final class CreateLeadsRequest {
 
         @java.lang.Override
         public CreateLeadsRequest build() {
-            return new CreateLeadsRequest(companyId, metadata, productId, referrer, userId, additionalProperties);
+            return new CreateLeadsRequest(accountId, metadata, productId, referrer, userId, additionalProperties);
+        }
+
+        @JsonAnySetter
+        private void putAdditionalPropertyFromJson(String key, Object value) {
+            if (key.equalsIgnoreCase("account_id")
+                    || key.equalsIgnoreCase("metadata")
+                    || key.equalsIgnoreCase("product_id")
+                    || key.equalsIgnoreCase("referrer")
+                    || key.equalsIgnoreCase("user_id")) {
+                return;
+            }
+            this.additionalProperties.put(key, value);
         }
 
         @java.lang.Override

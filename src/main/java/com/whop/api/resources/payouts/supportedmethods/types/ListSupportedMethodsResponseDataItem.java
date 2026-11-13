@@ -27,6 +27,8 @@ import org.jetbrains.annotations.NotNull;
 public final class ListSupportedMethodsResponseDataItem {
     private final ListSupportedMethodsResponseDataItemDeliveryType deliveryType;
 
+    private final ListSupportedMethodsResponseDataItemFeeStructure feeStructure;
+
     private final Optional<String> iconUrl;
 
     private final String id;
@@ -35,11 +37,15 @@ public final class ListSupportedMethodsResponseDataItem {
 
     private final ListSupportedMethodsResponseDataItemObject object;
 
+    private final Optional<String> parentId;
+
     private final Optional<List<ListSupportedMethodsResponseDataItemQuotesItem>> quotes;
 
     private final Optional<List<ListSupportedMethodsResponseDataItemRequiredFieldsItem>> requiredFields;
 
     private final boolean supportsInstantDelivery;
+
+    private final Optional<Boolean> supportsPaypalLogin;
 
     private final boolean supportsStandardDelivery;
 
@@ -47,23 +53,29 @@ public final class ListSupportedMethodsResponseDataItem {
 
     private ListSupportedMethodsResponseDataItem(
             ListSupportedMethodsResponseDataItemDeliveryType deliveryType,
+            ListSupportedMethodsResponseDataItemFeeStructure feeStructure,
             Optional<String> iconUrl,
             String id,
             Optional<String> name,
             ListSupportedMethodsResponseDataItemObject object,
+            Optional<String> parentId,
             Optional<List<ListSupportedMethodsResponseDataItemQuotesItem>> quotes,
             Optional<List<ListSupportedMethodsResponseDataItemRequiredFieldsItem>> requiredFields,
             boolean supportsInstantDelivery,
+            Optional<Boolean> supportsPaypalLogin,
             boolean supportsStandardDelivery,
             Map<String, Object> additionalProperties) {
         this.deliveryType = deliveryType;
+        this.feeStructure = feeStructure;
         this.iconUrl = iconUrl;
         this.id = id;
         this.name = name;
         this.object = object;
+        this.parentId = parentId;
         this.quotes = quotes;
         this.requiredFields = requiredFields;
         this.supportsInstantDelivery = supportsInstantDelivery;
+        this.supportsPaypalLogin = supportsPaypalLogin;
         this.supportsStandardDelivery = supportsStandardDelivery;
         this.additionalProperties = additionalProperties;
     }
@@ -74,6 +86,14 @@ public final class ListSupportedMethodsResponseDataItem {
     @JsonProperty("delivery_type")
     public ListSupportedMethodsResponseDataItemDeliveryType getDeliveryType() {
         return deliveryType;
+    }
+
+    /**
+     * @return Fee terms for payouts to this method: a percentage of the payout amount plus a fixed fee. The quotes carry the exact fee for a specific amount.
+     */
+    @JsonProperty("fee_structure")
+    public ListSupportedMethodsResponseDataItemFeeStructure getFeeStructure() {
+        return feeStructure;
     }
 
     /**
@@ -112,6 +132,17 @@ public final class ListSupportedMethodsResponseDataItem {
     }
 
     /**
+     * @return The ID of the supported payout method that lists this one, such as the bank deposit method that lists a named bank. Show this method as a choice inside that method, not as a separate method. Null for every other method.
+     */
+    @JsonIgnore
+    public Optional<String> getParentId() {
+        if (parentId == null) {
+            return Optional.empty();
+        }
+        return parentId;
+    }
+
+    /**
      * @return Fee and delivery estimates for the requested amount, one per destination currency. Null unless an amount was provided.
      */
     @JsonIgnore
@@ -138,6 +169,14 @@ public final class ListSupportedMethodsResponseDataItem {
         return supportsInstantDelivery;
     }
 
+    /**
+     * @return Whether the payer can add this method by logging in to PayPal through <code>POST /payouts/paypal_link_sessions</code>, which confirms the PayPal account is verified and owned by the payee. True only for the PayPal method, and only once PayPal login is enabled for the account.
+     */
+    @JsonProperty("supports_paypal_login")
+    public Optional<Boolean> getSupportsPaypalLogin() {
+        return supportsPaypalLogin;
+    }
+
     @JsonProperty("supports_standard_delivery")
     public boolean getSupportsStandardDelivery() {
         return supportsStandardDelivery;
@@ -153,6 +192,12 @@ public final class ListSupportedMethodsResponseDataItem {
     @JsonProperty("name")
     private Optional<String> _getName() {
         return name;
+    }
+
+    @JsonInclude(value = JsonInclude.Include.CUSTOM, valueFilter = NullableNonemptyFilter.class)
+    @JsonProperty("parent_id")
+    private Optional<String> _getParentId() {
+        return parentId;
     }
 
     @JsonInclude(value = JsonInclude.Include.CUSTOM, valueFilter = NullableNonemptyFilter.class)
@@ -181,13 +226,16 @@ public final class ListSupportedMethodsResponseDataItem {
 
     private boolean equalTo(ListSupportedMethodsResponseDataItem other) {
         return deliveryType.equals(other.deliveryType)
+                && feeStructure.equals(other.feeStructure)
                 && iconUrl.equals(other.iconUrl)
                 && id.equals(other.id)
                 && name.equals(other.name)
                 && object.equals(other.object)
+                && parentId.equals(other.parentId)
                 && quotes.equals(other.quotes)
                 && requiredFields.equals(other.requiredFields)
                 && supportsInstantDelivery == other.supportsInstantDelivery
+                && supportsPaypalLogin.equals(other.supportsPaypalLogin)
                 && supportsStandardDelivery == other.supportsStandardDelivery;
     }
 
@@ -195,13 +243,16 @@ public final class ListSupportedMethodsResponseDataItem {
     public int hashCode() {
         return Objects.hash(
                 this.deliveryType,
+                this.feeStructure,
                 this.iconUrl,
                 this.id,
                 this.name,
                 this.object,
+                this.parentId,
                 this.quotes,
                 this.requiredFields,
                 this.supportsInstantDelivery,
+                this.supportsPaypalLogin,
                 this.supportsStandardDelivery);
     }
 
@@ -218,9 +269,16 @@ public final class ListSupportedMethodsResponseDataItem {
         /**
          * <p>How funds are delivered, for example <code>bank_deposit</code>.</p>
          */
-        IdStage deliveryType(@NotNull ListSupportedMethodsResponseDataItemDeliveryType deliveryType);
+        FeeStructureStage deliveryType(@NotNull ListSupportedMethodsResponseDataItemDeliveryType deliveryType);
 
         Builder from(ListSupportedMethodsResponseDataItem other);
+    }
+
+    public interface FeeStructureStage {
+        /**
+         * <p>Fee terms for payouts to this method: a percentage of the payout amount plus a fixed fee. The quotes carry the exact fee for a specific amount.</p>
+         */
+        IdStage feeStructure(@NotNull ListSupportedMethodsResponseDataItemFeeStructure feeStructure);
     }
 
     public interface IdStage {
@@ -268,6 +326,15 @@ public final class ListSupportedMethodsResponseDataItem {
         _FinalStage name(Nullable<String> name);
 
         /**
+         * <p>The ID of the supported payout method that lists this one, such as the bank deposit method that lists a named bank. Show this method as a choice inside that method, not as a separate method. Null for every other method.</p>
+         */
+        _FinalStage parentId(Optional<String> parentId);
+
+        _FinalStage parentId(String parentId);
+
+        _FinalStage parentId(Nullable<String> parentId);
+
+        /**
          * <p>Fee and delivery estimates for the requested amount, one per destination currency. Null unless an amount was provided.</p>
          */
         _FinalStage quotes(Optional<List<ListSupportedMethodsResponseDataItemQuotesItem>> quotes);
@@ -286,17 +353,27 @@ public final class ListSupportedMethodsResponseDataItem {
 
         _FinalStage requiredFields(
                 Nullable<List<ListSupportedMethodsResponseDataItemRequiredFieldsItem>> requiredFields);
+
+        /**
+         * <p>Whether the payer can add this method by logging in to PayPal through <code>POST /payouts/paypal_link_sessions</code>, which confirms the PayPal account is verified and owned by the payee. True only for the PayPal method, and only once PayPal login is enabled for the account.</p>
+         */
+        _FinalStage supportsPaypalLogin(Optional<Boolean> supportsPaypalLogin);
+
+        _FinalStage supportsPaypalLogin(Boolean supportsPaypalLogin);
     }
 
     @JsonIgnoreProperties(ignoreUnknown = true)
     public static final class Builder
             implements DeliveryTypeStage,
+                    FeeStructureStage,
                     IdStage,
                     ObjectStage,
                     SupportsInstantDeliveryStage,
                     SupportsStandardDeliveryStage,
                     _FinalStage {
         private ListSupportedMethodsResponseDataItemDeliveryType deliveryType;
+
+        private ListSupportedMethodsResponseDataItemFeeStructure feeStructure;
 
         private String id;
 
@@ -306,16 +383,19 @@ public final class ListSupportedMethodsResponseDataItem {
 
         private boolean supportsStandardDelivery;
 
+        private Optional<Boolean> supportsPaypalLogin = Optional.empty();
+
         private Optional<List<ListSupportedMethodsResponseDataItemRequiredFieldsItem>> requiredFields =
                 Optional.empty();
 
         private Optional<List<ListSupportedMethodsResponseDataItemQuotesItem>> quotes = Optional.empty();
 
+        private Optional<String> parentId = Optional.empty();
+
         private Optional<String> name = Optional.empty();
 
         private Optional<String> iconUrl = Optional.empty();
 
-        @JsonAnySetter
         private Map<String, Object> additionalProperties = new HashMap<>();
 
         private Builder() {}
@@ -323,31 +403,43 @@ public final class ListSupportedMethodsResponseDataItem {
         @java.lang.Override
         public Builder from(ListSupportedMethodsResponseDataItem other) {
             deliveryType(other.getDeliveryType());
+            feeStructure(other.getFeeStructure());
             iconUrl(other.getIconUrl());
             id(other.getId());
             name(other.getName());
             object(other.getObject());
+            parentId(other.getParentId());
             quotes(other.getQuotes());
             requiredFields(other.getRequiredFields());
             supportsInstantDelivery(other.getSupportsInstantDelivery());
+            supportsPaypalLogin(other.getSupportsPaypalLogin());
             supportsStandardDelivery(other.getSupportsStandardDelivery());
             return this;
         }
 
         /**
          * <p>How funds are delivered, for example <code>bank_deposit</code>.</p>
-         * <p>How funds are delivered, for example <code>bank_deposit</code>.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
         @JsonSetter("delivery_type")
-        public IdStage deliveryType(@NotNull ListSupportedMethodsResponseDataItemDeliveryType deliveryType) {
+        public FeeStructureStage deliveryType(@NotNull ListSupportedMethodsResponseDataItemDeliveryType deliveryType) {
             this.deliveryType = Objects.requireNonNull(deliveryType, "deliveryType must not be null");
             return this;
         }
 
         /**
-         * <p>Supported payout method ID.</p>
+         * <p>Fee terms for payouts to this method: a percentage of the payout amount plus a fixed fee. The quotes carry the exact fee for a specific amount.</p>
+         * @return Reference to {@code this} so that method calls can be chained together.
+         */
+        @java.lang.Override
+        @JsonSetter("fee_structure")
+        public IdStage feeStructure(@NotNull ListSupportedMethodsResponseDataItemFeeStructure feeStructure) {
+            this.feeStructure = Objects.requireNonNull(feeStructure, "feeStructure must not be null");
+            return this;
+        }
+
+        /**
          * <p>Supported payout method ID.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
@@ -376,6 +468,26 @@ public final class ListSupportedMethodsResponseDataItem {
         @JsonSetter("supports_standard_delivery")
         public _FinalStage supportsStandardDelivery(boolean supportsStandardDelivery) {
             this.supportsStandardDelivery = supportsStandardDelivery;
+            return this;
+        }
+
+        /**
+         * <p>Whether the payer can add this method by logging in to PayPal through <code>POST /payouts/paypal_link_sessions</code>, which confirms the PayPal account is verified and owned by the payee. True only for the PayPal method, and only once PayPal login is enabled for the account.</p>
+         * @return Reference to {@code this} so that method calls can be chained together.
+         */
+        @java.lang.Override
+        public _FinalStage supportsPaypalLogin(Boolean supportsPaypalLogin) {
+            this.supportsPaypalLogin = Optional.ofNullable(supportsPaypalLogin);
+            return this;
+        }
+
+        /**
+         * <p>Whether the payer can add this method by logging in to PayPal through <code>POST /payouts/paypal_link_sessions</code>, which confirms the PayPal account is verified and owned by the payee. True only for the PayPal method, and only once PayPal login is enabled for the account.</p>
+         */
+        @java.lang.Override
+        @JsonSetter(value = "supports_paypal_login", nulls = Nulls.SKIP)
+        public _FinalStage supportsPaypalLogin(Optional<Boolean> supportsPaypalLogin) {
+            this.supportsPaypalLogin = supportsPaypalLogin;
             return this;
         }
 
@@ -450,6 +562,42 @@ public final class ListSupportedMethodsResponseDataItem {
         @JsonSetter(value = "quotes", nulls = Nulls.SKIP)
         public _FinalStage quotes(Optional<List<ListSupportedMethodsResponseDataItemQuotesItem>> quotes) {
             this.quotes = quotes;
+            return this;
+        }
+
+        /**
+         * <p>The ID of the supported payout method that lists this one, such as the bank deposit method that lists a named bank. Show this method as a choice inside that method, not as a separate method. Null for every other method.</p>
+         * @return Reference to {@code this} so that method calls can be chained together.
+         */
+        @java.lang.Override
+        public _FinalStage parentId(Nullable<String> parentId) {
+            if (parentId.isNull()) {
+                this.parentId = null;
+            } else if (parentId.isEmpty()) {
+                this.parentId = Optional.empty();
+            } else {
+                this.parentId = Optional.of(parentId.get());
+            }
+            return this;
+        }
+
+        /**
+         * <p>The ID of the supported payout method that lists this one, such as the bank deposit method that lists a named bank. Show this method as a choice inside that method, not as a separate method. Null for every other method.</p>
+         * @return Reference to {@code this} so that method calls can be chained together.
+         */
+        @java.lang.Override
+        public _FinalStage parentId(String parentId) {
+            this.parentId = Optional.ofNullable(parentId);
+            return this;
+        }
+
+        /**
+         * <p>The ID of the supported payout method that lists this one, such as the bank deposit method that lists a named bank. Show this method as a choice inside that method, not as a separate method. Null for every other method.</p>
+         */
+        @java.lang.Override
+        @JsonSetter(value = "parent_id", nulls = Nulls.SKIP)
+        public _FinalStage parentId(Optional<String> parentId) {
+            this.parentId = parentId;
             return this;
         }
 
@@ -529,15 +677,37 @@ public final class ListSupportedMethodsResponseDataItem {
         public ListSupportedMethodsResponseDataItem build() {
             return new ListSupportedMethodsResponseDataItem(
                     deliveryType,
+                    feeStructure,
                     iconUrl,
                     id,
                     name,
                     object,
+                    parentId,
                     quotes,
                     requiredFields,
                     supportsInstantDelivery,
+                    supportsPaypalLogin,
                     supportsStandardDelivery,
                     additionalProperties);
+        }
+
+        @JsonAnySetter
+        private void putAdditionalPropertyFromJson(String key, Object value) {
+            if (key.equalsIgnoreCase("delivery_type")
+                    || key.equalsIgnoreCase("fee_structure")
+                    || key.equalsIgnoreCase("icon_url")
+                    || key.equalsIgnoreCase("id")
+                    || key.equalsIgnoreCase("name")
+                    || key.equalsIgnoreCase("object")
+                    || key.equalsIgnoreCase("parent_id")
+                    || key.equalsIgnoreCase("quotes")
+                    || key.equalsIgnoreCase("required_fields")
+                    || key.equalsIgnoreCase("supports_instant_delivery")
+                    || key.equalsIgnoreCase("supports_paypal_login")
+                    || key.equalsIgnoreCase("supports_standard_delivery")) {
+                return;
+            }
+            this.additionalProperties.put(key, value);
         }
 
         @java.lang.Override

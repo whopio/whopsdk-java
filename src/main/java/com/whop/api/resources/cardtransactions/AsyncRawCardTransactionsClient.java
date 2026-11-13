@@ -6,8 +6,10 @@ package com.whop.api.resources.cardtransactions;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.whop.api.core.ClientOptions;
 import com.whop.api.core.ObjectMappers;
+import com.whop.api.core.PathSegments;
 import com.whop.api.core.QueryStringMapper;
 import com.whop.api.core.RequestOptions;
+import com.whop.api.core.RetryInterceptor;
 import com.whop.api.core.WhopApiApiException;
 import com.whop.api.core.WhopApiException;
 import com.whop.api.core.WhopApiHttpResponse;
@@ -43,14 +45,14 @@ public class AsyncRawCardTransactionsClient {
     }
 
     /**
-     * Lists an account's card transactions, newest first. Defaults to the account the credential belongs to. Covers every card the owner has ever had, including canceled cards and spend that predates a re-application, and team members only see transactions on the cards assigned to them. Pass <code>transaction_ids</code> to fetch specific transactions instead of paging for them.
+     * Lists the card transactions of an account or a user, newest first. Covers every card the owner has ever had, including canceled cards and spend that predates a re-application, and team members only see transactions on the cards assigned to them. Pass <code>transaction_ids</code> to fetch specific transactions instead of paging for them.
      */
     public CompletableFuture<WhopApiHttpResponse<SyncPagingIterable<CardTransaction>>> list() {
         return list(ListCardTransactionsRequest.builder().build());
     }
 
     /**
-     * Lists an account's card transactions, newest first. Defaults to the account the credential belongs to. Covers every card the owner has ever had, including canceled cards and spend that predates a re-application, and team members only see transactions on the cards assigned to them. Pass <code>transaction_ids</code> to fetch specific transactions instead of paging for them.
+     * Lists the card transactions of an account or a user, newest first. Covers every card the owner has ever had, including canceled cards and spend that predates a re-application, and team members only see transactions on the cards assigned to them. Pass <code>transaction_ids</code> to fetch specific transactions instead of paging for them.
      */
     public CompletableFuture<WhopApiHttpResponse<SyncPagingIterable<CardTransaction>>> list(
             RequestOptions requestOptions) {
@@ -58,7 +60,7 @@ public class AsyncRawCardTransactionsClient {
     }
 
     /**
-     * Lists an account's card transactions, newest first. Defaults to the account the credential belongs to. Covers every card the owner has ever had, including canceled cards and spend that predates a re-application, and team members only see transactions on the cards assigned to them. Pass <code>transaction_ids</code> to fetch specific transactions instead of paging for them.
+     * Lists the card transactions of an account or a user, newest first. Covers every card the owner has ever had, including canceled cards and spend that predates a re-application, and team members only see transactions on the cards assigned to them. Pass <code>transaction_ids</code> to fetch specific transactions instead of paging for them.
      */
     public CompletableFuture<WhopApiHttpResponse<SyncPagingIterable<CardTransaction>>> list(
             ListCardTransactionsRequest request) {
@@ -66,16 +68,20 @@ public class AsyncRawCardTransactionsClient {
     }
 
     /**
-     * Lists an account's card transactions, newest first. Defaults to the account the credential belongs to. Covers every card the owner has ever had, including canceled cards and spend that predates a re-application, and team members only see transactions on the cards assigned to them. Pass <code>transaction_ids</code> to fetch specific transactions instead of paging for them.
+     * Lists the card transactions of an account or a user, newest first. Covers every card the owner has ever had, including canceled cards and spend that predates a re-application, and team members only see transactions on the cards assigned to them. Pass <code>transaction_ids</code> to fetch specific transactions instead of paging for them.
      */
     public CompletableFuture<WhopApiHttpResponse<SyncPagingIterable<CardTransaction>>> list(
             ListCardTransactionsRequest request, RequestOptions requestOptions) {
-        HttpUrl.Builder httpUrl = HttpUrl.parse(this.clientOptions.environment().getUrl())
+        HttpUrl.Builder httpUrl = HttpUrl.parse(this.clientOptions.environment().getApiURL())
                 .newBuilder()
                 .addPathSegments("card_transactions");
         if (request.getAccountId().isPresent()) {
             QueryStringMapper.addQueryParameter(
                     httpUrl, "account_id", request.getAccountId().get(), false);
+        }
+        if (request.getUserId().isPresent()) {
+            QueryStringMapper.addQueryParameter(
+                    httpUrl, "user_id", request.getUserId().get(), false);
         }
         if (request.getStatus().isPresent()) {
             QueryStringMapper.addQueryParameter(
@@ -140,8 +146,18 @@ public class AsyncRawCardTransactionsClient {
         if (requestOptions != null && requestOptions.getTimeout().isPresent()) {
             client = clientOptions.httpClientWithTimeout(requestOptions);
         }
+        if (requestOptions != null && requestOptions.getMaxRetries().isPresent()) {
+            okhttpRequest = okhttpRequest
+                    .newBuilder()
+                    .tag(
+                            RetryInterceptor.MaxRetriesOverride.class,
+                            new RetryInterceptor.MaxRetriesOverride(
+                                    requestOptions.getMaxRetries().get()))
+                    .build();
+        }
         CompletableFuture<WhopApiHttpResponse<SyncPagingIterable<CardTransaction>>> future = new CompletableFuture<>();
-        client.newCall(okhttpRequest).enqueue(new Callback() {
+        RetryInterceptor.AsyncCall okhttpCall = RetryInterceptor.newAsyncCall(client, okhttpRequest);
+        okhttpCall.enqueue(new Callback() {
             @Override
             public void onResponse(@NotNull Call call, @NotNull Response response) throws IOException {
                 try (ResponseBody responseBody = response.body()) {
@@ -158,7 +174,11 @@ public class AsyncRawCardTransactionsClient {
                         List<CardTransaction> result = parsedResponse.getData();
                         future.complete(new WhopApiHttpResponse<>(
                                 new SyncPagingIterable<CardTransaction>(
-                                        startingAfter != null, result, parsedResponse, () -> {
+                                        startingAfter.isPresent()
+                                                && !startingAfter.get().isEmpty(),
+                                        result,
+                                        parsedResponse,
+                                        () -> {
                                             try {
                                                 return list(nextRequest, requestOptions)
                                                         .get()
@@ -195,6 +215,9 @@ public class AsyncRawCardTransactionsClient {
                     future.completeExceptionally(new WhopApiApiException(
                             "Error with status code " + response.code(), response.code(), errorBody, response));
                     return;
+                } catch (JsonProcessingException e) {
+                    future.completeExceptionally(
+                            new WhopApiException("Failed to deserialize response: " + e.getMessage(), e));
                 } catch (IOException e) {
                     future.completeExceptionally(new WhopApiException("Network error executing HTTP request", e));
                 }
@@ -205,25 +228,30 @@ public class AsyncRawCardTransactionsClient {
                 future.completeExceptionally(new WhopApiException("Network error executing HTTP request", e));
             }
         });
+        future.whenComplete((result_, throwable_) -> {
+            if (future.isCancelled()) {
+                okhttpCall.cancel();
+            }
+        });
         return future;
     }
 
     /**
-     * Fetches a single card transaction by its <code>citx_</code> identifier. The owner defaults to the account the credential belongs to.
+     * Retrieves a single card transaction from any card the owner has ever had, including canceled cards. Team members can retrieve only transactions on the cards assigned to them.
      */
     public CompletableFuture<WhopApiHttpResponse<CardTransaction>> retrieve(String id) {
         return retrieve(id, RetrieveCardTransactionsRequest.builder().build());
     }
 
     /**
-     * Fetches a single card transaction by its <code>citx_</code> identifier. The owner defaults to the account the credential belongs to.
+     * Retrieves a single card transaction from any card the owner has ever had, including canceled cards. Team members can retrieve only transactions on the cards assigned to them.
      */
     public CompletableFuture<WhopApiHttpResponse<CardTransaction>> retrieve(String id, RequestOptions requestOptions) {
         return retrieve(id, RetrieveCardTransactionsRequest.builder().build(), requestOptions);
     }
 
     /**
-     * Fetches a single card transaction by its <code>citx_</code> identifier. The owner defaults to the account the credential belongs to.
+     * Retrieves a single card transaction from any card the owner has ever had, including canceled cards. Team members can retrieve only transactions on the cards assigned to them.
      */
     public CompletableFuture<WhopApiHttpResponse<CardTransaction>> retrieve(
             String id, RetrieveCardTransactionsRequest request) {
@@ -231,17 +259,21 @@ public class AsyncRawCardTransactionsClient {
     }
 
     /**
-     * Fetches a single card transaction by its <code>citx_</code> identifier. The owner defaults to the account the credential belongs to.
+     * Retrieves a single card transaction from any card the owner has ever had, including canceled cards. Team members can retrieve only transactions on the cards assigned to them.
      */
     public CompletableFuture<WhopApiHttpResponse<CardTransaction>> retrieve(
             String id, RetrieveCardTransactionsRequest request, RequestOptions requestOptions) {
-        HttpUrl.Builder httpUrl = HttpUrl.parse(this.clientOptions.environment().getUrl())
+        HttpUrl.Builder httpUrl = HttpUrl.parse(this.clientOptions.environment().getApiURL())
                 .newBuilder()
                 .addPathSegments("card_transactions")
-                .addPathSegment(id);
+                .addPathSegment(PathSegments.validate(id));
         if (request.getAccountId().isPresent()) {
             QueryStringMapper.addQueryParameter(
                     httpUrl, "account_id", request.getAccountId().get(), false);
+        }
+        if (request.getUserId().isPresent()) {
+            QueryStringMapper.addQueryParameter(
+                    httpUrl, "user_id", request.getUserId().get(), false);
         }
         if (requestOptions != null) {
             requestOptions.getQueryParameters().forEach((_key, _value) -> {
@@ -258,8 +290,18 @@ public class AsyncRawCardTransactionsClient {
         if (requestOptions != null && requestOptions.getTimeout().isPresent()) {
             client = clientOptions.httpClientWithTimeout(requestOptions);
         }
+        if (requestOptions != null && requestOptions.getMaxRetries().isPresent()) {
+            okhttpRequest = okhttpRequest
+                    .newBuilder()
+                    .tag(
+                            RetryInterceptor.MaxRetriesOverride.class,
+                            new RetryInterceptor.MaxRetriesOverride(
+                                    requestOptions.getMaxRetries().get()))
+                    .build();
+        }
         CompletableFuture<WhopApiHttpResponse<CardTransaction>> future = new CompletableFuture<>();
-        client.newCall(okhttpRequest).enqueue(new Callback() {
+        RetryInterceptor.AsyncCall okhttpCall = RetryInterceptor.newAsyncCall(client, okhttpRequest);
+        okhttpCall.enqueue(new Callback() {
             @Override
             public void onResponse(@NotNull Call call, @NotNull Response response) throws IOException {
                 try (ResponseBody responseBody = response.body()) {
@@ -295,6 +337,9 @@ public class AsyncRawCardTransactionsClient {
                     future.completeExceptionally(new WhopApiApiException(
                             "Error with status code " + response.code(), response.code(), errorBody, response));
                     return;
+                } catch (JsonProcessingException e) {
+                    future.completeExceptionally(
+                            new WhopApiException("Failed to deserialize response: " + e.getMessage(), e));
                 } catch (IOException e) {
                     future.completeExceptionally(new WhopApiException("Network error executing HTTP request", e));
                 }
@@ -303,6 +348,11 @@ public class AsyncRawCardTransactionsClient {
             @Override
             public void onFailure(@NotNull Call call, @NotNull IOException e) {
                 future.completeExceptionally(new WhopApiException("Network error executing HTTP request", e));
+            }
+        });
+        future.whenComplete((result_, throwable_) -> {
+            if (future.isCancelled()) {
+                okhttpCall.cancel();
             }
         });
         return future;

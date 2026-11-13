@@ -4,11 +4,14 @@
 package com.whop.api.resources.webhooks;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
+import com.whop.api.core.BodyProperties;
 import com.whop.api.core.ClientOptions;
 import com.whop.api.core.MediaTypes;
 import com.whop.api.core.ObjectMappers;
+import com.whop.api.core.PathSegments;
 import com.whop.api.core.QueryStringMapper;
 import com.whop.api.core.RequestOptions;
+import com.whop.api.core.RetryInterceptor;
 import com.whop.api.core.WhopApiApiException;
 import com.whop.api.core.WhopApiException;
 import com.whop.api.core.WhopApiHttpResponse;
@@ -16,14 +19,10 @@ import com.whop.api.core.pagination.SyncPagingIterable;
 import com.whop.api.errors.BadRequestError;
 import com.whop.api.errors.ConflictError;
 import com.whop.api.errors.ForbiddenError;
-import com.whop.api.errors.InternalServerError;
 import com.whop.api.errors.NotFoundError;
-import com.whop.api.errors.TooManyRequestsError;
 import com.whop.api.errors.UnauthorizedError;
-import com.whop.api.errors.UnprocessableEntityError;
 import com.whop.api.resources.webhooks.requests.CreateWebhooksRequest;
 import com.whop.api.resources.webhooks.requests.DeleteWebhooksRequest;
-import com.whop.api.resources.webhooks.requests.DeliveriesWebhookRequest;
 import com.whop.api.resources.webhooks.requests.ListDeliveriesWebhooksRequest;
 import com.whop.api.resources.webhooks.requests.ListWebhooksRequest;
 import com.whop.api.resources.webhooks.requests.ReplayDeliveryWebhooksRequest;
@@ -32,14 +31,11 @@ import com.whop.api.resources.webhooks.requests.RetrieveWebhooksRequest;
 import com.whop.api.resources.webhooks.requests.TestWebhooksRequest;
 import com.whop.api.resources.webhooks.requests.UpdateWebhooksRequest;
 import com.whop.api.resources.webhooks.types.DeleteWebhooksResponse;
-import com.whop.api.resources.webhooks.types.DeliveriesWebhookResponse;
-import com.whop.api.resources.webhooks.types.DeliveriesWebhookResponseDataItem;
 import com.whop.api.resources.webhooks.types.ListDeliveriesWebhooksResponse;
 import com.whop.api.resources.webhooks.types.ListWebhooksResponse;
 import com.whop.api.resources.webhooks.types.ReplayDeliveryWebhooksResponse;
 import com.whop.api.resources.webhooks.types.ReplayWebhooksResponse;
 import com.whop.api.resources.webhooks.types.TestWebhooksResponse;
-import com.whop.api.types.V1ErrorResponse;
 import com.whop.api.types.Webhook;
 import com.whop.api.types.WebhookDelivery;
 import com.whop.api.types.WebhookListItem;
@@ -64,6 +60,20 @@ public class RawWebhooksClient {
     /**
      * Returns a paginated list of webhook endpoints configured for an account, ordered by most recently created.
      */
+    public WhopApiHttpResponse<SyncPagingIterable<WebhookListItem>> list() {
+        return list(ListWebhooksRequest.builder().build());
+    }
+
+    /**
+     * Returns a paginated list of webhook endpoints configured for an account, ordered by most recently created.
+     */
+    public WhopApiHttpResponse<SyncPagingIterable<WebhookListItem>> list(RequestOptions requestOptions) {
+        return list(ListWebhooksRequest.builder().build(), requestOptions);
+    }
+
+    /**
+     * Returns a paginated list of webhook endpoints configured for an account, ordered by most recently created.
+     */
     public WhopApiHttpResponse<SyncPagingIterable<WebhookListItem>> list(ListWebhooksRequest request) {
         return list(request, null);
     }
@@ -73,10 +83,13 @@ public class RawWebhooksClient {
      */
     public WhopApiHttpResponse<SyncPagingIterable<WebhookListItem>> list(
             ListWebhooksRequest request, RequestOptions requestOptions) {
-        HttpUrl.Builder httpUrl = HttpUrl.parse(this.clientOptions.environment().getUrl())
+        HttpUrl.Builder httpUrl = HttpUrl.parse(this.clientOptions.environment().getApiURL())
                 .newBuilder()
                 .addPathSegments("webhooks");
-        QueryStringMapper.addQueryParameter(httpUrl, "account_id", request.getAccountId(), false);
+        if (request.getAccountId().isPresent()) {
+            QueryStringMapper.addQueryParameter(
+                    httpUrl, "account_id", request.getAccountId().get(), false);
+        }
         if (request.getAppId().isPresent()) {
             QueryStringMapper.addQueryParameter(
                     httpUrl, "app_id", request.getAppId().get(), false);
@@ -123,6 +136,15 @@ public class RawWebhooksClient {
         if (requestOptions != null && requestOptions.getTimeout().isPresent()) {
             client = clientOptions.httpClientWithTimeout(requestOptions);
         }
+        if (requestOptions != null && requestOptions.getMaxRetries().isPresent()) {
+            okhttpRequest = okhttpRequest
+                    .newBuilder()
+                    .tag(
+                            RetryInterceptor.MaxRetriesOverride.class,
+                            new RetryInterceptor.MaxRetriesOverride(
+                                    requestOptions.getMaxRetries().get()))
+                    .build();
+        }
         try (Response response = client.newCall(okhttpRequest).execute()) {
             ResponseBody responseBody = response.body();
             String responseBodyString = responseBody != null ? responseBody.string() : "{}";
@@ -137,8 +159,11 @@ public class RawWebhooksClient {
                 List<WebhookListItem> result = parsedResponse.getData();
                 return new WhopApiHttpResponse<>(
                         new SyncPagingIterable<WebhookListItem>(
-                                startingAfter != null, result, parsedResponse, () -> list(nextRequest, requestOptions)
-                                        .body()),
+                                startingAfter.isPresent()
+                                        && !startingAfter.get().isEmpty(),
+                                result,
+                                parsedResponse,
+                                () -> list(nextRequest, requestOptions).body()),
                         response);
             }
             try {
@@ -162,6 +187,8 @@ public class RawWebhooksClient {
             Object errorBody = ObjectMappers.parseErrorBody(responseBodyString);
             throw new WhopApiApiException(
                     "Error with status code " + response.code(), response.code(), errorBody, response);
+        } catch (JsonProcessingException e) {
+            throw new WhopApiException("Failed to deserialize response: " + e.getMessage(), e);
         } catch (IOException e) {
             throw new WhopApiException("Network error executing HTTP request", e);
         }
@@ -178,7 +205,7 @@ public class RawWebhooksClient {
      * Creates a webhook endpoint that receives event notifications via HTTP POST.
      */
     public WhopApiHttpResponse<Webhook> create(CreateWebhooksRequest request, RequestOptions requestOptions) {
-        HttpUrl.Builder httpUrl = HttpUrl.parse(this.clientOptions.environment().getUrl())
+        HttpUrl.Builder httpUrl = HttpUrl.parse(this.clientOptions.environment().getApiURL())
                 .newBuilder()
                 .addPathSegments("webhooks");
         if (requestOptions != null) {
@@ -189,7 +216,9 @@ public class RawWebhooksClient {
         RequestBody body;
         try {
             body = RequestBody.create(
-                    ObjectMappers.JSON_MAPPER.writeValueAsBytes(request), MediaTypes.APPLICATION_JSON);
+                    ObjectMappers.JSON_MAPPER.writeValueAsBytes(BodyProperties.merge(
+                            request, requestOptions != null ? requestOptions.getBodyProperties() : null)),
+                    MediaTypes.APPLICATION_JSON);
         } catch (JsonProcessingException e) {
             throw new WhopApiException("Failed to serialize request", e);
         }
@@ -203,6 +232,15 @@ public class RawWebhooksClient {
         OkHttpClient client = clientOptions.httpClient();
         if (requestOptions != null && requestOptions.getTimeout().isPresent()) {
             client = clientOptions.httpClientWithTimeout(requestOptions);
+        }
+        if (requestOptions != null && requestOptions.getMaxRetries().isPresent()) {
+            okhttpRequest = okhttpRequest
+                    .newBuilder()
+                    .tag(
+                            RetryInterceptor.MaxRetriesOverride.class,
+                            new RetryInterceptor.MaxRetriesOverride(
+                                    requestOptions.getMaxRetries().get()))
+                    .build();
         }
         try (Response response = client.newCall(okhttpRequest).execute()) {
             ResponseBody responseBody = response.body();
@@ -227,8 +265,7 @@ public class RawWebhooksClient {
                                 ObjectMappers.JSON_MAPPER.readValue(responseBodyString, Object.class), response);
                     case 409:
                         throw new ConflictError(
-                                ObjectMappers.JSON_MAPPER.readValue(responseBodyString, V1ErrorResponse.class),
-                                response);
+                                ObjectMappers.JSON_MAPPER.readValue(responseBodyString, Object.class), response);
                 }
             } catch (JsonProcessingException ignored) {
                 // unable to map error response, throwing generic error
@@ -236,6 +273,8 @@ public class RawWebhooksClient {
             Object errorBody = ObjectMappers.parseErrorBody(responseBodyString);
             throw new WhopApiApiException(
                     "Error with status code " + response.code(), response.code(), errorBody, response);
+        } catch (JsonProcessingException e) {
+            throw new WhopApiException("Failed to deserialize response: " + e.getMessage(), e);
         } catch (IOException e) {
             throw new WhopApiException("Network error executing HTTP request", e);
         }
@@ -267,10 +306,10 @@ public class RawWebhooksClient {
      */
     public WhopApiHttpResponse<Webhook> retrieve(
             String id, RetrieveWebhooksRequest request, RequestOptions requestOptions) {
-        HttpUrl.Builder httpUrl = HttpUrl.parse(this.clientOptions.environment().getUrl())
+        HttpUrl.Builder httpUrl = HttpUrl.parse(this.clientOptions.environment().getApiURL())
                 .newBuilder()
                 .addPathSegments("webhooks")
-                .addPathSegment(id);
+                .addPathSegment(PathSegments.validate(id));
         if (requestOptions != null) {
             requestOptions.getQueryParameters().forEach((_key, _value) -> {
                 httpUrl.addQueryParameter(_key, _value);
@@ -285,6 +324,15 @@ public class RawWebhooksClient {
         OkHttpClient client = clientOptions.httpClient();
         if (requestOptions != null && requestOptions.getTimeout().isPresent()) {
             client = clientOptions.httpClientWithTimeout(requestOptions);
+        }
+        if (requestOptions != null && requestOptions.getMaxRetries().isPresent()) {
+            okhttpRequest = okhttpRequest
+                    .newBuilder()
+                    .tag(
+                            RetryInterceptor.MaxRetriesOverride.class,
+                            new RetryInterceptor.MaxRetriesOverride(
+                                    requestOptions.getMaxRetries().get()))
+                    .build();
         }
         try (Response response = client.newCall(okhttpRequest).execute()) {
             ResponseBody responseBody = response.body();
@@ -311,41 +359,43 @@ public class RawWebhooksClient {
             Object errorBody = ObjectMappers.parseErrorBody(responseBodyString);
             throw new WhopApiApiException(
                     "Error with status code " + response.code(), response.code(), errorBody, response);
+        } catch (JsonProcessingException e) {
+            throw new WhopApiException("Failed to deserialize response: " + e.getMessage(), e);
         } catch (IOException e) {
             throw new WhopApiException("Network error executing HTTP request", e);
         }
     }
 
     /**
-     * Permanently deletes a webhook endpoint. Returns <code>true</code> on success, matching the legacy proxy response.
+     * Permanently deletes a webhook endpoint. To stop deliveries without deleting it, set <code>enabled</code> to <code>false</code> with <code>PATCH /webhooks/:id</code>.
      */
     public WhopApiHttpResponse<DeleteWebhooksResponse> delete(String id) {
         return delete(id, DeleteWebhooksRequest.builder().build());
     }
 
     /**
-     * Permanently deletes a webhook endpoint. Returns <code>true</code> on success, matching the legacy proxy response.
+     * Permanently deletes a webhook endpoint. To stop deliveries without deleting it, set <code>enabled</code> to <code>false</code> with <code>PATCH /webhooks/:id</code>.
      */
     public WhopApiHttpResponse<DeleteWebhooksResponse> delete(String id, RequestOptions requestOptions) {
         return delete(id, DeleteWebhooksRequest.builder().build(), requestOptions);
     }
 
     /**
-     * Permanently deletes a webhook endpoint. Returns <code>true</code> on success, matching the legacy proxy response.
+     * Permanently deletes a webhook endpoint. To stop deliveries without deleting it, set <code>enabled</code> to <code>false</code> with <code>PATCH /webhooks/:id</code>.
      */
     public WhopApiHttpResponse<DeleteWebhooksResponse> delete(String id, DeleteWebhooksRequest request) {
         return delete(id, request, null);
     }
 
     /**
-     * Permanently deletes a webhook endpoint. Returns <code>true</code> on success, matching the legacy proxy response.
+     * Permanently deletes a webhook endpoint. To stop deliveries without deleting it, set <code>enabled</code> to <code>false</code> with <code>PATCH /webhooks/:id</code>.
      */
     public WhopApiHttpResponse<DeleteWebhooksResponse> delete(
             String id, DeleteWebhooksRequest request, RequestOptions requestOptions) {
-        HttpUrl.Builder httpUrl = HttpUrl.parse(this.clientOptions.environment().getUrl())
+        HttpUrl.Builder httpUrl = HttpUrl.parse(this.clientOptions.environment().getApiURL())
                 .newBuilder()
                 .addPathSegments("webhooks")
-                .addPathSegment(id);
+                .addPathSegment(PathSegments.validate(id));
         if (requestOptions != null) {
             requestOptions.getQueryParameters().forEach((_key, _value) -> {
                 httpUrl.addQueryParameter(_key, _value);
@@ -353,13 +403,25 @@ public class RawWebhooksClient {
         }
         Request.Builder _requestBuilder = new Request.Builder()
                 .url(httpUrl.build())
-                .method("DELETE", null)
+                .method(
+                        "DELETE",
+                        BodyProperties.toRequestBody(
+                                requestOptions != null ? requestOptions.getBodyProperties() : null, null))
                 .headers(Headers.of(clientOptions.headers(requestOptions)))
                 .addHeader("Accept", "application/json");
         Request okhttpRequest = _requestBuilder.build();
         OkHttpClient client = clientOptions.httpClient();
         if (requestOptions != null && requestOptions.getTimeout().isPresent()) {
             client = clientOptions.httpClientWithTimeout(requestOptions);
+        }
+        if (requestOptions != null && requestOptions.getMaxRetries().isPresent()) {
+            okhttpRequest = okhttpRequest
+                    .newBuilder()
+                    .tag(
+                            RetryInterceptor.MaxRetriesOverride.class,
+                            new RetryInterceptor.MaxRetriesOverride(
+                                    requestOptions.getMaxRetries().get()))
+                    .build();
         }
         try (Response response = client.newCall(okhttpRequest).execute()) {
             ResponseBody responseBody = response.body();
@@ -387,6 +449,8 @@ public class RawWebhooksClient {
             Object errorBody = ObjectMappers.parseErrorBody(responseBodyString);
             throw new WhopApiApiException(
                     "Error with status code " + response.code(), response.code(), errorBody, response);
+        } catch (JsonProcessingException e) {
+            throw new WhopApiException("Failed to deserialize response: " + e.getMessage(), e);
         } catch (IOException e) {
             throw new WhopApiException("Network error executing HTTP request", e);
         }
@@ -418,10 +482,10 @@ public class RawWebhooksClient {
      */
     public WhopApiHttpResponse<Webhook> update(
             String id, UpdateWebhooksRequest request, RequestOptions requestOptions) {
-        HttpUrl.Builder httpUrl = HttpUrl.parse(this.clientOptions.environment().getUrl())
+        HttpUrl.Builder httpUrl = HttpUrl.parse(this.clientOptions.environment().getApiURL())
                 .newBuilder()
                 .addPathSegments("webhooks")
-                .addPathSegment(id);
+                .addPathSegment(PathSegments.validate(id));
         if (requestOptions != null) {
             requestOptions.getQueryParameters().forEach((_key, _value) -> {
                 httpUrl.addQueryParameter(_key, _value);
@@ -430,7 +494,9 @@ public class RawWebhooksClient {
         RequestBody body;
         try {
             body = RequestBody.create(
-                    ObjectMappers.JSON_MAPPER.writeValueAsBytes(request), MediaTypes.APPLICATION_JSON);
+                    ObjectMappers.JSON_MAPPER.writeValueAsBytes(BodyProperties.merge(
+                            request, requestOptions != null ? requestOptions.getBodyProperties() : null)),
+                    MediaTypes.APPLICATION_JSON);
         } catch (JsonProcessingException e) {
             throw new WhopApiException("Failed to serialize request", e);
         }
@@ -444,6 +510,15 @@ public class RawWebhooksClient {
         OkHttpClient client = clientOptions.httpClient();
         if (requestOptions != null && requestOptions.getTimeout().isPresent()) {
             client = clientOptions.httpClientWithTimeout(requestOptions);
+        }
+        if (requestOptions != null && requestOptions.getMaxRetries().isPresent()) {
+            okhttpRequest = okhttpRequest
+                    .newBuilder()
+                    .tag(
+                            RetryInterceptor.MaxRetriesOverride.class,
+                            new RetryInterceptor.MaxRetriesOverride(
+                                    requestOptions.getMaxRetries().get()))
+                    .build();
         }
         try (Response response = client.newCall(okhttpRequest).execute()) {
             ResponseBody responseBody = response.body();
@@ -473,20 +548,22 @@ public class RawWebhooksClient {
             Object errorBody = ObjectMappers.parseErrorBody(responseBodyString);
             throw new WhopApiApiException(
                     "Error with status code " + response.code(), response.code(), errorBody, response);
+        } catch (JsonProcessingException e) {
+            throw new WhopApiException("Failed to deserialize response: " + e.getMessage(), e);
         } catch (IOException e) {
             throw new WhopApiException("Network error executing HTTP request", e);
         }
     }
 
     /**
-     * Returns a paginated list of delivery attempts for a webhook, ordered by most recent first. Includes the request payload, response body, response code, and timing for each attempt.
+     * Returns a paginated list of delivery attempts for a webhook, ordered by most recent first. Includes the request payload, response body, response code, and timing for each attempt. Filtered queries use a bounded read budget, so a page may be partial or empty. Continue with <code>page_info.end_cursor</code> while <code>page_info.has_next_page</code> is <code>true</code>.
      */
     public WhopApiHttpResponse<SyncPagingIterable<WebhookDelivery>> listDeliveries(String id) {
         return listDeliveries(id, ListDeliveriesWebhooksRequest.builder().build());
     }
 
     /**
-     * Returns a paginated list of delivery attempts for a webhook, ordered by most recent first. Includes the request payload, response body, response code, and timing for each attempt.
+     * Returns a paginated list of delivery attempts for a webhook, ordered by most recent first. Includes the request payload, response body, response code, and timing for each attempt. Filtered queries use a bounded read budget, so a page may be partial or empty. Continue with <code>page_info.end_cursor</code> while <code>page_info.has_next_page</code> is <code>true</code>.
      */
     public WhopApiHttpResponse<SyncPagingIterable<WebhookDelivery>> listDeliveries(
             String id, RequestOptions requestOptions) {
@@ -494,7 +571,7 @@ public class RawWebhooksClient {
     }
 
     /**
-     * Returns a paginated list of delivery attempts for a webhook, ordered by most recent first. Includes the request payload, response body, response code, and timing for each attempt.
+     * Returns a paginated list of delivery attempts for a webhook, ordered by most recent first. Includes the request payload, response body, response code, and timing for each attempt. Filtered queries use a bounded read budget, so a page may be partial or empty. Continue with <code>page_info.end_cursor</code> while <code>page_info.has_next_page</code> is <code>true</code>.
      */
     public WhopApiHttpResponse<SyncPagingIterable<WebhookDelivery>> listDeliveries(
             String id, ListDeliveriesWebhooksRequest request) {
@@ -502,14 +579,14 @@ public class RawWebhooksClient {
     }
 
     /**
-     * Returns a paginated list of delivery attempts for a webhook, ordered by most recent first. Includes the request payload, response body, response code, and timing for each attempt.
+     * Returns a paginated list of delivery attempts for a webhook, ordered by most recent first. Includes the request payload, response body, response code, and timing for each attempt. Filtered queries use a bounded read budget, so a page may be partial or empty. Continue with <code>page_info.end_cursor</code> while <code>page_info.has_next_page</code> is <code>true</code>.
      */
     public WhopApiHttpResponse<SyncPagingIterable<WebhookDelivery>> listDeliveries(
             String id, ListDeliveriesWebhooksRequest request, RequestOptions requestOptions) {
-        HttpUrl.Builder httpUrl = HttpUrl.parse(this.clientOptions.environment().getUrl())
+        HttpUrl.Builder httpUrl = HttpUrl.parse(this.clientOptions.environment().getApiURL())
                 .newBuilder()
                 .addPathSegments("webhooks")
-                .addPathSegment(id)
+                .addPathSegment(PathSegments.validate(id))
                 .addPathSegments("deliveries");
         if (request.getFirst().isPresent()) {
             QueryStringMapper.addQueryParameter(
@@ -518,6 +595,26 @@ public class RawWebhooksClient {
         if (request.getAfter().isPresent()) {
             QueryStringMapper.addQueryParameter(
                     httpUrl, "after", request.getAfter().get(), false);
+        }
+        if (request.getSentAfter().isPresent()) {
+            QueryStringMapper.addQueryParameter(
+                    httpUrl, "sent_after", request.getSentAfter().get(), false);
+        }
+        if (request.getSentBefore().isPresent()) {
+            QueryStringMapper.addQueryParameter(
+                    httpUrl, "sent_before", request.getSentBefore().get(), false);
+        }
+        if (request.getStatus().isPresent()) {
+            QueryStringMapper.addQueryParameter(
+                    httpUrl, "status", request.getStatus().get(), false);
+        }
+        if (request.getResourceId().isPresent()) {
+            QueryStringMapper.addQueryParameter(
+                    httpUrl, "resource_id", request.getResourceId().get(), false);
+        }
+        if (request.getEvents().isPresent()) {
+            QueryStringMapper.addQueryParameter(
+                    httpUrl, "events", request.getEvents().get(), true);
         }
         if (requestOptions != null) {
             requestOptions.getQueryParameters().forEach((_key, _value) -> {
@@ -534,6 +631,15 @@ public class RawWebhooksClient {
         if (requestOptions != null && requestOptions.getTimeout().isPresent()) {
             client = clientOptions.httpClientWithTimeout(requestOptions);
         }
+        if (requestOptions != null && requestOptions.getMaxRetries().isPresent()) {
+            okhttpRequest = okhttpRequest
+                    .newBuilder()
+                    .tag(
+                            RetryInterceptor.MaxRetriesOverride.class,
+                            new RetryInterceptor.MaxRetriesOverride(
+                                    requestOptions.getMaxRetries().get()))
+                    .build();
+        }
         try (Response response = client.newCall(okhttpRequest).execute()) {
             ResponseBody responseBody = response.body();
             String responseBodyString = responseBody != null ? responseBody.string() : "{}";
@@ -548,13 +654,19 @@ public class RawWebhooksClient {
                 List<WebhookDelivery> result = parsedResponse.getData();
                 return new WhopApiHttpResponse<>(
                         new SyncPagingIterable<WebhookDelivery>(
-                                startingAfter != null, result, parsedResponse, () -> listDeliveries(
-                                                id, nextRequest, requestOptions)
+                                startingAfter.isPresent()
+                                        && !startingAfter.get().isEmpty(),
+                                result,
+                                parsedResponse,
+                                () -> listDeliveries(id, nextRequest, requestOptions)
                                         .body()),
                         response);
             }
             try {
                 switch (response.code()) {
+                    case 400:
+                        throw new BadRequestError(
+                                ObjectMappers.JSON_MAPPER.readValue(responseBodyString, Object.class), response);
                     case 401:
                         throw new UnauthorizedError(
                                 ObjectMappers.JSON_MAPPER.readValue(responseBodyString, Object.class), response);
@@ -571,13 +683,15 @@ public class RawWebhooksClient {
             Object errorBody = ObjectMappers.parseErrorBody(responseBodyString);
             throw new WhopApiApiException(
                     "Error with status code " + response.code(), response.code(), errorBody, response);
+        } catch (JsonProcessingException e) {
+            throw new WhopApiException("Failed to deserialize response: " + e.getMessage(), e);
         } catch (IOException e) {
             throw new WhopApiException("Network error executing HTTP request", e);
         }
     }
 
     /**
-     * Re-sends the exact payload of a past delivery to the webhook's current URL and returns the delivery result. By default the replay keeps the original <code>webhook-id</code>, so consumers that deduplicate on it can drop events they already processed. Pass <code>regenerate_id</code> to re-send under a freshly generated <code>webhook-id</code> instead, so a deduplicating consumer processes the replay as a new message. Only available for enabled webhooks on API version v1; deliveries are retained for 30 days.
+     * Re-sends the exact payload of a past delivery to the webhook's current URL and returns the delivery result. The replay keeps the original <code>webhook-id</code> unless you pass <code>regenerate_id</code>, so consumers that deduplicate on it can drop events they already processed. Only available for enabled webhooks on API version <code>v1</code>; deliveries are retained for 30 days.
      */
     public WhopApiHttpResponse<ReplayDeliveryWebhooksResponse> replayDelivery(String id, String deliveryId) {
         return replayDelivery(
@@ -585,7 +699,7 @@ public class RawWebhooksClient {
     }
 
     /**
-     * Re-sends the exact payload of a past delivery to the webhook's current URL and returns the delivery result. By default the replay keeps the original <code>webhook-id</code>, so consumers that deduplicate on it can drop events they already processed. Pass <code>regenerate_id</code> to re-send under a freshly generated <code>webhook-id</code> instead, so a deduplicating consumer processes the replay as a new message. Only available for enabled webhooks on API version v1; deliveries are retained for 30 days.
+     * Re-sends the exact payload of a past delivery to the webhook's current URL and returns the delivery result. The replay keeps the original <code>webhook-id</code> unless you pass <code>regenerate_id</code>, so consumers that deduplicate on it can drop events they already processed. Only available for enabled webhooks on API version <code>v1</code>; deliveries are retained for 30 days.
      */
     public WhopApiHttpResponse<ReplayDeliveryWebhooksResponse> replayDelivery(
             String id, String deliveryId, RequestOptions requestOptions) {
@@ -594,7 +708,7 @@ public class RawWebhooksClient {
     }
 
     /**
-     * Re-sends the exact payload of a past delivery to the webhook's current URL and returns the delivery result. By default the replay keeps the original <code>webhook-id</code>, so consumers that deduplicate on it can drop events they already processed. Pass <code>regenerate_id</code> to re-send under a freshly generated <code>webhook-id</code> instead, so a deduplicating consumer processes the replay as a new message. Only available for enabled webhooks on API version v1; deliveries are retained for 30 days.
+     * Re-sends the exact payload of a past delivery to the webhook's current URL and returns the delivery result. The replay keeps the original <code>webhook-id</code> unless you pass <code>regenerate_id</code>, so consumers that deduplicate on it can drop events they already processed. Only available for enabled webhooks on API version <code>v1</code>; deliveries are retained for 30 days.
      */
     public WhopApiHttpResponse<ReplayDeliveryWebhooksResponse> replayDelivery(
             String id, String deliveryId, ReplayDeliveryWebhooksRequest request) {
@@ -602,16 +716,16 @@ public class RawWebhooksClient {
     }
 
     /**
-     * Re-sends the exact payload of a past delivery to the webhook's current URL and returns the delivery result. By default the replay keeps the original <code>webhook-id</code>, so consumers that deduplicate on it can drop events they already processed. Pass <code>regenerate_id</code> to re-send under a freshly generated <code>webhook-id</code> instead, so a deduplicating consumer processes the replay as a new message. Only available for enabled webhooks on API version v1; deliveries are retained for 30 days.
+     * Re-sends the exact payload of a past delivery to the webhook's current URL and returns the delivery result. The replay keeps the original <code>webhook-id</code> unless you pass <code>regenerate_id</code>, so consumers that deduplicate on it can drop events they already processed. Only available for enabled webhooks on API version <code>v1</code>; deliveries are retained for 30 days.
      */
     public WhopApiHttpResponse<ReplayDeliveryWebhooksResponse> replayDelivery(
             String id, String deliveryId, ReplayDeliveryWebhooksRequest request, RequestOptions requestOptions) {
-        HttpUrl.Builder httpUrl = HttpUrl.parse(this.clientOptions.environment().getUrl())
+        HttpUrl.Builder httpUrl = HttpUrl.parse(this.clientOptions.environment().getApiURL())
                 .newBuilder()
                 .addPathSegments("webhooks")
-                .addPathSegment(id)
+                .addPathSegment(PathSegments.validate(id))
                 .addPathSegments("deliveries")
-                .addPathSegment(deliveryId)
+                .addPathSegment(PathSegments.validate(deliveryId))
                 .addPathSegments("replay");
         if (requestOptions != null) {
             requestOptions.getQueryParameters().forEach((_key, _value) -> {
@@ -621,7 +735,9 @@ public class RawWebhooksClient {
         RequestBody body;
         try {
             body = RequestBody.create(
-                    ObjectMappers.JSON_MAPPER.writeValueAsBytes(request), MediaTypes.APPLICATION_JSON);
+                    ObjectMappers.JSON_MAPPER.writeValueAsBytes(BodyProperties.merge(
+                            request, requestOptions != null ? requestOptions.getBodyProperties() : null)),
+                    MediaTypes.APPLICATION_JSON);
         } catch (JsonProcessingException e) {
             throw new WhopApiException("Failed to serialize request", e);
         }
@@ -635,6 +751,15 @@ public class RawWebhooksClient {
         OkHttpClient client = clientOptions.httpClient();
         if (requestOptions != null && requestOptions.getTimeout().isPresent()) {
             client = clientOptions.httpClientWithTimeout(requestOptions);
+        }
+        if (requestOptions != null && requestOptions.getMaxRetries().isPresent()) {
+            okhttpRequest = okhttpRequest
+                    .newBuilder()
+                    .tag(
+                            RetryInterceptor.MaxRetriesOverride.class,
+                            new RetryInterceptor.MaxRetriesOverride(
+                                    requestOptions.getMaxRetries().get()))
+                    .build();
         }
         try (Response response = client.newCall(okhttpRequest).execute()) {
             ResponseBody responseBody = response.body();
@@ -660,8 +785,7 @@ public class RawWebhooksClient {
                                 ObjectMappers.JSON_MAPPER.readValue(responseBodyString, Object.class), response);
                     case 409:
                         throw new ConflictError(
-                                ObjectMappers.JSON_MAPPER.readValue(responseBodyString, V1ErrorResponse.class),
-                                response);
+                                ObjectMappers.JSON_MAPPER.readValue(responseBodyString, Object.class), response);
                 }
             } catch (JsonProcessingException ignored) {
                 // unable to map error response, throwing generic error
@@ -669,27 +793,29 @@ public class RawWebhooksClient {
             Object errorBody = ObjectMappers.parseErrorBody(responseBodyString);
             throw new WhopApiApiException(
                     "Error with status code " + response.code(), response.code(), errorBody, response);
+        } catch (JsonProcessingException e) {
+            throw new WhopApiException("Failed to deserialize response: " + e.getMessage(), e);
         } catch (IOException e) {
             throw new WhopApiException("Network error executing HTTP request", e);
         }
     }
 
     /**
-     * Re-sends the webhook's past deliveries within a time window, optionally limited to specific events or to messages whose most recent delivery attempt failed. Fire and forget: nothing about the replay is stored, and each re-send appears as a new entry in the webhook's delivery log. Each matching message is re-sent once, by default with its original <code>webhook-id</code>, so consumers that deduplicate are unaffected; pass <code>regenerate_ids</code> to re-send under freshly generated ids instead. Only available for enabled webhooks on API version v1; deliveries are retained for 30 days.
+     * Re-sends the webhook's past deliveries within a time window, optionally limited to specific events or to failed deliveries. Use it to recover events your endpoint missed. The replay runs asynchronously and nothing about it is stored: each re-send appears as a new entry in the webhook's delivery log. Each matching message is re-sent once, with its original <code>webhook-id</code> unless you pass <code>regenerate_ids</code>. Only available for enabled webhooks on API version <code>v1</code>; deliveries are retained for 30 days.
      */
     public WhopApiHttpResponse<ReplayWebhooksResponse> replay(String id, ReplayWebhooksRequest request) {
         return replay(id, request, null);
     }
 
     /**
-     * Re-sends the webhook's past deliveries within a time window, optionally limited to specific events or to messages whose most recent delivery attempt failed. Fire and forget: nothing about the replay is stored, and each re-send appears as a new entry in the webhook's delivery log. Each matching message is re-sent once, by default with its original <code>webhook-id</code>, so consumers that deduplicate are unaffected; pass <code>regenerate_ids</code> to re-send under freshly generated ids instead. Only available for enabled webhooks on API version v1; deliveries are retained for 30 days.
+     * Re-sends the webhook's past deliveries within a time window, optionally limited to specific events or to failed deliveries. Use it to recover events your endpoint missed. The replay runs asynchronously and nothing about it is stored: each re-send appears as a new entry in the webhook's delivery log. Each matching message is re-sent once, with its original <code>webhook-id</code> unless you pass <code>regenerate_ids</code>. Only available for enabled webhooks on API version <code>v1</code>; deliveries are retained for 30 days.
      */
     public WhopApiHttpResponse<ReplayWebhooksResponse> replay(
             String id, ReplayWebhooksRequest request, RequestOptions requestOptions) {
-        HttpUrl.Builder httpUrl = HttpUrl.parse(this.clientOptions.environment().getUrl())
+        HttpUrl.Builder httpUrl = HttpUrl.parse(this.clientOptions.environment().getApiURL())
                 .newBuilder()
                 .addPathSegments("webhooks")
-                .addPathSegment(id)
+                .addPathSegment(PathSegments.validate(id))
                 .addPathSegments("replay");
         if (requestOptions != null) {
             requestOptions.getQueryParameters().forEach((_key, _value) -> {
@@ -699,7 +825,9 @@ public class RawWebhooksClient {
         RequestBody body;
         try {
             body = RequestBody.create(
-                    ObjectMappers.JSON_MAPPER.writeValueAsBytes(request), MediaTypes.APPLICATION_JSON);
+                    ObjectMappers.JSON_MAPPER.writeValueAsBytes(BodyProperties.merge(
+                            request, requestOptions != null ? requestOptions.getBodyProperties() : null)),
+                    MediaTypes.APPLICATION_JSON);
         } catch (JsonProcessingException e) {
             throw new WhopApiException("Failed to serialize request", e);
         }
@@ -713,6 +841,15 @@ public class RawWebhooksClient {
         OkHttpClient client = clientOptions.httpClient();
         if (requestOptions != null && requestOptions.getTimeout().isPresent()) {
             client = clientOptions.httpClientWithTimeout(requestOptions);
+        }
+        if (requestOptions != null && requestOptions.getMaxRetries().isPresent()) {
+            okhttpRequest = okhttpRequest
+                    .newBuilder()
+                    .tag(
+                            RetryInterceptor.MaxRetriesOverride.class,
+                            new RetryInterceptor.MaxRetriesOverride(
+                                    requestOptions.getMaxRetries().get()))
+                    .build();
         }
         try (Response response = client.newCall(okhttpRequest).execute()) {
             ResponseBody responseBody = response.body();
@@ -738,8 +875,7 @@ public class RawWebhooksClient {
                                 ObjectMappers.JSON_MAPPER.readValue(responseBodyString, Object.class), response);
                     case 409:
                         throw new ConflictError(
-                                ObjectMappers.JSON_MAPPER.readValue(responseBodyString, V1ErrorResponse.class),
-                                response);
+                                ObjectMappers.JSON_MAPPER.readValue(responseBodyString, Object.class), response);
                 }
             } catch (JsonProcessingException ignored) {
                 // unable to map error response, throwing generic error
@@ -747,6 +883,8 @@ public class RawWebhooksClient {
             Object errorBody = ObjectMappers.parseErrorBody(responseBodyString);
             throw new WhopApiApiException(
                     "Error with status code " + response.code(), response.code(), errorBody, response);
+        } catch (JsonProcessingException e) {
+            throw new WhopApiException("Failed to deserialize response: " + e.getMessage(), e);
         } catch (IOException e) {
             throw new WhopApiException("Network error executing HTTP request", e);
         }
@@ -764,10 +902,10 @@ public class RawWebhooksClient {
      */
     public WhopApiHttpResponse<TestWebhooksResponse> test(
             String id, TestWebhooksRequest request, RequestOptions requestOptions) {
-        HttpUrl.Builder httpUrl = HttpUrl.parse(this.clientOptions.environment().getUrl())
+        HttpUrl.Builder httpUrl = HttpUrl.parse(this.clientOptions.environment().getApiURL())
                 .newBuilder()
                 .addPathSegments("webhooks")
-                .addPathSegment(id)
+                .addPathSegment(PathSegments.validate(id))
                 .addPathSegments("test");
         if (requestOptions != null) {
             requestOptions.getQueryParameters().forEach((_key, _value) -> {
@@ -777,7 +915,9 @@ public class RawWebhooksClient {
         RequestBody body;
         try {
             body = RequestBody.create(
-                    ObjectMappers.JSON_MAPPER.writeValueAsBytes(request), MediaTypes.APPLICATION_JSON);
+                    ObjectMappers.JSON_MAPPER.writeValueAsBytes(BodyProperties.merge(
+                            request, requestOptions != null ? requestOptions.getBodyProperties() : null)),
+                    MediaTypes.APPLICATION_JSON);
         } catch (JsonProcessingException e) {
             throw new WhopApiException("Failed to serialize request", e);
         }
@@ -791,6 +931,15 @@ public class RawWebhooksClient {
         OkHttpClient client = clientOptions.httpClient();
         if (requestOptions != null && requestOptions.getTimeout().isPresent()) {
             client = clientOptions.httpClientWithTimeout(requestOptions);
+        }
+        if (requestOptions != null && requestOptions.getMaxRetries().isPresent()) {
+            okhttpRequest = okhttpRequest
+                    .newBuilder()
+                    .tag(
+                            RetryInterceptor.MaxRetriesOverride.class,
+                            new RetryInterceptor.MaxRetriesOverride(
+                                    requestOptions.getMaxRetries().get()))
+                    .build();
         }
         try (Response response = client.newCall(okhttpRequest).execute()) {
             ResponseBody responseBody = response.body();
@@ -815,142 +964,6 @@ public class RawWebhooksClient {
                                 ObjectMappers.JSON_MAPPER.readValue(responseBodyString, Object.class), response);
                     case 409:
                         throw new ConflictError(
-                                ObjectMappers.JSON_MAPPER.readValue(responseBodyString, V1ErrorResponse.class),
-                                response);
-                }
-            } catch (JsonProcessingException ignored) {
-                // unable to map error response, throwing generic error
-            }
-            Object errorBody = ObjectMappers.parseErrorBody(responseBodyString);
-            throw new WhopApiApiException(
-                    "Error with status code " + response.code(), response.code(), errorBody, response);
-        } catch (IOException e) {
-            throw new WhopApiException("Network error executing HTTP request", e);
-        }
-    }
-
-    /**
-     * Returns a paginated list of delivery attempts for a webhook, ordered by most recent first. Includes the request payload, response body, response code, and timing for each attempt.
-     * <p>Required permissions:</p>
-     * <ul>
-     * <li><code>developer:manage_webhook</code></li>
-     * </ul>
-     */
-    public WhopApiHttpResponse<SyncPagingIterable<DeliveriesWebhookResponseDataItem>> deliveriesWebhook(
-            String webhookId) {
-        return deliveriesWebhook(webhookId, DeliveriesWebhookRequest.builder().build());
-    }
-
-    /**
-     * Returns a paginated list of delivery attempts for a webhook, ordered by most recent first. Includes the request payload, response body, response code, and timing for each attempt.
-     * <p>Required permissions:</p>
-     * <ul>
-     * <li><code>developer:manage_webhook</code></li>
-     * </ul>
-     */
-    public WhopApiHttpResponse<SyncPagingIterable<DeliveriesWebhookResponseDataItem>> deliveriesWebhook(
-            String webhookId, RequestOptions requestOptions) {
-        return deliveriesWebhook(webhookId, DeliveriesWebhookRequest.builder().build(), requestOptions);
-    }
-
-    /**
-     * Returns a paginated list of delivery attempts for a webhook, ordered by most recent first. Includes the request payload, response body, response code, and timing for each attempt.
-     * <p>Required permissions:</p>
-     * <ul>
-     * <li><code>developer:manage_webhook</code></li>
-     * </ul>
-     */
-    public WhopApiHttpResponse<SyncPagingIterable<DeliveriesWebhookResponseDataItem>> deliveriesWebhook(
-            String webhookId, DeliveriesWebhookRequest request) {
-        return deliveriesWebhook(webhookId, request, null);
-    }
-
-    /**
-     * Returns a paginated list of delivery attempts for a webhook, ordered by most recent first. Includes the request payload, response body, response code, and timing for each attempt.
-     * <p>Required permissions:</p>
-     * <ul>
-     * <li><code>developer:manage_webhook</code></li>
-     * </ul>
-     */
-    public WhopApiHttpResponse<SyncPagingIterable<DeliveriesWebhookResponseDataItem>> deliveriesWebhook(
-            String webhookId, DeliveriesWebhookRequest request, RequestOptions requestOptions) {
-        HttpUrl.Builder httpUrl = HttpUrl.parse(this.clientOptions.environment().getUrl())
-                .newBuilder()
-                .addPathSegments("webhooks")
-                .addPathSegment(webhookId)
-                .addPathSegments("deliveries");
-        if (request.getAfter().isPresent()) {
-            QueryStringMapper.addQueryParameter(
-                    httpUrl, "after", request.getAfter().get(), false);
-        }
-        if (request.getBefore().isPresent()) {
-            QueryStringMapper.addQueryParameter(
-                    httpUrl, "before", request.getBefore().get(), false);
-        }
-        if (request.getFirst().isPresent()) {
-            QueryStringMapper.addQueryParameter(
-                    httpUrl, "first", request.getFirst().get(), false);
-        }
-        if (request.getLast().isPresent()) {
-            QueryStringMapper.addQueryParameter(
-                    httpUrl, "last", request.getLast().get(), false);
-        }
-        if (requestOptions != null) {
-            requestOptions.getQueryParameters().forEach((_key, _value) -> {
-                httpUrl.addQueryParameter(_key, _value);
-            });
-        }
-        Request.Builder _requestBuilder = new Request.Builder()
-                .url(httpUrl.build())
-                .method("GET", null)
-                .headers(Headers.of(clientOptions.headers(requestOptions)))
-                .addHeader("Accept", "application/json");
-        Request okhttpRequest = _requestBuilder.build();
-        OkHttpClient client = clientOptions.httpClient();
-        if (requestOptions != null && requestOptions.getTimeout().isPresent()) {
-            client = clientOptions.httpClientWithTimeout(requestOptions);
-        }
-        try (Response response = client.newCall(okhttpRequest).execute()) {
-            ResponseBody responseBody = response.body();
-            String responseBodyString = responseBody != null ? responseBody.string() : "{}";
-            if (response.isSuccessful()) {
-                DeliveriesWebhookResponse parsedResponse =
-                        ObjectMappers.JSON_MAPPER.readValue(responseBodyString, DeliveriesWebhookResponse.class);
-                Optional<String> startingAfter = parsedResponse.getPageInfo().getEndCursor();
-                DeliveriesWebhookRequest nextRequest = DeliveriesWebhookRequest.builder()
-                        .from(request)
-                        .after(startingAfter)
-                        .build();
-                List<DeliveriesWebhookResponseDataItem> result = parsedResponse.getData();
-                return new WhopApiHttpResponse<>(
-                        new SyncPagingIterable<DeliveriesWebhookResponseDataItem>(
-                                startingAfter != null, result, parsedResponse, () -> deliveriesWebhook(
-                                                webhookId, nextRequest, requestOptions)
-                                        .body()),
-                        response);
-            }
-            try {
-                switch (response.code()) {
-                    case 400:
-                        throw new BadRequestError(
-                                ObjectMappers.JSON_MAPPER.readValue(responseBodyString, Object.class), response);
-                    case 401:
-                        throw new UnauthorizedError(
-                                ObjectMappers.JSON_MAPPER.readValue(responseBodyString, Object.class), response);
-                    case 403:
-                        throw new ForbiddenError(
-                                ObjectMappers.JSON_MAPPER.readValue(responseBodyString, Object.class), response);
-                    case 404:
-                        throw new NotFoundError(
-                                ObjectMappers.JSON_MAPPER.readValue(responseBodyString, Object.class), response);
-                    case 422:
-                        throw new UnprocessableEntityError(
-                                ObjectMappers.JSON_MAPPER.readValue(responseBodyString, Object.class), response);
-                    case 429:
-                        throw new TooManyRequestsError(
-                                ObjectMappers.JSON_MAPPER.readValue(responseBodyString, Object.class), response);
-                    case 500:
-                        throw new InternalServerError(
                                 ObjectMappers.JSON_MAPPER.readValue(responseBodyString, Object.class), response);
                 }
             } catch (JsonProcessingException ignored) {
@@ -959,6 +972,8 @@ public class RawWebhooksClient {
             Object errorBody = ObjectMappers.parseErrorBody(responseBodyString);
             throw new WhopApiApiException(
                     "Error with status code " + response.code(), response.code(), errorBody, response);
+        } catch (JsonProcessingException e) {
+            throw new WhopApiException("Failed to deserialize response: " + e.getMessage(), e);
         } catch (IOException e) {
             throw new WhopApiException("Network error executing HTTP request", e);
         }

@@ -7,11 +7,17 @@ import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonValue;
 
 public final class DisputeEvidenceDocumentDocumentType {
+    public static final DisputeEvidenceDocumentDocumentType TERMS_OF_SERVICE =
+            new DisputeEvidenceDocumentDocumentType(Value.TERMS_OF_SERVICE, "terms_of_service");
+
     public static final DisputeEvidenceDocumentDocumentType DIGITAL_FULFILLMENT =
             new DisputeEvidenceDocumentDocumentType(Value.DIGITAL_FULFILLMENT, "digital_fulfillment");
 
     public static final DisputeEvidenceDocumentDocumentType RETURN_POLICY =
             new DisputeEvidenceDocumentDocumentType(Value.RETURN_POLICY, "return_policy");
+
+    public static final DisputeEvidenceDocumentDocumentType CANCELLATION_POLICY =
+            new DisputeEvidenceDocumentDocumentType(Value.CANCELLATION_POLICY, "cancellation_policy");
 
     public static final DisputeEvidenceDocumentDocumentType SHIPPING_POLICY =
             new DisputeEvidenceDocumentDocumentType(Value.SHIPPING_POLICY, "shipping_policy");
@@ -27,6 +33,9 @@ public final class DisputeEvidenceDocumentDocumentType {
 
     public static final DisputeEvidenceDocumentDocumentType PHYSICAL_FULFILLMENT =
             new DisputeEvidenceDocumentDocumentType(Value.PHYSICAL_FULFILLMENT, "physical_fulfillment");
+
+    public static final DisputeEvidenceDocumentDocumentType CUSTOMER_COMMUNICATION =
+            new DisputeEvidenceDocumentDocumentType(Value.CUSTOMER_COMMUNICATION, "customer_communication");
 
     public static final DisputeEvidenceDocumentDocumentType CUSTOMER_SESSION =
             new DisputeEvidenceDocumentDocumentType(Value.CUSTOMER_SESSION, "customer_session");
@@ -67,10 +76,14 @@ public final class DisputeEvidenceDocumentDocumentType {
 
     public <T> T visit(Visitor<T> visitor) {
         switch (value) {
+            case TERMS_OF_SERVICE:
+                return visitor.visitTermsOfService();
             case DIGITAL_FULFILLMENT:
                 return visitor.visitDigitalFulfillment();
             case RETURN_POLICY:
                 return visitor.visitReturnPolicy();
+            case CANCELLATION_POLICY:
+                return visitor.visitCancellationPolicy();
             case SHIPPING_POLICY:
                 return visitor.visitShippingPolicy();
             case CUSTOMER_ORDER_HISTORY:
@@ -81,6 +94,8 @@ public final class DisputeEvidenceDocumentDocumentType {
                 return visitor.visitProductImage();
             case PHYSICAL_FULFILLMENT:
                 return visitor.visitPhysicalFulfillment();
+            case CUSTOMER_COMMUNICATION:
+                return visitor.visitCustomerCommunication();
             case CUSTOMER_SESSION:
                 return visitor.visitCustomerSession();
             case PRIOR_TRANSACTIONS:
@@ -94,10 +109,14 @@ public final class DisputeEvidenceDocumentDocumentType {
     @JsonCreator(mode = JsonCreator.Mode.DELEGATING)
     public static DisputeEvidenceDocumentDocumentType valueOf(String value) {
         switch (value) {
+            case "terms_of_service":
+                return TERMS_OF_SERVICE;
             case "digital_fulfillment":
                 return DIGITAL_FULFILLMENT;
             case "return_policy":
                 return RETURN_POLICY;
+            case "cancellation_policy":
+                return CANCELLATION_POLICY;
             case "shipping_policy":
                 return SHIPPING_POLICY;
             case "customer_order_history":
@@ -108,6 +127,8 @@ public final class DisputeEvidenceDocumentDocumentType {
                 return PRODUCT_IMAGE;
             case "physical_fulfillment":
                 return PHYSICAL_FULFILLMENT;
+            case "customer_communication":
+                return CUSTOMER_COMMUNICATION;
             case "customer_session":
                 return CUSTOMER_SESSION;
             case "prior_transactions":
@@ -121,6 +142,10 @@ public final class DisputeEvidenceDocumentDocumentType {
         RETURN_POLICY,
 
         SHIPPING_POLICY,
+
+        CANCELLATION_POLICY,
+
+        TERMS_OF_SERVICE,
 
         PHYSICAL_FULFILLMENT,
 
@@ -136,6 +161,8 @@ public final class DisputeEvidenceDocumentDocumentType {
 
         SUBSCRIPTION,
 
+        CUSTOMER_COMMUNICATION,
+
         UNKNOWN
     }
 
@@ -143,6 +170,10 @@ public final class DisputeEvidenceDocumentDocumentType {
         T visitReturnPolicy();
 
         T visitShippingPolicy();
+
+        T visitCancellationPolicy();
+
+        T visitTermsOfService();
 
         T visitPhysicalFulfillment();
 
@@ -157,6 +188,8 @@ public final class DisputeEvidenceDocumentDocumentType {
         T visitDigitalFulfillment();
 
         T visitSubscription();
+
+        T visitCustomerCommunication();
 
         T visitUnknown(String unknownType);
     }

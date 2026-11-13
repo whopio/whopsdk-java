@@ -33,9 +33,19 @@ public final class UpdateVerificationsRequestBodyBusinessAddress {
 
     private final Optional<String> dateOfBirth;
 
+    private final Optional<UpdateVerificationsRequestBodyBusinessAddressDocuments> documents;
+
     private final Optional<String> firstName;
 
+    private final Optional<String> incorporationDate;
+
     private final Optional<String> lastName;
+
+    private final Optional<List<UpdateVerificationsRequestBodyBusinessAddressOwnersItem>> owners;
+
+    private final Optional<String> placeOfIncorporation;
+
+    private final Optional<String> registrationNumber;
 
     private final Optional<List<UpdateVerificationsRequestBodyBusinessAddressRequestedInformationItem>>
             requestedInformation;
@@ -51,8 +61,13 @@ public final class UpdateVerificationsRequestBodyBusinessAddress {
             Optional<String> businessTaxIdentificationNumber,
             Optional<String> country,
             Optional<String> dateOfBirth,
+            Optional<UpdateVerificationsRequestBodyBusinessAddressDocuments> documents,
             Optional<String> firstName,
+            Optional<String> incorporationDate,
             Optional<String> lastName,
+            Optional<List<UpdateVerificationsRequestBodyBusinessAddressOwnersItem>> owners,
+            Optional<String> placeOfIncorporation,
+            Optional<String> registrationNumber,
             Optional<List<UpdateVerificationsRequestBodyBusinessAddressRequestedInformationItem>> requestedInformation,
             Optional<String> taxIdentificationNumber,
             Map<String, Object> additionalProperties) {
@@ -62,8 +77,13 @@ public final class UpdateVerificationsRequestBodyBusinessAddress {
         this.businessTaxIdentificationNumber = businessTaxIdentificationNumber;
         this.country = country;
         this.dateOfBirth = dateOfBirth;
+        this.documents = documents;
         this.firstName = firstName;
+        this.incorporationDate = incorporationDate;
         this.lastName = lastName;
+        this.owners = owners;
+        this.placeOfIncorporation = placeOfIncorporation;
+        this.registrationNumber = registrationNumber;
         this.requestedInformation = requestedInformation;
         this.taxIdentificationNumber = taxIdentificationNumber;
         this.additionalProperties = additionalProperties;
@@ -118,6 +138,14 @@ public final class UpdateVerificationsRequestBodyBusinessAddress {
     }
 
     /**
+     * @return Company formation documents, each the ID of a file uploaded with Create File and not yet attached to anything else, prefixed <code>file_</code>. Send the ID once its <code>upload_status</code> is <code>ready</code>. Each file must be a PDF, JPEG, or PNG of up to 10MB. They are filed under the business's country, from <code>country</code>, <code>address</code>, or an earlier request. A document of a kind already on file is kept unless it was rejected, so a retried request does not add a second copy. The hosted session at <code>session_url</code> collects anything still missing.
+     */
+    @JsonProperty("documents")
+    public Optional<UpdateVerificationsRequestBodyBusinessAddressDocuments> getDocuments() {
+        return documents;
+    }
+
+    /**
      * @return First name of the business representative.
      */
     @JsonProperty("first_name")
@@ -126,11 +154,43 @@ public final class UpdateVerificationsRequestBodyBusinessAddress {
     }
 
     /**
+     * @return Date the business was incorporated, formatted as <code>YYYY-MM-DD</code>. Cannot be in the future. Sent to the verification provider and returned in the response; <code>requested_information</code> asks for it while it is still missing.
+     */
+    @JsonProperty("incorporation_date")
+    public Optional<String> getIncorporationDate() {
+        return incorporationDate;
+    }
+
+    /**
      * @return Last name of the business representative.
      */
     @JsonProperty("last_name")
     public Optional<String> getLastName() {
         return lastName;
+    }
+
+    /**
+     * @return Owners of the business, up to 10 per request. Once the company details, the company documents, and the owners are in and every new owner's documents were sent, Create Verification sends the business for review: in the request that completes it, as soon as the last owner's documents finish sending in the background, or when called again after Update Verification. Owners can still be added, changed, or removed while the review waits on them.
+     */
+    @JsonProperty("owners")
+    public Optional<List<UpdateVerificationsRequestBodyBusinessAddressOwnersItem>> getOwners() {
+        return owners;
+    }
+
+    /**
+     * @return State or region where the business is incorporated. Sent to the verification provider and returned in the response; <code>requested_information</code> asks for it while it is still missing.
+     */
+    @JsonProperty("place_of_incorporation")
+    public Optional<String> getPlaceOfIncorporation() {
+        return placeOfIncorporation;
+    }
+
+    /**
+     * @return Number the business was registered under in its place of incorporation, such as a state file number in the US or a Company Number in the UK. Sent to the verification provider and returned in the response; <code>requested_information</code> asks for it while it is still missing.
+     */
+    @JsonProperty("registration_number")
+    public Optional<String> getRegistrationNumber() {
+        return registrationNumber;
     }
 
     /**
@@ -169,8 +229,13 @@ public final class UpdateVerificationsRequestBodyBusinessAddress {
                 && businessTaxIdentificationNumber.equals(other.businessTaxIdentificationNumber)
                 && country.equals(other.country)
                 && dateOfBirth.equals(other.dateOfBirth)
+                && documents.equals(other.documents)
                 && firstName.equals(other.firstName)
+                && incorporationDate.equals(other.incorporationDate)
                 && lastName.equals(other.lastName)
+                && owners.equals(other.owners)
+                && placeOfIncorporation.equals(other.placeOfIncorporation)
+                && registrationNumber.equals(other.registrationNumber)
                 && requestedInformation.equals(other.requestedInformation)
                 && taxIdentificationNumber.equals(other.taxIdentificationNumber);
     }
@@ -184,8 +249,13 @@ public final class UpdateVerificationsRequestBodyBusinessAddress {
                 this.businessTaxIdentificationNumber,
                 this.country,
                 this.dateOfBirth,
+                this.documents,
                 this.firstName,
+                this.incorporationDate,
                 this.lastName,
+                this.owners,
+                this.placeOfIncorporation,
+                this.registrationNumber,
                 this.requestedInformation,
                 this.taxIdentificationNumber);
     }
@@ -214,16 +284,25 @@ public final class UpdateVerificationsRequestBodyBusinessAddress {
 
         private Optional<String> dateOfBirth = Optional.empty();
 
+        private Optional<UpdateVerificationsRequestBodyBusinessAddressDocuments> documents = Optional.empty();
+
         private Optional<String> firstName = Optional.empty();
 
+        private Optional<String> incorporationDate = Optional.empty();
+
         private Optional<String> lastName = Optional.empty();
+
+        private Optional<List<UpdateVerificationsRequestBodyBusinessAddressOwnersItem>> owners = Optional.empty();
+
+        private Optional<String> placeOfIncorporation = Optional.empty();
+
+        private Optional<String> registrationNumber = Optional.empty();
 
         private Optional<List<UpdateVerificationsRequestBodyBusinessAddressRequestedInformationItem>>
                 requestedInformation = Optional.empty();
 
         private Optional<String> taxIdentificationNumber = Optional.empty();
 
-        @JsonAnySetter
         private Map<String, Object> additionalProperties = new HashMap<>();
 
         private Builder() {}
@@ -235,8 +314,13 @@ public final class UpdateVerificationsRequestBodyBusinessAddress {
             businessTaxIdentificationNumber(other.getBusinessTaxIdentificationNumber());
             country(other.getCountry());
             dateOfBirth(other.getDateOfBirth());
+            documents(other.getDocuments());
             firstName(other.getFirstName());
+            incorporationDate(other.getIncorporationDate());
             lastName(other.getLastName());
+            owners(other.getOwners());
+            placeOfIncorporation(other.getPlaceOfIncorporation());
+            registrationNumber(other.getRegistrationNumber());
             requestedInformation(other.getRequestedInformation());
             taxIdentificationNumber(other.getTaxIdentificationNumber());
             return this;
@@ -328,6 +412,20 @@ public final class UpdateVerificationsRequestBodyBusinessAddress {
         }
 
         /**
+         * <p>Company formation documents, each the ID of a file uploaded with Create File and not yet attached to anything else, prefixed <code>file_</code>. Send the ID once its <code>upload_status</code> is <code>ready</code>. Each file must be a PDF, JPEG, or PNG of up to 10MB. They are filed under the business's country, from <code>country</code>, <code>address</code>, or an earlier request. A document of a kind already on file is kept unless it was rejected, so a retried request does not add a second copy. The hosted session at <code>session_url</code> collects anything still missing.</p>
+         */
+        @JsonSetter(value = "documents", nulls = Nulls.SKIP)
+        public Builder documents(Optional<UpdateVerificationsRequestBodyBusinessAddressDocuments> documents) {
+            this.documents = documents;
+            return this;
+        }
+
+        public Builder documents(UpdateVerificationsRequestBodyBusinessAddressDocuments documents) {
+            this.documents = Optional.ofNullable(documents);
+            return this;
+        }
+
+        /**
          * <p>First name of the business representative.</p>
          */
         @JsonSetter(value = "first_name", nulls = Nulls.SKIP)
@@ -342,6 +440,20 @@ public final class UpdateVerificationsRequestBodyBusinessAddress {
         }
 
         /**
+         * <p>Date the business was incorporated, formatted as <code>YYYY-MM-DD</code>. Cannot be in the future. Sent to the verification provider and returned in the response; <code>requested_information</code> asks for it while it is still missing.</p>
+         */
+        @JsonSetter(value = "incorporation_date", nulls = Nulls.SKIP)
+        public Builder incorporationDate(Optional<String> incorporationDate) {
+            this.incorporationDate = incorporationDate;
+            return this;
+        }
+
+        public Builder incorporationDate(String incorporationDate) {
+            this.incorporationDate = Optional.ofNullable(incorporationDate);
+            return this;
+        }
+
+        /**
          * <p>Last name of the business representative.</p>
          */
         @JsonSetter(value = "last_name", nulls = Nulls.SKIP)
@@ -352,6 +464,48 @@ public final class UpdateVerificationsRequestBodyBusinessAddress {
 
         public Builder lastName(String lastName) {
             this.lastName = Optional.ofNullable(lastName);
+            return this;
+        }
+
+        /**
+         * <p>Owners of the business, up to 10 per request. Once the company details, the company documents, and the owners are in and every new owner's documents were sent, Create Verification sends the business for review: in the request that completes it, as soon as the last owner's documents finish sending in the background, or when called again after Update Verification. Owners can still be added, changed, or removed while the review waits on them.</p>
+         */
+        @JsonSetter(value = "owners", nulls = Nulls.SKIP)
+        public Builder owners(Optional<List<UpdateVerificationsRequestBodyBusinessAddressOwnersItem>> owners) {
+            this.owners = owners;
+            return this;
+        }
+
+        public Builder owners(List<UpdateVerificationsRequestBodyBusinessAddressOwnersItem> owners) {
+            this.owners = Optional.ofNullable(owners);
+            return this;
+        }
+
+        /**
+         * <p>State or region where the business is incorporated. Sent to the verification provider and returned in the response; <code>requested_information</code> asks for it while it is still missing.</p>
+         */
+        @JsonSetter(value = "place_of_incorporation", nulls = Nulls.SKIP)
+        public Builder placeOfIncorporation(Optional<String> placeOfIncorporation) {
+            this.placeOfIncorporation = placeOfIncorporation;
+            return this;
+        }
+
+        public Builder placeOfIncorporation(String placeOfIncorporation) {
+            this.placeOfIncorporation = Optional.ofNullable(placeOfIncorporation);
+            return this;
+        }
+
+        /**
+         * <p>Number the business was registered under in its place of incorporation, such as a state file number in the US or a Company Number in the UK. Sent to the verification provider and returned in the response; <code>requested_information</code> asks for it while it is still missing.</p>
+         */
+        @JsonSetter(value = "registration_number", nulls = Nulls.SKIP)
+        public Builder registrationNumber(Optional<String> registrationNumber) {
+            this.registrationNumber = registrationNumber;
+            return this;
+        }
+
+        public Builder registrationNumber(String registrationNumber) {
+            this.registrationNumber = Optional.ofNullable(registrationNumber);
             return this;
         }
 
@@ -394,11 +548,38 @@ public final class UpdateVerificationsRequestBodyBusinessAddress {
                     businessTaxIdentificationNumber,
                     country,
                     dateOfBirth,
+                    documents,
                     firstName,
+                    incorporationDate,
                     lastName,
+                    owners,
+                    placeOfIncorporation,
+                    registrationNumber,
                     requestedInformation,
                     taxIdentificationNumber,
                     additionalProperties);
+        }
+
+        @JsonAnySetter
+        private void putAdditionalPropertyFromJson(String key, Object value) {
+            if (key.equalsIgnoreCase("business_address")
+                    || key.equalsIgnoreCase("business_name")
+                    || key.equalsIgnoreCase("business_structure")
+                    || key.equalsIgnoreCase("business_tax_identification_number")
+                    || key.equalsIgnoreCase("country")
+                    || key.equalsIgnoreCase("date_of_birth")
+                    || key.equalsIgnoreCase("documents")
+                    || key.equalsIgnoreCase("first_name")
+                    || key.equalsIgnoreCase("incorporation_date")
+                    || key.equalsIgnoreCase("last_name")
+                    || key.equalsIgnoreCase("owners")
+                    || key.equalsIgnoreCase("place_of_incorporation")
+                    || key.equalsIgnoreCase("registration_number")
+                    || key.equalsIgnoreCase("requested_information")
+                    || key.equalsIgnoreCase("tax_identification_number")) {
+                return;
+            }
+            this.additionalProperties.put(key, value);
         }
 
         public Builder additionalProperty(String key, Object value) {

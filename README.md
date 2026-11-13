@@ -1,11 +1,13 @@
 # Whop Java Library
 
-[![fern shield](https://img.shields.io/badge/%F0%9F%8C%BF-Built%20with%20Fern-brightgreen)](https://buildwithfern.com?utm_source=github&utm_medium=github&utm_campaign=readme&utm_source=https%3A%2F%2Fgithub.com%2Fwhopio%2Fwhopsdk-java)
+[![fern shield](https://img.shields.io/badge/%F0%9F%8C%BF-Built%20with%20Fern-brightgreen)](https://buildwithfern.com?utm_source=github&utm_medium=github&utm_campaign=readme&utm_source=Whop%2FJava)
 
-The Whop Java library provides convenient access to the Whop APIs from Java.
+The Whop SDK gives you typed access to the Whop API. Pass your API key to the client explicitly — the SDK reads no environment variables, so a client built without a key sends unauthenticated requests and the API answers 401.
+
 
 ## Table of Contents
 
+- [Documentation](#documentation)
 - [Reference](#reference)
 - [Usage](#usage)
 - [Environments](#environments)
@@ -16,12 +18,17 @@ The Whop Java library provides convenient access to the Whop APIs from Java.
   - [Retries](#retries)
   - [Timeouts](#timeouts)
   - [Custom Headers](#custom-headers)
+  - [Additional Body Properties](#additional-body-properties)
   - [Access Raw Response Data](#access-raw-response-data)
 - [Contributing](#contributing)
 
+## Documentation
+
+API reference documentation is available [here](https://docs.whop.com/api-reference).
+
 ## Reference
 
-A full reference for this library is available [here](https://github.com/whopio/whopsdk-java/blob/HEAD/./reference.md).
+A full reference for this library is available [here](./reference.md).
 
 ## Usage
 
@@ -59,7 +66,7 @@ import com.whop.api.core.Environment;
 
 WhopApiClient client = WhopApiClient
     .builder()
-    .environment(Environment.Default)
+    .environment(Environment.PRODUCTION)
     .build();
 ```
 
@@ -187,6 +194,25 @@ client.accessTokens().create(
     RequestOptions
         .builder()
         .addHeader("X-Request-Header", "request-value")
+        .build()
+);
+```
+
+### Additional Body Properties
+
+If you need to send a request body property that is not yet part of the SDK (for example, a beta field),
+use the `addBodyProperty` request option. Properties are sent with the key exactly as given and override
+any property with the same key; for endpoints without a request body, they are sent as a JSON body.
+This is supported for JSON and form-urlencoded request bodies, but not for multipart (file upload) requests.
+
+```java
+import com.whop.api.core.RequestOptions;
+
+client.accessTokens().create(
+    ...,
+    RequestOptions
+        .builder()
+        .addBodyProperty("extra_field", "extra-value")
         .build()
 );
 ```

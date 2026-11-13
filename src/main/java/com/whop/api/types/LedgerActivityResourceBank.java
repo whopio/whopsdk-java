@@ -269,7 +269,6 @@ public final class LedgerActivityResourceBank {
 
         private Optional<LedgerActivityResourceBankBank> bank = Optional.empty();
 
-        @JsonAnySetter
         private Map<String, Object> additionalProperties = new HashMap<>();
 
         private Builder() {}
@@ -287,7 +286,6 @@ public final class LedgerActivityResourceBank {
         }
 
         /**
-         * <p>Payment method ID.</p>
          * <p>Payment method ID.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
@@ -467,6 +465,20 @@ public final class LedgerActivityResourceBank {
         public LedgerActivityResourceBank build() {
             return new LedgerActivityResourceBank(
                     bank, card, emailIdentifier, gatewayType, id, object, paymentMethodType, additionalProperties);
+        }
+
+        @JsonAnySetter
+        private void putAdditionalPropertyFromJson(String key, Object value) {
+            if (key.equalsIgnoreCase("bank")
+                    || key.equalsIgnoreCase("card")
+                    || key.equalsIgnoreCase("email_identifier")
+                    || key.equalsIgnoreCase("gateway_type")
+                    || key.equalsIgnoreCase("id")
+                    || key.equalsIgnoreCase("object")
+                    || key.equalsIgnoreCase("payment_method_type")) {
+                return;
+            }
+            this.additionalProperties.put(key, value);
         }
 
         @java.lang.Override

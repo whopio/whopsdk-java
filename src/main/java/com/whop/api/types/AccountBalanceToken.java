@@ -68,7 +68,7 @@ public final class AccountBalanceToken {
     }
 
     /**
-     * @return Balance split into available, pending, and reserve amounts, as native-unit decimal strings, with the days the pending amount is expected to settle. On-chain crypto is entirely available; good_funds and fiat cash can have pending or reserve portions.
+     * @return Balance split into available, pending, and reserve amounts, as native-unit decimal strings, with the days the pending amount is expected to settle.
      */
     @JsonProperty("breakdown")
     public AccountBalanceBreakdown getBreakdown() {
@@ -189,7 +189,7 @@ public final class AccountBalanceToken {
 
     public interface BreakdownStage {
         /**
-         * <p>Balance split into available, pending, and reserve amounts, as native-unit decimal strings, with the days the pending amount is expected to settle. On-chain crypto is entirely available; good_funds and fiat cash can have pending or reserve portions.</p>
+         * <p>Balance split into available, pending, and reserve amounts, as native-unit decimal strings, with the days the pending amount is expected to settle.</p>
          */
         NameStage breakdown(@NotNull AccountBalanceBreakdown breakdown);
     }
@@ -259,7 +259,6 @@ public final class AccountBalanceToken {
 
         private Optional<String> iconUrl = Optional.empty();
 
-        @JsonAnySetter
         private Map<String, Object> additionalProperties = new HashMap<>();
 
         private Builder() {}
@@ -278,7 +277,6 @@ public final class AccountBalanceToken {
 
         /**
          * <p>Total amount held in native units, as a decimal string.</p>
-         * <p>Total amount held in native units, as a decimal string.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
@@ -289,8 +287,7 @@ public final class AccountBalanceToken {
         }
 
         /**
-         * <p>Balance split into available, pending, and reserve amounts, as native-unit decimal strings, with the days the pending amount is expected to settle. On-chain crypto is entirely available; good_funds and fiat cash can have pending or reserve portions.</p>
-         * <p>Balance split into available, pending, and reserve amounts, as native-unit decimal strings, with the days the pending amount is expected to settle. On-chain crypto is entirely available; good_funds and fiat cash can have pending or reserve portions.</p>
+         * <p>Balance split into available, pending, and reserve amounts, as native-unit decimal strings, with the days the pending amount is expected to settle.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
@@ -302,7 +299,6 @@ public final class AccountBalanceToken {
 
         /**
          * <p>The holding's display name</p>
-         * <p>The holding's display name</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
@@ -313,7 +309,6 @@ public final class AccountBalanceToken {
         }
 
         /**
-         * <p>Holding display symbol, such as <code>USDT</code>, <code>cbBTC</code>, or <code>EUR</code>.</p>
          * <p>Holding display symbol, such as <code>USDT</code>, <code>cbBTC</code>, or <code>EUR</code>.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
@@ -436,6 +431,20 @@ public final class AccountBalanceToken {
         public AccountBalanceToken build() {
             return new AccountBalanceToken(
                     balance, breakdown, iconUrl, name, priceUsd, symbol, valueUsd, additionalProperties);
+        }
+
+        @JsonAnySetter
+        private void putAdditionalPropertyFromJson(String key, Object value) {
+            if (key.equalsIgnoreCase("balance")
+                    || key.equalsIgnoreCase("breakdown")
+                    || key.equalsIgnoreCase("icon_url")
+                    || key.equalsIgnoreCase("name")
+                    || key.equalsIgnoreCase("price_usd")
+                    || key.equalsIgnoreCase("symbol")
+                    || key.equalsIgnoreCase("value_usd")) {
+                return;
+            }
+            this.additionalProperties.put(key, value);
         }
 
         @java.lang.Override

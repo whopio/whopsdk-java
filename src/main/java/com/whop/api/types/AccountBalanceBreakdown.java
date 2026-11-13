@@ -24,6 +24,8 @@ import org.jetbrains.annotations.NotNull;
 public final class AccountBalanceBreakdown {
     private final String available;
 
+    private final String finishingSettlement;
+
     private final String inTransit;
 
     private final String pending;
@@ -36,12 +38,14 @@ public final class AccountBalanceBreakdown {
 
     private AccountBalanceBreakdown(
             String available,
+            String finishingSettlement,
             String inTransit,
             String pending,
             List<AccountBalanceSettlement> pendingSettlements,
             String reserve,
             Map<String, Object> additionalProperties) {
         this.available = available;
+        this.finishingSettlement = finishingSettlement;
         this.inTransit = inTransit;
         this.pending = pending;
         this.pendingSettlements = pendingSettlements;
@@ -58,7 +62,15 @@ public final class AccountBalanceBreakdown {
     }
 
     /**
-     * @return Amount moving between the account's own destinations, such as a treasury sweep to its crypto wallet or a card top-up. In native units, as a decimal string.
+     * @return The part of <code>pending</code> that has already settled and is waiting to move into the account's crypto wallet or Whop Card, where it becomes <code>available</code>. The move usually starts within the hour; while it runs, the amount is reported in <code>in_transit</code> instead. Money moved only to top up the account's retained minimum balance is not included. In native units, as a decimal string.
+     */
+    @JsonProperty("finishing_settlement")
+    public String getFinishingSettlement() {
+        return finishingSettlement;
+    }
+
+    /**
+     * @return Amount moving between the account's own destinations, such as a card top-up. In native units, as a decimal string.
      */
     @JsonProperty("in_transit")
     public String getInTransit() {
@@ -99,6 +111,7 @@ public final class AccountBalanceBreakdown {
 
     private boolean equalTo(AccountBalanceBreakdown other) {
         return available.equals(other.available)
+                && finishingSettlement.equals(other.finishingSettlement)
                 && inTransit.equals(other.inTransit)
                 && pending.equals(other.pending)
                 && pendingSettlements.equals(other.pendingSettlements)
@@ -107,7 +120,13 @@ public final class AccountBalanceBreakdown {
 
     @java.lang.Override
     public int hashCode() {
-        return Objects.hash(this.available, this.inTransit, this.pending, this.pendingSettlements, this.reserve);
+        return Objects.hash(
+                this.available,
+                this.finishingSettlement,
+                this.inTransit,
+                this.pending,
+                this.pendingSettlements,
+                this.reserve);
     }
 
     @java.lang.Override
@@ -123,14 +142,21 @@ public final class AccountBalanceBreakdown {
         /**
          * <p>Amount you can spend, send, or withdraw now, in native units, as a decimal string.</p>
          */
-        InTransitStage available(@NotNull String available);
+        FinishingSettlementStage available(@NotNull String available);
 
         Builder from(AccountBalanceBreakdown other);
     }
 
+    public interface FinishingSettlementStage {
+        /**
+         * <p>The part of <code>pending</code> that has already settled and is waiting to move into the account's crypto wallet or Whop Card, where it becomes <code>available</code>. The move usually starts within the hour; while it runs, the amount is reported in <code>in_transit</code> instead. Money moved only to top up the account's retained minimum balance is not included. In native units, as a decimal string.</p>
+         */
+        InTransitStage finishingSettlement(@NotNull String finishingSettlement);
+    }
+
     public interface InTransitStage {
         /**
-         * <p>Amount moving between the account's own destinations, such as a treasury sweep to its crypto wallet or a card top-up. In native units, as a decimal string.</p>
+         * <p>Amount moving between the account's own destinations, such as a card top-up. In native units, as a decimal string.</p>
          */
         PendingStage inTransit(@NotNull String inTransit);
     }
@@ -165,8 +191,15 @@ public final class AccountBalanceBreakdown {
 
     @JsonIgnoreProperties(ignoreUnknown = true)
     public static final class Builder
-            implements AvailableStage, InTransitStage, PendingStage, ReserveStage, _FinalStage {
+            implements AvailableStage,
+                    FinishingSettlementStage,
+                    InTransitStage,
+                    PendingStage,
+                    ReserveStage,
+                    _FinalStage {
         private String available;
+
+        private String finishingSettlement;
 
         private String inTransit;
 
@@ -176,7 +209,6 @@ public final class AccountBalanceBreakdown {
 
         private List<AccountBalanceSettlement> pendingSettlements = new ArrayList<>();
 
-        @JsonAnySetter
         private Map<String, Object> additionalProperties = new HashMap<>();
 
         private Builder() {}
@@ -184,6 +216,7 @@ public final class AccountBalanceBreakdown {
         @java.lang.Override
         public Builder from(AccountBalanceBreakdown other) {
             available(other.getAvailable());
+            finishingSettlement(other.getFinishingSettlement());
             inTransit(other.getInTransit());
             pending(other.getPending());
             pendingSettlements(other.getPendingSettlements());
@@ -193,19 +226,29 @@ public final class AccountBalanceBreakdown {
 
         /**
          * <p>Amount you can spend, send, or withdraw now, in native units, as a decimal string.</p>
-         * <p>Amount you can spend, send, or withdraw now, in native units, as a decimal string.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
         @JsonSetter("available")
-        public InTransitStage available(@NotNull String available) {
+        public FinishingSettlementStage available(@NotNull String available) {
             this.available = Objects.requireNonNull(available, "available must not be null");
             return this;
         }
 
         /**
-         * <p>Amount moving between the account's own destinations, such as a treasury sweep to its crypto wallet or a card top-up. In native units, as a decimal string.</p>
-         * <p>Amount moving between the account's own destinations, such as a treasury sweep to its crypto wallet or a card top-up. In native units, as a decimal string.</p>
+         * <p>The part of <code>pending</code> that has already settled and is waiting to move into the account's crypto wallet or Whop Card, where it becomes <code>available</code>. The move usually starts within the hour; while it runs, the amount is reported in <code>in_transit</code> instead. Money moved only to top up the account's retained minimum balance is not included. In native units, as a decimal string.</p>
+         * @return Reference to {@code this} so that method calls can be chained together.
+         */
+        @java.lang.Override
+        @JsonSetter("finishing_settlement")
+        public InTransitStage finishingSettlement(@NotNull String finishingSettlement) {
+            this.finishingSettlement =
+                    Objects.requireNonNull(finishingSettlement, "finishingSettlement must not be null");
+            return this;
+        }
+
+        /**
+         * <p>Amount moving between the account's own destinations, such as a card top-up. In native units, as a decimal string.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
@@ -217,7 +260,6 @@ public final class AccountBalanceBreakdown {
 
         /**
          * <p>Amount from recent payments still settling, in native units, as a decimal string.</p>
-         * <p>Amount from recent payments still settling, in native units, as a decimal string.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
@@ -228,7 +270,6 @@ public final class AccountBalanceBreakdown {
         }
 
         /**
-         * <p>Amount held back, in native units, as a decimal string. Retrieve the account's reserves for why it is held and when it unlocks.</p>
          * <p>Amount held back, in native units, as a decimal string. Retrieve the account's reserves for why it is held and when it unlocks.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
@@ -266,7 +307,26 @@ public final class AccountBalanceBreakdown {
         @java.lang.Override
         public AccountBalanceBreakdown build() {
             return new AccountBalanceBreakdown(
-                    available, inTransit, pending, pendingSettlements, reserve, additionalProperties);
+                    available,
+                    finishingSettlement,
+                    inTransit,
+                    pending,
+                    pendingSettlements,
+                    reserve,
+                    additionalProperties);
+        }
+
+        @JsonAnySetter
+        private void putAdditionalPropertyFromJson(String key, Object value) {
+            if (key.equalsIgnoreCase("available")
+                    || key.equalsIgnoreCase("finishing_settlement")
+                    || key.equalsIgnoreCase("in_transit")
+                    || key.equalsIgnoreCase("pending")
+                    || key.equalsIgnoreCase("pending_settlements")
+                    || key.equalsIgnoreCase("reserve")) {
+                return;
+            }
+            this.additionalProperties.put(key, value);
         }
 
         @java.lang.Override

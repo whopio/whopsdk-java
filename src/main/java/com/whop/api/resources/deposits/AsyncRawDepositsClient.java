@@ -4,18 +4,25 @@
 package com.whop.api.resources.deposits;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
+import com.whop.api.core.BodyProperties;
 import com.whop.api.core.ClientOptions;
 import com.whop.api.core.MediaTypes;
 import com.whop.api.core.ObjectMappers;
+import com.whop.api.core.PathSegments;
 import com.whop.api.core.RequestOptions;
+import com.whop.api.core.RetryInterceptor;
 import com.whop.api.core.WhopApiApiException;
 import com.whop.api.core.WhopApiException;
 import com.whop.api.core.WhopApiHttpResponse;
 import com.whop.api.errors.BadRequestError;
 import com.whop.api.errors.ConflictError;
+import com.whop.api.errors.ForbiddenError;
+import com.whop.api.errors.NotFoundError;
+import com.whop.api.errors.UnauthorizedError;
 import com.whop.api.resources.deposits.requests.CreateDepositsRequest;
+import com.whop.api.resources.deposits.requests.ReverseDepositsRequest;
 import com.whop.api.resources.deposits.types.CreateDepositsResponse;
-import com.whop.api.types.V1ErrorResponse;
+import com.whop.api.types.LedgerActivity;
 import java.io.IOException;
 import java.util.concurrent.CompletableFuture;
 import okhttp3.Call;
@@ -37,18 +44,18 @@ public class AsyncRawDepositsClient {
     }
 
     /**
-     * Retrieve the deposit methods for an account, including crypto and bank transfer.
+     * Returns the deposit methods for an account or user, including crypto addresses, bank transfer instructions, and, for a business, a hosted deposit page. Bitcoin deposits are converted to USDT on Plasma in the destination's wallet. Business destinations require no authentication. Pass <code>payment_method_id</code> to also charge a business's saved payment method for <code>amount</code> in USD and add it to the business's balance; that requires authentication with the <code>payment:charge</code> scope. The charge has no fees or taxes and does not count as revenue.
      */
     public CompletableFuture<WhopApiHttpResponse<CreateDepositsResponse>> create(CreateDepositsRequest request) {
         return create(request, null);
     }
 
     /**
-     * Retrieve the deposit methods for an account, including crypto and bank transfer.
+     * Returns the deposit methods for an account or user, including crypto addresses, bank transfer instructions, and, for a business, a hosted deposit page. Bitcoin deposits are converted to USDT on Plasma in the destination's wallet. Business destinations require no authentication. Pass <code>payment_method_id</code> to also charge a business's saved payment method for <code>amount</code> in USD and add it to the business's balance; that requires authentication with the <code>payment:charge</code> scope. The charge has no fees or taxes and does not count as revenue.
      */
     public CompletableFuture<WhopApiHttpResponse<CreateDepositsResponse>> create(
             CreateDepositsRequest request, RequestOptions requestOptions) {
-        HttpUrl.Builder httpUrl = HttpUrl.parse(this.clientOptions.environment().getUrl())
+        HttpUrl.Builder httpUrl = HttpUrl.parse(this.clientOptions.environment().getApiURL())
                 .newBuilder()
                 .addPathSegments("deposits");
         if (requestOptions != null) {
@@ -59,7 +66,9 @@ public class AsyncRawDepositsClient {
         RequestBody body;
         try {
             body = RequestBody.create(
-                    ObjectMappers.JSON_MAPPER.writeValueAsBytes(request), MediaTypes.APPLICATION_JSON);
+                    ObjectMappers.JSON_MAPPER.writeValueAsBytes(BodyProperties.merge(
+                            request, requestOptions != null ? requestOptions.getBodyProperties() : null)),
+                    MediaTypes.APPLICATION_JSON);
         } catch (JsonProcessingException e) {
             throw new WhopApiException("Failed to serialize request", e);
         }
@@ -74,8 +83,18 @@ public class AsyncRawDepositsClient {
         if (requestOptions != null && requestOptions.getTimeout().isPresent()) {
             client = clientOptions.httpClientWithTimeout(requestOptions);
         }
+        if (requestOptions != null && requestOptions.getMaxRetries().isPresent()) {
+            okhttpRequest = okhttpRequest
+                    .newBuilder()
+                    .tag(
+                            RetryInterceptor.MaxRetriesOverride.class,
+                            new RetryInterceptor.MaxRetriesOverride(
+                                    requestOptions.getMaxRetries().get()))
+                    .build();
+        }
         CompletableFuture<WhopApiHttpResponse<CreateDepositsResponse>> future = new CompletableFuture<>();
-        client.newCall(okhttpRequest).enqueue(new Callback() {
+        RetryInterceptor.AsyncCall okhttpCall = RetryInterceptor.newAsyncCall(client, okhttpRequest);
+        okhttpCall.enqueue(new Callback() {
             @Override
             public void onResponse(@NotNull Call call, @NotNull Response response) throws IOException {
                 try (ResponseBody responseBody = response.body()) {
@@ -95,7 +114,7 @@ public class AsyncRawDepositsClient {
                                 return;
                             case 409:
                                 future.completeExceptionally(new ConflictError(
-                                        ObjectMappers.JSON_MAPPER.readValue(responseBodyString, V1ErrorResponse.class),
+                                        ObjectMappers.JSON_MAPPER.readValue(responseBodyString, Object.class),
                                         response));
                                 return;
                         }
@@ -106,6 +125,9 @@ public class AsyncRawDepositsClient {
                     future.completeExceptionally(new WhopApiApiException(
                             "Error with status code " + response.code(), response.code(), errorBody, response));
                     return;
+                } catch (JsonProcessingException e) {
+                    future.completeExceptionally(
+                            new WhopApiException("Failed to deserialize response: " + e.getMessage(), e));
                 } catch (IOException e) {
                     future.completeExceptionally(new WhopApiException("Network error executing HTTP request", e));
                 }
@@ -114,6 +136,161 @@ public class AsyncRawDepositsClient {
             @Override
             public void onFailure(@NotNull Call call, @NotNull IOException e) {
                 future.completeExceptionally(new WhopApiException("Network error executing HTTP request", e));
+            }
+        });
+        future.whenComplete((result_, throwable_) -> {
+            if (future.isCancelled()) {
+                okhttpCall.cancel();
+            }
+        });
+        return future;
+    }
+
+    /**
+     * Sends a deposit back where it came from. If the available balance doesn't cover it, nothing is sent.
+     * <ul>
+     * <li><strong>Bank deposit:</strong> pass its <code>vbt_</code> ID. The deposit fee is returned, so the balance only has to cover the rest. Returns a <code>topup_reversal</code> row.</li>
+     * <li><strong>Card deposit:</strong> pass its <code>pay_</code> ID. It's refunded to the card, and its fees aren't returned. Returns a <code>payment_refund</code> row.</li>
+     * </ul>
+     */
+    public CompletableFuture<WhopApiHttpResponse<LedgerActivity>> reverse(String id) {
+        return reverse(id, ReverseDepositsRequest.builder().build());
+    }
+
+    /**
+     * Sends a deposit back where it came from. If the available balance doesn't cover it, nothing is sent.
+     * <ul>
+     * <li><strong>Bank deposit:</strong> pass its <code>vbt_</code> ID. The deposit fee is returned, so the balance only has to cover the rest. Returns a <code>topup_reversal</code> row.</li>
+     * <li><strong>Card deposit:</strong> pass its <code>pay_</code> ID. It's refunded to the card, and its fees aren't returned. Returns a <code>payment_refund</code> row.</li>
+     * </ul>
+     */
+    public CompletableFuture<WhopApiHttpResponse<LedgerActivity>> reverse(String id, RequestOptions requestOptions) {
+        return reverse(id, ReverseDepositsRequest.builder().build(), requestOptions);
+    }
+
+    /**
+     * Sends a deposit back where it came from. If the available balance doesn't cover it, nothing is sent.
+     * <ul>
+     * <li><strong>Bank deposit:</strong> pass its <code>vbt_</code> ID. The deposit fee is returned, so the balance only has to cover the rest. Returns a <code>topup_reversal</code> row.</li>
+     * <li><strong>Card deposit:</strong> pass its <code>pay_</code> ID. It's refunded to the card, and its fees aren't returned. Returns a <code>payment_refund</code> row.</li>
+     * </ul>
+     */
+    public CompletableFuture<WhopApiHttpResponse<LedgerActivity>> reverse(String id, ReverseDepositsRequest request) {
+        return reverse(id, request, null);
+    }
+
+    /**
+     * Sends a deposit back where it came from. If the available balance doesn't cover it, nothing is sent.
+     * <ul>
+     * <li><strong>Bank deposit:</strong> pass its <code>vbt_</code> ID. The deposit fee is returned, so the balance only has to cover the rest. Returns a <code>topup_reversal</code> row.</li>
+     * <li><strong>Card deposit:</strong> pass its <code>pay_</code> ID. It's refunded to the card, and its fees aren't returned. Returns a <code>payment_refund</code> row.</li>
+     * </ul>
+     */
+    public CompletableFuture<WhopApiHttpResponse<LedgerActivity>> reverse(
+            String id, ReverseDepositsRequest request, RequestOptions requestOptions) {
+        HttpUrl.Builder httpUrl = HttpUrl.parse(this.clientOptions.environment().getApiURL())
+                .newBuilder()
+                .addPathSegments("deposits")
+                .addPathSegment(PathSegments.validate(id))
+                .addPathSegments("reverse");
+        if (requestOptions != null) {
+            requestOptions.getQueryParameters().forEach((_key, _value) -> {
+                httpUrl.addQueryParameter(_key, _value);
+            });
+        }
+        RequestBody body;
+        try {
+            body = RequestBody.create(
+                    ObjectMappers.JSON_MAPPER.writeValueAsBytes(BodyProperties.merge(
+                            request, requestOptions != null ? requestOptions.getBodyProperties() : null)),
+                    MediaTypes.APPLICATION_JSON);
+        } catch (JsonProcessingException e) {
+            throw new WhopApiException("Failed to serialize request", e);
+        }
+        Request okhttpRequest = new Request.Builder()
+                .url(httpUrl.build())
+                .method("POST", body)
+                .headers(Headers.of(clientOptions.headers(requestOptions)))
+                .addHeader("Content-Type", "application/json")
+                .addHeader("Accept", "application/json")
+                .build();
+        OkHttpClient client = clientOptions.httpClient();
+        if (requestOptions != null && requestOptions.getTimeout().isPresent()) {
+            client = clientOptions.httpClientWithTimeout(requestOptions);
+        }
+        if (requestOptions != null && requestOptions.getMaxRetries().isPresent()) {
+            okhttpRequest = okhttpRequest
+                    .newBuilder()
+                    .tag(
+                            RetryInterceptor.MaxRetriesOverride.class,
+                            new RetryInterceptor.MaxRetriesOverride(
+                                    requestOptions.getMaxRetries().get()))
+                    .build();
+        }
+        CompletableFuture<WhopApiHttpResponse<LedgerActivity>> future = new CompletableFuture<>();
+        RetryInterceptor.AsyncCall okhttpCall = RetryInterceptor.newAsyncCall(client, okhttpRequest);
+        okhttpCall.enqueue(new Callback() {
+            @Override
+            public void onResponse(@NotNull Call call, @NotNull Response response) throws IOException {
+                try (ResponseBody responseBody = response.body()) {
+                    String responseBodyString = responseBody != null ? responseBody.string() : "{}";
+                    if (response.isSuccessful()) {
+                        future.complete(new WhopApiHttpResponse<>(
+                                ObjectMappers.JSON_MAPPER.readValue(responseBodyString, LedgerActivity.class),
+                                response));
+                        return;
+                    }
+                    try {
+                        switch (response.code()) {
+                            case 400:
+                                future.completeExceptionally(new BadRequestError(
+                                        ObjectMappers.JSON_MAPPER.readValue(responseBodyString, Object.class),
+                                        response));
+                                return;
+                            case 401:
+                                future.completeExceptionally(new UnauthorizedError(
+                                        ObjectMappers.JSON_MAPPER.readValue(responseBodyString, Object.class),
+                                        response));
+                                return;
+                            case 403:
+                                future.completeExceptionally(new ForbiddenError(
+                                        ObjectMappers.JSON_MAPPER.readValue(responseBodyString, Object.class),
+                                        response));
+                                return;
+                            case 404:
+                                future.completeExceptionally(new NotFoundError(
+                                        ObjectMappers.JSON_MAPPER.readValue(responseBodyString, Object.class),
+                                        response));
+                                return;
+                            case 409:
+                                future.completeExceptionally(new ConflictError(
+                                        ObjectMappers.JSON_MAPPER.readValue(responseBodyString, Object.class),
+                                        response));
+                                return;
+                        }
+                    } catch (JsonProcessingException ignored) {
+                        // unable to map error response, throwing generic error
+                    }
+                    Object errorBody = ObjectMappers.parseErrorBody(responseBodyString);
+                    future.completeExceptionally(new WhopApiApiException(
+                            "Error with status code " + response.code(), response.code(), errorBody, response));
+                    return;
+                } catch (JsonProcessingException e) {
+                    future.completeExceptionally(
+                            new WhopApiException("Failed to deserialize response: " + e.getMessage(), e));
+                } catch (IOException e) {
+                    future.completeExceptionally(new WhopApiException("Network error executing HTTP request", e));
+                }
+            }
+
+            @Override
+            public void onFailure(@NotNull Call call, @NotNull IOException e) {
+                future.completeExceptionally(new WhopApiException("Network error executing HTTP request", e));
+            }
+        });
+        future.whenComplete((result_, throwable_) -> {
+            if (future.isCancelled()) {
+                okhttpCall.cancel();
             }
         });
         return future;

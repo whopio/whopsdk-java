@@ -33,6 +33,10 @@ public final class CreateEventsRequest {
 
     private final Optional<CreateEventsRequestActionSource> actionSource;
 
+    private final Optional<String> appBuildId;
+
+    private final Optional<String> appId;
+
     private final Optional<CreateEventsRequestContext> context;
 
     private final Optional<CreateEventsRequestCurrency> currency;
@@ -46,8 +50,6 @@ public final class CreateEventsRequest {
     private final String eventName;
 
     private final Optional<OffsetDateTime> eventTime;
-
-    private final Optional<String> planId;
 
     private final Optional<String> productId;
 
@@ -65,11 +67,15 @@ public final class CreateEventsRequest {
 
     private final Optional<Double> value;
 
+    private final Optional<String> variantId;
+
     private final Map<String, Object> additionalProperties;
 
     private CreateEventsRequest(
             String accountId,
             Optional<CreateEventsRequestActionSource> actionSource,
+            Optional<String> appBuildId,
+            Optional<String> appId,
             Optional<CreateEventsRequestContext> context,
             Optional<CreateEventsRequestCurrency> currency,
             Optional<String> customName,
@@ -77,7 +83,6 @@ public final class CreateEventsRequest {
             Optional<String> eventId,
             String eventName,
             Optional<OffsetDateTime> eventTime,
-            Optional<String> planId,
             Optional<String> productId,
             Optional<String> referrerUrl,
             Optional<Boolean> resumed,
@@ -86,9 +91,12 @@ public final class CreateEventsRequest {
             Optional<String> url,
             Optional<CreateEventsRequestUser> user,
             Optional<Double> value,
+            Optional<String> variantId,
             Map<String, Object> additionalProperties) {
         this.accountId = accountId;
         this.actionSource = actionSource;
+        this.appBuildId = appBuildId;
+        this.appId = appId;
         this.context = context;
         this.currency = currency;
         this.customName = customName;
@@ -96,7 +104,6 @@ public final class CreateEventsRequest {
         this.eventId = eventId;
         this.eventName = eventName;
         this.eventTime = eventTime;
-        this.planId = planId;
         this.productId = productId;
         this.referrerUrl = referrerUrl;
         this.resumed = resumed;
@@ -105,6 +112,7 @@ public final class CreateEventsRequest {
         this.url = url;
         this.user = user;
         this.value = value;
+        this.variantId = variantId;
         this.additionalProperties = additionalProperties;
     }
 
@@ -125,6 +133,28 @@ public final class CreateEventsRequest {
             return Optional.empty();
         }
         return actionSource;
+    }
+
+    /**
+     * @return The build of the hosted app that served the page where the event occurred.
+     */
+    @JsonIgnore
+    public Optional<String> getAppBuildId() {
+        if (appBuildId == null) {
+            return Optional.empty();
+        }
+        return appBuildId;
+    }
+
+    /**
+     * @return The hosted app that served the page where the event occurred.
+     */
+    @JsonIgnore
+    public Optional<String> getAppId() {
+        if (appId == null) {
+            return Optional.empty();
+        }
+        return appId;
     }
 
     /**
@@ -184,7 +214,7 @@ public final class CreateEventsRequest {
 
     /**
      * @return The type of event.
-     * <p>Use a standard event (lead, submit_application, contact, complete_registration, schedule, view_content, add_to_cart) or pass your own name directly for a custom event.</p>
+     * <p>Use a standard event (lead, submit_application, contact, complete_registration, schedule, view_content, add_to_cart, initiate_checkout) or pass your own name directly for a custom event.</p>
      */
     @JsonProperty("event_name")
     public String getEventName() {
@@ -200,17 +230,6 @@ public final class CreateEventsRequest {
             return Optional.empty();
         }
         return eventTime;
-    }
-
-    /**
-     * @return The plan associated with the event.
-     */
-    @JsonIgnore
-    public Optional<String> getPlanId() {
-        if (planId == null) {
-            return Optional.empty();
-        }
-        return planId;
     }
 
     /**
@@ -301,10 +320,33 @@ public final class CreateEventsRequest {
         return value;
     }
 
+    /**
+     * @return The variant associated with the event.
+     */
+    @JsonIgnore
+    public Optional<String> getVariantId() {
+        if (variantId == null) {
+            return Optional.empty();
+        }
+        return variantId;
+    }
+
     @JsonInclude(value = JsonInclude.Include.CUSTOM, valueFilter = NullableNonemptyFilter.class)
     @JsonProperty("action_source")
     private Optional<CreateEventsRequestActionSource> _getActionSource() {
         return actionSource;
+    }
+
+    @JsonInclude(value = JsonInclude.Include.CUSTOM, valueFilter = NullableNonemptyFilter.class)
+    @JsonProperty("app_build_id")
+    private Optional<String> _getAppBuildId() {
+        return appBuildId;
+    }
+
+    @JsonInclude(value = JsonInclude.Include.CUSTOM, valueFilter = NullableNonemptyFilter.class)
+    @JsonProperty("app_id")
+    private Optional<String> _getAppId() {
+        return appId;
     }
 
     @JsonInclude(value = JsonInclude.Include.CUSTOM, valueFilter = NullableNonemptyFilter.class)
@@ -341,12 +383,6 @@ public final class CreateEventsRequest {
     @JsonProperty("event_time")
     private Optional<OffsetDateTime> _getEventTime() {
         return eventTime;
-    }
-
-    @JsonInclude(value = JsonInclude.Include.CUSTOM, valueFilter = NullableNonemptyFilter.class)
-    @JsonProperty("plan_id")
-    private Optional<String> _getPlanId() {
-        return planId;
     }
 
     @JsonInclude(value = JsonInclude.Include.CUSTOM, valueFilter = NullableNonemptyFilter.class)
@@ -397,6 +433,12 @@ public final class CreateEventsRequest {
         return value;
     }
 
+    @JsonInclude(value = JsonInclude.Include.CUSTOM, valueFilter = NullableNonemptyFilter.class)
+    @JsonProperty("variant_id")
+    private Optional<String> _getVariantId() {
+        return variantId;
+    }
+
     @java.lang.Override
     public boolean equals(Object other) {
         if (this == other) return true;
@@ -411,6 +453,8 @@ public final class CreateEventsRequest {
     private boolean equalTo(CreateEventsRequest other) {
         return accountId.equals(other.accountId)
                 && actionSource.equals(other.actionSource)
+                && appBuildId.equals(other.appBuildId)
+                && appId.equals(other.appId)
                 && context.equals(other.context)
                 && currency.equals(other.currency)
                 && customName.equals(other.customName)
@@ -418,7 +462,6 @@ public final class CreateEventsRequest {
                 && eventId.equals(other.eventId)
                 && eventName.equals(other.eventName)
                 && eventTime.equals(other.eventTime)
-                && planId.equals(other.planId)
                 && productId.equals(other.productId)
                 && referrerUrl.equals(other.referrerUrl)
                 && resumed.equals(other.resumed)
@@ -426,7 +469,8 @@ public final class CreateEventsRequest {
                 && title.equals(other.title)
                 && url.equals(other.url)
                 && user.equals(other.user)
-                && value.equals(other.value);
+                && value.equals(other.value)
+                && variantId.equals(other.variantId);
     }
 
     @java.lang.Override
@@ -434,6 +478,8 @@ public final class CreateEventsRequest {
         return Objects.hash(
                 this.accountId,
                 this.actionSource,
+                this.appBuildId,
+                this.appId,
                 this.context,
                 this.currency,
                 this.customName,
@@ -441,7 +487,6 @@ public final class CreateEventsRequest {
                 this.eventId,
                 this.eventName,
                 this.eventTime,
-                this.planId,
                 this.productId,
                 this.referrerUrl,
                 this.resumed,
@@ -449,7 +494,8 @@ public final class CreateEventsRequest {
                 this.title,
                 this.url,
                 this.user,
-                this.value);
+                this.value,
+                this.variantId);
     }
 
     @java.lang.Override
@@ -473,7 +519,7 @@ public final class CreateEventsRequest {
     public interface EventNameStage {
         /**
          * <p>The type of event.</p>
-         * <p>Use a standard event (lead, submit_application, contact, complete_registration, schedule, view_content, add_to_cart) or pass your own name directly for a custom event.</p>
+         * <p>Use a standard event (lead, submit_application, contact, complete_registration, schedule, view_content, add_to_cart, initiate_checkout) or pass your own name directly for a custom event.</p>
          */
         _FinalStage eventName(@NotNull String eventName);
     }
@@ -493,6 +539,24 @@ public final class CreateEventsRequest {
         _FinalStage actionSource(CreateEventsRequestActionSource actionSource);
 
         _FinalStage actionSource(Nullable<CreateEventsRequestActionSource> actionSource);
+
+        /**
+         * <p>The build of the hosted app that served the page where the event occurred.</p>
+         */
+        _FinalStage appBuildId(Optional<String> appBuildId);
+
+        _FinalStage appBuildId(String appBuildId);
+
+        _FinalStage appBuildId(Nullable<String> appBuildId);
+
+        /**
+         * <p>The hosted app that served the page where the event occurred.</p>
+         */
+        _FinalStage appId(Optional<String> appId);
+
+        _FinalStage appId(String appId);
+
+        _FinalStage appId(Nullable<String> appId);
 
         /**
          * <p>Tracking and attribution context.</p>
@@ -547,15 +611,6 @@ public final class CreateEventsRequest {
         _FinalStage eventTime(OffsetDateTime eventTime);
 
         _FinalStage eventTime(Nullable<OffsetDateTime> eventTime);
-
-        /**
-         * <p>The plan associated with the event.</p>
-         */
-        _FinalStage planId(Optional<String> planId);
-
-        _FinalStage planId(String planId);
-
-        _FinalStage planId(Nullable<String> planId);
 
         /**
          * <p>The product associated with the event.</p>
@@ -628,6 +683,15 @@ public final class CreateEventsRequest {
         _FinalStage value(Double value);
 
         _FinalStage value(Nullable<Double> value);
+
+        /**
+         * <p>The variant associated with the event.</p>
+         */
+        _FinalStage variantId(Optional<String> variantId);
+
+        _FinalStage variantId(String variantId);
+
+        _FinalStage variantId(Nullable<String> variantId);
     }
 
     @JsonIgnoreProperties(ignoreUnknown = true)
@@ -635,6 +699,8 @@ public final class CreateEventsRequest {
         private String accountId;
 
         private String eventName;
+
+        private Optional<String> variantId = Optional.empty();
 
         private Optional<Double> value = Optional.empty();
 
@@ -652,8 +718,6 @@ public final class CreateEventsRequest {
 
         private Optional<String> productId = Optional.empty();
 
-        private Optional<String> planId = Optional.empty();
-
         private Optional<OffsetDateTime> eventTime = Optional.empty();
 
         private Optional<String> eventId = Optional.empty();
@@ -666,9 +730,12 @@ public final class CreateEventsRequest {
 
         private Optional<CreateEventsRequestContext> context = Optional.empty();
 
+        private Optional<String> appId = Optional.empty();
+
+        private Optional<String> appBuildId = Optional.empty();
+
         private Optional<CreateEventsRequestActionSource> actionSource = Optional.empty();
 
-        @JsonAnySetter
         private Map<String, Object> additionalProperties = new HashMap<>();
 
         private Builder() {}
@@ -677,6 +744,8 @@ public final class CreateEventsRequest {
         public Builder from(CreateEventsRequest other) {
             accountId(other.getAccountId());
             actionSource(other.getActionSource());
+            appBuildId(other.getAppBuildId());
+            appId(other.getAppId());
             context(other.getContext());
             currency(other.getCurrency());
             customName(other.getCustomName());
@@ -684,7 +753,6 @@ public final class CreateEventsRequest {
             eventId(other.getEventId());
             eventName(other.getEventName());
             eventTime(other.getEventTime());
-            planId(other.getPlanId());
             productId(other.getProductId());
             referrerUrl(other.getReferrerUrl());
             resumed(other.getResumed());
@@ -693,11 +761,11 @@ public final class CreateEventsRequest {
             url(other.getUrl());
             user(other.getUser());
             value(other.getValue());
+            variantId(other.getVariantId());
             return this;
         }
 
         /**
-         * <p>The account to associate with this event.</p>
          * <p>The account to associate with this event.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
@@ -710,15 +778,49 @@ public final class CreateEventsRequest {
 
         /**
          * <p>The type of event.</p>
-         * <p>Use a standard event (lead, submit_application, contact, complete_registration, schedule, view_content, add_to_cart) or pass your own name directly for a custom event.</p>
-         * <p>The type of event.</p>
-         * <p>Use a standard event (lead, submit_application, contact, complete_registration, schedule, view_content, add_to_cart) or pass your own name directly for a custom event.</p>
+         * <p>Use a standard event (lead, submit_application, contact, complete_registration, schedule, view_content, add_to_cart, initiate_checkout) or pass your own name directly for a custom event.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
         @JsonSetter("event_name")
         public _FinalStage eventName(@NotNull String eventName) {
             this.eventName = Objects.requireNonNull(eventName, "eventName must not be null");
+            return this;
+        }
+
+        /**
+         * <p>The variant associated with the event.</p>
+         * @return Reference to {@code this} so that method calls can be chained together.
+         */
+        @java.lang.Override
+        public _FinalStage variantId(Nullable<String> variantId) {
+            if (variantId.isNull()) {
+                this.variantId = null;
+            } else if (variantId.isEmpty()) {
+                this.variantId = Optional.empty();
+            } else {
+                this.variantId = Optional.of(variantId.get());
+            }
+            return this;
+        }
+
+        /**
+         * <p>The variant associated with the event.</p>
+         * @return Reference to {@code this} so that method calls can be chained together.
+         */
+        @java.lang.Override
+        public _FinalStage variantId(String variantId) {
+            this.variantId = Optional.ofNullable(variantId);
+            return this;
+        }
+
+        /**
+         * <p>The variant associated with the event.</p>
+         */
+        @java.lang.Override
+        @JsonSetter(value = "variant_id", nulls = Nulls.SKIP)
+        public _FinalStage variantId(Optional<String> variantId) {
+            this.variantId = variantId;
             return this;
         }
 
@@ -1011,42 +1113,6 @@ public final class CreateEventsRequest {
         }
 
         /**
-         * <p>The plan associated with the event.</p>
-         * @return Reference to {@code this} so that method calls can be chained together.
-         */
-        @java.lang.Override
-        public _FinalStage planId(Nullable<String> planId) {
-            if (planId.isNull()) {
-                this.planId = null;
-            } else if (planId.isEmpty()) {
-                this.planId = Optional.empty();
-            } else {
-                this.planId = Optional.of(planId.get());
-            }
-            return this;
-        }
-
-        /**
-         * <p>The plan associated with the event.</p>
-         * @return Reference to {@code this} so that method calls can be chained together.
-         */
-        @java.lang.Override
-        public _FinalStage planId(String planId) {
-            this.planId = Optional.ofNullable(planId);
-            return this;
-        }
-
-        /**
-         * <p>The plan associated with the event.</p>
-         */
-        @java.lang.Override
-        @JsonSetter(value = "plan_id", nulls = Nulls.SKIP)
-        public _FinalStage planId(Optional<String> planId) {
-            this.planId = planId;
-            return this;
-        }
-
-        /**
          * <p>When the event occurred. Defaults to now.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
@@ -1263,6 +1329,78 @@ public final class CreateEventsRequest {
         }
 
         /**
+         * <p>The hosted app that served the page where the event occurred.</p>
+         * @return Reference to {@code this} so that method calls can be chained together.
+         */
+        @java.lang.Override
+        public _FinalStage appId(Nullable<String> appId) {
+            if (appId.isNull()) {
+                this.appId = null;
+            } else if (appId.isEmpty()) {
+                this.appId = Optional.empty();
+            } else {
+                this.appId = Optional.of(appId.get());
+            }
+            return this;
+        }
+
+        /**
+         * <p>The hosted app that served the page where the event occurred.</p>
+         * @return Reference to {@code this} so that method calls can be chained together.
+         */
+        @java.lang.Override
+        public _FinalStage appId(String appId) {
+            this.appId = Optional.ofNullable(appId);
+            return this;
+        }
+
+        /**
+         * <p>The hosted app that served the page where the event occurred.</p>
+         */
+        @java.lang.Override
+        @JsonSetter(value = "app_id", nulls = Nulls.SKIP)
+        public _FinalStage appId(Optional<String> appId) {
+            this.appId = appId;
+            return this;
+        }
+
+        /**
+         * <p>The build of the hosted app that served the page where the event occurred.</p>
+         * @return Reference to {@code this} so that method calls can be chained together.
+         */
+        @java.lang.Override
+        public _FinalStage appBuildId(Nullable<String> appBuildId) {
+            if (appBuildId.isNull()) {
+                this.appBuildId = null;
+            } else if (appBuildId.isEmpty()) {
+                this.appBuildId = Optional.empty();
+            } else {
+                this.appBuildId = Optional.of(appBuildId.get());
+            }
+            return this;
+        }
+
+        /**
+         * <p>The build of the hosted app that served the page where the event occurred.</p>
+         * @return Reference to {@code this} so that method calls can be chained together.
+         */
+        @java.lang.Override
+        public _FinalStage appBuildId(String appBuildId) {
+            this.appBuildId = Optional.ofNullable(appBuildId);
+            return this;
+        }
+
+        /**
+         * <p>The build of the hosted app that served the page where the event occurred.</p>
+         */
+        @java.lang.Override
+        @JsonSetter(value = "app_build_id", nulls = Nulls.SKIP)
+        public _FinalStage appBuildId(Optional<String> appBuildId) {
+            this.appBuildId = appBuildId;
+            return this;
+        }
+
+        /**
          * <p>Where the event originated.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
@@ -1303,6 +1441,8 @@ public final class CreateEventsRequest {
             return new CreateEventsRequest(
                     accountId,
                     actionSource,
+                    appBuildId,
+                    appId,
                     context,
                     currency,
                     customName,
@@ -1310,7 +1450,6 @@ public final class CreateEventsRequest {
                     eventId,
                     eventName,
                     eventTime,
-                    planId,
                     productId,
                     referrerUrl,
                     resumed,
@@ -1319,7 +1458,35 @@ public final class CreateEventsRequest {
                     url,
                     user,
                     value,
+                    variantId,
                     additionalProperties);
+        }
+
+        @JsonAnySetter
+        private void putAdditionalPropertyFromJson(String key, Object value) {
+            if (key.equalsIgnoreCase("account_id")
+                    || key.equalsIgnoreCase("action_source")
+                    || key.equalsIgnoreCase("app_build_id")
+                    || key.equalsIgnoreCase("app_id")
+                    || key.equalsIgnoreCase("context")
+                    || key.equalsIgnoreCase("currency")
+                    || key.equalsIgnoreCase("custom_name")
+                    || key.equalsIgnoreCase("duration")
+                    || key.equalsIgnoreCase("event_id")
+                    || key.equalsIgnoreCase("event_name")
+                    || key.equalsIgnoreCase("event_time")
+                    || key.equalsIgnoreCase("product_id")
+                    || key.equalsIgnoreCase("referrer_url")
+                    || key.equalsIgnoreCase("resumed")
+                    || key.equalsIgnoreCase("source")
+                    || key.equalsIgnoreCase("title")
+                    || key.equalsIgnoreCase("url")
+                    || key.equalsIgnoreCase("user")
+                    || key.equalsIgnoreCase("value")
+                    || key.equalsIgnoreCase("variant_id")) {
+                return;
+            }
+            this.additionalProperties.put(key, value);
         }
 
         @java.lang.Override

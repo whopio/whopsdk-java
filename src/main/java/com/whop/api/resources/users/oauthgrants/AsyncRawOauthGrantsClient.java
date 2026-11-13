@@ -4,11 +4,13 @@
 package com.whop.api.resources.users.oauthgrants;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
+import com.whop.api.core.BodyProperties;
 import com.whop.api.core.ClientOptions;
 import com.whop.api.core.MediaTypes;
 import com.whop.api.core.ObjectMappers;
 import com.whop.api.core.QueryStringMapper;
 import com.whop.api.core.RequestOptions;
+import com.whop.api.core.RetryInterceptor;
 import com.whop.api.core.WhopApiApiException;
 import com.whop.api.core.WhopApiException;
 import com.whop.api.core.WhopApiHttpResponse;
@@ -22,7 +24,6 @@ import com.whop.api.resources.users.oauthgrants.requests.CreateOauthGrantsReques
 import com.whop.api.resources.users.oauthgrants.requests.ListOauthGrantsRequest;
 import com.whop.api.resources.users.oauthgrants.types.ListOauthGrantsResponse;
 import com.whop.api.types.OauthGrant;
-import com.whop.api.types.V1ErrorResponse;
 import java.io.IOException;
 import java.util.List;
 import java.util.Optional;
@@ -47,32 +48,32 @@ public class AsyncRawOauthGrantsClient {
     }
 
     /**
-     * Lists the authenticated user's own OAuth grants — one per app they have authorized, per account they authorized it for. The list is always the caller's own; there is no parameter for reading another user's grants. Requires a user session: an API key or an OAuth token is refused, so an app can never enumerate the other apps a user has authorized.
+     * Lists the authenticated user's own OAuth grants: one per app they have authorized, per account they authorized it for. You cannot read another user's grants. Requires a user session: an API key or an OAuth token is refused, so an app can never enumerate the other apps a user has authorized.
      */
     public CompletableFuture<WhopApiHttpResponse<SyncPagingIterable<OauthGrant>>> list() {
         return list(ListOauthGrantsRequest.builder().build());
     }
 
     /**
-     * Lists the authenticated user's own OAuth grants — one per app they have authorized, per account they authorized it for. The list is always the caller's own; there is no parameter for reading another user's grants. Requires a user session: an API key or an OAuth token is refused, so an app can never enumerate the other apps a user has authorized.
+     * Lists the authenticated user's own OAuth grants: one per app they have authorized, per account they authorized it for. You cannot read another user's grants. Requires a user session: an API key or an OAuth token is refused, so an app can never enumerate the other apps a user has authorized.
      */
     public CompletableFuture<WhopApiHttpResponse<SyncPagingIterable<OauthGrant>>> list(RequestOptions requestOptions) {
         return list(ListOauthGrantsRequest.builder().build(), requestOptions);
     }
 
     /**
-     * Lists the authenticated user's own OAuth grants — one per app they have authorized, per account they authorized it for. The list is always the caller's own; there is no parameter for reading another user's grants. Requires a user session: an API key or an OAuth token is refused, so an app can never enumerate the other apps a user has authorized.
+     * Lists the authenticated user's own OAuth grants: one per app they have authorized, per account they authorized it for. You cannot read another user's grants. Requires a user session: an API key or an OAuth token is refused, so an app can never enumerate the other apps a user has authorized.
      */
     public CompletableFuture<WhopApiHttpResponse<SyncPagingIterable<OauthGrant>>> list(ListOauthGrantsRequest request) {
         return list(request, null);
     }
 
     /**
-     * Lists the authenticated user's own OAuth grants — one per app they have authorized, per account they authorized it for. The list is always the caller's own; there is no parameter for reading another user's grants. Requires a user session: an API key or an OAuth token is refused, so an app can never enumerate the other apps a user has authorized.
+     * Lists the authenticated user's own OAuth grants: one per app they have authorized, per account they authorized it for. You cannot read another user's grants. Requires a user session: an API key or an OAuth token is refused, so an app can never enumerate the other apps a user has authorized.
      */
     public CompletableFuture<WhopApiHttpResponse<SyncPagingIterable<OauthGrant>>> list(
             ListOauthGrantsRequest request, RequestOptions requestOptions) {
-        HttpUrl.Builder httpUrl = HttpUrl.parse(this.clientOptions.environment().getUrl())
+        HttpUrl.Builder httpUrl = HttpUrl.parse(this.clientOptions.environment().getApiURL())
                 .newBuilder()
                 .addPathSegments("users/me/oauth_grants");
         if (request.getAppId().isPresent()) {
@@ -118,8 +119,18 @@ public class AsyncRawOauthGrantsClient {
         if (requestOptions != null && requestOptions.getTimeout().isPresent()) {
             client = clientOptions.httpClientWithTimeout(requestOptions);
         }
+        if (requestOptions != null && requestOptions.getMaxRetries().isPresent()) {
+            okhttpRequest = okhttpRequest
+                    .newBuilder()
+                    .tag(
+                            RetryInterceptor.MaxRetriesOverride.class,
+                            new RetryInterceptor.MaxRetriesOverride(
+                                    requestOptions.getMaxRetries().get()))
+                    .build();
+        }
         CompletableFuture<WhopApiHttpResponse<SyncPagingIterable<OauthGrant>>> future = new CompletableFuture<>();
-        client.newCall(okhttpRequest).enqueue(new Callback() {
+        RetryInterceptor.AsyncCall okhttpCall = RetryInterceptor.newAsyncCall(client, okhttpRequest);
+        okhttpCall.enqueue(new Callback() {
             @Override
             public void onResponse(@NotNull Call call, @NotNull Response response) throws IOException {
                 try (ResponseBody responseBody = response.body()) {
@@ -136,7 +147,11 @@ public class AsyncRawOauthGrantsClient {
                         List<OauthGrant> result = parsedResponse.getData();
                         future.complete(new WhopApiHttpResponse<>(
                                 new SyncPagingIterable<OauthGrant>(
-                                        startingAfter != null, result, parsedResponse, () -> {
+                                        startingAfter.isPresent()
+                                                && !startingAfter.get().isEmpty(),
+                                        result,
+                                        parsedResponse,
+                                        () -> {
                                             try {
                                                 return list(nextRequest, requestOptions)
                                                         .get()
@@ -173,6 +188,9 @@ public class AsyncRawOauthGrantsClient {
                     future.completeExceptionally(new WhopApiApiException(
                             "Error with status code " + response.code(), response.code(), errorBody, response));
                     return;
+                } catch (JsonProcessingException e) {
+                    future.completeExceptionally(
+                            new WhopApiException("Failed to deserialize response: " + e.getMessage(), e));
                 } catch (IOException e) {
                     future.completeExceptionally(new WhopApiException("Network error executing HTTP request", e));
                 }
@@ -183,22 +201,27 @@ public class AsyncRawOauthGrantsClient {
                 future.completeExceptionally(new WhopApiException("Network error executing HTTP request", e));
             }
         });
+        future.whenComplete((result_, throwable_) -> {
+            if (future.isCancelled()) {
+                okhttpCall.cancel();
+            }
+        });
         return future;
     }
 
     /**
-     * Completes the OAuth authorization step for the authenticated user: records their consent for the scopes an app asked for and mints the authorization code to hand back to it. Returns the grant, plus a <code>redirect_url</code> carrying that code — the one and only time it is returned. Exchange the code at <code>POST /oauth/token</code> with the verifier for <code>code_challenge</code>. Requires a user session, because consent has to come from the account holder: an API key or an OAuth token is refused, so an app can never authorize itself. Send an <code>Idempotency-Key</code> to make a retry safe — a replay returns the original <code>redirect_url</code> and its code rather than issuing a second one.
+     * Completes the OAuth authorization step for the authenticated user: records their consent to the scopes an app asked for and mints an authorization code. Returns the grant plus a <code>redirect_url</code> carrying the code, which is returned only this once; the app exchanges it at <code>POST /oauth/token</code>. Requires a user session, because consent has to come from the account holder: an API key or an OAuth token is refused, so an app can never authorize itself. Send an <code>Idempotency-Key</code> so a retry returns the original <code>redirect_url</code> and code instead of issuing a second one.
      */
     public CompletableFuture<WhopApiHttpResponse<OauthGrant>> create(CreateOauthGrantsRequest request) {
         return create(request, null);
     }
 
     /**
-     * Completes the OAuth authorization step for the authenticated user: records their consent for the scopes an app asked for and mints the authorization code to hand back to it. Returns the grant, plus a <code>redirect_url</code> carrying that code — the one and only time it is returned. Exchange the code at <code>POST /oauth/token</code> with the verifier for <code>code_challenge</code>. Requires a user session, because consent has to come from the account holder: an API key or an OAuth token is refused, so an app can never authorize itself. Send an <code>Idempotency-Key</code> to make a retry safe — a replay returns the original <code>redirect_url</code> and its code rather than issuing a second one.
+     * Completes the OAuth authorization step for the authenticated user: records their consent to the scopes an app asked for and mints an authorization code. Returns the grant plus a <code>redirect_url</code> carrying the code, which is returned only this once; the app exchanges it at <code>POST /oauth/token</code>. Requires a user session, because consent has to come from the account holder: an API key or an OAuth token is refused, so an app can never authorize itself. Send an <code>Idempotency-Key</code> so a retry returns the original <code>redirect_url</code> and code instead of issuing a second one.
      */
     public CompletableFuture<WhopApiHttpResponse<OauthGrant>> create(
             CreateOauthGrantsRequest request, RequestOptions requestOptions) {
-        HttpUrl.Builder httpUrl = HttpUrl.parse(this.clientOptions.environment().getUrl())
+        HttpUrl.Builder httpUrl = HttpUrl.parse(this.clientOptions.environment().getApiURL())
                 .newBuilder()
                 .addPathSegments("users/me/oauth_grants");
         if (requestOptions != null) {
@@ -209,7 +232,9 @@ public class AsyncRawOauthGrantsClient {
         RequestBody body;
         try {
             body = RequestBody.create(
-                    ObjectMappers.JSON_MAPPER.writeValueAsBytes(request), MediaTypes.APPLICATION_JSON);
+                    ObjectMappers.JSON_MAPPER.writeValueAsBytes(BodyProperties.merge(
+                            request, requestOptions != null ? requestOptions.getBodyProperties() : null)),
+                    MediaTypes.APPLICATION_JSON);
         } catch (JsonProcessingException e) {
             throw new WhopApiException("Failed to serialize request", e);
         }
@@ -224,8 +249,18 @@ public class AsyncRawOauthGrantsClient {
         if (requestOptions != null && requestOptions.getTimeout().isPresent()) {
             client = clientOptions.httpClientWithTimeout(requestOptions);
         }
+        if (requestOptions != null && requestOptions.getMaxRetries().isPresent()) {
+            okhttpRequest = okhttpRequest
+                    .newBuilder()
+                    .tag(
+                            RetryInterceptor.MaxRetriesOverride.class,
+                            new RetryInterceptor.MaxRetriesOverride(
+                                    requestOptions.getMaxRetries().get()))
+                    .build();
+        }
         CompletableFuture<WhopApiHttpResponse<OauthGrant>> future = new CompletableFuture<>();
-        client.newCall(okhttpRequest).enqueue(new Callback() {
+        RetryInterceptor.AsyncCall okhttpCall = RetryInterceptor.newAsyncCall(client, okhttpRequest);
+        okhttpCall.enqueue(new Callback() {
             @Override
             public void onResponse(@NotNull Call call, @NotNull Response response) throws IOException {
                 try (ResponseBody responseBody = response.body()) {
@@ -259,7 +294,7 @@ public class AsyncRawOauthGrantsClient {
                                 return;
                             case 409:
                                 future.completeExceptionally(new ConflictError(
-                                        ObjectMappers.JSON_MAPPER.readValue(responseBodyString, V1ErrorResponse.class),
+                                        ObjectMappers.JSON_MAPPER.readValue(responseBodyString, Object.class),
                                         response));
                                 return;
                         }
@@ -270,6 +305,9 @@ public class AsyncRawOauthGrantsClient {
                     future.completeExceptionally(new WhopApiApiException(
                             "Error with status code " + response.code(), response.code(), errorBody, response));
                     return;
+                } catch (JsonProcessingException e) {
+                    future.completeExceptionally(
+                            new WhopApiException("Failed to deserialize response: " + e.getMessage(), e));
                 } catch (IOException e) {
                     future.completeExceptionally(new WhopApiException("Network error executing HTTP request", e));
                 }
@@ -278,6 +316,11 @@ public class AsyncRawOauthGrantsClient {
             @Override
             public void onFailure(@NotNull Call call, @NotNull IOException e) {
                 future.completeExceptionally(new WhopApiException("Network error executing HTTP request", e));
+            }
+        });
+        future.whenComplete((result_, throwable_) -> {
+            if (future.isCancelled()) {
+                okhttpCall.cancel();
             }
         });
         return future;

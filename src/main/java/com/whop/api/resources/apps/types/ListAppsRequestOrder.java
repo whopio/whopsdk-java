@@ -7,6 +7,9 @@ import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonValue;
 
 public final class ListAppsRequestOrder {
+    public static final ListAppsRequestOrder TEMPLATE_RECENT_SALES =
+            new ListAppsRequestOrder(Value.TEMPLATE_RECENT_SALES, "template_recent_sales");
+
     public static final ListAppsRequestOrder CREATED_AT = new ListAppsRequestOrder(Value.CREATED_AT, "created_at");
 
     public static final ListAppsRequestOrder TEMPLATE_USAGE =
@@ -53,6 +56,8 @@ public final class ListAppsRequestOrder {
 
     public <T> T visit(Visitor<T> visitor) {
         switch (value) {
+            case TEMPLATE_RECENT_SALES:
+                return visitor.visitTemplateRecentSales();
             case CREATED_AT:
                 return visitor.visitCreatedAt();
             case TEMPLATE_USAGE:
@@ -72,6 +77,8 @@ public final class ListAppsRequestOrder {
     @JsonCreator(mode = JsonCreator.Mode.DELEGATING)
     public static ListAppsRequestOrder valueOf(String value) {
         switch (value) {
+            case "template_recent_sales":
+                return TEMPLATE_RECENT_SALES;
             case "created_at":
                 return CREATED_AT;
             case "template_usage":
@@ -92,6 +99,8 @@ public final class ListAppsRequestOrder {
 
         DISCOVERABLE_AT,
 
+        TEMPLATE_RECENT_SALES,
+
         TEMPLATE_USAGE,
 
         TOTAL_INSTALLS_LAST30DAYS,
@@ -105,6 +114,8 @@ public final class ListAppsRequestOrder {
         T visitCreatedAt();
 
         T visitDiscoverableAt();
+
+        T visitTemplateRecentSales();
 
         T visitTemplateUsage();
 

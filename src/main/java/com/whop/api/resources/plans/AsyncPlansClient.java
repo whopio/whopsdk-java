@@ -5,6 +5,7 @@ package com.whop.api.resources.plans;
 
 import com.whop.api.core.ClientOptions;
 import com.whop.api.core.RequestOptions;
+import com.whop.api.core.WhopApiHttpResponse;
 import com.whop.api.core.pagination.SyncPagingIterable;
 import com.whop.api.resources.plans.requests.CalculateTaxPlansRequest;
 import com.whop.api.resources.plans.requests.CreatePlansRequest;
@@ -36,159 +37,349 @@ public class AsyncPlansClient {
     }
 
     /**
-     * Returns a paginated list of plans belonging to an account, with optional filtering by visibility, type, release method, and product.
+     * Deprecated compatibility endpoint. List variants with <code>GET /variants</code> instead.
      */
-    public CompletableFuture<SyncPagingIterable<PlanListItem>> list(ListPlansRequest request) {
-        return this.rawClient.list(request).thenApply(response -> response.body());
+    public CompletableFuture<SyncPagingIterable<PlanListItem>> list() {
+        CompletableFuture<WhopApiHttpResponse<SyncPagingIterable<PlanListItem>>> rawFuture = this.rawClient.list();
+        CompletableFuture<SyncPagingIterable<PlanListItem>> future = rawFuture.thenApply(response -> response.body());
+        future.whenComplete((result_, throwable_) -> {
+            if (future.isCancelled()) {
+                rawFuture.cancel(true);
+            }
+        });
+        return future;
     }
 
     /**
-     * Returns a paginated list of plans belonging to an account, with optional filtering by visibility, type, release method, and product.
+     * Deprecated compatibility endpoint. List variants with <code>GET /variants</code> instead.
+     */
+    public CompletableFuture<SyncPagingIterable<PlanListItem>> list(RequestOptions requestOptions) {
+        CompletableFuture<WhopApiHttpResponse<SyncPagingIterable<PlanListItem>>> rawFuture =
+                this.rawClient.list(requestOptions);
+        CompletableFuture<SyncPagingIterable<PlanListItem>> future = rawFuture.thenApply(response -> response.body());
+        future.whenComplete((result_, throwable_) -> {
+            if (future.isCancelled()) {
+                rawFuture.cancel(true);
+            }
+        });
+        return future;
+    }
+
+    /**
+     * Deprecated compatibility endpoint. List variants with <code>GET /variants</code> instead.
+     */
+    public CompletableFuture<SyncPagingIterable<PlanListItem>> list(ListPlansRequest request) {
+        CompletableFuture<WhopApiHttpResponse<SyncPagingIterable<PlanListItem>>> rawFuture =
+                this.rawClient.list(request);
+        CompletableFuture<SyncPagingIterable<PlanListItem>> future = rawFuture.thenApply(response -> response.body());
+        future.whenComplete((result_, throwable_) -> {
+            if (future.isCancelled()) {
+                rawFuture.cancel(true);
+            }
+        });
+        return future;
+    }
+
+    /**
+     * Deprecated compatibility endpoint. List variants with <code>GET /variants</code> instead.
      */
     public CompletableFuture<SyncPagingIterable<PlanListItem>> list(
             ListPlansRequest request, RequestOptions requestOptions) {
-        return this.rawClient.list(request, requestOptions).thenApply(response -> response.body());
+        CompletableFuture<WhopApiHttpResponse<SyncPagingIterable<PlanListItem>>> rawFuture =
+                this.rawClient.list(request, requestOptions);
+        CompletableFuture<SyncPagingIterable<PlanListItem>> future = rawFuture.thenApply(response -> response.body());
+        future.whenComplete((result_, throwable_) -> {
+            if (future.isCancelled()) {
+                rawFuture.cancel(true);
+            }
+        });
+        return future;
     }
 
     /**
-     * Create a new pricing plan for a product. The plan defines the billing interval, price, and availability for customers.
+     * Deprecated compatibility endpoint. Create variants with <code>POST /variants</code> instead.
      */
     public CompletableFuture<Plan> create() {
-        return this.rawClient.create().thenApply(response -> response.body());
+        CompletableFuture<WhopApiHttpResponse<Plan>> rawFuture = this.rawClient.create();
+        CompletableFuture<Plan> future = rawFuture.thenApply(response -> response.body());
+        future.whenComplete((result_, throwable_) -> {
+            if (future.isCancelled()) {
+                rawFuture.cancel(true);
+            }
+        });
+        return future;
     }
 
     /**
-     * Create a new pricing plan for a product. The plan defines the billing interval, price, and availability for customers.
+     * Deprecated compatibility endpoint. Create variants with <code>POST /variants</code> instead.
      */
     public CompletableFuture<Plan> create(RequestOptions requestOptions) {
-        return this.rawClient.create(requestOptions).thenApply(response -> response.body());
+        CompletableFuture<WhopApiHttpResponse<Plan>> rawFuture = this.rawClient.create(requestOptions);
+        CompletableFuture<Plan> future = rawFuture.thenApply(response -> response.body());
+        future.whenComplete((result_, throwable_) -> {
+            if (future.isCancelled()) {
+                rawFuture.cancel(true);
+            }
+        });
+        return future;
     }
 
     /**
-     * Create a new pricing plan for a product. The plan defines the billing interval, price, and availability for customers.
+     * Deprecated compatibility endpoint. Create variants with <code>POST /variants</code> instead.
      */
     public CompletableFuture<Plan> create(CreatePlansRequest request) {
-        return this.rawClient.create(request).thenApply(response -> response.body());
+        CompletableFuture<WhopApiHttpResponse<Plan>> rawFuture = this.rawClient.create(request);
+        CompletableFuture<Plan> future = rawFuture.thenApply(response -> response.body());
+        future.whenComplete((result_, throwable_) -> {
+            if (future.isCancelled()) {
+                rawFuture.cancel(true);
+            }
+        });
+        return future;
     }
 
     /**
-     * Create a new pricing plan for a product. The plan defines the billing interval, price, and availability for customers.
+     * Deprecated compatibility endpoint. Create variants with <code>POST /variants</code> instead.
      */
     public CompletableFuture<Plan> create(CreatePlansRequest request, RequestOptions requestOptions) {
-        return this.rawClient.create(request, requestOptions).thenApply(response -> response.body());
+        CompletableFuture<WhopApiHttpResponse<Plan>> rawFuture = this.rawClient.create(request, requestOptions);
+        CompletableFuture<Plan> future = rawFuture.thenApply(response -> response.body());
+        future.whenComplete((result_, throwable_) -> {
+            if (future.isCancelled()) {
+                rawFuture.cancel(true);
+            }
+        });
+        return future;
     }
 
     /**
-     * Retrieves the details of an existing plan.
+     * Deprecated compatibility endpoint. Retrieve variants with <code>GET /variants/{id}</code> instead.
      */
     public CompletableFuture<Plan> retrieve(String id) {
-        return this.rawClient.retrieve(id).thenApply(response -> response.body());
+        CompletableFuture<WhopApiHttpResponse<Plan>> rawFuture = this.rawClient.retrieve(id);
+        CompletableFuture<Plan> future = rawFuture.thenApply(response -> response.body());
+        future.whenComplete((result_, throwable_) -> {
+            if (future.isCancelled()) {
+                rawFuture.cancel(true);
+            }
+        });
+        return future;
     }
 
     /**
-     * Retrieves the details of an existing plan.
+     * Deprecated compatibility endpoint. Retrieve variants with <code>GET /variants/{id}</code> instead.
      */
     public CompletableFuture<Plan> retrieve(String id, RequestOptions requestOptions) {
-        return this.rawClient.retrieve(id, requestOptions).thenApply(response -> response.body());
+        CompletableFuture<WhopApiHttpResponse<Plan>> rawFuture = this.rawClient.retrieve(id, requestOptions);
+        CompletableFuture<Plan> future = rawFuture.thenApply(response -> response.body());
+        future.whenComplete((result_, throwable_) -> {
+            if (future.isCancelled()) {
+                rawFuture.cancel(true);
+            }
+        });
+        return future;
     }
 
     /**
-     * Retrieves the details of an existing plan.
+     * Deprecated compatibility endpoint. Retrieve variants with <code>GET /variants/{id}</code> instead.
      */
     public CompletableFuture<Plan> retrieve(String id, RetrievePlansRequest request) {
-        return this.rawClient.retrieve(id, request).thenApply(response -> response.body());
+        CompletableFuture<WhopApiHttpResponse<Plan>> rawFuture = this.rawClient.retrieve(id, request);
+        CompletableFuture<Plan> future = rawFuture.thenApply(response -> response.body());
+        future.whenComplete((result_, throwable_) -> {
+            if (future.isCancelled()) {
+                rawFuture.cancel(true);
+            }
+        });
+        return future;
     }
 
     /**
-     * Retrieves the details of an existing plan.
+     * Deprecated compatibility endpoint. Retrieve variants with <code>GET /variants/{id}</code> instead.
      */
     public CompletableFuture<Plan> retrieve(String id, RetrievePlansRequest request, RequestOptions requestOptions) {
-        return this.rawClient.retrieve(id, request, requestOptions).thenApply(response -> response.body());
+        CompletableFuture<WhopApiHttpResponse<Plan>> rawFuture = this.rawClient.retrieve(id, request, requestOptions);
+        CompletableFuture<Plan> future = rawFuture.thenApply(response -> response.body());
+        future.whenComplete((result_, throwable_) -> {
+            if (future.isCancelled()) {
+                rawFuture.cancel(true);
+            }
+        });
+        return future;
     }
 
     /**
-     * Permanently delete a plan from a product. Existing memberships on this plan will not be affected.
+     * Deprecated compatibility endpoint. Delete variants with <code>DELETE /variants/{id}</code> instead.
      */
     public CompletableFuture<DeletePlansResponse> delete(String id) {
-        return this.rawClient.delete(id).thenApply(response -> response.body());
+        CompletableFuture<WhopApiHttpResponse<DeletePlansResponse>> rawFuture = this.rawClient.delete(id);
+        CompletableFuture<DeletePlansResponse> future = rawFuture.thenApply(response -> response.body());
+        future.whenComplete((result_, throwable_) -> {
+            if (future.isCancelled()) {
+                rawFuture.cancel(true);
+            }
+        });
+        return future;
     }
 
     /**
-     * Permanently delete a plan from a product. Existing memberships on this plan will not be affected.
+     * Deprecated compatibility endpoint. Delete variants with <code>DELETE /variants/{id}</code> instead.
      */
     public CompletableFuture<DeletePlansResponse> delete(String id, RequestOptions requestOptions) {
-        return this.rawClient.delete(id, requestOptions).thenApply(response -> response.body());
+        CompletableFuture<WhopApiHttpResponse<DeletePlansResponse>> rawFuture =
+                this.rawClient.delete(id, requestOptions);
+        CompletableFuture<DeletePlansResponse> future = rawFuture.thenApply(response -> response.body());
+        future.whenComplete((result_, throwable_) -> {
+            if (future.isCancelled()) {
+                rawFuture.cancel(true);
+            }
+        });
+        return future;
     }
 
     /**
-     * Permanently delete a plan from a product. Existing memberships on this plan will not be affected.
+     * Deprecated compatibility endpoint. Delete variants with <code>DELETE /variants/{id}</code> instead.
      */
     public CompletableFuture<DeletePlansResponse> delete(String id, DeletePlansRequest request) {
-        return this.rawClient.delete(id, request).thenApply(response -> response.body());
+        CompletableFuture<WhopApiHttpResponse<DeletePlansResponse>> rawFuture = this.rawClient.delete(id, request);
+        CompletableFuture<DeletePlansResponse> future = rawFuture.thenApply(response -> response.body());
+        future.whenComplete((result_, throwable_) -> {
+            if (future.isCancelled()) {
+                rawFuture.cancel(true);
+            }
+        });
+        return future;
     }
 
     /**
-     * Permanently delete a plan from a product. Existing memberships on this plan will not be affected.
+     * Deprecated compatibility endpoint. Delete variants with <code>DELETE /variants/{id}</code> instead.
      */
     public CompletableFuture<DeletePlansResponse> delete(
             String id, DeletePlansRequest request, RequestOptions requestOptions) {
-        return this.rawClient.delete(id, request, requestOptions).thenApply(response -> response.body());
+        CompletableFuture<WhopApiHttpResponse<DeletePlansResponse>> rawFuture =
+                this.rawClient.delete(id, request, requestOptions);
+        CompletableFuture<DeletePlansResponse> future = rawFuture.thenApply(response -> response.body());
+        future.whenComplete((result_, throwable_) -> {
+            if (future.isCancelled()) {
+                rawFuture.cancel(true);
+            }
+        });
+        return future;
     }
 
     /**
-     * Update a plan's pricing, billing interval, visibility, stock, and other settings.
+     * Deprecated compatibility endpoint. Update variants with <code>PATCH /variants/{id}</code> instead.
      */
     public CompletableFuture<Plan> update(String id) {
-        return this.rawClient.update(id).thenApply(response -> response.body());
+        CompletableFuture<WhopApiHttpResponse<Plan>> rawFuture = this.rawClient.update(id);
+        CompletableFuture<Plan> future = rawFuture.thenApply(response -> response.body());
+        future.whenComplete((result_, throwable_) -> {
+            if (future.isCancelled()) {
+                rawFuture.cancel(true);
+            }
+        });
+        return future;
     }
 
     /**
-     * Update a plan's pricing, billing interval, visibility, stock, and other settings.
+     * Deprecated compatibility endpoint. Update variants with <code>PATCH /variants/{id}</code> instead.
      */
     public CompletableFuture<Plan> update(String id, RequestOptions requestOptions) {
-        return this.rawClient.update(id, requestOptions).thenApply(response -> response.body());
+        CompletableFuture<WhopApiHttpResponse<Plan>> rawFuture = this.rawClient.update(id, requestOptions);
+        CompletableFuture<Plan> future = rawFuture.thenApply(response -> response.body());
+        future.whenComplete((result_, throwable_) -> {
+            if (future.isCancelled()) {
+                rawFuture.cancel(true);
+            }
+        });
+        return future;
     }
 
     /**
-     * Update a plan's pricing, billing interval, visibility, stock, and other settings.
+     * Deprecated compatibility endpoint. Update variants with <code>PATCH /variants/{id}</code> instead.
      */
     public CompletableFuture<Plan> update(String id, UpdatePlansRequest request) {
-        return this.rawClient.update(id, request).thenApply(response -> response.body());
+        CompletableFuture<WhopApiHttpResponse<Plan>> rawFuture = this.rawClient.update(id, request);
+        CompletableFuture<Plan> future = rawFuture.thenApply(response -> response.body());
+        future.whenComplete((result_, throwable_) -> {
+            if (future.isCancelled()) {
+                rawFuture.cancel(true);
+            }
+        });
+        return future;
     }
 
     /**
-     * Update a plan's pricing, billing interval, visibility, stock, and other settings.
+     * Deprecated compatibility endpoint. Update variants with <code>PATCH /variants/{id}</code> instead.
      */
     public CompletableFuture<Plan> update(String id, UpdatePlansRequest request, RequestOptions requestOptions) {
-        return this.rawClient.update(id, request, requestOptions).thenApply(response -> response.body());
+        CompletableFuture<WhopApiHttpResponse<Plan>> rawFuture = this.rawClient.update(id, request, requestOptions);
+        CompletableFuture<Plan> future = rawFuture.thenApply(response -> response.body());
+        future.whenComplete((result_, throwable_) -> {
+            if (future.isCancelled()) {
+                rawFuture.cancel(true);
+            }
+        });
+        return future;
     }
 
     /**
-     * Previews tax for a plan before checkout, based on the buyer's location.
+     * Deprecated compatibility endpoint. Quote tax with <code>POST /payment_quotes</code> instead.
      */
     public CompletableFuture<CalculateTaxPlansResponse> calculateTax(String id) {
-        return this.rawClient.calculateTax(id).thenApply(response -> response.body());
+        CompletableFuture<WhopApiHttpResponse<CalculateTaxPlansResponse>> rawFuture = this.rawClient.calculateTax(id);
+        CompletableFuture<CalculateTaxPlansResponse> future = rawFuture.thenApply(response -> response.body());
+        future.whenComplete((result_, throwable_) -> {
+            if (future.isCancelled()) {
+                rawFuture.cancel(true);
+            }
+        });
+        return future;
     }
 
     /**
-     * Previews tax for a plan before checkout, based on the buyer's location.
+     * Deprecated compatibility endpoint. Quote tax with <code>POST /payment_quotes</code> instead.
      */
     public CompletableFuture<CalculateTaxPlansResponse> calculateTax(String id, RequestOptions requestOptions) {
-        return this.rawClient.calculateTax(id, requestOptions).thenApply(response -> response.body());
+        CompletableFuture<WhopApiHttpResponse<CalculateTaxPlansResponse>> rawFuture =
+                this.rawClient.calculateTax(id, requestOptions);
+        CompletableFuture<CalculateTaxPlansResponse> future = rawFuture.thenApply(response -> response.body());
+        future.whenComplete((result_, throwable_) -> {
+            if (future.isCancelled()) {
+                rawFuture.cancel(true);
+            }
+        });
+        return future;
     }
 
     /**
-     * Previews tax for a plan before checkout, based on the buyer's location.
+     * Deprecated compatibility endpoint. Quote tax with <code>POST /payment_quotes</code> instead.
      */
     public CompletableFuture<CalculateTaxPlansResponse> calculateTax(String id, CalculateTaxPlansRequest request) {
-        return this.rawClient.calculateTax(id, request).thenApply(response -> response.body());
+        CompletableFuture<WhopApiHttpResponse<CalculateTaxPlansResponse>> rawFuture =
+                this.rawClient.calculateTax(id, request);
+        CompletableFuture<CalculateTaxPlansResponse> future = rawFuture.thenApply(response -> response.body());
+        future.whenComplete((result_, throwable_) -> {
+            if (future.isCancelled()) {
+                rawFuture.cancel(true);
+            }
+        });
+        return future;
     }
 
     /**
-     * Previews tax for a plan before checkout, based on the buyer's location.
+     * Deprecated compatibility endpoint. Quote tax with <code>POST /payment_quotes</code> instead.
      */
     public CompletableFuture<CalculateTaxPlansResponse> calculateTax(
             String id, CalculateTaxPlansRequest request, RequestOptions requestOptions) {
-        return this.rawClient.calculateTax(id, request, requestOptions).thenApply(response -> response.body());
+        CompletableFuture<WhopApiHttpResponse<CalculateTaxPlansResponse>> rawFuture =
+                this.rawClient.calculateTax(id, request, requestOptions);
+        CompletableFuture<CalculateTaxPlansResponse> future = rawFuture.thenApply(response -> response.body());
+        future.whenComplete((result_, throwable_) -> {
+            if (future.isCancelled()) {
+                rawFuture.cancel(true);
+            }
+        });
+        return future;
     }
 }

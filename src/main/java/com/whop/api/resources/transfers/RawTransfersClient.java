@@ -4,11 +4,14 @@
 package com.whop.api.resources.transfers;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
+import com.whop.api.core.BodyProperties;
 import com.whop.api.core.ClientOptions;
 import com.whop.api.core.MediaTypes;
 import com.whop.api.core.ObjectMappers;
+import com.whop.api.core.PathSegments;
 import com.whop.api.core.QueryStringMapper;
 import com.whop.api.core.RequestOptions;
+import com.whop.api.core.RetryInterceptor;
 import com.whop.api.core.WhopApiApiException;
 import com.whop.api.core.WhopApiException;
 import com.whop.api.core.WhopApiHttpResponse;
@@ -18,17 +21,16 @@ import com.whop.api.errors.ConflictError;
 import com.whop.api.errors.ForbiddenError;
 import com.whop.api.errors.NotFoundError;
 import com.whop.api.errors.UnauthorizedError;
-import com.whop.api.resources.transfers.requests.CreateTransfersRequest;
 import com.whop.api.resources.transfers.requests.ListRecipientsTransfersRequest;
 import com.whop.api.resources.transfers.requests.ListTransfersRequest;
 import com.whop.api.resources.transfers.requests.RetrieveTransfersRequest;
+import com.whop.api.resources.transfers.types.CreateTransfersRequestBody;
 import com.whop.api.resources.transfers.types.CreateTransfersResponse;
 import com.whop.api.resources.transfers.types.ListRecipientsTransfersResponse;
 import com.whop.api.resources.transfers.types.ListRecipientsTransfersResponseDataItem;
 import com.whop.api.resources.transfers.types.ListTransfersResponse;
 import com.whop.api.resources.transfers.types.ListTransfersResponseDataItem;
 import com.whop.api.resources.transfers.types.RetrieveTransfersResponse;
-import com.whop.api.types.V1ErrorResponse;
 import java.io.IOException;
 import java.util.List;
 import java.util.Optional;
@@ -48,32 +50,32 @@ public class RawTransfersClient {
     }
 
     /**
-     * Lists an account's transfers.
+     * Lists the transfers you can see, sent or received, newest first by default. Optional account filters narrow the results.
      */
     public WhopApiHttpResponse<SyncPagingIterable<ListTransfersResponseDataItem>> list() {
         return list(ListTransfersRequest.builder().build());
     }
 
     /**
-     * Lists an account's transfers.
+     * Lists the transfers you can see, sent or received, newest first by default. Optional account filters narrow the results.
      */
     public WhopApiHttpResponse<SyncPagingIterable<ListTransfersResponseDataItem>> list(RequestOptions requestOptions) {
         return list(ListTransfersRequest.builder().build(), requestOptions);
     }
 
     /**
-     * Lists an account's transfers.
+     * Lists the transfers you can see, sent or received, newest first by default. Optional account filters narrow the results.
      */
     public WhopApiHttpResponse<SyncPagingIterable<ListTransfersResponseDataItem>> list(ListTransfersRequest request) {
         return list(request, null);
     }
 
     /**
-     * Lists an account's transfers.
+     * Lists the transfers you can see, sent or received, newest first by default. Optional account filters narrow the results.
      */
     public WhopApiHttpResponse<SyncPagingIterable<ListTransfersResponseDataItem>> list(
             ListTransfersRequest request, RequestOptions requestOptions) {
-        HttpUrl.Builder httpUrl = HttpUrl.parse(this.clientOptions.environment().getUrl())
+        HttpUrl.Builder httpUrl = HttpUrl.parse(this.clientOptions.environment().getApiURL())
                 .newBuilder()
                 .addPathSegments("transfers");
         if (request.getOriginId().isPresent()) {
@@ -131,6 +133,15 @@ public class RawTransfersClient {
         if (requestOptions != null && requestOptions.getTimeout().isPresent()) {
             client = clientOptions.httpClientWithTimeout(requestOptions);
         }
+        if (requestOptions != null && requestOptions.getMaxRetries().isPresent()) {
+            okhttpRequest = okhttpRequest
+                    .newBuilder()
+                    .tag(
+                            RetryInterceptor.MaxRetriesOverride.class,
+                            new RetryInterceptor.MaxRetriesOverride(
+                                    requestOptions.getMaxRetries().get()))
+                    .build();
+        }
         try (Response response = client.newCall(okhttpRequest).execute()) {
             ResponseBody responseBody = response.body();
             String responseBodyString = responseBody != null ? responseBody.string() : "{}";
@@ -145,39 +156,36 @@ public class RawTransfersClient {
                 List<ListTransfersResponseDataItem> result = parsedResponse.getData();
                 return new WhopApiHttpResponse<>(
                         new SyncPagingIterable<ListTransfersResponseDataItem>(
-                                startingAfter != null, result, parsedResponse, () -> list(nextRequest, requestOptions)
-                                        .body()),
+                                startingAfter.isPresent()
+                                        && !startingAfter.get().isEmpty(),
+                                result,
+                                parsedResponse,
+                                () -> list(nextRequest, requestOptions).body()),
                         response);
-            }
-            try {
-                if (response.code() == 400) {
-                    throw new BadRequestError(
-                            ObjectMappers.JSON_MAPPER.readValue(responseBodyString, Object.class), response);
-                }
-            } catch (JsonProcessingException ignored) {
-                // unable to map error response, throwing generic error
             }
             Object errorBody = ObjectMappers.parseErrorBody(responseBodyString);
             throw new WhopApiApiException(
                     "Error with status code " + response.code(), response.code(), errorBody, response);
+        } catch (JsonProcessingException e) {
+            throw new WhopApiException("Failed to deserialize response: " + e.getMessage(), e);
         } catch (IOException e) {
             throw new WhopApiException("Network error executing HTTP request", e);
         }
     }
 
     /**
-     * Moves money between accounts, or into a claim link anyone with the URL can redeem.
+     * Moves money between Whop balances or funds a claim link anyone with the URL can redeem. The <code>type</code> you send decides which object comes back.
      */
-    public WhopApiHttpResponse<CreateTransfersResponse> create(CreateTransfersRequest request) {
+    public WhopApiHttpResponse<CreateTransfersResponse> create(CreateTransfersRequestBody request) {
         return create(request, null);
     }
 
     /**
-     * Moves money between accounts, or into a claim link anyone with the URL can redeem.
+     * Moves money between Whop balances or funds a claim link anyone with the URL can redeem. The <code>type</code> you send decides which object comes back.
      */
     public WhopApiHttpResponse<CreateTransfersResponse> create(
-            CreateTransfersRequest request, RequestOptions requestOptions) {
-        HttpUrl.Builder httpUrl = HttpUrl.parse(this.clientOptions.environment().getUrl())
+            CreateTransfersRequestBody request, RequestOptions requestOptions) {
+        HttpUrl.Builder httpUrl = HttpUrl.parse(this.clientOptions.environment().getApiURL())
                 .newBuilder()
                 .addPathSegments("transfers");
         if (requestOptions != null) {
@@ -188,7 +196,9 @@ public class RawTransfersClient {
         RequestBody body;
         try {
             body = RequestBody.create(
-                    ObjectMappers.JSON_MAPPER.writeValueAsBytes(request), MediaTypes.APPLICATION_JSON);
+                    ObjectMappers.JSON_MAPPER.writeValueAsBytes(BodyProperties.merge(
+                            request, requestOptions != null ? requestOptions.getBodyProperties() : null)),
+                    MediaTypes.APPLICATION_JSON);
         } catch (JsonProcessingException e) {
             throw new WhopApiException("Failed to serialize request", e);
         }
@@ -202,6 +212,15 @@ public class RawTransfersClient {
         OkHttpClient client = clientOptions.httpClient();
         if (requestOptions != null && requestOptions.getTimeout().isPresent()) {
             client = clientOptions.httpClientWithTimeout(requestOptions);
+        }
+        if (requestOptions != null && requestOptions.getMaxRetries().isPresent()) {
+            okhttpRequest = okhttpRequest
+                    .newBuilder()
+                    .tag(
+                            RetryInterceptor.MaxRetriesOverride.class,
+                            new RetryInterceptor.MaxRetriesOverride(
+                                    requestOptions.getMaxRetries().get()))
+                    .build();
         }
         try (Response response = client.newCall(okhttpRequest).execute()) {
             ResponseBody responseBody = response.body();
@@ -224,8 +243,7 @@ public class RawTransfersClient {
                                 ObjectMappers.JSON_MAPPER.readValue(responseBodyString, Object.class), response);
                     case 409:
                         throw new ConflictError(
-                                ObjectMappers.JSON_MAPPER.readValue(responseBodyString, V1ErrorResponse.class),
-                                response);
+                                ObjectMappers.JSON_MAPPER.readValue(responseBodyString, Object.class), response);
                 }
             } catch (JsonProcessingException ignored) {
                 // unable to map error response, throwing generic error
@@ -233,13 +251,15 @@ public class RawTransfersClient {
             Object errorBody = ObjectMappers.parseErrorBody(responseBodyString);
             throw new WhopApiApiException(
                     "Error with status code " + response.code(), response.code(), errorBody, response);
+        } catch (JsonProcessingException e) {
+            throw new WhopApiException("Failed to deserialize response: " + e.getMessage(), e);
         } catch (IOException e) {
             throw new WhopApiException("Network error executing HTTP request", e);
         }
     }
 
     /**
-     * Lists the people and accounts you can send money to.
+     * Lists the people and accounts you can send money to from a balance. Pass a result's ID as <code>destination_id</code> when creating a transfer.
      */
     public WhopApiHttpResponse<SyncPagingIterable<ListRecipientsTransfersResponseDataItem>> listRecipients(
             ListRecipientsTransfersRequest request) {
@@ -247,11 +267,11 @@ public class RawTransfersClient {
     }
 
     /**
-     * Lists the people and accounts you can send money to.
+     * Lists the people and accounts you can send money to from a balance. Pass a result's ID as <code>destination_id</code> when creating a transfer.
      */
     public WhopApiHttpResponse<SyncPagingIterable<ListRecipientsTransfersResponseDataItem>> listRecipients(
             ListRecipientsTransfersRequest request, RequestOptions requestOptions) {
-        HttpUrl.Builder httpUrl = HttpUrl.parse(this.clientOptions.environment().getUrl())
+        HttpUrl.Builder httpUrl = HttpUrl.parse(this.clientOptions.environment().getApiURL())
                 .newBuilder()
                 .addPathSegments("transfers/recipients");
         QueryStringMapper.addQueryParameter(httpUrl, "origin_id", request.getOriginId(), false);
@@ -282,6 +302,15 @@ public class RawTransfersClient {
         if (requestOptions != null && requestOptions.getTimeout().isPresent()) {
             client = clientOptions.httpClientWithTimeout(requestOptions);
         }
+        if (requestOptions != null && requestOptions.getMaxRetries().isPresent()) {
+            okhttpRequest = okhttpRequest
+                    .newBuilder()
+                    .tag(
+                            RetryInterceptor.MaxRetriesOverride.class,
+                            new RetryInterceptor.MaxRetriesOverride(
+                                    requestOptions.getMaxRetries().get()))
+                    .build();
+        }
         try (Response response = client.newCall(okhttpRequest).execute()) {
             ResponseBody responseBody = response.body();
             String responseBodyString = responseBody != null ? responseBody.string() : "{}";
@@ -296,8 +325,11 @@ public class RawTransfersClient {
                 List<ListRecipientsTransfersResponseDataItem> result = parsedResponse.getData();
                 return new WhopApiHttpResponse<>(
                         new SyncPagingIterable<ListRecipientsTransfersResponseDataItem>(
-                                startingAfter != null, result, parsedResponse, () -> listRecipients(
-                                                nextRequest, requestOptions)
+                                startingAfter.isPresent()
+                                        && !startingAfter.get().isEmpty(),
+                                result,
+                                parsedResponse,
+                                () -> listRecipients(nextRequest, requestOptions)
                                         .body()),
                         response);
             }
@@ -322,6 +354,8 @@ public class RawTransfersClient {
             Object errorBody = ObjectMappers.parseErrorBody(responseBodyString);
             throw new WhopApiApiException(
                     "Error with status code " + response.code(), response.code(), errorBody, response);
+        } catch (JsonProcessingException e) {
+            throw new WhopApiException("Failed to deserialize response: " + e.getMessage(), e);
         } catch (IOException e) {
             throw new WhopApiException("Network error executing HTTP request", e);
         }
@@ -353,10 +387,10 @@ public class RawTransfersClient {
      */
     public WhopApiHttpResponse<RetrieveTransfersResponse> retrieve(
             String id, RetrieveTransfersRequest request, RequestOptions requestOptions) {
-        HttpUrl.Builder httpUrl = HttpUrl.parse(this.clientOptions.environment().getUrl())
+        HttpUrl.Builder httpUrl = HttpUrl.parse(this.clientOptions.environment().getApiURL())
                 .newBuilder()
                 .addPathSegments("transfers")
-                .addPathSegment(id);
+                .addPathSegment(PathSegments.validate(id));
         if (requestOptions != null) {
             requestOptions.getQueryParameters().forEach((_key, _value) -> {
                 httpUrl.addQueryParameter(_key, _value);
@@ -371,6 +405,15 @@ public class RawTransfersClient {
         OkHttpClient client = clientOptions.httpClient();
         if (requestOptions != null && requestOptions.getTimeout().isPresent()) {
             client = clientOptions.httpClientWithTimeout(requestOptions);
+        }
+        if (requestOptions != null && requestOptions.getMaxRetries().isPresent()) {
+            okhttpRequest = okhttpRequest
+                    .newBuilder()
+                    .tag(
+                            RetryInterceptor.MaxRetriesOverride.class,
+                            new RetryInterceptor.MaxRetriesOverride(
+                                    requestOptions.getMaxRetries().get()))
+                    .build();
         }
         try (Response response = client.newCall(okhttpRequest).execute()) {
             ResponseBody responseBody = response.body();
@@ -391,6 +434,8 @@ public class RawTransfersClient {
             Object errorBody = ObjectMappers.parseErrorBody(responseBodyString);
             throw new WhopApiApiException(
                     "Error with status code " + response.code(), response.code(), errorBody, response);
+        } catch (JsonProcessingException e) {
+            throw new WhopApiException("Failed to deserialize response: " + e.getMessage(), e);
         } catch (IOException e) {
             throw new WhopApiException("Network error executing HTTP request", e);
         }

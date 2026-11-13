@@ -33,6 +33,8 @@ public final class ListCardTransactionsRequest {
 
     private final Optional<String> accountId;
 
+    private final Optional<String> userId;
+
     private final Optional<ListCardTransactionsRequestStatus> status;
 
     private final Optional<String> createdAfter;
@@ -58,6 +60,7 @@ public final class ListCardTransactionsRequest {
             Optional<List<String>> cardId,
             Optional<List<String>> cardholderId,
             Optional<String> accountId,
+            Optional<String> userId,
             Optional<ListCardTransactionsRequestStatus> status,
             Optional<String> createdAfter,
             Optional<String> createdBefore,
@@ -72,6 +75,7 @@ public final class ListCardTransactionsRequest {
         this.cardId = cardId;
         this.cardholderId = cardholderId;
         this.accountId = accountId;
+        this.userId = userId;
         this.status = status;
         this.createdAfter = createdAfter;
         this.createdBefore = createdBefore;
@@ -109,11 +113,19 @@ public final class ListCardTransactionsRequest {
     }
 
     /**
-     * @return The account whose card transactions to list, prefixed <code>biz_</code>. Defaults to the credential's account.
+     * @return The account whose card transactions to list, prefixed <code>biz_</code>. Provide this or <code>user_id</code>. Defaults to the credential's account.
      */
     @JsonProperty("account_id")
     public Optional<String> getAccountId() {
         return accountId;
+    }
+
+    /**
+     * @return The user whose personal card transactions to list, prefixed <code>user_</code>. Provide this or <code>account_id</code>. Only that user can read them.
+     */
+    @JsonProperty("user_id")
+    public Optional<String> getUserId() {
+        return userId;
     }
 
     /**
@@ -157,7 +169,7 @@ public final class ListCardTransactionsRequest {
     }
 
     /**
-     * @return The number of card transactions to return.
+     * @return Number of results to return from the start of the range.
      */
     @JsonProperty("first")
     public Optional<Integer> getFirst() {
@@ -165,7 +177,7 @@ public final class ListCardTransactionsRequest {
     }
 
     /**
-     * @return A cursor; returns card transactions after this position.
+     * @return Return results after this cursor. Use <code>page_info.end_cursor</code> from the previous response to fetch the next page.
      */
     @JsonProperty("after")
     public Optional<String> getAfter() {
@@ -173,7 +185,7 @@ public final class ListCardTransactionsRequest {
     }
 
     /**
-     * @return The number of card transactions to return, counting back from the end.
+     * @return Number of results to return from the end of the range.
      */
     @JsonProperty("last")
     public Optional<Integer> getLast() {
@@ -181,7 +193,7 @@ public final class ListCardTransactionsRequest {
     }
 
     /**
-     * @return A cursor; returns card transactions before this position.
+     * @return Return results before this cursor. Use <code>page_info.start_cursor</code> from the previous response to fetch the previous page.
      */
     @JsonProperty("before")
     public Optional<String> getBefore() {
@@ -204,6 +216,7 @@ public final class ListCardTransactionsRequest {
                 && cardId.equals(other.cardId)
                 && cardholderId.equals(other.cardholderId)
                 && accountId.equals(other.accountId)
+                && userId.equals(other.userId)
                 && status.equals(other.status)
                 && createdAfter.equals(other.createdAfter)
                 && createdBefore.equals(other.createdBefore)
@@ -222,6 +235,7 @@ public final class ListCardTransactionsRequest {
                 this.cardId,
                 this.cardholderId,
                 this.accountId,
+                this.userId,
                 this.status,
                 this.createdAfter,
                 this.createdBefore,
@@ -252,6 +266,8 @@ public final class ListCardTransactionsRequest {
 
         private Optional<String> accountId = Optional.empty();
 
+        private Optional<String> userId = Optional.empty();
+
         private Optional<ListCardTransactionsRequestStatus> status = Optional.empty();
 
         private Optional<String> createdAfter = Optional.empty();
@@ -270,7 +286,6 @@ public final class ListCardTransactionsRequest {
 
         private Optional<String> before = Optional.empty();
 
-        @JsonAnySetter
         private Map<String, Object> additionalProperties = new HashMap<>();
 
         private Builder() {}
@@ -280,6 +295,7 @@ public final class ListCardTransactionsRequest {
             cardId(other.getCardId());
             cardholderId(other.getCardholderId());
             accountId(other.getAccountId());
+            userId(other.getUserId());
             status(other.getStatus());
             createdAfter(other.getCreatedAfter());
             createdBefore(other.getCreatedBefore());
@@ -350,7 +366,7 @@ public final class ListCardTransactionsRequest {
         }
 
         /**
-         * <p>The account whose card transactions to list, prefixed <code>biz_</code>. Defaults to the credential's account.</p>
+         * <p>The account whose card transactions to list, prefixed <code>biz_</code>. Provide this or <code>user_id</code>. Defaults to the credential's account.</p>
          */
         @JsonSetter(value = "account_id", nulls = Nulls.SKIP)
         public Builder accountId(Optional<String> accountId) {
@@ -360,6 +376,20 @@ public final class ListCardTransactionsRequest {
 
         public Builder accountId(String accountId) {
             this.accountId = Optional.ofNullable(accountId);
+            return this;
+        }
+
+        /**
+         * <p>The user whose personal card transactions to list, prefixed <code>user_</code>. Provide this or <code>account_id</code>. Only that user can read them.</p>
+         */
+        @JsonSetter(value = "user_id", nulls = Nulls.SKIP)
+        public Builder userId(Optional<String> userId) {
+            this.userId = userId;
+            return this;
+        }
+
+        public Builder userId(String userId) {
+            this.userId = Optional.ofNullable(userId);
             return this;
         }
 
@@ -434,7 +464,7 @@ public final class ListCardTransactionsRequest {
         }
 
         /**
-         * <p>The number of card transactions to return.</p>
+         * <p>Number of results to return from the start of the range.</p>
          */
         @JsonSetter(value = "first", nulls = Nulls.SKIP)
         public Builder first(Optional<Integer> first) {
@@ -448,7 +478,7 @@ public final class ListCardTransactionsRequest {
         }
 
         /**
-         * <p>A cursor; returns card transactions after this position.</p>
+         * <p>Return results after this cursor. Use <code>page_info.end_cursor</code> from the previous response to fetch the next page.</p>
          */
         @JsonSetter(value = "after", nulls = Nulls.SKIP)
         public Builder after(Optional<String> after) {
@@ -462,7 +492,7 @@ public final class ListCardTransactionsRequest {
         }
 
         /**
-         * <p>The number of card transactions to return, counting back from the end.</p>
+         * <p>Number of results to return from the end of the range.</p>
          */
         @JsonSetter(value = "last", nulls = Nulls.SKIP)
         public Builder last(Optional<Integer> last) {
@@ -476,7 +506,7 @@ public final class ListCardTransactionsRequest {
         }
 
         /**
-         * <p>A cursor; returns card transactions before this position.</p>
+         * <p>Return results before this cursor. Use <code>page_info.start_cursor</code> from the previous response to fetch the previous page.</p>
          */
         @JsonSetter(value = "before", nulls = Nulls.SKIP)
         public Builder before(Optional<String> before) {
@@ -495,6 +525,7 @@ public final class ListCardTransactionsRequest {
                     cardId,
                     cardholderId,
                     accountId,
+                    userId,
                     status,
                     createdAfter,
                     createdBefore,
@@ -505,6 +536,27 @@ public final class ListCardTransactionsRequest {
                     last,
                     before,
                     additionalProperties);
+        }
+
+        @JsonAnySetter
+        private void putAdditionalPropertyFromJson(String key, Object value) {
+            if (key.equalsIgnoreCase("transaction_ids")
+                    || key.equalsIgnoreCase("card_id")
+                    || key.equalsIgnoreCase("cardholder_id")
+                    || key.equalsIgnoreCase("account_id")
+                    || key.equalsIgnoreCase("user_id")
+                    || key.equalsIgnoreCase("status")
+                    || key.equalsIgnoreCase("created_after")
+                    || key.equalsIgnoreCase("created_before")
+                    || key.equalsIgnoreCase("order")
+                    || key.equalsIgnoreCase("direction")
+                    || key.equalsIgnoreCase("first")
+                    || key.equalsIgnoreCase("after")
+                    || key.equalsIgnoreCase("last")
+                    || key.equalsIgnoreCase("before")) {
+                return;
+            }
+            this.additionalProperties.put(key, value);
         }
 
         public Builder additionalProperty(String key, Object value) {

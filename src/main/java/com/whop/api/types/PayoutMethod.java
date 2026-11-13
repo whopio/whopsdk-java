@@ -334,7 +334,6 @@ public final class PayoutMethod {
 
         private Optional<String> accountReference = Optional.empty();
 
-        @JsonAnySetter
         private Map<String, Object> additionalProperties = new HashMap<>();
 
         private Builder() {}
@@ -355,7 +354,6 @@ public final class PayoutMethod {
 
         /**
          * <p>The datetime the payout token was created.</p>
-         * <p>The datetime the payout token was created.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
@@ -366,7 +364,6 @@ public final class PayoutMethod {
         }
 
         /**
-         * <p>The three-letter ISO currency code that payouts are delivered in for this destination.</p>
          * <p>The three-letter ISO currency code that payouts are delivered in for this destination.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
@@ -379,7 +376,6 @@ public final class PayoutMethod {
 
         /**
          * <p>The unique identifier for the payout token.</p>
-         * <p>The unique identifier for the payout token.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
@@ -390,7 +386,6 @@ public final class PayoutMethod {
         }
 
         /**
-         * <p>Whether this is the default payout destination for the associated payout account.</p>
          * <p>Whether this is the default payout destination for the associated payout account.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
@@ -594,6 +589,22 @@ public final class PayoutMethod {
                     isDefault,
                     nickname,
                     additionalProperties);
+        }
+
+        @JsonAnySetter
+        private void putAdditionalPropertyFromJson(String key, Object value) {
+            if (key.equalsIgnoreCase("account_reference")
+                    || key.equalsIgnoreCase("company")
+                    || key.equalsIgnoreCase("created_at")
+                    || key.equalsIgnoreCase("currency")
+                    || key.equalsIgnoreCase("destination")
+                    || key.equalsIgnoreCase("id")
+                    || key.equalsIgnoreCase("institution_name")
+                    || key.equalsIgnoreCase("is_default")
+                    || key.equalsIgnoreCase("nickname")) {
+                return;
+            }
+            this.additionalProperties.put(key, value);
         }
 
         @java.lang.Override

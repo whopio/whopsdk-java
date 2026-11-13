@@ -36,6 +36,8 @@ public final class SocialAccount {
 
     private final Optional<SocialAccountParent> parentSocialAccount;
 
+    private final Optional<String> partnershipStatus;
+
     private final SocialAccountPlatform platform;
 
     private final Optional<String> profilePictureUrl;
@@ -56,6 +58,7 @@ public final class SocialAccount {
             String id,
             Optional<String> name,
             Optional<SocialAccountParent> parentSocialAccount,
+            Optional<String> partnershipStatus,
             SocialAccountPlatform platform,
             Optional<String> profilePictureUrl,
             List<String> scopes,
@@ -68,6 +71,7 @@ public final class SocialAccount {
         this.id = id;
         this.name = name;
         this.parentSocialAccount = parentSocialAccount;
+        this.partnershipStatus = partnershipStatus;
         this.platform = platform;
         this.profilePictureUrl = profilePictureUrl;
         this.scopes = scopes;
@@ -119,7 +123,7 @@ public final class SocialAccount {
     }
 
     /**
-     * @return The social account this one belongs to on the platform, such as the Facebook page that owns an Instagram account. Null when the social account stands on its own.
+     * @return The social account this one belongs to on the platform, such as the Facebook page that owns an Instagram account. Null when the social account stands on its own, or when it is a partner.
      */
     @JsonIgnore
     public Optional<SocialAccountParent> getParentSocialAccount() {
@@ -127,6 +131,17 @@ public final class SocialAccount {
             return Optional.empty();
         }
         return parentSocialAccount;
+    }
+
+    /**
+     * @return Always <code>null</code>. Partnership ads are no longer available.
+     */
+    @JsonIgnore
+    public Optional<String> getPartnershipStatus() {
+        if (partnershipStatus == null) {
+            return Optional.empty();
+        }
+        return partnershipStatus;
     }
 
     /**
@@ -154,7 +169,7 @@ public final class SocialAccount {
     }
 
     /**
-     * @return The URL where the social account can be accessed on the platform. Null while a Whop-owned page is still being provisioned.
+     * @return The URL where the social account can be accessed on the platform. Null while a Whop-owned account is still being provisioned.
      */
     @JsonIgnore
     public Optional<String> getUrl() {
@@ -165,7 +180,7 @@ public final class SocialAccount {
     }
 
     /**
-     * @return The username of the social account on the platform. Null while a Whop-owned page is still being provisioned.
+     * @return The username of the social account on the platform. Null while a Whop-owned account is still being provisioned, and on platforms without usernames, such as Klaviyo.
      */
     @JsonIgnore
     public Optional<String> getUsername() {
@@ -208,6 +223,12 @@ public final class SocialAccount {
     }
 
     @JsonInclude(value = JsonInclude.Include.CUSTOM, valueFilter = NullableNonemptyFilter.class)
+    @JsonProperty("partnership_status")
+    private Optional<String> _getPartnershipStatus() {
+        return partnershipStatus;
+    }
+
+    @JsonInclude(value = JsonInclude.Include.CUSTOM, valueFilter = NullableNonemptyFilter.class)
     @JsonProperty("profile_picture_url")
     private Optional<String> _getProfilePictureUrl() {
         return profilePictureUrl;
@@ -242,6 +263,7 @@ public final class SocialAccount {
                 && id.equals(other.id)
                 && name.equals(other.name)
                 && parentSocialAccount.equals(other.parentSocialAccount)
+                && partnershipStatus.equals(other.partnershipStatus)
                 && platform.equals(other.platform)
                 && profilePictureUrl.equals(other.profilePictureUrl)
                 && scopes.equals(other.scopes)
@@ -258,6 +280,7 @@ public final class SocialAccount {
                 this.id,
                 this.name,
                 this.parentSocialAccount,
+                this.partnershipStatus,
                 this.platform,
                 this.profilePictureUrl,
                 this.scopes,
@@ -333,13 +356,22 @@ public final class SocialAccount {
         _FinalStage name(Nullable<String> name);
 
         /**
-         * <p>The social account this one belongs to on the platform, such as the Facebook page that owns an Instagram account. Null when the social account stands on its own.</p>
+         * <p>The social account this one belongs to on the platform, such as the Facebook page that owns an Instagram account. Null when the social account stands on its own, or when it is a partner.</p>
          */
         _FinalStage parentSocialAccount(Optional<SocialAccountParent> parentSocialAccount);
 
         _FinalStage parentSocialAccount(SocialAccountParent parentSocialAccount);
 
         _FinalStage parentSocialAccount(Nullable<SocialAccountParent> parentSocialAccount);
+
+        /**
+         * <p>Always <code>null</code>. Partnership ads are no longer available.</p>
+         */
+        _FinalStage partnershipStatus(Optional<String> partnershipStatus);
+
+        _FinalStage partnershipStatus(String partnershipStatus);
+
+        _FinalStage partnershipStatus(Nullable<String> partnershipStatus);
 
         /**
          * <p>The URL where the profile picture of the social account can be accessed.</p>
@@ -357,7 +389,7 @@ public final class SocialAccount {
         _FinalStage addAllScopes(List<String> scopes);
 
         /**
-         * <p>The URL where the social account can be accessed on the platform. Null while a Whop-owned page is still being provisioned.</p>
+         * <p>The URL where the social account can be accessed on the platform. Null while a Whop-owned account is still being provisioned.</p>
          */
         _FinalStage url(Optional<String> url);
 
@@ -366,7 +398,7 @@ public final class SocialAccount {
         _FinalStage url(Nullable<String> url);
 
         /**
-         * <p>The username of the social account on the platform. Null while a Whop-owned page is still being provisioned.</p>
+         * <p>The username of the social account on the platform. Null while a Whop-owned account is still being provisioned, and on platforms without usernames, such as Klaviyo.</p>
          */
         _FinalStage username(Optional<String> username);
 
@@ -391,6 +423,8 @@ public final class SocialAccount {
 
         private Optional<String> profilePictureUrl = Optional.empty();
 
+        private Optional<String> partnershipStatus = Optional.empty();
+
         private Optional<SocialAccountParent> parentSocialAccount = Optional.empty();
 
         private Optional<String> name = Optional.empty();
@@ -399,7 +433,6 @@ public final class SocialAccount {
 
         private Optional<String> error = Optional.empty();
 
-        @JsonAnySetter
         private Map<String, Object> additionalProperties = new HashMap<>();
 
         private Builder() {}
@@ -411,6 +444,7 @@ public final class SocialAccount {
             id(other.getId());
             name(other.getName());
             parentSocialAccount(other.getParentSocialAccount());
+            partnershipStatus(other.getPartnershipStatus());
             platform(other.getPlatform());
             profilePictureUrl(other.getProfilePictureUrl());
             scopes(other.getScopes());
@@ -421,7 +455,6 @@ public final class SocialAccount {
         }
 
         /**
-         * <p>Unique identifier for the social account.</p>
          * <p>Unique identifier for the social account.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
@@ -434,7 +467,6 @@ public final class SocialAccount {
 
         /**
          * <p>The platform the social account exists on.</p>
-         * <p>The platform the social account exists on.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
@@ -446,7 +478,6 @@ public final class SocialAccount {
 
         /**
          * <p>Whether the social account is verified on the platform.</p>
-         * <p>Whether the social account is verified on the platform.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
@@ -457,7 +488,7 @@ public final class SocialAccount {
         }
 
         /**
-         * <p>The username of the social account on the platform. Null while a Whop-owned page is still being provisioned.</p>
+         * <p>The username of the social account on the platform. Null while a Whop-owned account is still being provisioned, and on platforms without usernames, such as Klaviyo.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
@@ -473,7 +504,7 @@ public final class SocialAccount {
         }
 
         /**
-         * <p>The username of the social account on the platform. Null while a Whop-owned page is still being provisioned.</p>
+         * <p>The username of the social account on the platform. Null while a Whop-owned account is still being provisioned, and on platforms without usernames, such as Klaviyo.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
@@ -483,7 +514,7 @@ public final class SocialAccount {
         }
 
         /**
-         * <p>The username of the social account on the platform. Null while a Whop-owned page is still being provisioned.</p>
+         * <p>The username of the social account on the platform. Null while a Whop-owned account is still being provisioned, and on platforms without usernames, such as Klaviyo.</p>
          */
         @java.lang.Override
         @JsonSetter(value = "username", nulls = Nulls.SKIP)
@@ -493,7 +524,7 @@ public final class SocialAccount {
         }
 
         /**
-         * <p>The URL where the social account can be accessed on the platform. Null while a Whop-owned page is still being provisioned.</p>
+         * <p>The URL where the social account can be accessed on the platform. Null while a Whop-owned account is still being provisioned.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
@@ -509,7 +540,7 @@ public final class SocialAccount {
         }
 
         /**
-         * <p>The URL where the social account can be accessed on the platform. Null while a Whop-owned page is still being provisioned.</p>
+         * <p>The URL where the social account can be accessed on the platform. Null while a Whop-owned account is still being provisioned.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
@@ -519,7 +550,7 @@ public final class SocialAccount {
         }
 
         /**
-         * <p>The URL where the social account can be accessed on the platform. Null while a Whop-owned page is still being provisioned.</p>
+         * <p>The URL where the social account can be accessed on the platform. Null while a Whop-owned account is still being provisioned.</p>
          */
         @java.lang.Override
         @JsonSetter(value = "url", nulls = Nulls.SKIP)
@@ -589,7 +620,43 @@ public final class SocialAccount {
         }
 
         /**
-         * <p>The social account this one belongs to on the platform, such as the Facebook page that owns an Instagram account. Null when the social account stands on its own.</p>
+         * <p>Always <code>null</code>. Partnership ads are no longer available.</p>
+         * @return Reference to {@code this} so that method calls can be chained together.
+         */
+        @java.lang.Override
+        public _FinalStage partnershipStatus(Nullable<String> partnershipStatus) {
+            if (partnershipStatus.isNull()) {
+                this.partnershipStatus = null;
+            } else if (partnershipStatus.isEmpty()) {
+                this.partnershipStatus = Optional.empty();
+            } else {
+                this.partnershipStatus = Optional.of(partnershipStatus.get());
+            }
+            return this;
+        }
+
+        /**
+         * <p>Always <code>null</code>. Partnership ads are no longer available.</p>
+         * @return Reference to {@code this} so that method calls can be chained together.
+         */
+        @java.lang.Override
+        public _FinalStage partnershipStatus(String partnershipStatus) {
+            this.partnershipStatus = Optional.ofNullable(partnershipStatus);
+            return this;
+        }
+
+        /**
+         * <p>Always <code>null</code>. Partnership ads are no longer available.</p>
+         */
+        @java.lang.Override
+        @JsonSetter(value = "partnership_status", nulls = Nulls.SKIP)
+        public _FinalStage partnershipStatus(Optional<String> partnershipStatus) {
+            this.partnershipStatus = partnershipStatus;
+            return this;
+        }
+
+        /**
+         * <p>The social account this one belongs to on the platform, such as the Facebook page that owns an Instagram account. Null when the social account stands on its own, or when it is a partner.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
@@ -605,7 +672,7 @@ public final class SocialAccount {
         }
 
         /**
-         * <p>The social account this one belongs to on the platform, such as the Facebook page that owns an Instagram account. Null when the social account stands on its own.</p>
+         * <p>The social account this one belongs to on the platform, such as the Facebook page that owns an Instagram account. Null when the social account stands on its own, or when it is a partner.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
@@ -615,7 +682,7 @@ public final class SocialAccount {
         }
 
         /**
-         * <p>The social account this one belongs to on the platform, such as the Facebook page that owns an Instagram account. Null when the social account stands on its own.</p>
+         * <p>The social account this one belongs to on the platform, such as the Facebook page that owns an Instagram account. Null when the social account stands on its own, or when it is a partner.</p>
          */
         @java.lang.Override
         @JsonSetter(value = "parent_social_account", nulls = Nulls.SKIP)
@@ -740,6 +807,7 @@ public final class SocialAccount {
                     id,
                     name,
                     parentSocialAccount,
+                    partnershipStatus,
                     platform,
                     profilePictureUrl,
                     scopes,
@@ -747,6 +815,25 @@ public final class SocialAccount {
                     username,
                     verified,
                     additionalProperties);
+        }
+
+        @JsonAnySetter
+        private void putAdditionalPropertyFromJson(String key, Object value) {
+            if (key.equalsIgnoreCase("error")
+                    || key.equalsIgnoreCase("external_id")
+                    || key.equalsIgnoreCase("id")
+                    || key.equalsIgnoreCase("name")
+                    || key.equalsIgnoreCase("parent_social_account")
+                    || key.equalsIgnoreCase("partnership_status")
+                    || key.equalsIgnoreCase("platform")
+                    || key.equalsIgnoreCase("profile_picture_url")
+                    || key.equalsIgnoreCase("scopes")
+                    || key.equalsIgnoreCase("url")
+                    || key.equalsIgnoreCase("username")
+                    || key.equalsIgnoreCase("verified")) {
+                return;
+            }
+            this.additionalProperties.put(key, value);
         }
 
         @java.lang.Override

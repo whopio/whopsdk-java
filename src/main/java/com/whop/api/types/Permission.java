@@ -271,7 +271,6 @@ public final class Permission {
 
         private Optional<String> category = Optional.empty();
 
-        @JsonAnySetter
         private Map<String, Object> additionalProperties = new HashMap<>();
 
         private Builder() {}
@@ -291,7 +290,6 @@ public final class Permission {
 
         /**
          * <p>The permission action's identifier, for example <code>company:basic:read</code>.</p>
-         * <p>The permission action's identifier, for example <code>company:basic:read</code>.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
@@ -302,7 +300,6 @@ public final class Permission {
         }
 
         /**
-         * <p>Whether an API key can be granted the permission.</p>
          * <p>Whether an API key can be granted the permission.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
@@ -315,7 +312,6 @@ public final class Permission {
 
         /**
          * <p>Whether an app can request and be granted the permission.</p>
-         * <p>Whether an app can request and be granted the permission.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
@@ -326,7 +322,6 @@ public final class Permission {
         }
 
         /**
-         * <p>Whether the permission can be granted to user tokens.</p>
          * <p>Whether the permission can be granted to user tokens.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
@@ -339,7 +334,6 @@ public final class Permission {
 
         /**
          * <p>What granting the action allows.</p>
-         * <p>What granting the action allows.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
@@ -350,7 +344,6 @@ public final class Permission {
         }
 
         /**
-         * <p>Human-readable name of the action.</p>
          * <p>Human-readable name of the action.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
@@ -433,6 +426,21 @@ public final class Permission {
                     grantedToSystemRoles,
                     name,
                     additionalProperties);
+        }
+
+        @JsonAnySetter
+        private void putAdditionalPropertyFromJson(String key, Object value) {
+            if (key.equalsIgnoreCase("action")
+                    || key.equalsIgnoreCase("allowed_on_api_key")
+                    || key.equalsIgnoreCase("allowed_on_app")
+                    || key.equalsIgnoreCase("allowed_on_user")
+                    || key.equalsIgnoreCase("category")
+                    || key.equalsIgnoreCase("description")
+                    || key.equalsIgnoreCase("granted_to_system_roles")
+                    || key.equalsIgnoreCase("name")) {
+                return;
+            }
+            this.additionalProperties.put(key, value);
         }
 
         @java.lang.Override

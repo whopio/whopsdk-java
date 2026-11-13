@@ -35,6 +35,8 @@ public final class LedgerActivityResourceAuthorizedAt {
 
     private final String id;
 
+    private final Optional<String> levelsPoints;
+
     private final Optional<String> localAmount;
 
     private final Optional<String> localCurrency;
@@ -61,6 +63,7 @@ public final class LedgerActivityResourceAuthorizedAt {
             Optional<String> cashbackUsd,
             Optional<String> declinedReason,
             String id,
+            Optional<String> levelsPoints,
             Optional<String> localAmount,
             Optional<String> localCurrency,
             Optional<String> merchantCategory,
@@ -76,6 +79,7 @@ public final class LedgerActivityResourceAuthorizedAt {
         this.cashbackUsd = cashbackUsd;
         this.declinedReason = declinedReason;
         this.id = id;
+        this.levelsPoints = levelsPoints;
         this.localAmount = localAmount;
         this.localCurrency = localCurrency;
         this.merchantCategory = merchantCategory;
@@ -138,6 +142,17 @@ public final class LedgerActivityResourceAuthorizedAt {
     @JsonProperty("id")
     public String getId() {
         return id;
+    }
+
+    /**
+     * @return Whop Levels points this transaction earned for the business, as a decimal string. Negative for a refund that takes them back. Null when it earns none: a transaction that hasn't settled, was declined, or was made on a personal card.
+     */
+    @JsonIgnore
+    public Optional<String> getLevelsPoints() {
+        if (levelsPoints == null) {
+            return Optional.empty();
+        }
+        return levelsPoints;
     }
 
     /**
@@ -223,7 +238,7 @@ public final class LedgerActivityResourceAuthorizedAt {
     }
 
     /**
-     * @return The processor-settled USD amount as a decimal string. The ledger's USDT leg is posted 1:1 from this value.
+     * @return The processor-settled USD amount as a decimal string.
      */
     @JsonIgnore
     public Optional<String> getUsdAmount() {
@@ -255,6 +270,12 @@ public final class LedgerActivityResourceAuthorizedAt {
     @JsonProperty("declined_reason")
     private Optional<String> _getDeclinedReason() {
         return declinedReason;
+    }
+
+    @JsonInclude(value = JsonInclude.Include.CUSTOM, valueFilter = NullableNonemptyFilter.class)
+    @JsonProperty("levels_points")
+    private Optional<String> _getLevelsPoints() {
+        return levelsPoints;
     }
 
     @JsonInclude(value = JsonInclude.Include.CUSTOM, valueFilter = NullableNonemptyFilter.class)
@@ -323,6 +344,7 @@ public final class LedgerActivityResourceAuthorizedAt {
                 && cashbackUsd.equals(other.cashbackUsd)
                 && declinedReason.equals(other.declinedReason)
                 && id.equals(other.id)
+                && levelsPoints.equals(other.levelsPoints)
                 && localAmount.equals(other.localAmount)
                 && localCurrency.equals(other.localCurrency)
                 && merchantCategory.equals(other.merchantCategory)
@@ -342,6 +364,7 @@ public final class LedgerActivityResourceAuthorizedAt {
                 this.cashbackUsd,
                 this.declinedReason,
                 this.id,
+                this.levelsPoints,
                 this.localAmount,
                 this.localCurrency,
                 this.merchantCategory,
@@ -419,6 +442,15 @@ public final class LedgerActivityResourceAuthorizedAt {
         _FinalStage declinedReason(Nullable<String> declinedReason);
 
         /**
+         * <p>Whop Levels points this transaction earned for the business, as a decimal string. Negative for a refund that takes them back. Null when it earns none: a transaction that hasn't settled, was declined, or was made on a personal card.</p>
+         */
+        _FinalStage levelsPoints(Optional<String> levelsPoints);
+
+        _FinalStage levelsPoints(String levelsPoints);
+
+        _FinalStage levelsPoints(Nullable<String> levelsPoints);
+
+        /**
          * <p>Amount the merchant charged in their local currency, as a decimal string. Pair with local_currency.</p>
          */
         _FinalStage localAmount(Optional<String> localAmount);
@@ -482,7 +514,7 @@ public final class LedgerActivityResourceAuthorizedAt {
         _FinalStage status(Nullable<String> status);
 
         /**
-         * <p>The processor-settled USD amount as a decimal string. The ledger's USDT leg is posted 1:1 from this value.</p>
+         * <p>The processor-settled USD amount as a decimal string.</p>
          */
         _FinalStage usdAmount(Optional<String> usdAmount);
 
@@ -513,6 +545,8 @@ public final class LedgerActivityResourceAuthorizedAt {
 
         private Optional<String> localAmount = Optional.empty();
 
+        private Optional<String> levelsPoints = Optional.empty();
+
         private Optional<String> declinedReason = Optional.empty();
 
         private Optional<String> cashbackUsd = Optional.empty();
@@ -521,7 +555,6 @@ public final class LedgerActivityResourceAuthorizedAt {
 
         private Optional<OffsetDateTime> authorizedAt = Optional.empty();
 
-        @JsonAnySetter
         private Map<String, Object> additionalProperties = new HashMap<>();
 
         private Builder() {}
@@ -533,6 +566,7 @@ public final class LedgerActivityResourceAuthorizedAt {
             cashbackUsd(other.getCashbackUsd());
             declinedReason(other.getDeclinedReason());
             id(other.getId());
+            levelsPoints(other.getLevelsPoints());
             localAmount(other.getLocalAmount());
             localCurrency(other.getLocalCurrency());
             merchantCategory(other.getMerchantCategory());
@@ -546,7 +580,6 @@ public final class LedgerActivityResourceAuthorizedAt {
         }
 
         /**
-         * <p>Card transaction ID.</p>
          * <p>Card transaction ID.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
@@ -565,7 +598,7 @@ public final class LedgerActivityResourceAuthorizedAt {
         }
 
         /**
-         * <p>The processor-settled USD amount as a decimal string. The ledger's USDT leg is posted 1:1 from this value.</p>
+         * <p>The processor-settled USD amount as a decimal string.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
@@ -581,7 +614,7 @@ public final class LedgerActivityResourceAuthorizedAt {
         }
 
         /**
-         * <p>The processor-settled USD amount as a decimal string. The ledger's USDT leg is posted 1:1 from this value.</p>
+         * <p>The processor-settled USD amount as a decimal string.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
@@ -591,7 +624,7 @@ public final class LedgerActivityResourceAuthorizedAt {
         }
 
         /**
-         * <p>The processor-settled USD amount as a decimal string. The ledger's USDT leg is posted 1:1 from this value.</p>
+         * <p>The processor-settled USD amount as a decimal string.</p>
          */
         @java.lang.Override
         @JsonSetter(value = "usd_amount", nulls = Nulls.SKIP)
@@ -853,6 +886,42 @@ public final class LedgerActivityResourceAuthorizedAt {
         }
 
         /**
+         * <p>Whop Levels points this transaction earned for the business, as a decimal string. Negative for a refund that takes them back. Null when it earns none: a transaction that hasn't settled, was declined, or was made on a personal card.</p>
+         * @return Reference to {@code this} so that method calls can be chained together.
+         */
+        @java.lang.Override
+        public _FinalStage levelsPoints(Nullable<String> levelsPoints) {
+            if (levelsPoints.isNull()) {
+                this.levelsPoints = null;
+            } else if (levelsPoints.isEmpty()) {
+                this.levelsPoints = Optional.empty();
+            } else {
+                this.levelsPoints = Optional.of(levelsPoints.get());
+            }
+            return this;
+        }
+
+        /**
+         * <p>Whop Levels points this transaction earned for the business, as a decimal string. Negative for a refund that takes them back. Null when it earns none: a transaction that hasn't settled, was declined, or was made on a personal card.</p>
+         * @return Reference to {@code this} so that method calls can be chained together.
+         */
+        @java.lang.Override
+        public _FinalStage levelsPoints(String levelsPoints) {
+            this.levelsPoints = Optional.ofNullable(levelsPoints);
+            return this;
+        }
+
+        /**
+         * <p>Whop Levels points this transaction earned for the business, as a decimal string. Negative for a refund that takes them back. Null when it earns none: a transaction that hasn't settled, was declined, or was made on a personal card.</p>
+         */
+        @java.lang.Override
+        @JsonSetter(value = "levels_points", nulls = Nulls.SKIP)
+        public _FinalStage levelsPoints(Optional<String> levelsPoints) {
+            this.levelsPoints = levelsPoints;
+            return this;
+        }
+
+        /**
          * <p>Reason the transaction was declined (when status is declined).</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
@@ -1004,6 +1073,7 @@ public final class LedgerActivityResourceAuthorizedAt {
                     cashbackUsd,
                     declinedReason,
                     id,
+                    levelsPoints,
                     localAmount,
                     localCurrency,
                     merchantCategory,
@@ -1014,6 +1084,28 @@ public final class LedgerActivityResourceAuthorizedAt {
                     status,
                     usdAmount,
                     additionalProperties);
+        }
+
+        @JsonAnySetter
+        private void putAdditionalPropertyFromJson(String key, Object value) {
+            if (key.equalsIgnoreCase("authorized_at")
+                    || key.equalsIgnoreCase("card_id")
+                    || key.equalsIgnoreCase("cashback_usd")
+                    || key.equalsIgnoreCase("declined_reason")
+                    || key.equalsIgnoreCase("id")
+                    || key.equalsIgnoreCase("levels_points")
+                    || key.equalsIgnoreCase("local_amount")
+                    || key.equalsIgnoreCase("local_currency")
+                    || key.equalsIgnoreCase("merchant_category")
+                    || key.equalsIgnoreCase("merchant_icon_url")
+                    || key.equalsIgnoreCase("merchant_name")
+                    || key.equalsIgnoreCase("object")
+                    || key.equalsIgnoreCase("posted_at")
+                    || key.equalsIgnoreCase("status")
+                    || key.equalsIgnoreCase("usd_amount")) {
+                return;
+            }
+            this.additionalProperties.put(key, value);
         }
 
         @java.lang.Override

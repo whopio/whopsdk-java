@@ -390,7 +390,6 @@ public final class LogsAppsResponseDataItem {
 
         private Optional<Integer> cpuTimeMs = Optional.empty();
 
-        @JsonAnySetter
         private Map<String, Object> additionalProperties = new HashMap<>();
 
         private Builder() {}
@@ -647,6 +646,28 @@ public final class LogsAppsResponseDataItem {
                     truncated,
                     wallTimeMs,
                     additionalProperties);
+        }
+
+        @JsonAnySetter
+        private void putAdditionalPropertyFromJson(String key, Object value) {
+            if (key.equalsIgnoreCase("app_build_id")
+                    || key.equalsIgnoreCase("app_id")
+                    || key.equalsIgnoreCase("cpu_time_ms")
+                    || key.equalsIgnoreCase("created_at")
+                    || key.equalsIgnoreCase("level")
+                    || key.equalsIgnoreCase("message")
+                    || key.equalsIgnoreCase("outcome")
+                    || key.equalsIgnoreCase("request_id")
+                    || key.equalsIgnoreCase("request_method")
+                    || key.equalsIgnoreCase("request_path")
+                    || key.equalsIgnoreCase("response_status")
+                    || key.equalsIgnoreCase("source")
+                    || key.equalsIgnoreCase("stack")
+                    || key.equalsIgnoreCase("truncated")
+                    || key.equalsIgnoreCase("wall_time_ms")) {
+                return;
+            }
+            this.additionalProperties.put(key, value);
         }
 
         @java.lang.Override

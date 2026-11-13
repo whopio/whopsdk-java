@@ -7,17 +7,17 @@ import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonValue;
 
 public final class CreateVerificationsRequestBodyIndividualDocumentType {
-    public static final CreateVerificationsRequestBodyIndividualDocumentType PASSPORT =
-            new CreateVerificationsRequestBodyIndividualDocumentType(Value.PASSPORT, "PASSPORT");
-
-    public static final CreateVerificationsRequestBodyIndividualDocumentType ID_CARD =
-            new CreateVerificationsRequestBodyIndividualDocumentType(Value.ID_CARD, "ID_CARD");
+    public static final CreateVerificationsRequestBodyIndividualDocumentType DRIVERS =
+            new CreateVerificationsRequestBodyIndividualDocumentType(Value.DRIVERS, "drivers");
 
     public static final CreateVerificationsRequestBodyIndividualDocumentType RESIDENCE_PERMIT =
-            new CreateVerificationsRequestBodyIndividualDocumentType(Value.RESIDENCE_PERMIT, "RESIDENCE_PERMIT");
+            new CreateVerificationsRequestBodyIndividualDocumentType(Value.RESIDENCE_PERMIT, "residence_permit");
 
-    public static final CreateVerificationsRequestBodyIndividualDocumentType DRIVERS =
-            new CreateVerificationsRequestBodyIndividualDocumentType(Value.DRIVERS, "DRIVERS");
+    public static final CreateVerificationsRequestBodyIndividualDocumentType PASSPORT =
+            new CreateVerificationsRequestBodyIndividualDocumentType(Value.PASSPORT, "passport");
+
+    public static final CreateVerificationsRequestBodyIndividualDocumentType ID_CARD =
+            new CreateVerificationsRequestBodyIndividualDocumentType(Value.ID_CARD, "id_card");
 
     private final Value value;
 
@@ -52,14 +52,14 @@ public final class CreateVerificationsRequestBodyIndividualDocumentType {
 
     public <T> T visit(Visitor<T> visitor) {
         switch (value) {
+            case DRIVERS:
+                return visitor.visitDrivers();
+            case RESIDENCE_PERMIT:
+                return visitor.visitResidencePermit();
             case PASSPORT:
                 return visitor.visitPassport();
             case ID_CARD:
                 return visitor.visitIdCard();
-            case RESIDENCE_PERMIT:
-                return visitor.visitResidencePermit();
-            case DRIVERS:
-                return visitor.visitDrivers();
             case UNKNOWN:
             default:
                 return visitor.visitUnknown(string);
@@ -69,14 +69,14 @@ public final class CreateVerificationsRequestBodyIndividualDocumentType {
     @JsonCreator(mode = JsonCreator.Mode.DELEGATING)
     public static CreateVerificationsRequestBodyIndividualDocumentType valueOf(String value) {
         switch (value) {
-            case "PASSPORT":
-                return PASSPORT;
-            case "ID_CARD":
-                return ID_CARD;
-            case "RESIDENCE_PERMIT":
-                return RESIDENCE_PERMIT;
-            case "DRIVERS":
+            case "drivers":
                 return DRIVERS;
+            case "residence_permit":
+                return RESIDENCE_PERMIT;
+            case "passport":
+                return PASSPORT;
+            case "id_card":
+                return ID_CARD;
             default:
                 return new CreateVerificationsRequestBodyIndividualDocumentType(Value.UNKNOWN, value);
         }

@@ -59,11 +59,15 @@ public final class ListMethodsResponseDataItem {
 
     private final Optional<ListMethodsResponseDataItemQuote> quote;
 
+    private final Optional<ListMethodsResponseDataItemRecipient> recipient;
+
     private final ListMethodsResponseDataItemStatus status;
 
     private final Optional<String> statusReason;
 
     private final Optional<ListMethodsResponseDataItemSupportedPayoutMethod> supportedPayoutMethod;
+
+    private final ListMethodsResponseDataItemType type;
 
     private final Optional<ListMethodsResponseDataItemUnavailableReason> unavailableReason;
 
@@ -87,9 +91,11 @@ public final class ListMethodsResponseDataItem {
             ListMethodsResponseDataItemObject object,
             Optional<String> payerName,
             Optional<ListMethodsResponseDataItemQuote> quote,
+            Optional<ListMethodsResponseDataItemRecipient> recipient,
             ListMethodsResponseDataItemStatus status,
             Optional<String> statusReason,
             Optional<ListMethodsResponseDataItemSupportedPayoutMethod> supportedPayoutMethod,
+            ListMethodsResponseDataItemType type,
             Optional<ListMethodsResponseDataItemUnavailableReason> unavailableReason,
             Map<String, Object> additionalProperties) {
         this.accountReference = accountReference;
@@ -109,9 +115,11 @@ public final class ListMethodsResponseDataItem {
         this.object = object;
         this.payerName = payerName;
         this.quote = quote;
+        this.recipient = recipient;
         this.status = status;
         this.statusReason = statusReason;
         this.supportedPayoutMethod = supportedPayoutMethod;
+        this.type = type;
         this.unavailableReason = unavailableReason;
         this.additionalProperties = additionalProperties;
     }
@@ -266,7 +274,7 @@ public final class ListMethodsResponseDataItem {
     }
 
     /**
-     * @return Fee and delivery estimate for withdrawing the requested amount through this method. Null unless an amount was provided, or when the estimate is unavailable.
+     * @return Fee and delivery estimate for paying out the requested amount through this method. Null unless an amount was provided, or when the estimate is unavailable.
      */
     @JsonIgnore
     public Optional<ListMethodsResponseDataItemQuote> getQuote() {
@@ -274,6 +282,14 @@ public final class ListMethodsResponseDataItem {
             return Optional.empty();
         }
         return quote;
+    }
+
+    /**
+     * @return The recipient of a third-party payout method. Present only for recipient payout methods.
+     */
+    @JsonProperty("recipient")
+    public Optional<ListMethodsResponseDataItemRecipient> getRecipient() {
+        return recipient;
     }
 
     /**
@@ -304,6 +320,14 @@ public final class ListMethodsResponseDataItem {
             return Optional.empty();
         }
         return supportedPayoutMethod;
+    }
+
+    /**
+     * @return The kind of payout method. <code>external</code> sends funds out of Whop. <code>whop_card</code> moves funds onto the account's own Whop Card. A <code>whop_card</code> method takes standard-speed payouts only, and cannot be updated, reconnected, or deleted.
+     */
+    @JsonProperty("type")
+    public ListMethodsResponseDataItemType getType() {
+        return type;
     }
 
     /**
@@ -418,9 +442,11 @@ public final class ListMethodsResponseDataItem {
                 && object.equals(other.object)
                 && payerName.equals(other.payerName)
                 && quote.equals(other.quote)
+                && recipient.equals(other.recipient)
                 && status.equals(other.status)
                 && statusReason.equals(other.statusReason)
                 && supportedPayoutMethod.equals(other.supportedPayoutMethod)
+                && type.equals(other.type)
                 && unavailableReason.equals(other.unavailableReason);
     }
 
@@ -444,9 +470,11 @@ public final class ListMethodsResponseDataItem {
                 this.object,
                 this.payerName,
                 this.quote,
+                this.recipient,
                 this.status,
                 this.statusReason,
                 this.supportedPayoutMethod,
+                this.type,
                 this.unavailableReason);
     }
 
@@ -518,7 +546,14 @@ public final class ListMethodsResponseDataItem {
         /**
          * <p>Lifecycle status: <code>created</code> means saved but unused, <code>active</code> means a payout succeeded through it, <code>broken</code> means a payout failure disabled it; a later successful payout returns it to <code>active</code>.</p>
          */
-        _FinalStage status(@NotNull ListMethodsResponseDataItemStatus status);
+        TypeStage status(@NotNull ListMethodsResponseDataItemStatus status);
+    }
+
+    public interface TypeStage {
+        /**
+         * <p>The kind of payout method. <code>external</code> sends funds out of Whop. <code>whop_card</code> moves funds onto the account's own Whop Card. A <code>whop_card</code> method takes standard-speed payouts only, and cannot be updated, reconnected, or deleted.</p>
+         */
+        _FinalStage type(@NotNull ListMethodsResponseDataItemType type);
     }
 
     public interface _FinalStage {
@@ -603,13 +638,20 @@ public final class ListMethodsResponseDataItem {
         _FinalStage payerName(Nullable<String> payerName);
 
         /**
-         * <p>Fee and delivery estimate for withdrawing the requested amount through this method. Null unless an amount was provided, or when the estimate is unavailable.</p>
+         * <p>Fee and delivery estimate for paying out the requested amount through this method. Null unless an amount was provided, or when the estimate is unavailable.</p>
          */
         _FinalStage quote(Optional<ListMethodsResponseDataItemQuote> quote);
 
         _FinalStage quote(ListMethodsResponseDataItemQuote quote);
 
         _FinalStage quote(Nullable<ListMethodsResponseDataItemQuote> quote);
+
+        /**
+         * <p>The recipient of a third-party payout method. Present only for recipient payout methods.</p>
+         */
+        _FinalStage recipient(Optional<ListMethodsResponseDataItemRecipient> recipient);
+
+        _FinalStage recipient(ListMethodsResponseDataItemRecipient recipient);
 
         /**
          * <p>Machine-readable code for why the method is <code>broken</code> — the newest disabling failure recorded through it, whether a payout error or a pre-payout rejection. <code>null</code> unless the method is broken, or when it was disabled without a recorded failure.</p>
@@ -652,6 +694,7 @@ public final class ListMethodsResponseDataItem {
                     NeedsPlaidReconnectStage,
                     ObjectStage,
                     StatusStage,
+                    TypeStage,
                     _FinalStage {
         private OffsetDateTime createdAt;
 
@@ -671,11 +714,15 @@ public final class ListMethodsResponseDataItem {
 
         private ListMethodsResponseDataItemStatus status;
 
+        private ListMethodsResponseDataItemType type;
+
         private Optional<ListMethodsResponseDataItemUnavailableReason> unavailableReason = Optional.empty();
 
         private Optional<ListMethodsResponseDataItemSupportedPayoutMethod> supportedPayoutMethod = Optional.empty();
 
         private Optional<String> statusReason = Optional.empty();
+
+        private Optional<ListMethodsResponseDataItemRecipient> recipient = Optional.empty();
 
         private Optional<ListMethodsResponseDataItemQuote> quote = Optional.empty();
 
@@ -695,7 +742,6 @@ public final class ListMethodsResponseDataItem {
 
         private Optional<String> accountReference = Optional.empty();
 
-        @JsonAnySetter
         private Map<String, Object> additionalProperties = new HashMap<>();
 
         private Builder() {}
@@ -719,15 +765,16 @@ public final class ListMethodsResponseDataItem {
             object(other.getObject());
             payerName(other.getPayerName());
             quote(other.getQuote());
+            recipient(other.getRecipient());
             status(other.getStatus());
             statusReason(other.getStatusReason());
             supportedPayoutMethod(other.getSupportedPayoutMethod());
+            type(other.getType());
             unavailableReason(other.getUnavailableReason());
             return this;
         }
 
         /**
-         * <p>When the payout method was added.</p>
          * <p>When the payout method was added.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
@@ -739,7 +786,6 @@ public final class ListMethodsResponseDataItem {
         }
 
         /**
-         * <p>Currency payouts are delivered in for this method.</p>
          * <p>Currency payouts are delivered in for this method.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
@@ -753,7 +799,6 @@ public final class ListMethodsResponseDataItem {
 
         /**
          * <p>Payout method ID.</p>
-         * <p>Payout method ID.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
@@ -764,7 +809,6 @@ public final class ListMethodsResponseDataItem {
         }
 
         /**
-         * <p>Whether this method is a copy of one saved on another of the payer's accounts.</p>
          * <p>Whether this method is a copy of one saved on another of the payer's accounts.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
@@ -777,7 +821,6 @@ public final class ListMethodsResponseDataItem {
 
         /**
          * <p>Whether this is the default payout method for the account.</p>
-         * <p>Whether this is the default payout method for the account.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
@@ -789,7 +832,6 @@ public final class ListMethodsResponseDataItem {
 
         /**
          * <p>Whether the payer added this method by signing in to their bank rather than typing account details.</p>
-         * <p>Whether the payer added this method by signing in to their bank rather than typing account details.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
@@ -800,7 +842,6 @@ public final class ListMethodsResponseDataItem {
         }
 
         /**
-         * <p>Whether the bank sign-in behind this method has expired and must be redone before it counts as linked.</p>
          * <p>Whether the bank sign-in behind this method has expired and must be redone before it counts as linked.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
@@ -820,13 +861,23 @@ public final class ListMethodsResponseDataItem {
 
         /**
          * <p>Lifecycle status: <code>created</code> means saved but unused, <code>active</code> means a payout succeeded through it, <code>broken</code> means a payout failure disabled it; a later successful payout returns it to <code>active</code>.</p>
-         * <p>Lifecycle status: <code>created</code> means saved but unused, <code>active</code> means a payout succeeded through it, <code>broken</code> means a payout failure disabled it; a later successful payout returns it to <code>active</code>.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
         @JsonSetter("status")
-        public _FinalStage status(@NotNull ListMethodsResponseDataItemStatus status) {
+        public TypeStage status(@NotNull ListMethodsResponseDataItemStatus status) {
             this.status = Objects.requireNonNull(status, "status must not be null");
+            return this;
+        }
+
+        /**
+         * <p>The kind of payout method. <code>external</code> sends funds out of Whop. <code>whop_card</code> moves funds onto the account's own Whop Card. A <code>whop_card</code> method takes standard-speed payouts only, and cannot be updated, reconnected, or deleted.</p>
+         * @return Reference to {@code this} so that method calls can be chained together.
+         */
+        @java.lang.Override
+        @JsonSetter("type")
+        public _FinalStage type(@NotNull ListMethodsResponseDataItemType type) {
+            this.type = Objects.requireNonNull(type, "type must not be null");
             return this;
         }
 
@@ -942,7 +993,27 @@ public final class ListMethodsResponseDataItem {
         }
 
         /**
-         * <p>Fee and delivery estimate for withdrawing the requested amount through this method. Null unless an amount was provided, or when the estimate is unavailable.</p>
+         * <p>The recipient of a third-party payout method. Present only for recipient payout methods.</p>
+         * @return Reference to {@code this} so that method calls can be chained together.
+         */
+        @java.lang.Override
+        public _FinalStage recipient(ListMethodsResponseDataItemRecipient recipient) {
+            this.recipient = Optional.ofNullable(recipient);
+            return this;
+        }
+
+        /**
+         * <p>The recipient of a third-party payout method. Present only for recipient payout methods.</p>
+         */
+        @java.lang.Override
+        @JsonSetter(value = "recipient", nulls = Nulls.SKIP)
+        public _FinalStage recipient(Optional<ListMethodsResponseDataItemRecipient> recipient) {
+            this.recipient = recipient;
+            return this;
+        }
+
+        /**
+         * <p>Fee and delivery estimate for paying out the requested amount through this method. Null unless an amount was provided, or when the estimate is unavailable.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
@@ -958,7 +1029,7 @@ public final class ListMethodsResponseDataItem {
         }
 
         /**
-         * <p>Fee and delivery estimate for withdrawing the requested amount through this method. Null unless an amount was provided, or when the estimate is unavailable.</p>
+         * <p>Fee and delivery estimate for paying out the requested amount through this method. Null unless an amount was provided, or when the estimate is unavailable.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
@@ -968,7 +1039,7 @@ public final class ListMethodsResponseDataItem {
         }
 
         /**
-         * <p>Fee and delivery estimate for withdrawing the requested amount through this method. Null unless an amount was provided, or when the estimate is unavailable.</p>
+         * <p>Fee and delivery estimate for paying out the requested amount through this method. Null unless an amount was provided, or when the estimate is unavailable.</p>
          */
         @java.lang.Override
         @JsonSetter(value = "quote", nulls = Nulls.SKIP)
@@ -1288,11 +1359,43 @@ public final class ListMethodsResponseDataItem {
                     object,
                     payerName,
                     quote,
+                    recipient,
                     status,
                     statusReason,
                     supportedPayoutMethod,
+                    type,
                     unavailableReason,
                     additionalProperties);
+        }
+
+        @JsonAnySetter
+        private void putAdditionalPropertyFromJson(String key, Object value) {
+            if (key.equalsIgnoreCase("account_reference")
+                    || key.equalsIgnoreCase("bank_verification_state")
+                    || key.equalsIgnoreCase("created_at")
+                    || key.equalsIgnoreCase("destination_currency")
+                    || key.equalsIgnoreCase("estimated_arrival")
+                    || key.equalsIgnoreCase("fee_structure")
+                    || key.equalsIgnoreCase("id")
+                    || key.equalsIgnoreCase("institution_name")
+                    || key.equalsIgnoreCase("is_clone")
+                    || key.equalsIgnoreCase("is_default")
+                    || key.equalsIgnoreCase("last_paid_out_at")
+                    || key.equalsIgnoreCase("linked_via_plaid")
+                    || key.equalsIgnoreCase("needs_plaid_reconnect")
+                    || key.equalsIgnoreCase("nickname")
+                    || key.equalsIgnoreCase("object")
+                    || key.equalsIgnoreCase("payer_name")
+                    || key.equalsIgnoreCase("quote")
+                    || key.equalsIgnoreCase("recipient")
+                    || key.equalsIgnoreCase("status")
+                    || key.equalsIgnoreCase("status_reason")
+                    || key.equalsIgnoreCase("supported_payout_method")
+                    || key.equalsIgnoreCase("type")
+                    || key.equalsIgnoreCase("unavailable_reason")) {
+                return;
+            }
+            this.additionalProperties.put(key, value);
         }
 
         @java.lang.Override

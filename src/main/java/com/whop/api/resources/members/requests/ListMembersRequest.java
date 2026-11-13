@@ -14,9 +14,13 @@ import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.whop.api.core.ObjectMappers;
 import com.whop.api.resources.members.types.ListMembersRequestAccessLevel;
 import com.whop.api.resources.members.types.ListMembersRequestDirection;
+import com.whop.api.resources.members.types.ListMembersRequestMembershipStatus;
+import com.whop.api.resources.members.types.ListMembersRequestMostRecentActionsItem;
 import com.whop.api.resources.members.types.ListMembersRequestOrder;
 import com.whop.api.resources.members.types.ListMembersRequestStatus;
+import java.util.Collections;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
@@ -24,11 +28,23 @@ import java.util.Optional;
 @JsonInclude(JsonInclude.Include.NON_ABSENT)
 @JsonDeserialize(builder = ListMembersRequest.Builder.class)
 public final class ListMembersRequest {
+    private final Optional<List<String>> userIds;
+
+    private final Optional<List<ListMembersRequestMostRecentActionsItem>> mostRecentActions;
+
+    private final Optional<List<String>> productIds;
+
+    private final Optional<List<String>> variantIds;
+
+    private final Optional<List<String>> promoCodeIds;
+
     private final Optional<String> accountId;
 
     private final Optional<ListMembersRequestAccessLevel> accessLevel;
 
     private final Optional<ListMembersRequestStatus> status;
+
+    private final Optional<ListMembersRequestMembershipStatus> membershipStatus;
 
     private final Optional<String> query;
 
@@ -48,12 +64,20 @@ public final class ListMembersRequest {
 
     private final Optional<String> before;
 
+    private final Optional<Boolean> includeTotalCount;
+
     private final Map<String, Object> additionalProperties;
 
     private ListMembersRequest(
+            Optional<List<String>> userIds,
+            Optional<List<ListMembersRequestMostRecentActionsItem>> mostRecentActions,
+            Optional<List<String>> productIds,
+            Optional<List<String>> variantIds,
+            Optional<List<String>> promoCodeIds,
             Optional<String> accountId,
             Optional<ListMembersRequestAccessLevel> accessLevel,
             Optional<ListMembersRequestStatus> status,
+            Optional<ListMembersRequestMembershipStatus> membershipStatus,
             Optional<String> query,
             Optional<String> createdAfter,
             Optional<String> createdBefore,
@@ -63,10 +87,17 @@ public final class ListMembersRequest {
             Optional<String> after,
             Optional<Integer> last,
             Optional<String> before,
+            Optional<Boolean> includeTotalCount,
             Map<String, Object> additionalProperties) {
+        this.userIds = userIds;
+        this.mostRecentActions = mostRecentActions;
+        this.productIds = productIds;
+        this.variantIds = variantIds;
+        this.promoCodeIds = promoCodeIds;
         this.accountId = accountId;
         this.accessLevel = accessLevel;
         this.status = status;
+        this.membershipStatus = membershipStatus;
         this.query = query;
         this.createdAfter = createdAfter;
         this.createdBefore = createdBefore;
@@ -76,7 +107,48 @@ public final class ListMembersRequest {
         this.after = after;
         this.last = last;
         this.before = before;
+        this.includeTotalCount = includeTotalCount;
         this.additionalProperties = additionalProperties;
+    }
+
+    /**
+     * @return Only return members whose users match these <code>user_</code> identifiers.
+     */
+    @JsonProperty("user_ids")
+    public Optional<List<String>> getUserIds() {
+        return userIds;
+    }
+
+    /**
+     * @return Only return members whose <code>most_recent_action</code> is one of these values.
+     */
+    @JsonProperty("most_recent_actions")
+    public Optional<List<ListMembersRequestMostRecentActionsItem>> getMostRecentActions() {
+        return mostRecentActions;
+    }
+
+    /**
+     * @return Only return members holding a membership to one of these products, prefixed <code>prod_</code>. Unknown IDs match nothing.
+     */
+    @JsonProperty("product_ids")
+    public Optional<List<String>> getProductIds() {
+        return productIds;
+    }
+
+    /**
+     * @return Only return members holding a membership on one of these variants, prefixed <code>plan_</code>. Unknown IDs match nothing.
+     */
+    @JsonProperty("variant_ids")
+    public Optional<List<String>> getVariantIds() {
+        return variantIds;
+    }
+
+    /**
+     * @return Only return members holding a membership bought with one of these promo codes, prefixed <code>promo_</code>. Unknown IDs match nothing.
+     */
+    @JsonProperty("promo_code_ids")
+    public Optional<List<String>> getPromoCodeIds() {
+        return promoCodeIds;
     }
 
     /**
@@ -104,6 +176,14 @@ public final class ListMembersRequest {
     }
 
     /**
+     * @return <code>active</code> returns members holding at least one membership that currently grants access; <code>inactive</code> returns members holding at least one membership that does not. Combined with <code>product_ids</code>, <code>variant_ids</code>, or <code>promo_code_ids</code>, one membership must match all of them.
+     */
+    @JsonProperty("membership_status")
+    public Optional<ListMembersRequestMembershipStatus> getMembershipStatus() {
+        return membershipStatus;
+    }
+
+    /**
      * @return Search members by name or username. An exact email address also matches when the credential holds the member:email:read scope.
      */
     @JsonProperty("query")
@@ -128,7 +208,7 @@ public final class ListMembersRequest {
     }
 
     /**
-     * @return Sort field.
+     * @return Sort field. <code>most_recent_action_at</code> and <code>last_activity_at</code> place members without one first when ascending and last when descending.
      */
     @JsonProperty("order")
     public Optional<ListMembersRequestOrder> getOrder() {
@@ -144,7 +224,7 @@ public final class ListMembersRequest {
     }
 
     /**
-     * @return Number of members to return from the start of the window.
+     * @return Number of results to return from the start of the range.
      */
     @JsonProperty("first")
     public Optional<Integer> getFirst() {
@@ -152,7 +232,7 @@ public final class ListMembersRequest {
     }
 
     /**
-     * @return Cursor to paginate forwards from.
+     * @return Return results after this cursor. Use <code>page_info.end_cursor</code> from the previous response to fetch the next page.
      */
     @JsonProperty("after")
     public Optional<String> getAfter() {
@@ -160,7 +240,7 @@ public final class ListMembersRequest {
     }
 
     /**
-     * @return Number of members to return from the end of the window.
+     * @return Number of results to return from the end of the range.
      */
     @JsonProperty("last")
     public Optional<Integer> getLast() {
@@ -168,11 +248,19 @@ public final class ListMembersRequest {
     }
 
     /**
-     * @return Cursor to paginate backwards from.
+     * @return Return results before this cursor. Use <code>page_info.start_cursor</code> from the previous response to fetch the previous page.
      */
     @JsonProperty("before")
     public Optional<String> getBefore() {
         return before;
+    }
+
+    /**
+     * @return Set to <code>true</code> to return the number of matching results in <code>page_info.total_count</code>. Send <code>first=0</code> as well to return the count without any results.
+     */
+    @JsonProperty("include_total_count")
+    public Optional<Boolean> getIncludeTotalCount() {
+        return includeTotalCount;
     }
 
     @java.lang.Override
@@ -187,9 +275,15 @@ public final class ListMembersRequest {
     }
 
     private boolean equalTo(ListMembersRequest other) {
-        return accountId.equals(other.accountId)
+        return userIds.equals(other.userIds)
+                && mostRecentActions.equals(other.mostRecentActions)
+                && productIds.equals(other.productIds)
+                && variantIds.equals(other.variantIds)
+                && promoCodeIds.equals(other.promoCodeIds)
+                && accountId.equals(other.accountId)
                 && accessLevel.equals(other.accessLevel)
                 && status.equals(other.status)
+                && membershipStatus.equals(other.membershipStatus)
                 && query.equals(other.query)
                 && createdAfter.equals(other.createdAfter)
                 && createdBefore.equals(other.createdBefore)
@@ -198,15 +292,22 @@ public final class ListMembersRequest {
                 && first.equals(other.first)
                 && after.equals(other.after)
                 && last.equals(other.last)
-                && before.equals(other.before);
+                && before.equals(other.before)
+                && includeTotalCount.equals(other.includeTotalCount);
     }
 
     @java.lang.Override
     public int hashCode() {
         return Objects.hash(
+                this.userIds,
+                this.mostRecentActions,
+                this.productIds,
+                this.variantIds,
+                this.promoCodeIds,
                 this.accountId,
                 this.accessLevel,
                 this.status,
+                this.membershipStatus,
                 this.query,
                 this.createdAfter,
                 this.createdBefore,
@@ -215,7 +316,8 @@ public final class ListMembersRequest {
                 this.first,
                 this.after,
                 this.last,
-                this.before);
+                this.before,
+                this.includeTotalCount);
     }
 
     @java.lang.Override
@@ -229,11 +331,23 @@ public final class ListMembersRequest {
 
     @JsonIgnoreProperties(ignoreUnknown = true)
     public static final class Builder {
+        private Optional<List<String>> userIds = Optional.empty();
+
+        private Optional<List<ListMembersRequestMostRecentActionsItem>> mostRecentActions = Optional.empty();
+
+        private Optional<List<String>> productIds = Optional.empty();
+
+        private Optional<List<String>> variantIds = Optional.empty();
+
+        private Optional<List<String>> promoCodeIds = Optional.empty();
+
         private Optional<String> accountId = Optional.empty();
 
         private Optional<ListMembersRequestAccessLevel> accessLevel = Optional.empty();
 
         private Optional<ListMembersRequestStatus> status = Optional.empty();
+
+        private Optional<ListMembersRequestMembershipStatus> membershipStatus = Optional.empty();
 
         private Optional<String> query = Optional.empty();
 
@@ -253,15 +367,22 @@ public final class ListMembersRequest {
 
         private Optional<String> before = Optional.empty();
 
-        @JsonAnySetter
+        private Optional<Boolean> includeTotalCount = Optional.empty();
+
         private Map<String, Object> additionalProperties = new HashMap<>();
 
         private Builder() {}
 
         public Builder from(ListMembersRequest other) {
+            userIds(other.getUserIds());
+            mostRecentActions(other.getMostRecentActions());
+            productIds(other.getProductIds());
+            variantIds(other.getVariantIds());
+            promoCodeIds(other.getPromoCodeIds());
             accountId(other.getAccountId());
             accessLevel(other.getAccessLevel());
             status(other.getStatus());
+            membershipStatus(other.getMembershipStatus());
             query(other.getQuery());
             createdAfter(other.getCreatedAfter());
             createdBefore(other.getCreatedBefore());
@@ -271,6 +392,102 @@ public final class ListMembersRequest {
             after(other.getAfter());
             last(other.getLast());
             before(other.getBefore());
+            includeTotalCount(other.getIncludeTotalCount());
+            return this;
+        }
+
+        /**
+         * <p>Only return members whose users match these <code>user_</code> identifiers.</p>
+         */
+        @JsonSetter(value = "user_ids", nulls = Nulls.SKIP)
+        public Builder userIds(Optional<List<String>> userIds) {
+            this.userIds = userIds;
+            return this;
+        }
+
+        public Builder userIds(List<String> userIds) {
+            this.userIds = Optional.ofNullable(userIds);
+            return this;
+        }
+
+        public Builder userIds(String userIds) {
+            this.userIds = Optional.of(Collections.singletonList(userIds));
+            return this;
+        }
+
+        /**
+         * <p>Only return members whose <code>most_recent_action</code> is one of these values.</p>
+         */
+        @JsonSetter(value = "most_recent_actions", nulls = Nulls.SKIP)
+        public Builder mostRecentActions(Optional<List<ListMembersRequestMostRecentActionsItem>> mostRecentActions) {
+            this.mostRecentActions = mostRecentActions;
+            return this;
+        }
+
+        public Builder mostRecentActions(List<ListMembersRequestMostRecentActionsItem> mostRecentActions) {
+            this.mostRecentActions = Optional.ofNullable(mostRecentActions);
+            return this;
+        }
+
+        public Builder mostRecentActions(ListMembersRequestMostRecentActionsItem mostRecentActions) {
+            this.mostRecentActions = Optional.of(Collections.singletonList(mostRecentActions));
+            return this;
+        }
+
+        /**
+         * <p>Only return members holding a membership to one of these products, prefixed <code>prod_</code>. Unknown IDs match nothing.</p>
+         */
+        @JsonSetter(value = "product_ids", nulls = Nulls.SKIP)
+        public Builder productIds(Optional<List<String>> productIds) {
+            this.productIds = productIds;
+            return this;
+        }
+
+        public Builder productIds(List<String> productIds) {
+            this.productIds = Optional.ofNullable(productIds);
+            return this;
+        }
+
+        public Builder productIds(String productIds) {
+            this.productIds = Optional.of(Collections.singletonList(productIds));
+            return this;
+        }
+
+        /**
+         * <p>Only return members holding a membership on one of these variants, prefixed <code>plan_</code>. Unknown IDs match nothing.</p>
+         */
+        @JsonSetter(value = "variant_ids", nulls = Nulls.SKIP)
+        public Builder variantIds(Optional<List<String>> variantIds) {
+            this.variantIds = variantIds;
+            return this;
+        }
+
+        public Builder variantIds(List<String> variantIds) {
+            this.variantIds = Optional.ofNullable(variantIds);
+            return this;
+        }
+
+        public Builder variantIds(String variantIds) {
+            this.variantIds = Optional.of(Collections.singletonList(variantIds));
+            return this;
+        }
+
+        /**
+         * <p>Only return members holding a membership bought with one of these promo codes, prefixed <code>promo_</code>. Unknown IDs match nothing.</p>
+         */
+        @JsonSetter(value = "promo_code_ids", nulls = Nulls.SKIP)
+        public Builder promoCodeIds(Optional<List<String>> promoCodeIds) {
+            this.promoCodeIds = promoCodeIds;
+            return this;
+        }
+
+        public Builder promoCodeIds(List<String> promoCodeIds) {
+            this.promoCodeIds = Optional.ofNullable(promoCodeIds);
+            return this;
+        }
+
+        public Builder promoCodeIds(String promoCodeIds) {
+            this.promoCodeIds = Optional.of(Collections.singletonList(promoCodeIds));
             return this;
         }
 
@@ -317,6 +534,20 @@ public final class ListMembersRequest {
         }
 
         /**
+         * <p><code>active</code> returns members holding at least one membership that currently grants access; <code>inactive</code> returns members holding at least one membership that does not. Combined with <code>product_ids</code>, <code>variant_ids</code>, or <code>promo_code_ids</code>, one membership must match all of them.</p>
+         */
+        @JsonSetter(value = "membership_status", nulls = Nulls.SKIP)
+        public Builder membershipStatus(Optional<ListMembersRequestMembershipStatus> membershipStatus) {
+            this.membershipStatus = membershipStatus;
+            return this;
+        }
+
+        public Builder membershipStatus(ListMembersRequestMembershipStatus membershipStatus) {
+            this.membershipStatus = Optional.ofNullable(membershipStatus);
+            return this;
+        }
+
+        /**
          * <p>Search members by name or username. An exact email address also matches when the credential holds the member:email:read scope.</p>
          */
         @JsonSetter(value = "query", nulls = Nulls.SKIP)
@@ -359,7 +590,7 @@ public final class ListMembersRequest {
         }
 
         /**
-         * <p>Sort field.</p>
+         * <p>Sort field. <code>most_recent_action_at</code> and <code>last_activity_at</code> place members without one first when ascending and last when descending.</p>
          */
         @JsonSetter(value = "order", nulls = Nulls.SKIP)
         public Builder order(Optional<ListMembersRequestOrder> order) {
@@ -387,7 +618,7 @@ public final class ListMembersRequest {
         }
 
         /**
-         * <p>Number of members to return from the start of the window.</p>
+         * <p>Number of results to return from the start of the range.</p>
          */
         @JsonSetter(value = "first", nulls = Nulls.SKIP)
         public Builder first(Optional<Integer> first) {
@@ -401,7 +632,7 @@ public final class ListMembersRequest {
         }
 
         /**
-         * <p>Cursor to paginate forwards from.</p>
+         * <p>Return results after this cursor. Use <code>page_info.end_cursor</code> from the previous response to fetch the next page.</p>
          */
         @JsonSetter(value = "after", nulls = Nulls.SKIP)
         public Builder after(Optional<String> after) {
@@ -415,7 +646,7 @@ public final class ListMembersRequest {
         }
 
         /**
-         * <p>Number of members to return from the end of the window.</p>
+         * <p>Number of results to return from the end of the range.</p>
          */
         @JsonSetter(value = "last", nulls = Nulls.SKIP)
         public Builder last(Optional<Integer> last) {
@@ -429,7 +660,7 @@ public final class ListMembersRequest {
         }
 
         /**
-         * <p>Cursor to paginate backwards from.</p>
+         * <p>Return results before this cursor. Use <code>page_info.start_cursor</code> from the previous response to fetch the previous page.</p>
          */
         @JsonSetter(value = "before", nulls = Nulls.SKIP)
         public Builder before(Optional<String> before) {
@@ -442,11 +673,31 @@ public final class ListMembersRequest {
             return this;
         }
 
+        /**
+         * <p>Set to <code>true</code> to return the number of matching results in <code>page_info.total_count</code>. Send <code>first=0</code> as well to return the count without any results.</p>
+         */
+        @JsonSetter(value = "include_total_count", nulls = Nulls.SKIP)
+        public Builder includeTotalCount(Optional<Boolean> includeTotalCount) {
+            this.includeTotalCount = includeTotalCount;
+            return this;
+        }
+
+        public Builder includeTotalCount(Boolean includeTotalCount) {
+            this.includeTotalCount = Optional.ofNullable(includeTotalCount);
+            return this;
+        }
+
         public ListMembersRequest build() {
             return new ListMembersRequest(
+                    userIds,
+                    mostRecentActions,
+                    productIds,
+                    variantIds,
+                    promoCodeIds,
                     accountId,
                     accessLevel,
                     status,
+                    membershipStatus,
                     query,
                     createdAfter,
                     createdBefore,
@@ -456,7 +707,34 @@ public final class ListMembersRequest {
                     after,
                     last,
                     before,
+                    includeTotalCount,
                     additionalProperties);
+        }
+
+        @JsonAnySetter
+        private void putAdditionalPropertyFromJson(String key, Object value) {
+            if (key.equalsIgnoreCase("user_ids")
+                    || key.equalsIgnoreCase("most_recent_actions")
+                    || key.equalsIgnoreCase("product_ids")
+                    || key.equalsIgnoreCase("variant_ids")
+                    || key.equalsIgnoreCase("promo_code_ids")
+                    || key.equalsIgnoreCase("account_id")
+                    || key.equalsIgnoreCase("access_level")
+                    || key.equalsIgnoreCase("status")
+                    || key.equalsIgnoreCase("membership_status")
+                    || key.equalsIgnoreCase("query")
+                    || key.equalsIgnoreCase("created_after")
+                    || key.equalsIgnoreCase("created_before")
+                    || key.equalsIgnoreCase("order")
+                    || key.equalsIgnoreCase("direction")
+                    || key.equalsIgnoreCase("first")
+                    || key.equalsIgnoreCase("after")
+                    || key.equalsIgnoreCase("last")
+                    || key.equalsIgnoreCase("before")
+                    || key.equalsIgnoreCase("include_total_count")) {
+                return;
+            }
+            this.additionalProperties.put(key, value);
         }
 
         public Builder additionalProperty(String key, Object value) {

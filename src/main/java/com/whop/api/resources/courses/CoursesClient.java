@@ -32,7 +32,7 @@ public class CoursesClient {
     }
 
     /**
-     * Returns a paginated list of courses, filtered by either an experience or a company.
+     * Returns a paginated list of the courses in an experience or an account. <code>hidden</code> courses are included only for callers with <code>courses:update</code>.
      * <p>Required permissions:</p>
      * <ul>
      * <li><code>courses:read</code></li>
@@ -43,7 +43,7 @@ public class CoursesClient {
     }
 
     /**
-     * Returns a paginated list of courses, filtered by either an experience or a company.
+     * Returns a paginated list of the courses in an experience or an account. <code>hidden</code> courses are included only for callers with <code>courses:update</code>.
      * <p>Required permissions:</p>
      * <ul>
      * <li><code>courses:read</code></li>
@@ -54,7 +54,7 @@ public class CoursesClient {
     }
 
     /**
-     * Returns a paginated list of courses, filtered by either an experience or a company.
+     * Returns a paginated list of the courses in an experience or an account. <code>hidden</code> courses are included only for callers with <code>courses:update</code>.
      * <p>Required permissions:</p>
      * <ul>
      * <li><code>courses:read</code></li>
@@ -65,7 +65,7 @@ public class CoursesClient {
     }
 
     /**
-     * Returns a paginated list of courses, filtered by either an experience or a company.
+     * Returns a paginated list of the courses in an experience or an account. <code>hidden</code> courses are included only for callers with <code>courses:update</code>.
      * <p>Required permissions:</p>
      * <ul>
      * <li><code>courses:read</code></li>
@@ -98,7 +98,7 @@ public class CoursesClient {
     }
 
     /**
-     * Retrieves the details of an existing course.
+     * Retrieves the details of an existing course. A <code>hidden</code> course is returned only to callers with <code>courses:update</code>.
      * <p>Required permissions:</p>
      * <ul>
      * <li><code>courses:read</code></li>
@@ -109,7 +109,7 @@ public class CoursesClient {
     }
 
     /**
-     * Retrieves the details of an existing course.
+     * Retrieves the details of an existing course. A <code>hidden</code> course is returned only to callers with <code>courses:update</code>.
      * <p>Required permissions:</p>
      * <ul>
      * <li><code>courses:read</code></li>
@@ -120,7 +120,7 @@ public class CoursesClient {
     }
 
     /**
-     * Retrieves the details of an existing course.
+     * Retrieves the details of an existing course. A <code>hidden</code> course is returned only to callers with <code>courses:update</code>.
      * <p>Required permissions:</p>
      * <ul>
      * <li><code>courses:read</code></li>
@@ -131,7 +131,7 @@ public class CoursesClient {
     }
 
     /**
-     * Retrieves the details of an existing course.
+     * Retrieves the details of an existing course. A <code>hidden</code> course is returned only to callers with <code>courses:update</code>.
      * <p>Required permissions:</p>
      * <ul>
      * <li><code>courses:read</code></li>

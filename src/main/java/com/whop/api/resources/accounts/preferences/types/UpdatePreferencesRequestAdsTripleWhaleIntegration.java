@@ -25,16 +25,19 @@ import java.util.Optional;
 public final class UpdatePreferencesRequestAdsTripleWhaleIntegration {
     private final Optional<String> apiKey;
 
+    private final Optional<String> shopDomain;
+
     private final Map<String, Object> additionalProperties;
 
     private UpdatePreferencesRequestAdsTripleWhaleIntegration(
-            Optional<String> apiKey, Map<String, Object> additionalProperties) {
+            Optional<String> apiKey, Optional<String> shopDomain, Map<String, Object> additionalProperties) {
         this.apiKey = apiKey;
+        this.shopDomain = shopDomain;
         this.additionalProperties = additionalProperties;
     }
 
     /**
-     * @return A Triple Whale Data-In API key with the <code>Data-In Write: Ads</code> scope, validated against Triple Whale before it is stored. Pass <code>null</code> to disconnect. Connecting for the first time backfills the account's existing ad spend.
+     * @return A Triple Whale Data-In API key with the <code>Ads: Write</code> scope, validated against Triple Whale before it is stored. Pass <code>null</code> to disconnect. Connecting for the first time backfills the account's existing ad spend. Required unless you are only changing <code>shop_domain</code> on an already connected integration, in which case the stored key is reused.
      */
     @JsonIgnore
     public Optional<String> getApiKey() {
@@ -42,6 +45,14 @@ public final class UpdatePreferencesRequestAdsTripleWhaleIntegration {
             return Optional.empty();
         }
         return apiKey;
+    }
+
+    /**
+     * @return The exact shop domain configured in Triple Whale's Settings → Store (for Shopify this is the <code>.myshopify.com</code> domain; for a custom sales platform it's whatever domain Triple Whale assigned when the shop was set up there). A leading <code>https://</code> and trailing <code>/</code> are stripped, and what remains must be a bare hostname with no path or spaces. Validated against Triple Whale — the API key must have access to it — before it is stored. Changing it on a connected integration backfills the account's ad spend onto the new shop. Omit to keep the stored domain; there is no way to clear a stored value, only to overwrite it with a new domain.
+     */
+    @JsonProperty("shop_domain")
+    public Optional<String> getShopDomain() {
+        return shopDomain;
     }
 
     @JsonInclude(value = JsonInclude.Include.CUSTOM, valueFilter = NullableNonemptyFilter.class)
@@ -63,12 +74,12 @@ public final class UpdatePreferencesRequestAdsTripleWhaleIntegration {
     }
 
     private boolean equalTo(UpdatePreferencesRequestAdsTripleWhaleIntegration other) {
-        return apiKey.equals(other.apiKey);
+        return apiKey.equals(other.apiKey) && shopDomain.equals(other.shopDomain);
     }
 
     @java.lang.Override
     public int hashCode() {
-        return Objects.hash(this.apiKey);
+        return Objects.hash(this.apiKey, this.shopDomain);
     }
 
     @java.lang.Override
@@ -84,18 +95,20 @@ public final class UpdatePreferencesRequestAdsTripleWhaleIntegration {
     public static final class Builder {
         private Optional<String> apiKey = Optional.empty();
 
-        @JsonAnySetter
+        private Optional<String> shopDomain = Optional.empty();
+
         private Map<String, Object> additionalProperties = new HashMap<>();
 
         private Builder() {}
 
         public Builder from(UpdatePreferencesRequestAdsTripleWhaleIntegration other) {
             apiKey(other.getApiKey());
+            shopDomain(other.getShopDomain());
             return this;
         }
 
         /**
-         * <p>A Triple Whale Data-In API key with the <code>Data-In Write: Ads</code> scope, validated against Triple Whale before it is stored. Pass <code>null</code> to disconnect. Connecting for the first time backfills the account's existing ad spend.</p>
+         * <p>A Triple Whale Data-In API key with the <code>Ads: Write</code> scope, validated against Triple Whale before it is stored. Pass <code>null</code> to disconnect. Connecting for the first time backfills the account's existing ad spend. Required unless you are only changing <code>shop_domain</code> on an already connected integration, in which case the stored key is reused.</p>
          */
         @JsonSetter(value = "api_key", nulls = Nulls.SKIP)
         public Builder apiKey(Optional<String> apiKey) {
@@ -119,8 +132,30 @@ public final class UpdatePreferencesRequestAdsTripleWhaleIntegration {
             return this;
         }
 
+        /**
+         * <p>The exact shop domain configured in Triple Whale's Settings → Store (for Shopify this is the <code>.myshopify.com</code> domain; for a custom sales platform it's whatever domain Triple Whale assigned when the shop was set up there). A leading <code>https://</code> and trailing <code>/</code> are stripped, and what remains must be a bare hostname with no path or spaces. Validated against Triple Whale — the API key must have access to it — before it is stored. Changing it on a connected integration backfills the account's ad spend onto the new shop. Omit to keep the stored domain; there is no way to clear a stored value, only to overwrite it with a new domain.</p>
+         */
+        @JsonSetter(value = "shop_domain", nulls = Nulls.SKIP)
+        public Builder shopDomain(Optional<String> shopDomain) {
+            this.shopDomain = shopDomain;
+            return this;
+        }
+
+        public Builder shopDomain(String shopDomain) {
+            this.shopDomain = Optional.ofNullable(shopDomain);
+            return this;
+        }
+
         public UpdatePreferencesRequestAdsTripleWhaleIntegration build() {
-            return new UpdatePreferencesRequestAdsTripleWhaleIntegration(apiKey, additionalProperties);
+            return new UpdatePreferencesRequestAdsTripleWhaleIntegration(apiKey, shopDomain, additionalProperties);
+        }
+
+        @JsonAnySetter
+        private void putAdditionalPropertyFromJson(String key, Object value) {
+            if (key.equalsIgnoreCase("api_key") || key.equalsIgnoreCase("shop_domain")) {
+                return;
+            }
+            this.additionalProperties.put(key, value);
         }
 
         public Builder additionalProperty(String key, Object value) {

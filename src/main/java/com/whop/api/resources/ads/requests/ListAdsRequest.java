@@ -166,7 +166,7 @@ public final class ListAdsRequest {
     }
 
     /**
-     * @return The field to sort by. Defaults to created_at. Stat columns (spend, impressions, …) rank over the stats_from/stats_to window across the whole list, not just the current page. results, cost_per_result and return_on_ad_spend rank by the same Whop pixel-attributed values the response reports.
+     * @return The field to sort by. Defaults to created_at. Stat columns (spend, impressions, …) rank over the stats_from/stats_to window across the whole list, not just the current page. results, cost_per_result and return_on_ad_spend rank by the same Whop pixel-attributed values the response reports, and link_clicks by the same Whop pixel page views.
      */
     @JsonProperty("order")
     public Optional<ListAdsRequestOrder> getOrder() {
@@ -230,7 +230,7 @@ public final class ListAdsRequest {
     }
 
     /**
-     * @return The number of ads to return.
+     * @return Number of results to return from the start of the range.
      */
     @JsonProperty("first")
     public Optional<Integer> getFirst() {
@@ -238,7 +238,7 @@ public final class ListAdsRequest {
     }
 
     /**
-     * @return Cursor to fetch the page after (from page_info.end_cursor).
+     * @return Return results after this cursor. Use <code>page_info.end_cursor</code> from the previous response to fetch the next page.
      */
     @JsonProperty("after")
     public Optional<String> getAfter() {
@@ -246,7 +246,7 @@ public final class ListAdsRequest {
     }
 
     /**
-     * @return The number of ads to return from the end of the range.
+     * @return Number of results to return from the end of the range.
      */
     @JsonProperty("last")
     public Optional<Integer> getLast() {
@@ -254,7 +254,7 @@ public final class ListAdsRequest {
     }
 
     /**
-     * @return Cursor to fetch the page before (from page_info.start_cursor).
+     * @return Return results before this cursor. Use <code>page_info.start_cursor</code> from the previous response to fetch the previous page.
      */
     @JsonProperty("before")
     public Optional<String> getBefore() {
@@ -367,7 +367,6 @@ public final class ListAdsRequest {
 
         private Optional<String> before = Optional.empty();
 
-        @JsonAnySetter
         private Map<String, Object> additionalProperties = new HashMap<>();
 
         private Builder() {}
@@ -504,7 +503,7 @@ public final class ListAdsRequest {
         }
 
         /**
-         * <p>The field to sort by. Defaults to created_at. Stat columns (spend, impressions, …) rank over the stats_from/stats_to window across the whole list, not just the current page. results, cost_per_result and return_on_ad_spend rank by the same Whop pixel-attributed values the response reports.</p>
+         * <p>The field to sort by. Defaults to created_at. Stat columns (spend, impressions, …) rank over the stats_from/stats_to window across the whole list, not just the current page. results, cost_per_result and return_on_ad_spend rank by the same Whop pixel-attributed values the response reports, and link_clicks by the same Whop pixel page views.</p>
          */
         @JsonSetter(value = "order", nulls = Nulls.SKIP)
         public Builder order(Optional<ListAdsRequestOrder> order) {
@@ -616,7 +615,7 @@ public final class ListAdsRequest {
         }
 
         /**
-         * <p>The number of ads to return.</p>
+         * <p>Number of results to return from the start of the range.</p>
          */
         @JsonSetter(value = "first", nulls = Nulls.SKIP)
         public Builder first(Optional<Integer> first) {
@@ -630,7 +629,7 @@ public final class ListAdsRequest {
         }
 
         /**
-         * <p>Cursor to fetch the page after (from page_info.end_cursor).</p>
+         * <p>Return results after this cursor. Use <code>page_info.end_cursor</code> from the previous response to fetch the next page.</p>
          */
         @JsonSetter(value = "after", nulls = Nulls.SKIP)
         public Builder after(Optional<String> after) {
@@ -644,7 +643,7 @@ public final class ListAdsRequest {
         }
 
         /**
-         * <p>The number of ads to return from the end of the range.</p>
+         * <p>Number of results to return from the end of the range.</p>
          */
         @JsonSetter(value = "last", nulls = Nulls.SKIP)
         public Builder last(Optional<Integer> last) {
@@ -658,7 +657,7 @@ public final class ListAdsRequest {
         }
 
         /**
-         * <p>Cursor to fetch the page before (from page_info.start_cursor).</p>
+         * <p>Return results before this cursor. Use <code>page_info.start_cursor</code> from the previous response to fetch the previous page.</p>
          */
         @JsonSetter(value = "before", nulls = Nulls.SKIP)
         public Builder before(Optional<String> before) {
@@ -693,6 +692,32 @@ public final class ListAdsRequest {
                     last,
                     before,
                     additionalProperties);
+        }
+
+        @JsonAnySetter
+        private void putAdditionalPropertyFromJson(String key, Object value) {
+            if (key.equalsIgnoreCase("ad_campaign_ids")
+                    || key.equalsIgnoreCase("ad_group_ids")
+                    || key.equalsIgnoreCase("account_id")
+                    || key.equalsIgnoreCase("ad_campaign_id")
+                    || key.equalsIgnoreCase("ad_group_id")
+                    || key.equalsIgnoreCase("status")
+                    || key.equalsIgnoreCase("query")
+                    || key.equalsIgnoreCase("order")
+                    || key.equalsIgnoreCase("direction")
+                    || key.equalsIgnoreCase("created_before")
+                    || key.equalsIgnoreCase("created_after")
+                    || key.equalsIgnoreCase("stats_from")
+                    || key.equalsIgnoreCase("stats_to")
+                    || key.equalsIgnoreCase("time_zone")
+                    || key.equalsIgnoreCase("attribution_model")
+                    || key.equalsIgnoreCase("first")
+                    || key.equalsIgnoreCase("after")
+                    || key.equalsIgnoreCase("last")
+                    || key.equalsIgnoreCase("before")) {
+                return;
+            }
+            this.additionalProperties.put(key, value);
         }
 
         public Builder additionalProperty(String key, Object value) {

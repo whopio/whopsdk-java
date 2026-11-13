@@ -95,7 +95,7 @@ public final class PostTransferCompletedPayload {
     }
 
     /**
-     * @return A transfer of credit between two ledger accounts.
+     * @return A transfer between Whop accounts or users.
      */
     @JsonProperty("data")
     public PostTransferCompletedPayloadData getData() {
@@ -201,7 +201,7 @@ public final class PostTransferCompletedPayload {
 
     public interface DataStage {
         /**
-         * <p>A transfer of credit between two ledger accounts.</p>
+         * <p>A transfer between Whop accounts or users.</p>
          */
         IdStage data(@NotNull PostTransferCompletedPayloadData data);
     }
@@ -279,7 +279,6 @@ public final class PostTransferCompletedPayload {
 
         private Optional<String> accountId = Optional.empty();
 
-        @JsonAnySetter
         private Map<String, Object> additionalProperties = new HashMap<>();
 
         private Builder() {}
@@ -299,7 +298,6 @@ public final class PostTransferCompletedPayload {
 
         /**
          * <p>The API version for this webhook</p>
-         * <p>The API version for this webhook</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
@@ -310,8 +308,7 @@ public final class PostTransferCompletedPayload {
         }
 
         /**
-         * <p>A transfer of credit between two ledger accounts.</p>
-         * <p>A transfer of credit between two ledger accounts.</p>
+         * <p>A transfer between Whop accounts or users.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
@@ -322,7 +319,6 @@ public final class PostTransferCompletedPayload {
         }
 
         /**
-         * <p>A unique ID for every single webhook request</p>
          * <p>A unique ID for every single webhook request</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
@@ -335,7 +331,6 @@ public final class PostTransferCompletedPayload {
 
         /**
          * <p>The timestamp in ISO 8601 format that the webhook was sent at on the server</p>
-         * <p>The timestamp in ISO 8601 format that the webhook was sent at on the server</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
@@ -346,7 +341,6 @@ public final class PostTransferCompletedPayload {
         }
 
         /**
-         * <p>The webhook event type</p>
          * <p>The webhook event type</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
@@ -461,6 +455,21 @@ public final class PostTransferCompletedPayload {
                     timestamp,
                     type,
                     additionalProperties);
+        }
+
+        @JsonAnySetter
+        private void putAdditionalPropertyFromJson(String key, Object value) {
+            if (key.equalsIgnoreCase("account_id")
+                    || key.equalsIgnoreCase("api_version")
+                    || key.equalsIgnoreCase("api_version_date")
+                    || key.equalsIgnoreCase("data")
+                    || key.equalsIgnoreCase("id")
+                    || key.equalsIgnoreCase("previous_attributes")
+                    || key.equalsIgnoreCase("timestamp")
+                    || key.equalsIgnoreCase("type")) {
+                return;
+            }
+            this.additionalProperties.put(key, value);
         }
 
         @java.lang.Override

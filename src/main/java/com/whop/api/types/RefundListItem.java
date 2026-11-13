@@ -33,6 +33,8 @@ public final class RefundListItem {
 
     private final String id;
 
+    private final Optional<Map<String, Object>> metadata;
+
     private final Optional<RefundListItemPayment> payment;
 
     private final PaymentProviders provider;
@@ -54,6 +56,7 @@ public final class RefundListItem {
             OffsetDateTime createdAt,
             Currencies currency,
             String id,
+            Optional<Map<String, Object>> metadata,
             Optional<RefundListItemPayment> payment,
             PaymentProviders provider,
             Optional<OffsetDateTime> providerCreatedAt,
@@ -66,6 +69,7 @@ public final class RefundListItem {
         this.createdAt = createdAt;
         this.currency = currency;
         this.id = id;
+        this.metadata = metadata;
         this.payment = payment;
         this.provider = provider;
         this.providerCreatedAt = providerCreatedAt;
@@ -106,6 +110,17 @@ public final class RefundListItem {
     @JsonProperty("id")
     public String getId() {
         return id;
+    }
+
+    /**
+     * @return The custom metadata attached when this refund was requested.
+     */
+    @JsonIgnore
+    public Optional<Map<String, Object>> getMetadata() {
+        if (metadata == null) {
+            return Optional.empty();
+        }
+        return metadata;
     }
 
     /**
@@ -180,6 +195,12 @@ public final class RefundListItem {
     }
 
     @JsonInclude(value = JsonInclude.Include.CUSTOM, valueFilter = NullableNonemptyFilter.class)
+    @JsonProperty("metadata")
+    private Optional<Map<String, Object>> _getMetadata() {
+        return metadata;
+    }
+
+    @JsonInclude(value = JsonInclude.Include.CUSTOM, valueFilter = NullableNonemptyFilter.class)
     @JsonProperty("payment")
     private Optional<RefundListItemPayment> _getPayment() {
         return payment;
@@ -225,6 +246,7 @@ public final class RefundListItem {
                 && createdAt.equals(other.createdAt)
                 && currency.equals(other.currency)
                 && id.equals(other.id)
+                && metadata.equals(other.metadata)
                 && payment.equals(other.payment)
                 && provider.equals(other.provider)
                 && providerCreatedAt.equals(other.providerCreatedAt)
@@ -241,6 +263,7 @@ public final class RefundListItem {
                 this.createdAt,
                 this.currency,
                 this.id,
+                this.metadata,
                 this.payment,
                 this.provider,
                 this.providerCreatedAt,
@@ -309,6 +332,15 @@ public final class RefundListItem {
         _FinalStage additionalProperty(String key, Object value);
 
         _FinalStage additionalProperties(Map<String, Object> additionalProperties);
+
+        /**
+         * <p>The custom metadata attached when this refund was requested.</p>
+         */
+        _FinalStage metadata(Optional<Map<String, Object>> metadata);
+
+        _FinalStage metadata(Map<String, Object> metadata);
+
+        _FinalStage metadata(Nullable<Map<String, Object>> metadata);
 
         /**
          * <p>The original payment that this refund was issued against. Null if the payment is no longer available.</p>
@@ -381,7 +413,8 @@ public final class RefundListItem {
 
         private Optional<RefundListItemPayment> payment = Optional.empty();
 
-        @JsonAnySetter
+        private Optional<Map<String, Object>> metadata = Optional.empty();
+
         private Map<String, Object> additionalProperties = new HashMap<>();
 
         private Builder() {}
@@ -392,6 +425,7 @@ public final class RefundListItem {
             createdAt(other.getCreatedAt());
             currency(other.getCurrency());
             id(other.getId());
+            metadata(other.getMetadata());
             payment(other.getPayment());
             provider(other.getProvider());
             providerCreatedAt(other.getProviderCreatedAt());
@@ -404,7 +438,6 @@ public final class RefundListItem {
 
         /**
          * <p>The refunded amount as a decimal in the specified currency, such as 10.43 for $10.43 USD.</p>
-         * <p>The refunded amount as a decimal in the specified currency, such as 10.43 for $10.43 USD.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
@@ -415,7 +448,6 @@ public final class RefundListItem {
         }
 
         /**
-         * <p>The datetime the refund was created.</p>
          * <p>The datetime the refund was created.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
@@ -428,7 +460,6 @@ public final class RefundListItem {
 
         /**
          * <p>The three-letter ISO currency code for the refunded amount.</p>
-         * <p>The three-letter ISO currency code for the refunded amount.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
@@ -439,7 +470,6 @@ public final class RefundListItem {
         }
 
         /**
-         * <p>The unique identifier for the refund.</p>
          * <p>The unique identifier for the refund.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
@@ -452,7 +482,6 @@ public final class RefundListItem {
 
         /**
          * <p>The payment provider that processed the refund.</p>
-         * <p>The payment provider that processed the refund.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
@@ -463,7 +492,6 @@ public final class RefundListItem {
         }
 
         /**
-         * <p>The current processing status of the refund, such as pending, succeeded, or failed.</p>
          * <p>The current processing status of the refund, such as pending, succeeded, or failed.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
@@ -654,6 +682,42 @@ public final class RefundListItem {
             return this;
         }
 
+        /**
+         * <p>The custom metadata attached when this refund was requested.</p>
+         * @return Reference to {@code this} so that method calls can be chained together.
+         */
+        @java.lang.Override
+        public _FinalStage metadata(Nullable<Map<String, Object>> metadata) {
+            if (metadata.isNull()) {
+                this.metadata = null;
+            } else if (metadata.isEmpty()) {
+                this.metadata = Optional.empty();
+            } else {
+                this.metadata = Optional.of(metadata.get());
+            }
+            return this;
+        }
+
+        /**
+         * <p>The custom metadata attached when this refund was requested.</p>
+         * @return Reference to {@code this} so that method calls can be chained together.
+         */
+        @java.lang.Override
+        public _FinalStage metadata(Map<String, Object> metadata) {
+            this.metadata = Optional.ofNullable(metadata);
+            return this;
+        }
+
+        /**
+         * <p>The custom metadata attached when this refund was requested.</p>
+         */
+        @java.lang.Override
+        @JsonSetter(value = "metadata", nulls = Nulls.SKIP)
+        public _FinalStage metadata(Optional<Map<String, Object>> metadata) {
+            this.metadata = metadata;
+            return this;
+        }
+
         @java.lang.Override
         public RefundListItem build() {
             return new RefundListItem(
@@ -661,6 +725,7 @@ public final class RefundListItem {
                     createdAt,
                     currency,
                     id,
+                    metadata,
                     payment,
                     provider,
                     providerCreatedAt,
@@ -669,6 +734,25 @@ public final class RefundListItem {
                     referenceValue,
                     status,
                     additionalProperties);
+        }
+
+        @JsonAnySetter
+        private void putAdditionalPropertyFromJson(String key, Object value) {
+            if (key.equalsIgnoreCase("amount")
+                    || key.equalsIgnoreCase("created_at")
+                    || key.equalsIgnoreCase("currency")
+                    || key.equalsIgnoreCase("id")
+                    || key.equalsIgnoreCase("metadata")
+                    || key.equalsIgnoreCase("payment")
+                    || key.equalsIgnoreCase("provider")
+                    || key.equalsIgnoreCase("provider_created_at")
+                    || key.equalsIgnoreCase("reference_status")
+                    || key.equalsIgnoreCase("reference_type")
+                    || key.equalsIgnoreCase("reference_value")
+                    || key.equalsIgnoreCase("status")) {
+                return;
+            }
+            this.additionalProperties.put(key, value);
         }
 
         @java.lang.Override

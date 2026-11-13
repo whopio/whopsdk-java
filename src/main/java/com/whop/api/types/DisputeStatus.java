@@ -7,13 +7,24 @@ import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonValue;
 
 public final class DisputeStatus {
+    public static final DisputeStatus WARNING_UNDER_REVIEW =
+            new DisputeStatus(Value.WARNING_UNDER_REVIEW, "warning_under_review");
+
+    public static final DisputeStatus PREVENTED = new DisputeStatus(Value.PREVENTED, "prevented");
+
     public static final DisputeStatus NEEDS_RESPONSE = new DisputeStatus(Value.NEEDS_RESPONSE, "needs_response");
+
+    public static final DisputeStatus WARNING_NEEDS_RESPONSE =
+            new DisputeStatus(Value.WARNING_NEEDS_RESPONSE, "warning_needs_response");
 
     public static final DisputeStatus WON = new DisputeStatus(Value.WON, "won");
 
-    public static final DisputeStatus CLOSED = new DisputeStatus(Value.CLOSED, "closed");
+    public static final DisputeStatus WARNING_CLOSED = new DisputeStatus(Value.WARNING_CLOSED, "warning_closed");
 
     public static final DisputeStatus UNDER_REVIEW = new DisputeStatus(Value.UNDER_REVIEW, "under_review");
+
+    public static final DisputeStatus GENERATING_RESPONSE =
+            new DisputeStatus(Value.GENERATING_RESPONSE, "generating_response");
 
     public static final DisputeStatus LOST = new DisputeStatus(Value.LOST, "lost");
 
@@ -49,14 +60,22 @@ public final class DisputeStatus {
 
     public <T> T visit(Visitor<T> visitor) {
         switch (value) {
+            case WARNING_UNDER_REVIEW:
+                return visitor.visitWarningUnderReview();
+            case PREVENTED:
+                return visitor.visitPrevented();
             case NEEDS_RESPONSE:
                 return visitor.visitNeedsResponse();
+            case WARNING_NEEDS_RESPONSE:
+                return visitor.visitWarningNeedsResponse();
             case WON:
                 return visitor.visitWon();
-            case CLOSED:
-                return visitor.visitClosed();
+            case WARNING_CLOSED:
+                return visitor.visitWarningClosed();
             case UNDER_REVIEW:
                 return visitor.visitUnderReview();
+            case GENERATING_RESPONSE:
+                return visitor.visitGeneratingResponse();
             case LOST:
                 return visitor.visitLost();
             case UNKNOWN:
@@ -68,14 +87,22 @@ public final class DisputeStatus {
     @JsonCreator(mode = JsonCreator.Mode.DELEGATING)
     public static DisputeStatus valueOf(String value) {
         switch (value) {
+            case "warning_under_review":
+                return WARNING_UNDER_REVIEW;
+            case "prevented":
+                return PREVENTED;
             case "needs_response":
                 return NEEDS_RESPONSE;
+            case "warning_needs_response":
+                return WARNING_NEEDS_RESPONSE;
             case "won":
                 return WON;
-            case "closed":
-                return CLOSED;
+            case "warning_closed":
+                return WARNING_CLOSED;
             case "under_review":
                 return UNDER_REVIEW;
+            case "generating_response":
+                return GENERATING_RESPONSE;
             case "lost":
                 return LOST;
             default:
@@ -86,13 +113,21 @@ public final class DisputeStatus {
     public enum Value {
         NEEDS_RESPONSE,
 
+        WARNING_NEEDS_RESPONSE,
+
         UNDER_REVIEW,
+
+        WARNING_UNDER_REVIEW,
+
+        GENERATING_RESPONSE,
 
         WON,
 
         LOST,
 
-        CLOSED,
+        PREVENTED,
+
+        WARNING_CLOSED,
 
         UNKNOWN
     }
@@ -100,13 +135,21 @@ public final class DisputeStatus {
     public interface Visitor<T> {
         T visitNeedsResponse();
 
+        T visitWarningNeedsResponse();
+
         T visitUnderReview();
+
+        T visitWarningUnderReview();
+
+        T visitGeneratingResponse();
 
         T visitWon();
 
         T visitLost();
 
-        T visitClosed();
+        T visitPrevented();
+
+        T visitWarningClosed();
 
         T visitUnknown(String unknownType);
     }

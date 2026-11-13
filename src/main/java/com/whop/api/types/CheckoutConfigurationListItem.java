@@ -24,6 +24,8 @@ import org.jetbrains.annotations.NotNull;
 @JsonInclude(JsonInclude.Include.NON_ABSENT)
 @JsonDeserialize(builder = CheckoutConfigurationListItem.Builder.class)
 public final class CheckoutConfigurationListItem {
+    private final String accountId;
+
     private final Optional<String> affiliateCode;
 
     private final String companyId;
@@ -47,6 +49,7 @@ public final class CheckoutConfigurationListItem {
     private final Map<String, Object> additionalProperties;
 
     private CheckoutConfigurationListItem(
+            String accountId,
             Optional<String> affiliateCode,
             String companyId,
             Optional<Currencies> currency,
@@ -58,6 +61,7 @@ public final class CheckoutConfigurationListItem {
             String purchaseUrl,
             Optional<String> redirectUrl,
             Map<String, Object> additionalProperties) {
+        this.accountId = accountId;
         this.affiliateCode = affiliateCode;
         this.companyId = companyId;
         this.currency = currency;
@@ -72,6 +76,14 @@ public final class CheckoutConfigurationListItem {
     }
 
     /**
+     * @return The ID of the account to use for the checkout configuration
+     */
+    @JsonProperty("account_id")
+    public String getAccountId() {
+        return accountId;
+    }
+
+    /**
      * @return The affiliate code to use for the checkout configuration
      */
     @JsonIgnore
@@ -83,7 +95,7 @@ public final class CheckoutConfigurationListItem {
     }
 
     /**
-     * @return The ID of the company to use for the checkout configuration
+     * @return The ID of the account to use for the checkout configuration
      */
     @JsonProperty("company_id")
     public String getCompanyId() {
@@ -217,7 +229,8 @@ public final class CheckoutConfigurationListItem {
     }
 
     private boolean equalTo(CheckoutConfigurationListItem other) {
-        return affiliateCode.equals(other.affiliateCode)
+        return accountId.equals(other.accountId)
+                && affiliateCode.equals(other.affiliateCode)
                 && companyId.equals(other.companyId)
                 && currency.equals(other.currency)
                 && id.equals(other.id)
@@ -232,6 +245,7 @@ public final class CheckoutConfigurationListItem {
     @java.lang.Override
     public int hashCode() {
         return Objects.hash(
+                this.accountId,
                 this.affiliateCode,
                 this.companyId,
                 this.currency,
@@ -249,17 +263,24 @@ public final class CheckoutConfigurationListItem {
         return ObjectMappers.stringify(this);
     }
 
-    public static CompanyIdStage builder() {
+    public static AccountIdStage builder() {
         return new Builder();
+    }
+
+    public interface AccountIdStage {
+        /**
+         * <p>The ID of the account to use for the checkout configuration</p>
+         */
+        CompanyIdStage accountId(@NotNull String accountId);
+
+        Builder from(CheckoutConfigurationListItem other);
     }
 
     public interface CompanyIdStage {
         /**
-         * <p>The ID of the company to use for the checkout configuration</p>
+         * <p>The ID of the account to use for the checkout configuration</p>
          */
         IdStage companyId(@NotNull String companyId);
-
-        Builder from(CheckoutConfigurationListItem other);
     }
 
     public interface IdStage {
@@ -349,7 +370,10 @@ public final class CheckoutConfigurationListItem {
     }
 
     @JsonIgnoreProperties(ignoreUnknown = true)
-    public static final class Builder implements CompanyIdStage, IdStage, ModeStage, PurchaseUrlStage, _FinalStage {
+    public static final class Builder
+            implements AccountIdStage, CompanyIdStage, IdStage, ModeStage, PurchaseUrlStage, _FinalStage {
+        private String accountId;
+
         private String companyId;
 
         private String id;
@@ -371,13 +395,13 @@ public final class CheckoutConfigurationListItem {
 
         private Optional<String> affiliateCode = Optional.empty();
 
-        @JsonAnySetter
         private Map<String, Object> additionalProperties = new HashMap<>();
 
         private Builder() {}
 
         @java.lang.Override
         public Builder from(CheckoutConfigurationListItem other) {
+            accountId(other.getAccountId());
             affiliateCode(other.getAffiliateCode());
             companyId(other.getCompanyId());
             currency(other.getCurrency());
@@ -392,8 +416,18 @@ public final class CheckoutConfigurationListItem {
         }
 
         /**
-         * <p>The ID of the company to use for the checkout configuration</p>
-         * <p>The ID of the company to use for the checkout configuration</p>
+         * <p>The ID of the account to use for the checkout configuration</p>
+         * @return Reference to {@code this} so that method calls can be chained together.
+         */
+        @java.lang.Override
+        @JsonSetter("account_id")
+        public CompanyIdStage accountId(@NotNull String accountId) {
+            this.accountId = Objects.requireNonNull(accountId, "accountId must not be null");
+            return this;
+        }
+
+        /**
+         * <p>The ID of the account to use for the checkout configuration</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
@@ -404,7 +438,6 @@ public final class CheckoutConfigurationListItem {
         }
 
         /**
-         * <p>The unique identifier for the checkout session.</p>
          * <p>The unique identifier for the checkout session.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
@@ -417,7 +450,6 @@ public final class CheckoutConfigurationListItem {
 
         /**
          * <p>The mode of the checkout session.</p>
-         * <p>The mode of the checkout session.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
@@ -428,7 +460,6 @@ public final class CheckoutConfigurationListItem {
         }
 
         /**
-         * <p>A URL you can send to customers to complete a checkout. It looks like <code>/checkout/ch_xxxx/</code></p>
          * <p>A URL you can send to customers to complete a checkout. It looks like <code>/checkout/ch_xxxx/</code></p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
@@ -661,6 +692,7 @@ public final class CheckoutConfigurationListItem {
         @java.lang.Override
         public CheckoutConfigurationListItem build() {
             return new CheckoutConfigurationListItem(
+                    accountId,
                     affiliateCode,
                     companyId,
                     currency,
@@ -672,6 +704,24 @@ public final class CheckoutConfigurationListItem {
                     purchaseUrl,
                     redirectUrl,
                     additionalProperties);
+        }
+
+        @JsonAnySetter
+        private void putAdditionalPropertyFromJson(String key, Object value) {
+            if (key.equalsIgnoreCase("account_id")
+                    || key.equalsIgnoreCase("affiliate_code")
+                    || key.equalsIgnoreCase("company_id")
+                    || key.equalsIgnoreCase("currency")
+                    || key.equalsIgnoreCase("id")
+                    || key.equalsIgnoreCase("metadata")
+                    || key.equalsIgnoreCase("mode")
+                    || key.equalsIgnoreCase("payment_method_configuration")
+                    || key.equalsIgnoreCase("plan")
+                    || key.equalsIgnoreCase("purchase_url")
+                    || key.equalsIgnoreCase("redirect_url")) {
+                return;
+            }
+            this.additionalProperties.put(key, value);
         }
 
         @java.lang.Override

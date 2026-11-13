@@ -107,7 +107,6 @@ public final class AccessToken {
 
         private String token;
 
-        @JsonAnySetter
         private Map<String, Object> additionalProperties = new HashMap<>();
 
         private Builder() {}
@@ -121,7 +120,6 @@ public final class AccessToken {
 
         /**
          * <p>The timestamp after which this access token is no longer valid and must be refreshed.</p>
-         * <p>The timestamp after which this access token is no longer valid and must be refreshed.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
@@ -132,7 +130,6 @@ public final class AccessToken {
         }
 
         /**
-         * <p>The signed JWT access token string to include in API request Authorization headers.</p>
          * <p>The signed JWT access token string to include in API request Authorization headers.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
@@ -146,6 +143,14 @@ public final class AccessToken {
         @java.lang.Override
         public AccessToken build() {
             return new AccessToken(expiresAt, token, additionalProperties);
+        }
+
+        @JsonAnySetter
+        private void putAdditionalPropertyFromJson(String key, Object value) {
+            if (key.equalsIgnoreCase("expires_at") || key.equalsIgnoreCase("token")) {
+                return;
+            }
+            this.additionalProperties.put(key, value);
         }
 
         @java.lang.Override

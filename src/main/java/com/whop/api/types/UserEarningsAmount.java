@@ -155,7 +155,6 @@ public final class UserEarningsAmount {
 
         private String lifetime;
 
-        @JsonAnySetter
         private Map<String, Object> additionalProperties = new HashMap<>();
 
         private Builder() {}
@@ -171,7 +170,6 @@ public final class UserEarningsAmount {
 
         /**
          * <p>Gross income in USD over the last 24 hours.</p>
-         * <p>Gross income in USD over the last 24 hours.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
@@ -182,7 +180,6 @@ public final class UserEarningsAmount {
         }
 
         /**
-         * <p>Gross income in USD over the last 30 days.</p>
          * <p>Gross income in USD over the last 30 days.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
@@ -195,7 +192,6 @@ public final class UserEarningsAmount {
 
         /**
          * <p>Gross income in USD over the last 7 days.</p>
-         * <p>Gross income in USD over the last 7 days.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
@@ -206,7 +202,6 @@ public final class UserEarningsAmount {
         }
 
         /**
-         * <p>All-time gross income in USD.</p>
          * <p>All-time gross income in USD.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
@@ -220,6 +215,17 @@ public final class UserEarningsAmount {
         @java.lang.Override
         public UserEarningsAmount build() {
             return new UserEarningsAmount(last24Hours, last30Days, last7Days, lifetime, additionalProperties);
+        }
+
+        @JsonAnySetter
+        private void putAdditionalPropertyFromJson(String key, Object value) {
+            if (key.equalsIgnoreCase("last_24_hours")
+                    || key.equalsIgnoreCase("last_30_days")
+                    || key.equalsIgnoreCase("last_7_days")
+                    || key.equalsIgnoreCase("lifetime")) {
+                return;
+            }
+            this.additionalProperties.put(key, value);
         }
 
         @java.lang.Override

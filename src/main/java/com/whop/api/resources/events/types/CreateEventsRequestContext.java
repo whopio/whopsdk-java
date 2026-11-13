@@ -57,6 +57,8 @@ public final class CreateEventsRequestContext {
 
     private final Optional<String> rdtCid;
 
+    private final Optional<String> sc;
+
     private final Optional<String> sccid;
 
     private final Optional<String> screenResolution;
@@ -105,6 +107,7 @@ public final class CreateEventsRequestContext {
             Optional<String> liFatId,
             Optional<String> msclkid,
             Optional<String> rdtCid,
+            Optional<String> sc,
             Optional<String> sccid,
             Optional<String> screenResolution,
             Optional<String> timezone,
@@ -137,6 +140,7 @@ public final class CreateEventsRequestContext {
         this.liFatId = liFatId;
         this.msclkid = msclkid;
         this.rdtCid = rdtCid;
+        this.sc = sc;
         this.sccid = sccid;
         this.screenResolution = screenResolution;
         this.timezone = timezone;
@@ -339,6 +343,17 @@ public final class CreateEventsRequestContext {
             return Optional.empty();
         }
         return rdtCid;
+    }
+
+    /**
+     * @return Whop SC identifier.
+     */
+    @JsonIgnore
+    public Optional<String> getSc() {
+        if (sc == null) {
+            return Optional.empty();
+        }
+        return sc;
     }
 
     /**
@@ -598,6 +613,12 @@ public final class CreateEventsRequestContext {
     }
 
     @JsonInclude(value = JsonInclude.Include.CUSTOM, valueFilter = NullableNonemptyFilter.class)
+    @JsonProperty("sc")
+    private Optional<String> _getSc() {
+        return sc;
+    }
+
+    @JsonInclude(value = JsonInclude.Include.CUSTOM, valueFilter = NullableNonemptyFilter.class)
     @JsonProperty("sccid")
     private Optional<String> _getSccid() {
         return sccid;
@@ -710,6 +731,7 @@ public final class CreateEventsRequestContext {
                 && liFatId.equals(other.liFatId)
                 && msclkid.equals(other.msclkid)
                 && rdtCid.equals(other.rdtCid)
+                && sc.equals(other.sc)
                 && sccid.equals(other.sccid)
                 && screenResolution.equals(other.screenResolution)
                 && timezone.equals(other.timezone)
@@ -746,6 +768,7 @@ public final class CreateEventsRequestContext {
                 this.liFatId,
                 this.msclkid,
                 this.rdtCid,
+                this.sc,
                 this.sccid,
                 this.screenResolution,
                 this.timezone,
@@ -807,6 +830,8 @@ public final class CreateEventsRequestContext {
 
         private Optional<String> rdtCid = Optional.empty();
 
+        private Optional<String> sc = Optional.empty();
+
         private Optional<String> sccid = Optional.empty();
 
         private Optional<String> screenResolution = Optional.empty();
@@ -835,7 +860,6 @@ public final class CreateEventsRequestContext {
 
         private Optional<String> wbraid = Optional.empty();
 
-        @JsonAnySetter
         private Map<String, Object> additionalProperties = new HashMap<>();
 
         private Builder() {}
@@ -858,6 +882,7 @@ public final class CreateEventsRequestContext {
             liFatId(other.getLiFatId());
             msclkid(other.getMsclkid());
             rdtCid(other.getRdtCid());
+            sc(other.getSc());
             sccid(other.getSccid());
             screenResolution(other.getScreenResolution());
             timezone(other.getTimezone());
@@ -1301,6 +1326,31 @@ public final class CreateEventsRequestContext {
         }
 
         /**
+         * <p>Whop SC identifier.</p>
+         */
+        @JsonSetter(value = "sc", nulls = Nulls.SKIP)
+        public Builder sc(Optional<String> sc) {
+            this.sc = sc;
+            return this;
+        }
+
+        public Builder sc(String sc) {
+            this.sc = Optional.ofNullable(sc);
+            return this;
+        }
+
+        public Builder sc(Nullable<String> sc) {
+            if (sc.isNull()) {
+                this.sc = null;
+            } else if (sc.isEmpty()) {
+                this.sc = Optional.empty();
+            } else {
+                this.sc = Optional.of(sc.get());
+            }
+            return this;
+        }
+
+        /**
          * <p>Snapchat click ID.</p>
          */
         @JsonSetter(value = "sccid", nulls = Nulls.SKIP)
@@ -1669,6 +1719,7 @@ public final class CreateEventsRequestContext {
                     liFatId,
                     msclkid,
                     rdtCid,
+                    sc,
                     sccid,
                     screenResolution,
                     timezone,
@@ -1684,6 +1735,45 @@ public final class CreateEventsRequestContext {
                     utmTerm,
                     wbraid,
                     additionalProperties);
+        }
+
+        @JsonAnySetter
+        private void putAdditionalPropertyFromJson(String key, Object value) {
+            if (key.equalsIgnoreCase("ad_campaign_id")
+                    || key.equalsIgnoreCase("ad_id")
+                    || key.equalsIgnoreCase("ad_set_id")
+                    || key.equalsIgnoreCase("fbc")
+                    || key.equalsIgnoreCase("fbclid")
+                    || key.equalsIgnoreCase("fbp")
+                    || key.equalsIgnoreCase("fingerprint")
+                    || key.equalsIgnoreCase("fingerprint_confidence")
+                    || key.equalsIgnoreCase("ga")
+                    || key.equalsIgnoreCase("gbraid")
+                    || key.equalsIgnoreCase("gclid")
+                    || key.equalsIgnoreCase("ig_sid")
+                    || key.equalsIgnoreCase("ip_address")
+                    || key.equalsIgnoreCase("language")
+                    || key.equalsIgnoreCase("li_fat_id")
+                    || key.equalsIgnoreCase("msclkid")
+                    || key.equalsIgnoreCase("rdt_cid")
+                    || key.equalsIgnoreCase("sc")
+                    || key.equalsIgnoreCase("sccid")
+                    || key.equalsIgnoreCase("screen_resolution")
+                    || key.equalsIgnoreCase("timezone")
+                    || key.equalsIgnoreCase("ttclid")
+                    || key.equalsIgnoreCase("ttp")
+                    || key.equalsIgnoreCase("twclid")
+                    || key.equalsIgnoreCase("user_agent")
+                    || key.equalsIgnoreCase("utm_campaign")
+                    || key.equalsIgnoreCase("utm_content")
+                    || key.equalsIgnoreCase("utm_id")
+                    || key.equalsIgnoreCase("utm_medium")
+                    || key.equalsIgnoreCase("utm_source")
+                    || key.equalsIgnoreCase("utm_term")
+                    || key.equalsIgnoreCase("wbraid")) {
+                return;
+            }
+            this.additionalProperties.put(key, value);
         }
 
         public Builder additionalProperty(String key, Object value) {

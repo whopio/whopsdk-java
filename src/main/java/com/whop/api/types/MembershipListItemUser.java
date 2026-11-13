@@ -203,7 +203,6 @@ public final class MembershipListItemUser {
 
         private Optional<String> email = Optional.empty();
 
-        @JsonAnySetter
         private Map<String, Object> additionalProperties = new HashMap<>();
 
         private Builder() {}
@@ -220,7 +219,6 @@ public final class MembershipListItemUser {
 
         /**
          * <p>The unique identifier for the user.</p>
-         * <p>The unique identifier for the user.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
@@ -232,7 +230,6 @@ public final class MembershipListItemUser {
 
         /**
          * <p>The URL of the user's profile picture. Use profilePicture for the full attachment object.</p>
-         * <p>The URL of the user's profile picture. Use profilePicture for the full attachment object.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
@@ -243,7 +240,6 @@ public final class MembershipListItemUser {
         }
 
         /**
-         * <p>The user's unique username shown on their public profile.</p>
          * <p>The user's unique username shown on their public profile.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
@@ -329,6 +325,18 @@ public final class MembershipListItemUser {
         @java.lang.Override
         public MembershipListItemUser build() {
             return new MembershipListItemUser(email, id, name, profilePic, username, additionalProperties);
+        }
+
+        @JsonAnySetter
+        private void putAdditionalPropertyFromJson(String key, Object value) {
+            if (key.equalsIgnoreCase("email")
+                    || key.equalsIgnoreCase("id")
+                    || key.equalsIgnoreCase("name")
+                    || key.equalsIgnoreCase("profile_pic")
+                    || key.equalsIgnoreCase("username")) {
+                return;
+            }
+            this.additionalProperties.put(key, value);
         }
 
         @java.lang.Override

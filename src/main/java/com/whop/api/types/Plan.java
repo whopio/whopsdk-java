@@ -30,7 +30,13 @@ public final class Plan {
 
     private final boolean adaptivePricingEnabled;
 
+    private final boolean allowMultipleQuantity;
+
+    private final Optional<Map<String, Optional<String>>> attributes;
+
     private final Optional<Double> billingPeriod;
+
+    private final PlanBillingType billingType;
 
     private final Optional<Double> cancelDiscountIntervals;
 
@@ -62,6 +68,8 @@ public final class Plan {
 
     private final double initialPrice;
 
+    private final Money initialPriceDue;
+
     private final Optional<String> internalNotes;
 
     private final Optional<Map<String, Object>> invoice;
@@ -74,8 +82,6 @@ public final class Plan {
 
     private final Optional<Map<String, Object>> paymentMethodConfiguration;
 
-    private final PlanPlanType planType;
-
     private final Optional<Map<String, Object>> product;
 
     private final String purchaseUrl;
@@ -83,6 +89,8 @@ public final class Plan {
     private final PlanReleaseMethod releaseMethod;
 
     private final double renewalPrice;
+
+    private final Optional<String> sku;
 
     private final Optional<Double> splitPayRequiredPayments;
 
@@ -111,7 +119,10 @@ public final class Plan {
     private Plan(
             Optional<AccountSummary> account,
             boolean adaptivePricingEnabled,
+            boolean allowMultipleQuantity,
+            Optional<Map<String, Optional<String>>> attributes,
             Optional<Double> billingPeriod,
+            PlanBillingType billingType,
             Optional<Double> cancelDiscountIntervals,
             Optional<Double> cancelDiscountPercentage,
             Optional<Map<String, Object>> checkoutStyling,
@@ -127,17 +138,18 @@ public final class Plan {
             String id,
             Optional<Map<String, Object>> image,
             double initialPrice,
+            Money initialPriceDue,
             Optional<String> internalNotes,
             Optional<Map<String, Object>> invoice,
             Optional<Double> memberCount,
             Optional<Map<String, Object>> metadata,
             Optional<Boolean> offerCancelDiscount,
             Optional<Map<String, Object>> paymentMethodConfiguration,
-            PlanPlanType planType,
             Optional<Map<String, Object>> product,
             String purchaseUrl,
             PlanReleaseMethod releaseMethod,
             double renewalPrice,
+            Optional<String> sku,
             Optional<Double> splitPayRequiredPayments,
             Optional<Double> stock,
             Optional<Double> strikeThroughInitialPrice,
@@ -152,7 +164,10 @@ public final class Plan {
             Map<String, Object> additionalProperties) {
         this.account = account;
         this.adaptivePricingEnabled = adaptivePricingEnabled;
+        this.allowMultipleQuantity = allowMultipleQuantity;
+        this.attributes = attributes;
         this.billingPeriod = billingPeriod;
+        this.billingType = billingType;
         this.cancelDiscountIntervals = cancelDiscountIntervals;
         this.cancelDiscountPercentage = cancelDiscountPercentage;
         this.checkoutStyling = checkoutStyling;
@@ -168,17 +183,18 @@ public final class Plan {
         this.id = id;
         this.image = image;
         this.initialPrice = initialPrice;
+        this.initialPriceDue = initialPriceDue;
         this.internalNotes = internalNotes;
         this.invoice = invoice;
         this.memberCount = memberCount;
         this.metadata = metadata;
         this.offerCancelDiscount = offerCancelDiscount;
         this.paymentMethodConfiguration = paymentMethodConfiguration;
-        this.planType = planType;
         this.product = product;
         this.purchaseUrl = purchaseUrl;
         this.releaseMethod = releaseMethod;
         this.renewalPrice = renewalPrice;
+        this.sku = sku;
         this.splitPayRequiredPayments = splitPayRequiredPayments;
         this.stock = stock;
         this.strikeThroughInitialPrice = strikeThroughInitialPrice;
@@ -194,7 +210,7 @@ public final class Plan {
     }
 
     /**
-     * @return Account that sells this plan; <code>null</code> for standalone invoice plans.
+     * @return Account that sells this variant; <code>null</code> for standalone invoice variants.
      */
     @JsonIgnore
     public Optional<AccountSummary> getAccount() {
@@ -205,7 +221,7 @@ public final class Plan {
     }
 
     /**
-     * @return Whether adaptive pricing is enabled for this plan. Raw setting — does not check processor compatibility or feature flags.
+     * @return Whether adaptive pricing is enabled for this variant. Raw setting — does not check processor compatibility or feature flags.
      */
     @JsonProperty("adaptive_pricing_enabled")
     public boolean getAdaptivePricingEnabled() {
@@ -213,7 +229,26 @@ public final class Plan {
     }
 
     /**
-     * @return Number of days between recurring charges, such as 30 for monthly or 365 for annual. <code>null</code> for one-time plans.
+     * @return Whether more than one unit can be purchased in an order. Renewal variants cannot enable it. When <code>false</code>, checkouts, carts, and invoices reject a quantity above 1.
+     */
+    @JsonProperty("allow_multiple_quantity")
+    public boolean getAllowMultipleQuantity() {
+        return allowMultipleQuantity;
+    }
+
+    /**
+     * @return Attribute values that distinguish this variant within its product, as a map of attribute name to value, e.g. <code>{&quot;color&quot;: &quot;Blue&quot;, &quot;size&quot;: &quot;Large&quot;}</code>. Names are snake_case identifiers and come back in alphabetical order. Every attributed variant on a product carries the same attribute names and a distinct set of values; the product lists the full option set as <code>variant_attributes</code>. <code>null</code> when the variant has no attributes.
+     */
+    @JsonIgnore
+    public Optional<Map<String, Optional<String>>> getAttributes() {
+        if (attributes == null) {
+            return Optional.empty();
+        }
+        return attributes;
+    }
+
+    /**
+     * @return Number of days between recurring charges, such as 30 for monthly or 365 for annual. <code>null</code> for one-time variants.
      */
     @JsonIgnore
     public Optional<Double> getBillingPeriod() {
@@ -224,7 +259,15 @@ public final class Plan {
     }
 
     /**
-     * @return Billing intervals the cancellation discount applies to (<code>0</code> forever, <code>1</code> first payment, or a month count). <code>null</code> when none is offered or the actor lacks the <code>plan:basic:read</code> scope.
+     * @return Billing model for this variant.
+     */
+    @JsonProperty("billing_type")
+    public PlanBillingType getBillingType() {
+        return billingType;
+    }
+
+    /**
+     * @return How long the cancellation discount lasts: <code>0</code> forever, <code>1</code> the next payment only, or a number of calendar months from when the customer accepts it. <code>null</code> when none is offered or the actor lacks the <code>plan:basic:read</code> scope.
      */
     @JsonIgnore
     public Optional<Double> getCancelDiscountIntervals() {
@@ -246,7 +289,7 @@ public final class Plan {
     }
 
     /**
-     * @return Plan-level checkout styling (<code>background_color</code>, <code>button_color</code>, <code>font_family</code>, <code>border_style</code>); <code>null</code> inherits the account default.
+     * @return Variant-level checkout styling (<code>background_color</code>, <code>button_color</code>, <code>font_family</code>, <code>border_style</code>); <code>null</code> inherits the account default.
      */
     @JsonIgnore
     public Optional<Map<String, Object>> getCheckoutStyling() {
@@ -257,7 +300,7 @@ public final class Plan {
     }
 
     /**
-     * @return Whether tax is collected on purchases of this plan, based on the account's tax configuration.
+     * @return Whether tax is collected on purchases of this variant, based on the account's tax configuration.
      */
     @JsonProperty("collect_tax")
     public boolean getCollectTax() {
@@ -265,7 +308,7 @@ public final class Plan {
     }
 
     /**
-     * @return When the plan was created, as an ISO 8601 timestamp.
+     * @return When the variant was created, as an ISO 8601 timestamp.
      */
     @JsonProperty("created_at")
     public String getCreatedAt() {
@@ -273,7 +316,7 @@ public final class Plan {
     }
 
     /**
-     * @return Three-letter ISO currency code for this plan's prices.
+     * @return Three-letter ISO 4217 code of the currency every price on this variant is stated in, lowercase: the variant's own currency, or the <code>presentment_currency</code> the read asked for when the variant can be converted into it.
      */
     @JsonProperty("currency")
     public PlanCurrency getCurrency() {
@@ -286,7 +329,7 @@ public final class Plan {
     }
 
     /**
-     * @return Whether the plan can be deleted (it has no memberships or waitlist entries). <code>null</code> unless the actor has the <code>plan:basic:read</code> scope on the plan's account.
+     * @return Whether the variant can be deleted (it has no memberships or waitlist entries). <code>null</code> unless the actor has the <code>plan:basic:read</code> scope on the variant's account.
      */
     @JsonIgnore
     public Optional<Boolean> getDeletable() {
@@ -297,7 +340,7 @@ public final class Plan {
     }
 
     /**
-     * @return Customer-visible plan description. Maximum 1000 characters. <code>null</code> if no description is set.
+     * @return Customer-visible variant description. Maximum 1000 characters. <code>null</code> if no description is set.
      */
     @JsonIgnore
     public Optional<String> getDescription() {
@@ -308,7 +351,7 @@ public final class Plan {
     }
 
     /**
-     * @return The configuration governing a checkout for this plan, resolved through every layer (the plan's own and the account's) — the shape a session's <code>payment_method_configuration</code> carries. Apply it over the payment method types catalogue for the offerable set. <code>null</code> means platform defaults; <code>payment_method_configuration</code> stays the plan's own editable override.
+     * @return The configuration governing a checkout for this variant, resolved through every layer (the variant's own and the account's) — the shape a session's <code>payment_method_configuration</code> carries. Apply it over the payment method types catalogue for the offerable set. <code>null</code> means platform defaults; <code>payment_method_configuration</code> stays the variant's own editable override.
      */
     @JsonIgnore
     public Optional<CheckoutSessionPaymentMethodConfiguration> getEffectivePaymentMethodConfiguration() {
@@ -319,7 +362,7 @@ public final class Plan {
     }
 
     /**
-     * @return Access duration in days for expiration-based plans, such as 365 for a one-year pass. <code>null</code> for plans without an expiration.
+     * @return Access duration in days for expiration-based variants, such as 365 for a one-year pass. <code>null</code> for variants without an expiration.
      */
     @JsonIgnore
     public Optional<Double> getExpirationDays() {
@@ -330,7 +373,7 @@ public final class Plan {
     }
 
     /**
-     * @return Human-readable price for display (currency + interval), e.g. &quot;$10 / month&quot;.
+     * @return Human-readable price for display (currency + interval) in <code>currency</code>, e.g. &quot;$10 / month&quot;.
      */
     @JsonProperty("formatted_price")
     public String getFormattedPrice() {
@@ -338,7 +381,7 @@ public final class Plan {
     }
 
     /**
-     * @return Plan ID, prefixed <code>plan_</code>.
+     * @return Variant ID, prefixed <code>plan_</code>.
      */
     @JsonProperty("id")
     public String getId() {
@@ -357,7 +400,7 @@ public final class Plan {
     }
 
     /**
-     * @return Initial purchase price in plan currency.
+     * @return Initial purchase price, in <code>currency</code>.
      */
     @JsonProperty("initial_price")
     public double getInitialPrice() {
@@ -365,7 +408,15 @@ public final class Plan {
     }
 
     /**
-     * @return Private notes not shown to customers. <code>null</code> unless the actor has the <code>plan:basic:read</code> scope on the plan's account.
+     * @return Total charged at checkout for one unit, before promo codes and tax: <code>initial_price</code> plus the first <code>renewal_price</code> for recurring variants, or <code>initial_price</code> alone while a free trial applies. The trial does not apply when the viewing user has already used one for this variant. Stated in <code>currency</code>.
+     */
+    @JsonProperty("initial_price_due")
+    public Money getInitialPriceDue() {
+        return initialPriceDue;
+    }
+
+    /**
+     * @return Private notes not shown to customers. <code>null</code> unless the actor has the <code>plan:basic:read</code> scope on the variant's account.
      */
     @JsonIgnore
     public Optional<String> getInternalNotes() {
@@ -376,7 +427,7 @@ public final class Plan {
     }
 
     /**
-     * @return Invoice this plan was generated for; <code>null</code> unless created for an invoice.
+     * @return Invoice this variant was generated for; <code>null</code> unless created for an invoice.
      */
     @JsonIgnore
     public Optional<Map<String, Object>> getInvoice() {
@@ -387,7 +438,7 @@ public final class Plan {
     }
 
     /**
-     * @return Active memberships through this plan. <code>null</code> unless the actor has the <code>plan:basic:read</code> scope on the plan's account.
+     * @return Active memberships through this variant. <code>null</code> unless the actor has the <code>plan:basic:read</code> scope on the variant's account.
      */
     @JsonIgnore
     public Optional<Double> getMemberCount() {
@@ -398,7 +449,7 @@ public final class Plan {
     }
 
     /**
-     * @return Custom key-value pairs stored on the plan. Included in webhook payloads for payment and membership events. Maximum 50 keys, 100 characters per key, 500 characters per value. The reserved keys <code>custom_cta</code> and <code>custom_cta_url</code>, when set, override the product's checkout call to action for this plan.
+     * @return Custom key-value pairs stored on the variant. Included in webhook payloads for payment and membership events. Maximum 50 keys, 100 characters per key, 500 characters per value. The reserved keys <code>custom_cta</code> and <code>custom_cta_url</code>, when set, override the product's checkout call to action for this variant.
      */
     @JsonIgnore
     public Optional<Map<String, Object>> getMetadata() {
@@ -409,7 +460,7 @@ public final class Plan {
     }
 
     /**
-     * @return Whether a cancellation discount is offered. <code>null</code> unless the actor has the <code>plan:basic:read</code> scope on the plan's account.
+     * @return Whether a cancellation discount is offered. <code>null</code> unless the actor has the <code>plan:basic:read</code> scope on the variant's account.
      */
     @JsonIgnore
     public Optional<Boolean> getOfferCancelDiscount() {
@@ -420,7 +471,7 @@ public final class Plan {
     }
 
     /**
-     * @return Payment method configuration (<code>enabled</code>, <code>disabled</code>, <code>include_platform_defaults</code>); <code>null</code> when plan uses default settings.
+     * @return Payment method configuration (<code>enabled</code>, <code>disabled</code>, <code>include_platform_defaults</code>); <code>null</code> when variant uses default settings.
      */
     @JsonIgnore
     public Optional<Map<String, Object>> getPaymentMethodConfiguration() {
@@ -431,15 +482,7 @@ public final class Plan {
     }
 
     /**
-     * @return Billing model for this plan.
-     */
-    @JsonProperty("plan_type")
-    public PlanPlanType getPlanType() {
-        return planType;
-    }
-
-    /**
-     * @return Product this plan belongs to; <code>null</code> for standalone plans.
+     * @return Product this variant belongs to; <code>null</code> for standalone variants.
      */
     @JsonIgnore
     public Optional<Map<String, Object>> getProduct() {
@@ -450,7 +493,7 @@ public final class Plan {
     }
 
     /**
-     * @return URL where customers can purchase this plan directly.
+     * @return URL where customers can purchase this variant directly.
      */
     @JsonProperty("purchase_url")
     public String getPurchaseUrl() {
@@ -458,7 +501,7 @@ public final class Plan {
     }
 
     /**
-     * @return Sales method for this plan.
+     * @return Sales method for this variant.
      */
     @JsonProperty("release_method")
     public PlanReleaseMethod getReleaseMethod() {
@@ -466,11 +509,22 @@ public final class Plan {
     }
 
     /**
-     * @return Recurring price charged every billing period.
+     * @return Recurring price charged every billing period, in <code>currency</code>.
      */
     @JsonProperty("renewal_price")
     public double getRenewalPrice() {
         return renewalPrice;
+    }
+
+    /**
+     * @return Stock keeping unit, free text set by the seller (e.g. <code>TSHIRT-LARGE-BLUE</code>). Not enforced unique. <code>null</code> when unset.
+     */
+    @JsonIgnore
+    public Optional<String> getSku() {
+        if (sku == null) {
+            return Optional.empty();
+        }
+        return sku;
     }
 
     /**
@@ -485,7 +539,7 @@ public final class Plan {
     }
 
     /**
-     * @return Units available for purchase. <code>null</code> unless the actor has the <code>plan:basic:read</code> scope on the plan's account.
+     * @return Units available for purchase. <code>null</code> unless the actor has the <code>plan:basic:read</code> scope on the variant's account.
      */
     @JsonIgnore
     public Optional<Double> getStock() {
@@ -496,7 +550,7 @@ public final class Plan {
     }
 
     /**
-     * @return Original initial price shown with a strikethrough, in the plan's currency. <code>null</code> when no strikethrough is set.
+     * @return Original initial price shown with a strikethrough, in <code>currency</code>. <code>null</code> when no strikethrough is set.
      */
     @JsonIgnore
     public Optional<Double> getStrikeThroughInitialPrice() {
@@ -507,7 +561,7 @@ public final class Plan {
     }
 
     /**
-     * @return Original renewal price shown with a strikethrough, in the plan's currency. <code>null</code> when no strikethrough is set.
+     * @return Original renewal price shown with a strikethrough, in <code>currency</code>. <code>null</code> when no strikethrough is set.
      */
     @JsonIgnore
     public Optional<Double> getStrikeThroughRenewalPrice() {
@@ -518,7 +572,7 @@ public final class Plan {
     }
 
     /**
-     * @return How tax is handled for this plan, including whether tax is included in the price, added at checkout, or not configured.
+     * @return How tax is handled for this variant, including whether tax is included in the price, added at checkout, or not configured.
      */
     @JsonProperty("tax_type")
     public PlanTaxType getTaxType() {
@@ -526,7 +580,7 @@ public final class Plan {
     }
 
     /**
-     * @return 3D Secure behavior for this plan; <code>null</code> inherits the account default.
+     * @return 3D Secure behavior for supported on-session card payments. <code>mandate_challenge</code> requires a 3DS challenge before payment processing; <code>mandate_if_required</code> mandates a challenge only when the payment processor requires it; <code>frictionless_if_required</code> uses the regular frictionless 3DS flow. Payments of $1,000 or more use <code>mandate_if_required</code> unless <code>mandate_challenge</code> is selected. Risk and authentication recovery requirements can override the preference. <code>null</code> inherits the account default.
      */
     @JsonIgnore
     public Optional<PlanThreeDsLevel> getThreeDsLevel() {
@@ -537,7 +591,7 @@ public final class Plan {
     }
 
     /**
-     * @return Plan display name shown to customers. Maximum 30 characters. <code>null</code> if no title has been set.
+     * @return Variant display name shown to customers. Maximum 30 characters. A variant created without one defaults to its attribute values joined with <code>/</code>. <code>null</code> if no title has been set.
      */
     @JsonIgnore
     public Optional<String> getTitle() {
@@ -548,7 +602,7 @@ public final class Plan {
     }
 
     /**
-     * @return Free trial days before the first renewal charge. <code>null</code> if no trial is configured or the user has already used a trial for this plan.
+     * @return Free trial days before the first renewal charge. <code>null</code> if no trial is configured or the user has already used a trial for this variant.
      */
     @JsonIgnore
     public Optional<Double> getTrialPeriodDays() {
@@ -559,7 +613,7 @@ public final class Plan {
     }
 
     /**
-     * @return Whether the plan has unlimited stock. When <code>true</code>, the <code>stock</code> field is ignored; waitlist plans always report <code>true</code>.
+     * @return Whether the variant has unlimited stock. When <code>true</code>, the <code>stock</code> field is ignored; waitlist variants always report <code>true</code>.
      */
     @JsonProperty("unlimited_stock")
     public boolean getUnlimitedStock() {
@@ -567,7 +621,7 @@ public final class Plan {
     }
 
     /**
-     * @return When the plan was last updated, as an ISO 8601 timestamp.
+     * @return When the variant was last updated, as an ISO 8601 timestamp.
      */
     @JsonProperty("updated_at")
     public String getUpdatedAt() {
@@ -575,7 +629,7 @@ public final class Plan {
     }
 
     /**
-     * @return Controls where this plan can be seen. When <code>hidden</code>, the plan is reachable only by its direct link.
+     * @return Controls where this variant can be seen. When <code>hidden</code>, the variant is reachable only by its direct link.
      */
     @JsonProperty("visibility")
     public PlanVisibility getVisibility() {
@@ -586,6 +640,12 @@ public final class Plan {
     @JsonProperty("account")
     private Optional<AccountSummary> _getAccount() {
         return account;
+    }
+
+    @JsonInclude(value = JsonInclude.Include.CUSTOM, valueFilter = NullableNonemptyFilter.class)
+    @JsonProperty("attributes")
+    private Optional<Map<String, Optional<String>>> _getAttributes() {
+        return attributes;
     }
 
     @JsonInclude(value = JsonInclude.Include.CUSTOM, valueFilter = NullableNonemptyFilter.class)
@@ -685,6 +745,12 @@ public final class Plan {
     }
 
     @JsonInclude(value = JsonInclude.Include.CUSTOM, valueFilter = NullableNonemptyFilter.class)
+    @JsonProperty("sku")
+    private Optional<String> _getSku() {
+        return sku;
+    }
+
+    @JsonInclude(value = JsonInclude.Include.CUSTOM, valueFilter = NullableNonemptyFilter.class)
     @JsonProperty("split_pay_required_payments")
     private Optional<Double> _getSplitPayRequiredPayments() {
         return splitPayRequiredPayments;
@@ -740,7 +806,10 @@ public final class Plan {
     private boolean equalTo(Plan other) {
         return account.equals(other.account)
                 && adaptivePricingEnabled == other.adaptivePricingEnabled
+                && allowMultipleQuantity == other.allowMultipleQuantity
+                && attributes.equals(other.attributes)
                 && billingPeriod.equals(other.billingPeriod)
+                && billingType.equals(other.billingType)
                 && cancelDiscountIntervals.equals(other.cancelDiscountIntervals)
                 && cancelDiscountPercentage.equals(other.cancelDiscountPercentage)
                 && checkoutStyling.equals(other.checkoutStyling)
@@ -756,17 +825,18 @@ public final class Plan {
                 && id.equals(other.id)
                 && image.equals(other.image)
                 && initialPrice == other.initialPrice
+                && initialPriceDue.equals(other.initialPriceDue)
                 && internalNotes.equals(other.internalNotes)
                 && invoice.equals(other.invoice)
                 && memberCount.equals(other.memberCount)
                 && metadata.equals(other.metadata)
                 && offerCancelDiscount.equals(other.offerCancelDiscount)
                 && paymentMethodConfiguration.equals(other.paymentMethodConfiguration)
-                && planType.equals(other.planType)
                 && product.equals(other.product)
                 && purchaseUrl.equals(other.purchaseUrl)
                 && releaseMethod.equals(other.releaseMethod)
                 && renewalPrice == other.renewalPrice
+                && sku.equals(other.sku)
                 && splitPayRequiredPayments.equals(other.splitPayRequiredPayments)
                 && stock.equals(other.stock)
                 && strikeThroughInitialPrice.equals(other.strikeThroughInitialPrice)
@@ -785,7 +855,10 @@ public final class Plan {
         return Objects.hash(
                 this.account,
                 this.adaptivePricingEnabled,
+                this.allowMultipleQuantity,
+                this.attributes,
                 this.billingPeriod,
+                this.billingType,
                 this.cancelDiscountIntervals,
                 this.cancelDiscountPercentage,
                 this.checkoutStyling,
@@ -801,17 +874,18 @@ public final class Plan {
                 this.id,
                 this.image,
                 this.initialPrice,
+                this.initialPriceDue,
                 this.internalNotes,
                 this.invoice,
                 this.memberCount,
                 this.metadata,
                 this.offerCancelDiscount,
                 this.paymentMethodConfiguration,
-                this.planType,
                 this.product,
                 this.purchaseUrl,
                 this.releaseMethod,
                 this.renewalPrice,
+                this.sku,
                 this.splitPayRequiredPayments,
                 this.stock,
                 this.strikeThroughInitialPrice,
@@ -836,107 +910,121 @@ public final class Plan {
 
     public interface AdaptivePricingEnabledStage {
         /**
-         * <p>Whether adaptive pricing is enabled for this plan. Raw setting — does not check processor compatibility or feature flags.</p>
+         * <p>Whether adaptive pricing is enabled for this variant. Raw setting — does not check processor compatibility or feature flags.</p>
          */
-        CollectTaxStage adaptivePricingEnabled(boolean adaptivePricingEnabled);
+        AllowMultipleQuantityStage adaptivePricingEnabled(boolean adaptivePricingEnabled);
 
         Builder from(Plan other);
     }
 
+    public interface AllowMultipleQuantityStage {
+        /**
+         * <p>Whether more than one unit can be purchased in an order. Renewal variants cannot enable it. When <code>false</code>, checkouts, carts, and invoices reject a quantity above 1.</p>
+         */
+        BillingTypeStage allowMultipleQuantity(boolean allowMultipleQuantity);
+    }
+
+    public interface BillingTypeStage {
+        /**
+         * <p>Billing model for this variant.</p>
+         */
+        CollectTaxStage billingType(@NotNull PlanBillingType billingType);
+    }
+
     public interface CollectTaxStage {
         /**
-         * <p>Whether tax is collected on purchases of this plan, based on the account's tax configuration.</p>
+         * <p>Whether tax is collected on purchases of this variant, based on the account's tax configuration.</p>
          */
         CreatedAtStage collectTax(boolean collectTax);
     }
 
     public interface CreatedAtStage {
         /**
-         * <p>When the plan was created, as an ISO 8601 timestamp.</p>
+         * <p>When the variant was created, as an ISO 8601 timestamp.</p>
          */
         CurrencyStage createdAt(@NotNull String createdAt);
     }
 
     public interface CurrencyStage {
         /**
-         * <p>Three-letter ISO currency code for this plan's prices.</p>
+         * <p>Three-letter ISO 4217 code of the currency every price on this variant is stated in, lowercase: the variant's own currency, or the <code>presentment_currency</code> the read asked for when the variant can be converted into it.</p>
          */
         FormattedPriceStage currency(@NotNull PlanCurrency currency);
     }
 
     public interface FormattedPriceStage {
         /**
-         * <p>Human-readable price for display (currency + interval), e.g. &quot;$10 / month&quot;.</p>
+         * <p>Human-readable price for display (currency + interval) in <code>currency</code>, e.g. &quot;$10 / month&quot;.</p>
          */
         IdStage formattedPrice(@NotNull String formattedPrice);
     }
 
     public interface IdStage {
         /**
-         * <p>Plan ID, prefixed <code>plan_</code>.</p>
+         * <p>Variant ID, prefixed <code>plan_</code>.</p>
          */
         InitialPriceStage id(@NotNull String id);
     }
 
     public interface InitialPriceStage {
         /**
-         * <p>Initial purchase price in plan currency.</p>
+         * <p>Initial purchase price, in <code>currency</code>.</p>
          */
-        PlanTypeStage initialPrice(double initialPrice);
+        InitialPriceDueStage initialPrice(double initialPrice);
     }
 
-    public interface PlanTypeStage {
+    public interface InitialPriceDueStage {
         /**
-         * <p>Billing model for this plan.</p>
+         * <p>Total charged at checkout for one unit, before promo codes and tax: <code>initial_price</code> plus the first <code>renewal_price</code> for recurring variants, or <code>initial_price</code> alone while a free trial applies. The trial does not apply when the viewing user has already used one for this variant. Stated in <code>currency</code>.</p>
          */
-        PurchaseUrlStage planType(@NotNull PlanPlanType planType);
+        PurchaseUrlStage initialPriceDue(@NotNull Money initialPriceDue);
     }
 
     public interface PurchaseUrlStage {
         /**
-         * <p>URL where customers can purchase this plan directly.</p>
+         * <p>URL where customers can purchase this variant directly.</p>
          */
         ReleaseMethodStage purchaseUrl(@NotNull String purchaseUrl);
     }
 
     public interface ReleaseMethodStage {
         /**
-         * <p>Sales method for this plan.</p>
+         * <p>Sales method for this variant.</p>
          */
         RenewalPriceStage releaseMethod(@NotNull PlanReleaseMethod releaseMethod);
     }
 
     public interface RenewalPriceStage {
         /**
-         * <p>Recurring price charged every billing period.</p>
+         * <p>Recurring price charged every billing period, in <code>currency</code>.</p>
          */
         TaxTypeStage renewalPrice(double renewalPrice);
     }
 
     public interface TaxTypeStage {
         /**
-         * <p>How tax is handled for this plan, including whether tax is included in the price, added at checkout, or not configured.</p>
+         * <p>How tax is handled for this variant, including whether tax is included in the price, added at checkout, or not configured.</p>
          */
         UnlimitedStockStage taxType(@NotNull PlanTaxType taxType);
     }
 
     public interface UnlimitedStockStage {
         /**
-         * <p>Whether the plan has unlimited stock. When <code>true</code>, the <code>stock</code> field is ignored; waitlist plans always report <code>true</code>.</p>
+         * <p>Whether the variant has unlimited stock. When <code>true</code>, the <code>stock</code> field is ignored; waitlist variants always report <code>true</code>.</p>
          */
         UpdatedAtStage unlimitedStock(boolean unlimitedStock);
     }
 
     public interface UpdatedAtStage {
         /**
-         * <p>When the plan was last updated, as an ISO 8601 timestamp.</p>
+         * <p>When the variant was last updated, as an ISO 8601 timestamp.</p>
          */
         VisibilityStage updatedAt(@NotNull String updatedAt);
     }
 
     public interface VisibilityStage {
         /**
-         * <p>Controls where this plan can be seen. When <code>hidden</code>, the plan is reachable only by its direct link.</p>
+         * <p>Controls where this variant can be seen. When <code>hidden</code>, the variant is reachable only by its direct link.</p>
          */
         _FinalStage visibility(@NotNull PlanVisibility visibility);
     }
@@ -949,7 +1037,7 @@ public final class Plan {
         _FinalStage additionalProperties(Map<String, Object> additionalProperties);
 
         /**
-         * <p>Account that sells this plan; <code>null</code> for standalone invoice plans.</p>
+         * <p>Account that sells this variant; <code>null</code> for standalone invoice variants.</p>
          */
         _FinalStage account(Optional<AccountSummary> account);
 
@@ -958,7 +1046,16 @@ public final class Plan {
         _FinalStage account(Nullable<AccountSummary> account);
 
         /**
-         * <p>Number of days between recurring charges, such as 30 for monthly or 365 for annual. <code>null</code> for one-time plans.</p>
+         * <p>Attribute values that distinguish this variant within its product, as a map of attribute name to value, e.g. <code>{&quot;color&quot;: &quot;Blue&quot;, &quot;size&quot;: &quot;Large&quot;}</code>. Names are snake_case identifiers and come back in alphabetical order. Every attributed variant on a product carries the same attribute names and a distinct set of values; the product lists the full option set as <code>variant_attributes</code>. <code>null</code> when the variant has no attributes.</p>
+         */
+        _FinalStage attributes(Optional<Map<String, Optional<String>>> attributes);
+
+        _FinalStage attributes(Map<String, Optional<String>> attributes);
+
+        _FinalStage attributes(Nullable<Map<String, Optional<String>>> attributes);
+
+        /**
+         * <p>Number of days between recurring charges, such as 30 for monthly or 365 for annual. <code>null</code> for one-time variants.</p>
          */
         _FinalStage billingPeriod(Optional<Double> billingPeriod);
 
@@ -967,7 +1064,7 @@ public final class Plan {
         _FinalStage billingPeriod(Nullable<Double> billingPeriod);
 
         /**
-         * <p>Billing intervals the cancellation discount applies to (<code>0</code> forever, <code>1</code> first payment, or a month count). <code>null</code> when none is offered or the actor lacks the <code>plan:basic:read</code> scope.</p>
+         * <p>How long the cancellation discount lasts: <code>0</code> forever, <code>1</code> the next payment only, or a number of calendar months from when the customer accepts it. <code>null</code> when none is offered or the actor lacks the <code>plan:basic:read</code> scope.</p>
          */
         _FinalStage cancelDiscountIntervals(Optional<Double> cancelDiscountIntervals);
 
@@ -985,7 +1082,7 @@ public final class Plan {
         _FinalStage cancelDiscountPercentage(Nullable<Double> cancelDiscountPercentage);
 
         /**
-         * <p>Plan-level checkout styling (<code>background_color</code>, <code>button_color</code>, <code>font_family</code>, <code>border_style</code>); <code>null</code> inherits the account default.</p>
+         * <p>Variant-level checkout styling (<code>background_color</code>, <code>button_color</code>, <code>font_family</code>, <code>border_style</code>); <code>null</code> inherits the account default.</p>
          */
         _FinalStage checkoutStyling(Optional<Map<String, Object>> checkoutStyling);
 
@@ -1000,7 +1097,7 @@ public final class Plan {
         _FinalStage addAllCustomFields(List<PlanCustomField> customFields);
 
         /**
-         * <p>Whether the plan can be deleted (it has no memberships or waitlist entries). <code>null</code> unless the actor has the <code>plan:basic:read</code> scope on the plan's account.</p>
+         * <p>Whether the variant can be deleted (it has no memberships or waitlist entries). <code>null</code> unless the actor has the <code>plan:basic:read</code> scope on the variant's account.</p>
          */
         _FinalStage deletable(Optional<Boolean> deletable);
 
@@ -1009,7 +1106,7 @@ public final class Plan {
         _FinalStage deletable(Nullable<Boolean> deletable);
 
         /**
-         * <p>Customer-visible plan description. Maximum 1000 characters. <code>null</code> if no description is set.</p>
+         * <p>Customer-visible variant description. Maximum 1000 characters. <code>null</code> if no description is set.</p>
          */
         _FinalStage description(Optional<String> description);
 
@@ -1018,7 +1115,7 @@ public final class Plan {
         _FinalStage description(Nullable<String> description);
 
         /**
-         * <p>The configuration governing a checkout for this plan, resolved through every layer (the plan's own and the account's) — the shape a session's <code>payment_method_configuration</code> carries. Apply it over the payment method types catalogue for the offerable set. <code>null</code> means platform defaults; <code>payment_method_configuration</code> stays the plan's own editable override.</p>
+         * <p>The configuration governing a checkout for this variant, resolved through every layer (the variant's own and the account's) — the shape a session's <code>payment_method_configuration</code> carries. Apply it over the payment method types catalogue for the offerable set. <code>null</code> means platform defaults; <code>payment_method_configuration</code> stays the variant's own editable override.</p>
          */
         _FinalStage effectivePaymentMethodConfiguration(
                 Optional<CheckoutSessionPaymentMethodConfiguration> effectivePaymentMethodConfiguration);
@@ -1030,7 +1127,7 @@ public final class Plan {
                 Nullable<CheckoutSessionPaymentMethodConfiguration> effectivePaymentMethodConfiguration);
 
         /**
-         * <p>Access duration in days for expiration-based plans, such as 365 for a one-year pass. <code>null</code> for plans without an expiration.</p>
+         * <p>Access duration in days for expiration-based variants, such as 365 for a one-year pass. <code>null</code> for variants without an expiration.</p>
          */
         _FinalStage expirationDays(Optional<Double> expirationDays);
 
@@ -1048,7 +1145,7 @@ public final class Plan {
         _FinalStage image(Nullable<Map<String, Object>> image);
 
         /**
-         * <p>Private notes not shown to customers. <code>null</code> unless the actor has the <code>plan:basic:read</code> scope on the plan's account.</p>
+         * <p>Private notes not shown to customers. <code>null</code> unless the actor has the <code>plan:basic:read</code> scope on the variant's account.</p>
          */
         _FinalStage internalNotes(Optional<String> internalNotes);
 
@@ -1057,7 +1154,7 @@ public final class Plan {
         _FinalStage internalNotes(Nullable<String> internalNotes);
 
         /**
-         * <p>Invoice this plan was generated for; <code>null</code> unless created for an invoice.</p>
+         * <p>Invoice this variant was generated for; <code>null</code> unless created for an invoice.</p>
          */
         _FinalStage invoice(Optional<Map<String, Object>> invoice);
 
@@ -1066,7 +1163,7 @@ public final class Plan {
         _FinalStage invoice(Nullable<Map<String, Object>> invoice);
 
         /**
-         * <p>Active memberships through this plan. <code>null</code> unless the actor has the <code>plan:basic:read</code> scope on the plan's account.</p>
+         * <p>Active memberships through this variant. <code>null</code> unless the actor has the <code>plan:basic:read</code> scope on the variant's account.</p>
          */
         _FinalStage memberCount(Optional<Double> memberCount);
 
@@ -1075,7 +1172,7 @@ public final class Plan {
         _FinalStage memberCount(Nullable<Double> memberCount);
 
         /**
-         * <p>Custom key-value pairs stored on the plan. Included in webhook payloads for payment and membership events. Maximum 50 keys, 100 characters per key, 500 characters per value. The reserved keys <code>custom_cta</code> and <code>custom_cta_url</code>, when set, override the product's checkout call to action for this plan.</p>
+         * <p>Custom key-value pairs stored on the variant. Included in webhook payloads for payment and membership events. Maximum 50 keys, 100 characters per key, 500 characters per value. The reserved keys <code>custom_cta</code> and <code>custom_cta_url</code>, when set, override the product's checkout call to action for this variant.</p>
          */
         _FinalStage metadata(Optional<Map<String, Object>> metadata);
 
@@ -1084,7 +1181,7 @@ public final class Plan {
         _FinalStage metadata(Nullable<Map<String, Object>> metadata);
 
         /**
-         * <p>Whether a cancellation discount is offered. <code>null</code> unless the actor has the <code>plan:basic:read</code> scope on the plan's account.</p>
+         * <p>Whether a cancellation discount is offered. <code>null</code> unless the actor has the <code>plan:basic:read</code> scope on the variant's account.</p>
          */
         _FinalStage offerCancelDiscount(Optional<Boolean> offerCancelDiscount);
 
@@ -1093,7 +1190,7 @@ public final class Plan {
         _FinalStage offerCancelDiscount(Nullable<Boolean> offerCancelDiscount);
 
         /**
-         * <p>Payment method configuration (<code>enabled</code>, <code>disabled</code>, <code>include_platform_defaults</code>); <code>null</code> when plan uses default settings.</p>
+         * <p>Payment method configuration (<code>enabled</code>, <code>disabled</code>, <code>include_platform_defaults</code>); <code>null</code> when variant uses default settings.</p>
          */
         _FinalStage paymentMethodConfiguration(Optional<Map<String, Object>> paymentMethodConfiguration);
 
@@ -1102,13 +1199,22 @@ public final class Plan {
         _FinalStage paymentMethodConfiguration(Nullable<Map<String, Object>> paymentMethodConfiguration);
 
         /**
-         * <p>Product this plan belongs to; <code>null</code> for standalone plans.</p>
+         * <p>Product this variant belongs to; <code>null</code> for standalone variants.</p>
          */
         _FinalStage product(Optional<Map<String, Object>> product);
 
         _FinalStage product(Map<String, Object> product);
 
         _FinalStage product(Nullable<Map<String, Object>> product);
+
+        /**
+         * <p>Stock keeping unit, free text set by the seller (e.g. <code>TSHIRT-LARGE-BLUE</code>). Not enforced unique. <code>null</code> when unset.</p>
+         */
+        _FinalStage sku(Optional<String> sku);
+
+        _FinalStage sku(String sku);
+
+        _FinalStage sku(Nullable<String> sku);
 
         /**
          * <p>Installment payments required before the subscription pauses. Must be greater than 1. <code>null</code> if split pay is not configured.</p>
@@ -1120,7 +1226,7 @@ public final class Plan {
         _FinalStage splitPayRequiredPayments(Nullable<Double> splitPayRequiredPayments);
 
         /**
-         * <p>Units available for purchase. <code>null</code> unless the actor has the <code>plan:basic:read</code> scope on the plan's account.</p>
+         * <p>Units available for purchase. <code>null</code> unless the actor has the <code>plan:basic:read</code> scope on the variant's account.</p>
          */
         _FinalStage stock(Optional<Double> stock);
 
@@ -1129,7 +1235,7 @@ public final class Plan {
         _FinalStage stock(Nullable<Double> stock);
 
         /**
-         * <p>Original initial price shown with a strikethrough, in the plan's currency. <code>null</code> when no strikethrough is set.</p>
+         * <p>Original initial price shown with a strikethrough, in <code>currency</code>. <code>null</code> when no strikethrough is set.</p>
          */
         _FinalStage strikeThroughInitialPrice(Optional<Double> strikeThroughInitialPrice);
 
@@ -1138,7 +1244,7 @@ public final class Plan {
         _FinalStage strikeThroughInitialPrice(Nullable<Double> strikeThroughInitialPrice);
 
         /**
-         * <p>Original renewal price shown with a strikethrough, in the plan's currency. <code>null</code> when no strikethrough is set.</p>
+         * <p>Original renewal price shown with a strikethrough, in <code>currency</code>. <code>null</code> when no strikethrough is set.</p>
          */
         _FinalStage strikeThroughRenewalPrice(Optional<Double> strikeThroughRenewalPrice);
 
@@ -1147,7 +1253,7 @@ public final class Plan {
         _FinalStage strikeThroughRenewalPrice(Nullable<Double> strikeThroughRenewalPrice);
 
         /**
-         * <p>3D Secure behavior for this plan; <code>null</code> inherits the account default.</p>
+         * <p>3D Secure behavior for supported on-session card payments. <code>mandate_challenge</code> requires a 3DS challenge before payment processing; <code>mandate_if_required</code> mandates a challenge only when the payment processor requires it; <code>frictionless_if_required</code> uses the regular frictionless 3DS flow. Payments of $1,000 or more use <code>mandate_if_required</code> unless <code>mandate_challenge</code> is selected. Risk and authentication recovery requirements can override the preference. <code>null</code> inherits the account default.</p>
          */
         _FinalStage threeDsLevel(Optional<PlanThreeDsLevel> threeDsLevel);
 
@@ -1156,7 +1262,7 @@ public final class Plan {
         _FinalStage threeDsLevel(Nullable<PlanThreeDsLevel> threeDsLevel);
 
         /**
-         * <p>Plan display name shown to customers. Maximum 30 characters. <code>null</code> if no title has been set.</p>
+         * <p>Variant display name shown to customers. Maximum 30 characters. A variant created without one defaults to its attribute values joined with <code>/</code>. <code>null</code> if no title has been set.</p>
          */
         _FinalStage title(Optional<String> title);
 
@@ -1165,7 +1271,7 @@ public final class Plan {
         _FinalStage title(Nullable<String> title);
 
         /**
-         * <p>Free trial days before the first renewal charge. <code>null</code> if no trial is configured or the user has already used a trial for this plan.</p>
+         * <p>Free trial days before the first renewal charge. <code>null</code> if no trial is configured or the user has already used a trial for this variant.</p>
          */
         _FinalStage trialPeriodDays(Optional<Double> trialPeriodDays);
 
@@ -1177,13 +1283,15 @@ public final class Plan {
     @JsonIgnoreProperties(ignoreUnknown = true)
     public static final class Builder
             implements AdaptivePricingEnabledStage,
+                    AllowMultipleQuantityStage,
+                    BillingTypeStage,
                     CollectTaxStage,
                     CreatedAtStage,
                     CurrencyStage,
                     FormattedPriceStage,
                     IdStage,
                     InitialPriceStage,
-                    PlanTypeStage,
+                    InitialPriceDueStage,
                     PurchaseUrlStage,
                     ReleaseMethodStage,
                     RenewalPriceStage,
@@ -1193,6 +1301,10 @@ public final class Plan {
                     VisibilityStage,
                     _FinalStage {
         private boolean adaptivePricingEnabled;
+
+        private boolean allowMultipleQuantity;
+
+        private PlanBillingType billingType;
 
         private boolean collectTax;
 
@@ -1206,7 +1318,7 @@ public final class Plan {
 
         private double initialPrice;
 
-        private PlanPlanType planType;
+        private Money initialPriceDue;
 
         private String purchaseUrl;
 
@@ -1235,6 +1347,8 @@ public final class Plan {
         private Optional<Double> stock = Optional.empty();
 
         private Optional<Double> splitPayRequiredPayments = Optional.empty();
+
+        private Optional<String> sku = Optional.empty();
 
         private Optional<Map<String, Object>> product = Optional.empty();
 
@@ -1271,9 +1385,10 @@ public final class Plan {
 
         private Optional<Double> billingPeriod = Optional.empty();
 
+        private Optional<Map<String, Optional<String>>> attributes = Optional.empty();
+
         private Optional<AccountSummary> account = Optional.empty();
 
-        @JsonAnySetter
         private Map<String, Object> additionalProperties = new HashMap<>();
 
         private Builder() {}
@@ -1282,7 +1397,10 @@ public final class Plan {
         public Builder from(Plan other) {
             account(other.getAccount());
             adaptivePricingEnabled(other.getAdaptivePricingEnabled());
+            allowMultipleQuantity(other.getAllowMultipleQuantity());
+            attributes(other.getAttributes());
             billingPeriod(other.getBillingPeriod());
+            billingType(other.getBillingType());
             cancelDiscountIntervals(other.getCancelDiscountIntervals());
             cancelDiscountPercentage(other.getCancelDiscountPercentage());
             checkoutStyling(other.getCheckoutStyling());
@@ -1298,17 +1416,18 @@ public final class Plan {
             id(other.getId());
             image(other.getImage());
             initialPrice(other.getInitialPrice());
+            initialPriceDue(other.getInitialPriceDue());
             internalNotes(other.getInternalNotes());
             invoice(other.getInvoice());
             memberCount(other.getMemberCount());
             metadata(other.getMetadata());
             offerCancelDiscount(other.getOfferCancelDiscount());
             paymentMethodConfiguration(other.getPaymentMethodConfiguration());
-            planType(other.getPlanType());
             product(other.getProduct());
             purchaseUrl(other.getPurchaseUrl());
             releaseMethod(other.getReleaseMethod());
             renewalPrice(other.getRenewalPrice());
+            sku(other.getSku());
             splitPayRequiredPayments(other.getSplitPayRequiredPayments());
             stock(other.getStock());
             strikeThroughInitialPrice(other.getStrikeThroughInitialPrice());
@@ -1324,20 +1443,40 @@ public final class Plan {
         }
 
         /**
-         * <p>Whether adaptive pricing is enabled for this plan. Raw setting — does not check processor compatibility or feature flags.</p>
-         * <p>Whether adaptive pricing is enabled for this plan. Raw setting — does not check processor compatibility or feature flags.</p>
+         * <p>Whether adaptive pricing is enabled for this variant. Raw setting — does not check processor compatibility or feature flags.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
         @JsonSetter("adaptive_pricing_enabled")
-        public CollectTaxStage adaptivePricingEnabled(boolean adaptivePricingEnabled) {
+        public AllowMultipleQuantityStage adaptivePricingEnabled(boolean adaptivePricingEnabled) {
             this.adaptivePricingEnabled = adaptivePricingEnabled;
             return this;
         }
 
         /**
-         * <p>Whether tax is collected on purchases of this plan, based on the account's tax configuration.</p>
-         * <p>Whether tax is collected on purchases of this plan, based on the account's tax configuration.</p>
+         * <p>Whether more than one unit can be purchased in an order. Renewal variants cannot enable it. When <code>false</code>, checkouts, carts, and invoices reject a quantity above 1.</p>
+         * @return Reference to {@code this} so that method calls can be chained together.
+         */
+        @java.lang.Override
+        @JsonSetter("allow_multiple_quantity")
+        public BillingTypeStage allowMultipleQuantity(boolean allowMultipleQuantity) {
+            this.allowMultipleQuantity = allowMultipleQuantity;
+            return this;
+        }
+
+        /**
+         * <p>Billing model for this variant.</p>
+         * @return Reference to {@code this} so that method calls can be chained together.
+         */
+        @java.lang.Override
+        @JsonSetter("billing_type")
+        public CollectTaxStage billingType(@NotNull PlanBillingType billingType) {
+            this.billingType = Objects.requireNonNull(billingType, "billingType must not be null");
+            return this;
+        }
+
+        /**
+         * <p>Whether tax is collected on purchases of this variant, based on the account's tax configuration.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
@@ -1348,8 +1487,7 @@ public final class Plan {
         }
 
         /**
-         * <p>When the plan was created, as an ISO 8601 timestamp.</p>
-         * <p>When the plan was created, as an ISO 8601 timestamp.</p>
+         * <p>When the variant was created, as an ISO 8601 timestamp.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
@@ -1360,8 +1498,7 @@ public final class Plan {
         }
 
         /**
-         * <p>Three-letter ISO currency code for this plan's prices.</p>
-         * <p>Three-letter ISO currency code for this plan's prices.</p>
+         * <p>Three-letter ISO 4217 code of the currency every price on this variant is stated in, lowercase: the variant's own currency, or the <code>presentment_currency</code> the read asked for when the variant can be converted into it.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
@@ -1372,8 +1509,7 @@ public final class Plan {
         }
 
         /**
-         * <p>Human-readable price for display (currency + interval), e.g. &quot;$10 / month&quot;.</p>
-         * <p>Human-readable price for display (currency + interval), e.g. &quot;$10 / month&quot;.</p>
+         * <p>Human-readable price for display (currency + interval) in <code>currency</code>, e.g. &quot;$10 / month&quot;.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
@@ -1384,8 +1520,7 @@ public final class Plan {
         }
 
         /**
-         * <p>Plan ID, prefixed <code>plan_</code>.</p>
-         * <p>Plan ID, prefixed <code>plan_</code>.</p>
+         * <p>Variant ID, prefixed <code>plan_</code>.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
@@ -1396,32 +1531,29 @@ public final class Plan {
         }
 
         /**
-         * <p>Initial purchase price in plan currency.</p>
-         * <p>Initial purchase price in plan currency.</p>
+         * <p>Initial purchase price, in <code>currency</code>.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
         @JsonSetter("initial_price")
-        public PlanTypeStage initialPrice(double initialPrice) {
+        public InitialPriceDueStage initialPrice(double initialPrice) {
             this.initialPrice = initialPrice;
             return this;
         }
 
         /**
-         * <p>Billing model for this plan.</p>
-         * <p>Billing model for this plan.</p>
+         * <p>Total charged at checkout for one unit, before promo codes and tax: <code>initial_price</code> plus the first <code>renewal_price</code> for recurring variants, or <code>initial_price</code> alone while a free trial applies. The trial does not apply when the viewing user has already used one for this variant. Stated in <code>currency</code>.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
-        @JsonSetter("plan_type")
-        public PurchaseUrlStage planType(@NotNull PlanPlanType planType) {
-            this.planType = Objects.requireNonNull(planType, "planType must not be null");
+        @JsonSetter("initial_price_due")
+        public PurchaseUrlStage initialPriceDue(@NotNull Money initialPriceDue) {
+            this.initialPriceDue = Objects.requireNonNull(initialPriceDue, "initialPriceDue must not be null");
             return this;
         }
 
         /**
-         * <p>URL where customers can purchase this plan directly.</p>
-         * <p>URL where customers can purchase this plan directly.</p>
+         * <p>URL where customers can purchase this variant directly.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
@@ -1432,8 +1564,7 @@ public final class Plan {
         }
 
         /**
-         * <p>Sales method for this plan.</p>
-         * <p>Sales method for this plan.</p>
+         * <p>Sales method for this variant.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
@@ -1444,8 +1575,7 @@ public final class Plan {
         }
 
         /**
-         * <p>Recurring price charged every billing period.</p>
-         * <p>Recurring price charged every billing period.</p>
+         * <p>Recurring price charged every billing period, in <code>currency</code>.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
@@ -1456,8 +1586,7 @@ public final class Plan {
         }
 
         /**
-         * <p>How tax is handled for this plan, including whether tax is included in the price, added at checkout, or not configured.</p>
-         * <p>How tax is handled for this plan, including whether tax is included in the price, added at checkout, or not configured.</p>
+         * <p>How tax is handled for this variant, including whether tax is included in the price, added at checkout, or not configured.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
@@ -1468,8 +1597,7 @@ public final class Plan {
         }
 
         /**
-         * <p>Whether the plan has unlimited stock. When <code>true</code>, the <code>stock</code> field is ignored; waitlist plans always report <code>true</code>.</p>
-         * <p>Whether the plan has unlimited stock. When <code>true</code>, the <code>stock</code> field is ignored; waitlist plans always report <code>true</code>.</p>
+         * <p>Whether the variant has unlimited stock. When <code>true</code>, the <code>stock</code> field is ignored; waitlist variants always report <code>true</code>.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
@@ -1480,8 +1608,7 @@ public final class Plan {
         }
 
         /**
-         * <p>When the plan was last updated, as an ISO 8601 timestamp.</p>
-         * <p>When the plan was last updated, as an ISO 8601 timestamp.</p>
+         * <p>When the variant was last updated, as an ISO 8601 timestamp.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
@@ -1492,8 +1619,7 @@ public final class Plan {
         }
 
         /**
-         * <p>Controls where this plan can be seen. When <code>hidden</code>, the plan is reachable only by its direct link.</p>
-         * <p>Controls where this plan can be seen. When <code>hidden</code>, the plan is reachable only by its direct link.</p>
+         * <p>Controls where this variant can be seen. When <code>hidden</code>, the variant is reachable only by its direct link.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
@@ -1504,7 +1630,7 @@ public final class Plan {
         }
 
         /**
-         * <p>Free trial days before the first renewal charge. <code>null</code> if no trial is configured or the user has already used a trial for this plan.</p>
+         * <p>Free trial days before the first renewal charge. <code>null</code> if no trial is configured or the user has already used a trial for this variant.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
@@ -1520,7 +1646,7 @@ public final class Plan {
         }
 
         /**
-         * <p>Free trial days before the first renewal charge. <code>null</code> if no trial is configured or the user has already used a trial for this plan.</p>
+         * <p>Free trial days before the first renewal charge. <code>null</code> if no trial is configured or the user has already used a trial for this variant.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
@@ -1530,7 +1656,7 @@ public final class Plan {
         }
 
         /**
-         * <p>Free trial days before the first renewal charge. <code>null</code> if no trial is configured or the user has already used a trial for this plan.</p>
+         * <p>Free trial days before the first renewal charge. <code>null</code> if no trial is configured or the user has already used a trial for this variant.</p>
          */
         @java.lang.Override
         @JsonSetter(value = "trial_period_days", nulls = Nulls.SKIP)
@@ -1540,7 +1666,7 @@ public final class Plan {
         }
 
         /**
-         * <p>Plan display name shown to customers. Maximum 30 characters. <code>null</code> if no title has been set.</p>
+         * <p>Variant display name shown to customers. Maximum 30 characters. A variant created without one defaults to its attribute values joined with <code>/</code>. <code>null</code> if no title has been set.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
@@ -1556,7 +1682,7 @@ public final class Plan {
         }
 
         /**
-         * <p>Plan display name shown to customers. Maximum 30 characters. <code>null</code> if no title has been set.</p>
+         * <p>Variant display name shown to customers. Maximum 30 characters. A variant created without one defaults to its attribute values joined with <code>/</code>. <code>null</code> if no title has been set.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
@@ -1566,7 +1692,7 @@ public final class Plan {
         }
 
         /**
-         * <p>Plan display name shown to customers. Maximum 30 characters. <code>null</code> if no title has been set.</p>
+         * <p>Variant display name shown to customers. Maximum 30 characters. A variant created without one defaults to its attribute values joined with <code>/</code>. <code>null</code> if no title has been set.</p>
          */
         @java.lang.Override
         @JsonSetter(value = "title", nulls = Nulls.SKIP)
@@ -1576,7 +1702,7 @@ public final class Plan {
         }
 
         /**
-         * <p>3D Secure behavior for this plan; <code>null</code> inherits the account default.</p>
+         * <p>3D Secure behavior for supported on-session card payments. <code>mandate_challenge</code> requires a 3DS challenge before payment processing; <code>mandate_if_required</code> mandates a challenge only when the payment processor requires it; <code>frictionless_if_required</code> uses the regular frictionless 3DS flow. Payments of $1,000 or more use <code>mandate_if_required</code> unless <code>mandate_challenge</code> is selected. Risk and authentication recovery requirements can override the preference. <code>null</code> inherits the account default.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
@@ -1592,7 +1718,7 @@ public final class Plan {
         }
 
         /**
-         * <p>3D Secure behavior for this plan; <code>null</code> inherits the account default.</p>
+         * <p>3D Secure behavior for supported on-session card payments. <code>mandate_challenge</code> requires a 3DS challenge before payment processing; <code>mandate_if_required</code> mandates a challenge only when the payment processor requires it; <code>frictionless_if_required</code> uses the regular frictionless 3DS flow. Payments of $1,000 or more use <code>mandate_if_required</code> unless <code>mandate_challenge</code> is selected. Risk and authentication recovery requirements can override the preference. <code>null</code> inherits the account default.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
@@ -1602,7 +1728,7 @@ public final class Plan {
         }
 
         /**
-         * <p>3D Secure behavior for this plan; <code>null</code> inherits the account default.</p>
+         * <p>3D Secure behavior for supported on-session card payments. <code>mandate_challenge</code> requires a 3DS challenge before payment processing; <code>mandate_if_required</code> mandates a challenge only when the payment processor requires it; <code>frictionless_if_required</code> uses the regular frictionless 3DS flow. Payments of $1,000 or more use <code>mandate_if_required</code> unless <code>mandate_challenge</code> is selected. Risk and authentication recovery requirements can override the preference. <code>null</code> inherits the account default.</p>
          */
         @java.lang.Override
         @JsonSetter(value = "three_ds_level", nulls = Nulls.SKIP)
@@ -1612,7 +1738,7 @@ public final class Plan {
         }
 
         /**
-         * <p>Original renewal price shown with a strikethrough, in the plan's currency. <code>null</code> when no strikethrough is set.</p>
+         * <p>Original renewal price shown with a strikethrough, in <code>currency</code>. <code>null</code> when no strikethrough is set.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
@@ -1628,7 +1754,7 @@ public final class Plan {
         }
 
         /**
-         * <p>Original renewal price shown with a strikethrough, in the plan's currency. <code>null</code> when no strikethrough is set.</p>
+         * <p>Original renewal price shown with a strikethrough, in <code>currency</code>. <code>null</code> when no strikethrough is set.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
@@ -1638,7 +1764,7 @@ public final class Plan {
         }
 
         /**
-         * <p>Original renewal price shown with a strikethrough, in the plan's currency. <code>null</code> when no strikethrough is set.</p>
+         * <p>Original renewal price shown with a strikethrough, in <code>currency</code>. <code>null</code> when no strikethrough is set.</p>
          */
         @java.lang.Override
         @JsonSetter(value = "strike_through_renewal_price", nulls = Nulls.SKIP)
@@ -1648,7 +1774,7 @@ public final class Plan {
         }
 
         /**
-         * <p>Original initial price shown with a strikethrough, in the plan's currency. <code>null</code> when no strikethrough is set.</p>
+         * <p>Original initial price shown with a strikethrough, in <code>currency</code>. <code>null</code> when no strikethrough is set.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
@@ -1664,7 +1790,7 @@ public final class Plan {
         }
 
         /**
-         * <p>Original initial price shown with a strikethrough, in the plan's currency. <code>null</code> when no strikethrough is set.</p>
+         * <p>Original initial price shown with a strikethrough, in <code>currency</code>. <code>null</code> when no strikethrough is set.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
@@ -1674,7 +1800,7 @@ public final class Plan {
         }
 
         /**
-         * <p>Original initial price shown with a strikethrough, in the plan's currency. <code>null</code> when no strikethrough is set.</p>
+         * <p>Original initial price shown with a strikethrough, in <code>currency</code>. <code>null</code> when no strikethrough is set.</p>
          */
         @java.lang.Override
         @JsonSetter(value = "strike_through_initial_price", nulls = Nulls.SKIP)
@@ -1684,7 +1810,7 @@ public final class Plan {
         }
 
         /**
-         * <p>Units available for purchase. <code>null</code> unless the actor has the <code>plan:basic:read</code> scope on the plan's account.</p>
+         * <p>Units available for purchase. <code>null</code> unless the actor has the <code>plan:basic:read</code> scope on the variant's account.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
@@ -1700,7 +1826,7 @@ public final class Plan {
         }
 
         /**
-         * <p>Units available for purchase. <code>null</code> unless the actor has the <code>plan:basic:read</code> scope on the plan's account.</p>
+         * <p>Units available for purchase. <code>null</code> unless the actor has the <code>plan:basic:read</code> scope on the variant's account.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
@@ -1710,7 +1836,7 @@ public final class Plan {
         }
 
         /**
-         * <p>Units available for purchase. <code>null</code> unless the actor has the <code>plan:basic:read</code> scope on the plan's account.</p>
+         * <p>Units available for purchase. <code>null</code> unless the actor has the <code>plan:basic:read</code> scope on the variant's account.</p>
          */
         @java.lang.Override
         @JsonSetter(value = "stock", nulls = Nulls.SKIP)
@@ -1756,7 +1882,43 @@ public final class Plan {
         }
 
         /**
-         * <p>Product this plan belongs to; <code>null</code> for standalone plans.</p>
+         * <p>Stock keeping unit, free text set by the seller (e.g. <code>TSHIRT-LARGE-BLUE</code>). Not enforced unique. <code>null</code> when unset.</p>
+         * @return Reference to {@code this} so that method calls can be chained together.
+         */
+        @java.lang.Override
+        public _FinalStage sku(Nullable<String> sku) {
+            if (sku.isNull()) {
+                this.sku = null;
+            } else if (sku.isEmpty()) {
+                this.sku = Optional.empty();
+            } else {
+                this.sku = Optional.of(sku.get());
+            }
+            return this;
+        }
+
+        /**
+         * <p>Stock keeping unit, free text set by the seller (e.g. <code>TSHIRT-LARGE-BLUE</code>). Not enforced unique. <code>null</code> when unset.</p>
+         * @return Reference to {@code this} so that method calls can be chained together.
+         */
+        @java.lang.Override
+        public _FinalStage sku(String sku) {
+            this.sku = Optional.ofNullable(sku);
+            return this;
+        }
+
+        /**
+         * <p>Stock keeping unit, free text set by the seller (e.g. <code>TSHIRT-LARGE-BLUE</code>). Not enforced unique. <code>null</code> when unset.</p>
+         */
+        @java.lang.Override
+        @JsonSetter(value = "sku", nulls = Nulls.SKIP)
+        public _FinalStage sku(Optional<String> sku) {
+            this.sku = sku;
+            return this;
+        }
+
+        /**
+         * <p>Product this variant belongs to; <code>null</code> for standalone variants.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
@@ -1772,7 +1934,7 @@ public final class Plan {
         }
 
         /**
-         * <p>Product this plan belongs to; <code>null</code> for standalone plans.</p>
+         * <p>Product this variant belongs to; <code>null</code> for standalone variants.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
@@ -1782,7 +1944,7 @@ public final class Plan {
         }
 
         /**
-         * <p>Product this plan belongs to; <code>null</code> for standalone plans.</p>
+         * <p>Product this variant belongs to; <code>null</code> for standalone variants.</p>
          */
         @java.lang.Override
         @JsonSetter(value = "product", nulls = Nulls.SKIP)
@@ -1792,7 +1954,7 @@ public final class Plan {
         }
 
         /**
-         * <p>Payment method configuration (<code>enabled</code>, <code>disabled</code>, <code>include_platform_defaults</code>); <code>null</code> when plan uses default settings.</p>
+         * <p>Payment method configuration (<code>enabled</code>, <code>disabled</code>, <code>include_platform_defaults</code>); <code>null</code> when variant uses default settings.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
@@ -1808,7 +1970,7 @@ public final class Plan {
         }
 
         /**
-         * <p>Payment method configuration (<code>enabled</code>, <code>disabled</code>, <code>include_platform_defaults</code>); <code>null</code> when plan uses default settings.</p>
+         * <p>Payment method configuration (<code>enabled</code>, <code>disabled</code>, <code>include_platform_defaults</code>); <code>null</code> when variant uses default settings.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
@@ -1818,7 +1980,7 @@ public final class Plan {
         }
 
         /**
-         * <p>Payment method configuration (<code>enabled</code>, <code>disabled</code>, <code>include_platform_defaults</code>); <code>null</code> when plan uses default settings.</p>
+         * <p>Payment method configuration (<code>enabled</code>, <code>disabled</code>, <code>include_platform_defaults</code>); <code>null</code> when variant uses default settings.</p>
          */
         @java.lang.Override
         @JsonSetter(value = "payment_method_configuration", nulls = Nulls.SKIP)
@@ -1828,7 +1990,7 @@ public final class Plan {
         }
 
         /**
-         * <p>Whether a cancellation discount is offered. <code>null</code> unless the actor has the <code>plan:basic:read</code> scope on the plan's account.</p>
+         * <p>Whether a cancellation discount is offered. <code>null</code> unless the actor has the <code>plan:basic:read</code> scope on the variant's account.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
@@ -1844,7 +2006,7 @@ public final class Plan {
         }
 
         /**
-         * <p>Whether a cancellation discount is offered. <code>null</code> unless the actor has the <code>plan:basic:read</code> scope on the plan's account.</p>
+         * <p>Whether a cancellation discount is offered. <code>null</code> unless the actor has the <code>plan:basic:read</code> scope on the variant's account.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
@@ -1854,7 +2016,7 @@ public final class Plan {
         }
 
         /**
-         * <p>Whether a cancellation discount is offered. <code>null</code> unless the actor has the <code>plan:basic:read</code> scope on the plan's account.</p>
+         * <p>Whether a cancellation discount is offered. <code>null</code> unless the actor has the <code>plan:basic:read</code> scope on the variant's account.</p>
          */
         @java.lang.Override
         @JsonSetter(value = "offer_cancel_discount", nulls = Nulls.SKIP)
@@ -1864,7 +2026,7 @@ public final class Plan {
         }
 
         /**
-         * <p>Custom key-value pairs stored on the plan. Included in webhook payloads for payment and membership events. Maximum 50 keys, 100 characters per key, 500 characters per value. The reserved keys <code>custom_cta</code> and <code>custom_cta_url</code>, when set, override the product's checkout call to action for this plan.</p>
+         * <p>Custom key-value pairs stored on the variant. Included in webhook payloads for payment and membership events. Maximum 50 keys, 100 characters per key, 500 characters per value. The reserved keys <code>custom_cta</code> and <code>custom_cta_url</code>, when set, override the product's checkout call to action for this variant.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
@@ -1880,7 +2042,7 @@ public final class Plan {
         }
 
         /**
-         * <p>Custom key-value pairs stored on the plan. Included in webhook payloads for payment and membership events. Maximum 50 keys, 100 characters per key, 500 characters per value. The reserved keys <code>custom_cta</code> and <code>custom_cta_url</code>, when set, override the product's checkout call to action for this plan.</p>
+         * <p>Custom key-value pairs stored on the variant. Included in webhook payloads for payment and membership events. Maximum 50 keys, 100 characters per key, 500 characters per value. The reserved keys <code>custom_cta</code> and <code>custom_cta_url</code>, when set, override the product's checkout call to action for this variant.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
@@ -1890,7 +2052,7 @@ public final class Plan {
         }
 
         /**
-         * <p>Custom key-value pairs stored on the plan. Included in webhook payloads for payment and membership events. Maximum 50 keys, 100 characters per key, 500 characters per value. The reserved keys <code>custom_cta</code> and <code>custom_cta_url</code>, when set, override the product's checkout call to action for this plan.</p>
+         * <p>Custom key-value pairs stored on the variant. Included in webhook payloads for payment and membership events. Maximum 50 keys, 100 characters per key, 500 characters per value. The reserved keys <code>custom_cta</code> and <code>custom_cta_url</code>, when set, override the product's checkout call to action for this variant.</p>
          */
         @java.lang.Override
         @JsonSetter(value = "metadata", nulls = Nulls.SKIP)
@@ -1900,7 +2062,7 @@ public final class Plan {
         }
 
         /**
-         * <p>Active memberships through this plan. <code>null</code> unless the actor has the <code>plan:basic:read</code> scope on the plan's account.</p>
+         * <p>Active memberships through this variant. <code>null</code> unless the actor has the <code>plan:basic:read</code> scope on the variant's account.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
@@ -1916,7 +2078,7 @@ public final class Plan {
         }
 
         /**
-         * <p>Active memberships through this plan. <code>null</code> unless the actor has the <code>plan:basic:read</code> scope on the plan's account.</p>
+         * <p>Active memberships through this variant. <code>null</code> unless the actor has the <code>plan:basic:read</code> scope on the variant's account.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
@@ -1926,7 +2088,7 @@ public final class Plan {
         }
 
         /**
-         * <p>Active memberships through this plan. <code>null</code> unless the actor has the <code>plan:basic:read</code> scope on the plan's account.</p>
+         * <p>Active memberships through this variant. <code>null</code> unless the actor has the <code>plan:basic:read</code> scope on the variant's account.</p>
          */
         @java.lang.Override
         @JsonSetter(value = "member_count", nulls = Nulls.SKIP)
@@ -1936,7 +2098,7 @@ public final class Plan {
         }
 
         /**
-         * <p>Invoice this plan was generated for; <code>null</code> unless created for an invoice.</p>
+         * <p>Invoice this variant was generated for; <code>null</code> unless created for an invoice.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
@@ -1952,7 +2114,7 @@ public final class Plan {
         }
 
         /**
-         * <p>Invoice this plan was generated for; <code>null</code> unless created for an invoice.</p>
+         * <p>Invoice this variant was generated for; <code>null</code> unless created for an invoice.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
@@ -1962,7 +2124,7 @@ public final class Plan {
         }
 
         /**
-         * <p>Invoice this plan was generated for; <code>null</code> unless created for an invoice.</p>
+         * <p>Invoice this variant was generated for; <code>null</code> unless created for an invoice.</p>
          */
         @java.lang.Override
         @JsonSetter(value = "invoice", nulls = Nulls.SKIP)
@@ -1972,7 +2134,7 @@ public final class Plan {
         }
 
         /**
-         * <p>Private notes not shown to customers. <code>null</code> unless the actor has the <code>plan:basic:read</code> scope on the plan's account.</p>
+         * <p>Private notes not shown to customers. <code>null</code> unless the actor has the <code>plan:basic:read</code> scope on the variant's account.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
@@ -1988,7 +2150,7 @@ public final class Plan {
         }
 
         /**
-         * <p>Private notes not shown to customers. <code>null</code> unless the actor has the <code>plan:basic:read</code> scope on the plan's account.</p>
+         * <p>Private notes not shown to customers. <code>null</code> unless the actor has the <code>plan:basic:read</code> scope on the variant's account.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
@@ -1998,7 +2160,7 @@ public final class Plan {
         }
 
         /**
-         * <p>Private notes not shown to customers. <code>null</code> unless the actor has the <code>plan:basic:read</code> scope on the plan's account.</p>
+         * <p>Private notes not shown to customers. <code>null</code> unless the actor has the <code>plan:basic:read</code> scope on the variant's account.</p>
          */
         @java.lang.Override
         @JsonSetter(value = "internal_notes", nulls = Nulls.SKIP)
@@ -2044,7 +2206,7 @@ public final class Plan {
         }
 
         /**
-         * <p>Access duration in days for expiration-based plans, such as 365 for a one-year pass. <code>null</code> for plans without an expiration.</p>
+         * <p>Access duration in days for expiration-based variants, such as 365 for a one-year pass. <code>null</code> for variants without an expiration.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
@@ -2060,7 +2222,7 @@ public final class Plan {
         }
 
         /**
-         * <p>Access duration in days for expiration-based plans, such as 365 for a one-year pass. <code>null</code> for plans without an expiration.</p>
+         * <p>Access duration in days for expiration-based variants, such as 365 for a one-year pass. <code>null</code> for variants without an expiration.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
@@ -2070,7 +2232,7 @@ public final class Plan {
         }
 
         /**
-         * <p>Access duration in days for expiration-based plans, such as 365 for a one-year pass. <code>null</code> for plans without an expiration.</p>
+         * <p>Access duration in days for expiration-based variants, such as 365 for a one-year pass. <code>null</code> for variants without an expiration.</p>
          */
         @java.lang.Override
         @JsonSetter(value = "expiration_days", nulls = Nulls.SKIP)
@@ -2080,7 +2242,7 @@ public final class Plan {
         }
 
         /**
-         * <p>The configuration governing a checkout for this plan, resolved through every layer (the plan's own and the account's) — the shape a session's <code>payment_method_configuration</code> carries. Apply it over the payment method types catalogue for the offerable set. <code>null</code> means platform defaults; <code>payment_method_configuration</code> stays the plan's own editable override.</p>
+         * <p>The configuration governing a checkout for this variant, resolved through every layer (the variant's own and the account's) — the shape a session's <code>payment_method_configuration</code> carries. Apply it over the payment method types catalogue for the offerable set. <code>null</code> means platform defaults; <code>payment_method_configuration</code> stays the variant's own editable override.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
@@ -2097,7 +2259,7 @@ public final class Plan {
         }
 
         /**
-         * <p>The configuration governing a checkout for this plan, resolved through every layer (the plan's own and the account's) — the shape a session's <code>payment_method_configuration</code> carries. Apply it over the payment method types catalogue for the offerable set. <code>null</code> means platform defaults; <code>payment_method_configuration</code> stays the plan's own editable override.</p>
+         * <p>The configuration governing a checkout for this variant, resolved through every layer (the variant's own and the account's) — the shape a session's <code>payment_method_configuration</code> carries. Apply it over the payment method types catalogue for the offerable set. <code>null</code> means platform defaults; <code>payment_method_configuration</code> stays the variant's own editable override.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
@@ -2108,7 +2270,7 @@ public final class Plan {
         }
 
         /**
-         * <p>The configuration governing a checkout for this plan, resolved through every layer (the plan's own and the account's) — the shape a session's <code>payment_method_configuration</code> carries. Apply it over the payment method types catalogue for the offerable set. <code>null</code> means platform defaults; <code>payment_method_configuration</code> stays the plan's own editable override.</p>
+         * <p>The configuration governing a checkout for this variant, resolved through every layer (the variant's own and the account's) — the shape a session's <code>payment_method_configuration</code> carries. Apply it over the payment method types catalogue for the offerable set. <code>null</code> means platform defaults; <code>payment_method_configuration</code> stays the variant's own editable override.</p>
          */
         @java.lang.Override
         @JsonSetter(value = "effective_payment_method_configuration", nulls = Nulls.SKIP)
@@ -2119,7 +2281,7 @@ public final class Plan {
         }
 
         /**
-         * <p>Customer-visible plan description. Maximum 1000 characters. <code>null</code> if no description is set.</p>
+         * <p>Customer-visible variant description. Maximum 1000 characters. <code>null</code> if no description is set.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
@@ -2135,7 +2297,7 @@ public final class Plan {
         }
 
         /**
-         * <p>Customer-visible plan description. Maximum 1000 characters. <code>null</code> if no description is set.</p>
+         * <p>Customer-visible variant description. Maximum 1000 characters. <code>null</code> if no description is set.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
@@ -2145,7 +2307,7 @@ public final class Plan {
         }
 
         /**
-         * <p>Customer-visible plan description. Maximum 1000 characters. <code>null</code> if no description is set.</p>
+         * <p>Customer-visible variant description. Maximum 1000 characters. <code>null</code> if no description is set.</p>
          */
         @java.lang.Override
         @JsonSetter(value = "description", nulls = Nulls.SKIP)
@@ -2155,7 +2317,7 @@ public final class Plan {
         }
 
         /**
-         * <p>Whether the plan can be deleted (it has no memberships or waitlist entries). <code>null</code> unless the actor has the <code>plan:basic:read</code> scope on the plan's account.</p>
+         * <p>Whether the variant can be deleted (it has no memberships or waitlist entries). <code>null</code> unless the actor has the <code>plan:basic:read</code> scope on the variant's account.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
@@ -2171,7 +2333,7 @@ public final class Plan {
         }
 
         /**
-         * <p>Whether the plan can be deleted (it has no memberships or waitlist entries). <code>null</code> unless the actor has the <code>plan:basic:read</code> scope on the plan's account.</p>
+         * <p>Whether the variant can be deleted (it has no memberships or waitlist entries). <code>null</code> unless the actor has the <code>plan:basic:read</code> scope on the variant's account.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
@@ -2181,7 +2343,7 @@ public final class Plan {
         }
 
         /**
-         * <p>Whether the plan can be deleted (it has no memberships or waitlist entries). <code>null</code> unless the actor has the <code>plan:basic:read</code> scope on the plan's account.</p>
+         * <p>Whether the variant can be deleted (it has no memberships or waitlist entries). <code>null</code> unless the actor has the <code>plan:basic:read</code> scope on the variant's account.</p>
          */
         @java.lang.Override
         @JsonSetter(value = "deletable", nulls = Nulls.SKIP)
@@ -2215,7 +2377,7 @@ public final class Plan {
         }
 
         /**
-         * <p>Plan-level checkout styling (<code>background_color</code>, <code>button_color</code>, <code>font_family</code>, <code>border_style</code>); <code>null</code> inherits the account default.</p>
+         * <p>Variant-level checkout styling (<code>background_color</code>, <code>button_color</code>, <code>font_family</code>, <code>border_style</code>); <code>null</code> inherits the account default.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
@@ -2231,7 +2393,7 @@ public final class Plan {
         }
 
         /**
-         * <p>Plan-level checkout styling (<code>background_color</code>, <code>button_color</code>, <code>font_family</code>, <code>border_style</code>); <code>null</code> inherits the account default.</p>
+         * <p>Variant-level checkout styling (<code>background_color</code>, <code>button_color</code>, <code>font_family</code>, <code>border_style</code>); <code>null</code> inherits the account default.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
@@ -2241,7 +2403,7 @@ public final class Plan {
         }
 
         /**
-         * <p>Plan-level checkout styling (<code>background_color</code>, <code>button_color</code>, <code>font_family</code>, <code>border_style</code>); <code>null</code> inherits the account default.</p>
+         * <p>Variant-level checkout styling (<code>background_color</code>, <code>button_color</code>, <code>font_family</code>, <code>border_style</code>); <code>null</code> inherits the account default.</p>
          */
         @java.lang.Override
         @JsonSetter(value = "checkout_styling", nulls = Nulls.SKIP)
@@ -2287,7 +2449,7 @@ public final class Plan {
         }
 
         /**
-         * <p>Billing intervals the cancellation discount applies to (<code>0</code> forever, <code>1</code> first payment, or a month count). <code>null</code> when none is offered or the actor lacks the <code>plan:basic:read</code> scope.</p>
+         * <p>How long the cancellation discount lasts: <code>0</code> forever, <code>1</code> the next payment only, or a number of calendar months from when the customer accepts it. <code>null</code> when none is offered or the actor lacks the <code>plan:basic:read</code> scope.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
@@ -2303,7 +2465,7 @@ public final class Plan {
         }
 
         /**
-         * <p>Billing intervals the cancellation discount applies to (<code>0</code> forever, <code>1</code> first payment, or a month count). <code>null</code> when none is offered or the actor lacks the <code>plan:basic:read</code> scope.</p>
+         * <p>How long the cancellation discount lasts: <code>0</code> forever, <code>1</code> the next payment only, or a number of calendar months from when the customer accepts it. <code>null</code> when none is offered or the actor lacks the <code>plan:basic:read</code> scope.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
@@ -2313,7 +2475,7 @@ public final class Plan {
         }
 
         /**
-         * <p>Billing intervals the cancellation discount applies to (<code>0</code> forever, <code>1</code> first payment, or a month count). <code>null</code> when none is offered or the actor lacks the <code>plan:basic:read</code> scope.</p>
+         * <p>How long the cancellation discount lasts: <code>0</code> forever, <code>1</code> the next payment only, or a number of calendar months from when the customer accepts it. <code>null</code> when none is offered or the actor lacks the <code>plan:basic:read</code> scope.</p>
          */
         @java.lang.Override
         @JsonSetter(value = "cancel_discount_intervals", nulls = Nulls.SKIP)
@@ -2323,7 +2485,7 @@ public final class Plan {
         }
 
         /**
-         * <p>Number of days between recurring charges, such as 30 for monthly or 365 for annual. <code>null</code> for one-time plans.</p>
+         * <p>Number of days between recurring charges, such as 30 for monthly or 365 for annual. <code>null</code> for one-time variants.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
@@ -2339,7 +2501,7 @@ public final class Plan {
         }
 
         /**
-         * <p>Number of days between recurring charges, such as 30 for monthly or 365 for annual. <code>null</code> for one-time plans.</p>
+         * <p>Number of days between recurring charges, such as 30 for monthly or 365 for annual. <code>null</code> for one-time variants.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
@@ -2349,7 +2511,7 @@ public final class Plan {
         }
 
         /**
-         * <p>Number of days between recurring charges, such as 30 for monthly or 365 for annual. <code>null</code> for one-time plans.</p>
+         * <p>Number of days between recurring charges, such as 30 for monthly or 365 for annual. <code>null</code> for one-time variants.</p>
          */
         @java.lang.Override
         @JsonSetter(value = "billing_period", nulls = Nulls.SKIP)
@@ -2359,7 +2521,43 @@ public final class Plan {
         }
 
         /**
-         * <p>Account that sells this plan; <code>null</code> for standalone invoice plans.</p>
+         * <p>Attribute values that distinguish this variant within its product, as a map of attribute name to value, e.g. <code>{&quot;color&quot;: &quot;Blue&quot;, &quot;size&quot;: &quot;Large&quot;}</code>. Names are snake_case identifiers and come back in alphabetical order. Every attributed variant on a product carries the same attribute names and a distinct set of values; the product lists the full option set as <code>variant_attributes</code>. <code>null</code> when the variant has no attributes.</p>
+         * @return Reference to {@code this} so that method calls can be chained together.
+         */
+        @java.lang.Override
+        public _FinalStage attributes(Nullable<Map<String, Optional<String>>> attributes) {
+            if (attributes.isNull()) {
+                this.attributes = null;
+            } else if (attributes.isEmpty()) {
+                this.attributes = Optional.empty();
+            } else {
+                this.attributes = Optional.of(attributes.get());
+            }
+            return this;
+        }
+
+        /**
+         * <p>Attribute values that distinguish this variant within its product, as a map of attribute name to value, e.g. <code>{&quot;color&quot;: &quot;Blue&quot;, &quot;size&quot;: &quot;Large&quot;}</code>. Names are snake_case identifiers and come back in alphabetical order. Every attributed variant on a product carries the same attribute names and a distinct set of values; the product lists the full option set as <code>variant_attributes</code>. <code>null</code> when the variant has no attributes.</p>
+         * @return Reference to {@code this} so that method calls can be chained together.
+         */
+        @java.lang.Override
+        public _FinalStage attributes(Map<String, Optional<String>> attributes) {
+            this.attributes = Optional.ofNullable(attributes);
+            return this;
+        }
+
+        /**
+         * <p>Attribute values that distinguish this variant within its product, as a map of attribute name to value, e.g. <code>{&quot;color&quot;: &quot;Blue&quot;, &quot;size&quot;: &quot;Large&quot;}</code>. Names are snake_case identifiers and come back in alphabetical order. Every attributed variant on a product carries the same attribute names and a distinct set of values; the product lists the full option set as <code>variant_attributes</code>. <code>null</code> when the variant has no attributes.</p>
+         */
+        @java.lang.Override
+        @JsonSetter(value = "attributes", nulls = Nulls.SKIP)
+        public _FinalStage attributes(Optional<Map<String, Optional<String>>> attributes) {
+            this.attributes = attributes;
+            return this;
+        }
+
+        /**
+         * <p>Account that sells this variant; <code>null</code> for standalone invoice variants.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
@@ -2375,7 +2573,7 @@ public final class Plan {
         }
 
         /**
-         * <p>Account that sells this plan; <code>null</code> for standalone invoice plans.</p>
+         * <p>Account that sells this variant; <code>null</code> for standalone invoice variants.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
@@ -2385,7 +2583,7 @@ public final class Plan {
         }
 
         /**
-         * <p>Account that sells this plan; <code>null</code> for standalone invoice plans.</p>
+         * <p>Account that sells this variant; <code>null</code> for standalone invoice variants.</p>
          */
         @java.lang.Override
         @JsonSetter(value = "account", nulls = Nulls.SKIP)
@@ -2399,7 +2597,10 @@ public final class Plan {
             return new Plan(
                     account,
                     adaptivePricingEnabled,
+                    allowMultipleQuantity,
+                    attributes,
                     billingPeriod,
+                    billingType,
                     cancelDiscountIntervals,
                     cancelDiscountPercentage,
                     checkoutStyling,
@@ -2415,17 +2616,18 @@ public final class Plan {
                     id,
                     image,
                     initialPrice,
+                    initialPriceDue,
                     internalNotes,
                     invoice,
                     memberCount,
                     metadata,
                     offerCancelDiscount,
                     paymentMethodConfiguration,
-                    planType,
                     product,
                     purchaseUrl,
                     releaseMethod,
                     renewalPrice,
+                    sku,
                     splitPayRequiredPayments,
                     stock,
                     strikeThroughInitialPrice,
@@ -2438,6 +2640,57 @@ public final class Plan {
                     updatedAt,
                     visibility,
                     additionalProperties);
+        }
+
+        @JsonAnySetter
+        private void putAdditionalPropertyFromJson(String key, Object value) {
+            if (key.equalsIgnoreCase("account")
+                    || key.equalsIgnoreCase("adaptive_pricing_enabled")
+                    || key.equalsIgnoreCase("allow_multiple_quantity")
+                    || key.equalsIgnoreCase("attributes")
+                    || key.equalsIgnoreCase("billing_period")
+                    || key.equalsIgnoreCase("billing_type")
+                    || key.equalsIgnoreCase("cancel_discount_intervals")
+                    || key.equalsIgnoreCase("cancel_discount_percentage")
+                    || key.equalsIgnoreCase("checkout_styling")
+                    || key.equalsIgnoreCase("collect_tax")
+                    || key.equalsIgnoreCase("created_at")
+                    || key.equalsIgnoreCase("currency")
+                    || key.equalsIgnoreCase("custom_fields")
+                    || key.equalsIgnoreCase("deletable")
+                    || key.equalsIgnoreCase("description")
+                    || key.equalsIgnoreCase("effective_payment_method_configuration")
+                    || key.equalsIgnoreCase("expiration_days")
+                    || key.equalsIgnoreCase("formatted_price")
+                    || key.equalsIgnoreCase("id")
+                    || key.equalsIgnoreCase("image")
+                    || key.equalsIgnoreCase("initial_price")
+                    || key.equalsIgnoreCase("initial_price_due")
+                    || key.equalsIgnoreCase("internal_notes")
+                    || key.equalsIgnoreCase("invoice")
+                    || key.equalsIgnoreCase("member_count")
+                    || key.equalsIgnoreCase("metadata")
+                    || key.equalsIgnoreCase("offer_cancel_discount")
+                    || key.equalsIgnoreCase("payment_method_configuration")
+                    || key.equalsIgnoreCase("product")
+                    || key.equalsIgnoreCase("purchase_url")
+                    || key.equalsIgnoreCase("release_method")
+                    || key.equalsIgnoreCase("renewal_price")
+                    || key.equalsIgnoreCase("sku")
+                    || key.equalsIgnoreCase("split_pay_required_payments")
+                    || key.equalsIgnoreCase("stock")
+                    || key.equalsIgnoreCase("strike_through_initial_price")
+                    || key.equalsIgnoreCase("strike_through_renewal_price")
+                    || key.equalsIgnoreCase("tax_type")
+                    || key.equalsIgnoreCase("three_ds_level")
+                    || key.equalsIgnoreCase("title")
+                    || key.equalsIgnoreCase("trial_period_days")
+                    || key.equalsIgnoreCase("unlimited_stock")
+                    || key.equalsIgnoreCase("updated_at")
+                    || key.equalsIgnoreCase("visibility")) {
+                return;
+            }
+            this.additionalProperties.put(key, value);
         }
 
         @java.lang.Override

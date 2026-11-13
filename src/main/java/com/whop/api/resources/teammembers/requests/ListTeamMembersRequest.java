@@ -16,7 +16,9 @@ import com.whop.api.resources.teammembers.types.ListTeamMembersRequestDirection;
 import com.whop.api.resources.teammembers.types.ListTeamMembersRequestOrder;
 import com.whop.api.resources.teammembers.types.ListTeamMembersRequestRole;
 import com.whop.api.resources.teammembers.types.ListTeamMembersRequestStatus;
+import java.util.Collections;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
@@ -25,6 +27,8 @@ import org.jetbrains.annotations.NotNull;
 @JsonInclude(JsonInclude.Include.NON_ABSENT)
 @JsonDeserialize(builder = ListTeamMembersRequest.Builder.class)
 public final class ListTeamMembersRequest {
+    private final Optional<List<String>> userIds;
+
     private final String accountId;
 
     private final Optional<ListTeamMembersRequestStatus> status;
@@ -32,6 +36,18 @@ public final class ListTeamMembersRequest {
     private final Optional<String> userId;
 
     private final Optional<ListTeamMembersRequestRole> role;
+
+    private final Optional<String> query;
+
+    private final Optional<String> reportsToId;
+
+    private final Optional<Integer> directReportsMin;
+
+    private final Optional<Integer> directReportsMax;
+
+    private final Optional<String> teamLeadId;
+
+    private final Optional<Boolean> hasReferredBusinesses;
 
     private final Optional<String> createdBefore;
 
@@ -52,10 +68,17 @@ public final class ListTeamMembersRequest {
     private final Map<String, Object> additionalProperties;
 
     private ListTeamMembersRequest(
+            Optional<List<String>> userIds,
             String accountId,
             Optional<ListTeamMembersRequestStatus> status,
             Optional<String> userId,
             Optional<ListTeamMembersRequestRole> role,
+            Optional<String> query,
+            Optional<String> reportsToId,
+            Optional<Integer> directReportsMin,
+            Optional<Integer> directReportsMax,
+            Optional<String> teamLeadId,
+            Optional<Boolean> hasReferredBusinesses,
             Optional<String> createdBefore,
             Optional<String> createdAfter,
             Optional<ListTeamMembersRequestOrder> order,
@@ -65,10 +88,17 @@ public final class ListTeamMembersRequest {
             Optional<Integer> last,
             Optional<String> before,
             Map<String, Object> additionalProperties) {
+        this.userIds = userIds;
         this.accountId = accountId;
         this.status = status;
         this.userId = userId;
         this.role = role;
+        this.query = query;
+        this.reportsToId = reportsToId;
+        this.directReportsMin = directReportsMin;
+        this.directReportsMax = directReportsMax;
+        this.teamLeadId = teamLeadId;
+        this.hasReferredBusinesses = hasReferredBusinesses;
         this.createdBefore = createdBefore;
         this.createdAfter = createdAfter;
         this.order = order;
@@ -78,6 +108,14 @@ public final class ListTeamMembersRequest {
         this.last = last;
         this.before = before;
         this.additionalProperties = additionalProperties;
+    }
+
+    /**
+     * @return Only return the memberships of these users, prefixed <code>user_</code>, at most 100. IDs that match no user are ignored. With <code>account_id=global</code>, a user can have one in each partner account. Can't be combined with <code>user_id</code>.
+     */
+    @JsonProperty("user_ids")
+    public Optional<List<String>> getUserIds() {
+        return userIds;
     }
 
     /**
@@ -113,6 +151,54 @@ public final class ListTeamMembersRequest {
     }
 
     /**
+     * @return Only return members whose name or username contains this text, and invites whose email contains it.
+     */
+    @JsonProperty("query")
+    public Optional<String> getQuery() {
+        return query;
+    }
+
+    /**
+     * @return Only return the direct reports of this team member, whose ID may start with <code>ausr_</code> or <code>mber_</code>. Pass the account ID, prefixed <code>biz_</code>, for the members who report to the business directly. Pending invites are excluded, and the list pages in <code>created_at</code> order without moving Partner-role members last.
+     */
+    @JsonProperty("reports_to_id")
+    public Optional<String> getReportsToId() {
+        return reportsToId;
+    }
+
+    /**
+     * @return Only return members with at least this many direct reports. Pending invites are excluded, and the list pages in <code>created_at</code> order without moving Partner-role members last.
+     */
+    @JsonProperty("direct_reports_min")
+    public Optional<Integer> getDirectReportsMin() {
+        return directReportsMin;
+    }
+
+    /**
+     * @return Only return members with at most this many direct reports; <code>0</code> returns the people who manage no one. Pending invites are excluded, and the list pages in <code>created_at</code> order without moving Partner-role members last.
+     */
+    @JsonProperty("direct_reports_max")
+    public Optional<Integer> getDirectReportsMax() {
+        return directReportsMax;
+    }
+
+    /**
+     * @return Only return this user, prefixed <code>user_</code>, and everyone under them in today's org chart: the same team the stats API's <code>team_lead_id</code> reads. With <code>account_id=global</code>, their line in every partner account where they hold a role. Pending invites are excluded, and the list pages in <code>created_at</code> order without moving Partner-role members last.
+     */
+    @JsonProperty("team_lead_id")
+    public Optional<String> getTeamLeadId() {
+        return teamLeadId;
+    }
+
+    /**
+     * @return When true, only members who referred at least one business for their account; when false, only members who referred none. Pending invites are excluded, and the list pages in <code>created_at</code> order without moving Partner-role members last.
+     */
+    @JsonProperty("has_referred_businesses")
+    public Optional<Boolean> getHasReferredBusinesses() {
+        return hasReferredBusinesses;
+    }
+
+    /**
      * @return Only return members added before this ISO 8601 timestamp.
      */
     @JsonProperty("created_before")
@@ -129,7 +215,7 @@ public final class ListTeamMembersRequest {
     }
 
     /**
-     * @return Field used to sort members.
+     * @return Field used to sort members. Members with the view-only Partner role are listed after all other members whichever way the list is sorted.
      */
     @JsonProperty("order")
     public Optional<ListTeamMembersRequestOrder> getOrder() {
@@ -145,7 +231,7 @@ public final class ListTeamMembersRequest {
     }
 
     /**
-     * @return Number of members to return. Defaults to 20; maximum 100.
+     * @return Number of results to return from the start of the range.
      */
     @JsonProperty("first")
     public Optional<Integer> getFirst() {
@@ -153,7 +239,7 @@ public final class ListTeamMembersRequest {
     }
 
     /**
-     * @return Cursor for the next page of members.
+     * @return Return results after this cursor. Use <code>page_info.end_cursor</code> from the previous response to fetch the next page.
      */
     @JsonProperty("after")
     public Optional<String> getAfter() {
@@ -161,7 +247,7 @@ public final class ListTeamMembersRequest {
     }
 
     /**
-     * @return Number of members to return from the end of the window.
+     * @return Number of results to return from the end of the range.
      */
     @JsonProperty("last")
     public Optional<Integer> getLast() {
@@ -169,7 +255,7 @@ public final class ListTeamMembersRequest {
     }
 
     /**
-     * @return Cursor to paginate backwards from.
+     * @return Return results before this cursor. Use <code>page_info.start_cursor</code> from the previous response to fetch the previous page.
      */
     @JsonProperty("before")
     public Optional<String> getBefore() {
@@ -188,10 +274,17 @@ public final class ListTeamMembersRequest {
     }
 
     private boolean equalTo(ListTeamMembersRequest other) {
-        return accountId.equals(other.accountId)
+        return userIds.equals(other.userIds)
+                && accountId.equals(other.accountId)
                 && status.equals(other.status)
                 && userId.equals(other.userId)
                 && role.equals(other.role)
+                && query.equals(other.query)
+                && reportsToId.equals(other.reportsToId)
+                && directReportsMin.equals(other.directReportsMin)
+                && directReportsMax.equals(other.directReportsMax)
+                && teamLeadId.equals(other.teamLeadId)
+                && hasReferredBusinesses.equals(other.hasReferredBusinesses)
                 && createdBefore.equals(other.createdBefore)
                 && createdAfter.equals(other.createdAfter)
                 && order.equals(other.order)
@@ -205,10 +298,17 @@ public final class ListTeamMembersRequest {
     @java.lang.Override
     public int hashCode() {
         return Objects.hash(
+                this.userIds,
                 this.accountId,
                 this.status,
                 this.userId,
                 this.role,
+                this.query,
+                this.reportsToId,
+                this.directReportsMin,
+                this.directReportsMax,
+                this.teamLeadId,
+                this.hasReferredBusinesses,
                 this.createdBefore,
                 this.createdAfter,
                 this.order,
@@ -245,6 +345,15 @@ public final class ListTeamMembersRequest {
         _FinalStage additionalProperties(Map<String, Object> additionalProperties);
 
         /**
+         * <p>Only return the memberships of these users, prefixed <code>user_</code>, at most 100. IDs that match no user are ignored. With <code>account_id=global</code>, a user can have one in each partner account. Can't be combined with <code>user_id</code>.</p>
+         */
+        _FinalStage userIds(Optional<List<String>> userIds);
+
+        _FinalStage userIds(List<String> userIds);
+
+        _FinalStage userIds(String userIds);
+
+        /**
          * <p>Only return members with this status: <code>joined</code> (accepted members) or <code>pending</code> (pending invites). Both are returned by default.</p>
          */
         _FinalStage status(Optional<ListTeamMembersRequestStatus> status);
@@ -266,6 +375,48 @@ public final class ListTeamMembersRequest {
         _FinalStage role(ListTeamMembersRequestRole role);
 
         /**
+         * <p>Only return members whose name or username contains this text, and invites whose email contains it.</p>
+         */
+        _FinalStage query(Optional<String> query);
+
+        _FinalStage query(String query);
+
+        /**
+         * <p>Only return the direct reports of this team member, whose ID may start with <code>ausr_</code> or <code>mber_</code>. Pass the account ID, prefixed <code>biz_</code>, for the members who report to the business directly. Pending invites are excluded, and the list pages in <code>created_at</code> order without moving Partner-role members last.</p>
+         */
+        _FinalStage reportsToId(Optional<String> reportsToId);
+
+        _FinalStage reportsToId(String reportsToId);
+
+        /**
+         * <p>Only return members with at least this many direct reports. Pending invites are excluded, and the list pages in <code>created_at</code> order without moving Partner-role members last.</p>
+         */
+        _FinalStage directReportsMin(Optional<Integer> directReportsMin);
+
+        _FinalStage directReportsMin(Integer directReportsMin);
+
+        /**
+         * <p>Only return members with at most this many direct reports; <code>0</code> returns the people who manage no one. Pending invites are excluded, and the list pages in <code>created_at</code> order without moving Partner-role members last.</p>
+         */
+        _FinalStage directReportsMax(Optional<Integer> directReportsMax);
+
+        _FinalStage directReportsMax(Integer directReportsMax);
+
+        /**
+         * <p>Only return this user, prefixed <code>user_</code>, and everyone under them in today's org chart: the same team the stats API's <code>team_lead_id</code> reads. With <code>account_id=global</code>, their line in every partner account where they hold a role. Pending invites are excluded, and the list pages in <code>created_at</code> order without moving Partner-role members last.</p>
+         */
+        _FinalStage teamLeadId(Optional<String> teamLeadId);
+
+        _FinalStage teamLeadId(String teamLeadId);
+
+        /**
+         * <p>When true, only members who referred at least one business for their account; when false, only members who referred none. Pending invites are excluded, and the list pages in <code>created_at</code> order without moving Partner-role members last.</p>
+         */
+        _FinalStage hasReferredBusinesses(Optional<Boolean> hasReferredBusinesses);
+
+        _FinalStage hasReferredBusinesses(Boolean hasReferredBusinesses);
+
+        /**
          * <p>Only return members added before this ISO 8601 timestamp.</p>
          */
         _FinalStage createdBefore(Optional<String> createdBefore);
@@ -280,7 +431,7 @@ public final class ListTeamMembersRequest {
         _FinalStage createdAfter(String createdAfter);
 
         /**
-         * <p>Field used to sort members.</p>
+         * <p>Field used to sort members. Members with the view-only Partner role are listed after all other members whichever way the list is sorted.</p>
          */
         _FinalStage order(Optional<ListTeamMembersRequestOrder> order);
 
@@ -294,28 +445,28 @@ public final class ListTeamMembersRequest {
         _FinalStage direction(ListTeamMembersRequestDirection direction);
 
         /**
-         * <p>Number of members to return. Defaults to 20; maximum 100.</p>
+         * <p>Number of results to return from the start of the range.</p>
          */
         _FinalStage first(Optional<Integer> first);
 
         _FinalStage first(Integer first);
 
         /**
-         * <p>Cursor for the next page of members.</p>
+         * <p>Return results after this cursor. Use <code>page_info.end_cursor</code> from the previous response to fetch the next page.</p>
          */
         _FinalStage after(Optional<String> after);
 
         _FinalStage after(String after);
 
         /**
-         * <p>Number of members to return from the end of the window.</p>
+         * <p>Number of results to return from the end of the range.</p>
          */
         _FinalStage last(Optional<Integer> last);
 
         _FinalStage last(Integer last);
 
         /**
-         * <p>Cursor to paginate backwards from.</p>
+         * <p>Return results before this cursor. Use <code>page_info.start_cursor</code> from the previous response to fetch the previous page.</p>
          */
         _FinalStage before(Optional<String> before);
 
@@ -342,23 +493,43 @@ public final class ListTeamMembersRequest {
 
         private Optional<String> createdBefore = Optional.empty();
 
+        private Optional<Boolean> hasReferredBusinesses = Optional.empty();
+
+        private Optional<String> teamLeadId = Optional.empty();
+
+        private Optional<Integer> directReportsMax = Optional.empty();
+
+        private Optional<Integer> directReportsMin = Optional.empty();
+
+        private Optional<String> reportsToId = Optional.empty();
+
+        private Optional<String> query = Optional.empty();
+
         private Optional<ListTeamMembersRequestRole> role = Optional.empty();
 
         private Optional<String> userId = Optional.empty();
 
         private Optional<ListTeamMembersRequestStatus> status = Optional.empty();
 
-        @JsonAnySetter
+        private Optional<List<String>> userIds = Optional.empty();
+
         private Map<String, Object> additionalProperties = new HashMap<>();
 
         private Builder() {}
 
         @java.lang.Override
         public Builder from(ListTeamMembersRequest other) {
+            userIds(other.getUserIds());
             accountId(other.getAccountId());
             status(other.getStatus());
             userId(other.getUserId());
             role(other.getRole());
+            query(other.getQuery());
+            reportsToId(other.getReportsToId());
+            directReportsMin(other.getDirectReportsMin());
+            directReportsMax(other.getDirectReportsMax());
+            teamLeadId(other.getTeamLeadId());
+            hasReferredBusinesses(other.getHasReferredBusinesses());
             createdBefore(other.getCreatedBefore());
             createdAfter(other.getCreatedAfter());
             order(other.getOrder());
@@ -372,7 +543,6 @@ public final class ListTeamMembersRequest {
 
         /**
          * <p>Account ID, prefixed <code>biz_</code>.</p>
-         * <p>Account ID, prefixed <code>biz_</code>.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
@@ -383,7 +553,7 @@ public final class ListTeamMembersRequest {
         }
 
         /**
-         * <p>Cursor to paginate backwards from.</p>
+         * <p>Return results before this cursor. Use <code>page_info.start_cursor</code> from the previous response to fetch the previous page.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
@@ -393,7 +563,7 @@ public final class ListTeamMembersRequest {
         }
 
         /**
-         * <p>Cursor to paginate backwards from.</p>
+         * <p>Return results before this cursor. Use <code>page_info.start_cursor</code> from the previous response to fetch the previous page.</p>
          */
         @java.lang.Override
         @JsonSetter(value = "before", nulls = Nulls.SKIP)
@@ -403,7 +573,7 @@ public final class ListTeamMembersRequest {
         }
 
         /**
-         * <p>Number of members to return from the end of the window.</p>
+         * <p>Number of results to return from the end of the range.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
@@ -413,7 +583,7 @@ public final class ListTeamMembersRequest {
         }
 
         /**
-         * <p>Number of members to return from the end of the window.</p>
+         * <p>Number of results to return from the end of the range.</p>
          */
         @java.lang.Override
         @JsonSetter(value = "last", nulls = Nulls.SKIP)
@@ -423,7 +593,7 @@ public final class ListTeamMembersRequest {
         }
 
         /**
-         * <p>Cursor for the next page of members.</p>
+         * <p>Return results after this cursor. Use <code>page_info.end_cursor</code> from the previous response to fetch the next page.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
@@ -433,7 +603,7 @@ public final class ListTeamMembersRequest {
         }
 
         /**
-         * <p>Cursor for the next page of members.</p>
+         * <p>Return results after this cursor. Use <code>page_info.end_cursor</code> from the previous response to fetch the next page.</p>
          */
         @java.lang.Override
         @JsonSetter(value = "after", nulls = Nulls.SKIP)
@@ -443,7 +613,7 @@ public final class ListTeamMembersRequest {
         }
 
         /**
-         * <p>Number of members to return. Defaults to 20; maximum 100.</p>
+         * <p>Number of results to return from the start of the range.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
@@ -453,7 +623,7 @@ public final class ListTeamMembersRequest {
         }
 
         /**
-         * <p>Number of members to return. Defaults to 20; maximum 100.</p>
+         * <p>Number of results to return from the start of the range.</p>
          */
         @java.lang.Override
         @JsonSetter(value = "first", nulls = Nulls.SKIP)
@@ -483,7 +653,7 @@ public final class ListTeamMembersRequest {
         }
 
         /**
-         * <p>Field used to sort members.</p>
+         * <p>Field used to sort members. Members with the view-only Partner role are listed after all other members whichever way the list is sorted.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
@@ -493,7 +663,7 @@ public final class ListTeamMembersRequest {
         }
 
         /**
-         * <p>Field used to sort members.</p>
+         * <p>Field used to sort members. Members with the view-only Partner role are listed after all other members whichever way the list is sorted.</p>
          */
         @java.lang.Override
         @JsonSetter(value = "order", nulls = Nulls.SKIP)
@@ -539,6 +709,126 @@ public final class ListTeamMembersRequest {
         @JsonSetter(value = "created_before", nulls = Nulls.SKIP)
         public _FinalStage createdBefore(Optional<String> createdBefore) {
             this.createdBefore = createdBefore;
+            return this;
+        }
+
+        /**
+         * <p>When true, only members who referred at least one business for their account; when false, only members who referred none. Pending invites are excluded, and the list pages in <code>created_at</code> order without moving Partner-role members last.</p>
+         * @return Reference to {@code this} so that method calls can be chained together.
+         */
+        @java.lang.Override
+        public _FinalStage hasReferredBusinesses(Boolean hasReferredBusinesses) {
+            this.hasReferredBusinesses = Optional.ofNullable(hasReferredBusinesses);
+            return this;
+        }
+
+        /**
+         * <p>When true, only members who referred at least one business for their account; when false, only members who referred none. Pending invites are excluded, and the list pages in <code>created_at</code> order without moving Partner-role members last.</p>
+         */
+        @java.lang.Override
+        @JsonSetter(value = "has_referred_businesses", nulls = Nulls.SKIP)
+        public _FinalStage hasReferredBusinesses(Optional<Boolean> hasReferredBusinesses) {
+            this.hasReferredBusinesses = hasReferredBusinesses;
+            return this;
+        }
+
+        /**
+         * <p>Only return this user, prefixed <code>user_</code>, and everyone under them in today's org chart: the same team the stats API's <code>team_lead_id</code> reads. With <code>account_id=global</code>, their line in every partner account where they hold a role. Pending invites are excluded, and the list pages in <code>created_at</code> order without moving Partner-role members last.</p>
+         * @return Reference to {@code this} so that method calls can be chained together.
+         */
+        @java.lang.Override
+        public _FinalStage teamLeadId(String teamLeadId) {
+            this.teamLeadId = Optional.ofNullable(teamLeadId);
+            return this;
+        }
+
+        /**
+         * <p>Only return this user, prefixed <code>user_</code>, and everyone under them in today's org chart: the same team the stats API's <code>team_lead_id</code> reads. With <code>account_id=global</code>, their line in every partner account where they hold a role. Pending invites are excluded, and the list pages in <code>created_at</code> order without moving Partner-role members last.</p>
+         */
+        @java.lang.Override
+        @JsonSetter(value = "team_lead_id", nulls = Nulls.SKIP)
+        public _FinalStage teamLeadId(Optional<String> teamLeadId) {
+            this.teamLeadId = teamLeadId;
+            return this;
+        }
+
+        /**
+         * <p>Only return members with at most this many direct reports; <code>0</code> returns the people who manage no one. Pending invites are excluded, and the list pages in <code>created_at</code> order without moving Partner-role members last.</p>
+         * @return Reference to {@code this} so that method calls can be chained together.
+         */
+        @java.lang.Override
+        public _FinalStage directReportsMax(Integer directReportsMax) {
+            this.directReportsMax = Optional.ofNullable(directReportsMax);
+            return this;
+        }
+
+        /**
+         * <p>Only return members with at most this many direct reports; <code>0</code> returns the people who manage no one. Pending invites are excluded, and the list pages in <code>created_at</code> order without moving Partner-role members last.</p>
+         */
+        @java.lang.Override
+        @JsonSetter(value = "direct_reports_max", nulls = Nulls.SKIP)
+        public _FinalStage directReportsMax(Optional<Integer> directReportsMax) {
+            this.directReportsMax = directReportsMax;
+            return this;
+        }
+
+        /**
+         * <p>Only return members with at least this many direct reports. Pending invites are excluded, and the list pages in <code>created_at</code> order without moving Partner-role members last.</p>
+         * @return Reference to {@code this} so that method calls can be chained together.
+         */
+        @java.lang.Override
+        public _FinalStage directReportsMin(Integer directReportsMin) {
+            this.directReportsMin = Optional.ofNullable(directReportsMin);
+            return this;
+        }
+
+        /**
+         * <p>Only return members with at least this many direct reports. Pending invites are excluded, and the list pages in <code>created_at</code> order without moving Partner-role members last.</p>
+         */
+        @java.lang.Override
+        @JsonSetter(value = "direct_reports_min", nulls = Nulls.SKIP)
+        public _FinalStage directReportsMin(Optional<Integer> directReportsMin) {
+            this.directReportsMin = directReportsMin;
+            return this;
+        }
+
+        /**
+         * <p>Only return the direct reports of this team member, whose ID may start with <code>ausr_</code> or <code>mber_</code>. Pass the account ID, prefixed <code>biz_</code>, for the members who report to the business directly. Pending invites are excluded, and the list pages in <code>created_at</code> order without moving Partner-role members last.</p>
+         * @return Reference to {@code this} so that method calls can be chained together.
+         */
+        @java.lang.Override
+        public _FinalStage reportsToId(String reportsToId) {
+            this.reportsToId = Optional.ofNullable(reportsToId);
+            return this;
+        }
+
+        /**
+         * <p>Only return the direct reports of this team member, whose ID may start with <code>ausr_</code> or <code>mber_</code>. Pass the account ID, prefixed <code>biz_</code>, for the members who report to the business directly. Pending invites are excluded, and the list pages in <code>created_at</code> order without moving Partner-role members last.</p>
+         */
+        @java.lang.Override
+        @JsonSetter(value = "reports_to_id", nulls = Nulls.SKIP)
+        public _FinalStage reportsToId(Optional<String> reportsToId) {
+            this.reportsToId = reportsToId;
+            return this;
+        }
+
+        /**
+         * <p>Only return members whose name or username contains this text, and invites whose email contains it.</p>
+         * @return Reference to {@code this} so that method calls can be chained together.
+         */
+        @java.lang.Override
+        public _FinalStage query(String query) {
+            this.query = Optional.ofNullable(query);
+            return this;
+        }
+
+        /**
+         * <p>Only return members whose name or username contains this text, and invites whose email contains it.</p>
+         */
+        @java.lang.Override
+        @JsonSetter(value = "query", nulls = Nulls.SKIP)
+        public _FinalStage query(Optional<String> query) {
+            this.query = query;
             return this;
         }
 
@@ -603,12 +893,45 @@ public final class ListTeamMembersRequest {
         }
 
         @java.lang.Override
+        public _FinalStage userIds(String userIds) {
+            this.userIds = Optional.of(Collections.singletonList(userIds));
+            return this;
+        }
+
+        /**
+         * <p>Only return the memberships of these users, prefixed <code>user_</code>, at most 100. IDs that match no user are ignored. With <code>account_id=global</code>, a user can have one in each partner account. Can't be combined with <code>user_id</code>.</p>
+         * @return Reference to {@code this} so that method calls can be chained together.
+         */
+        @java.lang.Override
+        public _FinalStage userIds(List<String> userIds) {
+            this.userIds = Optional.ofNullable(userIds);
+            return this;
+        }
+
+        /**
+         * <p>Only return the memberships of these users, prefixed <code>user_</code>, at most 100. IDs that match no user are ignored. With <code>account_id=global</code>, a user can have one in each partner account. Can't be combined with <code>user_id</code>.</p>
+         */
+        @java.lang.Override
+        @JsonSetter(value = "user_ids", nulls = Nulls.SKIP)
+        public _FinalStage userIds(Optional<List<String>> userIds) {
+            this.userIds = userIds;
+            return this;
+        }
+
+        @java.lang.Override
         public ListTeamMembersRequest build() {
             return new ListTeamMembersRequest(
+                    userIds,
                     accountId,
                     status,
                     userId,
                     role,
+                    query,
+                    reportsToId,
+                    directReportsMin,
+                    directReportsMax,
+                    teamLeadId,
+                    hasReferredBusinesses,
                     createdBefore,
                     createdAfter,
                     order,
@@ -618,6 +941,32 @@ public final class ListTeamMembersRequest {
                     last,
                     before,
                     additionalProperties);
+        }
+
+        @JsonAnySetter
+        private void putAdditionalPropertyFromJson(String key, Object value) {
+            if (key.equalsIgnoreCase("user_ids")
+                    || key.equalsIgnoreCase("account_id")
+                    || key.equalsIgnoreCase("status")
+                    || key.equalsIgnoreCase("user_id")
+                    || key.equalsIgnoreCase("role")
+                    || key.equalsIgnoreCase("query")
+                    || key.equalsIgnoreCase("reports_to_id")
+                    || key.equalsIgnoreCase("direct_reports_min")
+                    || key.equalsIgnoreCase("direct_reports_max")
+                    || key.equalsIgnoreCase("team_lead_id")
+                    || key.equalsIgnoreCase("has_referred_businesses")
+                    || key.equalsIgnoreCase("created_before")
+                    || key.equalsIgnoreCase("created_after")
+                    || key.equalsIgnoreCase("order")
+                    || key.equalsIgnoreCase("direction")
+                    || key.equalsIgnoreCase("first")
+                    || key.equalsIgnoreCase("after")
+                    || key.equalsIgnoreCase("last")
+                    || key.equalsIgnoreCase("before")) {
+                return;
+            }
+            this.additionalProperties.put(key, value);
         }
 
         @java.lang.Override

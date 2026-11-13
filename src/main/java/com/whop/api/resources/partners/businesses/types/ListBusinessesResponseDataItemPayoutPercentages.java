@@ -31,6 +31,8 @@ public final class ListBusinessesResponseDataItemPayoutPercentages {
 
     private final Optional<Float> transfer;
 
+    private final Optional<Float> withdrawal;
+
     private final Map<String, Object> additionalProperties;
 
     private ListBusinessesResponseDataItemPayoutPercentages(
@@ -38,11 +40,13 @@ public final class ListBusinessesResponseDataItemPayoutPercentages {
             Optional<Float> cardInterchange,
             float sales,
             Optional<Float> transfer,
+            Optional<Float> withdrawal,
             Map<String, Object> additionalProperties) {
         this.adSpend = adSpend;
         this.cardInterchange = cardInterchange;
         this.sales = sales;
         this.transfer = transfer;
+        this.withdrawal = withdrawal;
         this.additionalProperties = additionalProperties;
     }
 
@@ -87,6 +91,17 @@ public final class ListBusinessesResponseDataItemPayoutPercentages {
         return transfer;
     }
 
+    /**
+     * @return Share of Whop's profit from withdrawals.
+     */
+    @JsonIgnore
+    public Optional<Float> getWithdrawal() {
+        if (withdrawal == null) {
+            return Optional.empty();
+        }
+        return withdrawal;
+    }
+
     @JsonInclude(value = JsonInclude.Include.CUSTOM, valueFilter = NullableNonemptyFilter.class)
     @JsonProperty("ad_spend")
     private Optional<Float> _getAdSpend() {
@@ -105,6 +120,12 @@ public final class ListBusinessesResponseDataItemPayoutPercentages {
         return transfer;
     }
 
+    @JsonInclude(value = JsonInclude.Include.CUSTOM, valueFilter = NullableNonemptyFilter.class)
+    @JsonProperty("withdrawal")
+    private Optional<Float> _getWithdrawal() {
+        return withdrawal;
+    }
+
     @java.lang.Override
     public boolean equals(Object other) {
         if (this == other) return true;
@@ -121,12 +142,13 @@ public final class ListBusinessesResponseDataItemPayoutPercentages {
         return adSpend.equals(other.adSpend)
                 && cardInterchange.equals(other.cardInterchange)
                 && sales == other.sales
-                && transfer.equals(other.transfer);
+                && transfer.equals(other.transfer)
+                && withdrawal.equals(other.withdrawal);
     }
 
     @java.lang.Override
     public int hashCode() {
-        return Objects.hash(this.adSpend, this.cardInterchange, this.sales, this.transfer);
+        return Objects.hash(this.adSpend, this.cardInterchange, this.sales, this.transfer, this.withdrawal);
     }
 
     @java.lang.Override
@@ -180,11 +202,22 @@ public final class ListBusinessesResponseDataItemPayoutPercentages {
         _FinalStage transfer(Float transfer);
 
         _FinalStage transfer(Nullable<Float> transfer);
+
+        /**
+         * <p>Share of Whop's profit from withdrawals.</p>
+         */
+        _FinalStage withdrawal(Optional<Float> withdrawal);
+
+        _FinalStage withdrawal(Float withdrawal);
+
+        _FinalStage withdrawal(Nullable<Float> withdrawal);
     }
 
     @JsonIgnoreProperties(ignoreUnknown = true)
     public static final class Builder implements SalesStage, _FinalStage {
         private float sales;
+
+        private Optional<Float> withdrawal = Optional.empty();
 
         private Optional<Float> transfer = Optional.empty();
 
@@ -192,7 +225,6 @@ public final class ListBusinessesResponseDataItemPayoutPercentages {
 
         private Optional<Float> adSpend = Optional.empty();
 
-        @JsonAnySetter
         private Map<String, Object> additionalProperties = new HashMap<>();
 
         private Builder() {}
@@ -203,11 +235,11 @@ public final class ListBusinessesResponseDataItemPayoutPercentages {
             cardInterchange(other.getCardInterchange());
             sales(other.getSales());
             transfer(other.getTransfer());
+            withdrawal(other.getWithdrawal());
             return this;
         }
 
         /**
-         * <p>Share of Whop's profit from product sales.</p>
          * <p>Share of Whop's profit from product sales.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
@@ -215,6 +247,42 @@ public final class ListBusinessesResponseDataItemPayoutPercentages {
         @JsonSetter("sales")
         public _FinalStage sales(float sales) {
             this.sales = sales;
+            return this;
+        }
+
+        /**
+         * <p>Share of Whop's profit from withdrawals.</p>
+         * @return Reference to {@code this} so that method calls can be chained together.
+         */
+        @java.lang.Override
+        public _FinalStage withdrawal(Nullable<Float> withdrawal) {
+            if (withdrawal.isNull()) {
+                this.withdrawal = null;
+            } else if (withdrawal.isEmpty()) {
+                this.withdrawal = Optional.empty();
+            } else {
+                this.withdrawal = Optional.of(withdrawal.get());
+            }
+            return this;
+        }
+
+        /**
+         * <p>Share of Whop's profit from withdrawals.</p>
+         * @return Reference to {@code this} so that method calls can be chained together.
+         */
+        @java.lang.Override
+        public _FinalStage withdrawal(Float withdrawal) {
+            this.withdrawal = Optional.ofNullable(withdrawal);
+            return this;
+        }
+
+        /**
+         * <p>Share of Whop's profit from withdrawals.</p>
+         */
+        @java.lang.Override
+        @JsonSetter(value = "withdrawal", nulls = Nulls.SKIP)
+        public _FinalStage withdrawal(Optional<Float> withdrawal) {
+            this.withdrawal = withdrawal;
             return this;
         }
 
@@ -329,7 +397,19 @@ public final class ListBusinessesResponseDataItemPayoutPercentages {
         @java.lang.Override
         public ListBusinessesResponseDataItemPayoutPercentages build() {
             return new ListBusinessesResponseDataItemPayoutPercentages(
-                    adSpend, cardInterchange, sales, transfer, additionalProperties);
+                    adSpend, cardInterchange, sales, transfer, withdrawal, additionalProperties);
+        }
+
+        @JsonAnySetter
+        private void putAdditionalPropertyFromJson(String key, Object value) {
+            if (key.equalsIgnoreCase("ad_spend")
+                    || key.equalsIgnoreCase("card_interchange")
+                    || key.equalsIgnoreCase("sales")
+                    || key.equalsIgnoreCase("transfer")
+                    || key.equalsIgnoreCase("withdrawal")) {
+                return;
+            }
+            this.additionalProperties.put(key, value);
         }
 
         @java.lang.Override

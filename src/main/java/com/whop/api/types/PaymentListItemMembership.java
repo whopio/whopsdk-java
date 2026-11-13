@@ -146,7 +146,6 @@ public final class PaymentListItemMembership {
 
         private Optional<String> phoneNumber = Optional.empty();
 
-        @JsonAnySetter
         private Map<String, Object> additionalProperties = new HashMap<>();
 
         private Builder() {}
@@ -161,7 +160,6 @@ public final class PaymentListItemMembership {
 
         /**
          * <p>The unique identifier for the membership.</p>
-         * <p>The unique identifier for the membership.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
@@ -172,7 +170,6 @@ public final class PaymentListItemMembership {
         }
 
         /**
-         * <p>The state of the membership.</p>
          * <p>The state of the membership.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
@@ -222,6 +219,14 @@ public final class PaymentListItemMembership {
         @java.lang.Override
         public PaymentListItemMembership build() {
             return new PaymentListItemMembership(id, phoneNumber, status, additionalProperties);
+        }
+
+        @JsonAnySetter
+        private void putAdditionalPropertyFromJson(String key, Object value) {
+            if (key.equalsIgnoreCase("id") || key.equalsIgnoreCase("phone_number") || key.equalsIgnoreCase("status")) {
+                return;
+            }
+            this.additionalProperties.put(key, value);
         }
 
         @java.lang.Override

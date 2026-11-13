@@ -5,18 +5,20 @@ package com.whop.api.resources.adcampaigns.requests;
 
 import com.fasterxml.jackson.annotation.JsonAnyGetter;
 import com.fasterxml.jackson.annotation.JsonAnySetter;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonSetter;
 import com.fasterxml.jackson.annotation.Nulls;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
+import com.whop.api.core.Nullable;
+import com.whop.api.core.NullableNonemptyFilter;
 import com.whop.api.core.ObjectMappers;
-import com.whop.api.resources.adcampaigns.types.CreateAdCampaignsRequestBidType;
 import com.whop.api.resources.adcampaigns.types.CreateAdCampaignsRequestBudgetOptimization;
 import com.whop.api.resources.adcampaigns.types.CreateAdCampaignsRequestBudgetType;
+import com.whop.api.resources.adcampaigns.types.CreateAdCampaignsRequestCampaignType;
 import com.whop.api.resources.adcampaigns.types.CreateAdCampaignsRequestObjective;
-import com.whop.api.resources.adcampaigns.types.CreateAdCampaignsRequestPlatform;
 import com.whop.api.resources.adcampaigns.types.CreateAdCampaignsRequestSpecialAdCategoriesItem;
 import java.util.HashMap;
 import java.util.List;
@@ -30,21 +32,21 @@ import org.jetbrains.annotations.NotNull;
 public final class CreateAdCampaignsRequest {
     private final Optional<String> accountId;
 
-    private final Optional<CreateAdCampaignsRequestBidType> bidType;
-
     private final Optional<Double> budgetAmount;
+
+    private final Optional<Double> budgetAmountLocal;
 
     private final Optional<CreateAdCampaignsRequestBudgetOptimization> budgetOptimization;
 
     private final Optional<CreateAdCampaignsRequestBudgetType> budgetType;
+
+    private final Optional<CreateAdCampaignsRequestCampaignType> campaignType;
 
     private final Optional<Double> desiredCostPerResult;
 
     private final Optional<String> endsAt;
 
     private final CreateAdCampaignsRequestObjective objective;
-
-    private final CreateAdCampaignsRequestPlatform platform;
 
     private final Optional<List<CreateAdCampaignsRequestSpecialAdCategoriesItem>> specialAdCategories;
 
@@ -56,27 +58,27 @@ public final class CreateAdCampaignsRequest {
 
     private CreateAdCampaignsRequest(
             Optional<String> accountId,
-            Optional<CreateAdCampaignsRequestBidType> bidType,
             Optional<Double> budgetAmount,
+            Optional<Double> budgetAmountLocal,
             Optional<CreateAdCampaignsRequestBudgetOptimization> budgetOptimization,
             Optional<CreateAdCampaignsRequestBudgetType> budgetType,
+            Optional<CreateAdCampaignsRequestCampaignType> campaignType,
             Optional<Double> desiredCostPerResult,
             Optional<String> endsAt,
             CreateAdCampaignsRequestObjective objective,
-            CreateAdCampaignsRequestPlatform platform,
             Optional<List<CreateAdCampaignsRequestSpecialAdCategoriesItem>> specialAdCategories,
             Optional<String> startsAt,
             String title,
             Map<String, Object> additionalProperties) {
         this.accountId = accountId;
-        this.bidType = bidType;
         this.budgetAmount = budgetAmount;
+        this.budgetAmountLocal = budgetAmountLocal;
         this.budgetOptimization = budgetOptimization;
         this.budgetType = budgetType;
+        this.campaignType = campaignType;
         this.desiredCostPerResult = desiredCostPerResult;
         this.endsAt = endsAt;
         this.objective = objective;
-        this.platform = platform;
         this.specialAdCategories = specialAdCategories;
         this.startsAt = startsAt;
         this.title = title;
@@ -92,19 +94,19 @@ public final class CreateAdCampaignsRequest {
     }
 
     /**
-     * @return How delivery bids in the ad auction: <code>minimum_cost</code> gets the most results for the budget, <code>average_target</code> holds an average cost per result, <code>maximum_target</code> never bids above a cap. Only for campaigns that own the budget.
-     */
-    @JsonProperty("bid_type")
-    public Optional<CreateAdCampaignsRequestBidType> getBidType() {
-        return bidType;
-    }
-
-    /**
-     * @return The campaign's budget, in the ad account's currency. Required when budget_optimization is <code>ad_campaign</code>; omit when each ad group sets its own budget.
+     * @return The campaign's budget in USD, which is what it is stored and billed in. Required when budget_optimization is <code>ad_campaign</code> (or send budget_amount_local instead); omit when each ad group sets its own budget.
      */
     @JsonProperty("budget_amount")
     public Optional<Double> getBudgetAmount() {
         return budgetAmount;
+    }
+
+    /**
+     * @return The campaign's budget stated in the account's ads reporting currency (<code>budget_currency</code> on the response) instead of USD. Converted to USD at the current exchange rate and stored as budget_amount. Provide this or budget_amount, not both.
+     */
+    @JsonProperty("budget_amount_local")
+    public Optional<Double> getBudgetAmountLocal() {
+        return budgetAmountLocal;
     }
 
     /**
@@ -124,10 +126,21 @@ public final class CreateAdCampaignsRequest {
     }
 
     /**
-     * @return Cost per result to aim for (<code>average_target</code>) or never exceed (<code>maximum_target</code>). Only for campaigns that own the budget.
+     * @return The kind of campaign to create. <code>standard</code> runs image and video ads; <code>search</code> shows text ads on search results for the ad groups' keywords. Defaults to <code>standard</code>. Can't be changed after creation.
      */
-    @JsonProperty("desired_cost_per_result")
+    @JsonProperty("campaign_type")
+    public Optional<CreateAdCampaignsRequestCampaignType> getCampaignType() {
+        return campaignType;
+    }
+
+    /**
+     * @return The cost per result, in USD, you want this campaign to achieve. A target only: it is not a bid, cost cap, or bid cap, and doesn't change how the campaign's ads bid. Ad groups set cost and bid caps with their own <code>desired_cost_per_result</code>. Omit or send <code>null</code> for no target.
+     */
+    @JsonIgnore
     public Optional<Double> getDesiredCostPerResult() {
+        if (desiredCostPerResult == null) {
+            return Optional.empty();
+        }
         return desiredCostPerResult;
     }
 
@@ -145,14 +158,6 @@ public final class CreateAdCampaignsRequest {
     @JsonProperty("objective")
     public CreateAdCampaignsRequestObjective getObjective() {
         return objective;
-    }
-
-    /**
-     * @return The ad network the campaign runs on.
-     */
-    @JsonProperty("platform")
-    public CreateAdCampaignsRequestPlatform getPlatform() {
-        return platform;
     }
 
     /**
@@ -179,6 +184,12 @@ public final class CreateAdCampaignsRequest {
         return title;
     }
 
+    @JsonInclude(value = JsonInclude.Include.CUSTOM, valueFilter = NullableNonemptyFilter.class)
+    @JsonProperty("desired_cost_per_result")
+    private Optional<Double> _getDesiredCostPerResult() {
+        return desiredCostPerResult;
+    }
+
     @java.lang.Override
     public boolean equals(Object other) {
         if (this == other) return true;
@@ -192,14 +203,14 @@ public final class CreateAdCampaignsRequest {
 
     private boolean equalTo(CreateAdCampaignsRequest other) {
         return accountId.equals(other.accountId)
-                && bidType.equals(other.bidType)
                 && budgetAmount.equals(other.budgetAmount)
+                && budgetAmountLocal.equals(other.budgetAmountLocal)
                 && budgetOptimization.equals(other.budgetOptimization)
                 && budgetType.equals(other.budgetType)
+                && campaignType.equals(other.campaignType)
                 && desiredCostPerResult.equals(other.desiredCostPerResult)
                 && endsAt.equals(other.endsAt)
                 && objective.equals(other.objective)
-                && platform.equals(other.platform)
                 && specialAdCategories.equals(other.specialAdCategories)
                 && startsAt.equals(other.startsAt)
                 && title.equals(other.title);
@@ -209,14 +220,14 @@ public final class CreateAdCampaignsRequest {
     public int hashCode() {
         return Objects.hash(
                 this.accountId,
-                this.bidType,
                 this.budgetAmount,
+                this.budgetAmountLocal,
                 this.budgetOptimization,
                 this.budgetType,
+                this.campaignType,
                 this.desiredCostPerResult,
                 this.endsAt,
                 this.objective,
-                this.platform,
                 this.specialAdCategories,
                 this.startsAt,
                 this.title);
@@ -235,16 +246,9 @@ public final class CreateAdCampaignsRequest {
         /**
          * <p>The goal the campaign optimizes toward.</p>
          */
-        PlatformStage objective(@NotNull CreateAdCampaignsRequestObjective objective);
+        TitleStage objective(@NotNull CreateAdCampaignsRequestObjective objective);
 
         Builder from(CreateAdCampaignsRequest other);
-    }
-
-    public interface PlatformStage {
-        /**
-         * <p>The ad network the campaign runs on.</p>
-         */
-        TitleStage platform(@NotNull CreateAdCampaignsRequestPlatform platform);
     }
 
     public interface TitleStage {
@@ -269,18 +273,18 @@ public final class CreateAdCampaignsRequest {
         _FinalStage accountId(String accountId);
 
         /**
-         * <p>How delivery bids in the ad auction: <code>minimum_cost</code> gets the most results for the budget, <code>average_target</code> holds an average cost per result, <code>maximum_target</code> never bids above a cap. Only for campaigns that own the budget.</p>
-         */
-        _FinalStage bidType(Optional<CreateAdCampaignsRequestBidType> bidType);
-
-        _FinalStage bidType(CreateAdCampaignsRequestBidType bidType);
-
-        /**
-         * <p>The campaign's budget, in the ad account's currency. Required when budget_optimization is <code>ad_campaign</code>; omit when each ad group sets its own budget.</p>
+         * <p>The campaign's budget in USD, which is what it is stored and billed in. Required when budget_optimization is <code>ad_campaign</code> (or send budget_amount_local instead); omit when each ad group sets its own budget.</p>
          */
         _FinalStage budgetAmount(Optional<Double> budgetAmount);
 
         _FinalStage budgetAmount(Double budgetAmount);
+
+        /**
+         * <p>The campaign's budget stated in the account's ads reporting currency (<code>budget_currency</code> on the response) instead of USD. Converted to USD at the current exchange rate and stored as budget_amount. Provide this or budget_amount, not both.</p>
+         */
+        _FinalStage budgetAmountLocal(Optional<Double> budgetAmountLocal);
+
+        _FinalStage budgetAmountLocal(Double budgetAmountLocal);
 
         /**
          * <p>Which level owns the budget: the whole campaign (<code>ad_campaign</code>) or each ad group individually (<code>ad_group</code>). Defaults to <code>ad_group</code>.</p>
@@ -297,11 +301,20 @@ public final class CreateAdCampaignsRequest {
         _FinalStage budgetType(CreateAdCampaignsRequestBudgetType budgetType);
 
         /**
-         * <p>Cost per result to aim for (<code>average_target</code>) or never exceed (<code>maximum_target</code>). Only for campaigns that own the budget.</p>
+         * <p>The kind of campaign to create. <code>standard</code> runs image and video ads; <code>search</code> shows text ads on search results for the ad groups' keywords. Defaults to <code>standard</code>. Can't be changed after creation.</p>
+         */
+        _FinalStage campaignType(Optional<CreateAdCampaignsRequestCampaignType> campaignType);
+
+        _FinalStage campaignType(CreateAdCampaignsRequestCampaignType campaignType);
+
+        /**
+         * <p>The cost per result, in USD, you want this campaign to achieve. A target only: it is not a bid, cost cap, or bid cap, and doesn't change how the campaign's ads bid. Ad groups set cost and bid caps with their own <code>desired_cost_per_result</code>. Omit or send <code>null</code> for no target.</p>
          */
         _FinalStage desiredCostPerResult(Optional<Double> desiredCostPerResult);
 
         _FinalStage desiredCostPerResult(Double desiredCostPerResult);
+
+        _FinalStage desiredCostPerResult(Nullable<Double> desiredCostPerResult);
 
         /**
          * <p>When the campaign stops delivering, as an ISO 8601 timestamp. Only for campaigns that own the budget.</p>
@@ -327,10 +340,8 @@ public final class CreateAdCampaignsRequest {
     }
 
     @JsonIgnoreProperties(ignoreUnknown = true)
-    public static final class Builder implements ObjectiveStage, PlatformStage, TitleStage, _FinalStage {
+    public static final class Builder implements ObjectiveStage, TitleStage, _FinalStage {
         private CreateAdCampaignsRequestObjective objective;
-
-        private CreateAdCampaignsRequestPlatform platform;
 
         private String title;
 
@@ -342,17 +353,18 @@ public final class CreateAdCampaignsRequest {
 
         private Optional<Double> desiredCostPerResult = Optional.empty();
 
+        private Optional<CreateAdCampaignsRequestCampaignType> campaignType = Optional.empty();
+
         private Optional<CreateAdCampaignsRequestBudgetType> budgetType = Optional.empty();
 
         private Optional<CreateAdCampaignsRequestBudgetOptimization> budgetOptimization = Optional.empty();
 
-        private Optional<Double> budgetAmount = Optional.empty();
+        private Optional<Double> budgetAmountLocal = Optional.empty();
 
-        private Optional<CreateAdCampaignsRequestBidType> bidType = Optional.empty();
+        private Optional<Double> budgetAmount = Optional.empty();
 
         private Optional<String> accountId = Optional.empty();
 
-        @JsonAnySetter
         private Map<String, Object> additionalProperties = new HashMap<>();
 
         private Builder() {}
@@ -360,14 +372,14 @@ public final class CreateAdCampaignsRequest {
         @java.lang.Override
         public Builder from(CreateAdCampaignsRequest other) {
             accountId(other.getAccountId());
-            bidType(other.getBidType());
             budgetAmount(other.getBudgetAmount());
+            budgetAmountLocal(other.getBudgetAmountLocal());
             budgetOptimization(other.getBudgetOptimization());
             budgetType(other.getBudgetType());
+            campaignType(other.getCampaignType());
             desiredCostPerResult(other.getDesiredCostPerResult());
             endsAt(other.getEndsAt());
             objective(other.getObjective());
-            platform(other.getPlatform());
             specialAdCategories(other.getSpecialAdCategories());
             startsAt(other.getStartsAt());
             title(other.getTitle());
@@ -376,30 +388,16 @@ public final class CreateAdCampaignsRequest {
 
         /**
          * <p>The goal the campaign optimizes toward.</p>
-         * <p>The goal the campaign optimizes toward.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
         @JsonSetter("objective")
-        public PlatformStage objective(@NotNull CreateAdCampaignsRequestObjective objective) {
+        public TitleStage objective(@NotNull CreateAdCampaignsRequestObjective objective) {
             this.objective = Objects.requireNonNull(objective, "objective must not be null");
             return this;
         }
 
         /**
-         * <p>The ad network the campaign runs on.</p>
-         * <p>The ad network the campaign runs on.</p>
-         * @return Reference to {@code this} so that method calls can be chained together.
-         */
-        @java.lang.Override
-        @JsonSetter("platform")
-        public TitleStage platform(@NotNull CreateAdCampaignsRequestPlatform platform) {
-            this.platform = Objects.requireNonNull(platform, "platform must not be null");
-            return this;
-        }
-
-        /**
-         * <p>The title of the campaign.</p>
          * <p>The title of the campaign.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
@@ -473,7 +471,23 @@ public final class CreateAdCampaignsRequest {
         }
 
         /**
-         * <p>Cost per result to aim for (<code>average_target</code>) or never exceed (<code>maximum_target</code>). Only for campaigns that own the budget.</p>
+         * <p>The cost per result, in USD, you want this campaign to achieve. A target only: it is not a bid, cost cap, or bid cap, and doesn't change how the campaign's ads bid. Ad groups set cost and bid caps with their own <code>desired_cost_per_result</code>. Omit or send <code>null</code> for no target.</p>
+         * @return Reference to {@code this} so that method calls can be chained together.
+         */
+        @java.lang.Override
+        public _FinalStage desiredCostPerResult(Nullable<Double> desiredCostPerResult) {
+            if (desiredCostPerResult.isNull()) {
+                this.desiredCostPerResult = null;
+            } else if (desiredCostPerResult.isEmpty()) {
+                this.desiredCostPerResult = Optional.empty();
+            } else {
+                this.desiredCostPerResult = Optional.of(desiredCostPerResult.get());
+            }
+            return this;
+        }
+
+        /**
+         * <p>The cost per result, in USD, you want this campaign to achieve. A target only: it is not a bid, cost cap, or bid cap, and doesn't change how the campaign's ads bid. Ad groups set cost and bid caps with their own <code>desired_cost_per_result</code>. Omit or send <code>null</code> for no target.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
@@ -483,12 +497,32 @@ public final class CreateAdCampaignsRequest {
         }
 
         /**
-         * <p>Cost per result to aim for (<code>average_target</code>) or never exceed (<code>maximum_target</code>). Only for campaigns that own the budget.</p>
+         * <p>The cost per result, in USD, you want this campaign to achieve. A target only: it is not a bid, cost cap, or bid cap, and doesn't change how the campaign's ads bid. Ad groups set cost and bid caps with their own <code>desired_cost_per_result</code>. Omit or send <code>null</code> for no target.</p>
          */
         @java.lang.Override
         @JsonSetter(value = "desired_cost_per_result", nulls = Nulls.SKIP)
         public _FinalStage desiredCostPerResult(Optional<Double> desiredCostPerResult) {
             this.desiredCostPerResult = desiredCostPerResult;
+            return this;
+        }
+
+        /**
+         * <p>The kind of campaign to create. <code>standard</code> runs image and video ads; <code>search</code> shows text ads on search results for the ad groups' keywords. Defaults to <code>standard</code>. Can't be changed after creation.</p>
+         * @return Reference to {@code this} so that method calls can be chained together.
+         */
+        @java.lang.Override
+        public _FinalStage campaignType(CreateAdCampaignsRequestCampaignType campaignType) {
+            this.campaignType = Optional.ofNullable(campaignType);
+            return this;
+        }
+
+        /**
+         * <p>The kind of campaign to create. <code>standard</code> runs image and video ads; <code>search</code> shows text ads on search results for the ad groups' keywords. Defaults to <code>standard</code>. Can't be changed after creation.</p>
+         */
+        @java.lang.Override
+        @JsonSetter(value = "campaign_type", nulls = Nulls.SKIP)
+        public _FinalStage campaignType(Optional<CreateAdCampaignsRequestCampaignType> campaignType) {
+            this.campaignType = campaignType;
             return this;
         }
 
@@ -533,7 +567,27 @@ public final class CreateAdCampaignsRequest {
         }
 
         /**
-         * <p>The campaign's budget, in the ad account's currency. Required when budget_optimization is <code>ad_campaign</code>; omit when each ad group sets its own budget.</p>
+         * <p>The campaign's budget stated in the account's ads reporting currency (<code>budget_currency</code> on the response) instead of USD. Converted to USD at the current exchange rate and stored as budget_amount. Provide this or budget_amount, not both.</p>
+         * @return Reference to {@code this} so that method calls can be chained together.
+         */
+        @java.lang.Override
+        public _FinalStage budgetAmountLocal(Double budgetAmountLocal) {
+            this.budgetAmountLocal = Optional.ofNullable(budgetAmountLocal);
+            return this;
+        }
+
+        /**
+         * <p>The campaign's budget stated in the account's ads reporting currency (<code>budget_currency</code> on the response) instead of USD. Converted to USD at the current exchange rate and stored as budget_amount. Provide this or budget_amount, not both.</p>
+         */
+        @java.lang.Override
+        @JsonSetter(value = "budget_amount_local", nulls = Nulls.SKIP)
+        public _FinalStage budgetAmountLocal(Optional<Double> budgetAmountLocal) {
+            this.budgetAmountLocal = budgetAmountLocal;
+            return this;
+        }
+
+        /**
+         * <p>The campaign's budget in USD, which is what it is stored and billed in. Required when budget_optimization is <code>ad_campaign</code> (or send budget_amount_local instead); omit when each ad group sets its own budget.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
@@ -543,32 +597,12 @@ public final class CreateAdCampaignsRequest {
         }
 
         /**
-         * <p>The campaign's budget, in the ad account's currency. Required when budget_optimization is <code>ad_campaign</code>; omit when each ad group sets its own budget.</p>
+         * <p>The campaign's budget in USD, which is what it is stored and billed in. Required when budget_optimization is <code>ad_campaign</code> (or send budget_amount_local instead); omit when each ad group sets its own budget.</p>
          */
         @java.lang.Override
         @JsonSetter(value = "budget_amount", nulls = Nulls.SKIP)
         public _FinalStage budgetAmount(Optional<Double> budgetAmount) {
             this.budgetAmount = budgetAmount;
-            return this;
-        }
-
-        /**
-         * <p>How delivery bids in the ad auction: <code>minimum_cost</code> gets the most results for the budget, <code>average_target</code> holds an average cost per result, <code>maximum_target</code> never bids above a cap. Only for campaigns that own the budget.</p>
-         * @return Reference to {@code this} so that method calls can be chained together.
-         */
-        @java.lang.Override
-        public _FinalStage bidType(CreateAdCampaignsRequestBidType bidType) {
-            this.bidType = Optional.ofNullable(bidType);
-            return this;
-        }
-
-        /**
-         * <p>How delivery bids in the ad auction: <code>minimum_cost</code> gets the most results for the budget, <code>average_target</code> holds an average cost per result, <code>maximum_target</code> never bids above a cap. Only for campaigns that own the budget.</p>
-         */
-        @java.lang.Override
-        @JsonSetter(value = "bid_type", nulls = Nulls.SKIP)
-        public _FinalStage bidType(Optional<CreateAdCampaignsRequestBidType> bidType) {
-            this.bidType = bidType;
             return this;
         }
 
@@ -596,18 +630,37 @@ public final class CreateAdCampaignsRequest {
         public CreateAdCampaignsRequest build() {
             return new CreateAdCampaignsRequest(
                     accountId,
-                    bidType,
                     budgetAmount,
+                    budgetAmountLocal,
                     budgetOptimization,
                     budgetType,
+                    campaignType,
                     desiredCostPerResult,
                     endsAt,
                     objective,
-                    platform,
                     specialAdCategories,
                     startsAt,
                     title,
                     additionalProperties);
+        }
+
+        @JsonAnySetter
+        private void putAdditionalPropertyFromJson(String key, Object value) {
+            if (key.equalsIgnoreCase("account_id")
+                    || key.equalsIgnoreCase("budget_amount")
+                    || key.equalsIgnoreCase("budget_amount_local")
+                    || key.equalsIgnoreCase("budget_optimization")
+                    || key.equalsIgnoreCase("budget_type")
+                    || key.equalsIgnoreCase("campaign_type")
+                    || key.equalsIgnoreCase("desired_cost_per_result")
+                    || key.equalsIgnoreCase("ends_at")
+                    || key.equalsIgnoreCase("objective")
+                    || key.equalsIgnoreCase("special_ad_categories")
+                    || key.equalsIgnoreCase("starts_at")
+                    || key.equalsIgnoreCase("title")) {
+                return;
+            }
+            this.additionalProperties.put(key, value);
         }
 
         @java.lang.Override

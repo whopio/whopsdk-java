@@ -43,7 +43,7 @@ public final class ExperienceListItemCompany {
     }
 
     /**
-     * @return URL slug for the account's store page, e.g. <code>pickaxe</code> in whop.com/pickaxe.
+     * @return URL slug for the account's store page. For example, <code>pickaxe</code> in whop.com/pickaxe.
      */
     @JsonProperty("route")
     public String getRoute() {
@@ -98,7 +98,7 @@ public final class ExperienceListItemCompany {
 
     public interface RouteStage {
         /**
-         * <p>URL slug for the account's store page, e.g. <code>pickaxe</code> in whop.com/pickaxe.</p>
+         * <p>URL slug for the account's store page. For example, <code>pickaxe</code> in whop.com/pickaxe.</p>
          */
         TitleStage route(@NotNull String route);
     }
@@ -126,7 +126,6 @@ public final class ExperienceListItemCompany {
 
         private String title;
 
-        @JsonAnySetter
         private Map<String, Object> additionalProperties = new HashMap<>();
 
         private Builder() {}
@@ -141,7 +140,6 @@ public final class ExperienceListItemCompany {
 
         /**
          * <p>The unique identifier for the company.</p>
-         * <p>The unique identifier for the company.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
@@ -152,8 +150,7 @@ public final class ExperienceListItemCompany {
         }
 
         /**
-         * <p>URL slug for the account's store page, e.g. <code>pickaxe</code> in whop.com/pickaxe.</p>
-         * <p>URL slug for the account's store page, e.g. <code>pickaxe</code> in whop.com/pickaxe.</p>
+         * <p>URL slug for the account's store page. For example, <code>pickaxe</code> in whop.com/pickaxe.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
@@ -164,7 +161,6 @@ public final class ExperienceListItemCompany {
         }
 
         /**
-         * <p>The display name of the company shown to customers.</p>
          * <p>The display name of the company shown to customers.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
@@ -178,6 +174,14 @@ public final class ExperienceListItemCompany {
         @java.lang.Override
         public ExperienceListItemCompany build() {
             return new ExperienceListItemCompany(id, route, title, additionalProperties);
+        }
+
+        @JsonAnySetter
+        private void putAdditionalPropertyFromJson(String key, Object value) {
+            if (key.equalsIgnoreCase("id") || key.equalsIgnoreCase("route") || key.equalsIgnoreCase("title")) {
+                return;
+            }
+            this.additionalProperties.put(key, value);
         }
 
         @java.lang.Override

@@ -119,7 +119,6 @@ public final class TestWebhooksResponse {
 
         private boolean success;
 
-        @JsonAnySetter
         private Map<String, Object> additionalProperties = new HashMap<>();
 
         private Builder() {}
@@ -141,7 +140,6 @@ public final class TestWebhooksResponse {
 
         /**
          * <p>The HTTP response code of this request.</p>
-         * <p>The HTTP response code of this request.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
@@ -152,7 +150,6 @@ public final class TestWebhooksResponse {
         }
 
         /**
-         * <p>Whether or not the webhook test was successful.</p>
          * <p>Whether or not the webhook test was successful.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
@@ -166,6 +163,14 @@ public final class TestWebhooksResponse {
         @java.lang.Override
         public TestWebhooksResponse build() {
             return new TestWebhooksResponse(body, status, success, additionalProperties);
+        }
+
+        @JsonAnySetter
+        private void putAdditionalPropertyFromJson(String key, Object value) {
+            if (key.equalsIgnoreCase("body") || key.equalsIgnoreCase("status") || key.equalsIgnoreCase("success")) {
+                return;
+            }
+            this.additionalProperties.put(key, value);
         }
 
         @java.lang.Override

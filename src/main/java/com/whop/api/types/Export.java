@@ -72,7 +72,7 @@ public final class Export {
     }
 
     /**
-     * @return A short-lived link to download the finished CSV. <code>null</code> until <code>status</code> is <code>completed</code>, and again once the export has expired.
+     * @return A short-lived link to download the finished file. <code>null</code> until <code>status</code> is <code>completed</code>, and again once the export has expired.
      */
     @JsonIgnore
     public Optional<String> getDownloadUrl() {
@@ -83,7 +83,7 @@ public final class Export {
     }
 
     /**
-     * @return When the CSV is deleted and the export moves to <code>expired</code>, as an ISO 8601 timestamp. Exports are retained for 30 days.
+     * @return When the file is deleted and the export moves to <code>expired</code>, as an ISO 8601 timestamp. Exports are retained for 30 days.
      */
     @JsonProperty("expires_at")
     public String getExpiresAt() {
@@ -118,7 +118,7 @@ public final class Export {
     }
 
     /**
-     * @return <code>pending</code> or <code>processing</code> while the CSV is generated, <code>completed</code> when the download is ready, <code>failed</code> if it errored, <code>expired</code> once the CSV has been deleted.
+     * @return <code>pending</code> or <code>processing</code> while the file is generated, <code>completed</code> when the download is ready, <code>failed</code> if it errored, <code>expired</code> once the file has been deleted.
      */
     @JsonProperty("status")
     public ExportStatus getStatus() {
@@ -200,7 +200,7 @@ public final class Export {
 
     public interface ExpiresAtStage {
         /**
-         * <p>When the CSV is deleted and the export moves to <code>expired</code>, as an ISO 8601 timestamp. Exports are retained for 30 days.</p>
+         * <p>When the file is deleted and the export moves to <code>expired</code>, as an ISO 8601 timestamp. Exports are retained for 30 days.</p>
          */
         IdStage expiresAt(@NotNull String expiresAt);
     }
@@ -221,7 +221,7 @@ public final class Export {
 
     public interface StatusStage {
         /**
-         * <p><code>pending</code> or <code>processing</code> while the CSV is generated, <code>completed</code> when the download is ready, <code>failed</code> if it errored, <code>expired</code> once the CSV has been deleted.</p>
+         * <p><code>pending</code> or <code>processing</code> while the file is generated, <code>completed</code> when the download is ready, <code>failed</code> if it errored, <code>expired</code> once the file has been deleted.</p>
          */
         UpdatedAtStage status(@NotNull ExportStatus status);
     }
@@ -241,7 +241,7 @@ public final class Export {
         _FinalStage additionalProperties(Map<String, Object> additionalProperties);
 
         /**
-         * <p>A short-lived link to download the finished CSV. <code>null</code> until <code>status</code> is <code>completed</code>, and again once the export has expired.</p>
+         * <p>A short-lived link to download the finished file. <code>null</code> until <code>status</code> is <code>completed</code>, and again once the export has expired.</p>
          */
         _FinalStage downloadUrl(Optional<String> downloadUrl);
 
@@ -284,7 +284,6 @@ public final class Export {
 
         private Optional<String> downloadUrl = Optional.empty();
 
-        @JsonAnySetter
         private Map<String, Object> additionalProperties = new HashMap<>();
 
         private Builder() {}
@@ -304,7 +303,6 @@ public final class Export {
 
         /**
          * <p>When the export was requested, as an ISO 8601 timestamp.</p>
-         * <p>When the export was requested, as an ISO 8601 timestamp.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
@@ -315,8 +313,7 @@ public final class Export {
         }
 
         /**
-         * <p>When the CSV is deleted and the export moves to <code>expired</code>, as an ISO 8601 timestamp. Exports are retained for 30 days.</p>
-         * <p>When the CSV is deleted and the export moves to <code>expired</code>, as an ISO 8601 timestamp. Exports are retained for 30 days.</p>
+         * <p>When the file is deleted and the export moves to <code>expired</code>, as an ISO 8601 timestamp. Exports are retained for 30 days.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
@@ -327,7 +324,6 @@ public final class Export {
         }
 
         /**
-         * <p>Export ID, prefixed <code>exprt_</code>.</p>
          * <p>Export ID, prefixed <code>exprt_</code>.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
@@ -340,7 +336,6 @@ public final class Export {
 
         /**
          * <p>The resource that was exported, e.g. <code>receipts</code>, <code>members</code>, or <code>payouts</code>.</p>
-         * <p>The resource that was exported, e.g. <code>receipts</code>, <code>members</code>, or <code>payouts</code>.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
@@ -351,8 +346,7 @@ public final class Export {
         }
 
         /**
-         * <p><code>pending</code> or <code>processing</code> while the CSV is generated, <code>completed</code> when the download is ready, <code>failed</code> if it errored, <code>expired</code> once the CSV has been deleted.</p>
-         * <p><code>pending</code> or <code>processing</code> while the CSV is generated, <code>completed</code> when the download is ready, <code>failed</code> if it errored, <code>expired</code> once the CSV has been deleted.</p>
+         * <p><code>pending</code> or <code>processing</code> while the file is generated, <code>completed</code> when the download is ready, <code>failed</code> if it errored, <code>expired</code> once the file has been deleted.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
@@ -363,7 +357,6 @@ public final class Export {
         }
 
         /**
-         * <p>When the export last changed, as an ISO 8601 timestamp.</p>
          * <p>When the export last changed, as an ISO 8601 timestamp.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
@@ -411,7 +404,7 @@ public final class Export {
         }
 
         /**
-         * <p>A short-lived link to download the finished CSV. <code>null</code> until <code>status</code> is <code>completed</code>, and again once the export has expired.</p>
+         * <p>A short-lived link to download the finished file. <code>null</code> until <code>status</code> is <code>completed</code>, and again once the export has expired.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
@@ -427,7 +420,7 @@ public final class Export {
         }
 
         /**
-         * <p>A short-lived link to download the finished CSV. <code>null</code> until <code>status</code> is <code>completed</code>, and again once the export has expired.</p>
+         * <p>A short-lived link to download the finished file. <code>null</code> until <code>status</code> is <code>completed</code>, and again once the export has expired.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
@@ -437,7 +430,7 @@ public final class Export {
         }
 
         /**
-         * <p>A short-lived link to download the finished CSV. <code>null</code> until <code>status</code> is <code>completed</code>, and again once the export has expired.</p>
+         * <p>A short-lived link to download the finished file. <code>null</code> until <code>status</code> is <code>completed</code>, and again once the export has expired.</p>
          */
         @java.lang.Override
         @JsonSetter(value = "download_url", nulls = Nulls.SKIP)
@@ -458,6 +451,21 @@ public final class Export {
                     status,
                     updatedAt,
                     additionalProperties);
+        }
+
+        @JsonAnySetter
+        private void putAdditionalPropertyFromJson(String key, Object value) {
+            if (key.equalsIgnoreCase("created_at")
+                    || key.equalsIgnoreCase("download_url")
+                    || key.equalsIgnoreCase("expires_at")
+                    || key.equalsIgnoreCase("id")
+                    || key.equalsIgnoreCase("progress_percent")
+                    || key.equalsIgnoreCase("resource")
+                    || key.equalsIgnoreCase("status")
+                    || key.equalsIgnoreCase("updated_at")) {
+                return;
+            }
+            this.additionalProperties.put(key, value);
         }
 
         @java.lang.Override

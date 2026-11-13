@@ -6,8 +6,10 @@ package com.whop.api.resources.payoutmethods;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.whop.api.core.ClientOptions;
 import com.whop.api.core.ObjectMappers;
+import com.whop.api.core.PathSegments;
 import com.whop.api.core.QueryStringMapper;
 import com.whop.api.core.RequestOptions;
+import com.whop.api.core.RetryInterceptor;
 import com.whop.api.core.WhopApiApiException;
 import com.whop.api.core.WhopApiException;
 import com.whop.api.core.WhopApiHttpResponse;
@@ -22,8 +24,10 @@ import com.whop.api.errors.UnprocessableEntityError;
 import com.whop.api.resources.payoutmethods.requests.ListPayoutMethodRequest;
 import com.whop.api.resources.payoutmethods.requests.RetrievePayoutMethodRequest;
 import com.whop.api.resources.payoutmethods.types.ListPayoutMethodResponse;
+import com.whop.api.types.InternalServerErrorBody;
 import com.whop.api.types.PayoutMethod;
 import com.whop.api.types.PayoutMethodListItem;
+import com.whop.api.types.UnprocessableEntityErrorBody;
 import java.io.IOException;
 import java.util.List;
 import java.util.Optional;
@@ -42,7 +46,7 @@ public class RawPayoutMethodsClient {
     }
 
     /**
-     * Returns a list of active payout methods configured for a company, ordered by most recently created.
+     * Lists the active payout methods configured for an account, newest first.
      * <p>Required permissions:</p>
      * <ul>
      * <li><code>payout:destination:read</code></li>
@@ -54,7 +58,7 @@ public class RawPayoutMethodsClient {
     }
 
     /**
-     * Returns a list of active payout methods configured for a company, ordered by most recently created.
+     * Lists the active payout methods configured for an account, newest first.
      * <p>Required permissions:</p>
      * <ul>
      * <li><code>payout:destination:read</code></li>
@@ -62,7 +66,7 @@ public class RawPayoutMethodsClient {
      */
     public WhopApiHttpResponse<SyncPagingIterable<PayoutMethodListItem>> listPayoutMethod(
             ListPayoutMethodRequest request, RequestOptions requestOptions) {
-        HttpUrl.Builder httpUrl = HttpUrl.parse(this.clientOptions.environment().getUrl())
+        HttpUrl.Builder httpUrl = HttpUrl.parse(this.clientOptions.environment().getApiURL())
                 .newBuilder()
                 .addPathSegments("payout_methods");
         if (request.getAfter().isPresent()) {
@@ -81,7 +85,7 @@ public class RawPayoutMethodsClient {
             QueryStringMapper.addQueryParameter(
                     httpUrl, "last", request.getLast().get(), false);
         }
-        QueryStringMapper.addQueryParameter(httpUrl, "company_id", request.getCompanyId(), false);
+        QueryStringMapper.addQueryParameter(httpUrl, "account_id", request.getAccountId(), false);
         if (requestOptions != null) {
             requestOptions.getQueryParameters().forEach((_key, _value) -> {
                 httpUrl.addQueryParameter(_key, _value);
@@ -97,6 +101,15 @@ public class RawPayoutMethodsClient {
         if (requestOptions != null && requestOptions.getTimeout().isPresent()) {
             client = clientOptions.httpClientWithTimeout(requestOptions);
         }
+        if (requestOptions != null && requestOptions.getMaxRetries().isPresent()) {
+            okhttpRequest = okhttpRequest
+                    .newBuilder()
+                    .tag(
+                            RetryInterceptor.MaxRetriesOverride.class,
+                            new RetryInterceptor.MaxRetriesOverride(
+                                    requestOptions.getMaxRetries().get()))
+                    .build();
+        }
         try (Response response = client.newCall(okhttpRequest).execute()) {
             ResponseBody responseBody = response.body();
             String responseBodyString = responseBody != null ? responseBody.string() : "{}";
@@ -111,8 +124,11 @@ public class RawPayoutMethodsClient {
                 List<PayoutMethodListItem> result = parsedResponse.getData();
                 return new WhopApiHttpResponse<>(
                         new SyncPagingIterable<PayoutMethodListItem>(
-                                startingAfter != null, result, parsedResponse, () -> listPayoutMethod(
-                                                nextRequest, requestOptions)
+                                startingAfter.isPresent()
+                                        && !startingAfter.get().isEmpty(),
+                                result,
+                                parsedResponse,
+                                () -> listPayoutMethod(nextRequest, requestOptions)
                                         .body()),
                         response);
             }
@@ -132,13 +148,16 @@ public class RawPayoutMethodsClient {
                                 ObjectMappers.JSON_MAPPER.readValue(responseBodyString, Object.class), response);
                     case 422:
                         throw new UnprocessableEntityError(
-                                ObjectMappers.JSON_MAPPER.readValue(responseBodyString, Object.class), response);
+                                ObjectMappers.JSON_MAPPER.readValue(
+                                        responseBodyString, UnprocessableEntityErrorBody.class),
+                                response);
                     case 429:
                         throw new TooManyRequestsError(
                                 ObjectMappers.JSON_MAPPER.readValue(responseBodyString, Object.class), response);
                     case 500:
                         throw new InternalServerError(
-                                ObjectMappers.JSON_MAPPER.readValue(responseBodyString, Object.class), response);
+                                ObjectMappers.JSON_MAPPER.readValue(responseBodyString, InternalServerErrorBody.class),
+                                response);
                 }
             } catch (JsonProcessingException ignored) {
                 // unable to map error response, throwing generic error
@@ -146,6 +165,8 @@ public class RawPayoutMethodsClient {
             Object errorBody = ObjectMappers.parseErrorBody(responseBodyString);
             throw new WhopApiApiException(
                     "Error with status code " + response.code(), response.code(), errorBody, response);
+        } catch (JsonProcessingException e) {
+            throw new WhopApiException("Failed to deserialize response: " + e.getMessage(), e);
         } catch (IOException e) {
             throw new WhopApiException("Network error executing HTTP request", e);
         }
@@ -193,10 +214,10 @@ public class RawPayoutMethodsClient {
      */
     public WhopApiHttpResponse<PayoutMethod> retrievePayoutMethod(
             String id, RetrievePayoutMethodRequest request, RequestOptions requestOptions) {
-        HttpUrl.Builder httpUrl = HttpUrl.parse(this.clientOptions.environment().getUrl())
+        HttpUrl.Builder httpUrl = HttpUrl.parse(this.clientOptions.environment().getApiURL())
                 .newBuilder()
                 .addPathSegments("payout_methods")
-                .addPathSegment(id);
+                .addPathSegment(PathSegments.validate(id));
         if (requestOptions != null) {
             requestOptions.getQueryParameters().forEach((_key, _value) -> {
                 httpUrl.addQueryParameter(_key, _value);
@@ -211,6 +232,15 @@ public class RawPayoutMethodsClient {
         OkHttpClient client = clientOptions.httpClient();
         if (requestOptions != null && requestOptions.getTimeout().isPresent()) {
             client = clientOptions.httpClientWithTimeout(requestOptions);
+        }
+        if (requestOptions != null && requestOptions.getMaxRetries().isPresent()) {
+            okhttpRequest = okhttpRequest
+                    .newBuilder()
+                    .tag(
+                            RetryInterceptor.MaxRetriesOverride.class,
+                            new RetryInterceptor.MaxRetriesOverride(
+                                    requestOptions.getMaxRetries().get()))
+                    .build();
         }
         try (Response response = client.newCall(okhttpRequest).execute()) {
             ResponseBody responseBody = response.body();
@@ -235,13 +265,16 @@ public class RawPayoutMethodsClient {
                                 ObjectMappers.JSON_MAPPER.readValue(responseBodyString, Object.class), response);
                     case 422:
                         throw new UnprocessableEntityError(
-                                ObjectMappers.JSON_MAPPER.readValue(responseBodyString, Object.class), response);
+                                ObjectMappers.JSON_MAPPER.readValue(
+                                        responseBodyString, UnprocessableEntityErrorBody.class),
+                                response);
                     case 429:
                         throw new TooManyRequestsError(
                                 ObjectMappers.JSON_MAPPER.readValue(responseBodyString, Object.class), response);
                     case 500:
                         throw new InternalServerError(
-                                ObjectMappers.JSON_MAPPER.readValue(responseBodyString, Object.class), response);
+                                ObjectMappers.JSON_MAPPER.readValue(responseBodyString, InternalServerErrorBody.class),
+                                response);
                 }
             } catch (JsonProcessingException ignored) {
                 // unable to map error response, throwing generic error
@@ -249,6 +282,8 @@ public class RawPayoutMethodsClient {
             Object errorBody = ObjectMappers.parseErrorBody(responseBodyString);
             throw new WhopApiApiException(
                     "Error with status code " + response.code(), response.code(), errorBody, response);
+        } catch (JsonProcessingException e) {
+            throw new WhopApiException("Failed to deserialize response: " + e.getMessage(), e);
         } catch (IOException e) {
             throw new WhopApiException("Network error executing HTTP request", e);
         }

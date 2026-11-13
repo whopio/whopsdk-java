@@ -4,11 +4,14 @@
 package com.whop.api.resources.payouts;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
+import com.whop.api.core.BodyProperties;
 import com.whop.api.core.ClientOptions;
 import com.whop.api.core.MediaTypes;
 import com.whop.api.core.ObjectMappers;
+import com.whop.api.core.PathSegments;
 import com.whop.api.core.QueryStringMapper;
 import com.whop.api.core.RequestOptions;
+import com.whop.api.core.RetryInterceptor;
 import com.whop.api.core.WhopApiApiException;
 import com.whop.api.core.WhopApiException;
 import com.whop.api.core.WhopApiHttpResponse;
@@ -18,14 +21,17 @@ import com.whop.api.errors.ConflictError;
 import com.whop.api.errors.ForbiddenError;
 import com.whop.api.errors.NotFoundError;
 import com.whop.api.errors.UnauthorizedError;
+import com.whop.api.resources.payouts.requests.CancelPayoutsRequest;
+import com.whop.api.resources.payouts.requests.CreatePayoutsRequest;
+import com.whop.api.resources.payouts.requests.CreateQuotePayoutsRequest;
 import com.whop.api.resources.payouts.requests.ListPayoutsRequest;
 import com.whop.api.resources.payouts.requests.RetrievePayoutsRequest;
-import com.whop.api.resources.payouts.types.CreatePayoutsRequestBody;
+import com.whop.api.resources.payouts.types.CancelPayoutsResponse;
 import com.whop.api.resources.payouts.types.CreatePayoutsResponse;
+import com.whop.api.resources.payouts.types.CreateQuotePayoutsResponse;
 import com.whop.api.resources.payouts.types.ListPayoutsResponse;
 import com.whop.api.resources.payouts.types.ListPayoutsResponseDataItem;
 import com.whop.api.resources.payouts.types.RetrievePayoutsResponse;
-import com.whop.api.types.V1ErrorResponse;
 import java.io.IOException;
 import java.util.List;
 import java.util.Optional;
@@ -70,7 +76,7 @@ public class RawPayoutsClient {
      */
     public WhopApiHttpResponse<SyncPagingIterable<ListPayoutsResponseDataItem>> list(
             ListPayoutsRequest request, RequestOptions requestOptions) {
-        HttpUrl.Builder httpUrl = HttpUrl.parse(this.clientOptions.environment().getUrl())
+        HttpUrl.Builder httpUrl = HttpUrl.parse(this.clientOptions.environment().getApiURL())
                 .newBuilder()
                 .addPathSegments("payouts");
         if (request.getAccountId().isPresent()) {
@@ -136,6 +142,15 @@ public class RawPayoutsClient {
         if (requestOptions != null && requestOptions.getTimeout().isPresent()) {
             client = clientOptions.httpClientWithTimeout(requestOptions);
         }
+        if (requestOptions != null && requestOptions.getMaxRetries().isPresent()) {
+            okhttpRequest = okhttpRequest
+                    .newBuilder()
+                    .tag(
+                            RetryInterceptor.MaxRetriesOverride.class,
+                            new RetryInterceptor.MaxRetriesOverride(
+                                    requestOptions.getMaxRetries().get()))
+                    .build();
+        }
         try (Response response = client.newCall(okhttpRequest).execute()) {
             ResponseBody responseBody = response.body();
             String responseBodyString = responseBody != null ? responseBody.string() : "{}";
@@ -150,8 +165,11 @@ public class RawPayoutsClient {
                 List<ListPayoutsResponseDataItem> result = parsedResponse.getData();
                 return new WhopApiHttpResponse<>(
                         new SyncPagingIterable<ListPayoutsResponseDataItem>(
-                                startingAfter != null, result, parsedResponse, () -> list(nextRequest, requestOptions)
-                                        .body()),
+                                startingAfter.isPresent()
+                                        && !startingAfter.get().isEmpty(),
+                                result,
+                                parsedResponse,
+                                () -> list(nextRequest, requestOptions).body()),
                         response);
             }
             try {
@@ -175,24 +193,26 @@ public class RawPayoutsClient {
             Object errorBody = ObjectMappers.parseErrorBody(responseBodyString);
             throw new WhopApiApiException(
                     "Error with status code " + response.code(), response.code(), errorBody, response);
+        } catch (JsonProcessingException e) {
+            throw new WhopApiException("Failed to deserialize response: " + e.getMessage(), e);
         } catch (IOException e) {
             throw new WhopApiException("Network error executing HTTP request", e);
         }
     }
 
     /**
-     * Sends money from an account or user balance to a saved payout method for that owner.
+     * Sends money from an account or user balance to a saved payout method for that owner. First create a quote with POST /payouts/quotes, then submit its quote_token with the same payout details before it expires.
      */
-    public WhopApiHttpResponse<CreatePayoutsResponse> create(CreatePayoutsRequestBody request) {
+    public WhopApiHttpResponse<CreatePayoutsResponse> create(CreatePayoutsRequest request) {
         return create(request, null);
     }
 
     /**
-     * Sends money from an account or user balance to a saved payout method for that owner.
+     * Sends money from an account or user balance to a saved payout method for that owner. First create a quote with POST /payouts/quotes, then submit its quote_token with the same payout details before it expires.
      */
     public WhopApiHttpResponse<CreatePayoutsResponse> create(
-            CreatePayoutsRequestBody request, RequestOptions requestOptions) {
-        HttpUrl.Builder httpUrl = HttpUrl.parse(this.clientOptions.environment().getUrl())
+            CreatePayoutsRequest request, RequestOptions requestOptions) {
+        HttpUrl.Builder httpUrl = HttpUrl.parse(this.clientOptions.environment().getApiURL())
                 .newBuilder()
                 .addPathSegments("payouts");
         if (requestOptions != null) {
@@ -203,7 +223,9 @@ public class RawPayoutsClient {
         RequestBody body;
         try {
             body = RequestBody.create(
-                    ObjectMappers.JSON_MAPPER.writeValueAsBytes(request), MediaTypes.APPLICATION_JSON);
+                    ObjectMappers.JSON_MAPPER.writeValueAsBytes(BodyProperties.merge(
+                            request, requestOptions != null ? requestOptions.getBodyProperties() : null)),
+                    MediaTypes.APPLICATION_JSON);
         } catch (JsonProcessingException e) {
             throw new WhopApiException("Failed to serialize request", e);
         }
@@ -217,6 +239,15 @@ public class RawPayoutsClient {
         OkHttpClient client = clientOptions.httpClient();
         if (requestOptions != null && requestOptions.getTimeout().isPresent()) {
             client = clientOptions.httpClientWithTimeout(requestOptions);
+        }
+        if (requestOptions != null && requestOptions.getMaxRetries().isPresent()) {
+            okhttpRequest = okhttpRequest
+                    .newBuilder()
+                    .tag(
+                            RetryInterceptor.MaxRetriesOverride.class,
+                            new RetryInterceptor.MaxRetriesOverride(
+                                    requestOptions.getMaxRetries().get()))
+                    .build();
         }
         try (Response response = client.newCall(okhttpRequest).execute()) {
             ResponseBody responseBody = response.body();
@@ -241,8 +272,7 @@ public class RawPayoutsClient {
                                 ObjectMappers.JSON_MAPPER.readValue(responseBodyString, Object.class), response);
                     case 409:
                         throw new ConflictError(
-                                ObjectMappers.JSON_MAPPER.readValue(responseBodyString, V1ErrorResponse.class),
-                                response);
+                                ObjectMappers.JSON_MAPPER.readValue(responseBodyString, Object.class), response);
                 }
             } catch (JsonProcessingException ignored) {
                 // unable to map error response, throwing generic error
@@ -250,41 +280,128 @@ public class RawPayoutsClient {
             Object errorBody = ObjectMappers.parseErrorBody(responseBodyString);
             throw new WhopApiApiException(
                     "Error with status code " + response.code(), response.code(), errorBody, response);
+        } catch (JsonProcessingException e) {
+            throw new WhopApiException("Failed to deserialize response: " + e.getMessage(), e);
         } catch (IOException e) {
             throw new WhopApiException("Network error executing HTTP request", e);
         }
     }
 
     /**
-     * Fetches one payout by its <code>wdrl_</code> ID, or by the <code>cofr_</code> conversion request ID a stablecoin payout carries as <code>payout_request_id</code> — both ids answer with the same payout object.
+     * Creates a short-lived, provider-backed quote of a payout's fee, exchange rate, and destination amount. No funds move until you submit the returned <code>quote_token</code> to <code>POST /payouts</code>.
+     */
+    public WhopApiHttpResponse<CreateQuotePayoutsResponse> createQuote(CreateQuotePayoutsRequest request) {
+        return createQuote(request, null);
+    }
+
+    /**
+     * Creates a short-lived, provider-backed quote of a payout's fee, exchange rate, and destination amount. No funds move until you submit the returned <code>quote_token</code> to <code>POST /payouts</code>.
+     */
+    public WhopApiHttpResponse<CreateQuotePayoutsResponse> createQuote(
+            CreateQuotePayoutsRequest request, RequestOptions requestOptions) {
+        HttpUrl.Builder httpUrl = HttpUrl.parse(this.clientOptions.environment().getApiURL())
+                .newBuilder()
+                .addPathSegments("payouts/quotes");
+        if (requestOptions != null) {
+            requestOptions.getQueryParameters().forEach((_key, _value) -> {
+                httpUrl.addQueryParameter(_key, _value);
+            });
+        }
+        RequestBody body;
+        try {
+            body = RequestBody.create(
+                    ObjectMappers.JSON_MAPPER.writeValueAsBytes(BodyProperties.merge(
+                            request, requestOptions != null ? requestOptions.getBodyProperties() : null)),
+                    MediaTypes.APPLICATION_JSON);
+        } catch (JsonProcessingException e) {
+            throw new WhopApiException("Failed to serialize request", e);
+        }
+        Request okhttpRequest = new Request.Builder()
+                .url(httpUrl.build())
+                .method("POST", body)
+                .headers(Headers.of(clientOptions.headers(requestOptions)))
+                .addHeader("Content-Type", "application/json")
+                .addHeader("Accept", "application/json")
+                .build();
+        OkHttpClient client = clientOptions.httpClient();
+        if (requestOptions != null && requestOptions.getTimeout().isPresent()) {
+            client = clientOptions.httpClientWithTimeout(requestOptions);
+        }
+        if (requestOptions != null && requestOptions.getMaxRetries().isPresent()) {
+            okhttpRequest = okhttpRequest
+                    .newBuilder()
+                    .tag(
+                            RetryInterceptor.MaxRetriesOverride.class,
+                            new RetryInterceptor.MaxRetriesOverride(
+                                    requestOptions.getMaxRetries().get()))
+                    .build();
+        }
+        try (Response response = client.newCall(okhttpRequest).execute()) {
+            ResponseBody responseBody = response.body();
+            String responseBodyString = responseBody != null ? responseBody.string() : "{}";
+            if (response.isSuccessful()) {
+                return new WhopApiHttpResponse<>(
+                        ObjectMappers.JSON_MAPPER.readValue(responseBodyString, CreateQuotePayoutsResponse.class),
+                        response);
+            }
+            try {
+                switch (response.code()) {
+                    case 400:
+                        throw new BadRequestError(
+                                ObjectMappers.JSON_MAPPER.readValue(responseBodyString, Object.class), response);
+                    case 401:
+                        throw new UnauthorizedError(
+                                ObjectMappers.JSON_MAPPER.readValue(responseBodyString, Object.class), response);
+                    case 403:
+                        throw new ForbiddenError(
+                                ObjectMappers.JSON_MAPPER.readValue(responseBodyString, Object.class), response);
+                    case 409:
+                        throw new ConflictError(
+                                ObjectMappers.JSON_MAPPER.readValue(responseBodyString, Object.class), response);
+                }
+            } catch (JsonProcessingException ignored) {
+                // unable to map error response, throwing generic error
+            }
+            Object errorBody = ObjectMappers.parseErrorBody(responseBodyString);
+            throw new WhopApiApiException(
+                    "Error with status code " + response.code(), response.code(), errorBody, response);
+        } catch (JsonProcessingException e) {
+            throw new WhopApiException("Failed to deserialize response: " + e.getMessage(), e);
+        } catch (IOException e) {
+            throw new WhopApiException("Network error executing HTTP request", e);
+        }
+    }
+
+    /**
+     * Retrieves a payout by its <code>wdrl_</code> ID, or by the <code>cofr_</code> conversion request ID a payout carries as <code>payout_request_id</code>. Authentication is optional: anyone with the ID can view tracking details, including notes, trace code, exchange rate, and payout request ID, while accounting fields require <code>payout:withdrawal:read</code> on the account or user that owns the payout. A supplied invalid credential returns 401.
      */
     public WhopApiHttpResponse<RetrievePayoutsResponse> retrieve(String id) {
         return retrieve(id, RetrievePayoutsRequest.builder().build());
     }
 
     /**
-     * Fetches one payout by its <code>wdrl_</code> ID, or by the <code>cofr_</code> conversion request ID a stablecoin payout carries as <code>payout_request_id</code> — both ids answer with the same payout object.
+     * Retrieves a payout by its <code>wdrl_</code> ID, or by the <code>cofr_</code> conversion request ID a payout carries as <code>payout_request_id</code>. Authentication is optional: anyone with the ID can view tracking details, including notes, trace code, exchange rate, and payout request ID, while accounting fields require <code>payout:withdrawal:read</code> on the account or user that owns the payout. A supplied invalid credential returns 401.
      */
     public WhopApiHttpResponse<RetrievePayoutsResponse> retrieve(String id, RequestOptions requestOptions) {
         return retrieve(id, RetrievePayoutsRequest.builder().build(), requestOptions);
     }
 
     /**
-     * Fetches one payout by its <code>wdrl_</code> ID, or by the <code>cofr_</code> conversion request ID a stablecoin payout carries as <code>payout_request_id</code> — both ids answer with the same payout object.
+     * Retrieves a payout by its <code>wdrl_</code> ID, or by the <code>cofr_</code> conversion request ID a payout carries as <code>payout_request_id</code>. Authentication is optional: anyone with the ID can view tracking details, including notes, trace code, exchange rate, and payout request ID, while accounting fields require <code>payout:withdrawal:read</code> on the account or user that owns the payout. A supplied invalid credential returns 401.
      */
     public WhopApiHttpResponse<RetrievePayoutsResponse> retrieve(String id, RetrievePayoutsRequest request) {
         return retrieve(id, request, null);
     }
 
     /**
-     * Fetches one payout by its <code>wdrl_</code> ID, or by the <code>cofr_</code> conversion request ID a stablecoin payout carries as <code>payout_request_id</code> — both ids answer with the same payout object.
+     * Retrieves a payout by its <code>wdrl_</code> ID, or by the <code>cofr_</code> conversion request ID a payout carries as <code>payout_request_id</code>. Authentication is optional: anyone with the ID can view tracking details, including notes, trace code, exchange rate, and payout request ID, while accounting fields require <code>payout:withdrawal:read</code> on the account or user that owns the payout. A supplied invalid credential returns 401.
      */
     public WhopApiHttpResponse<RetrievePayoutsResponse> retrieve(
             String id, RetrievePayoutsRequest request, RequestOptions requestOptions) {
-        HttpUrl.Builder httpUrl = HttpUrl.parse(this.clientOptions.environment().getUrl())
+        HttpUrl.Builder httpUrl = HttpUrl.parse(this.clientOptions.environment().getApiURL())
                 .newBuilder()
                 .addPathSegments("payouts")
-                .addPathSegment(id);
+                .addPathSegment(PathSegments.validate(id));
         if (request.getAccountId().isPresent()) {
             QueryStringMapper.addQueryParameter(
                     httpUrl, "account_id", request.getAccountId().get(), false);
@@ -308,6 +425,15 @@ public class RawPayoutsClient {
         if (requestOptions != null && requestOptions.getTimeout().isPresent()) {
             client = clientOptions.httpClientWithTimeout(requestOptions);
         }
+        if (requestOptions != null && requestOptions.getMaxRetries().isPresent()) {
+            okhttpRequest = okhttpRequest
+                    .newBuilder()
+                    .tag(
+                            RetryInterceptor.MaxRetriesOverride.class,
+                            new RetryInterceptor.MaxRetriesOverride(
+                                    requestOptions.getMaxRetries().get()))
+                    .build();
+        }
         try (Response response = client.newCall(okhttpRequest).execute()) {
             ResponseBody responseBody = response.body();
             String responseBodyString = responseBody != null ? responseBody.string() : "{}";
@@ -318,14 +444,8 @@ public class RawPayoutsClient {
             }
             try {
                 switch (response.code()) {
-                    case 400:
-                        throw new BadRequestError(
-                                ObjectMappers.JSON_MAPPER.readValue(responseBodyString, Object.class), response);
                     case 401:
                         throw new UnauthorizedError(
-                                ObjectMappers.JSON_MAPPER.readValue(responseBodyString, Object.class), response);
-                    case 403:
-                        throw new ForbiddenError(
                                 ObjectMappers.JSON_MAPPER.readValue(responseBodyString, Object.class), response);
                     case 404:
                         throw new NotFoundError(
@@ -337,6 +457,110 @@ public class RawPayoutsClient {
             Object errorBody = ObjectMappers.parseErrorBody(responseBodyString);
             throw new WhopApiApiException(
                     "Error with status code " + response.code(), response.code(), errorBody, response);
+        } catch (JsonProcessingException e) {
+            throw new WhopApiException("Failed to deserialize response: " + e.getMessage(), e);
+        } catch (IOException e) {
+            throw new WhopApiException("Network error executing HTTP request", e);
+        }
+    }
+
+    /**
+     * Cancels a payout before it is sent to the payout provider, or asks the provider to stop one already sent. While the payout is <code>in_review</code>, or <code>processing</code> with nothing sent yet (see <code>cancelable</code>), it is canceled and the funds, fees included, return to the balance. Once sent, the response is 202 with a <code>cancellation</code> object, and the payout reads <code>canceled</code> only if the provider confirms it stopped. A <code>requested</code> payout returns 409 until it reaches review, a payout the provider can no longer stop returns 409 with error type <code>not_cancelable</code>, and canceling an already-canceled payout returns it unchanged.
+     */
+    public WhopApiHttpResponse<CancelPayoutsResponse> cancel(String id) {
+        return cancel(id, CancelPayoutsRequest.builder().build());
+    }
+
+    /**
+     * Cancels a payout before it is sent to the payout provider, or asks the provider to stop one already sent. While the payout is <code>in_review</code>, or <code>processing</code> with nothing sent yet (see <code>cancelable</code>), it is canceled and the funds, fees included, return to the balance. Once sent, the response is 202 with a <code>cancellation</code> object, and the payout reads <code>canceled</code> only if the provider confirms it stopped. A <code>requested</code> payout returns 409 until it reaches review, a payout the provider can no longer stop returns 409 with error type <code>not_cancelable</code>, and canceling an already-canceled payout returns it unchanged.
+     */
+    public WhopApiHttpResponse<CancelPayoutsResponse> cancel(String id, RequestOptions requestOptions) {
+        return cancel(id, CancelPayoutsRequest.builder().build(), requestOptions);
+    }
+
+    /**
+     * Cancels a payout before it is sent to the payout provider, or asks the provider to stop one already sent. While the payout is <code>in_review</code>, or <code>processing</code> with nothing sent yet (see <code>cancelable</code>), it is canceled and the funds, fees included, return to the balance. Once sent, the response is 202 with a <code>cancellation</code> object, and the payout reads <code>canceled</code> only if the provider confirms it stopped. A <code>requested</code> payout returns 409 until it reaches review, a payout the provider can no longer stop returns 409 with error type <code>not_cancelable</code>, and canceling an already-canceled payout returns it unchanged.
+     */
+    public WhopApiHttpResponse<CancelPayoutsResponse> cancel(String id, CancelPayoutsRequest request) {
+        return cancel(id, request, null);
+    }
+
+    /**
+     * Cancels a payout before it is sent to the payout provider, or asks the provider to stop one already sent. While the payout is <code>in_review</code>, or <code>processing</code> with nothing sent yet (see <code>cancelable</code>), it is canceled and the funds, fees included, return to the balance. Once sent, the response is 202 with a <code>cancellation</code> object, and the payout reads <code>canceled</code> only if the provider confirms it stopped. A <code>requested</code> payout returns 409 until it reaches review, a payout the provider can no longer stop returns 409 with error type <code>not_cancelable</code>, and canceling an already-canceled payout returns it unchanged.
+     */
+    public WhopApiHttpResponse<CancelPayoutsResponse> cancel(
+            String id, CancelPayoutsRequest request, RequestOptions requestOptions) {
+        HttpUrl.Builder httpUrl = HttpUrl.parse(this.clientOptions.environment().getApiURL())
+                .newBuilder()
+                .addPathSegments("payouts")
+                .addPathSegment(PathSegments.validate(id))
+                .addPathSegments("cancel");
+        if (request.getAccountId().isPresent()) {
+            QueryStringMapper.addQueryParameter(
+                    httpUrl, "account_id", request.getAccountId().get(), false);
+        }
+        if (request.getUserId().isPresent()) {
+            QueryStringMapper.addQueryParameter(
+                    httpUrl, "user_id", request.getUserId().get(), false);
+        }
+        if (requestOptions != null) {
+            requestOptions.getQueryParameters().forEach((_key, _value) -> {
+                httpUrl.addQueryParameter(_key, _value);
+            });
+        }
+        Request.Builder _requestBuilder = new Request.Builder()
+                .url(httpUrl.build())
+                .method(
+                        "POST",
+                        BodyProperties.toRequestBody(
+                                requestOptions != null ? requestOptions.getBodyProperties() : null,
+                                RequestBody.create("", null)))
+                .headers(Headers.of(clientOptions.headers(requestOptions)))
+                .addHeader("Accept", "application/json");
+        Request okhttpRequest = _requestBuilder.build();
+        OkHttpClient client = clientOptions.httpClient();
+        if (requestOptions != null && requestOptions.getTimeout().isPresent()) {
+            client = clientOptions.httpClientWithTimeout(requestOptions);
+        }
+        if (requestOptions != null && requestOptions.getMaxRetries().isPresent()) {
+            okhttpRequest = okhttpRequest
+                    .newBuilder()
+                    .tag(
+                            RetryInterceptor.MaxRetriesOverride.class,
+                            new RetryInterceptor.MaxRetriesOverride(
+                                    requestOptions.getMaxRetries().get()))
+                    .build();
+        }
+        try (Response response = client.newCall(okhttpRequest).execute()) {
+            ResponseBody responseBody = response.body();
+            String responseBodyString = responseBody != null ? responseBody.string() : "{}";
+            if (response.isSuccessful()) {
+                return new WhopApiHttpResponse<>(
+                        ObjectMappers.JSON_MAPPER.readValue(responseBodyString, CancelPayoutsResponse.class), response);
+            }
+            try {
+                switch (response.code()) {
+                    case 401:
+                        throw new UnauthorizedError(
+                                ObjectMappers.JSON_MAPPER.readValue(responseBodyString, Object.class), response);
+                    case 403:
+                        throw new ForbiddenError(
+                                ObjectMappers.JSON_MAPPER.readValue(responseBodyString, Object.class), response);
+                    case 404:
+                        throw new NotFoundError(
+                                ObjectMappers.JSON_MAPPER.readValue(responseBodyString, Object.class), response);
+                    case 409:
+                        throw new ConflictError(
+                                ObjectMappers.JSON_MAPPER.readValue(responseBodyString, Object.class), response);
+                }
+            } catch (JsonProcessingException ignored) {
+                // unable to map error response, throwing generic error
+            }
+            Object errorBody = ObjectMappers.parseErrorBody(responseBodyString);
+            throw new WhopApiApiException(
+                    "Error with status code " + response.code(), response.code(), errorBody, response);
+        } catch (JsonProcessingException e) {
+            throw new WhopApiException("Failed to deserialize response: " + e.getMessage(), e);
         } catch (IOException e) {
             throw new WhopApiException("Network error executing HTTP request", e);
         }

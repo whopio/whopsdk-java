@@ -4,11 +4,14 @@
 package com.whop.api.resources.leads;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
+import com.whop.api.core.BodyProperties;
 import com.whop.api.core.ClientOptions;
 import com.whop.api.core.MediaTypes;
 import com.whop.api.core.ObjectMappers;
+import com.whop.api.core.PathSegments;
 import com.whop.api.core.QueryStringMapper;
 import com.whop.api.core.RequestOptions;
+import com.whop.api.core.RetryInterceptor;
 import com.whop.api.core.WhopApiApiException;
 import com.whop.api.core.WhopApiException;
 import com.whop.api.core.WhopApiHttpResponse;
@@ -25,8 +28,10 @@ import com.whop.api.resources.leads.requests.ListLeadsRequest;
 import com.whop.api.resources.leads.requests.RetrieveLeadsRequest;
 import com.whop.api.resources.leads.requests.UpdateLeadsRequest;
 import com.whop.api.resources.leads.types.ListLeadsResponse;
+import com.whop.api.types.InternalServerErrorBody;
 import com.whop.api.types.Lead;
 import com.whop.api.types.LeadListItem;
+import com.whop.api.types.UnprocessableEntityErrorBody;
 import java.io.IOException;
 import java.util.List;
 import java.util.Optional;
@@ -46,7 +51,7 @@ public class RawLeadsClient {
     }
 
     /**
-     * Returns a paginated list of leads for a company, with optional filtering by product and creation date.
+     * Lists an account's leads, newest first.
      * <p>Required permissions:</p>
      * <ul>
      * <li><code>lead:basic:read</code></li>
@@ -60,7 +65,7 @@ public class RawLeadsClient {
     }
 
     /**
-     * Returns a paginated list of leads for a company, with optional filtering by product and creation date.
+     * Lists an account's leads, newest first.
      * <p>Required permissions:</p>
      * <ul>
      * <li><code>lead:basic:read</code></li>
@@ -71,7 +76,7 @@ public class RawLeadsClient {
      */
     public WhopApiHttpResponse<SyncPagingIterable<LeadListItem>> list(
             ListLeadsRequest request, RequestOptions requestOptions) {
-        HttpUrl.Builder httpUrl = HttpUrl.parse(this.clientOptions.environment().getUrl())
+        HttpUrl.Builder httpUrl = HttpUrl.parse(this.clientOptions.environment().getApiURL())
                 .newBuilder()
                 .addPathSegments("leads");
         if (request.getAfter().isPresent()) {
@@ -90,7 +95,6 @@ public class RawLeadsClient {
             QueryStringMapper.addQueryParameter(
                     httpUrl, "last", request.getLast().get(), false);
         }
-        QueryStringMapper.addQueryParameter(httpUrl, "company_id", request.getCompanyId(), false);
         if (request.getCreatedAfter().isPresent()) {
             QueryStringMapper.addQueryParameter(
                     httpUrl, "created_after", request.getCreatedAfter().get(), false);
@@ -99,6 +103,7 @@ public class RawLeadsClient {
             QueryStringMapper.addQueryParameter(
                     httpUrl, "created_before", request.getCreatedBefore().get(), false);
         }
+        QueryStringMapper.addQueryParameter(httpUrl, "account_id", request.getAccountId(), false);
         if (request.getProductIds().isPresent()) {
             QueryStringMapper.addQueryParameter(
                     httpUrl, "product_ids", request.getProductIds().get(), true);
@@ -118,6 +123,15 @@ public class RawLeadsClient {
         if (requestOptions != null && requestOptions.getTimeout().isPresent()) {
             client = clientOptions.httpClientWithTimeout(requestOptions);
         }
+        if (requestOptions != null && requestOptions.getMaxRetries().isPresent()) {
+            okhttpRequest = okhttpRequest
+                    .newBuilder()
+                    .tag(
+                            RetryInterceptor.MaxRetriesOverride.class,
+                            new RetryInterceptor.MaxRetriesOverride(
+                                    requestOptions.getMaxRetries().get()))
+                    .build();
+        }
         try (Response response = client.newCall(okhttpRequest).execute()) {
             ResponseBody responseBody = response.body();
             String responseBodyString = responseBody != null ? responseBody.string() : "{}";
@@ -132,8 +146,11 @@ public class RawLeadsClient {
                 List<LeadListItem> result = parsedResponse.getData();
                 return new WhopApiHttpResponse<>(
                         new SyncPagingIterable<LeadListItem>(
-                                startingAfter != null, result, parsedResponse, () -> list(nextRequest, requestOptions)
-                                        .body()),
+                                startingAfter.isPresent()
+                                        && !startingAfter.get().isEmpty(),
+                                result,
+                                parsedResponse,
+                                () -> list(nextRequest, requestOptions).body()),
                         response);
             }
             try {
@@ -152,13 +169,16 @@ public class RawLeadsClient {
                                 ObjectMappers.JSON_MAPPER.readValue(responseBodyString, Object.class), response);
                     case 422:
                         throw new UnprocessableEntityError(
-                                ObjectMappers.JSON_MAPPER.readValue(responseBodyString, Object.class), response);
+                                ObjectMappers.JSON_MAPPER.readValue(
+                                        responseBodyString, UnprocessableEntityErrorBody.class),
+                                response);
                     case 429:
                         throw new TooManyRequestsError(
                                 ObjectMappers.JSON_MAPPER.readValue(responseBodyString, Object.class), response);
                     case 500:
                         throw new InternalServerError(
-                                ObjectMappers.JSON_MAPPER.readValue(responseBodyString, Object.class), response);
+                                ObjectMappers.JSON_MAPPER.readValue(responseBodyString, InternalServerErrorBody.class),
+                                response);
                 }
             } catch (JsonProcessingException ignored) {
                 // unable to map error response, throwing generic error
@@ -166,13 +186,15 @@ public class RawLeadsClient {
             Object errorBody = ObjectMappers.parseErrorBody(responseBodyString);
             throw new WhopApiApiException(
                     "Error with status code " + response.code(), response.code(), errorBody, response);
+        } catch (JsonProcessingException e) {
+            throw new WhopApiException("Failed to deserialize response: " + e.getMessage(), e);
         } catch (IOException e) {
             throw new WhopApiException("Network error executing HTTP request", e);
         }
     }
 
     /**
-     * Record a new lead for a company, capturing a potential customer's interest in a specific product.
+     * Records a lead: a potential customer's interest in an account or one of its products.
      * <p>Required permissions:</p>
      * <ul>
      * <li><code>lead:manage</code></li>
@@ -186,7 +208,7 @@ public class RawLeadsClient {
     }
 
     /**
-     * Record a new lead for a company, capturing a potential customer's interest in a specific product.
+     * Records a lead: a potential customer's interest in an account or one of its products.
      * <p>Required permissions:</p>
      * <ul>
      * <li><code>lead:manage</code></li>
@@ -196,7 +218,7 @@ public class RawLeadsClient {
      * </ul>
      */
     public WhopApiHttpResponse<Lead> create(CreateLeadsRequest request, RequestOptions requestOptions) {
-        HttpUrl.Builder httpUrl = HttpUrl.parse(this.clientOptions.environment().getUrl())
+        HttpUrl.Builder httpUrl = HttpUrl.parse(this.clientOptions.environment().getApiURL())
                 .newBuilder()
                 .addPathSegments("leads");
         if (requestOptions != null) {
@@ -207,7 +229,9 @@ public class RawLeadsClient {
         RequestBody body;
         try {
             body = RequestBody.create(
-                    ObjectMappers.JSON_MAPPER.writeValueAsBytes(request), MediaTypes.APPLICATION_JSON);
+                    ObjectMappers.JSON_MAPPER.writeValueAsBytes(BodyProperties.merge(
+                            request, requestOptions != null ? requestOptions.getBodyProperties() : null)),
+                    MediaTypes.APPLICATION_JSON);
         } catch (JsonProcessingException e) {
             throw new WhopApiException("Failed to serialize request", e);
         }
@@ -221,6 +245,15 @@ public class RawLeadsClient {
         OkHttpClient client = clientOptions.httpClient();
         if (requestOptions != null && requestOptions.getTimeout().isPresent()) {
             client = clientOptions.httpClientWithTimeout(requestOptions);
+        }
+        if (requestOptions != null && requestOptions.getMaxRetries().isPresent()) {
+            okhttpRequest = okhttpRequest
+                    .newBuilder()
+                    .tag(
+                            RetryInterceptor.MaxRetriesOverride.class,
+                            new RetryInterceptor.MaxRetriesOverride(
+                                    requestOptions.getMaxRetries().get()))
+                    .build();
         }
         try (Response response = client.newCall(okhttpRequest).execute()) {
             ResponseBody responseBody = response.body();
@@ -245,13 +278,16 @@ public class RawLeadsClient {
                                 ObjectMappers.JSON_MAPPER.readValue(responseBodyString, Object.class), response);
                     case 422:
                         throw new UnprocessableEntityError(
-                                ObjectMappers.JSON_MAPPER.readValue(responseBodyString, Object.class), response);
+                                ObjectMappers.JSON_MAPPER.readValue(
+                                        responseBodyString, UnprocessableEntityErrorBody.class),
+                                response);
                     case 429:
                         throw new TooManyRequestsError(
                                 ObjectMappers.JSON_MAPPER.readValue(responseBodyString, Object.class), response);
                     case 500:
                         throw new InternalServerError(
-                                ObjectMappers.JSON_MAPPER.readValue(responseBodyString, Object.class), response);
+                                ObjectMappers.JSON_MAPPER.readValue(responseBodyString, InternalServerErrorBody.class),
+                                response);
                 }
             } catch (JsonProcessingException ignored) {
                 // unable to map error response, throwing generic error
@@ -259,6 +295,8 @@ public class RawLeadsClient {
             Object errorBody = ObjectMappers.parseErrorBody(responseBodyString);
             throw new WhopApiApiException(
                     "Error with status code " + response.code(), response.code(), errorBody, response);
+        } catch (JsonProcessingException e) {
+            throw new WhopApiException("Failed to deserialize response: " + e.getMessage(), e);
         } catch (IOException e) {
             throw new WhopApiException("Network error executing HTTP request", e);
         }
@@ -317,10 +355,10 @@ public class RawLeadsClient {
      * </ul>
      */
     public WhopApiHttpResponse<Lead> retrieve(String id, RetrieveLeadsRequest request, RequestOptions requestOptions) {
-        HttpUrl.Builder httpUrl = HttpUrl.parse(this.clientOptions.environment().getUrl())
+        HttpUrl.Builder httpUrl = HttpUrl.parse(this.clientOptions.environment().getApiURL())
                 .newBuilder()
                 .addPathSegments("leads")
-                .addPathSegment(id);
+                .addPathSegment(PathSegments.validate(id));
         if (requestOptions != null) {
             requestOptions.getQueryParameters().forEach((_key, _value) -> {
                 httpUrl.addQueryParameter(_key, _value);
@@ -336,6 +374,15 @@ public class RawLeadsClient {
         if (requestOptions != null && requestOptions.getTimeout().isPresent()) {
             client = clientOptions.httpClientWithTimeout(requestOptions);
         }
+        if (requestOptions != null && requestOptions.getMaxRetries().isPresent()) {
+            okhttpRequest = okhttpRequest
+                    .newBuilder()
+                    .tag(
+                            RetryInterceptor.MaxRetriesOverride.class,
+                            new RetryInterceptor.MaxRetriesOverride(
+                                    requestOptions.getMaxRetries().get()))
+                    .build();
+        }
         try (Response response = client.newCall(okhttpRequest).execute()) {
             ResponseBody responseBody = response.body();
             String responseBodyString = responseBody != null ? responseBody.string() : "{}";
@@ -359,13 +406,16 @@ public class RawLeadsClient {
                                 ObjectMappers.JSON_MAPPER.readValue(responseBodyString, Object.class), response);
                     case 422:
                         throw new UnprocessableEntityError(
-                                ObjectMappers.JSON_MAPPER.readValue(responseBodyString, Object.class), response);
+                                ObjectMappers.JSON_MAPPER.readValue(
+                                        responseBodyString, UnprocessableEntityErrorBody.class),
+                                response);
                     case 429:
                         throw new TooManyRequestsError(
                                 ObjectMappers.JSON_MAPPER.readValue(responseBodyString, Object.class), response);
                     case 500:
                         throw new InternalServerError(
-                                ObjectMappers.JSON_MAPPER.readValue(responseBodyString, Object.class), response);
+                                ObjectMappers.JSON_MAPPER.readValue(responseBodyString, InternalServerErrorBody.class),
+                                response);
                 }
             } catch (JsonProcessingException ignored) {
                 // unable to map error response, throwing generic error
@@ -373,13 +423,15 @@ public class RawLeadsClient {
             Object errorBody = ObjectMappers.parseErrorBody(responseBodyString);
             throw new WhopApiApiException(
                     "Error with status code " + response.code(), response.code(), errorBody, response);
+        } catch (JsonProcessingException e) {
+            throw new WhopApiException("Failed to deserialize response: " + e.getMessage(), e);
         } catch (IOException e) {
             throw new WhopApiException("Network error executing HTTP request", e);
         }
     }
 
     /**
-     * Update the metadata or referrer information on an existing lead record.
+     * Updates a lead's <code>metadata</code> or <code>referrer</code>.
      * <p>Required permissions:</p>
      * <ul>
      * <li><code>lead:manage</code></li>
@@ -393,7 +445,7 @@ public class RawLeadsClient {
     }
 
     /**
-     * Update the metadata or referrer information on an existing lead record.
+     * Updates a lead's <code>metadata</code> or <code>referrer</code>.
      * <p>Required permissions:</p>
      * <ul>
      * <li><code>lead:manage</code></li>
@@ -407,7 +459,7 @@ public class RawLeadsClient {
     }
 
     /**
-     * Update the metadata or referrer information on an existing lead record.
+     * Updates a lead's <code>metadata</code> or <code>referrer</code>.
      * <p>Required permissions:</p>
      * <ul>
      * <li><code>lead:manage</code></li>
@@ -421,7 +473,7 @@ public class RawLeadsClient {
     }
 
     /**
-     * Update the metadata or referrer information on an existing lead record.
+     * Updates a lead's <code>metadata</code> or <code>referrer</code>.
      * <p>Required permissions:</p>
      * <ul>
      * <li><code>lead:manage</code></li>
@@ -431,10 +483,10 @@ public class RawLeadsClient {
      * </ul>
      */
     public WhopApiHttpResponse<Lead> update(String id, UpdateLeadsRequest request, RequestOptions requestOptions) {
-        HttpUrl.Builder httpUrl = HttpUrl.parse(this.clientOptions.environment().getUrl())
+        HttpUrl.Builder httpUrl = HttpUrl.parse(this.clientOptions.environment().getApiURL())
                 .newBuilder()
                 .addPathSegments("leads")
-                .addPathSegment(id);
+                .addPathSegment(PathSegments.validate(id));
         if (requestOptions != null) {
             requestOptions.getQueryParameters().forEach((_key, _value) -> {
                 httpUrl.addQueryParameter(_key, _value);
@@ -443,7 +495,9 @@ public class RawLeadsClient {
         RequestBody body;
         try {
             body = RequestBody.create(
-                    ObjectMappers.JSON_MAPPER.writeValueAsBytes(request), MediaTypes.APPLICATION_JSON);
+                    ObjectMappers.JSON_MAPPER.writeValueAsBytes(BodyProperties.merge(
+                            request, requestOptions != null ? requestOptions.getBodyProperties() : null)),
+                    MediaTypes.APPLICATION_JSON);
         } catch (JsonProcessingException e) {
             throw new WhopApiException("Failed to serialize request", e);
         }
@@ -458,6 +512,15 @@ public class RawLeadsClient {
         if (requestOptions != null && requestOptions.getTimeout().isPresent()) {
             client = clientOptions.httpClientWithTimeout(requestOptions);
         }
+        if (requestOptions != null && requestOptions.getMaxRetries().isPresent()) {
+            okhttpRequest = okhttpRequest
+                    .newBuilder()
+                    .tag(
+                            RetryInterceptor.MaxRetriesOverride.class,
+                            new RetryInterceptor.MaxRetriesOverride(
+                                    requestOptions.getMaxRetries().get()))
+                    .build();
+        }
         try (Response response = client.newCall(okhttpRequest).execute()) {
             ResponseBody responseBody = response.body();
             String responseBodyString = responseBody != null ? responseBody.string() : "{}";
@@ -481,13 +544,16 @@ public class RawLeadsClient {
                                 ObjectMappers.JSON_MAPPER.readValue(responseBodyString, Object.class), response);
                     case 422:
                         throw new UnprocessableEntityError(
-                                ObjectMappers.JSON_MAPPER.readValue(responseBodyString, Object.class), response);
+                                ObjectMappers.JSON_MAPPER.readValue(
+                                        responseBodyString, UnprocessableEntityErrorBody.class),
+                                response);
                     case 429:
                         throw new TooManyRequestsError(
                                 ObjectMappers.JSON_MAPPER.readValue(responseBodyString, Object.class), response);
                     case 500:
                         throw new InternalServerError(
-                                ObjectMappers.JSON_MAPPER.readValue(responseBodyString, Object.class), response);
+                                ObjectMappers.JSON_MAPPER.readValue(responseBodyString, InternalServerErrorBody.class),
+                                response);
                 }
             } catch (JsonProcessingException ignored) {
                 // unable to map error response, throwing generic error
@@ -495,6 +561,8 @@ public class RawLeadsClient {
             Object errorBody = ObjectMappers.parseErrorBody(responseBodyString);
             throw new WhopApiApiException(
                     "Error with status code " + response.code(), response.code(), errorBody, response);
+        } catch (JsonProcessingException e) {
+            throw new WhopApiException("Failed to deserialize response: " + e.getMessage(), e);
         } catch (IOException e) {
             throw new WhopApiException("Network error executing HTTP request", e);
         }

@@ -345,7 +345,6 @@ public final class SetupIntentListItem {
 
         private Optional<SetupIntentListItemCheckoutConfiguration> checkoutConfiguration = Optional.empty();
 
-        @JsonAnySetter
         private Map<String, Object> additionalProperties = new HashMap<>();
 
         private Builder() {}
@@ -366,7 +365,6 @@ public final class SetupIntentListItem {
 
         /**
          * <p>The datetime the setup intent was created.</p>
-         * <p>The datetime the setup intent was created.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
@@ -378,7 +376,6 @@ public final class SetupIntentListItem {
 
         /**
          * <p>The unique identifier for the setup intent.</p>
-         * <p>The unique identifier for the setup intent.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
@@ -389,7 +386,6 @@ public final class SetupIntentListItem {
         }
 
         /**
-         * <p>The current status of the setup intent.</p>
          * <p>The current status of the setup intent.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
@@ -631,6 +627,22 @@ public final class SetupIntentListItem {
                     paymentMethod,
                     status,
                     additionalProperties);
+        }
+
+        @JsonAnySetter
+        private void putAdditionalPropertyFromJson(String key, Object value) {
+            if (key.equalsIgnoreCase("checkout_configuration")
+                    || key.equalsIgnoreCase("company")
+                    || key.equalsIgnoreCase("created_at")
+                    || key.equalsIgnoreCase("error_message")
+                    || key.equalsIgnoreCase("id")
+                    || key.equalsIgnoreCase("member")
+                    || key.equalsIgnoreCase("metadata")
+                    || key.equalsIgnoreCase("payment_method")
+                    || key.equalsIgnoreCase("status")) {
+                return;
+            }
+            this.additionalProperties.put(key, value);
         }
 
         @java.lang.Override

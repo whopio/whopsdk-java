@@ -5,11 +5,12 @@ package com.whop.api.resources.transfers;
 
 import com.whop.api.core.ClientOptions;
 import com.whop.api.core.RequestOptions;
+import com.whop.api.core.WhopApiHttpResponse;
 import com.whop.api.core.pagination.SyncPagingIterable;
-import com.whop.api.resources.transfers.requests.CreateTransfersRequest;
 import com.whop.api.resources.transfers.requests.ListRecipientsTransfersRequest;
 import com.whop.api.resources.transfers.requests.ListTransfersRequest;
 import com.whop.api.resources.transfers.requests.RetrieveTransfersRequest;
+import com.whop.api.resources.transfers.types.CreateTransfersRequestBody;
 import com.whop.api.resources.transfers.types.CreateTransfersResponse;
 import com.whop.api.resources.transfers.types.ListRecipientsTransfersResponseDataItem;
 import com.whop.api.resources.transfers.types.ListTransfersResponseDataItem;
@@ -34,84 +35,176 @@ public class AsyncTransfersClient {
     }
 
     /**
-     * Lists an account's transfers.
+     * Lists the transfers you can see, sent or received, newest first by default. Optional account filters narrow the results.
      */
     public CompletableFuture<SyncPagingIterable<ListTransfersResponseDataItem>> list() {
-        return this.rawClient.list().thenApply(response -> response.body());
+        CompletableFuture<WhopApiHttpResponse<SyncPagingIterable<ListTransfersResponseDataItem>>> rawFuture =
+                this.rawClient.list();
+        CompletableFuture<SyncPagingIterable<ListTransfersResponseDataItem>> future =
+                rawFuture.thenApply(response -> response.body());
+        future.whenComplete((result_, throwable_) -> {
+            if (future.isCancelled()) {
+                rawFuture.cancel(true);
+            }
+        });
+        return future;
     }
 
     /**
-     * Lists an account's transfers.
+     * Lists the transfers you can see, sent or received, newest first by default. Optional account filters narrow the results.
      */
     public CompletableFuture<SyncPagingIterable<ListTransfersResponseDataItem>> list(RequestOptions requestOptions) {
-        return this.rawClient.list(requestOptions).thenApply(response -> response.body());
+        CompletableFuture<WhopApiHttpResponse<SyncPagingIterable<ListTransfersResponseDataItem>>> rawFuture =
+                this.rawClient.list(requestOptions);
+        CompletableFuture<SyncPagingIterable<ListTransfersResponseDataItem>> future =
+                rawFuture.thenApply(response -> response.body());
+        future.whenComplete((result_, throwable_) -> {
+            if (future.isCancelled()) {
+                rawFuture.cancel(true);
+            }
+        });
+        return future;
     }
 
     /**
-     * Lists an account's transfers.
+     * Lists the transfers you can see, sent or received, newest first by default. Optional account filters narrow the results.
      */
     public CompletableFuture<SyncPagingIterable<ListTransfersResponseDataItem>> list(ListTransfersRequest request) {
-        return this.rawClient.list(request).thenApply(response -> response.body());
+        CompletableFuture<WhopApiHttpResponse<SyncPagingIterable<ListTransfersResponseDataItem>>> rawFuture =
+                this.rawClient.list(request);
+        CompletableFuture<SyncPagingIterable<ListTransfersResponseDataItem>> future =
+                rawFuture.thenApply(response -> response.body());
+        future.whenComplete((result_, throwable_) -> {
+            if (future.isCancelled()) {
+                rawFuture.cancel(true);
+            }
+        });
+        return future;
     }
 
     /**
-     * Lists an account's transfers.
+     * Lists the transfers you can see, sent or received, newest first by default. Optional account filters narrow the results.
      */
     public CompletableFuture<SyncPagingIterable<ListTransfersResponseDataItem>> list(
             ListTransfersRequest request, RequestOptions requestOptions) {
-        return this.rawClient.list(request, requestOptions).thenApply(response -> response.body());
+        CompletableFuture<WhopApiHttpResponse<SyncPagingIterable<ListTransfersResponseDataItem>>> rawFuture =
+                this.rawClient.list(request, requestOptions);
+        CompletableFuture<SyncPagingIterable<ListTransfersResponseDataItem>> future =
+                rawFuture.thenApply(response -> response.body());
+        future.whenComplete((result_, throwable_) -> {
+            if (future.isCancelled()) {
+                rawFuture.cancel(true);
+            }
+        });
+        return future;
     }
 
     /**
-     * Moves money between accounts, or into a claim link anyone with the URL can redeem.
+     * Moves money between Whop balances or funds a claim link anyone with the URL can redeem. The <code>type</code> you send decides which object comes back.
      */
-    public CompletableFuture<CreateTransfersResponse> create(CreateTransfersRequest request) {
-        return this.rawClient.create(request).thenApply(response -> response.body());
+    public CompletableFuture<CreateTransfersResponse> create(CreateTransfersRequestBody request) {
+        CompletableFuture<WhopApiHttpResponse<CreateTransfersResponse>> rawFuture = this.rawClient.create(request);
+        CompletableFuture<CreateTransfersResponse> future = rawFuture.thenApply(response -> response.body());
+        future.whenComplete((result_, throwable_) -> {
+            if (future.isCancelled()) {
+                rawFuture.cancel(true);
+            }
+        });
+        return future;
     }
 
     /**
-     * Moves money between accounts, or into a claim link anyone with the URL can redeem.
+     * Moves money between Whop balances or funds a claim link anyone with the URL can redeem. The <code>type</code> you send decides which object comes back.
      */
     public CompletableFuture<CreateTransfersResponse> create(
-            CreateTransfersRequest request, RequestOptions requestOptions) {
-        return this.rawClient.create(request, requestOptions).thenApply(response -> response.body());
+            CreateTransfersRequestBody request, RequestOptions requestOptions) {
+        CompletableFuture<WhopApiHttpResponse<CreateTransfersResponse>> rawFuture =
+                this.rawClient.create(request, requestOptions);
+        CompletableFuture<CreateTransfersResponse> future = rawFuture.thenApply(response -> response.body());
+        future.whenComplete((result_, throwable_) -> {
+            if (future.isCancelled()) {
+                rawFuture.cancel(true);
+            }
+        });
+        return future;
     }
 
     /**
-     * Lists the people and accounts you can send money to.
+     * Lists the people and accounts you can send money to from a balance. Pass a result's ID as <code>destination_id</code> when creating a transfer.
      */
     public CompletableFuture<SyncPagingIterable<ListRecipientsTransfersResponseDataItem>> listRecipients(
             ListRecipientsTransfersRequest request) {
-        return this.rawClient.listRecipients(request).thenApply(response -> response.body());
+        CompletableFuture<WhopApiHttpResponse<SyncPagingIterable<ListRecipientsTransfersResponseDataItem>>> rawFuture =
+                this.rawClient.listRecipients(request);
+        CompletableFuture<SyncPagingIterable<ListRecipientsTransfersResponseDataItem>> future =
+                rawFuture.thenApply(response -> response.body());
+        future.whenComplete((result_, throwable_) -> {
+            if (future.isCancelled()) {
+                rawFuture.cancel(true);
+            }
+        });
+        return future;
     }
 
     /**
-     * Lists the people and accounts you can send money to.
+     * Lists the people and accounts you can send money to from a balance. Pass a result's ID as <code>destination_id</code> when creating a transfer.
      */
     public CompletableFuture<SyncPagingIterable<ListRecipientsTransfersResponseDataItem>> listRecipients(
             ListRecipientsTransfersRequest request, RequestOptions requestOptions) {
-        return this.rawClient.listRecipients(request, requestOptions).thenApply(response -> response.body());
+        CompletableFuture<WhopApiHttpResponse<SyncPagingIterable<ListRecipientsTransfersResponseDataItem>>> rawFuture =
+                this.rawClient.listRecipients(request, requestOptions);
+        CompletableFuture<SyncPagingIterable<ListRecipientsTransfersResponseDataItem>> future =
+                rawFuture.thenApply(response -> response.body());
+        future.whenComplete((result_, throwable_) -> {
+            if (future.isCancelled()) {
+                rawFuture.cancel(true);
+            }
+        });
+        return future;
     }
 
     /**
      * Retrieves a single transfer.
      */
     public CompletableFuture<RetrieveTransfersResponse> retrieve(String id) {
-        return this.rawClient.retrieve(id).thenApply(response -> response.body());
+        CompletableFuture<WhopApiHttpResponse<RetrieveTransfersResponse>> rawFuture = this.rawClient.retrieve(id);
+        CompletableFuture<RetrieveTransfersResponse> future = rawFuture.thenApply(response -> response.body());
+        future.whenComplete((result_, throwable_) -> {
+            if (future.isCancelled()) {
+                rawFuture.cancel(true);
+            }
+        });
+        return future;
     }
 
     /**
      * Retrieves a single transfer.
      */
     public CompletableFuture<RetrieveTransfersResponse> retrieve(String id, RequestOptions requestOptions) {
-        return this.rawClient.retrieve(id, requestOptions).thenApply(response -> response.body());
+        CompletableFuture<WhopApiHttpResponse<RetrieveTransfersResponse>> rawFuture =
+                this.rawClient.retrieve(id, requestOptions);
+        CompletableFuture<RetrieveTransfersResponse> future = rawFuture.thenApply(response -> response.body());
+        future.whenComplete((result_, throwable_) -> {
+            if (future.isCancelled()) {
+                rawFuture.cancel(true);
+            }
+        });
+        return future;
     }
 
     /**
      * Retrieves a single transfer.
      */
     public CompletableFuture<RetrieveTransfersResponse> retrieve(String id, RetrieveTransfersRequest request) {
-        return this.rawClient.retrieve(id, request).thenApply(response -> response.body());
+        CompletableFuture<WhopApiHttpResponse<RetrieveTransfersResponse>> rawFuture =
+                this.rawClient.retrieve(id, request);
+        CompletableFuture<RetrieveTransfersResponse> future = rawFuture.thenApply(response -> response.body());
+        future.whenComplete((result_, throwable_) -> {
+            if (future.isCancelled()) {
+                rawFuture.cancel(true);
+            }
+        });
+        return future;
     }
 
     /**
@@ -119,6 +212,14 @@ public class AsyncTransfersClient {
      */
     public CompletableFuture<RetrieveTransfersResponse> retrieve(
             String id, RetrieveTransfersRequest request, RequestOptions requestOptions) {
-        return this.rawClient.retrieve(id, request, requestOptions).thenApply(response -> response.body());
+        CompletableFuture<WhopApiHttpResponse<RetrieveTransfersResponse>> rawFuture =
+                this.rawClient.retrieve(id, request, requestOptions);
+        CompletableFuture<RetrieveTransfersResponse> future = rawFuture.thenApply(response -> response.body());
+        future.whenComplete((result_, throwable_) -> {
+            if (future.isCancelled()) {
+                rawFuture.cancel(true);
+            }
+        });
+        return future;
     }
 }

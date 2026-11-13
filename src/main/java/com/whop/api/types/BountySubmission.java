@@ -861,7 +861,6 @@ public final class BountySubmission {
 
         private Optional<List<BountyCaptureClip>> captureClips = Optional.empty();
 
-        @JsonAnySetter
         private Map<String, Object> additionalProperties = new HashMap<>();
 
         private Builder() {}
@@ -899,7 +898,6 @@ public final class BountySubmission {
 
         /**
          * <p>The bounty the work was submitted to, prefixed <code>bnty_</code>.</p>
-         * <p>The bounty the work was submitted to, prefixed <code>bnty_</code>.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
@@ -910,7 +908,6 @@ public final class BountySubmission {
         }
 
         /**
-         * <p>Number of verified capture clips accepted for this submission so far. <code>0</code> for submissions whose deliverable doesn't accumulate clips.</p>
          * <p>Number of verified capture clips accepted for this submission so far. <code>0</code> for submissions whose deliverable doesn't accumulate clips.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
@@ -923,7 +920,6 @@ public final class BountySubmission {
 
         /**
          * <p>Total verified duration of accepted capture clips, in whole seconds. <code>0</code> for submissions whose deliverable doesn't accumulate clips.</p>
-         * <p>Total verified duration of accepted capture clips, in whole seconds. <code>0</code> for submissions whose deliverable doesn't accumulate clips.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
@@ -934,7 +930,6 @@ public final class BountySubmission {
         }
 
         /**
-         * <p>When the submission was created, as an ISO 8601 timestamp.</p>
          * <p>When the submission was created, as an ISO 8601 timestamp.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
@@ -947,7 +942,6 @@ public final class BountySubmission {
 
         /**
          * <p>Submission ID, prefixed <code>btys_</code>.</p>
-         * <p>Submission ID, prefixed <code>btys_</code>.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
@@ -959,7 +953,6 @@ public final class BountySubmission {
 
         /**
          * <p>When the submission was last updated, as an ISO 8601 timestamp.</p>
-         * <p>When the submission was last updated, as an ISO 8601 timestamp.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
@@ -970,7 +963,6 @@ public final class BountySubmission {
         }
 
         /**
-         * <p>User who submitted the work.</p>
          * <p>User who submitted the work.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
@@ -1663,6 +1655,39 @@ public final class BountySubmission {
                     updatedAt,
                     worker,
                     additionalProperties);
+        }
+
+        @JsonAnySetter
+        private void putAdditionalPropertyFromJson(String key, Object value) {
+            if (key.equalsIgnoreCase("bounty_id")
+                    || key.equalsIgnoreCase("capture_clips")
+                    || key.equalsIgnoreCase("capture_filename")
+                    || key.equalsIgnoreCase("captured_clip_count")
+                    || key.equalsIgnoreCase("captured_duration_seconds")
+                    || key.equalsIgnoreCase("city")
+                    || key.equalsIgnoreCase("claimed_at")
+                    || key.equalsIgnoreCase("content")
+                    || key.equalsIgnoreCase("country")
+                    || key.equalsIgnoreCase("created_at")
+                    || key.equalsIgnoreCase("deliverable_type")
+                    || key.equalsIgnoreCase("deliverable_urls")
+                    || key.equalsIgnoreCase("denial_reason")
+                    || key.equalsIgnoreCase("device")
+                    || key.equalsIgnoreCase("files")
+                    || key.equalsIgnoreCase("fov")
+                    || key.equalsIgnoreCase("id")
+                    || key.equalsIgnoreCase("latest_proof_livestream_feed")
+                    || key.equalsIgnoreCase("operator")
+                    || key.equalsIgnoreCase("resolved_at")
+                    || key.equalsIgnoreCase("site")
+                    || key.equalsIgnoreCase("station")
+                    || key.equalsIgnoreCase("status")
+                    || key.equalsIgnoreCase("submitted_at")
+                    || key.equalsIgnoreCase("updated_at")
+                    || key.equalsIgnoreCase("worker")) {
+                return;
+            }
+            this.additionalProperties.put(key, value);
         }
 
         @java.lang.Override

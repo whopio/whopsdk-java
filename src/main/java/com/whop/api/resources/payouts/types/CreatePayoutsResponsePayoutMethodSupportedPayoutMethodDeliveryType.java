@@ -7,12 +7,15 @@ import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonValue;
 
 public final class CreatePayoutsResponsePayoutMethodSupportedPayoutMethodDeliveryType {
-    public static final CreatePayoutsResponsePayoutMethodSupportedPayoutMethodDeliveryType PAPER_CHECK =
-            new CreatePayoutsResponsePayoutMethodSupportedPayoutMethodDeliveryType(Value.PAPER_CHECK, "paper_check");
-
     public static final CreatePayoutsResponsePayoutMethodSupportedPayoutMethodDeliveryType CRYPTOCURRENCY =
             new CreatePayoutsResponsePayoutMethodSupportedPayoutMethodDeliveryType(
                     Value.CRYPTOCURRENCY, "cryptocurrency");
+
+    public static final CreatePayoutsResponsePayoutMethodSupportedPayoutMethodDeliveryType CHECK =
+            new CreatePayoutsResponsePayoutMethodSupportedPayoutMethodDeliveryType(Value.CHECK, "check");
+
+    public static final CreatePayoutsResponsePayoutMethodSupportedPayoutMethodDeliveryType CARD =
+            new CreatePayoutsResponsePayoutMethodSupportedPayoutMethodDeliveryType(Value.CARD, "card");
 
     public static final CreatePayoutsResponsePayoutMethodSupportedPayoutMethodDeliveryType UNKNOWN =
             new CreatePayoutsResponsePayoutMethodSupportedPayoutMethodDeliveryType(Value.UNKNOWN, "unknown");
@@ -23,9 +26,6 @@ public final class CreatePayoutsResponsePayoutMethodSupportedPayoutMethodDeliver
 
     public static final CreatePayoutsResponsePayoutMethodSupportedPayoutMethodDeliveryType BANK_DEPOSIT =
             new CreatePayoutsResponsePayoutMethodSupportedPayoutMethodDeliveryType(Value.BANK_DEPOSIT, "bank_deposit");
-
-    public static final CreatePayoutsResponsePayoutMethodSupportedPayoutMethodDeliveryType MASSPAY_CARD =
-            new CreatePayoutsResponsePayoutMethodSupportedPayoutMethodDeliveryType(Value.MASSPAY_CARD, "masspay_card");
 
     public static final CreatePayoutsResponsePayoutMethodSupportedPayoutMethodDeliveryType MOBILE_WALLET =
             new CreatePayoutsResponsePayoutMethodSupportedPayoutMethodDeliveryType(
@@ -71,18 +71,18 @@ public final class CreatePayoutsResponsePayoutMethodSupportedPayoutMethodDeliver
 
     public <T> T visit(Visitor<T> visitor) {
         switch (value) {
-            case PAPER_CHECK:
-                return visitor.visitPaperCheck();
             case CRYPTOCURRENCY:
                 return visitor.visitCryptocurrency();
+            case CHECK:
+                return visitor.visitCheck();
+            case CARD:
+                return visitor.visitCard();
             case UNKNOWN:
                 return visitor.visitUnknown();
             case HOME_DELIVERY:
                 return visitor.visitHomeDelivery();
             case BANK_DEPOSIT:
                 return visitor.visitBankDeposit();
-            case MASSPAY_CARD:
-                return visitor.visitMasspayCard();
             case MOBILE_WALLET:
                 return visitor.visitMobileWallet();
             case CASH_PICKUP:
@@ -98,18 +98,18 @@ public final class CreatePayoutsResponsePayoutMethodSupportedPayoutMethodDeliver
     @JsonCreator(mode = JsonCreator.Mode.DELEGATING)
     public static CreatePayoutsResponsePayoutMethodSupportedPayoutMethodDeliveryType valueOf(String value) {
         switch (value) {
-            case "paper_check":
-                return PAPER_CHECK;
             case "cryptocurrency":
                 return CRYPTOCURRENCY;
+            case "check":
+                return CHECK;
+            case "card":
+                return CARD;
             case "unknown":
                 return UNKNOWN;
             case "home_delivery":
                 return HOME_DELIVERY;
             case "bank_deposit":
                 return BANK_DEPOSIT;
-            case "masspay_card":
-                return MASSPAY_CARD;
             case "mobile_wallet":
                 return MOBILE_WALLET;
             case "cash_pickup":
@@ -130,9 +130,9 @@ public final class CreatePayoutsResponsePayoutMethodSupportedPayoutMethodDeliver
 
         MOBILE_WALLET,
 
-        MASSPAY_CARD,
+        CARD,
 
-        PAPER_CHECK,
+        CHECK,
 
         BILL,
 
@@ -152,9 +152,9 @@ public final class CreatePayoutsResponsePayoutMethodSupportedPayoutMethodDeliver
 
         T visitMobileWallet();
 
-        T visitMasspayCard();
+        T visitCard();
 
-        T visitPaperCheck();
+        T visitCheck();
 
         T visitBill();
 

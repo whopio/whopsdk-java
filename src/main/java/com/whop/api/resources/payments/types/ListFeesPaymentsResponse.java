@@ -12,7 +12,7 @@ import com.fasterxml.jackson.annotation.JsonSetter;
 import com.fasterxml.jackson.annotation.Nulls;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.whop.api.core.ObjectMappers;
-import com.whop.api.types.PageInfo;
+import com.whop.api.types.PaymentFee;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -23,32 +23,28 @@ import org.jetbrains.annotations.NotNull;
 @JsonInclude(JsonInclude.Include.NON_ABSENT)
 @JsonDeserialize(builder = ListFeesPaymentsResponse.Builder.class)
 public final class ListFeesPaymentsResponse {
-    private final List<ListFeesPaymentsResponseDataItem> data;
+    private final List<PaymentFee> data;
 
-    private final PageInfo pageInfo;
+    private final ListFeesPaymentsResponsePageInfo pageInfo;
 
     private final Map<String, Object> additionalProperties;
 
     private ListFeesPaymentsResponse(
-            List<ListFeesPaymentsResponseDataItem> data, PageInfo pageInfo, Map<String, Object> additionalProperties) {
+            List<PaymentFee> data,
+            ListFeesPaymentsResponsePageInfo pageInfo,
+            Map<String, Object> additionalProperties) {
         this.data = data;
         this.pageInfo = pageInfo;
         this.additionalProperties = additionalProperties;
     }
 
-    /**
-     * @return A list of nodes.
-     */
     @JsonProperty("data")
-    public List<ListFeesPaymentsResponseDataItem> getData() {
+    public List<PaymentFee> getData() {
         return data;
     }
 
-    /**
-     * @return Information to aid in pagination.
-     */
     @JsonProperty("page_info")
-    public PageInfo getPageInfo() {
+    public ListFeesPaymentsResponsePageInfo getPageInfo() {
         return pageInfo;
     }
 
@@ -82,10 +78,7 @@ public final class ListFeesPaymentsResponse {
     }
 
     public interface PageInfoStage {
-        /**
-         * <p>Information to aid in pagination.</p>
-         */
-        _FinalStage pageInfo(@NotNull PageInfo pageInfo);
+        _FinalStage pageInfo(@NotNull ListFeesPaymentsResponsePageInfo pageInfo);
 
         Builder from(ListFeesPaymentsResponse other);
     }
@@ -97,23 +90,19 @@ public final class ListFeesPaymentsResponse {
 
         _FinalStage additionalProperties(Map<String, Object> additionalProperties);
 
-        /**
-         * <p>A list of nodes.</p>
-         */
-        _FinalStage data(List<ListFeesPaymentsResponseDataItem> data);
+        _FinalStage data(List<PaymentFee> data);
 
-        _FinalStage addData(ListFeesPaymentsResponseDataItem data);
+        _FinalStage addData(PaymentFee data);
 
-        _FinalStage addAllData(List<ListFeesPaymentsResponseDataItem> data);
+        _FinalStage addAllData(List<PaymentFee> data);
     }
 
     @JsonIgnoreProperties(ignoreUnknown = true)
     public static final class Builder implements PageInfoStage, _FinalStage {
-        private PageInfo pageInfo;
+        private ListFeesPaymentsResponsePageInfo pageInfo;
 
-        private List<ListFeesPaymentsResponseDataItem> data = new ArrayList<>();
+        private List<PaymentFee> data = new ArrayList<>();
 
-        @JsonAnySetter
         private Map<String, Object> additionalProperties = new HashMap<>();
 
         private Builder() {}
@@ -125,46 +114,30 @@ public final class ListFeesPaymentsResponse {
             return this;
         }
 
-        /**
-         * <p>Information to aid in pagination.</p>
-         * <p>Information to aid in pagination.</p>
-         * @return Reference to {@code this} so that method calls can be chained together.
-         */
         @java.lang.Override
         @JsonSetter("page_info")
-        public _FinalStage pageInfo(@NotNull PageInfo pageInfo) {
+        public _FinalStage pageInfo(@NotNull ListFeesPaymentsResponsePageInfo pageInfo) {
             this.pageInfo = Objects.requireNonNull(pageInfo, "pageInfo must not be null");
             return this;
         }
 
-        /**
-         * <p>A list of nodes.</p>
-         * @return Reference to {@code this} so that method calls can be chained together.
-         */
         @java.lang.Override
-        public _FinalStage addAllData(List<ListFeesPaymentsResponseDataItem> data) {
+        public _FinalStage addAllData(List<PaymentFee> data) {
             if (data != null) {
                 this.data.addAll(data);
             }
             return this;
         }
 
-        /**
-         * <p>A list of nodes.</p>
-         * @return Reference to {@code this} so that method calls can be chained together.
-         */
         @java.lang.Override
-        public _FinalStage addData(ListFeesPaymentsResponseDataItem data) {
+        public _FinalStage addData(PaymentFee data) {
             this.data.add(data);
             return this;
         }
 
-        /**
-         * <p>A list of nodes.</p>
-         */
         @java.lang.Override
         @JsonSetter(value = "data", nulls = Nulls.SKIP)
-        public _FinalStage data(List<ListFeesPaymentsResponseDataItem> data) {
+        public _FinalStage data(List<PaymentFee> data) {
             this.data.clear();
             if (data != null) {
                 this.data.addAll(data);
@@ -175,6 +148,14 @@ public final class ListFeesPaymentsResponse {
         @java.lang.Override
         public ListFeesPaymentsResponse build() {
             return new ListFeesPaymentsResponse(data, pageInfo, additionalProperties);
+        }
+
+        @JsonAnySetter
+        private void putAdditionalPropertyFromJson(String key, Object value) {
+            if (key.equalsIgnoreCase("data") || key.equalsIgnoreCase("page_info")) {
+                return;
+            }
+            this.additionalProperties.put(key, value);
         }
 
         @java.lang.Override

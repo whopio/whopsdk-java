@@ -15,7 +15,6 @@ import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.whop.api.core.Nullable;
 import com.whop.api.core.NullableNonemptyFilter;
 import com.whop.api.core.ObjectMappers;
-import java.time.OffsetDateTime;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
@@ -25,83 +24,139 @@ import org.jetbrains.annotations.NotNull;
 @JsonInclude(JsonInclude.Include.NON_ABSENT)
 @JsonDeserialize(builder = Refund.Builder.class)
 public final class Refund {
-    private final double amount;
+    private final Optional<String> accountId;
 
-    private final OffsetDateTime createdAt;
+    private final Optional<Money> amount;
 
-    private final Currencies currency;
+    private final String createdAt;
+
+    private final Optional<String> failureMessage;
+
+    private final Optional<RefundFailureReason> failureReason;
 
     private final String id;
 
-    private final Optional<RefundPayment> payment;
+    private final Optional<Map<String, Object>> metadata;
 
-    private final PaymentProviders provider;
+    private final Money originalAmount;
 
-    private final Optional<OffsetDateTime> providerCreatedAt;
+    private final String paymentId;
 
-    private final Optional<RefundReferenceStatuses> referenceStatus;
+    private final String provider;
 
-    private final Optional<RefundReferenceTypes> referenceType;
+    private final Optional<String> providerCreatedAt;
+
+    private final Optional<RefundReason> reason;
+
+    private final Optional<RefundReferenceStatus> referenceStatus;
+
+    private final Optional<RefundReferenceType> referenceType;
 
     private final Optional<String> referenceValue;
 
-    private final RefundStatuses status;
+    private final RefundStatus status;
+
+    private final String updatedAt;
+
+    private final boolean visaRdr;
 
     private final Map<String, Object> additionalProperties;
 
     private Refund(
-            double amount,
-            OffsetDateTime createdAt,
-            Currencies currency,
+            Optional<String> accountId,
+            Optional<Money> amount,
+            String createdAt,
+            Optional<String> failureMessage,
+            Optional<RefundFailureReason> failureReason,
             String id,
-            Optional<RefundPayment> payment,
-            PaymentProviders provider,
-            Optional<OffsetDateTime> providerCreatedAt,
-            Optional<RefundReferenceStatuses> referenceStatus,
-            Optional<RefundReferenceTypes> referenceType,
+            Optional<Map<String, Object>> metadata,
+            Money originalAmount,
+            String paymentId,
+            String provider,
+            Optional<String> providerCreatedAt,
+            Optional<RefundReason> reason,
+            Optional<RefundReferenceStatus> referenceStatus,
+            Optional<RefundReferenceType> referenceType,
             Optional<String> referenceValue,
-            RefundStatuses status,
+            RefundStatus status,
+            String updatedAt,
+            boolean visaRdr,
             Map<String, Object> additionalProperties) {
+        this.accountId = accountId;
         this.amount = amount;
         this.createdAt = createdAt;
-        this.currency = currency;
+        this.failureMessage = failureMessage;
+        this.failureReason = failureReason;
         this.id = id;
-        this.payment = payment;
+        this.metadata = metadata;
+        this.originalAmount = originalAmount;
+        this.paymentId = paymentId;
         this.provider = provider;
         this.providerCreatedAt = providerCreatedAt;
+        this.reason = reason;
         this.referenceStatus = referenceStatus;
         this.referenceType = referenceType;
         this.referenceValue = referenceValue;
         this.status = status;
+        this.updatedAt = updatedAt;
+        this.visaRdr = visaRdr;
         this.additionalProperties = additionalProperties;
     }
 
     /**
-     * @return The refunded amount as a decimal in the specified currency, such as 10.43 for $10.43 USD.
+     * @return The account that issued the refund, prefixed <code>biz_</code>.
      */
-    @JsonProperty("amount")
-    public double getAmount() {
+    @JsonIgnore
+    public Optional<String> getAccountId() {
+        if (accountId == null) {
+            return Optional.empty();
+        }
+        return accountId;
+    }
+
+    /**
+     * @return The refunded amount as it settled, in the payment's settlement currency, so pages of refunds net against the payment's <code>refunded_amount</code>. Converted at the rate in force when the refund was issued, not the payment's original rate. Null only when no exchange rate is recorded for a legacy multi-currency payment.
+     */
+    @JsonIgnore
+    public Optional<Money> getAmount() {
+        if (amount == null) {
+            return Optional.empty();
+        }
         return amount;
     }
 
     /**
-     * @return The datetime the refund was created.
+     * @return When the refund was requested, as an ISO 8601 timestamp.
      */
     @JsonProperty("created_at")
-    public OffsetDateTime getCreatedAt() {
+    public String getCreatedAt() {
         return createdAt;
     }
 
     /**
-     * @return The three-letter ISO currency code for the refunded amount.
+     * @return A merchant-facing explanation of why the refund failed, in the request's language. Null unless the refund failed or was canceled.
      */
-    @JsonProperty("currency")
-    public Currencies getCurrency() {
-        return currency;
+    @JsonIgnore
+    public Optional<String> getFailureMessage() {
+        if (failureMessage == null) {
+            return Optional.empty();
+        }
+        return failureMessage;
     }
 
     /**
-     * @return The unique identifier for the refund.
+     * @return Why the refund failed, normalized across providers. Null unless the refund failed or was canceled.
+     */
+    @JsonIgnore
+    public Optional<RefundFailureReason> getFailureReason() {
+        if (failureReason == null) {
+            return Optional.empty();
+        }
+        return failureReason;
+    }
+
+    /**
+     * @return Refund ID, prefixed <code>rf_</code>.
      */
     @JsonProperty("id")
     public String getId() {
@@ -109,29 +164,45 @@ public final class Refund {
     }
 
     /**
-     * @return The original payment that this refund was issued against. Null if the payment is no longer available.
+     * @return Your own key-value data attached when the refund was requested.
      */
     @JsonIgnore
-    public Optional<RefundPayment> getPayment() {
-        if (payment == null) {
+    public Optional<Map<String, Object>> getMetadata() {
+        if (metadata == null) {
             return Optional.empty();
         }
-        return payment;
+        return metadata;
     }
 
     /**
-     * @return The payment provider that processed the refund.
+     * @return The refunded amount in the currency the processor moved.
+     */
+    @JsonProperty("original_amount")
+    public Money getOriginalAmount() {
+        return originalAmount;
+    }
+
+    /**
+     * @return The payment this refund reverses, prefixed <code>pay_</code>.
+     */
+    @JsonProperty("payment_id")
+    public String getPaymentId() {
+        return paymentId;
+    }
+
+    /**
+     * @return The payment provider that processed the refund, such as <code>paypal</code> or <code>coinbase</code>.
      */
     @JsonProperty("provider")
-    public PaymentProviders getProvider() {
+    public String getProvider() {
         return provider;
     }
 
     /**
-     * @return The timestamp when the refund was created in the payment provider's system. Null if not available from the provider.
+     * @return When the provider created the refund, as an ISO 8601 timestamp.
      */
     @JsonIgnore
-    public Optional<OffsetDateTime> getProviderCreatedAt() {
+    public Optional<String> getProviderCreatedAt() {
         if (providerCreatedAt == null) {
             return Optional.empty();
         }
@@ -139,10 +210,21 @@ public final class Refund {
     }
 
     /**
-     * @return The availability status of the refund tracking reference from the payment processor. Null if no reference was provided.
+     * @return Why the refund was issued, when recorded.
      */
     @JsonIgnore
-    public Optional<RefundReferenceStatuses> getReferenceStatus() {
+    public Optional<RefundReason> getReason() {
+        if (reason == null) {
+            return Optional.empty();
+        }
+        return reason;
+    }
+
+    /**
+     * @return Whether a banking-network tracking reference is available for this refund.
+     */
+    @JsonIgnore
+    public Optional<RefundReferenceStatus> getReferenceStatus() {
         if (referenceStatus == null) {
             return Optional.empty();
         }
@@ -150,10 +232,10 @@ public final class Refund {
     }
 
     /**
-     * @return The type of tracking reference provided by the payment processor, such as an acquirer reference number. Null if no reference was provided.
+     * @return The kind of tracking reference, such as an acquirer reference number.
      */
     @JsonIgnore
-    public Optional<RefundReferenceTypes> getReferenceType() {
+    public Optional<RefundReferenceType> getReferenceType() {
         if (referenceType == null) {
             return Optional.empty();
         }
@@ -161,7 +243,7 @@ public final class Refund {
     }
 
     /**
-     * @return The tracking reference value from the payment processor, used to trace the refund through banking networks. Null if no reference was provided.
+     * @return The tracking reference the buyer's bank can trace the refund by.
      */
     @JsonIgnore
     public Optional<String> getReferenceValue() {
@@ -172,34 +254,80 @@ public final class Refund {
     }
 
     /**
-     * @return The current processing status of the refund, such as pending, succeeded, or failed.
+     * @return Where the refund stands with the processor: <code>pending</code>, <code>requires_action</code>, <code>succeeded</code>, <code>failed</code>, or <code>canceled</code>.
      */
     @JsonProperty("status")
-    public RefundStatuses getStatus() {
+    public RefundStatus getStatus() {
         return status;
     }
 
+    /**
+     * @return When the refund last changed, as an ISO 8601 timestamp.
+     */
+    @JsonProperty("updated_at")
+    public String getUpdatedAt() {
+        return updatedAt;
+    }
+
+    /**
+     * @return True when the card network initiated the refund through Rapid Dispute Resolution.
+     */
+    @JsonProperty("visa_rdr")
+    public boolean getVisaRdr() {
+        return visaRdr;
+    }
+
     @JsonInclude(value = JsonInclude.Include.CUSTOM, valueFilter = NullableNonemptyFilter.class)
-    @JsonProperty("payment")
-    private Optional<RefundPayment> _getPayment() {
-        return payment;
+    @JsonProperty("account_id")
+    private Optional<String> _getAccountId() {
+        return accountId;
+    }
+
+    @JsonInclude(value = JsonInclude.Include.CUSTOM, valueFilter = NullableNonemptyFilter.class)
+    @JsonProperty("amount")
+    private Optional<Money> _getAmount() {
+        return amount;
+    }
+
+    @JsonInclude(value = JsonInclude.Include.CUSTOM, valueFilter = NullableNonemptyFilter.class)
+    @JsonProperty("failure_message")
+    private Optional<String> _getFailureMessage() {
+        return failureMessage;
+    }
+
+    @JsonInclude(value = JsonInclude.Include.CUSTOM, valueFilter = NullableNonemptyFilter.class)
+    @JsonProperty("failure_reason")
+    private Optional<RefundFailureReason> _getFailureReason() {
+        return failureReason;
+    }
+
+    @JsonInclude(value = JsonInclude.Include.CUSTOM, valueFilter = NullableNonemptyFilter.class)
+    @JsonProperty("metadata")
+    private Optional<Map<String, Object>> _getMetadata() {
+        return metadata;
     }
 
     @JsonInclude(value = JsonInclude.Include.CUSTOM, valueFilter = NullableNonemptyFilter.class)
     @JsonProperty("provider_created_at")
-    private Optional<OffsetDateTime> _getProviderCreatedAt() {
+    private Optional<String> _getProviderCreatedAt() {
         return providerCreatedAt;
     }
 
     @JsonInclude(value = JsonInclude.Include.CUSTOM, valueFilter = NullableNonemptyFilter.class)
+    @JsonProperty("reason")
+    private Optional<RefundReason> _getReason() {
+        return reason;
+    }
+
+    @JsonInclude(value = JsonInclude.Include.CUSTOM, valueFilter = NullableNonemptyFilter.class)
     @JsonProperty("reference_status")
-    private Optional<RefundReferenceStatuses> _getReferenceStatus() {
+    private Optional<RefundReferenceStatus> _getReferenceStatus() {
         return referenceStatus;
     }
 
     @JsonInclude(value = JsonInclude.Include.CUSTOM, valueFilter = NullableNonemptyFilter.class)
     @JsonProperty("reference_type")
-    private Optional<RefundReferenceTypes> _getReferenceType() {
+    private Optional<RefundReferenceType> _getReferenceType() {
         return referenceType;
     }
 
@@ -221,33 +349,47 @@ public final class Refund {
     }
 
     private boolean equalTo(Refund other) {
-        return amount == other.amount
+        return accountId.equals(other.accountId)
+                && amount.equals(other.amount)
                 && createdAt.equals(other.createdAt)
-                && currency.equals(other.currency)
+                && failureMessage.equals(other.failureMessage)
+                && failureReason.equals(other.failureReason)
                 && id.equals(other.id)
-                && payment.equals(other.payment)
+                && metadata.equals(other.metadata)
+                && originalAmount.equals(other.originalAmount)
+                && paymentId.equals(other.paymentId)
                 && provider.equals(other.provider)
                 && providerCreatedAt.equals(other.providerCreatedAt)
+                && reason.equals(other.reason)
                 && referenceStatus.equals(other.referenceStatus)
                 && referenceType.equals(other.referenceType)
                 && referenceValue.equals(other.referenceValue)
-                && status.equals(other.status);
+                && status.equals(other.status)
+                && updatedAt.equals(other.updatedAt)
+                && visaRdr == other.visaRdr;
     }
 
     @java.lang.Override
     public int hashCode() {
         return Objects.hash(
+                this.accountId,
                 this.amount,
                 this.createdAt,
-                this.currency,
+                this.failureMessage,
+                this.failureReason,
                 this.id,
-                this.payment,
+                this.metadata,
+                this.originalAmount,
+                this.paymentId,
                 this.provider,
                 this.providerCreatedAt,
+                this.reason,
                 this.referenceStatus,
                 this.referenceType,
                 this.referenceValue,
-                this.status);
+                this.status,
+                this.updatedAt,
+                this.visaRdr);
     }
 
     @java.lang.Override
@@ -255,52 +397,66 @@ public final class Refund {
         return ObjectMappers.stringify(this);
     }
 
-    public static AmountStage builder() {
+    public static CreatedAtStage builder() {
         return new Builder();
-    }
-
-    public interface AmountStage {
-        /**
-         * <p>The refunded amount as a decimal in the specified currency, such as 10.43 for $10.43 USD.</p>
-         */
-        CreatedAtStage amount(double amount);
-
-        Builder from(Refund other);
     }
 
     public interface CreatedAtStage {
         /**
-         * <p>The datetime the refund was created.</p>
+         * <p>When the refund was requested, as an ISO 8601 timestamp.</p>
          */
-        CurrencyStage createdAt(@NotNull OffsetDateTime createdAt);
-    }
+        IdStage createdAt(@NotNull String createdAt);
 
-    public interface CurrencyStage {
-        /**
-         * <p>The three-letter ISO currency code for the refunded amount.</p>
-         */
-        IdStage currency(@NotNull Currencies currency);
+        Builder from(Refund other);
     }
 
     public interface IdStage {
         /**
-         * <p>The unique identifier for the refund.</p>
+         * <p>Refund ID, prefixed <code>rf_</code>.</p>
          */
-        ProviderStage id(@NotNull String id);
+        OriginalAmountStage id(@NotNull String id);
+    }
+
+    public interface OriginalAmountStage {
+        /**
+         * <p>The refunded amount in the currency the processor moved.</p>
+         */
+        PaymentIdStage originalAmount(@NotNull Money originalAmount);
+    }
+
+    public interface PaymentIdStage {
+        /**
+         * <p>The payment this refund reverses, prefixed <code>pay_</code>.</p>
+         */
+        ProviderStage paymentId(@NotNull String paymentId);
     }
 
     public interface ProviderStage {
         /**
-         * <p>The payment provider that processed the refund.</p>
+         * <p>The payment provider that processed the refund, such as <code>paypal</code> or <code>coinbase</code>.</p>
          */
-        StatusStage provider(@NotNull PaymentProviders provider);
+        StatusStage provider(@NotNull String provider);
     }
 
     public interface StatusStage {
         /**
-         * <p>The current processing status of the refund, such as pending, succeeded, or failed.</p>
+         * <p>Where the refund stands with the processor: <code>pending</code>, <code>requires_action</code>, <code>succeeded</code>, <code>failed</code>, or <code>canceled</code>.</p>
          */
-        _FinalStage status(@NotNull RefundStatuses status);
+        UpdatedAtStage status(@NotNull RefundStatus status);
+    }
+
+    public interface UpdatedAtStage {
+        /**
+         * <p>When the refund last changed, as an ISO 8601 timestamp.</p>
+         */
+        VisaRdrStage updatedAt(@NotNull String updatedAt);
+    }
+
+    public interface VisaRdrStage {
+        /**
+         * <p>True when the card network initiated the refund through Rapid Dispute Resolution.</p>
+         */
+        _FinalStage visaRdr(boolean visaRdr);
     }
 
     public interface _FinalStage {
@@ -311,43 +467,88 @@ public final class Refund {
         _FinalStage additionalProperties(Map<String, Object> additionalProperties);
 
         /**
-         * <p>The original payment that this refund was issued against. Null if the payment is no longer available.</p>
+         * <p>The account that issued the refund, prefixed <code>biz_</code>.</p>
          */
-        _FinalStage payment(Optional<RefundPayment> payment);
+        _FinalStage accountId(Optional<String> accountId);
 
-        _FinalStage payment(RefundPayment payment);
+        _FinalStage accountId(String accountId);
 
-        _FinalStage payment(Nullable<RefundPayment> payment);
+        _FinalStage accountId(Nullable<String> accountId);
 
         /**
-         * <p>The timestamp when the refund was created in the payment provider's system. Null if not available from the provider.</p>
+         * <p>The refunded amount as it settled, in the payment's settlement currency, so pages of refunds net against the payment's <code>refunded_amount</code>. Converted at the rate in force when the refund was issued, not the payment's original rate. Null only when no exchange rate is recorded for a legacy multi-currency payment.</p>
          */
-        _FinalStage providerCreatedAt(Optional<OffsetDateTime> providerCreatedAt);
+        _FinalStage amount(Optional<Money> amount);
 
-        _FinalStage providerCreatedAt(OffsetDateTime providerCreatedAt);
+        _FinalStage amount(Money amount);
 
-        _FinalStage providerCreatedAt(Nullable<OffsetDateTime> providerCreatedAt);
+        _FinalStage amount(Nullable<Money> amount);
 
         /**
-         * <p>The availability status of the refund tracking reference from the payment processor. Null if no reference was provided.</p>
+         * <p>A merchant-facing explanation of why the refund failed, in the request's language. Null unless the refund failed or was canceled.</p>
          */
-        _FinalStage referenceStatus(Optional<RefundReferenceStatuses> referenceStatus);
+        _FinalStage failureMessage(Optional<String> failureMessage);
 
-        _FinalStage referenceStatus(RefundReferenceStatuses referenceStatus);
+        _FinalStage failureMessage(String failureMessage);
 
-        _FinalStage referenceStatus(Nullable<RefundReferenceStatuses> referenceStatus);
+        _FinalStage failureMessage(Nullable<String> failureMessage);
 
         /**
-         * <p>The type of tracking reference provided by the payment processor, such as an acquirer reference number. Null if no reference was provided.</p>
+         * <p>Why the refund failed, normalized across providers. Null unless the refund failed or was canceled.</p>
          */
-        _FinalStage referenceType(Optional<RefundReferenceTypes> referenceType);
+        _FinalStage failureReason(Optional<RefundFailureReason> failureReason);
 
-        _FinalStage referenceType(RefundReferenceTypes referenceType);
+        _FinalStage failureReason(RefundFailureReason failureReason);
 
-        _FinalStage referenceType(Nullable<RefundReferenceTypes> referenceType);
+        _FinalStage failureReason(Nullable<RefundFailureReason> failureReason);
 
         /**
-         * <p>The tracking reference value from the payment processor, used to trace the refund through banking networks. Null if no reference was provided.</p>
+         * <p>Your own key-value data attached when the refund was requested.</p>
+         */
+        _FinalStage metadata(Optional<Map<String, Object>> metadata);
+
+        _FinalStage metadata(Map<String, Object> metadata);
+
+        _FinalStage metadata(Nullable<Map<String, Object>> metadata);
+
+        /**
+         * <p>When the provider created the refund, as an ISO 8601 timestamp.</p>
+         */
+        _FinalStage providerCreatedAt(Optional<String> providerCreatedAt);
+
+        _FinalStage providerCreatedAt(String providerCreatedAt);
+
+        _FinalStage providerCreatedAt(Nullable<String> providerCreatedAt);
+
+        /**
+         * <p>Why the refund was issued, when recorded.</p>
+         */
+        _FinalStage reason(Optional<RefundReason> reason);
+
+        _FinalStage reason(RefundReason reason);
+
+        _FinalStage reason(Nullable<RefundReason> reason);
+
+        /**
+         * <p>Whether a banking-network tracking reference is available for this refund.</p>
+         */
+        _FinalStage referenceStatus(Optional<RefundReferenceStatus> referenceStatus);
+
+        _FinalStage referenceStatus(RefundReferenceStatus referenceStatus);
+
+        _FinalStage referenceStatus(Nullable<RefundReferenceStatus> referenceStatus);
+
+        /**
+         * <p>The kind of tracking reference, such as an acquirer reference number.</p>
+         */
+        _FinalStage referenceType(Optional<RefundReferenceType> referenceType);
+
+        _FinalStage referenceType(RefundReferenceType referenceType);
+
+        _FinalStage referenceType(Nullable<RefundReferenceType> referenceType);
+
+        /**
+         * <p>The tracking reference the buyer's bank can trace the refund by.</p>
          */
         _FinalStage referenceValue(Optional<String> referenceValue);
 
@@ -358,124 +559,168 @@ public final class Refund {
 
     @JsonIgnoreProperties(ignoreUnknown = true)
     public static final class Builder
-            implements AmountStage, CreatedAtStage, CurrencyStage, IdStage, ProviderStage, StatusStage, _FinalStage {
-        private double amount;
-
-        private OffsetDateTime createdAt;
-
-        private Currencies currency;
+            implements CreatedAtStage,
+                    IdStage,
+                    OriginalAmountStage,
+                    PaymentIdStage,
+                    ProviderStage,
+                    StatusStage,
+                    UpdatedAtStage,
+                    VisaRdrStage,
+                    _FinalStage {
+        private String createdAt;
 
         private String id;
 
-        private PaymentProviders provider;
+        private Money originalAmount;
 
-        private RefundStatuses status;
+        private String paymentId;
+
+        private String provider;
+
+        private RefundStatus status;
+
+        private String updatedAt;
+
+        private boolean visaRdr;
 
         private Optional<String> referenceValue = Optional.empty();
 
-        private Optional<RefundReferenceTypes> referenceType = Optional.empty();
+        private Optional<RefundReferenceType> referenceType = Optional.empty();
 
-        private Optional<RefundReferenceStatuses> referenceStatus = Optional.empty();
+        private Optional<RefundReferenceStatus> referenceStatus = Optional.empty();
 
-        private Optional<OffsetDateTime> providerCreatedAt = Optional.empty();
+        private Optional<RefundReason> reason = Optional.empty();
 
-        private Optional<RefundPayment> payment = Optional.empty();
+        private Optional<String> providerCreatedAt = Optional.empty();
 
-        @JsonAnySetter
+        private Optional<Map<String, Object>> metadata = Optional.empty();
+
+        private Optional<RefundFailureReason> failureReason = Optional.empty();
+
+        private Optional<String> failureMessage = Optional.empty();
+
+        private Optional<Money> amount = Optional.empty();
+
+        private Optional<String> accountId = Optional.empty();
+
         private Map<String, Object> additionalProperties = new HashMap<>();
 
         private Builder() {}
 
         @java.lang.Override
         public Builder from(Refund other) {
+            accountId(other.getAccountId());
             amount(other.getAmount());
             createdAt(other.getCreatedAt());
-            currency(other.getCurrency());
+            failureMessage(other.getFailureMessage());
+            failureReason(other.getFailureReason());
             id(other.getId());
-            payment(other.getPayment());
+            metadata(other.getMetadata());
+            originalAmount(other.getOriginalAmount());
+            paymentId(other.getPaymentId());
             provider(other.getProvider());
             providerCreatedAt(other.getProviderCreatedAt());
+            reason(other.getReason());
             referenceStatus(other.getReferenceStatus());
             referenceType(other.getReferenceType());
             referenceValue(other.getReferenceValue());
             status(other.getStatus());
+            updatedAt(other.getUpdatedAt());
+            visaRdr(other.getVisaRdr());
             return this;
         }
 
         /**
-         * <p>The refunded amount as a decimal in the specified currency, such as 10.43 for $10.43 USD.</p>
-         * <p>The refunded amount as a decimal in the specified currency, such as 10.43 for $10.43 USD.</p>
-         * @return Reference to {@code this} so that method calls can be chained together.
-         */
-        @java.lang.Override
-        @JsonSetter("amount")
-        public CreatedAtStage amount(double amount) {
-            this.amount = amount;
-            return this;
-        }
-
-        /**
-         * <p>The datetime the refund was created.</p>
-         * <p>The datetime the refund was created.</p>
+         * <p>When the refund was requested, as an ISO 8601 timestamp.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
         @JsonSetter("created_at")
-        public CurrencyStage createdAt(@NotNull OffsetDateTime createdAt) {
+        public IdStage createdAt(@NotNull String createdAt) {
             this.createdAt = Objects.requireNonNull(createdAt, "createdAt must not be null");
             return this;
         }
 
         /**
-         * <p>The three-letter ISO currency code for the refunded amount.</p>
-         * <p>The three-letter ISO currency code for the refunded amount.</p>
-         * @return Reference to {@code this} so that method calls can be chained together.
-         */
-        @java.lang.Override
-        @JsonSetter("currency")
-        public IdStage currency(@NotNull Currencies currency) {
-            this.currency = Objects.requireNonNull(currency, "currency must not be null");
-            return this;
-        }
-
-        /**
-         * <p>The unique identifier for the refund.</p>
-         * <p>The unique identifier for the refund.</p>
+         * <p>Refund ID, prefixed <code>rf_</code>.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
         @JsonSetter("id")
-        public ProviderStage id(@NotNull String id) {
+        public OriginalAmountStage id(@NotNull String id) {
             this.id = Objects.requireNonNull(id, "id must not be null");
             return this;
         }
 
         /**
-         * <p>The payment provider that processed the refund.</p>
-         * <p>The payment provider that processed the refund.</p>
+         * <p>The refunded amount in the currency the processor moved.</p>
+         * @return Reference to {@code this} so that method calls can be chained together.
+         */
+        @java.lang.Override
+        @JsonSetter("original_amount")
+        public PaymentIdStage originalAmount(@NotNull Money originalAmount) {
+            this.originalAmount = Objects.requireNonNull(originalAmount, "originalAmount must not be null");
+            return this;
+        }
+
+        /**
+         * <p>The payment this refund reverses, prefixed <code>pay_</code>.</p>
+         * @return Reference to {@code this} so that method calls can be chained together.
+         */
+        @java.lang.Override
+        @JsonSetter("payment_id")
+        public ProviderStage paymentId(@NotNull String paymentId) {
+            this.paymentId = Objects.requireNonNull(paymentId, "paymentId must not be null");
+            return this;
+        }
+
+        /**
+         * <p>The payment provider that processed the refund, such as <code>paypal</code> or <code>coinbase</code>.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
         @JsonSetter("provider")
-        public StatusStage provider(@NotNull PaymentProviders provider) {
+        public StatusStage provider(@NotNull String provider) {
             this.provider = Objects.requireNonNull(provider, "provider must not be null");
             return this;
         }
 
         /**
-         * <p>The current processing status of the refund, such as pending, succeeded, or failed.</p>
-         * <p>The current processing status of the refund, such as pending, succeeded, or failed.</p>
+         * <p>Where the refund stands with the processor: <code>pending</code>, <code>requires_action</code>, <code>succeeded</code>, <code>failed</code>, or <code>canceled</code>.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
         @JsonSetter("status")
-        public _FinalStage status(@NotNull RefundStatuses status) {
+        public UpdatedAtStage status(@NotNull RefundStatus status) {
             this.status = Objects.requireNonNull(status, "status must not be null");
             return this;
         }
 
         /**
-         * <p>The tracking reference value from the payment processor, used to trace the refund through banking networks. Null if no reference was provided.</p>
+         * <p>When the refund last changed, as an ISO 8601 timestamp.</p>
+         * @return Reference to {@code this} so that method calls can be chained together.
+         */
+        @java.lang.Override
+        @JsonSetter("updated_at")
+        public VisaRdrStage updatedAt(@NotNull String updatedAt) {
+            this.updatedAt = Objects.requireNonNull(updatedAt, "updatedAt must not be null");
+            return this;
+        }
+
+        /**
+         * <p>True when the card network initiated the refund through Rapid Dispute Resolution.</p>
+         * @return Reference to {@code this} so that method calls can be chained together.
+         */
+        @java.lang.Override
+        @JsonSetter("visa_rdr")
+        public _FinalStage visaRdr(boolean visaRdr) {
+            this.visaRdr = visaRdr;
+            return this;
+        }
+
+        /**
+         * <p>The tracking reference the buyer's bank can trace the refund by.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
@@ -491,7 +736,7 @@ public final class Refund {
         }
 
         /**
-         * <p>The tracking reference value from the payment processor, used to trace the refund through banking networks. Null if no reference was provided.</p>
+         * <p>The tracking reference the buyer's bank can trace the refund by.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
@@ -501,7 +746,7 @@ public final class Refund {
         }
 
         /**
-         * <p>The tracking reference value from the payment processor, used to trace the refund through banking networks. Null if no reference was provided.</p>
+         * <p>The tracking reference the buyer's bank can trace the refund by.</p>
          */
         @java.lang.Override
         @JsonSetter(value = "reference_value", nulls = Nulls.SKIP)
@@ -511,11 +756,11 @@ public final class Refund {
         }
 
         /**
-         * <p>The type of tracking reference provided by the payment processor, such as an acquirer reference number. Null if no reference was provided.</p>
+         * <p>The kind of tracking reference, such as an acquirer reference number.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
-        public _FinalStage referenceType(Nullable<RefundReferenceTypes> referenceType) {
+        public _FinalStage referenceType(Nullable<RefundReferenceType> referenceType) {
             if (referenceType.isNull()) {
                 this.referenceType = null;
             } else if (referenceType.isEmpty()) {
@@ -527,31 +772,31 @@ public final class Refund {
         }
 
         /**
-         * <p>The type of tracking reference provided by the payment processor, such as an acquirer reference number. Null if no reference was provided.</p>
+         * <p>The kind of tracking reference, such as an acquirer reference number.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
-        public _FinalStage referenceType(RefundReferenceTypes referenceType) {
+        public _FinalStage referenceType(RefundReferenceType referenceType) {
             this.referenceType = Optional.ofNullable(referenceType);
             return this;
         }
 
         /**
-         * <p>The type of tracking reference provided by the payment processor, such as an acquirer reference number. Null if no reference was provided.</p>
+         * <p>The kind of tracking reference, such as an acquirer reference number.</p>
          */
         @java.lang.Override
         @JsonSetter(value = "reference_type", nulls = Nulls.SKIP)
-        public _FinalStage referenceType(Optional<RefundReferenceTypes> referenceType) {
+        public _FinalStage referenceType(Optional<RefundReferenceType> referenceType) {
             this.referenceType = referenceType;
             return this;
         }
 
         /**
-         * <p>The availability status of the refund tracking reference from the payment processor. Null if no reference was provided.</p>
+         * <p>Whether a banking-network tracking reference is available for this refund.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
-        public _FinalStage referenceStatus(Nullable<RefundReferenceStatuses> referenceStatus) {
+        public _FinalStage referenceStatus(Nullable<RefundReferenceStatus> referenceStatus) {
             if (referenceStatus.isNull()) {
                 this.referenceStatus = null;
             } else if (referenceStatus.isEmpty()) {
@@ -563,31 +808,67 @@ public final class Refund {
         }
 
         /**
-         * <p>The availability status of the refund tracking reference from the payment processor. Null if no reference was provided.</p>
+         * <p>Whether a banking-network tracking reference is available for this refund.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
-        public _FinalStage referenceStatus(RefundReferenceStatuses referenceStatus) {
+        public _FinalStage referenceStatus(RefundReferenceStatus referenceStatus) {
             this.referenceStatus = Optional.ofNullable(referenceStatus);
             return this;
         }
 
         /**
-         * <p>The availability status of the refund tracking reference from the payment processor. Null if no reference was provided.</p>
+         * <p>Whether a banking-network tracking reference is available for this refund.</p>
          */
         @java.lang.Override
         @JsonSetter(value = "reference_status", nulls = Nulls.SKIP)
-        public _FinalStage referenceStatus(Optional<RefundReferenceStatuses> referenceStatus) {
+        public _FinalStage referenceStatus(Optional<RefundReferenceStatus> referenceStatus) {
             this.referenceStatus = referenceStatus;
             return this;
         }
 
         /**
-         * <p>The timestamp when the refund was created in the payment provider's system. Null if not available from the provider.</p>
+         * <p>Why the refund was issued, when recorded.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
-        public _FinalStage providerCreatedAt(Nullable<OffsetDateTime> providerCreatedAt) {
+        public _FinalStage reason(Nullable<RefundReason> reason) {
+            if (reason.isNull()) {
+                this.reason = null;
+            } else if (reason.isEmpty()) {
+                this.reason = Optional.empty();
+            } else {
+                this.reason = Optional.of(reason.get());
+            }
+            return this;
+        }
+
+        /**
+         * <p>Why the refund was issued, when recorded.</p>
+         * @return Reference to {@code this} so that method calls can be chained together.
+         */
+        @java.lang.Override
+        public _FinalStage reason(RefundReason reason) {
+            this.reason = Optional.ofNullable(reason);
+            return this;
+        }
+
+        /**
+         * <p>Why the refund was issued, when recorded.</p>
+         */
+        @java.lang.Override
+        @JsonSetter(value = "reason", nulls = Nulls.SKIP)
+        public _FinalStage reason(Optional<RefundReason> reason) {
+            this.reason = reason;
+            return this;
+        }
+
+        /**
+         * <p>When the provider created the refund, as an ISO 8601 timestamp.</p>
+         * @return Reference to {@code this} so that method calls can be chained together.
+         */
+        @java.lang.Override
+        public _FinalStage providerCreatedAt(Nullable<String> providerCreatedAt) {
             if (providerCreatedAt.isNull()) {
                 this.providerCreatedAt = null;
             } else if (providerCreatedAt.isEmpty()) {
@@ -599,76 +880,252 @@ public final class Refund {
         }
 
         /**
-         * <p>The timestamp when the refund was created in the payment provider's system. Null if not available from the provider.</p>
+         * <p>When the provider created the refund, as an ISO 8601 timestamp.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
-        public _FinalStage providerCreatedAt(OffsetDateTime providerCreatedAt) {
+        public _FinalStage providerCreatedAt(String providerCreatedAt) {
             this.providerCreatedAt = Optional.ofNullable(providerCreatedAt);
             return this;
         }
 
         /**
-         * <p>The timestamp when the refund was created in the payment provider's system. Null if not available from the provider.</p>
+         * <p>When the provider created the refund, as an ISO 8601 timestamp.</p>
          */
         @java.lang.Override
         @JsonSetter(value = "provider_created_at", nulls = Nulls.SKIP)
-        public _FinalStage providerCreatedAt(Optional<OffsetDateTime> providerCreatedAt) {
+        public _FinalStage providerCreatedAt(Optional<String> providerCreatedAt) {
             this.providerCreatedAt = providerCreatedAt;
             return this;
         }
 
         /**
-         * <p>The original payment that this refund was issued against. Null if the payment is no longer available.</p>
+         * <p>Your own key-value data attached when the refund was requested.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
-        public _FinalStage payment(Nullable<RefundPayment> payment) {
-            if (payment.isNull()) {
-                this.payment = null;
-            } else if (payment.isEmpty()) {
-                this.payment = Optional.empty();
+        public _FinalStage metadata(Nullable<Map<String, Object>> metadata) {
+            if (metadata.isNull()) {
+                this.metadata = null;
+            } else if (metadata.isEmpty()) {
+                this.metadata = Optional.empty();
             } else {
-                this.payment = Optional.of(payment.get());
+                this.metadata = Optional.of(metadata.get());
             }
             return this;
         }
 
         /**
-         * <p>The original payment that this refund was issued against. Null if the payment is no longer available.</p>
+         * <p>Your own key-value data attached when the refund was requested.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
-        public _FinalStage payment(RefundPayment payment) {
-            this.payment = Optional.ofNullable(payment);
+        public _FinalStage metadata(Map<String, Object> metadata) {
+            this.metadata = Optional.ofNullable(metadata);
             return this;
         }
 
         /**
-         * <p>The original payment that this refund was issued against. Null if the payment is no longer available.</p>
+         * <p>Your own key-value data attached when the refund was requested.</p>
          */
         @java.lang.Override
-        @JsonSetter(value = "payment", nulls = Nulls.SKIP)
-        public _FinalStage payment(Optional<RefundPayment> payment) {
-            this.payment = payment;
+        @JsonSetter(value = "metadata", nulls = Nulls.SKIP)
+        public _FinalStage metadata(Optional<Map<String, Object>> metadata) {
+            this.metadata = metadata;
+            return this;
+        }
+
+        /**
+         * <p>Why the refund failed, normalized across providers. Null unless the refund failed or was canceled.</p>
+         * @return Reference to {@code this} so that method calls can be chained together.
+         */
+        @java.lang.Override
+        public _FinalStage failureReason(Nullable<RefundFailureReason> failureReason) {
+            if (failureReason.isNull()) {
+                this.failureReason = null;
+            } else if (failureReason.isEmpty()) {
+                this.failureReason = Optional.empty();
+            } else {
+                this.failureReason = Optional.of(failureReason.get());
+            }
+            return this;
+        }
+
+        /**
+         * <p>Why the refund failed, normalized across providers. Null unless the refund failed or was canceled.</p>
+         * @return Reference to {@code this} so that method calls can be chained together.
+         */
+        @java.lang.Override
+        public _FinalStage failureReason(RefundFailureReason failureReason) {
+            this.failureReason = Optional.ofNullable(failureReason);
+            return this;
+        }
+
+        /**
+         * <p>Why the refund failed, normalized across providers. Null unless the refund failed or was canceled.</p>
+         */
+        @java.lang.Override
+        @JsonSetter(value = "failure_reason", nulls = Nulls.SKIP)
+        public _FinalStage failureReason(Optional<RefundFailureReason> failureReason) {
+            this.failureReason = failureReason;
+            return this;
+        }
+
+        /**
+         * <p>A merchant-facing explanation of why the refund failed, in the request's language. Null unless the refund failed or was canceled.</p>
+         * @return Reference to {@code this} so that method calls can be chained together.
+         */
+        @java.lang.Override
+        public _FinalStage failureMessage(Nullable<String> failureMessage) {
+            if (failureMessage.isNull()) {
+                this.failureMessage = null;
+            } else if (failureMessage.isEmpty()) {
+                this.failureMessage = Optional.empty();
+            } else {
+                this.failureMessage = Optional.of(failureMessage.get());
+            }
+            return this;
+        }
+
+        /**
+         * <p>A merchant-facing explanation of why the refund failed, in the request's language. Null unless the refund failed or was canceled.</p>
+         * @return Reference to {@code this} so that method calls can be chained together.
+         */
+        @java.lang.Override
+        public _FinalStage failureMessage(String failureMessage) {
+            this.failureMessage = Optional.ofNullable(failureMessage);
+            return this;
+        }
+
+        /**
+         * <p>A merchant-facing explanation of why the refund failed, in the request's language. Null unless the refund failed or was canceled.</p>
+         */
+        @java.lang.Override
+        @JsonSetter(value = "failure_message", nulls = Nulls.SKIP)
+        public _FinalStage failureMessage(Optional<String> failureMessage) {
+            this.failureMessage = failureMessage;
+            return this;
+        }
+
+        /**
+         * <p>The refunded amount as it settled, in the payment's settlement currency, so pages of refunds net against the payment's <code>refunded_amount</code>. Converted at the rate in force when the refund was issued, not the payment's original rate. Null only when no exchange rate is recorded for a legacy multi-currency payment.</p>
+         * @return Reference to {@code this} so that method calls can be chained together.
+         */
+        @java.lang.Override
+        public _FinalStage amount(Nullable<Money> amount) {
+            if (amount.isNull()) {
+                this.amount = null;
+            } else if (amount.isEmpty()) {
+                this.amount = Optional.empty();
+            } else {
+                this.amount = Optional.of(amount.get());
+            }
+            return this;
+        }
+
+        /**
+         * <p>The refunded amount as it settled, in the payment's settlement currency, so pages of refunds net against the payment's <code>refunded_amount</code>. Converted at the rate in force when the refund was issued, not the payment's original rate. Null only when no exchange rate is recorded for a legacy multi-currency payment.</p>
+         * @return Reference to {@code this} so that method calls can be chained together.
+         */
+        @java.lang.Override
+        public _FinalStage amount(Money amount) {
+            this.amount = Optional.ofNullable(amount);
+            return this;
+        }
+
+        /**
+         * <p>The refunded amount as it settled, in the payment's settlement currency, so pages of refunds net against the payment's <code>refunded_amount</code>. Converted at the rate in force when the refund was issued, not the payment's original rate. Null only when no exchange rate is recorded for a legacy multi-currency payment.</p>
+         */
+        @java.lang.Override
+        @JsonSetter(value = "amount", nulls = Nulls.SKIP)
+        public _FinalStage amount(Optional<Money> amount) {
+            this.amount = amount;
+            return this;
+        }
+
+        /**
+         * <p>The account that issued the refund, prefixed <code>biz_</code>.</p>
+         * @return Reference to {@code this} so that method calls can be chained together.
+         */
+        @java.lang.Override
+        public _FinalStage accountId(Nullable<String> accountId) {
+            if (accountId.isNull()) {
+                this.accountId = null;
+            } else if (accountId.isEmpty()) {
+                this.accountId = Optional.empty();
+            } else {
+                this.accountId = Optional.of(accountId.get());
+            }
+            return this;
+        }
+
+        /**
+         * <p>The account that issued the refund, prefixed <code>biz_</code>.</p>
+         * @return Reference to {@code this} so that method calls can be chained together.
+         */
+        @java.lang.Override
+        public _FinalStage accountId(String accountId) {
+            this.accountId = Optional.ofNullable(accountId);
+            return this;
+        }
+
+        /**
+         * <p>The account that issued the refund, prefixed <code>biz_</code>.</p>
+         */
+        @java.lang.Override
+        @JsonSetter(value = "account_id", nulls = Nulls.SKIP)
+        public _FinalStage accountId(Optional<String> accountId) {
+            this.accountId = accountId;
             return this;
         }
 
         @java.lang.Override
         public Refund build() {
             return new Refund(
+                    accountId,
                     amount,
                     createdAt,
-                    currency,
+                    failureMessage,
+                    failureReason,
                     id,
-                    payment,
+                    metadata,
+                    originalAmount,
+                    paymentId,
                     provider,
                     providerCreatedAt,
+                    reason,
                     referenceStatus,
                     referenceType,
                     referenceValue,
                     status,
+                    updatedAt,
+                    visaRdr,
                     additionalProperties);
+        }
+
+        @JsonAnySetter
+        private void putAdditionalPropertyFromJson(String key, Object value) {
+            if (key.equalsIgnoreCase("account_id")
+                    || key.equalsIgnoreCase("amount")
+                    || key.equalsIgnoreCase("created_at")
+                    || key.equalsIgnoreCase("failure_message")
+                    || key.equalsIgnoreCase("failure_reason")
+                    || key.equalsIgnoreCase("id")
+                    || key.equalsIgnoreCase("metadata")
+                    || key.equalsIgnoreCase("original_amount")
+                    || key.equalsIgnoreCase("payment_id")
+                    || key.equalsIgnoreCase("provider")
+                    || key.equalsIgnoreCase("provider_created_at")
+                    || key.equalsIgnoreCase("reason")
+                    || key.equalsIgnoreCase("reference_status")
+                    || key.equalsIgnoreCase("reference_type")
+                    || key.equalsIgnoreCase("reference_value")
+                    || key.equalsIgnoreCase("status")
+                    || key.equalsIgnoreCase("updated_at")
+                    || key.equalsIgnoreCase("visa_rdr")) {
+                return;
+            }
+            this.additionalProperties.put(key, value);
         }
 
         @java.lang.Override

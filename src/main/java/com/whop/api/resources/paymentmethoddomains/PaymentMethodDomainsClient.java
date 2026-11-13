@@ -32,28 +32,28 @@ public class PaymentMethodDomainsClient {
     }
 
     /**
-     * Lists payment method domains. Without <code>account_id</code>, returns the caller's own domains and those of every connected account.
+     * Lists the payment method domains registered for your account and its subaccounts. Deprecated: list domains with <code>GET /domains</code> and the <code>apple_pay</code> filter instead.
      */
     public SyncPagingIterable<PaymentMethodDomain> list() {
         return this.rawClient.list().body();
     }
 
     /**
-     * Lists payment method domains. Without <code>account_id</code>, returns the caller's own domains and those of every connected account.
+     * Lists the payment method domains registered for your account and its subaccounts. Deprecated: list domains with <code>GET /domains</code> and the <code>apple_pay</code> filter instead.
      */
     public SyncPagingIterable<PaymentMethodDomain> list(RequestOptions requestOptions) {
         return this.rawClient.list(requestOptions).body();
     }
 
     /**
-     * Lists payment method domains. Without <code>account_id</code>, returns the caller's own domains and those of every connected account.
+     * Lists the payment method domains registered for your account and its subaccounts. Deprecated: list domains with <code>GET /domains</code> and the <code>apple_pay</code> filter instead.
      */
     public SyncPagingIterable<PaymentMethodDomain> list(ListPaymentMethodDomainsRequest request) {
         return this.rawClient.list(request).body();
     }
 
     /**
-     * Lists payment method domains. Without <code>account_id</code>, returns the caller's own domains and those of every connected account.
+     * Lists the payment method domains registered for your account and its subaccounts. Deprecated: list domains with <code>GET /domains</code> and the <code>apple_pay</code> filter instead.
      */
     public SyncPagingIterable<PaymentMethodDomain> list(
             ListPaymentMethodDomainsRequest request, RequestOptions requestOptions) {
@@ -61,42 +61,42 @@ public class PaymentMethodDomainsClient {
     }
 
     /**
-     * Registers a hostname with the wallet provider and attempts verification inline. Returns <code>verified</code> when the provider fetched the domain-association file (for Apple Pay, <code>/.well-known/apple-developer-merchantid-domain-association</code>), or <code>pending</code> when it could not — host the file, then retry with the verify endpoint.
+     * Registers a hostname with the wallet provider and attempts verification inline. Returns <code>verified</code> when the provider fetched the domain-association file (for Apple Pay, <code>/.well-known/apple-developer-merchantid-domain-association</code>), or <code>pending</code> when it could not: host the file, then retry with <code>POST /payment_method_domains/:id/verify</code>. Deprecated: add Apple Pay with <code>POST /domains</code> and <code>apple_pay: {}</code> instead.
      */
     public PaymentMethodDomain create(CreatePaymentMethodDomainsRequest request) {
         return this.rawClient.create(request).body();
     }
 
     /**
-     * Registers a hostname with the wallet provider and attempts verification inline. Returns <code>verified</code> when the provider fetched the domain-association file (for Apple Pay, <code>/.well-known/apple-developer-merchantid-domain-association</code>), or <code>pending</code> when it could not — host the file, then retry with the verify endpoint.
+     * Registers a hostname with the wallet provider and attempts verification inline. Returns <code>verified</code> when the provider fetched the domain-association file (for Apple Pay, <code>/.well-known/apple-developer-merchantid-domain-association</code>), or <code>pending</code> when it could not: host the file, then retry with <code>POST /payment_method_domains/:id/verify</code>. Deprecated: add Apple Pay with <code>POST /domains</code> and <code>apple_pay: {}</code> instead.
      */
     public PaymentMethodDomain create(CreatePaymentMethodDomainsRequest request, RequestOptions requestOptions) {
         return this.rawClient.create(request, requestOptions).body();
     }
 
     /**
-     * Retrieves a payment method domain to check its verification status.
+     * Retrieves a payment method domain to check its verification status. Deprecated: retrieve the domain with <code>GET /domains/{id}</code> instead, using the same ID.
      */
     public PaymentMethodDomain retrieve(String id) {
         return this.rawClient.retrieve(id).body();
     }
 
     /**
-     * Retrieves a payment method domain to check its verification status.
+     * Retrieves a payment method domain to check its verification status. Deprecated: retrieve the domain with <code>GET /domains/{id}</code> instead, using the same ID.
      */
     public PaymentMethodDomain retrieve(String id, RequestOptions requestOptions) {
         return this.rawClient.retrieve(id, requestOptions).body();
     }
 
     /**
-     * Retrieves a payment method domain to check its verification status.
+     * Retrieves a payment method domain to check its verification status. Deprecated: retrieve the domain with <code>GET /domains/{id}</code> instead, using the same ID.
      */
     public PaymentMethodDomain retrieve(String id, RetrievePaymentMethodDomainsRequest request) {
         return this.rawClient.retrieve(id, request).body();
     }
 
     /**
-     * Retrieves a payment method domain to check its verification status.
+     * Retrieves a payment method domain to check its verification status. Deprecated: retrieve the domain with <code>GET /domains/{id}</code> instead, using the same ID.
      */
     public PaymentMethodDomain retrieve(
             String id, RetrievePaymentMethodDomainsRequest request, RequestOptions requestOptions) {
@@ -104,28 +104,28 @@ public class PaymentMethodDomainsClient {
     }
 
     /**
-     * Unregisters a payment method domain so its wallet payment methods stop rendering there.
+     * Unregisters a payment method domain so its wallet payment methods stop rendering there. Deprecated: remove Apple Pay with <code>PATCH /domains/{id}</code> and <code>apple_pay: null</code> instead. <code>DELETE /domains/{id}</code> removes the whole domain, including any website on it.
      */
     public DeletePaymentMethodDomainsResponse delete(String id) {
         return this.rawClient.delete(id).body();
     }
 
     /**
-     * Unregisters a payment method domain so its wallet payment methods stop rendering there.
+     * Unregisters a payment method domain so its wallet payment methods stop rendering there. Deprecated: remove Apple Pay with <code>PATCH /domains/{id}</code> and <code>apple_pay: null</code> instead. <code>DELETE /domains/{id}</code> removes the whole domain, including any website on it.
      */
     public DeletePaymentMethodDomainsResponse delete(String id, RequestOptions requestOptions) {
         return this.rawClient.delete(id, requestOptions).body();
     }
 
     /**
-     * Unregisters a payment method domain so its wallet payment methods stop rendering there.
+     * Unregisters a payment method domain so its wallet payment methods stop rendering there. Deprecated: remove Apple Pay with <code>PATCH /domains/{id}</code> and <code>apple_pay: null</code> instead. <code>DELETE /domains/{id}</code> removes the whole domain, including any website on it.
      */
     public DeletePaymentMethodDomainsResponse delete(String id, DeletePaymentMethodDomainsRequest request) {
         return this.rawClient.delete(id, request).body();
     }
 
     /**
-     * Unregisters a payment method domain so its wallet payment methods stop rendering there.
+     * Unregisters a payment method domain so its wallet payment methods stop rendering there. Deprecated: remove Apple Pay with <code>PATCH /domains/{id}</code> and <code>apple_pay: null</code> instead. <code>DELETE /domains/{id}</code> removes the whole domain, including any website on it.
      */
     public DeletePaymentMethodDomainsResponse delete(
             String id, DeletePaymentMethodDomainsRequest request, RequestOptions requestOptions) {
@@ -133,28 +133,28 @@ public class PaymentMethodDomainsClient {
     }
 
     /**
-     * Re-attempts provider verification of a pending domain once the association file is hosted. Fails with a <code>bad_request</code> explaining what to fix; verifying an already <code>verified</code> domain is a no-op.
+     * Re-attempts provider verification of a pending domain once the association file is hosted. Fails with a <code>bad_request</code> explaining what to fix; verifying an already <code>verified</code> domain is a no-op. Deprecated: check the domain with <code>POST /domains/{id}/check</code> instead.
      */
     public PaymentMethodDomain verify(String id) {
         return this.rawClient.verify(id).body();
     }
 
     /**
-     * Re-attempts provider verification of a pending domain once the association file is hosted. Fails with a <code>bad_request</code> explaining what to fix; verifying an already <code>verified</code> domain is a no-op.
+     * Re-attempts provider verification of a pending domain once the association file is hosted. Fails with a <code>bad_request</code> explaining what to fix; verifying an already <code>verified</code> domain is a no-op. Deprecated: check the domain with <code>POST /domains/{id}/check</code> instead.
      */
     public PaymentMethodDomain verify(String id, RequestOptions requestOptions) {
         return this.rawClient.verify(id, requestOptions).body();
     }
 
     /**
-     * Re-attempts provider verification of a pending domain once the association file is hosted. Fails with a <code>bad_request</code> explaining what to fix; verifying an already <code>verified</code> domain is a no-op.
+     * Re-attempts provider verification of a pending domain once the association file is hosted. Fails with a <code>bad_request</code> explaining what to fix; verifying an already <code>verified</code> domain is a no-op. Deprecated: check the domain with <code>POST /domains/{id}/check</code> instead.
      */
     public PaymentMethodDomain verify(String id, VerifyPaymentMethodDomainsRequest request) {
         return this.rawClient.verify(id, request).body();
     }
 
     /**
-     * Re-attempts provider verification of a pending domain once the association file is hosted. Fails with a <code>bad_request</code> explaining what to fix; verifying an already <code>verified</code> domain is a no-op.
+     * Re-attempts provider verification of a pending domain once the association file is hosted. Fails with a <code>bad_request</code> explaining what to fix; verifying an already <code>verified</code> domain is a no-op. Deprecated: check the domain with <code>POST /domains/{id}/check</code> instead.
      */
     public PaymentMethodDomain verify(
             String id, VerifyPaymentMethodDomainsRequest request, RequestOptions requestOptions) {

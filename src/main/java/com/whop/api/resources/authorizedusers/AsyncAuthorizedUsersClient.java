@@ -5,6 +5,7 @@ package com.whop.api.resources.authorizedusers;
 
 import com.whop.api.core.ClientOptions;
 import com.whop.api.core.RequestOptions;
+import com.whop.api.core.WhopApiHttpResponse;
 import com.whop.api.core.pagination.SyncPagingIterable;
 import com.whop.api.resources.authorizedusers.requests.CreateAuthorizedUsersRequest;
 import com.whop.api.resources.authorizedusers.requests.DeleteAuthorizedUsersRequest;
@@ -32,7 +33,7 @@ public class AsyncAuthorizedUsersClient {
     }
 
     /**
-     * Returns a paginated list of authorized team members for a company, with optional filtering by user, role, and creation date.
+     * Lists the authorized users on an account's team.
      * <p>Required permissions:</p>
      * <ul>
      * <li><code>company:authorized_user:read</code></li>
@@ -40,11 +41,20 @@ public class AsyncAuthorizedUsersClient {
      * </ul>
      */
     public CompletableFuture<SyncPagingIterable<AuthorizedUserListItem>> list() {
-        return this.rawClient.list().thenApply(response -> response.body());
+        CompletableFuture<WhopApiHttpResponse<SyncPagingIterable<AuthorizedUserListItem>>> rawFuture =
+                this.rawClient.list();
+        CompletableFuture<SyncPagingIterable<AuthorizedUserListItem>> future =
+                rawFuture.thenApply(response -> response.body());
+        future.whenComplete((result_, throwable_) -> {
+            if (future.isCancelled()) {
+                rawFuture.cancel(true);
+            }
+        });
+        return future;
     }
 
     /**
-     * Returns a paginated list of authorized team members for a company, with optional filtering by user, role, and creation date.
+     * Lists the authorized users on an account's team.
      * <p>Required permissions:</p>
      * <ul>
      * <li><code>company:authorized_user:read</code></li>
@@ -52,11 +62,20 @@ public class AsyncAuthorizedUsersClient {
      * </ul>
      */
     public CompletableFuture<SyncPagingIterable<AuthorizedUserListItem>> list(RequestOptions requestOptions) {
-        return this.rawClient.list(requestOptions).thenApply(response -> response.body());
+        CompletableFuture<WhopApiHttpResponse<SyncPagingIterable<AuthorizedUserListItem>>> rawFuture =
+                this.rawClient.list(requestOptions);
+        CompletableFuture<SyncPagingIterable<AuthorizedUserListItem>> future =
+                rawFuture.thenApply(response -> response.body());
+        future.whenComplete((result_, throwable_) -> {
+            if (future.isCancelled()) {
+                rawFuture.cancel(true);
+            }
+        });
+        return future;
     }
 
     /**
-     * Returns a paginated list of authorized team members for a company, with optional filtering by user, role, and creation date.
+     * Lists the authorized users on an account's team.
      * <p>Required permissions:</p>
      * <ul>
      * <li><code>company:authorized_user:read</code></li>
@@ -64,11 +83,20 @@ public class AsyncAuthorizedUsersClient {
      * </ul>
      */
     public CompletableFuture<SyncPagingIterable<AuthorizedUserListItem>> list(ListAuthorizedUsersRequest request) {
-        return this.rawClient.list(request).thenApply(response -> response.body());
+        CompletableFuture<WhopApiHttpResponse<SyncPagingIterable<AuthorizedUserListItem>>> rawFuture =
+                this.rawClient.list(request);
+        CompletableFuture<SyncPagingIterable<AuthorizedUserListItem>> future =
+                rawFuture.thenApply(response -> response.body());
+        future.whenComplete((result_, throwable_) -> {
+            if (future.isCancelled()) {
+                rawFuture.cancel(true);
+            }
+        });
+        return future;
     }
 
     /**
-     * Returns a paginated list of authorized team members for a company, with optional filtering by user, role, and creation date.
+     * Lists the authorized users on an account's team.
      * <p>Required permissions:</p>
      * <ul>
      * <li><code>company:authorized_user:read</code></li>
@@ -77,11 +105,20 @@ public class AsyncAuthorizedUsersClient {
      */
     public CompletableFuture<SyncPagingIterable<AuthorizedUserListItem>> list(
             ListAuthorizedUsersRequest request, RequestOptions requestOptions) {
-        return this.rawClient.list(request, requestOptions).thenApply(response -> response.body());
+        CompletableFuture<WhopApiHttpResponse<SyncPagingIterable<AuthorizedUserListItem>>> rawFuture =
+                this.rawClient.list(request, requestOptions);
+        CompletableFuture<SyncPagingIterable<AuthorizedUserListItem>> future =
+                rawFuture.thenApply(response -> response.body());
+        future.whenComplete((result_, throwable_) -> {
+            if (future.isCancelled()) {
+                rawFuture.cancel(true);
+            }
+        });
+        return future;
     }
 
     /**
-     * Add a new authorized user to a company.
+     * Adds a user to an account's team as an authorized user with the given role.
      * <p>Required permissions:</p>
      * <ul>
      * <li><code>authorized_user:create</code></li>
@@ -89,11 +126,18 @@ public class AsyncAuthorizedUsersClient {
      * </ul>
      */
     public CompletableFuture<AuthorizedUser> create(CreateAuthorizedUsersRequest request) {
-        return this.rawClient.create(request).thenApply(response -> response.body());
+        CompletableFuture<WhopApiHttpResponse<AuthorizedUser>> rawFuture = this.rawClient.create(request);
+        CompletableFuture<AuthorizedUser> future = rawFuture.thenApply(response -> response.body());
+        future.whenComplete((result_, throwable_) -> {
+            if (future.isCancelled()) {
+                rawFuture.cancel(true);
+            }
+        });
+        return future;
     }
 
     /**
-     * Add a new authorized user to a company.
+     * Adds a user to an account's team as an authorized user with the given role.
      * <p>Required permissions:</p>
      * <ul>
      * <li><code>authorized_user:create</code></li>
@@ -102,7 +146,15 @@ public class AsyncAuthorizedUsersClient {
      */
     public CompletableFuture<AuthorizedUser> create(
             CreateAuthorizedUsersRequest request, RequestOptions requestOptions) {
-        return this.rawClient.create(request, requestOptions).thenApply(response -> response.body());
+        CompletableFuture<WhopApiHttpResponse<AuthorizedUser>> rawFuture =
+                this.rawClient.create(request, requestOptions);
+        CompletableFuture<AuthorizedUser> future = rawFuture.thenApply(response -> response.body());
+        future.whenComplete((result_, throwable_) -> {
+            if (future.isCancelled()) {
+                rawFuture.cancel(true);
+            }
+        });
+        return future;
     }
 
     /**
@@ -114,7 +166,14 @@ public class AsyncAuthorizedUsersClient {
      * </ul>
      */
     public CompletableFuture<AuthorizedUser> retrieve(String id) {
-        return this.rawClient.retrieve(id).thenApply(response -> response.body());
+        CompletableFuture<WhopApiHttpResponse<AuthorizedUser>> rawFuture = this.rawClient.retrieve(id);
+        CompletableFuture<AuthorizedUser> future = rawFuture.thenApply(response -> response.body());
+        future.whenComplete((result_, throwable_) -> {
+            if (future.isCancelled()) {
+                rawFuture.cancel(true);
+            }
+        });
+        return future;
     }
 
     /**
@@ -126,7 +185,14 @@ public class AsyncAuthorizedUsersClient {
      * </ul>
      */
     public CompletableFuture<AuthorizedUser> retrieve(String id, RequestOptions requestOptions) {
-        return this.rawClient.retrieve(id, requestOptions).thenApply(response -> response.body());
+        CompletableFuture<WhopApiHttpResponse<AuthorizedUser>> rawFuture = this.rawClient.retrieve(id, requestOptions);
+        CompletableFuture<AuthorizedUser> future = rawFuture.thenApply(response -> response.body());
+        future.whenComplete((result_, throwable_) -> {
+            if (future.isCancelled()) {
+                rawFuture.cancel(true);
+            }
+        });
+        return future;
     }
 
     /**
@@ -138,7 +204,14 @@ public class AsyncAuthorizedUsersClient {
      * </ul>
      */
     public CompletableFuture<AuthorizedUser> retrieve(String id, RetrieveAuthorizedUsersRequest request) {
-        return this.rawClient.retrieve(id, request).thenApply(response -> response.body());
+        CompletableFuture<WhopApiHttpResponse<AuthorizedUser>> rawFuture = this.rawClient.retrieve(id, request);
+        CompletableFuture<AuthorizedUser> future = rawFuture.thenApply(response -> response.body());
+        future.whenComplete((result_, throwable_) -> {
+            if (future.isCancelled()) {
+                rawFuture.cancel(true);
+            }
+        });
+        return future;
     }
 
     /**
@@ -151,44 +224,73 @@ public class AsyncAuthorizedUsersClient {
      */
     public CompletableFuture<AuthorizedUser> retrieve(
             String id, RetrieveAuthorizedUsersRequest request, RequestOptions requestOptions) {
-        return this.rawClient.retrieve(id, request, requestOptions).thenApply(response -> response.body());
+        CompletableFuture<WhopApiHttpResponse<AuthorizedUser>> rawFuture =
+                this.rawClient.retrieve(id, request, requestOptions);
+        CompletableFuture<AuthorizedUser> future = rawFuture.thenApply(response -> response.body());
+        future.whenComplete((result_, throwable_) -> {
+            if (future.isCancelled()) {
+                rawFuture.cancel(true);
+            }
+        });
+        return future;
     }
 
     /**
-     * Remove an authorized user from a company.
+     * Removes an authorized user from an account's team.
      * <p>Required permissions:</p>
      * <ul>
      * <li><code>authorized_user:delete</code></li>
      * </ul>
      */
     public CompletableFuture<Boolean> delete(String id) {
-        return this.rawClient.delete(id).thenApply(response -> response.body());
+        CompletableFuture<WhopApiHttpResponse<Boolean>> rawFuture = this.rawClient.delete(id);
+        CompletableFuture<Boolean> future = rawFuture.thenApply(response -> response.body());
+        future.whenComplete((result_, throwable_) -> {
+            if (future.isCancelled()) {
+                rawFuture.cancel(true);
+            }
+        });
+        return future;
     }
 
     /**
-     * Remove an authorized user from a company.
+     * Removes an authorized user from an account's team.
      * <p>Required permissions:</p>
      * <ul>
      * <li><code>authorized_user:delete</code></li>
      * </ul>
      */
     public CompletableFuture<Boolean> delete(String id, RequestOptions requestOptions) {
-        return this.rawClient.delete(id, requestOptions).thenApply(response -> response.body());
+        CompletableFuture<WhopApiHttpResponse<Boolean>> rawFuture = this.rawClient.delete(id, requestOptions);
+        CompletableFuture<Boolean> future = rawFuture.thenApply(response -> response.body());
+        future.whenComplete((result_, throwable_) -> {
+            if (future.isCancelled()) {
+                rawFuture.cancel(true);
+            }
+        });
+        return future;
     }
 
     /**
-     * Remove an authorized user from a company.
+     * Removes an authorized user from an account's team.
      * <p>Required permissions:</p>
      * <ul>
      * <li><code>authorized_user:delete</code></li>
      * </ul>
      */
     public CompletableFuture<Boolean> delete(String id, DeleteAuthorizedUsersRequest request) {
-        return this.rawClient.delete(id, request).thenApply(response -> response.body());
+        CompletableFuture<WhopApiHttpResponse<Boolean>> rawFuture = this.rawClient.delete(id, request);
+        CompletableFuture<Boolean> future = rawFuture.thenApply(response -> response.body());
+        future.whenComplete((result_, throwable_) -> {
+            if (future.isCancelled()) {
+                rawFuture.cancel(true);
+            }
+        });
+        return future;
     }
 
     /**
-     * Remove an authorized user from a company.
+     * Removes an authorized user from an account's team.
      * <p>Required permissions:</p>
      * <ul>
      * <li><code>authorized_user:delete</code></li>
@@ -196,6 +298,13 @@ public class AsyncAuthorizedUsersClient {
      */
     public CompletableFuture<Boolean> delete(
             String id, DeleteAuthorizedUsersRequest request, RequestOptions requestOptions) {
-        return this.rawClient.delete(id, request, requestOptions).thenApply(response -> response.body());
+        CompletableFuture<WhopApiHttpResponse<Boolean>> rawFuture = this.rawClient.delete(id, request, requestOptions);
+        CompletableFuture<Boolean> future = rawFuture.thenApply(response -> response.body());
+        future.whenComplete((result_, throwable_) -> {
+            if (future.isCancelled()) {
+                rawFuture.cancel(true);
+            }
+        });
+        return future;
     }
 }

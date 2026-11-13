@@ -69,7 +69,6 @@ public final class CreateAudiencesResponseData {
     public static final class Builder {
         private List<Audience> data = new ArrayList<>();
 
-        @JsonAnySetter
         private Map<String, Object> additionalProperties = new HashMap<>();
 
         private Builder() {}
@@ -102,6 +101,14 @@ public final class CreateAudiencesResponseData {
 
         public CreateAudiencesResponseData build() {
             return new CreateAudiencesResponseData(data, additionalProperties);
+        }
+
+        @JsonAnySetter
+        private void putAdditionalPropertyFromJson(String key, Object value) {
+            if (key.equalsIgnoreCase("data")) {
+                return;
+            }
+            this.additionalProperties.put(key, value);
         }
 
         public Builder additionalProperty(String key, Object value) {

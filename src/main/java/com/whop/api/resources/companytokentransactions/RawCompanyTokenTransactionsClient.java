@@ -4,11 +4,14 @@
 package com.whop.api.resources.companytokentransactions;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
+import com.whop.api.core.BodyProperties;
 import com.whop.api.core.ClientOptions;
 import com.whop.api.core.MediaTypes;
 import com.whop.api.core.ObjectMappers;
+import com.whop.api.core.PathSegments;
 import com.whop.api.core.QueryStringMapper;
 import com.whop.api.core.RequestOptions;
+import com.whop.api.core.RetryInterceptor;
 import com.whop.api.core.WhopApiApiException;
 import com.whop.api.core.WhopApiException;
 import com.whop.api.core.WhopApiHttpResponse;
@@ -26,6 +29,8 @@ import com.whop.api.resources.companytokentransactions.types.CreateCompanyTokenT
 import com.whop.api.resources.companytokentransactions.types.ListCompanyTokenTransactionsResponse;
 import com.whop.api.types.CompanyTokenTransaction;
 import com.whop.api.types.CompanyTokenTransactionListItem;
+import com.whop.api.types.InternalServerErrorBody;
+import com.whop.api.types.UnprocessableEntityErrorBody;
 import java.io.IOException;
 import java.util.List;
 import java.util.Optional;
@@ -45,7 +50,7 @@ public class RawCompanyTokenTransactionsClient {
     }
 
     /**
-     * Returns a paginated list of token transactions for a user or company, depending on the authenticated actor, with optional filtering by user and transaction type.
+     * Lists an account's token transactions, newest first.
      * <p>Required permissions:</p>
      * <ul>
      * <li><code>company_token_transaction:read</code></li>
@@ -59,7 +64,7 @@ public class RawCompanyTokenTransactionsClient {
     }
 
     /**
-     * Returns a paginated list of token transactions for a user or company, depending on the authenticated actor, with optional filtering by user and transaction type.
+     * Lists an account's token transactions, newest first.
      * <p>Required permissions:</p>
      * <ul>
      * <li><code>company_token_transaction:read</code></li>
@@ -69,7 +74,7 @@ public class RawCompanyTokenTransactionsClient {
      */
     public WhopApiHttpResponse<SyncPagingIterable<CompanyTokenTransactionListItem>> list(
             ListCompanyTokenTransactionsRequest request, RequestOptions requestOptions) {
-        HttpUrl.Builder httpUrl = HttpUrl.parse(this.clientOptions.environment().getUrl())
+        HttpUrl.Builder httpUrl = HttpUrl.parse(this.clientOptions.environment().getApiURL())
                 .newBuilder()
                 .addPathSegments("company_token_transactions");
         if (request.getAfter().isPresent()) {
@@ -88,7 +93,6 @@ public class RawCompanyTokenTransactionsClient {
             QueryStringMapper.addQueryParameter(
                     httpUrl, "last", request.getLast().get(), false);
         }
-        QueryStringMapper.addQueryParameter(httpUrl, "company_id", request.getCompanyId(), false);
         if (request.getUserId().isPresent()) {
             QueryStringMapper.addQueryParameter(
                     httpUrl, "user_id", request.getUserId().get(), false);
@@ -97,6 +101,7 @@ public class RawCompanyTokenTransactionsClient {
             QueryStringMapper.addQueryParameter(
                     httpUrl, "transaction_type", request.getTransactionType().get(), false);
         }
+        QueryStringMapper.addQueryParameter(httpUrl, "account_id", request.getAccountId(), false);
         if (requestOptions != null) {
             requestOptions.getQueryParameters().forEach((_key, _value) -> {
                 httpUrl.addQueryParameter(_key, _value);
@@ -111,6 +116,15 @@ public class RawCompanyTokenTransactionsClient {
         OkHttpClient client = clientOptions.httpClient();
         if (requestOptions != null && requestOptions.getTimeout().isPresent()) {
             client = clientOptions.httpClientWithTimeout(requestOptions);
+        }
+        if (requestOptions != null && requestOptions.getMaxRetries().isPresent()) {
+            okhttpRequest = okhttpRequest
+                    .newBuilder()
+                    .tag(
+                            RetryInterceptor.MaxRetriesOverride.class,
+                            new RetryInterceptor.MaxRetriesOverride(
+                                    requestOptions.getMaxRetries().get()))
+                    .build();
         }
         try (Response response = client.newCall(okhttpRequest).execute()) {
             ResponseBody responseBody = response.body();
@@ -126,8 +140,11 @@ public class RawCompanyTokenTransactionsClient {
                 List<CompanyTokenTransactionListItem> result = parsedResponse.getData();
                 return new WhopApiHttpResponse<>(
                         new SyncPagingIterable<CompanyTokenTransactionListItem>(
-                                startingAfter != null, result, parsedResponse, () -> list(nextRequest, requestOptions)
-                                        .body()),
+                                startingAfter.isPresent()
+                                        && !startingAfter.get().isEmpty(),
+                                result,
+                                parsedResponse,
+                                () -> list(nextRequest, requestOptions).body()),
                         response);
             }
             try {
@@ -146,13 +163,16 @@ public class RawCompanyTokenTransactionsClient {
                                 ObjectMappers.JSON_MAPPER.readValue(responseBodyString, Object.class), response);
                     case 422:
                         throw new UnprocessableEntityError(
-                                ObjectMappers.JSON_MAPPER.readValue(responseBodyString, Object.class), response);
+                                ObjectMappers.JSON_MAPPER.readValue(
+                                        responseBodyString, UnprocessableEntityErrorBody.class),
+                                response);
                     case 429:
                         throw new TooManyRequestsError(
                                 ObjectMappers.JSON_MAPPER.readValue(responseBodyString, Object.class), response);
                     case 500:
                         throw new InternalServerError(
-                                ObjectMappers.JSON_MAPPER.readValue(responseBodyString, Object.class), response);
+                                ObjectMappers.JSON_MAPPER.readValue(responseBodyString, InternalServerErrorBody.class),
+                                response);
                 }
             } catch (JsonProcessingException ignored) {
                 // unable to map error response, throwing generic error
@@ -160,13 +180,15 @@ public class RawCompanyTokenTransactionsClient {
             Object errorBody = ObjectMappers.parseErrorBody(responseBodyString);
             throw new WhopApiApiException(
                     "Error with status code " + response.code(), response.code(), errorBody, response);
+        } catch (JsonProcessingException e) {
+            throw new WhopApiException("Failed to deserialize response: " + e.getMessage(), e);
         } catch (IOException e) {
             throw new WhopApiException("Network error executing HTTP request", e);
         }
     }
 
     /**
-     * Create a token transaction to add, subtract, or transfer tokens for a member within a company.
+     * Creates a token transaction that adds, subtracts, or transfers tokens for a member of an account.
      * <p>Required permissions:</p>
      * <ul>
      * <li><code>company_token_transaction:create</code></li>
@@ -179,7 +201,7 @@ public class RawCompanyTokenTransactionsClient {
     }
 
     /**
-     * Create a token transaction to add, subtract, or transfer tokens for a member within a company.
+     * Creates a token transaction that adds, subtracts, or transfers tokens for a member of an account.
      * <p>Required permissions:</p>
      * <ul>
      * <li><code>company_token_transaction:create</code></li>
@@ -189,7 +211,7 @@ public class RawCompanyTokenTransactionsClient {
      */
     public WhopApiHttpResponse<CompanyTokenTransaction> create(
             CreateCompanyTokenTransactionsRequest request, RequestOptions requestOptions) {
-        HttpUrl.Builder httpUrl = HttpUrl.parse(this.clientOptions.environment().getUrl())
+        HttpUrl.Builder httpUrl = HttpUrl.parse(this.clientOptions.environment().getApiURL())
                 .newBuilder()
                 .addPathSegments("company_token_transactions");
         if (requestOptions != null) {
@@ -200,7 +222,9 @@ public class RawCompanyTokenTransactionsClient {
         RequestBody body;
         try {
             body = RequestBody.create(
-                    ObjectMappers.JSON_MAPPER.writeValueAsBytes(request), MediaTypes.APPLICATION_JSON);
+                    ObjectMappers.JSON_MAPPER.writeValueAsBytes(BodyProperties.merge(
+                            request, requestOptions != null ? requestOptions.getBodyProperties() : null)),
+                    MediaTypes.APPLICATION_JSON);
         } catch (JsonProcessingException e) {
             throw new WhopApiException("Failed to serialize request", e);
         }
@@ -214,6 +238,15 @@ public class RawCompanyTokenTransactionsClient {
         OkHttpClient client = clientOptions.httpClient();
         if (requestOptions != null && requestOptions.getTimeout().isPresent()) {
             client = clientOptions.httpClientWithTimeout(requestOptions);
+        }
+        if (requestOptions != null && requestOptions.getMaxRetries().isPresent()) {
+            okhttpRequest = okhttpRequest
+                    .newBuilder()
+                    .tag(
+                            RetryInterceptor.MaxRetriesOverride.class,
+                            new RetryInterceptor.MaxRetriesOverride(
+                                    requestOptions.getMaxRetries().get()))
+                    .build();
         }
         try (Response response = client.newCall(okhttpRequest).execute()) {
             ResponseBody responseBody = response.body();
@@ -239,13 +272,16 @@ public class RawCompanyTokenTransactionsClient {
                                 ObjectMappers.JSON_MAPPER.readValue(responseBodyString, Object.class), response);
                     case 422:
                         throw new UnprocessableEntityError(
-                                ObjectMappers.JSON_MAPPER.readValue(responseBodyString, Object.class), response);
+                                ObjectMappers.JSON_MAPPER.readValue(
+                                        responseBodyString, UnprocessableEntityErrorBody.class),
+                                response);
                     case 429:
                         throw new TooManyRequestsError(
                                 ObjectMappers.JSON_MAPPER.readValue(responseBodyString, Object.class), response);
                     case 500:
                         throw new InternalServerError(
-                                ObjectMappers.JSON_MAPPER.readValue(responseBodyString, Object.class), response);
+                                ObjectMappers.JSON_MAPPER.readValue(responseBodyString, InternalServerErrorBody.class),
+                                response);
                 }
             } catch (JsonProcessingException ignored) {
                 // unable to map error response, throwing generic error
@@ -253,13 +289,15 @@ public class RawCompanyTokenTransactionsClient {
             Object errorBody = ObjectMappers.parseErrorBody(responseBodyString);
             throw new WhopApiApiException(
                     "Error with status code " + response.code(), response.code(), errorBody, response);
+        } catch (JsonProcessingException e) {
+            throw new WhopApiException("Failed to deserialize response: " + e.getMessage(), e);
         } catch (IOException e) {
             throw new WhopApiException("Network error executing HTTP request", e);
         }
     }
 
     /**
-     * Retrieves the details of an existing company token transaction.
+     * Retrieves a token transaction.
      * <p>Required permissions:</p>
      * <ul>
      * <li><code>company_token_transaction:read</code></li>
@@ -272,7 +310,7 @@ public class RawCompanyTokenTransactionsClient {
     }
 
     /**
-     * Retrieves the details of an existing company token transaction.
+     * Retrieves a token transaction.
      * <p>Required permissions:</p>
      * <ul>
      * <li><code>company_token_transaction:read</code></li>
@@ -285,7 +323,7 @@ public class RawCompanyTokenTransactionsClient {
     }
 
     /**
-     * Retrieves the details of an existing company token transaction.
+     * Retrieves a token transaction.
      * <p>Required permissions:</p>
      * <ul>
      * <li><code>company_token_transaction:read</code></li>
@@ -299,7 +337,7 @@ public class RawCompanyTokenTransactionsClient {
     }
 
     /**
-     * Retrieves the details of an existing company token transaction.
+     * Retrieves a token transaction.
      * <p>Required permissions:</p>
      * <ul>
      * <li><code>company_token_transaction:read</code></li>
@@ -309,10 +347,10 @@ public class RawCompanyTokenTransactionsClient {
      */
     public WhopApiHttpResponse<CompanyTokenTransaction> retrieve(
             String id, RetrieveCompanyTokenTransactionsRequest request, RequestOptions requestOptions) {
-        HttpUrl.Builder httpUrl = HttpUrl.parse(this.clientOptions.environment().getUrl())
+        HttpUrl.Builder httpUrl = HttpUrl.parse(this.clientOptions.environment().getApiURL())
                 .newBuilder()
                 .addPathSegments("company_token_transactions")
-                .addPathSegment(id);
+                .addPathSegment(PathSegments.validate(id));
         if (requestOptions != null) {
             requestOptions.getQueryParameters().forEach((_key, _value) -> {
                 httpUrl.addQueryParameter(_key, _value);
@@ -328,6 +366,15 @@ public class RawCompanyTokenTransactionsClient {
         if (requestOptions != null && requestOptions.getTimeout().isPresent()) {
             client = clientOptions.httpClientWithTimeout(requestOptions);
         }
+        if (requestOptions != null && requestOptions.getMaxRetries().isPresent()) {
+            okhttpRequest = okhttpRequest
+                    .newBuilder()
+                    .tag(
+                            RetryInterceptor.MaxRetriesOverride.class,
+                            new RetryInterceptor.MaxRetriesOverride(
+                                    requestOptions.getMaxRetries().get()))
+                    .build();
+        }
         try (Response response = client.newCall(okhttpRequest).execute()) {
             ResponseBody responseBody = response.body();
             String responseBodyString = responseBody != null ? responseBody.string() : "{}";
@@ -352,13 +399,16 @@ public class RawCompanyTokenTransactionsClient {
                                 ObjectMappers.JSON_MAPPER.readValue(responseBodyString, Object.class), response);
                     case 422:
                         throw new UnprocessableEntityError(
-                                ObjectMappers.JSON_MAPPER.readValue(responseBodyString, Object.class), response);
+                                ObjectMappers.JSON_MAPPER.readValue(
+                                        responseBodyString, UnprocessableEntityErrorBody.class),
+                                response);
                     case 429:
                         throw new TooManyRequestsError(
                                 ObjectMappers.JSON_MAPPER.readValue(responseBodyString, Object.class), response);
                     case 500:
                         throw new InternalServerError(
-                                ObjectMappers.JSON_MAPPER.readValue(responseBodyString, Object.class), response);
+                                ObjectMappers.JSON_MAPPER.readValue(responseBodyString, InternalServerErrorBody.class),
+                                response);
                 }
             } catch (JsonProcessingException ignored) {
                 // unable to map error response, throwing generic error
@@ -366,6 +416,8 @@ public class RawCompanyTokenTransactionsClient {
             Object errorBody = ObjectMappers.parseErrorBody(responseBodyString);
             throw new WhopApiApiException(
                     "Error with status code " + response.code(), response.code(), errorBody, response);
+        } catch (JsonProcessingException e) {
+            throw new WhopApiException("Failed to deserialize response: " + e.getMessage(), e);
         } catch (IOException e) {
             throw new WhopApiException("Network error executing HTTP request", e);
         }

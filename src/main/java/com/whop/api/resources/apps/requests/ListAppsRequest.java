@@ -30,9 +30,21 @@ public final class ListAppsRequest {
 
     private final Optional<ListAppsRequestViewType> viewType;
 
+    private final Optional<Boolean> verified;
+
     private final Optional<Boolean> verifiedAppsOnly;
 
+    private final Optional<Boolean> recommended;
+
     private final Optional<String> query;
+
+    private final Optional<String> productCategory;
+
+    private final Optional<String> businessType;
+
+    private final Optional<String> industryType;
+
+    private final Optional<String> marketplaceCategoryRoute;
 
     private final Optional<ListAppsRequestOrder> order;
 
@@ -46,32 +58,48 @@ public final class ListAppsRequest {
 
     private final Optional<String> before;
 
+    private final Optional<Boolean> includeTotalCount;
+
     private final Map<String, Object> additionalProperties;
 
     private ListAppsRequest(
             Optional<String> accountId,
             Optional<ListAppsRequestAppType> appType,
             Optional<ListAppsRequestViewType> viewType,
+            Optional<Boolean> verified,
             Optional<Boolean> verifiedAppsOnly,
+            Optional<Boolean> recommended,
             Optional<String> query,
+            Optional<String> productCategory,
+            Optional<String> businessType,
+            Optional<String> industryType,
+            Optional<String> marketplaceCategoryRoute,
             Optional<ListAppsRequestOrder> order,
             Optional<ListAppsRequestDirection> direction,
             Optional<Integer> first,
             Optional<String> after,
             Optional<Integer> last,
             Optional<String> before,
+            Optional<Boolean> includeTotalCount,
             Map<String, Object> additionalProperties) {
         this.accountId = accountId;
         this.appType = appType;
         this.viewType = viewType;
+        this.verified = verified;
         this.verifiedAppsOnly = verifiedAppsOnly;
+        this.recommended = recommended;
         this.query = query;
+        this.productCategory = productCategory;
+        this.businessType = businessType;
+        this.industryType = industryType;
+        this.marketplaceCategoryRoute = marketplaceCategoryRoute;
         this.order = order;
         this.direction = direction;
         this.first = first;
         this.after = after;
         this.last = last;
         this.before = before;
+        this.includeTotalCount = includeTotalCount;
         this.additionalProperties = additionalProperties;
     }
 
@@ -100,11 +128,27 @@ public final class ListAppsRequest {
     }
 
     /**
-     * @return Whether to only return apps verified by Whop. Verified website templates — websites with a published web build — are included, even though websites are otherwise left out of app lists.
+     * @return Only return apps whose Whop verification status matches this value. Omit this filter to include every verification status the caller can see.
+     */
+    @JsonProperty("verified")
+    public Optional<Boolean> getVerified() {
+        return verified;
+    }
+
+    /**
+     * @return Legacy compatibility filter. Use <code>verified</code> for field equality. <code>true</code> returns verified apps; clients pinned before <code>2026-08-25-2</code> retain the earlier public website discovery behavior.
      */
     @JsonProperty("verified_apps_only")
     public Optional<Boolean> getVerifiedAppsOnly() {
         return verifiedAppsOnly;
+    }
+
+    /**
+     * @return Only return apps Whop recommends (or, with <code>false</code>, only those it does not), independently of verification status.
+     */
+    @JsonProperty("recommended")
+    public Optional<Boolean> getRecommended() {
+        return recommended;
     }
 
     /**
@@ -116,7 +160,39 @@ public final class ListAppsRequest {
     }
 
     /**
-     * @return The field to sort apps by. Defaults to discoverable_at, showing the most recently published apps first. <code>template_usage</code> ranks Whop-verified apps first, then apps with a banner image, then by how many apps were created from each app as a template.
+     * @return Only return apps whose <code>product_category</code> is this product category, such as <code>pressure_washing</code>. An unknown product category is rejected.
+     */
+    @JsonProperty("product_category")
+    public Optional<String> getProductCategory() {
+        return productCategory;
+    }
+
+    /**
+     * @return Only return apps whose <code>product_category</code> sits under this business type in Whop's business taxonomy, such as <code>services</code>. An unknown business type is rejected.
+     */
+    @JsonProperty("business_type")
+    public Optional<String> getBusinessType() {
+        return businessType;
+    }
+
+    /**
+     * @return Only return apps whose <code>product_category</code> sits under this industry type of <code>business_type</code>, such as <code>exterior_cleaning</code>. Requires <code>business_type</code>. An industry type outside it is rejected.
+     */
+    @JsonProperty("industry_type")
+    public Optional<String> getIndustryType() {
+        return industryType;
+    }
+
+    /**
+     * @return Only return apps in this app store category. Use a <code>route</code> from <code>GET /apps/categories</code>, such as <code>business-productivity</code>. An unknown route is rejected.
+     */
+    @JsonProperty("marketplace_category_route")
+    public Optional<String> getMarketplaceCategoryRoute() {
+        return marketplaceCategoryRoute;
+    }
+
+    /**
+     * @return The field to sort apps by. Defaults to discoverable_at, showing the most recently published apps first. <code>template_usage</code> ranks Whop-verified apps first, then by how many businesses created apps from each app as a template. <code>template_recent_sales</code> ranks them by how many of those businesses processed a payment in the last 24 hours, recounted hourly, breaking ties by <code>template_usage</code>.
      */
     @JsonProperty("order")
     public Optional<ListAppsRequestOrder> getOrder() {
@@ -132,7 +208,7 @@ public final class ListAppsRequest {
     }
 
     /**
-     * @return The number of apps to return (default 20, max 100).
+     * @return Number of results to return from the start of the range.
      */
     @JsonProperty("first")
     public Optional<Integer> getFirst() {
@@ -140,7 +216,7 @@ public final class ListAppsRequest {
     }
 
     /**
-     * @return A cursor; returns apps after this position.
+     * @return Return results after this cursor. Use <code>page_info.end_cursor</code> from the previous response to fetch the next page.
      */
     @JsonProperty("after")
     public Optional<String> getAfter() {
@@ -148,7 +224,7 @@ public final class ListAppsRequest {
     }
 
     /**
-     * @return The number of apps to return from the end of the range.
+     * @return Number of results to return from the end of the range.
      */
     @JsonProperty("last")
     public Optional<Integer> getLast() {
@@ -156,11 +232,19 @@ public final class ListAppsRequest {
     }
 
     /**
-     * @return A cursor; returns apps before this position.
+     * @return Return results before this cursor. Use <code>page_info.start_cursor</code> from the previous response to fetch the previous page.
      */
     @JsonProperty("before")
     public Optional<String> getBefore() {
         return before;
+    }
+
+    /**
+     * @return Set to <code>true</code> to return the number of matching results in <code>page_info.total_count</code>. Send <code>first=0</code> as well to return the count without any results.
+     */
+    @JsonProperty("include_total_count")
+    public Optional<Boolean> getIncludeTotalCount() {
+        return includeTotalCount;
     }
 
     @java.lang.Override
@@ -178,14 +262,21 @@ public final class ListAppsRequest {
         return accountId.equals(other.accountId)
                 && appType.equals(other.appType)
                 && viewType.equals(other.viewType)
+                && verified.equals(other.verified)
                 && verifiedAppsOnly.equals(other.verifiedAppsOnly)
+                && recommended.equals(other.recommended)
                 && query.equals(other.query)
+                && productCategory.equals(other.productCategory)
+                && businessType.equals(other.businessType)
+                && industryType.equals(other.industryType)
+                && marketplaceCategoryRoute.equals(other.marketplaceCategoryRoute)
                 && order.equals(other.order)
                 && direction.equals(other.direction)
                 && first.equals(other.first)
                 && after.equals(other.after)
                 && last.equals(other.last)
-                && before.equals(other.before);
+                && before.equals(other.before)
+                && includeTotalCount.equals(other.includeTotalCount);
     }
 
     @java.lang.Override
@@ -194,14 +285,21 @@ public final class ListAppsRequest {
                 this.accountId,
                 this.appType,
                 this.viewType,
+                this.verified,
                 this.verifiedAppsOnly,
+                this.recommended,
                 this.query,
+                this.productCategory,
+                this.businessType,
+                this.industryType,
+                this.marketplaceCategoryRoute,
                 this.order,
                 this.direction,
                 this.first,
                 this.after,
                 this.last,
-                this.before);
+                this.before,
+                this.includeTotalCount);
     }
 
     @java.lang.Override
@@ -221,9 +319,21 @@ public final class ListAppsRequest {
 
         private Optional<ListAppsRequestViewType> viewType = Optional.empty();
 
+        private Optional<Boolean> verified = Optional.empty();
+
         private Optional<Boolean> verifiedAppsOnly = Optional.empty();
 
+        private Optional<Boolean> recommended = Optional.empty();
+
         private Optional<String> query = Optional.empty();
+
+        private Optional<String> productCategory = Optional.empty();
+
+        private Optional<String> businessType = Optional.empty();
+
+        private Optional<String> industryType = Optional.empty();
+
+        private Optional<String> marketplaceCategoryRoute = Optional.empty();
 
         private Optional<ListAppsRequestOrder> order = Optional.empty();
 
@@ -237,7 +347,8 @@ public final class ListAppsRequest {
 
         private Optional<String> before = Optional.empty();
 
-        @JsonAnySetter
+        private Optional<Boolean> includeTotalCount = Optional.empty();
+
         private Map<String, Object> additionalProperties = new HashMap<>();
 
         private Builder() {}
@@ -246,14 +357,21 @@ public final class ListAppsRequest {
             accountId(other.getAccountId());
             appType(other.getAppType());
             viewType(other.getViewType());
+            verified(other.getVerified());
             verifiedAppsOnly(other.getVerifiedAppsOnly());
+            recommended(other.getRecommended());
             query(other.getQuery());
+            productCategory(other.getProductCategory());
+            businessType(other.getBusinessType());
+            industryType(other.getIndustryType());
+            marketplaceCategoryRoute(other.getMarketplaceCategoryRoute());
             order(other.getOrder());
             direction(other.getDirection());
             first(other.getFirst());
             after(other.getAfter());
             last(other.getLast());
             before(other.getBefore());
+            includeTotalCount(other.getIncludeTotalCount());
             return this;
         }
 
@@ -300,7 +418,21 @@ public final class ListAppsRequest {
         }
 
         /**
-         * <p>Whether to only return apps verified by Whop. Verified website templates — websites with a published web build — are included, even though websites are otherwise left out of app lists.</p>
+         * <p>Only return apps whose Whop verification status matches this value. Omit this filter to include every verification status the caller can see.</p>
+         */
+        @JsonSetter(value = "verified", nulls = Nulls.SKIP)
+        public Builder verified(Optional<Boolean> verified) {
+            this.verified = verified;
+            return this;
+        }
+
+        public Builder verified(Boolean verified) {
+            this.verified = Optional.ofNullable(verified);
+            return this;
+        }
+
+        /**
+         * <p>Legacy compatibility filter. Use <code>verified</code> for field equality. <code>true</code> returns verified apps; clients pinned before <code>2026-08-25-2</code> retain the earlier public website discovery behavior.</p>
          */
         @JsonSetter(value = "verified_apps_only", nulls = Nulls.SKIP)
         public Builder verifiedAppsOnly(Optional<Boolean> verifiedAppsOnly) {
@@ -310,6 +442,20 @@ public final class ListAppsRequest {
 
         public Builder verifiedAppsOnly(Boolean verifiedAppsOnly) {
             this.verifiedAppsOnly = Optional.ofNullable(verifiedAppsOnly);
+            return this;
+        }
+
+        /**
+         * <p>Only return apps Whop recommends (or, with <code>false</code>, only those it does not), independently of verification status.</p>
+         */
+        @JsonSetter(value = "recommended", nulls = Nulls.SKIP)
+        public Builder recommended(Optional<Boolean> recommended) {
+            this.recommended = recommended;
+            return this;
+        }
+
+        public Builder recommended(Boolean recommended) {
+            this.recommended = Optional.ofNullable(recommended);
             return this;
         }
 
@@ -328,7 +474,63 @@ public final class ListAppsRequest {
         }
 
         /**
-         * <p>The field to sort apps by. Defaults to discoverable_at, showing the most recently published apps first. <code>template_usage</code> ranks Whop-verified apps first, then apps with a banner image, then by how many apps were created from each app as a template.</p>
+         * <p>Only return apps whose <code>product_category</code> is this product category, such as <code>pressure_washing</code>. An unknown product category is rejected.</p>
+         */
+        @JsonSetter(value = "product_category", nulls = Nulls.SKIP)
+        public Builder productCategory(Optional<String> productCategory) {
+            this.productCategory = productCategory;
+            return this;
+        }
+
+        public Builder productCategory(String productCategory) {
+            this.productCategory = Optional.ofNullable(productCategory);
+            return this;
+        }
+
+        /**
+         * <p>Only return apps whose <code>product_category</code> sits under this business type in Whop's business taxonomy, such as <code>services</code>. An unknown business type is rejected.</p>
+         */
+        @JsonSetter(value = "business_type", nulls = Nulls.SKIP)
+        public Builder businessType(Optional<String> businessType) {
+            this.businessType = businessType;
+            return this;
+        }
+
+        public Builder businessType(String businessType) {
+            this.businessType = Optional.ofNullable(businessType);
+            return this;
+        }
+
+        /**
+         * <p>Only return apps whose <code>product_category</code> sits under this industry type of <code>business_type</code>, such as <code>exterior_cleaning</code>. Requires <code>business_type</code>. An industry type outside it is rejected.</p>
+         */
+        @JsonSetter(value = "industry_type", nulls = Nulls.SKIP)
+        public Builder industryType(Optional<String> industryType) {
+            this.industryType = industryType;
+            return this;
+        }
+
+        public Builder industryType(String industryType) {
+            this.industryType = Optional.ofNullable(industryType);
+            return this;
+        }
+
+        /**
+         * <p>Only return apps in this app store category. Use a <code>route</code> from <code>GET /apps/categories</code>, such as <code>business-productivity</code>. An unknown route is rejected.</p>
+         */
+        @JsonSetter(value = "marketplace_category_route", nulls = Nulls.SKIP)
+        public Builder marketplaceCategoryRoute(Optional<String> marketplaceCategoryRoute) {
+            this.marketplaceCategoryRoute = marketplaceCategoryRoute;
+            return this;
+        }
+
+        public Builder marketplaceCategoryRoute(String marketplaceCategoryRoute) {
+            this.marketplaceCategoryRoute = Optional.ofNullable(marketplaceCategoryRoute);
+            return this;
+        }
+
+        /**
+         * <p>The field to sort apps by. Defaults to discoverable_at, showing the most recently published apps first. <code>template_usage</code> ranks Whop-verified apps first, then by how many businesses created apps from each app as a template. <code>template_recent_sales</code> ranks them by how many of those businesses processed a payment in the last 24 hours, recounted hourly, breaking ties by <code>template_usage</code>.</p>
          */
         @JsonSetter(value = "order", nulls = Nulls.SKIP)
         public Builder order(Optional<ListAppsRequestOrder> order) {
@@ -356,7 +558,7 @@ public final class ListAppsRequest {
         }
 
         /**
-         * <p>The number of apps to return (default 20, max 100).</p>
+         * <p>Number of results to return from the start of the range.</p>
          */
         @JsonSetter(value = "first", nulls = Nulls.SKIP)
         public Builder first(Optional<Integer> first) {
@@ -370,7 +572,7 @@ public final class ListAppsRequest {
         }
 
         /**
-         * <p>A cursor; returns apps after this position.</p>
+         * <p>Return results after this cursor. Use <code>page_info.end_cursor</code> from the previous response to fetch the next page.</p>
          */
         @JsonSetter(value = "after", nulls = Nulls.SKIP)
         public Builder after(Optional<String> after) {
@@ -384,7 +586,7 @@ public final class ListAppsRequest {
         }
 
         /**
-         * <p>The number of apps to return from the end of the range.</p>
+         * <p>Number of results to return from the end of the range.</p>
          */
         @JsonSetter(value = "last", nulls = Nulls.SKIP)
         public Builder last(Optional<Integer> last) {
@@ -398,7 +600,7 @@ public final class ListAppsRequest {
         }
 
         /**
-         * <p>A cursor; returns apps before this position.</p>
+         * <p>Return results before this cursor. Use <code>page_info.start_cursor</code> from the previous response to fetch the previous page.</p>
          */
         @JsonSetter(value = "before", nulls = Nulls.SKIP)
         public Builder before(Optional<String> before) {
@@ -411,20 +613,66 @@ public final class ListAppsRequest {
             return this;
         }
 
+        /**
+         * <p>Set to <code>true</code> to return the number of matching results in <code>page_info.total_count</code>. Send <code>first=0</code> as well to return the count without any results.</p>
+         */
+        @JsonSetter(value = "include_total_count", nulls = Nulls.SKIP)
+        public Builder includeTotalCount(Optional<Boolean> includeTotalCount) {
+            this.includeTotalCount = includeTotalCount;
+            return this;
+        }
+
+        public Builder includeTotalCount(Boolean includeTotalCount) {
+            this.includeTotalCount = Optional.ofNullable(includeTotalCount);
+            return this;
+        }
+
         public ListAppsRequest build() {
             return new ListAppsRequest(
                     accountId,
                     appType,
                     viewType,
+                    verified,
                     verifiedAppsOnly,
+                    recommended,
                     query,
+                    productCategory,
+                    businessType,
+                    industryType,
+                    marketplaceCategoryRoute,
                     order,
                     direction,
                     first,
                     after,
                     last,
                     before,
+                    includeTotalCount,
                     additionalProperties);
+        }
+
+        @JsonAnySetter
+        private void putAdditionalPropertyFromJson(String key, Object value) {
+            if (key.equalsIgnoreCase("account_id")
+                    || key.equalsIgnoreCase("app_type")
+                    || key.equalsIgnoreCase("view_type")
+                    || key.equalsIgnoreCase("verified")
+                    || key.equalsIgnoreCase("verified_apps_only")
+                    || key.equalsIgnoreCase("recommended")
+                    || key.equalsIgnoreCase("query")
+                    || key.equalsIgnoreCase("product_category")
+                    || key.equalsIgnoreCase("business_type")
+                    || key.equalsIgnoreCase("industry_type")
+                    || key.equalsIgnoreCase("marketplace_category_route")
+                    || key.equalsIgnoreCase("order")
+                    || key.equalsIgnoreCase("direction")
+                    || key.equalsIgnoreCase("first")
+                    || key.equalsIgnoreCase("after")
+                    || key.equalsIgnoreCase("last")
+                    || key.equalsIgnoreCase("before")
+                    || key.equalsIgnoreCase("include_total_count")) {
+                return;
+            }
+            this.additionalProperties.put(key, value);
         }
 
         public Builder additionalProperty(String key, Object value) {

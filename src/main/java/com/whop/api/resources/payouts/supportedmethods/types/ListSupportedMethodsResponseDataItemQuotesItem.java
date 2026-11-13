@@ -64,7 +64,7 @@ public final class ListSupportedMethodsResponseDataItemQuotesItem {
     }
 
     /**
-     * @return The withdrawal amount the quote is for.
+     * @return The payout amount the quote is for.
      */
     @JsonProperty("amount")
     public float getAmount() {
@@ -88,7 +88,7 @@ public final class ListSupportedMethodsResponseDataItemQuotesItem {
     }
 
     /**
-     * @return Exchange rate from the withdrawal currency to the destination currency.
+     * @return Exchange rate from the payout currency to the destination currency.
      */
     @JsonProperty("exchange_rate")
     public float getExchangeRate() {
@@ -107,7 +107,7 @@ public final class ListSupportedMethodsResponseDataItemQuotesItem {
     }
 
     /**
-     * @return Maximum withdrawal amount, in the withdrawal currency.
+     * @return Maximum payout amount, in the payout currency.
      */
     @JsonIgnore
     public Optional<Float> getMaxLimit() {
@@ -118,7 +118,7 @@ public final class ListSupportedMethodsResponseDataItemQuotesItem {
     }
 
     /**
-     * @return Minimum withdrawal amount, in the withdrawal currency.
+     * @return Minimum payout amount, in the payout currency.
      */
     @JsonProperty("min_limit")
     public float getMinLimit() {
@@ -201,7 +201,7 @@ public final class ListSupportedMethodsResponseDataItemQuotesItem {
 
     public interface AmountStage {
         /**
-         * <p>The withdrawal amount the quote is for.</p>
+         * <p>The payout amount the quote is for.</p>
          */
         CurrencyStage amount(float amount);
 
@@ -224,14 +224,14 @@ public final class ListSupportedMethodsResponseDataItemQuotesItem {
 
     public interface ExchangeRateStage {
         /**
-         * <p>Exchange rate from the withdrawal currency to the destination currency.</p>
+         * <p>Exchange rate from the payout currency to the destination currency.</p>
          */
         MinLimitStage exchangeRate(float exchangeRate);
     }
 
     public interface MinLimitStage {
         /**
-         * <p>Minimum withdrawal amount, in the withdrawal currency.</p>
+         * <p>Minimum payout amount, in the payout currency.</p>
          */
         _FinalStage minLimit(float minLimit);
     }
@@ -253,7 +253,7 @@ public final class ListSupportedMethodsResponseDataItemQuotesItem {
         _FinalStage instant(Nullable<ListSupportedMethodsResponseDataItemQuotesItemInstant> instant);
 
         /**
-         * <p>Maximum withdrawal amount, in the withdrawal currency.</p>
+         * <p>Maximum payout amount, in the payout currency.</p>
          */
         _FinalStage maxLimit(Optional<Float> maxLimit);
 
@@ -295,7 +295,6 @@ public final class ListSupportedMethodsResponseDataItemQuotesItem {
 
         private Optional<ListSupportedMethodsResponseDataItemQuotesItemInstant> instant = Optional.empty();
 
-        @JsonAnySetter
         private Map<String, Object> additionalProperties = new HashMap<>();
 
         private Builder() {}
@@ -314,8 +313,7 @@ public final class ListSupportedMethodsResponseDataItemQuotesItem {
         }
 
         /**
-         * <p>The withdrawal amount the quote is for.</p>
-         * <p>The withdrawal amount the quote is for.</p>
+         * <p>The payout amount the quote is for.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
@@ -326,7 +324,6 @@ public final class ListSupportedMethodsResponseDataItemQuotesItem {
         }
 
         /**
-         * <p>Currency of the quoted amount.</p>
          * <p>Currency of the quoted amount.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
@@ -339,7 +336,6 @@ public final class ListSupportedMethodsResponseDataItemQuotesItem {
 
         /**
          * <p>Currency the funds are delivered in.</p>
-         * <p>Currency the funds are delivered in.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
@@ -351,8 +347,7 @@ public final class ListSupportedMethodsResponseDataItemQuotesItem {
         }
 
         /**
-         * <p>Exchange rate from the withdrawal currency to the destination currency.</p>
-         * <p>Exchange rate from the withdrawal currency to the destination currency.</p>
+         * <p>Exchange rate from the payout currency to the destination currency.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
@@ -363,8 +358,7 @@ public final class ListSupportedMethodsResponseDataItemQuotesItem {
         }
 
         /**
-         * <p>Minimum withdrawal amount, in the withdrawal currency.</p>
-         * <p>Minimum withdrawal amount, in the withdrawal currency.</p>
+         * <p>Minimum payout amount, in the payout currency.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
@@ -411,7 +405,7 @@ public final class ListSupportedMethodsResponseDataItemQuotesItem {
         }
 
         /**
-         * <p>Maximum withdrawal amount, in the withdrawal currency.</p>
+         * <p>Maximum payout amount, in the payout currency.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
@@ -427,7 +421,7 @@ public final class ListSupportedMethodsResponseDataItemQuotesItem {
         }
 
         /**
-         * <p>Maximum withdrawal amount, in the withdrawal currency.</p>
+         * <p>Maximum payout amount, in the payout currency.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
@@ -437,7 +431,7 @@ public final class ListSupportedMethodsResponseDataItemQuotesItem {
         }
 
         /**
-         * <p>Maximum withdrawal amount, in the withdrawal currency.</p>
+         * <p>Maximum payout amount, in the payout currency.</p>
          */
         @java.lang.Override
         @JsonSetter(value = "max_limit", nulls = Nulls.SKIP)
@@ -494,6 +488,21 @@ public final class ListSupportedMethodsResponseDataItemQuotesItem {
                     minLimit,
                     standard,
                     additionalProperties);
+        }
+
+        @JsonAnySetter
+        private void putAdditionalPropertyFromJson(String key, Object value) {
+            if (key.equalsIgnoreCase("amount")
+                    || key.equalsIgnoreCase("currency")
+                    || key.equalsIgnoreCase("destination_currency")
+                    || key.equalsIgnoreCase("exchange_rate")
+                    || key.equalsIgnoreCase("instant")
+                    || key.equalsIgnoreCase("max_limit")
+                    || key.equalsIgnoreCase("min_limit")
+                    || key.equalsIgnoreCase("standard")) {
+                return;
+            }
+            this.additionalProperties.put(key, value);
         }
 
         @java.lang.Override

@@ -43,7 +43,7 @@ public final class Money {
     }
 
     /**
-     * @return The amount in major units, as an exact decimal string — <code>&quot;10.00&quot;</code> is ten dollars. A string so no float rounds it in transit.
+     * @return The amount in major units, as an exact decimal string. For example, <code>&quot;10.00&quot;</code> is ten dollars. It is a string so that no float rounds it in transit.
      */
     @JsonProperty("amount")
     public String getAmount() {
@@ -59,7 +59,7 @@ public final class Money {
     }
 
     /**
-     * @return How many decimal places the amount CARRIES — the precision the charge itself runs at.
+     * @return How many decimal places the amount carries. This is the precision the charge itself runs at.
      */
     @JsonProperty("decimals")
     public int getDecimals() {
@@ -108,7 +108,7 @@ public final class Money {
 
     public interface AmountStage {
         /**
-         * <p>The amount in major units, as an exact decimal string — <code>&quot;10.00&quot;</code> is ten dollars. A string so no float rounds it in transit.</p>
+         * <p>The amount in major units, as an exact decimal string. For example, <code>&quot;10.00&quot;</code> is ten dollars. It is a string so that no float rounds it in transit.</p>
          */
         CurrencyStage amount(@NotNull String amount);
 
@@ -124,7 +124,7 @@ public final class Money {
 
     public interface DecimalsStage {
         /**
-         * <p>How many decimal places the amount CARRIES — the precision the charge itself runs at.</p>
+         * <p>How many decimal places the amount carries. This is the precision the charge itself runs at.</p>
          */
         DisplayDecimalsStage decimals(int decimals);
     }
@@ -155,7 +155,6 @@ public final class Money {
 
         private int displayDecimals;
 
-        @JsonAnySetter
         private Map<String, Object> additionalProperties = new HashMap<>();
 
         private Builder() {}
@@ -170,8 +169,7 @@ public final class Money {
         }
 
         /**
-         * <p>The amount in major units, as an exact decimal string — <code>&quot;10.00&quot;</code> is ten dollars. A string so no float rounds it in transit.</p>
-         * <p>The amount in major units, as an exact decimal string — <code>&quot;10.00&quot;</code> is ten dollars. A string so no float rounds it in transit.</p>
+         * <p>The amount in major units, as an exact decimal string. For example, <code>&quot;10.00&quot;</code> is ten dollars. It is a string so that no float rounds it in transit.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
@@ -183,7 +181,6 @@ public final class Money {
 
         /**
          * <p>Three-letter ISO 4217 currency code, lowercase.</p>
-         * <p>Three-letter ISO 4217 currency code, lowercase.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
@@ -194,8 +191,7 @@ public final class Money {
         }
 
         /**
-         * <p>How many decimal places the amount CARRIES — the precision the charge itself runs at.</p>
-         * <p>How many decimal places the amount CARRIES — the precision the charge itself runs at.</p>
+         * <p>How many decimal places the amount carries. This is the precision the charge itself runs at.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
@@ -206,7 +202,6 @@ public final class Money {
         }
 
         /**
-         * <p>How many decimal places to SHOW. Usually equal to <code>decimals</code>, and deliberately not always: COP is charged in centavos but written in whole pesos, so it is <code>2</code> and <code>0</code>. Format the number in your own locale using this.</p>
          * <p>How many decimal places to SHOW. Usually equal to <code>decimals</code>, and deliberately not always: COP is charged in centavos but written in whole pesos, so it is <code>2</code> and <code>0</code>. Format the number in your own locale using this.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
@@ -220,6 +215,17 @@ public final class Money {
         @java.lang.Override
         public Money build() {
             return new Money(amount, currency, decimals, displayDecimals, additionalProperties);
+        }
+
+        @JsonAnySetter
+        private void putAdditionalPropertyFromJson(String key, Object value) {
+            if (key.equalsIgnoreCase("amount")
+                    || key.equalsIgnoreCase("currency")
+                    || key.equalsIgnoreCase("decimals")
+                    || key.equalsIgnoreCase("display_decimals")) {
+                return;
+            }
+            this.additionalProperties.put(key, value);
         }
 
         @java.lang.Override

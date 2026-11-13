@@ -124,7 +124,6 @@ public final class ListMethodsResponse {
 
         private List<ListMethodsResponseDataItem> data = new ArrayList<>();
 
-        @JsonAnySetter
         private Map<String, Object> additionalProperties = new HashMap<>();
 
         private Builder() {}
@@ -191,6 +190,14 @@ public final class ListMethodsResponse {
         @java.lang.Override
         public ListMethodsResponse build() {
             return new ListMethodsResponse(data, limits, pageInfo, additionalProperties);
+        }
+
+        @JsonAnySetter
+        private void putAdditionalPropertyFromJson(String key, Object value) {
+            if (key.equalsIgnoreCase("data") || key.equalsIgnoreCase("limits") || key.equalsIgnoreCase("page_info")) {
+                return;
+            }
+            this.additionalProperties.put(key, value);
         }
 
         @java.lang.Override

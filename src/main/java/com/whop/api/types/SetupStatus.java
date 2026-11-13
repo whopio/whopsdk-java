@@ -236,7 +236,6 @@ public final class SetupStatus {
 
         private Optional<SetupLastSetupError> lastSetupError = Optional.empty();
 
-        @JsonAnySetter
         private Map<String, Object> additionalProperties = new HashMap<>();
 
         private Builder() {}
@@ -254,7 +253,6 @@ public final class SetupStatus {
 
         /**
          * <p>The setup this status describes, prefixed <code>sint_</code>.</p>
-         * <p>The setup this status describes, prefixed <code>sint_</code>.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
@@ -266,7 +264,6 @@ public final class SetupStatus {
 
         /**
          * <p>Always <code>setup_status</code>.</p>
-         * <p>Always <code>setup_status</code>.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
@@ -277,7 +274,6 @@ public final class SetupStatus {
         }
 
         /**
-         * <p>How far the setup has got. <strong>A 200 means we answered, not that the method was saved — always branch on this.</strong> <code>requires_action</code> — the buyer has a step outstanding; see <code>next_action</code>. <code>processing</code> — the buyer has done their part and the processor is deciding. <code>succeeded</code> — the payment method is saved, and only this one means saved. <code>canceled</code> — abandoned or refused; see <code>last_setup_error</code> to tell which.</p>
          * <p>How far the setup has got. <strong>A 200 means we answered, not that the method was saved — always branch on this.</strong> <code>requires_action</code> — the buyer has a step outstanding; see <code>next_action</code>. <code>processing</code> — the buyer has done their part and the processor is deciding. <code>succeeded</code> — the payment method is saved, and only this one means saved. <code>canceled</code> — abandoned or refused; see <code>last_setup_error</code> to tell which.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
@@ -399,6 +395,19 @@ public final class SetupStatus {
         @java.lang.Override
         public SetupStatus build() {
             return new SetupStatus(id, lastSetupError, nextAction, object, returnUrl, status, additionalProperties);
+        }
+
+        @JsonAnySetter
+        private void putAdditionalPropertyFromJson(String key, Object value) {
+            if (key.equalsIgnoreCase("id")
+                    || key.equalsIgnoreCase("last_setup_error")
+                    || key.equalsIgnoreCase("next_action")
+                    || key.equalsIgnoreCase("object")
+                    || key.equalsIgnoreCase("return_url")
+                    || key.equalsIgnoreCase("status")) {
+                return;
+            }
+            this.additionalProperties.put(key, value);
         }
 
         @java.lang.Override

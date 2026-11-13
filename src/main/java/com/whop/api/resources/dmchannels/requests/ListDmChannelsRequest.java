@@ -28,7 +28,7 @@ public final class ListDmChannelsRequest {
 
     private final Optional<Integer> last;
 
-    private final Optional<String> companyId;
+    private final Optional<String> accountId;
 
     private final Map<String, Object> additionalProperties;
 
@@ -37,13 +37,13 @@ public final class ListDmChannelsRequest {
             Optional<String> before,
             Optional<Integer> first,
             Optional<Integer> last,
-            Optional<String> companyId,
+            Optional<String> accountId,
             Map<String, Object> additionalProperties) {
         this.after = after;
         this.before = before;
         this.first = first;
         this.last = last;
-        this.companyId = companyId;
+        this.accountId = accountId;
         this.additionalProperties = additionalProperties;
     }
 
@@ -82,9 +82,9 @@ public final class ListDmChannelsRequest {
     /**
      * @return The unique identifier of a company to filter DM channels by. Only returns channels scoped to this company.
      */
-    @JsonProperty("company_id")
-    public Optional<String> getCompanyId() {
-        return companyId;
+    @JsonProperty("account_id")
+    public Optional<String> getAccountId() {
+        return accountId;
     }
 
     @java.lang.Override
@@ -103,12 +103,12 @@ public final class ListDmChannelsRequest {
                 && before.equals(other.before)
                 && first.equals(other.first)
                 && last.equals(other.last)
-                && companyId.equals(other.companyId);
+                && accountId.equals(other.accountId);
     }
 
     @java.lang.Override
     public int hashCode() {
-        return Objects.hash(this.after, this.before, this.first, this.last, this.companyId);
+        return Objects.hash(this.after, this.before, this.first, this.last, this.accountId);
     }
 
     @java.lang.Override
@@ -130,9 +130,8 @@ public final class ListDmChannelsRequest {
 
         private Optional<Integer> last = Optional.empty();
 
-        private Optional<String> companyId = Optional.empty();
+        private Optional<String> accountId = Optional.empty();
 
-        @JsonAnySetter
         private Map<String, Object> additionalProperties = new HashMap<>();
 
         private Builder() {}
@@ -142,7 +141,7 @@ public final class ListDmChannelsRequest {
             before(other.getBefore());
             first(other.getFirst());
             last(other.getLast());
-            companyId(other.getCompanyId());
+            accountId(other.getAccountId());
             return this;
         }
 
@@ -205,19 +204,31 @@ public final class ListDmChannelsRequest {
         /**
          * <p>The unique identifier of a company to filter DM channels by. Only returns channels scoped to this company.</p>
          */
-        @JsonSetter(value = "company_id", nulls = Nulls.SKIP)
-        public Builder companyId(Optional<String> companyId) {
-            this.companyId = companyId;
+        @JsonSetter(value = "account_id", nulls = Nulls.SKIP)
+        public Builder accountId(Optional<String> accountId) {
+            this.accountId = accountId;
             return this;
         }
 
-        public Builder companyId(String companyId) {
-            this.companyId = Optional.ofNullable(companyId);
+        public Builder accountId(String accountId) {
+            this.accountId = Optional.ofNullable(accountId);
             return this;
         }
 
         public ListDmChannelsRequest build() {
-            return new ListDmChannelsRequest(after, before, first, last, companyId, additionalProperties);
+            return new ListDmChannelsRequest(after, before, first, last, accountId, additionalProperties);
+        }
+
+        @JsonAnySetter
+        private void putAdditionalPropertyFromJson(String key, Object value) {
+            if (key.equalsIgnoreCase("after")
+                    || key.equalsIgnoreCase("before")
+                    || key.equalsIgnoreCase("first")
+                    || key.equalsIgnoreCase("last")
+                    || key.equalsIgnoreCase("account_id")) {
+                return;
+            }
+            this.additionalProperties.put(key, value);
         }
 
         public Builder additionalProperty(String key, Object value) {

@@ -315,7 +315,6 @@ public final class UpdatePreferencesResponseAdsPaymentMethodsBackup {
 
         private Optional<String> cardBrand = Optional.empty();
 
-        @JsonAnySetter
         private Map<String, Object> additionalProperties = new HashMap<>();
 
         private Builder() {}
@@ -335,7 +334,6 @@ public final class UpdatePreferencesResponseAdsPaymentMethodsBackup {
 
         /**
          * <p>The funding source ID: a Whop balance (<code>ldgr_</code>) for <code>platform_balance</code>, or a payment method (<code>payt_</code>) for <code>card</code>.</p>
-         * <p>The funding source ID: a Whop balance (<code>ldgr_</code>) for <code>platform_balance</code>, or a payment method (<code>payt_</code>) for <code>card</code>.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
@@ -346,7 +344,6 @@ public final class UpdatePreferencesResponseAdsPaymentMethodsBackup {
         }
 
         /**
-         * <p>The funding source kind: a Whop balance or a saved card.</p>
          * <p>The funding source kind: a Whop balance or a saved card.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
@@ -577,6 +574,21 @@ public final class UpdatePreferencesResponseAdsPaymentMethodsBackup {
         public UpdatePreferencesResponseAdsPaymentMethodsBackup build() {
             return new UpdatePreferencesResponseAdsPaymentMethodsBackup(
                     cardBrand, expMonth, expYear, iconUrl, id, last4, title, type, additionalProperties);
+        }
+
+        @JsonAnySetter
+        private void putAdditionalPropertyFromJson(String key, Object value) {
+            if (key.equalsIgnoreCase("card_brand")
+                    || key.equalsIgnoreCase("exp_month")
+                    || key.equalsIgnoreCase("exp_year")
+                    || key.equalsIgnoreCase("icon_url")
+                    || key.equalsIgnoreCase("id")
+                    || key.equalsIgnoreCase("last4")
+                    || key.equalsIgnoreCase("title")
+                    || key.equalsIgnoreCase("type")) {
+                return;
+            }
+            this.additionalProperties.put(key, value);
         }
 
         @java.lang.Override

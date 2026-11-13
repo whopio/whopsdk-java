@@ -478,7 +478,6 @@ public final class MessageListItem {
 
         private Optional<String> content = Optional.empty();
 
-        @JsonAnySetter
         private Map<String, Object> additionalProperties = new HashMap<>();
 
         private Builder() {}
@@ -505,7 +504,6 @@ public final class MessageListItem {
 
         /**
          * <p>The timestamp when this message was originally created.</p>
-         * <p>The timestamp when this message was originally created.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
@@ -516,7 +514,6 @@ public final class MessageListItem {
         }
 
         /**
-         * <p>Represents a unique identifier that is Base64 obfuscated. It is often used to refetch an object or as key for a cache. The ID type appears in a JSON response as a String; however, it is not intended to be human-readable. When expected as an input type, any string (such as <code>&quot;VXNlci0xMA==&quot;</code>) or integer (such as <code>4</code>) input value will be accepted as an ID.</p>
          * <p>Represents a unique identifier that is Base64 obfuscated. It is often used to refetch an object or as key for a cache. The ID type appears in a JSON response as a String; however, it is not intended to be human-readable. When expected as an input type, any string (such as <code>&quot;VXNlci0xMA==&quot;</code>) or integer (such as <code>4</code>) input value will be accepted as an ID.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
@@ -529,7 +526,6 @@ public final class MessageListItem {
 
         /**
          * <p>Whether the message content has been edited after it was originally sent.</p>
-         * <p>Whether the message content has been edited after it was originally sent.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
@@ -540,7 +536,6 @@ public final class MessageListItem {
         }
 
         /**
-         * <p>Whether this message is pinned to the top of the channel for easy access.</p>
          * <p>Whether this message is pinned to the top of the channel for easy access.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
@@ -553,7 +548,6 @@ public final class MessageListItem {
 
         /**
          * <p>Whether the message includes an @everyone mention that notifies all channel members.</p>
-         * <p>Whether the message includes an @everyone mention that notifies all channel members.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
@@ -564,7 +558,6 @@ public final class MessageListItem {
         }
 
         /**
-         * <p>The classification of this message: regular, system, or automated.</p>
          * <p>The classification of this message: regular, system, or automated.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
@@ -577,7 +570,6 @@ public final class MessageListItem {
 
         /**
          * <p>The timestamp when this message was last modified.</p>
-         * <p>The timestamp when this message was last modified.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
@@ -588,7 +580,6 @@ public final class MessageListItem {
         }
 
         /**
-         * <p>The user who authored this message.</p>
          * <p>The user who authored this message.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
@@ -867,6 +858,28 @@ public final class MessageListItem {
                     user,
                     viewCount,
                     additionalProperties);
+        }
+
+        @JsonAnySetter
+        private void putAdditionalPropertyFromJson(String key, Object value) {
+            if (key.equalsIgnoreCase("content")
+                    || key.equalsIgnoreCase("created_at")
+                    || key.equalsIgnoreCase("id")
+                    || key.equalsIgnoreCase("is_edited")
+                    || key.equalsIgnoreCase("is_pinned")
+                    || key.equalsIgnoreCase("mentions")
+                    || key.equalsIgnoreCase("mentions_everyone")
+                    || key.equalsIgnoreCase("message_type")
+                    || key.equalsIgnoreCase("poll")
+                    || key.equalsIgnoreCase("poll_votes")
+                    || key.equalsIgnoreCase("reaction_counts")
+                    || key.equalsIgnoreCase("replying_to_message_id")
+                    || key.equalsIgnoreCase("updated_at")
+                    || key.equalsIgnoreCase("user")
+                    || key.equalsIgnoreCase("view_count")) {
+                return;
+            }
+            this.additionalProperties.put(key, value);
         }
 
         @java.lang.Override

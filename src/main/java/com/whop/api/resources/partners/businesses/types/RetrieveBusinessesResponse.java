@@ -15,8 +15,11 @@ import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.whop.api.core.Nullable;
 import com.whop.api.core.NullableNonemptyFilter;
 import com.whop.api.core.ObjectMappers;
+import com.whop.api.types.Money;
+import com.whop.api.types.PartnerAdvance;
 import java.time.OffsetDateTime;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
@@ -27,9 +30,25 @@ import org.jetbrains.annotations.NotNull;
 public final class RetrieveBusinessesResponse {
     private final Optional<RetrieveBusinessesResponseAccount> account;
 
+    private final Optional<RetrieveBusinessesResponseBlueprintPartner> blueprintPartner;
+
+    private final boolean canEditFees;
+
+    private final Optional<PartnerAdvance> commissionAdvance;
+
+    private final Optional<Money> commissionAdvanceCap;
+
+    private final Optional<Boolean> commissionAdvanceProjectionsAllowed;
+
+    private final Optional<String> commissionAdvanceRate;
+
     private final OffsetDateTime createdAt;
 
+    private final Optional<String> dealClosedReason;
+
     private final RetrieveBusinessesResponseEarningsUsd earningsUsd;
+
+    private final Optional<String> estimatedCommissionRate;
 
     private final Optional<RetrieveBusinessesResponseFirstTierPartner> firstTierPartner;
 
@@ -37,15 +56,21 @@ public final class RetrieveBusinessesResponse {
 
     private final RetrieveBusinessesResponseMyPartnerTier myPartnerTier;
 
+    private final Optional<RetrieveBusinessesResponseMyPayoutPercentages> myPayoutPercentages;
+
     private final RetrieveBusinessesResponseObject object;
 
     private final Optional<RetrieveBusinessesResponseOwner> owner;
 
     private final RetrieveBusinessesResponsePayoutPercentages payoutPercentages;
 
+    private final Optional<List<RetrieveBusinessesResponsePendingOwnerInvitesItem>> pendingOwnerInvites;
+
     private final Optional<OffsetDateTime> referralExpiresAt;
 
     private final Optional<OffsetDateTime> referralStartedAt;
+
+    private final Optional<RetrieveBusinessesResponseReferringBusiness> referringBusiness;
 
     private final Optional<RetrieveBusinessesResponseSecondTierPartner> secondTierPartner;
 
@@ -57,31 +82,53 @@ public final class RetrieveBusinessesResponse {
 
     private RetrieveBusinessesResponse(
             Optional<RetrieveBusinessesResponseAccount> account,
+            Optional<RetrieveBusinessesResponseBlueprintPartner> blueprintPartner,
+            boolean canEditFees,
+            Optional<PartnerAdvance> commissionAdvance,
+            Optional<Money> commissionAdvanceCap,
+            Optional<Boolean> commissionAdvanceProjectionsAllowed,
+            Optional<String> commissionAdvanceRate,
             OffsetDateTime createdAt,
+            Optional<String> dealClosedReason,
             RetrieveBusinessesResponseEarningsUsd earningsUsd,
+            Optional<String> estimatedCommissionRate,
             Optional<RetrieveBusinessesResponseFirstTierPartner> firstTierPartner,
             String id,
             RetrieveBusinessesResponseMyPartnerTier myPartnerTier,
+            Optional<RetrieveBusinessesResponseMyPayoutPercentages> myPayoutPercentages,
             RetrieveBusinessesResponseObject object,
             Optional<RetrieveBusinessesResponseOwner> owner,
             RetrieveBusinessesResponsePayoutPercentages payoutPercentages,
+            Optional<List<RetrieveBusinessesResponsePendingOwnerInvitesItem>> pendingOwnerInvites,
             Optional<OffsetDateTime> referralExpiresAt,
             Optional<OffsetDateTime> referralStartedAt,
+            Optional<RetrieveBusinessesResponseReferringBusiness> referringBusiness,
             Optional<RetrieveBusinessesResponseSecondTierPartner> secondTierPartner,
             RetrieveBusinessesResponseStatus status,
             RetrieveBusinessesResponseVolumeUsd volumeUsd,
             Map<String, Object> additionalProperties) {
         this.account = account;
+        this.blueprintPartner = blueprintPartner;
+        this.canEditFees = canEditFees;
+        this.commissionAdvance = commissionAdvance;
+        this.commissionAdvanceCap = commissionAdvanceCap;
+        this.commissionAdvanceProjectionsAllowed = commissionAdvanceProjectionsAllowed;
+        this.commissionAdvanceRate = commissionAdvanceRate;
         this.createdAt = createdAt;
+        this.dealClosedReason = dealClosedReason;
         this.earningsUsd = earningsUsd;
+        this.estimatedCommissionRate = estimatedCommissionRate;
         this.firstTierPartner = firstTierPartner;
         this.id = id;
         this.myPartnerTier = myPartnerTier;
+        this.myPayoutPercentages = myPayoutPercentages;
         this.object = object;
         this.owner = owner;
         this.payoutPercentages = payoutPercentages;
+        this.pendingOwnerInvites = pendingOwnerInvites;
         this.referralExpiresAt = referralExpiresAt;
         this.referralStartedAt = referralStartedAt;
+        this.referringBusiness = referringBusiness;
         this.secondTierPartner = secondTierPartner;
         this.status = status;
         this.volumeUsd = volumeUsd;
@@ -100,6 +147,63 @@ public final class RetrieveBusinessesResponse {
     }
 
     /**
+     * @return The partner whose blueprint the business deployed. Null unless this is a blueprint referral.
+     */
+    @JsonIgnore
+    public Optional<RetrieveBusinessesResponseBlueprintPartner> getBlueprintPartner() {
+        if (blueprintPartner == null) {
+            return Optional.empty();
+        }
+        return blueprintPartner;
+    }
+
+    /**
+     * @return Whether the caller can change the fees of this business. <code>true</code> for the Whop Verified Partner who referred it. Also <code>true</code> for a verified partner in the same team who manages that partner or can update every reporting line. Read and change the fees with the account fees endpoints.
+     */
+    @JsonProperty("can_edit_fees")
+    public boolean getCanEditFees() {
+        return canEditFees;
+    }
+
+    /**
+     * @return CPA terms for the referring partner. Read with referring_account_id, the business's owner sees every rep's terms and a manager sees those of the reps below them, read-only. Omitted for other callers. An offer token is only for the referring partner and requires partner:commission_advance:accept permission.
+     */
+    @JsonIgnore
+    public Optional<PartnerAdvance> getCommissionAdvance() {
+        if (commissionAdvance == null) {
+            return Optional.empty();
+        }
+        return commissionAdvance;
+    }
+
+    /**
+     * @return The most the referring organization advances per business, in USD. Returned only with commission_advance_rate.
+     */
+    @JsonProperty("commission_advance_cap")
+    public Optional<Money> getCommissionAdvanceCap() {
+        return commissionAdvanceCap;
+    }
+
+    /**
+     * @return Whether this referral meets the partner and ownership requirements for saving commission advance projections. Returned only to the referring partner; existing advance terms and update permissions still apply.
+     */
+    @JsonProperty("commission_advance_projections_allowed")
+    public Optional<Boolean> getCommissionAdvanceProjectionsAllowed() {
+        return commissionAdvanceProjectionsAllowed;
+    }
+
+    /**
+     * @return Estimated upfront advance per USD of annual card and BNPL payments, including advance share and remaining term. Multiply annual payments by this rate, cap at commission_advance_cap, and round down to cents. Uses observed commissions or, without history, a typical gross profit share adjusted for the business's US card fee, times the partner share. Null when projections or pricing are unavailable. Only returned to the referring partner. Qualification and final offers use actual activity.
+     */
+    @JsonIgnore
+    public Optional<String> getCommissionAdvanceRate() {
+        if (commissionAdvanceRate == null) {
+            return Optional.empty();
+        }
+        return commissionAdvanceRate;
+    }
+
+    /**
      * @return When the partner business was created.
      */
     @JsonProperty("created_at")
@@ -107,9 +211,31 @@ public final class RetrieveBusinessesResponse {
         return createdAt;
     }
 
+    /**
+     * @return How the partner closed this business, in their own words. Null until the partner saves one.
+     */
+    @JsonIgnore
+    public Optional<String> getDealClosedReason() {
+        if (dealClosedReason == null) {
+            return Optional.empty();
+        }
+        return dealClosedReason;
+    }
+
     @JsonProperty("earnings_usd")
     public RetrieveBusinessesResponseEarningsUsd getEarningsUsd() {
         return earningsUsd;
+    }
+
+    /**
+     * @return Estimated regular commission per USD of card and BNPL payments, as a decimal string (for example <code>0.004</code>). Once the advance qualifies, the rate its terms were sized with; before that, observed payout rates or, without payment history, reference US card fees. Multiply payments by this rate to estimate commissions, including those that resume after a commission advance term. <code>null</code> when pricing is unavailable or the response has neither <code>commission_advance_rate</code> nor <code>commission_advance</code>.
+     */
+    @JsonIgnore
+    public Optional<String> getEstimatedCommissionRate() {
+        if (estimatedCommissionRate == null) {
+            return Optional.empty();
+        }
+        return estimatedCommissionRate;
     }
 
     /**
@@ -132,11 +258,22 @@ public final class RetrieveBusinessesResponse {
     }
 
     /**
-     * @return Which tier the caller earns on for this business: <code>first</code> (they referred the owner) or <code>second</code> (they referred the first-tier partner).
+     * @return Which tier the caller earns on for this business: <code>first</code> (they referred the owner), <code>second</code> (they referred the first-tier partner), or <code>blueprint</code> (the business deployed a site from their blueprint).
      */
     @JsonProperty("my_partner_tier")
     public RetrieveBusinessesResponseMyPartnerTier getMyPartnerTier() {
         return myPartnerTier;
+    }
+
+    /**
+     * @return The caller's own cut of each income source on this business, as a fraction of the same base as <code>payout_percentages</code> (0.12 = 12%). A solo partner's cut is the whole rate. On a referring partner business's deal it is the caller's team share of the rate: a closer earns their share, a manager earns their share minus the share of the person below them, and a deal participant earns their cut. Null when the caller earns nothing on this business, as with an account API key.
+     */
+    @JsonIgnore
+    public Optional<RetrieveBusinessesResponseMyPayoutPercentages> getMyPayoutPercentages() {
+        if (myPayoutPercentages == null) {
+            return Optional.empty();
+        }
+        return myPayoutPercentages;
     }
 
     @JsonProperty("object")
@@ -156,11 +293,19 @@ public final class RetrieveBusinessesResponse {
     }
 
     /**
-     * @return The referrer's commission rate for each income source, expressed as a fraction (0.3 = 30%).
+     * @return The commission rate this referral pays for each income source, as a fraction (0.3 = 30%). A solo partner earns it directly; the team of a referring partner business splits it by their shares.
      */
     @JsonProperty("payout_percentages")
     public RetrieveBusinessesResponsePayoutPercentages getPayoutPercentages() {
         return payoutPercentages;
+    }
+
+    /**
+     * @return Outstanding invites to claim ownership of this business. Present only to the first-tier partner's whop.com session, or the Whop CLI or MCP with the <code>partner:handoff</code> scope, and empty once every invite has been accepted.
+     */
+    @JsonProperty("pending_owner_invites")
+    public Optional<List<RetrieveBusinessesResponsePendingOwnerInvitesItem>> getPendingOwnerInvites() {
+        return pendingOwnerInvites;
     }
 
     /**
@@ -183,6 +328,17 @@ public final class RetrieveBusinessesResponse {
             return Optional.empty();
         }
         return referralStartedAt;
+    }
+
+    /**
+     * @return The partner business whose team member made this referral, the one its commission is paid to. Null for a solo partner's referral.
+     */
+    @JsonIgnore
+    public Optional<RetrieveBusinessesResponseReferringBusiness> getReferringBusiness() {
+        if (referringBusiness == null) {
+            return Optional.empty();
+        }
+        return referringBusiness;
     }
 
     /**
@@ -216,9 +372,45 @@ public final class RetrieveBusinessesResponse {
     }
 
     @JsonInclude(value = JsonInclude.Include.CUSTOM, valueFilter = NullableNonemptyFilter.class)
+    @JsonProperty("blueprint_partner")
+    private Optional<RetrieveBusinessesResponseBlueprintPartner> _getBlueprintPartner() {
+        return blueprintPartner;
+    }
+
+    @JsonInclude(value = JsonInclude.Include.CUSTOM, valueFilter = NullableNonemptyFilter.class)
+    @JsonProperty("commission_advance")
+    private Optional<PartnerAdvance> _getCommissionAdvance() {
+        return commissionAdvance;
+    }
+
+    @JsonInclude(value = JsonInclude.Include.CUSTOM, valueFilter = NullableNonemptyFilter.class)
+    @JsonProperty("commission_advance_rate")
+    private Optional<String> _getCommissionAdvanceRate() {
+        return commissionAdvanceRate;
+    }
+
+    @JsonInclude(value = JsonInclude.Include.CUSTOM, valueFilter = NullableNonemptyFilter.class)
+    @JsonProperty("deal_closed_reason")
+    private Optional<String> _getDealClosedReason() {
+        return dealClosedReason;
+    }
+
+    @JsonInclude(value = JsonInclude.Include.CUSTOM, valueFilter = NullableNonemptyFilter.class)
+    @JsonProperty("estimated_commission_rate")
+    private Optional<String> _getEstimatedCommissionRate() {
+        return estimatedCommissionRate;
+    }
+
+    @JsonInclude(value = JsonInclude.Include.CUSTOM, valueFilter = NullableNonemptyFilter.class)
     @JsonProperty("first_tier_partner")
     private Optional<RetrieveBusinessesResponseFirstTierPartner> _getFirstTierPartner() {
         return firstTierPartner;
+    }
+
+    @JsonInclude(value = JsonInclude.Include.CUSTOM, valueFilter = NullableNonemptyFilter.class)
+    @JsonProperty("my_payout_percentages")
+    private Optional<RetrieveBusinessesResponseMyPayoutPercentages> _getMyPayoutPercentages() {
+        return myPayoutPercentages;
     }
 
     @JsonInclude(value = JsonInclude.Include.CUSTOM, valueFilter = NullableNonemptyFilter.class)
@@ -240,6 +432,12 @@ public final class RetrieveBusinessesResponse {
     }
 
     @JsonInclude(value = JsonInclude.Include.CUSTOM, valueFilter = NullableNonemptyFilter.class)
+    @JsonProperty("referring_business")
+    private Optional<RetrieveBusinessesResponseReferringBusiness> _getReferringBusiness() {
+        return referringBusiness;
+    }
+
+    @JsonInclude(value = JsonInclude.Include.CUSTOM, valueFilter = NullableNonemptyFilter.class)
     @JsonProperty("second_tier_partner")
     private Optional<RetrieveBusinessesResponseSecondTierPartner> _getSecondTierPartner() {
         return secondTierPartner;
@@ -258,16 +456,27 @@ public final class RetrieveBusinessesResponse {
 
     private boolean equalTo(RetrieveBusinessesResponse other) {
         return account.equals(other.account)
+                && blueprintPartner.equals(other.blueprintPartner)
+                && canEditFees == other.canEditFees
+                && commissionAdvance.equals(other.commissionAdvance)
+                && commissionAdvanceCap.equals(other.commissionAdvanceCap)
+                && commissionAdvanceProjectionsAllowed.equals(other.commissionAdvanceProjectionsAllowed)
+                && commissionAdvanceRate.equals(other.commissionAdvanceRate)
                 && createdAt.equals(other.createdAt)
+                && dealClosedReason.equals(other.dealClosedReason)
                 && earningsUsd.equals(other.earningsUsd)
+                && estimatedCommissionRate.equals(other.estimatedCommissionRate)
                 && firstTierPartner.equals(other.firstTierPartner)
                 && id.equals(other.id)
                 && myPartnerTier.equals(other.myPartnerTier)
+                && myPayoutPercentages.equals(other.myPayoutPercentages)
                 && object.equals(other.object)
                 && owner.equals(other.owner)
                 && payoutPercentages.equals(other.payoutPercentages)
+                && pendingOwnerInvites.equals(other.pendingOwnerInvites)
                 && referralExpiresAt.equals(other.referralExpiresAt)
                 && referralStartedAt.equals(other.referralStartedAt)
+                && referringBusiness.equals(other.referringBusiness)
                 && secondTierPartner.equals(other.secondTierPartner)
                 && status.equals(other.status)
                 && volumeUsd.equals(other.volumeUsd);
@@ -277,16 +486,27 @@ public final class RetrieveBusinessesResponse {
     public int hashCode() {
         return Objects.hash(
                 this.account,
+                this.blueprintPartner,
+                this.canEditFees,
+                this.commissionAdvance,
+                this.commissionAdvanceCap,
+                this.commissionAdvanceProjectionsAllowed,
+                this.commissionAdvanceRate,
                 this.createdAt,
+                this.dealClosedReason,
                 this.earningsUsd,
+                this.estimatedCommissionRate,
                 this.firstTierPartner,
                 this.id,
                 this.myPartnerTier,
+                this.myPayoutPercentages,
                 this.object,
                 this.owner,
                 this.payoutPercentages,
+                this.pendingOwnerInvites,
                 this.referralExpiresAt,
                 this.referralStartedAt,
+                this.referringBusiness,
                 this.secondTierPartner,
                 this.status,
                 this.volumeUsd);
@@ -297,8 +517,17 @@ public final class RetrieveBusinessesResponse {
         return ObjectMappers.stringify(this);
     }
 
-    public static CreatedAtStage builder() {
+    public static CanEditFeesStage builder() {
         return new Builder();
+    }
+
+    public interface CanEditFeesStage {
+        /**
+         * <p>Whether the caller can change the fees of this business. <code>true</code> for the Whop Verified Partner who referred it. Also <code>true</code> for a verified partner in the same team who manages that partner or can update every reporting line. Read and change the fees with the account fees endpoints.</p>
+         */
+        CreatedAtStage canEditFees(boolean canEditFees);
+
+        Builder from(RetrieveBusinessesResponse other);
     }
 
     public interface CreatedAtStage {
@@ -306,8 +535,6 @@ public final class RetrieveBusinessesResponse {
          * <p>When the partner business was created.</p>
          */
         EarningsUsdStage createdAt(@NotNull OffsetDateTime createdAt);
-
-        Builder from(RetrieveBusinessesResponse other);
     }
 
     public interface EarningsUsdStage {
@@ -323,7 +550,7 @@ public final class RetrieveBusinessesResponse {
 
     public interface MyPartnerTierStage {
         /**
-         * <p>Which tier the caller earns on for this business: <code>first</code> (they referred the owner) or <code>second</code> (they referred the first-tier partner).</p>
+         * <p>Which tier the caller earns on for this business: <code>first</code> (they referred the owner), <code>second</code> (they referred the first-tier partner), or <code>blueprint</code> (the business deployed a site from their blueprint).</p>
          */
         ObjectStage myPartnerTier(@NotNull RetrieveBusinessesResponseMyPartnerTier myPartnerTier);
     }
@@ -334,7 +561,7 @@ public final class RetrieveBusinessesResponse {
 
     public interface PayoutPercentagesStage {
         /**
-         * <p>The referrer's commission rate for each income source, expressed as a fraction (0.3 = 30%).</p>
+         * <p>The commission rate this referral pays for each income source, as a fraction (0.3 = 30%). A solo partner earns it directly; the team of a referring partner business splits it by their shares.</p>
          */
         StatusStage payoutPercentages(@NotNull RetrieveBusinessesResponsePayoutPercentages payoutPercentages);
     }
@@ -367,6 +594,65 @@ public final class RetrieveBusinessesResponse {
         _FinalStage account(Nullable<RetrieveBusinessesResponseAccount> account);
 
         /**
+         * <p>The partner whose blueprint the business deployed. Null unless this is a blueprint referral.</p>
+         */
+        _FinalStage blueprintPartner(Optional<RetrieveBusinessesResponseBlueprintPartner> blueprintPartner);
+
+        _FinalStage blueprintPartner(RetrieveBusinessesResponseBlueprintPartner blueprintPartner);
+
+        _FinalStage blueprintPartner(Nullable<RetrieveBusinessesResponseBlueprintPartner> blueprintPartner);
+
+        /**
+         * <p>CPA terms for the referring partner. Read with referring_account_id, the business's owner sees every rep's terms and a manager sees those of the reps below them, read-only. Omitted for other callers. An offer token is only for the referring partner and requires partner:commission_advance:accept permission.</p>
+         */
+        _FinalStage commissionAdvance(Optional<PartnerAdvance> commissionAdvance);
+
+        _FinalStage commissionAdvance(PartnerAdvance commissionAdvance);
+
+        _FinalStage commissionAdvance(Nullable<PartnerAdvance> commissionAdvance);
+
+        /**
+         * <p>The most the referring organization advances per business, in USD. Returned only with commission_advance_rate.</p>
+         */
+        _FinalStage commissionAdvanceCap(Optional<Money> commissionAdvanceCap);
+
+        _FinalStage commissionAdvanceCap(Money commissionAdvanceCap);
+
+        /**
+         * <p>Whether this referral meets the partner and ownership requirements for saving commission advance projections. Returned only to the referring partner; existing advance terms and update permissions still apply.</p>
+         */
+        _FinalStage commissionAdvanceProjectionsAllowed(Optional<Boolean> commissionAdvanceProjectionsAllowed);
+
+        _FinalStage commissionAdvanceProjectionsAllowed(Boolean commissionAdvanceProjectionsAllowed);
+
+        /**
+         * <p>Estimated upfront advance per USD of annual card and BNPL payments, including advance share and remaining term. Multiply annual payments by this rate, cap at commission_advance_cap, and round down to cents. Uses observed commissions or, without history, a typical gross profit share adjusted for the business's US card fee, times the partner share. Null when projections or pricing are unavailable. Only returned to the referring partner. Qualification and final offers use actual activity.</p>
+         */
+        _FinalStage commissionAdvanceRate(Optional<String> commissionAdvanceRate);
+
+        _FinalStage commissionAdvanceRate(String commissionAdvanceRate);
+
+        _FinalStage commissionAdvanceRate(Nullable<String> commissionAdvanceRate);
+
+        /**
+         * <p>How the partner closed this business, in their own words. Null until the partner saves one.</p>
+         */
+        _FinalStage dealClosedReason(Optional<String> dealClosedReason);
+
+        _FinalStage dealClosedReason(String dealClosedReason);
+
+        _FinalStage dealClosedReason(Nullable<String> dealClosedReason);
+
+        /**
+         * <p>Estimated regular commission per USD of card and BNPL payments, as a decimal string (for example <code>0.004</code>). Once the advance qualifies, the rate its terms were sized with; before that, observed payout rates or, without payment history, reference US card fees. Multiply payments by this rate to estimate commissions, including those that resume after a commission advance term. <code>null</code> when pricing is unavailable or the response has neither <code>commission_advance_rate</code> nor <code>commission_advance</code>.</p>
+         */
+        _FinalStage estimatedCommissionRate(Optional<String> estimatedCommissionRate);
+
+        _FinalStage estimatedCommissionRate(String estimatedCommissionRate);
+
+        _FinalStage estimatedCommissionRate(Nullable<String> estimatedCommissionRate);
+
+        /**
          * <p>The partner who referred the business owner onto Whop (first tier). Null if there is no active first-tier partner.</p>
          */
         _FinalStage firstTierPartner(Optional<RetrieveBusinessesResponseFirstTierPartner> firstTierPartner);
@@ -376,6 +662,15 @@ public final class RetrieveBusinessesResponse {
         _FinalStage firstTierPartner(Nullable<RetrieveBusinessesResponseFirstTierPartner> firstTierPartner);
 
         /**
+         * <p>The caller's own cut of each income source on this business, as a fraction of the same base as <code>payout_percentages</code> (0.12 = 12%). A solo partner's cut is the whole rate. On a referring partner business's deal it is the caller's team share of the rate: a closer earns their share, a manager earns their share minus the share of the person below them, and a deal participant earns their cut. Null when the caller earns nothing on this business, as with an account API key.</p>
+         */
+        _FinalStage myPayoutPercentages(Optional<RetrieveBusinessesResponseMyPayoutPercentages> myPayoutPercentages);
+
+        _FinalStage myPayoutPercentages(RetrieveBusinessesResponseMyPayoutPercentages myPayoutPercentages);
+
+        _FinalStage myPayoutPercentages(Nullable<RetrieveBusinessesResponseMyPayoutPercentages> myPayoutPercentages);
+
+        /**
          * <p>The owner of the referred business.</p>
          */
         _FinalStage owner(Optional<RetrieveBusinessesResponseOwner> owner);
@@ -383,6 +678,14 @@ public final class RetrieveBusinessesResponse {
         _FinalStage owner(RetrieveBusinessesResponseOwner owner);
 
         _FinalStage owner(Nullable<RetrieveBusinessesResponseOwner> owner);
+
+        /**
+         * <p>Outstanding invites to claim ownership of this business. Present only to the first-tier partner's whop.com session, or the Whop CLI or MCP with the <code>partner:handoff</code> scope, and empty once every invite has been accepted.</p>
+         */
+        _FinalStage pendingOwnerInvites(
+                Optional<List<RetrieveBusinessesResponsePendingOwnerInvitesItem>> pendingOwnerInvites);
+
+        _FinalStage pendingOwnerInvites(List<RetrieveBusinessesResponsePendingOwnerInvitesItem> pendingOwnerInvites);
 
         /**
          * <p>When the referral expires.</p>
@@ -403,6 +706,15 @@ public final class RetrieveBusinessesResponse {
         _FinalStage referralStartedAt(Nullable<OffsetDateTime> referralStartedAt);
 
         /**
+         * <p>The partner business whose team member made this referral, the one its commission is paid to. Null for a solo partner's referral.</p>
+         */
+        _FinalStage referringBusiness(Optional<RetrieveBusinessesResponseReferringBusiness> referringBusiness);
+
+        _FinalStage referringBusiness(RetrieveBusinessesResponseReferringBusiness referringBusiness);
+
+        _FinalStage referringBusiness(Nullable<RetrieveBusinessesResponseReferringBusiness> referringBusiness);
+
+        /**
          * <p>The second-tier partner who earns on this business (referred the first-tier partner). Null if there is no active second-tier partner.</p>
          */
         _FinalStage secondTierPartner(Optional<RetrieveBusinessesResponseSecondTierPartner> secondTierPartner);
@@ -414,7 +726,8 @@ public final class RetrieveBusinessesResponse {
 
     @JsonIgnoreProperties(ignoreUnknown = true)
     public static final class Builder
-            implements CreatedAtStage,
+            implements CanEditFeesStage,
+                    CreatedAtStage,
                     EarningsUsdStage,
                     IdStage,
                     MyPartnerTierStage,
@@ -423,6 +736,8 @@ public final class RetrieveBusinessesResponse {
                     StatusStage,
                     VolumeUsdStage,
                     _FinalStage {
+        private boolean canEditFees;
+
         private OffsetDateTime createdAt;
 
         private RetrieveBusinessesResponseEarningsUsd earningsUsd;
@@ -441,17 +756,37 @@ public final class RetrieveBusinessesResponse {
 
         private Optional<RetrieveBusinessesResponseSecondTierPartner> secondTierPartner = Optional.empty();
 
+        private Optional<RetrieveBusinessesResponseReferringBusiness> referringBusiness = Optional.empty();
+
         private Optional<OffsetDateTime> referralStartedAt = Optional.empty();
 
         private Optional<OffsetDateTime> referralExpiresAt = Optional.empty();
 
+        private Optional<List<RetrieveBusinessesResponsePendingOwnerInvitesItem>> pendingOwnerInvites =
+                Optional.empty();
+
         private Optional<RetrieveBusinessesResponseOwner> owner = Optional.empty();
+
+        private Optional<RetrieveBusinessesResponseMyPayoutPercentages> myPayoutPercentages = Optional.empty();
 
         private Optional<RetrieveBusinessesResponseFirstTierPartner> firstTierPartner = Optional.empty();
 
+        private Optional<String> estimatedCommissionRate = Optional.empty();
+
+        private Optional<String> dealClosedReason = Optional.empty();
+
+        private Optional<String> commissionAdvanceRate = Optional.empty();
+
+        private Optional<Boolean> commissionAdvanceProjectionsAllowed = Optional.empty();
+
+        private Optional<Money> commissionAdvanceCap = Optional.empty();
+
+        private Optional<PartnerAdvance> commissionAdvance = Optional.empty();
+
+        private Optional<RetrieveBusinessesResponseBlueprintPartner> blueprintPartner = Optional.empty();
+
         private Optional<RetrieveBusinessesResponseAccount> account = Optional.empty();
 
-        @JsonAnySetter
         private Map<String, Object> additionalProperties = new HashMap<>();
 
         private Builder() {}
@@ -459,16 +794,27 @@ public final class RetrieveBusinessesResponse {
         @java.lang.Override
         public Builder from(RetrieveBusinessesResponse other) {
             account(other.getAccount());
+            blueprintPartner(other.getBlueprintPartner());
+            canEditFees(other.getCanEditFees());
+            commissionAdvance(other.getCommissionAdvance());
+            commissionAdvanceCap(other.getCommissionAdvanceCap());
+            commissionAdvanceProjectionsAllowed(other.getCommissionAdvanceProjectionsAllowed());
+            commissionAdvanceRate(other.getCommissionAdvanceRate());
             createdAt(other.getCreatedAt());
+            dealClosedReason(other.getDealClosedReason());
             earningsUsd(other.getEarningsUsd());
+            estimatedCommissionRate(other.getEstimatedCommissionRate());
             firstTierPartner(other.getFirstTierPartner());
             id(other.getId());
             myPartnerTier(other.getMyPartnerTier());
+            myPayoutPercentages(other.getMyPayoutPercentages());
             object(other.getObject());
             owner(other.getOwner());
             payoutPercentages(other.getPayoutPercentages());
+            pendingOwnerInvites(other.getPendingOwnerInvites());
             referralExpiresAt(other.getReferralExpiresAt());
             referralStartedAt(other.getReferralStartedAt());
+            referringBusiness(other.getReferringBusiness());
             secondTierPartner(other.getSecondTierPartner());
             status(other.getStatus());
             volumeUsd(other.getVolumeUsd());
@@ -476,7 +822,17 @@ public final class RetrieveBusinessesResponse {
         }
 
         /**
-         * <p>When the partner business was created.</p>
+         * <p>Whether the caller can change the fees of this business. <code>true</code> for the Whop Verified Partner who referred it. Also <code>true</code> for a verified partner in the same team who manages that partner or can update every reporting line. Read and change the fees with the account fees endpoints.</p>
+         * @return Reference to {@code this} so that method calls can be chained together.
+         */
+        @java.lang.Override
+        @JsonSetter("can_edit_fees")
+        public CreatedAtStage canEditFees(boolean canEditFees) {
+            this.canEditFees = canEditFees;
+            return this;
+        }
+
+        /**
          * <p>When the partner business was created.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
@@ -496,7 +852,6 @@ public final class RetrieveBusinessesResponse {
 
         /**
          * <p>Partner business ID.</p>
-         * <p>Partner business ID.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
@@ -507,8 +862,7 @@ public final class RetrieveBusinessesResponse {
         }
 
         /**
-         * <p>Which tier the caller earns on for this business: <code>first</code> (they referred the owner) or <code>second</code> (they referred the first-tier partner).</p>
-         * <p>Which tier the caller earns on for this business: <code>first</code> (they referred the owner) or <code>second</code> (they referred the first-tier partner).</p>
+         * <p>Which tier the caller earns on for this business: <code>first</code> (they referred the owner), <code>second</code> (they referred the first-tier partner), or <code>blueprint</code> (the business deployed a site from their blueprint).</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
@@ -526,8 +880,7 @@ public final class RetrieveBusinessesResponse {
         }
 
         /**
-         * <p>The referrer's commission rate for each income source, expressed as a fraction (0.3 = 30%).</p>
-         * <p>The referrer's commission rate for each income source, expressed as a fraction (0.3 = 30%).</p>
+         * <p>The commission rate this referral pays for each income source, as a fraction (0.3 = 30%). A solo partner earns it directly; the team of a referring partner business splits it by their shares.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
@@ -538,7 +891,6 @@ public final class RetrieveBusinessesResponse {
         }
 
         /**
-         * <p>Current referral status.</p>
          * <p>Current referral status.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
@@ -589,6 +941,42 @@ public final class RetrieveBusinessesResponse {
         @JsonSetter(value = "second_tier_partner", nulls = Nulls.SKIP)
         public _FinalStage secondTierPartner(Optional<RetrieveBusinessesResponseSecondTierPartner> secondTierPartner) {
             this.secondTierPartner = secondTierPartner;
+            return this;
+        }
+
+        /**
+         * <p>The partner business whose team member made this referral, the one its commission is paid to. Null for a solo partner's referral.</p>
+         * @return Reference to {@code this} so that method calls can be chained together.
+         */
+        @java.lang.Override
+        public _FinalStage referringBusiness(Nullable<RetrieveBusinessesResponseReferringBusiness> referringBusiness) {
+            if (referringBusiness.isNull()) {
+                this.referringBusiness = null;
+            } else if (referringBusiness.isEmpty()) {
+                this.referringBusiness = Optional.empty();
+            } else {
+                this.referringBusiness = Optional.of(referringBusiness.get());
+            }
+            return this;
+        }
+
+        /**
+         * <p>The partner business whose team member made this referral, the one its commission is paid to. Null for a solo partner's referral.</p>
+         * @return Reference to {@code this} so that method calls can be chained together.
+         */
+        @java.lang.Override
+        public _FinalStage referringBusiness(RetrieveBusinessesResponseReferringBusiness referringBusiness) {
+            this.referringBusiness = Optional.ofNullable(referringBusiness);
+            return this;
+        }
+
+        /**
+         * <p>The partner business whose team member made this referral, the one its commission is paid to. Null for a solo partner's referral.</p>
+         */
+        @java.lang.Override
+        @JsonSetter(value = "referring_business", nulls = Nulls.SKIP)
+        public _FinalStage referringBusiness(Optional<RetrieveBusinessesResponseReferringBusiness> referringBusiness) {
+            this.referringBusiness = referringBusiness;
             return this;
         }
 
@@ -665,6 +1053,28 @@ public final class RetrieveBusinessesResponse {
         }
 
         /**
+         * <p>Outstanding invites to claim ownership of this business. Present only to the first-tier partner's whop.com session, or the Whop CLI or MCP with the <code>partner:handoff</code> scope, and empty once every invite has been accepted.</p>
+         * @return Reference to {@code this} so that method calls can be chained together.
+         */
+        @java.lang.Override
+        public _FinalStage pendingOwnerInvites(
+                List<RetrieveBusinessesResponsePendingOwnerInvitesItem> pendingOwnerInvites) {
+            this.pendingOwnerInvites = Optional.ofNullable(pendingOwnerInvites);
+            return this;
+        }
+
+        /**
+         * <p>Outstanding invites to claim ownership of this business. Present only to the first-tier partner's whop.com session, or the Whop CLI or MCP with the <code>partner:handoff</code> scope, and empty once every invite has been accepted.</p>
+         */
+        @java.lang.Override
+        @JsonSetter(value = "pending_owner_invites", nulls = Nulls.SKIP)
+        public _FinalStage pendingOwnerInvites(
+                Optional<List<RetrieveBusinessesResponsePendingOwnerInvitesItem>> pendingOwnerInvites) {
+            this.pendingOwnerInvites = pendingOwnerInvites;
+            return this;
+        }
+
+        /**
          * <p>The owner of the referred business.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
@@ -701,6 +1111,44 @@ public final class RetrieveBusinessesResponse {
         }
 
         /**
+         * <p>The caller's own cut of each income source on this business, as a fraction of the same base as <code>payout_percentages</code> (0.12 = 12%). A solo partner's cut is the whole rate. On a referring partner business's deal it is the caller's team share of the rate: a closer earns their share, a manager earns their share minus the share of the person below them, and a deal participant earns their cut. Null when the caller earns nothing on this business, as with an account API key.</p>
+         * @return Reference to {@code this} so that method calls can be chained together.
+         */
+        @java.lang.Override
+        public _FinalStage myPayoutPercentages(
+                Nullable<RetrieveBusinessesResponseMyPayoutPercentages> myPayoutPercentages) {
+            if (myPayoutPercentages.isNull()) {
+                this.myPayoutPercentages = null;
+            } else if (myPayoutPercentages.isEmpty()) {
+                this.myPayoutPercentages = Optional.empty();
+            } else {
+                this.myPayoutPercentages = Optional.of(myPayoutPercentages.get());
+            }
+            return this;
+        }
+
+        /**
+         * <p>The caller's own cut of each income source on this business, as a fraction of the same base as <code>payout_percentages</code> (0.12 = 12%). A solo partner's cut is the whole rate. On a referring partner business's deal it is the caller's team share of the rate: a closer earns their share, a manager earns their share minus the share of the person below them, and a deal participant earns their cut. Null when the caller earns nothing on this business, as with an account API key.</p>
+         * @return Reference to {@code this} so that method calls can be chained together.
+         */
+        @java.lang.Override
+        public _FinalStage myPayoutPercentages(RetrieveBusinessesResponseMyPayoutPercentages myPayoutPercentages) {
+            this.myPayoutPercentages = Optional.ofNullable(myPayoutPercentages);
+            return this;
+        }
+
+        /**
+         * <p>The caller's own cut of each income source on this business, as a fraction of the same base as <code>payout_percentages</code> (0.12 = 12%). A solo partner's cut is the whole rate. On a referring partner business's deal it is the caller's team share of the rate: a closer earns their share, a manager earns their share minus the share of the person below them, and a deal participant earns their cut. Null when the caller earns nothing on this business, as with an account API key.</p>
+         */
+        @java.lang.Override
+        @JsonSetter(value = "my_payout_percentages", nulls = Nulls.SKIP)
+        public _FinalStage myPayoutPercentages(
+                Optional<RetrieveBusinessesResponseMyPayoutPercentages> myPayoutPercentages) {
+            this.myPayoutPercentages = myPayoutPercentages;
+            return this;
+        }
+
+        /**
          * <p>The partner who referred the business owner onto Whop (first tier). Null if there is no active first-tier partner.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
@@ -733,6 +1181,226 @@ public final class RetrieveBusinessesResponse {
         @JsonSetter(value = "first_tier_partner", nulls = Nulls.SKIP)
         public _FinalStage firstTierPartner(Optional<RetrieveBusinessesResponseFirstTierPartner> firstTierPartner) {
             this.firstTierPartner = firstTierPartner;
+            return this;
+        }
+
+        /**
+         * <p>Estimated regular commission per USD of card and BNPL payments, as a decimal string (for example <code>0.004</code>). Once the advance qualifies, the rate its terms were sized with; before that, observed payout rates or, without payment history, reference US card fees. Multiply payments by this rate to estimate commissions, including those that resume after a commission advance term. <code>null</code> when pricing is unavailable or the response has neither <code>commission_advance_rate</code> nor <code>commission_advance</code>.</p>
+         * @return Reference to {@code this} so that method calls can be chained together.
+         */
+        @java.lang.Override
+        public _FinalStage estimatedCommissionRate(Nullable<String> estimatedCommissionRate) {
+            if (estimatedCommissionRate.isNull()) {
+                this.estimatedCommissionRate = null;
+            } else if (estimatedCommissionRate.isEmpty()) {
+                this.estimatedCommissionRate = Optional.empty();
+            } else {
+                this.estimatedCommissionRate = Optional.of(estimatedCommissionRate.get());
+            }
+            return this;
+        }
+
+        /**
+         * <p>Estimated regular commission per USD of card and BNPL payments, as a decimal string (for example <code>0.004</code>). Once the advance qualifies, the rate its terms were sized with; before that, observed payout rates or, without payment history, reference US card fees. Multiply payments by this rate to estimate commissions, including those that resume after a commission advance term. <code>null</code> when pricing is unavailable or the response has neither <code>commission_advance_rate</code> nor <code>commission_advance</code>.</p>
+         * @return Reference to {@code this} so that method calls can be chained together.
+         */
+        @java.lang.Override
+        public _FinalStage estimatedCommissionRate(String estimatedCommissionRate) {
+            this.estimatedCommissionRate = Optional.ofNullable(estimatedCommissionRate);
+            return this;
+        }
+
+        /**
+         * <p>Estimated regular commission per USD of card and BNPL payments, as a decimal string (for example <code>0.004</code>). Once the advance qualifies, the rate its terms were sized with; before that, observed payout rates or, without payment history, reference US card fees. Multiply payments by this rate to estimate commissions, including those that resume after a commission advance term. <code>null</code> when pricing is unavailable or the response has neither <code>commission_advance_rate</code> nor <code>commission_advance</code>.</p>
+         */
+        @java.lang.Override
+        @JsonSetter(value = "estimated_commission_rate", nulls = Nulls.SKIP)
+        public _FinalStage estimatedCommissionRate(Optional<String> estimatedCommissionRate) {
+            this.estimatedCommissionRate = estimatedCommissionRate;
+            return this;
+        }
+
+        /**
+         * <p>How the partner closed this business, in their own words. Null until the partner saves one.</p>
+         * @return Reference to {@code this} so that method calls can be chained together.
+         */
+        @java.lang.Override
+        public _FinalStage dealClosedReason(Nullable<String> dealClosedReason) {
+            if (dealClosedReason.isNull()) {
+                this.dealClosedReason = null;
+            } else if (dealClosedReason.isEmpty()) {
+                this.dealClosedReason = Optional.empty();
+            } else {
+                this.dealClosedReason = Optional.of(dealClosedReason.get());
+            }
+            return this;
+        }
+
+        /**
+         * <p>How the partner closed this business, in their own words. Null until the partner saves one.</p>
+         * @return Reference to {@code this} so that method calls can be chained together.
+         */
+        @java.lang.Override
+        public _FinalStage dealClosedReason(String dealClosedReason) {
+            this.dealClosedReason = Optional.ofNullable(dealClosedReason);
+            return this;
+        }
+
+        /**
+         * <p>How the partner closed this business, in their own words. Null until the partner saves one.</p>
+         */
+        @java.lang.Override
+        @JsonSetter(value = "deal_closed_reason", nulls = Nulls.SKIP)
+        public _FinalStage dealClosedReason(Optional<String> dealClosedReason) {
+            this.dealClosedReason = dealClosedReason;
+            return this;
+        }
+
+        /**
+         * <p>Estimated upfront advance per USD of annual card and BNPL payments, including advance share and remaining term. Multiply annual payments by this rate, cap at commission_advance_cap, and round down to cents. Uses observed commissions or, without history, a typical gross profit share adjusted for the business's US card fee, times the partner share. Null when projections or pricing are unavailable. Only returned to the referring partner. Qualification and final offers use actual activity.</p>
+         * @return Reference to {@code this} so that method calls can be chained together.
+         */
+        @java.lang.Override
+        public _FinalStage commissionAdvanceRate(Nullable<String> commissionAdvanceRate) {
+            if (commissionAdvanceRate.isNull()) {
+                this.commissionAdvanceRate = null;
+            } else if (commissionAdvanceRate.isEmpty()) {
+                this.commissionAdvanceRate = Optional.empty();
+            } else {
+                this.commissionAdvanceRate = Optional.of(commissionAdvanceRate.get());
+            }
+            return this;
+        }
+
+        /**
+         * <p>Estimated upfront advance per USD of annual card and BNPL payments, including advance share and remaining term. Multiply annual payments by this rate, cap at commission_advance_cap, and round down to cents. Uses observed commissions or, without history, a typical gross profit share adjusted for the business's US card fee, times the partner share. Null when projections or pricing are unavailable. Only returned to the referring partner. Qualification and final offers use actual activity.</p>
+         * @return Reference to {@code this} so that method calls can be chained together.
+         */
+        @java.lang.Override
+        public _FinalStage commissionAdvanceRate(String commissionAdvanceRate) {
+            this.commissionAdvanceRate = Optional.ofNullable(commissionAdvanceRate);
+            return this;
+        }
+
+        /**
+         * <p>Estimated upfront advance per USD of annual card and BNPL payments, including advance share and remaining term. Multiply annual payments by this rate, cap at commission_advance_cap, and round down to cents. Uses observed commissions or, without history, a typical gross profit share adjusted for the business's US card fee, times the partner share. Null when projections or pricing are unavailable. Only returned to the referring partner. Qualification and final offers use actual activity.</p>
+         */
+        @java.lang.Override
+        @JsonSetter(value = "commission_advance_rate", nulls = Nulls.SKIP)
+        public _FinalStage commissionAdvanceRate(Optional<String> commissionAdvanceRate) {
+            this.commissionAdvanceRate = commissionAdvanceRate;
+            return this;
+        }
+
+        /**
+         * <p>Whether this referral meets the partner and ownership requirements for saving commission advance projections. Returned only to the referring partner; existing advance terms and update permissions still apply.</p>
+         * @return Reference to {@code this} so that method calls can be chained together.
+         */
+        @java.lang.Override
+        public _FinalStage commissionAdvanceProjectionsAllowed(Boolean commissionAdvanceProjectionsAllowed) {
+            this.commissionAdvanceProjectionsAllowed = Optional.ofNullable(commissionAdvanceProjectionsAllowed);
+            return this;
+        }
+
+        /**
+         * <p>Whether this referral meets the partner and ownership requirements for saving commission advance projections. Returned only to the referring partner; existing advance terms and update permissions still apply.</p>
+         */
+        @java.lang.Override
+        @JsonSetter(value = "commission_advance_projections_allowed", nulls = Nulls.SKIP)
+        public _FinalStage commissionAdvanceProjectionsAllowed(Optional<Boolean> commissionAdvanceProjectionsAllowed) {
+            this.commissionAdvanceProjectionsAllowed = commissionAdvanceProjectionsAllowed;
+            return this;
+        }
+
+        /**
+         * <p>The most the referring organization advances per business, in USD. Returned only with commission_advance_rate.</p>
+         * @return Reference to {@code this} so that method calls can be chained together.
+         */
+        @java.lang.Override
+        public _FinalStage commissionAdvanceCap(Money commissionAdvanceCap) {
+            this.commissionAdvanceCap = Optional.ofNullable(commissionAdvanceCap);
+            return this;
+        }
+
+        /**
+         * <p>The most the referring organization advances per business, in USD. Returned only with commission_advance_rate.</p>
+         */
+        @java.lang.Override
+        @JsonSetter(value = "commission_advance_cap", nulls = Nulls.SKIP)
+        public _FinalStage commissionAdvanceCap(Optional<Money> commissionAdvanceCap) {
+            this.commissionAdvanceCap = commissionAdvanceCap;
+            return this;
+        }
+
+        /**
+         * <p>CPA terms for the referring partner. Read with referring_account_id, the business's owner sees every rep's terms and a manager sees those of the reps below them, read-only. Omitted for other callers. An offer token is only for the referring partner and requires partner:commission_advance:accept permission.</p>
+         * @return Reference to {@code this} so that method calls can be chained together.
+         */
+        @java.lang.Override
+        public _FinalStage commissionAdvance(Nullable<PartnerAdvance> commissionAdvance) {
+            if (commissionAdvance.isNull()) {
+                this.commissionAdvance = null;
+            } else if (commissionAdvance.isEmpty()) {
+                this.commissionAdvance = Optional.empty();
+            } else {
+                this.commissionAdvance = Optional.of(commissionAdvance.get());
+            }
+            return this;
+        }
+
+        /**
+         * <p>CPA terms for the referring partner. Read with referring_account_id, the business's owner sees every rep's terms and a manager sees those of the reps below them, read-only. Omitted for other callers. An offer token is only for the referring partner and requires partner:commission_advance:accept permission.</p>
+         * @return Reference to {@code this} so that method calls can be chained together.
+         */
+        @java.lang.Override
+        public _FinalStage commissionAdvance(PartnerAdvance commissionAdvance) {
+            this.commissionAdvance = Optional.ofNullable(commissionAdvance);
+            return this;
+        }
+
+        /**
+         * <p>CPA terms for the referring partner. Read with referring_account_id, the business's owner sees every rep's terms and a manager sees those of the reps below them, read-only. Omitted for other callers. An offer token is only for the referring partner and requires partner:commission_advance:accept permission.</p>
+         */
+        @java.lang.Override
+        @JsonSetter(value = "commission_advance", nulls = Nulls.SKIP)
+        public _FinalStage commissionAdvance(Optional<PartnerAdvance> commissionAdvance) {
+            this.commissionAdvance = commissionAdvance;
+            return this;
+        }
+
+        /**
+         * <p>The partner whose blueprint the business deployed. Null unless this is a blueprint referral.</p>
+         * @return Reference to {@code this} so that method calls can be chained together.
+         */
+        @java.lang.Override
+        public _FinalStage blueprintPartner(Nullable<RetrieveBusinessesResponseBlueprintPartner> blueprintPartner) {
+            if (blueprintPartner.isNull()) {
+                this.blueprintPartner = null;
+            } else if (blueprintPartner.isEmpty()) {
+                this.blueprintPartner = Optional.empty();
+            } else {
+                this.blueprintPartner = Optional.of(blueprintPartner.get());
+            }
+            return this;
+        }
+
+        /**
+         * <p>The partner whose blueprint the business deployed. Null unless this is a blueprint referral.</p>
+         * @return Reference to {@code this} so that method calls can be chained together.
+         */
+        @java.lang.Override
+        public _FinalStage blueprintPartner(RetrieveBusinessesResponseBlueprintPartner blueprintPartner) {
+            this.blueprintPartner = Optional.ofNullable(blueprintPartner);
+            return this;
+        }
+
+        /**
+         * <p>The partner whose blueprint the business deployed. Null unless this is a blueprint referral.</p>
+         */
+        @java.lang.Override
+        @JsonSetter(value = "blueprint_partner", nulls = Nulls.SKIP)
+        public _FinalStage blueprintPartner(Optional<RetrieveBusinessesResponseBlueprintPartner> blueprintPartner) {
+            this.blueprintPartner = blueprintPartner;
             return this;
         }
 
@@ -776,20 +1444,63 @@ public final class RetrieveBusinessesResponse {
         public RetrieveBusinessesResponse build() {
             return new RetrieveBusinessesResponse(
                     account,
+                    blueprintPartner,
+                    canEditFees,
+                    commissionAdvance,
+                    commissionAdvanceCap,
+                    commissionAdvanceProjectionsAllowed,
+                    commissionAdvanceRate,
                     createdAt,
+                    dealClosedReason,
                     earningsUsd,
+                    estimatedCommissionRate,
                     firstTierPartner,
                     id,
                     myPartnerTier,
+                    myPayoutPercentages,
                     object,
                     owner,
                     payoutPercentages,
+                    pendingOwnerInvites,
                     referralExpiresAt,
                     referralStartedAt,
+                    referringBusiness,
                     secondTierPartner,
                     status,
                     volumeUsd,
                     additionalProperties);
+        }
+
+        @JsonAnySetter
+        private void putAdditionalPropertyFromJson(String key, Object value) {
+            if (key.equalsIgnoreCase("account")
+                    || key.equalsIgnoreCase("blueprint_partner")
+                    || key.equalsIgnoreCase("can_edit_fees")
+                    || key.equalsIgnoreCase("commission_advance")
+                    || key.equalsIgnoreCase("commission_advance_cap")
+                    || key.equalsIgnoreCase("commission_advance_projections_allowed")
+                    || key.equalsIgnoreCase("commission_advance_rate")
+                    || key.equalsIgnoreCase("created_at")
+                    || key.equalsIgnoreCase("deal_closed_reason")
+                    || key.equalsIgnoreCase("earnings_usd")
+                    || key.equalsIgnoreCase("estimated_commission_rate")
+                    || key.equalsIgnoreCase("first_tier_partner")
+                    || key.equalsIgnoreCase("id")
+                    || key.equalsIgnoreCase("my_partner_tier")
+                    || key.equalsIgnoreCase("my_payout_percentages")
+                    || key.equalsIgnoreCase("object")
+                    || key.equalsIgnoreCase("owner")
+                    || key.equalsIgnoreCase("payout_percentages")
+                    || key.equalsIgnoreCase("pending_owner_invites")
+                    || key.equalsIgnoreCase("referral_expires_at")
+                    || key.equalsIgnoreCase("referral_started_at")
+                    || key.equalsIgnoreCase("referring_business")
+                    || key.equalsIgnoreCase("second_tier_partner")
+                    || key.equalsIgnoreCase("status")
+                    || key.equalsIgnoreCase("volume_usd")) {
+                return;
+            }
+            this.additionalProperties.put(key, value);
         }
 
         @java.lang.Override

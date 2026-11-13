@@ -4,10 +4,13 @@
 package com.whop.api.resources.paymentmethods;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
+import com.whop.api.core.BodyProperties;
 import com.whop.api.core.ClientOptions;
 import com.whop.api.core.ObjectMappers;
+import com.whop.api.core.PathSegments;
 import com.whop.api.core.QueryStringMapper;
 import com.whop.api.core.RequestOptions;
+import com.whop.api.core.RetryInterceptor;
 import com.whop.api.core.WhopApiApiException;
 import com.whop.api.core.WhopApiException;
 import com.whop.api.core.WhopApiHttpResponse;
@@ -23,8 +26,10 @@ import com.whop.api.resources.paymentmethods.requests.DeletePaymentMethodRequest
 import com.whop.api.resources.paymentmethods.requests.ListPaymentMethodsRequest;
 import com.whop.api.resources.paymentmethods.requests.RetrievePaymentMethodsRequest;
 import com.whop.api.resources.paymentmethods.types.ListPaymentMethodsResponse;
+import com.whop.api.types.InternalServerErrorBody;
 import com.whop.api.types.PaymentMethod;
 import com.whop.api.types.PaymentMethodListItem;
+import com.whop.api.types.UnprocessableEntityErrorBody;
 import java.io.IOException;
 import java.util.List;
 import java.util.Optional;
@@ -48,7 +53,7 @@ public class AsyncRawPaymentMethodsClient {
     }
 
     /**
-     * Returns a paginated list of payment methods for a member or company, or for the authenticated user when neither is given, with optional filtering by creation date. A payment method is a stored representation of how a customer intends to pay, such as a card, bank account, or digital wallet.
+     * Returns a paginated list of saved payment methods for a member or account, or for the authenticated user when you pass neither.
      * <p>Required permissions:</p>
      * <ul>
      * <li><code>member:payment_methods:read</code></li>
@@ -59,7 +64,7 @@ public class AsyncRawPaymentMethodsClient {
     }
 
     /**
-     * Returns a paginated list of payment methods for a member or company, or for the authenticated user when neither is given, with optional filtering by creation date. A payment method is a stored representation of how a customer intends to pay, such as a card, bank account, or digital wallet.
+     * Returns a paginated list of saved payment methods for a member or account, or for the authenticated user when you pass neither.
      * <p>Required permissions:</p>
      * <ul>
      * <li><code>member:payment_methods:read</code></li>
@@ -71,7 +76,7 @@ public class AsyncRawPaymentMethodsClient {
     }
 
     /**
-     * Returns a paginated list of payment methods for a member or company, or for the authenticated user when neither is given, with optional filtering by creation date. A payment method is a stored representation of how a customer intends to pay, such as a card, bank account, or digital wallet.
+     * Returns a paginated list of saved payment methods for a member or account, or for the authenticated user when you pass neither.
      * <p>Required permissions:</p>
      * <ul>
      * <li><code>member:payment_methods:read</code></li>
@@ -83,7 +88,7 @@ public class AsyncRawPaymentMethodsClient {
     }
 
     /**
-     * Returns a paginated list of payment methods for a member or company, or for the authenticated user when neither is given, with optional filtering by creation date. A payment method is a stored representation of how a customer intends to pay, such as a card, bank account, or digital wallet.
+     * Returns a paginated list of saved payment methods for a member or account, or for the authenticated user when you pass neither.
      * <p>Required permissions:</p>
      * <ul>
      * <li><code>member:payment_methods:read</code></li>
@@ -91,7 +96,7 @@ public class AsyncRawPaymentMethodsClient {
      */
     public CompletableFuture<WhopApiHttpResponse<SyncPagingIterable<PaymentMethodListItem>>> list(
             ListPaymentMethodsRequest request, RequestOptions requestOptions) {
-        HttpUrl.Builder httpUrl = HttpUrl.parse(this.clientOptions.environment().getUrl())
+        HttpUrl.Builder httpUrl = HttpUrl.parse(this.clientOptions.environment().getApiURL())
                 .newBuilder()
                 .addPathSegments("payment_methods");
         if (request.getAfter().isPresent()) {
@@ -113,10 +118,6 @@ public class AsyncRawPaymentMethodsClient {
         if (request.getMemberId().isPresent()) {
             QueryStringMapper.addQueryParameter(
                     httpUrl, "member_id", request.getMemberId().get(), false);
-        }
-        if (request.getCompanyId().isPresent()) {
-            QueryStringMapper.addQueryParameter(
-                    httpUrl, "company_id", request.getCompanyId().get(), false);
         }
         if (request.getDirection().isPresent()) {
             QueryStringMapper.addQueryParameter(
@@ -145,6 +146,10 @@ public class AsyncRawPaymentMethodsClient {
         if (request.getBroken().isPresent()) {
             QueryStringMapper.addQueryParameter(
                     httpUrl, "broken", request.getBroken().get(), false);
+        }
+        if (request.getAccountId().isPresent()) {
+            QueryStringMapper.addQueryParameter(
+                    httpUrl, "account_id", request.getAccountId().get(), false);
         }
         if (request.getPaymentMethodTypes().isPresent()) {
             QueryStringMapper.addQueryParameter(
@@ -176,9 +181,19 @@ public class AsyncRawPaymentMethodsClient {
         if (requestOptions != null && requestOptions.getTimeout().isPresent()) {
             client = clientOptions.httpClientWithTimeout(requestOptions);
         }
+        if (requestOptions != null && requestOptions.getMaxRetries().isPresent()) {
+            okhttpRequest = okhttpRequest
+                    .newBuilder()
+                    .tag(
+                            RetryInterceptor.MaxRetriesOverride.class,
+                            new RetryInterceptor.MaxRetriesOverride(
+                                    requestOptions.getMaxRetries().get()))
+                    .build();
+        }
         CompletableFuture<WhopApiHttpResponse<SyncPagingIterable<PaymentMethodListItem>>> future =
                 new CompletableFuture<>();
-        client.newCall(okhttpRequest).enqueue(new Callback() {
+        RetryInterceptor.AsyncCall okhttpCall = RetryInterceptor.newAsyncCall(client, okhttpRequest);
+        okhttpCall.enqueue(new Callback() {
             @Override
             public void onResponse(@NotNull Call call, @NotNull Response response) throws IOException {
                 try (ResponseBody responseBody = response.body()) {
@@ -195,7 +210,11 @@ public class AsyncRawPaymentMethodsClient {
                         List<PaymentMethodListItem> result = parsedResponse.getData();
                         future.complete(new WhopApiHttpResponse<>(
                                 new SyncPagingIterable<PaymentMethodListItem>(
-                                        startingAfter != null, result, parsedResponse, () -> {
+                                        startingAfter.isPresent()
+                                                && !startingAfter.get().isEmpty(),
+                                        result,
+                                        parsedResponse,
+                                        () -> {
                                             try {
                                                 return list(nextRequest, requestOptions)
                                                         .get()
@@ -231,7 +250,8 @@ public class AsyncRawPaymentMethodsClient {
                                 return;
                             case 422:
                                 future.completeExceptionally(new UnprocessableEntityError(
-                                        ObjectMappers.JSON_MAPPER.readValue(responseBodyString, Object.class),
+                                        ObjectMappers.JSON_MAPPER.readValue(
+                                                responseBodyString, UnprocessableEntityErrorBody.class),
                                         response));
                                 return;
                             case 429:
@@ -241,7 +261,8 @@ public class AsyncRawPaymentMethodsClient {
                                 return;
                             case 500:
                                 future.completeExceptionally(new InternalServerError(
-                                        ObjectMappers.JSON_MAPPER.readValue(responseBodyString, Object.class),
+                                        ObjectMappers.JSON_MAPPER.readValue(
+                                                responseBodyString, InternalServerErrorBody.class),
                                         response));
                                 return;
                         }
@@ -252,6 +273,9 @@ public class AsyncRawPaymentMethodsClient {
                     future.completeExceptionally(new WhopApiApiException(
                             "Error with status code " + response.code(), response.code(), errorBody, response));
                     return;
+                } catch (JsonProcessingException e) {
+                    future.completeExceptionally(
+                            new WhopApiException("Failed to deserialize response: " + e.getMessage(), e));
                 } catch (IOException e) {
                     future.completeExceptionally(new WhopApiException("Network error executing HTTP request", e));
                 }
@@ -262,11 +286,16 @@ public class AsyncRawPaymentMethodsClient {
                 future.completeExceptionally(new WhopApiException("Network error executing HTTP request", e));
             }
         });
+        future.whenComplete((result_, throwable_) -> {
+            if (future.isCancelled()) {
+                okhttpCall.cancel();
+            }
+        });
         return future;
     }
 
     /**
-     * Retrieves the details of an existing payment method. Addresses a member's wallet when member_id or company_id is given, otherwise your own.
+     * Retrieves a saved payment method from a member's wallet when you pass <code>member_id</code> or <code>account_id</code>, or from your own otherwise.
      * <p>Required permissions:</p>
      * <ul>
      * <li><code>member:payment_methods:read</code></li>
@@ -277,7 +306,7 @@ public class AsyncRawPaymentMethodsClient {
     }
 
     /**
-     * Retrieves the details of an existing payment method. Addresses a member's wallet when member_id or company_id is given, otherwise your own.
+     * Retrieves a saved payment method from a member's wallet when you pass <code>member_id</code> or <code>account_id</code>, or from your own otherwise.
      * <p>Required permissions:</p>
      * <ul>
      * <li><code>member:payment_methods:read</code></li>
@@ -288,7 +317,7 @@ public class AsyncRawPaymentMethodsClient {
     }
 
     /**
-     * Retrieves the details of an existing payment method. Addresses a member's wallet when member_id or company_id is given, otherwise your own.
+     * Retrieves a saved payment method from a member's wallet when you pass <code>member_id</code> or <code>account_id</code>, or from your own otherwise.
      * <p>Required permissions:</p>
      * <ul>
      * <li><code>member:payment_methods:read</code></li>
@@ -300,7 +329,7 @@ public class AsyncRawPaymentMethodsClient {
     }
 
     /**
-     * Retrieves the details of an existing payment method. Addresses a member's wallet when member_id or company_id is given, otherwise your own.
+     * Retrieves a saved payment method from a member's wallet when you pass <code>member_id</code> or <code>account_id</code>, or from your own otherwise.
      * <p>Required permissions:</p>
      * <ul>
      * <li><code>member:payment_methods:read</code></li>
@@ -308,17 +337,17 @@ public class AsyncRawPaymentMethodsClient {
      */
     public CompletableFuture<WhopApiHttpResponse<PaymentMethod>> retrieve(
             String id, RetrievePaymentMethodsRequest request, RequestOptions requestOptions) {
-        HttpUrl.Builder httpUrl = HttpUrl.parse(this.clientOptions.environment().getUrl())
+        HttpUrl.Builder httpUrl = HttpUrl.parse(this.clientOptions.environment().getApiURL())
                 .newBuilder()
                 .addPathSegments("payment_methods")
-                .addPathSegment(id);
-        if (request.getCompanyId().isPresent()) {
-            QueryStringMapper.addQueryParameter(
-                    httpUrl, "company_id", request.getCompanyId().get(), false);
-        }
+                .addPathSegment(PathSegments.validate(id));
         if (request.getMemberId().isPresent()) {
             QueryStringMapper.addQueryParameter(
                     httpUrl, "member_id", request.getMemberId().get(), false);
+        }
+        if (request.getAccountId().isPresent()) {
+            QueryStringMapper.addQueryParameter(
+                    httpUrl, "account_id", request.getAccountId().get(), false);
         }
         if (requestOptions != null) {
             requestOptions.getQueryParameters().forEach((_key, _value) -> {
@@ -335,8 +364,18 @@ public class AsyncRawPaymentMethodsClient {
         if (requestOptions != null && requestOptions.getTimeout().isPresent()) {
             client = clientOptions.httpClientWithTimeout(requestOptions);
         }
+        if (requestOptions != null && requestOptions.getMaxRetries().isPresent()) {
+            okhttpRequest = okhttpRequest
+                    .newBuilder()
+                    .tag(
+                            RetryInterceptor.MaxRetriesOverride.class,
+                            new RetryInterceptor.MaxRetriesOverride(
+                                    requestOptions.getMaxRetries().get()))
+                    .build();
+        }
         CompletableFuture<WhopApiHttpResponse<PaymentMethod>> future = new CompletableFuture<>();
-        client.newCall(okhttpRequest).enqueue(new Callback() {
+        RetryInterceptor.AsyncCall okhttpCall = RetryInterceptor.newAsyncCall(client, okhttpRequest);
+        okhttpCall.enqueue(new Callback() {
             @Override
             public void onResponse(@NotNull Call call, @NotNull Response response) throws IOException {
                 try (ResponseBody responseBody = response.body()) {
@@ -371,7 +410,8 @@ public class AsyncRawPaymentMethodsClient {
                                 return;
                             case 422:
                                 future.completeExceptionally(new UnprocessableEntityError(
-                                        ObjectMappers.JSON_MAPPER.readValue(responseBodyString, Object.class),
+                                        ObjectMappers.JSON_MAPPER.readValue(
+                                                responseBodyString, UnprocessableEntityErrorBody.class),
                                         response));
                                 return;
                             case 429:
@@ -381,7 +421,8 @@ public class AsyncRawPaymentMethodsClient {
                                 return;
                             case 500:
                                 future.completeExceptionally(new InternalServerError(
-                                        ObjectMappers.JSON_MAPPER.readValue(responseBodyString, Object.class),
+                                        ObjectMappers.JSON_MAPPER.readValue(
+                                                responseBodyString, InternalServerErrorBody.class),
                                         response));
                                 return;
                         }
@@ -392,6 +433,9 @@ public class AsyncRawPaymentMethodsClient {
                     future.completeExceptionally(new WhopApiApiException(
                             "Error with status code " + response.code(), response.code(), errorBody, response));
                     return;
+                } catch (JsonProcessingException e) {
+                    future.completeExceptionally(
+                            new WhopApiException("Failed to deserialize response: " + e.getMessage(), e));
                 } catch (IOException e) {
                     future.completeExceptionally(new WhopApiException("Network error executing HTTP request", e));
                 }
@@ -400,6 +444,11 @@ public class AsyncRawPaymentMethodsClient {
             @Override
             public void onFailure(@NotNull Call call, @NotNull IOException e) {
                 future.completeExceptionally(new WhopApiException("Network error executing HTTP request", e));
+            }
+        });
+        future.whenComplete((result_, throwable_) -> {
+            if (future.isCancelled()) {
+                okhttpCall.cancel();
             }
         });
         return future;
@@ -449,17 +498,17 @@ public class AsyncRawPaymentMethodsClient {
      */
     public CompletableFuture<WhopApiHttpResponse<Boolean>> deletePaymentMethod(
             String id, DeletePaymentMethodRequest request, RequestOptions requestOptions) {
-        HttpUrl.Builder httpUrl = HttpUrl.parse(this.clientOptions.environment().getUrl())
+        HttpUrl.Builder httpUrl = HttpUrl.parse(this.clientOptions.environment().getApiURL())
                 .newBuilder()
                 .addPathSegments("payment_methods")
-                .addPathSegment(id);
-        if (request.getCompanyId().isPresent()) {
-            QueryStringMapper.addQueryParameter(
-                    httpUrl, "company_id", request.getCompanyId().get(), false);
-        }
+                .addPathSegment(PathSegments.validate(id));
         if (request.getMemberId().isPresent()) {
             QueryStringMapper.addQueryParameter(
                     httpUrl, "member_id", request.getMemberId().get(), false);
+        }
+        if (request.getAccountId().isPresent()) {
+            QueryStringMapper.addQueryParameter(
+                    httpUrl, "account_id", request.getAccountId().get(), false);
         }
         if (requestOptions != null) {
             requestOptions.getQueryParameters().forEach((_key, _value) -> {
@@ -468,7 +517,10 @@ public class AsyncRawPaymentMethodsClient {
         }
         Request.Builder _requestBuilder = new Request.Builder()
                 .url(httpUrl.build())
-                .method("DELETE", null)
+                .method(
+                        "DELETE",
+                        BodyProperties.toRequestBody(
+                                requestOptions != null ? requestOptions.getBodyProperties() : null, null))
                 .headers(Headers.of(clientOptions.headers(requestOptions)))
                 .addHeader("Accept", "application/json");
         Request okhttpRequest = _requestBuilder.build();
@@ -476,8 +528,18 @@ public class AsyncRawPaymentMethodsClient {
         if (requestOptions != null && requestOptions.getTimeout().isPresent()) {
             client = clientOptions.httpClientWithTimeout(requestOptions);
         }
+        if (requestOptions != null && requestOptions.getMaxRetries().isPresent()) {
+            okhttpRequest = okhttpRequest
+                    .newBuilder()
+                    .tag(
+                            RetryInterceptor.MaxRetriesOverride.class,
+                            new RetryInterceptor.MaxRetriesOverride(
+                                    requestOptions.getMaxRetries().get()))
+                    .build();
+        }
         CompletableFuture<WhopApiHttpResponse<Boolean>> future = new CompletableFuture<>();
-        client.newCall(okhttpRequest).enqueue(new Callback() {
+        RetryInterceptor.AsyncCall okhttpCall = RetryInterceptor.newAsyncCall(client, okhttpRequest);
+        okhttpCall.enqueue(new Callback() {
             @Override
             public void onResponse(@NotNull Call call, @NotNull Response response) throws IOException {
                 try (ResponseBody responseBody = response.body()) {
@@ -511,7 +573,8 @@ public class AsyncRawPaymentMethodsClient {
                                 return;
                             case 422:
                                 future.completeExceptionally(new UnprocessableEntityError(
-                                        ObjectMappers.JSON_MAPPER.readValue(responseBodyString, Object.class),
+                                        ObjectMappers.JSON_MAPPER.readValue(
+                                                responseBodyString, UnprocessableEntityErrorBody.class),
                                         response));
                                 return;
                             case 429:
@@ -521,7 +584,8 @@ public class AsyncRawPaymentMethodsClient {
                                 return;
                             case 500:
                                 future.completeExceptionally(new InternalServerError(
-                                        ObjectMappers.JSON_MAPPER.readValue(responseBodyString, Object.class),
+                                        ObjectMappers.JSON_MAPPER.readValue(
+                                                responseBodyString, InternalServerErrorBody.class),
                                         response));
                                 return;
                         }
@@ -532,6 +596,9 @@ public class AsyncRawPaymentMethodsClient {
                     future.completeExceptionally(new WhopApiApiException(
                             "Error with status code " + response.code(), response.code(), errorBody, response));
                     return;
+                } catch (JsonProcessingException e) {
+                    future.completeExceptionally(
+                            new WhopApiException("Failed to deserialize response: " + e.getMessage(), e));
                 } catch (IOException e) {
                     future.completeExceptionally(new WhopApiException("Network error executing HTTP request", e));
                 }
@@ -540,6 +607,11 @@ public class AsyncRawPaymentMethodsClient {
             @Override
             public void onFailure(@NotNull Call call, @NotNull IOException e) {
                 future.completeExceptionally(new WhopApiException("Network error executing HTTP request", e));
+            }
+        });
+        future.whenComplete((result_, throwable_) -> {
+            if (future.isCancelled()) {
+                okhttpCall.cancel();
             }
         });
         return future;

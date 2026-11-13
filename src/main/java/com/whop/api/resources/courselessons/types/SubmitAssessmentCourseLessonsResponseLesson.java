@@ -108,7 +108,6 @@ public final class SubmitAssessmentCourseLessonsResponseLesson {
 
         private String title;
 
-        @JsonAnySetter
         private Map<String, Object> additionalProperties = new HashMap<>();
 
         private Builder() {}
@@ -122,7 +121,6 @@ public final class SubmitAssessmentCourseLessonsResponseLesson {
 
         /**
          * <p>The unique identifier for the lesson.</p>
-         * <p>The unique identifier for the lesson.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
@@ -133,7 +131,6 @@ public final class SubmitAssessmentCourseLessonsResponseLesson {
         }
 
         /**
-         * <p>The display name of the lesson shown to students. Maximum 120 characters.</p>
          * <p>The display name of the lesson shown to students. Maximum 120 characters.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
@@ -147,6 +144,14 @@ public final class SubmitAssessmentCourseLessonsResponseLesson {
         @java.lang.Override
         public SubmitAssessmentCourseLessonsResponseLesson build() {
             return new SubmitAssessmentCourseLessonsResponseLesson(id, title, additionalProperties);
+        }
+
+        @JsonAnySetter
+        private void putAdditionalPropertyFromJson(String key, Object value) {
+            if (key.equalsIgnoreCase("id") || key.equalsIgnoreCase("title")) {
+                return;
+            }
+            this.additionalProperties.put(key, value);
         }
 
         @java.lang.Override

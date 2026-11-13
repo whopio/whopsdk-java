@@ -4,11 +4,14 @@
 package com.whop.api.resources.users;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
+import com.whop.api.core.BodyProperties;
 import com.whop.api.core.ClientOptions;
 import com.whop.api.core.MediaTypes;
 import com.whop.api.core.ObjectMappers;
+import com.whop.api.core.PathSegments;
 import com.whop.api.core.QueryStringMapper;
 import com.whop.api.core.RequestOptions;
+import com.whop.api.core.RetryInterceptor;
 import com.whop.api.core.WhopApiApiException;
 import com.whop.api.core.WhopApiException;
 import com.whop.api.core.WhopApiHttpResponse;
@@ -47,33 +50,37 @@ public class RawUsersClient {
     }
 
     /**
-     * Search for users by name or username, ranked by social proximity to the authenticated user. Returns the user's most recently followed users when no query is given.
+     * Searches for users by name or username, ranked by social proximity to the authenticated user. Without a <code>query</code>, returns the user's most recently followed users.
      */
     public WhopApiHttpResponse<SyncPagingIterable<User>> list() {
         return list(ListUsersRequest.builder().build());
     }
 
     /**
-     * Search for users by name or username, ranked by social proximity to the authenticated user. Returns the user's most recently followed users when no query is given.
+     * Searches for users by name or username, ranked by social proximity to the authenticated user. Without a <code>query</code>, returns the user's most recently followed users.
      */
     public WhopApiHttpResponse<SyncPagingIterable<User>> list(RequestOptions requestOptions) {
         return list(ListUsersRequest.builder().build(), requestOptions);
     }
 
     /**
-     * Search for users by name or username, ranked by social proximity to the authenticated user. Returns the user's most recently followed users when no query is given.
+     * Searches for users by name or username, ranked by social proximity to the authenticated user. Without a <code>query</code>, returns the user's most recently followed users.
      */
     public WhopApiHttpResponse<SyncPagingIterable<User>> list(ListUsersRequest request) {
         return list(request, null);
     }
 
     /**
-     * Search for users by name or username, ranked by social proximity to the authenticated user. Returns the user's most recently followed users when no query is given.
+     * Searches for users by name or username, ranked by social proximity to the authenticated user. Without a <code>query</code>, returns the user's most recently followed users.
      */
     public WhopApiHttpResponse<SyncPagingIterable<User>> list(ListUsersRequest request, RequestOptions requestOptions) {
-        HttpUrl.Builder httpUrl = HttpUrl.parse(this.clientOptions.environment().getUrl())
+        HttpUrl.Builder httpUrl = HttpUrl.parse(this.clientOptions.environment().getApiURL())
                 .newBuilder()
                 .addPathSegments("users");
+        if (request.getContextChannelId().isPresent()) {
+            QueryStringMapper.addQueryParameter(
+                    httpUrl, "context_channel_id", request.getContextChannelId().get(), false);
+        }
         if (request.getQuery().isPresent()) {
             QueryStringMapper.addQueryParameter(
                     httpUrl, "query", request.getQuery().get(), false);
@@ -109,6 +116,15 @@ public class RawUsersClient {
         if (requestOptions != null && requestOptions.getTimeout().isPresent()) {
             client = clientOptions.httpClientWithTimeout(requestOptions);
         }
+        if (requestOptions != null && requestOptions.getMaxRetries().isPresent()) {
+            okhttpRequest = okhttpRequest
+                    .newBuilder()
+                    .tag(
+                            RetryInterceptor.MaxRetriesOverride.class,
+                            new RetryInterceptor.MaxRetriesOverride(
+                                    requestOptions.getMaxRetries().get()))
+                    .build();
+        }
         try (Response response = client.newCall(okhttpRequest).execute()) {
             ResponseBody responseBody = response.body();
             String responseBodyString = responseBody != null ? responseBody.string() : "{}";
@@ -123,8 +139,11 @@ public class RawUsersClient {
                 List<User> result = parsedResponse.getData();
                 return new WhopApiHttpResponse<>(
                         new SyncPagingIterable<User>(
-                                startingAfter != null, result, parsedResponse, () -> list(nextRequest, requestOptions)
-                                        .body()),
+                                startingAfter.isPresent()
+                                        && !startingAfter.get().isEmpty(),
+                                result,
+                                parsedResponse,
+                                () -> list(nextRequest, requestOptions).body()),
                         response);
             }
             try {
@@ -138,42 +157,52 @@ public class RawUsersClient {
             Object errorBody = ObjectMappers.parseErrorBody(responseBodyString);
             throw new WhopApiApiException(
                     "Error with status code " + response.code(), response.code(), errorBody, response);
+        } catch (JsonProcessingException e) {
+            throw new WhopApiException("Failed to deserialize response: " + e.getMessage(), e);
         } catch (IOException e) {
             throw new WhopApiException("Network error executing HTTP request", e);
         }
     }
 
     /**
-     * Retrieves the authenticated user — the self view of the user object. Same shape as <code>GET /users/{id}</code>, with the self-only fields populated: <code>email</code> (email-read scope), <code>staff</code> (Whop staff only, staff-read scope), <code>balance</code> and <code>earnings_usd</code> (balance-read scope), the opt-in <code>balance_history</code>, and every linked social account.
+     * Retrieves the authenticated user. Same as <code>GET /users/:id</code> with the reserved id <code>me</code>: the self view, where self-only fields such as <code>email</code>, <code>balance</code>, and <code>cards</code> can be populated.
      */
     public WhopApiHttpResponse<User> me() {
         return me(MeUsersRequest.builder().build());
     }
 
     /**
-     * Retrieves the authenticated user — the self view of the user object. Same shape as <code>GET /users/{id}</code>, with the self-only fields populated: <code>email</code> (email-read scope), <code>staff</code> (Whop staff only, staff-read scope), <code>balance</code> and <code>earnings_usd</code> (balance-read scope), the opt-in <code>balance_history</code>, and every linked social account.
+     * Retrieves the authenticated user. Same as <code>GET /users/:id</code> with the reserved id <code>me</code>: the self view, where self-only fields such as <code>email</code>, <code>balance</code>, and <code>cards</code> can be populated.
      */
     public WhopApiHttpResponse<User> me(RequestOptions requestOptions) {
         return me(MeUsersRequest.builder().build(), requestOptions);
     }
 
     /**
-     * Retrieves the authenticated user — the self view of the user object. Same shape as <code>GET /users/{id}</code>, with the self-only fields populated: <code>email</code> (email-read scope), <code>staff</code> (Whop staff only, staff-read scope), <code>balance</code> and <code>earnings_usd</code> (balance-read scope), the opt-in <code>balance_history</code>, and every linked social account.
+     * Retrieves the authenticated user. Same as <code>GET /users/:id</code> with the reserved id <code>me</code>: the self view, where self-only fields such as <code>email</code>, <code>balance</code>, and <code>cards</code> can be populated.
      */
     public WhopApiHttpResponse<User> me(MeUsersRequest request) {
         return me(request, null);
     }
 
     /**
-     * Retrieves the authenticated user — the self view of the user object. Same shape as <code>GET /users/{id}</code>, with the self-only fields populated: <code>email</code> (email-read scope), <code>staff</code> (Whop staff only, staff-read scope), <code>balance</code> and <code>earnings_usd</code> (balance-read scope), the opt-in <code>balance_history</code>, and every linked social account.
+     * Retrieves the authenticated user. Same as <code>GET /users/:id</code> with the reserved id <code>me</code>: the self view, where self-only fields such as <code>email</code>, <code>balance</code>, and <code>cards</code> can be populated.
      */
     public WhopApiHttpResponse<User> me(MeUsersRequest request, RequestOptions requestOptions) {
-        HttpUrl.Builder httpUrl = HttpUrl.parse(this.clientOptions.environment().getUrl())
+        HttpUrl.Builder httpUrl = HttpUrl.parse(this.clientOptions.environment().getApiURL())
                 .newBuilder()
                 .addPathSegments("users/me");
+        if (request.getIncludeTrading().isPresent()) {
+            QueryStringMapper.addQueryParameter(
+                    httpUrl, "include_trading", request.getIncludeTrading().get(), false);
+        }
         if (request.getAccountId().isPresent()) {
             QueryStringMapper.addQueryParameter(
                     httpUrl, "account_id", request.getAccountId().get(), false);
+        }
+        if (request.getIncludeBalance().isPresent()) {
+            QueryStringMapper.addQueryParameter(
+                    httpUrl, "include_balance", request.getIncludeBalance().get(), false);
         }
         if (request.getIncludeBalanceHistory().isPresent()) {
             QueryStringMapper.addQueryParameter(
@@ -212,6 +241,15 @@ public class RawUsersClient {
         if (requestOptions != null && requestOptions.getTimeout().isPresent()) {
             client = clientOptions.httpClientWithTimeout(requestOptions);
         }
+        if (requestOptions != null && requestOptions.getMaxRetries().isPresent()) {
+            okhttpRequest = okhttpRequest
+                    .newBuilder()
+                    .tag(
+                            RetryInterceptor.MaxRetriesOverride.class,
+                            new RetryInterceptor.MaxRetriesOverride(
+                                    requestOptions.getMaxRetries().get()))
+                    .build();
+        }
         try (Response response = client.newCall(okhttpRequest).execute()) {
             ResponseBody responseBody = response.body();
             String responseBodyString = responseBody != null ? responseBody.string() : "{}";
@@ -230,37 +268,39 @@ public class RawUsersClient {
             Object errorBody = ObjectMappers.parseErrorBody(responseBodyString);
             throw new WhopApiApiException(
                     "Error with status code " + response.code(), response.code(), errorBody, response);
+        } catch (JsonProcessingException e) {
+            throw new WhopApiException("Failed to deserialize response: " + e.getMessage(), e);
         } catch (IOException e) {
             throw new WhopApiException("Network error executing HTTP request", e);
         }
     }
 
     /**
-     * Updates the authenticated user's global profile, or their profile override for an account when account_id is given. Not available to API keys.
+     * Updates the authenticated user's global profile, or their profile override for an account when <code>account_id</code> is given. Not available to API keys.
      */
     public WhopApiHttpResponse<User> updateMe() {
         return updateMe(UpdateMeUsersRequest.builder().build());
     }
 
     /**
-     * Updates the authenticated user's global profile, or their profile override for an account when account_id is given. Not available to API keys.
+     * Updates the authenticated user's global profile, or their profile override for an account when <code>account_id</code> is given. Not available to API keys.
      */
     public WhopApiHttpResponse<User> updateMe(RequestOptions requestOptions) {
         return updateMe(UpdateMeUsersRequest.builder().build(), requestOptions);
     }
 
     /**
-     * Updates the authenticated user's global profile, or their profile override for an account when account_id is given. Not available to API keys.
+     * Updates the authenticated user's global profile, or their profile override for an account when <code>account_id</code> is given. Not available to API keys.
      */
     public WhopApiHttpResponse<User> updateMe(UpdateMeUsersRequest request) {
         return updateMe(request, null);
     }
 
     /**
-     * Updates the authenticated user's global profile, or their profile override for an account when account_id is given. Not available to API keys.
+     * Updates the authenticated user's global profile, or their profile override for an account when <code>account_id</code> is given. Not available to API keys.
      */
     public WhopApiHttpResponse<User> updateMe(UpdateMeUsersRequest request, RequestOptions requestOptions) {
-        HttpUrl.Builder httpUrl = HttpUrl.parse(this.clientOptions.environment().getUrl())
+        HttpUrl.Builder httpUrl = HttpUrl.parse(this.clientOptions.environment().getApiURL())
                 .newBuilder()
                 .addPathSegments("users/me");
         if (request.getAccountId().isPresent()) {
@@ -275,7 +315,9 @@ public class RawUsersClient {
         RequestBody body;
         try {
             body = RequestBody.create(
-                    ObjectMappers.JSON_MAPPER.writeValueAsBytes(request), MediaTypes.APPLICATION_JSON);
+                    ObjectMappers.JSON_MAPPER.writeValueAsBytes(BodyProperties.merge(
+                            request, requestOptions != null ? requestOptions.getBodyProperties() : null)),
+                    MediaTypes.APPLICATION_JSON);
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
@@ -289,6 +331,15 @@ public class RawUsersClient {
         OkHttpClient client = clientOptions.httpClient();
         if (requestOptions != null && requestOptions.getTimeout().isPresent()) {
             client = clientOptions.httpClientWithTimeout(requestOptions);
+        }
+        if (requestOptions != null && requestOptions.getMaxRetries().isPresent()) {
+            okhttpRequest = okhttpRequest
+                    .newBuilder()
+                    .tag(
+                            RetryInterceptor.MaxRetriesOverride.class,
+                            new RetryInterceptor.MaxRetriesOverride(
+                                    requestOptions.getMaxRetries().get()))
+                    .build();
         }
         try (Response response = client.newCall(okhttpRequest).execute()) {
             ResponseBody responseBody = response.body();
@@ -308,43 +359,53 @@ public class RawUsersClient {
             Object errorBody = ObjectMappers.parseErrorBody(responseBodyString);
             throw new WhopApiApiException(
                     "Error with status code " + response.code(), response.code(), errorBody, response);
+        } catch (JsonProcessingException e) {
+            throw new WhopApiException("Failed to deserialize response: " + e.getMessage(), e);
         } catch (IOException e) {
             throw new WhopApiException("Network error executing HTTP request", e);
         }
     }
 
     /**
-     * Retrieves a user by <code>user_</code> tag or username, or the authenticated user with the reserved id <code>me</code>. Profiles include linked social accounts — reading your own profile returns every linked account, other profiles only what is public on Whop (the primary Discord and the X account). The self-only fields are populated only when the id is <code>me</code>: <code>email</code> (email-read scope), <code>staff</code> (Whop staff only, staff-read scope), <code>balance</code> and <code>earnings_usd</code> (balance-read scope), and the opt-in <code>balance_history</code>. They are always <code>null</code> when addressing a user by tag or username.
+     * Retrieves a user by <code>user_</code> tag or username, or the authenticated user with the reserved id <code>me</code>. Self-only fields such as <code>email</code>, <code>balance</code>, and <code>earnings_usd</code> are populated only when the id is <code>me</code>, and are always <code>null</code> when addressing a user by tag or username.
      */
     public WhopApiHttpResponse<User> retrieve(String id) {
         return retrieve(id, RetrieveUsersRequest.builder().build());
     }
 
     /**
-     * Retrieves a user by <code>user_</code> tag or username, or the authenticated user with the reserved id <code>me</code>. Profiles include linked social accounts — reading your own profile returns every linked account, other profiles only what is public on Whop (the primary Discord and the X account). The self-only fields are populated only when the id is <code>me</code>: <code>email</code> (email-read scope), <code>staff</code> (Whop staff only, staff-read scope), <code>balance</code> and <code>earnings_usd</code> (balance-read scope), and the opt-in <code>balance_history</code>. They are always <code>null</code> when addressing a user by tag or username.
+     * Retrieves a user by <code>user_</code> tag or username, or the authenticated user with the reserved id <code>me</code>. Self-only fields such as <code>email</code>, <code>balance</code>, and <code>earnings_usd</code> are populated only when the id is <code>me</code>, and are always <code>null</code> when addressing a user by tag or username.
      */
     public WhopApiHttpResponse<User> retrieve(String id, RequestOptions requestOptions) {
         return retrieve(id, RetrieveUsersRequest.builder().build(), requestOptions);
     }
 
     /**
-     * Retrieves a user by <code>user_</code> tag or username, or the authenticated user with the reserved id <code>me</code>. Profiles include linked social accounts — reading your own profile returns every linked account, other profiles only what is public on Whop (the primary Discord and the X account). The self-only fields are populated only when the id is <code>me</code>: <code>email</code> (email-read scope), <code>staff</code> (Whop staff only, staff-read scope), <code>balance</code> and <code>earnings_usd</code> (balance-read scope), and the opt-in <code>balance_history</code>. They are always <code>null</code> when addressing a user by tag or username.
+     * Retrieves a user by <code>user_</code> tag or username, or the authenticated user with the reserved id <code>me</code>. Self-only fields such as <code>email</code>, <code>balance</code>, and <code>earnings_usd</code> are populated only when the id is <code>me</code>, and are always <code>null</code> when addressing a user by tag or username.
      */
     public WhopApiHttpResponse<User> retrieve(String id, RetrieveUsersRequest request) {
         return retrieve(id, request, null);
     }
 
     /**
-     * Retrieves a user by <code>user_</code> tag or username, or the authenticated user with the reserved id <code>me</code>. Profiles include linked social accounts — reading your own profile returns every linked account, other profiles only what is public on Whop (the primary Discord and the X account). The self-only fields are populated only when the id is <code>me</code>: <code>email</code> (email-read scope), <code>staff</code> (Whop staff only, staff-read scope), <code>balance</code> and <code>earnings_usd</code> (balance-read scope), and the opt-in <code>balance_history</code>. They are always <code>null</code> when addressing a user by tag or username.
+     * Retrieves a user by <code>user_</code> tag or username, or the authenticated user with the reserved id <code>me</code>. Self-only fields such as <code>email</code>, <code>balance</code>, and <code>earnings_usd</code> are populated only when the id is <code>me</code>, and are always <code>null</code> when addressing a user by tag or username.
      */
     public WhopApiHttpResponse<User> retrieve(String id, RetrieveUsersRequest request, RequestOptions requestOptions) {
-        HttpUrl.Builder httpUrl = HttpUrl.parse(this.clientOptions.environment().getUrl())
+        HttpUrl.Builder httpUrl = HttpUrl.parse(this.clientOptions.environment().getApiURL())
                 .newBuilder()
                 .addPathSegments("users")
-                .addPathSegment(id);
+                .addPathSegment(PathSegments.validate(id));
+        if (request.getIncludeTrading().isPresent()) {
+            QueryStringMapper.addQueryParameter(
+                    httpUrl, "include_trading", request.getIncludeTrading().get(), false);
+        }
         if (request.getAccountId().isPresent()) {
             QueryStringMapper.addQueryParameter(
                     httpUrl, "account_id", request.getAccountId().get(), false);
+        }
+        if (request.getIncludeBalance().isPresent()) {
+            QueryStringMapper.addQueryParameter(
+                    httpUrl, "include_balance", request.getIncludeBalance().get(), false);
         }
         if (request.getIncludeBalanceHistory().isPresent()) {
             QueryStringMapper.addQueryParameter(
@@ -383,6 +444,15 @@ public class RawUsersClient {
         if (requestOptions != null && requestOptions.getTimeout().isPresent()) {
             client = clientOptions.httpClientWithTimeout(requestOptions);
         }
+        if (requestOptions != null && requestOptions.getMaxRetries().isPresent()) {
+            okhttpRequest = okhttpRequest
+                    .newBuilder()
+                    .tag(
+                            RetryInterceptor.MaxRetriesOverride.class,
+                            new RetryInterceptor.MaxRetriesOverride(
+                                    requestOptions.getMaxRetries().get()))
+                    .build();
+        }
         try (Response response = client.newCall(okhttpRequest).execute()) {
             ResponseBody responseBody = response.body();
             String responseBodyString = responseBody != null ? responseBody.string() : "{}";
@@ -401,40 +471,42 @@ public class RawUsersClient {
             Object errorBody = ObjectMappers.parseErrorBody(responseBodyString);
             throw new WhopApiApiException(
                     "Error with status code " + response.code(), response.code(), errorBody, response);
+        } catch (JsonProcessingException e) {
+            throw new WhopApiException("Failed to deserialize response: " + e.getMessage(), e);
         } catch (IOException e) {
             throw new WhopApiException("Network error executing HTTP request", e);
         }
     }
 
     /**
-     * Updates a user, addressed by <code>user_</code> tag, username, or the reserved id <code>me</code> for the authenticated user. A user token updates their own global profile; an API key updates the user's account-specific profile override (account_id required).
+     * Updates a user, addressed by <code>user_</code> tag, username, or the reserved id <code>me</code> for the authenticated user. A user token updates their own global profile; an API key updates the user's profile override for the account in <code>account_id</code>.
      */
     public WhopApiHttpResponse<User> update(String id) {
         return update(id, UpdateUsersRequest.builder().build());
     }
 
     /**
-     * Updates a user, addressed by <code>user_</code> tag, username, or the reserved id <code>me</code> for the authenticated user. A user token updates their own global profile; an API key updates the user's account-specific profile override (account_id required).
+     * Updates a user, addressed by <code>user_</code> tag, username, or the reserved id <code>me</code> for the authenticated user. A user token updates their own global profile; an API key updates the user's profile override for the account in <code>account_id</code>.
      */
     public WhopApiHttpResponse<User> update(String id, RequestOptions requestOptions) {
         return update(id, UpdateUsersRequest.builder().build(), requestOptions);
     }
 
     /**
-     * Updates a user, addressed by <code>user_</code> tag, username, or the reserved id <code>me</code> for the authenticated user. A user token updates their own global profile; an API key updates the user's account-specific profile override (account_id required).
+     * Updates a user, addressed by <code>user_</code> tag, username, or the reserved id <code>me</code> for the authenticated user. A user token updates their own global profile; an API key updates the user's profile override for the account in <code>account_id</code>.
      */
     public WhopApiHttpResponse<User> update(String id, UpdateUsersRequest request) {
         return update(id, request, null);
     }
 
     /**
-     * Updates a user, addressed by <code>user_</code> tag, username, or the reserved id <code>me</code> for the authenticated user. A user token updates their own global profile; an API key updates the user's account-specific profile override (account_id required).
+     * Updates a user, addressed by <code>user_</code> tag, username, or the reserved id <code>me</code> for the authenticated user. A user token updates their own global profile; an API key updates the user's profile override for the account in <code>account_id</code>.
      */
     public WhopApiHttpResponse<User> update(String id, UpdateUsersRequest request, RequestOptions requestOptions) {
-        HttpUrl.Builder httpUrl = HttpUrl.parse(this.clientOptions.environment().getUrl())
+        HttpUrl.Builder httpUrl = HttpUrl.parse(this.clientOptions.environment().getApiURL())
                 .newBuilder()
                 .addPathSegments("users")
-                .addPathSegment(id);
+                .addPathSegment(PathSegments.validate(id));
         if (request.getAccountId().isPresent()) {
             QueryStringMapper.addQueryParameter(
                     httpUrl, "account_id", request.getAccountId().get(), false);
@@ -447,7 +519,9 @@ public class RawUsersClient {
         RequestBody body;
         try {
             body = RequestBody.create(
-                    ObjectMappers.JSON_MAPPER.writeValueAsBytes(request), MediaTypes.APPLICATION_JSON);
+                    ObjectMappers.JSON_MAPPER.writeValueAsBytes(BodyProperties.merge(
+                            request, requestOptions != null ? requestOptions.getBodyProperties() : null)),
+                    MediaTypes.APPLICATION_JSON);
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
@@ -462,6 +536,15 @@ public class RawUsersClient {
         if (requestOptions != null && requestOptions.getTimeout().isPresent()) {
             client = clientOptions.httpClientWithTimeout(requestOptions);
         }
+        if (requestOptions != null && requestOptions.getMaxRetries().isPresent()) {
+            okhttpRequest = okhttpRequest
+                    .newBuilder()
+                    .tag(
+                            RetryInterceptor.MaxRetriesOverride.class,
+                            new RetryInterceptor.MaxRetriesOverride(
+                                    requestOptions.getMaxRetries().get()))
+                    .build();
+        }
         try (Response response = client.newCall(okhttpRequest).execute()) {
             ResponseBody responseBody = response.body();
             String responseBodyString = responseBody != null ? responseBody.string() : "{}";
@@ -472,6 +555,8 @@ public class RawUsersClient {
             Object errorBody = ObjectMappers.parseErrorBody(responseBodyString);
             throw new WhopApiApiException(
                     "Error with status code " + response.code(), response.code(), errorBody, response);
+        } catch (JsonProcessingException e) {
+            throw new WhopApiException("Failed to deserialize response: " + e.getMessage(), e);
         } catch (IOException e) {
             throw new WhopApiException("Network error executing HTTP request", e);
         }
@@ -505,12 +590,12 @@ public class RawUsersClient {
      */
     public WhopApiHttpResponse<CheckAccessUsersResponse> checkAccess(
             String id, String resourceId, CheckAccessUsersRequest request, RequestOptions requestOptions) {
-        HttpUrl.Builder httpUrl = HttpUrl.parse(this.clientOptions.environment().getUrl())
+        HttpUrl.Builder httpUrl = HttpUrl.parse(this.clientOptions.environment().getApiURL())
                 .newBuilder()
                 .addPathSegments("users")
-                .addPathSegment(id)
+                .addPathSegment(PathSegments.validate(id))
                 .addPathSegments("access")
-                .addPathSegment(resourceId);
+                .addPathSegment(PathSegments.validate(resourceId));
         if (requestOptions != null) {
             requestOptions.getQueryParameters().forEach((_key, _value) -> {
                 httpUrl.addQueryParameter(_key, _value);
@@ -526,6 +611,15 @@ public class RawUsersClient {
         if (requestOptions != null && requestOptions.getTimeout().isPresent()) {
             client = clientOptions.httpClientWithTimeout(requestOptions);
         }
+        if (requestOptions != null && requestOptions.getMaxRetries().isPresent()) {
+            okhttpRequest = okhttpRequest
+                    .newBuilder()
+                    .tag(
+                            RetryInterceptor.MaxRetriesOverride.class,
+                            new RetryInterceptor.MaxRetriesOverride(
+                                    requestOptions.getMaxRetries().get()))
+                    .build();
+        }
         try (Response response = client.newCall(okhttpRequest).execute()) {
             ResponseBody responseBody = response.body();
             String responseBodyString = responseBody != null ? responseBody.string() : "{}";
@@ -537,20 +631,22 @@ public class RawUsersClient {
             Object errorBody = ObjectMappers.parseErrorBody(responseBodyString);
             throw new WhopApiApiException(
                     "Error with status code " + response.code(), response.code(), errorBody, response);
+        } catch (JsonProcessingException e) {
+            throw new WhopApiException("Failed to deserialize response: " + e.getMessage(), e);
         } catch (IOException e) {
             throw new WhopApiException("Network error executing HTTP request", e);
         }
     }
 
     /**
-     * Lists the recommended actions computed for the user: personal suggestions (e.g. start a business or become an affiliate) pooled with the highest-impact actions across the accounts the user owns. Business actions are tagged with their <code>account_id</code>/<code>account_name</code>; personal actions leave those <code>null</code>. Self-only: <code>id</code> must be <code>me</code> or the authenticated user's own tag/username.
+     * Lists the recommended actions computed for the authenticated user, such as starting a business. You can only list your own recommended actions.
      */
     public WhopApiHttpResponse<RecommendActionsUsersResponse> recommendActions(String id) {
         return recommendActions(id, RecommendActionsUsersRequest.builder().build());
     }
 
     /**
-     * Lists the recommended actions computed for the user: personal suggestions (e.g. start a business or become an affiliate) pooled with the highest-impact actions across the accounts the user owns. Business actions are tagged with their <code>account_id</code>/<code>account_name</code>; personal actions leave those <code>null</code>. Self-only: <code>id</code> must be <code>me</code> or the authenticated user's own tag/username.
+     * Lists the recommended actions computed for the authenticated user, such as starting a business. You can only list your own recommended actions.
      */
     public WhopApiHttpResponse<RecommendActionsUsersResponse> recommendActions(
             String id, RequestOptions requestOptions) {
@@ -558,7 +654,7 @@ public class RawUsersClient {
     }
 
     /**
-     * Lists the recommended actions computed for the user: personal suggestions (e.g. start a business or become an affiliate) pooled with the highest-impact actions across the accounts the user owns. Business actions are tagged with their <code>account_id</code>/<code>account_name</code>; personal actions leave those <code>null</code>. Self-only: <code>id</code> must be <code>me</code> or the authenticated user's own tag/username.
+     * Lists the recommended actions computed for the authenticated user, such as starting a business. You can only list your own recommended actions.
      */
     public WhopApiHttpResponse<RecommendActionsUsersResponse> recommendActions(
             String id, RecommendActionsUsersRequest request) {
@@ -566,14 +662,14 @@ public class RawUsersClient {
     }
 
     /**
-     * Lists the recommended actions computed for the user: personal suggestions (e.g. start a business or become an affiliate) pooled with the highest-impact actions across the accounts the user owns. Business actions are tagged with their <code>account_id</code>/<code>account_name</code>; personal actions leave those <code>null</code>. Self-only: <code>id</code> must be <code>me</code> or the authenticated user's own tag/username.
+     * Lists the recommended actions computed for the authenticated user, such as starting a business. You can only list your own recommended actions.
      */
     public WhopApiHttpResponse<RecommendActionsUsersResponse> recommendActions(
             String id, RecommendActionsUsersRequest request, RequestOptions requestOptions) {
-        HttpUrl.Builder httpUrl = HttpUrl.parse(this.clientOptions.environment().getUrl())
+        HttpUrl.Builder httpUrl = HttpUrl.parse(this.clientOptions.environment().getApiURL())
                 .newBuilder()
                 .addPathSegments("users")
-                .addPathSegment(id)
+                .addPathSegment(PathSegments.validate(id))
                 .addPathSegments("recommend_actions");
         if (requestOptions != null) {
             requestOptions.getQueryParameters().forEach((_key, _value) -> {
@@ -589,6 +685,15 @@ public class RawUsersClient {
         OkHttpClient client = clientOptions.httpClient();
         if (requestOptions != null && requestOptions.getTimeout().isPresent()) {
             client = clientOptions.httpClientWithTimeout(requestOptions);
+        }
+        if (requestOptions != null && requestOptions.getMaxRetries().isPresent()) {
+            okhttpRequest = okhttpRequest
+                    .newBuilder()
+                    .tag(
+                            RetryInterceptor.MaxRetriesOverride.class,
+                            new RetryInterceptor.MaxRetriesOverride(
+                                    requestOptions.getMaxRetries().get()))
+                    .build();
         }
         try (Response response = client.newCall(okhttpRequest).execute()) {
             ResponseBody responseBody = response.body();
@@ -613,6 +718,8 @@ public class RawUsersClient {
             Object errorBody = ObjectMappers.parseErrorBody(responseBodyString);
             throw new WhopApiApiException(
                     "Error with status code " + response.code(), response.code(), errorBody, response);
+        } catch (JsonProcessingException e) {
+            throw new WhopApiException("Failed to deserialize response: " + e.getMessage(), e);
         } catch (IOException e) {
             throw new WhopApiException("Network error executing HTTP request", e);
         }

@@ -12,7 +12,7 @@
 <dl>
 <dd>
 
-Create a short-lived access token for authenticating API requests. When using API key authentication, provide company_id or user_id. When using OAuth, the user is derived from the token. Use this token with Whop's web and mobile embedded components.
+Creates a short-lived access token for Whop's web and mobile embedded components. With API key authentication, pass `account_id` or `user_id`; with OAuth, the token is issued for the OAuth user.
 </dd>
 </dl>
 </dd>
@@ -46,7 +46,7 @@ client.accessTokens().create(
 <dl>
 <dd>
 
-**companyId:** `Optional<String>` — The unique identifier of the company to generate the token for, starting with 'biz_'. The API key must have permission to access this company.
+**accountId:** `Optional<String>` — The unique identifier of the company to generate the token for, starting with 'biz_'. The API key must have permission to access this company.
     
 </dd>
 </dl>
@@ -95,7 +95,7 @@ client.accessTokens().create(
 <dl>
 <dd>
 
-Generate a URL that directs a sub-merchant to their account portal, such as the hosted payouts dashboard or the KYC onboarding flow.
+Generates a URL that sends a sub-merchant to a hosted Whop page, such as the payouts dashboard or the KYC onboarding flow. Requires an API key.
 </dd>
 </dl>
 </dd>
@@ -113,7 +113,7 @@ Generate a URL that directs a sub-merchant to their account portal, such as the 
 client.accountLinks().create(
     CreateAccountLinksRequest
         .builder()
-        .companyId("biz_xxxxxxxxxxxxxx")
+        .accountId("biz_xxxxxxxxxxxxxx")
         .refreshUrl("refresh_url")
         .returnUrl("return_url")
         .useCase(AccountLinkUseCases.ACCOUNT_ONBOARDING)
@@ -133,7 +133,7 @@ client.accountLinks().create(
 <dl>
 <dd>
 
-**companyId:** `String` — The unique identifier of the company to generate the link for, starting with 'biz_'. Must be a sub-merchant of the API key's company.
+**accountId:** `String` — The unique identifier of the company to generate the link for, starting with 'biz_'. Must be a sub-merchant of the API key's company.
     
 </dd>
 </dl>
@@ -182,7 +182,7 @@ client.accountLinks().create(
 <dl>
 <dd>
 
-Lists accounts visible to the credential. User tokens return the user's business accounts; Account API keys return the requesting account and its connected accounts. Pass `parent_account_id` to return only that parent account's connected accounts.
+Lists accounts visible to the credential. User tokens return the user's business accounts; Account API keys return the requesting account and its subaccounts.
 </dd>
 </dl>
 </dd>
@@ -216,7 +216,7 @@ client.accounts().list(
 <dl>
 <dd>
 
-**first:** `Optional<Integer>` — The number of accounts to return (default 10, max 50).
+**first:** `Optional<Integer>` — Number of results to return from the start of the range.
     
 </dd>
 </dl>
@@ -224,7 +224,7 @@ client.accounts().list(
 <dl>
 <dd>
 
-**after:** `Optional<String>` — A cursor; returns accounts after this position.
+**after:** `Optional<String>` — Return results after this cursor. Use `page_info.end_cursor` from the previous response to fetch the next page.
     
 </dd>
 </dl>
@@ -232,7 +232,7 @@ client.accounts().list(
 <dl>
 <dd>
 
-**last:** `Optional<Integer>` — The number of accounts to return from the end of the range.
+**last:** `Optional<Integer>` — Number of results to return from the end of the range.
     
 </dd>
 </dl>
@@ -240,7 +240,7 @@ client.accounts().list(
 <dl>
 <dd>
 
-**before:** `Optional<String>` — A cursor; returns accounts before this position.
+**before:** `Optional<String>` — Return results before this cursor. Use `page_info.start_cursor` from the previous response to fetch the previous page.
     
 </dd>
 </dl>
@@ -296,6 +296,14 @@ client.accounts().list(
 <dl>
 <dd>
 
+**externalId:** `Optional<String>` — Return only the subaccount with this `external_id`, matched exactly and case-sensitively. End it with `%` to return every subaccount whose `external_id` starts with the text before it, such as `shopline:%`. `%` is accepted only at the end, because anywhere else it would scan all your subaccounts. `_` always matches literally.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
 **volumeMin:** `Optional<Double>` — Return only accounts whose lifetime USD volume is at least this value. Requires `stats:read` on the parent account.
     
 </dd>
@@ -312,7 +320,15 @@ client.accounts().list(
 <dl>
 <dd>
 
-**parentAccountId:** `Optional<String>` — For platforms: the parent account ID whose direct connected accounts to return. Requires `payout:account:read` on the parent account.
+**parentAccountId:** `Optional<String>` — For platforms: the parent account ID whose direct subaccounts to return. Requires `payout:account:read` on the parent account.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**ownerId:** `Optional<String>` — Return only accounts owned by this user (`user_...`), the account's `owner`. Cannot be combined with `parent_account_id`.
     
 </dd>
 </dl>
@@ -336,7 +352,7 @@ client.accounts().list(
 <dl>
 <dd>
 
-Creates an account. User tokens create business accounts; Account API keys create connected accounts. Tax fields (`tax_remitted_by`, `tax_type`, `product_tax_code_id`, `business_address`, `tax_identifiers`) are configured with Update Account, not at creation.
+Creates an account. User tokens create business accounts; Account API keys create subaccounts. Tax fields (`tax_remitted_by`, `tax_type`, `product_tax_code_id`, `business_address`, `tax_identifiers`) are configured with Update Account, not at creation.
 </dd>
 </dl>
 </dd>
@@ -370,7 +386,7 @@ client.accounts().create(
 <dl>
 <dd>
 
-**affiliateCode:** `Optional<String>` — The username, if any, of the partner who referred this account
+**affiliateCode:** `Optional<String>` — A saved partner referral link code for this new business account. An existing primary user referral takes priority. Used with user tokens creating top-level accounts.
     
 </dd>
 </dl>
@@ -378,7 +394,7 @@ client.accounts().create(
 <dl>
 <dd>
 
-**country:** `Optional<String>` — The ISO 3166-1 alpha-2 country code where the account's business is located (e.g. `US`). Defaults to the parent account's country for connected accounts.
+**blueprintId:** `Optional<String>` — The blueprint App ID, prefixed `app_`. Creates a hosted website for the account and queues its deployment asynchronously; the Account response does not report deployment completion.
     
 </dd>
 </dl>
@@ -386,7 +402,7 @@ client.accounts().create(
 <dl>
 <dd>
 
-**email:** `Optional<String>` — The email address of the account owner. Required for Account API key requests.
+**country:** `Optional<String>` — The ISO 3166-1 alpha-2 country code where the account's business is located (e.g. `US`). Defaults to the parent account's country for subaccounts.
     
 </dd>
 </dl>
@@ -394,7 +410,7 @@ client.accounts().create(
 <dl>
 <dd>
 
-**metadata:** `Optional<Map<String, Object>>` — Arbitrary key/value metadata to store on the account.
+**disputeFighterEnabled:** `Optional<Boolean>` — Whether Whop assembles and files dispute evidence for this account. Enabling it opts into the success fee charged on disputes it wins. Requires payment:dispute. Omit to preserve the existing setting or creation default.
     
 </dd>
 </dl>
@@ -402,7 +418,63 @@ client.accounts().create(
 <dl>
 <dd>
 
-**title:** `Optional<String>` — The display name of the account. Defaults to `metadata.external_id` or the owner's email when omitted.
+**email:** `Optional<String>` — The email address of the account owner. Required when creating a subaccount.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**externalId:** `Optional<String>` — Your platform's own identifier for this subaccount, such as your user or store ID. Unique among your subaccounts: creating a second account with the same `external_id` and a different `email` returns a 409, unless `reassign_external_id` is `true`. Retrying with the same `email` and `external_id` returns the existing account. Subaccounts only.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**metadata:** `Optional<Map<String, Object>>` — Arbitrary key/value metadata to store on the account. When `external_id` is not sent, an `external_id` key here sets `external_id` and follows its rules. It must be unique among your subaccounts unless `reassign_external_id` is `true`. It stays in `metadata` as sent. Changing it later does not change `external_id`.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**orchestrationEnabled:** `Optional<Boolean>` — Whether payment orchestration is enabled for this account. Requires payout:account:update. Omit to preserve the existing setting or creation default.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**reassignExternalId:** `Optional<Boolean>` — Pass `true` to move `external_id` to the new subaccount when another of your subaccounts already has it. Without it, that request returns a 409. The subaccount that had it is not deleted. It stays active with `external_id` set to `null`, and its `metadata` is unchanged. Requires `external_id`. Also requires the `company:update` permission on your platform account, in addition to `company:create_child`. Ignored when the same `email` already has the `external_id`, which returns that account.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**sendCustomerEmails:** `Optional<Boolean>` — Whether Whop sends transactional emails to customers on behalf of the subaccount.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**title:** `Optional<String>` — The display name of the account. Defaults to `external_id` or the owner's email when omitted.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**website:** `Optional<String>` — The account's business website, as an `http` or `https` URL of at most 255 characters. Also added to the account's `social_links` as a `website` entry.
     
 </dd>
 </dl>
@@ -441,8 +513,134 @@ Retrieves the account associated with the current Account API key.
 <dd>
 
 ```java
-client.accounts().me();
+client.accounts().me(
+    MeAccountsRequest
+        .builder()
+        .build()
+);
 ```
+</dd>
+</dl>
+</dd>
+</dl>
+
+#### ⚙️ Parameters
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+**includeTrading:** `Optional<Boolean>` — Also return the trading account under `trading`: its address, a snapshot of its margin and open positions, and its Hyperliquid WebSocket subscriptions. Requires crypto_wallet:trade:read, crypto_wallet:trade, or crypto_wallet:manage permission and an Ethereum wallet. Otherwise `trading` is `null`.
+    
+</dd>
+</dl>
+</dd>
+</dl>
+
+
+</dd>
+</dl>
+</details>
+
+<details><summary><code>client.accounts.search() -> SyncPagingIterable&amp;lt;AccountSearchResult&amp;gt;</code></summary>
+<dl>
+<dd>
+
+#### 📝 Description
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+Finds accounts by name among the accounts the credential can list. Support searches cover every company and return only the 50 best matches.
+</dd>
+</dl>
+</dd>
+</dl>
+
+#### 🔌 Usage
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+```java
+client.accounts().search(
+    SearchAccountsRequest
+        .builder()
+        .query("query")
+        .build()
+);
+```
+</dd>
+</dl>
+</dd>
+</dl>
+
+#### ⚙️ Parameters
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+**first:** `Optional<Integer>` — Number of results to return from the start of the range.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**after:** `Optional<String>` — Return results after this cursor. Use `page_info.end_cursor` from the previous response to fetch the next page.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**last:** `Optional<Integer>` — Number of results to return from the end of the range.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**before:** `Optional<String>` — Return results before this cursor. Use `page_info.start_cursor` from the previous response to fetch the previous page.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**query:** `String` — The account name to search for.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**order:** `Optional<SearchAccountsRequestOrder>` — Sort field. Without it, support searches return the best match first and other searches return the newest account first.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**direction:** `Optional<SearchAccountsRequestDirection>` — Sort direction.
+    
 </dd>
 </dl>
 </dd>
@@ -465,7 +663,7 @@ client.accounts().me();
 <dl>
 <dd>
 
-Retrieves a single account by ID or public route when it is visible to the credential, including its crypto wallet. The reserved id `me` retrieves the account associated with the current Account API key; user tokens have no single account, so they must address one by ID or route.
+Retrieves an account visible to the credential by ID or public route, including its crypto wallet.
 </dd>
 </dl>
 </dd>
@@ -500,7 +698,74 @@ client.accounts().retrieve(
 <dl>
 <dd>
 
-**id:** `String` — Account ID, prefixed `biz_`, its public route, or `me` for the account associated with the current API key.
+**id:** `String` — Account ID, prefixed `biz_`, its public route, or `me` for the account associated with the current Account API key. User tokens have no single account, so they cannot use `me`.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**includeTrading:** `Optional<Boolean>` — Also return the trading account under `trading`: its address, a snapshot of its margin and open positions, and its Hyperliquid WebSocket subscriptions. Requires crypto_wallet:trade:read, crypto_wallet:trade, or crypto_wallet:manage permission and an Ethereum wallet. Otherwise `trading` is `null`.
+    
+</dd>
+</dl>
+</dd>
+</dl>
+
+
+</dd>
+</dl>
+</details>
+
+<details><summary><code>client.accounts.delete(id) -> DeleteAccountsResponse</code></summary>
+<dl>
+<dd>
+
+#### 📝 Description
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+Deletes a subaccount directly owned by the authenticated platform account. The account must have no settled, pending, or reserved balance in any currency and no active, trialing, or past-due memberships. The account stops resolving immediately, and its products, plans, and team access are removed in the background; payment history is retained. Deletion cannot be undone through the API. This cannot delete the platform account itself or an account owned by another platform.
+</dd>
+</dl>
+</dd>
+</dl>
+
+#### 🔌 Usage
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+```java
+client.accounts().delete(
+    "id",
+    DeleteAccountsRequest
+        .builder()
+        .build()
+);
+```
+</dd>
+</dl>
+</dd>
+</dl>
+
+#### ⚙️ Parameters
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+**id:** `String` — Subaccount ID, prefixed `biz_`.
     
 </dd>
 </dl>
@@ -524,7 +789,7 @@ client.accounts().retrieve(
 <dl>
 <dd>
 
-Updates an account. User tokens can update business accounts; Account API keys can update connected accounts. The reserved id `me` — accepted on Retrieve Account — resolves to the requesting account, which an Account API key cannot edit, so updates must name the connected account by its `biz_` id.
+Updates an account. User tokens can update business accounts; Account API keys can update subaccounts.
 </dd>
 </dl>
 </dd>
@@ -559,7 +824,7 @@ client.accounts().update(
 <dl>
 <dd>
 
-**id:** `String` — Account ID, prefixed `biz_`.
+**id:** `String` — Account ID, prefixed `biz_`. The reserved id `me` resolves to the requesting account, which an Account API key cannot edit.
     
 </dd>
 </dl>
@@ -607,7 +872,7 @@ client.accounts().update(
 <dl>
 <dd>
 
-**businessType:** `Optional<UpdateAccountsRequestBusinessType>` — High-level business category for the account. See the [business types and industries glossary](/api-reference/beta/accounts/account#business-types-and-industries-glossary) for valid values.
+**cancellationPolicy:** `Optional<UpdateAccountsRequestCancellationPolicy>` — The account's cancellation policy document. Attached to new disputes as the cancellation policy evidence, with the terms of service as the fallback. PDF only. Pass a JSON object containing an `id` from [Create File](/api-reference/files/create-file), or `null` to remove it.
     
 </dd>
 </dl>
@@ -639,6 +904,30 @@ client.accounts().update(
 <dl>
 <dd>
 
+**disputeFighterEnabled:** `Optional<Boolean>` — Whether Whop assembles and files dispute evidence for this account. Enabling it opts into the success fee charged on disputes it wins. Requires payment:dispute. Omit to preserve the existing setting or creation default.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**eula:** `Optional<UpdateAccountsRequestEula>` — The account's end-user license agreement document. PDF only. Pass a JSON object containing an `id` from [Create File](/api-reference/files/create-file), or `null` to remove it.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**externalId:** `Optional<String>` — Your platform's own identifier for this subaccount. It must be unique among your subaccounts, and a duplicate returns a 409. Only the parent account can set it. Pass `null` to clear.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
 **featuredAffiliateProductId:** `Optional<String>` — The ID of the product to feature for affiliates. Pass `null` to clear.
     
 </dd>
@@ -648,22 +937,6 @@ client.accounts().update(
 <dd>
 
 **homePreferences:** `Optional<List<UpdateAccountsRequestHomePreferencesItem>>` — Public account home page preferences.
-    
-</dd>
-</dl>
-
-<dl>
-<dd>
-
-**industryGroup:** `Optional<UpdateAccountsRequestIndustryGroup>` — Account industry group. See the [business types and industries glossary](/api-reference/beta/accounts/account#business-types-and-industries-glossary) for valid values.
-    
-</dd>
-</dl>
-
-<dl>
-<dd>
-
-**industryType:** `Optional<String>` — Specific industry vertical for the account. See the [business types and industries glossary](/api-reference/beta/accounts/account#business-types-and-industries-glossary) for valid values.
     
 </dd>
 </dl>
@@ -719,6 +992,14 @@ client.accounts().update(
 <dl>
 <dd>
 
+**orchestrationEnabled:** `Optional<Boolean>` — Whether payment orchestration is enabled for this account. Requires payout:account:update. Omit to preserve the existing setting or creation default.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
 **otherBusinessDescription:** `Optional<String>` — The description of the business type when business_type is other.
     
 </dd>
@@ -728,6 +1009,14 @@ client.accounts().update(
 <dd>
 
 **otherIndustryDescription:** `Optional<String>` — The description of the industry type when industry_type is other.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**privacyPolicy:** `Optional<UpdateAccountsRequestPrivacyPolicy>` — The account's privacy policy document. PDF only. Pass a JSON object containing an `id` from [Create File](/api-reference/files/create-file), or `null` to remove it.
     
 </dd>
 </dl>
@@ -751,6 +1040,14 @@ client.accounts().update(
 <dl>
 <dd>
 
+**returnPolicy:** `Optional<UpdateAccountsRequestReturnPolicy>` — The account's return and refund policy document. Attached to new disputes as the refund policy evidence, with the terms of service as the fallback. PDF only. Pass a JSON object containing an `id` from [Create File](/api-reference/files/create-file), or `null` to remove it.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
 **route:** `Optional<String>` — The unique URL slug for the account.
     
 </dd>
@@ -760,6 +1057,14 @@ client.accounts().update(
 <dd>
 
 **sendCustomerEmails:** `Optional<Boolean>` — Whether Whop sends transactional emails to customers on behalf of this account.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**shippingPolicy:** `Optional<UpdateAccountsRequestShippingPolicy>` — The account's shipping policy document. Sent with physical-goods dispute evidence. PDF only. Pass a JSON object containing an `id` from [Create File](/api-reference/files/create-file), or `null` to remove it.
     
 </dd>
 </dl>
@@ -823,7 +1128,7 @@ client.accounts().update(
 <dl>
 <dd>
 
-**taxIdentifiers:** `Optional<List<UpdateAccountsRequestTaxIdentifiersItem>>` — Account tax/VAT registrations to add or update. When `tax_remitted_by` is `self`, tax is calculated and collected only in the countries where the account holds a registration.
+**taxIdentifiers:** `Optional<List<UpdateAccountsRequestTaxIdentifiersItem>>` — Tax IDs to add to the account, or to replace when the account already has one of that type. When `tax_remitted_by` is `self`, tax outside the US is calculated and collected only in the countries where the account has a tax ID. US collection follows `tax_collection_enabled_states`.
     
 </dd>
 </dl>
@@ -847,7 +1152,15 @@ client.accounts().update(
 <dl>
 <dd>
 
-**threeDsLevel:** `Optional<UpdateAccountsRequestThreeDsLevel>` — Account-level 3D Secure behavior. Set `mandate_challenge` to require cardholder verification on supported card payments, or `null` to use the standard checkout flow.
+**termsOfService:** `Optional<UpdateAccountsRequestTermsOfService>` — The account's terms of service document. Attached to new disputes as the cancellation policy evidence when no cancellation policy is set. PDF only. Pass a JSON object containing an `id` from [Create File](/api-reference/files/create-file), or `null` to remove it.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**threeDsLevel:** `Optional<UpdateAccountsRequestThreeDsLevel>` — 3D Secure behavior for supported on-session card payments. `mandate_challenge` requires a 3DS challenge before payment processing; `mandate_if_required` mandates a challenge only when the payment processor requires it; `frictionless_if_required` uses the regular frictionless 3DS flow. Payments of $1,000 or more use `mandate_if_required` unless `mandate_challenge` is selected. Risk and authentication recovery requirements can override the preference. `null` uses the standard checkout flow.
     
 </dd>
 </dl>
@@ -864,6 +1177,30 @@ client.accounts().update(
 <dd>
 
 **useLogoAsOpengraphImageFallback:** `Optional<Boolean>` — Whether the account uses its logo as the fallback Open Graph image.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**website:** `Optional<String>` — The account's business website, as an `http` or `https` URL of at most 255 characters. Also added to the account's `social_links` as a `website` entry. Pass `null` to clear the website; existing social links are left unchanged.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**whopPartnerEnabled:** `Optional<Boolean>` — Set to `true` to turn on Whop Partner mode for the account, so its team can refer businesses and the account is paid partner commission on their sales. Recorded once; `false` is rejected. Only a verified Whop Partner can turn it on.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**industryType:** `Optional<Object>` 
     
 </dd>
 </dl>
@@ -887,7 +1224,7 @@ client.accounts().update(
 <dl>
 <dd>
 
-Starts an LLC or C-Corp formation for a business account. Defaults to an LLC; set `entity_type` to `c_corp` to form a C-Corp, which additionally requires `share_structure` and officer `roles` on every founder. On submission, the application is validated and the response returns a hosted checkout URL. Once paid, the filing is submitted. Track progress through the account's [`company_formation`](/api-reference/beta/accounts/retrieve-account) field on Retrieve Account.
+Starts an LLC or C-Corp formation for a business account. The application is validated and the response returns a hosted checkout URL; once paid, the filing is submitted. Track progress through the account's [`company_formation`](/api-reference/accounts/retrieve-account) field on Retrieve Account.
 </dd>
 </dl>
 </dd>
@@ -907,10 +1244,7 @@ client.accounts().formCompany(
     FormCompanyAccountsRequest
         .builder()
         .businessName("Shine Time Auto Detailing")
-        .businessType("brick_and_mortar")
-        .formationState(FormCompanyAccountsRequestFormationState.TX)
-        .industryGroup("automotive")
-        .industryType("car_wash")
+        .formationState(FormCompanyAccountsRequestFormationState.WY)
         .founders(
             Arrays.asList(
                 FormCompanyAccountsRequestFoundersItem
@@ -1014,14 +1348,6 @@ client.accounts().formCompany(
 <dl>
 <dd>
 
-**businessType:** `String` — High-level business category, from the Whop business taxonomy. Valid values are listed on [business types and industries glossary](/api-reference/beta/accounts/account#business-types-and-industries-glossary).
-    
-</dd>
-</dl>
-
-<dl>
-<dd>
-
 **businessWebsite:** `Optional<String>` — Company website URL.
     
 </dd>
@@ -1054,7 +1380,7 @@ client.accounts().formCompany(
 <dl>
 <dd>
 
-**formationState:** `FormCompanyAccountsRequestFormationState` — Two-letter code of the US state (or `DC`) to form the company in.
+**formationState:** `FormCompanyAccountsRequestFormationState` — Two-letter code of the US state (or `DC`) to form the company in. We recommend `WY` because Wyoming formations are completed the same day.
     
 </dd>
 </dl>
@@ -1063,22 +1389,6 @@ client.accounts().formCompany(
 <dd>
 
 **founders:** `List<FormCompanyAccountsRequestFoundersItem>` — The company's founders. Exactly one must be marked `is_primary` — the responsible party for the filing.
-    
-</dd>
-</dl>
-
-<dl>
-<dd>
-
-**industryGroup:** `String` — Industry group, from the Whop business taxonomy. Valid values are listed on [business types and industries glossary](/api-reference/beta/accounts/account#business-types-and-industries-glossary).
-    
-</dd>
-</dl>
-
-<dl>
-<dd>
-
-**industryType:** `String` — Specific industry vertical, from the Whop business taxonomy. Valid values are listed on [business types and industries glossary](/api-reference/beta/accounts/account#business-types-and-industries-glossary).
     
 </dd>
 </dl>
@@ -1106,6 +1416,124 @@ client.accounts().formCompany(
 </dl>
 </details>
 
+<details><summary><code>client.accounts.retryAdsPayment(id) -> RetryAdsPaymentAccountsResponse</code></summary>
+<dl>
+<dd>
+
+#### 📝 Description
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+Queues one background retry of the account's failed ads payments across its campaigns, using the account's configured ads payment methods. A queued response does not mean payment succeeded; read each campaign's `delivery_status` and `issues` for the outcome. Successful settlement clears the payment block without changing a configured `active` or `paused` status; a legacy `payment_failed` status becomes `paused`. Returns an error when the account has no failed ads payments, or while a previous retry for the account is queued or running.
+</dd>
+</dl>
+</dd>
+</dl>
+
+#### 🔌 Usage
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+```java
+client.accounts().retryAdsPayment(
+    "id",
+    RetryAdsPaymentAccountsRequest
+        .builder()
+        .build()
+);
+```
+</dd>
+</dl>
+</dd>
+</dl>
+
+#### ⚙️ Parameters
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+**id:** `String` — Account ID, prefixed `biz_`.
+    
+</dd>
+</dl>
+</dd>
+</dl>
+
+
+</dd>
+</dl>
+</details>
+
+<details><summary><code>client.accounts.suspend(id) -> Account</code></summary>
+<dl>
+<dd>
+
+#### 📝 Description
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+Suspends a subaccount directly owned by the authenticated platform account. This cannot suspend the platform account itself or an account owned by another platform.
+</dd>
+</dl>
+</dd>
+</dl>
+
+#### 🔌 Usage
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+```java
+client.accounts().suspend(
+    "id",
+    SuspendAccountsRequest
+        .builder()
+        .build()
+);
+```
+</dd>
+</dl>
+</dd>
+</dl>
+
+#### ⚙️ Parameters
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+**id:** `String` — Subaccount ID, prefixed `biz_`.
+    
+</dd>
+</dl>
+</dd>
+</dl>
+
+
+</dd>
+</dl>
+</details>
+
 <details><summary><code>client.accounts.transferOwnership(id, request) -> TransferOwnershipAccountsResponse</code></summary>
 <dl>
 <dd>
@@ -1118,7 +1546,7 @@ client.accounts().formCompany(
 <dl>
 <dd>
 
-Transfers ownership of the account to another user, identified by user ID or email address. If the recipient already holds the owner role, ownership moves immediately; otherwise they get an invite and ownership moves when they accept.
+Transfers ownership of the account to another user, identified by user ID or email address. If the recipient already holds the owner role, ownership moves immediately; otherwise they get an invite and ownership moves when they accept. The Whop CLI and MCP can hand off a business their user owns as a partner (`as_partner: true`) with the `partner:handoff` scope; other OAuth apps cannot transfer ownership.
 </dd>
 </dl>
 </dd>
@@ -1170,7 +1598,31 @@ client.accounts().transferOwnership(
 <dl>
 <dd>
 
+**authorizedUserId:** `Optional<String>` — Your team membership on the business this referral is made for, prefixed `ausr_`. The referral then credits that team instead of you personally. Requires `as_partner`.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
 **identifier:** `String` — The user to transfer ownership to: a user ID (`user_*`) or an email address. An email address with no Whop account yet is sent an invite to create one.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**memberId:** `Optional<String>` — Your member record on the business this referral is made for, prefixed `mber_`, when your role there is held on your member record. Send this or `authorized_user_id`, not both. Requires `as_partner`.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**message:** `Optional<String>` — A note from the partner, shown as a quote in the invite email and signed with their name. Requires `as_partner`; sending it on an ordinary transfer is a 400. Omit it and the email sends without a note.
     
 </dd>
 </dl>
@@ -1253,7 +1705,7 @@ client.adCampaigns().list(
 <dl>
 <dd>
 
-**order:** `Optional<ListAdCampaignsRequestOrder>` — The field to sort by. Defaults to created_at. Stat columns (spend, impressions, …) rank over the stats_from/stats_to window across the whole list, not just the current page. results, cost_per_result and return_on_ad_spend rank by the same Whop pixel-attributed values the response reports.
+**order:** `Optional<ListAdCampaignsRequestOrder>` — The field to sort by. Defaults to created_at. Stat columns (spend, impressions, …) rank over the stats_from/stats_to window across the whole list, not just the current page. results, cost_per_result and return_on_ad_spend rank by the same Whop pixel-attributed values the response reports, and link_clicks by the same Whop pixel page views.
     
 </dd>
 </dl>
@@ -1262,6 +1714,14 @@ client.adCampaigns().list(
 <dd>
 
 **direction:** `Optional<ListAdCampaignsRequestDirection>` — The sort direction. Defaults to desc.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**campaignType:** `Optional<ListAdCampaignsRequestCampaignType>` — Only return campaigns of this type.
     
 </dd>
 </dl>
@@ -1317,7 +1777,7 @@ client.adCampaigns().list(
 <dl>
 <dd>
 
-**first:** `Optional<Integer>` — The number of campaigns to return.
+**first:** `Optional<Integer>` — Number of results to return from the start of the range.
     
 </dd>
 </dl>
@@ -1325,7 +1785,7 @@ client.adCampaigns().list(
 <dl>
 <dd>
 
-**after:** `Optional<String>` — Cursor to fetch the page after (from page_info.end_cursor).
+**after:** `Optional<String>` — Return results after this cursor. Use `page_info.end_cursor` from the previous response to fetch the next page.
     
 </dd>
 </dl>
@@ -1333,7 +1793,7 @@ client.adCampaigns().list(
 <dl>
 <dd>
 
-**last:** `Optional<Integer>` — The number of campaigns to return from the end of the range.
+**last:** `Optional<Integer>` — Number of results to return from the end of the range.
     
 </dd>
 </dl>
@@ -1341,7 +1801,7 @@ client.adCampaigns().list(
 <dl>
 <dd>
 
-**before:** `Optional<String>` — Cursor to fetch the page before (from page_info.start_cursor).
+**before:** `Optional<String>` — Return results before this cursor. Use `page_info.start_cursor` from the previous response to fetch the previous page.
     
 </dd>
 </dl>
@@ -1365,7 +1825,7 @@ client.adCampaigns().list(
 <dl>
 <dd>
 
-Creates an ad campaign for an account.
+Creates an ad campaign in `draft` status for an account. Nothing runs until you launch it by setting `status` to `active` with `PATCH /ad_campaigns/:id`.
 </dd>
 </dl>
 </dd>
@@ -1383,8 +1843,7 @@ Creates an ad campaign for an account.
 client.adCampaigns().create(
     CreateAdCampaignsRequest
         .builder()
-        .objective(CreateAdCampaignsRequestObjective.AWARENESS)
-        .platform(CreateAdCampaignsRequestPlatform.META)
+        .objective(CreateAdCampaignsRequestObjective.TRAFFIC)
         .title("Now hiring mobile detailers — Austin")
         .build()
 );
@@ -1410,7 +1869,7 @@ client.adCampaigns().create(
 <dl>
 <dd>
 
-**bidType:** `Optional<CreateAdCampaignsRequestBidType>` — How delivery bids in the ad auction: `minimum_cost` gets the most results for the budget, `average_target` holds an average cost per result, `maximum_target` never bids above a cap. Only for campaigns that own the budget.
+**budgetAmount:** `Optional<Double>` — The campaign's budget in USD, which is what it is stored and billed in. Required when budget_optimization is `ad_campaign` (or send budget_amount_local instead); omit when each ad group sets its own budget.
     
 </dd>
 </dl>
@@ -1418,7 +1877,7 @@ client.adCampaigns().create(
 <dl>
 <dd>
 
-**budgetAmount:** `Optional<Double>` — The campaign's budget, in the ad account's currency. Required when budget_optimization is `ad_campaign`; omit when each ad group sets its own budget.
+**budgetAmountLocal:** `Optional<Double>` — The campaign's budget stated in the account's ads reporting currency (`budget_currency` on the response) instead of USD. Converted to USD at the current exchange rate and stored as budget_amount. Provide this or budget_amount, not both.
     
 </dd>
 </dl>
@@ -1442,7 +1901,15 @@ client.adCampaigns().create(
 <dl>
 <dd>
 
-**desiredCostPerResult:** `Optional<Double>` — Cost per result to aim for (`average_target`) or never exceed (`maximum_target`). Only for campaigns that own the budget.
+**campaignType:** `Optional<CreateAdCampaignsRequestCampaignType>` — The kind of campaign to create. `standard` runs image and video ads; `search` shows text ads on search results for the ad groups' keywords. Defaults to `standard`. Can't be changed after creation.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**desiredCostPerResult:** `Optional<Double>` — The cost per result, in USD, you want this campaign to achieve. A target only: it is not a bid, cost cap, or bid cap, and doesn't change how the campaign's ads bid. Ad groups set cost and bid caps with their own `desired_cost_per_result`. Omit or send `null` for no target.
     
 </dd>
 </dl>
@@ -1459,14 +1926,6 @@ client.adCampaigns().create(
 <dd>
 
 **objective:** `CreateAdCampaignsRequestObjective` — The goal the campaign optimizes toward.
-    
-</dd>
-</dl>
-
-<dl>
-<dd>
-
-**platform:** `CreateAdCampaignsRequestPlatform` — The ad network the campaign runs on.
     
 </dd>
 </dl>
@@ -1605,7 +2064,7 @@ client.adCampaigns().retrieve(
 <dl>
 <dd>
 
-Deletes an ad campaign and archives it on the ad platform (cascades to ad groups and ads).
+Deletes an ad campaign with its ad groups and ads, and stops their delivery.
 </dd>
 </dl>
 </dd>
@@ -1664,7 +2123,7 @@ client.adCampaigns().delete(
 <dl>
 <dd>
 
-Updates an ad campaign's editable fields (title, budget, schedule, bid strategy, special ad categories, and, before launch, budget optimization), and launches a draft campaign by setting status to active. Objective, budget type and desired cost per result are fixed at creation and cannot be changed.
+Updates an ad campaign's settings, or launches a draft campaign by setting `status` to `active`. The objective is fixed at creation and cannot be changed.
 </dd>
 </dl>
 </dd>
@@ -1707,7 +2166,7 @@ client.adCampaigns().update(
 <dl>
 <dd>
 
-**bidType:** `Optional<UpdateAdCampaignsRequestBidType>` — How delivery bids in the ad auction: `minimum_cost` gets the most results for the budget, `average_target` holds an average cost per result, `maximum_target` never bids above a cap. Switching to `minimum_cost` clears the cap amounts stored on the campaign's ad groups. Only for campaigns that own the budget.
+**budgetAmount:** `Optional<Double>` — The campaign budget in USD, which is what it is stored and billed in. Interpreted as daily or lifetime per the campaign's budget type, including a budget_type sent in the same request.
     
 </dd>
 </dl>
@@ -1715,7 +2174,7 @@ client.adCampaigns().update(
 <dl>
 <dd>
 
-**budgetAmount:** `Optional<Double>` — The campaign budget, in the account's currency. Interpreted as daily or lifetime per the campaign's existing budget type.
+**budgetAmountLocal:** `Optional<Double>` — The campaign budget stated in the account's ads reporting currency (`budget_currency` on the response) instead of USD. Converted to USD at the current exchange rate and stored as budget_amount; an amount equal to the current budget_amount_local keeps the stored USD budget as is. Provide this or budget_amount, not both.
     
 </dd>
 </dl>
@@ -1723,7 +2182,31 @@ client.adCampaigns().update(
 <dl>
 <dd>
 
-**budgetOptimization:** `Optional<UpdateAdCampaignsRequestBudgetOptimization>` — Which level owns the budget: the whole campaign (`ad_campaign`) or each ad group individually (`ad_group`). Only changeable before the campaign is live on the ad network; switching to `ad_campaign` requires budget_amount in the same request, and switching to `ad_group` clears the campaign budget.
+**budgetOptimization:** `Optional<UpdateAdCampaignsRequestBudgetOptimization>` — Which level owns the budget: the whole campaign (`ad_campaign`) or each ad group individually (`ad_group`). Only changeable before the campaign launches; switching to `ad_campaign` requires budget_amount in the same request, and switching to `ad_group` clears the campaign budget.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**budgetType:** `Optional<UpdateAdCampaignsRequestBudgetType>` — Whether `budget_amount` is spent per day (`daily`) or over the campaign's full run (`lifetime`). Only changeable while the campaign is a draft; send budget_amount in the same request so the amount lands on the new type.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**campaignType:** `Optional<UpdateAdCampaignsRequestCampaignType>` — Accepted only when it matches the campaign's current type, so a read can be sent back unchanged. The type is fixed at creation.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**desiredCostPerResult:** `Optional<Double>` — The cost per result, in USD, you want this campaign to achieve. A target only: it is not a bid, cost cap, or bid cap, and doesn't change how the campaign's ads bid. Ad groups set cost and bid caps with their own `desired_cost_per_result`. `null` clears it.
     
 </dd>
 </dl>
@@ -1764,6 +2247,65 @@ client.adCampaigns().update(
 <dd>
 
 **title:** `Optional<String>` — The name of the campaign.
+    
+</dd>
+</dl>
+</dd>
+</dl>
+
+
+</dd>
+</dl>
+</details>
+
+<details><summary><code>client.adCampaigns.claim(id) -> AdCampaign</code></summary>
+<dl>
+<dd>
+
+#### 📝 Description
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+Attributes the whole campaign and its daily budget to the calling user as its runner. One runner holds a campaign at a time. Takes the runner's Whop session, or a user API key with `ad_campaign:update`. The caller also needs active advertiser-supplier program access. Everyone else gets a 404. Returns 403 until the caller has verified their identity and added a phone number and a social account. Returns 403 when the claim would take the daily budget the caller holds past the limit for their score. Returns 409 when another user holds the campaign. Changes nothing when the caller already holds it.
+</dd>
+</dl>
+</dd>
+</dl>
+
+#### 🔌 Usage
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+```java
+client.adCampaigns().claim(
+    "id",
+    ClaimAdCampaignsRequest
+        .builder()
+        .build()
+);
+```
+</dd>
+</dl>
+</dd>
+</dl>
+
+#### ⚙️ Parameters
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+**id:** `String` — The ad campaign ID.
     
 </dd>
 </dl>
@@ -1834,14 +2376,6 @@ client.adCampaigns().duplicate(
     
 </dd>
 </dl>
-
-<dl>
-<dd>
-
-**preserveEngagement:** `Optional<Boolean>` — Whether the copied ads keep the original posts' engagement (likes, comments, shares). Defaults to false.
-    
-</dd>
-</dl>
 </dd>
 </dl>
 
@@ -1909,65 +2443,6 @@ client.adCampaigns().pause(
 </dl>
 </details>
 
-<details><summary><code>client.adCampaigns.retryPayment(id) -> AdCampaign</code></summary>
-<dl>
-<dd>
-
-#### 📝 Description
-
-<dl>
-<dd>
-
-<dl>
-<dd>
-
-Retries billing for an ad campaign whose payment previously failed.
-</dd>
-</dl>
-</dd>
-</dl>
-
-#### 🔌 Usage
-
-<dl>
-<dd>
-
-<dl>
-<dd>
-
-```java
-client.adCampaigns().retryPayment(
-    "id",
-    RetryPaymentAdCampaignsRequest
-        .builder()
-        .build()
-);
-```
-</dd>
-</dl>
-</dd>
-</dl>
-
-#### ⚙️ Parameters
-
-<dl>
-<dd>
-
-<dl>
-<dd>
-
-**id:** `String` — The ad campaign ID.
-    
-</dd>
-</dl>
-</dd>
-</dl>
-
-
-</dd>
-</dl>
-</details>
-
 <details><summary><code>client.adCampaigns.unpause(id) -> AdCampaign</code></summary>
 <dl>
 <dd>
@@ -1980,7 +2455,7 @@ client.adCampaigns().retryPayment(
 <dl>
 <dd>
 
-Resumes a paused ad campaign.
+Resumes a paused ad campaign. Requires an ads payment method on the account.
 </dd>
 </dl>
 </dd>
@@ -2117,7 +2592,7 @@ client.adGroups().list(
 <dl>
 <dd>
 
-**order:** `Optional<ListAdGroupsRequestOrder>` — The field to sort by. Defaults to created_at. Stat columns (spend, impressions, …) rank over the stats_from/stats_to window across the whole list, not just the current page. results, cost_per_result and return_on_ad_spend rank by the same Whop pixel-attributed values the response reports.
+**order:** `Optional<ListAdGroupsRequestOrder>` — The field to sort by. Defaults to created_at. Stat columns (spend, impressions, …) rank over the stats_from/stats_to window across the whole list, not just the current page. results, cost_per_result and return_on_ad_spend rank by the same Whop pixel-attributed values the response reports, and link_clicks by the same Whop pixel page views.
     
 </dd>
 </dl>
@@ -2181,7 +2656,7 @@ client.adGroups().list(
 <dl>
 <dd>
 
-**first:** `Optional<Integer>` — The number of ad groups to return.
+**first:** `Optional<Integer>` — Number of results to return from the start of the range.
     
 </dd>
 </dl>
@@ -2189,7 +2664,7 @@ client.adGroups().list(
 <dl>
 <dd>
 
-**after:** `Optional<String>` — Cursor to fetch the page after (from page_info.end_cursor).
+**after:** `Optional<String>` — Return results after this cursor. Use `page_info.end_cursor` from the previous response to fetch the next page.
     
 </dd>
 </dl>
@@ -2197,7 +2672,7 @@ client.adGroups().list(
 <dl>
 <dd>
 
-**last:** `Optional<Integer>` — The number of ad groups to return from the end of the range.
+**last:** `Optional<Integer>` — Number of results to return from the end of the range.
     
 </dd>
 </dl>
@@ -2205,7 +2680,7 @@ client.adGroups().list(
 <dl>
 <dd>
 
-**before:** `Optional<String>` — Cursor to fetch the page before (from page_info.start_cursor).
+**before:** `Optional<String>` — Return results before this cursor. Use `page_info.start_cursor` from the previous response to fetch the previous page.
     
 </dd>
 </dl>
@@ -2288,7 +2763,15 @@ client.adGroups().create(
 <dl>
 <dd>
 
-**budgetAmount:** `Optional<Double>` — This ad group's budget, in the ad account's currency. Omit when the budget is set on the campaign instead.
+**budgetAmount:** `Optional<Double>` — This ad group's budget in USD, which is what it is stored and billed in. Omit when the budget is set on the campaign instead.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**budgetAmountLocal:** `Optional<Double>` — This ad group's budget stated in the account's ads reporting currency (`budget_currency` on the response) instead of USD. Converted to USD at the current exchange rate and stored as budget_amount; on an update, an amount equal to the current budget_amount_local keeps the stored USD budget as is. Provide this or budget_amount, not both.
     
 </dd>
 </dl>
@@ -2312,7 +2795,7 @@ client.adGroups().create(
 <dl>
 <dd>
 
-**conversionLocation:** `Optional<CreateAdGroupsRequestConversionLocation>` — Where the outcome being optimized for occurs, such as a website visit, social-profile visit, messaging conversation, ad interaction, or lead-form submission. The lead form itself is set on the ad.
+**deliverySchedule:** `Optional<CreateAdGroupsRequestDeliverySchedule>` — Hours the ad group delivers in each week, keyed by day. Each window runs from `start` to `end` on the hour, with `24:00` for midnight, and a day's windows can't overlap or touch. A day that's empty or left out doesn't deliver. Replaces the whole schedule; `null` delivers at every hour. Some platforms need a lifetime `budget_type` for a schedule, on the ad group or on its campaign when the campaign holds the budget.
     
 </dd>
 </dl>
@@ -2336,23 +2819,7 @@ client.adGroups().create(
 <dl>
 <dd>
 
-**detailedTargeting:** `Optional<AdGroupDetailedTargetingBody>` — Interest, behavior, and demographic targeting, using categories from the ad platform's targeting taxonomy. Entries across interests, behaviors, and demographics are OR'd together (anyone matching any entry is reached), matching Ads Manager's detailed-targeting box. At most 100 entries per section. Can't be combined with demographics.automatic, and unavailable to campaigns with special_ad_categories. Send the complete intended state — a section you omit is cleared.
-    
-</dd>
-</dl>
-
-<dl>
-<dd>
-
 **devices:** `Optional<AdGroupDevicesBody>` — Device platforms and operating systems to target.
-    
-</dd>
-</dl>
-
-<dl>
-<dd>
-
-**dynamicCreative:** `Optional<Boolean>` — Let the ad platform automatically mix and match this ad group's creatives and copy to find the best-performing combinations. Set at creation; can't be changed afterward.
     
 </dd>
 </dl>
@@ -2368,7 +2835,7 @@ client.adGroups().create(
 <dl>
 <dd>
 
-**frequencyCap:** `Optional<CreateAdGroupsRequestFrequencyCap>` — Cap on how often one person sees ads from this ad group. Only available on campaigns with the `awareness` objective.
+**keywords:** `Optional<List<CreateAdGroupsRequestKeywordsItem>>` — Search terms the ad group's ads can show for, and terms they never show for. Only search campaigns take keywords, and each of their ad groups needs at least one before launch. Replaces the stored list; omit to keep it.
     
 </dd>
 </dl>
@@ -2377,49 +2844,6 @@ client.adGroups().create(
 <dd>
 
 **languages:** `Optional<List<String>>` — Languages to target, as ISO 639 codes such as `en` or `es`. Empty or omitted targets all languages.
-    
-</dd>
-</dl>
-
-<dl>
-<dd>
-
-**messageApps:** `Optional<List<CreateAdGroupsRequestMessageAppsItem>>` — Apps the conversation opens in. Required when setting `conversion_location` to `messaging`, and rejected unless the ad group's conversion location is `messaging`.
-    
-</dd>
-</dl>
-
-<dl>
-<dd>
-
-**minimumDailySpend:** `Optional<Double>` — Minimum the ad group tries to spend each day.
-    
-</dd>
-</dl>
-
-<dl>
-<dd>
-
-**optimizationGoal:** `Optional<CreateAdGroupsRequestOptimizationGoal>` — The result the ad group's delivery is optimized to get the most of.
-    
-</dd>
-</dl>
-
-<dl>
-<dd>
-
-**placements:** `Optional<CreateAdGroupsRequestPlacements>` 
-
-`automatic` to let the ad platform choose placements, or the list of platforms and positions to target. Omit a platform's positions to target all of them.
-
-Valid positions per platform:
-
-- `facebook`: `feed`, `right_hand_column`, `marketplace`, `search`, `profile_feed`, `notification`, `story`, `instream_video`, `facebook_reels`, `facebook_reels_overlay`, `biz_disco_feed`
-- `instagram`: `stream`, `story`, `explore`, `explore_home`, `reels`, `profile_feed`, `profile_reels`, `ig_search`
-- `messenger`: `story`
-- `audience_network`: `classic`, `rewarded_video`
-- `threads`: `threads_stream`
-- `whatsapp`: `status`
     
 </dd>
 </dl>
@@ -2463,228 +2887,6 @@ Valid positions per platform:
 </dl>
 </details>
 
-<details><summary><code>client.adGroups.estimateReach(request) -> ReachEstimate</code></summary>
-<dl>
-<dd>
-
-#### 📝 Description
-
-<dl>
-<dd>
-
-<dl>
-<dd>
-
-Estimates how many people a draft targeting spec can reach, before an ad group is created. The body takes the same targeting fields as creating an ad group — `regions`, `demographics`, `detailed_targeting`, `audiences`, `languages`, and `devices` — and nothing is persisted.
-</dd>
-</dl>
-</dd>
-</dl>
-
-#### 🔌 Usage
-
-<dl>
-<dd>
-
-<dl>
-<dd>
-
-```java
-client.adGroups().estimateReach(
-    EstimateReachAdGroupsRequest
-        .builder()
-        .platform(EstimateReachAdGroupsRequestPlatform.META)
-        .build()
-);
-```
-</dd>
-</dl>
-</dd>
-</dl>
-
-#### ⚙️ Parameters
-
-<dl>
-<dd>
-
-<dl>
-<dd>
-
-**accountId:** `Optional<String>` — Account to estimate on behalf of. Defaults to the authenticated account.
-    
-</dd>
-</dl>
-
-<dl>
-<dd>
-
-**audiences:** `Optional<AdGroupAudiencesBody>` — Saved audiences to deliver to or exclude. Can't be combined with demographics.automatic.
-    
-</dd>
-</dl>
-
-<dl>
-<dd>
-
-**demographics:** `Optional<AdGroupDemographicsBody>` — Age, gender, and automatic-audience targeting.
-    
-</dd>
-</dl>
-
-<dl>
-<dd>
-
-**detailedTargeting:** `Optional<AdGroupDetailedTargetingBody>` — Interest, behavior, and demographic targeting, using categories from the ad platform's targeting taxonomy. At most 100 entries per section.
-    
-</dd>
-</dl>
-
-<dl>
-<dd>
-
-**devices:** `Optional<AdGroupDevicesBody>` — Device platforms and operating systems to target.
-    
-</dd>
-</dl>
-
-<dl>
-<dd>
-
-**languages:** `Optional<List<String>>` — Languages to target, as ISO 639 codes such as `en` or `es`. Empty or omitted targets all languages.
-    
-</dd>
-</dl>
-
-<dl>
-<dd>
-
-**platform:** `EstimateReachAdGroupsRequestPlatform` — The ad network the estimate runs on.
-    
-</dd>
-</dl>
-
-<dl>
-<dd>
-
-**regions:** `Optional<AdGroupRegionsBody>` — Locations to target and exclude.
-    
-</dd>
-</dl>
-</dd>
-</dl>
-
-
-</dd>
-</dl>
-</details>
-
-<details><summary><code>client.adGroups.searchTargetingOptions() -> SearchTargetingOptionsAdGroupsResponse</code></summary>
-<dl>
-<dd>
-
-#### 📝 Description
-
-<dl>
-<dd>
-
-<dl>
-<dd>
-
-Searches the ad platform's targeting taxonomy for options to target an ad group with. Each result comes back in the exact shape the ad-group body accepts for its `type`, so it can be used in `detailed_targeting`, `regions`, or `languages` as-is. A blank `query` browses the small fixed lists (behaviors, browse demographic categories, languages); interests, work employers, job titles, schools, majors, and locations need a search term.
-</dd>
-</dl>
-</dd>
-</dl>
-
-#### 🔌 Usage
-
-<dl>
-<dd>
-
-<dl>
-<dd>
-
-```java
-client.adGroups().searchTargetingOptions(
-    SearchTargetingOptionsAdGroupsRequest
-        .builder()
-        .platform(SearchTargetingOptionsAdGroupsRequestPlatform.META)
-        .build()
-);
-```
-</dd>
-</dl>
-</dd>
-</dl>
-
-#### ⚙️ Parameters
-
-<dl>
-<dd>
-
-<dl>
-<dd>
-
-**accountId:** `Optional<String>` — Account to search on behalf of. Defaults to the authenticated account.
-    
-</dd>
-</dl>
-
-<dl>
-<dd>
-
-**platform:** `SearchTargetingOptionsAdGroupsRequestPlatform` — The ad network whose targeting taxonomy to search.
-    
-</dd>
-</dl>
-
-<dl>
-<dd>
-
-**query:** `Optional<String>` — The search term. Blank browses the fixed lists; interests, work employers, job titles, schools, majors, and locations return nothing without one.
-    
-</dd>
-</dl>
-
-<dl>
-<dd>
-
-**types:** `Optional<SearchTargetingOptionsAdGroupsRequestTypesItem>` — Kinds of targeting options to search. Defaults to all of them.
-    
-</dd>
-</dl>
-
-<dl>
-<dd>
-
-**locationTypes:** `Optional<SearchTargetingOptionsAdGroupsRequestLocationTypesItem>` — Narrow location results to these kinds of places. Only applies when `types` includes `locations`.
-    
-</dd>
-</dl>
-
-<dl>
-<dd>
-
-**country:** `Optional<String>` — Narrow location results to one country, as an ISO 3166-1 code such as `US`. Only applies when `types` includes `locations`.
-    
-</dd>
-</dl>
-
-<dl>
-<dd>
-
-**limit:** `Optional<Integer>` — Maximum number of results per requested type.
-    
-</dd>
-</dl>
-</dd>
-</dl>
-
-
-</dd>
-</dl>
-</details>
-
 <details><summary><code>client.adGroups.retrieve(id) -> AdGroup</code></summary>
 <dl>
 <dd>
@@ -2697,7 +2899,7 @@ client.adGroups().searchTargetingOptions(
 <dl>
 <dd>
 
-Retrieves a single ad group.
+Retrieves an ad group, with performance stats for the window set by `stats_from` and `stats_to`.
 </dd>
 </dl>
 </dd>
@@ -2788,7 +2990,7 @@ client.adGroups().retrieve(
 <dl>
 <dd>
 
-Deletes an ad group.
+Deletes an ad group and stops its delivery.
 </dd>
 </dl>
 </dd>
@@ -2906,7 +3108,15 @@ client.adGroups().update(
 <dl>
 <dd>
 
-**budgetAmount:** `Optional<Double>` — This ad group's budget, in the ad account's currency. Omit when the budget is set on the campaign instead.
+**budgetAmount:** `Optional<Double>` — This ad group's budget in USD, which is what it is stored and billed in. Omit when the budget is set on the campaign instead.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**budgetAmountLocal:** `Optional<Double>` — This ad group's budget stated in the account's ads reporting currency (`budget_currency` on the response) instead of USD. Converted to USD at the current exchange rate and stored as budget_amount; on an update, an amount equal to the current budget_amount_local keeps the stored USD budget as is. Provide this or budget_amount, not both.
     
 </dd>
 </dl>
@@ -2930,7 +3140,7 @@ client.adGroups().update(
 <dl>
 <dd>
 
-**conversionLocation:** `Optional<UpdateAdGroupsRequestConversionLocation>` — Where the outcome being optimized for occurs, such as a website visit, social-profile visit, messaging conversation, ad interaction, or lead-form submission. The lead form itself is set on the ad.
+**deliverySchedule:** `Optional<UpdateAdGroupsRequestDeliverySchedule>` — Hours the ad group delivers in each week, keyed by day. Each window runs from `start` to `end` on the hour, with `24:00` for midnight, and a day's windows can't overlap or touch. A day that's empty or left out doesn't deliver. Replaces the whole schedule; `null` delivers at every hour. Some platforms need a lifetime `budget_type` for a schedule, on the ad group or on its campaign when the campaign holds the budget.
     
 </dd>
 </dl>
@@ -2954,14 +3164,6 @@ client.adGroups().update(
 <dl>
 <dd>
 
-**detailedTargeting:** `Optional<AdGroupDetailedTargetingBody>` — Interest, behavior, and demographic targeting, using categories from the ad platform's targeting taxonomy. Entries across interests, behaviors, and demographics are OR'd together (anyone matching any entry is reached), matching Ads Manager's detailed-targeting box. At most 100 entries per section. Can't be combined with demographics.automatic, and unavailable to campaigns with special_ad_categories. Send the complete intended state — a section you omit is cleared.
-    
-</dd>
-</dl>
-
-<dl>
-<dd>
-
 **devices:** `Optional<AdGroupDevicesBody>` — Device platforms and operating systems to target.
     
 </dd>
@@ -2978,7 +3180,7 @@ client.adGroups().update(
 <dl>
 <dd>
 
-**frequencyCap:** `Optional<UpdateAdGroupsRequestFrequencyCap>` — Cap on how often one person sees ads from this ad group. Only available on campaigns with the `awareness` objective.
+**keywords:** `Optional<List<UpdateAdGroupsRequestKeywordsItem>>` — Search terms the ad group's ads can show for, and terms they never show for. Only search campaigns take keywords, and each of their ad groups needs at least one before launch. Replaces the stored list; omit to keep it.
     
 </dd>
 </dl>
@@ -2987,49 +3189,6 @@ client.adGroups().update(
 <dd>
 
 **languages:** `Optional<List<String>>` — Languages to target, as ISO 639 codes such as `en` or `es`. Empty or omitted targets all languages.
-    
-</dd>
-</dl>
-
-<dl>
-<dd>
-
-**messageApps:** `Optional<List<UpdateAdGroupsRequestMessageAppsItem>>` — Apps the conversation opens in. Required when setting `conversion_location` to `messaging`, and rejected unless the ad group's conversion location is `messaging`.
-    
-</dd>
-</dl>
-
-<dl>
-<dd>
-
-**minimumDailySpend:** `Optional<Double>` — Minimum the ad group tries to spend each day.
-    
-</dd>
-</dl>
-
-<dl>
-<dd>
-
-**optimizationGoal:** `Optional<UpdateAdGroupsRequestOptimizationGoal>` — The result the ad group's delivery is optimized to get the most of.
-    
-</dd>
-</dl>
-
-<dl>
-<dd>
-
-**placements:** `Optional<UpdateAdGroupsRequestPlacements>` 
-
-`automatic` to let the ad platform choose placements, or the list of platforms and positions to target. Omit a platform's positions to target all of them.
-
-Valid positions per platform:
-
-- `facebook`: `feed`, `right_hand_column`, `marketplace`, `search`, `profile_feed`, `notification`, `story`, `instream_video`, `facebook_reels`, `facebook_reels_overlay`, `biz_disco_feed`
-- `instagram`: `stream`, `story`, `explore`, `explore_home`, `reels`, `profile_feed`, `profile_reels`, `ig_search`
-- `messenger`: `story`
-- `audience_network`: `classic`, `rewarded_video`
-- `threads`: `threads_stream`
-- `whatsapp`: `status`
     
 </dd>
 </dl>
@@ -3085,7 +3244,7 @@ Valid positions per platform:
 <dl>
 <dd>
 
-Creates copies of the ad group in `duplicating` status and returns them — into its own campaign, or into target_ad_campaign_id (which must belong to the same account and be compatible with the ad group's targeting and goals); each copy transitions to its final status (matching the source's active/paused state) once duplication completes. Poll each returned ad group until it leaves `duplicating` — a copy that could not be completed is deleted and returns 404.
+Starts copying an ad group and returns the copies in `duplicating` status. Poll each returned ad group until it leaves `duplicating`: it then takes the source's `active` or `paused` status, or, if the copy could not be completed, is deleted and returns 404.
 </dd>
 </dl>
 </dd>
@@ -3136,15 +3295,7 @@ client.adGroups().duplicate(
 <dl>
 <dd>
 
-**preserveEngagement:** `Optional<Boolean>` — Whether the copied ads keep the original posts' engagement (likes, comments, shares). Defaults to false.
-    
-</dd>
-</dl>
-
-<dl>
-<dd>
-
-**targetAdCampaignId:** `Optional<String>` — Campaign to duplicate into. Defaults to the ad group's own campaign.
+**targetAdCampaignId:** `Optional<String>` — Campaign to duplicate into. Must belong to the same account and be compatible with the ad group's targeting and goals. Defaults to the ad group's own campaign.
     
 </dd>
 </dl>
@@ -3274,8 +3425,8 @@ client.adGroups().unpause(
 </dl>
 </details>
 
-## AdReports
-<details><summary><code>client.adReports.retrieve() -> AdReport</code></summary>
+## Ads
+<details><summary><code>client.ads.reportIssues(request) -> ReportIssuesAdsResponse</code></summary>
 <dl>
 <dd>
 
@@ -3287,10 +3438,7 @@ client.adGroups().unpause(
 <dl>
 <dd>
 
-Performance report for a company, ad campaigns, ad groups, or ads. Always returns aggregate `summary` totals summed across the scope. Set `granularity` to additionally get a time series, or set `breakdown` (`campaign`/`ad_group`/`ad`) to additionally get per-entity rows inside the requested scope. Exactly one of `companyId`, `adCampaignIds`, `adGroupIds`, or `adIds` must be provided.
-
-Required permissions:
- - `ad_campaign:stats:read`
+Reports why one of a runner's ads or ad groups can't deliver yet, and replaces what the runner reported for it before. The account running the campaign sees each issue, with what to change when it can fix it. An empty `issues` list clears the object's issues, and they also clear when the runner stops holding the campaign. Takes the runner's Whop session, a user API key, or a user OAuth token with `ad_campaign:update`. A token without that scope gets a 403, and anyone not holding the whole campaign gets a 404.
 </dd>
 </dl>
 </dd>
@@ -3305,12 +3453,17 @@ Required permissions:
 <dd>
 
 ```java
-client.adReports().retrieve(
-    RetrieveAdReportsRequest
+client.ads().reportIssues(
+    ReportIssuesAdsRequest
         .builder()
-        .from(OffsetDateTime.parse("2023-12-01T05:00:00Z"))
-        .to(OffsetDateTime.parse("2023-12-01T05:00:00Z"))
-        .companyId("biz_xxxxxxxxxxxxxx")
+        .issues(
+            Arrays.asList(
+                ReportIssuesAdsRequestIssuesItem
+                    .builder()
+                    .reason(ReportIssuesAdsRequestIssuesItemReason.CONTENT_REJECTED)
+                    .build()
+            )
+        )
         .build()
 );
 ```
@@ -3327,7 +3480,7 @@ client.adReports().retrieve(
 <dl>
 <dd>
 
-**adCampaignIds:** `Optional<String>` — Scope the report to these ad campaigns (max 100); stats are summed across them. Mutually exclusive with `companyId`, `adGroupIds`, and `adIds`.
+**adGroupId:** `Optional<String>` — The ID of the ad group the issues are on, prefixed `adgrp_`.
     
 </dd>
 </dl>
@@ -3335,7 +3488,7 @@ client.adReports().retrieve(
 <dl>
 <dd>
 
-**adGroupIds:** `Optional<String>` — Scope the report to these ad groups (max 100); stats are summed across them. Mutually exclusive with `companyId`, `adCampaignIds`, and `adIds`.
+**adId:** `Optional<String>` — The ID of the ad the issues are on, prefixed `ad_`. Send exactly one of `ad_id` or `ad_group_id`.
     
 </dd>
 </dl>
@@ -3343,55 +3496,7 @@ client.adReports().retrieve(
 <dl>
 <dd>
 
-**adIds:** `Optional<String>` — Scope the report to these ads (max 100); stats are summed across them. Mutually exclusive with `companyId`, `adCampaignIds`, and `adGroupIds`.
-    
-</dd>
-</dl>
-
-<dl>
-<dd>
-
-**breakdown:** `Optional<AdReportBreakdownLevels>` 
-    
-</dd>
-</dl>
-
-<dl>
-<dd>
-
-**companyId:** `Optional<String>` — The unique identifier of a company. Mutually exclusive with `adCampaignIds`, `adGroupIds`, and `adIds`. Use with `breakdown` to fan out across every campaign, ad group, or ad in the company without paging.
-    
-</dd>
-</dl>
-
-<dl>
-<dd>
-
-**currency:** `Optional<String>` — ISO 4217 currency code to report `spend` in. Defaults to the company's ads reporting currency.
-    
-</dd>
-</dl>
-
-<dl>
-<dd>
-
-**from:** `OffsetDateTime` — Inclusive start of the reporting window.
-    
-</dd>
-</dl>
-
-<dl>
-<dd>
-
-**granularity:** `Optional<Granularities>` 
-    
-</dd>
-</dl>
-
-<dl>
-<dd>
-
-**to:** `OffsetDateTime` — Inclusive end of the reporting window.
+**issues:** `List<ReportIssuesAdsRequestIssuesItem>` — Every issue the object has now, each reason once. Send an empty list when it has none.
     
 </dd>
 </dl>
@@ -3403,7 +3508,93 @@ client.adReports().retrieve(
 </dl>
 </details>
 
-## Ads
+<details><summary><code>client.ads.reportStats(request) -> AdStat</code></summary>
+<dl>
+<dd>
+
+#### 📝 Description
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+Records a runner's stats for one of their ads in one hour, and pays them for the spend. Send the ad's totals so far for an hour that has started; they replace what the ad held for that hour, and its ad group's and campaign's hours are rebuilt from their ads. The spend can go up but never down. Hours before the runner's first report on the campaign can be reported too. The spend is recorded and paid exactly as sent, with no markup added, so send it with the runner's markup already applied. Takes the runner's Whop session, a user API key, or a user OAuth token with `ad_campaign:update`. A token without that scope gets a 403, and anyone not holding the ad's campaign gets a 404.
+</dd>
+</dl>
+</dd>
+</dl>
+
+#### 🔌 Usage
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+```java
+client.ads().reportStats(
+    ReportStatsAdsRequest
+        .builder()
+        .adId("ad_xxxxxxxxxxxxxx")
+        .hourStartedAt(OffsetDateTime.parse("2026-01-01T12:00:00Z"))
+        .spend(
+            ReportStatsAdsRequestSpend.of(1.1)
+        )
+        .build()
+);
+```
+</dd>
+</dl>
+</dd>
+</dl>
+
+#### ⚙️ Parameters
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+**adId:** `String` — The ad's ID, prefixed `ad_`: the campaign's ad or the runner's copy of it.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**hourStartedAt:** `OffsetDateTime` — Start of the hour, on the hour, for an hour that has already started.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**impressions:** `Optional<ReportStatsAdsRequestImpressions>` — The ad's impressions in the hour so far. Zero when left out.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**spend:** `ReportStatsAdsRequestSpend` — The USD to be paid for the ad's hour so far, to the cent: what the ad spent plus any markup, such as 105.00 for 100.00 spent with a 5% markup.
+    
+</dd>
+</dl>
+</dd>
+</dl>
+
+
+</dd>
+</dl>
+</details>
+
 <details><summary><code>client.ads.list() -> SyncPagingIterable&amp;lt;Ad&amp;gt;</code></summary>
 <dl>
 <dd>
@@ -3512,7 +3703,7 @@ client.ads().list(
 <dl>
 <dd>
 
-**order:** `Optional<ListAdsRequestOrder>` — The field to sort by. Defaults to created_at. Stat columns (spend, impressions, …) rank over the stats_from/stats_to window across the whole list, not just the current page. results, cost_per_result and return_on_ad_spend rank by the same Whop pixel-attributed values the response reports.
+**order:** `Optional<ListAdsRequestOrder>` — The field to sort by. Defaults to created_at. Stat columns (spend, impressions, …) rank over the stats_from/stats_to window across the whole list, not just the current page. results, cost_per_result and return_on_ad_spend rank by the same Whop pixel-attributed values the response reports, and link_clicks by the same Whop pixel page views.
     
 </dd>
 </dl>
@@ -3576,7 +3767,7 @@ client.ads().list(
 <dl>
 <dd>
 
-**first:** `Optional<Integer>` — The number of ads to return.
+**first:** `Optional<Integer>` — Number of results to return from the start of the range.
     
 </dd>
 </dl>
@@ -3584,7 +3775,7 @@ client.ads().list(
 <dl>
 <dd>
 
-**after:** `Optional<String>` — Cursor to fetch the page after (from page_info.end_cursor).
+**after:** `Optional<String>` — Return results after this cursor. Use `page_info.end_cursor` from the previous response to fetch the next page.
     
 </dd>
 </dl>
@@ -3592,7 +3783,7 @@ client.ads().list(
 <dl>
 <dd>
 
-**last:** `Optional<Integer>` — The number of ads to return from the end of the range.
+**last:** `Optional<Integer>` — Number of results to return from the end of the range.
     
 </dd>
 </dl>
@@ -3600,7 +3791,7 @@ client.ads().list(
 <dl>
 <dd>
 
-**before:** `Optional<String>` — Cursor to fetch the page before (from page_info.start_cursor).
+**before:** `Optional<String>` — Return results before this cursor. Use `page_info.start_cursor` from the previous response to fetch the previous page.
     
 </dd>
 </dl>
@@ -3624,7 +3815,7 @@ client.ads().list(
 <dl>
 <dd>
 
-Creates an ad in an ad group.
+Creates an ad in an ad group. Any campaign status other than `draft` launches the campaign, which requires an ads payment method on the account.
 </dd>
 </dl>
 </dd>
@@ -3682,7 +3873,7 @@ client.ads().create(
 <dl>
 <dd>
 
-**creatives:** `Optional<List<CreateAdsRequestCreativesItem>>` — The ad's creative assets. Each entry is an uploaded file id with an optional format; omit format for the original asset. Two or more entries with no format become a carousel (2-10 attachments), in order, sharing the ad's copy.
+**creatives:** `Optional<List<CreateAdsRequestCreativesItem>>` — The ad's creative assets. Each entry is an uploaded file id with an optional format; omit format for the original asset. Entries with no format become a carousel's ordered cards, sharing the ad's copy.
     
 </dd>
 </dl>
@@ -3690,7 +3881,7 @@ client.ads().create(
 <dl>
 <dd>
 
-**descriptions:** `Optional<List<String>>` — The description variants shown on the ad.
+**descriptions:** `Optional<List<CreateAdsRequestDescriptionsItem>>` — The description shown on the ad.
     
 </dd>
 </dl>
@@ -3698,7 +3889,7 @@ client.ads().create(
 <dl>
 <dd>
 
-**headlines:** `Optional<List<String>>` — The headline variants shown on the ad.
+**headlines:** `Optional<List<CreateAdsRequestHeadlinesItem>>` — The headline shown on the ad.
     
 </dd>
 </dl>
@@ -3706,63 +3897,7 @@ client.ads().create(
 <dl>
 <dd>
 
-**leadForm:** `Optional<CreateAdsRequestLeadForm>` — Instant lead form for the ad. Only allowed when the ad group's conversion_location is an instant-form destination (instant_forms, instant_forms_and_messenger, website_and_instant_forms). Mutually exclusive with lead_form_id.
-    
-</dd>
-</dl>
-
-<dl>
-<dd>
-
-**leadFormId:** `Optional<String>` — Use an existing instant form instead of creating one — the form's platform ID, from a form already on the ad's Facebook page. Only allowed when the ad group's conversion_location is an instant-form destination. Mutually exclusive with lead_form.
-    
-</dd>
-</dl>
-
-<dl>
-<dd>
-
-**messagingConfig:** `Optional<CreateAdsRequestMessagingConfig>` — Click-to-message welcome copy: the greeting (message) and the ice-breaker prompt (keyword).
-    
-</dd>
-</dl>
-
-<dl>
-<dd>
-
-**multiAdvertiserAds:** `Optional<Boolean>` — Whether the ad can appear alongside other advertisers' ads in the same unit. Defaults to true.
-    
-</dd>
-</dl>
-
-<dl>
-<dd>
-
-**postId:** `Optional<String>` — Promote an existing post instead of uploading creatives — a Facebook post or Instagram media id. Mutually exclusive with creatives. Pair with post_source.
-    
-</dd>
-</dl>
-
-<dl>
-<dd>
-
-**postSource:** `Optional<CreateAdsRequestPostSource>` — Identifies the network that owns `post_id`. The source is inferred from the ID shape when omitted.
-    
-</dd>
-</dl>
-
-<dl>
-<dd>
-
-**primaryTexts:** `Optional<List<String>>` — The primary text variants shown in the ad body.
-    
-</dd>
-</dl>
-
-<dl>
-<dd>
-
-**socialAccounts:** `Optional<List<CreateAdsRequestSocialAccountsItem>>` — The social accounts the ad runs under — a connected Facebook page and, optionally, an Instagram profile.
+**primaryTexts:** `Optional<List<CreateAdsRequestPrimaryTextsItem>>` — The primary text shown in the ad body. Several entries make text variations.
     
 </dd>
 </dl>
@@ -3786,7 +3921,7 @@ client.ads().create(
 <dl>
 <dd>
 
-**urlParameters:** `Optional<Map<String, Object>>` — Query parameters to append to the destination URL, keyed by parameter name. Merged with any query string on `url`. Whop adds its own click-attribution parameters; those are reserved and rejected if you set them (utm_meta_ad_id, utm_meta_adset_id, utm_meta_campaign_id, utm_source, utm_placement, utm_medium, utm_content, utm_adset, utm_whop, wacid, wasid, waid, tw_source, tw_adid).
+**urlParameters:** `Optional<Map<String, Object>>` — Query parameters to append to the destination URL, keyed by parameter name. Merged with any query string on `url`. Whop adds its own click-attribution parameters; those are reserved, and setting one returns an error that names it.
     
 </dd>
 </dl>
@@ -4011,7 +4146,7 @@ client.ads().update(
 <dl>
 <dd>
 
-**creatives:** `Optional<List<UpdateAdsRequestCreativesItem>>` — The ad's creative assets. Each entry is an uploaded file id with an optional format; omit format for the original asset. Replaces a live ad's creative on the platform. Two or more entries with no format replace it with a carousel (2-10 attachments), in order, sharing the ad's copy.
+**creatives:** `Optional<List<UpdateAdsRequestCreativesItem>>` — The ad's creative assets. Each entry is an uploaded file id with an optional format; omit format for the original asset. Replaces a live ad's creative. Entries with no format replace it with a carousel's ordered cards.
     
 </dd>
 </dl>
@@ -4019,7 +4154,7 @@ client.ads().update(
 <dl>
 <dd>
 
-**descriptions:** `Optional<List<String>>` — The description variants shown on the ad.
+**descriptions:** `Optional<List<UpdateAdsRequestDescriptionsItem>>` — The description shown on the ad.
     
 </dd>
 </dl>
@@ -4027,7 +4162,7 @@ client.ads().update(
 <dl>
 <dd>
 
-**headlines:** `Optional<List<String>>` — The headline variants shown on the ad.
+**headlines:** `Optional<List<UpdateAdsRequestHeadlinesItem>>` — The headline shown on the ad.
     
 </dd>
 </dl>
@@ -4035,63 +4170,7 @@ client.ads().update(
 <dl>
 <dd>
 
-**leadForm:** `Optional<UpdateAdsRequestLeadForm>` — Instant lead form for the ad. Only allowed when the ad group's conversion_location is an instant-form destination (instant_forms, instant_forms_and_messenger, website_and_instant_forms). Mutually exclusive with lead_form_id.
-    
-</dd>
-</dl>
-
-<dl>
-<dd>
-
-**leadFormId:** `Optional<String>` — Use an existing instant form instead of creating one — the form's platform ID, from a form already on the ad's Facebook page. Only allowed when the ad group's conversion_location is an instant-form destination. Mutually exclusive with lead_form. Replaces a stored lead_form.
-    
-</dd>
-</dl>
-
-<dl>
-<dd>
-
-**messagingConfig:** `Optional<UpdateAdsRequestMessagingConfig>` — Click-to-message welcome copy: the greeting (message) and the ice-breaker prompt (keyword).
-    
-</dd>
-</dl>
-
-<dl>
-<dd>
-
-**multiAdvertiserAds:** `Optional<Boolean>` — Whether the ad can appear alongside other advertisers' ads in the same unit. Defaults to true.
-    
-</dd>
-</dl>
-
-<dl>
-<dd>
-
-**postId:** `Optional<String>` — Promote an existing post instead of uploading creatives — a Facebook post or Instagram media id. Mutually exclusive with creatives. Pair with post_source.
-    
-</dd>
-</dl>
-
-<dl>
-<dd>
-
-**postSource:** `Optional<UpdateAdsRequestPostSource>` — Identifies the network that owns `post_id`. The source is inferred from the ID shape when omitted.
-    
-</dd>
-</dl>
-
-<dl>
-<dd>
-
-**primaryTexts:** `Optional<List<String>>` — The primary text variants shown in the ad body.
-    
-</dd>
-</dl>
-
-<dl>
-<dd>
-
-**socialAccounts:** `Optional<List<UpdateAdsRequestSocialAccountsItem>>` — The social accounts the ad runs under — a connected Facebook page and, optionally, an Instagram profile.
+**primaryTexts:** `Optional<List<UpdateAdsRequestPrimaryTextsItem>>` — The primary text shown in the ad body. Several entries make text variations.
     
 </dd>
 </dl>
@@ -4115,7 +4194,7 @@ client.ads().update(
 <dl>
 <dd>
 
-**urlParameters:** `Optional<Map<String, Object>>` — Query parameters to append to the destination URL, keyed by parameter name. Merged with any query string on `url`. Whop adds its own click-attribution parameters; those are reserved and rejected if you set them (utm_meta_ad_id, utm_meta_adset_id, utm_meta_campaign_id, utm_source, utm_placement, utm_medium, utm_content, utm_adset, utm_whop, wacid, wasid, waid, tw_source, tw_adid).
+**urlParameters:** `Optional<Map<String, Object>>` — Query parameters to append to the destination URL, keyed by parameter name. Merged with any query string on `url`. Whop adds its own click-attribution parameters; those are reserved, and setting one returns an error that names it.
     
 </dd>
 </dl>
@@ -4139,7 +4218,7 @@ client.ads().update(
 <dl>
 <dd>
 
-Copies the ad into its own ad group, or into target_ad_group_id (which must belong to the same account and be compatible with the ad). Copies keep the source ad's active/paused state.
+Copies an ad into its own ad group or into another one. Copies keep the source ad's active or paused state.
 </dd>
 </dl>
 </dd>
@@ -4190,15 +4269,7 @@ client.ads().duplicate(
 <dl>
 <dd>
 
-**preserveEngagement:** `Optional<Boolean>` — Whether the copies keep the original post's engagement (likes, comments, shares). Defaults to false.
-    
-</dd>
-</dl>
-
-<dl>
-<dd>
-
-**targetAdGroupId:** `Optional<String>` — Ad group to duplicate into. Defaults to the ad's own ad group.
+**targetAdGroupId:** `Optional<String>` — Ad group to duplicate into, which must belong to the same account and be compatible with the ad. Defaults to the ad's own ad group.
     
 </dd>
 </dl>
@@ -4328,6 +4399,371 @@ client.ads().unpause(
 </dl>
 </details>
 
+## Ad Pixels
+<details><summary><code>client.adPixels.list() -> SyncPagingIterable&amp;lt;AdPixel&amp;gt;</code></summary>
+<dl>
+<dd>
+
+#### 📝 Description
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+List the pixels you added for businesses whose campaigns you claimed.
+</dd>
+</dl>
+</dd>
+</dl>
+
+#### 🔌 Usage
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+```java
+client.adPixels().list(
+    ListAdPixelsRequest
+        .builder()
+        .build()
+);
+```
+</dd>
+</dl>
+</dd>
+</dl>
+
+#### ⚙️ Parameters
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+**accountId:** `Optional<String>` — Only return the pixels for this business, prefixed `biz_`.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**first:** `Optional<Integer>` — Number of results to return from the start of the range.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**after:** `Optional<String>` — Return results after this cursor. Use `page_info.end_cursor` from the previous response to fetch the next page.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**last:** `Optional<Integer>` — Number of results to return from the end of the range.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**before:** `Optional<String>` — Return results before this cursor. Use `page_info.start_cursor` from the previous response to fetch the previous page.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**order:** `Optional<ListAdPixelsRequestOrder>` 
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**direction:** `Optional<ListAdPixelsRequestDirection>` 
+    
+</dd>
+</dl>
+</dd>
+</dl>
+
+
+</dd>
+</dl>
+</details>
+
+<details><summary><code>client.adPixels.create(request) -> AdPixel</code></summary>
+<dl>
+<dd>
+
+#### 📝 Description
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+Add your pixel for a business whose campaigns you claimed. Whop checks the access token with the ad platform, then sends the pixel the conversions credited to your claimed campaigns for that business. Each business takes one pixel per ad platform, and each pixel can serve one business. On Google, the pixel is your Google Ads account, which can serve several businesses, and Whop creates its conversion actions there with your service account key.
+</dd>
+</dl>
+</dd>
+</dl>
+
+#### 🔌 Usage
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+```java
+client.adPixels().create(
+    CreateAdPixelsRequest
+        .builder()
+        .accessToken("new-token")
+        .accountId("biz_xxxxxxxxxxxxxx")
+        .externalId("998877665544")
+        .platform(CreateAdPixelsRequestPlatform.META)
+        .build()
+);
+```
+</dd>
+</dl>
+</dd>
+</dl>
+
+#### ⚙️ Parameters
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+**accessToken:** `String` — A credential that can send events to the pixel on the ad platform. For `meta`, a Conversions API access token. For `tiktok`, an Events API access token. For `thrad`, an API key with `events:write` for the tag. For `google`, the JSON key of a Google Cloud service account. Give the service account Standard access to the Google Ads account. In its project, turn on the Google Ads API and the Data Manager API. The project also needs Explorer access or higher to the Google Ads API. Use a service account made only for Whop, with no roles in its project. Whop never returns it.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**accountId:** `String` — The business whose claimed campaigns send conversions to this pixel, prefixed `biz_`. You must have claimed at least one of its campaigns.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**externalId:** `String` — The pixel's ID on the ad platform: a Meta pixel or dataset ID, TikTok pixel code, Google Ads customer ID, or Thrad tag ID.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**platform:** `CreateAdPixelsRequestPlatform` — The ad platform the pixel belongs to.
+    
+</dd>
+</dl>
+</dd>
+</dl>
+
+
+</dd>
+</dl>
+</details>
+
+<details><summary><code>client.adPixels.retrieve(id) -> AdPixel</code></summary>
+<dl>
+<dd>
+
+#### 🔌 Usage
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+```java
+client.adPixels().retrieve(
+    "id",
+    RetrieveAdPixelsRequest
+        .builder()
+        .build()
+);
+```
+</dd>
+</dl>
+</dd>
+</dl>
+
+#### ⚙️ Parameters
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+**id:** `String` — Ad pixel ID, prefixed `adpx_`.
+    
+</dd>
+</dl>
+</dd>
+</dl>
+
+
+</dd>
+</dl>
+</details>
+
+<details><summary><code>client.adPixels.delete(id) -> DeleteAdPixelsResponse</code></summary>
+<dl>
+<dd>
+
+#### 📝 Description
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+Remove the pixel and its access token. Whop stops sending it conversions.
+</dd>
+</dl>
+</dd>
+</dl>
+
+#### 🔌 Usage
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+```java
+client.adPixels().delete(
+    "id",
+    DeleteAdPixelsRequest
+        .builder()
+        .build()
+);
+```
+</dd>
+</dl>
+</dd>
+</dl>
+
+#### ⚙️ Parameters
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+**id:** `String` — Ad pixel ID, prefixed `adpx_`.
+    
+</dd>
+</dl>
+</dd>
+</dl>
+
+
+</dd>
+</dl>
+</details>
+
+<details><summary><code>client.adPixels.update(id, request) -> AdPixel</code></summary>
+<dl>
+<dd>
+
+#### 📝 Description
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+Replace the pixel's access token. Whop checks the new token with the ad platform and resumes deliveries to an `errored` pixel.
+</dd>
+</dl>
+</dd>
+</dl>
+
+#### 🔌 Usage
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+```java
+client.adPixels().update(
+    "id",
+    UpdateAdPixelsRequest
+        .builder()
+        .accessToken("new-token")
+        .build()
+);
+```
+</dd>
+</dl>
+</dd>
+</dl>
+
+#### ⚙️ Parameters
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+**id:** `String` — Ad pixel ID, prefixed `adpx_`.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**accessToken:** `String` — A credential that can send events to the pixel on the ad platform. For `meta`, a Conversions API access token. For `tiktok`, an Events API access token. For `thrad`, an API key with `events:write` for the tag. For `google`, the JSON key of a Google Cloud service account. Give the service account Standard access to the Google Ads account. In its project, turn on the Google Ads API and the Data Manager API. The project also needs Explorer access or higher to the Google Ads API. Use a service account made only for Whop, with no roles in its project. Whop never returns it.
+    
+</dd>
+</dl>
+</dd>
+</dl>
+
+
+</dd>
+</dl>
+</details>
+
 ## Affiliates
 <details><summary><code>client.affiliates.list() -> SyncPagingIterable&amp;lt;AffiliateListItem&amp;gt;</code></summary>
 <dl>
@@ -4341,7 +4777,7 @@ client.ads().unpause(
 <dl>
 <dd>
 
-Returns a paginated list of affiliates for the actor in context, with optional filtering by status, search, and sorting.
+Lists the affiliates of an account.
 
 Required permissions:
  - `affiliate:basic:read`
@@ -4362,7 +4798,7 @@ Required permissions:
 client.affiliates().list(
     ListAffiliatesRequest
         .builder()
-        .companyId("biz_xxxxxxxxxxxxxx")
+        .accountId("biz_xxxxxxxxxxxxxx")
         .first(42)
         .last(42)
         .build()
@@ -4413,14 +4849,6 @@ client.affiliates().list(
 <dl>
 <dd>
 
-**companyId:** `String` — The unique identifier of the company to list affiliates for.
-    
-</dd>
-</dl>
-
-<dl>
-<dd>
-
 **direction:** `Optional<Direction>` 
     
 </dd>
@@ -4449,6 +4877,14 @@ client.affiliates().list(
     
 </dd>
 </dl>
+
+<dl>
+<dd>
+
+**accountId:** `String` — The unique identifier of the company to list affiliates for.
+    
+</dd>
+</dl>
 </dd>
 </dl>
 
@@ -4469,7 +4905,7 @@ client.affiliates().list(
 <dl>
 <dd>
 
-Creates or finds an affiliate for a company and user.
+Creates an affiliate for a user on an account. If the user is already an affiliate of the account, returns that affiliate, reactivating it if it was archived.
 
 Required permissions:
  - `affiliate:create`
@@ -4490,7 +4926,7 @@ Required permissions:
 client.affiliates().create(
     CreateAffiliatesRequest
         .builder()
-        .companyId("biz_xxxxxxxxxxxxxx")
+        .accountId("biz_xxxxxxxxxxxxxx")
         .userIdentifier("user_identifier")
         .build()
 );
@@ -4508,7 +4944,7 @@ client.affiliates().create(
 <dl>
 <dd>
 
-**companyId:** `String` — The ID of the company to create the affiliate for.
+**accountId:** `String` — The ID of the company to create the affiliate for.
     
 </dd>
 </dl>
@@ -4602,7 +5038,7 @@ client.affiliates().retrieve(
 <dl>
 <dd>
 
-Archives an existing Affiliate
+Archives an affiliate. The affiliate that handles Whop marketplace referrals cannot be archived.
 
 Required permissions:
  - `affiliate:update`
@@ -4664,7 +5100,7 @@ client.affiliates().archive(
 <dl>
 <dd>
 
-Unarchives an existing Affiliate
+Unarchives an archived affiliate.
 
 Required permissions:
  - `affiliate:update`
@@ -4728,6 +5164,9 @@ client.affiliates().unarchive(
 <dd>
 
 Returns a paginated list of AI chat threads for the current authenticated user.
+
+Required permissions:
+ - `ai_chat:read`
 </dd>
 </dl>
 </dd>
@@ -4788,6 +5227,22 @@ client.aiChats().list(
 <dd>
 
 **last:** `Optional<Integer>` — Returns the last _n_ elements from the list.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**agentIdentifier:** `Optional<AiChatAgentIdentifiers>` 
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**accountId:** `Optional<String>` — Only return chats associated with this business account.
     
 </dd>
 </dl>
@@ -4857,7 +5312,15 @@ client.aiChats().create(
 <dl>
 <dd>
 
-**currentCompanyId:** `Optional<String>` — The unique identifier of the company to set as context for the AI chat (e.g., "biz_XXXXX").
+**agentIdentifier:** `Optional<AiChatAgentIdentifiers>` — The AI agent that handles the chat. Defaults to `support`.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**currentAccountId:** `Optional<String>` — The unique identifier of the account to set as context for the AI chat (e.g., "biz_XXXXX").
     
 </dd>
 </dl>
@@ -4922,6 +5385,9 @@ client.aiChats().create(
 <dd>
 
 Retrieves the details of an existing AI chat.
+
+Required permissions:
+ - `ai_chat:read`
 </dd>
 </dl>
 </dd>
@@ -5042,7 +5508,7 @@ client.aiChats().delete(
 <dl>
 <dd>
 
-Update an AI chat's title, notification preferences, or associated company context.
+Update an AI chat's title, notification preferences, or associated account context.
 
 Required permissions:
  - `ai_chat:update`
@@ -5088,7 +5554,7 @@ client.aiChats().update(
 <dl>
 <dd>
 
-**currentCompanyId:** `Optional<String>` — The unique identifier of the company to set as context for the AI chat (e.g., "biz_XXXXX").
+**currentAccountId:** `Optional<String>` — The unique identifier of the account to set as context for the AI chat (e.g., "biz_XXXXX").
     
 </dd>
 </dl>
@@ -5129,7 +5595,7 @@ client.aiChats().update(
 <dl>
 <dd>
 
-Lists the API keys of an account or app, newest first. Responses never include the full secret — only its obfuscated form.
+Lists the API keys of an account, app, or your own user, newest first. Responses never include the full secret — only its obfuscated form.
 </dd>
 </dl>
 </dd>
@@ -5165,7 +5631,7 @@ client.apiKeys().list(
 <dl>
 <dd>
 
-**resourceId:** `String` — The account (`biz_`) or app (`app_`) tag to list API keys for.
+**resourceId:** `String` — The account (`biz_`), app (`app_`), or your own user (`user_`) tag to list API keys for.
     
 </dd>
 </dl>
@@ -5197,7 +5663,7 @@ client.apiKeys().list(
 <dl>
 <dd>
 
-**first:** `Optional<Integer>` — The number of API keys to return (default 20, max 100).
+**first:** `Optional<Integer>` — Number of results to return from the start of the range.
     
 </dd>
 </dl>
@@ -5205,7 +5671,7 @@ client.apiKeys().list(
 <dl>
 <dd>
 
-**after:** `Optional<String>` — A cursor; returns API keys after this position.
+**after:** `Optional<String>` — Return results after this cursor. Use `page_info.end_cursor` from the previous response to fetch the next page.
     
 </dd>
 </dl>
@@ -5213,7 +5679,7 @@ client.apiKeys().list(
 <dl>
 <dd>
 
-**last:** `Optional<Integer>` — The number of API keys to return from the end of the range.
+**last:** `Optional<Integer>` — Number of results to return from the end of the range.
     
 </dd>
 </dl>
@@ -5221,7 +5687,7 @@ client.apiKeys().list(
 <dl>
 <dd>
 
-**before:** `Optional<String>` — A cursor; returns API keys before this position.
+**before:** `Optional<String>` — Return results before this cursor. Use `page_info.start_cursor` from the previous response to fetch the previous page.
     
 </dd>
 </dl>
@@ -5261,7 +5727,7 @@ client.apiKeys().list(
 <dl>
 <dd>
 
-Creates an API key for an account or app. The response is the only place the full `secret_key` is returned — store it immediately. Requires a user session; API keys cannot manage API keys.
+Creates an API key for an account, an app, or your own user. A user API key acts as you and can only grant `ad_campaign:basic:read`, `ad_campaign:update`, `ad_pixel:manage`, `member:journey:read`. The response is the only place the full `secret_key` is returned — store it immediately. Requires a user session; API keys cannot manage API keys.
 </dd>
 </dl>
 </dd>
@@ -5343,7 +5809,7 @@ client.apiKeys().create(
 <dl>
 <dd>
 
-**resourceId:** `String` — The account (`biz_`) or app (`app_`) tag to create the API key for.
+**resourceId:** `String` — The account (`biz_`), app (`app_`), or your own user (`user_`) tag to create the API key for.
     
 </dd>
 </dl>
@@ -5375,7 +5841,7 @@ client.apiKeys().create(
 <dl>
 <dd>
 
-Lists the catalog of permission actions that can be granted to users, apps, and API keys — the source for the dashboard's permission pickers. Small and returned in full on one page.
+Lists the catalog of permission actions that can be granted to users, apps, and API keys. Use it to choose the `permissions` for an API key or to build a permission picker. Small and returned in full on one page.
 </dd>
 </dl>
 </dd>
@@ -5678,6 +6144,145 @@ client.apiKeys().rotate(
 </dl>
 </details>
 
+## Api Logs
+<details><summary><code>client.apiLogs.list() -> SyncPagingIterable&amp;lt;ListApiLogsResponseDataItem&amp;gt;</code></summary>
+<dl>
+<dd>
+
+#### 📝 Description
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+Lists the requests served by Whop's API with the account's API keys, newest first — every surface (GraphQL, REST, and native /api/v1), reads and failed requests included.
+</dd>
+</dl>
+</dd>
+</dl>
+
+#### 🔌 Usage
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+```java
+client.apiLogs().list(
+    ListApiLogsRequest
+        .builder()
+        .build()
+);
+```
+</dd>
+</dl>
+</dd>
+</dl>
+
+#### ⚙️ Parameters
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+**accountId:** `Optional<String>` — The account (biz_*) whose API logs to list. Defaults to the authenticated account.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**createdAfter:** `Optional<String>` — Only return requests served at or after this ISO 8601 timestamp. Defaults to 7 days before created_before, or 7 days ago.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**createdBefore:** `Optional<String>` — Only return requests served before this ISO 8601 timestamp.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**operationName:** `Optional<String>` — Only return requests for this operation, matched exactly against the operation_name shown on each log row (for example api/v1/products#create).
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**httpMethod:** `Optional<ListApiLogsRequestHttpMethod>` — Only return requests made with this HTTP method.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**status:** `Optional<ListApiLogsRequestStatus>` — Only return requests that finished with this status.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**apiKeyId:** `Optional<String>` — Only return requests made with this API key (apik_…).
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**minDurationMs:** `Optional<Integer>` — Only return requests that took at least this many milliseconds.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**maxDurationMs:** `Optional<Integer>` — Only return requests that took at most this many milliseconds.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**first:** `Optional<Integer>` — Number of results to return from the start of the range.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**after:** `Optional<String>` — Return results after this cursor. Use `page_info.end_cursor` from the previous response to fetch the next page.
+    
+</dd>
+</dl>
+</dd>
+</dl>
+
+
+</dd>
+</dl>
+</details>
+
 ## App Builds
 <details><summary><code>client.appBuilds.list() -> SyncPagingIterable&amp;lt;AppBuild&amp;gt;</code></summary>
 <dl>
@@ -5766,7 +6371,7 @@ client.appBuilds().list(
 <dl>
 <dd>
 
-**first:** `Optional<Integer>` — The number of builds to return (default 20, max 100).
+**first:** `Optional<Integer>` — Number of results to return from the start of the range.
     
 </dd>
 </dl>
@@ -5774,7 +6379,7 @@ client.appBuilds().list(
 <dl>
 <dd>
 
-**after:** `Optional<String>` — A cursor; returns builds after this position.
+**after:** `Optional<String>` — Return results after this cursor. Use `page_info.end_cursor` from the previous response to fetch the next page.
     
 </dd>
 </dl>
@@ -5782,7 +6387,7 @@ client.appBuilds().list(
 <dl>
 <dd>
 
-**last:** `Optional<Integer>` — The number of builds to return from the end of the range.
+**last:** `Optional<Integer>` — Number of results to return from the end of the range.
     
 </dd>
 </dl>
@@ -5790,7 +6395,7 @@ client.appBuilds().list(
 <dl>
 <dd>
 
-**before:** `Optional<String>` — A cursor; returns builds before this position.
+**before:** `Optional<String>` — Return results before this cursor. Use `page_info.start_cursor` from the previous response to fetch the previous page.
     
 </dd>
 </dl>
@@ -5814,7 +6419,7 @@ client.appBuilds().list(
 <dl>
 <dd>
 
-Uploads a new build artifact for an app. Upload the file first (POST /files or a direct upload), then reference it here; iOS and Android take a .zip bundle, web takes a JavaScript file or a .zip archive of the hosted site.
+Uploads a new build artifact for an app. Upload the file first with `POST /files` or a direct upload, then reference it in `attachment`.
 </dd>
 </dl>
 </dd>
@@ -5855,14 +6460,6 @@ client.appBuilds().create(
 <dl>
 <dd>
 
-**aiPromptId:** `Optional<String>` — The AI prompt that generated this build, if applicable.
-    
-</dd>
-</dl>
-
-<dl>
-<dd>
-
 **appId:** `Optional<String>` — The app to create the build for, prefixed `app_`. Defaults to the app behind the presented credential.
     
 </dd>
@@ -5871,7 +6468,7 @@ client.appBuilds().create(
 <dl>
 <dd>
 
-**attachment:** `CreateAppBuildsRequestAttachment` — The uploaded build file: `{ id }` for an existing file or `{ direct_upload_id }` for a completed direct upload.
+**attachment:** `CreateAppBuildsRequestAttachment` — The uploaded build file: pass `id` for an existing file or `direct_upload_id` for a completed direct upload. iOS and Android builds take a .zip bundle; web builds take a JavaScript file or a .zip archive of the hosted site.
     
 </dd>
 </dl>
@@ -6033,6 +6630,287 @@ client.appBuilds().promote(
 </dl>
 </details>
 
+## App Installations
+<details><summary><code>client.appInstallations.list() -> SyncPagingIterable&amp;lt;AppInstallation&amp;gt;</code></summary>
+<dl>
+<dd>
+
+#### 📝 Description
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+Lists app installations, newest first. An app's API key lists the accounts that installed it. An account lists the apps installed on it; a user passes that account's `account_id`. The developer of an app lists every installation of it by passing `app_id`. Uninstalled apps, deleted apps and deleted accounts are left out.
+</dd>
+</dl>
+</dd>
+</dl>
+
+#### 🔌 Usage
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+```java
+client.appInstallations().list(
+    ListAppInstallationsRequest
+        .builder()
+        .build()
+);
+```
+</dd>
+</dl>
+</dd>
+</dl>
+
+#### ⚙️ Parameters
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+**accountId:** `Optional<String>` — Only return installations on this account, prefixed `biz_`.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**appId:** `Optional<String>` — Only return installations of this app, prefixed `app_`. Pass your own app's ID to list the accounts that installed it.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**viewType:** `Optional<ListAppInstallationsRequestViewType>` — Only return installations of apps that have this view, such as `dashboard` for apps shown in a business's dashboard.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**externalId:** `Optional<String>` — Only return the installation with this `external_id`, the installed app's own identifier for it. Only the app and its developer can filter by it.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**createdBefore:** `Optional<String>` — Only return installations created before this ISO 8601 timestamp.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**createdAfter:** `Optional<String>` — Only return installations created after this ISO 8601 timestamp.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**first:** `Optional<Integer>` — Number of results to return from the start of the range.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**after:** `Optional<String>` — Return results after this cursor. Use `page_info.end_cursor` from the previous response to fetch the next page.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**last:** `Optional<Integer>` — Number of results to return from the end of the range.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**before:** `Optional<String>` — Return results before this cursor. Use `page_info.start_cursor` from the previous response to fetch the previous page.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**order:** `Optional<ListAppInstallationsRequestOrder>` — Field to sort installations by. `name` sorts by app name, and only when listing the apps installed on one account.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**direction:** `Optional<ListAppInstallationsRequestDirection>` — Sort direction.
+    
+</dd>
+</dl>
+</dd>
+</dl>
+
+
+</dd>
+</dl>
+</details>
+
+<details><summary><code>client.appInstallations.retrieve(id) -> AppInstallation</code></summary>
+<dl>
+<dd>
+
+#### 📝 Description
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+Retrieves an app installation, with the metadata the app stores on it. The app, its developer and the account it's installed on can retrieve it.
+</dd>
+</dl>
+</dd>
+</dl>
+
+#### 🔌 Usage
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+```java
+client.appInstallations().retrieve(
+    "id",
+    RetrieveAppInstallationsRequest
+        .builder()
+        .build()
+);
+```
+</dd>
+</dl>
+</dd>
+</dl>
+
+#### ⚙️ Parameters
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+**id:** `String` — App installation ID, prefixed `aag_`.
+    
+</dd>
+</dl>
+</dd>
+</dl>
+
+
+</dd>
+</dl>
+</details>
+
+<details><summary><code>client.appInstallations.update(id, request) -> AppInstallation</code></summary>
+<dl>
+<dd>
+
+#### 📝 Description
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+Updates the `metadata` and `external_id` your app keeps on an installation. Only the metadata keys you send change, so separate jobs can each keep their own keys.
+</dd>
+</dl>
+</dd>
+</dl>
+
+#### 🔌 Usage
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+```java
+client.appInstallations().update(
+    "id",
+    UpdateAppInstallationsRequest
+        .builder()
+        .build()
+);
+```
+</dd>
+</dl>
+</dd>
+</dl>
+
+#### ⚙️ Parameters
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+**id:** `String` — App installation ID, prefixed `aag_`.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**externalId:** `Optional<String>` — Your app's own identifier for this installation, such as the ID of the linked account in another system, or `null` when none is set. At most 255 characters and unique across your app's installations, so you can find an installation with `GET /app_installations?external_id=`; setting one another installation already has returns a `409`. Only the app and its developer see it; for the account the app is installed on it is always `null`.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**metadata:** `Optional<Map<String, Optional<String>>>` — Metadata keys to set, as string values. A key set to `null` is removed and keys you leave out don't change; an empty object clears every key. At most 50 keys; keys are at most 100 characters and values at most 500.
+    
+</dd>
+</dl>
+</dd>
+</dl>
+
+
+</dd>
+</dl>
+</details>
+
 ## Apps
 <details><summary><code>client.apps.list() -> SyncPagingIterable&amp;lt;AppListItem&amp;gt;</code></summary>
 <dl>
@@ -6046,7 +6924,7 @@ client.appBuilds().promote(
 <dl>
 <dd>
 
-Lists apps on the Whop platform: the app store's live apps, or — with `account_id` and developer access to that account — every app the account owns. Requires authentication, except for the publicly readable lists: `verified_apps_only=true`, and `app_type=website` with no `account_id`, which returns every live deployed website that Whop has not verified — verified templates are the curated `verified_apps_only=true` list instead.
+Lists published apps approved for the app store without authentication. With `account_id` and developer access, also includes unpublished apps that the account owns. Public website discovery includes built official blueprints and built, live community blueprints that Whop recommends.
 </dd>
 </dl>
 </dd>
@@ -6104,7 +6982,23 @@ client.apps().list(
 <dl>
 <dd>
 
-**verifiedAppsOnly:** `Optional<Boolean>` — Whether to only return apps verified by Whop. Verified website templates — websites with a published web build — are included, even though websites are otherwise left out of app lists.
+**verified:** `Optional<Boolean>` — Only return apps whose Whop verification status matches this value. Omit this filter to include every verification status the caller can see.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**verifiedAppsOnly:** `Optional<Boolean>` — Legacy compatibility filter. Use `verified` for field equality. `true` returns verified apps; clients pinned before `2026-08-25-2` retain the earlier public website discovery behavior.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**recommended:** `Optional<Boolean>` — Only return apps Whop recommends (or, with `false`, only those it does not), independently of verification status.
     
 </dd>
 </dl>
@@ -6120,7 +7014,39 @@ client.apps().list(
 <dl>
 <dd>
 
-**order:** `Optional<ListAppsRequestOrder>` — The field to sort apps by. Defaults to discoverable_at, showing the most recently published apps first. `template_usage` ranks Whop-verified apps first, then apps with a banner image, then by how many apps were created from each app as a template.
+**productCategory:** `Optional<String>` — Only return apps whose `product_category` is this product category, such as `pressure_washing`. An unknown product category is rejected.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**businessType:** `Optional<String>` — Only return apps whose `product_category` sits under this business type in Whop's business taxonomy, such as `services`. An unknown business type is rejected.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**industryType:** `Optional<String>` — Only return apps whose `product_category` sits under this industry type of `business_type`, such as `exterior_cleaning`. Requires `business_type`. An industry type outside it is rejected.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**marketplaceCategoryRoute:** `Optional<String>` — Only return apps in this app store category. Use a `route` from `GET /apps/categories`, such as `business-productivity`. An unknown route is rejected.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**order:** `Optional<ListAppsRequestOrder>` — The field to sort apps by. Defaults to discoverable_at, showing the most recently published apps first. `template_usage` ranks Whop-verified apps first, then by how many businesses created apps from each app as a template. `template_recent_sales` ranks them by how many of those businesses processed a payment in the last 24 hours, recounted hourly, breaking ties by `template_usage`.
     
 </dd>
 </dl>
@@ -6136,7 +7062,7 @@ client.apps().list(
 <dl>
 <dd>
 
-**first:** `Optional<Integer>` — The number of apps to return (default 20, max 100).
+**first:** `Optional<Integer>` — Number of results to return from the start of the range.
     
 </dd>
 </dl>
@@ -6144,7 +7070,7 @@ client.apps().list(
 <dl>
 <dd>
 
-**after:** `Optional<String>` — A cursor; returns apps after this position.
+**after:** `Optional<String>` — Return results after this cursor. Use `page_info.end_cursor` from the previous response to fetch the next page.
     
 </dd>
 </dl>
@@ -6152,7 +7078,7 @@ client.apps().list(
 <dl>
 <dd>
 
-**last:** `Optional<Integer>` — The number of apps to return from the end of the range.
+**last:** `Optional<Integer>` — Number of results to return from the end of the range.
     
 </dd>
 </dl>
@@ -6160,7 +7086,15 @@ client.apps().list(
 <dl>
 <dd>
 
-**before:** `Optional<String>` — A cursor; returns apps before this position.
+**before:** `Optional<String>` — Return results before this cursor. Use `page_info.start_cursor` from the previous response to fetch the previous page.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**includeTotalCount:** `Optional<Boolean>` — Set to `true` to return the number of matching results in `page_info.total_count`. Send `first=0` as well to return the count without any results.
     
 </dd>
 </dl>
@@ -6243,7 +7177,23 @@ client.apps().create(
 <dl>
 <dd>
 
+**domainId:** `Optional<String>` — A domain on the account (`dom_` tag) to serve the app at, such as a whop.site address claimed with `POST /domains`. Required with `template_id`.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
 **icon:** `Optional<CreateAppsRequestIcon>` — The icon image for the app in PNG, JPEG, or GIF format, referencing an uploaded file: `{ id }` for an existing attachment or `{ direct_upload_id }` for a new direct upload.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**importedFromUrl:** `Optional<String>` — The address of the existing website this app is imported from, such as `https://shop.example.com`. Must be an `http` or `https` URL.
     
 </dd>
 </dl>
@@ -6267,87 +7217,7 @@ client.apps().create(
 <dl>
 <dd>
 
-**route:** `Optional<String>` — The subdomain route where the app's hosted web builds are served, such as `myapp` for myapp.whop.app.
-    
-</dd>
-</dl>
-</dd>
-</dl>
-
-
-</dd>
-</dl>
-</details>
-
-<details><summary><code>client.apps.updatePermissionsApp(appId, request) -> Boolean</code></summary>
-<dl>
-<dd>
-
-#### 📝 Description
-
-<dl>
-<dd>
-
-<dl>
-<dd>
-
-Updates the permission requirements for an app
-
-Required permissions:
- - `developer:update_app_authorization`
-</dd>
-</dl>
-</dd>
-</dl>
-
-#### 🔌 Usage
-
-<dl>
-<dd>
-
-<dl>
-<dd>
-
-```java
-client.apps().updatePermissionsApp(
-    "app_id",
-    UpdatePermissionsAppRequest
-        .builder()
-        .requestedPermissions(
-            Arrays.asList(
-                UpdatePermissionsAppRequestRequestedPermissionsItem
-                    .builder()
-                    .action("action")
-                    .isRequired(true)
-                    .justification("justification")
-                    .build()
-            )
-        )
-        .build()
-);
-```
-</dd>
-</dl>
-</dd>
-</dl>
-
-#### ⚙️ Parameters
-
-<dl>
-<dd>
-
-<dl>
-<dd>
-
-**appId:** `String` — The ID of the app the permission requirements are being updated for
-    
-</dd>
-</dl>
-
-<dl>
-<dd>
-
-**requestedPermissions:** `List<UpdatePermissionsAppRequestRequestedPermissionsItem>` — The permissions that the app will request off of users when a user installs the app.
+**route:** `Optional<String>` — Deprecated: claim an address with `POST /domains` and pass `domain_id`. The subdomain route where the app's hosted web builds are served, such as `myapp` for myapp.whop.site.
     
 </dd>
 </dl>
@@ -6371,7 +7241,7 @@ client.apps().updatePermissionsApp(
 <dl>
 <dd>
 
-Retrieves an app by ID, claimed route, or proxy domain id. Credential fields (api_key, default_api_key, secrets) render `null` unless the caller has the corresponding developer permission on the owning account.
+Retrieves an app by ID, claimed route, active verified custom hostname, or proxy domain id. Authentication is optional; credential fields stay `null` unless you have the matching developer permission on the owning account.
 </dd>
 </dl>
 </dd>
@@ -6406,7 +7276,7 @@ client.apps().retrieve(
 <dl>
 <dd>
 
-**id:** `String` — App ID (prefixed `app_`), the app's claimed route, or its proxy domain id.
+**id:** `String` — App ID (prefixed `app_`). Retrieval also accepts the app's claimed route, an active verified custom hostname, or its proxy domain id; a custom hostname returns `404` when its assignment is inactive, the owning account is suspended, or the app is deleted.
     
 </dd>
 </dl>
@@ -6465,7 +7335,7 @@ client.apps().delete(
 <dl>
 <dd>
 
-**id:** `String` — App ID (prefixed `app_`), the app's claimed route, or its proxy domain id.
+**id:** `String` — App ID (prefixed `app_`). Retrieval also accepts the app's claimed route, an active verified custom hostname, or its proxy domain id; a custom hostname returns `404` when its assignment is inactive, the owning account is suspended, or the app is deleted.
     
 </dd>
 </dl>
@@ -6524,7 +7394,7 @@ client.apps().update(
 <dl>
 <dd>
 
-**id:** `String` — App ID (prefixed `app_`), the app's claimed route, or its proxy domain id.
+**id:** `String` — App ID (prefixed `app_`). Retrieval also accepts the app's claimed route, an active verified custom hostname, or its proxy domain id; a custom hostname returns `404` when its assignment is inactive, the owning account is suspended, or the app is deleted.
     
 </dd>
 </dl>
@@ -6549,6 +7419,14 @@ client.apps().update(
 <dd>
 
 **baseUrl:** `Optional<String>` — The base production URL where the app is hosted. Set to `null` to take the app proxy offline.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**categoryId:** `Optional<String>` — The App Store category of a business app. Pass an `mcat_` ID from `GET /apps/categories?app_type=b2b_app`, or `null` to clear it. Omit it to keep the current category. Setting a category needs the app to have an App Store product.
     
 </dd>
 </dl>
@@ -6596,6 +7474,14 @@ client.apps().update(
 <dl>
 <dd>
 
+**importedFromUrl:** `Optional<String>` — The address of the existing website this app is imported from, such as `https://shop.example.com`. Must be an `http` or `https` URL. Set to `null` to clear it.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
 **name:** `Optional<String>` — The display name for the app, shown to users on the app store and product pages.
     
 </dd>
@@ -6613,6 +7499,14 @@ client.apps().update(
 <dd>
 
 **openapiPath:** `Optional<String>` — The URL path to the app's OpenAPI spec file (requires the ai_chat capability).
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**perInstallSchedule:** `Optional<String>` — Five-field cron expression, read in UTC, on which Whop runs the production web build's `scheduled()` export once for every installation, with the installation in `ctx.props.app_installation`. It must fire at least once and no more often than every 15 minutes. Slots are skipped while the app has no production web build with a server entry. Set to `null` or an empty string to stop the per-install schedule.
     
 </dd>
 </dl>
@@ -6661,6 +7555,14 @@ client.apps().update(
 <dd>
 
 **route:** `Optional<String>` — The subdomain route where the app's hosted web builds are served.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**schedule:** `Optional<String>` — Five-field cron expression, read in UTC, on which Whop runs the production web build's `scheduled()` export once per slot, such as `* /15 * * * *`. It must fire at least once. Slots are skipped while the app has no production web build with a server entry. Set to `null` or an empty string to stop the global schedule.
     
 </dd>
 </dl>
@@ -6775,7 +7677,7 @@ client.apps().deploy(
 <dl>
 <dd>
 
-Lists a hosted app's server runtime logs, most recent first: console output, uncaught exceptions, and failed-request summaries captured on whop.app hosting. Logs are retained for 7 days.
+Lists a hosted app's server runtime logs, most recent first: console output, uncaught exceptions, and failed-request summaries captured on whop.site hosting. Logs are retained for 7 days.
 </dd>
 </dl>
 </dd>
@@ -6858,7 +7760,7 @@ client.apps().logs(
 <dl>
 <dd>
 
-**first:** `Optional<Integer>` — The number of log lines to return (max 500).
+**first:** `Optional<Integer>` — Number of results to return from the start of the range.
     
 </dd>
 </dl>
@@ -6866,7 +7768,7 @@ client.apps().logs(
 <dl>
 <dd>
 
-**after:** `Optional<String>` — A cursor for fetching logs after a previous page.
+**after:** `Optional<String>` — Return results after this cursor. Use `page_info.end_cursor` from the previous response to fetch the next page.
     
 </dd>
 </dl>
@@ -6874,7 +7776,7 @@ client.apps().logs(
 <dl>
 <dd>
 
-**before:** `Optional<String>` — A cursor for fetching logs before a later page.
+**before:** `Optional<String>` — Return results before this cursor. Use `page_info.start_cursor` from the previous response to fetch the previous page.
     
 </dd>
 </dl>
@@ -6976,7 +7878,7 @@ client.apps().updatePermissions(
 <dl>
 <dd>
 
-Lists uploaded customer-list audiences for an account. Pass `audience_id` to return a specific audience.
+Lists an account's custom and lookalike audiences.
 </dd>
 </dl>
 </dd>
@@ -7027,7 +7929,7 @@ client.audiences().list(
 <dl>
 <dd>
 
-**audienceType:** `Optional<ListAudiencesRequestAudienceType>` — Filter by audience type: `custom` (uploaded lists) or `lookalike`.
+**audienceType:** `Optional<ListAudiencesRequestAudienceType>` — Filter by custom or lookalike audiences.
     
 </dd>
 </dl>
@@ -7035,7 +7937,7 @@ client.audiences().list(
 <dl>
 <dd>
 
-**sourceType:** `Optional<ListAudiencesRequestSourceType>` — Filter by member source: `csv_upload` (uploaded lists) or `people_filter` (automatic audiences built from saved People filters).
+**sourceType:** `Optional<ListAudiencesRequestSourceType>` — Filter by uploaded customer lists, Whop People filters, or social engagement.
     
 </dd>
 </dl>
@@ -7043,7 +7945,7 @@ client.audiences().list(
 <dl>
 <dd>
 
-**first:** `Optional<Integer>` — Number of audiences to return. Defaults to 20; maximum 100.
+**first:** `Optional<Integer>` — Number of results to return from the start of the range.
     
 </dd>
 </dl>
@@ -7051,7 +7953,7 @@ client.audiences().list(
 <dl>
 <dd>
 
-**after:** `Optional<String>` — Cursor for the next page of audiences.
+**after:** `Optional<String>` — Return results after this cursor. Use `page_info.end_cursor` from the previous response to fetch the next page.
     
 </dd>
 </dl>
@@ -7075,7 +7977,7 @@ client.audiences().list(
 <dl>
 <dd>
 
-Creates an audience. Default (`audience_type` omitted or `custom`): creates one audience from an uploaded customer identity CSV file (`name`, `column_mapping`, and `file_id` required) and starts processing it; responds with the audience object. With `filters`: creates an audience from saved People filters (`name` required) — membership is built from the account's People data, and `auto_refresh` decides whether it keeps tracking the filters or keeps whoever matched at creation. With `audience_type: lookalike`: creates a ladder of Meta lookalike audiences from an existing ready custom audience (`source_audience_id`, `count`, and `percentage` required) — `count` equal similarity bands slicing the top `percentage`% (3 audiences at 6% = 0–2%, 2–4%, 4–6%), each returned as its own audience in a `{ data: [...] }` envelope.
+Creates a custom audience from a customer list or your account's Whop People data, or a lookalike audience that reaches people similar to an existing one. Processing runs asynchronously. A custom audience returns one audience; a lookalike returns the requested similarity bands in `data`.
 </dd>
 </dl>
 </dd>
@@ -7118,7 +8020,7 @@ client.audiences().create(
 <dl>
 <dd>
 
-**audienceType:** `Optional<CreateAudiencesRequestAudienceType>` — What to create. Defaults to `custom` (CSV upload).
+**audienceType:** `Optional<CreateAudiencesRequestAudienceType>` — Audience type. Defaults to `custom`.
     
 </dd>
 </dl>
@@ -7134,7 +8036,7 @@ client.audiences().create(
 <dl>
 <dd>
 
-**columnMapping:** `Optional<CreateAudiencesRequestColumnMapping>` — Custom audiences only. Maps supported identity fields to CSV column headers. Map at least one of `email` or `phone`.
+**columnMapping:** `Optional<CreateAudiencesRequestColumnMapping>` — CSV audiences only. Maps supported identity fields to CSV column headers. Map at least one of `email` or `phone`.
     
 </dd>
 </dl>
@@ -7150,7 +8052,7 @@ client.audiences().create(
 <dl>
 <dd>
 
-**fileId:** `Optional<String>` — Custom audiences only. The uploaded customer CSV — a file id (`file_...`) returned by `POST /files`.
+**fileId:** `Optional<String>` — CSV audiences only. The uploaded customer CSV — a file id (`file_...`) returned by `POST /files`.
     
 </dd>
 </dl>
@@ -7158,7 +8060,7 @@ client.audiences().create(
 <dl>
 <dd>
 
-**filters:** `Optional<Map<String, Object>>` — Filter audiences only. The People filters that define membership, keyed exactly as `GET /people` accepts them — for example `{"os": "iOS", "country": "US"}`. Date filters must be rolling windows — `first_seen_within_days` or `last_seen_within_days` — so the audience re-anchors on every refresh; fixed dates such as `first_seen_after` are rejected. Source values are canonical source paths (`whop:<campaign>:<group>:<ad>`, `ext:<platform>:...`, `referrer:<domain>`, `direct`), exact or with a trailing `:*` wildcard.
+**filters:** `Optional<Map<String, Object>>` — Filter audiences only. The People filters that define membership, keyed exactly as `GET /people` accepts them — for example `{"os": "iOS", "country": "US"}`. Activity dates `event_from` and `event_to` are inclusive and remain fixed on refresh. Use `event_within_days`, `first_seen_within_days` or `last_seen_within_days` for a rolling window. Source values are canonical source paths (`whop:<campaign>:<group>:<ad>`, `ext:<platform>:...`, `referrer:<domain>`, `direct`), exact or with a trailing `:*` wildcard.
     
 </dd>
 </dl>
@@ -7174,7 +8076,7 @@ client.audiences().create(
 <dl>
 <dd>
 
-**percentage:** `Optional<Integer>` — Lookalikes only. Total similarity reach as a whole percent (1–20), sliced evenly across `count` — must be divisible by `count`.
+**percentage:** `Optional<Integer>` — Lookalikes only. Total similarity reach as a whole percent (1–20), sliced evenly across `count` — must be divisible by `count`. For example, 3 audiences at 6% creates 0–2%, 2–4%, and 4–6% bands.
     
 </dd>
 </dl>
@@ -7182,7 +8084,15 @@ client.audiences().create(
 <dl>
 <dd>
 
-**sourceAudienceId:** `Optional<String>` — Lookalikes only. The ready custom audience (`adaud_`) to build from; it needs at least 100 matched people.
+**sourceAudienceId:** `Optional<String>` — Lookalikes only. The ready custom audience (`adaud_`) to build from; uploaded and People audiences need at least 100 matched people.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**sourceType:** `Optional<CreateAudiencesRequestSourceType>` — Custom audience source. Inferred from `filters`, otherwise defaults to `csv_upload`. Supply only the fields for the selected source.
     
 </dd>
 </dl>
@@ -7409,7 +8319,7 @@ client.audiences().addPeople(
 <dl>
 <dd>
 
-Returns a paginated list of authorized team members for a company, with optional filtering by user, role, and creation date.
+Lists the authorized users on an account's team.
 
 Required permissions:
  - `company:authorized_user:read`
@@ -7433,10 +8343,10 @@ client.authorizedUsers().list(
         .builder()
         .first(42)
         .last(42)
-        .companyId("biz_xxxxxxxxxxxxxx")
         .userId("user_xxxxxxxxxxxxx")
         .createdBefore(OffsetDateTime.parse("2023-12-01T05:00:00Z"))
         .createdAfter(OffsetDateTime.parse("2023-12-01T05:00:00Z"))
+        .accountId("biz_xxxxxxxxxxxxxx")
         .build()
 );
 ```
@@ -7485,14 +8395,6 @@ client.authorizedUsers().list(
 <dl>
 <dd>
 
-**companyId:** `Optional<String>` — The unique identifier of the company to list authorized users for.
-    
-</dd>
-</dl>
-
-<dl>
-<dd>
-
 **userId:** `Optional<String>` — Filter results to a specific user to check if they are an authorized team member.
     
 </dd>
@@ -7521,6 +8423,14 @@ client.authorizedUsers().list(
     
 </dd>
 </dl>
+
+<dl>
+<dd>
+
+**accountId:** `Optional<String>` — The unique identifier of the company to list authorized users for.
+    
+</dd>
+</dl>
 </dd>
 </dl>
 
@@ -7541,7 +8451,7 @@ client.authorizedUsers().list(
 <dl>
 <dd>
 
-Add a new authorized user to a company.
+Adds a user to an account's team as an authorized user with the given role.
 
 Required permissions:
  - `authorized_user:create`
@@ -7563,7 +8473,7 @@ Required permissions:
 client.authorizedUsers().create(
     CreateAuthorizedUsersRequest
         .builder()
-        .companyId("biz_xxxxxxxxxxxxxx")
+        .accountId("biz_xxxxxxxxxxxxxx")
         .role(GrantableAuthorizedUserRoles.OWNER)
         .userId("user_xxxxxxxxxxxxx")
         .build()
@@ -7582,7 +8492,7 @@ client.authorizedUsers().create(
 <dl>
 <dd>
 
-**companyId:** `String` — The ID of the company to add the authorized user to.
+**accountId:** `String` — The ID of the company to add the authorized user to.
     
 </dd>
 </dl>
@@ -7677,7 +8587,7 @@ client.authorizedUsers().retrieve(
 <dl>
 <dd>
 
-**id:** `String` — The unique identifier of the authorized user to retrieve.
+**id:** `String` — The unique identifier of the authorized user to retrieve. Team member IDs may start with `ausr_` or `mber_`; treat them as opaque.
     
 </dd>
 </dl>
@@ -7701,7 +8611,7 @@ client.authorizedUsers().retrieve(
 <dl>
 <dd>
 
-Remove an authorized user from a company.
+Removes an authorized user from an account's team.
 
 Required permissions:
  - `authorized_user:delete`
@@ -7723,7 +8633,7 @@ client.authorizedUsers().delete(
     "ausr_xxxxxxxxxxxxx",
     DeleteAuthorizedUsersRequest
         .builder()
-        .companyId("biz_xxxxxxxxxxxxxx")
+        .accountId("biz_xxxxxxxxxxxxxx")
         .build()
 );
 ```
@@ -7740,7 +8650,7 @@ client.authorizedUsers().delete(
 <dl>
 <dd>
 
-**id:** `String` — The ID of the authorized user or user to remove.
+**id:** `String` — The ID of the authorized user or user to remove. Team member IDs may start with `ausr_` or `mber_`; treat them as opaque.
     
 </dd>
 </dl>
@@ -7748,7 +8658,1294 @@ client.authorizedUsers().delete(
 <dl>
 <dd>
 
-**companyId:** `Optional<String>` — The ID of the company the authorized user belongs to. Optional if the authorized user ID is provided.
+**accountId:** `Optional<String>` — The ID of the company the authorized user belongs to. Optional if the authorized user ID is provided.
+    
+</dd>
+</dl>
+</dd>
+</dl>
+
+
+</dd>
+</dl>
+</details>
+
+## Automation Enrollments
+<details><summary><code>client.automationEnrollments.list() -> SyncPagingIterable&amp;lt;AutomationEnrollment&amp;gt;</code></summary>
+<dl>
+<dd>
+
+#### 📝 Description
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+Lists members' enrollments in automations, newest first.
+</dd>
+</dl>
+</dd>
+</dl>
+
+#### 🔌 Usage
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+```java
+client.automationEnrollments().list(
+    ListAutomationEnrollmentsRequest
+        .builder()
+        .build()
+);
+```
+</dd>
+</dl>
+</dd>
+</dl>
+
+#### ⚙️ Parameters
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+**accountId:** `Optional<String>` — Only this account's enrollments, prefixed `biz_`. Defaults to the credential's account, or every account a user can read.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**automationId:** `Optional<String>` — Only this automation's enrollments, prefixed `ato_`.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**memberId:** `Optional<String>` — Only this member's enrollments, prefixed `mber_`.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**status:** `Optional<ListAutomationEnrollmentsRequestStatus>` — Only enrollments with this status.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**version:** `Optional<Integer>` — Only members on this automation version.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**order:** `Optional<ListAutomationEnrollmentsRequestOrder>` — Field to sort by.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**direction:** `Optional<ListAutomationEnrollmentsRequestDirection>` — Sort direction.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**first:** `Optional<Integer>` — Number of results to return from the start of the range.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**after:** `Optional<String>` — Return results after this cursor. Use `page_info.end_cursor` from the previous response to fetch the next page.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**last:** `Optional<Integer>` — Number of results to return from the end of the range.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**before:** `Optional<String>` — Return results before this cursor. Use `page_info.start_cursor` from the previous response to fetch the previous page.
+    
+</dd>
+</dl>
+</dd>
+</dl>
+
+
+</dd>
+</dl>
+</details>
+
+<details><summary><code>client.automationEnrollments.retrieve(id) -> AutomationEnrollment</code></summary>
+<dl>
+<dd>
+
+#### 📝 Description
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+Retrieves a member's enrollment in an automation, with the step they're waiting on.
+</dd>
+</dl>
+</dd>
+</dl>
+
+#### 🔌 Usage
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+```java
+client.automationEnrollments().retrieve(
+    "id",
+    RetrieveAutomationEnrollmentsRequest
+        .builder()
+        .build()
+);
+```
+</dd>
+</dl>
+</dd>
+</dl>
+
+#### ⚙️ Parameters
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+**id:** `String` — Automation enrollment ID, prefixed `atoe_`.
+    
+</dd>
+</dl>
+</dd>
+</dl>
+
+
+</dd>
+</dl>
+</details>
+
+<details><summary><code>client.automationEnrollments.cancel(id) -> AutomationEnrollment</code></summary>
+<dl>
+<dd>
+
+#### 📝 Description
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+Cancels an `active` enrollment: the member gets none of the automation's remaining steps, and their enrollment becomes `canceled`. The member can enroll in the automation again later.
+</dd>
+</dl>
+</dd>
+</dl>
+
+#### 🔌 Usage
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+```java
+client.automationEnrollments().cancel(
+    "id",
+    CancelAutomationEnrollmentsRequest
+        .builder()
+        .build()
+);
+```
+</dd>
+</dl>
+</dd>
+</dl>
+
+#### ⚙️ Parameters
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+**id:** `String` — Automation enrollment ID, prefixed `atoe_`.
+    
+</dd>
+</dl>
+</dd>
+</dl>
+
+
+</dd>
+</dl>
+</details>
+
+## Automation Steps
+<details><summary><code>client.automationSteps.list() -> SyncPagingIterable&amp;lt;AutomationStep&amp;gt;</code></summary>
+<dl>
+<dd>
+
+#### 📝 Description
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+Lists automation steps. With `automation_id`, lists one version of that automation in the order its steps run: the draft version unless `version` names another. Without it, lists the steps of every version of every automation, newest first. Steps get new IDs at every publish, so list them again afterwards and match them up by `key`.
+</dd>
+</dl>
+</dd>
+</dl>
+
+#### 🔌 Usage
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+```java
+client.automationSteps().list(
+    ListAutomationStepsRequest
+        .builder()
+        .build()
+);
+```
+</dd>
+</dl>
+</dd>
+</dl>
+
+#### ⚙️ Parameters
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+**automationId:** `Optional<String>` — Only this automation's steps, in run order, prefixed `ato_`. `order` doesn't apply.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**version:** `Optional<Integer>` — With `automation_id`, the version to list, such as its `published_version`. Defaults to its `draft_version`.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**accountId:** `Optional<String>` — Without `automation_id`, only this account's steps, prefixed `biz_`. Defaults to the credential's account, or every account a user can read.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**order:** `Optional<ListAutomationStepsRequestOrder>` — Field to sort by.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**direction:** `Optional<ListAutomationStepsRequestDirection>` — Sort direction.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**first:** `Optional<Integer>` — Number of results to return from the start of the range.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**after:** `Optional<String>` — Return results after this cursor. Use `page_info.end_cursor` from the previous response to fetch the next page.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**last:** `Optional<Integer>` — Number of results to return from the end of the range.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**before:** `Optional<String>` — Return results before this cursor. Use `page_info.start_cursor` from the previous response to fetch the previous page.
+    
+</dd>
+</dl>
+</dd>
+</dl>
+
+
+</dd>
+</dl>
+</details>
+
+<details><summary><code>client.automationSteps.create(request) -> AutomationStep</code></summary>
+<dl>
+<dd>
+
+#### 📝 Description
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+Adds a step to an automation's draft version, directly after `previous_step_id`, or first when it's left out. The step that held that position now runs after the new one. Steps can't be moved, so add each one where it belongs. Setting `source_code` also needs every read permission listed for previewing a step, which the step's code reads the account with.
+</dd>
+</dl>
+</dd>
+</dl>
+
+#### 🔌 Usage
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+```java
+client.automationSteps().create(
+    CreateAutomationStepsRequest
+        .builder()
+        .actionType(CreateAutomationStepsRequestActionType.WAIT)
+        .automationId("ato_xxxxxxxxxxxxxx")
+        .build()
+);
+```
+</dd>
+</dl>
+</dd>
+</dl>
+
+#### ⚙️ Parameters
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+**actionType:** `CreateAutomationStepsRequestActionType` — What the step does: `wait` holds the member for `config.delay_seconds`, `email` emails them, and `message` sends them a message from a team member. A draft step can switch between `email` and `message`, which clears `config.sender_id`. A `wait` can't become a sending step, or the other way round.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**automationId:** `String` — ID of the automation to add the step to, prefixed `ato_`.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**config:** `Optional<AutomationStepConfig>` 
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**previousStepId:** `Optional<String>` — ID of the draft step the new one runs after, prefixed `atos_`. Leave it out to make the new step run first.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**sourceCode:** `Optional<String>` — An `email` or `message` step's code: a TSX module whose default export gets the member and returns `message.send()`, `message.skip()` or `message.exit()` from `whop:message`. An `email` step sends its `subject`, its `react` element as the body and its `text` as the plain-text part. A `message` step sends its `text`. The code can import `react` and `@react-email/components`. It reads the account through the `whop` client from `whop:message`, which can only read. That client holds every account-level `:read` permission that both the admin role and Whop AI hold, except `payout:account:read`, as listed for previewing a step. Setting it, or previewing the step, needs every one of those permissions. Up to 64,000 characters. `null` on a `wait`, and until it is written.
+    
+</dd>
+</dl>
+</dd>
+</dl>
+
+
+</dd>
+</dl>
+</details>
+
+<details><summary><code>client.automationSteps.retrieve(id) -> AutomationStep</code></summary>
+<dl>
+<dd>
+
+#### 📝 Description
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+Retrieves an automation step, with how many members are waiting for it.
+</dd>
+</dl>
+</dd>
+</dl>
+
+#### 🔌 Usage
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+```java
+client.automationSteps().retrieve(
+    "id",
+    RetrieveAutomationStepsRequest
+        .builder()
+        .build()
+);
+```
+</dd>
+</dl>
+</dd>
+</dl>
+
+#### ⚙️ Parameters
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+**id:** `String` — Automation step ID, prefixed `atos_`.
+    
+</dd>
+</dl>
+</dd>
+</dl>
+
+
+</dd>
+</dl>
+</details>
+
+<details><summary><code>client.automationSteps.delete(id) -> AutomationStep</code></summary>
+<dl>
+<dd>
+
+#### 📝 Description
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+Deletes a step of the draft version. The step after it runs in its place. Members already in the automation aren't affected until the draft is published.
+</dd>
+</dl>
+</dd>
+</dl>
+
+#### 🔌 Usage
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+```java
+client.automationSteps().delete(
+    "id",
+    DeleteAutomationStepsRequest
+        .builder()
+        .build()
+);
+```
+</dd>
+</dl>
+</dd>
+</dl>
+
+#### ⚙️ Parameters
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+**id:** `String` — Automation step ID, prefixed `atos_`.
+    
+</dd>
+</dl>
+</dd>
+</dl>
+
+
+</dd>
+</dl>
+</details>
+
+<details><summary><code>client.automationSteps.update(id, request) -> AutomationStep</code></summary>
+<dl>
+<dd>
+
+#### 📝 Description
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+Edits a step of the draft version. A published version's steps never change; edit the same `key` in the draft instead. `previous_step_id` can't change. Setting `source_code` also needs every read permission listed for previewing a step, which the step's code reads the account with.
+</dd>
+</dl>
+</dd>
+</dl>
+
+#### 🔌 Usage
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+```java
+client.automationSteps().update(
+    "id",
+    UpdateAutomationStepsRequest
+        .builder()
+        .build()
+);
+```
+</dd>
+</dl>
+</dd>
+</dl>
+
+#### ⚙️ Parameters
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+**id:** `String` — Automation step ID, prefixed `atos_`.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**actionType:** `Optional<UpdateAutomationStepsRequestActionType>` — What the step does: `wait` holds the member for `config.delay_seconds`, `email` emails them, and `message` sends them a message from a team member. A draft step can switch between `email` and `message`, which clears `config.sender_id`. A `wait` can't become a sending step, or the other way round.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**config:** `Optional<AutomationStepConfig>` 
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**sourceCode:** `Optional<String>` — An `email` or `message` step's code: a TSX module whose default export gets the member and returns `message.send()`, `message.skip()` or `message.exit()` from `whop:message`. An `email` step sends its `subject`, its `react` element as the body and its `text` as the plain-text part. A `message` step sends its `text`. The code can import `react` and `@react-email/components`. It reads the account through the `whop` client from `whop:message`, which can only read. That client holds every account-level `:read` permission that both the admin role and Whop AI hold, except `payout:account:read`, as listed for previewing a step. Setting it, or previewing the step, needs every one of those permissions. Up to 64,000 characters. `null` on a `wait`, and until it is written.
+    
+</dd>
+</dl>
+</dd>
+</dl>
+
+
+</dd>
+</dl>
+</details>
+
+<details><summary><code>client.automationSteps.preview(id, request) -> AutomationStepPreview</code></summary>
+<dl>
+<dd>
+
+#### 📝 Description
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+Runs an `email` or `message` step's code for one member, as if they had reached it, and returns what it would send. Nothing is sent. The step's code reads the account with every account-level `:read` permission that both the admin role and Whop AI hold except `payout:account:read`, so previewing, like setting `source_code`, needs `automation:write` and every one of those permissions. OAuth apps can't be granted all of them, so they can't preview or set step code.
+</dd>
+</dl>
+</dd>
+</dl>
+
+#### 🔌 Usage
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+```java
+client.automationSteps().preview(
+    "id",
+    PreviewAutomationStepsRequest
+        .builder()
+        .memberId("mber_xxxxxxxxxxxxxx")
+        .build()
+);
+```
+</dd>
+</dl>
+</dd>
+</dl>
+
+#### ⚙️ Parameters
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+**id:** `String` — Automation step ID, prefixed `atos_`.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**memberId:** `String` — The member to preview the step for, prefixed `mber_`.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**triggerResourceId:** `Optional<String>` — ID of the record the automation's trigger event was about for this member, such as a `pay_` payment.
+    
+</dd>
+</dl>
+</dd>
+</dl>
+
+
+</dd>
+</dl>
+</details>
+
+## Automations
+<details><summary><code>client.automations.list() -> SyncPagingIterable&amp;lt;Automation&amp;gt;</code></summary>
+<dl>
+<dd>
+
+#### 📝 Description
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+Lists automations, newest first.
+</dd>
+</dl>
+</dd>
+</dl>
+
+#### 🔌 Usage
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+```java
+client.automations().list(
+    ListAutomationsRequest
+        .builder()
+        .build()
+);
+```
+</dd>
+</dl>
+</dd>
+</dl>
+
+#### ⚙️ Parameters
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+**accountId:** `Optional<String>` — Only this account's automations, prefixed `biz_`. Defaults to the credential's account, or every account a user can read.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**status:** `Optional<ListAutomationsRequestStatus>` — Only automations with this status.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**triggerEvent:** `Optional<ListAutomationsRequestTriggerEvent>` — Only automations this webhook event enrolls into.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**order:** `Optional<ListAutomationsRequestOrder>` — Field to sort by.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**direction:** `Optional<ListAutomationsRequestDirection>` — Sort direction.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**first:** `Optional<Integer>` — Number of results to return from the start of the range.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**after:** `Optional<String>` — Return results after this cursor. Use `page_info.end_cursor` from the previous response to fetch the next page.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**last:** `Optional<Integer>` — Number of results to return from the end of the range.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**before:** `Optional<String>` — Return results before this cursor. Use `page_info.start_cursor` from the previous response to fetch the previous page.
+    
+</dd>
+</dl>
+</dd>
+</dl>
+
+
+</dd>
+</dl>
+</details>
+
+<details><summary><code>client.automations.create(request) -> Automation</code></summary>
+<dl>
+<dd>
+
+#### 📝 Description
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+Creates an automation, `stopped`, with an empty draft version. Add steps with `POST /automation_steps`, then publish it with `POST /automations/{id}/publish`, which makes it `active`.
+</dd>
+</dl>
+</dd>
+</dl>
+
+#### 🔌 Usage
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+```java
+client.automations().create(
+    CreateAutomationsRequest
+        .builder()
+        .name("Welcome")
+        .build()
+);
+```
+</dd>
+</dl>
+</dd>
+</dl>
+
+#### ⚙️ Parameters
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+**accountId:** `Optional<String>` — Account ID, prefixed `biz_`. Required for user credentials; otherwise defaults to the credential's account.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**name:** `String` — The automation's name, shown on the dashboard. Up to 255 characters.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**triggerEvent:** `Optional<CreateAutomationsRequestTriggerEvent>` — The webhook event that enrolls the member it's about, such as `payment.succeeded`. `null` for an automation that only `POST /automations/{id}/trigger` enrolls into. Fixed once the automation has been published.
+    
+</dd>
+</dl>
+</dd>
+</dl>
+
+
+</dd>
+</dl>
+</details>
+
+<details><summary><code>client.automations.retrieve(id) -> Automation</code></summary>
+<dl>
+<dd>
+
+#### 📝 Description
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+Retrieves an automation, with how many members are in it now and how many times members have enrolled in it.
+</dd>
+</dl>
+</dd>
+</dl>
+
+#### 🔌 Usage
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+```java
+client.automations().retrieve(
+    "id",
+    RetrieveAutomationsRequest
+        .builder()
+        .build()
+);
+```
+</dd>
+</dl>
+</dd>
+</dl>
+
+#### ⚙️ Parameters
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+**id:** `String` — Automation ID, prefixed `ato_`.
+    
+</dd>
+</dl>
+</dd>
+</dl>
+
+
+</dd>
+</dl>
+</details>
+
+<details><summary><code>client.automations.delete(id) -> Automation</code></summary>
+<dl>
+<dd>
+
+#### 📝 Description
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+Deletes an automation. It stops enrolling members, and every member in it stops.
+</dd>
+</dl>
+</dd>
+</dl>
+
+#### 🔌 Usage
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+```java
+client.automations().delete(
+    "id",
+    DeleteAutomationsRequest
+        .builder()
+        .build()
+);
+```
+</dd>
+</dl>
+</dd>
+</dl>
+
+#### ⚙️ Parameters
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+**id:** `String` — Automation ID, prefixed `ato_`.
+    
+</dd>
+</dl>
+</dd>
+</dl>
+
+
+</dd>
+</dl>
+</details>
+
+<details><summary><code>client.automations.update(id, request) -> Automation</code></summary>
+<dl>
+<dd>
+
+#### 📝 Description
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+Renames an automation, changes its trigger event before its first publish, sets its secrets, or changes its status. Changing `secrets` or `status` also needs `automation:manage`. Use `POST /automations/{id}/publish` to publish the draft, and the steps endpoints to change what it does.
+</dd>
+</dl>
+</dd>
+</dl>
+
+#### 🔌 Usage
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+```java
+client.automations().update(
+    "id",
+    UpdateAutomationsRequest
+        .builder()
+        .build()
+);
+```
+</dd>
+</dl>
+</dd>
+</dl>
+
+#### ⚙️ Parameters
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+**id:** `String` — Automation ID, prefixed `ato_`.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**name:** `Optional<String>` — The automation's name, shown on the dashboard. Up to 255 characters.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**secrets:** `Optional<Map<String, Optional<String>>>` — Secrets to set, by name, merged into the automation's: a name set to `null` is removed. Step code reads them as environment variables, and no endpoint returns their values. Names are uppercase letters, digits and underscores, starting with a letter, up to 64 characters. Up to 50 secrets, each up to 4 KB.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**status:** `Optional<UpdateAutomationsRequestStatus>` — `active` enrolls members and runs their steps. `closed` stops new enrollments and lets members already in it finish. `stopped` stops new enrollments and ends every member's enrollment. `active` and `closed` need a published version.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**triggerEvent:** `Optional<UpdateAutomationsRequestTriggerEvent>` — The webhook event that enrolls the member it's about, such as `payment.succeeded`. `null` for an automation that only `POST /automations/{id}/trigger` enrolls into. Fixed once the automation has been published.
+    
+</dd>
+</dl>
+</dd>
+</dl>
+
+
+</dd>
+</dl>
+</details>
+
+<details><summary><code>client.automations.publish(id) -> Automation</code></summary>
+<dl>
+<dd>
+
+#### 📝 Description
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+Publishes the draft version: new members start on it, and the automation becomes `active`. Members already in the automation move onto it. A member stays on the same step when it's still there. When the draft removed that step, the member moves to the step that now follows the nearest earlier step the draft kept. The draft is then copied into the next draft version, whose steps get new IDs and keep their `key`. Every draft step's `issues` must be empty. When the draft has no edits since the last publish, no new version is made. Publishing then only makes a `closed` or `stopped` automation `active` again. The account must have Economic Intelligence turned on.
+</dd>
+</dl>
+</dd>
+</dl>
+
+#### 🔌 Usage
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+```java
+client.automations().publish(
+    "id",
+    PublishAutomationsRequest
+        .builder()
+        .build()
+);
+```
+</dd>
+</dl>
+</dd>
+</dl>
+
+#### ⚙️ Parameters
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+**id:** `String` — Automation ID, prefixed `ato_`.
+    
+</dd>
+</dl>
+</dd>
+</dl>
+
+
+</dd>
+</dl>
+</details>
+
+<details><summary><code>client.automations.trigger(id, request) -> Automation</code></summary>
+<dl>
+<dd>
+
+#### 📝 Description
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+Enrolls members into an active automation at the first step of its published version: the members you name, or every member `GET /members` lists with the filters you pass, as they match now. Members already in the automation are skipped. Enrolling runs in the background, so this returns the automation right away and `active_enrollments_count` grows as members enroll.
+</dd>
+</dl>
+</dd>
+</dl>
+
+#### 🔌 Usage
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+```java
+client.automations().trigger(
+    "id",
+    TriggerAutomationsRequest
+        .builder()
+        .members(
+            TriggerAutomationsRequestMembers.of(
+                Arrays.asList("mber_xxxxxxxxxxxxxx")
+            )
+        )
+        .build()
+);
+```
+</dd>
+</dl>
+</dd>
+</dl>
+
+#### ⚙️ Parameters
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+**id:** `String` — Automation ID, prefixed `ato_`.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**members:** `TriggerAutomationsRequestMembers` — Who to enroll: up to 1,000 member IDs, or an object of `GET /members` filters. An empty object enrolls every member.
     
 </dd>
 </dl>
@@ -7807,7 +10004,7 @@ client.bounties().list(
 <dl>
 <dd>
 
-**accountId:** `Optional<String>` — Scope the list to this account (`biz_` tag). Requires read access to the account; account API keys may pass their own account or a connected account.
+**accountId:** `Optional<String>` — Scope the list to this account (`biz_` tag). Requires read access to the account; account API keys may pass their own account or a subaccount.
     
 </dd>
 </dl>
@@ -7895,7 +10092,7 @@ client.bounties().list(
 <dl>
 <dd>
 
-**first:** `Optional<Integer>` — Number of bounties to return from the start of the window.
+**first:** `Optional<Integer>` — Number of results to return from the start of the range.
     
 </dd>
 </dl>
@@ -7903,7 +10100,7 @@ client.bounties().list(
 <dl>
 <dd>
 
-**after:** `Optional<String>` — Cursor to paginate forwards from.
+**after:** `Optional<String>` — Return results after this cursor. Use `page_info.end_cursor` from the previous response to fetch the next page.
     
 </dd>
 </dl>
@@ -7911,7 +10108,7 @@ client.bounties().list(
 <dl>
 <dd>
 
-**last:** `Optional<Integer>` — Number of bounties to return from the end of the window.
+**last:** `Optional<Integer>` — Number of results to return from the end of the range.
     
 </dd>
 </dl>
@@ -7919,7 +10116,7 @@ client.bounties().list(
 <dl>
 <dd>
 
-**before:** `Optional<String>` — Cursor to paginate backwards from.
+**before:** `Optional<String>` — Return results before this cursor. Use `page_info.start_cursor` from the previous response to fetch the previous page.
     
 </dd>
 </dl>
@@ -8448,7 +10645,7 @@ client.bountySubmissions().list(
 <dl>
 <dd>
 
-**first:** `Optional<Integer>` — Number of submissions to return from the start of the window.
+**first:** `Optional<Integer>` — Number of results to return from the start of the range.
     
 </dd>
 </dl>
@@ -8456,7 +10653,7 @@ client.bountySubmissions().list(
 <dl>
 <dd>
 
-**after:** `Optional<String>` — Cursor to paginate forwards from.
+**after:** `Optional<String>` — Return results after this cursor. Use `page_info.end_cursor` from the previous response to fetch the next page.
     
 </dd>
 </dl>
@@ -8464,7 +10661,7 @@ client.bountySubmissions().list(
 <dl>
 <dd>
 
-**last:** `Optional<Integer>` — Number of submissions to return from the end of the window.
+**last:** `Optional<Integer>` — Number of results to return from the end of the range.
     
 </dd>
 </dl>
@@ -8472,7 +10669,7 @@ client.bountySubmissions().list(
 <dl>
 <dd>
 
-**before:** `Optional<String>` — Cursor to paginate backwards from.
+**before:** `Optional<String>` — Return results before this cursor. Use `page_info.start_cursor` from the previous response to fetch the previous page.
     
 </dd>
 </dl>
@@ -8496,7 +10693,7 @@ client.bountySubmissions().list(
 <dl>
 <dd>
 
-Creates a submission on a workforce bounty. Include a `deliverable` payload — any combination of links and uploaded files, with at least one of the two — and the submission goes straight to review; create is the only step. For `data_capture` bounties, omit the deliverable: this starts a claimed attempt whose proof accumulates server-side, and the separate submit endpoint sends it to review once complete. Requires a user credential — account API keys cannot author submissions.
+Creates a submission on a workforce bounty. Include a `deliverable` and the submission goes straight to review; create is the only step. For `data_capture` bounties, omit the deliverable: this starts a claimed attempt whose proof accumulates server-side, and `POST /bounty_submissions/:id/submit` sends it to review once complete. Requires a user credential — account API keys cannot author submissions.
 </dd>
 </dl>
 </dd>
@@ -8705,7 +10902,7 @@ client.bountySubmissions().delete(
 <dl>
 <dd>
 
-Submits a claimed attempt for review. A livestream attempt needs an ended proof stream and can attach an optional `deliverable` — links, files, and a caption in any combination; if the attempt already went to review when its stream ended, the payload attaches to it once, until reviewers start voting. A data capture attempt instead needs enough validated clip time and takes no payload. Only the worker who started the attempt can submit it — account API keys cannot.
+Submits a claimed attempt for review. A livestream attempt needs an ended proof stream and can attach a `deliverable`; a data capture attempt instead needs enough validated clip time and takes no payload. Only the worker who started the attempt can submit it — account API keys cannot.
 </dd>
 </dl>
 </dd>
@@ -8748,7 +10945,7 @@ client.bountySubmissions().submit(
 <dl>
 <dd>
 
-**deliverable:** `Optional<SubmitBountySubmissionsRequestDeliverable>` — Work to attach to the submission. Combine `urls`, `file_ids`, and `caption` freely; all are optional.
+**deliverable:** `Optional<SubmitBountySubmissionsRequestDeliverable>` — Work to attach to a livestream attempt. Combine `urls`, `file_ids`, and `caption` freely; all are optional. If the attempt already went to review when its stream ended, the deliverable attaches to it once, until reviewers start voting. Data capture attempts take no deliverable.
     
 </dd>
 </dl>
@@ -8773,7 +10970,7 @@ client.bountySubmissions().submit(
 <dl>
 <dd>
 
-Lists an account's card transactions, newest first. Defaults to the account the credential belongs to. Covers every card the owner has ever had, including canceled cards and spend that predates a re-application, and team members only see transactions on the cards assigned to them. Pass `transaction_ids` to fetch specific transactions instead of paging for them.
+Lists the card transactions of an account or a user, newest first. Covers every card the owner has ever had, including canceled cards and spend that predates a re-application, and team members only see transactions on the cards assigned to them. Pass `transaction_ids` to fetch specific transactions instead of paging for them.
 </dd>
 </dl>
 </dd>
@@ -8816,7 +11013,15 @@ client.cardTransactions().list(
 <dl>
 <dd>
 
-**accountId:** `Optional<String>` — The account whose card transactions to list, prefixed `biz_`. Defaults to the credential's account.
+**accountId:** `Optional<String>` — The account whose card transactions to list, prefixed `biz_`. Provide this or `user_id`. Defaults to the credential's account.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**userId:** `Optional<String>` — The user whose personal card transactions to list, prefixed `user_`. Provide this or `account_id`. Only that user can read them.
     
 </dd>
 </dl>
@@ -8888,7 +11093,7 @@ client.cardTransactions().list(
 <dl>
 <dd>
 
-**first:** `Optional<Integer>` — The number of card transactions to return.
+**first:** `Optional<Integer>` — Number of results to return from the start of the range.
     
 </dd>
 </dl>
@@ -8896,7 +11101,7 @@ client.cardTransactions().list(
 <dl>
 <dd>
 
-**after:** `Optional<String>` — A cursor; returns card transactions after this position.
+**after:** `Optional<String>` — Return results after this cursor. Use `page_info.end_cursor` from the previous response to fetch the next page.
     
 </dd>
 </dl>
@@ -8904,7 +11109,7 @@ client.cardTransactions().list(
 <dl>
 <dd>
 
-**last:** `Optional<Integer>` — The number of card transactions to return, counting back from the end.
+**last:** `Optional<Integer>` — Number of results to return from the end of the range.
     
 </dd>
 </dl>
@@ -8912,7 +11117,7 @@ client.cardTransactions().list(
 <dl>
 <dd>
 
-**before:** `Optional<String>` — A cursor; returns card transactions before this position.
+**before:** `Optional<String>` — Return results before this cursor. Use `page_info.start_cursor` from the previous response to fetch the previous page.
     
 </dd>
 </dl>
@@ -8936,7 +11141,7 @@ client.cardTransactions().list(
 <dl>
 <dd>
 
-Fetches a single card transaction by its `citx_` identifier. The owner defaults to the account the credential belongs to.
+Retrieves a single card transaction from any card the owner has ever had, including canceled cards. Team members can retrieve only transactions on the cards assigned to them.
 </dd>
 </dl>
 </dd>
@@ -8979,7 +11184,15 @@ client.cardTransactions().retrieve(
 <dl>
 <dd>
 
-**accountId:** `Optional<String>` — The account that owns the transaction, prefixed `biz_`. Defaults to the credential's account.
+**accountId:** `Optional<String>` — The account that owns the transaction, prefixed `biz_`. Provide this or `user_id`. Defaults to the credential's account.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**userId:** `Optional<String>` — The user that owns the transaction, prefixed `user_`. Provide this or `account_id`. Only that user can read it.
     
 </dd>
 </dl>
@@ -9070,7 +11283,7 @@ client.cards().list(
 <dl>
 <dd>
 
-Issue a virtual card, or apply for card issuing.
+Issues a virtual card, or applies for card issuing. An account with no application files one here and gets back a `202`; call again to issue the card once it is approved. An account whose application was denied or canceled applies again the same way, replacing that application.
 </dd>
 </dl>
 </dd>
@@ -9112,7 +11325,31 @@ client.cards().create(
 <dl>
 <dd>
 
-**assignedUserId:** `Optional<String>` — The account member (a user_ identifier) to assign the card to. Required for business card issuing accounts.
+**assignedUserId:** `Optional<String>` — The account member (a user_ identifier) to assign the card to. Required for business card issuing accounts. When this call files the card application, the member applies with their identity; a company API key that sends neither this nor kind is refused.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**billing:** `Optional<CreateCardsRequestBilling>` — The card's initial billing address. On a company card it also registers the assigned member as a cardholder if they are not one yet. For an individual card, region is also required.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**cardholder:** `Optional<CreateCardsRequestCardholder>` — Details for a company card's assigned member when they are not registered as a cardholder yet. Send with billing to register them and start provisioning in one call instead of sending them an onboarding invitation. The legal name comes from the member's approved identity verification when they have one, and from these fields when they do not.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**kind:** `Optional<CreateCardsRequestKind>` — Who the card application verifies, set only on the call that files it; sending it while the account's application is in progress or approved is a 400. `business` applies as the account with its approved KYB. `individual` applies as a person: assigned_user_id when given, otherwise the account owner, using the identity verified on the account. Omit it to apply as the business when its KYB is approved, and as an individual otherwise.
     
 </dd>
 </dl>
@@ -9176,7 +11413,7 @@ client.cards().create(
 <dl>
 <dd>
 
-Retrieve a single card.
+Retrieves a single card, including its `secrets` (card number, CVC, and PIN), which List Cards does not return.
 </dd>
 </dl>
 </dd>
@@ -9251,7 +11488,7 @@ client.cards().retrieve(
 <dl>
 <dd>
 
-Update, freeze, or cancel a card. Updating the card's name, billing address, or limits requires both `payout:account:update` and `company:balance:read`; a card's assigned holder may update their own card's pin and frozen state with any user token.
+Updates, freezes, or cancels a card. Updating the card's name, billing address, or limits requires both `payout:account:update` and `company:balance:read`; a card's assigned holder may update their own card's pin and frozen state with any user token.
 </dd>
 </dl>
 </dd>
@@ -9302,7 +11539,7 @@ client.cards().update(
 <dl>
 <dd>
 
-**billing:** `Optional<UpdateCardsRequestBilling>` — New billing address. Requires line1, city, region, postal_code, and country_code. On an invited card, passing billing alone (as the invited user) completes onboarding and starts card provisioning.
+**billing:** `Optional<UpdateCardsRequestBilling>` — The billing address. On an issued card this replaces the card's billing address and region is also required. On an invited card, sending it as the invited user completes onboarding and starts card provisioning.
     
 </dd>
 </dl>
@@ -9311,6 +11548,14 @@ client.cards().update(
 <dd>
 
 **canceled:** `Optional<Boolean>` — Pass `true` to permanently cancel the card. A canceled card cannot be uncanceled. Cannot be combined with other fields.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**cardholder:** `Optional<UpdateCardsRequestCardholder>` — Details for the invited cardholder, accepted only while completing onboarding on an invited card. The legal name comes from an approved identity verification when the invited user has one, and from these fields when they do not.
     
 </dd>
 </dl>
@@ -9386,6 +11631,1798 @@ client.cards().update(
 </dl>
 </details>
 
+## Cashback Rules
+<details><summary><code>client.cashbackRules.create(request) -> CashbackRule</code></summary>
+<dl>
+<dd>
+
+#### 📝 Description
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+Creates a future-dated card cashback rule for your direct subaccounts, funded by the authenticated platform account. Creating a rule does not transfer funds; pay cashback out with `POST /cashback_rules/payout`. Requires `payout:transfer_funds`. Supports `Idempotency-Key` for safe retries.
+</dd>
+</dl>
+</dd>
+</dl>
+
+#### 🔌 Usage
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+```java
+client.cashbackRules().create(
+    CreateCashbackRulesRequest
+        .builder()
+        .rateBps(500)
+        .startsAt(OffsetDateTime.parse("2026-01-01T12:00:00Z"))
+        .build()
+);
+```
+</dd>
+</dl>
+</dd>
+</dl>
+
+#### ⚙️ Parameters
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+**description:** `Optional<String>` — Optional description of the rule.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**expiresAt:** `Optional<OffsetDateTime>` — Exclusive end, strictly later than starts_at. Omit or set null for no expiration.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**merchantCategoryCode:** `Optional<String>` — Four-digit MCC, including leading zeros. Null matches any MCC. When both merchant filters are absent, scoped_account_id is required.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**merchantName:** `Optional<String>` — Raw merchant name reported by the card provider, not the enriched display name. Omit or set null to match any merchant name. Supplied names must contain a non-whitespace character and match together with any MCC filter.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**rateBps:** `Integer` — Cashback rate in basis points: 500 means 5%.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**scopedAccountId:** `Optional<String>` — Account ID, prefixed `biz_`, of one direct subaccount to limit the rule to. Required when both merchant filters are omitted or `null`, in which case the rule matches all eligible transactions for that account. Otherwise, omit or set `null` to designate all direct subaccounts.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**startsAt:** `OffsetDateTime` — Inclusive start, strictly later than the current time, as an ISO 8601 timestamp.
+    
+</dd>
+</dl>
+</dd>
+</dl>
+
+
+</dd>
+</dl>
+</details>
+
+<details><summary><code>client.cashbackRules.list() -> SyncPagingIterable&amp;lt;CashbackRule&amp;gt;</code></summary>
+<dl>
+<dd>
+
+#### 📝 Description
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+Lists the cashback rules funded by the authenticated platform account, including scheduled, expired, and discarded rules. Requires an account-scoped credential with `payout:transfer:read`.
+</dd>
+</dl>
+</dd>
+</dl>
+
+#### 🔌 Usage
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+```java
+client.cashbackRules().list(
+    ListCashbackRulesRequest
+        .builder()
+        .build()
+);
+```
+</dd>
+</dl>
+</dd>
+</dl>
+
+#### ⚙️ Parameters
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+**first:** `Optional<Integer>` — Number of results to return from the start of the range.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**after:** `Optional<String>` — Return results after this cursor. Use `page_info.end_cursor` from the previous response to fetch the next page.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**last:** `Optional<Integer>` — Number of results to return from the end of the range.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**before:** `Optional<String>` — Return results before this cursor. Use `page_info.start_cursor` from the previous response to fetch the previous page.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**order:** `Optional<ListCashbackRulesRequestOrder>` — Field to sort by. Defaults to created_at.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**direction:** `Optional<ListCashbackRulesRequestDirection>` — Sort direction. Defaults to desc.
+    
+</dd>
+</dl>
+</dd>
+</dl>
+
+
+</dd>
+</dl>
+</details>
+
+<details><summary><code>client.cashbackRules.payout(request) -> CashbackPayout</code></summary>
+<dl>
+<dd>
+
+#### 📝 Description
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+Pays out cashback on demand from the authenticated platform's available USD balance to its direct subaccounts. Covers completed, unpaid card transactions created before the request, each under its latest matching rule, which must be funded by the authenticated platform. Filters combine, and an empty body includes every eligible transaction. Payouts process in the background and amounts are calculated then, so the response confirms queuing, not payment. If a payout fails for insufficient funds, add USD to the platform's balance. Requires `payout:transfer_funds`. Supports `Idempotency-Key`, and overlapping requests cannot pay the same card transaction twice.
+</dd>
+</dl>
+</dd>
+</dl>
+
+#### 🔌 Usage
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+```java
+client.cashbackRules().payout(
+    PayoutCashbackRulesRequest
+        .builder()
+        .build()
+);
+```
+</dd>
+</dl>
+</dd>
+</dl>
+
+#### ⚙️ Parameters
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+**accountId:** `Optional<String>` — Pay only this direct subaccount.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**cashbackRuleId:** `Optional<String>` — Pay only transactions whose winning cashback rule has this ID and is funded by the authenticated platform.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**transactionId:** `Optional<String>` — Pay only this card transaction belonging to a direct subaccount.
+    
+</dd>
+</dl>
+</dd>
+</dl>
+
+
+</dd>
+</dl>
+</details>
+
+<details><summary><code>client.cashbackRules.update(id, request) -> CashbackRule</code></summary>
+<dl>
+<dd>
+
+#### 📝 Description
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+Updates the merchant filters, description, or expiration of a cashback rule funded by the authenticated platform account; its start, rate, and accounts can't change. Omitted fields stay unchanged. Scheduled, active, and expired rules can be updated, but discarded rules can't. Updating a rule does not transfer funds. Requires `payout:transfer_funds`.
+</dd>
+</dl>
+</dd>
+</dl>
+
+#### 🔌 Usage
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+```java
+client.cashbackRules().update(
+    "id",
+    UpdateCashbackRulesRequest
+        .builder()
+        .build()
+);
+```
+</dd>
+</dl>
+</dd>
+</dl>
+
+#### ⚙️ Parameters
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+**id:** `String` — ID of the cashback rule, prefixed cicbr_.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**description:** `Optional<String>` — Description of the rule. Set null to clear it.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**expiresAt:** `Optional<OffsetDateTime>` — Exclusive end as an ISO 8601 timestamp, strictly later than the original starts_at. May be in the past to end an active rule. Set null to remove the expiration.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**merchantCategoryCode:** `Optional<String>` — Four-digit MCC, including leading zeros. Null matches any MCC. When both merchant filters are absent, scoped_account_id is required.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**merchantName:** `Optional<String>` — Raw merchant name reported by the card provider. Set null to match any merchant name. Supplied names must contain a non-whitespace character and match together with any MCC filter. Clearing both filters requires an existing scoped_account_id.
+    
+</dd>
+</dl>
+</dd>
+</dl>
+
+
+</dd>
+</dl>
+</details>
+
+## Channel Members
+<details><summary><code>client.channelMembers.list() -> SyncPagingIterable&amp;lt;ChannelMember&amp;gt;</code></summary>
+<dl>
+<dd>
+
+#### 📝 Description
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+List or search the people in a channel.
+</dd>
+</dl>
+</dd>
+</dl>
+
+#### 🔌 Usage
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+```java
+client.channelMembers().list(
+    ListChannelMembersRequest
+        .builder()
+        .channelId("channel_id")
+        .build()
+);
+```
+</dd>
+</dl>
+</dd>
+</dl>
+
+#### ⚙️ Parameters
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+**first:** `Optional<Integer>` — Number of results to return from the start of the range.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**after:** `Optional<String>` — Return results after this cursor. Use `page_info.end_cursor` from the previous response to fetch the next page.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**last:** `Optional<Integer>` — Number of results to return from the end of the range.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**before:** `Optional<String>` — Return results before this cursor. Use `page_info.start_cursor` from the previous response to fetch the previous page.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**channelId:** `String` — The channel whose members to list.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**query:** `Optional<String>` — Search by name or username.
+    
+</dd>
+</dl>
+</dd>
+</dl>
+
+
+</dd>
+</dl>
+</details>
+
+<details><summary><code>client.channelMembers.create(request) -> ChannelMember</code></summary>
+<dl>
+<dd>
+
+#### 📝 Description
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+Add a member to a direct or support channel.
+</dd>
+</dl>
+</dd>
+</dl>
+
+#### 🔌 Usage
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+```java
+client.channelMembers().create(
+    CreateChannelMembersRequest
+        .builder()
+        .channelId("feed_xxxxxxxxxxxxxxxxxxxxxx")
+        .userId("user_xxxxxxxxxxxxxx")
+        .build()
+);
+```
+</dd>
+</dl>
+</dd>
+</dl>
+
+#### ⚙️ Parameters
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+**channelId:** `String` — The channel to add the user to.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**userId:** `String` — The user to add.
+    
+</dd>
+</dl>
+</dd>
+</dl>
+
+
+</dd>
+</dl>
+</details>
+
+<details><summary><code>client.channelMembers.retrieve(id) -> ChannelMember</code></summary>
+<dl>
+<dd>
+
+#### 📝 Description
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+Retrieve a channel member and their read position.
+</dd>
+</dl>
+</dd>
+</dl>
+
+#### 🔌 Usage
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+```java
+client.channelMembers().retrieve(
+    "id",
+    RetrieveChannelMembersRequest
+        .builder()
+        .build()
+);
+```
+</dd>
+</dl>
+</dd>
+</dl>
+
+#### ⚙️ Parameters
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+**id:** `String` — Public resource ID.
+    
+</dd>
+</dl>
+</dd>
+</dl>
+
+
+</dd>
+</dl>
+</details>
+
+<details><summary><code>client.channelMembers.delete(id)</code></summary>
+<dl>
+<dd>
+
+#### 📝 Description
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+Remove a channel member, or leave the channel yourself. Requires dms:channel:manage and access to the channel. Removing someone else also requires permission to manage its members.
+</dd>
+</dl>
+</dd>
+</dl>
+
+#### 🔌 Usage
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+```java
+client.channelMembers().delete(
+    "id",
+    DeleteChannelMembersRequest
+        .builder()
+        .build()
+);
+```
+</dd>
+</dl>
+</dd>
+</dl>
+
+#### ⚙️ Parameters
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+**id:** `String` — Public resource ID.
+    
+</dd>
+</dl>
+</dd>
+</dl>
+
+
+</dd>
+</dl>
+</details>
+
+<details><summary><code>client.channelMembers.update(id, request) -> ChannelMember</code></summary>
+<dl>
+<dd>
+
+#### 📝 Description
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+Update your notification preference using your stored membership ID in a private or support channel.
+</dd>
+</dl>
+</dd>
+</dl>
+
+#### 🔌 Usage
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+```java
+client.channelMembers().update(
+    "id",
+    UpdateChannelMembersRequest
+        .builder()
+        .notificationPreference(UpdateChannelMembersRequestNotificationPreference.ALL)
+        .build()
+);
+```
+</dd>
+</dl>
+</dd>
+</dl>
+
+#### ⚙️ Parameters
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+**id:** `String` — Public resource ID.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**notificationPreference:** `UpdateChannelMembersRequestNotificationPreference` 
+    
+</dd>
+</dl>
+</dd>
+</dl>
+
+
+</dd>
+</dl>
+</details>
+
+## Channels
+<details><summary><code>client.channels.list() -> SyncPagingIterable&amp;lt;ChannelListItem&amp;gt;</code></summary>
+<dl>
+<dd>
+
+#### 📝 Description
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+List channels you can access.
+</dd>
+</dl>
+</dd>
+</dl>
+
+#### 🔌 Usage
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+```java
+client.channels().list(
+    ListChannelsRequest
+        .builder()
+        .kind(
+            Arrays.asList(ListChannelsRequestKindItem.PRIVATE)
+        )
+        .build()
+);
+```
+</dd>
+</dl>
+</dd>
+</dl>
+
+#### ⚙️ Parameters
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+**first:** `Optional<Integer>` — Number of results to return from the start of the range.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**after:** `Optional<String>` — Return results after this cursor. Use `page_info.end_cursor` from the previous response to fetch the next page.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**last:** `Optional<Integer>` — Number of results to return from the end of the range.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**before:** `Optional<String>` — Return results before this cursor. Use `page_info.start_cursor` from the previous response to fetch the previous page.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**includeTotalCount:** `Optional<Boolean>` — Set to `true` to return the number of matching results in `page_info.total_count`. Send `first=0` as well to return the count without any results.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**kind:** `Optional<ListChannelsRequestKindItem>` — Channel kinds to return. Combine `private` and `support`, or pass `community` alone. `private` includes one-to-one and group direct messages.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**supportRole:** `Optional<ListChannelsRequestSupportRole>` — Which support channels to return. `customer` returns support chats you opened, including when `account_id` is set. `staff` returns the support inbox of the account in `account_id`, and requires permission to read that account's support chats. Applies only to `support` channels.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**accountId:** `Optional<String>` — Filter channels by their owning account, prefixed `biz_`. Applies to private, community and support channels.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**query:** `Optional<String>` — Return only channels whose name contains this text. Private and support channels also match a member's username or name. `%` and `_` match literally.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**status:** `Optional<ListChannelsRequestStatus>` — Return only support channels with this resolution. Requires `kind` to be `support` alone.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**awaitingReply:** `Optional<Boolean>` — `true` returns unresolved support channels whose last message came from the customer; `false` returns the other support channels. Other channel kinds are returned either way.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**unread:** `Optional<Boolean>` — `true` returns channels with messages you have not read; `false` returns the rest. Requires authenticating as a user.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**pinned:** `Optional<Boolean>` — `true` returns private and support channels you have pinned; `false` returns those you have not. Requires authenticating as a user.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**viewed:** `Optional<Boolean>` — `true` returns community channels you have opened; `false` returns those you never have. Requires authenticating as a user.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**requested:** `Optional<Boolean>` — `true` returns your pending direct-message requests; `false` returns your accepted private channels. Requires `private` in `kind` and authenticating as a user. With `support` also in `kind`, `false` keeps support channels and `true` returns only pending requests.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**order:** `Optional<ListChannelsRequestOrder>` — The field to sort by. Defaults to `last_viewed_at` for community channels and `last_message_at` for private and support channels. Ties sort in a stable order. Cannot be supplied with updated_after.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**includeMembers:** `Optional<Boolean>` — Include the current members of private and support channels, including you, with their public profiles.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**includeLastMessage:** `Optional<Boolean>` — Include the most recent message you can see, with its author.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**direction:** `Optional<ListChannelsRequestDirection>` — The sort direction. Defaults to `desc`. Cannot be supplied with updated_after.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**includeDeleted:** `Optional<Boolean>` — Include redacted entries for deleted channels and your removed memberships. Use deleted_at to remove these channels from your cache.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**updatedAfter:** `Optional<String>` — Return channels where the channel or your membership changed at or after this ISO 8601 timestamp. Cannot be more than one hour old, including on subsequent pages. For older changes, reload channels without updated_after. Results use ascending synchronized_at order. Cannot be combined with order, direction, query, status, awaiting_reply, unread, pinned, viewed, requested, created_before, or created_after.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**createdBefore:** `Optional<String>` — Return only channels created before this ISO 8601 timestamp.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**createdAfter:** `Optional<String>` — Return only channels created after this ISO 8601 timestamp.
+    
+</dd>
+</dl>
+</dd>
+</dl>
+
+
+</dd>
+</dl>
+</details>
+
+<details><summary><code>client.channels.create(request) -> Channel</code></summary>
+<dl>
+<dd>
+
+#### 📝 Description
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+Create a private, community or support channel. Returns an existing private or support channel unchanged with `200`, or a new channel with `201`.
+</dd>
+</dl>
+</dd>
+</dl>
+
+#### 🔌 Usage
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+```java
+client.channels().create(
+    CreateChannelsRequest
+        .builder()
+        .kind(CreateChannelsRequestKind.PRIVATE)
+        .build()
+);
+```
+</dd>
+</dl>
+</dd>
+</dl>
+
+#### ⚙️ Parameters
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+**accountId:** `Optional<String>` — Owning account ID, prefixed `biz_`. Accepted for all channel kinds. Required for community and support channels unless supplied by the credential's account context.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**customerUserId:** `Optional<String>` — Customer ID, prefixed `user_`. Support channels only; requires support management permission. Omit to open your own support conversation.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**icon:** `Optional<CreateChannelsRequestIcon>` — Channel icon as a file reference, for community channels and private channels with two or more participant IDs. Image files only. Group icons can be up to 5 MB. For community channels it sets the experience logo. Used only when a channel is created.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**kind:** `CreateChannelsRequestKind` — Channel kind. `private` is a one-to-one or group conversation, `community` creates a Chat experience on the account, and `support` opens a conversation between the account and a customer.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**name:** `Optional<String>` — Channel display name, accepted for all channel kinds. Used only when a channel is created. For community channels, names the new Chat experience; defaults to the Chat app's name.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**notificationsEnabled:** `Optional<Boolean>` — Whether app notifications are on for any channel kind. Webhooks fire either way. Defaults to `true`. Used only when a channel is created; change an existing channel with `PATCH /channels/:id`.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**participantUserIds:** `Optional<List<String>>` — Other participant IDs, prefixed `user_`, excluding the sender. Required for private channels and accepted only for them. One ID creates a one-to-one conversation; more create a group.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**productId:** `Optional<String>` — Product ID, prefixed `prod_`, to attach the new community channel to. Accepted only for community channels. Must belong to the owning account and requires the `experience:attach` permission on it. Omit to leave the channel unattached.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**senderUserId:** `Optional<String>` — Sender ID, prefixed `user_`. Private channels only. Required for account API keys; omit when authenticating as a user. Requires channel management permission on the account.
+    
+</dd>
+</dl>
+</dd>
+</dl>
+
+
+</dd>
+</dl>
+</details>
+
+<details><summary><code>client.channels.retrieve(id) -> Channel</code></summary>
+<dl>
+<dd>
+
+#### 📝 Description
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+Retrieve a channel.
+</dd>
+</dl>
+</dd>
+</dl>
+
+#### 🔌 Usage
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+```java
+client.channels().retrieve(
+    "id",
+    RetrieveChannelsRequest
+        .builder()
+        .build()
+);
+```
+</dd>
+</dl>
+</dd>
+</dl>
+
+#### ⚙️ Parameters
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+**id:** `String` — Public resource ID.
+    
+</dd>
+</dl>
+</dd>
+</dl>
+
+
+</dd>
+</dl>
+</details>
+
+<details><summary><code>client.channels.delete(id)</code></summary>
+<dl>
+<dd>
+
+#### 📝 Description
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+Delete a channel. Deleting a support channel requires `support_chat:create` on the account. Community channels delete their backing experience and accept account API keys with the `experience:delete` permission. Private and support channels require a user identity with channel management permission; account API keys cannot act as a channel participant.
+</dd>
+</dl>
+</dd>
+</dl>
+
+#### 🔌 Usage
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+```java
+client.channels().delete(
+    "id",
+    DeleteChannelsRequest
+        .builder()
+        .build()
+);
+```
+</dd>
+</dl>
+</dd>
+</dl>
+
+#### ⚙️ Parameters
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+**id:** `String` — Public resource ID.
+    
+</dd>
+</dl>
+</dd>
+</dl>
+
+
+</dd>
+</dl>
+</details>
+
+<details><summary><code>client.channels.update(id, request) -> Channel</code></summary>
+<dl>
+<dd>
+
+#### 📝 Description
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+Update a channel. Community icon changes update the experience logo and require `experience:update`. Group private channel icon changes set the channel's own icon and require a group member. One-to-one private and support channels reject icon changes. Support rename and notification changes require `support_chat:create`. Private and support writes require a user identity with channel management permission. Account API keys can update community channels only.
+</dd>
+</dl>
+</dd>
+</dl>
+
+#### 🔌 Usage
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+```java
+client.channels().update(
+    "id",
+    UpdateChannelsRequest
+        .builder()
+        .build()
+);
+```
+</dd>
+</dl>
+</dd>
+</dl>
+
+#### ⚙️ Parameters
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+**id:** `String` — Public resource ID.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**icon:** `Optional<UpdateChannelsRequestIcon>` — Channel icon as a file reference, for community channels and group private channels. Image files only. Group icons can be up to 5 MB. For community channels it sets the experience logo, and `null` restores the app icon. For group private channels it sets the channel's own icon, and `null` clears it. Omit to keep the current icon.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**moderation:** `Optional<UpdateChannelsRequestModeration>` — Moderation settings, accepted only for community channels. Requires chat moderation permission. Omitted settings are preserved.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**name:** `Optional<String>` — Replacement display name for any channel kind. Send `null` to clear a private or support channel name. Community channels require a name and also rename the experience.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**notificationsEnabled:** `Optional<Boolean>` — Whether app notifications are on for any channel kind. Webhooks fire either way. Omit to preserve the current setting.
+    
+</dd>
+</dl>
+</dd>
+</dl>
+
+
+</dd>
+</dl>
+</details>
+
+<details><summary><code>client.channels.accept(id, request) -> ChannelMember</code></summary>
+<dl>
+<dd>
+
+#### 📝 Description
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+Accept a direct-message request.
+</dd>
+</dl>
+</dd>
+</dl>
+
+#### 🔌 Usage
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+```java
+client.channels().accept(
+    "id",
+    AcceptChannelsRequest
+        .builder()
+        .build()
+);
+```
+</dd>
+</dl>
+</dd>
+</dl>
+
+#### ⚙️ Parameters
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+**id:** `String` — Public resource ID.
+    
+</dd>
+</dl>
+</dd>
+</dl>
+
+
+</dd>
+</dl>
+</details>
+
+<details><summary><code>client.channels.hide(id, request) -> ChannelMember</code></summary>
+<dl>
+<dd>
+
+#### 📝 Description
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+Decline a DM request by hiding the channel from your inbox.
+</dd>
+</dl>
+</dd>
+</dl>
+
+#### 🔌 Usage
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+```java
+client.channels().hide(
+    "id",
+    HideChannelsRequest
+        .builder()
+        .build()
+);
+```
+</dd>
+</dl>
+</dd>
+</dl>
+
+#### ⚙️ Parameters
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+**id:** `String` — Public resource ID.
+    
+</dd>
+</dl>
+</dd>
+</dl>
+
+
+</dd>
+</dl>
+</details>
+
+<details><summary><code>client.channels.markRead(id, request) -> ChannelMember</code></summary>
+<dl>
+<dd>
+
+#### 📝 Description
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+Mark a channel as read and optionally record viewed messages.
+</dd>
+</dl>
+</dd>
+</dl>
+
+#### 🔌 Usage
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+```java
+client.channels().markRead(
+    "id",
+    MarkReadChannelsRequest
+        .builder()
+        .build()
+);
+```
+</dd>
+</dl>
+</dd>
+</dl>
+
+#### ⚙️ Parameters
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+**id:** `String` — Public resource ID.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**lastViewedAt:** `Optional<OffsetDateTime>` — Required for DM-backed kinds; not accepted for experience.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**viewedMessageIds:** `Optional<List<String>>` — Messages actually seen in this channel. Optional for all channel kinds; up to 100 IDs. Omitted or empty records no message views. Experience view counts update asynchronously.
+    
+</dd>
+</dl>
+</dd>
+</dl>
+
+
+</dd>
+</dl>
+</details>
+
+<details><summary><code>client.channels.markUnread(id, request) -> ChannelMember</code></summary>
+<dl>
+<dd>
+
+#### 📝 Description
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+Mark a channel as unread for the authenticated user. Experience channels are unchanged.
+</dd>
+</dl>
+</dd>
+</dl>
+
+#### 🔌 Usage
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+```java
+client.channels().markUnread(
+    "id",
+    MarkUnreadChannelsRequest
+        .builder()
+        .build()
+);
+```
+</dd>
+</dl>
+</dd>
+</dl>
+
+#### ⚙️ Parameters
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+**id:** `String` — Public resource ID.
+    
+</dd>
+</dl>
+</dd>
+</dl>
+
+
+</dd>
+</dl>
+</details>
+
+<details><summary><code>client.channels.pin(id, request)</code></summary>
+<dl>
+<dd>
+
+#### 📝 Description
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+Pin a private or support channel for yourself. Omit position to append a new pin or keep an existing pin in place. An explicit zero-based position inserts or moves the pin and shifts the rest. At most 12 channels can be pinned.
+</dd>
+</dl>
+</dd>
+</dl>
+
+#### 🔌 Usage
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+```java
+client.channels().pin(
+    "id",
+    PinChannelsRequest
+        .builder()
+        .build()
+);
+```
+</dd>
+</dl>
+</dd>
+</dl>
+
+#### ⚙️ Parameters
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+**id:** `String` — The channel ID, prefixed `feed_`.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**position:** `Optional<Integer>` — Zero-based position in the resulting list. Must not exceed the last index after insertion. Omit to append a new pin or preserve an existing position.
+    
+</dd>
+</dl>
+</dd>
+</dl>
+
+
+</dd>
+</dl>
+</details>
+
+<details><summary><code>client.channels.reopen(id, request) -> Channel</code></summary>
+<dl>
+<dd>
+
+#### 📝 Description
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+Reopen a resolved support channel.
+</dd>
+</dl>
+</dd>
+</dl>
+
+#### 🔌 Usage
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+```java
+client.channels().reopen(
+    "id",
+    ReopenChannelsRequest
+        .builder()
+        .build()
+);
+```
+</dd>
+</dl>
+</dd>
+</dl>
+
+#### ⚙️ Parameters
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+**id:** `String` — Public resource ID.
+    
+</dd>
+</dl>
+</dd>
+</dl>
+
+
+</dd>
+</dl>
+</details>
+
+<details><summary><code>client.channels.resolve(id, request) -> Channel</code></summary>
+<dl>
+<dd>
+
+#### 📝 Description
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+Resolve a support channel.
+</dd>
+</dl>
+</dd>
+</dl>
+
+#### 🔌 Usage
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+```java
+client.channels().resolve(
+    "id",
+    ResolveChannelsRequest
+        .builder()
+        .build()
+);
+```
+</dd>
+</dl>
+</dd>
+</dl>
+
+#### ⚙️ Parameters
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+**id:** `String` — Public resource ID.
+    
+</dd>
+</dl>
+</dd>
+</dl>
+
+
+</dd>
+</dl>
+</details>
+
+<details><summary><code>client.channels.unpin(id)</code></summary>
+<dl>
+<dd>
+
+#### 📝 Description
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+Remove a channel from your pins and compact the remaining order. Your discarded memberships and inaccessible channels can be unpinned. Does not return channel data or grant read access.
+</dd>
+</dl>
+</dd>
+</dl>
+
+#### 🔌 Usage
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+```java
+client.channels().unpin(
+    "id",
+    UnpinChannelsRequest
+        .builder()
+        .build()
+);
+```
+</dd>
+</dl>
+</dd>
+</dl>
+
+#### ⚙️ Parameters
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+**id:** `String` — The channel ID, prefixed `feed_`.
+    
+</dd>
+</dl>
+</dd>
+</dl>
+
+
+</dd>
+</dl>
+</details>
+
 ## ChatChannels
 <details><summary><code>client.chatChannels.list() -> SyncPagingIterable&amp;lt;ChatChannelListItem&amp;gt;</code></summary>
 <dl>
@@ -9399,7 +13436,7 @@ client.cards().update(
 <dl>
 <dd>
 
-Returns a paginated list of chat channels within a specific company, with optional filtering by product.
+Lists the chat channels in an account.
 
 Required permissions:
  - `chat:read`
@@ -9420,7 +13457,7 @@ Required permissions:
 client.chatChannels().list(
     ListChatChannelsRequest
         .builder()
-        .companyId("biz_xxxxxxxxxxxxxx")
+        .accountId("biz_xxxxxxxxxxxxxx")
         .first(42)
         .last(42)
         .productId("prod_xxxxxxxxxxxxx")
@@ -9472,7 +13509,7 @@ client.chatChannels().list(
 <dl>
 <dd>
 
-**companyId:** `String` — The unique identifier of the company to list chat channels for.
+**productId:** `Optional<String>` — The unique identifier of a product to filter by. When set, only chat channels connected to this product are returned.
     
 </dd>
 </dl>
@@ -9480,7 +13517,7 @@ client.chatChannels().list(
 <dl>
 <dd>
 
-**productId:** `Optional<String>` — The unique identifier of a product to filter by. When set, only chat channels connected to this product are returned.
+**accountId:** `String` — The unique identifier of the company to list chat channels for.
     
 </dd>
 </dl>
@@ -9566,7 +13603,7 @@ client.chatChannels().retrieve(
 <dl>
 <dd>
 
-Update moderation settings for a chat channel, such as who can post, banned words, and media restrictions.
+Updates a chat channel's moderation settings, such as who can post, banned words, and media restrictions.
 
 Required permissions:
  - `chat:moderate`
@@ -9636,7 +13673,7 @@ client.chatChannels().update(
 <dl>
 <dd>
 
-**userPostsCooldownSeconds:** `Optional<Integer>` — The minimum number of seconds a user must wait between sending messages in this chat channel.
+**userPostsCooldownSeconds:** `Optional<Integer>` — The minimum number of seconds a user must wait between sending messages in this chat channel. Pass null or 0 to remove the cooldown.
     
 </dd>
 </dl>
@@ -9720,7 +13757,7 @@ client.checkoutConfigurations().list(
 <dl>
 <dd>
 
-**planId:** `Optional<String>` — Only return checkout configurations for this plan ID, prefixed `plan_`.
+**variantId:** `Optional<String>` — Only return checkout configurations for this variant ID, prefixed `plan_`.
     
 </dd>
 </dl>
@@ -9760,7 +13797,7 @@ client.checkoutConfigurations().list(
 <dl>
 <dd>
 
-**first:** `Optional<Integer>` — Number of checkout configurations to return.
+**first:** `Optional<Integer>` — Number of results to return from the start of the range.
     
 </dd>
 </dl>
@@ -9768,7 +13805,7 @@ client.checkoutConfigurations().list(
 <dl>
 <dd>
 
-**after:** `Optional<String>` — Cursor for the next page of results.
+**after:** `Optional<String>` — Return results after this cursor. Use `page_info.end_cursor` from the previous response to fetch the next page.
     
 </dd>
 </dl>
@@ -9792,7 +13829,7 @@ client.checkoutConfigurations().list(
 <dl>
 <dd>
 
-Creates a reusable checkout configuration for an existing or inline plan.
+Creates a reusable checkout configuration for an existing or inline variant. Send customers to its `purchase_url` to check out.
 </dd>
 </dl>
 </dd>
@@ -9811,7 +13848,7 @@ client.checkoutConfigurations().create(
     CreateCheckoutConfigurationsRequest
         .builder()
         .accountId("biz_xxxxxxxxxxxxxx")
-        .planId("plan_xxxxxxxxxxxxx")
+        .variantId("plan_xxxxxxxxxxxxx")
         .build()
 );
 ```
@@ -9868,23 +13905,7 @@ client.checkoutConfigurations().create(
 <dl>
 <dd>
 
-**paymentMethodConfiguration:** `Optional<CreateCheckoutConfigurationsRequestPaymentMethodConfiguration>` — Payment method overrides for this checkout. `null` uses the plan or platform defaults.
-    
-</dd>
-</dl>
-
-<dl>
-<dd>
-
-**plan:** `Optional<CreateCheckoutConfigurationsRequestPlan>` — Plan attributes used to create or find a plan for this checkout configuration. Mutually exclusive with `plan_id`.
-    
-</dd>
-</dl>
-
-<dl>
-<dd>
-
-**planId:** `Optional<String>` — Existing plan ID, prefixed `plan_`. Mutually exclusive with `plan`.
+**paymentMethodConfiguration:** `Optional<CreateCheckoutConfigurationsRequestPaymentMethodConfiguration>` — Payment method overrides for this checkout. `null` uses the variant or platform defaults.
     
 </dd>
 </dl>
@@ -9900,7 +13921,23 @@ client.checkoutConfigurations().create(
 <dl>
 <dd>
 
-**threeDsLevel:** `Optional<CreateCheckoutConfigurationsRequestThreeDsLevel>` — 3D Secure behavior for this checkout.
+**threeDsLevel:** `Optional<CreateCheckoutConfigurationsRequestThreeDsLevel>` — 3D Secure behavior for supported on-session card payments. `mandate_challenge` requires a 3DS challenge before payment processing; `mandate_if_required` mandates a challenge only when the payment processor requires it; `frictionless_if_required` uses the regular frictionless 3DS flow. Payments of $1,000 or more use `mandate_if_required` unless `mandate_challenge` is selected. Risk and authentication recovery requirements can override the preference. Applies in setup mode; `null` uses frictionless 3DS. Payment mode uses the variant policy.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**variant:** `Optional<CreateCheckoutConfigurationsRequestVariant>` — Variant attributes used to create or find a variant for this checkout configuration. Mutually exclusive with `variant_id`.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**variantId:** `Optional<String>` — Existing variant ID, prefixed `plan_`. Mutually exclusive with `variant`.
     
 </dd>
 </dl>
@@ -10030,8 +14067,8 @@ client.checkoutConfigurations().delete(
 </dl>
 </details>
 
-## Companies
-<details><summary><code>client.companies.list() -> SyncPagingIterable&amp;lt;CompanyListItem&amp;gt;</code></summary>
+## ClaimLinks
+<details><summary><code>client.claimLinks.retrieve(id) -> RetrieveClaimLinksResponse</code></summary>
 <dl>
 <dd>
 
@@ -10043,10 +14080,7 @@ client.checkoutConfigurations().delete(
 <dl>
 <dd>
 
-Returns a paginated list of companies. When parent_company_id is provided, lists connected accounts under that platform. When omitted, lists companies the current user has access to.
-
-Required permissions:
- - `company:basic:read`
+Retrieves a funded claim link by ID or by its public claim code. By ID, the caller needs `airdrop_link:basic:read` on the funding account, or must own the funding personal account; `code` and `claim_url` are `null` without `airdrop_link:manage` on the funding account or `payout:withdraw_funds` on the personal account. A claim code previews the sender, amount, expiry, and claim availability without authentication. Treat codes as secrets: anyone holding one can claim after signing in.
 </dd>
 </dl>
 </dd>
@@ -10061,13 +14095,10 @@ Required permissions:
 <dd>
 
 ```java
-client.companies().list(
-    ListCompaniesRequest
+client.claimLinks().retrieve(
+    "id",
+    RetrieveClaimLinksRequest
         .builder()
-        .first(42)
-        .last(42)
-        .createdBefore(OffsetDateTime.parse("2023-12-01T05:00:00Z"))
-        .createdAfter(OffsetDateTime.parse("2023-12-01T05:00:00Z"))
         .build()
 );
 ```
@@ -10084,63 +14115,7 @@ client.companies().list(
 <dl>
 <dd>
 
-**after:** `Optional<String>` — Returns the elements in the list that come after the specified cursor.
-    
-</dd>
-</dl>
-
-<dl>
-<dd>
-
-**before:** `Optional<String>` — Returns the elements in the list that come before the specified cursor.
-    
-</dd>
-</dl>
-
-<dl>
-<dd>
-
-**first:** `Optional<Integer>` — Returns the first _n_ elements from the list.
-    
-</dd>
-</dl>
-
-<dl>
-<dd>
-
-**last:** `Optional<Integer>` — Returns the last _n_ elements from the list.
-    
-</dd>
-</dl>
-
-<dl>
-<dd>
-
-**parentCompanyId:** `Optional<String>` — The unique identifier of the parent platform company. When provided, lists connected accounts under that platform. Omit to list the current user's own companies.
-    
-</dd>
-</dl>
-
-<dl>
-<dd>
-
-**direction:** `Optional<Direction>` 
-    
-</dd>
-</dl>
-
-<dl>
-<dd>
-
-**createdBefore:** `Optional<OffsetDateTime>` — Only return companies created before this timestamp.
-    
-</dd>
-</dl>
-
-<dl>
-<dd>
-
-**createdAfter:** `Optional<OffsetDateTime>` — Only return companies created after this timestamp.
+**id:** `String` — A claim-link ID (`airdrp_…`), or the public claim code from the `c` parameter in the claim URL.
     
 </dd>
 </dl>
@@ -10152,7 +14127,7 @@ client.companies().list(
 </dl>
 </details>
 
-<details><summary><code>client.companies.create(request) -> Company</code></summary>
+<details><summary><code>client.claimLinks.claim(id) -> ClaimClaimLinksResponse</code></summary>
 <dl>
 <dd>
 
@@ -10164,11 +14139,7 @@ client.companies().list(
 <dl>
 <dd>
 
-Create a new company. Pass parent_company_id to create a connected account under a platform, or omit it to create a company for the current user.
-
-Required permissions:
- - `company:create`
- - `company:basic:read`
+Claims a funded link into the authenticated user's personal balance and returns the updated link. Requires a signed-in user and the public claim code; account API keys cannot claim on a recipient's behalf. Each user can claim a link once. Reuse the same `Idempotency-Key` when retrying the same request. On-chain claims may take several minutes to complete.
 </dd>
 </dl>
 </dd>
@@ -10183,127 +14154,9 @@ Required permissions:
 <dd>
 
 ```java
-client.companies().create(
-    CreateCompaniesRequest
-        .builder()
-        .title("title")
-        .build()
-);
-```
-</dd>
-</dl>
-</dd>
-</dl>
-
-#### ⚙️ Parameters
-
-<dl>
-<dd>
-
-<dl>
-<dd>
-
-**country:** `Optional<Countries>` — The country the company is located in. Defaults to the parent company's country for connected accounts, or the owner's IP-derived country.
-    
-</dd>
-</dl>
-
-<dl>
-<dd>
-
-**description:** `Optional<String>` — A promotional pitch displayed to potential customers on the company's store page.
-    
-</dd>
-</dl>
-
-<dl>
-<dd>
-
-**email:** `Optional<String>` — The email address of the user who will own the connected account. Required when parent_company_id is provided.
-    
-</dd>
-</dl>
-
-<dl>
-<dd>
-
-**logo:** `Optional<CreateCompaniesRequestLogo>` — The company's logo image. Accepts PNG, JPEG, or GIF format.
-    
-</dd>
-</dl>
-
-<dl>
-<dd>
-
-**metadata:** `Optional<Map<String, Object>>` — A key-value JSON object of custom metadata to store on the company.
-    
-</dd>
-</dl>
-
-<dl>
-<dd>
-
-**parentCompanyId:** `Optional<String>` — The unique identifier of the parent platform company. When provided, creates a connected account under that platform. Omit to create a company for the current user.
-    
-</dd>
-</dl>
-
-<dl>
-<dd>
-
-**sendCustomerEmails:** `Optional<Boolean>` — Whether Whop sends transactional emails to customers on behalf of this company. Only applies when creating a connected account.
-    
-</dd>
-</dl>
-
-<dl>
-<dd>
-
-**title:** `String` — The display name of the company shown to customers.
-    
-</dd>
-</dl>
-</dd>
-</dl>
-
-
-</dd>
-</dl>
-</details>
-
-<details><summary><code>client.companies.retrieve(id) -> Company</code></summary>
-<dl>
-<dd>
-
-#### 📝 Description
-
-<dl>
-<dd>
-
-<dl>
-<dd>
-
-Retrieves the details of an existing company.
-
-Required permissions:
- - `company:basic:read`
-</dd>
-</dl>
-</dd>
-</dl>
-
-#### 🔌 Usage
-
-<dl>
-<dd>
-
-<dl>
-<dd>
-
-```java
-client.companies().retrieve(
-    "biz_xxxxxxxxxxxxxx",
-    RetrieveCompaniesRequest
+client.claimLinks().claim(
+    "id",
+    ClaimClaimLinksRequest
         .builder()
         .build()
 );
@@ -10321,250 +14174,7 @@ client.companies().retrieve(
 <dl>
 <dd>
 
-**id:** `String` — The unique identifier or route slug of the company.
-    
-</dd>
-</dl>
-</dd>
-</dl>
-
-
-</dd>
-</dl>
-</details>
-
-<details><summary><code>client.companies.update(id, request) -> Company</code></summary>
-<dl>
-<dd>
-
-#### 📝 Description
-
-<dl>
-<dd>
-
-<dl>
-<dd>
-
-Update a company's title, description, logo, and other settings.
-
-Required permissions:
- - `company:update`
- - `company:basic:read`
-</dd>
-</dl>
-</dd>
-</dl>
-
-#### 🔌 Usage
-
-<dl>
-<dd>
-
-<dl>
-<dd>
-
-```java
-client.companies().update(
-    "biz_xxxxxxxxxxxxxx",
-    UpdateCompaniesRequest
-        .builder()
-        .build()
-);
-```
-</dd>
-</dl>
-</dd>
-</dl>
-
-#### ⚙️ Parameters
-
-<dl>
-<dd>
-
-<dl>
-<dd>
-
-**id:** `String` — The unique identifier of the company to update.
-    
-</dd>
-</dl>
-
-<dl>
-<dd>
-
-**affiliateApplicationRequired:** `Optional<Boolean>` — Whether prospective affiliates must submit an application before they can promote this company.
-    
-</dd>
-</dl>
-
-<dl>
-<dd>
-
-**affiliateInstructions:** `Optional<String>` — Guidelines and instructions shown to affiliates explaining how to promote this company's products.
-    
-</dd>
-</dl>
-
-<dl>
-<dd>
-
-**bannerImage:** `Optional<UpdateCompaniesRequestBannerImage>` — The company's banner image. Accepts PNG or JPEG format.
-    
-</dd>
-</dl>
-
-<dl>
-<dd>
-
-**description:** `Optional<String>` — A promotional pitch displayed to potential customers on the company's store page.
-    
-</dd>
-</dl>
-
-<dl>
-<dd>
-
-**featuredAffiliateProductId:** `Optional<String>` — The ID of the product to feature on this company's affiliate page. Pass null to clear.
-    
-</dd>
-</dl>
-
-<dl>
-<dd>
-
-**logo:** `Optional<UpdateCompaniesRequestLogo>` — The company's logo image. Accepts PNG, JPEG, or GIF format.
-    
-</dd>
-</dl>
-
-<dl>
-<dd>
-
-**route:** `Optional<String>` — The unique URL slug for the company's store page. Must be lowercase and can include hyphens (e.g., 'my-company'). If not provided, the route will remain unchanged.
-    
-</dd>
-</dl>
-
-<dl>
-<dd>
-
-**sendCustomerEmails:** `Optional<Boolean>` — Whether Whop sends transactional emails (receipts, renewals, cancelations) to customers on behalf of this company.
-    
-</dd>
-</dl>
-
-<dl>
-<dd>
-
-**socialLinks:** `Optional<List<UpdateCompaniesRequestSocialLinksItem>>` — The social media links to display on the company's store page. Pass the full list of desired social links — any existing links not included will be removed.
-    
-</dd>
-</dl>
-
-<dl>
-<dd>
-
-**targetAudience:** `Optional<String>` — The target audience for this company (e.g., 'beginner day traders aged 18-25 looking to learn options').
-    
-</dd>
-</dl>
-
-<dl>
-<dd>
-
-**title:** `Optional<String>` — The display name of the company shown to customers.
-    
-</dd>
-</dl>
-</dd>
-</dl>
-
-
-</dd>
-</dl>
-</details>
-
-<details><summary><code>client.companies.createApiKey(parentCompanyId, request) -> CreateApiKeyCompaniesResponse</code></summary>
-<dl>
-<dd>
-
-#### 📝 Description
-
-<dl>
-<dd>
-
-<dl>
-<dd>
-
-Create an API key for a connected account (child company) owned by a parent company.
-</dd>
-</dl>
-</dd>
-</dl>
-
-#### 🔌 Usage
-
-<dl>
-<dd>
-
-<dl>
-<dd>
-
-```java
-client.companies().createApiKey(
-    "parent_company_id",
-    CreateApiKeyCompaniesRequest
-        .builder()
-        .childCompanyId("child_company_id")
-        .build()
-);
-```
-</dd>
-</dl>
-</dd>
-</dl>
-
-#### ⚙️ Parameters
-
-<dl>
-<dd>
-
-<dl>
-<dd>
-
-**parentCompanyId:** `String` — The unique identifier of the parent platform company (e.g. 'biz_xxx').
-    
-</dd>
-</dl>
-
-<dl>
-<dd>
-
-**childCompanyId:** `String` — The unique identifier of the connected account to create the API key for (e.g. 'biz_xxx').
-    
-</dd>
-</dl>
-
-<dl>
-<dd>
-
-**name:** `Optional<String>` — A human-readable name for the API key, such as 'Production API Key'.
-    
-</dd>
-</dl>
-
-<dl>
-<dd>
-
-**permissions:** `Optional<List<CreateApiKeyCompaniesRequestPermissionsItem>>` — Granular permission statements defining which actions this API key can perform. Either permissions or role must be provided.
-    
-</dd>
-</dl>
-
-<dl>
-<dd>
-
-**role:** `Optional<PermissionSystemRoles>` — A system role to inherit permissions from (e.g. owner, admin, moderator). Either role or permissions must be provided.
+**id:** `String` — The public claim code from the `c` parameter in the claim URL. A claim-link ID does not authorize redemption.
     
 </dd>
 </dl>
@@ -10589,7 +14199,7 @@ client.companies().createApiKey(
 <dl>
 <dd>
 
-Returns a paginated list of token transactions for a user or company, depending on the authenticated actor, with optional filtering by user and transaction type.
+Lists an account's token transactions, newest first.
 
 Required permissions:
  - `company_token_transaction:read`
@@ -10612,7 +14222,7 @@ Required permissions:
 client.companyTokenTransactions().list(
     ListCompanyTokenTransactionsRequest
         .builder()
-        .companyId("biz_xxxxxxxxxxxxxx")
+        .accountId("biz_xxxxxxxxxxxxxx")
         .first(42)
         .last(42)
         .userId("user_xxxxxxxxxxxxx")
@@ -10664,14 +14274,6 @@ client.companyTokenTransactions().list(
 <dl>
 <dd>
 
-**companyId:** `String` — The unique identifier of the company to list token transactions for.
-    
-</dd>
-</dl>
-
-<dl>
-<dd>
-
 **userId:** `Optional<String>` — Filter transactions to only those involving this specific user.
     
 </dd>
@@ -10681,6 +14283,14 @@ client.companyTokenTransactions().list(
 <dd>
 
 **transactionType:** `Optional<CompanyTokenTransactionTypes>` 
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**accountId:** `String` — The unique identifier of the company to list token transactions for.
     
 </dd>
 </dl>
@@ -10704,7 +14314,7 @@ client.companyTokenTransactions().list(
 <dl>
 <dd>
 
-Create a token transaction to add, subtract, or transfer tokens for a member within a company.
+Creates a token transaction that adds, subtracts, or transfers tokens for a member of an account.
 
 Required permissions:
  - `company_token_transaction:create`
@@ -10728,8 +14338,8 @@ client.companyTokenTransactions().create(
     CreateCompanyTokenTransactionsRequest.transfer(
         CreateCompanyTokenTransactionsRequestTransfer
             .builder()
+            .accountId("biz_xxxxxxxxxxxxxx")
             .amount(6.9)
-            .companyId("biz_xxxxxxxxxxxxxx")
             .destinationUserId("destination_user_id")
             .userId("user_xxxxxxxxxxxxx")
             .build()
@@ -10773,7 +14383,7 @@ client.companyTokenTransactions().create(
 <dl>
 <dd>
 
-Retrieves the details of an existing company token transaction.
+Retrieves a token transaction.
 
 Required permissions:
  - `company_token_transaction:read`
@@ -10814,6 +14424,75 @@ client.companyTokenTransactions().retrieve(
 <dd>
 
 **id:** `String` — The unique identifier of the token transaction to retrieve.
+    
+</dd>
+</dl>
+</dd>
+</dl>
+
+
+</dd>
+</dl>
+</details>
+
+## Confirmation Tokens
+<details><summary><code>client.confirmationTokens.retrieve(id) -> ConfirmationToken</code></summary>
+<dl>
+<dd>
+
+#### 📝 Description
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+Retrieves a confirmation token's payment method and billing details, never the underlying payment credential, to display what the buyer chose or check that the token is still usable. Requires no authentication and is rate-limited.
+</dd>
+</dl>
+</dd>
+</dl>
+
+#### 🔌 Usage
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+```java
+client.confirmationTokens().retrieve(
+    "id",
+    RetrieveConfirmationTokensRequest
+        .builder()
+        .accountId("account_id")
+        .build()
+);
+```
+</dd>
+</dl>
+</dd>
+</dl>
+
+#### ⚙️ Parameters
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+**id:** `String` — Confirmation token ID, prefixed `ctok_`.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**accountId:** `String` — The account the token was minted for, prefixed `biz_`. It must match the token's account.
     
 </dd>
 </dl>
@@ -11200,7 +14879,7 @@ client.courseChapters().update(
 <dl>
 <dd>
 
-Returns a paginated list of lesson interactions, filtered by lesson, course, user, or completion status.
+Returns a paginated list of lesson interactions for a lesson or course. Callers without admin access to the course's experience see only their own interactions.
 
 Required permissions:
  - `courses:read`
@@ -12272,7 +15951,7 @@ client.courseStudents().retrieve(
 <dl>
 <dd>
 
-Returns a paginated list of courses, filtered by either an experience or a company.
+Returns a paginated list of the courses in an experience or an account. `hidden` courses are included only for callers with `courses:update`.
 
 Required permissions:
  - `courses:read`
@@ -12296,7 +15975,7 @@ client.courses().list(
         .first(42)
         .last(42)
         .experienceId("exp_xxxxxxxxxxxxxx")
-        .companyId("biz_xxxxxxxxxxxxxx")
+        .accountId("biz_xxxxxxxxxxxxxx")
         .build()
 );
 ```
@@ -12353,7 +16032,7 @@ client.courses().list(
 <dl>
 <dd>
 
-**companyId:** `Optional<String>` — The unique identifier of the company to list courses for.
+**accountId:** `Optional<String>` — The unique identifier of the company to list courses for.
     
 </dd>
 </dl>
@@ -12496,7 +16175,7 @@ client.courses().create(
 <dl>
 <dd>
 
-Retrieves the details of an existing course.
+Retrieves the details of an existing course. A `hidden` course is returned only to callers with `courses:update`.
 
 Required permissions:
  - `courses:read`
@@ -12763,7 +16442,7 @@ client.courses().update(
 <dl>
 <dd>
 
-Retrieve the deposit methods for an account, including crypto and bank transfer.
+Returns the deposit methods for an account or user, including crypto addresses, bank transfer instructions, and, for a business, a hosted deposit page. Bitcoin deposits are converted to USDT on Plasma in the destination's wallet. Business destinations require no authentication. Pass `payment_method_id` to also charge a business's saved payment method for `amount` in USD and add it to the business's balance; that requires authentication with the `payment:charge` scope. The charge has no fees or taxes and does not count as revenue.
 </dd>
 </dl>
 </dd>
@@ -12781,9 +16460,7 @@ Retrieve the deposit methods for an account, including crypto and bank transfer.
 client.deposits().create(
     CreateDepositsRequest
         .builder()
-        .destination(
-            CreateDepositsRequestDestination.of("destination")
-        )
+        .destination("biz_xxxxxxxxxxxxxx")
         .build()
 );
 ```
@@ -12800,7 +16477,7 @@ client.deposits().create(
 <dl>
 <dd>
 
-**amount:** `Optional<Double>` — Amount to prefill on hosted deposit page.
+**amount:** `Optional<Double>` — Amount to prefill on hosted deposit page. Crypto deposits require a $10 minimum. With `payment_method_id`, the amount in USD to charge, and required.
     
 </dd>
 </dl>
@@ -12808,7 +16485,7 @@ client.deposits().create(
 <dl>
 <dd>
 
-**destination:** `CreateDepositsRequestDestination` — Destination account ID or wallet address. Object form is supported for compatibility. Any business resolves by its account ID without authentication; a user account resolves only for that same authenticated user.
+**destination:** `String` — Account ID to fund, `biz_` or `user_`. Any business resolves without authentication; a user account resolves only for that same authenticated user.
     
 </dd>
 </dl>
@@ -12816,7 +16493,7 @@ client.deposits().create(
 <dl>
 <dd>
 
-**metadata:** `Optional<Map<String, Object>>` — Metadata to include with the deposit response.
+**metadata:** `Optional<Map<String, Optional<CreateDepositsRequestMetadataValue>>>` — Custom metadata to attach to the payment the charge creates. Ignored unless `payment_method_id` is provided.
     
 </dd>
 </dl>
@@ -12824,7 +16501,101 @@ client.deposits().create(
 <dl>
 <dd>
 
-**network:** `Optional<CreateDepositsRequestNetwork>` — Destination network override. Defaults to the destination wallet's own network.
+**originBic:** `Optional<String>` — SWIFT/BIC of the bank the funds are sent from, 8 or 11 characters. Fills each bank currency's `swift_bic` with the intermediary bank to route the wire through.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**paymentMethodId:** `Optional<String>` — A saved payment method of the business to charge for `amount`, prefixed `payt_`. Save one with Create setup intent and `owner_id` set to the account. Only for a `biz_` destination, and requires authentication with the `payment:charge` scope. A declined charge fails the request with 400.
+    
+</dd>
+</dl>
+</dd>
+</dl>
+
+
+</dd>
+</dl>
+</details>
+
+<details><summary><code>client.deposits.reverse(id, request) -> LedgerActivity</code></summary>
+<dl>
+<dd>
+
+#### 📝 Description
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+Sends a deposit back where it came from. If the available balance doesn't cover it, nothing is sent.
+
+- **Bank deposit:** pass its `vbt_` ID. The deposit fee is returned, so the balance only has to cover the rest. Returns a `topup_reversal` row.
+- **Card deposit:** pass its `pay_` ID. It's refunded to the card, and its fees aren't returned. Returns a `payment_refund` row.
+</dd>
+</dl>
+</dd>
+</dl>
+
+#### 🔌 Usage
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+```java
+client.deposits().reverse(
+    "vbt_xxxxxxxxxxxxxx",
+    ReverseDepositsRequest
+        .builder()
+        .build()
+);
+```
+</dd>
+</dl>
+</dd>
+</dl>
+
+#### ⚙️ Parameters
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+**id:** `String` — A bank deposit ID, prefixed `vbt_`, or a card deposit's payment ID, prefixed `pay_`.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**accountId:** `Optional<String>` — The business that received the deposit, prefixed `biz_`. Pass this or `user_id`.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**metadata:** `Optional<Map<String, Optional<ReverseDepositsRequestMetadataValue>>>` — Custom metadata to store with the reversal.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**userId:** `Optional<String>` — The user that received the deposit, prefixed `user_`. Pass this or `account_id`.
     
 </dd>
 </dl>
@@ -12907,7 +16678,7 @@ client.disputeAlerts().list(
 <dl>
 <dd>
 
-**first:** `Optional<Integer>` — The number of alerts to return (default 20, max 100).
+**first:** `Optional<Integer>` — Number of results to return from the start of the range.
     
 </dd>
 </dl>
@@ -12915,7 +16686,7 @@ client.disputeAlerts().list(
 <dl>
 <dd>
 
-**after:** `Optional<String>` — A cursor; returns alerts after this position.
+**after:** `Optional<String>` — Return results after this cursor. Use `page_info.end_cursor` from the previous response to fetch the next page.
     
 </dd>
 </dl>
@@ -12923,7 +16694,7 @@ client.disputeAlerts().list(
 <dl>
 <dd>
 
-**last:** `Optional<Integer>` — The number of alerts to return from the end of the range.
+**last:** `Optional<Integer>` — Number of results to return from the end of the range.
     
 </dd>
 </dl>
@@ -12931,7 +16702,7 @@ client.disputeAlerts().list(
 <dl>
 <dd>
 
-**before:** `Optional<String>` — A cursor; returns alerts before this position.
+**before:** `Optional<String>` — Return results before this cursor. Use `page_info.start_cursor` from the previous response to fetch the previous page.
     
 </dd>
 </dl>
@@ -13089,7 +16860,7 @@ client.disputes().list(
 <dl>
 <dd>
 
-**first:** `Optional<Integer>` — The number of disputes to return (default 20, max 100).
+**first:** `Optional<Integer>` — Number of results to return from the start of the range.
     
 </dd>
 </dl>
@@ -13097,7 +16868,7 @@ client.disputes().list(
 <dl>
 <dd>
 
-**after:** `Optional<String>` — A cursor; returns disputes after this position.
+**after:** `Optional<String>` — Return results after this cursor. Use `page_info.end_cursor` from the previous response to fetch the next page.
     
 </dd>
 </dl>
@@ -13105,7 +16876,7 @@ client.disputes().list(
 <dl>
 <dd>
 
-**last:** `Optional<Integer>` — The number of disputes to return from the end of the range.
+**last:** `Optional<Integer>` — Number of results to return from the end of the range.
     
 </dd>
 </dl>
@@ -13113,7 +16884,7 @@ client.disputes().list(
 <dl>
 <dd>
 
-**before:** `Optional<String>` — A cursor; returns disputes before this position.
+**before:** `Optional<String>` — Return results before this cursor. Use `page_info.start_cursor` from the previous response to fetch the previous page.
     
 </dd>
 </dl>
@@ -13137,7 +16908,7 @@ client.disputes().list(
 <dl>
 <dd>
 
-**status:** `Optional<ListDisputesRequestStatusItem>` — Only disputes in these statuses. Repeat the parameter to pass several — one paginated list covers all of them. Covers both chargebacks and inquiries at each stage. A `needs_response` dispute whose evidence deadline has passed reports and filters as `under_review` instead.
+**status:** `Optional<ListDisputesRequestStatusItem>` — Only disputes in these statuses. Repeat the parameter to pass several — one paginated list covers all of them. Inquiries match only the `warning_` statuses. A `needs_response` dispute whose evidence deadline has passed reports and filters as `under_review` instead.
     
 </dd>
 </dl>
@@ -13162,6 +16933,22 @@ client.disputes().list(
 <dd>
 
 **createdAfter:** `Optional<String>` — Only disputes opened after this ISO 8601 timestamp.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**query:** `Optional<String>` — Search disputes by dispute ID, payment ID, user ID, membership ID, user email, name, or username. Email filtering requires the member:email:read permission.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**includeSubaccounts:** `Optional<Boolean>` — Also cover the account's subaccounts. Requires `account_id`, and is a 400 without it. Without `query`, covers the disputes of the account and every subaccount, in any order. The listing is cut off after 10 seconds; add a `query` to narrow it. With `query`, matches on dispute, payment, user or membership ID, buyer email, or a card's first 6 or 8 digits and last 4 separated by a space or dash (`424242 4242`); free-text queries such as a name search only the named account. Subaccounts' disputes are returned only for subaccounts you can read disputes on.
     
 </dd>
 </dl>
@@ -13263,6 +17050,22 @@ client.disputes().summary(
     
 </dd>
 </dl>
+
+<dl>
+<dd>
+
+**query:** `Optional<String>` — Search disputes by dispute ID, payment ID, user ID, membership ID, user email, name, or username. Email filtering requires the member:email:read permission.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**includeSubaccounts:** `Optional<Boolean>` — Also cover the account's subaccounts. Requires `account_id`, and is a 400 without it. Without `query`, covers the disputes of the account and every subaccount, in any order. The listing is cut off after 10 seconds; add a `query` to narrow it. With `query`, matches on dispute, payment, user or membership ID, buyer email, or a card's first 6 or 8 digits and last 4 separated by a space or dash (`424242 4242`); free-text queries such as a name search only the named account. Subaccounts' disputes are returned only for subaccounts you can read disputes on.
+    
+</dd>
+</dl>
 </dd>
 </dl>
 
@@ -13342,7 +17145,7 @@ client.disputes().retrieve(
 <dl>
 <dd>
 
-Edits a dispute's evidence, while it is still editable. Sending it is a separate call.
+Edits a dispute's evidence while it is still editable. When the evidence is ready, send it to the payment processor with `POST /disputes/:id/submit`.
 </dd>
 </dl>
 </dd>
@@ -13397,6 +17200,65 @@ client.disputes().update(
 </dl>
 </details>
 
+<details><summary><code>client.disputes.accept(id) -> Dispute</code></summary>
+<dl>
+<dd>
+
+#### 📝 Description
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+Accepts a chargeback, conceding it to the customer instead of contesting it. The payment processor closes the dispute as `lost`. This is final — the dispute cannot be contested afterwards. Only a dispute whose `acceptable` is true can be accepted.
+</dd>
+</dl>
+</dd>
+</dl>
+
+#### 🔌 Usage
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+```java
+client.disputes().accept(
+    "id",
+    AcceptDisputesRequest
+        .builder()
+        .build()
+);
+```
+</dd>
+</dl>
+</dd>
+</dl>
+
+#### ⚙️ Parameters
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+**id:** `String` — The dispute ID (`dspt_` tag).
+    
+</dd>
+</dl>
+</dd>
+</dl>
+
+
+</dd>
+</dl>
+</details>
+
 <details><summary><code>client.disputes.submit(id) -> Dispute</code></summary>
 <dl>
 <dd>
@@ -13409,7 +17271,7 @@ client.disputes().update(
 <dl>
 <dd>
 
-Sends a dispute's evidence to the payment processor. This is final — it cannot be edited or sent again.
+Sends a dispute's evidence to the payment processor. The packet is checked against the processor's limits first, so a file over a cap is refused here with the file and the limit named. Otherwise the dispute is returned as `generating_response` with its evidence locked and the filing completes in the background: the dispute moves to `under_review` with `evidence_submitted_at` set once the processor accepts it, or back to `needs_response` with `submission_failure_reason` set when the processor refuses it, so it can be fixed and sent again before `evidence_due_at`. Either move is sent as `dispute.updated`.
 </dd>
 </dl>
 </dd>
@@ -13456,256 +17318,6 @@ client.disputes().submit(
 </dl>
 </details>
 
-<details><summary><code>client.disputes.submitEvidenceDispute(id) -> Dispute</code></summary>
-<dl>
-<dd>
-
-#### 📝 Description
-
-<dl>
-<dd>
-
-<dl>
-<dd>
-
-Submit a payment dispute to the payment processor for review. Once submitted, no further edits can be made.
-
-Required permissions:
- - `payment:dispute`
- - `plan:basic:read`
- - `access_pass:basic:read`
- - `company:basic:read`
- - `payment:basic:read`
- - `member:email:read`
- - `member:basic:read`
- - `member:phone:read`
-</dd>
-</dl>
-</dd>
-</dl>
-
-#### 🔌 Usage
-
-<dl>
-<dd>
-
-<dl>
-<dd>
-
-```java
-client.disputes().submitEvidenceDispute(
-    "dspt_xxxxxxxxxxxxx",
-    SubmitEvidenceDisputeRequest
-        .builder()
-        .build()
-);
-```
-</dd>
-</dl>
-</dd>
-</dl>
-
-#### ⚙️ Parameters
-
-<dl>
-<dd>
-
-<dl>
-<dd>
-
-**id:** `String` — The unique identifier of the dispute to submit to the payment processor for review.
-    
-</dd>
-</dl>
-</dd>
-</dl>
-
-
-</dd>
-</dl>
-</details>
-
-<details><summary><code>client.disputes.updateEvidenceDispute(id, request) -> Dispute</code></summary>
-<dl>
-<dd>
-
-#### 📝 Description
-
-<dl>
-<dd>
-
-<dl>
-<dd>
-
-Update a dispute with evidence data to attempt to win the dispute.
-
-Required permissions:
- - `payment:dispute`
- - `plan:basic:read`
- - `access_pass:basic:read`
- - `company:basic:read`
- - `payment:basic:read`
- - `member:email:read`
- - `member:basic:read`
- - `member:phone:read`
-</dd>
-</dl>
-</dd>
-</dl>
-
-#### 🔌 Usage
-
-<dl>
-<dd>
-
-<dl>
-<dd>
-
-```java
-client.disputes().updateEvidenceDispute(
-    "dspt_xxxxxxxxxxxxx",
-    UpdateEvidenceDisputeRequest
-        .builder()
-        .build()
-);
-```
-</dd>
-</dl>
-</dd>
-</dl>
-
-#### ⚙️ Parameters
-
-<dl>
-<dd>
-
-<dl>
-<dd>
-
-**id:** `String` — The unique identifier of the dispute to update.
-    
-</dd>
-</dl>
-
-<dl>
-<dd>
-
-**accessActivityLog:** `Optional<String>` — An IP access activity log showing the customer used the service.
-    
-</dd>
-</dl>
-
-<dl>
-<dd>
-
-**billingAddress:** `Optional<String>` — The billing address associated with the customer's payment method.
-    
-</dd>
-</dl>
-
-<dl>
-<dd>
-
-**cancellationPolicyAttachment:** `Optional<UpdateEvidenceDisputeRequestCancellationPolicyAttachment>` — A file upload containing the company's cancellation policy document.
-    
-</dd>
-</dl>
-
-<dl>
-<dd>
-
-**cancellationPolicyDisclosure:** `Optional<String>` — The company's cancellation policy text to submit as evidence.
-    
-</dd>
-</dl>
-
-<dl>
-<dd>
-
-**customerCommunicationAttachment:** `Optional<UpdateEvidenceDisputeRequestCustomerCommunicationAttachment>` — A file upload containing evidence of customer communication. Must be a JPEG, PNG, GIF, or PDF.
-    
-</dd>
-</dl>
-
-<dl>
-<dd>
-
-**customerEmailAddress:** `Optional<String>` — The email address of the customer associated with the disputed payment.
-    
-</dd>
-</dl>
-
-<dl>
-<dd>
-
-**customerName:** `Optional<String>` — The full name of the customer associated with the disputed payment.
-    
-</dd>
-</dl>
-
-<dl>
-<dd>
-
-**notes:** `Optional<String>` — Additional notes or context to submit as part of the dispute evidence.
-    
-</dd>
-</dl>
-
-<dl>
-<dd>
-
-**productDescription:** `Optional<String>` — A description of the product or service that was provided to the customer.
-    
-</dd>
-</dl>
-
-<dl>
-<dd>
-
-**refundPolicyAttachment:** `Optional<UpdateEvidenceDisputeRequestRefundPolicyAttachment>` — A file upload containing the company's refund policy document.
-    
-</dd>
-</dl>
-
-<dl>
-<dd>
-
-**refundPolicyDisclosure:** `Optional<String>` — The company's refund policy text to submit as evidence.
-    
-</dd>
-</dl>
-
-<dl>
-<dd>
-
-**refundRefusalExplanation:** `Optional<String>` — An explanation of why the refund request was refused.
-    
-</dd>
-</dl>
-
-<dl>
-<dd>
-
-**serviceDate:** `Optional<String>` — The date when the product or service was delivered to the customer.
-    
-</dd>
-</dl>
-
-<dl>
-<dd>
-
-**uncategorizedAttachment:** `Optional<UpdateEvidenceDisputeRequestUncategorizedAttachment>` — A file upload for evidence that does not fit into the other categories.
-    
-</dd>
-</dl>
-</dd>
-</dl>
-
-
-</dd>
-</dl>
-</details>
-
 <details><summary><code>client.disputes.uploadEvidence(id, request) -> Dispute</code></summary>
 <dl>
 <dd>
@@ -13718,7 +17330,7 @@ client.disputes().updateEvidenceDispute(
 <dl>
 <dd>
 
-Replaces the full set of uploaded evidence documents on a dispute, beyond the four fixed evidence slots. Send the files as multipart file parts to upload and attach in one call, or reference files already stored by `id`/`direct_upload_id`. Send every document the packet should carry — up to 10, 10MB each and 25MB in total; an empty list removes them all. Accepted content types: application/pdf, application/json, image/jpeg, image/png, image/webp — any other type is rejected.
+Replaces the full set of uploaded evidence documents on a dispute, beyond the four fixed evidence slots. Prefer `PATCH /disputes/:id` with `evidence.documents`, which does the same replace alongside every other evidence field in one call.
 </dd>
 </dl>
 </dd>
@@ -13769,7 +17381,7 @@ client.disputes().uploadEvidence(
 <dl>
 <dd>
 
-**documents:** `List<UploadEvidenceDisputesRequestDocumentsItem>` — The full set of evidence documents the dispute should carry. Replaces all previously uploaded documents.
+**documents:** `List<UploadEvidenceDisputesRequestDocumentsItem>` — The full set of evidence documents the dispute should carry, beyond the four fixed evidence slots. Replaces all previously uploaded documents; an empty list removes them all. Send up to 10, 10MB each and 25MB in total. Accepted content types: application/pdf, application/json, image/jpeg, image/png, image/webp — any other type is rejected. Upload files through `POST /files` and reference them by `id`, or send the files as multipart file parts to upload and attach in one call. Policy documents (`return_policy`, `shipping_policy`, `cancellation_policy`, `terms_of_service`) default from the account's own documents; uploading one here replaces the account copy for this dispute, and a `cancellation_policy` or `return_policy` upload also takes precedence over the matching fixed evidence slot.
     
 </dd>
 </dl>
@@ -13794,7 +17406,7 @@ client.disputes().uploadEvidence(
 <dl>
 <dd>
 
-Returns a paginated list of DM channels for the currently authenticated user, sorted by most recently active.
+Lists the authenticated user's DM channels, most recently active first.
 
 Required permissions:
  - `dms:read`
@@ -13817,7 +17429,7 @@ client.dmChannels().list(
         .builder()
         .first(42)
         .last(42)
-        .companyId("biz_xxxxxxxxxxxxxx")
+        .accountId("biz_xxxxxxxxxxxxxx")
         .build()
 );
 ```
@@ -13866,7 +17478,7 @@ client.dmChannels().list(
 <dl>
 <dd>
 
-**companyId:** `Optional<String>` — The unique identifier of a company to filter DM channels by. Only returns channels scoped to this company.
+**accountId:** `Optional<String>` — The unique identifier of a company to filter DM channels by. Only returns channels scoped to this company.
     
 </dd>
 </dl>
@@ -13890,7 +17502,7 @@ client.dmChannels().list(
 <dl>
 <dd>
 
-Create a new DM channel between two or more users, optionally scoped to a specific company. Returns the existing channel if one already exists.
+Creates a DM channel between two or more users, optionally scoped to an account. Returns the existing channel if one already exists.
 
 Required permissions:
  - `dms:channel:manage`
@@ -13930,7 +17542,7 @@ client.dmChannels().create(
 <dl>
 <dd>
 
-**companyId:** `Optional<String>` — The unique identifier of the company to scope this DM channel to. When set, the channel is visible only within that company context.
+**accountId:** `Optional<String>` — The unique identifier of the company to scope this DM channel to. When set, the channel is visible only within that company context.
     
 </dd>
 </dl>
@@ -14041,7 +17653,7 @@ client.dmChannels().retrieve(
 <dl>
 <dd>
 
-Permanently delete a DM channel and all of its messages. Only an admin of the channel can perform this action.
+Permanently deletes a DM channel and all of its messages. Only a channel admin can delete it.
 
 Required permissions (one of):
  - `dms:channel:manage`
@@ -14104,7 +17716,7 @@ client.dmChannels().delete(
 <dl>
 <dd>
 
-Update the settings of an existing DM channel, such as its display name. Only an admin of the channel can perform this action.
+Updates a DM channel's settings, such as its display name. Only a channel admin can update it.
 
 Required permissions (one of):
  - `dms:channel:manage`
@@ -14538,8 +18150,8 @@ client.dmMembers().update(
 </dl>
 </details>
 
-## Entries
-<details><summary><code>client.entries.list() -> SyncPagingIterable&amp;lt;EntryListItem&amp;gt;</code></summary>
+## Domains
+<details><summary><code>client.domains.list() -> SyncPagingIterable&amp;lt;DomainListItem&amp;gt;</code></summary>
 <dl>
 <dd>
 
@@ -14551,11 +18163,9 @@ client.dmMembers().update(
 <dl>
 <dd>
 
-Returns a paginated list of waitlist entries for a company, with optional filtering by product, plan, status, and creation date.
+Lists your domains. Filter by account, app, status, hostname, or the state of a capability.
 
-Required permissions:
- - `plan:waitlist:read`
- - `member:email:read`
+Pass `search` to find domains to buy instead: the exact domain first, even when taken, then your name on popular extensions, then suggestions. Pass `tlds` to check only the extensions you choose. Results aren't reserved.
 </dd>
 </dl>
 </dd>
@@ -14570,14 +18180,12 @@ Required permissions:
 <dd>
 
 ```java
-client.entries().list(
-    ListEntriesRequest
+client.domains().list(
+    ListDomainsRequest
         .builder()
-        .companyId("biz_xxxxxxxxxxxxxx")
-        .first(42)
-        .last(42)
-        .createdBefore(OffsetDateTime.parse("2023-12-01T05:00:00Z"))
-        .createdAfter(OffsetDateTime.parse("2023-12-01T05:00:00Z"))
+        .tlds(
+            Arrays.asList("com")
+        )
         .build()
 );
 ```
@@ -14594,7 +18202,7 @@ client.entries().list(
 <dl>
 <dd>
 
-**after:** `Optional<String>` — Returns the elements in the list that come after the specified cursor.
+**accountId:** `Optional<String>` — Only domains belonging to this account, prefixed biz_.
     
 </dd>
 </dl>
@@ -14602,7 +18210,7 @@ client.entries().list(
 <dl>
 <dd>
 
-**before:** `Optional<String>` — Returns the elements in the list that come before the specified cursor.
+**appId:** `Optional<String>` — Only domains whose website serves this app, prefixed app_.
     
 </dd>
 </dl>
@@ -14610,7 +18218,7 @@ client.entries().list(
 <dl>
 <dd>
 
-**first:** `Optional<Integer>` — Returns the first _n_ elements from the list.
+**status:** `Optional<ListDomainsRequestStatus>` — Only domains with this status: the most pressing state of their capabilities, or `idle` when they want nothing.
     
 </dd>
 </dl>
@@ -14618,7 +18226,7 @@ client.entries().list(
 <dl>
 <dd>
 
-**last:** `Optional<Integer>` — Returns the last _n_ elements from the list.
+**order:** `Optional<ListDomainsRequestOrder>` — Field to sort by. Domains with the same value keep their creation order in the same direction.
     
 </dd>
 </dl>
@@ -14626,7 +18234,7 @@ client.entries().list(
 <dl>
 <dd>
 
-**companyId:** `String` — The unique identifier of the company to list waitlist entries for.
+**direction:** `Optional<ListDomainsRequestDirection>` — Sort direction.
     
 </dd>
 </dl>
@@ -14634,7 +18242,7 @@ client.entries().list(
 <dl>
 <dd>
 
-**direction:** `Optional<Direction>` 
+**first:** `Optional<Integer>` — Number of results to return from the start of the range.
     
 </dd>
 </dl>
@@ -14642,7 +18250,7 @@ client.entries().list(
 <dl>
 <dd>
 
-**order:** `Optional<EntriesSortableColumns>` 
+**after:** `Optional<String>` — Return results after this cursor. Use `page_info.end_cursor` from the previous response to fetch the next page.
     
 </dd>
 </dl>
@@ -14650,7 +18258,7 @@ client.entries().list(
 <dl>
 <dd>
 
-**productIds:** `Optional<String>` — Filter entries to only those for specific products.
+**last:** `Optional<Integer>` — Number of results to return from the end of the range.
     
 </dd>
 </dl>
@@ -14658,7 +18266,7 @@ client.entries().list(
 <dl>
 <dd>
 
-**planIds:** `Optional<String>` — Filter entries to only those for specific plans.
+**before:** `Optional<String>` — Return results before this cursor. Use `page_info.start_cursor` from the previous response to fetch the previous page.
     
 </dd>
 </dl>
@@ -14666,7 +18274,7 @@ client.entries().list(
 <dl>
 <dd>
 
-**statuses:** `Optional<EntryStatus>` — Filter entries by their current status.
+**search:** `Optional<String>` — A name or domain to find domains to buy, such as `example` or `example.com`; a subdomain or URL searches its registrable domain. Returns domains with `availability` instead of your domains, without other filters or pagination.
     
 </dd>
 </dl>
@@ -14674,7 +18282,7 @@ client.entries().list(
 <dl>
 <dd>
 
-**createdBefore:** `Optional<OffsetDateTime>` — Only return entries created before this timestamp.
+**tlds:** `Optional<String>` — With `search`, check only these extensions, such as `com` or `co.uk`, returned in this order. Repeat for several, up to 100.
     
 </dd>
 </dl>
@@ -14682,7 +18290,79 @@ client.entries().list(
 <dl>
 <dd>
 
-**createdAfter:** `Optional<OffsetDateTime>` — Only return entries created after this timestamp.
+**domain:** `Optional<String>` — Only your domain with this hostname, such as `example.com`.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**verification:** `Optional<ListDomainsRequestVerification>` — Only domains with verification in this state, such as `ready`, or `any` for every domain that has verification.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**registration:** `Optional<ListDomainsRequestRegistration>` — Only domains with registration in this state, such as `ready`, or `any` for every domain that has registration.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**platform:** `Optional<ListDomainsRequestPlatform>` — Only domains with platform in this state, such as `ready`, or `any` for every domain that has platform.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**subdomain:** `Optional<ListDomainsRequestSubdomain>` — Only domains with subdomain in this state, such as `ready`, or `any` for every domain that has subdomain.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**website:** `Optional<ListDomainsRequestWebsite>` — Only domains with website in this state, such as `ready`, or `any` for every domain that has website.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**applePay:** `Optional<ListDomainsRequestApplePay>` — Only domains with apple_pay in this state, such as `ready`, or `any` for every domain that has apple_pay.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**pixel:** `Optional<ListDomainsRequestPixel>` — Only domains with pixel in this state, such as `ready`, or `any` for every domain that has pixel.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**email:** `Optional<ListDomainsRequestEmail>` — Only domains with email in this state, such as `ready`, or `any` for every domain that has email.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**transfer:** `Optional<ListDomainsRequestTransfer>` — Only domains with transfer in this state, such as `ready`, or `any` for every domain that has transfer.
     
 </dd>
 </dl>
@@ -14694,7 +18374,7 @@ client.entries().list(
 </dl>
 </details>
 
-<details><summary><code>client.entries.retrieve(id) -> Entry</code></summary>
+<details><summary><code>client.domains.create(request) -> Domain</code></summary>
 <dl>
 <dd>
 
@@ -14706,11 +18386,15 @@ client.entries().list(
 <dl>
 <dd>
 
-Retrieves the details of an existing waitlist entry.
+Adds a domain to your account with the capabilities you want.
 
-Required permissions:
- - `plan:waitlist:read`
- - `member:email:read`
+Pass `registration` to buy the domain through Whop; it's the default when you pass no capability. Pay its `amount_due` at `purchase_url`, or pass `registration.payment_method_id` to charge a saved card. Whop then registers it, runs its DNS, and renews it every year while `auto_renew` is on.
+
+Pass `registration.auth_code` to transfer in a domain you own at another registrar. The transfer starts once its `amount_due` is paid, or at once when `amount_due` is `null`. While `registration.phase` is `transferring`, its `issues` say what the transfer needs from you.
+
+Pass `verification` to connect a domain you registered elsewhere: its `issues` list the TXT and routing records to publish. A subdomain of a domain this account bought through Whop takes `subdomain` by default, and Whop publishes its DNS records itself. Pass `website` with an `app_id` to serve that app on the domain.
+
+To change a domain you already have, update it instead. Adding a domain this account deleted revives it under its original ID.
 </dd>
 </dl>
 </dd>
@@ -14725,10 +18409,10 @@ Required permissions:
 <dd>
 
 ```java
-client.entries().retrieve(
-    "entry_xxxxxxxxxxxx",
-    RetrieveEntriesRequest
+client.domains().create(
+    CreateDomainsRequest
         .builder()
+        .domain("www.bought.com")
         .build()
 );
 ```
@@ -14745,7 +18429,87 @@ client.entries().retrieve(
 <dl>
 <dd>
 
-**id:** `String` — The unique identifier of the waitlist entry to retrieve.
+**accountId:** `Optional<String>` — Account ID, prefixed biz_. Required for user credentials; otherwise defaults to the credential's account.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**applePay:** `Optional<CreateDomainsRequestApplePay>` — Accept Apple Pay at checkout on the domain. It needs no other capability. Whop registers the domain with Apple: it stays `pending` until Apple answers, then turns `ready`, or `action_required` when Apple couldn't fetch the domain association file. Serve the file, then check the domain to register it again. Pass `null` to turn Apple Pay off: Whop removes the domain from Apple, and the domain stays, like releasing any other capability.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**domain:** `String` — Bare hostname, such as example.com or checkout.example.com. A bought domain must be a root domain. Wildcards, paths, schemes, and ports are not accepted.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**email:** `Optional<CreateDomainsRequestEmail>` — Send and receive email on the domain. It needs `registration` or `subdomain`, so only a domain bought through Whop, or a subdomain of one in the same account, can have it. Whop publishes the DNS records and stays `pending` until its email provider verifies them, then turns `ready`. Pass `null` to remove email.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**metadata:** `Optional<Map<String, String>>` — Custom string keys and values.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**pixel:** `Optional<CreateDomainsRequestPixel>` — Track page views on the domain with the Whop pixel. It needs no other capability: it stays `pending` until the pixel records a page view, and turns `action_required` if it goes 7 days without one. Pass `null` to stop tracking.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**registration:** `Optional<CreateDomainsRequestRegistration>` — Buy the domain through Whop, or transfer in a domain you own elsewhere with `auth_code`, then renew it every year and let Whop run its DNS. Pass `null` to release an unpaid or failed purchase, or to cancel a transfer while its current registrar can still stop it.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**subdomain:** `Optional<CreateDomainsRequestSubdomain>` — Use a subdomain of a domain this account bought through Whop, such as shop.example.com under example.com. It's the default when you add such a subdomain without a capability. Whop publishes its DNS records in the root domain's zone, so it needs nothing from you: it stays `pending` until the root domain is set up, then turns `ready`. Whop releases it, and its website, when the account no longer holds the root domain, and deletes it when the root domain leaves the account. Pass `null` to release it. Can't be combined with `verification` or `registration`.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**transfer:** `Optional<CreateDomainsRequestTransfer>` — Move a domain registered through Whop to another Whop account. Turning it on returns a code in `transfer.code`; the receiving account enters it as `registration.auth_code` on its own copy of the domain. Whop then removes the domain's email, email addresses and Apple Pay from this account, moves the registration with its expiry, stops charging this account to renew it, and removes the domain from this account. Pass `null` to turn it off and invalidate the code, until another account has entered it.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**verification:** `Optional<CreateDomainsRequestVerification>` — Prove you control the domain's DNS: Whop returns a TXT record to publish in `issues`, and whoever publishes it owns the domain on Whop. Pass `null` to release it. Can't be combined with `registration`.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**website:** `Optional<CreateDomainsRequestWebsite>` — Serve a Whop website on the domain. Pass `null` to stop serving it; the domain keeps its other capabilities.
     
 </dd>
 </dl>
@@ -14757,7 +18521,7 @@ client.entries().retrieve(
 </dl>
 </details>
 
-<details><summary><code>client.entries.approve(id) -> ApproveEntriesResponse</code></summary>
+<details><summary><code>client.domains.retrieve(id) -> Domain</code></summary>
 <dl>
 <dd>
 
@@ -14769,10 +18533,9 @@ client.entries().retrieve(
 <dl>
 <dd>
 
-Approve a pending waitlist entry, triggering the checkout process to grant the user access to the plan.
+Retrieves a domain by ID or hostname. Both return the same domain, shown as fully as you can see it: everything for your own accounts, and only who has it and what it serves for anyone else.
 
-Required permissions:
- - `plan:waitlist:manage`
+A hostname no domain on Whop has comes back with its `availability` instead.
 </dd>
 </dl>
 </dd>
@@ -14787,9 +18550,9 @@ Required permissions:
 <dd>
 
 ```java
-client.entries().approve(
-    "entry_xxxxxxxxxxxx",
-    ApproveEntriesRequest
+client.domains().retrieve(
+    "id",
+    RetrieveDomainsRequest
         .builder()
         .build()
 );
@@ -14807,7 +18570,7 @@ client.entries().approve(
 <dl>
 <dd>
 
-**id:** `String` — The unique identifier of the waitlist entry to approve.
+**id:** `String` — Domain ID, prefixed `dom_`, or a hostname such as `example.com`; a bare name looks up `.com`.
     
 </dd>
 </dl>
@@ -14819,7 +18582,7 @@ client.entries().approve(
 </dl>
 </details>
 
-<details><summary><code>client.entries.deny(id) -> Entry</code></summary>
+<details><summary><code>client.domains.delete(id) -> Domain</code></summary>
 <dl>
 <dd>
 
@@ -14831,12 +18594,7 @@ client.entries().approve(
 <dl>
 <dd>
 
-Deny a pending waitlist entry, preventing the user from gaining access to the plan.
-
-Required permissions:
- - `plan:waitlist:manage`
- - `plan:basic:read`
- - `member:email:read`
+Removes the domain from your account and releases its capabilities in the background. Deleting an unpaid purchase cancels it, and deleting a transfer cancels it and refunds it while the current registrar can still stop it. A registered domain can't be deleted; turn off `auto_renew` and it's released after it expires. Adding the domain to this account again revives it under the same ID.
 </dd>
 </dl>
 </dd>
@@ -14851,9 +18609,9 @@ Required permissions:
 <dd>
 
 ```java
-client.entries().deny(
-    "entry_xxxxxxxxxxxx",
-    DenyEntriesRequest
+client.domains().delete(
+    "id",
+    DeleteDomainsRequest
         .builder()
         .build()
 );
@@ -14871,7 +18629,936 @@ client.entries().deny(
 <dl>
 <dd>
 
-**id:** `String` — The unique identifier of the waitlist entry to deny.
+**id:** `String` — Domain ID, prefixed `dom_`, or a hostname such as `example.com`; a bare name looks up `.com`.
+    
+</dd>
+</dl>
+</dd>
+</dl>
+
+
+</dd>
+</dl>
+</details>
+
+<details><summary><code>client.domains.update(id, request) -> Domain</code></summary>
+<dl>
+<dd>
+
+#### 📝 Description
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+Changes a domain's capabilities or metadata. Pass a capability to add it or change its settings, or `null` to release it; capabilities you leave out don't change. Passing a capability that needs action again retries it. Releasing every capability keeps the domain, `idle`; delete it to remove it.
+</dd>
+</dl>
+</dd>
+</dl>
+
+#### 🔌 Usage
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+```java
+client.domains().update(
+    "id",
+    UpdateDomainsRequest
+        .builder()
+        .build()
+);
+```
+</dd>
+</dl>
+</dd>
+</dl>
+
+#### ⚙️ Parameters
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+**id:** `String` — Domain ID, prefixed `dom_`, or a hostname such as `example.com`; a bare name looks up `.com`.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**applePay:** `Optional<UpdateDomainsRequestApplePay>` — Accept Apple Pay at checkout on the domain. It needs no other capability. Whop registers the domain with Apple: it stays `pending` until Apple answers, then turns `ready`, or `action_required` when Apple couldn't fetch the domain association file. Serve the file, then check the domain to register it again. Pass `null` to turn Apple Pay off: Whop removes the domain from Apple, and the domain stays, like releasing any other capability.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**email:** `Optional<UpdateDomainsRequestEmail>` — Send and receive email on the domain. It needs `registration` or `subdomain`, so only a domain bought through Whop, or a subdomain of one in the same account, can have it. Whop publishes the DNS records and stays `pending` until its email provider verifies them, then turns `ready`. Pass `null` to remove email.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**metadata:** `Optional<Map<String, String>>` — Replacement custom string keys and values.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**pixel:** `Optional<UpdateDomainsRequestPixel>` — Track page views on the domain with the Whop pixel. It needs no other capability: it stays `pending` until the pixel records a page view, and turns `action_required` if it goes 7 days without one. Pass `null` to stop tracking.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**registration:** `Optional<UpdateDomainsRequestRegistration>` — Buy the domain through Whop, or transfer in a domain you own elsewhere with `auth_code`, then renew it every year and let Whop run its DNS. Pass `null` to release an unpaid or failed purchase, or to cancel a transfer while its current registrar can still stop it.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**subdomain:** `Optional<UpdateDomainsRequestSubdomain>` — Use a subdomain of a domain this account bought through Whop, such as shop.example.com under example.com. It's the default when you add such a subdomain without a capability. Whop publishes its DNS records in the root domain's zone, so it needs nothing from you: it stays `pending` until the root domain is set up, then turns `ready`. Whop releases it, and its website, when the account no longer holds the root domain, and deletes it when the root domain leaves the account. Pass `null` to release it. Can't be combined with `verification` or `registration`.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**transfer:** `Optional<UpdateDomainsRequestTransfer>` — Move a domain registered through Whop to another Whop account. Turning it on returns a code in `transfer.code`; the receiving account enters it as `registration.auth_code` on its own copy of the domain. Whop then removes the domain's email, email addresses and Apple Pay from this account, moves the registration with its expiry, stops charging this account to renew it, and removes the domain from this account. Pass `null` to turn it off and invalidate the code, until another account has entered it.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**verification:** `Optional<UpdateDomainsRequestVerification>` — Prove you control the domain's DNS: Whop returns a TXT record to publish in `issues`, and whoever publishes it owns the domain on Whop. Pass `null` to release it. Can't be combined with `registration`.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**website:** `Optional<UpdateDomainsRequestWebsite>` — Serve a Whop website on the domain. Pass `null` to stop serving it; the domain keeps its other capabilities.
+    
+</dd>
+</dl>
+</dd>
+</dl>
+
+
+</dd>
+</dl>
+</details>
+
+<details><summary><code>client.domains.check(id) -> Domain</code></summary>
+<dl>
+<dd>
+
+#### 📝 Description
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+Checks the domain's DNS, payment, and provider state again now instead of at its next scheduled check. Returns the domain as saved; retrieve it again to see the result.
+</dd>
+</dl>
+</dd>
+</dl>
+
+#### 🔌 Usage
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+```java
+client.domains().check(
+    "id",
+    CheckDomainsRequest
+        .builder()
+        .build()
+);
+```
+</dd>
+</dl>
+</dd>
+</dl>
+
+#### ⚙️ Parameters
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+**id:** `String` — Domain ID, prefixed `dom_`.
+    
+</dd>
+</dl>
+</dd>
+</dl>
+
+
+</dd>
+</dl>
+</details>
+
+## Economic Intelligence
+<details><summary><code>client.economicIntelligence.list() -> SyncPagingIterable&amp;lt;EconomicIntelligence&amp;gt;</code></summary>
+<dl>
+<dd>
+
+#### 📝 Description
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+Lists an account's recommendations, newest first by default. `status: ready` is what the account can act on now. Any other listing is its history of runs. Executed recommendations and runs stay listed after Economic Intelligence turns off, but new recommendations are offered only to businesses it is written for. For visitor countries, page views, ad impressions and clicks, or payment volume over a time range, use `GET /stats/time_series/:metric`.
+</dd>
+</dl>
+</dd>
+</dl>
+
+#### 🔌 Usage
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+```java
+client.economicIntelligence().list(
+    ListEconomicIntelligenceRequest
+        .builder()
+        .build()
+);
+```
+</dd>
+</dl>
+</dd>
+</dl>
+
+#### ⚙️ Parameters
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+**accountId:** `Optional<String>` — Account ID, prefixed `biz_`. Defaults to the API key's own account. Omit with `has_run` for the runs on every account you can read.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**status:** `Optional<ListEconomicIntelligenceRequestStatus>` — `ready` lists the recommendations the account can run now. A run status lists only the runs in that state. `queued`, `pending` and `superseded` are no longer listed and answer nothing.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**input:** `Optional<String>` — No longer read: recommendations are written for the business as it changes. Up to 1000 characters.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**hasRun:** `Optional<Boolean>` — When true, only recommendations someone has started running, by any user. Without `account_id`, covers every account you can read.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**order:** `Optional<ListEconomicIntelligenceRequestOrder>` — Sort field.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**direction:** `Optional<ListEconomicIntelligenceRequestDirection>` — Sort direction.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**first:** `Optional<Integer>` — Number of results to return from the start of the range.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**after:** `Optional<String>` — Return results after this cursor. Use `page_info.end_cursor` from the previous response to fetch the next page.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**last:** `Optional<Integer>` — Number of results to return from the end of the range.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**before:** `Optional<String>` — Return results before this cursor. Use `page_info.start_cursor` from the previous response to fetch the previous page.
+    
+</dd>
+</dl>
+</dd>
+</dl>
+
+
+</dd>
+</dl>
+</details>
+
+<details><summary><code>client.economicIntelligence.update(id, request) -> EconomicIntelligence</code></summary>
+<dl>
+<dd>
+
+#### 📝 Description
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+Updates a recommendation status, records feedback, or both. Send `sentiment` to rate it. Include `status: superseded` to retire a ready recommendation. A rating alone leaves its status unchanged. To run a recommendation yourself, send `status: running` to start. Send `status: executed` when it is carried out, or `status: incomplete` if the run ended without carrying it out. With `executed`, name what changed in `result_id` or where the run worked in `result_page`, and the result links there. Whop AI reports its own runs the same way. Send `status: acknowledged` once an executed run's result has been seen.
+</dd>
+</dl>
+</dd>
+</dl>
+
+#### 🔌 Usage
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+```java
+client.economicIntelligence().update(
+    "id",
+    UpdateEconomicIntelligenceRequest
+        .builder()
+        .build()
+);
+```
+</dd>
+</dl>
+</dd>
+</dl>
+
+#### ⚙️ Parameters
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+**id:** `String` — Recommendation ID, prefixed `reca_`.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**accountId:** `Optional<String>` — Account ID, prefixed `biz_`. Defaults to the API key's own account.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**input:** `Optional<String>` — No longer read: recommendations are written for the business as it changes. Up to 1000 characters.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**resultId:** `Optional<String>` — With `status: executed`, the ID of what the run produced or changed, and the recommendation's `result_url` becomes where to view it: an ad (`ad_`), ad group (`adgrp_`) or ad campaign (`adcamp_`), a website (`app_`), a product (`prod_`), a plan (`plan_`), a checkout link (`ch_`), a promo code (`promo_`), or an experience (`exp_`). Without `result_id` or `result_page`, `result_url` links to the resource the recommendation was about, when it names one. Send only one of `result_id`, `result_page` and `result_url`.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**resultPage:** `Optional<UpdateEconomicIntelligenceRequestResultPage>` — With `status: executed`, the page where the run's result can be seen when it is not one resource, such as the checkout links list. The recommendation's `result_url` becomes that page on the account's dashboard.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**resultUrl:** `Optional<String>` — With `status: executed`, where to view what was produced when it is outside Whop. An http or https URL. Prefer `result_id` for anything on Whop.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**sentiment:** `Optional<UpdateEconomicIntelligenceRequestSentiment>` — A signed-in user can rate a recommendation as `positive` or `negative`. Can be sent alone or together with status.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**status:** `Optional<UpdateEconomicIntelligenceRequestStatus>` — Use `running` to start a run of a ready recommendation, `executed` to record that it was carried out, `incomplete` to record that a running recommendation's run ended without carrying it out, `superseded` to reject a ready recommendation, or `acknowledged` to mark an executed run as seen; the recommendation stays `executed` and records `acknowledged_at`.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**userFeedback:** `Optional<String>` — An optional explanation of the rating or rejection.
+    
+</dd>
+</dl>
+</dd>
+</dl>
+
+
+</dd>
+</dl>
+</details>
+
+## Email addresses
+<details><summary><code>client.emailAddresses.list() -> SyncPagingIterable&amp;lt;EmailAddress&amp;gt;</code></summary>
+<dl>
+<dd>
+
+#### 📝 Description
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+Lists the email addresses of the accounts you can read, and the mailboxes you own. A password is included only for mailboxes you can use.
+</dd>
+</dl>
+</dd>
+</dl>
+
+#### 🔌 Usage
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+```java
+client.emailAddresses().list(
+    ListEmailAddressesRequest
+        .builder()
+        .build()
+);
+```
+</dd>
+</dl>
+</dd>
+</dl>
+
+#### ⚙️ Parameters
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+**accountId:** `Optional<String>` — Only addresses belonging to this account, prefixed biz_.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**order:** `Optional<ListEmailAddressesRequestOrder>` — Field to sort by.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**direction:** `Optional<ListEmailAddressesRequestDirection>` — Sort direction.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**first:** `Optional<Integer>` — Number of results to return from the start of the range.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**after:** `Optional<String>` — Return results after this cursor. Use `page_info.end_cursor` from the previous response to fetch the next page.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**last:** `Optional<Integer>` — Number of results to return from the end of the range.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**before:** `Optional<String>` — Return results before this cursor. Use `page_info.start_cursor` from the previous response to fetch the previous page.
+    
+</dd>
+</dl>
+</dd>
+</dl>
+
+
+</dd>
+</dl>
+</details>
+
+<details><summary><code>client.emailAddresses.create(request) -> EmailAddress</code></summary>
+<dl>
+<dd>
+
+#### 📝 Description
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+Creates a mailbox on one of the account's domains. The domain needs the `email` capability turned on. The address can be created and signed in to while email is still setting up, and it can send once email is `ready`. Give it to a team member with `user_id`, or leave it out to share the mailbox with the account. Creating an address this account deleted brings the mailbox back, with its mail and a new password.
+</dd>
+</dl>
+</dd>
+</dl>
+
+#### 🔌 Usage
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+```java
+client.emailAddresses().create(
+    CreateEmailAddressesRequest
+        .builder()
+        .address("marcus@shinetime.example")
+        .build()
+);
+```
+</dd>
+</dl>
+</dd>
+</dl>
+
+#### ⚙️ Parameters
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+**accountId:** `Optional<String>` — Account ID, prefixed biz_. Required for user credentials; otherwise defaults to the credential's account.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**address:** `String` — The full address, such as support@example.com. The part before the @ can use letters, numbers, dots, dashes, underscores and plus signs.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**userId:** `Optional<String>` — ID of the team member who owns the mailbox, prefixed `user_`. Only they can read it or send from it. Leave it out, or pass `null`, to share the mailbox with the account. Giving an owned mailbox to someone else empties it: the owner's mail is never shown to anyone else.
+    
+</dd>
+</dl>
+</dd>
+</dl>
+
+
+</dd>
+</dl>
+</details>
+
+<details><summary><code>client.emailAddresses.retrieve(id) -> EmailAddress</code></summary>
+<dl>
+<dd>
+
+#### 📝 Description
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+Retrieves an email address. Its owner can always retrieve it; anyone else needs `email:read`. The password is included only if you can use the mailbox.
+</dd>
+</dl>
+</dd>
+</dl>
+
+#### 🔌 Usage
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+```java
+client.emailAddresses().retrieve(
+    "id",
+    RetrieveEmailAddressesRequest
+        .builder()
+        .build()
+);
+```
+</dd>
+</dl>
+</dd>
+</dl>
+
+#### ⚙️ Parameters
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+**id:** `String` — Email address ID, prefixed `emaddr_`.
+    
+</dd>
+</dl>
+</dd>
+</dl>
+
+
+</dd>
+</dl>
+</details>
+
+<details><summary><code>client.emailAddresses.delete(id) -> EmailAddress</code></summary>
+<dl>
+<dd>
+
+#### 📝 Description
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+Deletes the address. Mail apps signed in to it lose access, and mail sent to it is no longer received. Its mail is kept, and creating the address again in this account brings the mailbox back.
+</dd>
+</dl>
+</dd>
+</dl>
+
+#### 🔌 Usage
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+```java
+client.emailAddresses().delete(
+    "id",
+    DeleteEmailAddressesRequest
+        .builder()
+        .build()
+);
+```
+</dd>
+</dl>
+</dd>
+</dl>
+
+#### ⚙️ Parameters
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+**id:** `String` — Email address ID, prefixed `emaddr_`.
+    
+</dd>
+</dl>
+</dd>
+</dl>
+
+
+</dd>
+</dl>
+</details>
+
+<details><summary><code>client.emailAddresses.update(id, request) -> EmailAddress</code></summary>
+<dl>
+<dd>
+
+#### 📝 Description
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+Gives the mailbox to a team member, or shares it with the account, under a new password. A mailbox that had an owner starts empty, because its earlier mail is private to that owner; mail apps sync it again from the start.
+</dd>
+</dl>
+</dd>
+</dl>
+
+#### 🔌 Usage
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+```java
+client.emailAddresses().update(
+    "id",
+    UpdateEmailAddressesRequest
+        .builder()
+        .build()
+);
+```
+</dd>
+</dl>
+</dd>
+</dl>
+
+#### ⚙️ Parameters
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+**id:** `String` — Email address ID, prefixed `emaddr_`.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**userId:** `Optional<String>` — ID of the team member who owns the mailbox, prefixed `user_`. Only they can read it or send from it. Leave it out, or pass `null`, to share the mailbox with the account. Giving an owned mailbox to someone else empties it: the owner's mail is never shown to anyone else.
+    
+</dd>
+</dl>
+</dd>
+</dl>
+
+
+</dd>
+</dl>
+</details>
+
+<details><summary><code>client.emailAddresses.mobileconfig(id) -> InputStream</code></summary>
+<dl>
+<dd>
+
+#### 📝 Description
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+Downloads an Apple configuration profile that adds the mailbox to Mail on a Mac, iPhone or iPad, signed in and ready to send. Only the owner can download it for an owned mailbox; a shared one needs `email:read` and `email:send`.
+</dd>
+</dl>
+</dd>
+</dl>
+
+#### 🔌 Usage
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+```java
+client.emailAddresses().mobileconfig(
+    "id",
+    MobileconfigEmailAddressesRequest
+        .builder()
+        .build()
+);
+```
+</dd>
+</dl>
+</dd>
+</dl>
+
+#### ⚙️ Parameters
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+**id:** `String` — Email address ID, prefixed `emaddr_`.
+    
+</dd>
+</dl>
+</dd>
+</dl>
+
+
+</dd>
+</dl>
+</details>
+
+<details><summary><code>client.emailAddresses.resetPassword(id) -> EmailAddress</code></summary>
+<dl>
+<dd>
+
+#### 📝 Description
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+Gives the mailbox a new password. Every mail app signed in with the old one loses access. Only the owner can reset an owned mailbox; a shared one needs `email:read` and `email:send`.
+</dd>
+</dl>
+</dd>
+</dl>
+
+#### 🔌 Usage
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+```java
+client.emailAddresses().resetPassword(
+    "id",
+    ResetPasswordEmailAddressesRequest
+        .builder()
+        .build()
+);
+```
+</dd>
+</dl>
+</dd>
+</dl>
+
+#### ⚙️ Parameters
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+**id:** `String` — Email address ID, prefixed `emaddr_`.
     
 </dd>
 </dl>
@@ -14896,7 +19583,7 @@ client.entries().deny(
 <dl>
 <dd>
 
-Lists identity-linked events, most recent first by default. Pass identifier for one person's journey, or omit it to list events for an account within an explicit time range. Pass direction=asc to read a journey forwards from where it starts. Events are shaped like the POST /events intake: attribution in context, identity in user.
+Lists identity-linked events, most recent first by default. Pass `identifier` for one person's journey, or omit it to list an account's events within a time range. Events have the same shape as the `POST /events` intake: attribution in `context`, identity in `user`.
 </dd>
 </dl>
 </dd>
@@ -14962,7 +19649,7 @@ client.events().list(
 <dl>
 <dd>
 
-**first:** `Optional<Integer>` — The number of events to return.
+**first:** `Optional<Integer>` — Number of results to return from the start of the range.
     
 </dd>
 </dl>
@@ -14970,7 +19657,7 @@ client.events().list(
 <dl>
 <dd>
 
-**after:** `Optional<String>` — A cursor for fetching events after a previous page.
+**after:** `Optional<String>` — Return results after this cursor. Use `page_info.end_cursor` from the previous response to fetch the next page.
     
 </dd>
 </dl>
@@ -14978,7 +19665,7 @@ client.events().list(
 <dl>
 <dd>
 
-**before:** `Optional<String>` — A cursor for fetching events before a later page.
+**before:** `Optional<String>` — Return results before this cursor. Use `page_info.start_cursor` from the previous response to fetch the previous page.
     
 </dd>
 </dl>
@@ -15002,7 +19689,7 @@ client.events().list(
 <dl>
 <dd>
 
-**source:** `Optional<String>` — Canonical source path, exact or with a trailing :* prefix (whop:<campaign>:*, ext:meta:*, referrer:<domain>, direct). Restricts the list to conversion targets attributed to that source — the debuggability twin of a metric cell's source parameter.
+**source:** `Optional<String>` — Canonical source path, exact or with a trailing :* prefix (whop:<campaign>:*, ext:meta:*, referrer:<domain>, direct, unknown). Selects conversions credited to this source.
     
 </dd>
 </dl>
@@ -15098,7 +19785,7 @@ client.events().list(
 <dl>
 <dd>
 
-Tracks a conversion or engagement event for an account.
+Tracks a conversion or engagement event for an account, such as a lead or a sign-up, so it can be attributed to the ads and links that drove it. Send server-side events with an API key that has `event:create`; the browser pixel calls this without authentication.
 </dd>
 </dl>
 </dd>
@@ -15150,6 +19837,22 @@ client.events().create(
 <dl>
 <dd>
 
+**appBuildId:** `Optional<String>` — The build of the hosted app that served the page where the event occurred.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**appId:** `Optional<String>` — The hosted app that served the page where the event occurred.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
 **context:** `Optional<CreateEventsRequestContext>` — Tracking and attribution context.
     
 </dd>
@@ -15194,7 +19897,7 @@ client.events().create(
 
 The type of event.
 
-Use a standard event (lead, submit_application, contact, complete_registration, schedule, view_content, add_to_cart) or pass your own name directly for a custom event.
+Use a standard event (lead, submit_application, contact, complete_registration, schedule, view_content, add_to_cart, initiate_checkout) or pass your own name directly for a custom event.
     
 </dd>
 </dl>
@@ -15203,14 +19906,6 @@ Use a standard event (lead, submit_application, contact, complete_registration, 
 <dd>
 
 **eventTime:** `Optional<OffsetDateTime>` — When the event occurred. Defaults to now.
-    
-</dd>
-</dl>
-
-<dl>
-<dd>
-
-**planId:** `Optional<String>` — The plan associated with the event.
     
 </dd>
 </dl>
@@ -15278,6 +19973,14 @@ Use a standard event (lead, submit_application, contact, complete_registration, 
     
 </dd>
 </dl>
+
+<dl>
+<dd>
+
+**variantId:** `Optional<String>` — The variant associated with the event.
+    
+</dd>
+</dl>
 </dd>
 </dl>
 
@@ -15298,7 +20001,7 @@ Use a standard event (lead, submit_application, contact, complete_registration, 
 <dl>
 <dd>
 
-Returns a fully anonymized feed of recent platform-wide money movement, most recent first: purchases, affiliate commissions, card and ad spend, app revenue, off-platform sales, wallet deposits, card loads, claimed drops, transfers between accounts, and referral bonuses. Items carry only a `type`, the underlying event name, a USD amount, a coarse location under `user`, and a timestamp coarsened to the start of the minute; missing fields are omitted, not nulled. The payload is identical for every caller; no auth is required.
+Returns a fully anonymized feed of recent money movement across Whop, most recent first, such as purchases, card spend, and transfers between accounts. Each item carries only its `type`, a USD amount, a coarse location, and a timestamp coarsened to the minute. The payload is identical for every caller and requires no authentication.
 </dd>
 </dl>
 </dd>
@@ -15340,7 +20043,7 @@ client.events().pulse(
 <dl>
 <dd>
 
-**first:** `Optional<Integer>` — The number of events to return.
+**first:** `Optional<Integer>` — Number of results to return from the start of the range.
     
 </dd>
 </dl>
@@ -15348,7 +20051,7 @@ client.events().pulse(
 <dl>
 <dd>
 
-**after:** `Optional<String>` — A cursor for fetching events after a previous page.
+**after:** `Optional<String>` — Return results after this cursor. Use `page_info.end_cursor` from the previous response to fetch the next page.
     
 </dd>
 </dl>
@@ -15356,7 +20059,7 @@ client.events().pulse(
 <dl>
 <dd>
 
-**before:** `Optional<String>` — A cursor for fetching events before a later page.
+**before:** `Optional<String>` — Return results before this cursor. Use `page_info.start_cursor` from the previous response to fetch the previous page.
     
 </dd>
 </dl>
@@ -15380,7 +20083,7 @@ client.events().pulse(
 <dl>
 <dd>
 
-Checks whether the Whop pixel is installed for an account. Recent pixel events count as proof on their own, so an account that has sent data lately comes back installed without a `url`. Pass a `url` and events from that page settle it; conversion events are also read across the hostname because they commonly fire on a later confirmation page. If the requested page hasn't sent any events lately, it is fetched and read for the pixel and conversion events wired on it. `installed` is only true when the pixel was actually seen — in the account's events or in the page.
+Checks whether the Whop pixel is installed for an account, or on one page when you pass a `url`. Use it before launching an ad to confirm its destination is tracked, or in a setup flow to tell a merchant whether their install is live.
 </dd>
 </dl>
 </dd>
@@ -15422,7 +20125,7 @@ client.events().validatePixel(
 <dl>
 <dd>
 
-**url:** `Optional<String>` — A page to read for the pixel, e.g. an ad destination. Omit it to check the account from its events alone.
+**url:** `Optional<String>` — A page to check for the pixel, such as an ad destination. Events from that page settle the answer; if it hasn't sent any lately, it is fetched and its source read for the pixel and the conversion events wired on it. Omit it to check the account from its events alone.
     
 </dd>
 </dl>
@@ -15447,7 +20150,7 @@ client.events().validatePixel(
 <dl>
 <dd>
 
-Returns a paginated list of experiences belonging to a company, with optional filtering by product and app.
+Lists the experiences in an account, optionally filtered to those attached to one product or powered by one app.
 </dd>
 </dl>
 </dd>
@@ -15465,7 +20168,7 @@ Returns a paginated list of experiences belonging to a company, with optional fi
 client.experiences().list(
     ListExperiencesRequest
         .builder()
-        .companyId("biz_xxxxxxxxxxxxxx")
+        .accountId("biz_xxxxxxxxxxxxxx")
         .first(42)
         .last(42)
         .productId("prod_xxxxxxxxxxxxx")
@@ -15520,14 +20223,6 @@ client.experiences().list(
 <dl>
 <dd>
 
-**companyId:** `String` — The unique identifier of the company to list experiences for.
-    
-</dd>
-</dl>
-
-<dl>
-<dd>
-
 **productId:** `Optional<String>` — Filter to only experiences attached to this product identifier.
     
 </dd>
@@ -15556,6 +20251,14 @@ client.experiences().list(
     
 </dd>
 </dl>
+
+<dl>
+<dd>
+
+**accountId:** `String` — The unique identifier of the company to list experiences for.
+    
+</dd>
+</dl>
 </dd>
 </dl>
 
@@ -15576,6 +20279,8 @@ client.experiences().list(
 <dl>
 <dd>
 
+Creates an experience for an account, powered by an app such as courses, forums, or chat. Attach it to a product with `POST /experiences/:id/attach` to give that product's customers access.
+
 Required permissions:
  - `experience:create`
 </dd>
@@ -15595,8 +20300,8 @@ Required permissions:
 client.experiences().create(
     CreateExperiencesRequest
         .builder()
+        .accountId("biz_xxxxxxxxxxxxxx")
         .appId("app_xxxxxxxxxxxxxx")
-        .companyId("biz_xxxxxxxxxxxxxx")
         .build()
 );
 ```
@@ -15613,7 +20318,7 @@ client.experiences().create(
 <dl>
 <dd>
 
-**appId:** `String` — The unique identifier of the app that powers this experience.
+**accountId:** `String` — The unique identifier of the company to create this experience for.
     
 </dd>
 </dl>
@@ -15621,7 +20326,7 @@ client.experiences().create(
 <dl>
 <dd>
 
-**companyId:** `String` — The unique identifier of the company to create this experience for.
+**appId:** `String` — The unique identifier of the app that powers this experience.
     
 </dd>
 </dl>
@@ -15744,6 +20449,8 @@ client.experiences().retrieve(
 <dl>
 <dd>
 
+Deletes an experience and detaches it from every product, removing customer access to it. Returns `true` on success.
+
 Required permissions:
  - `experience:delete`
 </dd>
@@ -15803,6 +20510,8 @@ client.experiences().delete(
 
 <dl>
 <dd>
+
+Updates an experience's name, logo, visibility, or notification setting, or moves it to another section or position.
 
 Required permissions:
  - `experience:update`
@@ -15920,7 +20629,7 @@ client.experiences().update(
 <dl>
 <dd>
 
-Attach an experience to a product, making it accessible to the product's customers.
+Attaches an experience to a product, giving the product's customers access to it.
 
 Required permissions:
  - `experience:attach`
@@ -15991,7 +20700,7 @@ client.experiences().attach(
 <dl>
 <dd>
 
-Detach an experience from a product, removing customer access to it through that product.
+Detaches an experience from a product, removing customer access to it through that product.
 
 Required permissions:
  - `experience:detach`
@@ -16062,10 +20771,7 @@ client.experiences().detach(
 <dl>
 <dd>
 
-Duplicates an existing experience. The name will be copied, unless provided. The new experience will be attached to the same products as the original experience.
-If duplicating a Forum or Chat experience, the new experience will have the same settings as the original experience, e.g. who can post, who can comment, etc.
-No content, e.g. posts, messages, lessons from within the original experience will be copied.
-
+Duplicates an experience and attaches the copy to the same products as the original. Forum and chat copies keep the original's settings, such as who can post or comment. No content, such as posts, messages, or lessons, is copied.
 
 Required permissions:
  - `experience:create`
@@ -16112,6 +20818,767 @@ client.experiences().duplicate(
 <dd>
 
 **name:** `Optional<String>` — The display name for the duplicated experience. Defaults to the original experience's name.
+    
+</dd>
+</dl>
+</dd>
+</dl>
+
+
+</dd>
+</dl>
+</details>
+
+## Experiments
+<details><summary><code>client.experiments.list() -> SyncPagingIterable&amp;lt;Experiment&amp;gt;</code></summary>
+<dl>
+<dd>
+
+#### 📝 Description
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+Lists the experiments and feature flags owned by an account. Requires `experiment:read` on the account.
+</dd>
+</dl>
+</dd>
+</dl>
+
+#### 🔌 Usage
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+```java
+client.experiments().list(
+    ListExperimentsRequest
+        .builder()
+        .build()
+);
+```
+</dd>
+</dl>
+</dd>
+</dl>
+
+#### ⚙️ Parameters
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+**accountId:** `Optional<String>` — Owning account ID.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**relatedResource:** `Optional<ExperimentResourceReference>` — Filter by related resource; requires account_id.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**status:** `Optional<ListExperimentsRequestStatus>` — Only experiments with this status.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**first:** `Optional<Integer>` — Number of results to return from the start of the range.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**after:** `Optional<String>` — Return results after this cursor. Use `page_info.end_cursor` from the previous response to fetch the next page.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**last:** `Optional<Integer>` — Number of results to return from the end of the range.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**before:** `Optional<String>` — Return results before this cursor. Use `page_info.start_cursor` from the previous response to fetch the previous page.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**order:** `Optional<ListExperimentsRequestOrder>` — The field to sort experiments by.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**direction:** `Optional<ListExperimentsRequestDirection>` — Sort direction.
+    
+</dd>
+</dl>
+</dd>
+</dl>
+
+
+</dd>
+</dl>
+</details>
+
+<details><summary><code>client.experiments.create(request) -> Experiment</code></summary>
+<dl>
+<dd>
+
+#### 📝 Description
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+Creates an experiment or feature flag in `draft` status for an account. Nothing is served until you activate it with `POST /experiments/:id/activate`, which needs Economic Intelligence on for the account. Requires `experiment:manage` on the account.
+</dd>
+</dl>
+</dd>
+</dl>
+
+#### 🔌 Usage
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+```java
+client.experiments().create(
+    CreateExperimentsRequest
+        .builder()
+        .accountId("biz_xxxxxxxxxxxxxx")
+        .flagKey("checkout_redesign_v2")
+        .build()
+);
+```
+</dd>
+</dl>
+</dd>
+</dl>
+
+#### ⚙️ Parameters
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+**accountId:** `String` — Owning account ID. Required; ownership cannot change.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**bucketBy:** `Optional<CreateExperimentsRequestBucketBy>` — Randomization unit, and the only identity the assignment is keyed on — evaluation fails rather than falling back to another. `user` (default) uses `subject[user_id]`; `account` uses `subject[account_id]`, so every user of an account gets the same arm; `anonymous` uses the anonymous id and survives sign-in. Fixed after creation.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**control:** `Optional<CreateExperimentsRequestControl>` 
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**featureFlagOnly:** `Optional<Boolean>` — When `true`, creates a binary feature flag rather than a full experiment. Feature flags expose the same evaluation API but do not collect metric results. Defaults to `false`.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**flagKey:** `String` — Developer-chosen handle referenced from code, used in evaluation and results calls. Interchangeable with the returned `expt_` id anywhere the API takes an experiment identifier.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**hypothesis:** `Optional<String>` — Required for full experiments; rejected on feature flags. Structure it as "If we [change] for [cohort], then [measurable behavior] will [increase/decrease], resulting in [business outcome], because [evidence]. Created by [name]." Evidence should be something real — a baseline number, a funnel breakdown — not a guess, and [name] is you, not something to leave blank.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**metadata:** `Optional<Map<String, String>>` — Up to 20 key-value pairs you can attach to the experiment for your own use, such as which pages it changes. Keys are at most 40 characters and values at most 500.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**name:** `Optional<String>` — Human-readable display name. Defaults to `flag_key` when omitted.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**relatedResource:** `Optional<ExperimentResourceReference>` — Resource owned by the account that this experiment is bound to, such as an app or product. `null` when unbound. Fixed once the experiment first activates.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**targetingRules:** `Optional<List<CreateExperimentsRequestTargetingRulesItem>>` — Rules that determine which subjects qualify for the experiment.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**variants:** `Optional<List<CreateExperimentsRequestVariantsItem>>` — Treatment arms to create. Users outside every arm form the implicit `control` group. Required unless `feature_flag_only` is `true`.
+    
+</dd>
+</dl>
+</dd>
+</dl>
+
+
+</dd>
+</dl>
+</details>
+
+<details><summary><code>client.experiments.exposures() -> ExposuresExperimentsResponse</code></summary>
+<dl>
+<dd>
+
+#### 📝 Description
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+Evaluates experiments and feature flags for a subject and records an exposure. Pass `flag_key` to evaluate one flag, or omit it to evaluate every active flag in the account and related resource scope. Requires no authentication; when a credential resolves, its authentication method, API key ID, and signed-in user ID are recorded on the exposure event.
+</dd>
+</dl>
+</dd>
+</dl>
+
+#### 🔌 Usage
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+```java
+client.experiments().exposures(
+    ExposuresExperimentsRequest
+        .builder()
+        .build()
+);
+```
+</dd>
+</dl>
+</dd>
+</dl>
+
+#### ⚙️ Parameters
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+**subject:** `Optional<ExposuresExperimentsRequestSubject>` — Bucketing subject: the user, account, or anonymous ID the experiment's `bucket_by` assigns on. Only the identity matching `bucket_by` is used; when it is missing, evaluating a single flag fails and a batch omits that experiment. Subjects outside every treatment range receive `control`. `subject[account_id]` also enables account-level targeting rules. Experiment ownership comes from the top-level `account_id`.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**relatedResource:** `Optional<ExperimentResourceReference>` — Restricts batch evaluation to this related resource; omitted batches contain only unbound experiments.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**flagKey:** `Optional<String>` — Flag or experiment to evaluate — the flag_key handle or the `expt_` id. Omit to return all flags the caller qualifies for.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**accountId:** `Optional<String>` — Owning account ID. Required when evaluating by flag_key or in a batch; optional for an expt_ ID.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**properties:** `Optional<String>` — JSON-encoded scalar values that property targeting conditions match against. Numeric and boolean strings are coerced. Nested query keys such as properties[variant]=pro remain accepted for existing callers.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**logExposure:** `Optional<Boolean>` — Set `false` to read an assignment without recording an exposure, such as when a client caches assignments up front and records the exposure when the arm is rendered. Omitted records the exposure.
+    
+</dd>
+</dl>
+</dd>
+</dl>
+
+
+</dd>
+</dl>
+</details>
+
+<details><summary><code>client.experiments.retrieve(id) -> Experiment</code></summary>
+<dl>
+<dd>
+
+#### 📝 Description
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+Retrieves an experiment or feature flag by its `expt_` ID or `flag_key` handle. Requires `experiment:read` on the owning account.
+</dd>
+</dl>
+</dd>
+</dl>
+
+#### 🔌 Usage
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+```java
+client.experiments().retrieve(
+    "id",
+    RetrieveExperimentsRequest
+        .builder()
+        .build()
+);
+```
+</dd>
+</dl>
+</dd>
+</dl>
+
+#### ⚙️ Parameters
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+**id:** `String` — The experiment identifier — the `expt_` id or the flag_key handle.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**accountId:** `Optional<String>` — Owning account ID. Required when id is a flag key; optional for an expt_ ID.
+    
+</dd>
+</dl>
+</dd>
+</dl>
+
+
+</dd>
+</dl>
+</details>
+
+<details><summary><code>client.experiments.update(id, request) -> Experiment</code></summary>
+<dl>
+<dd>
+
+#### 📝 Description
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+Updates the targeting rules, treatment allocation, or hypothesis of an existing experiment or feature flag. To change its lifecycle, use the `activate`, `pause`, and `end` endpoints instead. Requires `experiment:manage` on the owning account.
+</dd>
+</dl>
+</dd>
+</dl>
+
+#### 🔌 Usage
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+```java
+client.experiments().update(
+    "id",
+    UpdateExperimentsRequest
+        .builder()
+        .build()
+);
+```
+</dd>
+</dl>
+</dd>
+</dl>
+
+#### ⚙️ Parameters
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+**id:** `String` — The experiment identifier — the `expt_` id or the flag_key handle.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**accountId:** `Optional<String>` — Owning account ID. Required when id is a flag key; optional for an expt_ ID.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**control:** `Optional<UpdateExperimentsRequestControl>` 
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**hypothesis:** `Optional<String>` — Omit to leave unchanged. Send an empty string to clear it. Not accepted on feature flags. When setting it, structure it as "If we [change] for [cohort], then [measurable behavior] will [increase/decrease], resulting in [business outcome], because [evidence]. Created by [name]." same as on create.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**relatedResource:** `Optional<ExperimentResourceReference>` — Resource owned by the account that this experiment is bound to, such as an app or product. `null` when unbound. Fixed once the experiment first activates.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**targetingRules:** `Optional<List<UpdateExperimentsRequestTargetingRulesItem>>` — Replace the targeting rules with this set. Omit to leave unchanged.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**variants:** `Optional<List<UpdateExperimentsRequestVariantsItem>>` — Grow treatment allocation. Pass every existing treatment with an equal-or-higher weight; append new names to add arms. Weights never decrease and arms are never removed. Omit to leave unchanged.
+    
+</dd>
+</dl>
+</dd>
+</dl>
+
+
+</dd>
+</dl>
+</details>
+
+<details><summary><code>client.experiments.activate(id, request) -> Experiment</code></summary>
+<dl>
+<dd>
+
+#### 📝 Description
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+Starts (or resumes) an experiment or feature flag so evaluation begins serving it. Activating a draft stamps `started_at`; resuming a paused experiment keeps the original start. Only drafts and paused experiments can be activated. Requires `experiment:manage` on the owning account. Activating needs Economic Intelligence on for the owning account: while the account's `economic_intelligence` is `false`, this returns a `403` and the experiment keeps its status. Turn it on with `PATCH /accounts/:account_id/preferences`. Creating, editing, pausing and ending an experiment don't need it.
+</dd>
+</dl>
+</dd>
+</dl>
+
+#### 🔌 Usage
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+```java
+client.experiments().activate(
+    "id",
+    ActivateExperimentsRequest
+        .builder()
+        .build()
+);
+```
+</dd>
+</dl>
+</dd>
+</dl>
+
+#### ⚙️ Parameters
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+**id:** `String` — The experiment identifier — the `expt_` id or the flag_key handle.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**accountId:** `Optional<String>` — Owning account ID. Required when id is a flag key; optional for an expt_ ID.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**durationDays:** `Optional<Integer>` — Reporting window length in days. Omit to use the default. This does not automatically end the experiment.
+    
+</dd>
+</dl>
+</dd>
+</dl>
+
+
+</dd>
+</dl>
+</details>
+
+<details><summary><code>client.experiments.end(id, request) -> Experiment</code></summary>
+<dl>
+<dd>
+
+#### 📝 Description
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+Concludes the experiment and records required `findings`. Pass `winning_arm` to serve the winning treatment to everyone; omit it when control won. Ended experiments cannot restart, but may be ended again to correct the winner. Requires `experiment:manage` on the owning account.
+</dd>
+</dl>
+</dd>
+</dl>
+
+#### 🔌 Usage
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+```java
+client.experiments().end(
+    "id",
+    EndExperimentsRequest
+        .builder()
+        .findings("Treatment lifted signups 12%, shipping it to everyone.")
+        .build()
+);
+```
+</dd>
+</dl>
+</dd>
+</dl>
+
+#### ⚙️ Parameters
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+**id:** `String` — The experiment identifier — the `expt_` id or the flag_key handle.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**accountId:** `Optional<String>` — Owning account ID. Required when id is a flag key; optional for an expt_ ID.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**findings:** `String` — What you learned and why you chose this outcome. Required.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**winningArm:** `Optional<String>` — The treatment that won. Setting it rolls that arm out: every later evaluation returns it to every caller, ignoring targeting and allocation, and exposures stop being recorded. Omit it when control won — an ended experiment with no winning arm evaluates to `control` for everyone, so ending again without one also reverts a rollout recorded by mistake. Not accepted on feature flags, which evaluate to disabled once ended.
+    
+</dd>
+</dl>
+</dd>
+</dl>
+
+
+</dd>
+</dl>
+</details>
+
+<details><summary><code>client.experiments.pause(id) -> Experiment</code></summary>
+<dl>
+<dd>
+
+#### 📝 Description
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+Pauses an active experiment or feature flag: evaluation stops serving it and exposures stop flowing. Assignments are keyed on stable identity, so users return to their original arm when the experiment resumes. Requires `experiment:manage` on the owning account.
+</dd>
+</dl>
+</dd>
+</dl>
+
+#### 🔌 Usage
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+```java
+client.experiments().pause(
+    "id",
+    PauseExperimentsRequest
+        .builder()
+        .build()
+);
+```
+</dd>
+</dl>
+</dd>
+</dl>
+
+#### ⚙️ Parameters
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+**id:** `String` — The experiment identifier — the `expt_` id or the flag_key handle.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**accountId:** `Optional<String>` — Owning account ID. Required when id is a flag key; optional for an expt_ ID.
     
 </dd>
 </dl>
@@ -16242,7 +21709,7 @@ client.exports().list(
 <dl>
 <dd>
 
-Starts an asynchronous CSV export of a resource for an account. Returns the export in `pending`; poll `GET /exports/{id}` until `download_url` is set.
+Starts an asynchronous export of a resource for an account. Returns the export in `pending`; poll `GET /exports/:id` until `download_url` is set.
 </dd>
 </dl>
 </dd>
@@ -16293,7 +21760,7 @@ client.exports().create(
 <dl>
 <dd>
 
-**filters:** `Optional<Map<String, Object>>` — Resource-specific filters. For native REST resources (`payouts`, `transfers`, `memberships`) these are the resource's own list query params; for dashboard tables they mirror the dashboard table filters.
+**filters:** `Optional<Map<String, Object>>` — Resource-specific filters. For native REST resources (`payouts`, `transfers`, `products`) these are the resource's own list query params; for dashboard tables they mirror the dashboard table filters.
     
 </dd>
 </dl>
@@ -16380,6 +21847,431 @@ client.exports().retrieve(
 </dl>
 </details>
 
+## External Accounts
+<details><summary><code>client.externalAccounts.list() -> SyncPagingIterable&amp;lt;ExternalAccount&amp;gt;</code></summary>
+<dl>
+<dd>
+
+#### 📝 Description
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+Lists the external accounts linked to an account or user.
+</dd>
+</dl>
+</dd>
+</dl>
+
+#### 🔌 Usage
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+```java
+client.externalAccounts().list(
+    ListExternalAccountsRequest
+        .builder()
+        .build()
+);
+```
+</dd>
+</dl>
+</dd>
+</dl>
+
+#### ⚙️ Parameters
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+**accountId:** `Optional<String>` — The Account that the external accounts are connected to. Provide either this or user_id.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**userId:** `Optional<String>` — The User that the external accounts are connected to. Provide either this or account_id.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**platform:** `Optional<ListExternalAccountsRequestPlatform>` — Only return external accounts for the platform that is specified. An `aimerce` account is returned only with this filter, which requires the `company:manage_checkout` scope instead of `social_account:read`.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**trustLevel:** `Optional<ListExternalAccountsRequestTrustLevel>` — Only return external accounts linked with this trust level, such as `oauth` for accounts connected through OAuth.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**verified:** `Optional<Boolean>` — Only return external accounts that are verified on the platform.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**scopes:** `Optional<ListExternalAccountsRequestScopesItem>` — Only return external accounts that have these scopes.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**first:** `Optional<Integer>` — Number of results to return from the start of the range.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**after:** `Optional<String>` — Return results after this cursor. Use `page_info.end_cursor` from the previous response to fetch the next page.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**last:** `Optional<Integer>` — Number of results to return from the end of the range.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**before:** `Optional<String>` — Return results before this cursor. Use `page_info.start_cursor` from the previous response to fetch the previous page.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**order:** `Optional<ListExternalAccountsRequestOrder>` — The field to sort external accounts by.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**direction:** `Optional<ListExternalAccountsRequestDirection>` — Sort direction.
+    
+</dd>
+</dl>
+</dd>
+</dl>
+
+
+</dd>
+</dl>
+</details>
+
+<details><summary><code>client.externalAccounts.create(request) -> ExternalAccount</code></summary>
+<dl>
+<dd>
+
+#### 📝 Description
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+Creates or returns a Whop-managed TikTok account for an account, or connects the account's existing Klaviyo account with a private API key. Whop no longer creates Facebook pages.
+</dd>
+</dl>
+</dd>
+</dl>
+
+#### 🔌 Usage
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+```java
+client.externalAccounts().create(
+    CreateExternalAccountsRequestBody.facebook(
+        CreateExternalAccountsRequestBodyFacebook
+            .builder()
+            .build()
+    )
+);
+```
+</dd>
+</dl>
+</dd>
+</dl>
+
+#### ⚙️ Parameters
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+**request:** `CreateExternalAccountsRequestBody` 
+    
+</dd>
+</dl>
+</dd>
+</dl>
+
+
+</dd>
+</dl>
+</details>
+
+<details><summary><code>client.externalAccounts.connect(request) -> ConnectExternalAccountsResponse</code></summary>
+<dl>
+<dd>
+
+#### 📝 Description
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+Starts an OAuth connection flow and returns an `authorize_url` to send the user to, where they connect an external account. Personal profile connections must be completed in a browser signed in as the Whop user who started the flow.
+</dd>
+</dl>
+</dd>
+</dl>
+
+#### 🔌 Usage
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+```java
+client.externalAccounts().connect(
+    ConnectExternalAccountsRequest
+        .builder()
+        .platform(ConnectExternalAccountsRequestPlatform.TIKTOK)
+        .redirectUrl("https://whop.com/dashboard/biz_xxxxxxxxxxxxxx/settings")
+        .build()
+);
+```
+</dd>
+</dl>
+</dd>
+</dl>
+
+#### ⚙️ Parameters
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+**accountId:** `Optional<String>` — The Account (biz_ identifier) to connect the external account for. An account-scoped API key may omit this to default to its own account. Omit for user profile connections.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**platform:** `ConnectExternalAccountsRequestPlatform` — The platform to connect the external account on. Use `tiktok` to connect the authenticated user’s TikTok profile, `linkedin` for their LinkedIn profile, `youtube` for their YouTube channel, or `x` for their X profile. Use `quickbooks` to connect the account’s QuickBooks Online company: pass `account_id`, and the user picks the company in QuickBooks.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**redirectUrl:** `String` — Where to send the user once they finish connecting their accounts. Must be an `https` URL on whop.com; any other host is rejected. On success, the user is redirected with an `external_account_connected` query param naming the platform; if the connection fails, with an `external_account_error` query param instead. The same values also arrive as `social_account_connected` / `social_account_error`.
+    
+</dd>
+</dl>
+</dd>
+</dl>
+
+
+</dd>
+</dl>
+</details>
+
+<details><summary><code>client.externalAccounts.delete(id) -> DeleteExternalAccountsResponse</code></summary>
+<dl>
+<dd>
+
+#### 📝 Description
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+Disconnects an external account from an account or user without deleting the underlying platform account.
+</dd>
+</dl>
+</dd>
+</dl>
+
+#### 🔌 Usage
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+```java
+client.externalAccounts().delete(
+    "id",
+    DeleteExternalAccountsRequest
+        .builder()
+        .build()
+);
+```
+</dd>
+</dl>
+</dd>
+</dl>
+
+#### ⚙️ Parameters
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+**id:** `String` — The ID of the external account to disconnect.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**accountId:** `Optional<String>` — The Account that the external account is connected to. Provide either this or user_id.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**userId:** `Optional<String>` — The User that the external account is connected to. Provide either this or account_id.
+    
+</dd>
+</dl>
+</dd>
+</dl>
+
+
+</dd>
+</dl>
+</details>
+
+<details><summary><code>client.externalAccounts.refresh(id, request) -> ExternalAccount</code></summary>
+<dl>
+<dd>
+
+#### 📝 Description
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+Refreshes the state of an external account. Use it to clear an `error` that has been resolved.
+</dd>
+</dl>
+</dd>
+</dl>
+
+#### 🔌 Usage
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+```java
+client.externalAccounts().refresh(
+    "id",
+    RefreshExternalAccountsRequest
+        .builder()
+        .build()
+);
+```
+</dd>
+</dl>
+</dd>
+</dl>
+
+#### ⚙️ Parameters
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+**id:** `String` — The external account (a sacc_ identifier) to refresh.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**accountId:** `Optional<String>` — The Account (biz_ identifier) the external account is connected to. An account-scoped API key may omit this to default to its own account.
+    
+</dd>
+</dl>
+</dd>
+</dl>
+
+
+</dd>
+</dl>
+</details>
+
 ## FeeMarkups
 <details><summary><code>client.feeMarkups.list() -> SyncPagingIterable&amp;lt;FeeMarkupListItem&amp;gt;</code></summary>
 <dl>
@@ -16393,7 +22285,7 @@ client.exports().retrieve(
 <dl>
 <dd>
 
-Returns a paginated list of fee markups configured for a company. If the company is a platform account, returns the platform default markups.
+Lists the fee markups configured for an account. For a platform account, returns the platform's default markups.
 
 Required permissions:
  - `company:update_child_fees`
@@ -16414,7 +22306,7 @@ Required permissions:
 client.feeMarkups().list(
     ListFeeMarkupsRequest
         .builder()
-        .companyId("biz_xxxxxxxxxxxxxx")
+        .accountId("biz_xxxxxxxxxxxxxx")
         .first(42)
         .last(42)
         .build()
@@ -16465,7 +22357,7 @@ client.feeMarkups().list(
 <dl>
 <dd>
 
-**companyId:** `String` — The unique identifier of the company to list fee markups for. Pass a platform account identifier to retrieve platform default markups.
+**accountId:** `String` — The unique identifier of the company to list fee markups for. Pass a platform account identifier to retrieve platform default markups.
     
 </dd>
 </dl>
@@ -16489,7 +22381,7 @@ client.feeMarkups().list(
 <dl>
 <dd>
 
-Create or update a fee markup for a company. If a markup for the specified fee type already exists, it will be updated with the new values.
+Creates or updates an account's markup for one fee type. If the account already has a markup for that `fee_type`, it is updated with the new values.
 
 Required permissions:
  - `company:update_child_fees`
@@ -16510,7 +22402,7 @@ Required permissions:
 client.feeMarkups().create(
     CreateFeeMarkupsRequest
         .builder()
-        .companyId("biz_xxxxxxxxxxxxxx")
+        .accountId("biz_xxxxxxxxxxxxxx")
         .feeType(FeeMarkupTypes.CRYPTO_WITHDRAWAL_MARKUP)
         .build()
 );
@@ -16528,7 +22420,7 @@ client.feeMarkups().create(
 <dl>
 <dd>
 
-**companyId:** `String` — The unique identifier of the company to create or update the fee markup for.
+**accountId:** `String` — The unique identifier of the company to create or update the fee markup for.
     
 </dd>
 </dl>
@@ -16592,7 +22484,7 @@ client.feeMarkups().create(
 <dl>
 <dd>
 
-Delete a fee markup configuration for a company. This removes the custom fee override and reverts to the parent company's default fees.
+Deletes a fee markup, removing the custom fee override so the account reverts to its parent account's default fees.
 
 Required permissions:
  - `company:update_child_fees`
@@ -16642,8 +22534,8 @@ client.feeMarkups().delete(
 </dl>
 </details>
 
-## Files
-<details><summary><code>client.files.create(request) -> CreateFilesResponse</code></summary>
+## FeedbackSubmissions
+<details><summary><code>client.feedbackSubmissions.create(request) -> CreateFeedbackSubmissionsResponse</code></summary>
 <dl>
 <dd>
 
@@ -16655,7 +22547,193 @@ client.feeMarkups().delete(
 <dl>
 <dd>
 
-Create a new file record and receive a presigned URL for uploading content to S3.
+Submits an issue or an unanswered question to Whop for review, recorded under the authenticated user, account, or app. Returns a receipt once the submission is accepted; processing is asynchronous and no reply is sent.
+</dd>
+</dl>
+</dd>
+</dl>
+
+#### 🔌 Usage
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+```java
+client.feedbackSubmissions().create(
+    CreateFeedbackSubmissionsRequest
+        .builder()
+        .content("The docs omit the required permission")
+        .source(CreateFeedbackSubmissionsRequestSource.MCP_REPORT_FEEDBACK)
+        .build()
+);
+```
+</dd>
+</dl>
+</dd>
+</dl>
+
+#### ⚙️ Parameters
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+**accountId:** `Optional<String>` — The ID of the account the feedback is about (biz_...), if any. Recorded as context only; it does not require or grant access to that account.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**content:** `String` — The problem or question in plain text, with enough context to act on. Leave out credentials, personal data, and payment details.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**source:** `CreateFeedbackSubmissionsRequestSource` — What kind of submission this is. Use api_report_feedback for an issue or api_ask_question for an unanswered question. The other values are reserved for Whop's own clients: the hosted MCP server, the Whop CLI, and Whop AI chat.
+    
+</dd>
+</dl>
+</dd>
+</dl>
+
+
+</dd>
+</dl>
+</details>
+
+## Files
+<details><summary><code>client.files.list() -> SyncPagingIterable&amp;lt;File&amp;gt;</code></summary>
+<dl>
+<dd>
+
+#### 📝 Description
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+Returns the files with the given IDs, newest first — fetch a batch in one request instead of retrieving each file individually. Only files you created are returned; IDs that do not exist, or that another credential created, are omitted. For a batch larger than one page, follow `page_info` with the same `file_ids` to walk the rest.
+</dd>
+</dl>
+</dd>
+</dl>
+
+#### 🔌 Usage
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+```java
+client.files().list(
+    ListFilesRequest
+        .builder()
+        .fileIds(
+            Arrays.asList("file_xxxxxxxxxxxxx")
+        )
+        .build()
+);
+```
+</dd>
+</dl>
+</dd>
+</dl>
+
+#### ⚙️ Parameters
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+**fileIds:** `Optional<String>` — The files to return, each prefixed `file_`. Repeat the parameter to pass several, up to 250 per request. Batches of up to 100 answer in one page by default; larger batches page at up to 100 per response.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**order:** `Optional<ListFilesRequestOrder>` — The field to sort by.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**direction:** `Optional<ListFilesRequestDirection>` — The sort direction.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**first:** `Optional<Integer>` — Number of results to return from the start of the range.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**after:** `Optional<String>` — Return results after this cursor. Use `page_info.end_cursor` from the previous response to fetch the next page.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**last:** `Optional<Integer>` — Number of results to return from the end of the range.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**before:** `Optional<String>` — Return results before this cursor. Use `page_info.start_cursor` from the previous response to fetch the previous page.
+    
+</dd>
+</dl>
+</dd>
+</dl>
+
+
+</dd>
+</dl>
+</details>
+
+<details><summary><code>client.files.create(request) -> File</code></summary>
+<dl>
+<dd>
+
+#### 📝 Description
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+Creates a file and returns a presigned destination to upload its bytes to. PUT the bytes to `upload_url` (single-part), or to each of `multipart_upload_urls` and then call Complete File Multipart Upload. Once the bytes land the file becomes `ready`, and its ID can be attached wherever a file is accepted — account legal documents, dispute evidence documents. For a step-by-step walkthrough of single-part and multipart uploads, see the [direct file uploads guide](/developer/guides/direct-file-uploads).
 </dd>
 </dl>
 </dd>
@@ -16673,7 +22751,7 @@ Create a new file record and receive a presigned URL for uploading content to S3
 client.files().create(
     CreateFilesRequest
         .builder()
-        .filename("filename")
+        .filename("terms.pdf")
         .build()
 );
 ```
@@ -16690,7 +22768,7 @@ client.files().create(
 <dl>
 <dd>
 
-**filename:** `String` — The name of the file including its extension (e.g., "photo.png" or "document.pdf").
+**byteSize:** `Optional<Integer>` — The file's size in bytes. Required when `multipart` is `true`. Multipart uploads support at most 10,000 parts of 5MB each (about 50 GB).
     
 </dd>
 </dl>
@@ -16698,7 +22776,23 @@ client.files().create(
 <dl>
 <dd>
 
-**visibility:** `Optional<FileVisibility>` — Controls whether the file is publicly accessible via CDN or requires authentication. Defaults to private.
+**filename:** `String` — The name of the file including its extension, e.g. `terms.pdf`.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**multipart:** `Optional<Boolean>` — Upload the file in 5MB parts. Required for files larger than 5GB; useful above ~100MB. The file must be larger than 5MB.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**visibility:** `Optional<CreateFilesRequestVisibility>` — `public` files are served via an unsigned CDN URL — use for assets anyone may see. `private` files are served via a signed, expiring URL — use for sensitive documents. Defaults to `private`.
     
 </dd>
 </dl>
@@ -16722,7 +22816,7 @@ client.files().create(
 <dl>
 <dd>
 
-Retrieves the details of an existing file.
+Retrieves a file you uploaded — poll it after uploading the bytes to see `upload_status` become `ready`. Only the creator can retrieve a file this way; a file attached to another resource is read through that resource.
 </dd>
 </dl>
 </dd>
@@ -16738,7 +22832,7 @@ Retrieves the details of an existing file.
 
 ```java
 client.files().retrieve(
-    "file_xxxxxxxxxxxxx",
+    "id",
     RetrieveFilesRequest
         .builder()
         .build()
@@ -16757,7 +22851,92 @@ client.files().retrieve(
 <dl>
 <dd>
 
-**id:** `String` — The unique identifier of the file to retrieve.
+**id:** `String` — The unique identifier of the file, prefixed `file_`.
+    
+</dd>
+</dl>
+</dd>
+</dl>
+
+
+</dd>
+</dl>
+</details>
+
+<details><summary><code>client.files.complete(id, request) -> File</code></summary>
+<dl>
+<dd>
+
+#### 📝 Description
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+Assembles the parts of a multipart upload after every part has been PUT to its presigned URL. Pass the `multipart_upload_id` from Create File and each part's `ETag` response header. For a step-by-step walkthrough of multipart uploads, see the [direct file uploads guide](/developer/guides/direct-file-uploads).
+</dd>
+</dl>
+</dd>
+</dl>
+
+#### 🔌 Usage
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+```java
+client.files().complete(
+    "id",
+    CompleteFilesRequest
+        .builder()
+        .multipartUploadId("upload-id")
+        .multipartParts(
+            Arrays.asList(
+                CompleteFilesRequestMultipartPartsItem
+                    .builder()
+                    .etag("etag-1")
+                    .partNumber(1)
+                    .build()
+            )
+        )
+        .build()
+);
+```
+</dd>
+</dl>
+</dd>
+</dl>
+
+#### ⚙️ Parameters
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+**id:** `String` — The unique identifier of the file, prefixed `file_`.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**multipartParts:** `List<CompleteFilesRequestMultipartPartsItem>` — Every uploaded part, in order.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**multipartUploadId:** `String` — The ID of the multipart upload, returned by Create File.
     
 </dd>
 </dl>
@@ -16856,6 +23035,62 @@ client.financialActivity().list(
 <dl>
 <dd>
 
+**direction:** `Optional<ListFinancialActivityRequestDirection>` — Optional direction filter. `money_in` returns positive activity and `money_out` returns negative activity.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**resourceId:** `Optional<String>` — Optional prefixed resource ID. Returns activity associated with that resource.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**paymentId:** `Optional<String>` — Filter activity by payment ID (pay_), including related refunds, disputes, and fees. Combines with resource_id and other filters within the selected accounts. Unknown payments return an empty list.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**activityId:** `Optional<String>` — Optional ledger activity ID (for example `line_3`). Returns at most that one activity.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**excludeInternalMovements:** `Optional<Boolean>` — Whether to exclude balance reservations and balanced movements between the account's own balances.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**balanceType:** `Optional<ListFinancialActivityRequestBalanceType>` — Which balance the activity changes. `total` includes available, pending, and reserved funds. `available` includes only movements into or out of available funds, including reservations, releases, and fees. Movements within the selected balance are omitted. Omit to preserve the existing activity feed. Requires account_id or user_id; cannot be combined with available_after or available_before.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**withdrawalId:** `Optional<String>` — Withdrawal ID (wdrl_). With balance_type=available, selects the same period as its statement, after the previous withdrawal and through this withdrawal, excluding this withdrawal and its fee. Requires a single account. Overrides currency and posted-date filters.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
 **currency:** `Optional<String>` — Optional currency code filter, for example `usd`.
     
 </dd>
@@ -16880,7 +23115,7 @@ client.financialActivity().list(
 <dl>
 <dd>
 
-**availableAfter:** `Optional<String>` — Only include rows whose funds became withdrawable on or after this `YYYY-MM-DD` settlement date (UTC), distinct from posted_at. Requires currency.
+**availableAfter:** `Optional<String>` — Only include balance credits and debits available on or after this `YYYY-MM-DD` date (UTC), distinct from posted_at. Requires currency.
     
 </dd>
 </dl>
@@ -16888,7 +23123,7 @@ client.financialActivity().list(
 <dl>
 <dd>
 
-**availableBefore:** `Optional<String>` — Only include rows whose funds became withdrawable on or before this `YYYY-MM-DD` settlement date (UTC). Set equal to available_after for a single day. Requires currency.
+**availableBefore:** `Optional<String>` — Only include balance credits and debits available on or before this `YYYY-MM-DD` date (UTC). Set equal to available_after for a single day. Requires currency.
     
 </dd>
 </dl>
@@ -16916,8 +23151,8 @@ client.financialActivity().list(
 </dl>
 </details>
 
-## Ledgers
-<details><summary><code>client.ledgers.getFinancialReport() -> GetFinancialReportResponse</code></summary>
+## FinancialReports
+<details><summary><code>client.financialReports.retrieve() -> RetrieveFinancialReportsResponse</code></summary>
 <dl>
 <dd>
 
@@ -16944,11 +23179,11 @@ Returns a financial report — balance activity, income statement, or balance su
 <dd>
 
 ```java
-client.ledgers().getFinancialReport(
-    GetFinancialReportRequest
+client.financialReports().retrieve(
+    RetrieveFinancialReportsRequest
         .builder()
         .accountId("account_id")
-        .reportType(GetFinancialReportRequestReportType.BALANCE_SUMMARY)
+        .reportType(RetrieveFinancialReportsRequestReportType.BALANCE_SUMMARY)
         .build()
 );
 ```
@@ -16965,7 +23200,7 @@ client.ledgers().getFinancialReport(
 <dl>
 <dd>
 
-**accountId:** `String` — The owning account ID (a biz_ identifier), or `global` for a platform-wide report across all ledger accounts (requires internal admin access).
+**accountId:** `String` — The account that owns the report, prefixed `biz_`.
     
 </dd>
 </dl>
@@ -16973,7 +23208,7 @@ client.ledgers().getFinancialReport(
 <dl>
 <dd>
 
-**reportType:** `GetFinancialReportRequestReportType` — The type of financial report to generate.
+**reportType:** `RetrieveFinancialReportsRequestReportType` — The type of financial report to generate.
     
 </dd>
 </dl>
@@ -16997,7 +23232,7 @@ client.ledgers().getFinancialReport(
 <dl>
 <dd>
 
-**fromDate:** `Optional<String>` — Start of the report window as an ISO 8601 timestamp (UTC). Required for platform-wide (global) reports.
+**from:** `Optional<OffsetDateTime>` — Start of the report window as an ISO 8601 timestamp.
     
 </dd>
 </dl>
@@ -17005,7 +23240,7 @@ client.ledgers().getFinancialReport(
 <dl>
 <dd>
 
-**toDate:** `Optional<String>` — End of the report window as an ISO 8601 timestamp (UTC). Required for platform-wide (global) reports.
+**to:** `Optional<OffsetDateTime>` — Exclusive end of the report window as an ISO 8601 timestamp.
     
 </dd>
 </dl>
@@ -17013,7 +23248,7 @@ client.ledgers().getFinancialReport(
 <dl>
 <dd>
 
-**groupBy:** `Optional<GetFinancialReportRequestGroupBy>` — Grouping granularity for report rows.
+**groupBy:** `Optional<RetrieveFinancialReportsRequestGroupBy>` — Grouping granularity for report rows. Hourly grouping is supported for account-level balance activity reports only; hourly periods are timestamps in the requested timezone.
     
 </dd>
 </dl>
@@ -17021,7 +23256,7 @@ client.ledgers().getFinancialReport(
 <dl>
 <dd>
 
-**timezone:** `Optional<String>` — IANA timezone (for example `America/New_York`) used to bucket report periods and to interpret calendar-day boundaries for balance snapshots. Defaults to UTC. from_date/to_date remain exact instants regardless of this setting.
+**timezone:** `Optional<String>` — IANA timezone (for example `America/New_York`) used to bucket report periods. Defaults to UTC. `from` and `to` remain exact instants.
     
 </dd>
 </dl>
@@ -17029,7 +23264,7 @@ client.ledgers().getFinancialReport(
 <dl>
 <dd>
 
-**cumulative:** `Optional<Boolean>` — Platform-wide (global) reports only: when true, return cumulative balances as of to_date (all history, no lower bound) instead of activity within the period.
+**lineTypes:** `Optional<RetrieveFinancialReportsRequestLineTypesItem>` — Account-level balance activity only: ledger line categories to include.
     
 </dd>
 </dl>
@@ -17037,7 +23272,420 @@ client.ledgers().getFinancialReport(
 <dl>
 <dd>
 
-**scopeAccountId:** `Optional<String>` — Platform-wide (global) reports only: narrow the report to ledger lines on the ledger account owned by this account ID (a biz_ identifier). Ignored unless account_id is `global`.
+**direction:** `Optional<RetrieveFinancialReportsRequestDirection>` — Account-level balance activity only: include money moving in or money moving out.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**includePaymentFeeBreakdown:** `Optional<Boolean>` — Balance activity only: include payment costs grouped by payment method and provider.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**periodOnlyCurrencies:** `Optional<Boolean>` — Account-level balance activity only: return only currencies with cashflow in the exact requested window. Requires `from` and `to`.
+    
+</dd>
+</dl>
+</dd>
+</dl>
+
+
+</dd>
+</dl>
+</details>
+
+## Financing Applications
+<details><summary><code>client.financingApplications.list() -> SyncPagingIterable&amp;lt;FinancingApplication&amp;gt;</code></summary>
+<dl>
+<dd>
+
+#### 📝 Description
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+Lists payment-financing applications. Without `account_id`, an account credential lists its own account and its direct subaccounts, but not deeper descendants, and a user credential lists every account it can read applications for.
+</dd>
+</dl>
+</dd>
+</dl>
+
+#### 🔌 Usage
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+```java
+client.financingApplications().list(
+    ListFinancingApplicationsRequest
+        .builder()
+        .build()
+);
+```
+</dd>
+</dl>
+</dd>
+</dl>
+
+#### ⚙️ Parameters
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+**accountId:** `Optional<String>` — Only applications for this account, prefixed `biz_`.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**status:** `Optional<ListFinancingApplicationsRequestStatus>` — Only applications in this review state.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**createdBefore:** `Optional<String>` — Applications created at or before this ISO 8601 timestamp.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**createdAfter:** `Optional<String>` — Applications created at or after this ISO 8601 timestamp.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**order:** `Optional<ListFinancingApplicationsRequestOrder>` — Field to sort by. Defaults to created_at.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**direction:** `Optional<ListFinancingApplicationsRequestDirection>` — Sort direction. Defaults to desc.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**first:** `Optional<Integer>` — Number of results to return from the start of the range.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**after:** `Optional<String>` — Return results after this cursor. Use `page_info.end_cursor` from the previous response to fetch the next page.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**last:** `Optional<Integer>` — Number of results to return from the end of the range.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**before:** `Optional<String>` — Return results before this cursor. Use `page_info.start_cursor` from the previous response to fetch the previous page.
+    
+</dd>
+</dl>
+</dd>
+</dl>
+
+
+</dd>
+</dl>
+</details>
+
+<details><summary><code>client.financingApplications.create(request) -> FinancingApplication</code></summary>
+<dl>
+<dd>
+
+#### 📝 Description
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+Starts an application for payment-financing approval, or returns the account's open one: an application in `awaiting_review` takes precedence over one in `requires_collection`, and the open application is reused across different `Idempotency-Key` values. Creating an application does not submit it for review. The account must have a Whop balance set up, and accounts in restricted industries cannot apply. Once an application closes, the account can apply again.
+</dd>
+</dl>
+</dd>
+</dl>
+
+#### 🔌 Usage
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+```java
+client.financingApplications().create(
+    CreateFinancingApplicationsRequest
+        .builder()
+        .build()
+);
+```
+</dd>
+</dl>
+</dd>
+</dl>
+
+#### ⚙️ Parameters
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+**accountId:** `Optional<String>` — The account applying, prefixed `biz_`. Defaults to the account behind an account credential; required with a user credential.
+    
+</dd>
+</dl>
+</dd>
+</dl>
+
+
+</dd>
+</dl>
+</details>
+
+<details><summary><code>client.financingApplications.retrieve(id) -> FinancingApplication</code></summary>
+<dl>
+<dd>
+
+#### 📝 Description
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+Retrieves a payment-financing application with its review state, requirements, saved answers, documents, current terms, and review feedback. Requires read access to the account that owns it.
+</dd>
+</dl>
+</dd>
+</dl>
+
+#### 🔌 Usage
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+```java
+client.financingApplications().retrieve(
+    "id",
+    RetrieveFinancingApplicationsRequest
+        .builder()
+        .build()
+);
+```
+</dd>
+</dl>
+</dd>
+</dl>
+
+#### ⚙️ Parameters
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+**id:** `String` — Financing application ID, prefixed `inrq_`.
+    
+</dd>
+</dl>
+</dd>
+</dl>
+
+
+</dd>
+</dl>
+</details>
+
+<details><summary><code>client.financingApplications.update(id, request) -> FinancingApplication</code></summary>
+<dl>
+<dd>
+
+#### 📝 Description
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+Saves merchant answers to an application in `requires_collection`. The batch is atomic: if any answer is rejected, none are saved. Omitted requirements and answer fields are left unchanged. Saving answers does not submit the application; call Submit Financing Application when it is complete.
+</dd>
+</dl>
+</dd>
+</dl>
+
+#### 🔌 Usage
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+```java
+client.financingApplications().update(
+    "id",
+    UpdateFinancingApplicationsRequest
+        .builder()
+        .answers(
+            Arrays.asList(
+                UpdateFinancingApplicationsRequestAnswersItem
+                    .builder()
+                    .requirementId("inrqi_xxxxxxxxxxxxxx")
+                    .build()
+            )
+        )
+        .build()
+);
+```
+</dd>
+</dl>
+</dd>
+</dl>
+
+#### ⚙️ Parameters
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+**id:** `String` — Financing application ID, prefixed `inrq_`.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**answers:** `List<UpdateFinancingApplicationsRequestAnswersItem>` 
+    
+</dd>
+</dl>
+</dd>
+</dl>
+
+
+</dd>
+</dl>
+</details>
+
+<details><summary><code>client.financingApplications.submit(id, request) -> FinancingApplication</code></summary>
+<dl>
+<dd>
+
+#### 📝 Description
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+Submits a complete application for financing review, recording the merchant's acceptance, who submitted, and when, then moving it to `awaiting_review`. Before calling, present the application's `terms.content`, policies, and disclosure to the merchant and collect affirmative acceptance; every resubmission needs acceptance again. Only an application in `requires_collection` can be submitted, including after a reviewer requests more information. Retry with the same `Idempotency-Key`: submitting an application already in review without a replay returns an error. Approval does not by itself enable financing payment methods.
+</dd>
+</dl>
+</dd>
+</dl>
+
+#### 🔌 Usage
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+```java
+client.financingApplications().submit(
+    "id",
+    SubmitFinancingApplicationsRequest
+        .builder()
+        .merchantAcceptance(
+            SubmitFinancingApplicationsRequestMerchantAcceptance
+                .builder()
+                .accepted(true)
+                .termsVersion("xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx")
+                .build()
+        )
+        .build()
+);
+```
+</dd>
+</dl>
+</dd>
+</dl>
+
+#### ⚙️ Parameters
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+**id:** `String` — Financing application ID, prefixed `inrq_`.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**merchantAcceptance:** `SubmitFinancingApplicationsRequestMerchantAcceptance` 
     
 </dd>
 </dl>
@@ -17182,7 +23830,7 @@ client.forumPosts().list(
 <dl>
 <dd>
 
-Create a new forum post or comment within an experience. Supports text content, attachments, polls, paywalling, and pinning. Pass experience_id 'public' with a company_id to post to a company's public forum.
+Create a new forum post or comment within an experience. Supports text content, attachments, polls, paywalling, and pinning.
 
 Required permissions:
  - `forum:post:create`
@@ -17220,7 +23868,7 @@ client.forumPosts().create(
 <dl>
 <dd>
 
-**attachments:** `Optional<List<CreateForumPostsRequestAttachmentsItem>>` — A list of file attachments to include with the post, such as images or videos.
+**accountId:** `Optional<String>` — The unique identifier of the company whose public forum to post in. Required when experience_id is 'public'. For example, 'biz_xxxxx'.
     
 </dd>
 </dl>
@@ -17228,7 +23876,7 @@ client.forumPosts().create(
 <dl>
 <dd>
 
-**companyId:** `Optional<String>` — The unique identifier of the company whose public forum to post in. Required when experience_id is 'public'. For example, 'biz_xxxxx'.
+**attachments:** `Optional<List<CreateForumPostsRequestAttachmentsItem>>` — A list of file attachments to include with the post, such as images or videos.
     
 </dd>
 </dl>
@@ -17244,7 +23892,7 @@ client.forumPosts().create(
 <dl>
 <dd>
 
-**experienceId:** `String` — The unique identifier of the experience to create this post in. For example, 'exp_xxxxx'. Pass 'public' along with company_id to automatically use the company's public forum.
+**experienceId:** `String` — The unique identifier of the experience to create this post in. For example, 'exp_xxxxx'. Pass 'public' along with account_id to automatically use the account's public forum.
     
 </dd>
 </dl>
@@ -17502,7 +24150,7 @@ client.forumPosts().update(
 <dl>
 <dd>
 
-Returns a paginated list of forums within a specific company, with optional filtering by product.
+Returns a paginated list of forums for an account, with optional filtering by product.
 
 Required permissions:
  - `forum:read`
@@ -17523,7 +24171,7 @@ Required permissions:
 client.forums().list(
     ListForumsRequest
         .builder()
-        .companyId("biz_xxxxxxxxxxxxxx")
+        .accountId("biz_xxxxxxxxxxxxxx")
         .first(42)
         .last(42)
         .productId("prod_xxxxxxxxxxxxx")
@@ -17575,7 +24223,7 @@ client.forums().list(
 <dl>
 <dd>
 
-**companyId:** `String` — The unique identifier of the company to list forums for.
+**productId:** `Optional<String>` — The unique identifier of a product to filter by. When set, only forums connected to this product are returned.
     
 </dd>
 </dl>
@@ -17583,7 +24231,7 @@ client.forums().list(
 <dl>
 <dd>
 
-**productId:** `Optional<String>` — The unique identifier of a product to filter by. When set, only forums connected to this product are returned.
+**accountId:** `String` — The unique identifier of the company to list forums for.
     
 </dd>
 </dl>
@@ -17772,7 +24420,7 @@ client.forums().update(
 <dl>
 <dd>
 
-Returns a paginated list of identity profiles. When company_id is provided, lists IPs currently linked to that company's ledger. When omitted, lists IPs linked to any ledger the actor can read (including child companies under a parent).
+Lists the identity profiles currently linked to an account, or to every account you can read when `account_id` is omitted.
 
 Required permissions:
  - `identity:read`
@@ -17795,7 +24443,7 @@ client.identityProfiles().listIdentityProfile(
         .builder()
         .first(42)
         .last(42)
-        .companyId("biz_xxxxxxxxxxxxxx")
+        .accountId("biz_xxxxxxxxxxxxxx")
         .build()
 );
 ```
@@ -17844,14 +24492,6 @@ client.identityProfiles().listIdentityProfile(
 <dl>
 <dd>
 
-**companyId:** `Optional<String>` — The unique identifier of the company to filter to. When omitted, returns IPs across all ledgers the actor can read.
-    
-</dd>
-</dl>
-
-<dl>
-<dd>
-
 **profileType:** `Optional<IdentityProfileKinds>` 
     
 </dd>
@@ -17861,6 +24501,14 @@ client.identityProfiles().listIdentityProfile(
 <dd>
 
 **status:** `Optional<IdentityProfileStatuses>` 
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**accountId:** `Optional<String>` — Account to list identity profiles for, prefixed `biz_`. Omit to list profiles across every account you can read, including child accounts under a parent and, with a user credential, your own user.
     
 </dd>
 </dl>
@@ -17946,7 +24594,10 @@ client.identityProfiles().retrieveIdentityProfile(
 <dl>
 <dd>
 
-Unlinks an IdentityProfile from a LedgerAccount (flips the matching link to is_current=false).
+Unlinks an identity profile from the account or user that owns `ledger_account_id`. Requires `identity:write` on that account or user.
+
+Required permissions:
+ - `identity:write`
 </dd>
 </dl>
 </dd>
@@ -18099,7 +24750,7 @@ client.identityProfiles().listVerificationsIdentityProfile(
 </details>
 
 ## Invoices
-<details><summary><code>client.invoices.list() -> SyncPagingIterable&amp;lt;InvoiceListItem&amp;gt;</code></summary>
+<details><summary><code>client.invoices.list() -> SyncPagingIterable&amp;lt;Invoice&amp;gt;</code></summary>
 <dl>
 <dd>
 
@@ -18111,10 +24762,7 @@ client.identityProfiles().listVerificationsIdentityProfile(
 <dl>
 <dd>
 
-Returns a paginated list of invoices for a company, with optional filtering by product, status, collection method, and creation date.
-
-Required permissions:
- - `invoice:basic:read`
+Lists receipt-backed invoices for accounts the caller can read. Legacy invoices are excluded.
 </dd>
 </dl>
 </dd>
@@ -18132,11 +24780,6 @@ Required permissions:
 client.invoices().list(
     ListInvoicesRequest
         .builder()
-        .first(42)
-        .last(42)
-        .companyId("biz_xxxxxxxxxxxxxx")
-        .createdBefore(OffsetDateTime.parse("2023-12-01T05:00:00Z"))
-        .createdAfter(OffsetDateTime.parse("2023-12-01T05:00:00Z"))
         .build()
 );
 ```
@@ -18153,7 +24796,7 @@ client.invoices().list(
 <dl>
 <dd>
 
-**after:** `Optional<String>` — Returns the elements in the list that come after the specified cursor.
+**accountId:** `Optional<String>` 
     
 </dd>
 </dl>
@@ -18161,7 +24804,7 @@ client.invoices().list(
 <dl>
 <dd>
 
-**before:** `Optional<String>` — Returns the elements in the list that come before the specified cursor.
+**status:** `Optional<ListInvoicesRequestStatus>` 
     
 </dd>
 </dl>
@@ -18169,7 +24812,7 @@ client.invoices().list(
 <dl>
 <dd>
 
-**first:** `Optional<Integer>` — Returns the first _n_ elements from the list.
+**overdue:** `Optional<Boolean>` 
     
 </dd>
 </dl>
@@ -18177,7 +24820,7 @@ client.invoices().list(
 <dl>
 <dd>
 
-**last:** `Optional<Integer>` — Returns the last _n_ elements from the list.
+**memberId:** `Optional<String>` 
     
 </dd>
 </dl>
@@ -18185,7 +24828,7 @@ client.invoices().list(
 <dl>
 <dd>
 
-**companyId:** `Optional<String>` — The unique identifier of the company to list invoices for.
+**productId:** `Optional<String>` 
     
 </dd>
 </dl>
@@ -18193,7 +24836,7 @@ client.invoices().list(
 <dl>
 <dd>
 
-**direction:** `Optional<Direction>` 
+**createdAfter:** `Optional<OffsetDateTime>` 
     
 </dd>
 </dl>
@@ -18201,7 +24844,7 @@ client.invoices().list(
 <dl>
 <dd>
 
-**productIds:** `Optional<String>` — Filter invoices to only those associated with these specific product identifiers.
+**createdBefore:** `Optional<OffsetDateTime>` 
     
 </dd>
 </dl>
@@ -18209,7 +24852,7 @@ client.invoices().list(
 <dl>
 <dd>
 
-**collectionMethods:** `Optional<InvoiceCollectionMethods>` — Filter invoices by their collection method.
+**order:** `Optional<ListInvoicesRequestOrder>` 
     
 </dd>
 </dl>
@@ -18217,7 +24860,7 @@ client.invoices().list(
 <dl>
 <dd>
 
-**statuses:** `Optional<InvoiceStatuses>` — Filter invoices by their current status.
+**direction:** `Optional<ListInvoicesRequestDirection>` 
     
 </dd>
 </dl>
@@ -18225,7 +24868,7 @@ client.invoices().list(
 <dl>
 <dd>
 
-**order:** `Optional<InvoicesSortableColumns>` 
+**first:** `Optional<Integer>` — Number of results to return from the start of the range.
     
 </dd>
 </dl>
@@ -18233,7 +24876,7 @@ client.invoices().list(
 <dl>
 <dd>
 
-**createdBefore:** `Optional<OffsetDateTime>` — Only return invoices created before this timestamp.
+**after:** `Optional<String>` — Return results after this cursor. Use `page_info.end_cursor` from the previous response to fetch the next page.
     
 </dd>
 </dl>
@@ -18241,7 +24884,23 @@ client.invoices().list(
 <dl>
 <dd>
 
-**createdAfter:** `Optional<OffsetDateTime>` — Only return invoices created after this timestamp.
+**last:** `Optional<Integer>` — Number of results to return from the end of the range.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**before:** `Optional<String>` — Return results before this cursor. Use `page_info.start_cursor` from the previous response to fetch the previous page.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**includeTotalCount:** `Optional<Boolean>` — Set to `true` to return the number of matching results in `page_info.total_count`. Send `first=0` as well to return the count without any results.
     
 </dd>
 </dl>
@@ -18265,13 +24924,7 @@ client.invoices().list(
 <dl>
 <dd>
 
-Create an invoice for a customer. The invoice can be charged automatically using a stored payment method, or sent to the customer for manual payment.
-
-Required permissions:
- - `invoice:create`
- - `member:email:read`
- - `member:basic:read`
- - `payment:basic:read`
+Creates a draft invoice backed by a receipt, with saved items, quantities, prices, and recipients. Issue the draft to resolve final tax and open the invoice. The pay_ ID stays the same when paid. Needs `invoice:create` or `payment:charge`; a `payment_method_id` needs `payment:charge`.
 </dd>
 </dl>
 </dd>
@@ -18287,24 +24940,17 @@ Required permissions:
 
 ```java
 client.invoices().create(
-    CreateInvoicesRequest.of(
-        CreateInvoicesRequestProduct
-            .builder()
-            .collectionMethod(InvoiceCollectionMethods.SEND_INVOICE)
-            .companyId("biz_xxxxxxxxxxxxxx")
-            .plan(
-                CreateInvoicesRequestProductPlan
+    CreateInvoicesRequest
+        .builder()
+        .accountId("biz_xxxxxxxxxxxxxx")
+        .items(
+            Arrays.asList(
+                CreateInvoicesRequestItemsItem
                     .builder()
                     .build()
             )
-            .product(
-                CreateInvoicesRequestProductProduct
-                    .builder()
-                    .title("title")
-                    .build()
-            )
-            .build()
-    )
+        )
+        .build()
 );
 ```
 </dd>
@@ -18320,7 +24966,111 @@ client.invoices().create(
 <dl>
 <dd>
 
-**request:** `CreateInvoicesRequest` — Parameters for CreateInvoice
+**accountId:** `String` — The issuing account.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**billingAddress:** `Optional<CreateInvoicesRequestBillingAddress>` — Create a billing address linked to this member.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**buyerFeePercentage:** `Optional<Double>` — The buyer's adjustable fee in percentage points, with at most two decimal places: `0` for none, or between 5 and 100. The account keeps it, and Whop waives its take rate on the invoice.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**customerName:** `Optional<String>` — The contact name when creating an email-only member.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**dueAt:** `Optional<OffsetDateTime>` — When payment is due, as an ISO 8601 timestamp.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**emailAddress:** `Optional<String>` — Resolve or create the member for this email, creating a Whop user when none exists. Mutually exclusive with member_id.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**items:** `List<CreateInvoicesRequestItemsItem>` — The variants being invoiced, all in the same currency. Each variant may appear once. Use quantity for multiple units. A recurring variant must belong to a product. Its first invoice charges `initial_price` plus `renewal_price`. Later invoices charge only `renewal_price`. Paying the first invoice starts a paid billing period immediately, without the variant's trial. The subscription uses the `collection_method` the invoice was sent or issued with. A finite payment count includes the first paid invoice. With several items, every item that has a product must be a regular product, and all items need compatible payment, tax, and access settings.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**mailingAddressId:** `Optional<String>` — An address associated with the member. Mutually exclusive with billing_address.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**memberId:** `Optional<String>` — The billed customer, a member of the account, prefixed `mber_`. It can't change once the draft is created. Changing email recipients does not change this buyer.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**memo:** `Optional<String>` — A note to the customer, shown on the invoice email, PDF, and checkout page with its line breaks kept. Trimmed; `null` or blank clears it. Can be updated on draft, open, or uncollectible invoices.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**metadata:** `Optional<Map<String, String>>` — Up to 50 caller-owned string key/value pairs. The `invoice_memo` key is reserved and ignored; set `memo` instead.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**paymentMethodConfiguration:** `Optional<CreateInvoicesRequestPaymentMethodConfiguration>` — The payment methods the customer can choose from when paying through the invoice's checkout link, in the shape a variant or checkout configuration takes. It takes precedence over the invoice's variants and the account, and changes neither. Send both lists. `null` uses its variants' payment methods. Can be updated on drafts.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**paymentMethodId:** `Optional<String>` — A saved payment method belonging to the member, prefixed `payt_`. Sending or issuing the invoice charges this method at the `charge_at` passed to that call, otherwise on `due_at`, or right away when there is no `due_at` or it has passed. Sending also emails the invoice now when the charge is later; issuing does not. Setting it needs `payment:charge`.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**recipientEmails:** `Optional<List<String>>` — Email addresses saved for invoice delivery, independent of the billed customer. Saving them sends no email. Defaults to the customer email when omitted on create. Can be updated on draft, open, or uncollectible invoices.
     
 </dd>
 </dl>
@@ -18344,13 +25094,7 @@ client.invoices().create(
 <dl>
 <dd>
 
-Retrieves the details of an existing invoice.
-
-Required permissions:
- - `invoice:basic:read`
- - `member:email:read`
- - `member:basic:read`
- - `payment:basic:read`
+Retrieves a receipt-backed invoice by its pay_ ID.
 </dd>
 </dl>
 </dd>
@@ -18366,7 +25110,7 @@ Required permissions:
 
 ```java
 client.invoices().retrieve(
-    "inv_xxxxxxxxxxxxxx",
+    "id",
     RetrieveInvoicesRequest
         .builder()
         .build()
@@ -18385,7 +25129,7 @@ client.invoices().retrieve(
 <dl>
 <dd>
 
-**id:** `String` — The unique identifier of the invoice, or a secure token.
+**id:** `String` — The invoice's pay_ ID.
     
 </dd>
 </dl>
@@ -18397,7 +25141,7 @@ client.invoices().retrieve(
 </dl>
 </details>
 
-<details><summary><code>client.invoices.delete(id) -> Boolean</code></summary>
+<details><summary><code>client.invoices.delete(id) -> DeleteInvoicesResponse</code></summary>
 <dl>
 <dd>
 
@@ -18409,10 +25153,7 @@ client.invoices().retrieve(
 <dl>
 <dd>
 
-Delete a draft invoice.
-
-Required permissions:
- - `invoice:update`
+Deletes a draft or void invoice. A deleted invoice no longer appears in invoice or payment lists, and its ID returns a `404`. Deleting can't be undone. Void an open invoice before you delete it. A draft with a scheduled send or charge must be unscheduled first. A draft renewal invoice can't be deleted, and neither can a void invoice that collected money or still awaits a bank wire. The invoice's `deletable` field is `true` when this call can delete it.
 </dd>
 </dl>
 </dd>
@@ -18428,7 +25169,7 @@ Required permissions:
 
 ```java
 client.invoices().delete(
-    "inv_xxxxxxxxxxxxxx",
+    "id",
     DeleteInvoicesRequest
         .builder()
         .build()
@@ -18447,7 +25188,7 @@ client.invoices().delete(
 <dl>
 <dd>
 
-**id:** `String` — The unique identifier of the draft invoice to delete.
+**id:** `String` — The invoice's pay_ ID.
     
 </dd>
 </dl>
@@ -18471,13 +25212,7 @@ client.invoices().delete(
 <dl>
 <dd>
 
-Update a draft invoice's details.
-
-Required permissions:
- - `invoice:update`
- - `member:email:read`
- - `member:basic:read`
- - `payment:basic:read`
+Updates draft invoice items and billing fields. Updates of only `recipient_emails` and `memo` are also allowed on unpaid invoices. The customer is set when the draft is created and can't change. To bill someone else, first void the draft. Then create a new invoice. Edit customer contact details through the member API. A draft with no saved payment method and no scheduled send needs `invoice:update`, `invoice:create`, or `payment:charge`; every other update, and setting `payment_method_id`, needs `payment:charge`.
 </dd>
 </dl>
 </dd>
@@ -18493,7 +25228,7 @@ Required permissions:
 
 ```java
 client.invoices().update(
-    "inv_xxxxxxxxxxxxxx",
+    "id",
     UpdateInvoicesRequest
         .builder()
         .build()
@@ -18512,7 +25247,7 @@ client.invoices().update(
 <dl>
 <dd>
 
-**id:** `String` — The unique identifier of the invoice to update.
+**id:** `String` — The invoice's pay_ ID.
     
 </dd>
 </dl>
@@ -18520,7 +25255,7 @@ client.invoices().update(
 <dl>
 <dd>
 
-**automaticallyFinalizesAt:** `Optional<OffsetDateTime>` — The date and time when the invoice will be automatically finalized. For charge_automatically, triggers an automatic charge. For send_invoice, sends the invoice email at the specified time.
+**billingAddress:** `Optional<UpdateInvoicesRequestBillingAddress>` — Create a billing address linked to this member.
     
 </dd>
 </dl>
@@ -18528,7 +25263,7 @@ client.invoices().update(
 <dl>
 <dd>
 
-**billingAddress:** `Optional<UpdateInvoicesRequestBillingAddress>` — Inline billing address to create or update a mailing address for this invoice.
+**buyerFeePercentage:** `Optional<Double>` — The buyer's adjustable fee in percentage points, with at most two decimal places: `0` for none, or between 5 and 100. The account keeps it, and Whop waives its take rate on the invoice.
     
 </dd>
 </dl>
@@ -18536,7 +25271,7 @@ client.invoices().update(
 <dl>
 <dd>
 
-**chargeBuyerFee:** `Optional<Boolean>` — Whether to charge the customer a buyer fee on this invoice.
+**dueAt:** `Optional<OffsetDateTime>` — When payment is due, as an ISO 8601 timestamp.
     
 </dd>
 </dl>
@@ -18544,7 +25279,7 @@ client.invoices().update(
 <dl>
 <dd>
 
-**collectionMethod:** `Optional<InvoiceCollectionMethods>` — How the invoice should be collected.
+**items:** `Optional<List<UpdateInvoicesRequestItemsItem>>` — The variants being invoiced, all in the same currency. Each variant may appear once. Use quantity for multiple units. A recurring variant must belong to a product. Its first invoice charges `initial_price` plus `renewal_price`. Later invoices charge only `renewal_price`. Paying the first invoice starts a paid billing period immediately, without the variant's trial. The subscription uses the `collection_method` the invoice was sent or issued with. A finite payment count includes the first paid invoice. With several items, every item that has a product must be a regular product, and all items need compatible payment, tax, and access settings.
     
 </dd>
 </dl>
@@ -18552,7 +25287,7 @@ client.invoices().update(
 <dl>
 <dd>
 
-**customerName:** `Optional<String>` — The name of the customer.
+**mailingAddressId:** `Optional<String>` — An address associated with the member. Mutually exclusive with billing_address.
     
 </dd>
 </dl>
@@ -18560,7 +25295,7 @@ client.invoices().update(
 <dl>
 <dd>
 
-**dueDate:** `Optional<OffsetDateTime>` — The date by which the invoice must be paid.
+**memberId:** `Optional<String>` — The billed customer, a member of the account, prefixed `mber_`. The customer is set when the draft is created and can't change, so pass the draft's current customer or omit this field. A draft saved without a customer can take one here. Changing email recipients does not change this buyer.
     
 </dd>
 </dl>
@@ -18568,7 +25303,7 @@ client.invoices().update(
 <dl>
 <dd>
 
-**emailAddress:** `Optional<String>` — The email address of the customer.
+**memo:** `Optional<String>` — A note to the customer, shown on the invoice email, PDF, and checkout page with its line breaks kept. Trimmed; `null` or blank clears it. Can be updated on draft, open, or uncollectible invoices.
     
 </dd>
 </dl>
@@ -18576,7 +25311,7 @@ client.invoices().update(
 <dl>
 <dd>
 
-**lineItems:** `Optional<List<UpdateInvoicesRequestLineItemsItem>>` — Line items that break down the invoice total.
+**metadata:** `Optional<Map<String, String>>` — Up to 50 caller-owned string key/value pairs. The `invoice_memo` key is reserved and ignored; set `memo` instead.
     
 </dd>
 </dl>
@@ -18584,7 +25319,7 @@ client.invoices().update(
 <dl>
 <dd>
 
-**mailingAddressId:** `Optional<String>` — The unique identifier of an existing mailing address to attach.
+**paymentMethodConfiguration:** `Optional<UpdateInvoicesRequestPaymentMethodConfiguration>` — The payment methods the customer can choose from when paying through the invoice's checkout link, in the shape a variant or checkout configuration takes. It takes precedence over the invoice's variants and the account, and changes neither. Send both lists. `null` uses its variants' payment methods. Can be updated on drafts.
     
 </dd>
 </dl>
@@ -18592,7 +25327,7 @@ client.invoices().update(
 <dl>
 <dd>
 
-**memberId:** `Optional<String>` — The unique identifier of a member to assign as the customer.
+**paymentMethodId:** `Optional<String>` — A saved payment method belonging to the member, prefixed `payt_`. Sending or issuing the invoice charges this method at the `charge_at` passed to that call, otherwise on `due_at`, or right away when there is no `due_at` or it has passed. Sending also emails the invoice now when the charge is later; issuing does not. Setting it needs `payment:charge`.
     
 </dd>
 </dl>
@@ -18600,31 +25335,7 @@ client.invoices().update(
 <dl>
 <dd>
 
-**paymentMethodId:** `Optional<String>` — The unique identifier of the payment method to charge.
-    
-</dd>
-</dl>
-
-<dl>
-<dd>
-
-**plan:** `Optional<UpdateInvoicesRequestPlan>` — Updated plan attributes.
-    
-</dd>
-</dl>
-
-<dl>
-<dd>
-
-**productId:** `Optional<String>` — The unique identifier of an existing product to attach to this invoice. Only allowed while the invoice is still a draft.
-    
-</dd>
-</dl>
-
-<dl>
-<dd>
-
-**subscriptionBillingAnchorAt:** `Optional<OffsetDateTime>` — The date that defines when the subscription billing cycle should start.
+**recipientEmails:** `Optional<List<String>>` — Email addresses saved for invoice delivery, independent of the billed customer. Saving them sends no email. Defaults to the customer email when omitted on create. Can be updated on draft, open, or uncollectible invoices.
     
 </dd>
 </dl>
@@ -18636,7 +25347,7 @@ client.invoices().update(
 </dl>
 </details>
 
-<details><summary><code>client.invoices.markPaid(id) -> Boolean</code></summary>
+<details><summary><code>client.invoices.charge(id, request) -> Invoice</code></summary>
 <dl>
 <dd>
 
@@ -18648,10 +25359,7 @@ client.invoices().update(
 <dl>
 <dd>
 
-Mark an open invoice as paid when payment was collected outside of Whop.
-
-Required permissions:
- - `invoice:update`
+Charges an open invoice now to one of its customer's saved payment methods, canceling any charge scheduled for later. The charge completes asynchronously: the invoice becomes `paid`, or, if declined, stays `open` and its recipients are emailed the `checkout_link`. Refused for drafts and while another payment is in progress.
 </dd>
 </dl>
 </dd>
@@ -18666,9 +25374,9 @@ Required permissions:
 <dd>
 
 ```java
-client.invoices().markPaid(
-    "inv_xxxxxxxxxxxxxx",
-    MarkPaidInvoicesRequest
+client.invoices().charge(
+    "id",
+    ChargeInvoicesRequest
         .builder()
         .build()
 );
@@ -18686,7 +25394,15 @@ client.invoices().markPaid(
 <dl>
 <dd>
 
-**id:** `String` — The unique identifier of the invoice to mark as paid.
+**id:** `String` — The invoice's pay_ ID.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**paymentMethodId:** `Optional<String>` — The saved payment method to charge, prefixed `payt_`. It must belong to the invoice's customer and be chargeable without the customer present. Omit it to charge the invoice's own `payment_method_id`.
     
 </dd>
 </dl>
@@ -18698,7 +25414,7 @@ client.invoices().markPaid(
 </dl>
 </details>
 
-<details><summary><code>client.invoices.markUncollectible(id) -> Boolean</code></summary>
+<details><summary><code>client.invoices.generatePdf(id, request) -> InvoicePdf</code></summary>
 <dl>
 <dd>
 
@@ -18710,10 +25426,149 @@ client.invoices().markPaid(
 <dl>
 <dd>
 
-Mark an open invoice as uncollectible when payment is not expected.
+Generates the invoice as a PDF and returns a short-lived link to download it. A draft shows its estimated totals. The buyer's name and email need `member:basic:read` and `member:email:read`, and the Pay now link on an open invoice needs `payment:charge`, or `invoice:create` or `invoice:update` when it has no `payment_method_id`. Each call generates a new file and link, so this endpoint does not replay `Idempotency-Key` responses.
+</dd>
+</dl>
+</dd>
+</dl>
 
-Required permissions:
- - `invoice:update`
+#### 🔌 Usage
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+```java
+client.invoices().generatePdf(
+    "id",
+    GeneratePdfInvoicesRequest
+        .builder()
+        .build()
+);
+```
+</dd>
+</dl>
+</dd>
+</dl>
+
+#### ⚙️ Parameters
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+**id:** `String` — The invoice's pay_ ID.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**includeDescriptions:** `Optional<Boolean>` — Whether to print each line item's `description` under it. Defaults to `true`.
+    
+</dd>
+</dl>
+</dd>
+</dl>
+
+
+</dd>
+</dl>
+</details>
+
+<details><summary><code>client.invoices.issue(id, request) -> Invoice</code></summary>
+<dl>
+<dd>
+
+#### 📝 Description
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+Resolves final tax and opens a draft invoice without emailing it. An invoice with a `payment_method_id` is charged to it off-session, as `POST /payments` charges a saved payment method: at `charge_at` if given, otherwise on `due_at` while it is still ahead, otherwise right away (see `scheduled_charge_at`). With a future `due_at` and no `charge_at`, the customer is charged on the due date without being emailed first. Issuing an open invoice again retains its totals and charges nothing.
+</dd>
+</dl>
+</dd>
+</dl>
+
+#### 🔌 Usage
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+```java
+client.invoices().issue(
+    "id",
+    IssueInvoicesRequest
+        .builder()
+        .build()
+);
+```
+</dd>
+</dl>
+</dd>
+</dl>
+
+#### ⚙️ Parameters
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+**id:** `String` — The invoice's pay_ ID.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**chargeAt:** `Optional<OffsetDateTime>` — When to charge the draft's `payment_method_id`, as an ISO 8601 timestamp in the future. Only for a draft with a `payment_method_id` and a total above zero. Omit to charge on `due_at` if it is still ahead, or right away otherwise.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**collectionMethod:** `Optional<IssueInvoicesRequestCollectionMethod>` — How the subscription this invoice starts collects each renewal. `charge_automatically` charges the payment method that paid the invoice each period: the draft's `payment_method_id`, or the one the customer pays the invoice link with. `send_invoice` issues a numbered invoice each period, due on the renewal date and emailed with its payment link to the latest invoice's `recipient_emails`, so it needs at least one recipient and isn't available for invoices billed to a business. Defaults to `charge_automatically`. Only for a draft with a recurring item. A scheduled send applies it when it fires (see `scheduled_collection_method`).
+    
+</dd>
+</dl>
+</dd>
+</dl>
+
+
+</dd>
+</dl>
+</details>
+
+<details><summary><code>client.invoices.markUncollectible(id) -> Invoice</code></summary>
+<dl>
+<dd>
+
+#### 📝 Description
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+Marks an open invoice as uncollectible. Its checkout link stops working.
 </dd>
 </dl>
 </dd>
@@ -18729,7 +25584,7 @@ Required permissions:
 
 ```java
 client.invoices().markUncollectible(
-    "inv_xxxxxxxxxxxxxx",
+    "id",
     MarkUncollectibleInvoicesRequest
         .builder()
         .build()
@@ -18748,7 +25603,7 @@ client.invoices().markUncollectible(
 <dl>
 <dd>
 
-**id:** `String` — The unique identifier of the invoice to mark as uncollectible.
+**id:** `String` — The invoice's pay_ ID.
     
 </dd>
 </dl>
@@ -18760,7 +25615,7 @@ client.invoices().markUncollectible(
 </dl>
 </details>
 
-<details><summary><code>client.invoices.resend(id) -> Boolean</code></summary>
+<details><summary><code>client.invoices.send(id, request) -> Invoice</code></summary>
 <dl>
 <dd>
 
@@ -18772,10 +25627,7 @@ client.invoices().markUncollectible(
 <dl>
 <dd>
 
-Resend the notification email for an existing invoice to the customer.
-
-Required permissions:
- - `invoice:update`
+Issues a draft and emails it to its recipients, with reminders after the due date. A draft with no `payment_method_id` needs `invoice:update`, `invoice:create`, or `payment:charge`, and is never charged. A draft with a `payment_method_id` needs `payment:charge`: with a `charge_at`, or when its `due_at` is still ahead, it is emailed now and charged to that method at that time (see `scheduled_charge_at`); otherwise it is charged right away instead of emailed. Voiding the invoice, marking it uncollectible, or paying it first cancels the scheduled charge, and its recipients get the payment link if a charge fails. Sending an open invoice needs `payment:charge` and emails it again, up to three emails a day including the first send. With `send_at`, the draft is sent at that time instead, and cannot be edited, except its recipients, until it is sent or unscheduled. Each email, reminders included, is sent separately to the customer email shown on the invoice and to each address in `recipient_emails`, so recipients never see each other's addresses.
 </dd>
 </dl>
 </dd>
@@ -18790,9 +25642,9 @@ Required permissions:
 <dd>
 
 ```java
-client.invoices().resend(
-    "inv_xxxxxxxxxxxxxx",
-    ResendInvoicesRequest
+client.invoices().send(
+    "id",
+    SendInvoicesRequest
         .builder()
         .build()
 );
@@ -18810,7 +25662,31 @@ client.invoices().resend(
 <dl>
 <dd>
 
-**id:** `String` — The unique identifier of the invoice to resend.
+**id:** `String` — The invoice's pay_ ID.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**chargeAt:** `Optional<OffsetDateTime>` — When to charge the draft's `payment_method_id`, as an ISO 8601 timestamp in the future and no earlier than `send_at`. Only for a draft with a `payment_method_id` and a total above zero. Omit to charge on `due_at` if it is still ahead when the draft is sent, or right away otherwise. A scheduled send that runs after `charge_at` charges right away.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**collectionMethod:** `Optional<SendInvoicesRequestCollectionMethod>` — How the subscription this invoice starts collects each renewal. `charge_automatically` charges the payment method that paid the invoice each period: the draft's `payment_method_id`, or the one the customer pays the invoice link with. `send_invoice` issues a numbered invoice each period, due on the renewal date and emailed with its payment link to the latest invoice's `recipient_emails`, so it needs at least one recipient and isn't available for invoices billed to a business. Defaults to `charge_automatically`. Only for a draft with a recurring item. A scheduled send applies it when it fires (see `scheduled_collection_method`).
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**sendAt:** `Optional<OffsetDateTime>` — When to send the draft, as an ISO 8601 timestamp in the future. Omit to send now.
     
 </dd>
 </dl>
@@ -18822,7 +25698,7 @@ client.invoices().resend(
 </dl>
 </details>
 
-<details><summary><code>client.invoices.void_(id) -> Boolean</code></summary>
+<details><summary><code>client.invoices.unschedule(id) -> Invoice</code></summary>
 <dl>
 <dd>
 
@@ -18834,10 +25710,66 @@ client.invoices().resend(
 <dl>
 <dd>
 
-Void an open invoice so it can no longer be paid. Voiding is permanent and cannot be undone.
+Cancels a draft's scheduled send, so it can be edited again. An invoice with no scheduled send is returned unchanged. A draft with no `payment_method_id` needs `invoice:update`, `invoice:create`, or `payment:charge`; any other invoice needs `payment:charge`.
+</dd>
+</dl>
+</dd>
+</dl>
 
-Required permissions:
- - `invoice:update`
+#### 🔌 Usage
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+```java
+client.invoices().unschedule(
+    "id",
+    UnscheduleInvoicesRequest
+        .builder()
+        .build()
+);
+```
+</dd>
+</dl>
+</dd>
+</dl>
+
+#### ⚙️ Parameters
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+**id:** `String` — The invoice's pay_ ID.
+    
+</dd>
+</dl>
+</dd>
+</dl>
+
+
+</dd>
+</dl>
+</details>
+
+<details><summary><code>client.invoices.void_(id) -> Invoice</code></summary>
+<dl>
+<dd>
+
+#### 📝 Description
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+Voids a draft or unpaid invoice.
 </dd>
 </dl>
 </dd>
@@ -18853,7 +25785,7 @@ Required permissions:
 
 ```java
 client.invoices().void_(
-    "inv_xxxxxxxxxxxxxx",
+    "id",
     VoidInvoicesRequest
         .builder()
         .build()
@@ -18872,7 +25804,7 @@ client.invoices().void_(
 <dl>
 <dd>
 
-**id:** `String` — The unique identifier of the invoice to void.
+**id:** `String` — The invoice's pay_ ID.
     
 </dd>
 </dl>
@@ -18897,7 +25829,7 @@ client.invoices().void_(
 <dl>
 <dd>
 
-Returns a paginated list of leads for a company, with optional filtering by product and creation date.
+Lists an account's leads, newest first.
 
 Required permissions:
  - `lead:basic:read`
@@ -18921,7 +25853,7 @@ Required permissions:
 client.leads().list(
     ListLeadsRequest
         .builder()
-        .companyId("biz_xxxxxxxxxxxxxx")
+        .accountId("biz_xxxxxxxxxxxxxx")
         .first(42)
         .last(42)
         .createdAfter(OffsetDateTime.parse("2023-12-01T05:00:00Z"))
@@ -18967,14 +25899,6 @@ client.leads().list(
 <dd>
 
 **last:** `Optional<Integer>` — Returns the last _n_ elements from the list.
-    
-</dd>
-</dl>
-
-<dl>
-<dd>
-
-**companyId:** `String` — The unique identifier of the company to list leads for.
     
 </dd>
 </dl>
@@ -19002,6 +25926,14 @@ client.leads().list(
     
 </dd>
 </dl>
+
+<dl>
+<dd>
+
+**accountId:** `String` — The unique identifier of the company to list leads for.
+    
+</dd>
+</dl>
 </dd>
 </dl>
 
@@ -19022,7 +25954,7 @@ client.leads().list(
 <dl>
 <dd>
 
-Record a new lead for a company, capturing a potential customer's interest in a specific product.
+Records a lead: a potential customer's interest in an account or one of its products.
 
 Required permissions:
  - `lead:manage`
@@ -19046,7 +25978,7 @@ Required permissions:
 client.leads().create(
     CreateLeadsRequest
         .builder()
-        .companyId("biz_xxxxxxxxxxxxxx")
+        .accountId("biz_xxxxxxxxxxxxxx")
         .build()
 );
 ```
@@ -19063,7 +25995,7 @@ client.leads().create(
 <dl>
 <dd>
 
-**companyId:** `String` — The unique identifier of the company to create the lead for, starting with 'biz_'.
+**accountId:** `String` — The unique identifier of the company to create the lead for, starting with 'biz_'.
     
 </dd>
 </dl>
@@ -19184,7 +26116,7 @@ client.leads().retrieve(
 <dl>
 <dd>
 
-Update the metadata or referrer information on an existing lead record.
+Updates a lead's `metadata` or `referrer`.
 
 Required permissions:
  - `lead:manage`
@@ -19317,6 +26249,291 @@ client.ledgerAccounts().retrieve(
 </dl>
 </details>
 
+## Livestreams
+<details><summary><code>client.livestreams.list() -> SyncPagingIterable&amp;lt;Livestream&amp;gt;</code></summary>
+<dl>
+<dd>
+
+#### 📝 Description
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+Lists the livestreams in an experience, live and ended, newest first.
+</dd>
+</dl>
+</dd>
+</dl>
+
+#### 🔌 Usage
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+```java
+client.livestreams().list(
+    ListLivestreamsRequest
+        .builder()
+        .experienceId("experience_id")
+        .build()
+);
+```
+</dd>
+</dl>
+</dd>
+</dl>
+
+#### ⚙️ Parameters
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+**experienceId:** `String` — ID of a livestreams experience, prefixed `exp_`.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**pinned:** `Optional<Boolean>` — When `true`, only pinned livestreams, most recently pinned first. When `false`, only livestreams that are not pinned.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**recorded:** `Optional<Boolean>` — When `true`, only ended livestreams that were recorded, including recordings still processing. `false` or omitted lists every livestream.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**first:** `Optional<Integer>` — Number of results to return from the start of the range.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**after:** `Optional<String>` — Return results after this cursor. Use `page_info.end_cursor` from the previous response to fetch the next page.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**last:** `Optional<Integer>` — Number of results to return from the end of the range.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**before:** `Optional<String>` — Return results before this cursor. Use `page_info.start_cursor` from the previous response to fetch the previous page.
+    
+</dd>
+</dl>
+</dd>
+</dl>
+
+
+</dd>
+</dl>
+</details>
+
+<details><summary><code>client.livestreams.retrieve(id) -> Livestream</code></summary>
+<dl>
+<dd>
+
+#### 📝 Description
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+Retrieves a livestream by ID.
+</dd>
+</dl>
+</dd>
+</dl>
+
+#### 🔌 Usage
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+```java
+client.livestreams().retrieve(
+    "id",
+    RetrieveLivestreamsRequest
+        .builder()
+        .build()
+);
+```
+</dd>
+</dl>
+</dd>
+</dl>
+
+#### ⚙️ Parameters
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+**id:** `String` — Livestream ID, prefixed `lfeed_`.
+    
+</dd>
+</dl>
+</dd>
+</dl>
+
+
+</dd>
+</dl>
+</details>
+
+<details><summary><code>client.livestreams.pin(id) -> Livestream</code></summary>
+<dl>
+<dd>
+
+#### 📝 Description
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+Pins an ended livestream's recording so everyone in the experience sees it featured. Pinning it again keeps the original `pinned_at`.
+</dd>
+</dl>
+</dd>
+</dl>
+
+#### 🔌 Usage
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+```java
+client.livestreams().pin(
+    "id",
+    PinLivestreamsRequest
+        .builder()
+        .build()
+);
+```
+</dd>
+</dl>
+</dd>
+</dl>
+
+#### ⚙️ Parameters
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+**id:** `String` — Livestream ID, prefixed `lfeed_`.
+    
+</dd>
+</dl>
+</dd>
+</dl>
+
+
+</dd>
+</dl>
+</details>
+
+<details><summary><code>client.livestreams.unpin(id) -> Livestream</code></summary>
+<dl>
+<dd>
+
+#### 📝 Description
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+Unpins a livestream's recording so it is no longer featured in the experience.
+</dd>
+</dl>
+</dd>
+</dl>
+
+#### 🔌 Usage
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+```java
+client.livestreams().unpin(
+    "id",
+    UnpinLivestreamsRequest
+        .builder()
+        .build()
+);
+```
+</dd>
+</dl>
+</dd>
+</dl>
+
+#### ⚙️ Parameters
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+**id:** `String` — Livestream ID, prefixed `lfeed_`.
+    
+</dd>
+</dl>
+</dd>
+</dl>
+
+
+</dd>
+</dl>
+</details>
+
 ## Media
 <details><summary><code>client.media.generate(request) -> MediaAsset</code></summary>
 <dl>
@@ -19390,7 +26607,7 @@ client.media().generate(
 <dl>
 <dd>
 
-**referenceMedia:** `Optional<List<String>>` — Optional reference image file IDs (`file_` prefixed), up to 4. For video, a single reference seeds the opening frame; multiple references guide subject and style instead.
+**referenceMedia:** `Optional<List<String>>` — Optional reference file IDs (`file_` prefixed), up to 4. Images guide the output: for video, a single image seeds the opening frame; multiple images guide subject and style instead. Include one video to remake it: its motion and scene are kept and the images are swapped in. Video only; needs an image and can't be combined with `duration_seconds`. The output matches the video's length, up to 30 seconds, and is billed on it.
     
 </dd>
 </dl>
@@ -19508,6 +26725,18 @@ Lists the members of an account. A member is one buyer's relationship with the a
 client.members().list(
     ListMembersRequest
         .builder()
+        .userIds(
+            Arrays.asList("user_xxxxxxxxxxxxxx")
+        )
+        .productIds(
+            Arrays.asList("prod_xxxxxxxxxxxxx")
+        )
+        .variantIds(
+            Arrays.asList("plan_xxxxxxxxxxxxx")
+        )
+        .promoCodeIds(
+            Arrays.asList("promo_xxxxxxxxxxxx")
+        )
         .build()
 );
 ```
@@ -19548,6 +26777,54 @@ client.members().list(
 <dl>
 <dd>
 
+**userIds:** `Optional<String>` — Only return members whose users match these `user_` identifiers.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**mostRecentActions:** `Optional<ListMembersRequestMostRecentActionsItem>` — Only return members whose `most_recent_action` is one of these values.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**membershipStatus:** `Optional<ListMembersRequestMembershipStatus>` — `active` returns members holding at least one membership that currently grants access; `inactive` returns members holding at least one membership that does not. Combined with `product_ids`, `variant_ids`, or `promo_code_ids`, one membership must match all of them.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**productIds:** `Optional<String>` — Only return members holding a membership to one of these products, prefixed `prod_`. Unknown IDs match nothing.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**variantIds:** `Optional<String>` — Only return members holding a membership on one of these variants, prefixed `plan_`. Unknown IDs match nothing.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**promoCodeIds:** `Optional<String>` — Only return members holding a membership bought with one of these promo codes, prefixed `promo_`. Unknown IDs match nothing.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
 **query:** `Optional<String>` — Search members by name or username. An exact email address also matches when the credential holds the member:email:read scope.
     
 </dd>
@@ -19572,7 +26849,7 @@ client.members().list(
 <dl>
 <dd>
 
-**order:** `Optional<ListMembersRequestOrder>` — Sort field.
+**order:** `Optional<ListMembersRequestOrder>` — Sort field. `most_recent_action_at` and `last_activity_at` place members without one first when ascending and last when descending.
     
 </dd>
 </dl>
@@ -19588,7 +26865,7 @@ client.members().list(
 <dl>
 <dd>
 
-**first:** `Optional<Integer>` — Number of members to return from the start of the window.
+**first:** `Optional<Integer>` — Number of results to return from the start of the range.
     
 </dd>
 </dl>
@@ -19596,7 +26873,7 @@ client.members().list(
 <dl>
 <dd>
 
-**after:** `Optional<String>` — Cursor to paginate forwards from.
+**after:** `Optional<String>` — Return results after this cursor. Use `page_info.end_cursor` from the previous response to fetch the next page.
     
 </dd>
 </dl>
@@ -19604,7 +26881,7 @@ client.members().list(
 <dl>
 <dd>
 
-**last:** `Optional<Integer>` — Number of members to return from the end of the window.
+**last:** `Optional<Integer>` — Number of results to return from the end of the range.
     
 </dd>
 </dl>
@@ -19612,7 +26889,90 @@ client.members().list(
 <dl>
 <dd>
 
-**before:** `Optional<String>` — Cursor to paginate backwards from.
+**before:** `Optional<String>` — Return results before this cursor. Use `page_info.start_cursor` from the previous response to fetch the previous page.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**includeTotalCount:** `Optional<Boolean>` — Set to `true` to return the number of matching results in `page_info.total_count`. Send `first=0` as well to return the count without any results.
+    
+</dd>
+</dl>
+</dd>
+</dl>
+
+
+</dd>
+</dl>
+</details>
+
+<details><summary><code>client.members.create(request) -> Member</code></summary>
+<dl>
+<dd>
+
+#### 📝 Description
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+Adds a person to an account as a member. If the person is already a member of the account, that member is returned unchanged.
+</dd>
+</dl>
+</dd>
+</dl>
+
+#### 🔌 Usage
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+```java
+client.members().create(
+    CreateMembersRequest
+        .builder()
+        .email("jane@example.com")
+        .build()
+);
+```
+</dd>
+</dl>
+</dd>
+</dl>
+
+#### ⚙️ Parameters
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+**accountId:** `Optional<String>` — The account to add the member to (`biz_` tag). Defaults to the account the credential acts as.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**email:** `String` — The email address of the person to add. If no Whop user has it, one is created.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**name:** `Optional<String>` — The name of the person to add. Ignored when a user on Whop already exists for this email address.
     
 </dd>
 </dl>
@@ -19683,6 +27043,157 @@ client.members().retrieve(
 </dl>
 </details>
 
+<details><summary><code>client.members.update(id, request) -> Member</code></summary>
+<dl>
+<dd>
+
+#### 📝 Description
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+Updates a member.
+</dd>
+</dl>
+</dd>
+</dl>
+
+#### 🔌 Usage
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+```java
+client.members().update(
+    "id",
+    UpdateMembersRequest
+        .builder()
+        .build()
+);
+```
+</dd>
+</dl>
+</dd>
+</dl>
+
+#### ⚙️ Parameters
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+**id:** `String` — Member ID (`mber_` tag).
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**metadata:** `Optional<Map<String, Optional<UpdateMembersRequestMetadataValue>>>` — Your own key-value data on this member. Up to 50 keys of at most 100 characters. Values are strings of at most 500 characters, numbers, `true`, `false`, or `null`. At most 200 KB. Replaces existing metadata, and `null` clears it. Requires `member:manage`.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**name:** `Optional<String>` — The name invoices show for this member, in place of the user's own. `null` clears it. Requires `member:manage`.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**unsubscribeStatus:** `Optional<UpdateMembersRequestUnsubscribeStatus>` — `unsubscribed` to opt out of the account's marketing, `null` to opt back in. Only the member can set it, with `user:notifications:update`.
+    
+</dd>
+</dl>
+</dd>
+</dl>
+
+
+</dd>
+</dl>
+</details>
+
+<details><summary><code>client.members.unsubscribe(id)</code></summary>
+<dl>
+<dd>
+
+#### 📝 Description
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+Unsubscribes a member from the account's marketing communications with the token from their unsubscribe link. Inboxes post here directly for one-click unsubscribe (RFC 8058).
+</dd>
+</dl>
+</dd>
+</dl>
+
+#### 🔌 Usage
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+```java
+client.members().unsubscribe(
+    "id",
+    UnsubscribeMembersRequest
+        .builder()
+        .token("token")
+        .build()
+);
+```
+</dd>
+</dl>
+</dd>
+</dl>
+
+#### ⚙️ Parameters
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+**id:** `String` — The member to unsubscribe, prefixed `mber_`.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**token:** `String` — The token from the member's unsubscribe link.
+    
+</dd>
+</dl>
+</dd>
+</dl>
+
+
+</dd>
+</dl>
+</details>
+
 ## Memberships
 <details><summary><code>client.memberships.list() -> SyncPagingIterable&amp;lt;Membership&amp;gt;</code></summary>
 <dl>
@@ -19714,6 +27225,16 @@ Lists every membership the caller can read: an account API key its account's; a 
 client.memberships().list(
     ListMembershipsRequest
         .builder()
+        .productIds(
+            Arrays.asList("prod_xxxxxxxxxxxxx")
+        )
+        .variantIds(
+            Arrays.asList("plan_xxxxxxxxxxxxx")
+        )
+        .promoCodeIds(
+            Arrays.asList("promo_xxxxxxxxxxxxxx")
+        )
+        .externalAccount("discord_123456789012345678")
         .build()
 );
 ```
@@ -19746,7 +27267,7 @@ client.memberships().list(
 <dl>
 <dd>
 
-**status:** `Optional<ListMembershipsRequestStatus>` — Filter by billing state. `canceling` matches active memberships set to cancel at period end; `paused` matches memberships with payment collection paused.
+**memberId:** `Optional<String>` — Narrow to one member's memberships (`mber_` tag), including memberships bought by another business. A member outside the caller's visible set returns an empty list.
     
 </dd>
 </dl>
@@ -19754,7 +27275,7 @@ client.memberships().list(
 <dl>
 <dd>
 
-**productId:** `Optional<String>` — Filter to memberships of this product (`prod_` tag). Repeat as product_ids[] for several.
+**externalAccount:** `Optional<String>` — Narrow to memberships linked to one Discord or Telegram account, given as the platform's user ID prefixed with `discord_` or `telegram_`. Discord matches include memberships imported with that Discord ID. Any other format is a 400.
     
 </dd>
 </dl>
@@ -19762,7 +27283,55 @@ client.memberships().list(
 <dl>
 <dd>
 
-**planId:** `Optional<String>` — Filter to memberships of this plan (`plan_` tag). Repeat as plan_ids[] for several.
+**status:** `Optional<ListMembershipsRequestStatus>` — Filter by billing state. `trialing`, `active`, `past_due`, `completed`, `canceled`, and `expired` match the membership's `status`; `active`, `trialing`, and `past_due` exclude memberships set to cancel at period end. The other values are derived buckets that never appear as a `status`: `canceling` matches memberships set to cancel at period end; `paused` matches memberships with payment collection paused; `expiring` matches one-time purchases that have not yet expired; `one_time` matches one-time purchases that never expire; `unclaimed` matches memberships with no buyer user, including memberships bought by another business; `banned` matches memberships whose buyer is banned from the account.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**statuses:** `Optional<ListMembershipsRequestStatusesItem>` — Filter to memberships matching any of these billing states, with the same meanings as `status`. Repeat the parameter to pass several. Combined with `status` when both are sent.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**productId:** `Optional<String>` — Filter to memberships of this product (`prod_` tag).
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**productIds:** `Optional<String>` — Filter to memberships of any of these products, each prefixed `prod_`. Repeat the parameter to pass several.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**variantId:** `Optional<String>` — Filter to memberships of this variant (`plan_` tag).
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**variantIds:** `Optional<String>` — Filter to memberships of any of these variants, each prefixed `plan_`. Repeat the parameter to pass several.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**promoCodeIds:** `Optional<String>` — Filter to memberships discounted by any of these promo codes, each prefixed `promo_`. Repeat the parameter to pass several.
     
 </dd>
 </dl>
@@ -19802,7 +27371,7 @@ client.memberships().list(
 <dl>
 <dd>
 
-**first:** `Optional<Integer>` — Number of memberships to return from the start of the window.
+**first:** `Optional<Integer>` — Number of results to return from the start of the range.
     
 </dd>
 </dl>
@@ -19810,7 +27379,7 @@ client.memberships().list(
 <dl>
 <dd>
 
-**after:** `Optional<String>` — Cursor to paginate forwards from.
+**after:** `Optional<String>` — Return results after this cursor. Use `page_info.end_cursor` from the previous response to fetch the next page.
     
 </dd>
 </dl>
@@ -19818,7 +27387,7 @@ client.memberships().list(
 <dl>
 <dd>
 
-**last:** `Optional<Integer>` — Number of memberships to return from the end of the window.
+**last:** `Optional<Integer>` — Number of results to return from the end of the range.
     
 </dd>
 </dl>
@@ -19826,7 +27395,15 @@ client.memberships().list(
 <dl>
 <dd>
 
-**before:** `Optional<String>` — Cursor to paginate backwards from.
+**before:** `Optional<String>` — Return results before this cursor. Use `page_info.start_cursor` from the previous response to fetch the previous page.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**includeTotalCount:** `Optional<Boolean>` — Set to `true` to return the number of matching results in `page_info.total_count`. Send `first=0` as well to return the count without any results.
     
 </dd>
 </dl>
@@ -19850,7 +27427,7 @@ client.memberships().list(
 <dl>
 <dd>
 
-Sends an email inviting one recipient to join the account through a free plan. Identify the recipient by exactly one of `user_id` or `email`. The invitation is bound to that recipient; after signing in, accepting it immediately grants the membership without checkout. This Experimental endpoint is available only to accounts enabled for membership invitations.
+Emails one recipient an invitation to a free variant's membership. The invitation is bound to that recipient; after signing in, accepting it immediately grants the membership without checkout. This Experimental endpoint is available only to accounts enabled for membership invitations.
 </dd>
 </dl>
 </dd>
@@ -19866,13 +27443,10 @@ Sends an email inviting one recipient to join the account through a free plan. I
 
 ```java
 client.memberships().invite(
-    InviteMembershipsRequestBody.of(
-        InviteMembershipsRequestBodyUserId
-            .builder()
-            .planId("plan_xxxxxxxxxxxxxx")
-            .userId("user_xxxxxxxxxxxxxx")
-            .build()
-    )
+    InviteMembershipsRequest
+        .builder()
+        .variantId("plan_xxxxxxxxxxxxxx")
+        .build()
 );
 ```
 </dd>
@@ -19888,7 +27462,23 @@ client.memberships().invite(
 <dl>
 <dd>
 
-**request:** `InviteMembershipsRequestBody` 
+**email:** `Optional<String>` — Recipient email address. Pass exactly one of `user_id` or `email`.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**userId:** `Optional<String>` — Recipient user ID, prefixed `user_`. Pass exactly one of `user_id` or `email`.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**variantId:** `String` — Free variant whose membership the recipient is invited to, prefixed `plan_`.
     
 </dd>
 </dl>
@@ -19971,7 +27561,7 @@ client.memberships().retrieve(
 <dl>
 <dd>
 
-Updates a membership: merge metadata key-value pairs, or toggle `cancel_at_period_end` — `true` schedules the cancellation for the end of the current billing period, `false` reverses a pending one.
+Updates a membership's metadata, scheduled cancellation, renewal payment method, renewal cadence, next renewal date, or renewal price.
 </dd>
 </dl>
 </dd>
@@ -19990,6 +27580,7 @@ client.memberships().update(
     "id",
     UpdateMembershipsRequest
         .builder()
+        .billingPeriodDays(45)
         .build()
 );
 ```
@@ -20014,7 +27605,23 @@ client.memberships().update(
 <dl>
 <dd>
 
+**billingPeriodDays:** `Optional<Integer>` — Number of days between recurring charges, applied to every recurring variant so future renewals use the same cadence. Sets the current period end to the current period start plus this value; when the value is a multiple of 30 or is 365, a membership that renews on a fixed day of the month (for example, after `current_period_end` was set) ends on that day instead. The new period end must remain in the future. Only for active, trialing, or past-due memberships billed automatically by Whop; invoice, externally billed, and canceling memberships are not supported. Existing non-daily memberships cannot be changed to daily billing. Cannot be combined with other fields.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
 **cancelAtPeriodEnd:** `Optional<Boolean>` — `true` cancels at the end of the current billing period (the customer keeps access until then); `false` reverses a pending cancellation.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**currentPeriodEnd:** `Optional<OffsetDateTime>` — When the next renewal charges, as an ISO 8601 timestamp; a date without a time means midnight UTC. Must fall after today in UTC. Later renewals follow on from this date, and a membership charged automatically on a variant billed every 30, 60, 90 … 360 or 365 days keeps renewing on this day of the month in UTC, or on the month's last day when a month is shorter. Only for active or trialing renewing memberships billed by Whop whose payments are not paused. Cannot be combined with other fields.
     
 </dd>
 </dl>
@@ -20026,6 +27633,22 @@ client.memberships().update(
     
 </dd>
 </dl>
+
+<dl>
+<dd>
+
+**paymentMethodId:** `Optional<String>` — The ID of a payment method the customer has saved with your account. Future renewals charge it, and an open past-due payment is retried on it right away. Requires the `member:payment_methods:manage` permission.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**renewalPrice:** `Optional<Double>` — The amount future renewals charge, in the membership's renewal currency. Can only lower the current renewal price; raising a price is not supported here. Moves only this membership to the new price and emails the customer the change. Only for active or trialing renewing memberships billed by Whop whose payments are not paused. Cannot be combined with other fields.
+    
+</dd>
+</dl>
 </dd>
 </dl>
 
@@ -20034,7 +27657,7 @@ client.memberships().update(
 </dl>
 </details>
 
-<details><summary><code>client.memberships.addFreeDaysMembership(id, request) -> Membership</code></summary>
+<details><summary><code>client.memberships.applyPromoCode(id, request) -> Membership</code></summary>
 <dl>
 <dd>
 
@@ -20046,12 +27669,7 @@ client.memberships().update(
 <dl>
 <dd>
 
-Add free days to extend a membership's current billing period, expiration date, or Stripe trial.
-
-Required permissions:
- - `member:manage`
- - `member:email:read`
- - `member:basic:read`
+Applies a promo code to an `active` or `trialing` membership that does not already have one and has exactly one recurring item, for Stripe-billed memberships and memberships billed by Whop's billing engine. The discount lands on the next invoice and follows the code's duration (`once`, `repeating`, or `forever`).
 </dd>
 </dl>
 </dd>
@@ -20066,11 +27684,11 @@ Required permissions:
 <dd>
 
 ```java
-client.memberships().addFreeDaysMembership(
-    "mem_xxxxxxxxxxxxxx",
-    AddFreeDaysMembershipRequest
+client.memberships().applyPromoCode(
+    "id",
+    ApplyPromoCodeMembershipsRequest
         .builder()
-        .freeDays(42)
+        .promoCode("SAVE20")
         .build()
 );
 ```
@@ -20087,7 +27705,7 @@ client.memberships().addFreeDaysMembership(
 <dl>
 <dd>
 
-**id:** `String` — The unique identifier of the membership.
+**id:** `String` — Membership ID (`mem_` tag).
     
 </dd>
 </dl>
@@ -20095,7 +27713,109 @@ client.memberships().addFreeDaysMembership(
 <dl>
 <dd>
 
-**freeDays:** `Integer` — The number of free days to add (1-1095). Extends the billing period, expiration date, or Stripe trial depending on plan type.
+**promoCode:** `String` — The promo code to apply, as customers enter it at checkout (for example `SAVE20`). Its stock, variant eligibility, and expiry are checked as at checkout.
+    
+</dd>
+</dl>
+</dd>
+</dl>
+
+
+</dd>
+</dl>
+</details>
+
+<details><summary><code>client.memberships.assignAffiliate(id, request) -> Membership</code></summary>
+<dl>
+<dd>
+
+#### 📝 Description
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+Assigns an affiliate to a membership and pays them the commission you set on its future payments; past payments are not recalculated. A user who is not yet an affiliate of your account becomes one, which also requires `affiliate:create`. Send a new `commission_type` or `commission_value` for the membership's current affiliate to change their commission; a membership that already has a different affiliate returns a conflict. Works for active or trialing memberships with one recurring variant that bill through Stripe or Whop's billing engine, and not for marketplace memberships, paused payments, or a scheduled cancellation. You cannot assign yourself.
+</dd>
+</dl>
+</dd>
+</dl>
+
+#### 🔌 Usage
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+```java
+client.memberships().assignAffiliate(
+    "id",
+    AssignAffiliateMembershipsRequest
+        .builder()
+        .commissionType(AssignAffiliateMembershipsRequestCommissionType.FLAT_FEE)
+        .commissionValue(5.0)
+        .email("affiliate@example.com")
+        .build()
+);
+```
+</dd>
+</dl>
+</dd>
+</dl>
+
+#### ⚙️ Parameters
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+**id:** `String` — Membership ID (`mem_` tag).
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**commissionType:** `AssignAffiliateMembershipsRequestCommissionType` — Whether the commission is a percentage of each payment or a fixed amount per payment.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**commissionValue:** `Double` — A whole number from 1 to 90 for `percentage`, or an amount greater than 1 in the membership currency for `flat_fee`. The payout cannot exceed 90% of the next renewal amount. Flat fees need matching billing and settlement currencies.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**email:** `Optional<String>` — Email address of the user to assign. Pass exactly one of `user_id`, `email`, or `username`.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**userId:** `Optional<String>` — The user to assign, prefixed `user_`. Pass exactly one of `user_id`, `email`, or `username`.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**username:** `Optional<String>` — Whop username of the user to assign. Pass exactly one of `user_id`, `email`, or `username`.
     
 </dd>
 </dl>
@@ -20119,7 +27839,7 @@ client.memberships().addFreeDaysMembership(
 <dl>
 <dd>
 
-Cancels a membership. Pass `cancel_at_period_end: true` to stop auto-renewal and keep access until the current billing period ends. Omit it (or pass `false`) to revoke access immediately. Buyers cannot cancel buy-now-pay-later (`splitit`, `sezzle`) or non-trial split-pay memberships.
+Cancels a membership, either immediately or at the end of the current billing period. Buyers cannot cancel buy-now-pay-later (`splitit`, `sezzle`) or non-trial split-pay memberships.
 </dd>
 </dl>
 </dd>
@@ -20163,6 +27883,14 @@ client.memberships().cancel(
 <dd>
 
 **cancelAtPeriodEnd:** `Optional<Boolean>` — `true` stops auto-renewal and keeps access until the current billing period ends. Omit or `false` revokes access immediately.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**feedbackOptionId:** `Optional<String>` — The ID of the feedback option the customer picked as their reason for canceling, from the account's `feedback_options` preference. The membership records the option's label as the customer saw it and its category as `cancel_option`.
     
 </dd>
 </dl>
@@ -20317,6 +28045,73 @@ client.memberships().pause(
 </dl>
 </details>
 
+<details><summary><code>client.memberships.reactivate(id, request) -> Membership</code></summary>
+<dl>
+<dd>
+
+#### 📝 Description
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+Restores access to a `canceled` or `expired` membership that contains only one-time purchases and sets its `status` to `completed`. Lifetime memberships regain lifetime access; for memberships with an expiration, `days` sets the new `current_period_end`. Active and recurring memberships cannot be reactivated.
+</dd>
+</dl>
+</dd>
+</dl>
+
+#### 🔌 Usage
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+```java
+client.memberships().reactivate(
+    "id",
+    ReactivateMembershipsRequest
+        .builder()
+        .build()
+);
+```
+</dd>
+</dl>
+</dd>
+</dl>
+
+#### ⚙️ Parameters
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+**id:** `String` — Membership ID (`mem_` tag).
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**days:** `Optional<Integer>` — Days of access from now (1-1095), which sets `current_period_end`. Omit to keep the original `current_period_end`; required once it has passed. Ignored for lifetime memberships.
+    
+</dd>
+</dl>
+</dd>
+</dl>
+
+
+</dd>
+</dl>
+</details>
+
 <details><summary><code>client.memberships.resume(id) -> Membership</code></summary>
 <dl>
 <dd>
@@ -20376,7 +28171,7 @@ client.memberships().resume(
 </dl>
 </details>
 
-<details><summary><code>client.memberships.resyncAccessMembership(id) -> Membership</code></summary>
+<details><summary><code>client.memberships.resyncAccess(id) -> Membership</code></summary>
 <dl>
 <dd>
 
@@ -20388,12 +28183,7 @@ client.memberships().resume(
 <dl>
 <dd>
 
-Re-run access fulfillment for a membership. Recomputes the member's content access on Whop, re-validates their Discord link (re-adding them to the server and re-assigning roles if needed), and re-fulfills TradingView indicator access. Telegram access is invite-based and cannot be resynced here. The outcome is written to the membership's logs.
-
-Required permissions:
- - `membership:resync_access`
- - `member:email:read`
- - `member:basic:read`
+Re-runs access fulfillment for a membership: recomputes the member's content access on Whop, re-validates their Discord link (re-adding them to the server and re-assigning roles if needed), and re-fulfills TradingView indicator access. Telegram access is invite-based and is not resynced. The work runs in the background and the outcome is written to the membership's logs.
 </dd>
 </dl>
 </dd>
@@ -20408,9 +28198,9 @@ Required permissions:
 <dd>
 
 ```java
-client.memberships().resyncAccessMembership(
-    "mem_xxxxxxxxxxxxxx",
-    ResyncAccessMembershipRequest
+client.memberships().resyncAccess(
+    "id",
+    ResyncAccessMembershipsRequest
         .builder()
         .build()
 );
@@ -20428,7 +28218,7 @@ client.memberships().resyncAccessMembership(
 <dl>
 <dd>
 
-**id:** `String` — The unique identifier of the membership to resync access for.
+**id:** `String` — Membership ID (`mem_` tag).
     
 </dd>
 </dl>
@@ -20499,72 +28289,8 @@ client.memberships().transfer(
 </dl>
 </details>
 
-<details><summary><code>client.memberships.uncancelMembership(id) -> Membership</code></summary>
-<dl>
-<dd>
-
-#### 📝 Description
-
-<dl>
-<dd>
-
-<dl>
-<dd>
-
-Reverse a pending cancellation for a membership that was scheduled to cancel at period end.
-
-Required permissions:
- - `member:manage`
- - `member:email:read`
- - `member:basic:read`
-</dd>
-</dl>
-</dd>
-</dl>
-
-#### 🔌 Usage
-
-<dl>
-<dd>
-
-<dl>
-<dd>
-
-```java
-client.memberships().uncancelMembership(
-    "mem_xxxxxxxxxxxxxx",
-    UncancelMembershipRequest
-        .builder()
-        .build()
-);
-```
-</dd>
-</dl>
-</dd>
-</dl>
-
-#### ⚙️ Parameters
-
-<dl>
-<dd>
-
-<dl>
-<dd>
-
-**id:** `String` — The unique identifier of the membership to uncancel.
-    
-</dd>
-</dl>
-</dd>
-</dl>
-
-
-</dd>
-</dl>
-</details>
-
 ## Messages
-<details><summary><code>client.messages.list() -> SyncPagingIterable&amp;lt;MessageListItem&amp;gt;</code></summary>
+<details><summary><code>client.messages.list() -> SyncPagingIterable&amp;lt;ChatMessage&amp;gt;</code></summary>
 <dl>
 <dd>
 
@@ -20576,12 +28302,7 @@ client.memberships().uncancelMembership(
 <dl>
 <dd>
 
-Returns a paginated list of messages within a specific experience chat, DM, or group chat channel, sorted by creation time.
-
-Required permissions (one of):
- - `chat:read`
- - `dms:read`
- - `support_chat:read`
+Lists messages in a channel. Existing public message and channel IDs are preserved. For reconnect synchronization, use inclusive updated_after with include_deleted=true; results use ascending change order. Follow the returned cursors and replace cached messages by ID, including when updated_at is unchanged. The returned updated_at is the stored message update time; reaction changes only affect synchronization ordering. Deleted entries contain identity and timestamps with their content redacted. To jump into history, specify channel_id and one around anchor; results use ascending creation-time order. For older messages in chronological order, use before_message_id with last and direction=asc; for newer messages, use after_message_id with first and direction=asc. Do not supply order or direction with updated_after or an around anchor. Keep message-ID filters when continuing with cursors. For around queries, omit the around anchor and continue with direction=asc.
 </dd>
 </dl>
 </dd>
@@ -20600,8 +28321,6 @@ client.messages().list(
     ListMessagesRequest
         .builder()
         .channelId("channel_id")
-        .first(42)
-        .last(42)
         .build()
 );
 ```
@@ -20618,7 +28337,7 @@ client.messages().list(
 <dl>
 <dd>
 
-**after:** `Optional<String>` — Returns the elements in the list that come after the specified cursor.
+**channelId:** `String` — Filter by public channel ID. An experience ID is also accepted for experience chat.
     
 </dd>
 </dl>
@@ -20626,7 +28345,7 @@ client.messages().list(
 <dl>
 <dd>
 
-**before:** `Optional<String>` — Returns the elements in the list that come before the specified cursor.
+**replyingToMessageId:** `Optional<String>` — Return replies to this message.
     
 </dd>
 </dl>
@@ -20634,7 +28353,7 @@ client.messages().list(
 <dl>
 <dd>
 
-**first:** `Optional<Integer>` — Returns the first _n_ elements from the list.
+**pinned:** `Optional<Boolean>` — Filter by message pin state.
     
 </dd>
 </dl>
@@ -20642,7 +28361,7 @@ client.messages().list(
 <dl>
 <dd>
 
-**last:** `Optional<Integer>` — Returns the last _n_ elements from the list.
+**includeDeleted:** `Optional<Boolean>` — Include redacted deletion entries for cache synchronization.
     
 </dd>
 </dl>
@@ -20650,7 +28369,7 @@ client.messages().list(
 <dl>
 <dd>
 
-**channelId:** `String` — The unique identifier of the channel or experience to list messages for.
+**createdAfter:** `Optional<String>` — Return messages created strictly after this ISO 8601 timestamp.
     
 </dd>
 </dl>
@@ -20658,7 +28377,95 @@ client.messages().list(
 <dl>
 <dd>
 
-**direction:** `Optional<Direction>` 
+**createdBefore:** `Optional<String>` — Return messages created strictly before this ISO 8601 timestamp.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**updatedAfter:** `Optional<String>` — Return messages changed at or after this ISO 8601 timestamp in ascending change order. Cannot be combined with history filters, around anchors, order, or direction.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**beforeMessageId:** `Optional<String>` — Filter messages strictly before this message in channel_id by creation time and message ID. Deleted anchors are accepted; missing or other-channel IDs return 404. Cannot be combined with around anchors or updated_after.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**afterMessageId:** `Optional<String>` — Filter messages strictly after this message in channel_id by creation time and message ID. Deleted anchors are accepted; missing or other-channel IDs return 404. Cannot be combined with around anchors or updated_after.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**aroundMessageId:** `Optional<String>` — Center the first page around this live message in the selected channel.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**aroundTimestamp:** `Optional<String>` — Center the first page around this ISO 8601 timestamp in the selected channel.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**order:** `Optional<ListMessagesRequestOrder>` — History sort field. Defaults to created_at. Cannot be supplied with updated_after or around anchors.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**direction:** `Optional<ListMessagesRequestDirection>` — History sort direction. Defaults to desc. Cannot be supplied with updated_after or around anchors.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**first:** `Optional<Integer>` — Number of results to return from the start of the range.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**after:** `Optional<String>` — Return results after this cursor. Use `page_info.end_cursor` from the previous response to fetch the next page.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**last:** `Optional<Integer>` — Number of results to return from the end of the range.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**before:** `Optional<String>` — Return results before this cursor. Use `page_info.start_cursor` from the previous response to fetch the previous page.
     
 </dd>
 </dl>
@@ -20670,7 +28477,7 @@ client.messages().list(
 </dl>
 </details>
 
-<details><summary><code>client.messages.create(request) -> Message</code></summary>
+<details><summary><code>client.messages.create(request) -> ChatMessage</code></summary>
 <dl>
 <dd>
 
@@ -20682,13 +28489,7 @@ client.messages().list(
 <dl>
 <dd>
 
-Send a new message in an experience chat, DM, or group chat channel. Supports text content, attachments, polls, and replies.
-
-Required permissions (one of):
- - `chat:message:create`
- - `dms:message:manage`
- - `livestream:chat:write`
- - `support_chat:message:create`
+Sends a Markdown message as the authenticated user or app agent. Channel access, posting restrictions, moderation, and delivery follow the existing chat services. Use Idempotency-Key to safely retry a send. The response and realtime message use the same message ID. Custom author presentation and embeds are read-only.
 </dd>
 </dl>
 </dd>
@@ -20706,8 +28507,8 @@ Required permissions (one of):
 client.messages().create(
     CreateMessagesRequest
         .builder()
-        .channelId("channel_id")
-        .content("content")
+        .channelId("feed_xxxxxxxxxxxxxxxxxxxxxx")
+        .content("New **message**")
         .build()
 );
 ```
@@ -20724,7 +28525,7 @@ client.messages().create(
 <dl>
 <dd>
 
-**attachments:** `Optional<List<CreateMessagesRequestAttachmentsItem>>` — A list of file attachments to include with the message, such as images or videos.
+**attachments:** `Optional<List<CreateMessagesRequestAttachmentsItem>>` — Files to attach to the message.
     
 </dd>
 </dl>
@@ -20732,7 +28533,7 @@ client.messages().create(
 <dl>
 <dd>
 
-**autoDetectLinks:** `Optional<Boolean>` — Automatically detect URLs in the message and generate link previews.
+**autoDetectLinks:** `Optional<Boolean>` — Generate previews for URLs in content. Mutually exclusive with link_previews.
     
 </dd>
 </dl>
@@ -20740,7 +28541,7 @@ client.messages().create(
 <dl>
 <dd>
 
-**channelId:** `String` — The unique identifier of the channel or experience to send the message in. For example, 'exp_xxxxx' or 'feed_xxxxx'.
+**channelId:** `String` — Public channel ID, or an experience ID for experience chat.
     
 </dd>
 </dl>
@@ -20748,7 +28549,7 @@ client.messages().create(
 <dl>
 <dd>
 
-**content:** `String` — The body of the message in Markdown format. For example, 'Hello **world**'.
+**content:** `String` — Markdown content. May be empty when the message contains media or a poll.
     
 </dd>
 </dl>
@@ -20756,7 +28557,7 @@ client.messages().create(
 <dl>
 <dd>
 
-**poll:** `Optional<CreateMessagesRequestPoll>` — A poll to attach to this message, allowing recipients to vote on options.
+**gifs:** `Optional<List<CreateMessagesRequestGifsItem>>` — Up to 10 GIFs to attach. URLs must use HTTPS on static.klipy.com, static1.klipy.com, or static2.klipy.com. Omit to preserve on edit; an empty list clears them.
     
 </dd>
 </dl>
@@ -20764,7 +28565,31 @@ client.messages().create(
 <dl>
 <dd>
 
-**replyingToMessageId:** `Optional<String>` — The unique identifier of the message this is replying to, creating a threaded reply.
+**id:** `Optional<String>` — Optional, for clients that show a message before the server confirms it. Use `post_` followed by 22 Base58 characters. Omit to generate an ID. Reuse the same ID and `Idempotency-Key` when retrying a send.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**linkPreviews:** `Optional<List<CreateMessagesRequestLinkPreviewsItem>>` — Explicit URLs for the server to preview.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**poll:** `Optional<CreateMessagesRequestPoll>` 
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**replyingToMessageId:** `Optional<String>` — A live message in the same channel to reply to.
     
 </dd>
 </dl>
@@ -20776,7 +28601,7 @@ client.messages().create(
 </dl>
 </details>
 
-<details><summary><code>client.messages.retrieve(id) -> Message</code></summary>
+<details><summary><code>client.messages.retrieve(id) -> ChatMessage</code></summary>
 <dl>
 <dd>
 
@@ -20788,13 +28613,7 @@ client.messages().create(
 <dl>
 <dd>
 
-Retrieves the details of an existing message.
-
-Required permissions (one of):
- - `chat:read`
- - `dms:read`
- - `livestream:chat:read`
- - `support_chat:read`
+Retrieves a live message from an accessible channel. Use list synchronization to retrieve deletion entries.
 </dd>
 </dl>
 </dd>
@@ -20829,7 +28648,7 @@ client.messages().retrieve(
 <dl>
 <dd>
 
-**id:** `String` — The unique identifier of the message to retrieve.
+**id:** `String` — Existing public message ID.
     
 </dd>
 </dl>
@@ -20841,7 +28660,7 @@ client.messages().retrieve(
 </dl>
 </details>
 
-<details><summary><code>client.messages.delete(id) -> Boolean</code></summary>
+<details><summary><code>client.messages.delete(id)</code></summary>
 <dl>
 <dd>
 
@@ -20853,13 +28672,7 @@ client.messages().retrieve(
 <dl>
 <dd>
 
-Permanently delete a message from an experience chat, DM, or group chat channel. Only the message author or a channel admin can delete a message.
-
-Required permissions (one of):
- - `chat:message:create` and `chat:read`
- - `dms:message:manage` and `dms:read`
- - `livestream:chat:write` and `livestream:chat:read`
- - `support_chat:message:create` and `support_chat:read`
+Deletes a message as its author or a permitted moderator. Deleted messages remain available as redacted entries through list synchronization.
 </dd>
 </dl>
 </dd>
@@ -20894,7 +28707,7 @@ client.messages().delete(
 <dl>
 <dd>
 
-**id:** `String` — The unique identifier of the message to delete.
+**id:** `String` — Existing public message ID.
     
 </dd>
 </dl>
@@ -20906,7 +28719,7 @@ client.messages().delete(
 </dl>
 </details>
 
-<details><summary><code>client.messages.update(id, request) -> Message</code></summary>
+<details><summary><code>client.messages.update(id, request) -> ChatMessage</code></summary>
 <dl>
 <dd>
 
@@ -20918,13 +28731,7 @@ client.messages().delete(
 <dl>
 <dd>
 
-Edit the content, attachments, or pinned status of an existing message in an experience chat, DM, or group chat channel.
-
-Required permissions (one of):
- - `chat:message:create`
- - `dms:message:manage`
- - `livestream:chat:write`
- - `support_chat:message:create`
+Updates the author's message. Use the pin and unpin actions to change its pin state. Omitted fields are preserved; attachment and preview collections replace their previous values.
 </dd>
 </dl>
 </dd>
@@ -20959,7 +28766,7 @@ client.messages().update(
 <dl>
 <dd>
 
-**id:** `String` — The unique identifier of the message to update.
+**id:** `String` — Existing public message ID.
     
 </dd>
 </dl>
@@ -20967,7 +28774,7 @@ client.messages().update(
 <dl>
 <dd>
 
-**attachments:** `Optional<List<UpdateMessagesRequestAttachmentsItem>>` — A replacement list of file attachments for this message, such as images or videos.
+**attachments:** `Optional<List<UpdateMessagesRequestAttachmentsItem>>` — Replacement attachment list; pass an empty list to remove attachments.
     
 </dd>
 </dl>
@@ -20975,7 +28782,7 @@ client.messages().update(
 <dl>
 <dd>
 
-**content:** `Optional<String>` — The updated body of the message in Markdown format. For example, 'Hello **world**'.
+**content:** `Optional<String>` — Replacement Markdown content.
     
 </dd>
 </dl>
@@ -20983,7 +28790,436 @@ client.messages().update(
 <dl>
 <dd>
 
-**isPinned:** `Optional<Boolean>` — Whether this message should be pinned to the top of the channel.
+**gifs:** `Optional<List<UpdateMessagesRequestGifsItem>>` — Up to 10 GIFs to attach. URLs must use HTTPS on static.klipy.com, static1.klipy.com, or static2.klipy.com. Omit to preserve on edit; an empty list clears them.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**linkPreviews:** `Optional<List<UpdateMessagesRequestLinkPreviewsItem>>` — Replacement preview URLs; pass an empty list to remove previews.
+    
+</dd>
+</dl>
+</dd>
+</dl>
+
+
+</dd>
+</dl>
+</details>
+
+<details><summary><code>client.messages.pin(id) -> ChatMessage</code></summary>
+<dl>
+<dd>
+
+#### 📝 Description
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+Pins a message in its channel. Requires the channel's pin permission.
+</dd>
+</dl>
+</dd>
+</dl>
+
+#### 🔌 Usage
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+```java
+client.messages().pin(
+    "id",
+    PinMessagesRequest
+        .builder()
+        .build()
+);
+```
+</dd>
+</dl>
+</dd>
+</dl>
+
+#### ⚙️ Parameters
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+**id:** `String` — The message to pin.
+    
+</dd>
+</dl>
+</dd>
+</dl>
+
+
+</dd>
+</dl>
+</details>
+
+<details><summary><code>client.messages.react(id, request) -> ChatMessage</code></summary>
+<dl>
+<dd>
+
+#### 📝 Description
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+Add your emoji reaction to a message. Reacting again with the same emoji changes nothing.
+</dd>
+</dl>
+</dd>
+</dl>
+
+#### 🔌 Usage
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+```java
+client.messages().react(
+    "id",
+    ReactMessagesRequest
+        .builder()
+        .emoji("❤️")
+        .build()
+);
+```
+</dd>
+</dl>
+</dd>
+</dl>
+
+#### ⚙️ Parameters
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+**id:** `String` — The ID of the message to react to.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**emoji:** `String` — A single Unicode emoji or a supported shortcode such as `:heart:`.
+    
+</dd>
+</dl>
+</dd>
+</dl>
+
+
+</dd>
+</dl>
+</details>
+
+<details><summary><code>client.messages.listReactions(id) -> SyncPagingIterable&amp;lt;ChatReaction&amp;gt;</code></summary>
+<dl>
+<dd>
+
+#### 📝 Description
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+List who reacted to a message, newest first. Optionally filter by emoji.
+</dd>
+</dl>
+</dd>
+</dl>
+
+#### 🔌 Usage
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+```java
+client.messages().listReactions(
+    "id",
+    ListReactionsMessagesRequest
+        .builder()
+        .build()
+);
+```
+</dd>
+</dl>
+</dd>
+</dl>
+
+#### ⚙️ Parameters
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+**id:** `String` — The ID of the message.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**first:** `Optional<Integer>` — Number of results to return from the start of the range.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**after:** `Optional<String>` — Return results after this cursor. Use `page_info.end_cursor` from the previous response to fetch the next page.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**last:** `Optional<Integer>` — Number of results to return from the end of the range.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**before:** `Optional<String>` — Return results before this cursor. Use `page_info.start_cursor` from the previous response to fetch the previous page.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**emoji:** `Optional<String>` — Only return reactions with this emoji, as a Unicode emoji or a supported shortcode.
+    
+</dd>
+</dl>
+</dd>
+</dl>
+
+
+</dd>
+</dl>
+</details>
+
+<details><summary><code>client.messages.unpin(id) -> ChatMessage</code></summary>
+<dl>
+<dd>
+
+#### 📝 Description
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+Unpins a message in its channel. Requires the channel's pin permission.
+</dd>
+</dl>
+</dd>
+</dl>
+
+#### 🔌 Usage
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+```java
+client.messages().unpin(
+    "id",
+    UnpinMessagesRequest
+        .builder()
+        .build()
+);
+```
+</dd>
+</dl>
+</dd>
+</dl>
+
+#### ⚙️ Parameters
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+**id:** `String` — The message to unpin.
+    
+</dd>
+</dl>
+</dd>
+</dl>
+
+
+</dd>
+</dl>
+</details>
+
+<details><summary><code>client.messages.unreact(id, request) -> ChatMessage</code></summary>
+<dl>
+<dd>
+
+#### 📝 Description
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+Remove your emoji reaction from a message. Removing a reaction you have not added changes nothing.
+</dd>
+</dl>
+</dd>
+</dl>
+
+#### 🔌 Usage
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+```java
+client.messages().unreact(
+    "id",
+    UnreactMessagesRequest
+        .builder()
+        .emoji("❤️")
+        .build()
+);
+```
+</dd>
+</dl>
+</dd>
+</dl>
+
+#### ⚙️ Parameters
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+**id:** `String` — The ID of the message to remove your reaction from.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**emoji:** `String` — The emoji to remove, as a Unicode emoji or a supported shortcode.
+    
+</dd>
+</dl>
+</dd>
+</dl>
+
+
+</dd>
+</dl>
+</details>
+
+<details><summary><code>client.messages.vote(id, request) -> ChatMessage</code></summary>
+<dl>
+<dd>
+
+#### 📝 Description
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+Vote for one option on a message poll. Each user can vote once per poll.
+</dd>
+</dl>
+</dd>
+</dl>
+
+#### 🔌 Usage
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+```java
+client.messages().vote(
+    "id",
+    VoteMessagesRequest
+        .builder()
+        .pollOptionId("2")
+        .build()
+);
+```
+</dd>
+</dl>
+</dd>
+</dl>
+
+#### ⚙️ Parameters
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+**id:** `String` — The ID of the message containing the poll.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**pollOptionId:** `String` — The option ID from the poll, not its display text.
     
 </dd>
 </dl>
@@ -21008,7 +29244,7 @@ client.messages().update(
 <dl>
 <dd>
 
-Lists the authenticated user's notifications, newest first. Requires a user credential — an account API key has no notification feed. Without filters the feed spans every experience the user belongs to plus the teams they are a member of.
+Lists the authenticated user's notifications, newest first. Without filters the feed spans every experience the user belongs to plus the teams they are a member of. Requires a user credential — an account API key has no notification feed.
 </dd>
 </dl>
 </dd>
@@ -21074,7 +29310,7 @@ client.notifications().list(
 <dl>
 <dd>
 
-**first:** `Optional<Integer>` — The number of notifications to return (default 20, max 100).
+**first:** `Optional<Integer>` — Number of results to return from the start of the range.
     
 </dd>
 </dl>
@@ -21082,7 +29318,7 @@ client.notifications().list(
 <dl>
 <dd>
 
-**after:** `Optional<String>` — A cursor (a notification `id` from a previous page); returns notifications older than it.
+**after:** `Optional<String>` — Return results after this cursor. Use `page_info.end_cursor` from the previous response to fetch the next page.
     
 </dd>
 </dl>
@@ -21291,7 +29527,7 @@ client.notifications().badges(
 <dl>
 <dd>
 
-Marks the authenticated user's notifications as read: one experience's (`experience_id`) or everything (`all: true`) — exactly one of the two. Requires a user credential. Responds with the refreshed badge rows for the affected scope.
+Marks the authenticated user's notifications as read, for one experience or all of them, and returns the refreshed badge rows for that scope. Requires a user credential.
 </dd>
 </dl>
 </dd>
@@ -21357,7 +29593,7 @@ client.notifications().markRead(
 <dl>
 <dd>
 
-Retrieves a single notification by id — either an `id` returned by List Notifications, or the ephemeral id delivered with a push/websocket event. Requires a user credential.
+Retrieves a single notification, from the feed or from a push or websocket event. Requires a user credential.
 </dd>
 </dl>
 </dd>
@@ -21392,7 +29628,475 @@ client.notifications().retrieve(
 <dl>
 <dd>
 
-**id:** `String` — A notification `id` from List Notifications, or the id delivered with a push/websocket event.
+**id:** `String` — A notification `id` from List Notifications, or the ephemeral id delivered with a push or websocket event.
+    
+</dd>
+</dl>
+</dd>
+</dl>
+
+
+</dd>
+</dl>
+</details>
+
+## Partner Referral Requests
+<details><summary><code>client.partnerReferralRequests.list() -> SyncPagingIterable&amp;lt;PartnerReferralRequest&amp;gt;</code></summary>
+<dl>
+<dd>
+
+#### 📝 Description
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+Lists your referral links and attribution requests, including incoming requests for you or businesses you own, with filters for recipient, partner, type, and status.
+</dd>
+</dl>
+</dd>
+</dl>
+
+#### 🔌 Usage
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+```java
+client.partnerReferralRequests().list(
+    ListPartnerReferralRequestsRequest
+        .builder()
+        .build()
+);
+```
+</dd>
+</dl>
+</dd>
+</dl>
+
+#### ⚙️ Parameters
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+**accountId:** `Optional<String>` — Only requests for this business ID, prefixed `biz_`.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**targetUserId:** `Optional<String>` — Only requests received by this user ID, prefixed `user_`.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**partnerId:** `Optional<String>` — Only requests sent by this partner's user ID, prefixed `user_`.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**referringAccountId:** `Optional<String>` — Only the referral links created for memberships on this business's team, prefixed `biz_`. Needs read access to the business: its owner sees every member's links, a manager the links of the people reporting to them, and other members only their own.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**status:** `Optional<ListPartnerReferralRequestsRequestStatus>` — Only requests with this approval status.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**requestType:** `Optional<ListPartnerReferralRequestsRequestRequestType>` — Only requests initiated in this way.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**authorizedUserId:** `Optional<String>` — Only requests created for this team membership, prefixed `ausr_`.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**memberId:** `Optional<String>` — Only requests that credit this member record, prefixed `mber_`. A request created for a team membership also credits its holder's member record.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**personal:** `Optional<Boolean>` — When true, only personal requests, created for neither a team membership nor a member record. When false, only requests created for one.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**order:** `Optional<ListPartnerReferralRequestsRequestOrder>` — Field used to sort requests.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**direction:** `Optional<ListPartnerReferralRequestsRequestDirection>` — Sort direction.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**first:** `Optional<Integer>` — Number of results to return from the start of the range.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**after:** `Optional<String>` — Return results after this cursor. Use `page_info.end_cursor` from the previous response to fetch the next page.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**last:** `Optional<Integer>` — Number of results to return from the end of the range.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**before:** `Optional<String>` — Return results before this cursor. Use `page_info.start_cursor` from the previous response to fetch the previous page.
+    
+</dd>
+</dl>
+</dd>
+</dl>
+
+
+</dd>
+</dl>
+</details>
+
+<details><summary><code>client.partnerReferralRequests.create(request) -> PartnerReferralRequest</code></summary>
+<dl>
+<dd>
+
+#### 📝 Description
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+Creates a referral link, or sends an attribution request to an existing business or user for approval. Links require an enrolled partner who is not suspended; attribution requests require an enrolled, verified partner. Recipients do not need to join the partner program.
+</dd>
+</dl>
+</dd>
+</dl>
+
+#### 🔌 Usage
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+```java
+client.partnerReferralRequests().create(
+    CreatePartnerReferralRequestsRequestBody.of(
+        CreatePartnerReferralRequestsRequestBodyAccountId
+            .builder()
+            .accountId("biz_xxxxxxxxxxxxxx")
+            .build()
+    )
+);
+```
+</dd>
+</dl>
+</dd>
+</dl>
+
+#### ⚙️ Parameters
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+**request:** `CreatePartnerReferralRequestsRequestBody` 
+    
+</dd>
+</dl>
+</dd>
+</dl>
+
+
+</dd>
+</dl>
+</details>
+
+<details><summary><code>client.partnerReferralRequests.retrieve(id) -> PartnerReferralRequest</code></summary>
+<dl>
+<dd>
+
+#### 📝 Description
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+Retrieves a referral link or attribution request by ID, including its partner, recipient, approval status, and referral code when present.
+</dd>
+</dl>
+</dd>
+</dl>
+
+#### 🔌 Usage
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+```java
+client.partnerReferralRequests().retrieve(
+    "id",
+    RetrievePartnerReferralRequestsRequest
+        .builder()
+        .build()
+);
+```
+</dd>
+</dl>
+</dd>
+</dl>
+
+#### ⚙️ Parameters
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+**id:** `String` — Partner referral request ID, prefixed `prfr_`.
+    
+</dd>
+</dl>
+</dd>
+</dl>
+
+
+</dd>
+</dl>
+</details>
+
+<details><summary><code>client.partnerReferralRequests.accept(id) -> PartnerReferralRequest</code></summary>
+<dl>
+<dd>
+
+#### 📝 Description
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+Accepts a pending attribution request as the receiving user or business owner, assigning the requesting partner as that user's or business's referrer.
+</dd>
+</dl>
+</dd>
+</dl>
+
+#### 🔌 Usage
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+```java
+client.partnerReferralRequests().accept(
+    "id",
+    AcceptPartnerReferralRequestsRequest
+        .builder()
+        .build()
+);
+```
+</dd>
+</dl>
+</dd>
+</dl>
+
+#### ⚙️ Parameters
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+**id:** `String` — Partner referral request ID, prefixed `prfr_`.
+    
+</dd>
+</dl>
+</dd>
+</dl>
+
+
+</dd>
+</dl>
+</details>
+
+<details><summary><code>client.partnerReferralRequests.cancel(id) -> PartnerReferralRequest</code></summary>
+<dl>
+<dd>
+
+#### 📝 Description
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+Cancels a pending attribution request you sent so the recipient can no longer accept it, and returns the cancelled request.
+</dd>
+</dl>
+</dd>
+</dl>
+
+#### 🔌 Usage
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+```java
+client.partnerReferralRequests().cancel(
+    "id",
+    CancelPartnerReferralRequestsRequest
+        .builder()
+        .build()
+);
+```
+</dd>
+</dl>
+</dd>
+</dl>
+
+#### ⚙️ Parameters
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+**id:** `String` — Partner referral request ID, prefixed `prfr_`.
+    
+</dd>
+</dl>
+</dd>
+</dl>
+
+
+</dd>
+</dl>
+</details>
+
+<details><summary><code>client.partnerReferralRequests.decline(id) -> PartnerReferralRequest</code></summary>
+<dl>
+<dd>
+
+#### 📝 Description
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+Declines a pending attribution request for you or a business you own, marking it as denied without assigning the requesting partner as a referrer.
+</dd>
+</dl>
+</dd>
+</dl>
+
+#### 🔌 Usage
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+```java
+client.partnerReferralRequests().decline(
+    "id",
+    DeclinePartnerReferralRequestsRequest
+        .builder()
+        .build()
+);
+```
+</dd>
+</dl>
+</dd>
+</dl>
+
+#### ⚙️ Parameters
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+**id:** `String` — Partner referral request ID, prefixed `prfr_`.
     
 </dd>
 </dl>
@@ -21444,6 +30148,45 @@ client.partners().create();
 </dl>
 </details>
 
+<details><summary><code>client.partners.feeOptions() -> FeeOptionsPartnersResponse</code></summary>
+<dl>
+<dd>
+
+#### 📝 Description
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+Lists, per income stream, the fee a business the caller refers would be charged, how low the caller may price it, and the commission the caller earns on that stream. Answers for a referral that does not exist yet, so a referral flow can price the deal before the business is created. Requires `partner:fees:update`, since the floors a partner may price down to are only for a credential that can set them.
+</dd>
+</dl>
+</dd>
+</dl>
+
+#### 🔌 Usage
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+```java
+client.partners().feeOptions();
+```
+</dd>
+</dl>
+</dd>
+</dl>
+
+
+</dd>
+</dl>
+</details>
+
 <details><summary><code>client.partners.leaderboard() -> LeaderboardPartnersResponse</code></summary>
 <dl>
 <dd>
@@ -21456,7 +30199,7 @@ client.partners().create();
 <dl>
 <dd>
 
-Ranks referrers by partner business earnings — all-time by default, or over the current day, month, year, or trailing 30 days. Authentication is optional: authenticated callers also get their own standing, anonymous callers get the rankings alone.
+Ranks referrers by partner business earnings over the chosen `period`, all-time by default. Authentication is optional: authenticated callers also get their own standing, anonymous callers get the rankings alone.
 </dd>
 </dl>
 </dd>
@@ -21514,7 +30257,7 @@ client.partners().leaderboard(
 <dl>
 <dd>
 
-Lists the users the caller referred onto Whop (newest first), each with the second-tier earnings the caller has made from that user's businesses.
+Lists the users the caller referred onto Whop, newest first by default, each with the caller's total affiliate earnings from that user across all tiers. Deprecated: this list is retired and no longer appears in the API reference. It keeps responding for existing integrations and has no replacement.
 </dd>
 </dl>
 </dd>
@@ -21548,6 +30291,38 @@ client.partners().referredUsers(
 <dl>
 <dd>
 
+**earningPartnerId:** `Optional<String>` — The selected referring partner's user_ ID. Requires user_id=global; cannot be combined with earning_partner_username.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**earningPartnerUsername:** `Optional<String>` — The selected referring partner's exact username. Requires user_id=global; cannot be combined with earning_partner_id.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**referringAccountId:** `Optional<String>` — List the users this business's team members referred, past members included, instead of the caller's own. Requires company:basic:read on that business, which every team member holds, and cannot be combined with user_id. The owner role reads every team member's referrals; anyone else reads only their own and those of the people under them in the org chart. earning_partner_id or earning_partner_username then narrows to one team member.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**query:** `Optional<String>` — Search referred users by name or username. In global mode, matches the beginning of usernames only.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
 **hasBusinesses:** `Optional<Boolean>` — When true, only referred users who brought at least one business onto Whop.
     
 </dd>
@@ -21564,7 +30339,7 @@ client.partners().referredUsers(
 <dl>
 <dd>
 
-**first:** `Optional<Integer>` — Number of referred users to return from the start of the window.
+**order:** `Optional<ReferredUsersPartnersRequestOrder>` — The field to sort by. created_at uses the user's signup date; earnings_usd uses the current primary referrer's cached total affiliate earnings from that user.
     
 </dd>
 </dl>
@@ -21572,7 +30347,7 @@ client.partners().referredUsers(
 <dl>
 <dd>
 
-**after:** `Optional<String>` — Cursor to fetch the page after (from page_info.end_cursor).
+**direction:** `Optional<ReferredUsersPartnersRequestDirection>` — The direction to sort results.
     
 </dd>
 </dl>
@@ -21580,7 +30355,7 @@ client.partners().referredUsers(
 <dl>
 <dd>
 
-**last:** `Optional<Integer>` — Number of referred users to return from the end of the window.
+**first:** `Optional<Integer>` — Number of results to return from the start of the range.
     
 </dd>
 </dl>
@@ -21588,7 +30363,90 @@ client.partners().referredUsers(
 <dl>
 <dd>
 
-**before:** `Optional<String>` — Cursor to fetch the page before (from page_info.start_cursor).
+**after:** `Optional<String>` — Return results after this cursor. Use `page_info.end_cursor` from the previous response to fetch the next page.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**last:** `Optional<Integer>` — Number of results to return from the end of the range.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**before:** `Optional<String>` — Return results before this cursor. Use `page_info.start_cursor` from the previous response to fetch the previous page.
+    
+</dd>
+</dl>
+</dd>
+</dl>
+
+
+</dd>
+</dl>
+</details>
+
+<details><summary><code>client.partners.retrieve(id) -> Partner</code></summary>
+<dl>
+<dd>
+
+#### 📝 Description
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+Retrieves the authenticated user's partner profile: enrollment and verification status, certification completion, active direct business referral count, and default payout rates. Other users' profiles are not accessible. To create and manage referral links, use `/partner_referral_requests`.
+</dd>
+</dl>
+</dd>
+</dl>
+
+#### 🔌 Usage
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+```java
+client.partners().retrieve(
+    "me",
+    RetrievePartnersRequest
+        .builder()
+        .build()
+);
+```
+</dd>
+</dl>
+</dd>
+</dl>
+
+#### ⚙️ Parameters
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+**id:** `String` — The authenticated partner's user ID, prefixed user_, or me. Other users' profiles are not accessible.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**accountId:** `Optional<String>` — Return `payout_rates` for this business, prefixed `biz_`, instead of the caller's own: the business's rate rows, else the platform defaults. Requires company:basic:read on that business, which every team member holds. The rest of the profile stays the caller's.
     
 </dd>
 </dl>
@@ -21613,7 +30471,7 @@ client.partners().referredUsers(
 <dl>
 <dd>
 
-Lists payment method domains. Without `account_id`, returns the caller's own domains and those of every connected account.
+Lists the payment method domains registered for your account and its subaccounts. Deprecated: list domains with `GET /domains` and the `apple_pay` filter instead.
 </dd>
 </dl>
 </dd>
@@ -21647,7 +30505,7 @@ client.paymentMethodDomains().list(
 <dl>
 <dd>
 
-**accountId:** `Optional<String>` — Only domains registered for this account (`biz_` tag). Defaults to the caller's account plus its connected accounts.
+**accountId:** `Optional<String>` — Only domains registered for this account (`biz_` tag). Defaults to the caller's account plus its subaccounts.
     
 </dd>
 </dl>
@@ -21711,7 +30569,7 @@ client.paymentMethodDomains().list(
 <dl>
 <dd>
 
-**first:** `Optional<Integer>` — Number of domains to return from the start of the window.
+**first:** `Optional<Integer>` — Number of results to return from the start of the range.
     
 </dd>
 </dl>
@@ -21719,7 +30577,7 @@ client.paymentMethodDomains().list(
 <dl>
 <dd>
 
-**after:** `Optional<String>` — Cursor to paginate forwards from.
+**after:** `Optional<String>` — Return results after this cursor. Use `page_info.end_cursor` from the previous response to fetch the next page.
     
 </dd>
 </dl>
@@ -21727,7 +30585,7 @@ client.paymentMethodDomains().list(
 <dl>
 <dd>
 
-**last:** `Optional<Integer>` — Number of domains to return from the end of the window.
+**last:** `Optional<Integer>` — Number of results to return from the end of the range.
     
 </dd>
 </dl>
@@ -21735,7 +30593,7 @@ client.paymentMethodDomains().list(
 <dl>
 <dd>
 
-**before:** `Optional<String>` — Cursor to paginate backwards from.
+**before:** `Optional<String>` — Return results before this cursor. Use `page_info.start_cursor` from the previous response to fetch the previous page.
     
 </dd>
 </dl>
@@ -21759,7 +30617,7 @@ client.paymentMethodDomains().list(
 <dl>
 <dd>
 
-Registers a hostname with the wallet provider and attempts verification inline. Returns `verified` when the provider fetched the domain-association file (for Apple Pay, `/.well-known/apple-developer-merchantid-domain-association`), or `pending` when it could not — host the file, then retry with the verify endpoint.
+Registers a hostname with the wallet provider and attempts verification inline. Returns `verified` when the provider fetched the domain-association file (for Apple Pay, `/.well-known/apple-developer-merchantid-domain-association`), or `pending` when it could not: host the file, then retry with `POST /payment_method_domains/:id/verify`. Deprecated: add Apple Pay with `POST /domains` and `apple_pay: {}` instead.
 </dd>
 </dl>
 </dd>
@@ -21777,7 +30635,7 @@ Registers a hostname with the wallet provider and attempts verification inline. 
 client.paymentMethodDomains().create(
     CreatePaymentMethodDomainsRequest
         .builder()
-        .hostname("pending.shinetime.example")
+        .hostname("pending.shinetime.com")
         .build()
 );
 ```
@@ -21794,7 +30652,7 @@ client.paymentMethodDomains().create(
 <dl>
 <dd>
 
-**accountId:** `Optional<String>` — Account to register the domain for (`biz_` tag). Defaults to the caller's account.
+**accountId:** `Optional<String>` — Account to register the domain for (`biz_` tag). Required when authenticating as a user; an account API key supplies its own account.
     
 </dd>
 </dl>
@@ -21802,7 +30660,7 @@ client.paymentMethodDomains().create(
 <dl>
 <dd>
 
-**hostname:** `String` — Hostname to register (e.g. `checkout.shinetime.example`).
+**hostname:** `String` — Hostname to register (e.g. `checkout.shinetime.com`).
     
 </dd>
 </dl>
@@ -21826,7 +30684,7 @@ client.paymentMethodDomains().create(
 <dl>
 <dd>
 
-Retrieves a payment method domain to check its verification status.
+Retrieves a payment method domain to check its verification status. Deprecated: retrieve the domain with `GET /domains/{id}` instead, using the same ID.
 </dd>
 </dl>
 </dd>
@@ -21861,7 +30719,7 @@ client.paymentMethodDomains().retrieve(
 <dl>
 <dd>
 
-**id:** `String` — The unique identifier of the payment method domain, prefixed `pmd_`.
+**id:** `String` — The unique identifier of the payment method domain, prefixed `pmd_` or `dom_`.
     
 </dd>
 </dl>
@@ -21885,7 +30743,7 @@ client.paymentMethodDomains().retrieve(
 <dl>
 <dd>
 
-Unregisters a payment method domain so its wallet payment methods stop rendering there.
+Unregisters a payment method domain so its wallet payment methods stop rendering there. Deprecated: remove Apple Pay with `PATCH /domains/{id}` and `apple_pay: null` instead. `DELETE /domains/{id}` removes the whole domain, including any website on it.
 </dd>
 </dl>
 </dd>
@@ -21920,7 +30778,7 @@ client.paymentMethodDomains().delete(
 <dl>
 <dd>
 
-**id:** `String` — The unique identifier of the payment method domain, prefixed `pmd_`.
+**id:** `String` — The unique identifier of the payment method domain, prefixed `pmd_` or `dom_`.
     
 </dd>
 </dl>
@@ -21944,7 +30802,7 @@ client.paymentMethodDomains().delete(
 <dl>
 <dd>
 
-Re-attempts provider verification of a pending domain once the association file is hosted. Fails with a `bad_request` explaining what to fix; verifying an already `verified` domain is a no-op.
+Re-attempts provider verification of a pending domain once the association file is hosted. Fails with a `bad_request` explaining what to fix; verifying an already `verified` domain is a no-op. Deprecated: check the domain with `POST /domains/{id}/check` instead.
 </dd>
 </dl>
 </dd>
@@ -21979,7 +30837,7 @@ client.paymentMethodDomains().verify(
 <dl>
 <dd>
 
-**id:** `String` — The unique identifier of the payment method domain, prefixed `pmd_`.
+**id:** `String` — The unique identifier of the payment method domain, prefixed `pmd_` or `dom_`.
     
 </dd>
 </dl>
@@ -22004,7 +30862,7 @@ client.paymentMethodDomains().verify(
 <dl>
 <dd>
 
-Returns a paginated list of payment methods for a member or company, or for the authenticated user when neither is given, with optional filtering by creation date. A payment method is a stored representation of how a customer intends to pay, such as a card, bank account, or digital wallet.
+Returns a paginated list of saved payment methods for a member or account, or for the authenticated user when you pass neither.
 
 Required permissions:
  - `member:payment_methods:read`
@@ -22028,9 +30886,9 @@ client.paymentMethods().list(
         .first(42)
         .last(42)
         .memberId("mber_xxxxxxxxxxxxx")
-        .companyId("biz_xxxxxxxxxxxxxx")
         .createdBefore(OffsetDateTime.parse("2023-12-01T05:00:00Z"))
         .createdAfter(OffsetDateTime.parse("2023-12-01T05:00:00Z"))
+        .accountId("biz_xxxxxxxxxxxxxx")
         .build()
 );
 ```
@@ -22079,15 +30937,7 @@ client.paymentMethods().list(
 <dl>
 <dd>
 
-**memberId:** `Optional<String>` — The unique identifier of the member to list payment methods for. Omit this and company_id to list your own saved payment methods.
-    
-</dd>
-</dl>
-
-<dl>
-<dd>
-
-**companyId:** `Optional<String>` — The unique identifier of the company. Provide either this or member_id, not both. Omit both to address your own saved payment methods.
+**memberId:** `Optional<String>` — The unique identifier of the member to list payment methods for. Omit this and account_id to list your own saved payment methods.
     
 </dd>
 </dl>
@@ -22171,6 +31021,14 @@ client.paymentMethods().list(
     
 </dd>
 </dl>
+
+<dl>
+<dd>
+
+**accountId:** `Optional<String>` — The unique identifier of the company. Provide either this or member_id, not both. Omit both to address your own saved payment methods.
+    
+</dd>
+</dl>
 </dd>
 </dl>
 
@@ -22191,7 +31049,7 @@ client.paymentMethods().list(
 <dl>
 <dd>
 
-Retrieves the details of an existing payment method. Addresses a member's wallet when member_id or company_id is given, otherwise your own.
+Retrieves a saved payment method from a member's wallet when you pass `member_id` or `account_id`, or from your own otherwise.
 
 Required permissions:
  - `member:payment_methods:read`
@@ -22213,8 +31071,8 @@ client.paymentMethods().retrieve(
     "payt_xxxxxxxxxxxxx",
     RetrievePaymentMethodsRequest
         .builder()
-        .companyId("biz_xxxxxxxxxxxxxx")
         .memberId("mber_xxxxxxxxxxxxx")
+        .accountId("biz_xxxxxxxxxxxxxx")
         .build()
 );
 ```
@@ -22239,7 +31097,7 @@ client.paymentMethods().retrieve(
 <dl>
 <dd>
 
-**companyId:** `Optional<String>` — The unique identifier of the company. Provide either this or member_id, not both. Omit both to address your own saved payment methods.
+**memberId:** `Optional<String>` — The unique identifier of the member. Provide either this or account_id, not both. Omit both to address your own saved payment methods.
     
 </dd>
 </dl>
@@ -22247,7 +31105,7 @@ client.paymentMethods().retrieve(
 <dl>
 <dd>
 
-**memberId:** `Optional<String>` — The unique identifier of the member. Provide either this or company_id, not both. Omit both to address your own saved payment methods.
+**accountId:** `Optional<String>` — The unique identifier of the company. Provide either this or member_id, not both. Omit both to address your own saved payment methods.
     
 </dd>
 </dl>
@@ -22293,8 +31151,8 @@ client.paymentMethods().deletePaymentMethod(
     "payt_xxxxxxxxxxxxx",
     DeletePaymentMethodRequest
         .builder()
-        .companyId("biz_xxxxxxxxxxxxxx")
         .memberId("mber_xxxxxxxxxxxxx")
+        .accountId("biz_xxxxxxxxxxxxxx")
         .build()
 );
 ```
@@ -22319,7 +31177,7 @@ client.paymentMethods().deletePaymentMethod(
 <dl>
 <dd>
 
-**companyId:** `Optional<String>` — The unique identifier of the company. Provide either this or member_id, not both. Omit both to address your own saved payment methods.
+**memberId:** `Optional<String>` — The unique identifier of the member. Provide either this or account_id, not both. Omit both to address your own saved payment methods.
     
 </dd>
 </dl>
@@ -22327,7 +31185,849 @@ client.paymentMethods().deletePaymentMethod(
 <dl>
 <dd>
 
-**memberId:** `Optional<String>` — The unique identifier of the member. Provide either this or company_id, not both. Omit both to address your own saved payment methods.
+**accountId:** `Optional<String>` — The unique identifier of the company. Provide either this or member_id, not both. Omit both to address your own saved payment methods.
+    
+</dd>
+</dl>
+</dd>
+</dl>
+
+
+</dd>
+</dl>
+</details>
+
+## Payment Quotes
+<details><summary><code>client.paymentQuotes.create(request) -> PaymentQuote</code></summary>
+<dl>
+<dd>
+
+#### 📝 Description
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+Prices a purchase the way a payment for it will be charged. The body is the `PaymentInput` a payment takes plus where the buyer is, which a seller that collects no tax on the purchase can leave out. The purchase is priced from exactly what you send: no buyer is looked up, so no stored registration or purchase history applies. Pass the quote's `id` as `quote_id` when you create the payment to charge exactly the purchase, promo code, and tax shown here. A quote is priced once and may be consumed by one payment before `expires_at`. Cart entries must name existing variants with `variant_id`.
+</dd>
+</dl>
+</dd>
+</dl>
+
+#### 🔌 Usage
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+```java
+client.paymentQuotes().create(
+    CreatePaymentQuotesRequest
+        .builder()
+        .accountId("biz_xxxxxxxxxxxxxx")
+        .build()
+);
+```
+</dd>
+</dl>
+</dd>
+</dl>
+
+#### ⚙️ Parameters
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+**address:** `Optional<CreatePaymentQuotesRequestAddress>` — The buyer's billing address. Where tax is calculated when no shipping address is given, and the address a tax registration belongs to. A seller that collects tax on this purchase needs the buyer located by a `country` here, on `shipping_address`, a `presentment_country`, or an `ip_address`; without one the quote is refused with `quote_location_required`. Only the keys you supply are kept. The payment that consumes the quote must put the buyer in the same place, by country, state and postal code, through its own `shipping_address` or its confirmation token's billing address, or it is refused with `quote_mismatch`.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**ipAddress:** `Optional<String>` — The buyer's IP address, when your server makes the call on their behalf. Locates the buyer when neither address carries a country and no `presentment_country` is sent. A quote located this way (`located_by` is `ip_address`) is a preview: a payment refuses it with `quote_preview_only`, so quote again with the buyer's address before paying. Also where `presentment_currency` `auto` and `recommended_currencies` find the buyer's local currency, and where a payment method must be able to collect it.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**lineItems:** `Optional<List<CreatePaymentQuotesRequestLineItemsItem>>` — What the buyer is purchasing. Each entry names an existing variant by `variant_id`. Several entries form a cart, which requires every variant to be compatible, belong to this account, and use the same currency.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**presentmentCountry:** `Optional<String>` — The country to price the purchase for, as an ISO 3166-1 alpha-2 code such as `JP`, when the buyer chose one: a store's country picker. Prices in the currency `auto` would pick for a buyer in that country, so send it instead of `presentment_currency`, never with it. Whether a payment method can collect that currency is still judged where the buyer is: by `ip_address`, and by this country only without one. With no address that carries a country, tax is estimated for this country (`located_by` is `presentment_country`) at the country level, and a quote located this way is a preview a payment refuses with `quote_preview_only`. Send it only once the buyer has chosen a country: without it, an `ip_address` estimates more precisely, such as for a US state. For a country Whop has no currency for, the quote is priced as `auto` for the buyer's `ip_address`, and tax is still estimated for the country.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**presentmentCurrency:** `Optional<String>` — The currency to price and charge the purchase in. Omit it, or send null, to price in the variants' own currency. `auto` prices in the currency of the country Whop places the buyer's `ip_address` in when the purchase can be converted into it and a payment method can collect it, and in the variants' own currency otherwise, including when no `ip_address` is sent or Whop cannot place it in a country. To choose that country instead, send `presentment_country` in place of this. A three-letter ISO 4217 code, such as `eur`, prices in that currency or is refused: with `presentment_currency_unsupported` when the purchase cannot be converted into it (adaptive pricing is off for the variant, the variant is not a one-time purchase, or `plan` describes a variant that does not exist yet), and with `presentment_currency_not_payable` when no payment method can collect it. A converted quote states every amount in this currency at an `exchange_rate` fixed until `expires_at`, and the payment that consumes it is charged in this currency at that rate.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**shippingAddress:** `Optional<CreatePaymentQuotesRequestShippingAddress>` — Where physical goods ship. When present it is where tax is calculated; omit it for digital goods. Only the keys you supply are kept. The payment that consumes the quote must ship to the same place, by country, state and postal code, or it is refused with `quote_mismatch`.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**taxIds:** `Optional<List<CreatePaymentQuotesRequestTaxIdsItem>>` — The buyer's tax registration, for a business purchase. One entry. Prices the purchase as business-to-business where that applies (EU reverse charge, for one) and requires an `address` to belong to.
+    
+</dd>
+</dl>
+</dd>
+</dl>
+
+
+</dd>
+</dl>
+</details>
+
+<details><summary><code>client.paymentQuotes.retrieve(id) -> PaymentQuote</code></summary>
+<dl>
+<dd>
+
+#### 📝 Description
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+Retrieves a payment quote. Use it to check which payment holds the quote, through `payment_id`, and when it expires.
+</dd>
+</dl>
+</dd>
+</dl>
+
+#### 🔌 Usage
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+```java
+client.paymentQuotes().retrieve(
+    "id",
+    RetrievePaymentQuotesRequest
+        .builder()
+        .build()
+);
+```
+</dd>
+</dl>
+</dd>
+</dl>
+
+#### ⚙️ Parameters
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+**id:** `String` — The payment quote ID, prefixed `pq_`.
+    
+</dd>
+</dl>
+</dd>
+</dl>
+
+
+</dd>
+</dl>
+</details>
+
+## Payment Rules
+<details><summary><code>client.paymentRules.list() -> SyncPagingIterable&amp;lt;PaymentRule&amp;gt;</code></summary>
+<dl>
+<dd>
+
+#### 📝 Description
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+Lists the payment rules on an account.
+</dd>
+</dl>
+</dd>
+</dl>
+
+#### 🔌 Usage
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+```java
+client.paymentRules().list(
+    ListPaymentRulesRequest
+        .builder()
+        .build()
+);
+```
+</dd>
+</dl>
+</dd>
+</dl>
+
+#### ⚙️ Parameters
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+**accountId:** `Optional<String>` — Only return rules belonging to this account. Defaults to the account the request is acting for.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**status:** `Optional<ListPaymentRulesRequestStatus>` — Only return rules with this status.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**action:** `Optional<ListPaymentRulesRequestAction>` — Only return rules that take this action.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**order:** `Optional<ListPaymentRulesRequestOrder>` — The field to sort by.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**direction:** `Optional<ListPaymentRulesRequestDirection>` — The sort direction.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**first:** `Optional<Integer>` — Number of results to return from the start of the range.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**after:** `Optional<String>` — Return results after this cursor. Use `page_info.end_cursor` from the previous response to fetch the next page.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**last:** `Optional<Integer>` — Number of results to return from the end of the range.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**before:** `Optional<String>` — Return results before this cursor. Use `page_info.start_cursor` from the previous response to fetch the previous page.
+    
+</dd>
+</dl>
+</dd>
+</dl>
+
+
+</dd>
+</dl>
+</details>
+
+<details><summary><code>client.paymentRules.create(request) -> PaymentRule</code></summary>
+<dl>
+<dd>
+
+#### 📝 Description
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+Creates a payment rule. It is created `active` and applies its `action` to new payments that match all of its `conditions`.
+</dd>
+</dl>
+</dd>
+</dl>
+
+#### 🔌 Usage
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+```java
+client.paymentRules().create(
+    CreatePaymentRulesRequest
+        .builder()
+        .action(CreatePaymentRulesRequestAction.ALLOW)
+        .conditions(
+            CreatePaymentRulesRequestConditions
+                .builder()
+                .all(
+                    Arrays.asList(
+                        CreatePaymentRulesRequestConditionsAllItem
+                            .builder()
+                            .field(CreatePaymentRulesRequestConditionsAllItemField.RISK_SCORE)
+                            .operator(CreatePaymentRulesRequestConditionsAllItemOperator.GTE)
+                            .value(
+                                PaymentRuleConditionValue.of(70.0)
+                            )
+                            .build()
+                    )
+                )
+                .build()
+        )
+        .name("Review risky cards")
+        .build()
+);
+```
+</dd>
+</dl>
+</dd>
+</dl>
+
+#### ⚙️ Parameters
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+**accountId:** `Optional<String>` — The account to create the rule on. Defaults to the account the request is acting for.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**action:** `CreatePaymentRulesRequestAction` — What this account's rule requests when every condition matches. One applicable account-rule action wins, in this order: `allow`, `block`, `review`, `enforce_3ds`. An `allow` overrides this account's other rules, never Whop's own fraud controls. A `review` requests authorization without capture for an eligible on-session card payment through Whop Payments. Automatic capture is scheduled for 48 hours after authorization; capture or void the payment before then to decide sooner. Capture may complete later or fail. Review is skipped for unsupported methods, off-session payments, and payments already configured for manual capture. An `enforce_3ds` is skipped when the account rule cannot apply a challenge. Other 3DS requirements still apply.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**conditions:** `CreatePaymentRulesRequestConditions` — The conditions a payment is matched against. Up to 10 conditions, and 8 KiB once serialized.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**metadata:** `Optional<Map<String, String>>` — Custom string-to-string values for your integration. Maximum 50 keys, 40 characters per key, 500 characters per value.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**name:** `String` — A name for this rule. Up to 255 characters.
+    
+</dd>
+</dl>
+</dd>
+</dl>
+
+
+</dd>
+</dl>
+</details>
+
+<details><summary><code>client.paymentRules.listFields() -> ListFieldsPaymentRulesResponse</code></summary>
+<dl>
+<dd>
+
+#### 📝 Description
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+Lists the payment attributes a rule condition can read, with the operators and values each one accepts. Small and returned in full on one page.
+</dd>
+</dl>
+</dd>
+</dl>
+
+#### 🔌 Usage
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+```java
+client.paymentRules().listFields();
+```
+</dd>
+</dl>
+</dd>
+</dl>
+
+
+</dd>
+</dl>
+</details>
+
+<details><summary><code>client.paymentRules.retrieve(id) -> PaymentRule</code></summary>
+<dl>
+<dd>
+
+#### 📝 Description
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+Retrieves a payment rule.
+</dd>
+</dl>
+</dd>
+</dl>
+
+#### 🔌 Usage
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+```java
+client.paymentRules().retrieve(
+    "id",
+    RetrievePaymentRulesRequest
+        .builder()
+        .build()
+);
+```
+</dd>
+</dl>
+</dd>
+</dl>
+
+#### ⚙️ Parameters
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+**id:** `String` — The payment rule ID.
+    
+</dd>
+</dl>
+</dd>
+</dl>
+
+
+</dd>
+</dl>
+</details>
+
+<details><summary><code>client.paymentRules.delete(id)</code></summary>
+<dl>
+<dd>
+
+#### 📝 Description
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+Deletes a payment rule. It stops applying to new payments but is kept, so the payments it already decided still name it.
+</dd>
+</dl>
+</dd>
+</dl>
+
+#### 🔌 Usage
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+```java
+client.paymentRules().delete(
+    "id",
+    DeletePaymentRulesRequest
+        .builder()
+        .build()
+);
+```
+</dd>
+</dl>
+</dd>
+</dl>
+
+#### ⚙️ Parameters
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+**id:** `String` — The payment rule ID.
+    
+</dd>
+</dl>
+</dd>
+</dl>
+
+
+</dd>
+</dl>
+</details>
+
+<details><summary><code>client.paymentRules.update(id, request) -> PaymentRule</code></summary>
+<dl>
+<dd>
+
+#### 📝 Description
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+Updates a payment rule's name or metadata, keeping its ID and everything recorded against it. A rule's `action` and `conditions` are fixed once created, so the payments it decided keep naming the rule that decided them; use `POST /payment_rules/:id/replace` to change them.
+</dd>
+</dl>
+</dd>
+</dl>
+
+#### 🔌 Usage
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+```java
+client.paymentRules().update(
+    "id",
+    UpdatePaymentRulesRequest
+        .builder()
+        .build()
+);
+```
+</dd>
+</dl>
+</dd>
+</dl>
+
+#### ⚙️ Parameters
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+**id:** `String` — The payment rule ID.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**metadata:** `Optional<Map<String, String>>` — Custom string-to-string values for your integration. Maximum 50 keys, 40 characters per key, 500 characters per value.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**name:** `Optional<String>` — A name for this rule. Up to 255 characters.
+    
+</dd>
+</dl>
+</dd>
+</dl>
+
+
+</dd>
+</dl>
+</details>
+
+<details><summary><code>client.paymentRules.activate(id) -> PaymentRule</code></summary>
+<dl>
+<dd>
+
+#### 📝 Description
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+Activates an inactive payment rule so it applies to new payments again. A deleted rule cannot be activated.
+</dd>
+</dl>
+</dd>
+</dl>
+
+#### 🔌 Usage
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+```java
+client.paymentRules().activate(
+    "id",
+    ActivatePaymentRulesRequest
+        .builder()
+        .build()
+);
+```
+</dd>
+</dl>
+</dd>
+</dl>
+
+#### ⚙️ Parameters
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+**id:** `String` — The payment rule ID.
+    
+</dd>
+</dl>
+</dd>
+</dl>
+
+
+</dd>
+</dl>
+</details>
+
+<details><summary><code>client.paymentRules.deactivate(id) -> PaymentRule</code></summary>
+<dl>
+<dd>
+
+#### 📝 Description
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+Deactivates a payment rule so it stops applying to new payments. It keeps its ID and can be activated again.
+</dd>
+</dl>
+</dd>
+</dl>
+
+#### 🔌 Usage
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+```java
+client.paymentRules().deactivate(
+    "id",
+    DeactivatePaymentRulesRequest
+        .builder()
+        .build()
+);
+```
+</dd>
+</dl>
+</dd>
+</dl>
+
+#### ⚙️ Parameters
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+**id:** `String` — The payment rule ID.
+    
+</dd>
+</dl>
+</dd>
+</dl>
+
+
+</dd>
+</dl>
+</details>
+
+<details><summary><code>client.paymentRules.replace(id, request) -> PaymentRule</code></summary>
+<dl>
+<dd>
+
+#### 📝 Description
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+Changes a payment rule's `action` and `conditions` by deleting it and creating its successor in one step. The successor has a new ID and keeps the replaced rule's name, metadata, and `active` or `inactive` status.
+</dd>
+</dl>
+</dd>
+</dl>
+
+#### 🔌 Usage
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+```java
+client.paymentRules().replace(
+    "id",
+    ReplacePaymentRulesRequest
+        .builder()
+        .action(ReplacePaymentRulesRequestAction.ALLOW)
+        .conditions(
+            ReplacePaymentRulesRequestConditions
+                .builder()
+                .all(
+                    Arrays.asList(
+                        ReplacePaymentRulesRequestConditionsAllItem
+                            .builder()
+                            .field(ReplacePaymentRulesRequestConditionsAllItemField.RISK_SCORE)
+                            .operator(ReplacePaymentRulesRequestConditionsAllItemOperator.GTE)
+                            .value(
+                                PaymentRuleConditionValue.of(70.0)
+                            )
+                            .build()
+                    )
+                )
+                .build()
+        )
+        .build()
+);
+```
+</dd>
+</dl>
+</dd>
+</dl>
+
+#### ⚙️ Parameters
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+**id:** `String` — The payment rule ID.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**action:** `ReplacePaymentRulesRequestAction` — What this account's rule requests when every condition matches. One applicable account-rule action wins, in this order: `allow`, `block`, `review`, `enforce_3ds`. An `allow` overrides this account's other rules, never Whop's own fraud controls. A `review` requests authorization without capture for an eligible on-session card payment through Whop Payments. Automatic capture is scheduled for 48 hours after authorization; capture or void the payment before then to decide sooner. Capture may complete later or fail. Review is skipped for unsupported methods, off-session payments, and payments already configured for manual capture. An `enforce_3ds` is skipped when the account rule cannot apply a challenge. Other 3DS requirements still apply.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**conditions:** `ReplacePaymentRulesRequestConditions` — The conditions a payment is matched against. Up to 10 conditions, and 8 KiB once serialized.
     
 </dd>
 </dl>
@@ -22340,7 +32040,7 @@ client.paymentMethods().deletePaymentMethod(
 </details>
 
 ## Payments
-<details><summary><code>client.payments.list() -> SyncPagingIterable&amp;lt;PaymentListItem&amp;gt;</code></summary>
+<details><summary><code>client.payments.list() -> SyncPagingIterable&amp;lt;Payment&amp;gt;</code></summary>
 <dl>
 <dd>
 
@@ -22352,17 +32052,7 @@ client.paymentMethods().deletePaymentMethod(
 <dl>
 <dd>
 
-Returns a paginated list of payments for the actor in context, with optional filtering by product, plan, status, billing reason, currency, and creation date.
-
-Required permissions:
- - `payment:basic:read`
- - `plan:basic:read`
- - `access_pass:basic:read`
- - `member:email:read`
- - `member:basic:read`
- - `member:phone:read`
- - `promo_code:basic:read`
- - `shipment:basic:read`
+Lists payments, newest first. By default, returns sales for the accounts your credential can read: an account credential's own account, or every account a user can read payments for. Set `mode` to `user_sales` to list the sales the signed-in user received personally, outside any account.
 </dd>
 </dl>
 </dd>
@@ -22380,13 +32070,17 @@ Required permissions:
 client.payments().list(
     ListPaymentsRequest
         .builder()
-        .first(42)
-        .last(42)
-        .companyId("biz_xxxxxxxxxxxxxx")
-        .createdBefore(OffsetDateTime.parse("2023-12-01T05:00:00Z"))
-        .createdAfter(OffsetDateTime.parse("2023-12-01T05:00:00Z"))
-        .updatedBefore(OffsetDateTime.parse("2023-12-01T05:00:00Z"))
-        .updatedAfter(OffsetDateTime.parse("2023-12-01T05:00:00Z"))
+        .currencies(
+            Arrays.asList("eur")
+        )
+        .variantIds(
+            Arrays.asList("plan_xxxxxxxxxxxxx")
+        )
+        .productIds(
+            Arrays.asList("prod_xxxxxxxxxxxxx")
+        )
+        .minAmount(995.0)
+        .maxAmount(995.0)
         .build()
 );
 ```
@@ -22403,7 +32097,7 @@ client.payments().list(
 <dl>
 <dd>
 
-**after:** `Optional<String>` — Returns the elements in the list that come after the specified cursor.
+**mode:** `Optional<ListPaymentsRequestMode>` — Which sales to list. `account_sales` returns sales for the accounts the caller can read. `user_sales` returns only sales the signed-in user received personally, outside any account; it requires the user's own Whop login session and cannot be combined with `account_id`.
     
 </dd>
 </dl>
@@ -22411,7 +32105,7 @@ client.payments().list(
 <dl>
 <dd>
 
-**before:** `Optional<String>` — Returns the elements in the list that come before the specified cursor.
+**accountId:** `Optional<String>` — Only payments charged by this account, prefixed `biz_`.
     
 </dd>
 </dl>
@@ -22419,7 +32113,7 @@ client.payments().list(
 <dl>
 <dd>
 
-**first:** `Optional<Integer>` — Returns the first _n_ elements from the list.
+**status:** `Optional<ListPaymentsRequestStatus>` — Only payments in this lifecycle state.
     
 </dd>
 </dl>
@@ -22427,7 +32121,7 @@ client.payments().list(
 <dl>
 <dd>
 
-**last:** `Optional<Integer>` — Returns the last _n_ elements from the list.
+**trackingStatus:** `Optional<ListPaymentsRequestTrackingStatus>` — Only payments whose most recently attached kept shipment is in this tracking state. `missing_tracking` selects paid payments with a captured shipping address and no kept shipment, excluding fully refunded payments. `needs_tracking` selects payments with an open pre-shipment funds hold and no kept shipment. Shipment states do not imply a payment or refund state. Requires `shipment:basic:read` as well as `payment:basic:read`; user-wide lists include only accounts readable under both scopes. Only supported with `mode=account_sales`.
     
 </dd>
 </dl>
@@ -22435,7 +32129,7 @@ client.payments().list(
 <dl>
 <dd>
 
-**companyId:** `Optional<String>` — The unique identifier of the company to list payments for.
+**billingReason:** `Optional<ListPaymentsRequestBillingReason>` — Only payments charged for this reason. `subscription_cycle` also matches renewals recorded as `subscription_update`.
     
 </dd>
 </dl>
@@ -22443,7 +32137,7 @@ client.payments().list(
 <dl>
 <dd>
 
-**direction:** `Optional<Direction>` 
+**currency:** `Optional<String>` — Only payments presented in this three-letter currency, such as `usd`.
     
 </dd>
 </dl>
@@ -22451,7 +32145,7 @@ client.payments().list(
 <dl>
 <dd>
 
-**order:** `Optional<ReceiptV2Order>` 
+**userId:** `Optional<String>` — Only payments made by this buyer, prefixed `user_`. This filters sales the caller can read, so `me` is not accepted; list the caller's own purchases with `GET /memberships?user_id=me`.
     
 </dd>
 </dl>
@@ -22459,7 +32153,7 @@ client.payments().list(
 <dl>
 <dd>
 
-**productIds:** `Optional<String>` — Filter payments to only those associated with these specific product identifiers.
+**query:** `Optional<String>` — Search payments by payment ID, dispute ID, user ID, membership ID, user email, name, or username. Email filtering requires the member:email:read permission.
     
 </dd>
 </dl>
@@ -22467,7 +32161,7 @@ client.payments().list(
 <dl>
 <dd>
 
-**billingReasons:** `Optional<BillingReasons>` — Filter payments by their billing reason.
+**includeSubaccounts:** `Optional<Boolean>` — Also cover the account's subaccounts. Requires `account_id`, and is a 400 without it. Without `query`, lists the payments of the account and every subaccount, newest first by `created_at` only; another `order` is a 400. The listing is cut off after 10 seconds, which a rare filter on an account with little recent activity can reach; add a `query` to narrow it. With `query`, matches on payment, dispute, user or membership ID, buyer email, or a card's first 6 or 8 digits and last 4 separated by a space or dash (`424242 4242`); free-text queries such as a name search only the named account. Subaccounts' payments are returned only for subaccounts you can read payments on.
     
 </dd>
 </dl>
@@ -22475,7 +32169,7 @@ client.payments().list(
 <dl>
 <dd>
 
-**currencies:** `Optional<Currencies>` — Filter payments by their currency code.
+**memberId:** `Optional<String>` — Only payments made by this member, prefixed `mber_`.
     
 </dd>
 </dl>
@@ -22483,7 +32177,7 @@ client.payments().list(
 <dl>
 <dd>
 
-**planIds:** `Optional<String>` — Filter payments to only those associated with these specific plan identifiers.
+**membershipId:** `Optional<String>` — Only payments billed under this membership, prefixed `mem_`.
     
 </dd>
 </dl>
@@ -22491,7 +32185,7 @@ client.payments().list(
 <dl>
 <dd>
 
-**statuses:** `Optional<ReceiptStatus>` — Filter payments by their current status.
+**productId:** `Optional<String>` — Only payments for this product, prefixed `prod_`.
     
 </dd>
 </dl>
@@ -22499,7 +32193,7 @@ client.payments().list(
 <dl>
 <dd>
 
-**substatuses:** `Optional<FriendlyReceiptStatus>` — Filter payments by their current substatus for more granular filtering.
+**variantId:** `Optional<String>` — Only payments priced by this variant, prefixed `plan_`.
     
 </dd>
 </dl>
@@ -22507,7 +32201,7 @@ client.payments().list(
 <dl>
 <dd>
 
-**includeFree:** `Optional<Boolean>` — Whether to include payments with a zero amount.
+**createdBefore:** `Optional<OffsetDateTime>` — Only payments created before this ISO 8601 timestamp.
     
 </dd>
 </dl>
@@ -22515,7 +32209,7 @@ client.payments().list(
 <dl>
 <dd>
 
-**createdBefore:** `Optional<OffsetDateTime>` — Only return payments created before this timestamp.
+**createdAfter:** `Optional<OffsetDateTime>` — Only payments created after this ISO 8601 timestamp.
     
 </dd>
 </dl>
@@ -22523,7 +32217,7 @@ client.payments().list(
 <dl>
 <dd>
 
-**createdAfter:** `Optional<OffsetDateTime>` — Only return payments created after this timestamp.
+**statuses:** `Optional<ListPaymentsRequestStatusesItem>` — Only payments in any of these lifecycle states, with the same meanings as `status`. Repeat the parameter to pass several. Combined with `status` when both are sent.
     
 </dd>
 </dl>
@@ -22531,7 +32225,7 @@ client.payments().list(
 <dl>
 <dd>
 
-**updatedBefore:** `Optional<OffsetDateTime>` — Only return payments last updated before this timestamp.
+**substatuses:** `Optional<ListPaymentsRequestSubstatusesItem>` — Only payments whose `substatus` is any of these. Repeat the parameter to pass several. `incomplete` also matches payments that report `incomplete` because no finer status was recorded.
     
 </dd>
 </dl>
@@ -22539,7 +32233,7 @@ client.payments().list(
 <dl>
 <dd>
 
-**updatedAfter:** `Optional<OffsetDateTime>` — Only return payments last updated after this timestamp.
+**billingReasons:** `Optional<ListPaymentsRequestBillingReasonsItem>` — Only payments charged for any of these reasons, with the same meanings as `billing_reason`. Repeat the parameter to pass several. Combined with `billing_reason` when both are sent.
     
 </dd>
 </dl>
@@ -22547,7 +32241,7 @@ client.payments().list(
 <dl>
 <dd>
 
-**query:** `Optional<String>` — Search payments by user ID, membership ID, user email, name, or username. Email filtering requires the member:email:read permission.
+**currencies:** `Optional<String>` — Only payments presented in any of these three-letter currencies. Repeat the parameter to pass several. Combined with `currency` when both are sent.
     
 </dd>
 </dl>
@@ -22555,7 +32249,151 @@ client.payments().list(
 <dl>
 <dd>
 
-**checkoutConfigurationIds:** `Optional<String>` — Only return payments from these checkout configurations.
+**minAmount:** `Optional<Double>` — Only payments charged at least this amount: what the buyer was charged after discounts and including tax, in the currency each payment was presented in, the same amount `order=amount` sorts by. Where tax is added on top of the price (`tax_behavior` is `exclusive`), that is the price plus the tax, so a 995 price with tax added does not match `995`: match a range instead. A failed payment that charged nothing matches 0, not its price. Inclusive and compared to the cent. Pair it with `currencies` when the account sells in several. Send the same value as `max_amount` to match one exact amount.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**maxAmount:** `Optional<Double>` — Only payments charged at most this amount, measured like `min_amount`: after discounts and including tax, in the currency each payment was presented in. Inclusive and compared to the cent. Must not be less than `min_amount`.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**variantIds:** `Optional<String>` — Only payments priced by any of these variants, each prefixed `plan_`. Repeat the parameter to pass several. Combined with `variant_id` when both are sent.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**productIds:** `Optional<String>` — Only payments for any of these products, each prefixed `prod_`. Repeat the parameter to pass several. Combined with `product_id` when both are sent.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**paymentMethods:** `Optional<ListPaymentsRequestPaymentMethodsItem>` — Only payments paid with any of these methods: a card brand such as `amex`, a wallet such as `apple_pay`, or a payment method type such as `paypal`. Repeat the parameter to pass several.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**trackingStates:** `Optional<ListPaymentsRequestTrackingStatesItem>` — Only payments whose shipment is in any of these tracking states, or that still need a tracking number (`needs_tracking`). Repeat the parameter to pass several. Requires `account_id` and the shipment:basic:read permission.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**refundedAfter:** `Optional<OffsetDateTime>` — Only payments refunded after this ISO 8601 timestamp.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**refundedBefore:** `Optional<OffsetDateTime>` — Only payments refunded before this ISO 8601 timestamp.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**disputeAlertedAfter:** `Optional<OffsetDateTime>` — Only payments with a dispute alert after this ISO 8601 timestamp.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**disputeAlertedBefore:** `Optional<OffsetDateTime>` — Only payments with a dispute alert before this ISO 8601 timestamp.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**disputeCreatedAfter:** `Optional<OffsetDateTime>` — Only payments with a dispute opened after this ISO 8601 timestamp.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**disputeCreatedBefore:** `Optional<OffsetDateTime>` — Only payments with a dispute opened before this ISO 8601 timestamp.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**order:** `Optional<ListPaymentsRequestOrder>` — The field to sort by. `amount` sorts by the amount charged, in the currency it was charged in.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**direction:** `Optional<ListPaymentsRequestDirection>` — The sort direction.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**first:** `Optional<Integer>` — Number of results to return from the start of the range.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**after:** `Optional<String>` — Return results after this cursor. Use `page_info.end_cursor` from the previous response to fetch the next page.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**last:** `Optional<Integer>` — Number of results to return from the end of the range.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**before:** `Optional<String>` — Return results before this cursor. Use `page_info.start_cursor` from the previous response to fetch the previous page.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**includeTotalCount:** `Optional<Boolean>` — Set to `true` to return the number of matching results in `page_info.total_count`. Send `first=0` as well to return the count without any results.
     
 </dd>
 </dl>
@@ -22567,7 +32405,7 @@ client.payments().list(
 </dl>
 </details>
 
-<details><summary><code>client.payments.create(request) -> CreatePaymentsResponse</code></summary>
+<details><summary><code>client.payments.create(request) -> Payment</code></summary>
 <dl>
 <dd>
 
@@ -22579,22 +32417,7 @@ client.payments().list(
 <dl>
 <dd>
 
-Charge an existing member off-session using one of their stored payment methods. You can provide an existing plan, or create a new one in-line. This endpoint will respond with a payment object immediately, but the payment is processed asynchronously in the background. Use webhooks to be notified when the payment succeeds or fails.
-
-Required permissions:
- - `payment:charge`
- - `plan:create`
- - `access_pass:create`
- - `access_pass:update`
- - `plan:basic:read`
- - `access_pass:basic:read`
- - `member:email:read`
- - `member:basic:read`
- - `member:phone:read`
- - `promo_code:basic:read`
- - `shipment:basic:read`
- - `payment:dispute:read`
- - `payment:resolution_center_case:read`
+Charges a buyer for one or more variants with a payment method already on file (`member_id` and `payment_method_id`), or with a `confirmation_token` for a method the buyer just supplied. Collection runs in the background, so the response is the payment as created, not its outcome: poll Retrieve payment status for how far it has got and what the buyer must still do.
 </dd>
 </dl>
 </dd>
@@ -22610,19 +32433,10 @@ Required permissions:
 
 ```java
 client.payments().create(
-    CreatePaymentsRequest.of(
-        CreatePaymentsRequestZero
-            .builder()
-            .companyId("biz_xxxxxxxxxxxxxx")
-            .confirmationToken("confirmation_token")
-            .plan(
-                CreatePaymentsRequestZeroPlan
-                    .builder()
-                    .currency(Currencies.USD)
-                    .build()
-            )
-            .build()
-    )
+    CreatePaymentsRequest
+        .builder()
+        .accountId("biz_xxxxxxxxxxxxxx")
+        .build()
 );
 ```
 </dd>
@@ -22638,7 +32452,143 @@ client.payments().create(
 <dl>
 <dd>
 
-**request:** `CreatePaymentsRequest` — Parameters for CreatePayment
+**affiliateCode:** `Optional<String>` — The code an affiliate link carries, which is the affiliate's username. The affiliate is credited for this payment as on a checkout session. A code naming no one eligible to earn on the product is ignored, and the payment goes ahead. A promo code with its own affiliate takes precedence. No affiliate is credited on a variant without a product or on a purchase of several variants. At most 255 characters. Not supported with a `card_present` `payment_method`.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**autoCaptureAfterMinutes:** `Optional<Integer>` — Minutes after authorization at which Whop captures the hold automatically unless it has been voided. Requires `capture: false`. Between 5 and 5760 (4 days).
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**billingAddress:** `Optional<CreatePaymentsRequestBillingAddress>` — The buyer's billing address, returned on the payment as `billing_address` and used to calculate tax when Whop calculates it for the account. Only with a `paypal` `payment_method`. Only the keys you supply are kept.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**capture:** `Optional<Boolean>` — Whether to capture a card payment immediately. Defaults to true. Pass false to place an authorization hold that must be captured in full within five days via the capture endpoint, or automatically after `auto_capture_after_minutes`.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**confirmationToken:** `Optional<String>` — A confirmation token describing a payment method the buyer just supplied. Provide this instead of `member_id` and `payment_method_id`; the buyer is resolved from the token's billing email, or from `email`. The buyer may still have a step to complete — poll the payment's status for what to do next.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**email:** `Optional<String>` — The buyer's email, resolving or creating the user the payment belongs to. With `confirmation_token` it overrides the email the token carries, and is ignored when the token was created by a signed-in buyer; with a `card_present` `payment_method` it names a buyer the point of sale already knows, otherwise the sale belongs to a guest until a buyer is attached; with a `paypal` `payment_method` it names the buyer, and when it and `member_id` are both omitted the buyer is the PayPal account that approves the payment. Ignored with `member_id`.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**ipAddress:** `Optional<String>` — The buyer's IPv4 or IPv6 address, used to assess the charge's risk and passed to the processor. Ignored unless a saved payment method is charged with `off_session` set to false.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**lineItems:** `Optional<List<CreatePaymentsRequestLineItemsItem>>` — What the buyer is purchasing. Each entry takes exactly one of `variant_id` or an inline `variant`. One entry charges that variant; several entries form a cart, which requires every variant to be compatible, belong to this account, and use the same currency. Mutually exclusive with `variant_id` and `variant`.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**memberId:** `Optional<String>` — The member to charge, prefixed `mber_`. Required with `payment_method_id` unless `confirmation_token` is provided. With a `paypal` `payment_method` it names the buyer instead of `email`, and must belong to a user; omit both to take the buyer from the PayPal account that approves.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**metadata:** `Optional<Map<String, Optional<String>>>` — Custom metadata to attach to the payment.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**offSession:** `Optional<Boolean>` — Whether the buyer is absent from your checkout and can't authenticate. Pass true when you charge the card without the buyer, such as a renewal on your own schedule. Pass false when the buyer is present, such as a one-click upsell right after checkout: the charge is processed as a customer-initiated card-on-file payment, and if the issuer asks the buyer to authenticate, the payment's status is `requires_action` with a `next_action` to send them to, after which they return to `return_url`. From API version 2026-10-07-1 it defaults to false when `return_url` is provided and to true otherwise; before that version it defaults to true. A saved Apple Pay, Google Pay or PayPal payment method is always charged with `off_session` true. Ignored unless `member_id` and `payment_method_id` are provided.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**paymentMethod:** `Optional<CreatePaymentsRequestPaymentMethod>` — A payment method named on this call rather than described by a confirmation token. `type` names it and the member named after it carries its details. Nothing is collected on this call: the payment is created first and the buyer or device then acts on the `next_action` the status endpoint serves. `card_present` (Tap to Pay): the reader collects against the payment with the client secret in `next_action`. `paypal`: the buyer approves on PayPal's page, reached through a `redirect` `next_action`, then returns to `return_url`; `member_id` or `email` names the buyer. Mutually exclusive with `confirmation_token` and `payment_method_id`, and with `member_id` except for `paypal`.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**paymentMethodId:** `Optional<String>` — The stored payment method to charge, prefixed `payt_`. It must belong to the member. Required unless `confirmation_token` is provided.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**quoteId:** `Optional<String>` — A payment quote from `POST /payment_quotes`, prefixed `pq_`. The payment charges exactly the quote: its purchase (its variants and quantities, or the `variant` it priced), which this body may then omit, its promo code, and its tax, the quote's `tax_amount` rather than a figure calculated now. Omit it, or send null, to have tax calculated when the payment is charged. The quote must belong to `account_id`. A purchase field you omit or send as null takes the quote's value; the buyer's email, the addresses and the payment method are this request's own, never the quote's. Whatever you do send must describe the quoted purchase: the same variants, quantities and promo code. A quote that priced `variant` takes only the same `variant` you sent to `POST /payment_quotes` (or omit the purchase to take the quoted one), never `variant_id` or `line_items`, and a quote that priced variants by id never takes `variant`. Unless the quote located no buyer (`located_by` is null), the address the payment carries (its shipping address, else its billing address) must put the buyer where the quote priced tax, by country, state and postal code; otherwise the payment is refused with 400 before the payment method is used. A quote located by IP address or by the country the buyer chose (`located_by` is `ip_address` or `presentment_country`) is a preview and cannot be paid. A quote is consumed by one payment: a declined payment keeps it and can be retried; a new payment needs a new quote. A quote cannot be charged by a processor that doesn't take quotes, such as a seller's own connected PayPal account; such a payment is refused before the payment method is used. A quote priced in a `presentment_currency` is charged in that currency at the quote's `exchange_rate`. A payment refused over its quote carries an error `code`. `quote_expired`: the quote has expired; quote again. `quote_tax_unavailable`: the quote could not price tax; quote again, or omit `quote_id`. `quote_preview_only`: the quote was located by IP address or by the country the buyer chose; quote again with the buyer's address. `quote_in_use` (409): another payment holds the quote. `quote_mismatch`: the purchase or the buyer's address is not the one quoted. `quote_rate_expired`: the exchange rate the quote was priced at has moved too far to charge; quote again. `payment_method_currency_unsupported`: the payment method cannot pay in the quote's currency; use another method, or quote again in another currency. `quote_processor_unsupported`: the payment would be processed by a processor that doesn't take quotes, such as a seller's own connected PayPal account; use another method, or omit `quote_id` to have tax calculated when the payment is charged.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**returnUrl:** `Optional<String>` — Where the buyer continues after completing an off-site step such as 3D Secure. An absolute https URL without credentials, at most 2,048 characters. Required when a saved payment method is charged with `off_session` false; otherwise ignored unless `confirmation_token` or a `paypal` `payment_method` is provided.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**setupFutureUsage:** `Optional<CreatePaymentsRequestSetupFutureUsage>` — Attests that the buyer was told the payment method will be saved for later charges, and saves it once they approve, so it can be charged with `member_id` and `payment_method_id`. PayPal shows the buyer the agreement to future charges on its approval page. Omit it for a one-time payment that saves nothing. Ignored unless a `paypal` `payment_method` is provided.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**shippingAddress:** `Optional<CreatePaymentsRequestShippingAddress>` — Where physical goods ship, returned on the payment as `shipping_address`. Only the keys you supply are kept; omit it for digital goods.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**statementDescriptor:** `Optional<String>` — Overrides the text on the buyer's card statement for this payment only. Takes precedence over the product's and account's custom descriptors, and changes neither. Must start with `WHOP*` unless the business processes as the merchant of record. For businesses processing as the merchant of record, omit the `WHOP*` prefix; the descriptor appears as provided. Must be 5-22 characters, contain at least one letter, and use only Latin letters, numbers, spaces, underscores, hyphens, or asterisks.
     
 </dd>
 </dl>
@@ -22650,7 +32600,7 @@ client.payments().create(
 </dl>
 </details>
 
-<details><summary><code>client.payments.retrieve(id) -> RetrievePaymentsResponse</code></summary>
+<details><summary><code>client.payments.summary() -> SummaryPaymentsResponse</code></summary>
 <dl>
 <dd>
 
@@ -22662,19 +32612,244 @@ client.payments().create(
 <dl>
 <dd>
 
-Retrieves the details of an existing payment.
+Totals up the same payments the list returns, so you can build status tabs and filter options without paging through them. Takes the same filters as List Payments.
+</dd>
+</dl>
+</dd>
+</dl>
 
-Required permissions:
- - `payment:basic:read`
- - `plan:basic:read`
- - `access_pass:basic:read`
- - `member:email:read`
- - `member:basic:read`
- - `member:phone:read`
- - `promo_code:basic:read`
- - `shipment:basic:read`
- - `payment:dispute:read`
- - `payment:resolution_center_case:read`
+#### 🔌 Usage
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+```java
+client.payments().summary(
+    SummaryPaymentsRequest
+        .builder()
+        .currencies(
+            Arrays.asList("usd")
+        )
+        .variantIds(
+            Arrays.asList("plan_xxxxxxxxxxxxx")
+        )
+        .productIds(
+            Arrays.asList("prod_xxxxxxxxxxxxx")
+        )
+        .minAmount(995.0)
+        .maxAmount(995.0)
+        .build()
+);
+```
+</dd>
+</dl>
+</dd>
+</dl>
+
+#### ⚙️ Parameters
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+**groups:** `Optional<SummaryPaymentsRequestGroupsItem>` — Which breakdowns to return, keyed by these names under `groups`. Repeat the parameter to ask for several; omit it for all of them.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**accountId:** `Optional<String>` — Only payments charged by this account, prefixed `biz_`.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**statuses:** `Optional<SummaryPaymentsRequestStatusesItem>` — Only payments in any of these lifecycle states. Repeat the parameter to pass several.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**substatuses:** `Optional<SummaryPaymentsRequestSubstatusesItem>` — Only payments whose `substatus` is any of these. Repeat the parameter to pass several.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**billingReasons:** `Optional<SummaryPaymentsRequestBillingReasonsItem>` — Only payments charged for any of these reasons. Repeat the parameter to pass several.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**currencies:** `Optional<String>` — Only payments presented in any of these three-letter currencies. Repeat the parameter to pass several.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**minAmount:** `Optional<Double>` — Only payments charged at least this amount: what the buyer was charged after discounts and including tax, in the currency each payment was presented in. Where tax is added on top of the price (`tax_behavior` is `exclusive`), that is the price plus the tax. A failed payment that charged nothing counts as 0. Inclusive and compared to the cent.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**maxAmount:** `Optional<Double>` — Only payments charged at most this amount, measured like `min_amount`: after discounts and including tax. Inclusive and compared to the cent. Must not be less than `min_amount`.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**variantIds:** `Optional<String>` — Only payments priced by any of these variants, each prefixed `plan_`. Repeat the parameter to pass several.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**productIds:** `Optional<String>` — Only payments for any of these products, each prefixed `prod_`. Repeat the parameter to pass several.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**paymentMethods:** `Optional<SummaryPaymentsRequestPaymentMethodsItem>` — Only payments paid with any of these methods. Repeat the parameter to pass several.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**trackingStates:** `Optional<SummaryPaymentsRequestTrackingStatesItem>` — Only payments in any of these tracking states. Requires `account_id` and the shipment:basic:read permission.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**createdAfter:** `Optional<OffsetDateTime>` — Only payments created after this ISO 8601 timestamp.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**createdBefore:** `Optional<OffsetDateTime>` — Only payments created before this ISO 8601 timestamp.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**refundedAfter:** `Optional<OffsetDateTime>` — Only payments refunded after this ISO 8601 timestamp.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**refundedBefore:** `Optional<OffsetDateTime>` — Only payments refunded before this ISO 8601 timestamp.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**disputeAlertedAfter:** `Optional<OffsetDateTime>` — Only payments with a dispute alert after this ISO 8601 timestamp.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**disputeAlertedBefore:** `Optional<OffsetDateTime>` — Only payments with a dispute alert before this ISO 8601 timestamp.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**disputeCreatedAfter:** `Optional<OffsetDateTime>` — Only payments with a dispute opened after this ISO 8601 timestamp.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**disputeCreatedBefore:** `Optional<OffsetDateTime>` — Only payments with a dispute opened before this ISO 8601 timestamp.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**query:** `Optional<String>` — Search payments by payment ID, dispute ID, user ID, membership ID, user email, name, or username.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**includeSubaccounts:** `Optional<Boolean>` — Only for searches: with `query`, also search the account's subaccounts. Requires `account_id` and `query`, and is a 400 without either; it never lists subaccounts' payments on its own. Matches on payment, dispute, user or membership ID, buyer email, or a card's first 6 or 8 digits and last 4 separated by a space or dash (`424242 4242`). Free-text queries such as a name search only the named account. Subaccounts' payments are returned only for subaccounts you can read payments on.
+    
+</dd>
+</dl>
+</dd>
+</dl>
+
+
+</dd>
+</dl>
+</details>
+
+<details><summary><code>client.payments.retrieve(id) -> Payment</code></summary>
+<dl>
+<dd>
+
+#### 📝 Description
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+Returns one payment, including every purchased line item with its quantity and subtotal. Related records are ids — resolve a variant, membership, member or shipment on its own endpoint, and list this payment's refunds, disputes or Resolution Center cases with `?payment_id=`.
 </dd>
 </dl>
 </dd>
@@ -22690,8 +32865,142 @@ Required permissions:
 
 ```java
 client.payments().retrieve(
-    "pay_xxxxxxxxxxxxxx",
+    "id",
     RetrievePaymentsRequest
+        .builder()
+        .build()
+);
+```
+</dd>
+</dl>
+</dd>
+</dl>
+
+#### ⚙️ Parameters
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+**id:** `String` — The payment, prefixed `pay_`.
+    
+</dd>
+</dl>
+</dd>
+</dl>
+
+
+</dd>
+</dl>
+</details>
+
+<details><summary><code>client.payments.update(id, request) -> Payment</code></summary>
+<dl>
+<dd>
+
+#### 📝 Description
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+Updates a payment's `shipping_address` or `return_url`.
+</dd>
+</dl>
+</dd>
+</dl>
+
+#### 🔌 Usage
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+```java
+client.payments().update(
+    "id",
+    UpdatePaymentsRequest
+        .builder()
+        .build()
+);
+```
+</dd>
+</dl>
+</dd>
+</dl>
+
+#### ⚙️ Parameters
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+**id:** `String` — The payment, prefixed `pay_`.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**returnUrl:** `Optional<String>` — Where the buyer continues after completing an off-site step. An absolute https URL without credentials, at most 2,048 characters. Only for payments created with a `confirmation_token`, and only until the buyer has returned. Omit it to leave it unchanged.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**shippingAddress:** `Optional<UpdatePaymentsRequestShippingAddress>` — The complete new shipping address. It replaces the current address as a whole and is never merged with it, so send every field the address should have, including the ones that are not changing. Any field you leave out is cleared: sending only `city` leaves an address with nothing but a city. Pass null to remove the address, or omit `shipping_address` to leave it unchanged. It cannot change once a shipment exists for the payment.
+    
+</dd>
+</dl>
+</dd>
+</dl>
+
+
+</dd>
+</dl>
+</details>
+
+<details><summary><code>client.payments.capture(id) -> PaymentStatus</code></summary>
+<dl>
+<dd>
+
+#### 📝 Description
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+Captures the full amount of a card payment created with `capture: false`. The payment must still be in `requires_capture` before `capture_expires_at`. Partial capture, multiple captures, capturing more than the authorized amount, and tips are not supported.
+</dd>
+</dl>
+</dd>
+</dl>
+
+#### 🔌 Usage
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+```java
+client.payments().capture(
+    "id",
+    CapturePaymentsRequest
         .builder()
         .build()
 );
@@ -22721,7 +33030,7 @@ client.payments().retrieve(
 </dl>
 </details>
 
-<details><summary><code>client.payments.listFees(id) -> SyncPagingIterable&amp;lt;ListFeesPaymentsResponseDataItem&amp;gt;</code></summary>
+<details><summary><code>client.payments.listFees(id) -> ListFeesPaymentsResponse</code></summary>
 <dl>
 <dd>
 
@@ -22733,10 +33042,7 @@ client.payments().retrieve(
 <dl>
 <dd>
 
-Returns the list of fees associated with a specific payment, including platform fees and processing fees.
-
-Required permissions:
- - `payment:basic:read`
+Returns the fee breakdown of one payment — Whop's fee, processing, affiliate and other lines — each in the currency it was collected in and converted to the payment's settlement currency. The list is complete in one page.
 </dd>
 </dl>
 </dd>
@@ -22752,11 +33058,9 @@ Required permissions:
 
 ```java
 client.payments().listFees(
-    "pay_xxxxxxxxxxxxxx",
+    "id",
     ListFeesPaymentsRequest
         .builder()
-        .first(42)
-        .last(42)
         .build()
 );
 ```
@@ -22773,39 +33077,66 @@ client.payments().listFees(
 <dl>
 <dd>
 
-**id:** `String` — The unique identifier of the payment to list fees for.
+**id:** `String` — The payment whose fees to list, prefixed `pay_`.
     
 </dd>
 </dl>
+</dd>
+</dl>
+
+
+</dd>
+</dl>
+</details>
+
+<details><summary><code>client.payments.generatePdf(id) -> PaymentPdf</code></summary>
+<dl>
+<dd>
+
+#### 📝 Description
 
 <dl>
 <dd>
 
-**after:** `Optional<String>` — Returns the elements in the list that come after the specified cursor.
-    
+<dl>
+<dd>
+
+Generates the payment's receipt (invoice) as a PDF and returns a short-lived link to download it. Each call generates a new file and link, so this endpoint does not replay `Idempotency-Key` responses.
 </dd>
 </dl>
+</dd>
+</dl>
+
+#### 🔌 Usage
 
 <dl>
 <dd>
 
-**before:** `Optional<String>` — Returns the elements in the list that come before the specified cursor.
-    
+<dl>
+<dd>
+
+```java
+client.payments().generatePdf(
+    "id",
+    GeneratePdfPaymentsRequest
+        .builder()
+        .build()
+);
+```
 </dd>
 </dl>
+</dd>
+</dl>
+
+#### ⚙️ Parameters
 
 <dl>
 <dd>
 
-**first:** `Optional<Integer>` — Returns the first _n_ elements from the list.
-    
-</dd>
-</dl>
-
 <dl>
 <dd>
 
-**last:** `Optional<Integer>` — Returns the last _n_ elements from the list.
+**id:** `String` — The payment whose receipt to generate, prefixed `pay_`.
     
 </dd>
 </dl>
@@ -22829,19 +33160,7 @@ client.payments().listFees(
 <dl>
 <dd>
 
-Issue a full or partial refund for a payment. The refund is processed through the original payment processor and the membership status is updated accordingly.
-
-Required permissions:
- - `payment:manage`
- - `plan:basic:read`
- - `access_pass:basic:read`
- - `member:email:read`
- - `member:basic:read`
- - `member:phone:read`
- - `promo_code:basic:read`
- - `shipment:basic:read`
- - `payment:dispute:read`
- - `payment:resolution_center_case:read`
+Refunds all or part of a payment through the processor that charged it, and updates its membership to match. The buyer is emailed, the affiliate commission on the payment is clawed back, and any open Resolution Center case on the payment is closed.
 </dd>
 </dl>
 </dd>
@@ -22857,7 +33176,7 @@ Required permissions:
 
 ```java
 client.payments().refund(
-    "pay_xxxxxxxxxxxxxx",
+    "id",
     RefundPaymentsRequest
         .builder()
         .build()
@@ -22876,7 +33195,7 @@ client.payments().refund(
 <dl>
 <dd>
 
-**id:** `String` — The unique identifier of the payment to refund.
+**id:** `String` — The payment to refund, prefixed `pay_`.
     
 </dd>
 </dl>
@@ -22884,7 +33203,15 @@ client.payments().refund(
 <dl>
 <dd>
 
-**partialAmount:** `Optional<Double>` — The amount to refund. For multi-currency payments, this is in the charge currency (what the buyer paid). For single-currency, this is in the payment currency. If omitted, the full payment amount is refunded.
+**metadata:** `Optional<Map<String, Optional<String>>>` — Your own key-value data to attach to the refund, returned on it and on its `refund.created` and `refund.updated` webhooks. At most 50 keys; keys up to 100 characters and values up to 500.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**partialAmount:** `Optional<Double>` — The amount to refund, stated in this payment's `currency` like every other amount on it. When the buyer was billed in a different currency, it is converted at the payment's own exchange rate before the refund is issued. An amount that covers everything still refundable refunds the rest of the payment — omit it to refund the rest without having to work out what that is.
     
 </dd>
 </dl>
@@ -22908,19 +33235,7 @@ client.payments().refund(
 <dl>
 <dd>
 
-Retry a failed or pending payment. This re-attempts the charge using the original payment method and plan details.
-
-Required permissions:
- - `payment:manage`
- - `plan:basic:read`
- - `access_pass:basic:read`
- - `member:email:read`
- - `member:basic:read`
- - `member:phone:read`
- - `promo_code:basic:read`
- - `shipment:basic:read`
- - `payment:dispute:read`
- - `payment:resolution_center_case:read`
+Charges an unpaid payment again with its original payment method and variant. A payment can typically be retried once, and only while its membership is active, trialing or past due, or when it is a membership's failed first payment.
 </dd>
 </dl>
 </dd>
@@ -22936,7 +33251,7 @@ Required permissions:
 
 ```java
 client.payments().retry(
-    "pay_xxxxxxxxxxxxxx",
+    "id",
     RetryPaymentsRequest
         .builder()
         .build()
@@ -22955,7 +33270,7 @@ client.payments().retry(
 <dl>
 <dd>
 
-**id:** `String` — The unique identifier of the payment to retry.
+**id:** `String` — The payment to retry, prefixed `pay_`.
     
 </dd>
 </dl>
@@ -22979,19 +33294,7 @@ client.payments().retry(
 <dl>
 <dd>
 
-Void a payment that has not yet been settled. Voiding cancels the payment before it is captured by the payment processor.
-
-Required permissions:
- - `payment:manage`
- - `plan:basic:read`
- - `access_pass:basic:read`
- - `member:email:read`
- - `member:basic:read`
- - `member:phone:read`
- - `promo_code:basic:read`
- - `shipment:basic:read`
- - `payment:dispute:read`
- - `payment:resolution_center_case:read`
+Voids or cancels an eligible payment. The request is rejected if the payment is no longer eligible. Some processors confirm the release of a card authorization asynchronously: the payment is then returned still `authorized`, and a `payment.canceled` webhook follows once the hold is released.
 </dd>
 </dl>
 </dd>
@@ -23007,7 +33310,7 @@ Required permissions:
 
 ```java
 client.payments().void_(
-    "pay_xxxxxxxxxxxxxx",
+    "id",
     VoidPaymentsRequest
         .builder()
         .build()
@@ -23026,7 +33329,82 @@ client.payments().void_(
 <dl>
 <dd>
 
-**id:** `String` — The unique identifier of the payment to void.
+**id:** `String` — The payment to void, prefixed `pay_`.
+    
+</dd>
+</dl>
+</dd>
+</dl>
+
+
+</dd>
+</dl>
+</details>
+
+<details><summary><code>client.payments.resume(paymentId, request) -> PaymentStatus</code></summary>
+<dl>
+<dd>
+
+#### 📝 Description
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+Charges the saved card again, with the buyer present, for a payment their bank declined until they authenticate (such as with 3DS). Retrieve the payment afterward to get the bank's challenge from `next_action`; once the buyer completes it, they land on `return_url`, or on Whop's hosted verification page if none was given. Only the buyer can call this, with the payment's `client_secret` in the body, an OAuth token for their own account with the `member:payment_methods:use` scope, or the token from a verified `payment` session intent. An API key gets a `403`. Has no effect on a payment that is not waiting on authentication.
+</dd>
+</dl>
+</dd>
+</dl>
+
+#### 🔌 Usage
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+```java
+client.payments().resume(
+    "payment_id",
+    ResumePaymentsRequest
+        .builder()
+        .build()
+);
+```
+</dd>
+</dl>
+</dd>
+</dl>
+
+#### ⚙️ Parameters
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+**paymentId:** `String` — The unique identifier of the payment.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**clientSecret:** `Optional<String>` — The payment's own `client_secret`, for a buyer without a token.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**returnUrl:** `Optional<String>` — Where the buyer continues after completing an off-site step. Must be an absolute https URL without credentials (http is allowed for localhost), at most 2,048 characters. Defaults to Whop's hosted verification page. Ignored when the payment is not waiting on authentication.
     
 </dd>
 </dl>
@@ -23050,7 +33428,7 @@ client.payments().void_(
 <dl>
 <dd>
 
-Changes where the buyer lands after completing an off-site step, up until they return. Accepts either a secret key or the payment's own `client_secret`, so the surface that knows the final destination can set it.
+Changes where the buyer lands after completing an off-site step, up until they return. Accepts either a secret key or the payment's own `client_secret` in the body, so the surface that knows the final destination can set it.
 </dd>
 </dl>
 </dd>
@@ -23094,6 +33472,14 @@ client.payments().updateReturnUrl(
 <dl>
 <dd>
 
+**clientSecret:** `Optional<String>` — The payment's own `client_secret`, for a caller without a secret key.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
 **returnUrl:** `String` — Where the buyer continues after completing an off-site step. Must be an absolute https URL without credentials (http is allowed for localhost), at most 2,048 characters.
     
 </dd>
@@ -23118,7 +33504,7 @@ client.payments().updateReturnUrl(
 <dl>
 <dd>
 
-Retrieves how far a payment has got and what the buyer must do next, if anything. A payment is collected in the background, so poll this rather than reading the create response. Accepts either a secret key or the payment's own `client_secret`, so the surface collecting the payment can poll it directly.
+Retrieves how far a payment has got and what the buyer must do next, if anything. A payment is collected in the background, so poll this rather than reading the create response. Accepts either a secret key or the payment's own `client_secret` as a query parameter, so the surface collecting the payment can poll it directly.
 </dd>
 </dl>
 </dd>
@@ -23154,6 +33540,14 @@ client.payments().retrieveStatus(
 <dd>
 
 **paymentId:** `String` — The unique identifier of the payment.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**clientSecret:** `Optional<String>` — The payment's own `client_secret`, for a caller without a secret key.
     
 </dd>
 </dl>
@@ -23241,7 +33635,7 @@ client.payoutAccounts().retrieve(
 <dl>
 <dd>
 
-Returns a list of active payout methods configured for a company, ordered by most recently created.
+Lists the active payout methods configured for an account, newest first.
 
 Required permissions:
  - `payout:destination:read`
@@ -23262,7 +33656,7 @@ Required permissions:
 client.payoutMethods().listPayoutMethod(
     ListPayoutMethodRequest
         .builder()
-        .companyId("biz_xxxxxxxxxxxxxx")
+        .accountId("biz_xxxxxxxxxxxxxx")
         .first(42)
         .last(42)
         .build()
@@ -23313,7 +33707,7 @@ client.payoutMethods().listPayoutMethod(
 <dl>
 <dd>
 
-**companyId:** `String` — The unique identifier of the company to list payout methods for.
+**accountId:** `String` — The unique identifier of the company to list payout methods for.
     
 </dd>
 </dl>
@@ -23466,7 +33860,7 @@ client.payouts().list(
 <dl>
 <dd>
 
-**source:** `Optional<ListPayoutsRequestSource>` — Filter by how the payout was created. Payouts created before source tracking or through internal tooling carry no source and never match.
+**source:** `Optional<ListPayoutsRequestSource>` — Filter by how the payout was created. A payout with no recorded source never matches.
     
 </dd>
 </dl>
@@ -23498,7 +33892,7 @@ client.payouts().list(
 <dl>
 <dd>
 
-**first:** `Optional<Integer>` — Number of payouts to return from the start of the window.
+**first:** `Optional<Integer>` — Number of results to return from the start of the range.
     
 </dd>
 </dl>
@@ -23506,7 +33900,7 @@ client.payouts().list(
 <dl>
 <dd>
 
-**after:** `Optional<String>` — Cursor to fetch the page after (from page_info.end_cursor).
+**after:** `Optional<String>` — Return results after this cursor. Use `page_info.end_cursor` from the previous response to fetch the next page.
     
 </dd>
 </dl>
@@ -23514,7 +33908,7 @@ client.payouts().list(
 <dl>
 <dd>
 
-**last:** `Optional<Integer>` — Number of payouts to return from the end of the window.
+**last:** `Optional<Integer>` — Number of results to return from the end of the range.
     
 </dd>
 </dl>
@@ -23522,7 +33916,7 @@ client.payouts().list(
 <dl>
 <dd>
 
-**before:** `Optional<String>` — Cursor to fetch the page before (from page_info.start_cursor).
+**before:** `Optional<String>` — Return results before this cursor. Use `page_info.start_cursor` from the previous response to fetch the previous page.
     
 </dd>
 </dl>
@@ -23546,7 +33940,7 @@ client.payouts().list(
 <dl>
 <dd>
 
-Sends money from an account or user balance to a saved payout method for that owner.
+Sends money from an account or user balance to a saved payout method for that owner. First create a quote with POST /payouts/quotes, then submit its quote_token with the same payout details before it expires.
 </dd>
 </dl>
 </dd>
@@ -23562,9 +33956,12 @@ Sends money from an account or user balance to a saved payout method for that ow
 
 ```java
 client.payouts().create(
-    CreatePayoutsRequestBody.of(new 
-    HashMap<String, Object>() {{put("key", "value");
-    }})
+    CreatePayoutsRequest
+        .builder()
+        .amount(50f)
+        .payoutMethodId("potk_xxxxxxxxxxxxxx")
+        .quoteToken("signed-payout-quote")
+        .build()
 );
 ```
 </dd>
@@ -23580,7 +33977,234 @@ client.payouts().create(
 <dl>
 <dd>
 
-**request:** `CreatePayoutsRequestBody` 
+**accountId:** `Optional<String>` — Account to pay out from, prefixed `biz_`. Provide exactly one of `account_id` or `user_id`.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**acknowledgeBankWarning:** `Optional<Boolean>` — Set to `true` to continue when the destination bank could not confirm the payout method account holder's name, or `false` to have the payout refused in that case so the account holder can correct the name or link their bank first. Omitting the field skips the warning gate — a client that cannot show the warning keeps its pre-gate behavior.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**amount:** `Float` — The amount to pay out in the specified currency.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**currency:** `Optional<String>` — The currency to pay out. Balances are held per currency and the payout draws only from the balance in this currency, so match the currency the funds arrived in — for example `cad` for an account funded by CAD transfers. When omitted, uses `usd` if that balance can cover a withdrawal, otherwise the account's only other funded currency.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**metadata:** `Optional<Map<String, String>>` — Key-value data to attach to the payout, echoed on every read and in webhook payloads. At most 50 keys, key names up to 40 characters, string values up to 500 characters. Never store secrets or regulated personal data here — webhook bodies are retained for delivery inspection.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**notes:** `Optional<String>` — Free-form notes to attach to the payout, with a maximum of 255 characters. Omit or pass `null` for no notes.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**paymentMethodId:** `Optional<String>` — A saved card of the account, prefixed `payt_`, to charge for this payout instead of paying from the balance. Requires a `quote_token` from `POST /payouts/quotes` made with the same card and `amount`. Only for business accounts paying a saved recipient in `usd` at `standard` speed. The payout is returned under the card payment's `pay_` id until it is submitted, then `GET /payouts/{id}` returns the submitted payout.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**payoutMethodId:** `String` — The saved payout method to deliver to (a potk_ identifier).
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**platformCoversFees:** `Optional<Boolean>` — Whether the parent platform covers the payout fee instead of the account being paid out. Omit to use the platform's configured fee coverage policy; pass `false` to opt out of it. `true` is only accepted for accounts that belong to a platform, and requires the platform's policy to cover this payout method's category or a caller authorized to manage the platform's child account fees.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**quoteToken:** `String` — Required server-signed token from POST /payouts/quotes, matching this payout's owner, method, amount, currency and speed. Submit before expiry. For an uncertain payout, retry with the original token and Idempotency-Key to recover the existing payout.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**speed:** `Optional<CreatePayoutsRequestSpeed>` — How fast the funds should arrive. `instant` is only accepted when the account and payout method are eligible; otherwise the payout is rejected.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**statementDescriptor:** `Optional<String>` — Payment description sent with the payout, such as an invoice number or what it pays for. Must be 5-80 printable ASCII characters (letters, digits, spaces and punctuation); Whop sends it in upper case. Not all countries and banks show it on the recipient's statement, and it is not the sender name. Set this value when creating the quote; the payout request may omit it but cannot add or change it.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**userId:** `Optional<String>` — User to pay out from, prefixed `user_`. Provide exactly one of `account_id` or `user_id`.
+    
+</dd>
+</dl>
+</dd>
+</dl>
+
+
+</dd>
+</dl>
+</details>
+
+<details><summary><code>client.payouts.createQuote(request) -> CreateQuotePayoutsResponse</code></summary>
+<dl>
+<dd>
+
+#### 📝 Description
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+Creates a short-lived, provider-backed quote of a payout's fee, exchange rate, and destination amount. No funds move until you submit the returned `quote_token` to `POST /payouts`.
+</dd>
+</dl>
+</dd>
+</dl>
+
+#### 🔌 Usage
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+```java
+client.payouts().createQuote(
+    CreateQuotePayoutsRequest
+        .builder()
+        .payoutMethodId("potk_xxxxxxxxxxxxxx")
+        .build()
+);
+```
+</dd>
+</dl>
+</dd>
+</dl>
+
+#### ⚙️ Parameters
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+**accountId:** `Optional<String>` — Account to pay out from, prefixed `biz_`. Provide exactly one of `account_id` or `user_id`.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**amount:** `Optional<Double>` — The amount to pay out in the specified currency, fees included. Provide exactly one of `amount` or `recipient_amount`.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**currency:** `Optional<String>` — The currency to pay out. When omitted, uses `usd` if that balance can cover a withdrawal, otherwise the account's only other funded currency.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**paymentMethodId:** `Optional<String>` — A saved card of the account, prefixed `payt_`, to quote paying this payout from. The quote's `amount` is the card charge, `fee` adds the estimated card fees to the payout fee, and `net_amount` is what the recipient receives. Send `recipient_amount` instead of `amount` to quote the charge that delivers a set amount.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**payoutMethodId:** `String` — The saved payout method to quote (a potk_ identifier).
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**platformCoversFees:** `Optional<Boolean>` — Whether the parent platform covers the payout fee instead of the account being paid out.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**recipientAmount:** `Optional<Double>` — The amount the recipient should receive, with fees added on top. When the payout method pays out in `currency`, the quote's `destination_amount` covers it; otherwise its `net_amount` does. With `payment_method_id`, the card charge is set so the quote's `net_amount` is exactly this amount, or the quote is refused. Provide exactly one of `amount` or `recipient_amount`.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**speed:** `Optional<CreateQuotePayoutsRequestSpeed>` — How fast the funds should arrive.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**statementDescriptor:** `Optional<String>` — Payment description sent with the payout, such as an invoice number or what it pays for. Must be 5-80 printable ASCII characters (letters, digits, spaces and punctuation); Whop sends it in upper case. Not all countries and banks show it on the recipient's statement, and it is not the sender name. Omit or pass `null` to use the default descriptor.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**userId:** `Optional<String>` — User to pay out from, prefixed `user_`. Provide exactly one of `account_id` or `user_id`.
     
 </dd>
 </dl>
@@ -23604,7 +34228,7 @@ client.payouts().create(
 <dl>
 <dd>
 
-Fetches one payout by its `wdrl_` ID, or by the `cofr_` conversion request ID a stablecoin payout carries as `payout_request_id` — both ids answer with the same payout object.
+Retrieves a payout by its `wdrl_` ID, or by the `cofr_` conversion request ID a payout carries as `payout_request_id`. Authentication is optional: anyone with the ID can view tracking details, including notes, trace code, exchange rate, and payout request ID, while accounting fields require `payout:withdrawal:read` on the account or user that owns the payout. A supplied invalid credential returns 401.
 </dd>
 </dl>
 </dd>
@@ -23647,6 +34271,81 @@ client.payouts().retrieve(
 <dl>
 <dd>
 
+**accountId:** `Optional<String>` — Optional owning account ID, prefixed `biz_`. The payout ID identifies its ledger. If supplied, this must match the owner and cannot be combined with `user_id`.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**userId:** `Optional<String>` — Optional owning user ID, prefixed `user_`. The payout ID identifies its ledger. If supplied, this must match the owner and cannot be combined with `account_id`.
+    
+</dd>
+</dl>
+</dd>
+</dl>
+
+
+</dd>
+</dl>
+</details>
+
+<details><summary><code>client.payouts.cancel(id) -> CancelPayoutsResponse</code></summary>
+<dl>
+<dd>
+
+#### 📝 Description
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+Cancels a payout before it is sent to the payout provider, or asks the provider to stop one already sent. While the payout is `in_review`, or `processing` with nothing sent yet (see `cancelable`), it is canceled and the funds, fees included, return to the balance. Once sent, the response is 202 with a `cancellation` object, and the payout reads `canceled` only if the provider confirms it stopped. A `requested` payout returns 409 until it reaches review, a payout the provider can no longer stop returns 409 with error type `not_cancelable`, and canceling an already-canceled payout returns it unchanged.
+</dd>
+</dl>
+</dd>
+</dl>
+
+#### 🔌 Usage
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+```java
+client.payouts().cancel(
+    "id",
+    CancelPayoutsRequest
+        .builder()
+        .build()
+);
+```
+</dd>
+</dl>
+</dd>
+</dl>
+
+#### ⚙️ Parameters
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+**id:** `String` — Payout ID, prefixed `wdrl_`, or the `cofr_` payout request ID returned by `POST /payouts` — both cancel the same payout.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
 **accountId:** `Optional<String>` — Owning account ID, prefixed `biz_`. Provide exactly one of `account_id` or `user_id`.
     
 </dd>
@@ -23680,7 +34379,7 @@ client.payouts().retrieve(
 <dl>
 <dd>
 
-Lists the people (visitors and customers) of an account: the identity-linked person profiles aggregated from every pixel, payment, and platform event — identities, purchases and LTV, geo/device profile, traffic sources, and first/last marketing touches.
+Lists the people (visitors and customers) of an account: identity-linked profiles assembled from every pixel, payment, and platform event. Filter and sort them to segment an account's audience.
 </dd>
 </dl>
 </dd>
@@ -23768,7 +34467,7 @@ client.people().list(
 <dl>
 <dd>
 
-**eventFrom:** `Optional<OffsetDateTime>` — With event_to plus an event or source filter, switches to exact-population mode: person ids are resolved and paginated on the events side within this window (the same query the people metric counts), then hydrated per page.
+**eventWithinDays:** `Optional<Integer>` — Match activity within a rolling number of days. Cannot be combined with event_from/event_to.
     
 </dd>
 </dl>
@@ -23776,7 +34475,31 @@ client.people().list(
 <dl>
 <dd>
 
-**eventTo:** `Optional<OffsetDateTime>` — The inclusive end of the event window for exact-population mode.
+**from:** `Optional<OffsetDateTime>` — Inclusive activity-window start. Alias for event_from.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**to:** `Optional<OffsetDateTime>` — Inclusive activity-window end. Alias for event_to.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**eventFrom:** `Optional<OffsetDateTime>` — The inclusive start of the matching activity window.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**eventTo:** `Optional<OffsetDateTime>` — The inclusive end of the matching activity window, for both stats drilldowns and saved audiences.
     
 </dd>
 </dl>
@@ -23816,7 +34539,7 @@ client.people().list(
 <dl>
 <dd>
 
-**country:** `Optional<String>` — Only include people whose most recent visit came from this ISO 3166-1 alpha-2 country code.
+**country:** `Optional<String>` — Only include people with activity from this ISO 3166-1 alpha-2 country code.
     
 </dd>
 </dl>
@@ -23888,7 +34611,7 @@ client.people().list(
 <dl>
 <dd>
 
-**first:** `Optional<Integer>` — The number of people to return (default 100, max 100).
+**ltvGt:** `Optional<Double>` — Select people whose lifetime ltv is greater than this value. LTV and AOV are in USD.
     
 </dd>
 </dl>
@@ -23896,7 +34619,7 @@ client.people().list(
 <dl>
 <dd>
 
-**after:** `Optional<String>` — A cursor for fetching people after a previous page.
+**ltvGte:** `Optional<Double>` — Select people whose lifetime ltv is at least this value. LTV and AOV are in USD.
     
 </dd>
 </dl>
@@ -23904,7 +34627,135 @@ client.people().list(
 <dl>
 <dd>
 
-**before:** `Optional<String>` — A cursor for fetching people before a later page.
+**ltvLt:** `Optional<Double>` — Select people whose lifetime ltv is less than this value. LTV and AOV are in USD.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**ltvLte:** `Optional<Double>` — Select people whose lifetime ltv is at most this value. LTV and AOV are in USD.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**aovGt:** `Optional<Double>` — Select people whose lifetime aov is greater than this value. LTV and AOV are in USD.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**aovGte:** `Optional<Double>` — Select people whose lifetime aov is at least this value. LTV and AOV are in USD.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**aovLt:** `Optional<Double>` — Select people whose lifetime aov is less than this value. LTV and AOV are in USD.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**aovLte:** `Optional<Double>` — Select people whose lifetime aov is at most this value. LTV and AOV are in USD.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**purchaseCountGt:** `Optional<Double>` — Select people whose lifetime purchase_count is greater than this value. LTV and AOV are in USD.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**purchaseCountGte:** `Optional<Double>` — Select people whose lifetime purchase_count is at least this value. LTV and AOV are in USD.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**purchaseCountLt:** `Optional<Double>` — Select people whose lifetime purchase_count is less than this value. LTV and AOV are in USD.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**purchaseCountLte:** `Optional<Double>` — Select people whose lifetime purchase_count is at most this value. LTV and AOV are in USD.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**eventCountGt:** `Optional<Double>` — Select people whose lifetime event_count is greater than this value. LTV and AOV are in USD.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**eventCountGte:** `Optional<Double>` — Select people whose lifetime event_count is at least this value. LTV and AOV are in USD.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**eventCountLt:** `Optional<Double>` — Select people whose lifetime event_count is less than this value. LTV and AOV are in USD.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**eventCountLte:** `Optional<Double>` — Select people whose lifetime event_count is at most this value. LTV and AOV are in USD.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**first:** `Optional<Integer>` — Number of results to return from the start of the range.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**after:** `Optional<String>` — Return results after this cursor. Use `page_info.end_cursor` from the previous response to fetch the next page.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**before:** `Optional<String>` — Return results before this cursor. Use `page_info.start_cursor` from the previous response to fetch the previous page.
     
 </dd>
 </dl>
@@ -23944,7 +34795,7 @@ client.people().list(
 <dl>
 <dd>
 
-Retrieves one person for an account. The identifier can be a person ID (prefixed `prsn_`), a user ID (prefixed `user_`), an email address, or a phone number — merged people resolve to the surviving profile.
+Retrieves one person for an account, looked up by person ID, user ID, email address, or phone number.
 </dd>
 </dl>
 </dd>
@@ -23979,7 +34830,7 @@ client.people().retrieve(
 <dl>
 <dd>
 
-**id:** `String` — The person ID, user ID, email address, or phone number to look up.
+**id:** `String` — The person ID (prefixed `prsn_`), user ID (prefixed `user_`), email address, or phone number to look up. A merged person resolves to the surviving profile.
     
 </dd>
 </dl>
@@ -24080,7 +34931,7 @@ client.permissions().list(
 <dl>
 <dd>
 
-Returns a paginated list of plans belonging to an account, with optional filtering by visibility, type, release method, and product.
+Deprecated compatibility endpoint. List variants with `GET /variants` instead.
 </dd>
 </dl>
 </dd>
@@ -24098,19 +34949,6 @@ Returns a paginated list of plans belonging to an account, with optional filteri
 client.plans().list(
     ListPlansRequest
         .builder()
-        .accountId("account_id")
-        .releaseMethods(
-            Arrays.asList("buy_now")
-        )
-        .visibilities(
-            Arrays.asList("visible")
-        )
-        .planTypes(
-            Arrays.asList("renewal")
-        )
-        .productIds(
-            Arrays.asList("prod_xxxxxxxxxxxxxx")
-        )
         .build()
 );
 ```
@@ -24127,7 +34965,7 @@ client.plans().list(
 <dl>
 <dd>
 
-**accountId:** `String` — The unique identifier of the account to list plans for.
+**accountId:** `Optional<String>` 
     
 </dd>
 </dl>
@@ -24135,7 +34973,7 @@ client.plans().list(
 <dl>
 <dd>
 
-**direction:** `Optional<ListPlansRequestDirection>` — The sort direction for results. Defaults to descending.
+**direction:** `Optional<ListPlansRequestDirection>` 
     
 </dd>
 </dl>
@@ -24143,7 +34981,7 @@ client.plans().list(
 <dl>
 <dd>
 
-**order:** `Optional<ListPlansRequestOrder>` — The field to sort results by. Defaults to created_at.
+**order:** `Optional<ListPlansRequestOrder>` 
     
 </dd>
 </dl>
@@ -24151,7 +34989,7 @@ client.plans().list(
 <dl>
 <dd>
 
-**releaseMethods:** `Optional<String>` — Filter to only plans matching these release methods.
+**releaseMethods:** `Optional<String>` 
     
 </dd>
 </dl>
@@ -24159,7 +34997,7 @@ client.plans().list(
 <dl>
 <dd>
 
-**visibilities:** `Optional<String>` — Filter to only plans matching these visibility states.
+**visibilities:** `Optional<String>` 
     
 </dd>
 </dl>
@@ -24167,7 +35005,7 @@ client.plans().list(
 <dl>
 <dd>
 
-**planTypes:** `Optional<String>` — Filter to only plans matching these billing types.
+**billingTypes:** `Optional<String>` 
     
 </dd>
 </dl>
@@ -24175,7 +35013,7 @@ client.plans().list(
 <dl>
 <dd>
 
-**productIds:** `Optional<String>` — Filter to only plans belonging to these product identifiers.
+**productIds:** `Optional<String>` 
     
 </dd>
 </dl>
@@ -24183,7 +35021,7 @@ client.plans().list(
 <dl>
 <dd>
 
-**createdBefore:** `Optional<String>` — Only return plans created before this timestamp.
+**createdBefore:** `Optional<String>` 
     
 </dd>
 </dl>
@@ -24191,7 +35029,7 @@ client.plans().list(
 <dl>
 <dd>
 
-**createdAfter:** `Optional<String>` — Only return plans created after this timestamp.
+**createdAfter:** `Optional<String>` 
     
 </dd>
 </dl>
@@ -24199,7 +35037,7 @@ client.plans().list(
 <dl>
 <dd>
 
-**first:** `Optional<Integer>` — The number of plans to return (default and max 100).
+**first:** `Optional<Integer>` — Number of results to return from the start of the range.
     
 </dd>
 </dl>
@@ -24207,7 +35045,7 @@ client.plans().list(
 <dl>
 <dd>
 
-**after:** `Optional<String>` — A cursor; returns plans after this position.
+**after:** `Optional<String>` — Return results after this cursor. Use `page_info.end_cursor` from the previous response to fetch the next page.
     
 </dd>
 </dl>
@@ -24215,7 +35053,7 @@ client.plans().list(
 <dl>
 <dd>
 
-**last:** `Optional<Integer>` — The number of plans to return from the end of the range.
+**last:** `Optional<Integer>` — Number of results to return from the end of the range.
     
 </dd>
 </dl>
@@ -24223,7 +35061,7 @@ client.plans().list(
 <dl>
 <dd>
 
-**before:** `Optional<String>` — A cursor; returns plans before this position.
+**before:** `Optional<String>` — Return results before this cursor. Use `page_info.start_cursor` from the previous response to fetch the previous page.
     
 </dd>
 </dl>
@@ -24247,7 +35085,7 @@ client.plans().list(
 <dl>
 <dd>
 
-Create a new pricing plan for a product. The plan defines the billing interval, price, and availability for customers.
+Deprecated compatibility endpoint. Create variants with `POST /variants` instead.
 </dd>
 </dl>
 </dd>
@@ -24281,7 +35119,7 @@ client.plans().create(
 <dl>
 <dd>
 
-**accountId:** `Optional<String>` — The unique identifier of the account to create this plan for. Defaults to the caller's account.
+**accountId:** `Optional<String>` 
     
 </dd>
 </dl>
@@ -24289,7 +35127,7 @@ client.plans().create(
 <dl>
 <dd>
 
-**adaptivePricingEnabled:** `Optional<Boolean>` — Whether this plan accepts local currency payments via adaptive pricing.
+**adaptivePricingEnabled:** `Optional<Boolean>` 
     
 </dd>
 </dl>
@@ -24297,7 +35135,7 @@ client.plans().create(
 <dl>
 <dd>
 
-**billingPeriod:** `Optional<Integer>` — Recurring billing interval in days, such as 30 for monthly or 365 for annual.
+**allowMultipleQuantity:** `Optional<Boolean>` 
     
 </dd>
 </dl>
@@ -24305,7 +35143,7 @@ client.plans().create(
 <dl>
 <dd>
 
-**checkoutStyling:** `Optional<Map<String, Object>>` — Checkout styling overrides for this plan.
+**attributes:** `Optional<Map<String, Object>>` 
     
 </dd>
 </dl>
@@ -24313,7 +35151,7 @@ client.plans().create(
 <dl>
 <dd>
 
-**currency:** `Optional<String>` — The three-letter ISO currency code for the plan's pricing. Defaults to USD.
+**billingPeriod:** `Optional<Integer>` 
     
 </dd>
 </dl>
@@ -24321,7 +35159,7 @@ client.plans().create(
 <dl>
 <dd>
 
-**customFields:** `Optional<List<CreatePlansRequestCustomFieldsItem>>` — An array of custom field definitions to collect from customers at checkout. Omitting this field clears existing custom fields.
+**billingType:** `Optional<String>` 
     
 </dd>
 </dl>
@@ -24329,7 +35167,7 @@ client.plans().create(
 <dl>
 <dd>
 
-**description:** `Optional<String>` — A text description of the plan displayed to customers on the product page.
+**cancelDiscountIntervals:** `Optional<Integer>` 
     
 </dd>
 </dl>
@@ -24337,7 +35175,7 @@ client.plans().create(
 <dl>
 <dd>
 
-**expirationDays:** `Optional<Integer>` — Access duration in days before the membership expires.
+**cancelDiscountPercentage:** `Optional<Integer>` 
     
 </dd>
 </dl>
@@ -24345,7 +35183,7 @@ client.plans().create(
 <dl>
 <dd>
 
-**image:** `Optional<CreatePlansRequestImage>` — An image displayed on the product page to represent this plan.
+**checkoutStyling:** `Optional<Map<String, Object>>` 
     
 </dd>
 </dl>
@@ -24353,7 +35191,7 @@ client.plans().create(
 <dl>
 <dd>
 
-**initialPrice:** `Optional<Double>` — Initial amount charged in the plan's currency, e.g. 10.43 for $10.43.
+**currency:** `Optional<String>` 
     
 </dd>
 </dl>
@@ -24361,7 +35199,7 @@ client.plans().create(
 <dl>
 <dd>
 
-**internalNotes:** `Optional<String>` — Private notes visible only to the account owner. Not shown to customers.
+**customFields:** `Optional<List<CreatePlansRequestCustomFieldsItem>>` 
     
 </dd>
 </dl>
@@ -24369,7 +35207,7 @@ client.plans().create(
 <dl>
 <dd>
 
-**metadata:** `Optional<Map<String, Object>>` — Custom key-value pairs to store on the plan. Included in webhook payloads for payment and membership events. Max 50 keys, 100 chars per key, 500 chars per string value. The reserved keys `custom_cta` (a checkout call-to-action button label — one of the product custom CTA values, e.g. `subscribe`, `get_offer`) and `custom_cta_url` (a URL the button links to; web or `tel:`) override the product's call to action for this plan and are validated on save.
+**description:** `Optional<String>` 
     
 </dd>
 </dl>
@@ -24377,7 +35215,7 @@ client.plans().create(
 <dl>
 <dd>
 
-**overrideTaxType:** `Optional<String>` — Override the default tax classification for this specific plan.
+**expirationDays:** `Optional<Integer>` 
     
 </dd>
 </dl>
@@ -24385,7 +35223,7 @@ client.plans().create(
 <dl>
 <dd>
 
-**paymentMethodConfiguration:** `Optional<CreatePlansRequestPaymentMethodConfiguration>` — Explicit payment method configuration for the plan. When not provided, the account's defaults apply.
+**image:** `Optional<CreatePlansRequestImage>` 
     
 </dd>
 </dl>
@@ -24393,7 +35231,7 @@ client.plans().create(
 <dl>
 <dd>
 
-**planType:** `Optional<String>` — Plan billing type, such as `one_time` or `renewal`.
+**initialPrice:** `Optional<Double>` 
     
 </dd>
 </dl>
@@ -24401,7 +35239,7 @@ client.plans().create(
 <dl>
 <dd>
 
-**productId:** `Optional<String>` — The unique identifier of the product to attach this plan to.
+**internalNotes:** `Optional<String>` 
     
 </dd>
 </dl>
@@ -24409,7 +35247,7 @@ client.plans().create(
 <dl>
 <dd>
 
-**releaseMethod:** `Optional<String>` — Sales method for this plan.
+**metadata:** `Optional<Map<String, Object>>` 
     
 </dd>
 </dl>
@@ -24417,7 +35255,7 @@ client.plans().create(
 <dl>
 <dd>
 
-**renewalPrice:** `Optional<Double>` — The amount charged each billing period for recurring plans, in the plan's currency.
+**offerCancelDiscount:** `Optional<Boolean>` 
     
 </dd>
 </dl>
@@ -24425,7 +35263,7 @@ client.plans().create(
 <dl>
 <dd>
 
-**splitPayRequiredPayments:** `Optional<Integer>` — Installment payments required before the subscription pauses.
+**overrideTaxType:** `Optional<String>` 
     
 </dd>
 </dl>
@@ -24433,7 +35271,7 @@ client.plans().create(
 <dl>
 <dd>
 
-**stock:** `Optional<Integer>` — The maximum number of units available for purchase. Ignored when unlimited_stock is true.
+**paymentMethodConfiguration:** `Optional<CreatePlansRequestPaymentMethodConfiguration>` 
     
 </dd>
 </dl>
@@ -24441,7 +35279,7 @@ client.plans().create(
 <dl>
 <dd>
 
-**threeDsLevel:** `Optional<CreatePlansRequestThreeDsLevel>` — 3D Secure behavior for this plan. Send `null` to inherit the account default.
+**productId:** `Optional<String>` 
     
 </dd>
 </dl>
@@ -24449,7 +35287,7 @@ client.plans().create(
 <dl>
 <dd>
 
-**title:** `Optional<String>` — The display name of the plan shown to customers on the product page.
+**releaseMethod:** `Optional<String>` 
     
 </dd>
 </dl>
@@ -24457,7 +35295,7 @@ client.plans().create(
 <dl>
 <dd>
 
-**trialPeriodDays:** `Optional<Integer>` — Free trial duration before the first recurring charge.
+**renewalPrice:** `Optional<Double>` 
     
 </dd>
 </dl>
@@ -24465,7 +35303,7 @@ client.plans().create(
 <dl>
 <dd>
 
-**unlimitedStock:** `Optional<Boolean>` — Whether the plan has unlimited stock. When true, the stock field is ignored.
+**sku:** `Optional<String>` 
     
 </dd>
 </dl>
@@ -24473,7 +35311,55 @@ client.plans().create(
 <dl>
 <dd>
 
-**visibility:** `Optional<String>` — Whether the plan is visible to customers or hidden from public view.
+**splitPayRequiredPayments:** `Optional<Integer>` 
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**stock:** `Optional<Integer>` 
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**threeDsLevel:** `Optional<CreatePlansRequestThreeDsLevel>` 
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**title:** `Optional<String>` 
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**trialPeriodDays:** `Optional<Integer>` 
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**unlimitedStock:** `Optional<Boolean>` 
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**visibility:** `Optional<String>` 
     
 </dd>
 </dl>
@@ -24497,7 +35383,7 @@ client.plans().create(
 <dl>
 <dd>
 
-Retrieves the details of an existing plan.
+Deprecated compatibility endpoint. Retrieve variants with `GET /variants/{id}` instead.
 </dd>
 </dl>
 </dd>
@@ -24532,7 +35418,7 @@ client.plans().retrieve(
 <dl>
 <dd>
 
-**id:** `String` — Plan ID, prefixed `plan_`.
+**id:** `String` — Variant ID, prefixed `plan_`.
     
 </dd>
 </dl>
@@ -24556,7 +35442,7 @@ client.plans().retrieve(
 <dl>
 <dd>
 
-Permanently delete a plan from a product. Existing memberships on this plan will not be affected.
+Deprecated compatibility endpoint. Delete variants with `DELETE /variants/{id}` instead.
 </dd>
 </dl>
 </dd>
@@ -24591,7 +35477,7 @@ client.plans().delete(
 <dl>
 <dd>
 
-**id:** `String` — Plan ID, prefixed `plan_`.
+**id:** `String` — Variant ID, prefixed `plan_`.
     
 </dd>
 </dl>
@@ -24615,7 +35501,7 @@ client.plans().delete(
 <dl>
 <dd>
 
-Update a plan's pricing, billing interval, visibility, stock, and other settings.
+Deprecated compatibility endpoint. Update variants with `PATCH /variants/{id}` instead.
 </dd>
 </dl>
 </dd>
@@ -24650,7 +35536,7 @@ client.plans().update(
 <dl>
 <dd>
 
-**id:** `String` — Plan ID, prefixed `plan_`.
+**id:** `String` — Variant ID, prefixed `plan_`.
     
 </dd>
 </dl>
@@ -24658,7 +35544,7 @@ client.plans().update(
 <dl>
 <dd>
 
-**adaptivePricingEnabled:** `Optional<Boolean>` — Whether this plan accepts local currency payments via adaptive pricing.
+**adaptivePricingEnabled:** `Optional<Boolean>` 
     
 </dd>
 </dl>
@@ -24666,7 +35552,7 @@ client.plans().update(
 <dl>
 <dd>
 
-**billingPeriod:** `Optional<Integer>` — Recurring billing interval in days, such as 30 for monthly or 365 for annual.
+**allowMultipleQuantity:** `Optional<Boolean>` 
     
 </dd>
 </dl>
@@ -24674,7 +35560,7 @@ client.plans().update(
 <dl>
 <dd>
 
-**cancelDiscountIntervals:** `Optional<Integer>` — How many renewals the retention discount applies to. Required when `offer_cancel_discount` is true.
+**attributes:** `Optional<Map<String, Object>>` 
     
 </dd>
 </dl>
@@ -24682,7 +35568,7 @@ client.plans().update(
 <dl>
 <dd>
 
-**cancelDiscountPercentage:** `Optional<Integer>` — Percentage taken off each discounted renewal. Required when `offer_cancel_discount` is true.
+**billingPeriod:** `Optional<Integer>` 
     
 </dd>
 </dl>
@@ -24690,7 +35576,7 @@ client.plans().update(
 <dl>
 <dd>
 
-**checkoutStyling:** `Optional<Map<String, Object>>` — Checkout styling overrides for this plan.
+**cancelDiscountIntervals:** `Optional<Integer>` 
     
 </dd>
 </dl>
@@ -24698,7 +35584,7 @@ client.plans().update(
 <dl>
 <dd>
 
-**currency:** `Optional<String>` — The three-letter ISO currency code for the plan's pricing. Defaults to USD.
+**cancelDiscountPercentage:** `Optional<Integer>` 
     
 </dd>
 </dl>
@@ -24706,7 +35592,7 @@ client.plans().update(
 <dl>
 <dd>
 
-**customFields:** `Optional<List<UpdatePlansRequestCustomFieldsItem>>` — An array of custom field definitions to collect from customers at checkout. Omitting this field clears existing custom fields.
+**checkoutStyling:** `Optional<Map<String, Object>>` 
     
 </dd>
 </dl>
@@ -24714,7 +35600,7 @@ client.plans().update(
 <dl>
 <dd>
 
-**description:** `Optional<String>` — A text description of the plan displayed to customers on the product page.
+**currency:** `Optional<String>` 
     
 </dd>
 </dl>
@@ -24722,7 +35608,7 @@ client.plans().update(
 <dl>
 <dd>
 
-**expirationDays:** `Optional<Integer>` — Access duration in days before the membership expires.
+**customFields:** `Optional<List<UpdatePlansRequestCustomFieldsItem>>` 
     
 </dd>
 </dl>
@@ -24730,7 +35616,7 @@ client.plans().update(
 <dl>
 <dd>
 
-**image:** `Optional<UpdatePlansRequestImage>` — An image displayed on the product page to represent this plan.
+**description:** `Optional<String>` 
     
 </dd>
 </dl>
@@ -24738,7 +35624,7 @@ client.plans().update(
 <dl>
 <dd>
 
-**initialPrice:** `Optional<Double>` — Initial amount charged in the plan's currency, e.g. 10.43 for $10.43.
+**expirationDays:** `Optional<Integer>` 
     
 </dd>
 </dl>
@@ -24746,7 +35632,7 @@ client.plans().update(
 <dl>
 <dd>
 
-**internalNotes:** `Optional<String>` — Private notes visible only to the account owner. Not shown to customers.
+**image:** `Optional<UpdatePlansRequestImage>` 
     
 </dd>
 </dl>
@@ -24754,7 +35640,7 @@ client.plans().update(
 <dl>
 <dd>
 
-**metadata:** `Optional<Map<String, Object>>` — Custom key-value pairs to store on the plan. Included in webhook payloads for payment and membership events. Max 50 keys, 100 chars per key, 500 chars per string value. The reserved keys `custom_cta` (a checkout call-to-action button label — one of the product custom CTA values, e.g. `subscribe`, `get_offer`) and `custom_cta_url` (a URL the button links to; web or `tel:`) override the product's call to action for this plan and are validated on save.
+**initialPrice:** `Optional<Double>` 
     
 </dd>
 </dl>
@@ -24762,7 +35648,7 @@ client.plans().update(
 <dl>
 <dd>
 
-**offerCancelDiscount:** `Optional<Boolean>` — Whether to offer a retention discount when a customer attempts to cancel.
+**internalNotes:** `Optional<String>` 
     
 </dd>
 </dl>
@@ -24770,7 +35656,7 @@ client.plans().update(
 <dl>
 <dd>
 
-**overrideTaxType:** `Optional<String>` — Override the default tax classification for this specific plan.
+**metadata:** `Optional<Map<String, Object>>` 
     
 </dd>
 </dl>
@@ -24778,7 +35664,7 @@ client.plans().update(
 <dl>
 <dd>
 
-**paymentMethodConfiguration:** `Optional<UpdatePlansRequestPaymentMethodConfiguration>` — Explicit payment method configuration for the plan. When not provided, the account's defaults apply.
+**offerCancelDiscount:** `Optional<Boolean>` 
     
 </dd>
 </dl>
@@ -24786,7 +35672,7 @@ client.plans().update(
 <dl>
 <dd>
 
-**releaseMethod:** `Optional<String>` — Sales method for this plan.
+**overrideTaxType:** `Optional<String>` 
     
 </dd>
 </dl>
@@ -24794,7 +35680,7 @@ client.plans().update(
 <dl>
 <dd>
 
-**renewalPrice:** `Optional<Double>` — The amount charged each billing period for recurring plans, in the plan's currency.
+**paymentMethodConfiguration:** `Optional<UpdatePlansRequestPaymentMethodConfiguration>` 
     
 </dd>
 </dl>
@@ -24802,7 +35688,7 @@ client.plans().update(
 <dl>
 <dd>
 
-**stock:** `Optional<Integer>` — The maximum number of units available for purchase. Ignored when unlimited_stock is true.
+**releaseMethod:** `Optional<String>` 
     
 </dd>
 </dl>
@@ -24810,7 +35696,7 @@ client.plans().update(
 <dl>
 <dd>
 
-**strikeThroughInitialPrice:** `Optional<Double>` — A comparison price displayed with a strikethrough for the initial price.
+**renewalPrice:** `Optional<Double>` 
     
 </dd>
 </dl>
@@ -24818,7 +35704,7 @@ client.plans().update(
 <dl>
 <dd>
 
-**strikeThroughRenewalPrice:** `Optional<Double>` — A comparison price displayed with a strikethrough for the renewal price.
+**sku:** `Optional<String>` 
     
 </dd>
 </dl>
@@ -24826,7 +35712,7 @@ client.plans().update(
 <dl>
 <dd>
 
-**threeDsLevel:** `Optional<UpdatePlansRequestThreeDsLevel>` — 3D Secure behavior for this plan. Send `null` to inherit the account default.
+**splitPayRequiredPayments:** `Optional<Integer>` 
     
 </dd>
 </dl>
@@ -24834,7 +35720,7 @@ client.plans().update(
 <dl>
 <dd>
 
-**title:** `Optional<String>` — The display name of the plan shown to customers on the product page.
+**stock:** `Optional<Integer>` 
     
 </dd>
 </dl>
@@ -24842,7 +35728,7 @@ client.plans().update(
 <dl>
 <dd>
 
-**trialPeriodDays:** `Optional<Integer>` — Free trial duration before the first recurring charge.
+**strikeThroughInitialPrice:** `Optional<Double>` 
     
 </dd>
 </dl>
@@ -24850,7 +35736,7 @@ client.plans().update(
 <dl>
 <dd>
 
-**unlimitedStock:** `Optional<Boolean>` — Whether the plan has unlimited stock. When true, the stock field is ignored.
+**strikeThroughRenewalPrice:** `Optional<Double>` 
     
 </dd>
 </dl>
@@ -24858,7 +35744,39 @@ client.plans().update(
 <dl>
 <dd>
 
-**visibility:** `Optional<String>` — Whether the plan is visible to customers or hidden from public view.
+**threeDsLevel:** `Optional<UpdatePlansRequestThreeDsLevel>` 
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**title:** `Optional<String>` 
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**trialPeriodDays:** `Optional<Integer>` 
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**unlimitedStock:** `Optional<Boolean>` 
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**visibility:** `Optional<String>` 
     
 </dd>
 </dl>
@@ -24882,7 +35800,7 @@ client.plans().update(
 <dl>
 <dd>
 
-Previews tax for a plan before checkout, based on the buyer's location.
+Deprecated compatibility endpoint. Quote tax with `POST /payment_quotes` instead.
 </dd>
 </dl>
 </dd>
@@ -24901,12 +35819,92 @@ client.plans().calculateTax(
     "id",
     CalculateTaxPlansRequest
         .builder()
-        .address(
-            CalculateTaxPlansRequestAddress
-                .builder()
-                .country("DE")
-                .postalCode("10115")
-                .build()
+        .build()
+);
+```
+</dd>
+</dl>
+</dd>
+</dl>
+
+#### ⚙️ Parameters
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+**id:** `String` — Variant ID, prefixed `plan_`.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**address:** `Optional<CalculateTaxPlansRequestAddress>` 
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**ipAddress:** `Optional<String>` 
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**taxIds:** `Optional<List<CalculateTaxPlansRequestTaxIdsItem>>` 
+    
+</dd>
+</dl>
+</dd>
+</dl>
+
+
+</dd>
+</dl>
+</details>
+
+## Product Affiliates
+<details><summary><code>client.productAffiliates.list() -> SyncPagingIterable&amp;lt;ProductAffiliate&amp;gt;</code></summary>
+<dl>
+<dd>
+
+#### 📝 Description
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+Lists affiliate enrollments for an account's products, newest first, including affiliates who have not made a referral. Requires `affiliate:basic:read` on the account. Email addresses and email search also require `member:email:read`.
+</dd>
+</dl>
+</dd>
+</dl>
+
+#### 🔌 Usage
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+```java
+client.productAffiliates().list(
+    ListProductAffiliatesRequest
+        .builder()
+        .accountId("account_id")
+        .productIds(
+            Arrays.asList("prod_xxxxxxxxxxxxxx")
         )
         .build()
 );
@@ -24924,7 +35922,7 @@ client.plans().calculateTax(
 <dl>
 <dd>
 
-**id:** `String` — Plan ID, prefixed `plan_`.
+**accountId:** `String` — Account whose product affiliates are listed (`biz_` tag).
     
 </dd>
 </dl>
@@ -24932,7 +35930,7 @@ client.plans().calculateTax(
 <dl>
 <dd>
 
-**address:** `Optional<CalculateTaxPlansRequestAddress>` — Buyer billing address used for tax calculation. Provide either `address.country` or `ip_address`; include state and postal code when available for more accurate results.
+**query:** `Optional<String>` — Matches the start of the affiliate's username or of any word in their name, or their exact email (with `member:email:read`).
     
 </dd>
 </dl>
@@ -24940,7 +35938,7 @@ client.plans().calculateTax(
 <dl>
 <dd>
 
-**ipAddress:** `Optional<String>` — Buyer IP address used to infer location when no billing address is provided.
+**status:** `Optional<ListProductAffiliatesRequestStatus>` — Only product affiliates with this status.
     
 </dd>
 </dl>
@@ -24948,7 +35946,55 @@ client.plans().calculateTax(
 <dl>
 <dd>
 
-**taxIds:** `Optional<List<CalculateTaxPlansRequestTaxIdsItem>>` — Optional buyer tax ID for B2B exemptions. At most one entry is supported.
+**productIds:** `Optional<String>` — Only product affiliates of these products.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**createdAfter:** `Optional<OffsetDateTime>` — Only signups at or after this ISO 8601 timestamp.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**createdBefore:** `Optional<OffsetDateTime>` — Only signups before this ISO 8601 timestamp.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**first:** `Optional<Integer>` — Number of results to return from the start of the range.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**after:** `Optional<String>` — Return results after this cursor. Use `page_info.end_cursor` from the previous response to fetch the next page.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**last:** `Optional<Integer>` — Number of results to return from the end of the range.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**before:** `Optional<String>` — Return results before this cursor. Use `page_info.start_cursor` from the previous response to fetch the previous page.
     
 </dd>
 </dl>
@@ -24973,7 +36019,7 @@ client.plans().calculateTax(
 <dl>
 <dd>
 
-Returns a paginated list of products belonging to an account.
+Lists an account's products, or searches the public marketplace when you omit `account_id`. Without the `access_pass:basic:read` permission on the account, including when signed out, the list holds only the products its store page lists.
 </dd>
 </dl>
 </dd>
@@ -24991,7 +36037,6 @@ Returns a paginated list of products belonging to an account.
 client.products().list(
     ListProductsRequest
         .builder()
-        .accountId("account_id")
         .visibilities(
             Arrays.asList("visible")
         )
@@ -25014,7 +36059,7 @@ client.products().list(
 <dl>
 <dd>
 
-**accountId:** `String` — The unique identifier of the account to list products for.
+**accountId:** `Optional<String>` — Account to list products for, prefixed `biz_`. Without the `access_pass:basic:read` permission on it, only the products its store page lists are returned. Omit to search the public marketplace.
     
 </dd>
 </dl>
@@ -25022,7 +36067,47 @@ client.products().list(
 <dl>
 <dd>
 
-**visibilities:** `Optional<String>` — Filter to only products matching these visibility states.
+**query:** `Optional<String>` — Filters products by text. The public marketplace list searches product title, account name, headline and description, ranking products that match every word first and the closest partial matches after them; an account's own list is a plain substring match over title, headline and description. Omit to browse by recency.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**marketplaceCategoryRoute:** `Optional<String>` — Only return marketplace products assigned to this category route, such as `trading`.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**billingTypes:** `Optional<ListProductsRequestBillingTypesItem>` — Filter to products with a buyable variant of these billing models, such as `one_time` or `renewal`. On an account list, needs the `access_pass:basic:read` permission.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**priceMinimum:** `Optional<Double>` — Only return products whose advertised buyable variant has a displayed price of at least this amount. Recurring variants use renewal price. On an account list, needs the `access_pass:basic:read` permission.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**priceMaximum:** `Optional<Double>` — Only return products whose advertised buyable variant has a displayed price of at most this amount. Recurring variants use renewal price. On an account list, needs the `access_pass:basic:read` permission.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**visibilities:** `Optional<String>` — Filter to only products matching these visibility states. Ignored on the public marketplace list, which only returns visible products. Without the `access_pass:basic:read` permission on the account, only `visible` matches anything.
     
 </dd>
 </dl>
@@ -25054,7 +36139,7 @@ client.products().list(
 <dl>
 <dd>
 
-**order:** `Optional<String>` — The field to sort results by. Defaults to created_at.
+**order:** `Optional<ListProductsRequestOrder>` — Field to sort results by. Account lists default to `created_at`, and `position` with `direction` `asc` matches the order the store page shows. Without the `access_pass:basic:read` permission, an account list sorts only by `created_at` or `position`. Marketplace lists default to `discoverable_at`, accept only `created_at` or `discoverable_at`, and can't be combined with `query`.
     
 </dd>
 </dl>
@@ -25062,7 +36147,7 @@ client.products().list(
 <dl>
 <dd>
 
-**first:** `Optional<Integer>` — The number of products to return (default and max 100).
+**first:** `Optional<Integer>` — Number of results to return from the start of the range.
     
 </dd>
 </dl>
@@ -25070,7 +36155,7 @@ client.products().list(
 <dl>
 <dd>
 
-**after:** `Optional<String>` — A cursor; returns products after this position.
+**after:** `Optional<String>` — Return results after this cursor. Use `page_info.end_cursor` from the previous response to fetch the next page.
     
 </dd>
 </dl>
@@ -25078,7 +36163,7 @@ client.products().list(
 <dl>
 <dd>
 
-**last:** `Optional<Integer>` — The number of products to return from the end of the range.
+**last:** `Optional<Integer>` — Number of results to return from the end of the range.
     
 </dd>
 </dl>
@@ -25086,7 +36171,31 @@ client.products().list(
 <dl>
 <dd>
 
-**before:** `Optional<String>` — A cursor; returns products before this position.
+**before:** `Optional<String>` — Return results before this cursor. Use `page_info.start_cursor` from the previous response to fetch the previous page.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**includeTotalCount:** `Optional<Boolean>` — Set to `true` to return the number of matching results in `page_info.total_count`. Send `first=0` as well to return the count without any results.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**createdAfter:** `Optional<String>` — Only return products created after this ISO 8601 timestamp.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**createdBefore:** `Optional<String>` — Only return products created before this ISO 8601 timestamp.
     
 </dd>
 </dl>
@@ -25185,7 +36294,15 @@ client.products().create(
 <dl>
 <dd>
 
-**description:** `Optional<String>` — A written description displayed on the product page.
+**description:** `Optional<String>` — A written description displayed on the product page. Maximum 1,500 characters.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**galleryImages:** `Optional<List<CreateProductsRequestGalleryImagesItem>>` — Images or videos displayed in the product gallery, in display order. Replaces the existing gallery. Send an empty array to clear it; omit or pass null to leave it unchanged. A banner image does not populate the gallery.
     
 </dd>
 </dl>
@@ -25209,7 +36326,7 @@ client.products().create(
 <dl>
 <dd>
 
-**headline:** `Optional<String>` — A short marketing headline for the product page.
+**headline:** `Optional<String>` — A short marketing headline for the product page. Maximum 80 characters.
     
 </dd>
 </dl>
@@ -25313,7 +36430,7 @@ client.products().create(
 <dl>
 <dd>
 
-Retrieves the details of an existing product. This endpoint is publicly accessible.
+Retrieves a product. Requires no authentication.
 </dd>
 </dl>
 </dd>
@@ -25482,7 +36599,7 @@ client.products().update(
 <dl>
 <dd>
 
-**description:** `Optional<String>` — A written description displayed on the product page.
+**description:** `Optional<String>` — A written description displayed on the product page. Maximum 1,500 characters.
     
 </dd>
 </dl>
@@ -25490,7 +36607,15 @@ client.products().update(
 <dl>
 <dd>
 
-**headline:** `Optional<String>` — A short marketing headline for the product page.
+**galleryImages:** `Optional<List<UpdateProductsRequestGalleryImagesItem>>` — Images or videos displayed in the product gallery, in display order. Replaces the existing gallery. Send an empty array to clear it; omit or pass null to leave it unchanged. A banner image does not populate the gallery.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**headline:** `Optional<String>` — A short marketing headline for the product page. Maximum 80 characters.
     
 </dd>
 </dl>
@@ -25530,7 +36655,7 @@ client.products().update(
 <dl>
 <dd>
 
-**title:** `Optional<String>` — The display name of the product.
+**title:** `Optional<String>` — The display name of the product. Maximum 80 characters.
     
 </dd>
 </dl>
@@ -25562,7 +36687,7 @@ client.products().update(
 <dl>
 <dd>
 
-Submits a product to the whop.com marketplace for review. The product moves to `pending_review`; a Whop reviewer approves it before it goes live.
+Submits an App Store app's product for review. The product moves to `pending_review`; a Whop reviewer approves it before it goes live. Other products can no longer be listed on the whop.com marketplace, so the request fails with `discover_listing_discontinued`.
 </dd>
 </dl>
 </dd>
@@ -25681,7 +36806,7 @@ client.products().unpublish(
 <dl>
 <dd>
 
-Lists promo codes for an account with cursor pagination, filters, and sorting.
+Lists an account's promo codes.
 </dd>
 </dl>
 </dd>
@@ -25703,7 +36828,7 @@ client.promoCodes().list(
         .productIds(
             Arrays.asList("prod_xxxxxxxxxxxxxx")
         )
-        .planIds(
+        .variantIds(
             Arrays.asList("plan_xxxxxxxxxxxxxx")
         )
         .build()
@@ -25746,7 +36871,7 @@ client.promoCodes().list(
 <dl>
 <dd>
 
-**planIds:** `Optional<String>` — Only promo codes scoped to these plan IDs.
+**variantIds:** `Optional<String>` — Only promo codes scoped to these variant IDs.
     
 </dd>
 </dl>
@@ -25786,7 +36911,7 @@ client.promoCodes().list(
 <dl>
 <dd>
 
-**first:** `Optional<Integer>` — Number of promo codes to return from the start of the window.
+**first:** `Optional<Integer>` — Number of results to return from the start of the range.
     
 </dd>
 </dl>
@@ -25794,7 +36919,7 @@ client.promoCodes().list(
 <dl>
 <dd>
 
-**after:** `Optional<String>` — Cursor to paginate forwards from.
+**after:** `Optional<String>` — Return results after this cursor. Use `page_info.end_cursor` from the previous response to fetch the next page.
     
 </dd>
 </dl>
@@ -25802,7 +36927,7 @@ client.promoCodes().list(
 <dl>
 <dd>
 
-**last:** `Optional<Integer>` — Number of promo codes to return from the end of the window.
+**last:** `Optional<Integer>` — Number of results to return from the end of the range.
     
 </dd>
 </dl>
@@ -25810,7 +36935,15 @@ client.promoCodes().list(
 <dl>
 <dd>
 
-**before:** `Optional<String>` — Cursor to paginate backwards from.
+**before:** `Optional<String>` — Return results before this cursor. Use `page_info.start_cursor` from the previous response to fetch the previous page.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**includeTotalCount:** `Optional<Boolean>` — Set to `true` to return the number of matching results in `page_info.total_count`. Send `first=0` as well to return the count without any results.
     
 </dd>
 </dl>
@@ -25834,7 +36967,7 @@ client.promoCodes().list(
 <dl>
 <dd>
 
-Creates a promo code for an account. First-party sessions may attach an affiliate.
+Creates a promo code for an account.
 </dd>
 </dl>
 </dd>
@@ -25947,14 +37080,6 @@ client.promoCodes().create(
 <dl>
 <dd>
 
-**planIds:** `Optional<List<String>>` 
-    
-</dd>
-</dl>
-
-<dl>
-<dd>
-
 **productId:** `Optional<String>` 
     
 </dd>
@@ -25988,6 +37113,14 @@ client.promoCodes().create(
 <dd>
 
 **unlimitedStock:** `Optional<Boolean>` 
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**variantIds:** `Optional<List<String>>` 
     
 </dd>
 </dl>
@@ -26558,268 +37691,8 @@ client.reactions().delete(
 </dl>
 </details>
 
-## Recommended Actions
-<details><summary><code>client.recommendedActions.list() -> ListRecommendedActionsResponse</code></summary>
-<dl>
-<dd>
-
-#### 📝 Description
-
-<dl>
-<dd>
-
-<dl>
-<dd>
-
-Lists the recommended action chains for an account — short sequences of actions (create a product, price it, publish it) the account should run next, gated on what it already has.
-</dd>
-</dl>
-</dd>
-</dl>
-
-#### 🔌 Usage
-
-<dl>
-<dd>
-
-<dl>
-<dd>
-
-```java
-client.recommendedActions().list(
-    ListRecommendedActionsRequest
-        .builder()
-        .build()
-);
-```
-</dd>
-</dl>
-</dd>
-</dl>
-
-#### ⚙️ Parameters
-
-<dl>
-<dd>
-
-<dl>
-<dd>
-
-**accountId:** `Optional<String>` — Account ID, prefixed `biz_`. Defaults to the API key's own account.
-    
-</dd>
-</dl>
-</dd>
-</dl>
-
-
-</dd>
-</dl>
-</details>
-
-<details><summary><code>client.recommendedActions.retrieve(id) -> AccountRecommendedActionChain</code></summary>
-<dl>
-<dd>
-
-#### 📝 Description
-
-<dl>
-<dd>
-
-<dl>
-<dd>
-
-Retrieves a recommended action chain by id, including chains that have already been run. Seeded chains are reconstructed from their hard-coded chain; generated chains are read from the account's stored chain, with each step's filled-in input.
-</dd>
-</dl>
-</dd>
-</dl>
-
-#### 🔌 Usage
-
-<dl>
-<dd>
-
-<dl>
-<dd>
-
-```java
-client.recommendedActions().retrieve(
-    "id",
-    RetrieveRecommendedActionsRequest
-        .builder()
-        .build()
-);
-```
-</dd>
-</dl>
-</dd>
-</dl>
-
-#### ⚙️ Parameters
-
-<dl>
-<dd>
-
-<dl>
-<dd>
-
-**id:** `String` — Chain ID from the list endpoint, e.g. `rac_seed_start_selling_9f2c1a7b04`.
-    
-</dd>
-</dl>
-
-<dl>
-<dd>
-
-**accountId:** `Optional<String>` — Account ID, prefixed `biz_`. Defaults to the API key's own account.
-    
-</dd>
-</dl>
-</dd>
-</dl>
-
-
-</dd>
-</dl>
-</details>
-
-<details><summary><code>client.recommendedActions.run(id) -> RunRecommendedActionsResponse</code></summary>
-<dl>
-<dd>
-
-#### 📝 Description
-
-<dl>
-<dd>
-
-<dl>
-<dd>
-
-Records that the caller ran a recommended action chain. Nothing is executed server-side yet — the client follows the chain's step CTAs itself; this writes the `recommended_action_chain.executed` analytics event.
-</dd>
-</dl>
-</dd>
-</dl>
-
-#### 🔌 Usage
-
-<dl>
-<dd>
-
-<dl>
-<dd>
-
-```java
-client.recommendedActions().run(
-    "id",
-    RunRecommendedActionsRequest
-        .builder()
-        .build()
-);
-```
-</dd>
-</dl>
-</dd>
-</dl>
-
-#### ⚙️ Parameters
-
-<dl>
-<dd>
-
-<dl>
-<dd>
-
-**id:** `String` — Chain ID from the list endpoint, e.g. `rac_seed_start_selling_9f2c1a7b04`.
-    
-</dd>
-</dl>
-
-<dl>
-<dd>
-
-**accountId:** `Optional<String>` — Account ID, prefixed `biz_`. Defaults to the API key's own account.
-    
-</dd>
-</dl>
-</dd>
-</dl>
-
-
-</dd>
-</dl>
-</details>
-
-<details><summary><code>client.recommendedActions.listExecutions(id) -> ListExecutionsRecommendedActionsResponse</code></summary>
-<dl>
-<dd>
-
-#### 📝 Description
-
-<dl>
-<dd>
-
-<dl>
-<dd>
-
-Lists the per-step record of a recommended action chain the server ran — one entry per step in position order, each carrying its current status and, once the step completed, the API response it produced. A chain that was never run server-side returns an empty list.
-</dd>
-</dl>
-</dd>
-</dl>
-
-#### 🔌 Usage
-
-<dl>
-<dd>
-
-<dl>
-<dd>
-
-```java
-client.recommendedActions().listExecutions(
-    "id",
-    ListExecutionsRecommendedActionsRequest
-        .builder()
-        .build()
-);
-```
-</dd>
-</dl>
-</dd>
-</dl>
-
-#### ⚙️ Parameters
-
-<dl>
-<dd>
-
-<dl>
-<dd>
-
-**id:** `String` — Chain ID from the list endpoint.
-    
-</dd>
-</dl>
-
-<dl>
-<dd>
-
-**accountId:** `Optional<String>` — Account ID, prefixed `biz_`. Defaults to the API key's own account.
-    
-</dd>
-</dl>
-</dd>
-</dl>
-
-
-</dd>
-</dl>
-</details>
-
 ## Refunds
-<details><summary><code>client.refunds.list() -> SyncPagingIterable&amp;lt;RefundListItem&amp;gt;</code></summary>
+<details><summary><code>client.refunds.list() -> SyncPagingIterable&amp;lt;Refund&amp;gt;</code></summary>
 <dl>
 <dd>
 
@@ -26831,10 +37704,7 @@ client.recommendedActions().listExecutions(
 <dl>
 <dd>
 
-Returns a paginated list of refunds, with optional filtering by payment, company, user, and creation date.
-
-Required permissions:
- - `payment:basic:read`
+Lists refunds the caller can read, newest first. Filter by payment, account, or buyer to narrow the results.
 </dd>
 </dl>
 </dd>
@@ -26852,13 +37722,6 @@ Required permissions:
 client.refunds().list(
     ListRefundsRequest
         .builder()
-        .first(42)
-        .last(42)
-        .paymentId("pay_xxxxxxxxxxxxxx")
-        .companyId("biz_xxxxxxxxxxxxxx")
-        .userId("user_xxxxxxxxxxxxx")
-        .createdBefore(OffsetDateTime.parse("2023-12-01T05:00:00Z"))
-        .createdAfter(OffsetDateTime.parse("2023-12-01T05:00:00Z"))
         .build()
 );
 ```
@@ -26875,7 +37738,7 @@ client.refunds().list(
 <dl>
 <dd>
 
-**after:** `Optional<String>` — Returns the elements in the list that come after the specified cursor.
+**accountId:** `Optional<String>` — Only refunds issued by this account, prefixed `biz_`.
     
 </dd>
 </dl>
@@ -26883,7 +37746,7 @@ client.refunds().list(
 <dl>
 <dd>
 
-**before:** `Optional<String>` — Returns the elements in the list that come before the specified cursor.
+**paymentId:** `Optional<String>` — Only refunds of this payment, prefixed `pay_`.
     
 </dd>
 </dl>
@@ -26891,7 +37754,7 @@ client.refunds().list(
 <dl>
 <dd>
 
-**first:** `Optional<Integer>` — Returns the first _n_ elements from the list.
+**userId:** `Optional<String>` — Only refunds to this buyer, prefixed `user_`.
     
 </dd>
 </dl>
@@ -26899,7 +37762,7 @@ client.refunds().list(
 <dl>
 <dd>
 
-**last:** `Optional<Integer>` — Returns the last _n_ elements from the list.
+**createdBefore:** `Optional<OffsetDateTime>` — Only refunds requested before this ISO 8601 timestamp.
     
 </dd>
 </dl>
@@ -26907,7 +37770,7 @@ client.refunds().list(
 <dl>
 <dd>
 
-**paymentId:** `Optional<String>` — Filter refunds to only those associated with this specific payment.
+**createdAfter:** `Optional<OffsetDateTime>` — Only refunds requested after this ISO 8601 timestamp.
     
 </dd>
 </dl>
@@ -26915,7 +37778,7 @@ client.refunds().list(
 <dl>
 <dd>
 
-**companyId:** `Optional<String>` — Filter refunds to only those belonging to this company.
+**order:** `Optional<ListRefundsRequestOrder>` — The field to sort by.
     
 </dd>
 </dl>
@@ -26923,7 +37786,7 @@ client.refunds().list(
 <dl>
 <dd>
 
-**userId:** `Optional<String>` — Filter refunds to only those associated with this specific user.
+**direction:** `Optional<ListRefundsRequestDirection>` — The sort direction.
     
 </dd>
 </dl>
@@ -26931,7 +37794,7 @@ client.refunds().list(
 <dl>
 <dd>
 
-**direction:** `Optional<Direction>` 
+**first:** `Optional<Integer>` — Number of results to return from the start of the range.
     
 </dd>
 </dl>
@@ -26939,7 +37802,7 @@ client.refunds().list(
 <dl>
 <dd>
 
-**createdBefore:** `Optional<OffsetDateTime>` — Only return refunds created before this timestamp.
+**after:** `Optional<String>` — Return results after this cursor. Use `page_info.end_cursor` from the previous response to fetch the next page.
     
 </dd>
 </dl>
@@ -26947,7 +37810,15 @@ client.refunds().list(
 <dl>
 <dd>
 
-**createdAfter:** `Optional<OffsetDateTime>` — Only return refunds created after this timestamp.
+**last:** `Optional<Integer>` — Number of results to return from the end of the range.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**before:** `Optional<String>` — Return results before this cursor. Use `page_info.start_cursor` from the previous response to fetch the previous page.
     
 </dd>
 </dl>
@@ -26971,15 +37842,7 @@ client.refunds().list(
 <dl>
 <dd>
 
-Retrieves the details of an existing refund.
-
-Required permissions:
- - `payment:basic:read`
- - `plan:basic:read`
- - `access_pass:basic:read`
- - `member:email:read`
- - `member:basic:read`
- - `member:phone:read`
+Returns one refund.
 </dd>
 </dl>
 </dd>
@@ -26995,7 +37858,7 @@ Required permissions:
 
 ```java
 client.refunds().retrieve(
-    "rf_xxxxxxxxxxxxxxx",
+    "id",
     RetrieveRefundsRequest
         .builder()
         .build()
@@ -27014,7 +37877,7 @@ client.refunds().retrieve(
 <dl>
 <dd>
 
-**id:** `String` — The unique identifier of the refund.
+**id:** `String` — The refund to retrieve, prefixed `rf_`.
     
 </dd>
 </dl>
@@ -27089,7 +37952,7 @@ client.resolutionCenterCases().list(
 <dl>
 <dd>
 
-**first:** `Optional<Integer>` — The number of cases to return (default 20, max 100).
+**first:** `Optional<Integer>` — Number of results to return from the start of the range.
     
 </dd>
 </dl>
@@ -27097,7 +37960,7 @@ client.resolutionCenterCases().list(
 <dl>
 <dd>
 
-**after:** `Optional<String>` — A cursor; returns cases after this position.
+**after:** `Optional<String>` — Return results after this cursor. Use `page_info.end_cursor` from the previous response to fetch the next page.
     
 </dd>
 </dl>
@@ -27105,7 +37968,7 @@ client.resolutionCenterCases().list(
 <dl>
 <dd>
 
-**last:** `Optional<Integer>` — The number of cases to return from the end of the range.
+**last:** `Optional<Integer>` — Number of results to return from the end of the range.
     
 </dd>
 </dl>
@@ -27113,7 +37976,7 @@ client.resolutionCenterCases().list(
 <dl>
 <dd>
 
-**before:** `Optional<String>` — A cursor; returns cases before this position.
+**before:** `Optional<String>` — Return results before this cursor. Use `page_info.start_cursor` from the previous response to fetch the previous page.
     
 </dd>
 </dl>
@@ -27534,7 +38397,7 @@ client.resolutionCenterCases().accept(
 <dl>
 <dd>
 
-Appeals a decision, as the customer, on a case that closed in the merchant's favor. Escalates the case to Whop for platform review. A case can be appealed once.
+Appeals a decision, as the customer, on a case that closed in the merchant's favor. Escalates the case to Whop for platform review. A case can be appealed once, within 7 days of the decision.
 </dd>
 </dl>
 </dd>
@@ -27729,7 +38592,7 @@ client.resolutionCenterCases().events(
 <dl>
 <dd>
 
-**first:** `Optional<Integer>` — The number of events to return (default 20, max 100).
+**first:** `Optional<Integer>` — Number of results to return from the start of the range.
     
 </dd>
 </dl>
@@ -27737,7 +38600,7 @@ client.resolutionCenterCases().events(
 <dl>
 <dd>
 
-**after:** `Optional<String>` — A cursor; returns events after this position.
+**after:** `Optional<String>` — Return results after this cursor. Use `page_info.end_cursor` from the previous response to fetch the next page.
     
 </dd>
 </dl>
@@ -27745,7 +38608,7 @@ client.resolutionCenterCases().events(
 <dl>
 <dd>
 
-**last:** `Optional<Integer>` — The number of events to return from the end of the range.
+**last:** `Optional<Integer>` — Number of results to return from the end of the range.
     
 </dd>
 </dl>
@@ -27753,7 +38616,7 @@ client.resolutionCenterCases().events(
 <dl>
 <dd>
 
-**before:** `Optional<String>` — A cursor; returns events before this position.
+**before:** `Optional<String>` — Return results before this cursor. Use `page_info.start_cursor` from the previous response to fetch the previous page.
     
 </dd>
 </dl>
@@ -27975,6 +38838,147 @@ client.resolutionCenterCases().withdraw(
 </dl>
 </details>
 
+## Review reports
+<details><summary><code>client.reviewReports.list() -> SyncPagingIterable&amp;lt;ReviewReport&amp;gt;</code></summary>
+<dl>
+<dd>
+
+#### 📝 Description
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+Lists the reports filed against customer reviews on the accounts you can moderate, newest first. Use it to check whether a review was reported and where the report stands. Omit `account_id` to cover every account you can moderate.
+</dd>
+</dl>
+</dd>
+</dl>
+
+#### 🔌 Usage
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+```java
+client.reviewReports().list(
+    ListReviewReportsRequest
+        .builder()
+        .accountId("biz_xxxxxxxxxxxxxx")
+        .reviewId("rev_xxxxxxxxxxxxxx")
+        .build()
+);
+```
+</dd>
+</dl>
+</dd>
+</dl>
+
+#### ⚙️ Parameters
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+**accountId:** `Optional<String>` — Only reports on this account's reviews.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**reviewId:** `Optional<String>` — Only reports filed against this review.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**status:** `Optional<ListReviewReportsRequestStatus>` — Only reports in this status.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**createdBefore:** `Optional<OffsetDateTime>` — Only reports filed before this timestamp.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**createdAfter:** `Optional<OffsetDateTime>` — Only reports filed after this timestamp.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**order:** `Optional<ListReviewReportsRequestOrder>` — The field to sort reports by.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**direction:** `Optional<ListReviewReportsRequestDirection>` — The sort direction.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**first:** `Optional<Integer>` — Number of results to return from the start of the range.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**after:** `Optional<String>` — Return results after this cursor. Use `page_info.end_cursor` from the previous response to fetch the next page.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**last:** `Optional<Integer>` — Number of results to return from the end of the range.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**before:** `Optional<String>` — Return results before this cursor. Use `page_info.start_cursor` from the previous response to fetch the previous page.
+    
+</dd>
+</dl>
+</dd>
+</dl>
+
+
+</dd>
+</dl>
+</details>
+
 ## Reviews
 <details><summary><code>client.reviews.list() -> SyncPagingIterable&amp;lt;ReviewListItem&amp;gt;</code></summary>
 <dl>
@@ -27988,7 +38992,7 @@ client.resolutionCenterCases().withdraw(
 <dl>
 <dd>
 
-Returns a paginated list of customer reviews for a specific product, with optional filtering by star rating and creation date.
+Lists the published reviews for a product or account. Without `account_id` or `product_id`, a user lists the reviews they wrote, an account or app API key lists its account's reviews, and a request without credentials returns 400.
 </dd>
 </dl>
 </dd>
@@ -28006,13 +39010,8 @@ Returns a paginated list of customer reviews for a specific product, with option
 client.reviews().list(
     ListReviewsRequest
         .builder()
+        .accountId("biz_xxxxxxxxxxxxxx")
         .productId("prod_xxxxxxxxxxxxx")
-        .first(42)
-        .last(42)
-        .minStars(42)
-        .maxStars(42)
-        .createdBefore(OffsetDateTime.parse("2023-12-01T05:00:00Z"))
-        .createdAfter(OffsetDateTime.parse("2023-12-01T05:00:00Z"))
         .build()
 );
 ```
@@ -28029,7 +39028,7 @@ client.reviews().list(
 <dl>
 <dd>
 
-**after:** `Optional<String>` — Returns the elements in the list that come after the specified cursor.
+**accountId:** `Optional<String>` — The unique identifier of the account to list reviews for.
     
 </dd>
 </dl>
@@ -28037,31 +39036,7 @@ client.reviews().list(
 <dl>
 <dd>
 
-**before:** `Optional<String>` — Returns the elements in the list that come before the specified cursor.
-    
-</dd>
-</dl>
-
-<dl>
-<dd>
-
-**first:** `Optional<Integer>` — Returns the first _n_ elements from the list.
-    
-</dd>
-</dl>
-
-<dl>
-<dd>
-
-**last:** `Optional<Integer>` — Returns the last _n_ elements from the list.
-    
-</dd>
-</dl>
-
-<dl>
-<dd>
-
-**productId:** `String` — The unique identifier of the product to list reviews for.
+**productId:** `Optional<String>` — The unique identifier of the product to list reviews for.
     
 </dd>
 </dl>
@@ -28097,6 +39072,62 @@ client.reviews().list(
     
 </dd>
 </dl>
+
+<dl>
+<dd>
+
+**order:** `Optional<ListReviewsRequestOrder>` — The field to sort reviews by.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**direction:** `Optional<ListReviewsRequestDirection>` — The sort direction.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**first:** `Optional<Integer>` — Number of results to return from the start of the range.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**after:** `Optional<String>` — Return results after this cursor. Use `page_info.end_cursor` from the previous response to fetch the next page.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**last:** `Optional<Integer>` — Number of results to return from the end of the range.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**before:** `Optional<String>` — Return results before this cursor. Use `page_info.start_cursor` from the previous response to fetch the previous page.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**includeTotalCount:** `Optional<Boolean>` — Set to `true` to return the number of matching results in `page_info.total_count`. Send `first=0` as well to return the count without any results.
+    
+</dd>
+</dl>
 </dd>
 </dl>
 
@@ -28117,7 +39148,7 @@ client.reviews().list(
 <dl>
 <dd>
 
-Retrieves the details of an existing review.
+Retrieves a published review. Reviews that are not published return 404.
 </dd>
 </dl>
 </dd>
@@ -28152,7 +39183,165 @@ client.reviews().retrieve(
 <dl>
 <dd>
 
-**id:** `String` — The unique identifier of the review to retrieve.
+**id:** `String` — The unique identifier of the review.
+    
+</dd>
+</dl>
+</dd>
+</dl>
+
+
+</dd>
+</dl>
+</details>
+
+<details><summary><code>client.reviews.delete(id) -> DeleteReviewsResponse</code></summary>
+<dl>
+<dd>
+
+#### 📝 Description
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+Deletes a review the signed-in user wrote. Requires the `review:delete` scope, and returns 404 for a review another user wrote.
+</dd>
+</dl>
+</dd>
+</dl>
+
+#### 🔌 Usage
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+```java
+client.reviews().delete(
+    "rev_xxxxxxxxxxxxxx",
+    DeleteReviewsRequest
+        .builder()
+        .build()
+);
+```
+</dd>
+</dl>
+</dd>
+</dl>
+
+#### ⚙️ Parameters
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+**id:** `String` — The unique identifier of the review.
+    
+</dd>
+</dl>
+</dd>
+</dl>
+
+
+</dd>
+</dl>
+</details>
+
+## Search
+<details><summary><code>client.search.list() -> ListSearchResponse</code></summary>
+<dl>
+<dd>
+
+#### 📝 Description
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+Searches one account's records in one call. `account` rows are `account_id` itself and, when you send `include_subaccounts`, its subaccounts; every other row belongs to one of those accounts.
+
+Each `object` needs its own read permission on the record's account, and rows you can't read are left out without an error: `account` (`biz_`, `company:basic:read`), `member` (`mber_`, `member:basic:read`), `membership` (`mem_`, `member:basic:read`), `payment` (`pay_`, `payment:basic:read`), `affiliate` (`aff_`, `affiliate:basic:read`), `review` (`rev_`, `company:basic:read`), `resolution_center_case` (`reso_`, `payment:resolution_center_case:read`) and `promo_code` (`promo_`, `promo_code:basic:read`). A query containing `@` also needs `member:email:read`, and a phone match `member:phone:read`. An invoice's number finds the invoice as its `payment`.
+
+`query` is trimmed and has to be 2 to 250 characters; a full card number returns a `400`. `data` comes identifier matches first, such as a pasted ID, email address, card digits or invoice number, newest first within each kind of match. Every query of 3 or more characters is also ranked, and ranked rows follow, best match first. Each record appears once, and `match_reason` says why it matched. [Search](/api-reference/search/search) lists the query shapes and match reasons.
+
+`first` caps the rows, 20 by default and up to 100. There is no cursor yet, so the response is a single page. Search ranks; to filter one resource or page through every match, use its list endpoint, such as `GET /payments?query=`.
+</dd>
+</dl>
+</dd>
+</dl>
+
+#### 🔌 Usage
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+```java
+client.search().list(
+    ListSearchRequest
+        .builder()
+        .query("query")
+        .accountId("account_id")
+        .build()
+);
+```
+</dd>
+</dl>
+</dd>
+</dl>
+
+#### ⚙️ Parameters
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+**query:** `String` — Text to search for, 2 to 250 characters.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**types:** `Optional<ListSearchRequestTypesItem>` — Kinds of records to search. Defaults to every kind. `account` rows are `account_id` itself and, with `include_subaccounts`, its subaccounts.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**accountId:** `String` — The account to search, prefixed `biz_`. Records other than accounts belong to it, or with `include_subaccounts` to its subaccounts. Your credential needs read access to at least one kind of record on it that search returns, or the account is a 404.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**includeSubaccounts:** `Optional<Boolean>` — `true` also searches the subaccounts of a platform `account_id`: an ID, an email, card digits or a phone number finds their records, and the subaccounts themselves are found as `account` rows by name, ID or store link, or by the email of their owner, a team member or a customer. Safe to send for any account: one without subaccounts is searched as if this were false.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**first:** `Optional<Integer>` — Number of results to return from the start of the range.
     
 </dd>
 </dl>
@@ -28165,7 +39354,7 @@ client.reviews().retrieve(
 </details>
 
 ## Setup Intents
-<details><summary><code>client.setupIntents.list() -> SyncPagingIterable&amp;lt;SetupIntentListItem&amp;gt;</code></summary>
+<details><summary><code>client.setupIntents.list() -> SyncPagingIterable&amp;lt;SetupIntent&amp;gt;</code></summary>
 <dl>
 <dd>
 
@@ -28177,12 +39366,7 @@ client.reviews().retrieve(
 <dl>
 <dd>
 
-Returns a paginated list of setup intents for a company, with optional filtering by creation date. A setup intent securely collects and stores a member's payment method for future use without charging them immediately.
-
-Required permissions:
- - `payment:setup_intent:read`
- - `member:basic:read`
- - `member:email:read`
+Lists setup intents newest first. An account API key lists its own account; a user token lists every account it can read, or one account with `account_id`.
 </dd>
 </dl>
 </dd>
@@ -28200,11 +39384,6 @@ Required permissions:
 client.setupIntents().list(
     ListSetupIntentsRequest
         .builder()
-        .companyId("biz_xxxxxxxxxxxxxx")
-        .first(42)
-        .last(42)
-        .createdBefore(OffsetDateTime.parse("2023-12-01T05:00:00Z"))
-        .createdAfter(OffsetDateTime.parse("2023-12-01T05:00:00Z"))
         .build()
 );
 ```
@@ -28221,7 +39400,7 @@ client.setupIntents().list(
 <dl>
 <dd>
 
-**after:** `Optional<String>` — Returns the elements in the list that come after the specified cursor.
+**accountId:** `Optional<String>` — Only setup intents for this account, prefixed `biz_`.
     
 </dd>
 </dl>
@@ -28229,7 +39408,7 @@ client.setupIntents().list(
 <dl>
 <dd>
 
-**before:** `Optional<String>` — Returns the elements in the list that come before the specified cursor.
+**status:** `Optional<ListSetupIntentsRequestStatus>` — Only setup intents in this state.
     
 </dd>
 </dl>
@@ -28237,7 +39416,7 @@ client.setupIntents().list(
 <dl>
 <dd>
 
-**first:** `Optional<Integer>` — Returns the first _n_ elements from the list.
+**createdBefore:** `Optional<OffsetDateTime>` — Only setup intents created before this ISO 8601 timestamp.
     
 </dd>
 </dl>
@@ -28245,7 +39424,7 @@ client.setupIntents().list(
 <dl>
 <dd>
 
-**last:** `Optional<Integer>` — Returns the last _n_ elements from the list.
+**createdAfter:** `Optional<OffsetDateTime>` — Only setup intents created after this ISO 8601 timestamp.
     
 </dd>
 </dl>
@@ -28253,7 +39432,7 @@ client.setupIntents().list(
 <dl>
 <dd>
 
-**companyId:** `String` — The unique identifier of the company to list setup intents for.
+**order:** `Optional<ListSetupIntentsRequestOrder>` — The field to sort by.
     
 </dd>
 </dl>
@@ -28261,7 +39440,7 @@ client.setupIntents().list(
 <dl>
 <dd>
 
-**direction:** `Optional<Direction>` 
+**direction:** `Optional<ListSetupIntentsRequestDirection>` — The sort direction.
     
 </dd>
 </dl>
@@ -28269,7 +39448,7 @@ client.setupIntents().list(
 <dl>
 <dd>
 
-**createdBefore:** `Optional<OffsetDateTime>` — Only return setup intents created before this timestamp.
+**first:** `Optional<Integer>` — Number of results to return from the start of the range.
     
 </dd>
 </dl>
@@ -28277,7 +39456,23 @@ client.setupIntents().list(
 <dl>
 <dd>
 
-**createdAfter:** `Optional<OffsetDateTime>` — Only return setup intents created after this timestamp.
+**after:** `Optional<String>` — Return results after this cursor. Use `page_info.end_cursor` from the previous response to fetch the next page.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**last:** `Optional<Integer>` — Number of results to return from the end of the range.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**before:** `Optional<String>` — Return results before this cursor. Use `page_info.start_cursor` from the previous response to fetch the previous page.
     
 </dd>
 </dl>
@@ -28289,7 +39484,7 @@ client.setupIntents().list(
 </dl>
 </details>
 
-<details><summary><code>client.setupIntents.create(request) -> CreateSetupIntentsResponse</code></summary>
+<details><summary><code>client.setupIntents.create(request) -> SetupIntent</code></summary>
 <dl>
 <dd>
 
@@ -28301,12 +39496,7 @@ client.setupIntents().list(
 <dl>
 <dd>
 
-Save a buyer's payment method for later without charging it. Provide a confirmation token for a method the buyer just supplied, or an existing payment method to re-verify. The buyer may still have a step to complete — 3D Secure, a hosted enrollment, linking a bank account — so poll the setup intent's status endpoint for what to do next.
-
-Required permissions:
- - `payment:charge`
- - `member:basic:read`
- - `member:email:read`
+Saves a buyer's payment method for later without charging it — one the buyer just supplied through the payment elements in setup mode, or one already on file to re-verify. The setup completes in the background, so the response is the setup intent as created, not its outcome: hand `client_secret` to the elements' `handleNextAction`, or poll Retrieve setup status. A buyer's own token holding `member:payment_methods:use` may create a setup intent for itself from a confirmation token.
 </dd>
 </dl>
 </dd>
@@ -28322,13 +39512,10 @@ Required permissions:
 
 ```java
 client.setupIntents().create(
-    CreateSetupIntentsRequest.of(
-        CreateSetupIntentsRequestConfirmationToken
-            .builder()
-            .companyId("biz_xxxxxxxxxxxxxx")
-            .confirmationToken("ctok_xxxxxxxxxxxxxx")
-            .build()
-    )
+    CreateSetupIntentsRequest
+        .builder()
+        .accountId("biz_xxxxxxxxxxxxxx")
+        .build()
 );
 ```
 </dd>
@@ -28344,7 +39531,79 @@ client.setupIntents().create(
 <dl>
 <dd>
 
-**request:** `CreateSetupIntentsRequest` — Parameters for CreateSetupIntent
+**accountId:** `String` — The account to save the payment method for, prefixed `biz_`.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**confirmationToken:** `Optional<String>` — A confirmation token describing a payment method the buyer just supplied, collected by the payment elements in setup mode. Provide this or `payment_method_id`, not both. The buyer is resolved from the token's billing email, or from `email`, and may still have a step to complete — poll Retrieve setup status for what to do next.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**currency:** `Optional<String>` — The currency the saved payment method will be used with, as a lowercase ISO 4217 code. Controls which currency-specific payment methods are available. Defaults to `usd`.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**email:** `Optional<String>` — Overrides the buyer email carried on the confirmation token, resolving or creating the user the method belongs to. Ignored unless `confirmation_token` is provided, and when the token was created by a signed-in buyer or the caller is the buyer.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**metadata:** `Optional<Map<String, Optional<String>>>` — Custom metadata to attach to the setup intent. Returned on the setup intent and its webhooks.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**ownerId:** `Optional<String>` — Who the saved payment method belongs to. Pass `account_id` to save it on the account itself, which needs `payment:charge` on the account. Pass your own user ID, prefixed `user_`, to save it on the authenticated user. Omit it to save it on the buyer: the caller when it is the buyer, otherwise the user the confirmation token names. Not available with `payment_method_id`, which keeps its current owner, or with `purpose`.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**paymentMethodId:** `Optional<String>` — An existing payment method to re-verify and save, prefixed `payt_`. Provide this or `confirmation_token`, not both. Not available to a buyer credential.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**purpose:** `Optional<CreateSetupIntentsRequestPurpose>` — What the saved payment method will pay for. Set to `ads_billing` when saving a card to pay for Whop Ads on `account_id`: the card is verified by Whop Ads, the merchant that charges it, which helps minimize security declines on ad payments, and it requires `ad_campaign:create` on `account_id`. Omit it for any other payment method.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**returnUrl:** `Optional<String>` — Where the buyer continues after completing an off-site step. An absolute https URL without credentials, at most 2,048 characters.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**threeDsLevel:** `Optional<CreateSetupIntentsRequestThreeDsLevel>` — 3D Secure behavior for supported on-session card payments. `mandate_challenge` requires a 3DS challenge before payment processing; `mandate_if_required` mandates a challenge only when the payment processor requires it; `frictionless_if_required` uses the regular frictionless 3DS flow. Payments of $1,000 or more use `mandate_if_required` unless `mandate_challenge` is selected. Risk and authentication recovery requirements can override the preference. Applies to this setup only, and only while the buyer is present: ignored with `payment_method_id`, which re-verifies off session. Not available with `purpose: ads_billing`. Defaults to `frictionless_if_required`.
     
 </dd>
 </dl>
@@ -28368,12 +39627,7 @@ client.setupIntents().create(
 <dl>
 <dd>
 
-Retrieves the details of an existing setup intent.
-
-Required permissions:
- - `payment:setup_intent:read`
- - `member:basic:read`
- - `member:email:read`
+Retrieves a setup intent. Once its `status` is `succeeded`, charge the saved method by its `payment_method_id`. The buyer's own token may retrieve a setup intent that belongs to it.
 </dd>
 </dl>
 </dd>
@@ -28389,7 +39643,7 @@ Required permissions:
 
 ```java
 client.setupIntents().retrieve(
-    "sint_xxxxxxxxxxxxx",
+    "id",
     RetrieveSetupIntentsRequest
         .builder()
         .build()
@@ -28408,7 +39662,7 @@ client.setupIntents().retrieve(
 <dl>
 <dd>
 
-**id:** `String` — The unique identifier of the setup intent.
+**id:** `String` — The setup intent to retrieve, prefixed `sint_`.
     
 </dd>
 </dl>
@@ -28432,7 +39686,7 @@ client.setupIntents().retrieve(
 <dl>
 <dd>
 
-Changes where the buyer lands after completing an off-site step, up until they return. Accepts either a secret key or the setup's own `client_secret`, so the surface that knows the final destination can set it.
+Changes where the buyer lands after completing an off-site step, up until they return. Accepts either a secret key or the setup's own `client_secret` in the body, so the surface that knows the final destination can set it.
 </dd>
 </dl>
 </dd>
@@ -28476,6 +39730,14 @@ client.setupIntents().updateReturnUrl(
 <dl>
 <dd>
 
+**clientSecret:** `Optional<String>` — The setup's own `client_secret`, for a caller without a secret key.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
 **returnUrl:** `String` — Where the buyer continues after completing an off-site step. Must be an absolute https URL without credentials (http is allowed for localhost), at most 2,048 characters.
     
 </dd>
@@ -28500,7 +39762,7 @@ client.setupIntents().updateReturnUrl(
 <dl>
 <dd>
 
-Retrieves how far a setup has got and what the buyer must do next, if anything. Collection runs in the background, so poll this rather than reading the create response. Accepts either a secret key or the setup's own `client_secret`, so the surface collecting the payment method can poll it directly.
+Retrieves how far a setup has got and what the buyer must do next, if anything. Collection runs in the background, so poll this rather than reading the create response. Accepts either a secret key or the setup's own `client_secret` as a query parameter, so the surface collecting the payment method can poll it directly.
 </dd>
 </dl>
 </dd>
@@ -28539,6 +39801,14 @@ client.setupIntents().retrieveStatus(
     
 </dd>
 </dl>
+
+<dl>
+<dd>
+
+**clientSecret:** `Optional<String>` — The setup's own `client_secret`, for a caller without a secret key.
+    
+</dd>
+</dl>
 </dd>
 </dl>
 
@@ -28560,7 +39830,7 @@ client.setupIntents().retrieveStatus(
 <dl>
 <dd>
 
-Returns a paginated list of shipments for an account.
+Lists an account's shipments.
 </dd>
 </dl>
 </dd>
@@ -28653,7 +39923,7 @@ client.shipments().list(
 <dl>
 <dd>
 
-**first:** `Optional<Integer>` — The number of shipments to return.
+**first:** `Optional<Integer>` — Number of results to return from the start of the range.
     
 </dd>
 </dl>
@@ -28661,7 +39931,7 @@ client.shipments().list(
 <dl>
 <dd>
 
-**after:** `Optional<String>` — A cursor; returns shipments after this position.
+**after:** `Optional<String>` — Return results after this cursor. Use `page_info.end_cursor` from the previous response to fetch the next page.
     
 </dd>
 </dl>
@@ -28669,7 +39939,7 @@ client.shipments().list(
 <dl>
 <dd>
 
-**last:** `Optional<Integer>` — The number of shipments to return from the end of the range.
+**last:** `Optional<Integer>` — Number of results to return from the end of the range.
     
 </dd>
 </dl>
@@ -28677,7 +39947,7 @@ client.shipments().list(
 <dl>
 <dd>
 
-**before:** `Optional<String>` — A cursor; returns shipments before this position.
+**before:** `Optional<String>` — Return results before this cursor. Use `page_info.start_cursor` from the previous response to fetch the previous page.
     
 </dd>
 </dl>
@@ -28765,6 +40035,90 @@ client.shipments().create(
 </dl>
 </details>
 
+<details><summary><code>client.shipments.lookup(request) -> ShipmentLookup</code></summary>
+<dl>
+<dd>
+
+#### 📝 Description
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+Finds the delivery for a purchase from an account with customer tracking turned on, using exactly one order or tracking number plus the buyer's current receipt email. No authentication is required and no sign-in or session is created. Email matching ignores case and surrounding whitespace, but dots and +tags must match. Every miss returns the same 404: an unknown account, tracking turned off, a wrong number or email, an unpaid order or a purchase with nothing to ship. `shipment` is `null` while a paid physical purchase has no tracking yet, unless it has been fully refunded. Limited to 10 attempts per hour per order or tracking number within the account, and 30 attempts per five minutes per client IP and per email within the account. Responses are never cached or replayed with Idempotency-Key.
+</dd>
+</dl>
+</dd>
+</dl>
+
+#### 🔌 Usage
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+```java
+client.shipments().lookup(
+    LookupShipmentsRequest
+        .builder()
+        .accountId("biz_xxxxxxxxxxxxxx")
+        .email("marcus@shinetime.example")
+        .build()
+);
+```
+</dd>
+</dl>
+</dd>
+</dl>
+
+#### ⚙️ Parameters
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+**accountId:** `String` — The selling account, prefixed `biz_`.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**email:** `String` — The buyer's current receipt email.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**orderNumber:** `Optional<String>` — The payment ID prefixed `pay_`, or the order number printed on the receipt (optional leading `#`). Supply this or `tracking_number`, not both.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**trackingNumber:** `Optional<String>` — The exact carrier tracking number. Supply this or `order_number`, not both.
+    
+</dd>
+</dl>
+</dd>
+</dl>
+
+
+</dd>
+</dl>
+</details>
+
 <details><summary><code>client.shipments.retrieve(id) -> Shipment</code></summary>
 <dl>
 <dd>
@@ -28777,7 +40131,7 @@ client.shipments().create(
 <dl>
 <dd>
 
-Retrieves a shipment by its id, or by the payment id it fulfills.
+Retrieves a shipment by its ID, or by the ID of the payment it fulfills.
 </dd>
 </dl>
 </dd>
@@ -28905,7 +40259,7 @@ client.shipments().update(
 <dl>
 <dd>
 
-Lists the social accounts linked to an account or user.
+Deprecated compatibility endpoint. List external accounts with `GET /external_accounts` instead.
 </dd>
 </dl>
 </dd>
@@ -28939,7 +40293,7 @@ client.socialAccounts().list(
 <dl>
 <dd>
 
-**accountId:** `Optional<String>` — The Account that the social accounts are connected to. Provide either this or user_id.
+**accountId:** `Optional<String>` — The Account that the external accounts are connected to. Provide either this or user_id.
     
 </dd>
 </dl>
@@ -28947,7 +40301,7 @@ client.socialAccounts().list(
 <dl>
 <dd>
 
-**userId:** `Optional<String>` — The User that the social accounts are connected to. Provide either this or account_id.
+**userId:** `Optional<String>` — The User that the external accounts are connected to. Provide either this or account_id.
     
 </dd>
 </dl>
@@ -28955,7 +40309,7 @@ client.socialAccounts().list(
 <dl>
 <dd>
 
-**platform:** `Optional<ListSocialAccountsRequestPlatform>` — Only return social accounts for the platform that is specified.
+**platform:** `Optional<ListSocialAccountsRequestPlatform>` — Only return external accounts for the platform that is specified. An `aimerce` account is returned only with this filter, which requires the `company:manage_checkout` scope instead of `social_account:read`.
     
 </dd>
 </dl>
@@ -28963,7 +40317,7 @@ client.socialAccounts().list(
 <dl>
 <dd>
 
-**verified:** `Optional<Boolean>` — Only return social accounts that are verified on the platform.
+**trustLevel:** `Optional<ListSocialAccountsRequestTrustLevel>` — Only return external accounts linked with this trust level, such as `oauth` for accounts connected through OAuth.
     
 </dd>
 </dl>
@@ -28971,7 +40325,7 @@ client.socialAccounts().list(
 <dl>
 <dd>
 
-**scopes:** `Optional<ListSocialAccountsRequestScopesItem>` — Only return social accounts that have these scopes.
+**verified:** `Optional<Boolean>` — Only return external accounts that are verified on the platform.
     
 </dd>
 </dl>
@@ -28979,7 +40333,7 @@ client.socialAccounts().list(
 <dl>
 <dd>
 
-**first:** `Optional<Integer>` — The number of social accounts to return.
+**scopes:** `Optional<ListSocialAccountsRequestScopesItem>` — Only return external accounts that have these scopes.
     
 </dd>
 </dl>
@@ -28987,7 +40341,7 @@ client.socialAccounts().list(
 <dl>
 <dd>
 
-**after:** `Optional<String>` — Cursor to fetch the page after (from page_info.end_cursor).
+**first:** `Optional<Integer>` — Number of results to return from the start of the range.
     
 </dd>
 </dl>
@@ -28995,7 +40349,7 @@ client.socialAccounts().list(
 <dl>
 <dd>
 
-**last:** `Optional<Integer>` — The number of social accounts to return from the end of the range.
+**after:** `Optional<String>` — Return results after this cursor. Use `page_info.end_cursor` from the previous response to fetch the next page.
     
 </dd>
 </dl>
@@ -29003,7 +40357,7 @@ client.socialAccounts().list(
 <dl>
 <dd>
 
-**before:** `Optional<String>` — Cursor to fetch the page before (from page_info.start_cursor).
+**last:** `Optional<Integer>` — Number of results to return from the end of the range.
     
 </dd>
 </dl>
@@ -29011,7 +40365,15 @@ client.socialAccounts().list(
 <dl>
 <dd>
 
-**order:** `Optional<ListSocialAccountsRequestOrder>` — The field to sort social accounts by.
+**before:** `Optional<String>` — Return results before this cursor. Use `page_info.start_cursor` from the previous response to fetch the previous page.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**order:** `Optional<ListSocialAccountsRequestOrder>` — The field to sort external accounts by.
     
 </dd>
 </dl>
@@ -29043,7 +40405,7 @@ client.socialAccounts().list(
 <dl>
 <dd>
 
-Creates or returns a Whop-managed Facebook page for an account.
+Deprecated compatibility endpoint. Create external accounts with `POST /external_accounts` instead.
 </dd>
 </dl>
 </dd>
@@ -29059,10 +40421,11 @@ Creates or returns a Whop-managed Facebook page for an account.
 
 ```java
 client.socialAccounts().create(
-    CreateSocialAccountsRequest
-        .builder()
-        .platform(CreateSocialAccountsRequestPlatform.FACEBOOK)
-        .build()
+    CreateSocialAccountsRequestBody.facebook(
+        CreateSocialAccountsRequestBodyFacebook
+            .builder()
+            .build()
+    )
 );
 ```
 </dd>
@@ -29078,15 +40441,7 @@ client.socialAccounts().create(
 <dl>
 <dd>
 
-**accountId:** `Optional<String>` — The Account (biz_ identifier) to create the social account for. An account-scoped API key may omit this to default to its own account. Account API keys cannot update their own account's branding through Update Account; use a user-authenticated path.
-    
-</dd>
-</dl>
-
-<dl>
-<dd>
-
-**platform:** `CreateSocialAccountsRequestPlatform` — The platform to create the social account on. `facebook` requires the account's `banner_image`, `logo`, and `description`; configure them with [Update Account](/api-reference/beta/accounts/update-account).
+**request:** `CreateSocialAccountsRequestBody` 
     
 </dd>
 </dl>
@@ -29110,7 +40465,7 @@ client.socialAccounts().create(
 <dl>
 <dd>
 
-Starts an OAuth connection flow and returns an authorize_url where the user can connect a social account.
+Deprecated compatibility endpoint. Connect external accounts with `POST /external_accounts/connect` instead.
 </dd>
 </dl>
 </dd>
@@ -29128,7 +40483,8 @@ Starts an OAuth connection flow and returns an authorize_url where the user can 
 client.socialAccounts().connect(
     ConnectSocialAccountsRequest
         .builder()
-        .platform(ConnectSocialAccountsRequestPlatform.META_BUSINESS)
+        .platform(ConnectSocialAccountsRequestPlatform.TIKTOK)
+        .redirectUrl("https://whop.com/dashboard/biz_xxxxxxxxxxxxxx/settings")
         .build()
 );
 ```
@@ -29145,7 +40501,7 @@ client.socialAccounts().connect(
 <dl>
 <dd>
 
-**accountId:** `Optional<String>` — The Account (biz_ identifier) to connect the social account for. An account-scoped API key may omit this to default to its own account.
+**accountId:** `Optional<String>` — The Account (biz_ identifier) to connect the external account for. An account-scoped API key may omit this to default to its own account. Omit for user profile connections.
     
 </dd>
 </dl>
@@ -29153,7 +40509,7 @@ client.socialAccounts().connect(
 <dl>
 <dd>
 
-**platform:** `ConnectSocialAccountsRequestPlatform` — The platform to connect the social account on. Supported options are `meta_business` and `tiktok`.
+**platform:** `ConnectSocialAccountsRequestPlatform` — The platform to connect the external account on. Use `tiktok` to connect the authenticated user’s TikTok profile, `linkedin` for their LinkedIn profile, `youtube` for their YouTube channel, or `x` for their X profile. Use `quickbooks` to connect the account’s QuickBooks Online company: pass `account_id`, and the user picks the company in QuickBooks.
     
 </dd>
 </dl>
@@ -29161,15 +40517,7 @@ client.socialAccounts().connect(
 <dl>
 <dd>
 
-**redirectUrl:** `Optional<String>` — The Whop URL to redirect the user to after they finish connecting.
-    
-</dd>
-</dl>
-
-<dl>
-<dd>
-
-**scopes:** `Optional<List<ConnectSocialAccountsRequestScopesItem>>` — Capabilities to grant for the connected social account. Use `advertise` when connecting a Meta Business or TikTok account for ads.
+**redirectUrl:** `String` — Where to send the user once they finish connecting their accounts. Must be an `https` URL on whop.com; any other host is rejected. On success, the user is redirected with an `external_account_connected` query param naming the platform; if the connection fails, with an `external_account_error` query param instead. The same values also arrive as `social_account_connected` / `social_account_error`.
     
 </dd>
 </dl>
@@ -29193,7 +40541,7 @@ client.socialAccounts().connect(
 <dl>
 <dd>
 
-Disconnects a social account from an account or user without deleting the underlying platform account.
+Deprecated compatibility endpoint. Disconnect external accounts with `DELETE /external_accounts/{id}` instead.
 </dd>
 </dl>
 </dd>
@@ -29236,7 +40584,7 @@ client.socialAccounts().delete(
 <dl>
 <dd>
 
-**accountId:** `Optional<String>` — The Account that the social account is connected to. Provide either this or user_id.
+**accountId:** `Optional<String>` 
     
 </dd>
 </dl>
@@ -29244,7 +40592,7 @@ client.socialAccounts().delete(
 <dl>
 <dd>
 
-**userId:** `Optional<String>` — The User that the social account is connected to. Provide either this or account_id.
+**userId:** `Optional<String>` 
     
 </dd>
 </dl>
@@ -29256,7 +40604,7 @@ client.socialAccounts().delete(
 </dl>
 </details>
 
-<details><summary><code>client.socialAccounts.leadForms(id) -> LeadFormsSocialAccountsResponse</code></summary>
+<details><summary><code>client.socialAccounts.refresh(id, request) -> SocialAccount</code></summary>
 <dl>
 <dd>
 
@@ -29268,7 +40616,7 @@ client.socialAccounts().delete(
 <dl>
 <dd>
 
-Lists the active lead (instant) forms that already exist on a connected Facebook page, so an ad can reuse one as its `lead_gen_form_id` instead of authoring a new form. Every active form comes back in a single response — the list is not paginated.
+Deprecated compatibility endpoint. Refresh external accounts with `POST /external_accounts/{id}/refresh` instead.
 </dd>
 </dl>
 </dd>
@@ -29283,11 +40631,10 @@ Lists the active lead (instant) forms that already exist on a connected Facebook
 <dd>
 
 ```java
-client.socialAccounts().leadForms(
+client.socialAccounts().refresh(
     "id",
-    LeadFormsSocialAccountsRequest
+    RefreshSocialAccountsRequest
         .builder()
-        .accountId("account_id")
         .build()
 );
 ```
@@ -29304,7 +40651,7 @@ client.socialAccounts().leadForms(
 <dl>
 <dd>
 
-**id:** `String` — The social account (a sacc_ identifier) whose lead forms to list.
+**id:** `String` — The social account (a sacc_ identifier) to refresh.
     
 </dd>
 </dl>
@@ -29312,99 +40659,7 @@ client.socialAccounts().leadForms(
 <dl>
 <dd>
 
-**accountId:** `String` — The Account (a biz_ identifier) the social account is connected to.
-    
-</dd>
-</dl>
-</dd>
-</dl>
-
-
-</dd>
-</dl>
-</details>
-
-<details><summary><code>client.socialAccounts.posts(id) -> SyncPagingIterable&amp;lt;SocialAccountPost&amp;gt;</code></summary>
-<dl>
-<dd>
-
-#### 📝 Description
-
-<dl>
-<dd>
-
-<dl>
-<dd>
-
-Lists the existing posts of a connected Facebook page, Instagram account, or TikTok account.
-</dd>
-</dl>
-</dd>
-</dl>
-
-#### 🔌 Usage
-
-<dl>
-<dd>
-
-<dl>
-<dd>
-
-```java
-client.socialAccounts().posts(
-    "id",
-    PostsSocialAccountsRequest
-        .builder()
-        .accountId("account_id")
-        .build()
-);
-```
-</dd>
-</dl>
-</dd>
-</dl>
-
-#### ⚙️ Parameters
-
-<dl>
-<dd>
-
-<dl>
-<dd>
-
-**id:** `String` — The social account (a sacc_ identifier) whose posts to list.
-    
-</dd>
-</dl>
-
-<dl>
-<dd>
-
-**accountId:** `String` — The Account (a biz_ identifier) the social account is connected to.
-    
-</dd>
-</dl>
-
-<dl>
-<dd>
-
-**postId:** `Optional<String>` — Return only the single post with this platform id, instead of the full list.
-    
-</dd>
-</dl>
-
-<dl>
-<dd>
-
-**first:** `Optional<Integer>` — The number of posts to return.
-    
-</dd>
-</dl>
-
-<dl>
-<dd>
-
-**after:** `Optional<String>` — Cursor to fetch the page after (from page_info.end_cursor).
+**accountId:** `Optional<String>` — The Account (biz_ identifier) the external account is connected to. An account-scoped API key may omit this to default to its own account.
     
 </dd>
 </dl>
@@ -29429,7 +40684,7 @@ client.socialAccounts().posts(
 <dl>
 <dd>
 
-Lists every metric you can query, with its unit and the properties you can filter or break it down by.
+Deprecated. Lists every metric without saying which ones you can chart. List chartable metrics with `GET /stats/time_series`, and aggregates that are not bucketed over time with `GET /stats/reports`.
 </dd>
 </dl>
 </dd>
@@ -29456,346 +40711,6 @@ client.stats().list();
 </dl>
 </details>
 
-<details><summary><code>client.stats.describeStats() -> DescribeStatsResponse</code></summary>
-<dl>
-<dd>
-
-#### 📝 Description
-
-<dl>
-<dd>
-
-<dl>
-<dd>
-
-Describe available stats schema. Without resource returns root nodes and metrics. With resource returns node columns, associations, and available metrics.
-
-Required permissions:
- - `stats:read`
-</dd>
-</dl>
-</dd>
-</dl>
-
-#### 🔌 Usage
-
-<dl>
-<dd>
-
-<dl>
-<dd>
-
-```java
-client.stats().describeStats(
-    DescribeStatsRequest
-        .builder()
-        .companyId("biz_xxxxxxxxxxxxxx")
-        .userId("user_xxxxxxxxxxxxx")
-        .build()
-);
-```
-</dd>
-</dl>
-</dd>
-</dl>
-
-#### ⚙️ Parameters
-
-<dl>
-<dd>
-
-<dl>
-<dd>
-
-**resource:** `Optional<String>` — Resource path using : as separator (e.g., 'receipts', 'payments:membership', 'receipts:gross_revenue').
-    
-</dd>
-</dl>
-
-<dl>
-<dd>
-
-**companyId:** `Optional<String>` — Scope query to a specific company.
-    
-</dd>
-</dl>
-
-<dl>
-<dd>
-
-**userId:** `Optional<String>` — Scope query to a specific user.
-    
-</dd>
-</dl>
-</dd>
-</dl>
-
-
-</dd>
-</dl>
-</details>
-
-<details><summary><code>client.stats.metricStats() -> MetricStatsResponse</code></summary>
-<dl>
-<dd>
-
-#### 📝 Description
-
-<dl>
-<dd>
-
-<dl>
-<dd>
-
-Query an aggregated metric. Returns data grouped by period with optional breakdowns.
-
-Required permissions:
- - `stats:read`
-</dd>
-</dl>
-</dd>
-</dl>
-
-#### 🔌 Usage
-
-<dl>
-<dd>
-
-<dl>
-<dd>
-
-```java
-client.stats().metricStats(
-    MetricStatsRequest
-        .builder()
-        .resource("resource")
-        .from(OffsetDateTime.parse("2023-12-01T05:00:00Z"))
-        .to(OffsetDateTime.parse("2023-12-01T05:00:00Z"))
-        .companyId("biz_xxxxxxxxxxxxxx")
-        .userId("user_xxxxxxxxxxxxx")
-        .build()
-);
-```
-</dd>
-</dl>
-</dd>
-</dl>
-
-#### ⚙️ Parameters
-
-<dl>
-<dd>
-
-<dl>
-<dd>
-
-**resource:** `String` — Metric resource using : as separator (e.g., 'receipts:gross_revenue', 'members:new_users').
-    
-</dd>
-</dl>
-
-<dl>
-<dd>
-
-**granularity:** `Optional<String>` — Time granularity (daily, weekly, monthly).
-    
-</dd>
-</dl>
-
-<dl>
-<dd>
-
-**breakdowns:** `Optional<String>` — Columns to break down the metric by.
-    
-</dd>
-</dl>
-
-<dl>
-<dd>
-
-**filters:** `Optional<Map<String, Object>>` — Key-value pairs to filter the data.
-    
-</dd>
-</dl>
-
-<dl>
-<dd>
-
-**timeZone:** `Optional<String>` — IANA timezone for period bucketing (e.g. 'America/New_York'). Defaults to UTC. Only applies to ClickHouse metrics.
-    
-</dd>
-</dl>
-
-<dl>
-<dd>
-
-**from:** `Optional<OffsetDateTime>` — Start of time range (unix timestamp).
-    
-</dd>
-</dl>
-
-<dl>
-<dd>
-
-**to:** `Optional<OffsetDateTime>` — End of time range (unix timestamp).
-    
-</dd>
-</dl>
-
-<dl>
-<dd>
-
-**companyId:** `Optional<String>` — Scope query to a specific company.
-    
-</dd>
-</dl>
-
-<dl>
-<dd>
-
-**userId:** `Optional<String>` — Scope query to a specific user.
-    
-</dd>
-</dl>
-</dd>
-</dl>
-
-
-</dd>
-</dl>
-</details>
-
-<details><summary><code>client.stats.rawStats() -> RawStatsResponse</code></summary>
-<dl>
-<dd>
-
-#### 📝 Description
-
-<dl>
-<dd>
-
-<dl>
-<dd>
-
-Query raw data from a resource. Returns paginated rows with all columns.
-
-Required permissions:
- - `stats:read`
-</dd>
-</dl>
-</dd>
-</dl>
-
-#### 🔌 Usage
-
-<dl>
-<dd>
-
-<dl>
-<dd>
-
-```java
-client.stats().rawStats(
-    RawStatsRequest
-        .builder()
-        .resource("resource")
-        .from(OffsetDateTime.parse("2023-12-01T05:00:00Z"))
-        .to(OffsetDateTime.parse("2023-12-01T05:00:00Z"))
-        .limit(42)
-        .companyId("biz_xxxxxxxxxxxxxx")
-        .userId("user_xxxxxxxxxxxxx")
-        .build()
-);
-```
-</dd>
-</dl>
-</dd>
-</dl>
-
-#### ⚙️ Parameters
-
-<dl>
-<dd>
-
-<dl>
-<dd>
-
-**resource:** `String` — Resource path using : as separator (e.g., 'members', 'payments:membership').
-    
-</dd>
-</dl>
-
-<dl>
-<dd>
-
-**from:** `Optional<OffsetDateTime>` — Start of time range (unix timestamp).
-    
-</dd>
-</dl>
-
-<dl>
-<dd>
-
-**to:** `Optional<OffsetDateTime>` — End of time range (unix timestamp).
-    
-</dd>
-</dl>
-
-<dl>
-<dd>
-
-**limit:** `Optional<Integer>` — Number of records to return (max 10000).
-    
-</dd>
-</dl>
-
-<dl>
-<dd>
-
-**cursor:** `Optional<String>` — Pagination cursor for next page.
-    
-</dd>
-</dl>
-
-<dl>
-<dd>
-
-**sort:** `Optional<String>` — Column to sort by.
-    
-</dd>
-</dl>
-
-<dl>
-<dd>
-
-**sortDirection:** `Optional<Direction>` 
-    
-</dd>
-</dl>
-
-<dl>
-<dd>
-
-**companyId:** `Optional<String>` — Scope query to a specific company.
-    
-</dd>
-</dl>
-
-<dl>
-<dd>
-
-**userId:** `Optional<String>` — Scope query to a specific user.
-    
-</dd>
-</dl>
-</dd>
-</dl>
-
-
-</dd>
-</dl>
-</details>
-
 <details><summary><code>client.stats.retrieve(metric) -> RetrieveStatsResponse</code></summary>
 <dl>
 <dd>
@@ -29808,7 +40723,7 @@ client.stats().rawStats(
 <dl>
 <dd>
 
-Retrieves a metric as a time series of points for an account or user over a time range. The `market_prices` metric is public and requires no authentication.
+Deprecated compatibility endpoint. Retrieve a metric's time series with `GET /stats/time_series/{metric}` instead.
 </dd>
 </dl>
 </dd>
@@ -29854,7 +40769,7 @@ client.stats().retrieve(
 <dl>
 <dd>
 
-**metric:** `String` — The metric to retrieve, for example net_revenue. Use GET /stats to see every metric key. The metric sets the unit and the properties you can filter or break down by.
+**metric:** `String` — The metric to retrieve, for example net_revenue.
     
 </dd>
 </dl>
@@ -29862,7 +40777,7 @@ client.stats().retrieve(
 <dl>
 <dd>
 
-**accountId:** `Optional<String>` — The account this query concerns, for example biz_AbC123.
+**accountId:** `Optional<String>` — Account this query concerns, prefixed `biz_`, or `platform` for all of Whop.
     
 </dd>
 </dl>
@@ -29886,7 +40801,7 @@ client.stats().retrieve(
 <dl>
 <dd>
 
-**to:** `String` — End of the range — a date (YYYY-MM-DD), expanded to the end of that day, or an ISO 8601 timestamp (for example 2026-07-17T16:37:00Z), used exactly.
+**to:** `String` — End of the range — a date (YYYY-MM-DD), expanded to the end of that day, or an ISO 8601 timestamp (for example 2026-07-17T16:37:00Z), used exactly. Funnel entry ranges cannot exceed 90 days.
     
 </dd>
 </dl>
@@ -29894,7 +40809,7 @@ client.stats().retrieve(
 <dl>
 <dd>
 
-**interval:** `Optional<RetrieveStatsRequestInterval>` — How wide each point is. Defaults to day. Snapshot metrics are day-only.
+**interval:** `Optional<RetrieveStatsRequestInterval>` — How wide each point is. Defaults to day. Snapshot metrics are day-only. Funnels support at most 2,000 first-entry cohort buckets.
     
 </dd>
 </dl>
@@ -29902,7 +40817,7 @@ client.stats().retrieve(
 <dl>
 <dd>
 
-**breakdownBy:** `Optional<String>` — Split the metric out by one of its properties — each point gets a breakdown array. For example breakdown_by=currency returns an entry for usd, an entry for eur, and so on.
+**breakdownBy:** `Optional<String>` — Split the metric out by one of its properties — each point gets a breakdown array. For example breakdown_by=currency returns an entry for usd, an entry for eur, and so on. Funnels use a property of the first matched event, with at most 300 groups. experiment_id and variant require an exposure as step 1. For funnel source breakdowns, steps[1][source]=whop:* groups by campaign, whop:<campaign>:* by ad group, and whop:<campaign>:<group>:* by ad. See the metric catalog for supported breakdowns.
     
 </dd>
 </dl>
@@ -29966,7 +40881,7 @@ client.stats().retrieve(
 <dl>
 <dd>
 
-**hostname:** `Optional<String>` — Filter traffic metrics to one website hostname, for example shop.example.com. Pair with breakdown_by=hostname to split by website.
+**hostname:** `Optional<String>` — Filter traffic metrics to one website hostname, for example shop.example.com. On the events and people metrics, comma-separated hostnames match any listed hostname. Pair with breakdown_by=hostname to split by website.
     
 </dd>
 </dl>
@@ -30118,7 +41033,7 @@ client.stats().retrieve(
 <dl>
 <dd>
 
-**snapshotWindow:** `Optional<RetrieveStatsRequestSnapshotWindow>` — Window used by a snapshot metric. Ordinary snapshots accept 30d as their trailing activity window. Cohorted dispute metrics accept 7d or 28d as the sales-transaction pool; their attribution window is fixed in the metric name. Each metric lists its accepted values in the catalog.
+**snapshotWindow:** `Optional<RetrieveStatsRequestSnapshotWindow>` — Window used by a snapshot metric. Ordinary snapshots accept 30d as their trailing activity window. Cohorted dispute metrics accept 7d or 28d as the sales-transaction pool; their attribution window is fixed in the metric name. Card network program metrics accept 7d, 14d, 28d, or 56d. Each metric lists its accepted values in the catalog.
     
 </dd>
 </dl>
@@ -30126,7 +41041,343 @@ client.stats().retrieve(
 <dl>
 <dd>
 
-**event:** `Optional<String>` — Filter the events metric to one or more full event names, for example payment.completed or pixel.lead. Comma-separate several to break the metric down by each event. Available on metrics that list event.
+**event:** `Optional<String>` — Filter the events metric to one or more full event names, for example payment.completed or pixel.lead. Comma-separated names match any listed event. Use group_by=event for separate groups. Available on metrics that list event.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**businessType:** `Optional<String>` — Filter to one business type, for example `education`. Pair with `breakdown_by=business_type` to split by business type. Available on metrics that list `business_type`.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**industryType:** `Optional<String>` — Filter to one industry type, for example `options_trading`. Pair with `breakdown_by=industry_type` to split by industry type. Available on metrics that list `industry_type`.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**productCategory:** `Optional<String>` — Filter to one product category, for example `algo_trading_course`. Pair with `breakdown_by=product_category` to split by product category. Available on metrics that list `product_category`.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**accountCountry:** `Optional<String>` — Filter to accounts located in one country, as an ISO 3166-1 alpha-2 code such as `US`. Pair with `breakdown_by=account_country` to split by account country. Available on metrics that list `account_country`.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**issuer:** `Optional<String>` — Filter to one card-issuing bank, named as the processor reports it, for example JPMORGAN CHASE BANK N A, or unknown for payments with no reported bank. Available on metrics that list issuer.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**webhookId:** `Optional<String>` — The webhook to count deliveries for, for example hook_AbC123. Required by webhook_deliveries, and must belong to account_id or one of its apps.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**conversionWindow:** `Optional<String>` — Funnel only. Time allowed from the first event to the final event: integer minutes, hours, or days, up to 30d.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**matureOnly:** `Optional<Boolean>` — Funnel only. Include only entrants whose full conversion window has elapsed. Required for confidence intervals and comparisons.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**steps:** `Optional<RetrieveStatsRequestSteps>` — Funnel only. Required when metric=funnel. 2 to 10 ordered events per person, as consecutive one-based bracket parameters such as `steps[1][event]=pixel.page&steps[1][page]=/pricing*&steps[2][event]=payment.completed`. Values are scalar strings, never JSON. A person's first step 1 match inside `from`/`to` anchors their cohort, breakdown, and conversion window; later matches do not restart it. Other events may occur between steps, and conversions may land after `to`. For an experiment funnel, make `experiment.exposure` step 1 and pass `breakdown_by=variant`.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**compareTo:** `Optional<String>` — Funnel only. The breakdown value to use as baseline for whole-window final conversion. Requires breakdown_by and mature_only=true; defaults confidence_level to 0.95.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**confidenceLevel:** `Optional<Double>` — Funnel only. Confidence level for whole-window final conversion intervals, for example 0.95. Requires mature_only=true. Exposure steps must each filter one user- or visitor-randomized experiment.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**contactable:** `Optional<Boolean>` — People metric only: contactable equals this value. Applies to the current person profile for every time bucket. LTV and AOV are in USD. Not accepted by the Events metric.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**hasPurchased:** `Optional<Boolean>` — People metric only: has_purchased equals this value. Applies to the current person profile for every time bucket. LTV and AOV are in USD. Not accepted by the Events metric.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**firstSeenAfter:** `Optional<OffsetDateTime>` — People metric only: first_seen_at greater than or equal this value. Applies to the current person profile for every time bucket. LTV and AOV are in USD. Not accepted by the Events metric.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**firstSeenBefore:** `Optional<OffsetDateTime>` — People metric only: first_seen_at less than this value. Applies to the current person profile for every time bucket. LTV and AOV are in USD. Not accepted by the Events metric.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**lastSeenAfter:** `Optional<OffsetDateTime>` — People metric only: last_seen_at greater than or equal this value. Applies to the current person profile for every time bucket. LTV and AOV are in USD. Not accepted by the Events metric.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**lastSeenBefore:** `Optional<OffsetDateTime>` — People metric only: last_seen_at less than this value. Applies to the current person profile for every time bucket. LTV and AOV are in USD. Not accepted by the Events metric.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**firstSeenWithinDays:** `Optional<Integer>` — People metric only: first_seen_at within this many days of now. Applies to the current person profile for every time bucket. LTV and AOV are in USD. Not accepted by the Events metric.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**lastSeenWithinDays:** `Optional<Integer>` — People metric only: last_seen_at within this many days of now. Applies to the current person profile for every time bucket. LTV and AOV are in USD. Not accepted by the Events metric.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**known:** `Optional<Boolean>` — People metric only: known equals this value. Applies to the current person profile for every time bucket. LTV and AOV are in USD. Not accepted by the Events metric.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**hasEmail:** `Optional<Boolean>` — People metric only: has_email equals this value. Applies to the current person profile for every time bucket. LTV and AOV are in USD. Not accepted by the Events metric.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**hasPhone:** `Optional<Boolean>` — People metric only: has_phone equals this value. Applies to the current person profile for every time bucket. LTV and AOV are in USD. Not accepted by the Events metric.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**ltvGt:** `Optional<Double>` — People metric only: ltv greater than this value. Applies to the current person profile for every time bucket. LTV and AOV are in USD. Not accepted by the Events metric.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**ltvGte:** `Optional<Double>` — People metric only: ltv greater than or equal this value. Applies to the current person profile for every time bucket. LTV and AOV are in USD. Not accepted by the Events metric.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**ltvLt:** `Optional<Double>` — People metric only: ltv less than this value. Applies to the current person profile for every time bucket. LTV and AOV are in USD. Not accepted by the Events metric.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**ltvLte:** `Optional<Double>` — People metric only: ltv less than or equal this value. Applies to the current person profile for every time bucket. LTV and AOV are in USD. Not accepted by the Events metric.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**aovGt:** `Optional<Double>` — People metric only: aov greater than this value. Applies to the current person profile for every time bucket. LTV and AOV are in USD. Not accepted by the Events metric.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**aovGte:** `Optional<Double>` — People metric only: aov greater than or equal this value. Applies to the current person profile for every time bucket. LTV and AOV are in USD. Not accepted by the Events metric.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**aovLt:** `Optional<Double>` — People metric only: aov less than this value. Applies to the current person profile for every time bucket. LTV and AOV are in USD. Not accepted by the Events metric.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**aovLte:** `Optional<Double>` — People metric only: aov less than or equal this value. Applies to the current person profile for every time bucket. LTV and AOV are in USD. Not accepted by the Events metric.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**purchaseCountGt:** `Optional<Double>` — People metric only: purchase_count greater than this value. Applies to the current person profile for every time bucket. LTV and AOV are in USD. Not accepted by the Events metric.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**purchaseCountGte:** `Optional<Double>` — People metric only: purchase_count greater than or equal this value. Applies to the current person profile for every time bucket. LTV and AOV are in USD. Not accepted by the Events metric.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**purchaseCountLt:** `Optional<Double>` — People metric only: purchase_count less than this value. Applies to the current person profile for every time bucket. LTV and AOV are in USD. Not accepted by the Events metric.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**purchaseCountLte:** `Optional<Double>` — People metric only: purchase_count less than or equal this value. Applies to the current person profile for every time bucket. LTV and AOV are in USD. Not accepted by the Events metric.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**eventCountGt:** `Optional<Double>` — People metric only: event_count greater than this value. Applies to the current person profile for every time bucket. LTV and AOV are in USD. Not accepted by the Events metric.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**eventCountGte:** `Optional<Double>` — People metric only: event_count greater than or equal this value. Applies to the current person profile for every time bucket. LTV and AOV are in USD. Not accepted by the Events metric.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**eventCountLt:** `Optional<Double>` — People metric only: event_count less than this value. Applies to the current person profile for every time bucket. LTV and AOV are in USD. Not accepted by the Events metric.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**eventCountLte:** `Optional<Double>` — People metric only: event_count less than or equal this value. Applies to the current person profile for every time bucket. LTV and AOV are in USD. Not accepted by the Events metric.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**referringAccountId:** `Optional<String>` — Read a referral metric for a business instead of the caller: the referrals its team members made, past members included, for example biz_AbC123. Requires company:basic:read on that business and cannot be combined with user_id. Available on metrics that list referring_account_id.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**teamLeadId:** `Optional<String>` — Read a partner metric for one team lead and everyone under them in today's org chart, for example user_AbC123. Needs referring_account_id or a global query. As breakdown_by=team_lead_id, figures sit under the highest lead above the partner who earned them, so each group matches that lead's team_lead_id filter and the groups add up to the total. With team_lead_id set, or for a caller who reads only their own team, the groups are the leads under that person, who keeps the rest. Anyone with no lead is in a null group. Available on metrics that list team_lead_id.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**activity:** `Optional<RetrieveStatsRequestActivity>` — On partner_reps, all counts the period's roster, earning counts those who earned in the period, and not_earning counts the roster minus them. On the other partner metrics, earning keeps the figures of the people partner_reps counts as earning over the whole range and not_earning keeps the figures of everyone else; those need referring_account_id or a global query. Defaults to all. Available on metrics that list activity.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**breakdownLimit:** `Optional<Integer>` — With a single breakdown_by, keep the groups with the highest whole-range values, up to this many, and fold every other group into one entry named other. A rate or an average ranks its groups by the deals it divides by. The other entry is measured from the underlying rows, so a distinct count or a rate stays exact rather than being added up from groups. Available on partner metrics only.
     
 </dd>
 </dl>
@@ -30151,7 +41402,7 @@ client.stats().retrieve(
 <dl>
 <dd>
 
-Returns a paginated list of support channels for a specific company, with optional filtering by resolution status and custom sorting.
+Lists support channels between an account's team and its customers, most recently active first by default. Pass `open=true` to find channels awaiting a support response.
 
 Required permissions:
  - `support_chat:read`
@@ -30174,7 +41425,7 @@ client.supportChannels().list(
         .builder()
         .first(42)
         .last(42)
-        .companyId("biz_xxxxxxxxxxxxxx")
+        .accountId("biz_xxxxxxxxxxxxxx")
         .build()
 );
 ```
@@ -30223,14 +41474,6 @@ client.supportChannels().list(
 <dl>
 <dd>
 
-**companyId:** `Optional<String>` — The unique identifier of the company to list support channels for. Includes channels of child companies. When omitted, returns support channels across all companies the user has access to.
-    
-</dd>
-</dl>
-
-<dl>
-<dd>
-
 **view:** `Optional<SupportChannelView>` 
     
 </dd>
@@ -30247,6 +41490,46 @@ client.supportChannels().list(
 <dl>
 <dd>
 
+**customerUserId:** `Optional<String>` — Only return support channels opened by this customer.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**customerUserIds:** `Optional<String>` — Only return support channels opened by any of these customers. Maximum 100 IDs per request.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**participated:** `Optional<Boolean>` — Set to true to only return channels the authenticated user has joined as a participant. Requires a user.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**includeLastMessage:** `Optional<Boolean>` — Set to true to return `last_message` and `unread` on each channel. Both are `null` otherwise, which keeps large lists fast.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**includeParticipated:** `Optional<Boolean>` — Set to true to return `participated` on each channel. It is `null` otherwise, which keeps large lists fast.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
 **direction:** `Optional<Direction>` 
     
 </dd>
@@ -30256,6 +41539,14 @@ client.supportChannels().list(
 <dd>
 
 **order:** `Optional<MessageChannelOrder>` 
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**accountId:** `Optional<String>` — The unique identifier of the company to list support channels for. Includes channels of child companies. When omitted, returns support channels across all companies the user has access to.
     
 </dd>
 </dl>
@@ -30279,7 +41570,7 @@ client.supportChannels().list(
 <dl>
 <dd>
 
-Open a new support channel between a company team member and a customer. Returns the existing channel if one already exists for that user.
+Opens a support channel between an account's team and a customer. Returns the existing channel if that customer already has one.
 
 Required permissions:
  - `support_chat:create`
@@ -30300,7 +41591,7 @@ Required permissions:
 client.supportChannels().create(
     CreateSupportChannelsRequest
         .builder()
-        .companyId("biz_xxxxxxxxxxxxxx")
+        .accountId("biz_xxxxxxxxxxxxxx")
         .userId("user_xxxxxxxxxxxxx")
         .build()
 );
@@ -30318,7 +41609,7 @@ client.supportChannels().create(
 <dl>
 <dd>
 
-**companyId:** `String` — The unique identifier of the company to create the support channel in.
+**accountId:** `String` — The unique identifier of the company to create the support channel in.
     
 </dd>
 </dl>
@@ -30429,7 +41720,7 @@ client.supportChannels().retrieve(
 <dl>
 <dd>
 
-Retrieve the account's completed or pending swaps — currently just the latest one.
+Lists the completed or pending swaps for an account or user — currently only the most recent one.
 </dd>
 </dl>
 </dd>
@@ -30447,7 +41738,6 @@ Retrieve the account's completed or pending swaps — currently just the latest 
 client.swaps().list(
     ListSwapsRequest
         .builder()
-        .accountId("account_id")
         .build()
 );
 ```
@@ -30464,7 +41754,15 @@ client.swaps().list(
 <dl>
 <dd>
 
-**accountId:** `String` — Business or user account ID (biz_* / user_*).
+**accountId:** `Optional<String>` — Business account whose swaps to list, prefixed `biz_`. Provide this or `user_id`.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**userId:** `Optional<String>` — The caller's own user ID, prefixed `user_`, to list swaps in their personal account. Provide this or `account_id`.
     
 </dd>
 </dl>
@@ -30488,7 +41786,7 @@ client.swaps().list(
 <dl>
 <dd>
 
-Swaps one token for another from the account's wallet, or converts between fiat currencies in the account's ledger at the mid-market rate. Crypto swaps finish in the background — check the swap for its status.
+Swaps one token for another in an account or user's wallet, or converts between their fiat balances. Crypto swaps finish in the background — retrieve the swap to follow its status.
 </dd>
 </dl>
 </dd>
@@ -30506,7 +41804,6 @@ Swaps one token for another from the account's wallet, or converts between fiat 
 client.swaps().create(
     CreateSwapsRequest
         .builder()
-        .accountId("biz_xxxxxxxxxxxxxx")
         .fromToken("usd")
         .toToken("cad")
         .build()
@@ -30525,7 +41822,7 @@ client.swaps().create(
 <dl>
 <dd>
 
-**accountId:** `String` — Business or user account ID (biz_* / user_*).
+**accountId:** `Optional<String>` — Business account that makes the swap, prefixed `biz_`. Provide this or `user_id`.
     
 </dd>
 </dl>
@@ -30533,7 +41830,7 @@ client.swaps().create(
 <dl>
 <dd>
 
-**amount:** `Optional<String>` — Source token amount. Required for crypto swaps. For fiat pairs: the amount of from_token to convert at the mid-market rate; omit (along with to_amount) to repay the full negative to_token balance instead.
+**amount:** `Optional<String>` — Source token amount. Required for a crypto pair: a decimal amount, or `all` to swap the whole from_token balance in the account's wallet, read from the chain when the swap is created (any token but USDT). An amount above that balance is rejected when the balance can be read. For fiat pairs: the amount of from_token to convert; omit (along with to_amount) to repay the full negative to_token balance instead.
     
 </dd>
 </dl>
@@ -30585,6 +41882,14 @@ client.swaps().create(
     
 </dd>
 </dl>
+
+<dl>
+<dd>
+
+**userId:** `Optional<String>` — The caller's own user ID, prefixed `user_`, to swap in their personal account. Provide this or `account_id`.
+    
+</dd>
+</dl>
 </dd>
 </dl>
 
@@ -30605,7 +41910,7 @@ client.swaps().create(
 <dl>
 <dd>
 
-Previews the price of a swap. Fiat pairs quote the in-ledger mid-market conversion — the same rate creating the swap fills at. No funds move and nothing is saved.
+Previews the price of a swap before you create it. A fiat pair quotes the same rate creating the swap fills at; name the account with `account_id` or `user_id` to quote the rate for that account. No funds move, nothing is saved, and no authentication is required unless you name an account.
 </dd>
 </dl>
 </dd>
@@ -30638,6 +41943,14 @@ client.swaps().createQuote(
 
 <dl>
 <dd>
+
+<dl>
+<dd>
+
+**accountId:** `Optional<String>` — Fiat pairs only: business account to quote the swap for, prefixed `biz_`. Requires a credential with `payout:transfer_funds` on that account. Provide this, `user_id`, or neither for a public quote.
+    
+</dd>
+</dl>
 
 <dl>
 <dd>
@@ -30710,6 +42023,14 @@ client.swaps().createQuote(
     
 </dd>
 </dl>
+
+<dl>
+<dd>
+
+**userId:** `Optional<String>` — Fiat pairs only: the caller's own user ID, prefixed `user_`, to quote the swap for their personal account. Provide this or `account_id`.
+    
+</dd>
+</dl>
 </dd>
 </dl>
 
@@ -30730,7 +42051,7 @@ client.swaps().createQuote(
 <dl>
 <dd>
 
-Retrieves a single swap and its status.
+Retrieves a swap and its status. Poll it after creating a crypto swap, which finishes in the background.
 </dd>
 </dl>
 </dd>
@@ -30790,7 +42111,7 @@ client.swaps().retrieve(
 <dl>
 <dd>
 
-Lists an account's team members, including pending invites (`status: "pending"`, `ausri_` ids; `user` is `null` for invites sent to an email with no Whop account yet). For accepted members, `email` requires the `company:authorized_user:email:read` scope and is `null` otherwise. Listing `role=workforce` is also allowed with the `bounty:create` scope.
+Lists an account's team members, including pending invites. A user credential with `company:basic:read` may list only its own joined membership by passing its own `user_id` and `status=joined`. Listing `role=workforce` is also allowed with the `bounty:create` scope. A signed-in Partner, or a member others report to, without `company:authorized_user:read` lists only their own joined membership and the members who report up to them, never pending invites. Members with the view-only Partner role are listed after all other members.
 </dd>
 </dl>
 </dd>
@@ -30849,7 +42170,63 @@ client.teamMembers().list(
 <dl>
 <dd>
 
+**userIds:** `Optional<String>` — Only return the memberships of these users, prefixed `user_`, at most 100. IDs that match no user are ignored. With `account_id=global`, a user can have one in each partner account. Can't be combined with `user_id`.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
 **role:** `Optional<ListTeamMembersRequestRole>` — Only return members with this role. `custom` matches members on a dashboard-managed custom role.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**query:** `Optional<String>` — Only return members whose name or username contains this text, and invites whose email contains it.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**reportsToId:** `Optional<String>` — Only return the direct reports of this team member, whose ID may start with `ausr_` or `mber_`. Pass the account ID, prefixed `biz_`, for the members who report to the business directly. Pending invites are excluded, and the list pages in `created_at` order without moving Partner-role members last.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**directReportsMin:** `Optional<Integer>` — Only return members with at least this many direct reports. Pending invites are excluded, and the list pages in `created_at` order without moving Partner-role members last.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**directReportsMax:** `Optional<Integer>` — Only return members with at most this many direct reports; `0` returns the people who manage no one. Pending invites are excluded, and the list pages in `created_at` order without moving Partner-role members last.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**teamLeadId:** `Optional<String>` — Only return this user, prefixed `user_`, and everyone under them in today's org chart: the same team the stats API's `team_lead_id` reads. With `account_id=global`, their line in every partner account where they hold a role. Pending invites are excluded, and the list pages in `created_at` order without moving Partner-role members last.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**hasReferredBusinesses:** `Optional<Boolean>` — When true, only members who referred at least one business for their account; when false, only members who referred none. Pending invites are excluded, and the list pages in `created_at` order without moving Partner-role members last.
     
 </dd>
 </dl>
@@ -30873,7 +42250,7 @@ client.teamMembers().list(
 <dl>
 <dd>
 
-**order:** `Optional<ListTeamMembersRequestOrder>` — Field used to sort members.
+**order:** `Optional<ListTeamMembersRequestOrder>` — Field used to sort members. Members with the view-only Partner role are listed after all other members whichever way the list is sorted.
     
 </dd>
 </dl>
@@ -30889,7 +42266,7 @@ client.teamMembers().list(
 <dl>
 <dd>
 
-**first:** `Optional<Integer>` — Number of members to return. Defaults to 20; maximum 100.
+**first:** `Optional<Integer>` — Number of results to return from the start of the range.
     
 </dd>
 </dl>
@@ -30897,7 +42274,7 @@ client.teamMembers().list(
 <dl>
 <dd>
 
-**after:** `Optional<String>` — Cursor for the next page of members.
+**after:** `Optional<String>` — Return results after this cursor. Use `page_info.end_cursor` from the previous response to fetch the next page.
     
 </dd>
 </dl>
@@ -30905,7 +42282,7 @@ client.teamMembers().list(
 <dl>
 <dd>
 
-**last:** `Optional<Integer>` — Number of members to return from the end of the window.
+**last:** `Optional<Integer>` — Number of results to return from the end of the range.
     
 </dd>
 </dl>
@@ -30913,7 +42290,7 @@ client.teamMembers().list(
 <dl>
 <dd>
 
-**before:** `Optional<String>` — Cursor to paginate backwards from.
+**before:** `Optional<String>` — Return results before this cursor. Use `page_info.start_cursor` from the previous response to fetch the previous page.
     
 </dd>
 </dl>
@@ -30937,7 +42314,7 @@ client.teamMembers().list(
 <dl>
 <dd>
 
-Adds a member to an account's team with a system role. Identify them by exactly one of `user_id` or `email`. If the person has not yet accepted — or the email does not belong to a Whop account yet — an invitation is sent instead and the response is `202` with `{ "object": "team_member_invite", "invitation_sent": true }`. If they already have a pending invite, the request fails with a `400`. Custom roles cannot be granted via the API. Granting the `workforce` role is also allowed with the `bounty:create` scope.
+Adds a member to an account's team with a system role. Identify them by exactly one of `user_id` or `email`. If the person has not yet accepted, or the email does not belong to a Whop account yet, an invitation is sent instead and the response is `202` with the pending team member, whose `status` is `pending` and whose id is prefixed `ausri_`. If they already have a pending invite, the request fails with a `400`. Granting the `workforce` role is also allowed with the `bounty:create` scope.
 </dd>
 </dl>
 </dd>
@@ -30956,7 +42333,8 @@ client.teamMembers().create(
     CreateTeamMembersRequest
         .builder()
         .accountId("biz_xxxxxxxxxxxxxx")
-        .role(CreateTeamMembersRequestRole.OWNER)
+        .role(CreateTeamMembersRequestRole.SALES_MANAGER)
+        .userId("user_xxxxxxxxxxxxxx")
         .build()
 );
 ```
@@ -30989,7 +42367,7 @@ client.teamMembers().create(
 <dl>
 <dd>
 
-**role:** `CreateTeamMembersRequestRole` — The system role to grant.
+**role:** `CreateTeamMembersRequestRole` — The system role to grant. Custom roles cannot be granted through the API. The Partner role provides view-only access.
     
 </dd>
 </dl>
@@ -31021,7 +42399,7 @@ client.teamMembers().create(
 <dl>
 <dd>
 
-Retrieves a team member by ID. `email` requires the `company:authorized_user:email:read` scope and is `null` otherwise.
+Retrieves a team member or pending invite by ID.
 </dd>
 </dl>
 </dd>
@@ -31056,7 +42434,7 @@ client.teamMembers().retrieve(
 <dl>
 <dd>
 
-**id:** `String` — Team member ID — `ausr_` for accepted members, `ausri_` for pending invites.
+**id:** `String` — Team member ID. Accepted members have an ID starting with `ausr_` or `mber_`, and pending invites one starting with `ausri_`. Treat it as opaque.
     
 </dd>
 </dl>
@@ -31115,7 +42493,7 @@ client.teamMembers().delete(
 <dl>
 <dd>
 
-**id:** `String` — Team member ID — `ausr_` for accepted members, `ausri_` for pending invites.
+**id:** `String` — Team member ID. Accepted members have an ID starting with `ausr_` or `mber_`, and pending invites one starting with `ausri_`. Treat it as opaque.
     
 </dd>
 </dl>
@@ -31158,7 +42536,6 @@ client.teamMembers().update(
     "id",
     UpdateTeamMembersRequest
         .builder()
-        .role(UpdateTeamMembersRequestRole.OWNER)
         .build()
 );
 ```
@@ -31175,7 +42552,7 @@ client.teamMembers().update(
 <dl>
 <dd>
 
-**id:** `String` — Team member ID — `ausr_` for accepted members, `ausri_` for pending invites.
+**id:** `String` — Team member ID. Accepted members have an ID starting with `ausr_` or `mber_`, and pending invites one starting with `ausri_`. Treat it as opaque.
     
 </dd>
 </dl>
@@ -31183,7 +42560,7 @@ client.teamMembers().update(
 <dl>
 <dd>
 
-**role:** `UpdateTeamMembersRequestRole` — The system role to grant.
+**role:** `Optional<UpdateTeamMembersRequestRole>` — The system role to grant. Custom roles cannot be granted through the API. The Partner role provides view-only access.
     
 </dd>
 </dl>
@@ -31195,8 +42572,8 @@ client.teamMembers().update(
 </dl>
 </details>
 
-## Topups
-<details><summary><code>client.topups.create(request) -> Topup</code></summary>
+## Trades
+<details><summary><code>client.trades.list() -> SyncPagingIterable&amp;lt;Trade&amp;gt;</code></summary>
 <dl>
 <dd>
 
@@ -31208,10 +42585,7 @@ client.teamMembers().update(
 <dl>
 <dd>
 
-Add funds to a company's platform balance by charging a stored payment method. Top-ups have no fees or taxes and do not count as revenue.
-
-Required permissions:
- - `payment:charge`
+Lists trades you can access, newest first. User credentials see their own trades and those of accounts they belong to, including subaccounts; account credentials see their account and its subaccounts.
 </dd>
 </dl>
 </dd>
@@ -31226,13 +42600,9 @@ Required permissions:
 <dd>
 
 ```java
-client.topups().create(
-    CreateTopupsRequest
+client.trades().list(
+    ListTradesRequest
         .builder()
-        .amount(6.9)
-        .companyId("biz_xxxxxxxxxxxxxx")
-        .currency(Currencies.USD)
-        .paymentMethodId("pmt_xxxxxxxxxxxxxx")
         .build()
 );
 ```
@@ -31249,7 +42619,7 @@ client.topups().create(
 <dl>
 <dd>
 
-**amount:** `Double` — The amount to add to the balance in the specified currency. For example, 50.00 for $50.00 USD.
+**accountId:** `Optional<String>` — Only return trades for this account or user, prefixed `biz_` or `user_`.
     
 </dd>
 </dl>
@@ -31257,7 +42627,7 @@ client.topups().create(
 <dl>
 <dd>
 
-**companyId:** `String` — The unique identifier of the company to add funds to, starting with 'biz_'.
+**status:** `Optional<ListTradesRequestStatus>` — Only return trades with this status.
     
 </dd>
 </dl>
@@ -31265,7 +42635,7 @@ client.topups().create(
 <dl>
 <dd>
 
-**currency:** `Currencies` — The currency for the top-up amount, such as 'usd'.
+**type:** `Optional<ListTradesRequestType>` — Only return trades of this type.
     
 </dd>
 </dl>
@@ -31273,7 +42643,369 @@ client.topups().create(
 <dl>
 <dd>
 
-**paymentMethodId:** `String` — The unique identifier of the stored payment method to charge for the top-up.
+**order:** `Optional<ListTradesRequestOrder>` — Field to sort by.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**direction:** `Optional<ListTradesRequestDirection>` — Sort direction.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**first:** `Optional<Integer>` — Number of results to return from the start of the range.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**after:** `Optional<String>` — Return results after this cursor. Use `page_info.end_cursor` from the previous response to fetch the next page.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**last:** `Optional<Integer>` — Number of results to return from the end of the range.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**before:** `Optional<String>` — Return results before this cursor. Use `page_info.start_cursor` from the previous response to fetch the previous page.
+    
+</dd>
+</dl>
+</dd>
+</dl>
+
+
+</dd>
+</dl>
+</details>
+
+<details><summary><code>client.trades.create(request) -> Trade</code></summary>
+<dl>
+<dd>
+
+#### 📝 Description
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+Places an order, closes a perpetual position, or deposits to or withdraws from the trading balance, from the Whop-managed wallet of an account or user. Answers `201` with the trade in `pending`; it runs in the background, so read it with `GET /trades/:id` until its `status` is `completed`, `failed` or `in_review`. Trades run alongside each other, except a second order on one market at a different leverage, which answers `409`. A retry with the same `Idempotency-Key` returns the same trade.
+</dd>
+</dl>
+</dd>
+</dl>
+
+#### 🔌 Usage
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+```java
+client.trades().create(
+    CreateTradesRequest
+        .builder()
+        .accountId("biz_xxxxxxxxxxxxxx")
+        .type(CreateTradesRequestType.CLOSE)
+        .build()
+);
+```
+</dd>
+</dl>
+</dd>
+</dl>
+
+#### ⚙️ Parameters
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+**accountId:** `String` — The account or user whose wallet trades, prefixed `biz_` or `user_`.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**amount:** `Optional<String>` — Only for a deposit or withdraw, and required for both. For a deposit, the USDT0 to send from the wallet, with at most 6 decimals. For a withdraw, the USDC to send back, at least 1 with at most 6 decimals, or `all`.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**clientOrderId:** `Optional<String>` — Only for an order. Your own ID for the trade, 1 to 128 characters, unique for the account. Sending it again with the same order returns the same trade; with a different order it answers `409`.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**instrumentType:** `Optional<CreateTradesRequestInstrumentType>` — `perpetual` or `spot`. Required for an order. A spot order is a market order that swaps in the wallet and does not use the trading balance.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**leverage:** `Optional<Integer>` — Only for a perpetual order. The cross leverage, from 1 to the market's maximum. Required unless `reduce_only`; not accepted on a reduce-only order.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**market:** `Optional<String>` — The market: a perpetual such as `BTC` or `xyz:TSLA`, or for spot an asset the wallet can swap into, such as `BTC` or `XAUT`. Required for an order or close, and a close takes only a perpetual; not accepted for a deposit or withdraw.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**metadata:** `Optional<Map<String, String>>` — Only for an order. Free-form string-to-string annotations: up to 50 keys of at most 40 characters, values up to 500 characters.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**notional:** `Optional<String>` — Only for an order. The order value in USD, as a decimal string; the size is rounded down to the market's decimals. Send exactly one of `size` or `notional`; a spot buy takes `notional`, the USDT0 to spend.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**orderType:** `Optional<CreateTradesRequestOrderType>` — `market` fills now within `slippage_bps` of the mid price, and anything unfilled is canceled; `limit` fills at `price` or better, and how long it stays on the book follows `time_in_force`. `take_profit` and `stop_loss` reduce the open perpetual position with a market order once the price crosses `trigger_price`; the trade stays `processing` until then. Required for an order.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**price:** `Optional<String>` — Only for an order. The limit price in USD, as a decimal string Hyperliquid accepts without rounding. Required for a limit order; not accepted for a market order.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**reduceOnly:** `Optional<Boolean>` — Only for a perpetual order. Only reduce an open position; defaults to `false`. A reduce-only order takes no `leverage`.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**side:** `Optional<CreateTradesRequestSide>` — `buy` or `sell`. Required for an order, except a `take_profit` or `stop_loss`, where it defaults to the side that reduces the position.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**size:** `Optional<String>` — Only for an order. The size in units of the market, as a decimal string, with at most the market's size decimals. Send exactly one of `size` or `notional`; a spot sell takes `size`. A perpetual order must be worth at least 10 USD, unless reduce-only. A `take_profit` or `stop_loss` takes `size` or nothing for the whole position, and a set `size` must be worth at least 10 USD at `trigger_price`.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**slippageBps:** `Optional<Integer>` — Only for a market order or a close. The worst price as basis points from the mid price, from 1 to 1000; defaults to 100 for a perpetual, and to the swap route's own default for spot.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**stopLoss:** `Optional<CreateTradesRequestStopLoss>` — Only for a perpetual order that opens or adds to a position. A stop-loss for the order's full size, armed once the order fills and sent with it as its own trade, whose `parent_id` is this trade.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**takeProfit:** `Optional<CreateTradesRequestTakeProfit>` — Only for a perpetual order that opens or adds to a position. A take-profit for the order's full size, armed once the order fills and sent with it as its own trade, whose `parent_id` is this trade.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**timeInForce:** `Optional<CreateTradesRequestTimeInForce>` — Only for a perpetual limit order. `good_til_canceled` rests on the book until it fills; `add_liquidity_only` is canceled instead of filling at once; `immediate_or_cancel` fills what it can now and cancels the rest. Defaults to `good_til_canceled`. The trade stays `processing` while the order rests.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**triggerPrice:** `Optional<String>` — Required for a `take_profit` or `stop_loss`, and only for them. The USD price, as a decimal string Hyperliquid accepts without rounding, at which it sends a market order. Closing a long, a take-profit triggers above the current price and a stop-loss below; closing a short, the reverse. It is always reduce-only, needs an open position, and takes no `price`, `notional`, `leverage`, `time_in_force` or `slippage_bps`.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**type:** `CreateTradesRequestType` — `order` places one order. A perpetual order trades from the trading balance, setting cross `leverage` first; when the balance is short, it bridges the USDT0 it needs from the wallet first. A spot order swaps between USDT0 and the asset in the wallet. `deposit` bridges `amount` USDT0 from the wallet to the trading balance. `withdraw` sends `amount` USDC (or `all`) from the trading balance back to the wallet. `close` closes the whole position in `market` with a market reduce-only order; when the account is then flat, a `withdraw` trade sends the trading balance back to the wallet.
+    
+</dd>
+</dl>
+</dd>
+</dl>
+
+
+</dd>
+</dl>
+</details>
+
+<details><summary><code>client.trades.retrieve(id) -> Trade</code></summary>
+<dl>
+<dd>
+
+#### 📝 Description
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+Retrieves a trade. Read it until its `status` is `completed`, `failed` or `in_review`.
+</dd>
+</dl>
+</dd>
+</dl>
+
+#### 🔌 Usage
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+```java
+client.trades().retrieve(
+    "id",
+    RetrieveTradesRequest
+        .builder()
+        .build()
+);
+```
+</dd>
+</dl>
+</dd>
+</dl>
+
+#### ⚙️ Parameters
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+**id:** `String` — Trade ID, prefixed `tint_`.
+    
+</dd>
+</dl>
+</dd>
+</dl>
+
+
+</dd>
+</dl>
+</details>
+
+<details><summary><code>client.trades.cancel(id) -> Trade</code></summary>
+<dl>
+<dd>
+
+#### 📝 Description
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+Cancels the order of a trade while it rests on the book, such as a `good_til_canceled` limit order. Answers with the trade still `processing`; read it with `GET /trades/:id` until its `status` is `completed` or `failed`. A part that filled before the cancel landed stays filled, and money bridged in for an order that did not fill goes back to the wallet. Calling it again sends no second cancel. Answers `409` when the trade has no order on the book.
+</dd>
+</dl>
+</dd>
+</dl>
+
+#### 🔌 Usage
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+```java
+client.trades().cancel(
+    "id",
+    CancelTradesRequest
+        .builder()
+        .build()
+);
+```
+</dd>
+</dl>
+</dd>
+</dl>
+
+#### ⚙️ Parameters
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+**id:** `String` — Trade ID, prefixed `tint_`.
     
 </dd>
 </dl>
@@ -31298,7 +43030,7 @@ client.topups().create(
 <dl>
 <dd>
 
-Lists an account's transfers.
+Lists the transfers you can see, sent or received, newest first by default. Optional account filters narrow the results.
 </dd>
 </dl>
 </dd>
@@ -31332,7 +43064,7 @@ client.transfers().list(
 <dl>
 <dd>
 
-**originId:** `Optional<String>` — Filter to transfers sent from this account. Provide this or destination_id.
+**originId:** `Optional<String>` — Filter to transfers sent from this account.
     
 </dd>
 </dl>
@@ -31340,7 +43072,7 @@ client.transfers().list(
 <dl>
 <dd>
 
-**destinationId:** `Optional<String>` — Filter to transfers received by this account. Provide this or origin_id.
+**destinationId:** `Optional<String>` — Filter to transfers received by this account.
     
 </dd>
 </dl>
@@ -31380,7 +43112,7 @@ client.transfers().list(
 <dl>
 <dd>
 
-**first:** `Optional<Integer>` — Number of transfers to return from the start of the window.
+**first:** `Optional<Integer>` — Number of results to return from the start of the range.
     
 </dd>
 </dl>
@@ -31388,7 +43120,7 @@ client.transfers().list(
 <dl>
 <dd>
 
-**after:** `Optional<String>` — Cursor to fetch the page after (from page_info.end_cursor).
+**after:** `Optional<String>` — Return results after this cursor. Use `page_info.end_cursor` from the previous response to fetch the next page.
     
 </dd>
 </dl>
@@ -31396,7 +43128,7 @@ client.transfers().list(
 <dl>
 <dd>
 
-**last:** `Optional<Integer>` — Number of transfers to return from the end of the window.
+**last:** `Optional<Integer>` — Number of results to return from the end of the range.
     
 </dd>
 </dl>
@@ -31404,7 +43136,7 @@ client.transfers().list(
 <dl>
 <dd>
 
-**before:** `Optional<String>` — Cursor to fetch the page before (from page_info.start_cursor).
+**before:** `Optional<String>` — Return results before this cursor. Use `page_info.start_cursor` from the previous response to fetch the previous page.
     
 </dd>
 </dl>
@@ -31428,7 +43160,7 @@ client.transfers().list(
 <dl>
 <dd>
 
-Moves money between accounts, or into a claim link anyone with the URL can redeem.
+Moves money between Whop balances or funds a claim link anyone with the URL can redeem. The `type` you send decides which object comes back.
 </dd>
 </dl>
 </dd>
@@ -31444,11 +43176,15 @@ Moves money between accounts, or into a claim link anyone with the URL can redee
 
 ```java
 client.transfers().create(
-    CreateTransfersRequest
-        .builder()
-        .amount(25.0)
-        .originId("biz_xxxxxxxxxxxxxx")
-        .build()
+    CreateTransfersRequestBody.balance(
+        CreateTransfersRequestBodyBalance
+            .builder()
+            .amount(25.0)
+            .currency("usd")
+            .destinationId("user_xxxxxxxxxxxxxx")
+            .originId("biz_xxxxxxxxxxxxxx")
+            .build()
+    )
 );
 ```
 </dd>
@@ -31464,79 +43200,7 @@ client.transfers().create(
 <dl>
 <dd>
 
-**amount:** `Double` — The amount to move, in the transfer currency. For example 25.00.
-    
-</dd>
-</dl>
-
-<dl>
-<dd>
-
-**currency:** `Optional<String>` — Currency, such as `usd`. Required for ledger transfers.
-    
-</dd>
-</dl>
-
-<dl>
-<dd>
-
-**destinationId:** `Optional<String>` — The recipient. Required for ledger and wallet_send (a user_/biz_/ldgr_ ID, or — for sends — an email). Omit for claim_link.
-    
-</dd>
-</dl>
-
-<dl>
-<dd>
-
-**expiresAt:** `Optional<OffsetDateTime>` — claim_link only. Link expiry as an ISO 8601 timestamp. Defaults to 24 hours from creation.
-    
-</dd>
-</dl>
-
-<dl>
-<dd>
-
-**idempotenceKey:** `Optional<String>` — Ledger transfers and wallet sends. A unique key that makes retries safe. Retrying with the same key returns the original transfer, or attaches to the original wallet send, instead of moving money twice.
-    
-</dd>
-</dl>
-
-<dl>
-<dd>
-
-**metadata:** `Optional<Map<String, Object>>` — Ledger transfers only. Custom key-value pairs attached to the transfer. Max 50 keys, 100 chars per key, 500 chars per string value.
-    
-</dd>
-</dl>
-
-<dl>
-<dd>
-
-**notes:** `Optional<String>` — Ledger transfers only. A short note describing the transfer.
-    
-</dd>
-</dl>
-
-<dl>
-<dd>
-
-**originId:** `String` — The account sending the funds. A user ID (user_xxx), account ID (biz_xxx), or ledger account ID (ldgr_xxx).
-    
-</dd>
-</dl>
-
-<dl>
-<dd>
-
-**redeemableCount:** `Optional<Integer>` — claim_link only. How many different users can claim the link. Defaults to 1.
-    
-</dd>
-</dl>
-
-<dl>
-<dd>
-
-**type:** `Optional<CreateTransfersRequestType>` — The kind of money movement, which decides what comes back. Defaults to ledger. `ledger` moves credit between two Whop balances and returns a `transfer`; `wallet_send` sends USDT from the origin account's Ethereum wallet and returns a `send`; `claim_link` funds a shareable link anyone with the URL can redeem and returns a `claim_link`. A `ledger` transfer from a stablecoin-rails account settles on-chain when covered, and still returns a `transfer`.
+**request:** `CreateTransfersRequestBody` 
     
 </dd>
 </dl>
@@ -31560,7 +43224,7 @@ client.transfers().create(
 <dl>
 <dd>
 
-Lists the people and accounts you can send money to.
+Lists the people and accounts you can send money to from a balance. Pass a result's ID as `destination_id` when creating a transfer.
 </dd>
 </dl>
 </dd>
@@ -31603,7 +43267,7 @@ client.transfers().listRecipients(
 <dl>
 <dd>
 
-**query:** `Optional<String>` — Search anyone on Whop by name or username, plus your own accounts by name or ID. Omit it to get the team around the balance, the people you follow, and your own accounts. The list is the same whether the balance belongs to a company or to you. Searching from a `biz_` origin additionally requires the member:basic:read scope. A credential scoped to a single company is the exception to the search itself: it only ever sees that company's own people. Complete email addresses return no matches.
+**query:** `Optional<String>` — Search anyone on Whop by name or username, plus your own accounts by name or ID. An exact business ID (`biz_`), user ID (`user_`), or username returns that recipient first; an ID or an `@username` returns only that recipient. Omit it to get the team around the balance, the people you follow, and your own accounts. The list is the same whether the balance belongs to a company or to you. Searching from a `biz_` origin additionally requires the member:basic:read scope. A credential scoped to a single company is the exception to the search itself: it only ever sees that company's own people. Complete email addresses return no matches. Search results are limited to 20 recipients.
     
 </dd>
 </dl>
@@ -31611,7 +43275,7 @@ client.transfers().listRecipients(
 <dl>
 <dd>
 
-**first:** `Optional<Integer>` — Number of recipients per page. Search queries preserve the dashboard's 20-result maximum.
+**first:** `Optional<Integer>` — Number of results to return from the start of the range.
     
 </dd>
 </dl>
@@ -31619,7 +43283,7 @@ client.transfers().listRecipients(
 <dl>
 <dd>
 
-**after:** `Optional<String>` — Cursor to fetch the page after (from page_info.end_cursor).
+**after:** `Optional<String>` — Return results after this cursor. Use `page_info.end_cursor` from the previous response to fetch the next page.
     
 </dd>
 </dl>
@@ -31703,7 +43367,7 @@ client.transfers().retrieve(
 <dl>
 <dd>
 
-Search for users by name or username, ranked by social proximity to the authenticated user. Returns the user's most recently followed users when no query is given.
+Searches for users by name or username, ranked by social proximity to the authenticated user. Without a `query`, returns the user's most recently followed users.
 </dd>
 </dl>
 </dd>
@@ -31737,6 +43401,14 @@ client.users().list(
 <dl>
 <dd>
 
+**contextChannelId:** `Optional<String>` — Prioritize people relevant to this channel for mentions. Results remain global; channel access is required.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
 **query:** `Optional<String>` — A search term to filter users by name or username.
     
 </dd>
@@ -31745,7 +43417,7 @@ client.users().list(
 <dl>
 <dd>
 
-**first:** `Optional<Integer>` — The number of users to return (max 50).
+**first:** `Optional<Integer>` — Number of results to return from the start of the range.
     
 </dd>
 </dl>
@@ -31753,7 +43425,7 @@ client.users().list(
 <dl>
 <dd>
 
-**after:** `Optional<String>` — A cursor; returns users after this position.
+**after:** `Optional<String>` — Return results after this cursor. Use `page_info.end_cursor` from the previous response to fetch the next page.
     
 </dd>
 </dl>
@@ -31761,7 +43433,7 @@ client.users().list(
 <dl>
 <dd>
 
-**last:** `Optional<Integer>` — The number of users to return from the end of the range.
+**last:** `Optional<Integer>` — Number of results to return from the end of the range.
     
 </dd>
 </dl>
@@ -31769,7 +43441,7 @@ client.users().list(
 <dl>
 <dd>
 
-**before:** `Optional<String>` — A cursor; returns users before this position.
+**before:** `Optional<String>` — Return results before this cursor. Use `page_info.start_cursor` from the previous response to fetch the previous page.
     
 </dd>
 </dl>
@@ -31793,7 +43465,7 @@ client.users().list(
 <dl>
 <dd>
 
-Retrieves the authenticated user — the self view of the user object. Same shape as `GET /users/{id}`, with the self-only fields populated: `email` (email-read scope), `staff` (Whop staff only, staff-read scope), `balance` and `earnings_usd` (balance-read scope), the opt-in `balance_history`, and every linked social account.
+Retrieves the authenticated user. Same as `GET /users/:id` with the reserved id `me`: the self view, where self-only fields such as `email`, `balance`, and `cards` can be populated.
 </dd>
 </dl>
 </dd>
@@ -31827,7 +43499,23 @@ client.users().me(
 <dl>
 <dd>
 
+**includeTrading:** `Optional<Boolean>` — Also return the trading account under `trading`: its address, a snapshot of its margin and open positions, and its Hyperliquid WebSocket subscriptions. Only honored on the self view (me) with crypto_wallet:trade:read, crypto_wallet:trade, or crypto_wallet:manage permission and an Ethereum wallet.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
 **accountId:** `Optional<String>` — When set, returns your account-specific profile overrides for this account.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**includeBalance:** `Optional<Boolean>` — Compute live wallet and owned-account balances (default true). Set false for identity-only reads. Ignored for callers without balance-read scope.
     
 </dd>
 </dl>
@@ -31891,7 +43579,7 @@ client.users().me(
 <dl>
 <dd>
 
-Updates the authenticated user's global profile, or their profile override for an account when account_id is given. Not available to API keys.
+Updates the authenticated user's global profile, or their profile override for an account when `account_id` is given. Not available to API keys.
 </dd>
 </dl>
 </dd>
@@ -31949,6 +43637,14 @@ client.users().updateMe(
 <dl>
 <dd>
 
+**dateOfBirth:** `Optional<String>` — The user's date of birth as an ISO 8601 date, like `1998-04-23`. The user must be at least 13. Global profile only; refused with `account_id`.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
 **name:** `Optional<String>` 
     
 </dd>
@@ -31989,7 +43685,7 @@ client.users().updateMe(
 <dl>
 <dd>
 
-Retrieves a user by `user_` tag or username, or the authenticated user with the reserved id `me`. Profiles include linked social accounts — reading your own profile returns every linked account, other profiles only what is public on Whop (the primary Discord and the X account). The self-only fields are populated only when the id is `me`: `email` (email-read scope), `staff` (Whop staff only, staff-read scope), `balance` and `earnings_usd` (balance-read scope), and the opt-in `balance_history`. They are always `null` when addressing a user by tag or username.
+Retrieves a user by `user_` tag or username, or the authenticated user with the reserved id `me`. Self-only fields such as `email`, `balance`, and `earnings_usd` are populated only when the id is `me`, and are always `null` when addressing a user by tag or username.
 </dd>
 </dl>
 </dd>
@@ -32032,7 +43728,23 @@ client.users().retrieve(
 <dl>
 <dd>
 
+**includeTrading:** `Optional<Boolean>` — Also return the trading account under `trading`: its address, a snapshot of its margin and open positions, and its Hyperliquid WebSocket subscriptions. Only honored on the self view (me) with crypto_wallet:trade:read, crypto_wallet:trade, or crypto_wallet:manage permission and an Ethereum wallet.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
 **accountId:** `Optional<String>` — When set, returns the user's account-specific profile overrides for this account.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**includeBalance:** `Optional<Boolean>` — Compute live wallet and owned-account balances on the self view (default true). Set false for identity-only reads. Ignored when the id is not `me` or the caller lacks balance-read scope.
     
 </dd>
 </dl>
@@ -32096,7 +43808,7 @@ client.users().retrieve(
 <dl>
 <dd>
 
-Updates a user, addressed by `user_` tag, username, or the reserved id `me` for the authenticated user. A user token updates their own global profile; an API key updates the user's account-specific profile override (account_id required).
+Updates a user, addressed by `user_` tag, username, or the reserved id `me` for the authenticated user. A user token updates their own global profile; an API key updates the user's profile override for the account in `account_id`.
 </dd>
 </dl>
 </dd>
@@ -32156,6 +43868,14 @@ client.users().update(
 <dd>
 
 **bio:** `Optional<String>` 
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**dateOfBirth:** `Optional<String>` — The user's date of birth as an ISO 8601 date, like `1998-04-23`. The user must be at least 13. Global profile only; refused with `account_id`.
     
 </dd>
 </dl>
@@ -32271,7 +43991,7 @@ client.users().checkAccess(
 <dl>
 <dd>
 
-Lists the recommended actions computed for the user: personal suggestions (e.g. start a business or become an affiliate) pooled with the highest-impact actions across the accounts the user owns. Business actions are tagged with their `account_id`/`account_name`; personal actions leave those `null`. Self-only: `id` must be `me` or the authenticated user's own tag/username.
+Lists the recommended actions computed for the authenticated user, such as starting a business. You can only list your own recommended actions.
 </dd>
 </dl>
 </dd>
@@ -32318,8 +44038,8 @@ client.users().recommendActions(
 </dl>
 </details>
 
-## Verifications
-<details><summary><code>client.verifications.list() -> ListVerificationsResponse</code></summary>
+## Variants
+<details><summary><code>client.variants.list() -> SyncPagingIterable&amp;lt;VariantListItem&amp;gt;</code></summary>
 <dl>
 <dd>
 
@@ -32331,7 +44051,1033 @@ client.users().recommendActions(
 <dl>
 <dd>
 
-Returns verifications for an account, including their status and any required actions.
+Lists an account's variants, leaving out variants generated for a legacy invoice; retrieve one of those by ID. To list a product's public, buyable variants without authentication, omit `account_id` and pass `product_ids`.
+</dd>
+</dl>
+</dd>
+</dl>
+
+#### 🔌 Usage
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+```java
+client.variants().list(
+    ListVariantsRequest
+        .builder()
+        .releaseMethods(
+            Arrays.asList("buy_now")
+        )
+        .visibilities(
+            Arrays.asList("visible")
+        )
+        .billingTypes(
+            Arrays.asList("renewal")
+        )
+        .productIds(
+            Arrays.asList("prod_xxxxxxxxxxxxxx")
+        )
+        .presentmentCurrency("auto")
+        .ipAddress("203.0.113.7")
+        .presentmentCountry("JP")
+        .build()
+);
+```
+</dd>
+</dl>
+</dd>
+</dl>
+
+#### ⚙️ Parameters
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+**accountId:** `Optional<String>` — The unique identifier of the account to list variants for. Required unless `product_ids` is provided for a public product-variant read.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**direction:** `Optional<ListVariantsRequestDirection>` — The sort direction for results. Defaults to descending.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**order:** `Optional<ListVariantsRequestOrder>` — The field to sort results by. Defaults to created_at.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**releaseMethods:** `Optional<String>` — Filter to only variants matching these release methods.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**visibilities:** `Optional<String>` — Filter to only variants matching these visibility states.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**billingTypes:** `Optional<String>` — Filter to only variants matching these billing types.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**productIds:** `Optional<String>` — Filter to only variants belonging to these product identifiers. When `account_id` is omitted, this is required and the response is publicly readable: only visible, non-invoice variants are returned.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**createdBefore:** `Optional<String>` — Only return variants created before this timestamp.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**createdAfter:** `Optional<String>` — Only return variants created after this timestamp.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**presentmentCurrency:** `Optional<String>` — The currency to state each variant's prices in. Omit it, or send null, for each variant's own currency. `auto` states them in the currency of the country Whop places the buyer in: by `ip_address` when your server sends one, and by the request's own IP address otherwise. To choose that country instead, send `presentment_country` in place of this. A three-letter ISO 4217 code, such as `eur`, states them in that currency. A variant converts only where a payment quote for it would be priced in that currency, and stays in its own currency otherwise: a renewing variant, one with adaptive pricing off, a currency no payment method can collect, or `auto` for a buyer Whop cannot place in a country. Converted prices are an estimate at the current exchange rate. Nothing is held: the payment quote the buyer pays from fixes the rate.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**ipAddress:** `Optional<String>` — The buyer's IP address, when your server reads on their behalf. Needs an API key; any other caller is placed by its own request. Where `presentment_currency` `auto` finds the buyer's local currency, and where a payment method must be able to collect it.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**presentmentCountry:** `Optional<String>` — The country to state each variant's prices for, as an ISO 3166-1 alpha-2 code such as `JP`, when the buyer chose one: a store's country picker. States them in the currency `auto` would for a buyer in that country, so send it instead of `presentment_currency`, never with it. Whether a payment method can collect that currency is still judged where the buyer is: by `ip_address`, else by the request's own IP address. A country Whop has no currency for is ignored, and the prices are stated as `auto` would state them.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**first:** `Optional<Integer>` — Number of results to return from the start of the range.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**after:** `Optional<String>` — Return results after this cursor. Use `page_info.end_cursor` from the previous response to fetch the next page.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**last:** `Optional<Integer>` — Number of results to return from the end of the range.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**before:** `Optional<String>` — Return results before this cursor. Use `page_info.start_cursor` from the previous response to fetch the previous page.
+    
+</dd>
+</dl>
+</dd>
+</dl>
+
+
+</dd>
+</dl>
+</details>
+
+<details><summary><code>client.variants.create(request) -> Variant</code></summary>
+<dl>
+<dd>
+
+#### 📝 Description
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+Creates a pricing variant for a product, defining the billing interval, price, and availability customers buy it with.
+</dd>
+</dl>
+</dd>
+</dl>
+
+#### 🔌 Usage
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+```java
+client.variants().create(
+    CreateVariantsRequest
+        .builder()
+        .build()
+);
+```
+</dd>
+</dl>
+</dd>
+</dl>
+
+#### ⚙️ Parameters
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+**accountId:** `Optional<String>` — The unique identifier of the account to create this variant for. Required when authenticating as a user; an account API key supplies its own account.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**adaptivePricingEnabled:** `Optional<Boolean>` — Whether this variant accepts local currency payments via adaptive pricing.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**allowMultipleQuantity:** `Optional<Boolean>` — Whether more than one unit can be purchased in an order. Renewal variants cannot enable it. When `false`, checkouts, carts, and invoices reject a quantity above 1.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**attributes:** `Optional<Map<String, Object>>` — Attribute values that make this variant one variant of its product, as a map of attribute name to value, e.g. `{"size": "Large", "color": "Blue"}`. Names are normalized to snake_case identifiers (`Ring Size` becomes `ring_size`) and come back in alphabetical order. Every variant on a product must carry the same attribute names and a distinct set of values. Send `null` to make the variant an ordinary pricing option again.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**billingPeriod:** `Optional<Integer>` — Recurring billing interval in days, such as 30 for monthly or 365 for annual.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**billingType:** `Optional<String>` — Variant billing type, such as `one_time` or `renewal`.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**cancelDiscountIntervals:** `Optional<Integer>` — How long the retention discount lasts: `0` forever, `1` the next payment only, or a number of calendar months from when the customer accepts it. Required when `offer_cancel_discount` is true.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**cancelDiscountPercentage:** `Optional<Integer>` — Percentage taken off each discounted renewal, as a whole number from 1 to 100. Required when `offer_cancel_discount` is true.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**checkoutStyling:** `Optional<Map<String, Object>>` — Checkout styling overrides for this variant.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**currency:** `Optional<String>` — The three-letter ISO currency code for the variant's pricing. Defaults to USD.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**customFields:** `Optional<List<CreateVariantsRequestCustomFieldsItem>>` — An array of custom field definitions to collect from customers at checkout. Omitting this field clears existing custom fields.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**description:** `Optional<String>` — A text description of the variant displayed to customers on the product page.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**expirationDays:** `Optional<Integer>` — Access duration in days before the membership expires.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**image:** `Optional<CreateVariantsRequestImage>` — An image displayed on the product page to represent this variant.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**initialPrice:** `Optional<Double>` — Initial amount charged in the variant's currency, e.g. 10.43 for $10.43. A paid fiat variant charges at least 1.00 in its currency; use 0 for free.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**internalNotes:** `Optional<String>` — Private notes visible only to the account owner. Not shown to customers.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**metadata:** `Optional<Map<String, Object>>` — Custom key-value pairs to store on the variant. Included in webhook payloads for payment and membership events. Max 50 keys, 100 chars per key, 500 chars per string value. The reserved keys `custom_cta` (a checkout call-to-action button label — one of the product custom CTA values, e.g. `subscribe`, `get_offer`) and `custom_cta_url` (a URL the button links to; web or `tel:`) override the product's call to action for this variant and are validated on save.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**offerCancelDiscount:** `Optional<Boolean>` — Whether to offer a retention discount when a customer attempts to cancel.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**overrideTaxType:** `Optional<String>` — Override the default tax classification for this specific variant.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**paymentMethodConfiguration:** `Optional<CreateVariantsRequestPaymentMethodConfiguration>` — Explicit payment method configuration for the variant. When not provided, the account's defaults apply. Send at least one of `enabled` or `disabled`; an omitted one is empty.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**productId:** `Optional<String>` — The unique identifier of the product to attach this variant to.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**releaseMethod:** `Optional<String>` — Sales method for this variant.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**renewalPrice:** `Optional<Double>` — The amount charged each billing period for recurring variants, in the variant's currency. A paid fiat variant charges at least 1.00 in its currency.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**sku:** `Optional<String>` — Stock keeping unit for this variant. Maximum 100 characters. Free text, not enforced unique.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**splitPayRequiredPayments:** `Optional<Integer>` — Installment payments required before the subscription pauses, from 2 to 115. Only valid on `renewal` variants.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**stock:** `Optional<Integer>` — The maximum number of units available for purchase. Ignored when unlimited_stock is true.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**threeDsLevel:** `Optional<CreateVariantsRequestThreeDsLevel>` — 3D Secure behavior for supported on-session card payments. `mandate_challenge` requires a 3DS challenge before payment processing; `mandate_if_required` mandates a challenge only when the payment processor requires it; `frictionless_if_required` uses the regular frictionless 3DS flow. Payments of $1,000 or more use `mandate_if_required` unless `mandate_challenge` is selected. Risk and authentication recovery requirements can override the preference. Send `null` to inherit the account default.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**title:** `Optional<String>` — The display name of the variant shown to customers on the product page. Maximum 30 characters.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**trialPeriodDays:** `Optional<Integer>` — Free trial duration before the first recurring charge.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**unlimitedStock:** `Optional<Boolean>` — Whether the variant has unlimited stock. When true, the stock field is ignored.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**visibility:** `Optional<String>` — Whether the variant is visible to customers or hidden from public view.
+    
+</dd>
+</dl>
+</dd>
+</dl>
+
+
+</dd>
+</dl>
+</details>
+
+<details><summary><code>client.variants.retrieve(id) -> Variant</code></summary>
+<dl>
+<dd>
+
+#### 📝 Description
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+Retrieves a variant. Requires no authentication; fields that need a permission are `null` for callers without it.
+</dd>
+</dl>
+</dd>
+</dl>
+
+#### 🔌 Usage
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+```java
+client.variants().retrieve(
+    "id",
+    RetrieveVariantsRequest
+        .builder()
+        .presentmentCurrency("auto")
+        .ipAddress("203.0.113.7")
+        .presentmentCountry("JP")
+        .build()
+);
+```
+</dd>
+</dl>
+</dd>
+</dl>
+
+#### ⚙️ Parameters
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+**id:** `String` — Variant ID, prefixed `plan_`.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**presentmentCurrency:** `Optional<String>` — The currency to state each variant's prices in. Omit it, or send null, for each variant's own currency. `auto` states them in the currency of the country Whop places the buyer in: by `ip_address` when your server sends one, and by the request's own IP address otherwise. To choose that country instead, send `presentment_country` in place of this. A three-letter ISO 4217 code, such as `eur`, states them in that currency. A variant converts only where a payment quote for it would be priced in that currency, and stays in its own currency otherwise: a renewing variant, one with adaptive pricing off, a currency no payment method can collect, or `auto` for a buyer Whop cannot place in a country. Converted prices are an estimate at the current exchange rate. Nothing is held: the payment quote the buyer pays from fixes the rate.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**ipAddress:** `Optional<String>` — The buyer's IP address, when your server reads on their behalf. Needs an API key; any other caller is placed by its own request. Where `presentment_currency` `auto` finds the buyer's local currency, and where a payment method must be able to collect it.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**presentmentCountry:** `Optional<String>` — The country to state each variant's prices for, as an ISO 3166-1 alpha-2 code such as `JP`, when the buyer chose one: a store's country picker. States them in the currency `auto` would for a buyer in that country, so send it instead of `presentment_currency`, never with it. Whether a payment method can collect that currency is still judged where the buyer is: by `ip_address`, else by the request's own IP address. A country Whop has no currency for is ignored, and the prices are stated as `auto` would state them.
+    
+</dd>
+</dl>
+</dd>
+</dl>
+
+
+</dd>
+</dl>
+</details>
+
+<details><summary><code>client.variants.delete(id) -> DeleteVariantsResponse</code></summary>
+<dl>
+<dd>
+
+#### 📝 Description
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+Deletes a variant from a product. It stops selling immediately; existing memberships on it are unaffected.
+</dd>
+</dl>
+</dd>
+</dl>
+
+#### 🔌 Usage
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+```java
+client.variants().delete(
+    "id",
+    DeleteVariantsRequest
+        .builder()
+        .build()
+);
+```
+</dd>
+</dl>
+</dd>
+</dl>
+
+#### ⚙️ Parameters
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+**id:** `String` — Variant ID, prefixed `plan_`.
+    
+</dd>
+</dl>
+</dd>
+</dl>
+
+
+</dd>
+</dl>
+</details>
+
+<details><summary><code>client.variants.update(id, request) -> Variant</code></summary>
+<dl>
+<dd>
+
+#### 📝 Description
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+Updates a variant's pricing, billing interval, visibility, stock, and other settings.
+</dd>
+</dl>
+</dd>
+</dl>
+
+#### 🔌 Usage
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+```java
+client.variants().update(
+    "id",
+    UpdateVariantsRequest
+        .builder()
+        .build()
+);
+```
+</dd>
+</dl>
+</dd>
+</dl>
+
+#### ⚙️ Parameters
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+**id:** `String` — Variant ID, prefixed `plan_`.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**adaptivePricingEnabled:** `Optional<Boolean>` — Whether this variant accepts local currency payments via adaptive pricing.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**allowMultipleQuantity:** `Optional<Boolean>` — Whether more than one unit can be purchased in an order. Renewal variants cannot enable it. When `false`, checkouts, carts, and invoices reject a quantity above 1.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**attributes:** `Optional<Map<String, Object>>` — Attribute values that make this variant one variant of its product, as a map of attribute name to value, e.g. `{"size": "Large", "color": "Blue"}`. Names are normalized to snake_case identifiers (`Ring Size` becomes `ring_size`) and come back in alphabetical order. Every variant on a product must carry the same attribute names and a distinct set of values. Send `null` to make the variant an ordinary pricing option again.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**billingPeriod:** `Optional<Integer>` — Recurring billing interval in days, such as 30 for monthly or 365 for annual.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**cancelDiscountIntervals:** `Optional<Integer>` — How long the retention discount lasts: `0` forever, `1` the next payment only, or a number of calendar months from when the customer accepts it. Required when `offer_cancel_discount` is true.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**cancelDiscountPercentage:** `Optional<Integer>` — Percentage taken off each discounted renewal, as a whole number from 1 to 100. Required when `offer_cancel_discount` is true.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**checkoutStyling:** `Optional<Map<String, Object>>` — Checkout styling overrides for this variant.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**currency:** `Optional<String>` — The three-letter ISO currency code for the variant's pricing. Defaults to USD.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**customFields:** `Optional<List<UpdateVariantsRequestCustomFieldsItem>>` — An array of custom field definitions to collect from customers at checkout. Omitting this field clears existing custom fields.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**description:** `Optional<String>` — A text description of the variant displayed to customers on the product page.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**expirationDays:** `Optional<Integer>` — Access duration in days before the membership expires.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**image:** `Optional<UpdateVariantsRequestImage>` — An image displayed on the product page to represent this variant.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**initialPrice:** `Optional<Double>` — Initial amount charged in the variant's currency, e.g. 10.43 for $10.43. A paid fiat variant charges at least 1.00 in its currency; use 0 for free.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**internalNotes:** `Optional<String>` — Private notes visible only to the account owner. Not shown to customers.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**metadata:** `Optional<Map<String, Object>>` — Custom key-value pairs to store on the variant. Included in webhook payloads for payment and membership events. Max 50 keys, 100 chars per key, 500 chars per string value. The reserved keys `custom_cta` (a checkout call-to-action button label — one of the product custom CTA values, e.g. `subscribe`, `get_offer`) and `custom_cta_url` (a URL the button links to; web or `tel:`) override the product's call to action for this variant and are validated on save.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**offerCancelDiscount:** `Optional<Boolean>` — Whether to offer a retention discount when a customer attempts to cancel.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**overrideTaxType:** `Optional<String>` — Override the default tax classification for this specific variant.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**paymentMethodConfiguration:** `Optional<UpdateVariantsRequestPaymentMethodConfiguration>` — Explicit payment method configuration for the variant. When not provided, the account's defaults apply. Send at least one of `enabled` or `disabled`; an omitted one is empty.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**releaseMethod:** `Optional<String>` — Sales method for this variant.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**renewalPrice:** `Optional<Double>` — The amount charged each billing period for recurring variants, in the variant's currency. A paid fiat variant charges at least 1.00 in its currency.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**sku:** `Optional<String>` — Stock keeping unit for this variant. Maximum 100 characters. Free text, not enforced unique.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**splitPayRequiredPayments:** `Optional<Integer>` — Installment payments required before the subscription pauses, from 2 to 115. Only valid on `renewal` variants.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**stock:** `Optional<Integer>` — The maximum number of units available for purchase. Ignored when unlimited_stock is true.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**strikeThroughInitialPrice:** `Optional<Double>` — A comparison price displayed with a strikethrough for the initial price.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**strikeThroughRenewalPrice:** `Optional<Double>` — A comparison price displayed with a strikethrough for the renewal price.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**threeDsLevel:** `Optional<UpdateVariantsRequestThreeDsLevel>` — 3D Secure behavior for supported on-session card payments. `mandate_challenge` requires a 3DS challenge before payment processing; `mandate_if_required` mandates a challenge only when the payment processor requires it; `frictionless_if_required` uses the regular frictionless 3DS flow. Payments of $1,000 or more use `mandate_if_required` unless `mandate_challenge` is selected. Risk and authentication recovery requirements can override the preference. Send `null` to inherit the account default.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**title:** `Optional<String>` — The display name of the variant shown to customers on the product page. Maximum 30 characters.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**trialPeriodDays:** `Optional<Integer>` — Free trial duration before the first recurring charge.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**unlimitedStock:** `Optional<Boolean>` — Whether the variant has unlimited stock. When true, the stock field is ignored.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**visibility:** `Optional<String>` — Whether the variant is visible to customers or hidden from public view.
+    
+</dd>
+</dl>
+</dd>
+</dl>
+
+
+</dd>
+</dl>
+</details>
+
+<details><summary><code>client.variants.calculateTax(id, request) -> CalculateTaxVariantsResponse</code></summary>
+<dl>
+<dd>
+
+#### 📝 Description
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+Deprecated. Quote tax with `POST /payment_quotes` instead. Previews tax for a variant before checkout, based on the buyer's location.
+</dd>
+</dl>
+</dd>
+</dl>
+
+#### 🔌 Usage
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+```java
+client.variants().calculateTax(
+    "id",
+    CalculateTaxVariantsRequest
+        .builder()
+        .address(
+            CalculateTaxVariantsRequestAddress
+                .builder()
+                .country("DE")
+                .postalCode("10115")
+                .build()
+        )
+        .build()
+);
+```
+</dd>
+</dl>
+</dd>
+</dl>
+
+#### ⚙️ Parameters
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+**id:** `String` — Variant ID, prefixed `plan_`.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**address:** `Optional<CalculateTaxVariantsRequestAddress>` — Buyer billing address used for tax calculation. Provide either `address.country` or `ip_address`; include state and postal code when available for more accurate results.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**ipAddress:** `Optional<String>` — Buyer IP address used to infer location when no billing address is provided.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**taxIds:** `Optional<List<CalculateTaxVariantsRequestTaxIdsItem>>` — Optional buyer tax ID for B2B exemptions. At most one entry is supported.
+    
+</dd>
+</dl>
+</dd>
+</dl>
+
+
+</dd>
+</dl>
+</details>
+
+## Verifications
+<details><summary><code>client.verifications.list() -> SyncPagingIterable&amp;lt;ListVerificationsResponseDataItem&amp;gt;</code></summary>
+<dl>
+<dd>
+
+#### 📝 Description
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+Lists the verifications for an account or user, including their status and any required actions. Platforms list their own and every subaccount's verifications at once with `include_subaccounts`; each one's `account_ids` names its account, and a verification shared by several accounts appears once for each.
 </dd>
 </dl>
 </dd>
@@ -32349,7 +45095,6 @@ Returns verifications for an account, including their status and any required ac
 client.verifications().list(
     ListVerificationsRequest
         .builder()
-        .accountId("account_id")
         .build()
 );
 ```
@@ -32366,7 +45111,55 @@ client.verifications().list(
 <dl>
 <dd>
 
-**accountId:** `String` — Account or user ID whose verifications you want to list. Use a `biz_` account ID, or the caller's `user_` ID for personal verifications.
+**accountId:** `Optional<String>` — Business account whose verifications you want to list, prefixed `biz_`. Provide this or `user_id`.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**userId:** `Optional<String>` — The caller's own user ID, prefixed `user_`, to list personal verifications. Provide this or `account_id`.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**includeSubaccounts:** `Optional<Boolean>` — Also cover the account's subaccounts. Requires `account_id`, and is a 400 without it. Lists the verifications of the account and every subaccount in account order, oldest account first, paging forward; `status`, `order`, `direction`, `last` and `before` are a 400. Leaves out removed subaccounts and ones you can't read verifications on. A page can hold fewer than `first` verifications while `has_next_page` is `true`; keep following `end_cursor`. On a subaccount, lists only that account's verifications.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**first:** `Optional<Integer>` — Number of results to return from the start of the range.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**after:** `Optional<String>` — Return results after this cursor. Use `page_info.end_cursor` from the previous response to fetch the next page.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**last:** `Optional<Integer>` — Number of results to return from the end of the range.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**before:** `Optional<String>` — Return results before this cursor. Use `page_info.start_cursor` from the previous response to fetch the previous page.
     
 </dd>
 </dl>
@@ -32406,7 +45199,7 @@ client.verifications().list(
 <dl>
 <dd>
 
-Starts a hosted verification session for an account or user, or returns the active session when one already exists. Any fields you include in the request body are used to prefill the session. Send `documents` (with `document_type`) to instead verify the person from identity documents included in this request — no hosted session involved. Send `share_token` to reuse a verification another Sumsub account has already completed for this person, instead of verifying them again. If the account already has an `approved` verification the request is rejected; unlink it first to start a new one.
+Starts a hosted verification session for an account or user, or returns the active session when one already exists; any fields you send prefill it. To skip the hosted session, send `documents` to verify the person from files in this request, `share_token` to reuse a verification another Sumsub account completed, or `verification_id` to reuse one the signed-in user completed on Whop. For a business, `documents` and `owners` add company formation documents and owners to the verification, and once everything is in this call sends the business for review — call it again after Update Verification to send it. Until then it stays `pending` and the hosted session collects anything left out. Once the account has an `approved` verification, every mode except `verification_id` is rejected — unlink it first to start a new one.
 </dd>
 </dl>
 </dd>
@@ -32424,7 +45217,6 @@ Starts a hosted verification session for an account or user, or returns the acti
 client.verifications().create(
     CreateVerificationsRequest
         .builder()
-        .accountId("account_id")
         .body(
             CreateVerificationsRequestBody.individual(
                 CreateVerificationsRequestBodyIndividual
@@ -32448,7 +45240,15 @@ client.verifications().create(
 <dl>
 <dd>
 
-**accountId:** `String` — Account or user ID whose identity you want to verify. Use a `biz_` account ID for account verifications, or the caller's `user_` ID for personal verification.
+**accountId:** `Optional<String>` — Business account whose identity you want to verify, prefixed `biz_`. Provide this or `user_id`.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**userId:** `Optional<String>` — The caller's own user ID, prefixed `user_`, for a personal verification. Provide this or `account_id`.
     
 </dd>
 </dl>
@@ -32480,7 +45280,7 @@ client.verifications().create(
 <dl>
 <dd>
 
-Returns verifications for an account, including their status and any required actions.
+Retrieves a verification by ID, including its status and any information or documents still required.
 </dd>
 </dl>
 </dd>
@@ -32539,7 +45339,7 @@ client.verifications().retrieve(
 <dl>
 <dd>
 
-Updates editable profile details or submits answers for items returned in `requested_information`. Once a verification is `approved` its profile details are locked and can no longer be edited.
+Updates editable profile details or submits answers for items returned in `requested_information`. On a business verification still collecting details, company details, `documents`, and `owners` also go to the verification provider; call Create Verification again to send the business for review once everything is in. Under review, `registration_number`, `incorporation_date`, `place_of_incorporation`, and `documents` are refused. While the review waits on owners, owners can still be added, changed, or removed with `remove`; otherwise only an owner's missing documents can still be sent. Once a verification is `approved` its profile details are locked and can no longer be edited.
 </dd>
 </dl>
 </dd>
@@ -32601,6 +45401,555 @@ client.verifications().update(
 </dl>
 </details>
 
+## Waitlist Entries
+<details><summary><code>client.waitlistEntries.list() -> SyncPagingIterable&amp;lt;WaitlistEntry&amp;gt;</code></summary>
+<dl>
+<dd>
+
+#### 📝 Description
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+Lists the waitlist signups you can see. `waitlist_entry:read` returns your own signups, and `plan:waitlist:read` returns signups to the seller accounts you are authorized on; with both, you get both sets. Signups submitted on behalf of an account are not in this list; pass `buyer_account_id` to list them instead, which needs `waitlist_entry:read` on that account. Account credentials see the signups submitted to their own account, and pass their own account as `buyer_account_id` to see the ones it submitted.
+</dd>
+</dl>
+</dd>
+</dl>
+
+#### 🔌 Usage
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+```java
+client.waitlistEntries().list(
+    ListWaitlistEntriesRequest
+        .builder()
+        .build()
+);
+```
+</dd>
+</dl>
+</dd>
+</dl>
+
+#### ⚙️ Parameters
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+**first:** `Optional<Integer>` — Number of results to return from the start of the range.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**after:** `Optional<String>` — Return results after this cursor. Use `page_info.end_cursor` from the previous response to fetch the next page.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**last:** `Optional<Integer>` — Number of results to return from the end of the range.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**before:** `Optional<String>` — Return results before this cursor. Use `page_info.start_cursor` from the previous response to fetch the previous page.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**variantId:** `Optional<String>` — Only return signups for this variant, prefixed `plan_`.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**accountId:** `Optional<String>` — Only return signups submitted to this seller account, prefixed `biz_`.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**productId:** `Optional<String>` — Only return signups for variants on this product, prefixed `prod_`.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**buyerAccountId:** `Optional<String>` — List the signups submitted on behalf of this account, prefixed `biz_`, instead of your own and seller signups. Requires `waitlist_entry:read` on the account. The other filters still apply.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**status:** `Optional<ListWaitlistEntriesRequestStatus>` — Only return signups in this state. Canceled signups are returned only when `status` is `canceled`.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**query:** `Optional<String>` — Search signups by the user's name or username, or the name of the account they were submitted on behalf of. An account ID, prefixed `biz_`, matches signups submitted on behalf of that account, and a user ID, prefixed `user_`, or an exact email address matches that user's signups.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**createdBefore:** `Optional<String>` — Only return signups submitted at or before this ISO 8601 timestamp.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**createdAfter:** `Optional<String>` — Only return signups submitted at or after this ISO 8601 timestamp.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**order:** `Optional<ListWaitlistEntriesRequestOrder>` — The field to sort results by. Defaults to `created_at`.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**direction:** `Optional<ListWaitlistEntriesRequestDirection>` — The sort direction for results. Defaults to descending.
+    
+</dd>
+</dl>
+</dd>
+</dl>
+
+
+</dd>
+</dl>
+</details>
+
+<details><summary><code>client.waitlistEntries.create(request) -> WaitlistEntry</code></summary>
+<dl>
+<dd>
+
+#### 📝 Description
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+Joins a free waitlist variant as the authenticated user, or on behalf of an account with `buyer_account_id`. Requires `waitlist_entry:create`, on that account when one is given. Joining again returns the existing pending signup, or the approved one while its membership is valid. Paid variants are rejected; joining collects no payment method and grants no membership.
+</dd>
+</dl>
+</dd>
+</dl>
+
+#### 🔌 Usage
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+```java
+client.waitlistEntries().create(
+    CreateWaitlistEntriesRequest
+        .builder()
+        .variantId("plan_xxxxxxxxxxxxxx")
+        .build()
+);
+```
+</dd>
+</dl>
+</dd>
+</dl>
+
+#### ⚙️ Parameters
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+**buyerAccountId:** `Optional<String>` — The account to join on behalf of, prefixed `biz_`. Leave it out to join as yourself. Required with an account credential, which passes its own account and records the account's owner as the user who joined.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**customFieldResponses:** `Optional<List<CreateWaitlistEntriesRequestCustomFieldResponsesItem>>` — Answers to the variant's checkout questions. Every required question must be answered.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**metadata:** `Optional<Map<String, Object>>` — Custom key-value pairs to store on the signup. Max 50 keys, 100 chars per key, 500 chars per string value. Ignored when the request returns an existing signup.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**variantId:** `String` — The free waitlist variant to join, prefixed `plan_`.
+    
+</dd>
+</dl>
+</dd>
+</dl>
+
+
+</dd>
+</dl>
+</details>
+
+<details><summary><code>client.waitlistEntries.approveAll(request) -> ApproveAllWaitlistEntriesResponse</code></summary>
+<dl>
+<dd>
+
+#### 📝 Description
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+Queues approval of every pending signup for an account, optionally narrowed to a variant. Requires `plan:waitlist:manage`. Paid signups may charge saved payment methods. Approval runs asynchronously: list signups with `status` set to `pending` to follow progress, and retrieve a signup to read its outcome. Signups created after this request are excluded.
+</dd>
+</dl>
+</dd>
+</dl>
+
+#### 🔌 Usage
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+```java
+client.waitlistEntries().approveAll(
+    ApproveAllWaitlistEntriesRequest
+        .builder()
+        .accountId("biz_xxxxxxxxxxxxxx")
+        .build()
+);
+```
+</dd>
+</dl>
+</dd>
+</dl>
+
+#### ⚙️ Parameters
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+**accountId:** `String` — The seller account whose pending signups to approve, prefixed `biz_`.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**variantId:** `Optional<String>` — Only approve signups for this variant, prefixed `plan_`. Omit to include every waitlist variant on the account.
+    
+</dd>
+</dl>
+</dd>
+</dl>
+
+
+</dd>
+</dl>
+</details>
+
+<details><summary><code>client.waitlistEntries.retrieve(id) -> WaitlistEntry</code></summary>
+<dl>
+<dd>
+
+#### 📝 Description
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+Retrieves your own signup or one submitted on behalf of an account you hold `waitlist_entry:read` on, or one submitted to an account you can read, with `plan:waitlist:read`.
+</dd>
+</dl>
+</dd>
+</dl>
+
+#### 🔌 Usage
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+```java
+client.waitlistEntries().retrieve(
+    "id",
+    RetrieveWaitlistEntriesRequest
+        .builder()
+        .build()
+);
+```
+</dd>
+</dl>
+</dd>
+</dl>
+
+#### ⚙️ Parameters
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+**id:** `String` — Waitlist signup ID, prefixed `entry_`.
+    
+</dd>
+</dl>
+</dd>
+</dl>
+
+
+</dd>
+</dl>
+</details>
+
+<details><summary><code>client.waitlistEntries.approve(id) -> WaitlistEntry</code></summary>
+<dl>
+<dd>
+
+#### 📝 Description
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+Queues approval of a pending signup. Requires `plan:waitlist:manage` on its seller account. Paid signups may charge their saved payment method. Returns the signup's current state; retrieve it to read `status` and `approval_failure_reason` after processing.
+</dd>
+</dl>
+</dd>
+</dl>
+
+#### 🔌 Usage
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+```java
+client.waitlistEntries().approve(
+    "id",
+    ApproveWaitlistEntriesRequest
+        .builder()
+        .build()
+);
+```
+</dd>
+</dl>
+</dd>
+</dl>
+
+#### ⚙️ Parameters
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+**id:** `String` — Waitlist signup ID, prefixed `entry_`.
+    
+</dd>
+</dl>
+</dd>
+</dl>
+
+
+</dd>
+</dl>
+</details>
+
+<details><summary><code>client.waitlistEntries.cancel(id) -> WaitlistEntry</code></summary>
+<dl>
+<dd>
+
+#### 📝 Description
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+Withdraws a pending signup: your own, or one submitted on behalf of an account you hold `waitlist_entry:cancel` on. Requires `waitlist_entry:cancel`, on that account for an account's signup. Does not cancel an approved membership.
+</dd>
+</dl>
+</dd>
+</dl>
+
+#### 🔌 Usage
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+```java
+client.waitlistEntries().cancel(
+    "id",
+    CancelWaitlistEntriesRequest
+        .builder()
+        .build()
+);
+```
+</dd>
+</dl>
+</dd>
+</dl>
+
+#### ⚙️ Parameters
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+**id:** `String` — Waitlist signup ID, prefixed `entry_`.
+    
+</dd>
+</dl>
+</dd>
+</dl>
+
+
+</dd>
+</dl>
+</details>
+
+<details><summary><code>client.waitlistEntries.deny(id) -> WaitlistEntry</code></summary>
+<dl>
+<dd>
+
+#### 📝 Description
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+Denies a pending signup. Requires `plan:waitlist:manage` on its seller account.
+</dd>
+</dl>
+</dd>
+</dl>
+
+#### 🔌 Usage
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+```java
+client.waitlistEntries().deny(
+    "id",
+    DenyWaitlistEntriesRequest
+        .builder()
+        .build()
+);
+```
+</dd>
+</dl>
+</dd>
+</dl>
+
+#### ⚙️ Parameters
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+**id:** `String` — Waitlist signup ID, prefixed `entry_`.
+    
+</dd>
+</dl>
+</dd>
+</dl>
+
+
+</dd>
+</dl>
+</details>
+
 ## Webhooks
 <details><summary><code>client.webhooks.list() -> SyncPagingIterable&amp;lt;WebhookListItem&amp;gt;</code></summary>
 <dl>
@@ -32632,7 +45981,6 @@ Returns a paginated list of webhook endpoints configured for an account, ordered
 client.webhooks().list(
     ListWebhooksRequest
         .builder()
-        .accountId("account_id")
         .build()
 );
 ```
@@ -32649,7 +45997,7 @@ client.webhooks().list(
 <dl>
 <dd>
 
-**accountId:** `String` — The unique identifier of the account to list webhooks for.
+**accountId:** `Optional<String>` — The unique identifier of the account to list webhooks for.
     
 </dd>
 </dl>
@@ -32681,7 +46029,7 @@ client.webhooks().list(
 <dl>
 <dd>
 
-**first:** `Optional<Integer>` — The number of webhooks to return (default 20, max 100).
+**first:** `Optional<Integer>` — Number of results to return from the start of the range.
     
 </dd>
 </dl>
@@ -32689,7 +46037,7 @@ client.webhooks().list(
 <dl>
 <dd>
 
-**after:** `Optional<String>` — A cursor; returns webhooks after this position.
+**after:** `Optional<String>` — Return results after this cursor. Use `page_info.end_cursor` from the previous response to fetch the next page.
     
 </dd>
 </dl>
@@ -32697,7 +46045,7 @@ client.webhooks().list(
 <dl>
 <dd>
 
-**last:** `Optional<Integer>` — The number of webhooks to return from the end of the range.
+**last:** `Optional<Integer>` — Number of results to return from the end of the range.
     
 </dd>
 </dl>
@@ -32705,7 +46053,7 @@ client.webhooks().list(
 <dl>
 <dd>
 
-**before:** `Optional<String>` — A cursor; returns webhooks before this position.
+**before:** `Optional<String>` — Return results before this cursor. Use `page_info.start_cursor` from the previous response to fetch the previous page.
     
 </dd>
 </dl>
@@ -32772,7 +46120,7 @@ client.webhooks().create(
 <dl>
 <dd>
 
-**childResourceEvents:** `Optional<Boolean>` — Whether to send events for child resources. For example, if the webhook is created for an account, enabling this sends events only from its connected accounts.
+**childResourceEvents:** `Optional<Boolean>` — Whether to send events for child resources. For example, if the webhook is created for an account, enabling this sends events only from its subaccounts.
     
 </dd>
 </dl>
@@ -32797,6 +46145,14 @@ client.webhooks().create(
 <dd>
 
 **resourceId:** `Optional<String>` — The account or app to create the webhook for. Defaults to the current account.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**title:** `Optional<String>` — A label for the webhook, shown in the dashboard. Up to 255 characters.
     
 </dd>
 </dl>
@@ -32887,7 +46243,7 @@ client.webhooks().retrieve(
 <dl>
 <dd>
 
-Permanently deletes a webhook endpoint. Returns `true` on success, matching the legacy proxy response.
+Permanently deletes a webhook endpoint. To stop deliveries without deleting it, set `enabled` to `false` with `PATCH /webhooks/:id`.
 </dd>
 </dl>
 </dd>
@@ -33021,6 +46377,14 @@ client.webhooks().update(
 <dl>
 <dd>
 
+**title:** `Optional<String>` — A label for the webhook, shown in the dashboard. Up to 255 characters. Pass `null` or an empty string to remove it.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
 **url:** `Optional<String>` — The URL to send the webhook to.
     
 </dd>
@@ -33045,7 +46409,7 @@ client.webhooks().update(
 <dl>
 <dd>
 
-Returns a paginated list of delivery attempts for a webhook, ordered by most recent first. Includes the request payload, response body, response code, and timing for each attempt.
+Returns a paginated list of delivery attempts for a webhook, ordered by most recent first. Includes the request payload, response body, response code, and timing for each attempt. Filtered queries use a bounded read budget, so a page may be partial or empty. Continue with `page_info.end_cursor` while `page_info.has_next_page` is `true`.
 </dd>
 </dl>
 </dd>
@@ -33064,6 +46428,7 @@ client.webhooks().listDeliveries(
     "id",
     ListDeliveriesWebhooksRequest
         .builder()
+        .resourceId("pay_xxxxxxxxxxxxx")
         .build()
 );
 ```
@@ -33088,7 +46453,7 @@ client.webhooks().listDeliveries(
 <dl>
 <dd>
 
-**first:** `Optional<Integer>` — The number of deliveries to return (default 50, max 100).
+**first:** `Optional<Integer>` — Number of results to return from the start of the range.
     
 </dd>
 </dl>
@@ -33096,7 +46461,47 @@ client.webhooks().listDeliveries(
 <dl>
 <dd>
 
-**after:** `Optional<String>` — A cursor; returns deliveries after this position.
+**after:** `Optional<String>` — Return results after this cursor. Use `page_info.end_cursor` from the previous response to fetch the next page.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**sentAfter:** `Optional<OffsetDateTime>` — Only deliveries sent at or after this ISO 8601 timestamp. Deliveries are retained for 30 days.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**sentBefore:** `Optional<OffsetDateTime>` — Only deliveries sent at or before this ISO 8601 timestamp.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**events:** `Optional<ListDeliveriesWebhooksRequestEventsItem>` — Only deliveries of these event types. Repeat the parameter to pass several.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**status:** `Optional<ListDeliveriesWebhooksRequestStatus>` — Only deliveries with this outcome: `success` for a 2xx response, `error` otherwise.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**resourceId:** `Optional<String>` — Only deliveries triggered by this resource.
     
 </dd>
 </dl>
@@ -33120,7 +46525,7 @@ client.webhooks().listDeliveries(
 <dl>
 <dd>
 
-Re-sends the exact payload of a past delivery to the webhook's current URL and returns the delivery result. By default the replay keeps the original `webhook-id`, so consumers that deduplicate on it can drop events they already processed. Pass `regenerate_id` to re-send under a freshly generated `webhook-id` instead, so a deduplicating consumer processes the replay as a new message. Only available for enabled webhooks on API version v1; deliveries are retained for 30 days.
+Re-sends the exact payload of a past delivery to the webhook's current URL and returns the delivery result. The replay keeps the original `webhook-id` unless you pass `regenerate_id`, so consumers that deduplicate on it can drop events they already processed. Only available for enabled webhooks on API version `v1`; deliveries are retained for 30 days.
 </dd>
 </dl>
 </dd>
@@ -33196,7 +46601,7 @@ client.webhooks().replayDelivery(
 <dl>
 <dd>
 
-Re-sends the webhook's past deliveries within a time window, optionally limited to specific events or to messages whose most recent delivery attempt failed. Fire and forget: nothing about the replay is stored, and each re-send appears as a new entry in the webhook's delivery log. Each matching message is re-sent once, by default with its original `webhook-id`, so consumers that deduplicate are unaffected; pass `regenerate_ids` to re-send under freshly generated ids instead. Only available for enabled webhooks on API version v1; deliveries are retained for 30 days.
+Re-sends the webhook's past deliveries within a time window, optionally limited to specific events or to failed deliveries. Use it to recover events your endpoint missed. The replay runs asynchronously and nothing about it is stored: each re-send appears as a new entry in the webhook's delivery log. Each matching message is re-sent once, with its original `webhook-id` unless you pass `regenerate_ids`. Only available for enabled webhooks on API version `v1`; deliveries are retained for 30 days.
 </dd>
 </dl>
 </dd>
@@ -33352,7 +46757,8 @@ client.webhooks().test(
 </dl>
 </details>
 
-<details><summary><code>client.webhooks.deliveriesWebhook(webhookId) -> SyncPagingIterable&amp;lt;DeliveriesWebhookResponseDataItem&amp;gt;</code></summary>
+## Accounts CustomerTracking
+<details><summary><code>client.accounts.customerTracking.retrieve(accountId) -> AccountCustomerTracking</code></summary>
 <dl>
 <dd>
 
@@ -33364,10 +46770,7 @@ client.webhooks().test(
 <dl>
 <dd>
 
-Returns a paginated list of delivery attempts for a webhook, ordered by most recent first. Includes the request payload, response body, response code, and timing for each attempt.
-
-Required permissions:
- - `developer:manage_webhook`
+Retrieves the branding and support contacts the account's hosted customer tracking page and tracking Element display. Public by design, so no authentication is required. Returns 404 unless the account has turned customer tracking on in its preferences. Responses are never cached.
 </dd>
 </dl>
 </dd>
@@ -33382,12 +46785,10 @@ Required permissions:
 <dd>
 
 ```java
-client.webhooks().deliveriesWebhook(
-    "webhook_id",
-    DeliveriesWebhookRequest
+client.accounts().customerTracking().retrieve(
+    "account_id",
+    RetrieveCustomerTrackingRequest
         .builder()
-        .first(42)
-        .last(42)
         .build()
 );
 ```
@@ -33404,39 +46805,7 @@ client.webhooks().deliveriesWebhook(
 <dl>
 <dd>
 
-**webhookId:** `String` — The unique identifier of the webhook to list deliveries for.
-    
-</dd>
-</dl>
-
-<dl>
-<dd>
-
-**after:** `Optional<String>` — Returns the elements in the list that come after the specified cursor.
-    
-</dd>
-</dl>
-
-<dl>
-<dd>
-
-**before:** `Optional<String>` — Returns the elements in the list that come before the specified cursor.
-    
-</dd>
-</dl>
-
-<dl>
-<dd>
-
-**first:** `Optional<Integer>` — Returns the first _n_ elements from the list.
-    
-</dd>
-</dl>
-
-<dl>
-<dd>
-
-**last:** `Optional<Integer>` — Returns the last _n_ elements from the list.
+**accountId:** `String` — Account ID, prefixed `biz_`.
     
 </dd>
 </dl>
@@ -33448,8 +46817,8 @@ client.webhooks().deliveriesWebhook(
 </dl>
 </details>
 
-## Withdrawals
-<details><summary><code>client.withdrawals.list() -> SyncPagingIterable&amp;lt;WithdrawalListItem&amp;gt;</code></summary>
+## Accounts Fees
+<details><summary><code>client.accounts.fees.retrieve(accountId) -> AccountFees</code></summary>
 <dl>
 <dd>
 
@@ -33461,10 +46830,7 @@ client.webhooks().deliveriesWebhook(
 <dl>
 <dd>
 
-Returns a paginated list of withdrawals for a company, with optional sorting and date filtering.
-
-Required permissions:
- - `payout:withdrawal:read`
+Retrieves the account's fees as a single document keyed by fee, with any markups its platform adds. Subaccounts see the rates in effect for them. `adjustable` on each fee says what you may change with Update Account Fees.
 </dd>
 </dl>
 </dd>
@@ -33479,14 +46845,10 @@ Required permissions:
 <dd>
 
 ```java
-client.withdrawals().list(
-    ListWithdrawalsRequest
+client.accounts().fees().retrieve(
+    "account_id",
+    RetrieveFeesRequest
         .builder()
-        .companyId("biz_xxxxxxxxxxxxxx")
-        .first(42)
-        .last(42)
-        .createdBefore(OffsetDateTime.parse("2023-12-01T05:00:00Z"))
-        .createdAfter(OffsetDateTime.parse("2023-12-01T05:00:00Z"))
         .build()
 );
 ```
@@ -33503,63 +46865,7 @@ client.withdrawals().list(
 <dl>
 <dd>
 
-**after:** `Optional<String>` — Returns the elements in the list that come after the specified cursor.
-    
-</dd>
-</dl>
-
-<dl>
-<dd>
-
-**before:** `Optional<String>` — Returns the elements in the list that come before the specified cursor.
-    
-</dd>
-</dl>
-
-<dl>
-<dd>
-
-**first:** `Optional<Integer>` — Returns the first _n_ elements from the list.
-    
-</dd>
-</dl>
-
-<dl>
-<dd>
-
-**last:** `Optional<Integer>` — Returns the last _n_ elements from the list.
-    
-</dd>
-</dl>
-
-<dl>
-<dd>
-
-**companyId:** `String` — The unique identifier of the company to list withdrawals for.
-    
-</dd>
-</dl>
-
-<dl>
-<dd>
-
-**direction:** `Optional<Direction>` 
-    
-</dd>
-</dl>
-
-<dl>
-<dd>
-
-**createdBefore:** `Optional<OffsetDateTime>` — Only return withdrawals created before this timestamp.
-    
-</dd>
-</dl>
-
-<dl>
-<dd>
-
-**createdAfter:** `Optional<OffsetDateTime>` — Only return withdrawals created after this timestamp.
+**accountId:** `String` — Account ID, prefixed `biz_`.
     
 </dd>
 </dl>
@@ -33571,7 +46877,7 @@ client.withdrawals().list(
 </dl>
 </details>
 
-<details><summary><code>client.withdrawals.create(request) -> Withdrawal</code></summary>
+<details><summary><code>client.accounts.fees.update(accountId, request) -> AccountFees</code></summary>
 <dl>
 <dd>
 
@@ -33583,11 +46889,7 @@ client.withdrawals().list(
 <dl>
 <dd>
 
-Creates a withdrawal request for a ledger account
-
-Required permissions:
- - `payout:withdraw_funds`
- - `payout:destination:read`
+Updates the account's fees. Each key present in the body is replaced; omitted keys are left untouched. Only fees that Retrieve Account Fees reports as `adjustable` can be changed.
 </dd>
 </dl>
 </dd>
@@ -33602,12 +46904,10 @@ Required permissions:
 <dd>
 
 ```java
-client.withdrawals().create(
-    CreateWithdrawalsRequest
+client.accounts().fees().update(
+    "account_id",
+    UpdateFeesRequest
         .builder()
-        .amount(6.9)
-        .companyId("biz_xxxxxxxxxxxxxx")
-        .currency(Currencies.USD)
         .build()
 );
 ```
@@ -33624,7 +46924,7 @@ client.withdrawals().create(
 <dl>
 <dd>
 
-**acknowledgeBankWarning:** `Optional<Boolean>` — Set to true to continue when the bank could not confirm the account holder's name, or false to be refused in that case so the creator can fix the account or link their bank first. Omitting the argument skips the warning gate — a client that cannot show the warning keeps its pre-gate behavior.
+**accountId:** `String` — Account ID, prefixed `biz_`.
     
 </dd>
 </dl>
@@ -33632,7 +46932,7 @@ client.withdrawals().create(
 <dl>
 <dd>
 
-**amount:** `Double` — The amount to withdraw in the specified currency
+**achDispute:** `Optional<UpdateFeesRequestAchDispute>` — The fields of a fee the caller may change. Only the keys sent are replaced.
     
 </dd>
 </dl>
@@ -33640,7 +46940,7 @@ client.withdrawals().create(
 <dl>
 <dd>
 
-**companyId:** `String` — The ID of the company to withdraw from.
+**achReturn:** `Optional<UpdateFeesRequestAchReturn>` — The fields of a fee the caller may change. Only the keys sent are replaced.
     
 </dd>
 </dl>
@@ -33648,7 +46948,7 @@ client.withdrawals().create(
 <dl>
 <dd>
 
-**currency:** `Currencies` — The currency that is being withdrawn.
+**bankDeposit:** `Optional<UpdateFeesRequestBankDeposit>` — The fields of a fee the caller may change. Only the keys sent are replaced.
     
 </dd>
 </dl>
@@ -33656,7 +46956,7 @@ client.withdrawals().create(
 <dl>
 <dd>
 
-**idempotencyKey:** `Optional<String>` — A client-generated key that makes retries safe. Retrying with the same key returns the original withdrawal instead of creating a second one.
+**billing:** `Optional<UpdateFeesRequestBilling>` — The fields of a fee the caller may change. Only the keys sent are replaced.
     
 </dd>
 </dl>
@@ -33664,7 +46964,7 @@ client.withdrawals().create(
 <dl>
 <dd>
 
-**payoutMethodId:** `Optional<String>` — The ID of the payout method to use for the withdrawal.
+**buyer:** `Optional<UpdateFeesRequestBuyer>` — The fields of a fee the caller may change. Only the keys sent are replaced.
     
 </dd>
 </dl>
@@ -33672,7 +46972,7 @@ client.withdrawals().create(
 <dl>
 <dd>
 
-**platformCoversFees:** `Optional<Boolean>` — Whether the platform covers the payout fees.
+**cardProcessing:** `Optional<UpdateFeesRequestCardProcessing>` — The fields of a fee the caller may change. Only the keys sent are replaced.
     
 </dd>
 </dl>
@@ -33680,7 +46980,7 @@ client.withdrawals().create(
 <dl>
 <dd>
 
-**speed:** `Optional<WithdrawalSpeeds>` — The processing speed for the withdrawal. Either standard or instant.
+**childMarkups:** `Optional<UpdateFeesRequestChildMarkups>` — Default markups for subaccounts. Available on accounts without a parent, even before any accounts connect.
     
 </dd>
 </dl>
@@ -33688,7 +46988,215 @@ client.withdrawals().create(
 <dl>
 <dd>
 
-**statementDescriptor:** `Optional<String>` — Custom statement descriptor for the withdrawal. Must be between 5 and 22 characters and contain only alphanumeric characters.
+**coveredPayoutFees:** `Optional<UpdateFeesRequestCoveredPayoutFees>` — Changes to the payout fees this account covers for subaccounts. Send either all or individual category keys. Omitted categories stay unchanged; category changes have no effect while all is true.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**crossBorder:** `Optional<UpdateFeesRequestCrossBorder>` — The fields of a fee the caller may change. Only the keys sent are replaced.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**dispute:** `Optional<UpdateFeesRequestDispute>` — The fields of a fee the caller may change. Only the keys sent are replaced.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**disputeAlert:** `Optional<UpdateFeesRequestDisputeAlert>` — The fields of a fee the caller may change. Only the keys sent are replaced.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**disputeAlertCdrn:** `Optional<UpdateFeesRequestDisputeAlertCdrn>` — The fields of a fee the caller may change. Only the keys sent are replaced.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**disputeAlertEthoca:** `Optional<UpdateFeesRequestDisputeAlertEthoca>` — The fields of a fee the caller may change. Only the keys sent are replaced.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**disputeAlertRdr:** `Optional<UpdateFeesRequestDisputeAlertRdr>` — The fields of a fee the caller may change. Only the keys sent are replaced.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**disputeRepresentment:** `Optional<UpdateFeesRequestDisputeRepresentment>` — The fields of a fee the caller may change. Only the keys sent are replaced.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**foreignExchange:** `Optional<UpdateFeesRequestForeignExchange>` — The fields of a fee the caller may change. Only the keys sent are replaced.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**fraudScreening:** `Optional<UpdateFeesRequestFraudScreening>` — The fields of a fee the caller may change. Only the keys sent are replaced.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**highRisk:** `Optional<UpdateFeesRequestHighRisk>` — The fields of a fee the caller may change. Only the keys sent are replaced.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**marketplace:** `Optional<UpdateFeesRequestMarketplace>` — The fields of a fee the caller may change. Only the keys sent are replaced.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**markups:** `Optional<UpdateFeesRequestMarkups>` — Markups on this subaccount, set by the platform it is connected to.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**notes:** `Optional<String>` — Why the fees are changing, recorded with the change. Required when a Whop Verified Partner edits the fee schedule; ignored for markups.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**orchestration:** `Optional<UpdateFeesRequestOrchestration>` — The fields of a fee the caller may change. Only the keys sent are replaced.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**paymentMethods:** `Optional<Map<String, UpdateFeesRequestPaymentMethodsValue>>` — Changes to non-card payment method fees, keyed by payment method type.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**payouts:** `Optional<Map<String, UpdateFeesRequestPayoutsValue>>` — Changes to withdrawal fees, keyed by payout method.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**pendingAutoTopup:** `Optional<UpdateFeesRequestPendingAutoTopup>` — The fields of a fee the caller may change. Only the keys sent are replaced.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**platformProcessing:** `Optional<UpdateFeesRequestPlatformProcessing>` — The fields of a fee the caller may change. Only the keys sent are replaced.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**poolPayout:** `Optional<UpdateFeesRequestPoolPayout>` — The fields of a fee the caller may change. Only the keys sent are replaced.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**revshare:** `Optional<UpdateFeesRequestRevshare>` — The fields of a fee the caller may change. Only the keys sent are replaced.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**sepaDispute:** `Optional<UpdateFeesRequestSepaDispute>` — The fields of a fee the caller may change. Only the keys sent are replaced.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**sepaReturn:** `Optional<UpdateFeesRequestSepaReturn>` — The fields of a fee the caller may change. Only the keys sent are replaced.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**taxCalculation:** `Optional<UpdateFeesRequestTaxCalculation>` — The fields of a fee the caller may change. Only the keys sent are replaced.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**taxService:** `Optional<UpdateFeesRequestTaxService>` — The fields of a fee the caller may change. Only the keys sent are replaced.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**threeDs:** `Optional<UpdateFeesRequestThreeDs>` — The fields of a fee the caller may change. Only the keys sent are replaced.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**transfers:** `Optional<UpdateFeesRequestTransfers>` — The fields of a fee the caller may change. Only the keys sent are replaced.
     
 </dd>
 </dl>
@@ -33700,7 +47208,8 @@ client.withdrawals().create(
 </dl>
 </details>
 
-<details><summary><code>client.withdrawals.retrieve(id) -> Withdrawal</code></summary>
+## Accounts FinancingProviders
+<details><summary><code>client.accounts.financingProviders.list(accountId) -> SyncPagingIterable&amp;lt;FinancingProvider&amp;gt;</code></summary>
 <dl>
 <dd>
 
@@ -33712,11 +47221,7 @@ client.withdrawals().create(
 <dl>
 <dd>
 
-Retrieves the details of an existing withdrawal.
-
-Required permissions:
- - `payout:withdrawal:read`
- - `payout:destination:read`
+Lists every financing provider and where it stands for an account: whether checkout offers it, what the merchant can do to turn it on, and why it is off.
 </dd>
 </dl>
 </dd>
@@ -33731,9 +47236,9 @@ Required permissions:
 <dd>
 
 ```java
-client.withdrawals().retrieve(
-    "wdrl_xxxxxxxxxxxxx",
-    RetrieveWithdrawalsRequest
+client.accounts().financingProviders().list(
+    "account_id",
+    ListFinancingProvidersRequest
         .builder()
         .build()
 );
@@ -33751,69 +47256,47 @@ client.withdrawals().retrieve(
 <dl>
 <dd>
 
-**id:** `String` — The unique identifier of the withdrawal to retrieve.
+**accountId:** `String` — The ID of the account, prefixed `biz_`.
     
 </dd>
 </dl>
+
+<dl>
+<dd>
+
+**status:** `Optional<ListFinancingProvidersRequestStatus>` — Only providers with this status.
+    
 </dd>
 </dl>
 
-
-</dd>
-</dl>
-</details>
-
-<details><summary><code>client.withdrawals.generatePdf(id) -> GeneratePdfWithdrawalsResponse</code></summary>
 <dl>
 <dd>
 
-#### 📝 Description
-
-<dl>
-<dd>
-
-<dl>
-<dd>
-
-Generates a withdrawal PDF invoice and returns a temporary download URL.
-
-Required permissions:
- - `payout:withdrawal:read`
-</dd>
-</dl>
+**first:** `Optional<Integer>` — Number of results to return from the start of the range.
+    
 </dd>
 </dl>
 
-#### 🔌 Usage
-
 <dl>
 <dd>
 
-<dl>
-<dd>
-
-```java
-client.withdrawals().generatePdf(
-    "wdrl_xxxxxxxxxxxxx",
-    GeneratePdfWithdrawalsRequest
-        .builder()
-        .build()
-);
-```
-</dd>
-</dl>
+**after:** `Optional<String>` — Return results after this cursor. Use `page_info.end_cursor` from the previous response to fetch the next page.
+    
 </dd>
 </dl>
 
-#### ⚙️ Parameters
+<dl>
+<dd>
+
+**last:** `Optional<Integer>` — Number of results to return from the end of the range.
+    
+</dd>
+</dl>
 
 <dl>
 <dd>
 
-<dl>
-<dd>
-
-**id:** `String` — The unique identifier of the withdrawal to generate a PDF for.
+**before:** `Optional<String>` — Return results before this cursor. Use `page_info.start_cursor` from the previous response to fetch the previous page.
     
 </dd>
 </dl>
@@ -33897,7 +47380,17 @@ client.accounts().preferences().retrieve(
 <dl>
 <dd>
 
-Updates the account's preferences. Each top-level key present in the body is replaced as a whole; omitted keys are left untouched. `ads_triple_whale_integration` takes the Data-In API key to connect with, or `null` to disconnect. `ads_payment_methods` always requires a `primary` entry. `backup` is optional and any pairing is allowed — two cards, `card`+`platform_balance`, or a single method — so a card-only advertiser can fund ads without a platform balance. The `primary` and `backup` must be different sources. A `platform_balance` entry may omit `id` to use the account's default Whop balance. Configuring a `card` requires a user token; account API keys can set up platform-balance billing only.
+Updates the account's preferences. Each top-level key in the body replaces its stored value as a whole. Keys left out keep their current values.
+
+The required scope depends on which preferences you update.
+
+- `ad_campaign:create`: `ads_payment_methods`, `ads_reporting_currency`, `ads_scheduling_timezone`, `ads_triple_whale_integration`.
+- `payout:account:update`: `cards_auto_top_up`, `cards_notifications`, `covers_subaccount_negative_balances`.
+- `payment:dispute`: `dispute_fighter_enabled`.
+- `company:update`: `economic_intelligence_duration_key`, `economic_intelligence_auto_renew`, `review_request_emails`, `cancellation_emails`, `renewal_reminder_emails`, `failed_payment_emails`, `subaccount_notifications`, `subaccount_team_view_only`.
+- `company:manage_checkout`: `feedback_options`, `customer_tracking`.
+
+To update keys under more than one scope, the API key needs all of those scopes.
 </dd>
 </dl>
 </dd>
@@ -33940,7 +47433,7 @@ client.accounts().preferences().update(
 <dl>
 <dd>
 
-**adsPaymentMethods:** `Optional<UpdatePreferencesRequestAdsPaymentMethods>` — How the account pays for Whop Ads spend. `primary` is charged first; `backup` covers the charge when the primary fails.
+**adsPaymentMethods:** `Optional<UpdatePreferencesRequestAdsPaymentMethods>` — How the account pays for Whop Ads spend. Requires `primary`; `backup` is optional and covers the charge when the primary fails. Requires the `ad_campaign:create` scope on your API key. Configuring a `card` requires a user token; account API keys can configure only `platform_balance` sources.
     
 </dd>
 </dl>
@@ -33948,7 +47441,7 @@ client.accounts().preferences().update(
 <dl>
 <dd>
 
-**adsReportingCurrency:** `Optional<String>` — Lowercase ISO currency code, such as `usd` or `eur`, used to display ad spend and stats. Defaults to `usd`.
+**adsReportingCurrency:** `Optional<String>` — Lowercase ISO currency code, such as `usd` or `eur`, used to display ad spend and stats. Defaults to `usd`. Requires the `ad_campaign:create` scope on your API key.
     
 </dd>
 </dl>
@@ -33956,7 +47449,7 @@ client.accounts().preferences().update(
 <dl>
 <dd>
 
-**adsSchedulingTimezone:** `Optional<String>` — IANA timezone (e.g. `America/New_York`) used to interpret campaign start/end times and to bucket reports. Cannot be cleared once set — pass a new value to change it.
+**adsSchedulingTimezone:** `Optional<String>` — IANA timezone (e.g. `America/New_York`) used to interpret campaign start/end times and to bucket reports. Cannot be cleared once set — pass a new value to change it. Requires the `ad_campaign:create` scope on your API key.
     
 </dd>
 </dl>
@@ -33964,7 +47457,7 @@ client.accounts().preferences().update(
 <dl>
 <dd>
 
-**adsTripleWhaleIntegration:** `Optional<UpdatePreferencesRequestAdsTripleWhaleIntegration>` — Connects or disconnects the Triple Whale integration. Requires a connected Shopify store, since Triple Whale keys spend records by Shopify shop.
+**adsTripleWhaleIntegration:** `Optional<UpdatePreferencesRequestAdsTripleWhaleIntegration>` — Connects or disconnects the Triple Whale integration, or changes the shop it reports to. Requires the `ad_campaign:create` scope on your API key. Connecting requires a `shop_domain` to report spend against.
     
 </dd>
 </dl>
@@ -33972,7 +47465,7 @@ client.accounts().preferences().update(
 <dl>
 <dd>
 
-**cardsAutoTopUp:** `Optional<Boolean>` — Whether incoming funds are automatically moved to the account's cards balance. Requires a cards balance on the account.
+**cancellationEmails:** `Optional<Boolean>` — Whether Whop emails members when their membership is canceled or terminated. Set it to `false` to stop these emails while keeping the account's other customer emails. Requires the `company:update` scope on your API key.
     
 </dd>
 </dl>
@@ -33980,7 +47473,119 @@ client.accounts().preferences().update(
 <dl>
 <dd>
 
-**disputeFighterEnabled:** `Optional<Boolean>` — Whether Whop assembles and files the evidence response when this account's payments are disputed. Off by default; enabling it also opts the account into the success fee charged only on disputes it wins.
+**cardsAutoTopUp:** `Optional<Boolean>` — Whether incoming funds are automatically moved to the account's cards balance. Requires a cards balance on the account and the `payout:account:update` scope on your API key.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**cardsNotifications:** `Optional<Boolean>` — Whether Whop Card notifications reach this account's team. Set it to `false` to stop every card email and push notification for the account — application status, verification and action-required alerts, card-ready alerts, declines, large charges, and cashback summaries. Cardholder onboarding invitations still send, because they carry the only link an invited cardholder can onboard with. Requesting a card is rejected while notifications are off, since the request reaches nobody. Cards on personal accounts are unaffected. Requires a cards balance on the account and the `payout:account:update` scope on your API key.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**coversSubaccountNegativeBalances:** `Optional<Boolean>` — Whether this account covers its subaccounts' negative balances. When a subaccount's balance drops below zero (from refunds, disputes, or fees), this account's available balance in the same currency pays it back, up to what is available. Only accounts with subaccounts can set it. Requires the `payout:account:update` scope on your API key.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**customerTracking:** `Optional<UpdatePreferencesRequestCustomerTracking>` — Customer tracking settings for the hosted tracking page and Element, replaced as a whole: fields left out are reset to their defaults. Pass null to clear them, which turns tracking off. Requires the `company:manage_checkout` scope on your API key.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**disputeFighterEnabled:** `Optional<Boolean>` — Whether Whop assembles and files the evidence response when this account's payments are disputed. Off by default; enabling it also opts the account into the success fee charged only on disputes it wins. Requires the `payment:dispute` scope on your API key.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**economicIntelligenceAutoRenew:** `Optional<Boolean>` — `false` stops renewing: Economic Intelligence stays on until the end of the current period, and the fee is charged until then. `true` keeps it renewing again before then, or turns it on like the `3_days` offer. Can't be combined with `economic_intelligence_duration_key`. Requires the `company:update` scope on your API key.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**economicIntelligenceDurationKey:** `Optional<UpdatePreferencesRequestEconomicIntelligenceDurationKey>` — Turns on Economic Intelligence with the offer that has this `key` in `economic_intelligence_offers`, at that offer's fee. Only `3_days`, the auto-renew offer, is accepted. Any other key is rejected. Returns `403` for an account Economic Intelligence is not offered to. Requires the `company:update` scope on your API key.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**failedPaymentEmails:** `Optional<Boolean>` — Whether Whop emails members when a renewal payment fails or needs them to verify it. Set it to `false` to stop these emails while keeping the account's other customer emails. Subscriptions billed by invoice still get their invoice emails. Requires the `company:update` scope on your API key.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**feedbackOptions:** `Optional<List<UpdatePreferencesRequestFeedbackOptionsItem>>` — Replaces the account's own cancel reasons, shown to members in this order when they cancel. Pass an option's `id` to keep it, for example when renaming it; options without an `id` are added, and options left out are removed. Pass an empty array to go back to Whop's default reasons. Members who already picked an option keep the label they saw. Requires the `company:manage_checkout` scope on your API key.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**preferredSettlementCurrency:** `Optional<UpdatePreferencesRequestPreferredSettlementCurrency>` — Settle every new sale into this currency, regardless of the plan's currency or what the buyer paid in; sales converted this way carry an additional 0.5% FX fee. Pass `null` to go back to settling each sale in its plan's currency. Changing it never converts money already in your balances, and it can change at most once a day (see `preferred_settlement_currency_changeable_at`). Requires the `payout:account:update` scope on your API key.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**renewalReminderEmails:** `Optional<Boolean>` — Whether Whop emails members the day before their membership renews or their free trial converts. Set it to `false` to stop that reminder. Members still get the reminders card networks require. Requires the `company:update` scope on your API key.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**reviewRequestEmails:** `Optional<Boolean>` — Whether Whop emails customers after a purchase asking them to leave a review. Set it to `false` to stop these emails, including ones already scheduled. Requires the `company:update` scope on your API key.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**subaccountNotifications:** `Optional<Boolean>` — Whether Whop emails and notifies the teams of this account's subaccounts. Set it to `false` to stop Whop's emails, push, and in-app notifications to them. These include payout, verification, dispute, and card alerts about their accounts. Only accounts with subaccounts can set it. Requires the `company:update` scope on your API key.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**subaccountTeamViewOnly:** `Optional<Boolean>` — Whether this account's subaccounts are view-only for their own team members. Set it to `true` to refuse every change a subaccount's team tries to make while still letting them see what their role allows. Only accounts with subaccounts can set it. Requires the `company:update` scope on your API key.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**subscriptionFailureBehavior:** `Optional<UpdatePreferencesRequestSubscriptionFailureBehavior>` — What happens to a subscription once every retry of a renewal payment has failed. `cancel` (the default) cancels it. `none` leaves it past due and keeps billing it each period; access follows the account's past-due access setting. Requires company:manage_checkout permission.
     
 </dd>
 </dl>
@@ -34482,6 +48087,97 @@ client.affiliates().overrides().update(
 </dl>
 </details>
 
+## Apps Categories
+<details><summary><code>client.apps.categories.list() -> SyncPagingIterable&amp;lt;AppCategory&amp;gt;</code></summary>
+<dl>
+<dd>
+
+#### 📝 Description
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+Lists the App Store's categories. Pass `app_type` for one store's categories in the order that store shows them; without it, every category either store shows is listed. Use a business category's ID as an app's `category_id`, or any category's `route` to filter apps. This endpoint is public and does not require authentication.
+</dd>
+</dl>
+</dd>
+</dl>
+
+#### 🔌 Usage
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+```java
+client.apps().categories().list(
+    ListCategoriesRequest
+        .builder()
+        .build()
+);
+```
+</dd>
+</dl>
+</dd>
+</dl>
+
+#### ⚙️ Parameters
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+**appType:** `Optional<ListCategoriesRequestAppType>` — Only return the categories of this app type's store, in that store's order: `b2b_app` for the business App Store, `b2c_app` for the community App Store.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**first:** `Optional<Integer>` — Number of results to return from the start of the range.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**after:** `Optional<String>` — Return results after this cursor. Use `page_info.end_cursor` from the previous response to fetch the next page.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**last:** `Optional<Integer>` — Number of results to return from the end of the range.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**before:** `Optional<String>` — Return results before this cursor. Use `page_info.start_cursor` from the previous response to fetch the previous page.
+    
+</dd>
+</dl>
+</dd>
+</dl>
+
+
+</dd>
+</dl>
+</details>
+
 ## Bounties Submissions
 <details><summary><code>client.bounties.submissions.list(bountyId) -> SyncPagingIterable&amp;lt;PublicBountySubmission&amp;gt;</code></summary>
 <dl>
@@ -34578,7 +48274,7 @@ client.bounties().submissions().list(
 <dl>
 <dd>
 
-**first:** `Optional<Integer>` — Number of submissions to return from the start of the window.
+**first:** `Optional<Integer>` — Number of results to return from the start of the range.
     
 </dd>
 </dl>
@@ -34586,7 +48282,7 @@ client.bounties().submissions().list(
 <dl>
 <dd>
 
-**after:** `Optional<String>` — Cursor to paginate forwards from.
+**after:** `Optional<String>` — Return results after this cursor. Use `page_info.end_cursor` from the previous response to fetch the next page.
     
 </dd>
 </dl>
@@ -34594,7 +48290,7 @@ client.bounties().submissions().list(
 <dl>
 <dd>
 
-**last:** `Optional<Integer>` — Number of submissions to return from the end of the window.
+**last:** `Optional<Integer>` — Number of results to return from the end of the range.
     
 </dd>
 </dl>
@@ -34602,7 +48298,7 @@ client.bounties().submissions().list(
 <dl>
 <dd>
 
-**before:** `Optional<String>` — Cursor to paginate backwards from.
+**before:** `Optional<String>` — Return results before this cursor. Use `page_info.start_cursor` from the previous response to fetch the previous page.
     
 </dd>
 </dl>
@@ -34682,6 +48378,219 @@ client.bounties().submissions().retrieve(
 </dl>
 </details>
 
+## FinancialReports Breakdown
+<details><summary><code>client.financialReports.breakdown.retrieve() -> RetrieveBreakdownResponse</code></summary>
+<dl>
+<dd>
+
+#### 📝 Description
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+Breaks one bucket of a financial report, such as payments received or card spend, into the customers, accounts, merchants, or campaigns that contributed most, with the rest summed as a remainder. Use it to explain a total from `GET /financial_reports`.
+</dd>
+</dl>
+</dd>
+</dl>
+
+#### 🔌 Usage
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+```java
+client.financialReports().breakdown().retrieve(
+    RetrieveBreakdownRequest
+        .builder()
+        .accountId("account_id")
+        .bucket(RetrieveBreakdownRequestBucket.TRANSFERS)
+        .direction(RetrieveBreakdownRequestDirection.MONEY_IN)
+        .currency("currency")
+        .from(OffsetDateTime.parse("2024-01-15T09:30:00Z"))
+        .to(OffsetDateTime.parse("2024-01-15T09:30:00Z"))
+        .build()
+);
+```
+</dd>
+</dl>
+</dd>
+</dl>
+
+#### ⚙️ Parameters
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+**accountId:** `String` — The owning account ID (a biz_ identifier).
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**bucket:** `RetrieveBreakdownRequestBucket` — The high-level report bucket to explain.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**direction:** `RetrieveBreakdownRequestDirection` — Whether to explain money received or money sent.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**currency:** `String` — The report currency to explain.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**from:** `OffsetDateTime` — Start of the report window as an ISO 8601 timestamp.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**to:** `OffsetDateTime` — Exclusive end of the report window as an ISO 8601 timestamp.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**groupBy:** `Optional<RetrieveBreakdownRequestGroupBy>` — Period grouping used by the parent report.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**timezone:** `Optional<String>` — IANA timezone used by the parent report to bucket periods. Defaults to UTC.
+    
+</dd>
+</dl>
+</dd>
+</dl>
+
+
+</dd>
+</dl>
+</details>
+
+## Invoices Sends
+<details><summary><code>client.invoices.sends.list(id) -> SyncPagingIterable&amp;lt;InvoiceSend&amp;gt;</code></summary>
+<dl>
+<dd>
+
+#### 📝 Description
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+Lists recorded invoice emails, most recent first. Each entry is a send, send again, scheduled send, reminder, or payment link after a failed charge. Each entry includes the addresses it went to and who sent it. Issuing without sending adds nothing. Entries appear after queuing. Addresses need `member:email:read`, and the sender needs `company:authorized_user:read`. History starts when recording is enabled and does not confirm inbox delivery.
+</dd>
+</dl>
+</dd>
+</dl>
+
+#### 🔌 Usage
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+```java
+client.invoices().sends().list(
+    "id",
+    ListSendsRequest
+        .builder()
+        .build()
+);
+```
+</dd>
+</dl>
+</dd>
+</dl>
+
+#### ⚙️ Parameters
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+**id:** `String` — The invoice's pay_ ID.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**first:** `Optional<Integer>` — Number of results to return from the start of the range.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**after:** `Optional<String>` — Return results after this cursor. Use `page_info.end_cursor` from the previous response to fetch the next page.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**last:** `Optional<Integer>` — Number of results to return from the end of the range.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**before:** `Optional<String>` — Return results before this cursor. Use `page_info.start_cursor` from the previous response to fetch the previous page.
+    
+</dd>
+</dl>
+</dd>
+</dl>
+
+
+</dd>
+</dl>
+</details>
+
 ## Members Logs
 <details><summary><code>client.members.logs.list(id) -> SyncPagingIterable&amp;lt;ListLogsResponseDataItem&amp;gt;</code></summary>
 <dl>
@@ -34695,7 +48604,7 @@ client.bounties().submissions().retrieve(
 <dl>
 <dd>
 
-Lists activity for a member and all of their non-drafted memberships, most recent first.
+Lists activity for a member and all of their memberships that are not `drafted`, most recent first.
 </dd>
 </dl>
 </dd>
@@ -34738,7 +48647,7 @@ client.members().logs().list(
 <dl>
 <dd>
 
-**first:** `Optional<Integer>` — Number of log entries to return from the start of the window.
+**first:** `Optional<Integer>` — Number of results to return from the start of the range.
     
 </dd>
 </dl>
@@ -34746,7 +48655,7 @@ client.members().logs().list(
 <dl>
 <dd>
 
-**after:** `Optional<String>` — Cursor to paginate forwards from.
+**after:** `Optional<String>` — Return results after this cursor. Use `page_info.end_cursor` from the previous response to fetch the next page.
     
 </dd>
 </dl>
@@ -34754,7 +48663,7 @@ client.members().logs().list(
 <dl>
 <dd>
 
-**last:** `Optional<Integer>` — Number of log entries to return from the end of the window.
+**last:** `Optional<Integer>` — Number of results to return from the end of the range.
     
 </dd>
 </dl>
@@ -34762,7 +48671,175 @@ client.members().logs().list(
 <dl>
 <dd>
 
-**before:** `Optional<String>` — Cursor to paginate backwards from.
+**before:** `Optional<String>` — Return results before this cursor. Use `page_info.start_cursor` from the previous response to fetch the previous page.
+    
+</dd>
+</dl>
+</dd>
+</dl>
+
+
+</dd>
+</dl>
+</details>
+
+## Members Notes
+<details><summary><code>client.members.notes.list(memberId) -> SyncPagingIterable&amp;lt;MemberNote&amp;gt;</code></summary>
+<dl>
+<dd>
+
+#### 📝 Description
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+Lists a member's notes, newest first. Notes are visible to the account's team.
+</dd>
+</dl>
+</dd>
+</dl>
+
+#### 🔌 Usage
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+```java
+client.members().notes().list(
+    "member_id",
+    ListNotesRequest
+        .builder()
+        .build()
+);
+```
+</dd>
+</dl>
+</dd>
+</dl>
+
+#### ⚙️ Parameters
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+**memberId:** `String` — The member the notes are about, prefixed `mber_`.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**first:** `Optional<Integer>` — Number of results to return from the start of the range.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**after:** `Optional<String>` — Return results after this cursor. Use `page_info.end_cursor` from the previous response to fetch the next page.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**last:** `Optional<Integer>` — Number of results to return from the end of the range.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**before:** `Optional<String>` — Return results before this cursor. Use `page_info.start_cursor` from the previous response to fetch the previous page.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**includeTotalCount:** `Optional<Boolean>` — Set to `true` to return the number of matching results in `page_info.total_count`. Send `first=0` as well to return the count without any results.
+    
+</dd>
+</dl>
+</dd>
+</dl>
+
+
+</dd>
+</dl>
+</details>
+
+<details><summary><code>client.members.notes.create(memberId, request) -> MemberNote</code></summary>
+<dl>
+<dd>
+
+#### 📝 Description
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+Adds a note to a member. Notes are visible to the account's team.
+</dd>
+</dl>
+</dd>
+</dl>
+
+#### 🔌 Usage
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+```java
+client.members().notes().create(
+    "member_id",
+    CreateNotesRequest
+        .builder()
+        .content("Wants a call next week.")
+        .build()
+);
+```
+</dd>
+</dl>
+</dd>
+</dl>
+
+#### ⚙️ Parameters
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+**memberId:** `String` — The member the notes are about, prefixed `mber_`.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**content:** `String` — The note text.
     
 </dd>
 </dl>
@@ -34787,7 +48864,7 @@ client.members().logs().list(
 <dl>
 <dd>
 
-Lists the platform's visible notification topics — the categories users can set notification preferences on. App-created topics are internal and not returned.
+Lists the platform's visible notification topics — the categories users can set notification preferences on. App-created topics are not returned.
 </dd>
 </dl>
 </dd>
@@ -34829,7 +48906,7 @@ client.notifications().topics().list(
 <dl>
 <dd>
 
-**first:** `Optional<Integer>` — The number of topics to return (default 20, max 100).
+**first:** `Optional<Integer>` — Number of results to return from the start of the range.
     
 </dd>
 </dl>
@@ -34837,7 +48914,7 @@ client.notifications().topics().list(
 <dl>
 <dd>
 
-**after:** `Optional<String>` — A cursor; returns topics after this position.
+**after:** `Optional<String>` — Return results after this cursor. Use `page_info.end_cursor` from the previous response to fetch the next page.
     
 </dd>
 </dl>
@@ -34896,6 +48973,22 @@ client.partners().businesses().list(
 <dl>
 <dd>
 
+**referringAccountId:** `Optional<String>` — List the referrals this business's team members made, past members included, instead of the authenticated user's own. Requires company:basic:read on that business, which every team member holds, and cannot be combined with user_id. The owner role reads every referral; anyone else reads only the referrals made by themselves and by the people under them in the org chart.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**advanceStatus:** `Optional<ListBusinessesRequestAdvanceStatus>` — Filter the authenticated partner's CPA offers by status, or with referring_account_id, the CPA terms of the reps the caller manages. Use offered for every state after qualification.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
 **status:** `Optional<ListBusinessesRequestStatus>` — Filter by referral status.
     
 </dd>
@@ -34912,7 +49005,7 @@ client.partners().businesses().list(
 <dl>
 <dd>
 
-**first:** `Optional<Integer>` — Number of partner businesses to return from the start of the window.
+**first:** `Optional<Integer>` — Number of results to return from the start of the range.
     
 </dd>
 </dl>
@@ -34920,7 +49013,7 @@ client.partners().businesses().list(
 <dl>
 <dd>
 
-**after:** `Optional<String>` — Cursor to fetch the page after (from page_info.end_cursor).
+**after:** `Optional<String>` — Return results after this cursor. Use `page_info.end_cursor` from the previous response to fetch the next page.
     
 </dd>
 </dl>
@@ -34928,7 +49021,7 @@ client.partners().businesses().list(
 <dl>
 <dd>
 
-**last:** `Optional<Integer>` — Number of partner businesses to return from the end of the window.
+**last:** `Optional<Integer>` — Number of results to return from the end of the range.
     
 </dd>
 </dl>
@@ -34936,7 +49029,15 @@ client.partners().businesses().list(
 <dl>
 <dd>
 
-**before:** `Optional<String>` — Cursor to fetch the page before (from page_info.start_cursor).
+**before:** `Optional<String>` — Return results before this cursor. Use `page_info.start_cursor` from the previous response to fetch the previous page.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**includeTotalCount:** `Optional<Boolean>` — Set to `true` to return the number of matching results in `page_info.total_count`. Send `first=0` as well to return the count without any results.
     
 </dd>
 </dl>
@@ -34976,6 +49077,22 @@ client.partners().businesses().list(
 <dl>
 <dd>
 
+**firstSaleBefore:** `Optional<String>` — Only return partner businesses whose first paid sale above zero happened before this timestamp.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**firstSaleAfter:** `Optional<String>` — Only return partner businesses whose first paid sale above zero happened after this timestamp. Combined with first_sale_before, this is the net new set: businesses that processed their first $1 inside the window.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
 **referredUserId:** `Optional<String>` — Filter to referrals attributed to this user. For first-tier referrals, this is the referred account owner; for second-tier referrals, this is the partner you recruited.
     
 </dd>
@@ -34992,7 +49109,23 @@ client.partners().businesses().list(
 <dl>
 <dd>
 
-**tier:** `Optional<ListBusinessesRequestTier>` — Filter to only first-tier referrals or only second-tier referrals.
+**tier:** `Optional<ListBusinessesRequestTier>` — Filter to referrals from a single tier: first, second, or blueprint.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**businessPrefixQuery:** `Optional<String>` — Case-insensitive business-name prefix, or an exact `biz_` account ID. Surrounding whitespace is ignored; blank values apply no filter.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**earningPartnerId:** `Optional<String>` — Only the referrals this team member made, plus the ones they were added to as a deal participant. User ID, prefixed `user_`. Requires `referring_account_id`.
     
 </dd>
 </dl>
@@ -35016,7 +49149,7 @@ client.partners().businesses().list(
 <dl>
 <dd>
 
-Retrieves a single referred business and its referral terms.
+Retrieves a single referred business and its referral terms. The original referrer or a caller with company:basic:read on the business credited for the referral can read it.
 </dd>
 </dl>
 </dd>
@@ -35063,6 +49196,254 @@ client.partners().businesses().retrieve(
 </dl>
 </details>
 
+<details><summary><code>client.partners.businesses.update(id, request) -> UpdateBusinessesResponse</code></summary>
+<dl>
+<dd>
+
+#### 📝 Description
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+Save annual payment projections for a business referred by the authenticated partner. Unaccepted projections can be replaced with updated annual card and BNPL payment volume. To qualify, payment volume over the last 30 days must reach 5% of the annual payment projection. Ads are excluded from CPA; ordinary ad commissions continue. Pass withdraw_projections: true without projection amounts to remove unaccepted projections. Accepted projections are immutable. Public API access requires a partner OAuth token; business API keys are not supported.
+</dd>
+</dl>
+</dd>
+</dl>
+
+#### 🔌 Usage
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+```java
+client.partners().businesses().update(
+    "id",
+    UpdateBusinessesRequest
+        .builder()
+        .build()
+);
+```
+</dd>
+</dl>
+</dd>
+</dl>
+
+#### ⚙️ Parameters
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+**id:** `String` — The partner business ID (a coma_ identifier).
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**annualProcessingUsd:** `Optional<String>` — Annual projected card and BNPL processing combined, in USD.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**dealClosedReason:** `Optional<String>` — How the partner closed this business. Send it on its own to save it; the response is then the business ID and the saved reason.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**withdrawProjections:** `Optional<Boolean>` — Remove unaccepted projections and invalidate the offer. The original CPA term is retained if projections are later added again.
+    
+</dd>
+</dl>
+</dd>
+</dl>
+
+
+</dd>
+</dl>
+</details>
+
+<details><summary><code>client.partners.businesses.acceptCommissionAdvance(id, request) -> AcceptCommissionAdvanceBusinessesResponse</code></summary>
+<dl>
+<dd>
+
+#### 📝 Description
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+Accept the authenticated partner's CPA offer with the reviewed terms and signed offer token. Public API access requires a partner OAuth token; business API keys are not supported.
+</dd>
+</dl>
+</dd>
+</dl>
+
+#### 🔌 Usage
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+```java
+client.partners().businesses().acceptCommissionAdvance(
+    "id",
+    AcceptCommissionAdvanceBusinessesRequest
+        .builder()
+        .expectedAmountUsd("1079.99")
+        .offerToken("eyJfcmFpbHMiOnsiZGF0YSI6MSwicHVyIjoiYmxvYl9pZCJ9fQ==--xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx")
+        .termsVersion("2026-01-01")
+        .acknowledgments(
+            Arrays.asList(AcceptCommissionAdvanceBusinessesRequestAcknowledgmentsItem.COMMISSION_REPLACEMENT, AcceptCommissionAdvanceBusinessesRequestAcknowledgmentsItem.CLAWBACK, AcceptCommissionAdvanceBusinessesRequestAcknowledgmentsItem.TERM)
+        )
+        .build()
+);
+```
+</dd>
+</dl>
+</dd>
+</dl>
+
+#### ⚙️ Parameters
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+**id:** `String` — The referred business relationship ID.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**acknowledgments:** `List<AcceptCommissionAdvanceBusinessesRequestAcknowledgmentsItem>` 
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**expectedAmountUsd:** `String` — Reviewed payment amount in USD.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**offerToken:** `String` — Signed offer token returned by the partner business response. Requires partner:commission_advance:accept permission to retrieve.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**termsVersion:** `String` — Reviewed CPA terms version.
+    
+</dd>
+</dl>
+</dd>
+</dl>
+
+
+</dd>
+</dl>
+</details>
+
+<details><summary><code>client.partners.businesses.resendInvite(id, request) -> ResendInviteBusinessesResponse</code></summary>
+<dl>
+<dd>
+
+#### 📝 Description
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+Re-emails an outstanding invite to claim ownership of a referred business. Find the invite in the business's `pending_owner_invites`. Only the first-tier partner can resend, from a whop.com session or the Whop CLI or MCP with `partner:handoff`. Rate limited to one resend per invite every five minutes.
+</dd>
+</dl>
+</dd>
+</dl>
+
+#### 🔌 Usage
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+```java
+client.partners().businesses().resendInvite(
+    "id",
+    ResendInviteBusinessesRequest
+        .builder()
+        .inviteId("ausri_xxxxxxxxxxxxxx")
+        .build()
+);
+```
+</dd>
+</dl>
+</dd>
+</dl>
+
+#### ⚙️ Parameters
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+**id:** `String` — The partner business ID (a coma_ identifier).
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**inviteId:** `String` — The outstanding invite to resend (an ausri_ identifier from `pending_owner_invites`).
+    
+</dd>
+</dl>
+</dd>
+</dl>
+
+
+</dd>
+</dl>
+</details>
+
 ## Partners Businesses Earnings
 <details><summary><code>client.partners.businesses.earnings.list(id) -> SyncPagingIterable&amp;lt;ListEarningsResponseDataItem&amp;gt;</code></summary>
 <dl>
@@ -35076,7 +49457,7 @@ client.partners().businesses().retrieve(
 <dl>
 <dd>
 
-Lists the earnings Whop pays out for one referred business's activity, most recent first.
+Lists the earnings Whop pays out for one referred business's activity, most recent first. The original referrer or a caller with company:basic:read on the business credited for the referral can read them.
 </dd>
 </dl>
 </dd>
@@ -35135,7 +49516,7 @@ client.partners().businesses().earnings().list(
 <dl>
 <dd>
 
-**first:** `Optional<Integer>` 
+**first:** `Optional<Integer>` — Number of results to return from the start of the range.
     
 </dd>
 </dl>
@@ -35143,7 +49524,7 @@ client.partners().businesses().earnings().list(
 <dl>
 <dd>
 
-**after:** `Optional<String>` 
+**after:** `Optional<String>` — Return results after this cursor. Use `page_info.end_cursor` from the previous response to fetch the next page.
     
 </dd>
 </dl>
@@ -35151,7 +49532,7 @@ client.partners().businesses().earnings().list(
 <dl>
 <dd>
 
-**last:** `Optional<Integer>` 
+**last:** `Optional<Integer>` — Number of results to return from the end of the range.
     
 </dd>
 </dl>
@@ -35159,7 +49540,7 @@ client.partners().businesses().earnings().list(
 <dl>
 <dd>
 
-**before:** `Optional<String>` 
+**before:** `Optional<String>` — Return results before this cursor. Use `page_info.start_cursor` from the previous response to fetch the previous page.
     
 </dd>
 </dl>
@@ -35203,6 +49584,258 @@ client.partners().businesses().earnings().list(
 </dl>
 </details>
 
+## Payments Direct
+<details><summary><code>client.payments.direct.create(request) -> Payment</code></summary>
+<dl>
+<dd>
+
+#### 📝 Description
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+Charges a buyer for a variant from card details you hold yourself, for integrators whose own systems are PCI compliant. Card details are accepted only on the vault host, which tokenizes the card before it reaches Whop; the official SDKs route this operation there, and raw card details sent to the regular host are refused. Collection runs in the background, so the response is the payment as created, not its outcome: poll Retrieve payment status for how far it has got and what the buyer must still do, such as 3D Secure.
+</dd>
+</dl>
+</dd>
+</dl>
+
+#### 🔌 Usage
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+```java
+client.payments().direct().create(
+    CreateDirectRequest
+        .builder()
+        .accountId("biz_xxxxxxxxxxxxxx")
+        .billingDetails(
+            CreateDirectRequestBillingDetails
+                .builder()
+                .address(
+                    CreateDirectRequestBillingDetailsAddress
+                        .builder()
+                        .country("US")
+                        .postalCode("94105")
+                        .build()
+                )
+                .email("dana@shinetime.example")
+                .name("Dana Shine")
+                .build()
+        )
+        .paymentMethod(
+            CreateDirectRequestPaymentMethod
+                .builder()
+                .type(CreateDirectRequestPaymentMethodType.CARD)
+                .build()
+        )
+        .build()
+);
+```
+</dd>
+</dl>
+</dd>
+</dl>
+
+#### ⚙️ Parameters
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+**affiliateCode:** `Optional<String>` — The code an affiliate link carries, which is the affiliate's username. The affiliate is credited for this payment as on a checkout session. A code naming no one eligible to earn on the product is ignored, and the payment goes ahead. A promo code with its own affiliate takes precedence. No affiliate is credited on a variant without a product or on a purchase of several variants. At most 255 characters.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**autoCaptureAfterMinutes:** `Optional<Integer>` — Minutes after authorization at which Whop captures the hold automatically unless it has been voided. Requires `capture: false`. Between 5 and 5760 (4 days).
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**billingDetails:** `CreateDirectRequestBillingDetails` — The buyer's billing details.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**capture:** `Optional<Boolean>` — Whether to capture the payment immediately. Defaults to true. Pass false to place an authorization hold that must be captured in full within five days via the capture endpoint, or automatically after `auto_capture_after_minutes`.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**lineItems:** `Optional<List<CreateDirectRequestLineItemsItem>>` — What the buyer is purchasing. Each entry names an existing variant by `variant_id`. Several entries form a cart, which requires every variant to be compatible, belong to this account, and use the same currency.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**memberId:** `Optional<String>` — The member to charge, prefixed `mber_`. When omitted the buyer is resolved from `billing_details.email`.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**metadata:** `Optional<Map<String, Optional<String>>>` — Custom metadata to attach to the payment.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**offSession:** `Optional<Boolean>` — Whether the charge is merchant-initiated, with the buyer not present. Defaults to false. When true, `payment_method.card.network_transaction_id` is required: a merchant-initiated charge on a card Whop has not charged before carries the id of the card's prior customer-initiated transaction. No 3D Secure step is offered: an issuer that requires the buyer to authenticate declines the charge, and the payment fails with that reason so the card can be charged again with the buyer present. A declined card is not saved.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**paymentMethod:** `CreateDirectRequestPaymentMethod` — The payment method to charge, as the raw details the caller holds. Raw details are accepted only on the vault host, where Whop's vault tokenizes them in transit; the official SDKs route this operation there. Whop's own clients, which tokenize with the Basis Theory SDK, send the resulting token intent id to the regular host.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**plan:** `Optional<CreateDirectRequestPlan>` — Deprecated: send `variant`, which takes `billing_type` in place of `plan_type`. Accepted only from callers pinned to an API version before 2026-10-27-2.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**planId:** `Optional<String>` — Deprecated: send `variant_id`. Accepted only from callers pinned to an API version before 2026-10-27-2.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**quoteId:** `Optional<String>` — A payment quote from `POST /payment_quotes`, prefixed `pq_`. The payment charges exactly the quote: its purchase (its variants and quantities, or the `variant` it priced), which this body may then omit, its promo code, and its tax, the quote's `tax_amount` rather than a figure calculated now. Omit it, or send null, to have tax calculated when the payment is charged. The quote must belong to `account_id`. A purchase field you omit or send as null takes the quote's value; the buyer's email, the addresses and the payment method are this request's own, never the quote's. Whatever you do send must describe the quoted purchase: the same variants, quantities and promo code. A quote that priced `variant` takes only the same `variant` you sent to `POST /payment_quotes` (or omit the purchase to take the quoted one), never `variant_id` or `line_items`, and a quote that priced variants by id never takes `variant`. Unless the quote located no buyer (`located_by` is null), the address the payment carries (its shipping address, else its billing address) must put the buyer where the quote priced tax, by country, state and postal code; otherwise the payment is refused with 400 before the payment method is used. A quote located by IP address or by the country the buyer chose (`located_by` is `ip_address` or `presentment_country`) is a preview and cannot be paid. A quote is consumed by one payment: a declined payment keeps it and can be retried; a new payment needs a new quote. A quote cannot be charged by a processor that doesn't take quotes, such as a seller's own connected PayPal account; such a payment is refused before the payment method is used. A quote priced in a `presentment_currency` is charged in that currency at the quote's `exchange_rate`. A payment refused over its quote carries an error `code`. `quote_expired`: the quote has expired; quote again. `quote_tax_unavailable`: the quote could not price tax; quote again, or omit `quote_id`. `quote_preview_only`: the quote was located by IP address or by the country the buyer chose; quote again with the buyer's address. `quote_in_use` (409): another payment holds the quote. `quote_mismatch`: the purchase or the buyer's address is not the one quoted. `quote_rate_expired`: the exchange rate the quote was priced at has moved too far to charge; quote again. `payment_method_currency_unsupported`: the payment method cannot pay in the quote's currency; use another method, or quote again in another currency. `quote_processor_unsupported`: the payment would be processed by a processor that doesn't take quotes, such as a seller's own connected PayPal account; use another method, or omit `quote_id` to have tax calculated when the payment is charged.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**returnUrl:** `Optional<String>` — Where the buyer continues after completing an off-site step such as 3D Secure. An absolute https URL without credentials, at most 2,048 characters.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**setupFutureUsage:** `Optional<CreateDirectRequestSetupFutureUsage>` — Attests that the buyer was told the card will be saved for later charges. `off_session` for merchant-initiated charges, `on_session` for buyer-present ones.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**statementDescriptor:** `Optional<String>` — Overrides the text on the buyer's card statement for this payment only. Must start with `WHOP*`, be 5-22 characters, contain at least one letter, and use only Latin letters, numbers, spaces, underscores, hyphens, or asterisks.
+    
+</dd>
+</dl>
+</dd>
+</dl>
+
+
+</dd>
+</dl>
+</details>
+
+## Payments LevelsRebate
+<details><summary><code>client.payments.levelsRebate.retrieve(paymentId) -> PaymentLevelsRebate</code></summary>
+<dl>
+<dd>
+
+#### 📝 Description
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+Returns the part of its account's monthly Whop Levels rebate a card payment earned: the processing fee above its level's rate, once the month its fee posted in has closed. The rebate is paid to the account as one sum each month, so the payment's own amounts and fees never change.
+</dd>
+</dl>
+</dd>
+</dl>
+
+#### 🔌 Usage
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+```java
+client.payments().levelsRebate().retrieve(
+    "payment_id",
+    RetrieveLevelsRebateRequest
+        .builder()
+        .build()
+);
+```
+</dd>
+</dl>
+</dd>
+</dl>
+
+#### ⚙️ Parameters
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+**paymentId:** `String` — The payment whose rebate to retrieve, prefixed `pay_`.
+    
+</dd>
+</dl>
+</dd>
+</dl>
+
+
+</dd>
+</dl>
+</details>
+
 ## Payouts Methods
 <details><summary><code>client.payouts.methods.list() -> SyncPagingIterable&amp;lt;ListMethodsResponseDataItem&amp;gt;</code></summary>
 <dl>
@@ -35216,7 +49849,7 @@ client.partners().businesses().earnings().list(
 <dl>
 <dd>
 
-Lists the bank accounts, wallets, and crypto addresses an account or user can withdraw to, newest first.
+Lists the bank accounts, wallets, and crypto addresses an account or user can pay out to, newest first.
 </dd>
 </dl>
 </dd>
@@ -35274,7 +49907,7 @@ client.payouts().methods().list(
 <dl>
 <dd>
 
-**amount:** `Optional<Double>` — Optional withdrawal amount in whole currency units, for example `250.00`. When provided, each method includes a quote with the estimated fee, amount received, and delivery date for that amount.
+**amount:** `Optional<Double>` — Optional payout amount in whole currency units, for example `250.00`. When provided, each method includes a quote with the estimated fee, amount received, and delivery date for that amount.
     
 </dd>
 </dl>
@@ -35290,6 +49923,14 @@ client.payouts().methods().list(
 <dl>
 <dd>
 
+**includeRecipients:** `Optional<Boolean>` — When true, also includes bill-pay recipient methods tied to this funding account. Defaults to false, returning only the account's own payout methods.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
 **includeLimits:** `Optional<Boolean>` — When true, the response also carries limits — the live per-speed payout caps the account's payout requests are validated against, in the requested currency. Requires the payout:withdrawal:read scope.
     
 </dd>
@@ -35298,7 +49939,7 @@ client.payouts().methods().list(
 <dl>
 <dd>
 
-**first:** `Optional<Integer>` — Number of payout methods to return from the start of the window.
+**first:** `Optional<Integer>` — Number of results to return from the start of the range.
     
 </dd>
 </dl>
@@ -35306,7 +49947,7 @@ client.payouts().methods().list(
 <dl>
 <dd>
 
-**after:** `Optional<String>` — Cursor to fetch the page after (from page_info.end_cursor).
+**after:** `Optional<String>` — Return results after this cursor. Use `page_info.end_cursor` from the previous response to fetch the next page.
     
 </dd>
 </dl>
@@ -35314,7 +49955,7 @@ client.payouts().methods().list(
 <dl>
 <dd>
 
-**last:** `Optional<Integer>` — Number of payout methods to return from the end of the window.
+**last:** `Optional<Integer>` — Number of results to return from the end of the range.
     
 </dd>
 </dl>
@@ -35322,7 +49963,7 @@ client.payouts().methods().list(
 <dl>
 <dd>
 
-**before:** `Optional<String>` — Cursor to fetch the page before (from page_info.start_cursor).
+**before:** `Optional<String>` — Return results before this cursor. Use `page_info.start_cursor` from the previous response to fetch the previous page.
     
 </dd>
 </dl>
@@ -35346,7 +49987,7 @@ client.payouts().methods().list(
 <dl>
 <dd>
 
-Saves a new place an account or user can withdraw to. Sensitive details are vaulted in transit and never stored raw.
+Saves a bank account, wallet, or crypto address an account or user can pay out to, from a method listed by `GET /payouts/supported_methods`. Sensitive details are vaulted in transit and never stored raw.
 </dd>
 </dl>
 </dd>
@@ -35414,6 +50055,22 @@ client.payouts().methods().create(
 <dd>
 
 **nickname:** `Optional<String>` — A label for the payout method, unique per destination.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**paypalLinkToken:** `Optional<String>` — The token your `return_url` received after a Log in with PayPal session started with `POST /payouts/paypal_link_sessions`. Use it for a PayPal supported payout method instead of `fields`. Sending `fields` or `plaid_public_token` alongside it is rejected, and `nickname` is ignored because Whop names the method after the PayPal email. The PayPal holder's name must match the name on the account's payout setup. An account PayPal reports as unverified, or with an unconfirmed email, is saved and flagged on the method's log rather than refused. Single use; expires 15 minutes after the login.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**recipient:** `Optional<CreateMethodsRequestRecipient>` — Creates a recipient payout account linked to the funding ledger as a non-default account, then saves the bank method on it. No Whop user, company, or recipient ledger is created. A valid recipient email is required. Recipient methods cannot be default or recurring methods and cannot use Plaid.
     
 </dd>
 </dl>
@@ -35512,7 +50169,7 @@ client.payouts().methods().delete(
 <dl>
 <dd>
 
-Changes the label used to identify a saved payout method.
+Changes the label used to identify a saved payout method, makes it the account's default payout method, or updates the payout address on file for it. Send `address` on its own: it cannot be combined with `nickname` or `is_default`. Address updates require the `payout:account:update` scope as well, on the same account, and are supported only for bank and wallet payout methods, not recipient payout methods.
 </dd>
 </dl>
 </dd>
@@ -35531,7 +50188,6 @@ client.payouts().methods().update(
     "id",
     UpdateMethodsRequest
         .builder()
-        .nickname("Primary checking")
         .build()
 );
 ```
@@ -35556,7 +50212,116 @@ client.payouts().methods().update(
 <dl>
 <dd>
 
-**nickname:** `String` — New label for the payout method, with at least one non-whitespace character and a maximum of 100 characters.
+**address:** `Optional<UpdateMethodsRequestAddress>` — The payout address to keep on file for this payout method. Only the fields you send are changed; blank fields are ignored.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**isDefault:** `Optional<Boolean>` — Set to `true` to make this the account's default payout method. `false` is not accepted.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**nickname:** `Optional<String>` — New label for the payout method, with at least one non-whitespace character and a maximum of 100 characters.
+    
+</dd>
+</dl>
+</dd>
+</dl>
+
+
+</dd>
+</dl>
+</details>
+
+## Payouts PaypalLinkSessions
+<details><summary><code>client.payouts.paypalLinkSessions.create(request) -> CreatePaypalLinkSessionsResponse</code></summary>
+<dl>
+<dd>
+
+#### 📝 Description
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+Starts a Log in with PayPal session so PayPal itself can confirm the account holder owns a verified PayPal account. Send the holder to `authorize_url`; after they log in, PayPal returns them to Whop, and Whop redirects the browser to your `return_url` with a `paypal_link_token` query parameter to pass to `POST /payouts/methods`. If the login fails or is canceled, `return_url` receives an `error` query parameter (`paypal_login_canceled` or `paypal_login_failed`) instead. The payout method saved this way pays the email on the PayPal account, and its holder name must match the name on the account's payout setup. PayPal login is rolling out per account: until it is enabled for the account this answers `403 forbidden`, and `supports_paypal_login` on `GET /payouts/supported_methods` is false.
+</dd>
+</dl>
+</dd>
+</dl>
+
+#### 🔌 Usage
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+```java
+client.payouts().paypalLinkSessions().create(
+    CreatePaypalLinkSessionsRequest
+        .builder()
+        .returnUrl("https://example.com/settings/payouts")
+        .supportedPayoutMethodId("podst_xxxxxxxxxxxxxx")
+        .build()
+);
+```
+</dd>
+</dl>
+</dd>
+</dl>
+
+#### ⚙️ Parameters
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+**accountId:** `Optional<String>` — The account that will own the PayPal payout method, prefixed `biz_`. Provide this or `user_id`.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**destinationCurrency:** `Optional<String>` — Currency the PayPal payout method will deliver payouts in.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**returnUrl:** `String` — Where to send the holder once the PayPal login finishes. Must be an `https` URL whose host is a domain added to the account, or to its platform, with `POST /domains` and `verification: {}`; the domain doesn't need to finish verifying. Whop's own pages and `https://localhost` are also accepted; they're the only options for a `user_id` session. It receives `paypal_link_token` on success or `error` on failure.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**supportedPayoutMethodId:** `String` — The PayPal supported payout method to connect (a `podst_` identifier whose `supports_paypal_login` is true).
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**userId:** `Optional<String>` — The user who will own the PayPal payout method, prefixed `user_`. Provide this or `account_id`.
     
 </dd>
 </dl>
@@ -35581,7 +50346,7 @@ client.payouts().methods().update(
 <dl>
 <dd>
 
-Lists the payout methods an account or user is eligible to add.
+Lists the payout methods an account or user is eligible to add. Pass a result's ID as `supported_payout_method_id` to `POST /payouts/methods` to save one.
 </dd>
 </dl>
 </dd>
@@ -35639,7 +50404,7 @@ client.payouts().supportedMethods().list(
 <dl>
 <dd>
 
-**amount:** `Optional<Double>` — Optional withdrawal amount in whole currency units, for example `250.00`. When provided, each destination includes per-currency fee and delivery quotes.
+**amount:** `Optional<Double>` — Optional payout amount in whole currency units, for example `250.00`. When provided, each destination includes per-currency fee and delivery quotes.
     
 </dd>
 </dl>
@@ -35671,7 +50436,7 @@ client.payouts().supportedMethods().list(
 <dl>
 <dd>
 
-**first:** `Optional<Integer>` — Number of supported payout methods to return from the start of the window.
+**partyType:** `Optional<ListSupportedMethodsRequestPartyType>` — Who will own the payout method. `first_party` is the account itself. `third_party` is a recipient the account pays, saved with `recipient` on `POST /payouts/methods`, which needs no identity fields. Only meaningful with supported_payout_method_id.
     
 </dd>
 </dl>
@@ -35679,7 +50444,7 @@ client.payouts().supportedMethods().list(
 <dl>
 <dd>
 
-**after:** `Optional<String>` — Cursor to fetch the page after (from page_info.end_cursor).
+**includeIndividualBanks:** `Optional<Boolean>` — Whether to list each bank as its own payout method in countries where people choose a bank by name. Each bank has `parent_id` set to the bank deposit method that lists it. When `false`, these countries list one bank deposit method instead.
     
 </dd>
 </dl>
@@ -35687,7 +50452,7 @@ client.payouts().supportedMethods().list(
 <dl>
 <dd>
 
-**last:** `Optional<Integer>` — Number of supported payout methods to return from the end of the window.
+**first:** `Optional<Integer>` — Number of results to return from the start of the range.
     
 </dd>
 </dl>
@@ -35695,7 +50460,1130 @@ client.payouts().supportedMethods().list(
 <dl>
 <dd>
 
-**before:** `Optional<String>` — Cursor to fetch the page before (from page_info.start_cursor).
+**after:** `Optional<String>` — Return results after this cursor. Use `page_info.end_cursor` from the previous response to fetch the next page.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**last:** `Optional<Integer>` — Number of results to return from the end of the range.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**before:** `Optional<String>` — Return results before this cursor. Use `page_info.start_cursor` from the previous response to fetch the previous page.
+    
+</dd>
+</dl>
+</dd>
+</dl>
+
+
+</dd>
+</dl>
+</details>
+
+## SetupIntents Direct
+<details><summary><code>client.setupIntents.direct.create(request) -> SetupIntent</code></summary>
+<dl>
+<dd>
+
+#### 📝 Description
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+Saves a card for later charges from card details you hold yourself, for integrators whose own systems are PCI compliant. Send this operation to the vault host, which tokenizes the card before it reaches Whop; the official SDKs route it there, and raw card details sent to the regular host are refused. The setup runs in the background: poll Retrieve setup status for its outcome and for anything the buyer must still do, such as 3D Secure. Once it succeeds, the saved payment method arrives on the `setup_intent.succeeded` webhook and in List payment methods for the member.
+</dd>
+</dl>
+</dd>
+</dl>
+
+#### 🔌 Usage
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+```java
+client.setupIntents().direct().create(
+    CreateDirectRequest
+        .builder()
+        .accountId("biz_xxxxxxxxxxxxxx")
+        .billingDetails(
+            CreateDirectRequestBillingDetails
+                .builder()
+                .address(
+                    CreateDirectRequestBillingDetailsAddress
+                        .builder()
+                        .country("US")
+                        .postalCode("94105")
+                        .build()
+                )
+                .email("dana@shinetime.example")
+                .name("Dana Shine")
+                .build()
+        )
+        .paymentMethod(
+            CreateDirectRequestPaymentMethod
+                .builder()
+                .type(CreateDirectRequestPaymentMethodType.CARD)
+                .build()
+        )
+        .build()
+);
+```
+</dd>
+</dl>
+</dd>
+</dl>
+
+#### ⚙️ Parameters
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+**accountId:** `String` — The account the card is saved for, prefixed `biz_`.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**billingDetails:** `CreateDirectRequestBillingDetails` — The buyer's billing details.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**currency:** `Optional<String>` — The currency the card will be charged in, as a three-letter code. Defaults to usd.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**memberId:** `Optional<String>` — The member the card belongs to, prefixed `mber_`. When omitted the buyer is resolved from `billing_details.email`.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**metadata:** `Optional<Map<String, Optional<String>>>` — Custom metadata to attach to the setup.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**paymentMethod:** `CreateDirectRequestPaymentMethod` — The payment method to save, as the raw details the caller holds. Raw details are accepted only on the vault host, where Whop's vault tokenizes them in transit; the official SDKs route this operation there. Whop's own clients, which tokenize with the Basis Theory SDK, send the resulting token intent id to the regular host.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**returnUrl:** `Optional<String>` — Where the buyer continues after completing an off-site step such as 3D Secure. An absolute https URL without credentials, at most 2,048 characters.
+    
+</dd>
+</dl>
+</dd>
+</dl>
+
+
+</dd>
+</dl>
+</details>
+
+## Stats Reports
+<details><summary><code>client.stats.reports.list() -> ListReportsResponse</code></summary>
+<dl>
+<dd>
+
+#### 📝 Description
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+Lists every report: the aggregates that are not bucketed over time, with the breakdowns and columns each one accepts. Use it to discover what a report can return before you retrieve it. For a bucketed series, use `GET /stats/time_series`.
+</dd>
+</dl>
+</dd>
+</dl>
+
+#### 🔌 Usage
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+```java
+client.stats().reports().list();
+```
+</dd>
+</dl>
+</dd>
+</dl>
+
+
+</dd>
+</dl>
+</details>
+
+## Stats TimeSeries
+<details><summary><code>client.stats.timeSeries.list() -> ListTimeSeriesResponse</code></summary>
+<dl>
+<dd>
+
+#### 📝 Description
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+Lists the metrics you can chart over time, with the unit each reports and the properties you can filter or break it down by. Aggregates that are not bucketed over time are reports, listed at `GET /stats/reports`.
+</dd>
+</dl>
+</dd>
+</dl>
+
+#### 🔌 Usage
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+```java
+client.stats().timeSeries().list();
+```
+</dd>
+</dl>
+</dd>
+</dl>
+
+
+</dd>
+</dl>
+</details>
+
+<details><summary><code>client.stats.timeSeries.retrieve(metric) -> RetrieveTimeSeriesResponse</code></summary>
+<dl>
+<dd>
+
+#### 📝 Description
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+Retrieves a metric as a series of points over a time range for an account or user. For an aggregate that is not bucketed over time, use a report from `GET /stats/reports`. The `market_prices` metric is public and requires no authentication. Each metric takes its own scope: most need `stats:read`, the earnings, markup revenue and `platform_markup_amount` metrics need `company:balance:read`, `markup_earning_estimate` needs `company:update_child_fees`, and `ad_delivery`, `ad_campaign_score`, `people` and `events` also accept `ad_campaign:read`.
+</dd>
+</dl>
+</dd>
+</dl>
+
+#### 🔌 Usage
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+```java
+client.stats().timeSeries().retrieve(
+    "metric",
+    RetrieveTimeSeriesRequest
+        .builder()
+        .from("from")
+        .to("to")
+        .adCampaignIds(
+            Arrays.asList("adcamp_xxxxxxxxxxxxxx")
+        )
+        .adGroupIds(
+            Arrays.asList("adgrp_xxxxxxxxxxxxxx")
+        )
+        .adIds(
+            Arrays.asList("ad_xxxxxxxxxxxxxx")
+        )
+        .build()
+);
+```
+</dd>
+</dl>
+</dd>
+</dl>
+
+#### ⚙️ Parameters
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+**metric:** `String` — The metric to retrieve, for example net_revenue. Use GET /stats/time_series to see every metric key. The metric sets the unit and the properties you can filter or break down by.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**accountId:** `Optional<String>` — Account this query concerns, prefixed `biz_`, or `platform` for all of Whop.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**userId:** `Optional<String>` — The user this query concerns, for example user_AbC123. Available on metrics that support user subjects, such as account_balance.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**from:** `String` — Start of the range — a date (YYYY-MM-DD), expanded to the start of that day, or an ISO 8601 timestamp (for example 2026-07-16T16:37:00Z), used exactly.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**to:** `String` — End of the range — a date (YYYY-MM-DD), expanded to the end of that day, or an ISO 8601 timestamp (for example 2026-07-17T16:37:00Z), used exactly. Funnel entry ranges cannot exceed 90 days.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**interval:** `Optional<RetrieveTimeSeriesRequestInterval>` — How wide each point is. Defaults to day. Snapshot metrics are day-only. Funnels support at most 2,000 first-entry cohort buckets.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**breakdownBy:** `Optional<String>` — Split the metric out by one of its properties — each point gets a breakdown array. For example breakdown_by=currency returns an entry for usd, an entry for eur, and so on. Funnels use a property of the first matched event, with at most 300 groups. experiment_id and variant require an exposure as step 1. For funnel source breakdowns, steps[1][source]=whop:* groups by campaign, whop:<campaign>:* by ad group, and whop:<campaign>:<group>:* by ad. See the metric catalog for supported breakdowns.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**convertTo:** `Optional<String>` — Display currency for money metrics — every amount is converted into this ISO currency using the exchange rate on each period's date. Defaults to usd. For the ads metrics (ad_spend, ad_delivery), pass the account's ads reporting currency to match the ad entity endpoints. On transaction metrics, it is ignored when you filter or break down by currency (those report the original transaction currency, unconverted).
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**currency:** `Optional<String>` — Select the source currency or asset on metrics that list currency. For transaction metrics, for example currency=eur, values are reported without conversion. For market_prices, use btc or xaut and convert_to=usd. Pair with breakdown_by=currency to split a metric by currency.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**timeZone:** `Optional<String>` — IANA time zone to bucket the series in, for example America/New_York. Defaults to UTC. Not accepted by snapshot metrics, which are UTC only.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**paymentMethod:** `Optional<String>` — Filter to a single payment method, for example card or crypto. Available on metrics that list payment_method.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**cardNetwork:** `Optional<String>` — Filter to a single card brand, for example visa. A refinement of payment_method=card. Available on metrics that list card_network.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**disputeReason:** `Optional<String>` — Filter disputes to a normalized reason, for example product_not_received. Pair with breakdown_by=dispute_reason to split dispute counts by reason.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**source:** `Optional<String>` — Filter to a single GMV source, for example payments — or, on the traffic metrics, a visit source (whop_ads, direct, or a utm_source value). Pair with breakdown_by=source to split by source. Available on metrics that list source.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**hostname:** `Optional<String>` — Filter traffic metrics to one website hostname, for example shop.example.com. On the events and people metrics, comma-separated hostnames match any listed hostname. Pair with breakdown_by=hostname to split by website.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**page:** `Optional<String>` — Filter traffic metrics to one page — a hostname plus normalized path, for example shop.example.com/pricing. Pair with breakdown_by=page to split by page.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**deviceType:** `Optional<String>` — Filter traffic metrics to one device type: desktop, mobile, tablet, or unknown. Pair with breakdown_by=device_type to split by device.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**countryCode:** `Optional<String>` — Filter traffic metrics to one visitor country (uppercase ISO 3166-1 alpha-2, for example US). Pair with breakdown_by=country_code to split by country.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**eventName:** `Optional<String>` — Filter the events metric to one tracked event name, for example pixel.page or pixel.custom. Pair with breakdown_by=event_name to split by event.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**eventType:** `Optional<RetrieveTimeSeriesRequestEventType>` — Filter the events metric to a canonical group of events: page_view (pixel page views plus whop.com store views), checkout_start (hosted and embedded checkout views), or other. Pair with breakdown_by=event_type to split by group.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**customName:** `Optional<String>` — Filter the events metric to one merchant-defined custom event name. Only valid alongside event_name=pixel.custom. Pair with breakdown_by=custom_name to split custom events by name.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**segment:** `Optional<String>` — Filter to a single wallet-balance segment, for example available. Pair with breakdown_by=segment to split the balance. Available on metrics that list segment.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**category:** `Optional<String>` — Filter to a single balance-activity category, for example payments. Pair with breakdown_by=category to split the activity. Available on metrics that list category.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**merchant:** `Optional<String>` — Filter to a single cashback merchant bucket, for example whop-ads. Pair with breakdown_by=merchant to split cashback by merchant. Available on metrics that list merchant.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**feeType:** `Optional<String>` — Filter to a single fee type. Pair with breakdown_by=fee_type to split fees by type. Available on metrics that list fee_type.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**product:** `Optional<String>` — Filter to a single product (access pass id), for example prod_AbC123. Pair with breakdown_by=product. Available on metrics that list product.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**status:** `Optional<String>` — Filter to a single membership status. Pair with breakdown_by=status. Available on metrics that list status.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**accessLevel:** `Optional<String>` — Filter to a single access level. Pair with breakdown_by=access_level. Available on metrics that list access_level.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**mostRecentAction:** `Optional<String>` — Filter to a single most-recent member action. Pair with breakdown_by=most_recent_action. Available on metrics that list most_recent_action.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**referredUserId:** `Optional<String>` — Filter a referral metric to the businesses attributed to one person you referred, for example user_AbC123. Available on metrics that list referred_user_id.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**adCampaignIds:** `Optional<String>` — Ad campaign ids (adcamp_...) to scope the report to; stats are summed across them. Available on metrics that list ad_campaign_ids.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**adGroupIds:** `Optional<String>` — Ad group ids (adgrp_...) to scope the report to; stats are summed across them. Available on metrics that list ad_group_ids.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**adIds:** `Optional<String>` — Ad ids (ad_...) to scope the report to; stats are summed across them. Available on metrics that list ad_ids.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**snapshotWindow:** `Optional<RetrieveTimeSeriesRequestSnapshotWindow>` — Window used by a snapshot metric. Ordinary snapshots accept 30d as their trailing activity window. Cohorted dispute metrics accept 7d or 28d as the sales-transaction pool; their attribution window is fixed in the metric name. Card network program metrics accept 7d, 14d, 28d, or 56d. Each metric lists its accepted values in the catalog.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**event:** `Optional<String>` — Filter the events metric to one or more full event names, for example payment.completed or pixel.lead. Comma-separated names match any listed event. Use group_by=event for separate groups. Available on metrics that list event.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**businessType:** `Optional<String>` — Filter to one business type, for example `education`. Pair with `breakdown_by=business_type` to split by business type. Available on metrics that list `business_type`.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**industryType:** `Optional<String>` — Filter to one industry type, for example `options_trading`. Pair with `breakdown_by=industry_type` to split by industry type. Available on metrics that list `industry_type`.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**productCategory:** `Optional<String>` — Filter to one product category, for example `algo_trading_course`. Pair with `breakdown_by=product_category` to split by product category. Available on metrics that list `product_category`.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**accountCountry:** `Optional<String>` — Filter to accounts located in one country, as an ISO 3166-1 alpha-2 code such as `US`. Pair with `breakdown_by=account_country` to split by account country. Available on metrics that list `account_country`.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**issuer:** `Optional<String>` — Filter to one card-issuing bank, named as the processor reports it, for example JPMORGAN CHASE BANK N A, or unknown for payments with no reported bank. Available on metrics that list issuer.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**webhookId:** `Optional<String>` — The webhook to count deliveries for, for example hook_AbC123. Required by webhook_deliveries, and must belong to account_id or one of its apps.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**conversionWindow:** `Optional<String>` — Funnel only. Time allowed from the first event to the final event: integer minutes, hours, or days, up to 30d.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**matureOnly:** `Optional<Boolean>` — Funnel only. Include only entrants whose full conversion window has elapsed. Required for confidence intervals and comparisons.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**steps:** `Optional<RetrieveTimeSeriesRequestSteps>` — Funnel only. Required when metric=funnel. 2 to 10 ordered events per person, as consecutive one-based bracket parameters such as `steps[1][event]=pixel.page&steps[1][page]=/pricing*&steps[2][event]=payment.completed`. Values are scalar strings, never JSON. A person's first step 1 match inside `from`/`to` anchors their cohort, breakdown, and conversion window; later matches do not restart it. Other events may occur between steps, and conversions may land after `to`. For an experiment funnel, make `experiment.exposure` step 1 and pass `breakdown_by=variant`.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**compareTo:** `Optional<String>` — Funnel only. The breakdown value to use as baseline for whole-window final conversion. Requires breakdown_by and mature_only=true; defaults confidence_level to 0.95.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**confidenceLevel:** `Optional<Double>` — Funnel only. Confidence level for whole-window final conversion intervals, for example 0.95. Requires mature_only=true. Exposure steps must each filter one user- or visitor-randomized experiment.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**contactable:** `Optional<Boolean>` — People metric only: contactable equals this value. Applies to the current person profile for every time bucket. LTV and AOV are in USD. Not accepted by the Events metric.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**hasPurchased:** `Optional<Boolean>` — People metric only: has_purchased equals this value. Applies to the current person profile for every time bucket. LTV and AOV are in USD. Not accepted by the Events metric.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**firstSeenAfter:** `Optional<OffsetDateTime>` — People metric only: first_seen_at greater than or equal this value. Applies to the current person profile for every time bucket. LTV and AOV are in USD. Not accepted by the Events metric.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**firstSeenBefore:** `Optional<OffsetDateTime>` — People metric only: first_seen_at less than this value. Applies to the current person profile for every time bucket. LTV and AOV are in USD. Not accepted by the Events metric.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**lastSeenAfter:** `Optional<OffsetDateTime>` — People metric only: last_seen_at greater than or equal this value. Applies to the current person profile for every time bucket. LTV and AOV are in USD. Not accepted by the Events metric.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**lastSeenBefore:** `Optional<OffsetDateTime>` — People metric only: last_seen_at less than this value. Applies to the current person profile for every time bucket. LTV and AOV are in USD. Not accepted by the Events metric.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**firstSeenWithinDays:** `Optional<Integer>` — People metric only: first_seen_at within this many days of now. Applies to the current person profile for every time bucket. LTV and AOV are in USD. Not accepted by the Events metric.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**lastSeenWithinDays:** `Optional<Integer>` — People metric only: last_seen_at within this many days of now. Applies to the current person profile for every time bucket. LTV and AOV are in USD. Not accepted by the Events metric.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**known:** `Optional<Boolean>` — People metric only: known equals this value. Applies to the current person profile for every time bucket. LTV and AOV are in USD. Not accepted by the Events metric.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**hasEmail:** `Optional<Boolean>` — People metric only: has_email equals this value. Applies to the current person profile for every time bucket. LTV and AOV are in USD. Not accepted by the Events metric.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**hasPhone:** `Optional<Boolean>` — People metric only: has_phone equals this value. Applies to the current person profile for every time bucket. LTV and AOV are in USD. Not accepted by the Events metric.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**ltvGt:** `Optional<Double>` — People metric only: ltv greater than this value. Applies to the current person profile for every time bucket. LTV and AOV are in USD. Not accepted by the Events metric.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**ltvGte:** `Optional<Double>` — People metric only: ltv greater than or equal this value. Applies to the current person profile for every time bucket. LTV and AOV are in USD. Not accepted by the Events metric.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**ltvLt:** `Optional<Double>` — People metric only: ltv less than this value. Applies to the current person profile for every time bucket. LTV and AOV are in USD. Not accepted by the Events metric.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**ltvLte:** `Optional<Double>` — People metric only: ltv less than or equal this value. Applies to the current person profile for every time bucket. LTV and AOV are in USD. Not accepted by the Events metric.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**aovGt:** `Optional<Double>` — People metric only: aov greater than this value. Applies to the current person profile for every time bucket. LTV and AOV are in USD. Not accepted by the Events metric.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**aovGte:** `Optional<Double>` — People metric only: aov greater than or equal this value. Applies to the current person profile for every time bucket. LTV and AOV are in USD. Not accepted by the Events metric.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**aovLt:** `Optional<Double>` — People metric only: aov less than this value. Applies to the current person profile for every time bucket. LTV and AOV are in USD. Not accepted by the Events metric.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**aovLte:** `Optional<Double>` — People metric only: aov less than or equal this value. Applies to the current person profile for every time bucket. LTV and AOV are in USD. Not accepted by the Events metric.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**purchaseCountGt:** `Optional<Double>` — People metric only: purchase_count greater than this value. Applies to the current person profile for every time bucket. LTV and AOV are in USD. Not accepted by the Events metric.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**purchaseCountGte:** `Optional<Double>` — People metric only: purchase_count greater than or equal this value. Applies to the current person profile for every time bucket. LTV and AOV are in USD. Not accepted by the Events metric.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**purchaseCountLt:** `Optional<Double>` — People metric only: purchase_count less than this value. Applies to the current person profile for every time bucket. LTV and AOV are in USD. Not accepted by the Events metric.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**purchaseCountLte:** `Optional<Double>` — People metric only: purchase_count less than or equal this value. Applies to the current person profile for every time bucket. LTV and AOV are in USD. Not accepted by the Events metric.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**eventCountGt:** `Optional<Double>` — People metric only: event_count greater than this value. Applies to the current person profile for every time bucket. LTV and AOV are in USD. Not accepted by the Events metric.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**eventCountGte:** `Optional<Double>` — People metric only: event_count greater than or equal this value. Applies to the current person profile for every time bucket. LTV and AOV are in USD. Not accepted by the Events metric.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**eventCountLt:** `Optional<Double>` — People metric only: event_count less than this value. Applies to the current person profile for every time bucket. LTV and AOV are in USD. Not accepted by the Events metric.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**eventCountLte:** `Optional<Double>` — People metric only: event_count less than or equal this value. Applies to the current person profile for every time bucket. LTV and AOV are in USD. Not accepted by the Events metric.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**referringAccountId:** `Optional<String>` — Read a referral metric for a business instead of the caller: the referrals its team members made, past members included, for example biz_AbC123. Requires company:basic:read on that business and cannot be combined with user_id. Available on metrics that list referring_account_id.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**teamLeadId:** `Optional<String>` — Read a partner metric for one team lead and everyone under them in today's org chart, for example user_AbC123. Needs referring_account_id or a global query. As breakdown_by=team_lead_id, figures sit under the highest lead above the partner who earned them, so each group matches that lead's team_lead_id filter and the groups add up to the total. With team_lead_id set, or for a caller who reads only their own team, the groups are the leads under that person, who keeps the rest. Anyone with no lead is in a null group. Available on metrics that list team_lead_id.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**activity:** `Optional<RetrieveTimeSeriesRequestActivity>` — On partner_reps, all counts the period's roster, earning counts those who earned in the period, and not_earning counts the roster minus them. On the other partner metrics, earning keeps the figures of the people partner_reps counts as earning over the whole range and not_earning keeps the figures of everyone else; those need referring_account_id or a global query. Defaults to all. Available on metrics that list activity.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**breakdownLimit:** `Optional<Integer>` — With a single breakdown_by, keep the groups with the highest whole-range values, up to this many, and fold every other group into one entry named other. A rate or an average ranks its groups by the deals it divides by. The other entry is measured from the underlying rows, so a distinct count or a rate stays exact rather than being added up from groups. Available on partner metrics only.
+    
+</dd>
+</dl>
+</dd>
+</dl>
+
+
+</dd>
+</dl>
+</details>
+
+## Trades Candles
+<details><summary><code>client.trades.candles.list() -> SyncPagingIterable&amp;lt;Candle&amp;gt;</code></summary>
+<dl>
+<dd>
+
+#### 📝 Description
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+Returns price candles for a tokenized stock, oldest first.
+
+- **Intervals:** `1h`, `2h`, `4h`, `6h` and `12h` candles cover the last 30 days. `1d` and `1w` candles cover the full history.
+- **Weeks** start on Monday at 00:00 UTC.
+
+This endpoint is public: no API key is needed, and each IP address can make up to 60 requests a minute.
+</dd>
+</dl>
+</dd>
+</dl>
+
+#### 🔌 Usage
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+```java
+client.trades().candles().list(
+    ListCandlesRequest
+        .builder()
+        .market("market")
+        .interval(ListCandlesRequestInterval.ONE_H)
+        .from(OffsetDateTime.parse("2024-01-15T09:30:00Z"))
+        .build()
+);
+```
+</dd>
+</dl>
+</dd>
+</dl>
+
+#### ⚙️ Parameters
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+**market:** `String` — The tokenized stock's ticker, such as `NVDA`. This is the `id` of a spot market from List Markets.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**interval:** `ListCandlesRequestInterval` — How much time each candle covers.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**from:** `OffsetDateTime` — Return candles that start at or after this time, as an ISO 8601 timestamp.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**to:** `Optional<OffsetDateTime>` — Return candles that start before this time, as an ISO 8601 timestamp. Defaults to now.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**first:** `Optional<Integer>` — Number of results to return from the start of the range.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**after:** `Optional<String>` — Return results after this cursor. Use `page_info.end_cursor` from the previous response to fetch the next page.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**last:** `Optional<Integer>` — Number of results to return from the end of the range.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**before:** `Optional<String>` — Return results before this cursor. Use `page_info.start_cursor` from the previous response to fetch the previous page.
+    
+</dd>
+</dl>
+</dd>
+</dl>
+
+
+</dd>
+</dl>
+</details>
+
+## Trades Markets
+<details><summary><code>client.trades.markets.list() -> SyncPagingIterable&amp;lt;Market&amp;gt;</code></summary>
+<dl>
+<dd>
+
+#### 📝 Description
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+Returns every market you can trade on Whop.
+
+- **Spot:** listed by symbol: `BTC`, `SOL` and `XAUT` (gold), and tokenized stocks by ticker, such as `AAPL`, with their 24-hour change and logo.
+- **Perpetuals:** such as `BTC`, and stock and commodity perpetuals from Hyperliquid's `xyz` exchange, such as `xyz:TSLA`. Send the `id` as `market` when you create a trade.
+
+The same symbol can appear twice, once as a perpetual and once as spot, so use `id` together with `instrument_type` to tell them apart. Results are sorted by `id`, then `instrument_type`.
+
+This endpoint is public: no API key is needed, and each IP address can make up to 60 requests a minute.
+</dd>
+</dl>
+</dd>
+</dl>
+
+#### 🔌 Usage
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+```java
+client.trades().markets().list(
+    ListMarketsRequest
+        .builder()
+        .build()
+);
+```
+</dd>
+</dl>
+</dd>
+</dl>
+
+#### ⚙️ Parameters
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+**instrumentType:** `Optional<ListMarketsRequestInstrumentType>` — Only return perpetuals or only spot markets.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**first:** `Optional<Integer>` — Number of results to return from the start of the range.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**after:** `Optional<String>` — Return results after this cursor. Use `page_info.end_cursor` from the previous response to fetch the next page.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**last:** `Optional<Integer>` — Number of results to return from the end of the range.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**before:** `Optional<String>` — Return results before this cursor. Use `page_info.start_cursor` from the previous response to fetch the previous page.
     
 </dd>
 </dl>
@@ -35720,7 +51608,7 @@ client.payouts().supportedMethods().list(
 <dl>
 <dd>
 
-Lists the authenticated user's own OAuth grants — one per app they have authorized, per account they authorized it for. The list is always the caller's own; there is no parameter for reading another user's grants. Requires a user session: an API key or an OAuth token is refused, so an app can never enumerate the other apps a user has authorized.
+Lists the authenticated user's own OAuth grants: one per app they have authorized, per account they authorized it for. You cannot read another user's grants. Requires a user session: an API key or an OAuth token is refused, so an app can never enumerate the other apps a user has authorized.
 </dd>
 </dl>
 </dd>
@@ -35762,7 +51650,7 @@ client.users().oauthGrants().list(
 <dl>
 <dd>
 
-**first:** `Optional<Integer>` — The number of grants to return (default 20, max 100).
+**first:** `Optional<Integer>` — Number of results to return from the start of the range.
     
 </dd>
 </dl>
@@ -35770,7 +51658,7 @@ client.users().oauthGrants().list(
 <dl>
 <dd>
 
-**after:** `Optional<String>` — A cursor; returns grants after this position.
+**after:** `Optional<String>` — Return results after this cursor. Use `page_info.end_cursor` from the previous response to fetch the next page.
     
 </dd>
 </dl>
@@ -35778,7 +51666,7 @@ client.users().oauthGrants().list(
 <dl>
 <dd>
 
-**last:** `Optional<Integer>` — The number of grants to return from the end of the range.
+**last:** `Optional<Integer>` — Number of results to return from the end of the range.
     
 </dd>
 </dl>
@@ -35786,7 +51674,7 @@ client.users().oauthGrants().list(
 <dl>
 <dd>
 
-**before:** `Optional<String>` — A cursor; returns grants before this position.
+**before:** `Optional<String>` — Return results before this cursor. Use `page_info.start_cursor` from the previous response to fetch the previous page.
     
 </dd>
 </dl>
@@ -35826,7 +51714,7 @@ client.users().oauthGrants().list(
 <dl>
 <dd>
 
-Completes the OAuth authorization step for the authenticated user: records their consent for the scopes an app asked for and mints the authorization code to hand back to it. Returns the grant, plus a `redirect_url` carrying that code — the one and only time it is returned. Exchange the code at `POST /oauth/token` with the verifier for `code_challenge`. Requires a user session, because consent has to come from the account holder: an API key or an OAuth token is refused, so an app can never authorize itself. Send an `Idempotency-Key` to make a retry safe — a replay returns the original `redirect_url` and its code rather than issuing a second one.
+Completes the OAuth authorization step for the authenticated user: records their consent to the scopes an app asked for and mints an authorization code. Returns the grant plus a `redirect_url` carrying the code, which is returned only this once; the app exchanges it at `POST /oauth/token`. Requires a user session, because consent has to come from the account holder: an API key or an OAuth token is refused, so an app can never authorize itself. Send an `Idempotency-Key` so a retry returns the original `redirect_url` and code instead of issuing a second one.
 </dd>
 </dl>
 </dd>
@@ -35845,11 +51733,9 @@ client.users().oauthGrants().create(
     CreateOauthGrantsRequest
         .builder()
         .clientId("app_xxxxxxxxxxxxxx")
-        .codeChallenge("xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx")
-        .codeChallengeMethod(CreateOauthGrantsRequestCodeChallengeMethod.S256)
         .redirectUri("https://Booking.Shinetime.example:8443/oauth/Callback/")
         .requestedScopes(
-            Arrays.asList("profile")
+            Arrays.asList("openid")
         )
         .build()
 );
@@ -35883,7 +51769,7 @@ client.users().oauthGrants().create(
 <dl>
 <dd>
 
-**codeChallenge:** `String` — The PKCE code challenge: the base64url-encoded SHA-256 of your code verifier, without padding.
+**codeChallenge:** `Optional<String>` — The PKCE code challenge: the base64url-encoded SHA-256 of your code verifier, without padding. Required unless the app is confidential; a confidential app that leaves it out redeems the code with its secret instead of a verifier.
     
 </dd>
 </dl>
@@ -35891,7 +51777,7 @@ client.users().oauthGrants().create(
 <dl>
 <dd>
 
-**codeChallengeMethod:** `CreateOauthGrantsRequestCodeChallengeMethod` — How `code_challenge` was derived. Only `S256` is accepted.
+**codeChallengeMethod:** `Optional<CreateOauthGrantsRequestCodeChallengeMethod>` — How `code_challenge` was derived. Only `S256` is accepted. Required with `code_challenge`.
     
 </dd>
 </dl>
@@ -35899,7 +51785,15 @@ client.users().oauthGrants().create(
 <dl>
 <dd>
 
-**consentShown:** `Optional<Boolean>` — Whether the consent UI listed these scopes for the user. Sending `false` succeeds only when the user has already granted every scope requested.
+**consentShown:** `Optional<Boolean>` — Whether the consent UI listed these scopes for the user. Sending `false` succeeds only when the user has already granted every scope requested, or when the app is one of Whop's own with the consent skip switched on and asks for `openid` alone.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**mcpClient:** `Optional<CreateOauthGrantsRequestMcpClient>` — The downstream MCP client displayed on the consent screen. Requires explicit consent even when the upstream app already has a grant. Bound to the authorization code and returned on token exchange so the MCP server can verify the approved client.
     
 </dd>
 </dl>
@@ -35964,7 +51858,7 @@ client.users().oauthGrants().create(
 <dl>
 <dd>
 
-Lists the authenticated user's own passkeys, newest first. The list is always the caller's own; there is no parameter for reading another user's passkeys. Requires a user session: an API key or an OAuth token is refused, because a passkey confirms the account holder before a sensitive action and no app may enumerate one.
+Lists the authenticated user's own passkeys, newest first. You cannot read another user's passkeys. Requires a user session: an API key or an OAuth token is refused, because a passkey confirms the account holder before a sensitive action and no app may enumerate one.
 </dd>
 </dl>
 </dd>
@@ -35998,7 +51892,7 @@ client.users().passkeys().list(
 <dl>
 <dd>
 
-**first:** `Optional<Integer>` — The number of passkeys to return (default 20, max 100).
+**first:** `Optional<Integer>` — Number of results to return from the start of the range.
     
 </dd>
 </dl>
@@ -36006,7 +51900,7 @@ client.users().passkeys().list(
 <dl>
 <dd>
 
-**after:** `Optional<String>` — A cursor; returns passkeys after this position.
+**after:** `Optional<String>` — Return results after this cursor. Use `page_info.end_cursor` from the previous response to fetch the next page.
     
 </dd>
 </dl>
@@ -36014,7 +51908,7 @@ client.users().passkeys().list(
 <dl>
 <dd>
 
-**last:** `Optional<Integer>` — The number of passkeys to return from the end of the range.
+**last:** `Optional<Integer>` — Number of results to return from the end of the range.
     
 </dd>
 </dl>
@@ -36022,7 +51916,7 @@ client.users().passkeys().list(
 <dl>
 <dd>
 
-**before:** `Optional<String>` — A cursor; returns passkeys before this position.
+**before:** `Optional<String>` — Return results before this cursor. Use `page_info.start_cursor` from the previous response to fetch the previous page.
     
 </dd>
 </dl>
@@ -36062,7 +51956,7 @@ client.users().passkeys().list(
 <dl>
 <dd>
 
-Registers a passkey for the authenticated user from the attestation a browser produced for a `registration` challenge. Mint that challenge first with `POST /users/me/passkeys/challenge`; it is single-use and expires 5 minutes after it is issued. Requires a user session.
+Registers a passkey for the authenticated user from the attestation a browser produced for a `registration` challenge. Mint that challenge first with `POST /users/me/passkeys/challenge` and run the ceremony with its `creation_options`; it is single-use and expires 5 minutes after it is issued. Send back the `user_handle` the options carried; a registration without it is refused. Registering replaces the account's passkeys made before Whop issued options, which can only be deleted. Requires a user session that has completed step-up verification.
 </dd>
 </dl>
 </dd>
@@ -36084,6 +51978,7 @@ client.users().passkeys().create(
         .clientDataJson("Y2xpZW50LWRhdGE")
         .credentialId("bmV3LWNyZWRlbnRpYWw")
         .nickname("Work laptop")
+        .userHandle("xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx")
         .build()
 );
 ```
@@ -36128,6 +52023,22 @@ client.users().passkeys().create(
     
 </dd>
 </dl>
+
+<dl>
+<dd>
+
+**transports:** `Optional<List<String>>` — The `getTransports()` result from the registration response. Values Whop does not recognize are dropped.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**userHandle:** `String` — The `creation_options.user.id` the passkey was created with. Must match the challenge's options.
+    
+</dd>
+</dl>
 </dd>
 </dl>
 
@@ -36136,7 +52047,7 @@ client.users().passkeys().create(
 </dl>
 </details>
 
-<details><summary><code>client.users.passkeys.challenge(request) -> ChallengePasskeysResponse</code></summary>
+<details><summary><code>client.users.passkeys.challenge(request) -> PasskeyChallenge</code></summary>
 <dl>
 <dd>
 
@@ -36148,7 +52059,7 @@ client.users().passkeys().create(
 <dl>
 <dd>
 
-Mints the challenge a browser needs to run a WebAuthn ceremony against the authenticated user's own passkeys. A `registration` challenge enrolls a new passkey; a `deletion` challenge is bound to the one passkey named by `passkey_id` and proves the user still holds it. Challenges are single-use and expire 5 minutes after they are issued, so send a fresh `Idempotency-Key` per ceremony — a replayed key returns the original challenge, which may already have expired. Requires a user session.
+Mints the challenge and WebAuthn options a browser needs to run a ceremony against the authenticated user's own passkeys. A `registration` challenge enrolls a new passkey; a `deletion` challenge is bound to the one passkey named by `passkey_id` and proves the user still holds it. The options are in wire snake_case: convert the keys to camelCase before passing them to the browser. Challenges are single-use and expire 5 minutes after they are issued, so send a fresh `Idempotency-Key` per ceremony — a replayed key returns the original challenge, which may already have expired. Requires a user session. A `registration` challenge also requires step-up verification, so the user completes it before the browser ceremony.
 </dd>
 </dl>
 </dd>
@@ -36302,7 +52213,7 @@ client.users().passkeys().delete(
 <dl>
 <dd>
 
-Retrieves the authenticated user's settings document. Addressed only as `me` — the document always belongs to the session user.
+Retrieves the authenticated user's settings document.
 </dd>
 </dl>
 </dd>
@@ -36383,7 +52294,7 @@ client.users().preferences().update(
 <dl>
 <dd>
 
-**investigationEnabled:** `Optional<Boolean>` — Whether investigation mode is enabled for the user. Only meaningful for staff users with investigation access.
+**cardsAutoTopUp:** `Optional<Boolean>` — Whether incoming funds, including pending balance, are automatically moved to the user's personal cards balance. Requires a cards balance and the `payout:account:update` permission.
     
 </dd>
 </dl>
@@ -36392,6 +52303,66 @@ client.users().preferences().update(
 <dd>
 
 **termsAccepted:** `Optional<Boolean>` — Records the user's acceptance of Whop's terms and policies. Only `true` is accepted — the server stamps `terms_accepted_at` and acceptance cannot be withdrawn here.
+    
+</dd>
+</dl>
+</dd>
+</dl>
+
+
+</dd>
+</dl>
+</details>
+
+## Users Fees
+<details><summary><code>client.users.fees.retrieve(userId) -> UserFees</code></summary>
+<dl>
+<dd>
+
+#### 📝 Description
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+Retrieves the fees charged when the user moves money with their personal balance: withdrawals, transfers, bank deposits, and funding cards from pending balance. Each fee has the same shape as in Retrieve Account Fees. You can only retrieve your own fees, and they are read-only.
+</dd>
+</dl>
+</dd>
+</dl>
+
+#### 🔌 Usage
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+```java
+client.users().fees().retrieve(
+    "user_id",
+    RetrieveFeesRequest
+        .builder()
+        .build()
+);
+```
+</dd>
+</dl>
+</dd>
+</dl>
+
+#### ⚙️ Parameters
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+**userId:** `String` — `me`, or the authenticated user's own `user_` tag or username.
     
 </dd>
 </dl>
@@ -36416,13 +52387,7 @@ client.users().preferences().update(
 <dl>
 <dd>
 
-Sets the authenticated user's notification preferences. Each preference is addressed by `scope`, not by id, so a scope read back from either list endpoint can be sent straight here.
-
-A scope naming an experience with no topic sets that experience's level, and accepts all three levels. Any other scope sets a topic override, which is binary — `all` or `nothing` — and requires a `channel`.
-
-`level: null` clears the preference. Preferences are stored as overrides, so clearing one means the scope inherits its default again rather than being switched off.
-
-The batch is applied in one transaction: if any entry is rejected, none are written. Experience levels are applied before topic overrides, because setting a level replaces every topic preference for that experience — so an override sent alongside a level wins. The response reports what each scope now resolves to, in the order the entries were sent.
+Sets the authenticated user's notification preferences, each addressed by `scope` rather than by ID. The batch is applied in one transaction: if any entry is rejected, none are written. Experience levels are applied before topic overrides, because setting a level replaces every topic preference for that experience, so an override sent alongside a level wins. The response reports what each scope now resolves to, in the order the entries were sent.
 </dd>
 </dl>
 </dd>
@@ -36444,13 +52409,13 @@ client.users().preferences().notifications().set(
             Arrays.asList(
                 SetNotificationsRequestPreferencesItem
                     .builder()
-                    .level(
-                        Nullable.ofNull()
-                    )
                     .scope(
                         SetNotificationsRequestPreferencesItemScope
                             .builder()
                             .build()
+                    )
+                    .level(
+                        Nullable.ofNull()
                     )
                     .build()
             )
@@ -36530,7 +52495,7 @@ client.users().preferences().notifications().experiences().list(
 <dl>
 <dd>
 
-**first:** `Optional<Integer>` — The number of preferences to return.
+**first:** `Optional<Integer>` — Number of results to return from the start of the range.
     
 </dd>
 </dl>
@@ -36538,7 +52503,7 @@ client.users().preferences().notifications().experiences().list(
 <dl>
 <dd>
 
-**after:** `Optional<String>` — A cursor; returns preferences after this position.
+**after:** `Optional<String>` — Return results after this cursor. Use `page_info.end_cursor` from the previous response to fetch the next page.
     
 </dd>
 </dl>
@@ -36563,7 +52528,7 @@ client.users().preferences().notifications().experiences().list(
 <dl>
 <dd>
 
-Lists the authenticated user's topic-scoped notification preferences, plus user-agnostic platform defaults. Each filter matches preferences scoped to its value or not narrowed on that dimension. Per-experience levels are listed separately, by `GET /users/me/preferences/notifications/experiences`.
+Lists the authenticated user's topic-scoped notification preferences, plus user-agnostic platform defaults. Per-experience levels are listed separately, by `GET /users/me/preferences/notifications/experiences`.
 </dd>
 </dl>
 </dd>
@@ -36605,7 +52570,7 @@ client.users().preferences().notifications().topics().list(
 <dl>
 <dd>
 
-**accountId:** `Optional<String>` — Only return preferences scoped to this account's member notifications (`biz_` tag).
+**accountId:** `Optional<String>` — Only return preferences scoped to this account's member notifications (`biz_` tag), or not narrowed to an account.
     
 </dd>
 </dl>
@@ -36613,7 +52578,7 @@ client.users().preferences().notifications().topics().list(
 <dl>
 <dd>
 
-**teamAccountId:** `Optional<String>` — Only return preferences scoped to this account's team notifications (`biz_` tag).
+**teamAccountId:** `Optional<String>` — Only return preferences scoped to this account's team notifications (`biz_` tag), or not narrowed to a team account.
     
 </dd>
 </dl>
@@ -36621,7 +52586,7 @@ client.users().preferences().notifications().topics().list(
 <dl>
 <dd>
 
-**experienceId:** `Optional<String>` — Only return preferences scoped to this experience (`exp_` tag).
+**experienceId:** `Optional<String>` — Only return preferences scoped to this experience (`exp_` tag), or not narrowed to an experience.
     
 </dd>
 </dl>
@@ -36629,7 +52594,7 @@ client.users().preferences().notifications().topics().list(
 <dl>
 <dd>
 
-**topicId:** `Optional<String>` — Only return preferences scoped to this notification topic (`topic_` tag).
+**topicId:** `Optional<String>` — Only return preferences scoped to this notification topic (`topic_` tag), or not narrowed to a topic.
     
 </dd>
 </dl>
@@ -36637,7 +52602,7 @@ client.users().preferences().notifications().topics().list(
 <dl>
 <dd>
 
-**first:** `Optional<Integer>` — The number of preferences to return.
+**first:** `Optional<Integer>` — Number of results to return from the start of the range.
     
 </dd>
 </dl>
@@ -36645,7 +52610,7 @@ client.users().preferences().notifications().topics().list(
 <dl>
 <dd>
 
-**after:** `Optional<String>` — A cursor; returns preferences after this position.
+**after:** `Optional<String>` — Return results after this cursor. Use `page_info.end_cursor` from the previous response to fetch the next page.
     
 </dd>
 </dl>

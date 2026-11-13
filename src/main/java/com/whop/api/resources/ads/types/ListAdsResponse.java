@@ -100,7 +100,6 @@ public final class ListAdsResponse {
 
         private List<Ad> data = new ArrayList<>();
 
-        @JsonAnySetter
         private Map<String, Object> additionalProperties = new HashMap<>();
 
         private Builder() {}
@@ -146,6 +145,14 @@ public final class ListAdsResponse {
         @java.lang.Override
         public ListAdsResponse build() {
             return new ListAdsResponse(data, pageInfo, additionalProperties);
+        }
+
+        @JsonAnySetter
+        private void putAdditionalPropertyFromJson(String key, Object value) {
+            if (key.equalsIgnoreCase("data") || key.equalsIgnoreCase("page_info")) {
+                return;
+            }
+            this.additionalProperties.put(key, value);
         }
 
         @java.lang.Override

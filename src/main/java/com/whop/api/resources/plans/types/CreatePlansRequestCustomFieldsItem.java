@@ -54,41 +54,26 @@ public final class CreatePlansRequestCustomFieldsItem {
         this.additionalProperties = additionalProperties;
     }
 
-    /**
-     * @return The type of the custom field.
-     */
     @JsonProperty("field_type")
     public Optional<CreatePlansRequestCustomFieldsItemFieldType> getFieldType() {
         return fieldType;
     }
 
-    /**
-     * @return The ID of the custom field (if being updated).
-     */
     @JsonProperty("id")
     public Optional<String> getId() {
         return id;
     }
 
-    /**
-     * @return The name of the custom field.
-     */
     @JsonProperty("name")
     public Optional<String> getName() {
         return name;
     }
 
-    /**
-     * @return The order of the field.
-     */
     @JsonProperty("order")
     public Optional<Integer> getOrder() {
         return order;
     }
 
-    /**
-     * @return An example response displayed in the input field.
-     */
     @JsonIgnore
     public Optional<String> getPlaceholder() {
         if (placeholder == null) {
@@ -97,9 +82,6 @@ public final class CreatePlansRequestCustomFieldsItem {
         return placeholder;
     }
 
-    /**
-     * @return Whether or not the field is required.
-     */
     @JsonProperty("required")
     public Optional<Boolean> getRequired() {
         return required;
@@ -160,7 +142,6 @@ public final class CreatePlansRequestCustomFieldsItem {
 
         private Optional<Boolean> required = Optional.empty();
 
-        @JsonAnySetter
         private Map<String, Object> additionalProperties = new HashMap<>();
 
         private Builder() {}
@@ -175,9 +156,6 @@ public final class CreatePlansRequestCustomFieldsItem {
             return this;
         }
 
-        /**
-         * <p>The type of the custom field.</p>
-         */
         @JsonSetter(value = "field_type", nulls = Nulls.SKIP)
         public Builder fieldType(Optional<CreatePlansRequestCustomFieldsItemFieldType> fieldType) {
             this.fieldType = fieldType;
@@ -189,9 +167,6 @@ public final class CreatePlansRequestCustomFieldsItem {
             return this;
         }
 
-        /**
-         * <p>The ID of the custom field (if being updated).</p>
-         */
         @JsonSetter(value = "id", nulls = Nulls.SKIP)
         public Builder id(Optional<String> id) {
             this.id = id;
@@ -203,9 +178,6 @@ public final class CreatePlansRequestCustomFieldsItem {
             return this;
         }
 
-        /**
-         * <p>The name of the custom field.</p>
-         */
         @JsonSetter(value = "name", nulls = Nulls.SKIP)
         public Builder name(Optional<String> name) {
             this.name = name;
@@ -217,9 +189,6 @@ public final class CreatePlansRequestCustomFieldsItem {
             return this;
         }
 
-        /**
-         * <p>The order of the field.</p>
-         */
         @JsonSetter(value = "order", nulls = Nulls.SKIP)
         public Builder order(Optional<Integer> order) {
             this.order = order;
@@ -231,9 +200,6 @@ public final class CreatePlansRequestCustomFieldsItem {
             return this;
         }
 
-        /**
-         * <p>An example response displayed in the input field.</p>
-         */
         @JsonSetter(value = "placeholder", nulls = Nulls.SKIP)
         public Builder placeholder(Optional<String> placeholder) {
             this.placeholder = placeholder;
@@ -256,9 +222,6 @@ public final class CreatePlansRequestCustomFieldsItem {
             return this;
         }
 
-        /**
-         * <p>Whether or not the field is required.</p>
-         */
         @JsonSetter(value = "required", nulls = Nulls.SKIP)
         public Builder required(Optional<Boolean> required) {
             this.required = required;
@@ -273,6 +236,19 @@ public final class CreatePlansRequestCustomFieldsItem {
         public CreatePlansRequestCustomFieldsItem build() {
             return new CreatePlansRequestCustomFieldsItem(
                     fieldType, id, name, order, placeholder, required, additionalProperties);
+        }
+
+        @JsonAnySetter
+        private void putAdditionalPropertyFromJson(String key, Object value) {
+            if (key.equalsIgnoreCase("field_type")
+                    || key.equalsIgnoreCase("id")
+                    || key.equalsIgnoreCase("name")
+                    || key.equalsIgnoreCase("order")
+                    || key.equalsIgnoreCase("placeholder")
+                    || key.equalsIgnoreCase("required")) {
+                return;
+            }
+            this.additionalProperties.put(key, value);
         }
 
         public Builder additionalProperty(String key, Object value) {

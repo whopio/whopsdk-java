@@ -13,6 +13,8 @@ public final class ReceiptStatus {
 
     public static final ReceiptStatus PAID = new ReceiptStatus(Value.PAID, "paid");
 
+    public static final ReceiptStatus AUTHORIZED = new ReceiptStatus(Value.AUTHORIZED, "authorized");
+
     public static final ReceiptStatus DRAFT = new ReceiptStatus(Value.DRAFT, "draft");
 
     public static final ReceiptStatus UNCOLLECTIBLE = new ReceiptStatus(Value.UNCOLLECTIBLE, "uncollectible");
@@ -59,6 +61,8 @@ public final class ReceiptStatus {
                 return visitor.visitPending();
             case PAID:
                 return visitor.visitPaid();
+            case AUTHORIZED:
+                return visitor.visitAuthorized();
             case DRAFT:
                 return visitor.visitDraft();
             case UNCOLLECTIBLE:
@@ -82,6 +86,8 @@ public final class ReceiptStatus {
                 return PENDING;
             case "paid":
                 return PAID;
+            case "authorized":
+                return AUTHORIZED;
             case "draft":
                 return DRAFT;
             case "uncollectible":
@@ -100,6 +106,8 @@ public final class ReceiptStatus {
 
         OPEN,
 
+        AUTHORIZED,
+
         PAID,
 
         PENDING,
@@ -117,6 +125,8 @@ public final class ReceiptStatus {
         T visitDraft();
 
         T visitOpen();
+
+        T visitAuthorized();
 
         T visitPaid();
 

@@ -17,15 +17,11 @@ import com.whop.api.core.NullableNonemptyFilter;
 import com.whop.api.core.ObjectMappers;
 import com.whop.api.resources.adgroups.types.CreateAdGroupsRequestBidType;
 import com.whop.api.resources.adgroups.types.CreateAdGroupsRequestBudgetType;
-import com.whop.api.resources.adgroups.types.CreateAdGroupsRequestConversionLocation;
-import com.whop.api.resources.adgroups.types.CreateAdGroupsRequestFrequencyCap;
-import com.whop.api.resources.adgroups.types.CreateAdGroupsRequestMessageAppsItem;
-import com.whop.api.resources.adgroups.types.CreateAdGroupsRequestOptimizationGoal;
-import com.whop.api.resources.adgroups.types.CreateAdGroupsRequestPlacements;
+import com.whop.api.resources.adgroups.types.CreateAdGroupsRequestDeliverySchedule;
+import com.whop.api.resources.adgroups.types.CreateAdGroupsRequestKeywordsItem;
 import com.whop.api.resources.adgroups.types.CreateAdGroupsRequestStatus;
 import com.whop.api.types.AdGroupAudiencesBody;
 import com.whop.api.types.AdGroupDemographicsBody;
-import com.whop.api.types.AdGroupDetailedTargetingBody;
 import com.whop.api.types.AdGroupDevicesBody;
 import com.whop.api.types.AdGroupRegionsBody;
 import com.whop.api.types.ConversionEvent;
@@ -47,35 +43,25 @@ public final class CreateAdGroupsRequest {
 
     private final Optional<Double> budgetAmount;
 
+    private final Optional<Double> budgetAmountLocal;
+
     private final Optional<CreateAdGroupsRequestBudgetType> budgetType;
 
     private final Optional<ConversionEvent> conversionEvent;
 
-    private final Optional<CreateAdGroupsRequestConversionLocation> conversionLocation;
+    private final Optional<CreateAdGroupsRequestDeliverySchedule> deliverySchedule;
 
     private final Optional<AdGroupDemographicsBody> demographics;
 
     private final Optional<Double> desiredCostPerResult;
 
-    private final Optional<AdGroupDetailedTargetingBody> detailedTargeting;
-
     private final Optional<AdGroupDevicesBody> devices;
-
-    private final Optional<Boolean> dynamicCreative;
 
     private final Optional<String> endsAt;
 
-    private final Optional<CreateAdGroupsRequestFrequencyCap> frequencyCap;
+    private final Optional<List<CreateAdGroupsRequestKeywordsItem>> keywords;
 
     private final Optional<List<String>> languages;
-
-    private final Optional<List<CreateAdGroupsRequestMessageAppsItem>> messageApps;
-
-    private final Optional<Double> minimumDailySpend;
-
-    private final Optional<CreateAdGroupsRequestOptimizationGoal> optimizationGoal;
-
-    private final Optional<CreateAdGroupsRequestPlacements> placements;
 
     private final Optional<AdGroupRegionsBody> regions;
 
@@ -92,21 +78,16 @@ public final class CreateAdGroupsRequest {
             Optional<AdGroupAudiencesBody> audiences,
             Optional<CreateAdGroupsRequestBidType> bidType,
             Optional<Double> budgetAmount,
+            Optional<Double> budgetAmountLocal,
             Optional<CreateAdGroupsRequestBudgetType> budgetType,
             Optional<ConversionEvent> conversionEvent,
-            Optional<CreateAdGroupsRequestConversionLocation> conversionLocation,
+            Optional<CreateAdGroupsRequestDeliverySchedule> deliverySchedule,
             Optional<AdGroupDemographicsBody> demographics,
             Optional<Double> desiredCostPerResult,
-            Optional<AdGroupDetailedTargetingBody> detailedTargeting,
             Optional<AdGroupDevicesBody> devices,
-            Optional<Boolean> dynamicCreative,
             Optional<String> endsAt,
-            Optional<CreateAdGroupsRequestFrequencyCap> frequencyCap,
+            Optional<List<CreateAdGroupsRequestKeywordsItem>> keywords,
             Optional<List<String>> languages,
-            Optional<List<CreateAdGroupsRequestMessageAppsItem>> messageApps,
-            Optional<Double> minimumDailySpend,
-            Optional<CreateAdGroupsRequestOptimizationGoal> optimizationGoal,
-            Optional<CreateAdGroupsRequestPlacements> placements,
             Optional<AdGroupRegionsBody> regions,
             Optional<String> startsAt,
             Optional<CreateAdGroupsRequestStatus> status,
@@ -116,21 +97,16 @@ public final class CreateAdGroupsRequest {
         this.audiences = audiences;
         this.bidType = bidType;
         this.budgetAmount = budgetAmount;
+        this.budgetAmountLocal = budgetAmountLocal;
         this.budgetType = budgetType;
         this.conversionEvent = conversionEvent;
-        this.conversionLocation = conversionLocation;
+        this.deliverySchedule = deliverySchedule;
         this.demographics = demographics;
         this.desiredCostPerResult = desiredCostPerResult;
-        this.detailedTargeting = detailedTargeting;
         this.devices = devices;
-        this.dynamicCreative = dynamicCreative;
         this.endsAt = endsAt;
-        this.frequencyCap = frequencyCap;
+        this.keywords = keywords;
         this.languages = languages;
-        this.messageApps = messageApps;
-        this.minimumDailySpend = minimumDailySpend;
-        this.optimizationGoal = optimizationGoal;
-        this.placements = placements;
         this.regions = regions;
         this.startsAt = startsAt;
         this.status = status;
@@ -163,11 +139,19 @@ public final class CreateAdGroupsRequest {
     }
 
     /**
-     * @return This ad group's budget, in the ad account's currency. Omit when the budget is set on the campaign instead.
+     * @return This ad group's budget in USD, which is what it is stored and billed in. Omit when the budget is set on the campaign instead.
      */
     @JsonProperty("budget_amount")
     public Optional<Double> getBudgetAmount() {
         return budgetAmount;
+    }
+
+    /**
+     * @return This ad group's budget stated in the account's ads reporting currency (<code>budget_currency</code> on the response) instead of USD. Converted to USD at the current exchange rate and stored as budget_amount; on an update, an amount equal to the current budget_amount_local keeps the stored USD budget as is. Provide this or budget_amount, not both.
+     */
+    @JsonProperty("budget_amount_local")
+    public Optional<Double> getBudgetAmountLocal() {
+        return budgetAmountLocal;
     }
 
     /**
@@ -187,11 +171,14 @@ public final class CreateAdGroupsRequest {
     }
 
     /**
-     * @return Where the outcome being optimized for occurs, such as a website visit, social-profile visit, messaging conversation, ad interaction, or lead-form submission. The lead form itself is set on the ad.
+     * @return Hours the ad group delivers in each week, keyed by day. Each window runs from <code>start</code> to <code>end</code> on the hour, with <code>24:00</code> for midnight, and a day's windows can't overlap or touch. A day that's empty or left out doesn't deliver. Replaces the whole schedule; <code>null</code> delivers at every hour. Some platforms need a lifetime <code>budget_type</code> for a schedule, on the ad group or on its campaign when the campaign holds the budget.
      */
-    @JsonProperty("conversion_location")
-    public Optional<CreateAdGroupsRequestConversionLocation> getConversionLocation() {
-        return conversionLocation;
+    @JsonIgnore
+    public Optional<CreateAdGroupsRequestDeliverySchedule> getDeliverySchedule() {
+        if (deliverySchedule == null) {
+            return Optional.empty();
+        }
+        return deliverySchedule;
     }
 
     /**
@@ -211,27 +198,11 @@ public final class CreateAdGroupsRequest {
     }
 
     /**
-     * @return Interest, behavior, and demographic targeting, using categories from the ad platform's targeting taxonomy. Entries across interests, behaviors, and demographics are OR'd together (anyone matching any entry is reached), matching Ads Manager's detailed-targeting box. At most 100 entries per section. Can't be combined with demographics.automatic, and unavailable to campaigns with special_ad_categories. Send the complete intended state — a section you omit is cleared.
-     */
-    @JsonProperty("detailed_targeting")
-    public Optional<AdGroupDetailedTargetingBody> getDetailedTargeting() {
-        return detailedTargeting;
-    }
-
-    /**
      * @return Device platforms and operating systems to target.
      */
     @JsonProperty("devices")
     public Optional<AdGroupDevicesBody> getDevices() {
         return devices;
-    }
-
-    /**
-     * @return Let the ad platform automatically mix and match this ad group's creatives and copy to find the best-performing combinations. Set at creation; can't be changed afterward.
-     */
-    @JsonProperty("dynamic_creative")
-    public Optional<Boolean> getDynamicCreative() {
-        return dynamicCreative;
     }
 
     /**
@@ -243,11 +214,11 @@ public final class CreateAdGroupsRequest {
     }
 
     /**
-     * @return Cap on how often one person sees ads from this ad group. Only available on campaigns with the <code>awareness</code> objective.
+     * @return Search terms the ad group's ads can show for, and terms they never show for. Only search campaigns take keywords, and each of their ad groups needs at least one before launch. Replaces the stored list; omit to keep it.
      */
-    @JsonProperty("frequency_cap")
-    public Optional<CreateAdGroupsRequestFrequencyCap> getFrequencyCap() {
-        return frequencyCap;
+    @JsonProperty("keywords")
+    public Optional<List<CreateAdGroupsRequestKeywordsItem>> getKeywords() {
+        return keywords;
     }
 
     /**
@@ -256,47 +227,6 @@ public final class CreateAdGroupsRequest {
     @JsonProperty("languages")
     public Optional<List<String>> getLanguages() {
         return languages;
-    }
-
-    /**
-     * @return Apps the conversation opens in. Required when setting <code>conversion_location</code> to <code>messaging</code>, and rejected unless the ad group's conversion location is <code>messaging</code>.
-     */
-    @JsonProperty("message_apps")
-    public Optional<List<CreateAdGroupsRequestMessageAppsItem>> getMessageApps() {
-        return messageApps;
-    }
-
-    /**
-     * @return Minimum the ad group tries to spend each day.
-     */
-    @JsonProperty("minimum_daily_spend")
-    public Optional<Double> getMinimumDailySpend() {
-        return minimumDailySpend;
-    }
-
-    /**
-     * @return The result the ad group's delivery is optimized to get the most of.
-     */
-    @JsonProperty("optimization_goal")
-    public Optional<CreateAdGroupsRequestOptimizationGoal> getOptimizationGoal() {
-        return optimizationGoal;
-    }
-
-    /**
-     * @return <code>automatic</code> to let the ad platform choose placements, or the list of platforms and positions to target. Omit a platform's positions to target all of them.
-     * <p>Valid positions per platform:</p>
-     * <ul>
-     * <li><code>facebook</code>: <code>feed</code>, <code>right_hand_column</code>, <code>marketplace</code>, <code>search</code>, <code>profile_feed</code>, <code>notification</code>, <code>story</code>, <code>instream_video</code>, <code>facebook_reels</code>, <code>facebook_reels_overlay</code>, <code>biz_disco_feed</code></li>
-     * <li><code>instagram</code>: <code>stream</code>, <code>story</code>, <code>explore</code>, <code>explore_home</code>, <code>reels</code>, <code>profile_feed</code>, <code>profile_reels</code>, <code>ig_search</code></li>
-     * <li><code>messenger</code>: <code>story</code></li>
-     * <li><code>audience_network</code>: <code>classic</code>, <code>rewarded_video</code></li>
-     * <li><code>threads</code>: <code>threads_stream</code></li>
-     * <li><code>whatsapp</code>: <code>status</code></li>
-     * </ul>
-     */
-    @JsonProperty("placements")
-    public Optional<CreateAdGroupsRequestPlacements> getPlacements() {
-        return placements;
     }
 
     /**
@@ -337,6 +267,12 @@ public final class CreateAdGroupsRequest {
         return conversionEvent;
     }
 
+    @JsonInclude(value = JsonInclude.Include.CUSTOM, valueFilter = NullableNonemptyFilter.class)
+    @JsonProperty("delivery_schedule")
+    private Optional<CreateAdGroupsRequestDeliverySchedule> _getDeliverySchedule() {
+        return deliverySchedule;
+    }
+
     @java.lang.Override
     public boolean equals(Object other) {
         if (this == other) return true;
@@ -353,21 +289,16 @@ public final class CreateAdGroupsRequest {
                 && audiences.equals(other.audiences)
                 && bidType.equals(other.bidType)
                 && budgetAmount.equals(other.budgetAmount)
+                && budgetAmountLocal.equals(other.budgetAmountLocal)
                 && budgetType.equals(other.budgetType)
                 && conversionEvent.equals(other.conversionEvent)
-                && conversionLocation.equals(other.conversionLocation)
+                && deliverySchedule.equals(other.deliverySchedule)
                 && demographics.equals(other.demographics)
                 && desiredCostPerResult.equals(other.desiredCostPerResult)
-                && detailedTargeting.equals(other.detailedTargeting)
                 && devices.equals(other.devices)
-                && dynamicCreative.equals(other.dynamicCreative)
                 && endsAt.equals(other.endsAt)
-                && frequencyCap.equals(other.frequencyCap)
+                && keywords.equals(other.keywords)
                 && languages.equals(other.languages)
-                && messageApps.equals(other.messageApps)
-                && minimumDailySpend.equals(other.minimumDailySpend)
-                && optimizationGoal.equals(other.optimizationGoal)
-                && placements.equals(other.placements)
                 && regions.equals(other.regions)
                 && startsAt.equals(other.startsAt)
                 && status.equals(other.status)
@@ -381,21 +312,16 @@ public final class CreateAdGroupsRequest {
                 this.audiences,
                 this.bidType,
                 this.budgetAmount,
+                this.budgetAmountLocal,
                 this.budgetType,
                 this.conversionEvent,
-                this.conversionLocation,
+                this.deliverySchedule,
                 this.demographics,
                 this.desiredCostPerResult,
-                this.detailedTargeting,
                 this.devices,
-                this.dynamicCreative,
                 this.endsAt,
-                this.frequencyCap,
+                this.keywords,
                 this.languages,
-                this.messageApps,
-                this.minimumDailySpend,
-                this.optimizationGoal,
-                this.placements,
                 this.regions,
                 this.startsAt,
                 this.status,
@@ -442,11 +368,18 @@ public final class CreateAdGroupsRequest {
         _FinalStage bidType(CreateAdGroupsRequestBidType bidType);
 
         /**
-         * <p>This ad group's budget, in the ad account's currency. Omit when the budget is set on the campaign instead.</p>
+         * <p>This ad group's budget in USD, which is what it is stored and billed in. Omit when the budget is set on the campaign instead.</p>
          */
         _FinalStage budgetAmount(Optional<Double> budgetAmount);
 
         _FinalStage budgetAmount(Double budgetAmount);
+
+        /**
+         * <p>This ad group's budget stated in the account's ads reporting currency (<code>budget_currency</code> on the response) instead of USD. Converted to USD at the current exchange rate and stored as budget_amount; on an update, an amount equal to the current budget_amount_local keeps the stored USD budget as is. Provide this or budget_amount, not both.</p>
+         */
+        _FinalStage budgetAmountLocal(Optional<Double> budgetAmountLocal);
+
+        _FinalStage budgetAmountLocal(Double budgetAmountLocal);
 
         /**
          * <p>Whether budget_amount is spent per day (<code>daily</code>) or over the ad group's full run (<code>lifetime</code>).</p>
@@ -462,11 +395,13 @@ public final class CreateAdGroupsRequest {
         _FinalStage conversionEvent(Nullable<ConversionEvent> conversionEvent);
 
         /**
-         * <p>Where the outcome being optimized for occurs, such as a website visit, social-profile visit, messaging conversation, ad interaction, or lead-form submission. The lead form itself is set on the ad.</p>
+         * <p>Hours the ad group delivers in each week, keyed by day. Each window runs from <code>start</code> to <code>end</code> on the hour, with <code>24:00</code> for midnight, and a day's windows can't overlap or touch. A day that's empty or left out doesn't deliver. Replaces the whole schedule; <code>null</code> delivers at every hour. Some platforms need a lifetime <code>budget_type</code> for a schedule, on the ad group or on its campaign when the campaign holds the budget.</p>
          */
-        _FinalStage conversionLocation(Optional<CreateAdGroupsRequestConversionLocation> conversionLocation);
+        _FinalStage deliverySchedule(Optional<CreateAdGroupsRequestDeliverySchedule> deliverySchedule);
 
-        _FinalStage conversionLocation(CreateAdGroupsRequestConversionLocation conversionLocation);
+        _FinalStage deliverySchedule(CreateAdGroupsRequestDeliverySchedule deliverySchedule);
+
+        _FinalStage deliverySchedule(Nullable<CreateAdGroupsRequestDeliverySchedule> deliverySchedule);
 
         /**
          * <p>Age, gender, and automatic-audience targeting.</p>
@@ -483,25 +418,11 @@ public final class CreateAdGroupsRequest {
         _FinalStage desiredCostPerResult(Double desiredCostPerResult);
 
         /**
-         * <p>Interest, behavior, and demographic targeting, using categories from the ad platform's targeting taxonomy. Entries across interests, behaviors, and demographics are OR'd together (anyone matching any entry is reached), matching Ads Manager's detailed-targeting box. At most 100 entries per section. Can't be combined with demographics.automatic, and unavailable to campaigns with special_ad_categories. Send the complete intended state — a section you omit is cleared.</p>
-         */
-        _FinalStage detailedTargeting(Optional<AdGroupDetailedTargetingBody> detailedTargeting);
-
-        _FinalStage detailedTargeting(AdGroupDetailedTargetingBody detailedTargeting);
-
-        /**
          * <p>Device platforms and operating systems to target.</p>
          */
         _FinalStage devices(Optional<AdGroupDevicesBody> devices);
 
         _FinalStage devices(AdGroupDevicesBody devices);
-
-        /**
-         * <p>Let the ad platform automatically mix and match this ad group's creatives and copy to find the best-performing combinations. Set at creation; can't be changed afterward.</p>
-         */
-        _FinalStage dynamicCreative(Optional<Boolean> dynamicCreative);
-
-        _FinalStage dynamicCreative(Boolean dynamicCreative);
 
         /**
          * <p>When the ad group stops delivering, as an ISO 8601 timestamp. Omit to run until paused.</p>
@@ -511,11 +432,11 @@ public final class CreateAdGroupsRequest {
         _FinalStage endsAt(String endsAt);
 
         /**
-         * <p>Cap on how often one person sees ads from this ad group. Only available on campaigns with the <code>awareness</code> objective.</p>
+         * <p>Search terms the ad group's ads can show for, and terms they never show for. Only search campaigns take keywords, and each of their ad groups needs at least one before launch. Replaces the stored list; omit to keep it.</p>
          */
-        _FinalStage frequencyCap(Optional<CreateAdGroupsRequestFrequencyCap> frequencyCap);
+        _FinalStage keywords(Optional<List<CreateAdGroupsRequestKeywordsItem>> keywords);
 
-        _FinalStage frequencyCap(CreateAdGroupsRequestFrequencyCap frequencyCap);
+        _FinalStage keywords(List<CreateAdGroupsRequestKeywordsItem> keywords);
 
         /**
          * <p>Languages to target, as ISO 639 codes such as <code>en</code> or <code>es</code>. Empty or omitted targets all languages.</p>
@@ -523,43 +444,6 @@ public final class CreateAdGroupsRequest {
         _FinalStage languages(Optional<List<String>> languages);
 
         _FinalStage languages(List<String> languages);
-
-        /**
-         * <p>Apps the conversation opens in. Required when setting <code>conversion_location</code> to <code>messaging</code>, and rejected unless the ad group's conversion location is <code>messaging</code>.</p>
-         */
-        _FinalStage messageApps(Optional<List<CreateAdGroupsRequestMessageAppsItem>> messageApps);
-
-        _FinalStage messageApps(List<CreateAdGroupsRequestMessageAppsItem> messageApps);
-
-        /**
-         * <p>Minimum the ad group tries to spend each day.</p>
-         */
-        _FinalStage minimumDailySpend(Optional<Double> minimumDailySpend);
-
-        _FinalStage minimumDailySpend(Double minimumDailySpend);
-
-        /**
-         * <p>The result the ad group's delivery is optimized to get the most of.</p>
-         */
-        _FinalStage optimizationGoal(Optional<CreateAdGroupsRequestOptimizationGoal> optimizationGoal);
-
-        _FinalStage optimizationGoal(CreateAdGroupsRequestOptimizationGoal optimizationGoal);
-
-        /**
-         * <p><code>automatic</code> to let the ad platform choose placements, or the list of platforms and positions to target. Omit a platform's positions to target all of them.</p>
-         * <p>Valid positions per platform:</p>
-         * <ul>
-         * <li><code>facebook</code>: <code>feed</code>, <code>right_hand_column</code>, <code>marketplace</code>, <code>search</code>, <code>profile_feed</code>, <code>notification</code>, <code>story</code>, <code>instream_video</code>, <code>facebook_reels</code>, <code>facebook_reels_overlay</code>, <code>biz_disco_feed</code></li>
-         * <li><code>instagram</code>: <code>stream</code>, <code>story</code>, <code>explore</code>, <code>explore_home</code>, <code>reels</code>, <code>profile_feed</code>, <code>profile_reels</code>, <code>ig_search</code></li>
-         * <li><code>messenger</code>: <code>story</code></li>
-         * <li><code>audience_network</code>: <code>classic</code>, <code>rewarded_video</code></li>
-         * <li><code>threads</code>: <code>threads_stream</code></li>
-         * <li><code>whatsapp</code>: <code>status</code></li>
-         * </ul>
-         */
-        _FinalStage placements(Optional<CreateAdGroupsRequestPlacements> placements);
-
-        _FinalStage placements(CreateAdGroupsRequestPlacements placements);
 
         /**
          * <p>Locations to target and exclude.</p>
@@ -602,35 +486,25 @@ public final class CreateAdGroupsRequest {
 
         private Optional<AdGroupRegionsBody> regions = Optional.empty();
 
-        private Optional<CreateAdGroupsRequestPlacements> placements = Optional.empty();
-
-        private Optional<CreateAdGroupsRequestOptimizationGoal> optimizationGoal = Optional.empty();
-
-        private Optional<Double> minimumDailySpend = Optional.empty();
-
-        private Optional<List<CreateAdGroupsRequestMessageAppsItem>> messageApps = Optional.empty();
-
         private Optional<List<String>> languages = Optional.empty();
 
-        private Optional<CreateAdGroupsRequestFrequencyCap> frequencyCap = Optional.empty();
+        private Optional<List<CreateAdGroupsRequestKeywordsItem>> keywords = Optional.empty();
 
         private Optional<String> endsAt = Optional.empty();
 
-        private Optional<Boolean> dynamicCreative = Optional.empty();
-
         private Optional<AdGroupDevicesBody> devices = Optional.empty();
-
-        private Optional<AdGroupDetailedTargetingBody> detailedTargeting = Optional.empty();
 
         private Optional<Double> desiredCostPerResult = Optional.empty();
 
         private Optional<AdGroupDemographicsBody> demographics = Optional.empty();
 
-        private Optional<CreateAdGroupsRequestConversionLocation> conversionLocation = Optional.empty();
+        private Optional<CreateAdGroupsRequestDeliverySchedule> deliverySchedule = Optional.empty();
 
         private Optional<ConversionEvent> conversionEvent = Optional.empty();
 
         private Optional<CreateAdGroupsRequestBudgetType> budgetType = Optional.empty();
+
+        private Optional<Double> budgetAmountLocal = Optional.empty();
 
         private Optional<Double> budgetAmount = Optional.empty();
 
@@ -638,7 +512,6 @@ public final class CreateAdGroupsRequest {
 
         private Optional<AdGroupAudiencesBody> audiences = Optional.empty();
 
-        @JsonAnySetter
         private Map<String, Object> additionalProperties = new HashMap<>();
 
         private Builder() {}
@@ -649,21 +522,16 @@ public final class CreateAdGroupsRequest {
             audiences(other.getAudiences());
             bidType(other.getBidType());
             budgetAmount(other.getBudgetAmount());
+            budgetAmountLocal(other.getBudgetAmountLocal());
             budgetType(other.getBudgetType());
             conversionEvent(other.getConversionEvent());
-            conversionLocation(other.getConversionLocation());
+            deliverySchedule(other.getDeliverySchedule());
             demographics(other.getDemographics());
             desiredCostPerResult(other.getDesiredCostPerResult());
-            detailedTargeting(other.getDetailedTargeting());
             devices(other.getDevices());
-            dynamicCreative(other.getDynamicCreative());
             endsAt(other.getEndsAt());
-            frequencyCap(other.getFrequencyCap());
+            keywords(other.getKeywords());
             languages(other.getLanguages());
-            messageApps(other.getMessageApps());
-            minimumDailySpend(other.getMinimumDailySpend());
-            optimizationGoal(other.getOptimizationGoal());
-            placements(other.getPlacements());
             regions(other.getRegions());
             startsAt(other.getStartsAt());
             status(other.getStatus());
@@ -672,7 +540,6 @@ public final class CreateAdGroupsRequest {
         }
 
         /**
-         * <p>The ad campaign to create the ad group in, prefixed <code>adcamp_</code>.</p>
          * <p>The ad campaign to create the ad group in, prefixed <code>adcamp_</code>.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
@@ -764,104 +631,6 @@ public final class CreateAdGroupsRequest {
         }
 
         /**
-         * <p><code>automatic</code> to let the ad platform choose placements, or the list of platforms and positions to target. Omit a platform's positions to target all of them.</p>
-         * <p>Valid positions per platform:</p>
-         * <ul>
-         * <li><code>facebook</code>: <code>feed</code>, <code>right_hand_column</code>, <code>marketplace</code>, <code>search</code>, <code>profile_feed</code>, <code>notification</code>, <code>story</code>, <code>instream_video</code>, <code>facebook_reels</code>, <code>facebook_reels_overlay</code>, <code>biz_disco_feed</code></li>
-         * <li><code>instagram</code>: <code>stream</code>, <code>story</code>, <code>explore</code>, <code>explore_home</code>, <code>reels</code>, <code>profile_feed</code>, <code>profile_reels</code>, <code>ig_search</code></li>
-         * <li><code>messenger</code>: <code>story</code></li>
-         * <li><code>audience_network</code>: <code>classic</code>, <code>rewarded_video</code></li>
-         * <li><code>threads</code>: <code>threads_stream</code></li>
-         * <li><code>whatsapp</code>: <code>status</code></li>
-         * </ul>
-         * @return Reference to {@code this} so that method calls can be chained together.
-         */
-        @java.lang.Override
-        public _FinalStage placements(CreateAdGroupsRequestPlacements placements) {
-            this.placements = Optional.ofNullable(placements);
-            return this;
-        }
-
-        /**
-         * <p><code>automatic</code> to let the ad platform choose placements, or the list of platforms and positions to target. Omit a platform's positions to target all of them.</p>
-         * <p>Valid positions per platform:</p>
-         * <ul>
-         * <li><code>facebook</code>: <code>feed</code>, <code>right_hand_column</code>, <code>marketplace</code>, <code>search</code>, <code>profile_feed</code>, <code>notification</code>, <code>story</code>, <code>instream_video</code>, <code>facebook_reels</code>, <code>facebook_reels_overlay</code>, <code>biz_disco_feed</code></li>
-         * <li><code>instagram</code>: <code>stream</code>, <code>story</code>, <code>explore</code>, <code>explore_home</code>, <code>reels</code>, <code>profile_feed</code>, <code>profile_reels</code>, <code>ig_search</code></li>
-         * <li><code>messenger</code>: <code>story</code></li>
-         * <li><code>audience_network</code>: <code>classic</code>, <code>rewarded_video</code></li>
-         * <li><code>threads</code>: <code>threads_stream</code></li>
-         * <li><code>whatsapp</code>: <code>status</code></li>
-         * </ul>
-         */
-        @java.lang.Override
-        @JsonSetter(value = "placements", nulls = Nulls.SKIP)
-        public _FinalStage placements(Optional<CreateAdGroupsRequestPlacements> placements) {
-            this.placements = placements;
-            return this;
-        }
-
-        /**
-         * <p>The result the ad group's delivery is optimized to get the most of.</p>
-         * @return Reference to {@code this} so that method calls can be chained together.
-         */
-        @java.lang.Override
-        public _FinalStage optimizationGoal(CreateAdGroupsRequestOptimizationGoal optimizationGoal) {
-            this.optimizationGoal = Optional.ofNullable(optimizationGoal);
-            return this;
-        }
-
-        /**
-         * <p>The result the ad group's delivery is optimized to get the most of.</p>
-         */
-        @java.lang.Override
-        @JsonSetter(value = "optimization_goal", nulls = Nulls.SKIP)
-        public _FinalStage optimizationGoal(Optional<CreateAdGroupsRequestOptimizationGoal> optimizationGoal) {
-            this.optimizationGoal = optimizationGoal;
-            return this;
-        }
-
-        /**
-         * <p>Minimum the ad group tries to spend each day.</p>
-         * @return Reference to {@code this} so that method calls can be chained together.
-         */
-        @java.lang.Override
-        public _FinalStage minimumDailySpend(Double minimumDailySpend) {
-            this.minimumDailySpend = Optional.ofNullable(minimumDailySpend);
-            return this;
-        }
-
-        /**
-         * <p>Minimum the ad group tries to spend each day.</p>
-         */
-        @java.lang.Override
-        @JsonSetter(value = "minimum_daily_spend", nulls = Nulls.SKIP)
-        public _FinalStage minimumDailySpend(Optional<Double> minimumDailySpend) {
-            this.minimumDailySpend = minimumDailySpend;
-            return this;
-        }
-
-        /**
-         * <p>Apps the conversation opens in. Required when setting <code>conversion_location</code> to <code>messaging</code>, and rejected unless the ad group's conversion location is <code>messaging</code>.</p>
-         * @return Reference to {@code this} so that method calls can be chained together.
-         */
-        @java.lang.Override
-        public _FinalStage messageApps(List<CreateAdGroupsRequestMessageAppsItem> messageApps) {
-            this.messageApps = Optional.ofNullable(messageApps);
-            return this;
-        }
-
-        /**
-         * <p>Apps the conversation opens in. Required when setting <code>conversion_location</code> to <code>messaging</code>, and rejected unless the ad group's conversion location is <code>messaging</code>.</p>
-         */
-        @java.lang.Override
-        @JsonSetter(value = "message_apps", nulls = Nulls.SKIP)
-        public _FinalStage messageApps(Optional<List<CreateAdGroupsRequestMessageAppsItem>> messageApps) {
-            this.messageApps = messageApps;
-            return this;
-        }
-
-        /**
          * <p>Languages to target, as ISO 639 codes such as <code>en</code> or <code>es</code>. Empty or omitted targets all languages.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
@@ -882,22 +651,22 @@ public final class CreateAdGroupsRequest {
         }
 
         /**
-         * <p>Cap on how often one person sees ads from this ad group. Only available on campaigns with the <code>awareness</code> objective.</p>
+         * <p>Search terms the ad group's ads can show for, and terms they never show for. Only search campaigns take keywords, and each of their ad groups needs at least one before launch. Replaces the stored list; omit to keep it.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
-        public _FinalStage frequencyCap(CreateAdGroupsRequestFrequencyCap frequencyCap) {
-            this.frequencyCap = Optional.ofNullable(frequencyCap);
+        public _FinalStage keywords(List<CreateAdGroupsRequestKeywordsItem> keywords) {
+            this.keywords = Optional.ofNullable(keywords);
             return this;
         }
 
         /**
-         * <p>Cap on how often one person sees ads from this ad group. Only available on campaigns with the <code>awareness</code> objective.</p>
+         * <p>Search terms the ad group's ads can show for, and terms they never show for. Only search campaigns take keywords, and each of their ad groups needs at least one before launch. Replaces the stored list; omit to keep it.</p>
          */
         @java.lang.Override
-        @JsonSetter(value = "frequency_cap", nulls = Nulls.SKIP)
-        public _FinalStage frequencyCap(Optional<CreateAdGroupsRequestFrequencyCap> frequencyCap) {
-            this.frequencyCap = frequencyCap;
+        @JsonSetter(value = "keywords", nulls = Nulls.SKIP)
+        public _FinalStage keywords(Optional<List<CreateAdGroupsRequestKeywordsItem>> keywords) {
+            this.keywords = keywords;
             return this;
         }
 
@@ -922,26 +691,6 @@ public final class CreateAdGroupsRequest {
         }
 
         /**
-         * <p>Let the ad platform automatically mix and match this ad group's creatives and copy to find the best-performing combinations. Set at creation; can't be changed afterward.</p>
-         * @return Reference to {@code this} so that method calls can be chained together.
-         */
-        @java.lang.Override
-        public _FinalStage dynamicCreative(Boolean dynamicCreative) {
-            this.dynamicCreative = Optional.ofNullable(dynamicCreative);
-            return this;
-        }
-
-        /**
-         * <p>Let the ad platform automatically mix and match this ad group's creatives and copy to find the best-performing combinations. Set at creation; can't be changed afterward.</p>
-         */
-        @java.lang.Override
-        @JsonSetter(value = "dynamic_creative", nulls = Nulls.SKIP)
-        public _FinalStage dynamicCreative(Optional<Boolean> dynamicCreative) {
-            this.dynamicCreative = dynamicCreative;
-            return this;
-        }
-
-        /**
          * <p>Device platforms and operating systems to target.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
@@ -958,26 +707,6 @@ public final class CreateAdGroupsRequest {
         @JsonSetter(value = "devices", nulls = Nulls.SKIP)
         public _FinalStage devices(Optional<AdGroupDevicesBody> devices) {
             this.devices = devices;
-            return this;
-        }
-
-        /**
-         * <p>Interest, behavior, and demographic targeting, using categories from the ad platform's targeting taxonomy. Entries across interests, behaviors, and demographics are OR'd together (anyone matching any entry is reached), matching Ads Manager's detailed-targeting box. At most 100 entries per section. Can't be combined with demographics.automatic, and unavailable to campaigns with special_ad_categories. Send the complete intended state — a section you omit is cleared.</p>
-         * @return Reference to {@code this} so that method calls can be chained together.
-         */
-        @java.lang.Override
-        public _FinalStage detailedTargeting(AdGroupDetailedTargetingBody detailedTargeting) {
-            this.detailedTargeting = Optional.ofNullable(detailedTargeting);
-            return this;
-        }
-
-        /**
-         * <p>Interest, behavior, and demographic targeting, using categories from the ad platform's targeting taxonomy. Entries across interests, behaviors, and demographics are OR'd together (anyone matching any entry is reached), matching Ads Manager's detailed-targeting box. At most 100 entries per section. Can't be combined with demographics.automatic, and unavailable to campaigns with special_ad_categories. Send the complete intended state — a section you omit is cleared.</p>
-         */
-        @java.lang.Override
-        @JsonSetter(value = "detailed_targeting", nulls = Nulls.SKIP)
-        public _FinalStage detailedTargeting(Optional<AdGroupDetailedTargetingBody> detailedTargeting) {
-            this.detailedTargeting = detailedTargeting;
             return this;
         }
 
@@ -1022,22 +751,38 @@ public final class CreateAdGroupsRequest {
         }
 
         /**
-         * <p>Where the outcome being optimized for occurs, such as a website visit, social-profile visit, messaging conversation, ad interaction, or lead-form submission. The lead form itself is set on the ad.</p>
+         * <p>Hours the ad group delivers in each week, keyed by day. Each window runs from <code>start</code> to <code>end</code> on the hour, with <code>24:00</code> for midnight, and a day's windows can't overlap or touch. A day that's empty or left out doesn't deliver. Replaces the whole schedule; <code>null</code> delivers at every hour. Some platforms need a lifetime <code>budget_type</code> for a schedule, on the ad group or on its campaign when the campaign holds the budget.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
-        public _FinalStage conversionLocation(CreateAdGroupsRequestConversionLocation conversionLocation) {
-            this.conversionLocation = Optional.ofNullable(conversionLocation);
+        public _FinalStage deliverySchedule(Nullable<CreateAdGroupsRequestDeliverySchedule> deliverySchedule) {
+            if (deliverySchedule.isNull()) {
+                this.deliverySchedule = null;
+            } else if (deliverySchedule.isEmpty()) {
+                this.deliverySchedule = Optional.empty();
+            } else {
+                this.deliverySchedule = Optional.of(deliverySchedule.get());
+            }
             return this;
         }
 
         /**
-         * <p>Where the outcome being optimized for occurs, such as a website visit, social-profile visit, messaging conversation, ad interaction, or lead-form submission. The lead form itself is set on the ad.</p>
+         * <p>Hours the ad group delivers in each week, keyed by day. Each window runs from <code>start</code> to <code>end</code> on the hour, with <code>24:00</code> for midnight, and a day's windows can't overlap or touch. A day that's empty or left out doesn't deliver. Replaces the whole schedule; <code>null</code> delivers at every hour. Some platforms need a lifetime <code>budget_type</code> for a schedule, on the ad group or on its campaign when the campaign holds the budget.</p>
+         * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
-        @JsonSetter(value = "conversion_location", nulls = Nulls.SKIP)
-        public _FinalStage conversionLocation(Optional<CreateAdGroupsRequestConversionLocation> conversionLocation) {
-            this.conversionLocation = conversionLocation;
+        public _FinalStage deliverySchedule(CreateAdGroupsRequestDeliverySchedule deliverySchedule) {
+            this.deliverySchedule = Optional.ofNullable(deliverySchedule);
+            return this;
+        }
+
+        /**
+         * <p>Hours the ad group delivers in each week, keyed by day. Each window runs from <code>start</code> to <code>end</code> on the hour, with <code>24:00</code> for midnight, and a day's windows can't overlap or touch. A day that's empty or left out doesn't deliver. Replaces the whole schedule; <code>null</code> delivers at every hour. Some platforms need a lifetime <code>budget_type</code> for a schedule, on the ad group or on its campaign when the campaign holds the budget.</p>
+         */
+        @java.lang.Override
+        @JsonSetter(value = "delivery_schedule", nulls = Nulls.SKIP)
+        public _FinalStage deliverySchedule(Optional<CreateAdGroupsRequestDeliverySchedule> deliverySchedule) {
+            this.deliverySchedule = deliverySchedule;
             return this;
         }
 
@@ -1087,7 +832,27 @@ public final class CreateAdGroupsRequest {
         }
 
         /**
-         * <p>This ad group's budget, in the ad account's currency. Omit when the budget is set on the campaign instead.</p>
+         * <p>This ad group's budget stated in the account's ads reporting currency (<code>budget_currency</code> on the response) instead of USD. Converted to USD at the current exchange rate and stored as budget_amount; on an update, an amount equal to the current budget_amount_local keeps the stored USD budget as is. Provide this or budget_amount, not both.</p>
+         * @return Reference to {@code this} so that method calls can be chained together.
+         */
+        @java.lang.Override
+        public _FinalStage budgetAmountLocal(Double budgetAmountLocal) {
+            this.budgetAmountLocal = Optional.ofNullable(budgetAmountLocal);
+            return this;
+        }
+
+        /**
+         * <p>This ad group's budget stated in the account's ads reporting currency (<code>budget_currency</code> on the response) instead of USD. Converted to USD at the current exchange rate and stored as budget_amount; on an update, an amount equal to the current budget_amount_local keeps the stored USD budget as is. Provide this or budget_amount, not both.</p>
+         */
+        @java.lang.Override
+        @JsonSetter(value = "budget_amount_local", nulls = Nulls.SKIP)
+        public _FinalStage budgetAmountLocal(Optional<Double> budgetAmountLocal) {
+            this.budgetAmountLocal = budgetAmountLocal;
+            return this;
+        }
+
+        /**
+         * <p>This ad group's budget in USD, which is what it is stored and billed in. Omit when the budget is set on the campaign instead.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
@@ -1097,7 +862,7 @@ public final class CreateAdGroupsRequest {
         }
 
         /**
-         * <p>This ad group's budget, in the ad account's currency. Omit when the budget is set on the campaign instead.</p>
+         * <p>This ad group's budget in USD, which is what it is stored and billed in. Omit when the budget is set on the campaign instead.</p>
          */
         @java.lang.Override
         @JsonSetter(value = "budget_amount", nulls = Nulls.SKIP)
@@ -1153,26 +918,46 @@ public final class CreateAdGroupsRequest {
                     audiences,
                     bidType,
                     budgetAmount,
+                    budgetAmountLocal,
                     budgetType,
                     conversionEvent,
-                    conversionLocation,
+                    deliverySchedule,
                     demographics,
                     desiredCostPerResult,
-                    detailedTargeting,
                     devices,
-                    dynamicCreative,
                     endsAt,
-                    frequencyCap,
+                    keywords,
                     languages,
-                    messageApps,
-                    minimumDailySpend,
-                    optimizationGoal,
-                    placements,
                     regions,
                     startsAt,
                     status,
                     title,
                     additionalProperties);
+        }
+
+        @JsonAnySetter
+        private void putAdditionalPropertyFromJson(String key, Object value) {
+            if (key.equalsIgnoreCase("ad_campaign_id")
+                    || key.equalsIgnoreCase("audiences")
+                    || key.equalsIgnoreCase("bid_type")
+                    || key.equalsIgnoreCase("budget_amount")
+                    || key.equalsIgnoreCase("budget_amount_local")
+                    || key.equalsIgnoreCase("budget_type")
+                    || key.equalsIgnoreCase("conversion_event")
+                    || key.equalsIgnoreCase("delivery_schedule")
+                    || key.equalsIgnoreCase("demographics")
+                    || key.equalsIgnoreCase("desired_cost_per_result")
+                    || key.equalsIgnoreCase("devices")
+                    || key.equalsIgnoreCase("ends_at")
+                    || key.equalsIgnoreCase("keywords")
+                    || key.equalsIgnoreCase("languages")
+                    || key.equalsIgnoreCase("regions")
+                    || key.equalsIgnoreCase("starts_at")
+                    || key.equalsIgnoreCase("status")
+                    || key.equalsIgnoreCase("title")) {
+                return;
+            }
+            this.additionalProperties.put(key, value);
         }
 
         @java.lang.Override

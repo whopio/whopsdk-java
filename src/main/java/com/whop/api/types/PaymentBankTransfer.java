@@ -20,6 +20,8 @@ import java.util.Optional;
 @JsonInclude(JsonInclude.Include.NON_ABSENT)
 @JsonDeserialize(builder = PaymentBankTransfer.Builder.class)
 public final class PaymentBankTransfer {
+    private final Optional<Boolean> acceptsSplitTransfers;
+
     private final Optional<String> accountNumber;
 
     private final Optional<String> accountNumberLabel;
@@ -28,9 +30,13 @@ public final class PaymentBankTransfer {
 
     private final Optional<String> bankAccountType;
 
+    private final Optional<String> bankAddress;
+
     private final Optional<String> bankBranch;
 
     private final Optional<String> bankCode;
+
+    private final Optional<String> bankCodeLabel;
 
     private final Optional<String> bankName;
 
@@ -46,7 +52,11 @@ public final class PaymentBankTransfer {
 
     private final Optional<String> instructions;
 
+    private final Optional<String> intermediaryBic;
+
     private final Optional<String> reference;
+
+    private final Optional<String> routingNumber;
 
     private final Optional<String> secondaryAccountNumber;
 
@@ -55,12 +65,15 @@ public final class PaymentBankTransfer {
     private final Map<String, Object> additionalProperties;
 
     private PaymentBankTransfer(
+            Optional<Boolean> acceptsSplitTransfers,
             Optional<String> accountNumber,
             Optional<String> accountNumberLabel,
             Optional<Money> amount,
             Optional<String> bankAccountType,
+            Optional<String> bankAddress,
             Optional<String> bankBranch,
             Optional<String> bankCode,
+            Optional<String> bankCodeLabel,
             Optional<String> bankName,
             Optional<String> beneficiaryDocument,
             Optional<String> beneficiaryDocumentType,
@@ -68,16 +81,21 @@ public final class PaymentBankTransfer {
             Optional<String> documentUrl,
             Optional<String> expiresAt,
             Optional<String> instructions,
+            Optional<String> intermediaryBic,
             Optional<String> reference,
+            Optional<String> routingNumber,
             Optional<String> secondaryAccountNumber,
             Optional<String> secondaryAccountNumberLabel,
             Map<String, Object> additionalProperties) {
+        this.acceptsSplitTransfers = acceptsSplitTransfers;
         this.accountNumber = accountNumber;
         this.accountNumberLabel = accountNumberLabel;
         this.amount = amount;
         this.bankAccountType = bankAccountType;
+        this.bankAddress = bankAddress;
         this.bankBranch = bankBranch;
         this.bankCode = bankCode;
+        this.bankCodeLabel = bankCodeLabel;
         this.bankName = bankName;
         this.beneficiaryDocument = beneficiaryDocument;
         this.beneficiaryDocumentType = beneficiaryDocumentType;
@@ -85,10 +103,20 @@ public final class PaymentBankTransfer {
         this.documentUrl = documentUrl;
         this.expiresAt = expiresAt;
         this.instructions = instructions;
+        this.intermediaryBic = intermediaryBic;
         this.reference = reference;
+        this.routingNumber = routingNumber;
         this.secondaryAccountNumber = secondaryAccountNumber;
         this.secondaryAccountNumberLabel = secondaryAccountNumberLabel;
         this.additionalProperties = additionalProperties;
+    }
+
+    /**
+     * @return Whether the buyer can complete this payment with more than one transfer. When false, only one transfer for the full amount completes it.
+     */
+    @JsonProperty("accepts_split_transfers")
+    public Optional<Boolean> getAcceptsSplitTransfers() {
+        return acceptsSplitTransfers;
     }
 
     /**
@@ -124,6 +152,14 @@ public final class PaymentBankTransfer {
     }
 
     /**
+     * @return The receiving bank's address.
+     */
+    @JsonProperty("bank_address")
+    public Optional<String> getBankAddress() {
+        return bankAddress;
+    }
+
+    /**
      * @return The receiving branch, where the local system routes by branch.
      */
     @JsonProperty("bank_branch")
@@ -132,11 +168,19 @@ public final class PaymentBankTransfer {
     }
 
     /**
-     * @return The receiving bank's code in the local clearing system.
+     * @return The code that identifies the receiving bank — its code in the local clearing system, or its SWIFT/BIC on a transfer that crosses borders.
      */
     @JsonProperty("bank_code")
     public Optional<String> getBankCode() {
         return bankCode;
+    }
+
+    /**
+     * @return What to call <code>bank_code</code> when showing it, in the scheme's own terms — <code>SWIFT / BIC</code> on an international wire, for example.
+     */
+    @JsonProperty("bank_code_label")
+    public Optional<String> getBankCodeLabel() {
+        return bankCodeLabel;
     }
 
     /**
@@ -196,11 +240,27 @@ public final class PaymentBankTransfer {
     }
 
     /**
+     * @return The SWIFT/BIC of the intermediary bank the buyer's bank should route the transfer through, when the buyer named the bank they are sending from.
+     */
+    @JsonProperty("intermediary_bic")
+    public Optional<String> getIntermediaryBic() {
+        return intermediaryBic;
+    }
+
+    /**
      * @return The reference the buyer must attach to the transfer so it can be matched to this payment.
      */
     @JsonProperty("reference")
     public Optional<String> getReference() {
         return reference;
+    }
+
+    /**
+     * @return The receiving bank's routing number for US transfers.
+     */
+    @JsonProperty("routing_number")
+    public Optional<String> getRoutingNumber() {
+        return routingNumber;
     }
 
     /**
@@ -231,12 +291,15 @@ public final class PaymentBankTransfer {
     }
 
     private boolean equalTo(PaymentBankTransfer other) {
-        return accountNumber.equals(other.accountNumber)
+        return acceptsSplitTransfers.equals(other.acceptsSplitTransfers)
+                && accountNumber.equals(other.accountNumber)
                 && accountNumberLabel.equals(other.accountNumberLabel)
                 && amount.equals(other.amount)
                 && bankAccountType.equals(other.bankAccountType)
+                && bankAddress.equals(other.bankAddress)
                 && bankBranch.equals(other.bankBranch)
                 && bankCode.equals(other.bankCode)
+                && bankCodeLabel.equals(other.bankCodeLabel)
                 && bankName.equals(other.bankName)
                 && beneficiaryDocument.equals(other.beneficiaryDocument)
                 && beneficiaryDocumentType.equals(other.beneficiaryDocumentType)
@@ -244,7 +307,9 @@ public final class PaymentBankTransfer {
                 && documentUrl.equals(other.documentUrl)
                 && expiresAt.equals(other.expiresAt)
                 && instructions.equals(other.instructions)
+                && intermediaryBic.equals(other.intermediaryBic)
                 && reference.equals(other.reference)
+                && routingNumber.equals(other.routingNumber)
                 && secondaryAccountNumber.equals(other.secondaryAccountNumber)
                 && secondaryAccountNumberLabel.equals(other.secondaryAccountNumberLabel);
     }
@@ -252,12 +317,15 @@ public final class PaymentBankTransfer {
     @java.lang.Override
     public int hashCode() {
         return Objects.hash(
+                this.acceptsSplitTransfers,
                 this.accountNumber,
                 this.accountNumberLabel,
                 this.amount,
                 this.bankAccountType,
+                this.bankAddress,
                 this.bankBranch,
                 this.bankCode,
+                this.bankCodeLabel,
                 this.bankName,
                 this.beneficiaryDocument,
                 this.beneficiaryDocumentType,
@@ -265,7 +333,9 @@ public final class PaymentBankTransfer {
                 this.documentUrl,
                 this.expiresAt,
                 this.instructions,
+                this.intermediaryBic,
                 this.reference,
+                this.routingNumber,
                 this.secondaryAccountNumber,
                 this.secondaryAccountNumberLabel);
     }
@@ -281,6 +351,8 @@ public final class PaymentBankTransfer {
 
     @JsonIgnoreProperties(ignoreUnknown = true)
     public static final class Builder {
+        private Optional<Boolean> acceptsSplitTransfers = Optional.empty();
+
         private Optional<String> accountNumber = Optional.empty();
 
         private Optional<String> accountNumberLabel = Optional.empty();
@@ -289,9 +361,13 @@ public final class PaymentBankTransfer {
 
         private Optional<String> bankAccountType = Optional.empty();
 
+        private Optional<String> bankAddress = Optional.empty();
+
         private Optional<String> bankBranch = Optional.empty();
 
         private Optional<String> bankCode = Optional.empty();
+
+        private Optional<String> bankCodeLabel = Optional.empty();
 
         private Optional<String> bankName = Optional.empty();
 
@@ -307,24 +383,30 @@ public final class PaymentBankTransfer {
 
         private Optional<String> instructions = Optional.empty();
 
+        private Optional<String> intermediaryBic = Optional.empty();
+
         private Optional<String> reference = Optional.empty();
+
+        private Optional<String> routingNumber = Optional.empty();
 
         private Optional<String> secondaryAccountNumber = Optional.empty();
 
         private Optional<String> secondaryAccountNumberLabel = Optional.empty();
 
-        @JsonAnySetter
         private Map<String, Object> additionalProperties = new HashMap<>();
 
         private Builder() {}
 
         public Builder from(PaymentBankTransfer other) {
+            acceptsSplitTransfers(other.getAcceptsSplitTransfers());
             accountNumber(other.getAccountNumber());
             accountNumberLabel(other.getAccountNumberLabel());
             amount(other.getAmount());
             bankAccountType(other.getBankAccountType());
+            bankAddress(other.getBankAddress());
             bankBranch(other.getBankBranch());
             bankCode(other.getBankCode());
+            bankCodeLabel(other.getBankCodeLabel());
             bankName(other.getBankName());
             beneficiaryDocument(other.getBeneficiaryDocument());
             beneficiaryDocumentType(other.getBeneficiaryDocumentType());
@@ -332,9 +414,25 @@ public final class PaymentBankTransfer {
             documentUrl(other.getDocumentUrl());
             expiresAt(other.getExpiresAt());
             instructions(other.getInstructions());
+            intermediaryBic(other.getIntermediaryBic());
             reference(other.getReference());
+            routingNumber(other.getRoutingNumber());
             secondaryAccountNumber(other.getSecondaryAccountNumber());
             secondaryAccountNumberLabel(other.getSecondaryAccountNumberLabel());
+            return this;
+        }
+
+        /**
+         * <p>Whether the buyer can complete this payment with more than one transfer. When false, only one transfer for the full amount completes it.</p>
+         */
+        @JsonSetter(value = "accepts_split_transfers", nulls = Nulls.SKIP)
+        public Builder acceptsSplitTransfers(Optional<Boolean> acceptsSplitTransfers) {
+            this.acceptsSplitTransfers = acceptsSplitTransfers;
+            return this;
+        }
+
+        public Builder acceptsSplitTransfers(Boolean acceptsSplitTransfers) {
+            this.acceptsSplitTransfers = Optional.ofNullable(acceptsSplitTransfers);
             return this;
         }
 
@@ -395,6 +493,20 @@ public final class PaymentBankTransfer {
         }
 
         /**
+         * <p>The receiving bank's address.</p>
+         */
+        @JsonSetter(value = "bank_address", nulls = Nulls.SKIP)
+        public Builder bankAddress(Optional<String> bankAddress) {
+            this.bankAddress = bankAddress;
+            return this;
+        }
+
+        public Builder bankAddress(String bankAddress) {
+            this.bankAddress = Optional.ofNullable(bankAddress);
+            return this;
+        }
+
+        /**
          * <p>The receiving branch, where the local system routes by branch.</p>
          */
         @JsonSetter(value = "bank_branch", nulls = Nulls.SKIP)
@@ -409,7 +521,7 @@ public final class PaymentBankTransfer {
         }
 
         /**
-         * <p>The receiving bank's code in the local clearing system.</p>
+         * <p>The code that identifies the receiving bank — its code in the local clearing system, or its SWIFT/BIC on a transfer that crosses borders.</p>
          */
         @JsonSetter(value = "bank_code", nulls = Nulls.SKIP)
         public Builder bankCode(Optional<String> bankCode) {
@@ -419,6 +531,20 @@ public final class PaymentBankTransfer {
 
         public Builder bankCode(String bankCode) {
             this.bankCode = Optional.ofNullable(bankCode);
+            return this;
+        }
+
+        /**
+         * <p>What to call <code>bank_code</code> when showing it, in the scheme's own terms — <code>SWIFT / BIC</code> on an international wire, for example.</p>
+         */
+        @JsonSetter(value = "bank_code_label", nulls = Nulls.SKIP)
+        public Builder bankCodeLabel(Optional<String> bankCodeLabel) {
+            this.bankCodeLabel = bankCodeLabel;
+            return this;
+        }
+
+        public Builder bankCodeLabel(String bankCodeLabel) {
+            this.bankCodeLabel = Optional.ofNullable(bankCodeLabel);
             return this;
         }
 
@@ -521,6 +647,20 @@ public final class PaymentBankTransfer {
         }
 
         /**
+         * <p>The SWIFT/BIC of the intermediary bank the buyer's bank should route the transfer through, when the buyer named the bank they are sending from.</p>
+         */
+        @JsonSetter(value = "intermediary_bic", nulls = Nulls.SKIP)
+        public Builder intermediaryBic(Optional<String> intermediaryBic) {
+            this.intermediaryBic = intermediaryBic;
+            return this;
+        }
+
+        public Builder intermediaryBic(String intermediaryBic) {
+            this.intermediaryBic = Optional.ofNullable(intermediaryBic);
+            return this;
+        }
+
+        /**
          * <p>The reference the buyer must attach to the transfer so it can be matched to this payment.</p>
          */
         @JsonSetter(value = "reference", nulls = Nulls.SKIP)
@@ -531,6 +671,20 @@ public final class PaymentBankTransfer {
 
         public Builder reference(String reference) {
             this.reference = Optional.ofNullable(reference);
+            return this;
+        }
+
+        /**
+         * <p>The receiving bank's routing number for US transfers.</p>
+         */
+        @JsonSetter(value = "routing_number", nulls = Nulls.SKIP)
+        public Builder routingNumber(Optional<String> routingNumber) {
+            this.routingNumber = routingNumber;
+            return this;
+        }
+
+        public Builder routingNumber(String routingNumber) {
+            this.routingNumber = Optional.ofNullable(routingNumber);
             return this;
         }
 
@@ -564,12 +718,15 @@ public final class PaymentBankTransfer {
 
         public PaymentBankTransfer build() {
             return new PaymentBankTransfer(
+                    acceptsSplitTransfers,
                     accountNumber,
                     accountNumberLabel,
                     amount,
                     bankAccountType,
+                    bankAddress,
                     bankBranch,
                     bankCode,
+                    bankCodeLabel,
                     bankName,
                     beneficiaryDocument,
                     beneficiaryDocumentType,
@@ -577,10 +734,40 @@ public final class PaymentBankTransfer {
                     documentUrl,
                     expiresAt,
                     instructions,
+                    intermediaryBic,
                     reference,
+                    routingNumber,
                     secondaryAccountNumber,
                     secondaryAccountNumberLabel,
                     additionalProperties);
+        }
+
+        @JsonAnySetter
+        private void putAdditionalPropertyFromJson(String key, Object value) {
+            if (key.equalsIgnoreCase("accepts_split_transfers")
+                    || key.equalsIgnoreCase("account_number")
+                    || key.equalsIgnoreCase("account_number_label")
+                    || key.equalsIgnoreCase("amount")
+                    || key.equalsIgnoreCase("bank_account_type")
+                    || key.equalsIgnoreCase("bank_address")
+                    || key.equalsIgnoreCase("bank_branch")
+                    || key.equalsIgnoreCase("bank_code")
+                    || key.equalsIgnoreCase("bank_code_label")
+                    || key.equalsIgnoreCase("bank_name")
+                    || key.equalsIgnoreCase("beneficiary_document")
+                    || key.equalsIgnoreCase("beneficiary_document_type")
+                    || key.equalsIgnoreCase("beneficiary_name")
+                    || key.equalsIgnoreCase("document_url")
+                    || key.equalsIgnoreCase("expires_at")
+                    || key.equalsIgnoreCase("instructions")
+                    || key.equalsIgnoreCase("intermediary_bic")
+                    || key.equalsIgnoreCase("reference")
+                    || key.equalsIgnoreCase("routing_number")
+                    || key.equalsIgnoreCase("secondary_account_number")
+                    || key.equalsIgnoreCase("secondary_account_number_label")) {
+                return;
+            }
+            this.additionalProperties.put(key, value);
         }
 
         public Builder additionalProperty(String key, Object value) {

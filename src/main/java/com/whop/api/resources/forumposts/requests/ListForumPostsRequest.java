@@ -252,7 +252,6 @@ public final class ListForumPostsRequest {
 
         private Optional<String> after = Optional.empty();
 
-        @JsonAnySetter
         private Map<String, Object> additionalProperties = new HashMap<>();
 
         private Builder() {}
@@ -271,7 +270,6 @@ public final class ListForumPostsRequest {
         }
 
         /**
-         * <p>The unique identifier of the experience to list forum posts for.</p>
          * <p>The unique identifier of the experience to list forum posts for.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
@@ -434,6 +432,21 @@ public final class ListForumPostsRequest {
                     parentId,
                     pinned,
                     additionalProperties);
+        }
+
+        @JsonAnySetter
+        private void putAdditionalPropertyFromJson(String key, Object value) {
+            if (key.equalsIgnoreCase("after")
+                    || key.equalsIgnoreCase("before")
+                    || key.equalsIgnoreCase("first")
+                    || key.equalsIgnoreCase("last")
+                    || key.equalsIgnoreCase("experience_id")
+                    || key.equalsIgnoreCase("include_bounty_anchors")
+                    || key.equalsIgnoreCase("parent_id")
+                    || key.equalsIgnoreCase("pinned")) {
+                return;
+            }
+            this.additionalProperties.put(key, value);
         }
 
         @java.lang.Override

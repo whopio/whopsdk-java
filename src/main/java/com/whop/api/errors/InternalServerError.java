@@ -4,20 +4,21 @@
 package com.whop.api.errors;
 
 import com.whop.api.core.WhopApiApiException;
+import com.whop.api.types.InternalServerErrorBody;
 import okhttp3.Response;
 
 public final class InternalServerError extends WhopApiApiException {
     /**
      * The body of the response that triggered the exception.
      */
-    private final Object body;
+    private final InternalServerErrorBody body;
 
-    public InternalServerError(Object body) {
+    public InternalServerError(InternalServerErrorBody body) {
         super("InternalServerError", 500, body);
         this.body = body;
     }
 
-    public InternalServerError(Object body, Response rawResponse) {
+    public InternalServerError(InternalServerErrorBody body, Response rawResponse) {
         super("InternalServerError", 500, body, rawResponse);
         this.body = body;
     }
@@ -26,7 +27,7 @@ public final class InternalServerError extends WhopApiApiException {
      * @return the body
      */
     @java.lang.Override
-    public Object body() {
+    public InternalServerErrorBody body() {
         return this.body;
     }
 }

@@ -204,7 +204,6 @@ public final class PostCardUpdatedPayloadDataBilling {
 
         private Optional<String> region = Optional.empty();
 
-        @JsonAnySetter
         private Map<String, Object> additionalProperties = new HashMap<>();
 
         private Builder() {}
@@ -372,6 +371,19 @@ public final class PostCardUpdatedPayloadDataBilling {
         public PostCardUpdatedPayloadDataBilling build() {
             return new PostCardUpdatedPayloadDataBilling(
                     city, countryCode, line1, line2, postalCode, region, additionalProperties);
+        }
+
+        @JsonAnySetter
+        private void putAdditionalPropertyFromJson(String key, Object value) {
+            if (key.equalsIgnoreCase("city")
+                    || key.equalsIgnoreCase("country_code")
+                    || key.equalsIgnoreCase("line1")
+                    || key.equalsIgnoreCase("line2")
+                    || key.equalsIgnoreCase("postal_code")
+                    || key.equalsIgnoreCase("region")) {
+                return;
+            }
+            this.additionalProperties.put(key, value);
         }
 
         public Builder additionalProperty(String key, Object value) {

@@ -34,6 +34,8 @@ public final class UpdateAppsRequest {
 
     private final Optional<String> baseUrl;
 
+    private final Optional<String> categoryId;
+
     private final Optional<String> dashboardPath;
 
     private final Optional<String> description;
@@ -44,11 +46,15 @@ public final class UpdateAppsRequest {
 
     private final Optional<UpdateAppsRequestIcon> icon;
 
+    private final Optional<String> importedFromUrl;
+
     private final Optional<String> name;
 
     private final Optional<UpdateAppsRequestOauthClientType> oauthClientType;
 
     private final Optional<String> openapiPath;
+
+    private final Optional<String> perInstallSchedule;
 
     private final Optional<String> productionAndroidBuildId;
 
@@ -62,6 +68,8 @@ public final class UpdateAppsRequest {
 
     private final Optional<String> route;
 
+    private final Optional<String> schedule;
+
     private final Optional<Map<String, Object>> secrets;
 
     private final Optional<String> skillsPath;
@@ -74,20 +82,24 @@ public final class UpdateAppsRequest {
             Optional<String> appStoreDescription,
             Optional<UpdateAppsRequestAppType> appType,
             Optional<String> baseUrl,
+            Optional<String> categoryId,
             Optional<String> dashboardPath,
             Optional<String> description,
             Optional<String> discoverPath,
             Optional<String> experiencePath,
             Optional<UpdateAppsRequestIcon> icon,
+            Optional<String> importedFromUrl,
             Optional<String> name,
             Optional<UpdateAppsRequestOauthClientType> oauthClientType,
             Optional<String> openapiPath,
+            Optional<String> perInstallSchedule,
             Optional<String> productionAndroidBuildId,
             Optional<String> productionIosBuildId,
             Optional<String> productionWebBuildId,
             Optional<List<String>> redirectUris,
             Optional<List<String>> requiredScopes,
             Optional<String> route,
+            Optional<String> schedule,
             Optional<Map<String, Object>> secrets,
             Optional<String> skillsPath,
             Optional<UpdateAppsRequestStatus> status,
@@ -95,20 +107,24 @@ public final class UpdateAppsRequest {
         this.appStoreDescription = appStoreDescription;
         this.appType = appType;
         this.baseUrl = baseUrl;
+        this.categoryId = categoryId;
         this.dashboardPath = dashboardPath;
         this.description = description;
         this.discoverPath = discoverPath;
         this.experiencePath = experiencePath;
         this.icon = icon;
+        this.importedFromUrl = importedFromUrl;
         this.name = name;
         this.oauthClientType = oauthClientType;
         this.openapiPath = openapiPath;
+        this.perInstallSchedule = perInstallSchedule;
         this.productionAndroidBuildId = productionAndroidBuildId;
         this.productionIosBuildId = productionIosBuildId;
         this.productionWebBuildId = productionWebBuildId;
         this.redirectUris = redirectUris;
         this.requiredScopes = requiredScopes;
         this.route = route;
+        this.schedule = schedule;
         this.secrets = secrets;
         this.skillsPath = skillsPath;
         this.status = status;
@@ -140,6 +156,17 @@ public final class UpdateAppsRequest {
             return Optional.empty();
         }
         return baseUrl;
+    }
+
+    /**
+     * @return The App Store category of a business app. Pass an <code>mcat_</code> ID from <code>GET /apps/categories?app_type=b2b_app</code>, or <code>null</code> to clear it. Omit it to keep the current category. Setting a category needs the app to have an App Store product.
+     */
+    @JsonIgnore
+    public Optional<String> getCategoryId() {
+        if (categoryId == null) {
+            return Optional.empty();
+        }
+        return categoryId;
     }
 
     /**
@@ -192,6 +219,17 @@ public final class UpdateAppsRequest {
     }
 
     /**
+     * @return The address of the existing website this app is imported from, such as <code>https://shop.example.com</code>. Must be an <code>http</code> or <code>https</code> URL. Set to <code>null</code> to clear it.
+     */
+    @JsonIgnore
+    public Optional<String> getImportedFromUrl() {
+        if (importedFromUrl == null) {
+            return Optional.empty();
+        }
+        return importedFromUrl;
+    }
+
+    /**
      * @return The display name for the app, shown to users on the app store and product pages.
      */
     @JsonProperty("name")
@@ -216,6 +254,17 @@ public final class UpdateAppsRequest {
             return Optional.empty();
         }
         return openapiPath;
+    }
+
+    /**
+     * @return Five-field cron expression, read in UTC, on which Whop runs the production web build's <code>scheduled()</code> export once for every installation, with the installation in <code>ctx.props.app_installation</code>. It must fire at least once and no more often than every 15 minutes. Slots are skipped while the app has no production web build with a server entry. Set to <code>null</code> or an empty string to stop the per-install schedule.
+     */
+    @JsonIgnore
+    public Optional<String> getPerInstallSchedule() {
+        if (perInstallSchedule == null) {
+            return Optional.empty();
+        }
+        return perInstallSchedule;
     }
 
     /**
@@ -276,6 +325,17 @@ public final class UpdateAppsRequest {
     }
 
     /**
+     * @return Five-field cron expression, read in UTC, on which Whop runs the production web build's <code>scheduled()</code> export once per slot, such as <code>* /15 * * * *</code>. It must fire at least once. Slots are skipped while the app has no production web build with a server entry. Set to <code>null</code> or an empty string to stop the global schedule.
+     */
+    @JsonIgnore
+    public Optional<String> getSchedule() {
+        if (schedule == null) {
+            return Optional.empty();
+        }
+        return schedule;
+    }
+
+    /**
      * @return Secrets to add or overwrite on the app, as an object of string values. Keys not included are left untouched; pass null or an empty string as the value to delete a secret. Encrypted at rest and injected into the app's hosted server runtime.
      */
     @JsonProperty("secrets")
@@ -309,6 +369,12 @@ public final class UpdateAppsRequest {
     }
 
     @JsonInclude(value = JsonInclude.Include.CUSTOM, valueFilter = NullableNonemptyFilter.class)
+    @JsonProperty("category_id")
+    private Optional<String> _getCategoryId() {
+        return categoryId;
+    }
+
+    @JsonInclude(value = JsonInclude.Include.CUSTOM, valueFilter = NullableNonemptyFilter.class)
     @JsonProperty("dashboard_path")
     private Optional<String> _getDashboardPath() {
         return dashboardPath;
@@ -327,9 +393,21 @@ public final class UpdateAppsRequest {
     }
 
     @JsonInclude(value = JsonInclude.Include.CUSTOM, valueFilter = NullableNonemptyFilter.class)
+    @JsonProperty("imported_from_url")
+    private Optional<String> _getImportedFromUrl() {
+        return importedFromUrl;
+    }
+
+    @JsonInclude(value = JsonInclude.Include.CUSTOM, valueFilter = NullableNonemptyFilter.class)
     @JsonProperty("openapi_path")
     private Optional<String> _getOpenapiPath() {
         return openapiPath;
+    }
+
+    @JsonInclude(value = JsonInclude.Include.CUSTOM, valueFilter = NullableNonemptyFilter.class)
+    @JsonProperty("per_install_schedule")
+    private Optional<String> _getPerInstallSchedule() {
+        return perInstallSchedule;
     }
 
     @JsonInclude(value = JsonInclude.Include.CUSTOM, valueFilter = NullableNonemptyFilter.class)
@@ -348,6 +426,12 @@ public final class UpdateAppsRequest {
     @JsonProperty("production_web_build_id")
     private Optional<String> _getProductionWebBuildId() {
         return productionWebBuildId;
+    }
+
+    @JsonInclude(value = JsonInclude.Include.CUSTOM, valueFilter = NullableNonemptyFilter.class)
+    @JsonProperty("schedule")
+    private Optional<String> _getSchedule() {
+        return schedule;
     }
 
     @JsonInclude(value = JsonInclude.Include.CUSTOM, valueFilter = NullableNonemptyFilter.class)
@@ -371,20 +455,24 @@ public final class UpdateAppsRequest {
         return appStoreDescription.equals(other.appStoreDescription)
                 && appType.equals(other.appType)
                 && baseUrl.equals(other.baseUrl)
+                && categoryId.equals(other.categoryId)
                 && dashboardPath.equals(other.dashboardPath)
                 && description.equals(other.description)
                 && discoverPath.equals(other.discoverPath)
                 && experiencePath.equals(other.experiencePath)
                 && icon.equals(other.icon)
+                && importedFromUrl.equals(other.importedFromUrl)
                 && name.equals(other.name)
                 && oauthClientType.equals(other.oauthClientType)
                 && openapiPath.equals(other.openapiPath)
+                && perInstallSchedule.equals(other.perInstallSchedule)
                 && productionAndroidBuildId.equals(other.productionAndroidBuildId)
                 && productionIosBuildId.equals(other.productionIosBuildId)
                 && productionWebBuildId.equals(other.productionWebBuildId)
                 && redirectUris.equals(other.redirectUris)
                 && requiredScopes.equals(other.requiredScopes)
                 && route.equals(other.route)
+                && schedule.equals(other.schedule)
                 && secrets.equals(other.secrets)
                 && skillsPath.equals(other.skillsPath)
                 && status.equals(other.status);
@@ -396,20 +484,24 @@ public final class UpdateAppsRequest {
                 this.appStoreDescription,
                 this.appType,
                 this.baseUrl,
+                this.categoryId,
                 this.dashboardPath,
                 this.description,
                 this.discoverPath,
                 this.experiencePath,
                 this.icon,
+                this.importedFromUrl,
                 this.name,
                 this.oauthClientType,
                 this.openapiPath,
+                this.perInstallSchedule,
                 this.productionAndroidBuildId,
                 this.productionIosBuildId,
                 this.productionWebBuildId,
                 this.redirectUris,
                 this.requiredScopes,
                 this.route,
+                this.schedule,
                 this.secrets,
                 this.skillsPath,
                 this.status);
@@ -432,6 +524,8 @@ public final class UpdateAppsRequest {
 
         private Optional<String> baseUrl = Optional.empty();
 
+        private Optional<String> categoryId = Optional.empty();
+
         private Optional<String> dashboardPath = Optional.empty();
 
         private Optional<String> description = Optional.empty();
@@ -442,11 +536,15 @@ public final class UpdateAppsRequest {
 
         private Optional<UpdateAppsRequestIcon> icon = Optional.empty();
 
+        private Optional<String> importedFromUrl = Optional.empty();
+
         private Optional<String> name = Optional.empty();
 
         private Optional<UpdateAppsRequestOauthClientType> oauthClientType = Optional.empty();
 
         private Optional<String> openapiPath = Optional.empty();
+
+        private Optional<String> perInstallSchedule = Optional.empty();
 
         private Optional<String> productionAndroidBuildId = Optional.empty();
 
@@ -460,13 +558,14 @@ public final class UpdateAppsRequest {
 
         private Optional<String> route = Optional.empty();
 
+        private Optional<String> schedule = Optional.empty();
+
         private Optional<Map<String, Object>> secrets = Optional.empty();
 
         private Optional<String> skillsPath = Optional.empty();
 
         private Optional<UpdateAppsRequestStatus> status = Optional.empty();
 
-        @JsonAnySetter
         private Map<String, Object> additionalProperties = new HashMap<>();
 
         private Builder() {}
@@ -475,20 +574,24 @@ public final class UpdateAppsRequest {
             appStoreDescription(other.getAppStoreDescription());
             appType(other.getAppType());
             baseUrl(other.getBaseUrl());
+            categoryId(other.getCategoryId());
             dashboardPath(other.getDashboardPath());
             description(other.getDescription());
             discoverPath(other.getDiscoverPath());
             experiencePath(other.getExperiencePath());
             icon(other.getIcon());
+            importedFromUrl(other.getImportedFromUrl());
             name(other.getName());
             oauthClientType(other.getOauthClientType());
             openapiPath(other.getOpenapiPath());
+            perInstallSchedule(other.getPerInstallSchedule());
             productionAndroidBuildId(other.getProductionAndroidBuildId());
             productionIosBuildId(other.getProductionIosBuildId());
             productionWebBuildId(other.getProductionWebBuildId());
             redirectUris(other.getRedirectUris());
             requiredScopes(other.getRequiredScopes());
             route(other.getRoute());
+            schedule(other.getSchedule());
             secrets(other.getSecrets());
             skillsPath(other.getSkillsPath());
             status(other.getStatus());
@@ -544,6 +647,31 @@ public final class UpdateAppsRequest {
                 this.baseUrl = Optional.empty();
             } else {
                 this.baseUrl = Optional.of(baseUrl.get());
+            }
+            return this;
+        }
+
+        /**
+         * <p>The App Store category of a business app. Pass an <code>mcat_</code> ID from <code>GET /apps/categories?app_type=b2b_app</code>, or <code>null</code> to clear it. Omit it to keep the current category. Setting a category needs the app to have an App Store product.</p>
+         */
+        @JsonSetter(value = "category_id", nulls = Nulls.SKIP)
+        public Builder categoryId(Optional<String> categoryId) {
+            this.categoryId = categoryId;
+            return this;
+        }
+
+        public Builder categoryId(String categoryId) {
+            this.categoryId = Optional.ofNullable(categoryId);
+            return this;
+        }
+
+        public Builder categoryId(Nullable<String> categoryId) {
+            if (categoryId.isNull()) {
+                this.categoryId = null;
+            } else if (categoryId.isEmpty()) {
+                this.categoryId = Optional.empty();
+            } else {
+                this.categoryId = Optional.of(categoryId.get());
             }
             return this;
         }
@@ -652,6 +780,31 @@ public final class UpdateAppsRequest {
         }
 
         /**
+         * <p>The address of the existing website this app is imported from, such as <code>https://shop.example.com</code>. Must be an <code>http</code> or <code>https</code> URL. Set to <code>null</code> to clear it.</p>
+         */
+        @JsonSetter(value = "imported_from_url", nulls = Nulls.SKIP)
+        public Builder importedFromUrl(Optional<String> importedFromUrl) {
+            this.importedFromUrl = importedFromUrl;
+            return this;
+        }
+
+        public Builder importedFromUrl(String importedFromUrl) {
+            this.importedFromUrl = Optional.ofNullable(importedFromUrl);
+            return this;
+        }
+
+        public Builder importedFromUrl(Nullable<String> importedFromUrl) {
+            if (importedFromUrl.isNull()) {
+                this.importedFromUrl = null;
+            } else if (importedFromUrl.isEmpty()) {
+                this.importedFromUrl = Optional.empty();
+            } else {
+                this.importedFromUrl = Optional.of(importedFromUrl.get());
+            }
+            return this;
+        }
+
+        /**
          * <p>The display name for the app, shown to users on the app store and product pages.</p>
          */
         @JsonSetter(value = "name", nulls = Nulls.SKIP)
@@ -700,6 +853,31 @@ public final class UpdateAppsRequest {
                 this.openapiPath = Optional.empty();
             } else {
                 this.openapiPath = Optional.of(openapiPath.get());
+            }
+            return this;
+        }
+
+        /**
+         * <p>Five-field cron expression, read in UTC, on which Whop runs the production web build's <code>scheduled()</code> export once for every installation, with the installation in <code>ctx.props.app_installation</code>. It must fire at least once and no more often than every 15 minutes. Slots are skipped while the app has no production web build with a server entry. Set to <code>null</code> or an empty string to stop the per-install schedule.</p>
+         */
+        @JsonSetter(value = "per_install_schedule", nulls = Nulls.SKIP)
+        public Builder perInstallSchedule(Optional<String> perInstallSchedule) {
+            this.perInstallSchedule = perInstallSchedule;
+            return this;
+        }
+
+        public Builder perInstallSchedule(String perInstallSchedule) {
+            this.perInstallSchedule = Optional.ofNullable(perInstallSchedule);
+            return this;
+        }
+
+        public Builder perInstallSchedule(Nullable<String> perInstallSchedule) {
+            if (perInstallSchedule.isNull()) {
+                this.perInstallSchedule = null;
+            } else if (perInstallSchedule.isEmpty()) {
+                this.perInstallSchedule = Optional.empty();
+            } else {
+                this.perInstallSchedule = Optional.of(perInstallSchedule.get());
             }
             return this;
         }
@@ -822,6 +1000,31 @@ public final class UpdateAppsRequest {
         }
 
         /**
+         * <p>Five-field cron expression, read in UTC, on which Whop runs the production web build's <code>scheduled()</code> export once per slot, such as <code>* /15 * * * *</code>. It must fire at least once. Slots are skipped while the app has no production web build with a server entry. Set to <code>null</code> or an empty string to stop the global schedule.</p>
+         */
+        @JsonSetter(value = "schedule", nulls = Nulls.SKIP)
+        public Builder schedule(Optional<String> schedule) {
+            this.schedule = schedule;
+            return this;
+        }
+
+        public Builder schedule(String schedule) {
+            this.schedule = Optional.ofNullable(schedule);
+            return this;
+        }
+
+        public Builder schedule(Nullable<String> schedule) {
+            if (schedule.isNull()) {
+                this.schedule = null;
+            } else if (schedule.isEmpty()) {
+                this.schedule = Optional.empty();
+            } else {
+                this.schedule = Optional.of(schedule.get());
+            }
+            return this;
+        }
+
+        /**
          * <p>Secrets to add or overwrite on the app, as an object of string values. Keys not included are left untouched; pass null or an empty string as the value to delete a secret. Encrypted at rest and injected into the app's hosted server runtime.</p>
          */
         @JsonSetter(value = "secrets", nulls = Nulls.SKIP)
@@ -879,24 +1082,59 @@ public final class UpdateAppsRequest {
                     appStoreDescription,
                     appType,
                     baseUrl,
+                    categoryId,
                     dashboardPath,
                     description,
                     discoverPath,
                     experiencePath,
                     icon,
+                    importedFromUrl,
                     name,
                     oauthClientType,
                     openapiPath,
+                    perInstallSchedule,
                     productionAndroidBuildId,
                     productionIosBuildId,
                     productionWebBuildId,
                     redirectUris,
                     requiredScopes,
                     route,
+                    schedule,
                     secrets,
                     skillsPath,
                     status,
                     additionalProperties);
+        }
+
+        @JsonAnySetter
+        private void putAdditionalPropertyFromJson(String key, Object value) {
+            if (key.equalsIgnoreCase("app_store_description")
+                    || key.equalsIgnoreCase("app_type")
+                    || key.equalsIgnoreCase("base_url")
+                    || key.equalsIgnoreCase("category_id")
+                    || key.equalsIgnoreCase("dashboard_path")
+                    || key.equalsIgnoreCase("description")
+                    || key.equalsIgnoreCase("discover_path")
+                    || key.equalsIgnoreCase("experience_path")
+                    || key.equalsIgnoreCase("icon")
+                    || key.equalsIgnoreCase("imported_from_url")
+                    || key.equalsIgnoreCase("name")
+                    || key.equalsIgnoreCase("oauth_client_type")
+                    || key.equalsIgnoreCase("openapi_path")
+                    || key.equalsIgnoreCase("per_install_schedule")
+                    || key.equalsIgnoreCase("production_android_build_id")
+                    || key.equalsIgnoreCase("production_ios_build_id")
+                    || key.equalsIgnoreCase("production_web_build_id")
+                    || key.equalsIgnoreCase("redirect_uris")
+                    || key.equalsIgnoreCase("required_scopes")
+                    || key.equalsIgnoreCase("route")
+                    || key.equalsIgnoreCase("schedule")
+                    || key.equalsIgnoreCase("secrets")
+                    || key.equalsIgnoreCase("skills_path")
+                    || key.equalsIgnoreCase("status")) {
+                return;
+            }
+            this.additionalProperties.put(key, value);
         }
 
         public Builder additionalProperty(String key, Object value) {

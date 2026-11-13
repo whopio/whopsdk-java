@@ -107,7 +107,6 @@ public final class CreateCardsResponseLimit {
 
         private CreateCardsResponseLimitFrequency frequency;
 
-        @JsonAnySetter
         private Map<String, Object> additionalProperties = new HashMap<>();
 
         private Builder() {}
@@ -121,7 +120,6 @@ public final class CreateCardsResponseLimit {
 
         /**
          * <p>The limit amount in dollars.</p>
-         * <p>The limit amount in dollars.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
@@ -132,7 +130,6 @@ public final class CreateCardsResponseLimit {
         }
 
         /**
-         * <p>The window the limit amount applies to. <code>per_transaction</code> caps each individual authorization and is what a limit set with <code>transaction_limit</code> reports.</p>
          * <p>The window the limit amount applies to. <code>per_transaction</code> caps each individual authorization and is what a limit set with <code>transaction_limit</code> reports.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
@@ -146,6 +143,14 @@ public final class CreateCardsResponseLimit {
         @java.lang.Override
         public CreateCardsResponseLimit build() {
             return new CreateCardsResponseLimit(amount, frequency, additionalProperties);
+        }
+
+        @JsonAnySetter
+        private void putAdditionalPropertyFromJson(String key, Object value) {
+            if (key.equalsIgnoreCase("amount") || key.equalsIgnoreCase("frequency")) {
+                return;
+            }
+            this.additionalProperties.put(key, value);
         }
 
         @java.lang.Override

@@ -454,7 +454,6 @@ public final class Notification {
 
         private Optional<NotificationAccount> account = Optional.empty();
 
-        @JsonAnySetter
         private Map<String, Object> additionalProperties = new HashMap<>();
 
         private Builder() {}
@@ -479,7 +478,6 @@ public final class Notification {
 
         /**
          * <p>Image displayed alongside the notification — the sender's avatar, or the default notification image.</p>
-         * <p>Image displayed alongside the notification — the sender's avatar, or the default notification image.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
@@ -490,7 +488,6 @@ public final class Notification {
         }
 
         /**
-         * <p>The body text of the notification displayed to the user.</p>
          * <p>The body text of the notification displayed to the user.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
@@ -503,7 +500,6 @@ public final class Notification {
 
         /**
          * <p>When the notification was created, as an ISO 8601 timestamp.</p>
-         * <p>When the notification was created, as an ISO 8601 timestamp.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
@@ -514,7 +510,6 @@ public final class Notification {
         }
 
         /**
-         * <p>Notification ID. Feed rows carry a composite id that doubles as the list cursor.</p>
          * <p>Notification ID. Feed rows carry a composite id that doubles as the list cursor.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
@@ -527,7 +522,6 @@ public final class Notification {
 
         /**
          * <p>Whether the authenticated user was directly mentioned in this notification.</p>
-         * <p>Whether the authenticated user was directly mentioned in this notification.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
@@ -538,7 +532,6 @@ public final class Notification {
         }
 
         /**
-         * <p>The title line of the notification displayed to the user.</p>
          * <p>The title line of the notification displayed to the user.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
@@ -818,6 +811,26 @@ public final class Notification {
                     subject,
                     topic,
                     additionalProperties);
+        }
+
+        @JsonAnySetter
+        private void putAdditionalPropertyFromJson(String key, Object value) {
+            if (key.equalsIgnoreCase("account")
+                    || key.equalsIgnoreCase("attachment_url")
+                    || key.equalsIgnoreCase("content")
+                    || key.equalsIgnoreCase("created_at")
+                    || key.equalsIgnoreCase("experience")
+                    || key.equalsIgnoreCase("id")
+                    || key.equalsIgnoreCase("iframe_link")
+                    || key.equalsIgnoreCase("link")
+                    || key.equalsIgnoreCase("mentions_me")
+                    || key.equalsIgnoreCase("rest_path")
+                    || key.equalsIgnoreCase("sender")
+                    || key.equalsIgnoreCase("subject")
+                    || key.equalsIgnoreCase("topic")) {
+                return;
+            }
+            this.additionalProperties.put(key, value);
         }
 
         @java.lang.Override

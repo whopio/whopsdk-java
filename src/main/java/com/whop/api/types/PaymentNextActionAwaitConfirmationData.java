@@ -87,7 +87,6 @@ public final class PaymentNextActionAwaitConfirmationData {
     public static final class Builder implements ExpiresAtStage, _FinalStage {
         private String expiresAt;
 
-        @JsonAnySetter
         private Map<String, Object> additionalProperties = new HashMap<>();
 
         private Builder() {}
@@ -99,7 +98,6 @@ public final class PaymentNextActionAwaitConfirmationData {
         }
 
         /**
-         * <p>When the confirmation window closes, as an ISO 8601 timestamp. A payment still unconfirmed by then will not succeed — watch <code>status</code> for the failed attempt.</p>
          * <p>When the confirmation window closes, as an ISO 8601 timestamp. A payment still unconfirmed by then will not succeed — watch <code>status</code> for the failed attempt.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
@@ -113,6 +111,14 @@ public final class PaymentNextActionAwaitConfirmationData {
         @java.lang.Override
         public PaymentNextActionAwaitConfirmationData build() {
             return new PaymentNextActionAwaitConfirmationData(expiresAt, additionalProperties);
+        }
+
+        @JsonAnySetter
+        private void putAdditionalPropertyFromJson(String key, Object value) {
+            if (key.equalsIgnoreCase("expires_at")) {
+                return;
+            }
+            this.additionalProperties.put(key, value);
         }
 
         @java.lang.Override

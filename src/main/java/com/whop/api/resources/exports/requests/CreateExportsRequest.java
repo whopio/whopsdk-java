@@ -67,7 +67,7 @@ public final class CreateExportsRequest {
     }
 
     /**
-     * @return Resource-specific filters. For native REST resources (<code>payouts</code>, <code>transfers</code>, <code>memberships</code>) these are the resource's own list query params; for dashboard tables they mirror the dashboard table filters.
+     * @return Resource-specific filters. For native REST resources (<code>payouts</code>, <code>transfers</code>, <code>products</code>) these are the resource's own list query params; for dashboard tables they mirror the dashboard table filters.
      */
     @JsonProperty("filters")
     public Optional<Map<String, Object>> getFilters() {
@@ -154,7 +154,7 @@ public final class CreateExportsRequest {
         _FinalStage columns(List<String> columns);
 
         /**
-         * <p>Resource-specific filters. For native REST resources (<code>payouts</code>, <code>transfers</code>, <code>memberships</code>) these are the resource's own list query params; for dashboard tables they mirror the dashboard table filters.</p>
+         * <p>Resource-specific filters. For native REST resources (<code>payouts</code>, <code>transfers</code>, <code>products</code>) these are the resource's own list query params; for dashboard tables they mirror the dashboard table filters.</p>
          */
         _FinalStage filters(Optional<Map<String, Object>> filters);
 
@@ -180,7 +180,6 @@ public final class CreateExportsRequest {
 
         private Optional<String> accountId = Optional.empty();
 
-        @JsonAnySetter
         private Map<String, Object> additionalProperties = new HashMap<>();
 
         private Builder() {}
@@ -196,7 +195,6 @@ public final class CreateExportsRequest {
         }
 
         /**
-         * <p>The resource to export, e.g. <code>payouts</code>, <code>receipts</code>, or <code>members</code>.</p>
          * <p>The resource to export, e.g. <code>payouts</code>, <code>receipts</code>, or <code>members</code>.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
@@ -228,7 +226,7 @@ public final class CreateExportsRequest {
         }
 
         /**
-         * <p>Resource-specific filters. For native REST resources (<code>payouts</code>, <code>transfers</code>, <code>memberships</code>) these are the resource's own list query params; for dashboard tables they mirror the dashboard table filters.</p>
+         * <p>Resource-specific filters. For native REST resources (<code>payouts</code>, <code>transfers</code>, <code>products</code>) these are the resource's own list query params; for dashboard tables they mirror the dashboard table filters.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
@@ -238,7 +236,7 @@ public final class CreateExportsRequest {
         }
 
         /**
-         * <p>Resource-specific filters. For native REST resources (<code>payouts</code>, <code>transfers</code>, <code>memberships</code>) these are the resource's own list query params; for dashboard tables they mirror the dashboard table filters.</p>
+         * <p>Resource-specific filters. For native REST resources (<code>payouts</code>, <code>transfers</code>, <code>products</code>) these are the resource's own list query params; for dashboard tables they mirror the dashboard table filters.</p>
          */
         @java.lang.Override
         @JsonSetter(value = "filters", nulls = Nulls.SKIP)
@@ -290,6 +288,18 @@ public final class CreateExportsRequest {
         @java.lang.Override
         public CreateExportsRequest build() {
             return new CreateExportsRequest(accountId, columns, filters, resource, timezone, additionalProperties);
+        }
+
+        @JsonAnySetter
+        private void putAdditionalPropertyFromJson(String key, Object value) {
+            if (key.equalsIgnoreCase("account_id")
+                    || key.equalsIgnoreCase("columns")
+                    || key.equalsIgnoreCase("filters")
+                    || key.equalsIgnoreCase("resource")
+                    || key.equalsIgnoreCase("timezone")) {
+                return;
+            }
+            this.additionalProperties.put(key, value);
         }
 
         @java.lang.Override

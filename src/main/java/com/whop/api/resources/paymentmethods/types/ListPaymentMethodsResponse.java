@@ -114,7 +114,6 @@ public final class ListPaymentMethodsResponse {
 
         private List<PaymentMethodListItem> data = new ArrayList<>();
 
-        @JsonAnySetter
         private Map<String, Object> additionalProperties = new HashMap<>();
 
         private Builder() {}
@@ -127,7 +126,6 @@ public final class ListPaymentMethodsResponse {
         }
 
         /**
-         * <p>Information to aid in pagination.</p>
          * <p>Information to aid in pagination.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
@@ -176,6 +174,14 @@ public final class ListPaymentMethodsResponse {
         @java.lang.Override
         public ListPaymentMethodsResponse build() {
             return new ListPaymentMethodsResponse(data, pageInfo, additionalProperties);
+        }
+
+        @JsonAnySetter
+        private void putAdditionalPropertyFromJson(String key, Object value) {
+            if (key.equalsIgnoreCase("data") || key.equalsIgnoreCase("page_info")) {
+                return;
+            }
+            this.additionalProperties.put(key, value);
         }
 
         @java.lang.Override

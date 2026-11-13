@@ -16,6 +16,7 @@ import com.whop.api.core.Nullable;
 import com.whop.api.core.NullableNonemptyFilter;
 import com.whop.api.core.ObjectMappers;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
@@ -24,35 +25,110 @@ import org.jetbrains.annotations.NotNull;
 @JsonInclude(JsonInclude.Include.NON_ABSENT)
 @JsonDeserialize(builder = DisputeEvidenceDocument.Builder.class)
 public final class DisputeEvidenceDocument {
+    private final Optional<String> blurhash;
+
     private final Optional<DisputeEvidenceDocumentContentType> contentType;
+
+    private final String createdAt;
 
     private final DisputeEvidenceDocumentDocumentType documentType;
 
+    private final Optional<Double> durationSeconds;
+
     private final Optional<String> filename;
+
+    private final Optional<Integer> height;
 
     private final String id;
 
+    private final Optional<Integer> multipartChunkSize;
+
+    private final Optional<String> multipartUploadId;
+
+    private final Optional<List<FileMultipartUrl>> multipartUploadUrls;
+
+    private final String object;
+
+    private final boolean removedByModeration;
+
+    private final Optional<Integer> size;
+
+    private final Optional<Map<String, Object>> uploadHeaders;
+
+    private final DisputeEvidenceDocumentUploadStatus uploadStatus;
+
+    private final Optional<String> uploadUrl;
+
     private final Optional<String> url;
+
+    private final DisputeEvidenceDocumentVisibility visibility;
+
+    private final Optional<String> waveformUrl;
+
+    private final Optional<Integer> width;
 
     private final Map<String, Object> additionalProperties;
 
     private DisputeEvidenceDocument(
+            Optional<String> blurhash,
             Optional<DisputeEvidenceDocumentContentType> contentType,
+            String createdAt,
             DisputeEvidenceDocumentDocumentType documentType,
+            Optional<Double> durationSeconds,
             Optional<String> filename,
+            Optional<Integer> height,
             String id,
+            Optional<Integer> multipartChunkSize,
+            Optional<String> multipartUploadId,
+            Optional<List<FileMultipartUrl>> multipartUploadUrls,
+            String object,
+            boolean removedByModeration,
+            Optional<Integer> size,
+            Optional<Map<String, Object>> uploadHeaders,
+            DisputeEvidenceDocumentUploadStatus uploadStatus,
+            Optional<String> uploadUrl,
             Optional<String> url,
+            DisputeEvidenceDocumentVisibility visibility,
+            Optional<String> waveformUrl,
+            Optional<Integer> width,
             Map<String, Object> additionalProperties) {
+        this.blurhash = blurhash;
         this.contentType = contentType;
+        this.createdAt = createdAt;
         this.documentType = documentType;
+        this.durationSeconds = durationSeconds;
         this.filename = filename;
+        this.height = height;
         this.id = id;
+        this.multipartChunkSize = multipartChunkSize;
+        this.multipartUploadId = multipartUploadId;
+        this.multipartUploadUrls = multipartUploadUrls;
+        this.object = object;
+        this.removedByModeration = removedByModeration;
+        this.size = size;
+        this.uploadHeaders = uploadHeaders;
+        this.uploadStatus = uploadStatus;
+        this.uploadUrl = uploadUrl;
         this.url = url;
+        this.visibility = visibility;
+        this.waveformUrl = waveformUrl;
+        this.width = width;
         this.additionalProperties = additionalProperties;
     }
 
     /**
-     * @return The uploaded file's MIME type. Uploads are restricted to the types the processor accepts.
+     * @return BlurHash placeholder for an image or video. Null when unavailable or removed by moderation.
+     */
+    @JsonIgnore
+    public Optional<String> getBlurhash() {
+        if (blurhash == null) {
+            return Optional.empty();
+        }
+        return blurhash;
+    }
+
+    /**
+     * @return The uploaded file's MIME type. Uploads are restricted to the types the processor accepts, and rejected without one — never null.
      */
     @JsonIgnore
     public Optional<DisputeEvidenceDocumentContentType> getContentType() {
@@ -63,7 +139,15 @@ public final class DisputeEvidenceDocument {
     }
 
     /**
-     * @return What kind of evidence the document is.
+     * @return When the file was created, as an ISO 8601 timestamp.
+     */
+    @JsonProperty("created_at")
+    public String getCreatedAt() {
+        return createdAt;
+    }
+
+    /**
+     * @return What this document proves, in the processor's own evidence vocabulary. <code>return_policy</code>, <code>cancellation_policy</code>, and <code>terms_of_service</code> are the seller's policy documents — uploading one overrides the account's copy for this dispute (<code>return_policy</code>, <code>cancellation_policy</code>, and <code>customer_communication</code> also override the matching fixed evidence slot). <code>shipping_policy</code> is the seller's shipping terms. <code>customer_communication</code> is correspondence with the buyer — a support thread or chat log. <code>product_image</code> is a photo of the product or service the buyer received. <code>physical_fulfillment</code> is proof a physical order shipped and arrived; <code>digital_fulfillment</code> is proof the buyer accessed a digital product. <code>customer_order_history</code> is the buyer's past orders with this seller; <code>prior_transactions</code> is their broader payment history across the platform, for a fraud defense. <code>customer_session</code> is checkout forensics — IP, device fingerprint, AVS/CVV, 3D Secure result. <code>subscription</code> is membership lifecycle evidence — renewals, cancellation, reminders sent.
      */
     @JsonProperty("document_type")
     public DisputeEvidenceDocumentDocumentType getDocumentType() {
@@ -71,7 +155,18 @@ public final class DisputeEvidenceDocument {
     }
 
     /**
-     * @return The uploaded file's name.
+     * @return Audio or video duration in seconds. Null when unavailable or removed by moderation.
+     */
+    @JsonIgnore
+    public Optional<Double> getDurationSeconds() {
+        if (durationSeconds == null) {
+            return Optional.empty();
+        }
+        return durationSeconds;
+    }
+
+    /**
+     * @return The original filename, including its extension.
      */
     @JsonIgnore
     public Optional<String> getFilename() {
@@ -82,7 +177,18 @@ public final class DisputeEvidenceDocument {
     }
 
     /**
-     * @return The attachment's ID, prefixed <code>file_</code>.
+     * @return Image or video height in pixels. Null when unavailable or removed by moderation.
+     */
+    @JsonIgnore
+    public Optional<Integer> getHeight() {
+        if (height == null) {
+            return Optional.empty();
+        }
+        return height;
+    }
+
+    /**
+     * @return The file's ID, prefixed <code>file_</code>.
      */
     @JsonProperty("id")
     public String getId() {
@@ -90,7 +196,91 @@ public final class DisputeEvidenceDocument {
     }
 
     /**
-     * @return A URL to download the document.
+     * @return The byte size each part (except the last) must be. Present only on create, and only for multipart uploads.
+     */
+    @JsonIgnore
+    public Optional<Integer> getMultipartChunkSize() {
+        if (multipartChunkSize == null) {
+            return Optional.empty();
+        }
+        return multipartChunkSize;
+    }
+
+    /**
+     * @return The ID of the multipart upload, passed back to <code>complete</code>. Present only on create, and only for multipart uploads.
+     */
+    @JsonIgnore
+    public Optional<String> getMultipartUploadId() {
+        if (multipartUploadId == null) {
+            return Optional.empty();
+        }
+        return multipartUploadId;
+    }
+
+    @JsonIgnore
+    public Optional<List<FileMultipartUrl>> getMultipartUploadUrls() {
+        if (multipartUploadUrls == null) {
+            return Optional.empty();
+        }
+        return multipartUploadUrls;
+    }
+
+    /**
+     * @return The type of this object, always <code>file</code>.
+     */
+    @JsonProperty("object")
+    public String getObject() {
+        return object;
+    }
+
+    /**
+     * @return Whether moderation removed the file. When <code>true</code>, <code>url</code> serves a replacement image. <code>filename</code>, <code>size</code> and <code>content_type</code> still describe the original file.
+     */
+    @JsonProperty("removed_by_moderation")
+    public boolean getRemovedByModeration() {
+        return removedByModeration;
+    }
+
+    /**
+     * @return The file size in bytes. <code>null</code> until the upload has finished.
+     */
+    @JsonIgnore
+    public Optional<Integer> getSize() {
+        if (size == null) {
+            return Optional.empty();
+        }
+        return size;
+    }
+
+    /**
+     * @return Headers to send with the upload PUT. Present only on create.
+     */
+    @JsonProperty("upload_headers")
+    public Optional<Map<String, Object>> getUploadHeaders() {
+        return uploadHeaders;
+    }
+
+    /**
+     * @return Where the file is in its upload lifecycle.
+     */
+    @JsonProperty("upload_status")
+    public DisputeEvidenceDocumentUploadStatus getUploadStatus() {
+        return uploadStatus;
+    }
+
+    /**
+     * @return Presigned URL to PUT the file's bytes to. Present only on create, and only for single-part uploads.
+     */
+    @JsonIgnore
+    public Optional<String> getUploadUrl() {
+        if (uploadUrl == null) {
+            return Optional.empty();
+        }
+        return uploadUrl;
+    }
+
+    /**
+     * @return A URL to download the file. Public files get a permanent CDN URL, and private files get a signed URL that expires. <code>null</code> until the upload has finished. When moderation removes the file, a replacement image URL.
      */
     @JsonIgnore
     public Optional<String> getUrl() {
@@ -100,10 +290,52 @@ public final class DisputeEvidenceDocument {
         return url;
     }
 
+    /**
+     * @return <code>public</code> files are served from an unsigned CDN URL. <code>private</code> files are served from a signed URL that expires.
+     */
+    @JsonProperty("visibility")
+    public DisputeEvidenceDocumentVisibility getVisibility() {
+        return visibility;
+    }
+
+    /**
+     * @return Audio waveform URL. Null when unavailable or removed by moderation.
+     */
+    @JsonIgnore
+    public Optional<String> getWaveformUrl() {
+        if (waveformUrl == null) {
+            return Optional.empty();
+        }
+        return waveformUrl;
+    }
+
+    /**
+     * @return Image or video width in pixels. Null when unavailable or removed by moderation.
+     */
+    @JsonIgnore
+    public Optional<Integer> getWidth() {
+        if (width == null) {
+            return Optional.empty();
+        }
+        return width;
+    }
+
+    @JsonInclude(value = JsonInclude.Include.CUSTOM, valueFilter = NullableNonemptyFilter.class)
+    @JsonProperty("blurhash")
+    private Optional<String> _getBlurhash() {
+        return blurhash;
+    }
+
     @JsonInclude(value = JsonInclude.Include.CUSTOM, valueFilter = NullableNonemptyFilter.class)
     @JsonProperty("content_type")
     private Optional<DisputeEvidenceDocumentContentType> _getContentType() {
         return contentType;
+    }
+
+    @JsonInclude(value = JsonInclude.Include.CUSTOM, valueFilter = NullableNonemptyFilter.class)
+    @JsonProperty("duration_seconds")
+    private Optional<Double> _getDurationSeconds() {
+        return durationSeconds;
     }
 
     @JsonInclude(value = JsonInclude.Include.CUSTOM, valueFilter = NullableNonemptyFilter.class)
@@ -113,9 +345,57 @@ public final class DisputeEvidenceDocument {
     }
 
     @JsonInclude(value = JsonInclude.Include.CUSTOM, valueFilter = NullableNonemptyFilter.class)
+    @JsonProperty("height")
+    private Optional<Integer> _getHeight() {
+        return height;
+    }
+
+    @JsonInclude(value = JsonInclude.Include.CUSTOM, valueFilter = NullableNonemptyFilter.class)
+    @JsonProperty("multipart_chunk_size")
+    private Optional<Integer> _getMultipartChunkSize() {
+        return multipartChunkSize;
+    }
+
+    @JsonInclude(value = JsonInclude.Include.CUSTOM, valueFilter = NullableNonemptyFilter.class)
+    @JsonProperty("multipart_upload_id")
+    private Optional<String> _getMultipartUploadId() {
+        return multipartUploadId;
+    }
+
+    @JsonInclude(value = JsonInclude.Include.CUSTOM, valueFilter = NullableNonemptyFilter.class)
+    @JsonProperty("multipart_upload_urls")
+    private Optional<List<FileMultipartUrl>> _getMultipartUploadUrls() {
+        return multipartUploadUrls;
+    }
+
+    @JsonInclude(value = JsonInclude.Include.CUSTOM, valueFilter = NullableNonemptyFilter.class)
+    @JsonProperty("size")
+    private Optional<Integer> _getSize() {
+        return size;
+    }
+
+    @JsonInclude(value = JsonInclude.Include.CUSTOM, valueFilter = NullableNonemptyFilter.class)
+    @JsonProperty("upload_url")
+    private Optional<String> _getUploadUrl() {
+        return uploadUrl;
+    }
+
+    @JsonInclude(value = JsonInclude.Include.CUSTOM, valueFilter = NullableNonemptyFilter.class)
     @JsonProperty("url")
     private Optional<String> _getUrl() {
         return url;
+    }
+
+    @JsonInclude(value = JsonInclude.Include.CUSTOM, valueFilter = NullableNonemptyFilter.class)
+    @JsonProperty("waveform_url")
+    private Optional<String> _getWaveformUrl() {
+        return waveformUrl;
+    }
+
+    @JsonInclude(value = JsonInclude.Include.CUSTOM, valueFilter = NullableNonemptyFilter.class)
+    @JsonProperty("width")
+    private Optional<Integer> _getWidth() {
+        return width;
     }
 
     @java.lang.Override
@@ -130,16 +410,53 @@ public final class DisputeEvidenceDocument {
     }
 
     private boolean equalTo(DisputeEvidenceDocument other) {
-        return contentType.equals(other.contentType)
+        return blurhash.equals(other.blurhash)
+                && contentType.equals(other.contentType)
+                && createdAt.equals(other.createdAt)
                 && documentType.equals(other.documentType)
+                && durationSeconds.equals(other.durationSeconds)
                 && filename.equals(other.filename)
+                && height.equals(other.height)
                 && id.equals(other.id)
-                && url.equals(other.url);
+                && multipartChunkSize.equals(other.multipartChunkSize)
+                && multipartUploadId.equals(other.multipartUploadId)
+                && multipartUploadUrls.equals(other.multipartUploadUrls)
+                && object.equals(other.object)
+                && removedByModeration == other.removedByModeration
+                && size.equals(other.size)
+                && uploadHeaders.equals(other.uploadHeaders)
+                && uploadStatus.equals(other.uploadStatus)
+                && uploadUrl.equals(other.uploadUrl)
+                && url.equals(other.url)
+                && visibility.equals(other.visibility)
+                && waveformUrl.equals(other.waveformUrl)
+                && width.equals(other.width);
     }
 
     @java.lang.Override
     public int hashCode() {
-        return Objects.hash(this.contentType, this.documentType, this.filename, this.id, this.url);
+        return Objects.hash(
+                this.blurhash,
+                this.contentType,
+                this.createdAt,
+                this.documentType,
+                this.durationSeconds,
+                this.filename,
+                this.height,
+                this.id,
+                this.multipartChunkSize,
+                this.multipartUploadId,
+                this.multipartUploadUrls,
+                this.object,
+                this.removedByModeration,
+                this.size,
+                this.uploadHeaders,
+                this.uploadStatus,
+                this.uploadUrl,
+                this.url,
+                this.visibility,
+                this.waveformUrl,
+                this.width);
     }
 
     @java.lang.Override
@@ -147,24 +464,59 @@ public final class DisputeEvidenceDocument {
         return ObjectMappers.stringify(this);
     }
 
-    public static DocumentTypeStage builder() {
+    public static CreatedAtStage builder() {
         return new Builder();
     }
 
-    public interface DocumentTypeStage {
+    public interface CreatedAtStage {
         /**
-         * <p>What kind of evidence the document is.</p>
+         * <p>When the file was created, as an ISO 8601 timestamp.</p>
          */
-        IdStage documentType(@NotNull DisputeEvidenceDocumentDocumentType documentType);
+        DocumentTypeStage createdAt(@NotNull String createdAt);
 
         Builder from(DisputeEvidenceDocument other);
     }
 
+    public interface DocumentTypeStage {
+        /**
+         * <p>What this document proves, in the processor's own evidence vocabulary. <code>return_policy</code>, <code>cancellation_policy</code>, and <code>terms_of_service</code> are the seller's policy documents — uploading one overrides the account's copy for this dispute (<code>return_policy</code>, <code>cancellation_policy</code>, and <code>customer_communication</code> also override the matching fixed evidence slot). <code>shipping_policy</code> is the seller's shipping terms. <code>customer_communication</code> is correspondence with the buyer — a support thread or chat log. <code>product_image</code> is a photo of the product or service the buyer received. <code>physical_fulfillment</code> is proof a physical order shipped and arrived; <code>digital_fulfillment</code> is proof the buyer accessed a digital product. <code>customer_order_history</code> is the buyer's past orders with this seller; <code>prior_transactions</code> is their broader payment history across the platform, for a fraud defense. <code>customer_session</code> is checkout forensics — IP, device fingerprint, AVS/CVV, 3D Secure result. <code>subscription</code> is membership lifecycle evidence — renewals, cancellation, reminders sent.</p>
+         */
+        IdStage documentType(@NotNull DisputeEvidenceDocumentDocumentType documentType);
+    }
+
     public interface IdStage {
         /**
-         * <p>The attachment's ID, prefixed <code>file_</code>.</p>
+         * <p>The file's ID, prefixed <code>file_</code>.</p>
          */
-        _FinalStage id(@NotNull String id);
+        ObjectStage id(@NotNull String id);
+    }
+
+    public interface ObjectStage {
+        /**
+         * <p>The type of this object, always <code>file</code>.</p>
+         */
+        RemovedByModerationStage object(@NotNull String object);
+    }
+
+    public interface RemovedByModerationStage {
+        /**
+         * <p>Whether moderation removed the file. When <code>true</code>, <code>url</code> serves a replacement image. <code>filename</code>, <code>size</code> and <code>content_type</code> still describe the original file.</p>
+         */
+        UploadStatusStage removedByModeration(boolean removedByModeration);
+    }
+
+    public interface UploadStatusStage {
+        /**
+         * <p>Where the file is in its upload lifecycle.</p>
+         */
+        VisibilityStage uploadStatus(@NotNull DisputeEvidenceDocumentUploadStatus uploadStatus);
+    }
+
+    public interface VisibilityStage {
+        /**
+         * <p><code>public</code> files are served from an unsigned CDN URL. <code>private</code> files are served from a signed URL that expires.</p>
+         */
+        _FinalStage visibility(@NotNull DisputeEvidenceDocumentVisibility visibility);
     }
 
     public interface _FinalStage {
@@ -175,7 +527,16 @@ public final class DisputeEvidenceDocument {
         _FinalStage additionalProperties(Map<String, Object> additionalProperties);
 
         /**
-         * <p>The uploaded file's MIME type. Uploads are restricted to the types the processor accepts.</p>
+         * <p>BlurHash placeholder for an image or video. Null when unavailable or removed by moderation.</p>
+         */
+        _FinalStage blurhash(Optional<String> blurhash);
+
+        _FinalStage blurhash(String blurhash);
+
+        _FinalStage blurhash(Nullable<String> blurhash);
+
+        /**
+         * <p>The uploaded file's MIME type. Uploads are restricted to the types the processor accepts, and rejected without one — never null.</p>
          */
         _FinalStage contentType(Optional<DisputeEvidenceDocumentContentType> contentType);
 
@@ -184,7 +545,16 @@ public final class DisputeEvidenceDocument {
         _FinalStage contentType(Nullable<DisputeEvidenceDocumentContentType> contentType);
 
         /**
-         * <p>The uploaded file's name.</p>
+         * <p>Audio or video duration in seconds. Null when unavailable or removed by moderation.</p>
+         */
+        _FinalStage durationSeconds(Optional<Double> durationSeconds);
+
+        _FinalStage durationSeconds(Double durationSeconds);
+
+        _FinalStage durationSeconds(Nullable<Double> durationSeconds);
+
+        /**
+         * <p>The original filename, including its extension.</p>
          */
         _FinalStage filename(Optional<String> filename);
 
@@ -193,45 +563,186 @@ public final class DisputeEvidenceDocument {
         _FinalStage filename(Nullable<String> filename);
 
         /**
-         * <p>A URL to download the document.</p>
+         * <p>Image or video height in pixels. Null when unavailable or removed by moderation.</p>
+         */
+        _FinalStage height(Optional<Integer> height);
+
+        _FinalStage height(Integer height);
+
+        _FinalStage height(Nullable<Integer> height);
+
+        /**
+         * <p>The byte size each part (except the last) must be. Present only on create, and only for multipart uploads.</p>
+         */
+        _FinalStage multipartChunkSize(Optional<Integer> multipartChunkSize);
+
+        _FinalStage multipartChunkSize(Integer multipartChunkSize);
+
+        _FinalStage multipartChunkSize(Nullable<Integer> multipartChunkSize);
+
+        /**
+         * <p>The ID of the multipart upload, passed back to <code>complete</code>. Present only on create, and only for multipart uploads.</p>
+         */
+        _FinalStage multipartUploadId(Optional<String> multipartUploadId);
+
+        _FinalStage multipartUploadId(String multipartUploadId);
+
+        _FinalStage multipartUploadId(Nullable<String> multipartUploadId);
+
+        _FinalStage multipartUploadUrls(Optional<List<FileMultipartUrl>> multipartUploadUrls);
+
+        _FinalStage multipartUploadUrls(List<FileMultipartUrl> multipartUploadUrls);
+
+        _FinalStage multipartUploadUrls(Nullable<List<FileMultipartUrl>> multipartUploadUrls);
+
+        /**
+         * <p>The file size in bytes. <code>null</code> until the upload has finished.</p>
+         */
+        _FinalStage size(Optional<Integer> size);
+
+        _FinalStage size(Integer size);
+
+        _FinalStage size(Nullable<Integer> size);
+
+        /**
+         * <p>Headers to send with the upload PUT. Present only on create.</p>
+         */
+        _FinalStage uploadHeaders(Optional<Map<String, Object>> uploadHeaders);
+
+        _FinalStage uploadHeaders(Map<String, Object> uploadHeaders);
+
+        /**
+         * <p>Presigned URL to PUT the file's bytes to. Present only on create, and only for single-part uploads.</p>
+         */
+        _FinalStage uploadUrl(Optional<String> uploadUrl);
+
+        _FinalStage uploadUrl(String uploadUrl);
+
+        _FinalStage uploadUrl(Nullable<String> uploadUrl);
+
+        /**
+         * <p>A URL to download the file. Public files get a permanent CDN URL, and private files get a signed URL that expires. <code>null</code> until the upload has finished. When moderation removes the file, a replacement image URL.</p>
          */
         _FinalStage url(Optional<String> url);
 
         _FinalStage url(String url);
 
         _FinalStage url(Nullable<String> url);
+
+        /**
+         * <p>Audio waveform URL. Null when unavailable or removed by moderation.</p>
+         */
+        _FinalStage waveformUrl(Optional<String> waveformUrl);
+
+        _FinalStage waveformUrl(String waveformUrl);
+
+        _FinalStage waveformUrl(Nullable<String> waveformUrl);
+
+        /**
+         * <p>Image or video width in pixels. Null when unavailable or removed by moderation.</p>
+         */
+        _FinalStage width(Optional<Integer> width);
+
+        _FinalStage width(Integer width);
+
+        _FinalStage width(Nullable<Integer> width);
     }
 
     @JsonIgnoreProperties(ignoreUnknown = true)
-    public static final class Builder implements DocumentTypeStage, IdStage, _FinalStage {
+    public static final class Builder
+            implements CreatedAtStage,
+                    DocumentTypeStage,
+                    IdStage,
+                    ObjectStage,
+                    RemovedByModerationStage,
+                    UploadStatusStage,
+                    VisibilityStage,
+                    _FinalStage {
+        private String createdAt;
+
         private DisputeEvidenceDocumentDocumentType documentType;
 
         private String id;
 
+        private String object;
+
+        private boolean removedByModeration;
+
+        private DisputeEvidenceDocumentUploadStatus uploadStatus;
+
+        private DisputeEvidenceDocumentVisibility visibility;
+
+        private Optional<Integer> width = Optional.empty();
+
+        private Optional<String> waveformUrl = Optional.empty();
+
         private Optional<String> url = Optional.empty();
+
+        private Optional<String> uploadUrl = Optional.empty();
+
+        private Optional<Map<String, Object>> uploadHeaders = Optional.empty();
+
+        private Optional<Integer> size = Optional.empty();
+
+        private Optional<List<FileMultipartUrl>> multipartUploadUrls = Optional.empty();
+
+        private Optional<String> multipartUploadId = Optional.empty();
+
+        private Optional<Integer> multipartChunkSize = Optional.empty();
+
+        private Optional<Integer> height = Optional.empty();
 
         private Optional<String> filename = Optional.empty();
 
+        private Optional<Double> durationSeconds = Optional.empty();
+
         private Optional<DisputeEvidenceDocumentContentType> contentType = Optional.empty();
 
-        @JsonAnySetter
+        private Optional<String> blurhash = Optional.empty();
+
         private Map<String, Object> additionalProperties = new HashMap<>();
 
         private Builder() {}
 
         @java.lang.Override
         public Builder from(DisputeEvidenceDocument other) {
+            blurhash(other.getBlurhash());
             contentType(other.getContentType());
+            createdAt(other.getCreatedAt());
             documentType(other.getDocumentType());
+            durationSeconds(other.getDurationSeconds());
             filename(other.getFilename());
+            height(other.getHeight());
             id(other.getId());
+            multipartChunkSize(other.getMultipartChunkSize());
+            multipartUploadId(other.getMultipartUploadId());
+            multipartUploadUrls(other.getMultipartUploadUrls());
+            object(other.getObject());
+            removedByModeration(other.getRemovedByModeration());
+            size(other.getSize());
+            uploadHeaders(other.getUploadHeaders());
+            uploadStatus(other.getUploadStatus());
+            uploadUrl(other.getUploadUrl());
             url(other.getUrl());
+            visibility(other.getVisibility());
+            waveformUrl(other.getWaveformUrl());
+            width(other.getWidth());
             return this;
         }
 
         /**
-         * <p>What kind of evidence the document is.</p>
-         * <p>What kind of evidence the document is.</p>
+         * <p>When the file was created, as an ISO 8601 timestamp.</p>
+         * @return Reference to {@code this} so that method calls can be chained together.
+         */
+        @java.lang.Override
+        @JsonSetter("created_at")
+        public DocumentTypeStage createdAt(@NotNull String createdAt) {
+            this.createdAt = Objects.requireNonNull(createdAt, "createdAt must not be null");
+            return this;
+        }
+
+        /**
+         * <p>What this document proves, in the processor's own evidence vocabulary. <code>return_policy</code>, <code>cancellation_policy</code>, and <code>terms_of_service</code> are the seller's policy documents — uploading one overrides the account's copy for this dispute (<code>return_policy</code>, <code>cancellation_policy</code>, and <code>customer_communication</code> also override the matching fixed evidence slot). <code>shipping_policy</code> is the seller's shipping terms. <code>customer_communication</code> is correspondence with the buyer — a support thread or chat log. <code>product_image</code> is a photo of the product or service the buyer received. <code>physical_fulfillment</code> is proof a physical order shipped and arrived; <code>digital_fulfillment</code> is proof the buyer accessed a digital product. <code>customer_order_history</code> is the buyer's past orders with this seller; <code>prior_transactions</code> is their broader payment history across the platform, for a fraud defense. <code>customer_session</code> is checkout forensics — IP, device fingerprint, AVS/CVV, 3D Secure result. <code>subscription</code> is membership lifecycle evidence — renewals, cancellation, reminders sent.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
@@ -242,19 +753,134 @@ public final class DisputeEvidenceDocument {
         }
 
         /**
-         * <p>The attachment's ID, prefixed <code>file_</code>.</p>
-         * <p>The attachment's ID, prefixed <code>file_</code>.</p>
+         * <p>The file's ID, prefixed <code>file_</code>.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
         @JsonSetter("id")
-        public _FinalStage id(@NotNull String id) {
+        public ObjectStage id(@NotNull String id) {
             this.id = Objects.requireNonNull(id, "id must not be null");
             return this;
         }
 
         /**
-         * <p>A URL to download the document.</p>
+         * <p>The type of this object, always <code>file</code>.</p>
+         * @return Reference to {@code this} so that method calls can be chained together.
+         */
+        @java.lang.Override
+        @JsonSetter("object")
+        public RemovedByModerationStage object(@NotNull String object) {
+            this.object = Objects.requireNonNull(object, "object must not be null");
+            return this;
+        }
+
+        /**
+         * <p>Whether moderation removed the file. When <code>true</code>, <code>url</code> serves a replacement image. <code>filename</code>, <code>size</code> and <code>content_type</code> still describe the original file.</p>
+         * @return Reference to {@code this} so that method calls can be chained together.
+         */
+        @java.lang.Override
+        @JsonSetter("removed_by_moderation")
+        public UploadStatusStage removedByModeration(boolean removedByModeration) {
+            this.removedByModeration = removedByModeration;
+            return this;
+        }
+
+        /**
+         * <p>Where the file is in its upload lifecycle.</p>
+         * @return Reference to {@code this} so that method calls can be chained together.
+         */
+        @java.lang.Override
+        @JsonSetter("upload_status")
+        public VisibilityStage uploadStatus(@NotNull DisputeEvidenceDocumentUploadStatus uploadStatus) {
+            this.uploadStatus = Objects.requireNonNull(uploadStatus, "uploadStatus must not be null");
+            return this;
+        }
+
+        /**
+         * <p><code>public</code> files are served from an unsigned CDN URL. <code>private</code> files are served from a signed URL that expires.</p>
+         * @return Reference to {@code this} so that method calls can be chained together.
+         */
+        @java.lang.Override
+        @JsonSetter("visibility")
+        public _FinalStage visibility(@NotNull DisputeEvidenceDocumentVisibility visibility) {
+            this.visibility = Objects.requireNonNull(visibility, "visibility must not be null");
+            return this;
+        }
+
+        /**
+         * <p>Image or video width in pixels. Null when unavailable or removed by moderation.</p>
+         * @return Reference to {@code this} so that method calls can be chained together.
+         */
+        @java.lang.Override
+        public _FinalStage width(Nullable<Integer> width) {
+            if (width.isNull()) {
+                this.width = null;
+            } else if (width.isEmpty()) {
+                this.width = Optional.empty();
+            } else {
+                this.width = Optional.of(width.get());
+            }
+            return this;
+        }
+
+        /**
+         * <p>Image or video width in pixels. Null when unavailable or removed by moderation.</p>
+         * @return Reference to {@code this} so that method calls can be chained together.
+         */
+        @java.lang.Override
+        public _FinalStage width(Integer width) {
+            this.width = Optional.ofNullable(width);
+            return this;
+        }
+
+        /**
+         * <p>Image or video width in pixels. Null when unavailable or removed by moderation.</p>
+         */
+        @java.lang.Override
+        @JsonSetter(value = "width", nulls = Nulls.SKIP)
+        public _FinalStage width(Optional<Integer> width) {
+            this.width = width;
+            return this;
+        }
+
+        /**
+         * <p>Audio waveform URL. Null when unavailable or removed by moderation.</p>
+         * @return Reference to {@code this} so that method calls can be chained together.
+         */
+        @java.lang.Override
+        public _FinalStage waveformUrl(Nullable<String> waveformUrl) {
+            if (waveformUrl.isNull()) {
+                this.waveformUrl = null;
+            } else if (waveformUrl.isEmpty()) {
+                this.waveformUrl = Optional.empty();
+            } else {
+                this.waveformUrl = Optional.of(waveformUrl.get());
+            }
+            return this;
+        }
+
+        /**
+         * <p>Audio waveform URL. Null when unavailable or removed by moderation.</p>
+         * @return Reference to {@code this} so that method calls can be chained together.
+         */
+        @java.lang.Override
+        public _FinalStage waveformUrl(String waveformUrl) {
+            this.waveformUrl = Optional.ofNullable(waveformUrl);
+            return this;
+        }
+
+        /**
+         * <p>Audio waveform URL. Null when unavailable or removed by moderation.</p>
+         */
+        @java.lang.Override
+        @JsonSetter(value = "waveform_url", nulls = Nulls.SKIP)
+        public _FinalStage waveformUrl(Optional<String> waveformUrl) {
+            this.waveformUrl = waveformUrl;
+            return this;
+        }
+
+        /**
+         * <p>A URL to download the file. Public files get a permanent CDN URL, and private files get a signed URL that expires. <code>null</code> until the upload has finished. When moderation removes the file, a replacement image URL.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
@@ -270,7 +896,7 @@ public final class DisputeEvidenceDocument {
         }
 
         /**
-         * <p>A URL to download the document.</p>
+         * <p>A URL to download the file. Public files get a permanent CDN URL, and private files get a signed URL that expires. <code>null</code> until the upload has finished. When moderation removes the file, a replacement image URL.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
@@ -280,7 +906,7 @@ public final class DisputeEvidenceDocument {
         }
 
         /**
-         * <p>A URL to download the document.</p>
+         * <p>A URL to download the file. Public files get a permanent CDN URL, and private files get a signed URL that expires. <code>null</code> until the upload has finished. When moderation removes the file, a replacement image URL.</p>
          */
         @java.lang.Override
         @JsonSetter(value = "url", nulls = Nulls.SKIP)
@@ -290,7 +916,232 @@ public final class DisputeEvidenceDocument {
         }
 
         /**
-         * <p>The uploaded file's name.</p>
+         * <p>Presigned URL to PUT the file's bytes to. Present only on create, and only for single-part uploads.</p>
+         * @return Reference to {@code this} so that method calls can be chained together.
+         */
+        @java.lang.Override
+        public _FinalStage uploadUrl(Nullable<String> uploadUrl) {
+            if (uploadUrl.isNull()) {
+                this.uploadUrl = null;
+            } else if (uploadUrl.isEmpty()) {
+                this.uploadUrl = Optional.empty();
+            } else {
+                this.uploadUrl = Optional.of(uploadUrl.get());
+            }
+            return this;
+        }
+
+        /**
+         * <p>Presigned URL to PUT the file's bytes to. Present only on create, and only for single-part uploads.</p>
+         * @return Reference to {@code this} so that method calls can be chained together.
+         */
+        @java.lang.Override
+        public _FinalStage uploadUrl(String uploadUrl) {
+            this.uploadUrl = Optional.ofNullable(uploadUrl);
+            return this;
+        }
+
+        /**
+         * <p>Presigned URL to PUT the file's bytes to. Present only on create, and only for single-part uploads.</p>
+         */
+        @java.lang.Override
+        @JsonSetter(value = "upload_url", nulls = Nulls.SKIP)
+        public _FinalStage uploadUrl(Optional<String> uploadUrl) {
+            this.uploadUrl = uploadUrl;
+            return this;
+        }
+
+        /**
+         * <p>Headers to send with the upload PUT. Present only on create.</p>
+         * @return Reference to {@code this} so that method calls can be chained together.
+         */
+        @java.lang.Override
+        public _FinalStage uploadHeaders(Map<String, Object> uploadHeaders) {
+            this.uploadHeaders = Optional.ofNullable(uploadHeaders);
+            return this;
+        }
+
+        /**
+         * <p>Headers to send with the upload PUT. Present only on create.</p>
+         */
+        @java.lang.Override
+        @JsonSetter(value = "upload_headers", nulls = Nulls.SKIP)
+        public _FinalStage uploadHeaders(Optional<Map<String, Object>> uploadHeaders) {
+            this.uploadHeaders = uploadHeaders;
+            return this;
+        }
+
+        /**
+         * <p>The file size in bytes. <code>null</code> until the upload has finished.</p>
+         * @return Reference to {@code this} so that method calls can be chained together.
+         */
+        @java.lang.Override
+        public _FinalStage size(Nullable<Integer> size) {
+            if (size.isNull()) {
+                this.size = null;
+            } else if (size.isEmpty()) {
+                this.size = Optional.empty();
+            } else {
+                this.size = Optional.of(size.get());
+            }
+            return this;
+        }
+
+        /**
+         * <p>The file size in bytes. <code>null</code> until the upload has finished.</p>
+         * @return Reference to {@code this} so that method calls can be chained together.
+         */
+        @java.lang.Override
+        public _FinalStage size(Integer size) {
+            this.size = Optional.ofNullable(size);
+            return this;
+        }
+
+        /**
+         * <p>The file size in bytes. <code>null</code> until the upload has finished.</p>
+         */
+        @java.lang.Override
+        @JsonSetter(value = "size", nulls = Nulls.SKIP)
+        public _FinalStage size(Optional<Integer> size) {
+            this.size = size;
+            return this;
+        }
+
+        @java.lang.Override
+        public _FinalStage multipartUploadUrls(Nullable<List<FileMultipartUrl>> multipartUploadUrls) {
+            if (multipartUploadUrls.isNull()) {
+                this.multipartUploadUrls = null;
+            } else if (multipartUploadUrls.isEmpty()) {
+                this.multipartUploadUrls = Optional.empty();
+            } else {
+                this.multipartUploadUrls = Optional.of(multipartUploadUrls.get());
+            }
+            return this;
+        }
+
+        @java.lang.Override
+        public _FinalStage multipartUploadUrls(List<FileMultipartUrl> multipartUploadUrls) {
+            this.multipartUploadUrls = Optional.ofNullable(multipartUploadUrls);
+            return this;
+        }
+
+        @java.lang.Override
+        @JsonSetter(value = "multipart_upload_urls", nulls = Nulls.SKIP)
+        public _FinalStage multipartUploadUrls(Optional<List<FileMultipartUrl>> multipartUploadUrls) {
+            this.multipartUploadUrls = multipartUploadUrls;
+            return this;
+        }
+
+        /**
+         * <p>The ID of the multipart upload, passed back to <code>complete</code>. Present only on create, and only for multipart uploads.</p>
+         * @return Reference to {@code this} so that method calls can be chained together.
+         */
+        @java.lang.Override
+        public _FinalStage multipartUploadId(Nullable<String> multipartUploadId) {
+            if (multipartUploadId.isNull()) {
+                this.multipartUploadId = null;
+            } else if (multipartUploadId.isEmpty()) {
+                this.multipartUploadId = Optional.empty();
+            } else {
+                this.multipartUploadId = Optional.of(multipartUploadId.get());
+            }
+            return this;
+        }
+
+        /**
+         * <p>The ID of the multipart upload, passed back to <code>complete</code>. Present only on create, and only for multipart uploads.</p>
+         * @return Reference to {@code this} so that method calls can be chained together.
+         */
+        @java.lang.Override
+        public _FinalStage multipartUploadId(String multipartUploadId) {
+            this.multipartUploadId = Optional.ofNullable(multipartUploadId);
+            return this;
+        }
+
+        /**
+         * <p>The ID of the multipart upload, passed back to <code>complete</code>. Present only on create, and only for multipart uploads.</p>
+         */
+        @java.lang.Override
+        @JsonSetter(value = "multipart_upload_id", nulls = Nulls.SKIP)
+        public _FinalStage multipartUploadId(Optional<String> multipartUploadId) {
+            this.multipartUploadId = multipartUploadId;
+            return this;
+        }
+
+        /**
+         * <p>The byte size each part (except the last) must be. Present only on create, and only for multipart uploads.</p>
+         * @return Reference to {@code this} so that method calls can be chained together.
+         */
+        @java.lang.Override
+        public _FinalStage multipartChunkSize(Nullable<Integer> multipartChunkSize) {
+            if (multipartChunkSize.isNull()) {
+                this.multipartChunkSize = null;
+            } else if (multipartChunkSize.isEmpty()) {
+                this.multipartChunkSize = Optional.empty();
+            } else {
+                this.multipartChunkSize = Optional.of(multipartChunkSize.get());
+            }
+            return this;
+        }
+
+        /**
+         * <p>The byte size each part (except the last) must be. Present only on create, and only for multipart uploads.</p>
+         * @return Reference to {@code this} so that method calls can be chained together.
+         */
+        @java.lang.Override
+        public _FinalStage multipartChunkSize(Integer multipartChunkSize) {
+            this.multipartChunkSize = Optional.ofNullable(multipartChunkSize);
+            return this;
+        }
+
+        /**
+         * <p>The byte size each part (except the last) must be. Present only on create, and only for multipart uploads.</p>
+         */
+        @java.lang.Override
+        @JsonSetter(value = "multipart_chunk_size", nulls = Nulls.SKIP)
+        public _FinalStage multipartChunkSize(Optional<Integer> multipartChunkSize) {
+            this.multipartChunkSize = multipartChunkSize;
+            return this;
+        }
+
+        /**
+         * <p>Image or video height in pixels. Null when unavailable or removed by moderation.</p>
+         * @return Reference to {@code this} so that method calls can be chained together.
+         */
+        @java.lang.Override
+        public _FinalStage height(Nullable<Integer> height) {
+            if (height.isNull()) {
+                this.height = null;
+            } else if (height.isEmpty()) {
+                this.height = Optional.empty();
+            } else {
+                this.height = Optional.of(height.get());
+            }
+            return this;
+        }
+
+        /**
+         * <p>Image or video height in pixels. Null when unavailable or removed by moderation.</p>
+         * @return Reference to {@code this} so that method calls can be chained together.
+         */
+        @java.lang.Override
+        public _FinalStage height(Integer height) {
+            this.height = Optional.ofNullable(height);
+            return this;
+        }
+
+        /**
+         * <p>Image or video height in pixels. Null when unavailable or removed by moderation.</p>
+         */
+        @java.lang.Override
+        @JsonSetter(value = "height", nulls = Nulls.SKIP)
+        public _FinalStage height(Optional<Integer> height) {
+            this.height = height;
+            return this;
+        }
+
+        /**
+         * <p>The original filename, including its extension.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
@@ -306,7 +1157,7 @@ public final class DisputeEvidenceDocument {
         }
 
         /**
-         * <p>The uploaded file's name.</p>
+         * <p>The original filename, including its extension.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
@@ -316,7 +1167,7 @@ public final class DisputeEvidenceDocument {
         }
 
         /**
-         * <p>The uploaded file's name.</p>
+         * <p>The original filename, including its extension.</p>
          */
         @java.lang.Override
         @JsonSetter(value = "filename", nulls = Nulls.SKIP)
@@ -326,7 +1177,43 @@ public final class DisputeEvidenceDocument {
         }
 
         /**
-         * <p>The uploaded file's MIME type. Uploads are restricted to the types the processor accepts.</p>
+         * <p>Audio or video duration in seconds. Null when unavailable or removed by moderation.</p>
+         * @return Reference to {@code this} so that method calls can be chained together.
+         */
+        @java.lang.Override
+        public _FinalStage durationSeconds(Nullable<Double> durationSeconds) {
+            if (durationSeconds.isNull()) {
+                this.durationSeconds = null;
+            } else if (durationSeconds.isEmpty()) {
+                this.durationSeconds = Optional.empty();
+            } else {
+                this.durationSeconds = Optional.of(durationSeconds.get());
+            }
+            return this;
+        }
+
+        /**
+         * <p>Audio or video duration in seconds. Null when unavailable or removed by moderation.</p>
+         * @return Reference to {@code this} so that method calls can be chained together.
+         */
+        @java.lang.Override
+        public _FinalStage durationSeconds(Double durationSeconds) {
+            this.durationSeconds = Optional.ofNullable(durationSeconds);
+            return this;
+        }
+
+        /**
+         * <p>Audio or video duration in seconds. Null when unavailable or removed by moderation.</p>
+         */
+        @java.lang.Override
+        @JsonSetter(value = "duration_seconds", nulls = Nulls.SKIP)
+        public _FinalStage durationSeconds(Optional<Double> durationSeconds) {
+            this.durationSeconds = durationSeconds;
+            return this;
+        }
+
+        /**
+         * <p>The uploaded file's MIME type. Uploads are restricted to the types the processor accepts, and rejected without one — never null.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
@@ -342,7 +1229,7 @@ public final class DisputeEvidenceDocument {
         }
 
         /**
-         * <p>The uploaded file's MIME type. Uploads are restricted to the types the processor accepts.</p>
+         * <p>The uploaded file's MIME type. Uploads are restricted to the types the processor accepts, and rejected without one — never null.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
@@ -352,7 +1239,7 @@ public final class DisputeEvidenceDocument {
         }
 
         /**
-         * <p>The uploaded file's MIME type. Uploads are restricted to the types the processor accepts.</p>
+         * <p>The uploaded file's MIME type. Uploads are restricted to the types the processor accepts, and rejected without one — never null.</p>
          */
         @java.lang.Override
         @JsonSetter(value = "content_type", nulls = Nulls.SKIP)
@@ -361,9 +1248,95 @@ public final class DisputeEvidenceDocument {
             return this;
         }
 
+        /**
+         * <p>BlurHash placeholder for an image or video. Null when unavailable or removed by moderation.</p>
+         * @return Reference to {@code this} so that method calls can be chained together.
+         */
+        @java.lang.Override
+        public _FinalStage blurhash(Nullable<String> blurhash) {
+            if (blurhash.isNull()) {
+                this.blurhash = null;
+            } else if (blurhash.isEmpty()) {
+                this.blurhash = Optional.empty();
+            } else {
+                this.blurhash = Optional.of(blurhash.get());
+            }
+            return this;
+        }
+
+        /**
+         * <p>BlurHash placeholder for an image or video. Null when unavailable or removed by moderation.</p>
+         * @return Reference to {@code this} so that method calls can be chained together.
+         */
+        @java.lang.Override
+        public _FinalStage blurhash(String blurhash) {
+            this.blurhash = Optional.ofNullable(blurhash);
+            return this;
+        }
+
+        /**
+         * <p>BlurHash placeholder for an image or video. Null when unavailable or removed by moderation.</p>
+         */
+        @java.lang.Override
+        @JsonSetter(value = "blurhash", nulls = Nulls.SKIP)
+        public _FinalStage blurhash(Optional<String> blurhash) {
+            this.blurhash = blurhash;
+            return this;
+        }
+
         @java.lang.Override
         public DisputeEvidenceDocument build() {
-            return new DisputeEvidenceDocument(contentType, documentType, filename, id, url, additionalProperties);
+            return new DisputeEvidenceDocument(
+                    blurhash,
+                    contentType,
+                    createdAt,
+                    documentType,
+                    durationSeconds,
+                    filename,
+                    height,
+                    id,
+                    multipartChunkSize,
+                    multipartUploadId,
+                    multipartUploadUrls,
+                    object,
+                    removedByModeration,
+                    size,
+                    uploadHeaders,
+                    uploadStatus,
+                    uploadUrl,
+                    url,
+                    visibility,
+                    waveformUrl,
+                    width,
+                    additionalProperties);
+        }
+
+        @JsonAnySetter
+        private void putAdditionalPropertyFromJson(String key, Object value) {
+            if (key.equalsIgnoreCase("blurhash")
+                    || key.equalsIgnoreCase("content_type")
+                    || key.equalsIgnoreCase("created_at")
+                    || key.equalsIgnoreCase("document_type")
+                    || key.equalsIgnoreCase("duration_seconds")
+                    || key.equalsIgnoreCase("filename")
+                    || key.equalsIgnoreCase("height")
+                    || key.equalsIgnoreCase("id")
+                    || key.equalsIgnoreCase("multipart_chunk_size")
+                    || key.equalsIgnoreCase("multipart_upload_id")
+                    || key.equalsIgnoreCase("multipart_upload_urls")
+                    || key.equalsIgnoreCase("object")
+                    || key.equalsIgnoreCase("removed_by_moderation")
+                    || key.equalsIgnoreCase("size")
+                    || key.equalsIgnoreCase("upload_headers")
+                    || key.equalsIgnoreCase("upload_status")
+                    || key.equalsIgnoreCase("upload_url")
+                    || key.equalsIgnoreCase("url")
+                    || key.equalsIgnoreCase("visibility")
+                    || key.equalsIgnoreCase("waveform_url")
+                    || key.equalsIgnoreCase("width")) {
+                return;
+            }
+            this.additionalProperties.put(key, value);
         }
 
         @java.lang.Override

@@ -9,9 +9,12 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonSetter;
+import com.fasterxml.jackson.annotation.Nulls;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.whop.api.core.ObjectMappers;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import org.jetbrains.annotations.NotNull;
@@ -21,12 +24,19 @@ import org.jetbrains.annotations.NotNull;
 public final class AccountReserveUnlock {
     private final String amount;
 
+    private final List<AccountReserveUnlockType> byType;
+
     private final String date;
 
     private final Map<String, Object> additionalProperties;
 
-    private AccountReserveUnlock(String amount, String date, Map<String, Object> additionalProperties) {
+    private AccountReserveUnlock(
+            String amount,
+            List<AccountReserveUnlockType> byType,
+            String date,
+            Map<String, Object> additionalProperties) {
         this.amount = amount;
+        this.byType = byType;
         this.date = date;
         this.additionalProperties = additionalProperties;
     }
@@ -37,6 +47,11 @@ public final class AccountReserveUnlock {
     @JsonProperty("amount")
     public String getAmount() {
         return amount;
+    }
+
+    @JsonProperty("by_type")
+    public List<AccountReserveUnlockType> getByType() {
+        return byType;
     }
 
     /**
@@ -59,12 +74,12 @@ public final class AccountReserveUnlock {
     }
 
     private boolean equalTo(AccountReserveUnlock other) {
-        return amount.equals(other.amount) && date.equals(other.date);
+        return amount.equals(other.amount) && byType.equals(other.byType) && date.equals(other.date);
     }
 
     @java.lang.Override
     public int hashCode() {
-        return Objects.hash(this.amount, this.date);
+        return Objects.hash(this.amount, this.byType, this.date);
     }
 
     @java.lang.Override
@@ -98,6 +113,12 @@ public final class AccountReserveUnlock {
         _FinalStage additionalProperty(String key, Object value);
 
         _FinalStage additionalProperties(Map<String, Object> additionalProperties);
+
+        _FinalStage byType(List<AccountReserveUnlockType> byType);
+
+        _FinalStage addByType(AccountReserveUnlockType byType);
+
+        _FinalStage addAllByType(List<AccountReserveUnlockType> byType);
     }
 
     @JsonIgnoreProperties(ignoreUnknown = true)
@@ -106,7 +127,8 @@ public final class AccountReserveUnlock {
 
         private String date;
 
-        @JsonAnySetter
+        private List<AccountReserveUnlockType> byType = new ArrayList<>();
+
         private Map<String, Object> additionalProperties = new HashMap<>();
 
         private Builder() {}
@@ -114,12 +136,12 @@ public final class AccountReserveUnlock {
         @java.lang.Override
         public Builder from(AccountReserveUnlock other) {
             amount(other.getAmount());
+            byType(other.getByType());
             date(other.getDate());
             return this;
         }
 
         /**
-         * <p>Amount unlocking that day across every reason, in native units, as a decimal string.</p>
          * <p>Amount unlocking that day across every reason, in native units, as a decimal string.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
@@ -132,7 +154,6 @@ public final class AccountReserveUnlock {
 
         /**
          * <p>The day this money unlocks, as an ISO 8601 date.</p>
-         * <p>The day this money unlocks, as an ISO 8601 date.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
@@ -143,8 +164,40 @@ public final class AccountReserveUnlock {
         }
 
         @java.lang.Override
+        public _FinalStage addAllByType(List<AccountReserveUnlockType> byType) {
+            if (byType != null) {
+                this.byType.addAll(byType);
+            }
+            return this;
+        }
+
+        @java.lang.Override
+        public _FinalStage addByType(AccountReserveUnlockType byType) {
+            this.byType.add(byType);
+            return this;
+        }
+
+        @java.lang.Override
+        @JsonSetter(value = "by_type", nulls = Nulls.SKIP)
+        public _FinalStage byType(List<AccountReserveUnlockType> byType) {
+            this.byType.clear();
+            if (byType != null) {
+                this.byType.addAll(byType);
+            }
+            return this;
+        }
+
+        @java.lang.Override
         public AccountReserveUnlock build() {
-            return new AccountReserveUnlock(amount, date, additionalProperties);
+            return new AccountReserveUnlock(amount, byType, date, additionalProperties);
+        }
+
+        @JsonAnySetter
+        private void putAdditionalPropertyFromJson(String key, Object value) {
+            if (key.equalsIgnoreCase("amount") || key.equalsIgnoreCase("by_type") || key.equalsIgnoreCase("date")) {
+                return;
+            }
+            this.additionalProperties.put(key, value);
         }
 
         @java.lang.Override

@@ -32,6 +32,8 @@ public final class PostPayoutMethodCreatedPayloadDataQuote {
 
     private final Optional<PostPayoutMethodCreatedPayloadDataQuoteInstant> instant;
 
+    private final Optional<PostPayoutMethodCreatedPayloadDataQuoteInstantUnavailableReason> instantUnavailableReason;
+
     private final Optional<Float> maxLimit;
 
     private final float minLimit;
@@ -45,6 +47,7 @@ public final class PostPayoutMethodCreatedPayloadDataQuote {
             String currency,
             float exchangeRate,
             Optional<PostPayoutMethodCreatedPayloadDataQuoteInstant> instant,
+            Optional<PostPayoutMethodCreatedPayloadDataQuoteInstantUnavailableReason> instantUnavailableReason,
             Optional<Float> maxLimit,
             float minLimit,
             Optional<PostPayoutMethodCreatedPayloadDataQuoteStandard> standard,
@@ -53,6 +56,7 @@ public final class PostPayoutMethodCreatedPayloadDataQuote {
         this.currency = currency;
         this.exchangeRate = exchangeRate;
         this.instant = instant;
+        this.instantUnavailableReason = instantUnavailableReason;
         this.maxLimit = maxLimit;
         this.minLimit = minLimit;
         this.standard = standard;
@@ -60,7 +64,7 @@ public final class PostPayoutMethodCreatedPayloadDataQuote {
     }
 
     /**
-     * @return The withdrawal amount the quote is for.
+     * @return The payout amount the quote is for.
      */
     @JsonProperty("amount")
     public float getAmount() {
@@ -76,7 +80,7 @@ public final class PostPayoutMethodCreatedPayloadDataQuote {
     }
 
     /**
-     * @return Exchange rate from the withdrawal currency to the destination currency.
+     * @return Exchange rate from the payout currency to the destination currency.
      */
     @JsonProperty("exchange_rate")
     public float getExchangeRate() {
@@ -95,7 +99,18 @@ public final class PostPayoutMethodCreatedPayloadDataQuote {
     }
 
     /**
-     * @return Maximum withdrawal amount for this method, in the withdrawal currency.
+     * @return Why instant delivery is unavailable for this method. <code>minimum_crypto_sales_not_met</code> means the account has not reached the total sales required for instant cryptocurrency payouts. <code>null</code> when this restriction does not apply.
+     */
+    @JsonIgnore
+    public Optional<PostPayoutMethodCreatedPayloadDataQuoteInstantUnavailableReason> getInstantUnavailableReason() {
+        if (instantUnavailableReason == null) {
+            return Optional.empty();
+        }
+        return instantUnavailableReason;
+    }
+
+    /**
+     * @return Maximum payout amount for this method, in the payout currency.
      */
     @JsonIgnore
     public Optional<Float> getMaxLimit() {
@@ -106,7 +121,7 @@ public final class PostPayoutMethodCreatedPayloadDataQuote {
     }
 
     /**
-     * @return Minimum withdrawal amount for this method, in the withdrawal currency.
+     * @return Minimum payout amount for this method, in the payout currency.
      */
     @JsonProperty("min_limit")
     public float getMinLimit() {
@@ -128,6 +143,12 @@ public final class PostPayoutMethodCreatedPayloadDataQuote {
     @JsonProperty("instant")
     private Optional<PostPayoutMethodCreatedPayloadDataQuoteInstant> _getInstant() {
         return instant;
+    }
+
+    @JsonInclude(value = JsonInclude.Include.CUSTOM, valueFilter = NullableNonemptyFilter.class)
+    @JsonProperty("instant_unavailable_reason")
+    private Optional<PostPayoutMethodCreatedPayloadDataQuoteInstantUnavailableReason> _getInstantUnavailableReason() {
+        return instantUnavailableReason;
     }
 
     @JsonInclude(value = JsonInclude.Include.CUSTOM, valueFilter = NullableNonemptyFilter.class)
@@ -159,6 +180,7 @@ public final class PostPayoutMethodCreatedPayloadDataQuote {
                 && currency.equals(other.currency)
                 && exchangeRate == other.exchangeRate
                 && instant.equals(other.instant)
+                && instantUnavailableReason.equals(other.instantUnavailableReason)
                 && maxLimit.equals(other.maxLimit)
                 && minLimit == other.minLimit
                 && standard.equals(other.standard);
@@ -171,6 +193,7 @@ public final class PostPayoutMethodCreatedPayloadDataQuote {
                 this.currency,
                 this.exchangeRate,
                 this.instant,
+                this.instantUnavailableReason,
                 this.maxLimit,
                 this.minLimit,
                 this.standard);
@@ -187,7 +210,7 @@ public final class PostPayoutMethodCreatedPayloadDataQuote {
 
     public interface AmountStage {
         /**
-         * <p>The withdrawal amount the quote is for.</p>
+         * <p>The payout amount the quote is for.</p>
          */
         CurrencyStage amount(float amount);
 
@@ -203,14 +226,14 @@ public final class PostPayoutMethodCreatedPayloadDataQuote {
 
     public interface ExchangeRateStage {
         /**
-         * <p>Exchange rate from the withdrawal currency to the destination currency.</p>
+         * <p>Exchange rate from the payout currency to the destination currency.</p>
          */
         MinLimitStage exchangeRate(float exchangeRate);
     }
 
     public interface MinLimitStage {
         /**
-         * <p>Minimum withdrawal amount for this method, in the withdrawal currency.</p>
+         * <p>Minimum payout amount for this method, in the payout currency.</p>
          */
         _FinalStage minLimit(float minLimit);
     }
@@ -232,7 +255,19 @@ public final class PostPayoutMethodCreatedPayloadDataQuote {
         _FinalStage instant(Nullable<PostPayoutMethodCreatedPayloadDataQuoteInstant> instant);
 
         /**
-         * <p>Maximum withdrawal amount for this method, in the withdrawal currency.</p>
+         * <p>Why instant delivery is unavailable for this method. <code>minimum_crypto_sales_not_met</code> means the account has not reached the total sales required for instant cryptocurrency payouts. <code>null</code> when this restriction does not apply.</p>
+         */
+        _FinalStage instantUnavailableReason(
+                Optional<PostPayoutMethodCreatedPayloadDataQuoteInstantUnavailableReason> instantUnavailableReason);
+
+        _FinalStage instantUnavailableReason(
+                PostPayoutMethodCreatedPayloadDataQuoteInstantUnavailableReason instantUnavailableReason);
+
+        _FinalStage instantUnavailableReason(
+                Nullable<PostPayoutMethodCreatedPayloadDataQuoteInstantUnavailableReason> instantUnavailableReason);
+
+        /**
+         * <p>Maximum payout amount for this method, in the payout currency.</p>
          */
         _FinalStage maxLimit(Optional<Float> maxLimit);
 
@@ -265,9 +300,11 @@ public final class PostPayoutMethodCreatedPayloadDataQuote {
 
         private Optional<Float> maxLimit = Optional.empty();
 
+        private Optional<PostPayoutMethodCreatedPayloadDataQuoteInstantUnavailableReason> instantUnavailableReason =
+                Optional.empty();
+
         private Optional<PostPayoutMethodCreatedPayloadDataQuoteInstant> instant = Optional.empty();
 
-        @JsonAnySetter
         private Map<String, Object> additionalProperties = new HashMap<>();
 
         private Builder() {}
@@ -278,6 +315,7 @@ public final class PostPayoutMethodCreatedPayloadDataQuote {
             currency(other.getCurrency());
             exchangeRate(other.getExchangeRate());
             instant(other.getInstant());
+            instantUnavailableReason(other.getInstantUnavailableReason());
             maxLimit(other.getMaxLimit());
             minLimit(other.getMinLimit());
             standard(other.getStandard());
@@ -285,8 +323,7 @@ public final class PostPayoutMethodCreatedPayloadDataQuote {
         }
 
         /**
-         * <p>The withdrawal amount the quote is for.</p>
-         * <p>The withdrawal amount the quote is for.</p>
+         * <p>The payout amount the quote is for.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
@@ -298,7 +335,6 @@ public final class PostPayoutMethodCreatedPayloadDataQuote {
 
         /**
          * <p>Currency of the quoted amount.</p>
-         * <p>Currency of the quoted amount.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
@@ -309,8 +345,7 @@ public final class PostPayoutMethodCreatedPayloadDataQuote {
         }
 
         /**
-         * <p>Exchange rate from the withdrawal currency to the destination currency.</p>
-         * <p>Exchange rate from the withdrawal currency to the destination currency.</p>
+         * <p>Exchange rate from the payout currency to the destination currency.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
@@ -321,8 +356,7 @@ public final class PostPayoutMethodCreatedPayloadDataQuote {
         }
 
         /**
-         * <p>Minimum withdrawal amount for this method, in the withdrawal currency.</p>
-         * <p>Minimum withdrawal amount for this method, in the withdrawal currency.</p>
+         * <p>Minimum payout amount for this method, in the payout currency.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
@@ -369,7 +403,7 @@ public final class PostPayoutMethodCreatedPayloadDataQuote {
         }
 
         /**
-         * <p>Maximum withdrawal amount for this method, in the withdrawal currency.</p>
+         * <p>Maximum payout amount for this method, in the payout currency.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
@@ -385,7 +419,7 @@ public final class PostPayoutMethodCreatedPayloadDataQuote {
         }
 
         /**
-         * <p>Maximum withdrawal amount for this method, in the withdrawal currency.</p>
+         * <p>Maximum payout amount for this method, in the payout currency.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
@@ -395,12 +429,51 @@ public final class PostPayoutMethodCreatedPayloadDataQuote {
         }
 
         /**
-         * <p>Maximum withdrawal amount for this method, in the withdrawal currency.</p>
+         * <p>Maximum payout amount for this method, in the payout currency.</p>
          */
         @java.lang.Override
         @JsonSetter(value = "max_limit", nulls = Nulls.SKIP)
         public _FinalStage maxLimit(Optional<Float> maxLimit) {
             this.maxLimit = maxLimit;
+            return this;
+        }
+
+        /**
+         * <p>Why instant delivery is unavailable for this method. <code>minimum_crypto_sales_not_met</code> means the account has not reached the total sales required for instant cryptocurrency payouts. <code>null</code> when this restriction does not apply.</p>
+         * @return Reference to {@code this} so that method calls can be chained together.
+         */
+        @java.lang.Override
+        public _FinalStage instantUnavailableReason(
+                Nullable<PostPayoutMethodCreatedPayloadDataQuoteInstantUnavailableReason> instantUnavailableReason) {
+            if (instantUnavailableReason.isNull()) {
+                this.instantUnavailableReason = null;
+            } else if (instantUnavailableReason.isEmpty()) {
+                this.instantUnavailableReason = Optional.empty();
+            } else {
+                this.instantUnavailableReason = Optional.of(instantUnavailableReason.get());
+            }
+            return this;
+        }
+
+        /**
+         * <p>Why instant delivery is unavailable for this method. <code>minimum_crypto_sales_not_met</code> means the account has not reached the total sales required for instant cryptocurrency payouts. <code>null</code> when this restriction does not apply.</p>
+         * @return Reference to {@code this} so that method calls can be chained together.
+         */
+        @java.lang.Override
+        public _FinalStage instantUnavailableReason(
+                PostPayoutMethodCreatedPayloadDataQuoteInstantUnavailableReason instantUnavailableReason) {
+            this.instantUnavailableReason = Optional.ofNullable(instantUnavailableReason);
+            return this;
+        }
+
+        /**
+         * <p>Why instant delivery is unavailable for this method. <code>minimum_crypto_sales_not_met</code> means the account has not reached the total sales required for instant cryptocurrency payouts. <code>null</code> when this restriction does not apply.</p>
+         */
+        @java.lang.Override
+        @JsonSetter(value = "instant_unavailable_reason", nulls = Nulls.SKIP)
+        public _FinalStage instantUnavailableReason(
+                Optional<PostPayoutMethodCreatedPayloadDataQuoteInstantUnavailableReason> instantUnavailableReason) {
+            this.instantUnavailableReason = instantUnavailableReason;
             return this;
         }
 
@@ -443,7 +516,30 @@ public final class PostPayoutMethodCreatedPayloadDataQuote {
         @java.lang.Override
         public PostPayoutMethodCreatedPayloadDataQuote build() {
             return new PostPayoutMethodCreatedPayloadDataQuote(
-                    amount, currency, exchangeRate, instant, maxLimit, minLimit, standard, additionalProperties);
+                    amount,
+                    currency,
+                    exchangeRate,
+                    instant,
+                    instantUnavailableReason,
+                    maxLimit,
+                    minLimit,
+                    standard,
+                    additionalProperties);
+        }
+
+        @JsonAnySetter
+        private void putAdditionalPropertyFromJson(String key, Object value) {
+            if (key.equalsIgnoreCase("amount")
+                    || key.equalsIgnoreCase("currency")
+                    || key.equalsIgnoreCase("exchange_rate")
+                    || key.equalsIgnoreCase("instant")
+                    || key.equalsIgnoreCase("instant_unavailable_reason")
+                    || key.equalsIgnoreCase("max_limit")
+                    || key.equalsIgnoreCase("min_limit")
+                    || key.equalsIgnoreCase("standard")) {
+                return;
+            }
+            this.additionalProperties.put(key, value);
         }
 
         @java.lang.Override

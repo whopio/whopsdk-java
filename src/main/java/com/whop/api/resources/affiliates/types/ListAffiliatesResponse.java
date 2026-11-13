@@ -114,7 +114,6 @@ public final class ListAffiliatesResponse {
 
         private List<AffiliateListItem> data = new ArrayList<>();
 
-        @JsonAnySetter
         private Map<String, Object> additionalProperties = new HashMap<>();
 
         private Builder() {}
@@ -127,7 +126,6 @@ public final class ListAffiliatesResponse {
         }
 
         /**
-         * <p>Information to aid in pagination.</p>
          * <p>Information to aid in pagination.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
@@ -176,6 +174,14 @@ public final class ListAffiliatesResponse {
         @java.lang.Override
         public ListAffiliatesResponse build() {
             return new ListAffiliatesResponse(data, pageInfo, additionalProperties);
+        }
+
+        @JsonAnySetter
+        private void putAdditionalPropertyFromJson(String key, Object value) {
+            if (key.equalsIgnoreCase("data") || key.equalsIgnoreCase("page_info")) {
+                return;
+            }
+            this.additionalProperties.put(key, value);
         }
 
         @java.lang.Override

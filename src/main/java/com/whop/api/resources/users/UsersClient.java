@@ -7,6 +7,7 @@ import com.whop.api.core.ClientOptions;
 import com.whop.api.core.RequestOptions;
 import com.whop.api.core.Suppliers;
 import com.whop.api.core.pagination.SyncPagingIterable;
+import com.whop.api.resources.users.fees.FeesClient;
 import com.whop.api.resources.users.oauthgrants.OauthGrantsClient;
 import com.whop.api.resources.users.passkeys.PasskeysClient;
 import com.whop.api.resources.users.preferences.PreferencesClient;
@@ -33,12 +34,15 @@ public class UsersClient {
 
     protected final Supplier<PreferencesClient> preferencesClient;
 
+    protected final Supplier<FeesClient> feesClient;
+
     public UsersClient(ClientOptions clientOptions) {
         this.clientOptions = clientOptions;
         this.rawClient = new RawUsersClient(clientOptions);
         this.oauthGrantsClient = Suppliers.memoize(() -> new OauthGrantsClient(clientOptions));
         this.passkeysClient = Suppliers.memoize(() -> new PasskeysClient(clientOptions));
         this.preferencesClient = Suppliers.memoize(() -> new PreferencesClient(clientOptions));
+        this.feesClient = Suppliers.memoize(() -> new FeesClient(clientOptions));
     }
 
     /**
@@ -49,140 +53,140 @@ public class UsersClient {
     }
 
     /**
-     * Search for users by name or username, ranked by social proximity to the authenticated user. Returns the user's most recently followed users when no query is given.
+     * Searches for users by name or username, ranked by social proximity to the authenticated user. Without a <code>query</code>, returns the user's most recently followed users.
      */
     public SyncPagingIterable<User> list() {
         return this.rawClient.list().body();
     }
 
     /**
-     * Search for users by name or username, ranked by social proximity to the authenticated user. Returns the user's most recently followed users when no query is given.
+     * Searches for users by name or username, ranked by social proximity to the authenticated user. Without a <code>query</code>, returns the user's most recently followed users.
      */
     public SyncPagingIterable<User> list(RequestOptions requestOptions) {
         return this.rawClient.list(requestOptions).body();
     }
 
     /**
-     * Search for users by name or username, ranked by social proximity to the authenticated user. Returns the user's most recently followed users when no query is given.
+     * Searches for users by name or username, ranked by social proximity to the authenticated user. Without a <code>query</code>, returns the user's most recently followed users.
      */
     public SyncPagingIterable<User> list(ListUsersRequest request) {
         return this.rawClient.list(request).body();
     }
 
     /**
-     * Search for users by name or username, ranked by social proximity to the authenticated user. Returns the user's most recently followed users when no query is given.
+     * Searches for users by name or username, ranked by social proximity to the authenticated user. Without a <code>query</code>, returns the user's most recently followed users.
      */
     public SyncPagingIterable<User> list(ListUsersRequest request, RequestOptions requestOptions) {
         return this.rawClient.list(request, requestOptions).body();
     }
 
     /**
-     * Retrieves the authenticated user — the self view of the user object. Same shape as <code>GET /users/{id}</code>, with the self-only fields populated: <code>email</code> (email-read scope), <code>staff</code> (Whop staff only, staff-read scope), <code>balance</code> and <code>earnings_usd</code> (balance-read scope), the opt-in <code>balance_history</code>, and every linked social account.
+     * Retrieves the authenticated user. Same as <code>GET /users/:id</code> with the reserved id <code>me</code>: the self view, where self-only fields such as <code>email</code>, <code>balance</code>, and <code>cards</code> can be populated.
      */
     public User me() {
         return this.rawClient.me().body();
     }
 
     /**
-     * Retrieves the authenticated user — the self view of the user object. Same shape as <code>GET /users/{id}</code>, with the self-only fields populated: <code>email</code> (email-read scope), <code>staff</code> (Whop staff only, staff-read scope), <code>balance</code> and <code>earnings_usd</code> (balance-read scope), the opt-in <code>balance_history</code>, and every linked social account.
+     * Retrieves the authenticated user. Same as <code>GET /users/:id</code> with the reserved id <code>me</code>: the self view, where self-only fields such as <code>email</code>, <code>balance</code>, and <code>cards</code> can be populated.
      */
     public User me(RequestOptions requestOptions) {
         return this.rawClient.me(requestOptions).body();
     }
 
     /**
-     * Retrieves the authenticated user — the self view of the user object. Same shape as <code>GET /users/{id}</code>, with the self-only fields populated: <code>email</code> (email-read scope), <code>staff</code> (Whop staff only, staff-read scope), <code>balance</code> and <code>earnings_usd</code> (balance-read scope), the opt-in <code>balance_history</code>, and every linked social account.
+     * Retrieves the authenticated user. Same as <code>GET /users/:id</code> with the reserved id <code>me</code>: the self view, where self-only fields such as <code>email</code>, <code>balance</code>, and <code>cards</code> can be populated.
      */
     public User me(MeUsersRequest request) {
         return this.rawClient.me(request).body();
     }
 
     /**
-     * Retrieves the authenticated user — the self view of the user object. Same shape as <code>GET /users/{id}</code>, with the self-only fields populated: <code>email</code> (email-read scope), <code>staff</code> (Whop staff only, staff-read scope), <code>balance</code> and <code>earnings_usd</code> (balance-read scope), the opt-in <code>balance_history</code>, and every linked social account.
+     * Retrieves the authenticated user. Same as <code>GET /users/:id</code> with the reserved id <code>me</code>: the self view, where self-only fields such as <code>email</code>, <code>balance</code>, and <code>cards</code> can be populated.
      */
     public User me(MeUsersRequest request, RequestOptions requestOptions) {
         return this.rawClient.me(request, requestOptions).body();
     }
 
     /**
-     * Updates the authenticated user's global profile, or their profile override for an account when account_id is given. Not available to API keys.
+     * Updates the authenticated user's global profile, or their profile override for an account when <code>account_id</code> is given. Not available to API keys.
      */
     public User updateMe() {
         return this.rawClient.updateMe().body();
     }
 
     /**
-     * Updates the authenticated user's global profile, or their profile override for an account when account_id is given. Not available to API keys.
+     * Updates the authenticated user's global profile, or their profile override for an account when <code>account_id</code> is given. Not available to API keys.
      */
     public User updateMe(RequestOptions requestOptions) {
         return this.rawClient.updateMe(requestOptions).body();
     }
 
     /**
-     * Updates the authenticated user's global profile, or their profile override for an account when account_id is given. Not available to API keys.
+     * Updates the authenticated user's global profile, or their profile override for an account when <code>account_id</code> is given. Not available to API keys.
      */
     public User updateMe(UpdateMeUsersRequest request) {
         return this.rawClient.updateMe(request).body();
     }
 
     /**
-     * Updates the authenticated user's global profile, or their profile override for an account when account_id is given. Not available to API keys.
+     * Updates the authenticated user's global profile, or their profile override for an account when <code>account_id</code> is given. Not available to API keys.
      */
     public User updateMe(UpdateMeUsersRequest request, RequestOptions requestOptions) {
         return this.rawClient.updateMe(request, requestOptions).body();
     }
 
     /**
-     * Retrieves a user by <code>user_</code> tag or username, or the authenticated user with the reserved id <code>me</code>. Profiles include linked social accounts — reading your own profile returns every linked account, other profiles only what is public on Whop (the primary Discord and the X account). The self-only fields are populated only when the id is <code>me</code>: <code>email</code> (email-read scope), <code>staff</code> (Whop staff only, staff-read scope), <code>balance</code> and <code>earnings_usd</code> (balance-read scope), and the opt-in <code>balance_history</code>. They are always <code>null</code> when addressing a user by tag or username.
+     * Retrieves a user by <code>user_</code> tag or username, or the authenticated user with the reserved id <code>me</code>. Self-only fields such as <code>email</code>, <code>balance</code>, and <code>earnings_usd</code> are populated only when the id is <code>me</code>, and are always <code>null</code> when addressing a user by tag or username.
      */
     public User retrieve(String id) {
         return this.rawClient.retrieve(id).body();
     }
 
     /**
-     * Retrieves a user by <code>user_</code> tag or username, or the authenticated user with the reserved id <code>me</code>. Profiles include linked social accounts — reading your own profile returns every linked account, other profiles only what is public on Whop (the primary Discord and the X account). The self-only fields are populated only when the id is <code>me</code>: <code>email</code> (email-read scope), <code>staff</code> (Whop staff only, staff-read scope), <code>balance</code> and <code>earnings_usd</code> (balance-read scope), and the opt-in <code>balance_history</code>. They are always <code>null</code> when addressing a user by tag or username.
+     * Retrieves a user by <code>user_</code> tag or username, or the authenticated user with the reserved id <code>me</code>. Self-only fields such as <code>email</code>, <code>balance</code>, and <code>earnings_usd</code> are populated only when the id is <code>me</code>, and are always <code>null</code> when addressing a user by tag or username.
      */
     public User retrieve(String id, RequestOptions requestOptions) {
         return this.rawClient.retrieve(id, requestOptions).body();
     }
 
     /**
-     * Retrieves a user by <code>user_</code> tag or username, or the authenticated user with the reserved id <code>me</code>. Profiles include linked social accounts — reading your own profile returns every linked account, other profiles only what is public on Whop (the primary Discord and the X account). The self-only fields are populated only when the id is <code>me</code>: <code>email</code> (email-read scope), <code>staff</code> (Whop staff only, staff-read scope), <code>balance</code> and <code>earnings_usd</code> (balance-read scope), and the opt-in <code>balance_history</code>. They are always <code>null</code> when addressing a user by tag or username.
+     * Retrieves a user by <code>user_</code> tag or username, or the authenticated user with the reserved id <code>me</code>. Self-only fields such as <code>email</code>, <code>balance</code>, and <code>earnings_usd</code> are populated only when the id is <code>me</code>, and are always <code>null</code> when addressing a user by tag or username.
      */
     public User retrieve(String id, RetrieveUsersRequest request) {
         return this.rawClient.retrieve(id, request).body();
     }
 
     /**
-     * Retrieves a user by <code>user_</code> tag or username, or the authenticated user with the reserved id <code>me</code>. Profiles include linked social accounts — reading your own profile returns every linked account, other profiles only what is public on Whop (the primary Discord and the X account). The self-only fields are populated only when the id is <code>me</code>: <code>email</code> (email-read scope), <code>staff</code> (Whop staff only, staff-read scope), <code>balance</code> and <code>earnings_usd</code> (balance-read scope), and the opt-in <code>balance_history</code>. They are always <code>null</code> when addressing a user by tag or username.
+     * Retrieves a user by <code>user_</code> tag or username, or the authenticated user with the reserved id <code>me</code>. Self-only fields such as <code>email</code>, <code>balance</code>, and <code>earnings_usd</code> are populated only when the id is <code>me</code>, and are always <code>null</code> when addressing a user by tag or username.
      */
     public User retrieve(String id, RetrieveUsersRequest request, RequestOptions requestOptions) {
         return this.rawClient.retrieve(id, request, requestOptions).body();
     }
 
     /**
-     * Updates a user, addressed by <code>user_</code> tag, username, or the reserved id <code>me</code> for the authenticated user. A user token updates their own global profile; an API key updates the user's account-specific profile override (account_id required).
+     * Updates a user, addressed by <code>user_</code> tag, username, or the reserved id <code>me</code> for the authenticated user. A user token updates their own global profile; an API key updates the user's profile override for the account in <code>account_id</code>.
      */
     public User update(String id) {
         return this.rawClient.update(id).body();
     }
 
     /**
-     * Updates a user, addressed by <code>user_</code> tag, username, or the reserved id <code>me</code> for the authenticated user. A user token updates their own global profile; an API key updates the user's account-specific profile override (account_id required).
+     * Updates a user, addressed by <code>user_</code> tag, username, or the reserved id <code>me</code> for the authenticated user. A user token updates their own global profile; an API key updates the user's profile override for the account in <code>account_id</code>.
      */
     public User update(String id, RequestOptions requestOptions) {
         return this.rawClient.update(id, requestOptions).body();
     }
 
     /**
-     * Updates a user, addressed by <code>user_</code> tag, username, or the reserved id <code>me</code> for the authenticated user. A user token updates their own global profile; an API key updates the user's account-specific profile override (account_id required).
+     * Updates a user, addressed by <code>user_</code> tag, username, or the reserved id <code>me</code> for the authenticated user. A user token updates their own global profile; an API key updates the user's profile override for the account in <code>account_id</code>.
      */
     public User update(String id, UpdateUsersRequest request) {
         return this.rawClient.update(id, request).body();
     }
 
     /**
-     * Updates a user, addressed by <code>user_</code> tag, username, or the reserved id <code>me</code> for the authenticated user. A user token updates their own global profile; an API key updates the user's account-specific profile override (account_id required).
+     * Updates a user, addressed by <code>user_</code> tag, username, or the reserved id <code>me</code> for the authenticated user. A user token updates their own global profile; an API key updates the user's profile override for the account in <code>account_id</code>.
      */
     public User update(String id, UpdateUsersRequest request, RequestOptions requestOptions) {
         return this.rawClient.update(id, request, requestOptions).body();
@@ -220,28 +224,28 @@ public class UsersClient {
     }
 
     /**
-     * Lists the recommended actions computed for the user: personal suggestions (e.g. start a business or become an affiliate) pooled with the highest-impact actions across the accounts the user owns. Business actions are tagged with their <code>account_id</code>/<code>account_name</code>; personal actions leave those <code>null</code>. Self-only: <code>id</code> must be <code>me</code> or the authenticated user's own tag/username.
+     * Lists the recommended actions computed for the authenticated user, such as starting a business. You can only list your own recommended actions.
      */
     public RecommendActionsUsersResponse recommendActions(String id) {
         return this.rawClient.recommendActions(id).body();
     }
 
     /**
-     * Lists the recommended actions computed for the user: personal suggestions (e.g. start a business or become an affiliate) pooled with the highest-impact actions across the accounts the user owns. Business actions are tagged with their <code>account_id</code>/<code>account_name</code>; personal actions leave those <code>null</code>. Self-only: <code>id</code> must be <code>me</code> or the authenticated user's own tag/username.
+     * Lists the recommended actions computed for the authenticated user, such as starting a business. You can only list your own recommended actions.
      */
     public RecommendActionsUsersResponse recommendActions(String id, RequestOptions requestOptions) {
         return this.rawClient.recommendActions(id, requestOptions).body();
     }
 
     /**
-     * Lists the recommended actions computed for the user: personal suggestions (e.g. start a business or become an affiliate) pooled with the highest-impact actions across the accounts the user owns. Business actions are tagged with their <code>account_id</code>/<code>account_name</code>; personal actions leave those <code>null</code>. Self-only: <code>id</code> must be <code>me</code> or the authenticated user's own tag/username.
+     * Lists the recommended actions computed for the authenticated user, such as starting a business. You can only list your own recommended actions.
      */
     public RecommendActionsUsersResponse recommendActions(String id, RecommendActionsUsersRequest request) {
         return this.rawClient.recommendActions(id, request).body();
     }
 
     /**
-     * Lists the recommended actions computed for the user: personal suggestions (e.g. start a business or become an affiliate) pooled with the highest-impact actions across the accounts the user owns. Business actions are tagged with their <code>account_id</code>/<code>account_name</code>; personal actions leave those <code>null</code>. Self-only: <code>id</code> must be <code>me</code> or the authenticated user's own tag/username.
+     * Lists the recommended actions computed for the authenticated user, such as starting a business. You can only list your own recommended actions.
      */
     public RecommendActionsUsersResponse recommendActions(
             String id, RecommendActionsUsersRequest request, RequestOptions requestOptions) {
@@ -258,5 +262,9 @@ public class UsersClient {
 
     public PreferencesClient preferences() {
         return this.preferencesClient.get();
+    }
+
+    public FeesClient fees() {
+        return this.feesClient.get();
     }
 }

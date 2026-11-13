@@ -27,17 +27,23 @@ import org.jetbrains.annotations.NotNull;
 @JsonInclude(JsonInclude.Include.NON_ABSENT)
 @JsonDeserialize(builder = AdCampaign.Builder.class)
 public final class AdCampaign {
+    private final Optional<StorefrontAccount> account;
+
     private final double addedToCartValue;
 
     private final double addedToCarts;
 
-    private final Optional<AdCampaignBidType> bidType;
-
     private final Optional<Double> budgetAmount;
+
+    private final Optional<Double> budgetAmountLocal;
+
+    private final String budgetCurrency;
 
     private final Optional<AdCampaignBudgetOptimization> budgetOptimization;
 
     private final Optional<AdCampaignBudgetType> budgetType;
+
+    private final AdCampaignCampaignType campaignType;
 
     private final double clickThroughRate;
 
@@ -85,6 +91,10 @@ public final class AdCampaign {
 
     private final AdCampaignDeliveryStatus deliveryStatus;
 
+    private final Optional<Double> desiredCostPerResult;
+
+    private final Optional<String> endsAt;
+
     private final Optional<Double> frequency;
 
     private final String id;
@@ -97,11 +107,9 @@ public final class AdCampaign {
 
     private final double leads;
 
+    private final double linkClicks;
+
     private final Optional<AdCampaignObjective> objective;
-
-    private final Optional<String> optimizationGoal;
-
-    private final AdCampaignPlatform platform;
 
     private final double purchaseValue;
 
@@ -127,11 +135,17 @@ public final class AdCampaign {
 
     private final Optional<String> spendCurrency;
 
+    private final Optional<String> startsAt;
+
     private final AdCampaignStatus status;
 
     private final double submittedApplicationValue;
 
     private final double submittedApplications;
+
+    private final Optional<Double> targetCostPerResult;
+
+    private final Optional<String> targetResultEvent;
 
     private final String title;
 
@@ -148,12 +162,15 @@ public final class AdCampaign {
     private final Map<String, Object> additionalProperties;
 
     private AdCampaign(
+            Optional<StorefrontAccount> account,
             double addedToCartValue,
             double addedToCarts,
-            Optional<AdCampaignBidType> bidType,
             Optional<Double> budgetAmount,
+            Optional<Double> budgetAmountLocal,
+            String budgetCurrency,
             Optional<AdCampaignBudgetOptimization> budgetOptimization,
             Optional<AdCampaignBudgetType> budgetType,
+            AdCampaignCampaignType campaignType,
             double clickThroughRate,
             double clicks,
             double completedRegistrationValue,
@@ -177,15 +194,16 @@ public final class AdCampaign {
             Map<String, Object> customEventCounts,
             Map<String, Object> customEventValues,
             AdCampaignDeliveryStatus deliveryStatus,
+            Optional<Double> desiredCostPerResult,
+            Optional<String> endsAt,
             Optional<Double> frequency,
             String id,
             double impressions,
             List<AdPlatformIssue> issues,
             double leadValue,
             double leads,
+            double linkClicks,
             Optional<AdCampaignObjective> objective,
-            Optional<String> optimizationGoal,
-            AdCampaignPlatform platform,
             double purchaseValue,
             double purchases,
             double reach,
@@ -198,9 +216,12 @@ public final class AdCampaign {
             List<AdCampaignSpecialAdCategoriesItem> specialAdCategories,
             double spend,
             Optional<String> spendCurrency,
+            Optional<String> startsAt,
             AdCampaignStatus status,
             double submittedApplicationValue,
             double submittedApplications,
+            Optional<Double> targetCostPerResult,
+            Optional<String> targetResultEvent,
             String title,
             Optional<Double> uniqueClickThroughRate,
             double uniqueClicks,
@@ -208,12 +229,15 @@ public final class AdCampaign {
             double viewedContentValue,
             double viewedContents,
             Map<String, Object> additionalProperties) {
+        this.account = account;
         this.addedToCartValue = addedToCartValue;
         this.addedToCarts = addedToCarts;
-        this.bidType = bidType;
         this.budgetAmount = budgetAmount;
+        this.budgetAmountLocal = budgetAmountLocal;
+        this.budgetCurrency = budgetCurrency;
         this.budgetOptimization = budgetOptimization;
         this.budgetType = budgetType;
+        this.campaignType = campaignType;
         this.clickThroughRate = clickThroughRate;
         this.clicks = clicks;
         this.completedRegistrationValue = completedRegistrationValue;
@@ -237,15 +261,16 @@ public final class AdCampaign {
         this.customEventCounts = customEventCounts;
         this.customEventValues = customEventValues;
         this.deliveryStatus = deliveryStatus;
+        this.desiredCostPerResult = desiredCostPerResult;
+        this.endsAt = endsAt;
         this.frequency = frequency;
         this.id = id;
         this.impressions = impressions;
         this.issues = issues;
         this.leadValue = leadValue;
         this.leads = leads;
+        this.linkClicks = linkClicks;
         this.objective = objective;
-        this.optimizationGoal = optimizationGoal;
-        this.platform = platform;
         this.purchaseValue = purchaseValue;
         this.purchases = purchases;
         this.reach = reach;
@@ -258,9 +283,12 @@ public final class AdCampaign {
         this.specialAdCategories = specialAdCategories;
         this.spend = spend;
         this.spendCurrency = spendCurrency;
+        this.startsAt = startsAt;
         this.status = status;
         this.submittedApplicationValue = submittedApplicationValue;
         this.submittedApplications = submittedApplications;
+        this.targetCostPerResult = targetCostPerResult;
+        this.targetResultEvent = targetResultEvent;
         this.title = title;
         this.uniqueClickThroughRate = uniqueClickThroughRate;
         this.uniqueClicks = uniqueClicks;
@@ -268,6 +296,17 @@ public final class AdCampaign {
         this.viewedContentValue = viewedContentValue;
         this.viewedContents = viewedContents;
         this.additionalProperties = additionalProperties;
+    }
+
+    /**
+     * @return The business running this campaign, with the name and logo its ads show.
+     */
+    @JsonIgnore
+    public Optional<StorefrontAccount> getAccount() {
+        if (account == null) {
+            return Optional.empty();
+        }
+        return account;
     }
 
     /**
@@ -287,18 +326,7 @@ public final class AdCampaign {
     }
 
     /**
-     * @return How delivery bids in the ad auction: <code>minimum_cost</code> gets the most results for the budget, <code>average_target</code> holds an average cost per result, and <code>maximum_target</code> never bids above a cap.
-     */
-    @JsonIgnore
-    public Optional<AdCampaignBidType> getBidType() {
-        if (bidType == null) {
-            return Optional.empty();
-        }
-        return bidType;
-    }
-
-    /**
-     * @return The campaign's budget, in the ad account's currency. <code>null</code> when each ad group sets its own budget instead.
+     * @return The campaign's budget in USD, which is what it is stored and billed in. <code>null</code> when each ad group sets its own budget instead.
      */
     @JsonIgnore
     public Optional<Double> getBudgetAmount() {
@@ -306,6 +334,25 @@ public final class AdCampaign {
             return Optional.empty();
         }
         return budgetAmount;
+    }
+
+    /**
+     * @return The same budget stated in <code>budget_currency</code> at today's exchange rate, for display in the account's ads reporting currency. <code>null</code> when <code>budget_amount</code> is.
+     */
+    @JsonIgnore
+    public Optional<Double> getBudgetAmountLocal() {
+        if (budgetAmountLocal == null) {
+            return Optional.empty();
+        }
+        return budgetAmountLocal;
+    }
+
+    /**
+     * @return The ISO 4217 code <code>budget_amount_local</code> is in: the account's <code>ads_reporting_currency</code> preference. <code>usd</code> unless the account changed it.
+     */
+    @JsonProperty("budget_currency")
+    public String getBudgetCurrency() {
+        return budgetCurrency;
     }
 
     /**
@@ -328,6 +375,14 @@ public final class AdCampaign {
             return Optional.empty();
         }
         return budgetType;
+    }
+
+    /**
+     * @return The kind of campaign, fixed at creation. <code>standard</code> runs image and video ads; <code>search</code> shows text ads on search results for the ad groups' keywords.
+     */
+    @JsonProperty("campaign_type")
+    public AdCampaignCampaignType getCampaignType() {
+        return campaignType;
     }
 
     /**
@@ -537,7 +592,7 @@ public final class AdCampaign {
     }
 
     /**
-     * @return Whether the campaign's ads are delivering right now, and if not, why. When several states apply at once, the highest-precedence one is returned.
+     * @return Whether the campaign's ads are delivering right now, and if not, why. Content review is in_review; a campaign waiting to start is processing. Account billing failures set payment_failed without changing the configured status. Successful payment retry clears that block and recalculates delivery. When several states apply at once, the highest-precedence one is returned.
      */
     @JsonProperty("delivery_status")
     public AdCampaignDeliveryStatus getDeliveryStatus() {
@@ -545,7 +600,29 @@ public final class AdCampaign {
     }
 
     /**
-     * @return Platform-reported impressions divided by reach.
+     * @return The cost per result, in USD, the advertiser wants this campaign to achieve. A target only: it is not a bid, cost cap, or bid cap, and doesn't change how the campaign's ads bid. <code>null</code> when no target is set.
+     */
+    @JsonIgnore
+    public Optional<Double> getDesiredCostPerResult() {
+        if (desiredCostPerResult == null) {
+            return Optional.empty();
+        }
+        return desiredCostPerResult;
+    }
+
+    /**
+     * @return When the campaign stops delivering, as an ISO 8601 timestamp. <code>null</code> when it runs until paused, or when its ad groups set their own schedule.
+     */
+    @JsonIgnore
+    public Optional<String> getEndsAt() {
+        if (endsAt == null) {
+            return Optional.empty();
+        }
+        return endsAt;
+    }
+
+    /**
+     * @return Impressions divided by reach.
      */
     @JsonIgnore
     public Optional<Double> getFrequency() {
@@ -593,7 +670,15 @@ public final class AdCampaign {
     }
 
     /**
-     * @return The goal the campaign optimizes toward.
+     * @return Page views on your destination from people who clicked the ad, recorded by the Whop pixel. Counted the same way on every ad platform.
+     */
+    @JsonProperty("link_clicks")
+    public double getLinkClicks() {
+        return linkClicks;
+    }
+
+    /**
+     * @return The goal the campaign optimizes toward. <code>awareness</code> appears only on campaigns created before it was retired; those campaigns can't launch.
      */
     @JsonIgnore
     public Optional<AdCampaignObjective> getObjective() {
@@ -601,25 +686,6 @@ public final class AdCampaign {
             return Optional.empty();
         }
         return objective;
-    }
-
-    /**
-     * @return The event the campaign optimizes for when a single goal is set campaign-wide. <code>null</code> when each ad group sets its own optimization_goal.
-     */
-    @JsonIgnore
-    public Optional<String> getOptimizationGoal() {
-        if (optimizationGoal == null) {
-            return Optional.empty();
-        }
-        return optimizationGoal;
-    }
-
-    /**
-     * @return The ad network the campaign runs on.
-     */
-    @JsonProperty("platform")
-    public AdCampaignPlatform getPlatform() {
-        return platform;
     }
 
     /**
@@ -728,7 +794,18 @@ public final class AdCampaign {
     }
 
     /**
-     * @return The lifecycle status of the ad campaign.
+     * @return When the campaign starts delivering, as an ISO 8601 timestamp. <code>null</code> when it starts as soon as it launches, or when its ad groups set their own schedule.
+     */
+    @JsonIgnore
+    public Optional<String> getStartsAt() {
+        if (startsAt == null) {
+            return Optional.empty();
+        }
+        return startsAt;
+    }
+
+    /**
+     * @return The configured lifecycle status of the ad campaign. Billing failures preserve active or paused here and set delivery_status to payment_failed.
      */
     @JsonProperty("status")
     public AdCampaignStatus getStatus() {
@@ -749,6 +826,28 @@ public final class AdCampaign {
     @JsonProperty("submitted_applications")
     public double getSubmittedApplications() {
         return submittedApplications;
+    }
+
+    /**
+     * @return The desired cost per result for <code>target_result_event</code>, in USD. <code>null</code> when none is set.
+     */
+    @JsonIgnore
+    public Optional<Double> getTargetCostPerResult() {
+        if (targetCostPerResult == null) {
+            return Optional.empty();
+        }
+        return targetCostPerResult;
+    }
+
+    /**
+     * @return The event <code>target_cost_per_result</code> is priced per, such as <code>purchase</code> or <code>lead</code>. <code>null</code> when the campaign has no single goal.
+     */
+    @JsonIgnore
+    public Optional<String> getTargetResultEvent() {
+        if (targetResultEvent == null) {
+            return Optional.empty();
+        }
+        return targetResultEvent;
     }
 
     /**
@@ -803,15 +902,21 @@ public final class AdCampaign {
     }
 
     @JsonInclude(value = JsonInclude.Include.CUSTOM, valueFilter = NullableNonemptyFilter.class)
-    @JsonProperty("bid_type")
-    private Optional<AdCampaignBidType> _getBidType() {
-        return bidType;
+    @JsonProperty("account")
+    private Optional<StorefrontAccount> _getAccount() {
+        return account;
     }
 
     @JsonInclude(value = JsonInclude.Include.CUSTOM, valueFilter = NullableNonemptyFilter.class)
     @JsonProperty("budget_amount")
     private Optional<Double> _getBudgetAmount() {
         return budgetAmount;
+    }
+
+    @JsonInclude(value = JsonInclude.Include.CUSTOM, valueFilter = NullableNonemptyFilter.class)
+    @JsonProperty("budget_amount_local")
+    private Optional<Double> _getBudgetAmountLocal() {
+        return budgetAmountLocal;
     }
 
     @JsonInclude(value = JsonInclude.Include.CUSTOM, valueFilter = NullableNonemptyFilter.class)
@@ -887,6 +992,18 @@ public final class AdCampaign {
     }
 
     @JsonInclude(value = JsonInclude.Include.CUSTOM, valueFilter = NullableNonemptyFilter.class)
+    @JsonProperty("desired_cost_per_result")
+    private Optional<Double> _getDesiredCostPerResult() {
+        return desiredCostPerResult;
+    }
+
+    @JsonInclude(value = JsonInclude.Include.CUSTOM, valueFilter = NullableNonemptyFilter.class)
+    @JsonProperty("ends_at")
+    private Optional<String> _getEndsAt() {
+        return endsAt;
+    }
+
+    @JsonInclude(value = JsonInclude.Include.CUSTOM, valueFilter = NullableNonemptyFilter.class)
     @JsonProperty("frequency")
     private Optional<Double> _getFrequency() {
         return frequency;
@@ -896,12 +1013,6 @@ public final class AdCampaign {
     @JsonProperty("objective")
     private Optional<AdCampaignObjective> _getObjective() {
         return objective;
-    }
-
-    @JsonInclude(value = JsonInclude.Include.CUSTOM, valueFilter = NullableNonemptyFilter.class)
-    @JsonProperty("optimization_goal")
-    private Optional<String> _getOptimizationGoal() {
-        return optimizationGoal;
     }
 
     @JsonInclude(value = JsonInclude.Include.CUSTOM, valueFilter = NullableNonemptyFilter.class)
@@ -929,6 +1040,24 @@ public final class AdCampaign {
     }
 
     @JsonInclude(value = JsonInclude.Include.CUSTOM, valueFilter = NullableNonemptyFilter.class)
+    @JsonProperty("starts_at")
+    private Optional<String> _getStartsAt() {
+        return startsAt;
+    }
+
+    @JsonInclude(value = JsonInclude.Include.CUSTOM, valueFilter = NullableNonemptyFilter.class)
+    @JsonProperty("target_cost_per_result")
+    private Optional<Double> _getTargetCostPerResult() {
+        return targetCostPerResult;
+    }
+
+    @JsonInclude(value = JsonInclude.Include.CUSTOM, valueFilter = NullableNonemptyFilter.class)
+    @JsonProperty("target_result_event")
+    private Optional<String> _getTargetResultEvent() {
+        return targetResultEvent;
+    }
+
+    @JsonInclude(value = JsonInclude.Include.CUSTOM, valueFilter = NullableNonemptyFilter.class)
     @JsonProperty("unique_click_through_rate")
     private Optional<Double> _getUniqueClickThroughRate() {
         return uniqueClickThroughRate;
@@ -946,12 +1075,15 @@ public final class AdCampaign {
     }
 
     private boolean equalTo(AdCampaign other) {
-        return addedToCartValue == other.addedToCartValue
+        return account.equals(other.account)
+                && addedToCartValue == other.addedToCartValue
                 && addedToCarts == other.addedToCarts
-                && bidType.equals(other.bidType)
                 && budgetAmount.equals(other.budgetAmount)
+                && budgetAmountLocal.equals(other.budgetAmountLocal)
+                && budgetCurrency.equals(other.budgetCurrency)
                 && budgetOptimization.equals(other.budgetOptimization)
                 && budgetType.equals(other.budgetType)
+                && campaignType.equals(other.campaignType)
                 && clickThroughRate == other.clickThroughRate
                 && clicks == other.clicks
                 && completedRegistrationValue == other.completedRegistrationValue
@@ -975,15 +1107,16 @@ public final class AdCampaign {
                 && customEventCounts.equals(other.customEventCounts)
                 && customEventValues.equals(other.customEventValues)
                 && deliveryStatus.equals(other.deliveryStatus)
+                && desiredCostPerResult.equals(other.desiredCostPerResult)
+                && endsAt.equals(other.endsAt)
                 && frequency.equals(other.frequency)
                 && id.equals(other.id)
                 && impressions == other.impressions
                 && issues.equals(other.issues)
                 && leadValue == other.leadValue
                 && leads == other.leads
+                && linkClicks == other.linkClicks
                 && objective.equals(other.objective)
-                && optimizationGoal.equals(other.optimizationGoal)
-                && platform.equals(other.platform)
                 && purchaseValue == other.purchaseValue
                 && purchases == other.purchases
                 && reach == other.reach
@@ -996,9 +1129,12 @@ public final class AdCampaign {
                 && specialAdCategories.equals(other.specialAdCategories)
                 && spend == other.spend
                 && spendCurrency.equals(other.spendCurrency)
+                && startsAt.equals(other.startsAt)
                 && status.equals(other.status)
                 && submittedApplicationValue == other.submittedApplicationValue
                 && submittedApplications == other.submittedApplications
+                && targetCostPerResult.equals(other.targetCostPerResult)
+                && targetResultEvent.equals(other.targetResultEvent)
                 && title.equals(other.title)
                 && uniqueClickThroughRate.equals(other.uniqueClickThroughRate)
                 && uniqueClicks == other.uniqueClicks
@@ -1010,12 +1146,15 @@ public final class AdCampaign {
     @java.lang.Override
     public int hashCode() {
         return Objects.hash(
+                this.account,
                 this.addedToCartValue,
                 this.addedToCarts,
-                this.bidType,
                 this.budgetAmount,
+                this.budgetAmountLocal,
+                this.budgetCurrency,
                 this.budgetOptimization,
                 this.budgetType,
+                this.campaignType,
                 this.clickThroughRate,
                 this.clicks,
                 this.completedRegistrationValue,
@@ -1039,15 +1178,16 @@ public final class AdCampaign {
                 this.customEventCounts,
                 this.customEventValues,
                 this.deliveryStatus,
+                this.desiredCostPerResult,
+                this.endsAt,
                 this.frequency,
                 this.id,
                 this.impressions,
                 this.issues,
                 this.leadValue,
                 this.leads,
+                this.linkClicks,
                 this.objective,
-                this.optimizationGoal,
-                this.platform,
                 this.purchaseValue,
                 this.purchases,
                 this.reach,
@@ -1060,9 +1200,12 @@ public final class AdCampaign {
                 this.specialAdCategories,
                 this.spend,
                 this.spendCurrency,
+                this.startsAt,
                 this.status,
                 this.submittedApplicationValue,
                 this.submittedApplications,
+                this.targetCostPerResult,
+                this.targetResultEvent,
                 this.title,
                 this.uniqueClickThroughRate,
                 this.uniqueClicks,
@@ -1093,7 +1236,21 @@ public final class AdCampaign {
         /**
          * <p>Whop pixel-attributed add-to-cart events, last-click.</p>
          */
-        ClickThroughRateStage addedToCarts(double addedToCarts);
+        BudgetCurrencyStage addedToCarts(double addedToCarts);
+    }
+
+    public interface BudgetCurrencyStage {
+        /**
+         * <p>The ISO 4217 code <code>budget_amount_local</code> is in: the account's <code>ads_reporting_currency</code> preference. <code>usd</code> unless the account changed it.</p>
+         */
+        CampaignTypeStage budgetCurrency(@NotNull String budgetCurrency);
+    }
+
+    public interface CampaignTypeStage {
+        /**
+         * <p>The kind of campaign, fixed at creation. <code>standard</code> runs image and video ads; <code>search</code> shows text ads on search results for the ad groups' keywords.</p>
+         */
+        ClickThroughRateStage campaignType(@NotNull AdCampaignCampaignType campaignType);
     }
 
     public interface ClickThroughRateStage {
@@ -1168,7 +1325,7 @@ public final class AdCampaign {
 
     public interface DeliveryStatusStage {
         /**
-         * <p>Whether the campaign's ads are delivering right now, and if not, why. When several states apply at once, the highest-precedence one is returned.</p>
+         * <p>Whether the campaign's ads are delivering right now, and if not, why. Content review is in_review; a campaign waiting to start is processing. Account billing failures set payment_failed without changing the configured status. Successful payment retry clears that block and recalculates delivery. When several states apply at once, the highest-precedence one is returned.</p>
          */
         IdStage deliveryStatus(@NotNull AdCampaignDeliveryStatus deliveryStatus);
     }
@@ -1198,14 +1355,14 @@ public final class AdCampaign {
         /**
          * <p>Whop pixel-attributed leads, last-click.</p>
          */
-        PlatformStage leads(double leads);
+        LinkClicksStage leads(double leads);
     }
 
-    public interface PlatformStage {
+    public interface LinkClicksStage {
         /**
-         * <p>The ad network the campaign runs on.</p>
+         * <p>Page views on your destination from people who clicked the ad, recorded by the Whop pixel. Counted the same way on every ad platform.</p>
          */
-        PurchaseValueStage platform(@NotNull AdCampaignPlatform platform);
+        PurchaseValueStage linkClicks(double linkClicks);
     }
 
     public interface PurchaseValueStage {
@@ -1259,7 +1416,7 @@ public final class AdCampaign {
 
     public interface StatusStage {
         /**
-         * <p>The lifecycle status of the ad campaign.</p>
+         * <p>The configured lifecycle status of the ad campaign. Billing failures preserve active or paused here and set delivery_status to payment_failed.</p>
          */
         SubmittedApplicationValueStage status(@NotNull AdCampaignStatus status);
     }
@@ -1321,22 +1478,31 @@ public final class AdCampaign {
         _FinalStage additionalProperties(Map<String, Object> additionalProperties);
 
         /**
-         * <p>How delivery bids in the ad auction: <code>minimum_cost</code> gets the most results for the budget, <code>average_target</code> holds an average cost per result, and <code>maximum_target</code> never bids above a cap.</p>
+         * <p>The business running this campaign, with the name and logo its ads show.</p>
          */
-        _FinalStage bidType(Optional<AdCampaignBidType> bidType);
+        _FinalStage account(Optional<StorefrontAccount> account);
 
-        _FinalStage bidType(AdCampaignBidType bidType);
+        _FinalStage account(StorefrontAccount account);
 
-        _FinalStage bidType(Nullable<AdCampaignBidType> bidType);
+        _FinalStage account(Nullable<StorefrontAccount> account);
 
         /**
-         * <p>The campaign's budget, in the ad account's currency. <code>null</code> when each ad group sets its own budget instead.</p>
+         * <p>The campaign's budget in USD, which is what it is stored and billed in. <code>null</code> when each ad group sets its own budget instead.</p>
          */
         _FinalStage budgetAmount(Optional<Double> budgetAmount);
 
         _FinalStage budgetAmount(Double budgetAmount);
 
         _FinalStage budgetAmount(Nullable<Double> budgetAmount);
+
+        /**
+         * <p>The same budget stated in <code>budget_currency</code> at today's exchange rate, for display in the account's ads reporting currency. <code>null</code> when <code>budget_amount</code> is.</p>
+         */
+        _FinalStage budgetAmountLocal(Optional<Double> budgetAmountLocal);
+
+        _FinalStage budgetAmountLocal(Double budgetAmountLocal);
+
+        _FinalStage budgetAmountLocal(Nullable<Double> budgetAmountLocal);
 
         /**
          * <p>Which level owns the budget: the whole campaign (<code>ad_campaign</code>) or each ad group individually (<code>ad_group</code>).</p>
@@ -1465,7 +1631,25 @@ public final class AdCampaign {
         _FinalStage customEventValues(String key, Object value);
 
         /**
-         * <p>Platform-reported impressions divided by reach.</p>
+         * <p>The cost per result, in USD, the advertiser wants this campaign to achieve. A target only: it is not a bid, cost cap, or bid cap, and doesn't change how the campaign's ads bid. <code>null</code> when no target is set.</p>
+         */
+        _FinalStage desiredCostPerResult(Optional<Double> desiredCostPerResult);
+
+        _FinalStage desiredCostPerResult(Double desiredCostPerResult);
+
+        _FinalStage desiredCostPerResult(Nullable<Double> desiredCostPerResult);
+
+        /**
+         * <p>When the campaign stops delivering, as an ISO 8601 timestamp. <code>null</code> when it runs until paused, or when its ad groups set their own schedule.</p>
+         */
+        _FinalStage endsAt(Optional<String> endsAt);
+
+        _FinalStage endsAt(String endsAt);
+
+        _FinalStage endsAt(Nullable<String> endsAt);
+
+        /**
+         * <p>Impressions divided by reach.</p>
          */
         _FinalStage frequency(Optional<Double> frequency);
 
@@ -1480,22 +1664,13 @@ public final class AdCampaign {
         _FinalStage addAllIssues(List<AdPlatformIssue> issues);
 
         /**
-         * <p>The goal the campaign optimizes toward.</p>
+         * <p>The goal the campaign optimizes toward. <code>awareness</code> appears only on campaigns created before it was retired; those campaigns can't launch.</p>
          */
         _FinalStage objective(Optional<AdCampaignObjective> objective);
 
         _FinalStage objective(AdCampaignObjective objective);
 
         _FinalStage objective(Nullable<AdCampaignObjective> objective);
-
-        /**
-         * <p>The event the campaign optimizes for when a single goal is set campaign-wide. <code>null</code> when each ad group sets its own optimization_goal.</p>
-         */
-        _FinalStage optimizationGoal(Optional<String> optimizationGoal);
-
-        _FinalStage optimizationGoal(String optimizationGoal);
-
-        _FinalStage optimizationGoal(Nullable<String> optimizationGoal);
 
         /**
          * <p>The Whop pixel conversion event whose attributed count represents results — the optimization goal, or the highest-volume attributed event for campaigns that budget per ad group. Null when the goal isn't a Whop-attributed event.</p>
@@ -1540,6 +1715,33 @@ public final class AdCampaign {
         _FinalStage spendCurrency(Nullable<String> spendCurrency);
 
         /**
+         * <p>When the campaign starts delivering, as an ISO 8601 timestamp. <code>null</code> when it starts as soon as it launches, or when its ad groups set their own schedule.</p>
+         */
+        _FinalStage startsAt(Optional<String> startsAt);
+
+        _FinalStage startsAt(String startsAt);
+
+        _FinalStage startsAt(Nullable<String> startsAt);
+
+        /**
+         * <p>The desired cost per result for <code>target_result_event</code>, in USD. <code>null</code> when none is set.</p>
+         */
+        _FinalStage targetCostPerResult(Optional<Double> targetCostPerResult);
+
+        _FinalStage targetCostPerResult(Double targetCostPerResult);
+
+        _FinalStage targetCostPerResult(Nullable<Double> targetCostPerResult);
+
+        /**
+         * <p>The event <code>target_cost_per_result</code> is priced per, such as <code>purchase</code> or <code>lead</code>. <code>null</code> when the campaign has no single goal.</p>
+         */
+        _FinalStage targetResultEvent(Optional<String> targetResultEvent);
+
+        _FinalStage targetResultEvent(String targetResultEvent);
+
+        _FinalStage targetResultEvent(Nullable<String> targetResultEvent);
+
+        /**
          * <p>Unique clicks divided by impressions, between 0 and 1.</p>
          */
         _FinalStage uniqueClickThroughRate(Optional<Double> uniqueClickThroughRate);
@@ -1553,6 +1755,8 @@ public final class AdCampaign {
     public static final class Builder
             implements AddedToCartValueStage,
                     AddedToCartsStage,
+                    BudgetCurrencyStage,
+                    CampaignTypeStage,
                     ClickThroughRateStage,
                     ClicksStage,
                     CompletedRegistrationValueStage,
@@ -1568,7 +1772,7 @@ public final class AdCampaign {
                     ImpressionsStage,
                     LeadValueStage,
                     LeadsStage,
-                    PlatformStage,
+                    LinkClicksStage,
                     PurchaseValueStage,
                     PurchasesStage,
                     ReachStage,
@@ -1588,6 +1792,10 @@ public final class AdCampaign {
         private double addedToCartValue;
 
         private double addedToCarts;
+
+        private String budgetCurrency;
+
+        private AdCampaignCampaignType campaignType;
 
         private double clickThroughRate;
 
@@ -1619,7 +1827,7 @@ public final class AdCampaign {
 
         private double leads;
 
-        private AdCampaignPlatform platform;
+        private double linkClicks;
 
         private double purchaseValue;
 
@@ -1653,6 +1861,12 @@ public final class AdCampaign {
 
         private Optional<Double> uniqueClickThroughRate = Optional.empty();
 
+        private Optional<String> targetResultEvent = Optional.empty();
+
+        private Optional<Double> targetCostPerResult = Optional.empty();
+
+        private Optional<String> startsAt = Optional.empty();
+
         private Optional<String> spendCurrency = Optional.empty();
 
         private List<AdCampaignSpecialAdCategoriesItem> specialAdCategories = new ArrayList<>();
@@ -1663,13 +1877,15 @@ public final class AdCampaign {
 
         private Optional<AdCampaignResultEvent> resultEvent = Optional.empty();
 
-        private Optional<String> optimizationGoal = Optional.empty();
-
         private Optional<AdCampaignObjective> objective = Optional.empty();
 
         private List<AdPlatformIssue> issues = new ArrayList<>();
 
         private Optional<Double> frequency = Optional.empty();
+
+        private Optional<String> endsAt = Optional.empty();
+
+        private Optional<Double> desiredCostPerResult = Optional.empty();
 
         private Map<String, Object> customEventValues = new LinkedHashMap<>();
 
@@ -1699,23 +1915,27 @@ public final class AdCampaign {
 
         private Optional<AdCampaignBudgetOptimization> budgetOptimization = Optional.empty();
 
+        private Optional<Double> budgetAmountLocal = Optional.empty();
+
         private Optional<Double> budgetAmount = Optional.empty();
 
-        private Optional<AdCampaignBidType> bidType = Optional.empty();
+        private Optional<StorefrontAccount> account = Optional.empty();
 
-        @JsonAnySetter
         private Map<String, Object> additionalProperties = new HashMap<>();
 
         private Builder() {}
 
         @java.lang.Override
         public Builder from(AdCampaign other) {
+            account(other.getAccount());
             addedToCartValue(other.getAddedToCartValue());
             addedToCarts(other.getAddedToCarts());
-            bidType(other.getBidType());
             budgetAmount(other.getBudgetAmount());
+            budgetAmountLocal(other.getBudgetAmountLocal());
+            budgetCurrency(other.getBudgetCurrency());
             budgetOptimization(other.getBudgetOptimization());
             budgetType(other.getBudgetType());
+            campaignType(other.getCampaignType());
             clickThroughRate(other.getClickThroughRate());
             clicks(other.getClicks());
             completedRegistrationValue(other.getCompletedRegistrationValue());
@@ -1739,15 +1959,16 @@ public final class AdCampaign {
             customEventCounts(other.getCustomEventCounts());
             customEventValues(other.getCustomEventValues());
             deliveryStatus(other.getDeliveryStatus());
+            desiredCostPerResult(other.getDesiredCostPerResult());
+            endsAt(other.getEndsAt());
             frequency(other.getFrequency());
             id(other.getId());
             impressions(other.getImpressions());
             issues(other.getIssues());
             leadValue(other.getLeadValue());
             leads(other.getLeads());
+            linkClicks(other.getLinkClicks());
             objective(other.getObjective());
-            optimizationGoal(other.getOptimizationGoal());
-            platform(other.getPlatform());
             purchaseValue(other.getPurchaseValue());
             purchases(other.getPurchases());
             reach(other.getReach());
@@ -1760,9 +1981,12 @@ public final class AdCampaign {
             specialAdCategories(other.getSpecialAdCategories());
             spend(other.getSpend());
             spendCurrency(other.getSpendCurrency());
+            startsAt(other.getStartsAt());
             status(other.getStatus());
             submittedApplicationValue(other.getSubmittedApplicationValue());
             submittedApplications(other.getSubmittedApplications());
+            targetCostPerResult(other.getTargetCostPerResult());
+            targetResultEvent(other.getTargetResultEvent());
             title(other.getTitle());
             uniqueClickThroughRate(other.getUniqueClickThroughRate());
             uniqueClicks(other.getUniqueClicks());
@@ -1773,7 +1997,6 @@ public final class AdCampaign {
         }
 
         /**
-         * <p>USD value attributed to add-to-cart events. Sums the value sent with each event, normalized to USD; events without a value contribute 0.</p>
          * <p>USD value attributed to add-to-cart events. Sums the value sent with each event, normalized to USD; events without a value contribute 0.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
@@ -1786,18 +2009,38 @@ public final class AdCampaign {
 
         /**
          * <p>Whop pixel-attributed add-to-cart events, last-click.</p>
-         * <p>Whop pixel-attributed add-to-cart events, last-click.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
         @JsonSetter("added_to_carts")
-        public ClickThroughRateStage addedToCarts(double addedToCarts) {
+        public BudgetCurrencyStage addedToCarts(double addedToCarts) {
             this.addedToCarts = addedToCarts;
             return this;
         }
 
         /**
-         * <p>Clicks divided by impressions, between 0 and 1.</p>
+         * <p>The ISO 4217 code <code>budget_amount_local</code> is in: the account's <code>ads_reporting_currency</code> preference. <code>usd</code> unless the account changed it.</p>
+         * @return Reference to {@code this} so that method calls can be chained together.
+         */
+        @java.lang.Override
+        @JsonSetter("budget_currency")
+        public CampaignTypeStage budgetCurrency(@NotNull String budgetCurrency) {
+            this.budgetCurrency = Objects.requireNonNull(budgetCurrency, "budgetCurrency must not be null");
+            return this;
+        }
+
+        /**
+         * <p>The kind of campaign, fixed at creation. <code>standard</code> runs image and video ads; <code>search</code> shows text ads on search results for the ad groups' keywords.</p>
+         * @return Reference to {@code this} so that method calls can be chained together.
+         */
+        @java.lang.Override
+        @JsonSetter("campaign_type")
+        public ClickThroughRateStage campaignType(@NotNull AdCampaignCampaignType campaignType) {
+            this.campaignType = Objects.requireNonNull(campaignType, "campaignType must not be null");
+            return this;
+        }
+
+        /**
          * <p>Clicks divided by impressions, between 0 and 1.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
@@ -1810,7 +2053,6 @@ public final class AdCampaign {
 
         /**
          * <p>The number of clicks.</p>
-         * <p>The number of clicks.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
@@ -1821,7 +2063,6 @@ public final class AdCampaign {
         }
 
         /**
-         * <p>USD value attributed to complete-registration events. Sums the value sent with each event, normalized to USD; events without a value contribute 0.</p>
          * <p>USD value attributed to complete-registration events. Sums the value sent with each event, normalized to USD; events without a value contribute 0.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
@@ -1834,7 +2075,6 @@ public final class AdCampaign {
 
         /**
          * <p>Whop pixel-attributed complete-registration events, last-click.</p>
-         * <p>Whop pixel-attributed complete-registration events, last-click.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
@@ -1845,7 +2085,6 @@ public final class AdCampaign {
         }
 
         /**
-         * <p>USD value attributed to contact events. Sums the value sent with each event, normalized to USD; events without a value contribute 0.</p>
          * <p>USD value attributed to contact events. Sums the value sent with each event, normalized to USD; events without a value contribute 0.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
@@ -1858,7 +2097,6 @@ public final class AdCampaign {
 
         /**
          * <p>Whop pixel-attributed contact events, last-click.</p>
-         * <p>Whop pixel-attributed contact events, last-click.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
@@ -1869,7 +2107,6 @@ public final class AdCampaign {
         }
 
         /**
-         * <p>Spend divided by clicks; 0 when there are no clicks.</p>
          * <p>Spend divided by clicks; 0 when there are no clicks.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
@@ -1882,7 +2119,6 @@ public final class AdCampaign {
 
         /**
          * <p>Spend per 1,000 impressions; 0 when there are no impressions.</p>
-         * <p>Spend per 1,000 impressions; 0 when there are no impressions.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
@@ -1893,7 +2129,6 @@ public final class AdCampaign {
         }
 
         /**
-         * <p>When the campaign was created, as an ISO 8601 timestamp.</p>
          * <p>When the campaign was created, as an ISO 8601 timestamp.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
@@ -1906,7 +2141,6 @@ public final class AdCampaign {
 
         /**
          * <p>Whop pixel-attributed custom (merchant-defined) conversion events, last-click, across all custom event names.</p>
-         * <p>Whop pixel-attributed custom (merchant-defined) conversion events, last-click, across all custom event names.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
@@ -1917,8 +2151,7 @@ public final class AdCampaign {
         }
 
         /**
-         * <p>Whether the campaign's ads are delivering right now, and if not, why. When several states apply at once, the highest-precedence one is returned.</p>
-         * <p>Whether the campaign's ads are delivering right now, and if not, why. When several states apply at once, the highest-precedence one is returned.</p>
+         * <p>Whether the campaign's ads are delivering right now, and if not, why. Content review is in_review; a campaign waiting to start is processing. Account billing failures set payment_failed without changing the configured status. Successful payment retry clears that block and recalculates delivery. When several states apply at once, the highest-precedence one is returned.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
@@ -1929,7 +2162,6 @@ public final class AdCampaign {
         }
 
         /**
-         * <p>Unique identifier for the ad campaign, prefixed <code>adcamp_</code>.</p>
          * <p>Unique identifier for the ad campaign, prefixed <code>adcamp_</code>.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
@@ -1942,7 +2174,6 @@ public final class AdCampaign {
 
         /**
          * <p>The number of impressions.</p>
-         * <p>The number of impressions.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
@@ -1953,7 +2184,6 @@ public final class AdCampaign {
         }
 
         /**
-         * <p>USD value attributed to lead events. Sums the value sent with each event, normalized to USD; events without a value contribute 0.</p>
          * <p>USD value attributed to lead events. Sums the value sent with each event, normalized to USD; events without a value contribute 0.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
@@ -1966,30 +2196,27 @@ public final class AdCampaign {
 
         /**
          * <p>Whop pixel-attributed leads, last-click.</p>
-         * <p>Whop pixel-attributed leads, last-click.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
         @JsonSetter("leads")
-        public PlatformStage leads(double leads) {
+        public LinkClicksStage leads(double leads) {
             this.leads = leads;
             return this;
         }
 
         /**
-         * <p>The ad network the campaign runs on.</p>
-         * <p>The ad network the campaign runs on.</p>
+         * <p>Page views on your destination from people who clicked the ad, recorded by the Whop pixel. Counted the same way on every ad platform.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
-        @JsonSetter("platform")
-        public PurchaseValueStage platform(@NotNull AdCampaignPlatform platform) {
-            this.platform = Objects.requireNonNull(platform, "platform must not be null");
+        @JsonSetter("link_clicks")
+        public PurchaseValueStage linkClicks(double linkClicks) {
+            this.linkClicks = linkClicks;
             return this;
         }
 
         /**
-         * <p>USD value of pixel-attributed purchases.</p>
          * <p>USD value of pixel-attributed purchases.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
@@ -2002,7 +2229,6 @@ public final class AdCampaign {
 
         /**
          * <p>Whop pixel-attributed purchases, last-click.</p>
-         * <p>Whop pixel-attributed purchases, last-click.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
@@ -2013,7 +2239,6 @@ public final class AdCampaign {
         }
 
         /**
-         * <p>The number of unique people who saw this.</p>
          * <p>The number of unique people who saw this.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
@@ -2026,7 +2251,6 @@ public final class AdCampaign {
 
         /**
          * <p>Purchase value divided by spend, both in USD (a currency-neutral ratio); 0 when there is no spend.</p>
-         * <p>Purchase value divided by spend, both in USD (a currency-neutral ratio); 0 when there is no spend.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
@@ -2037,7 +2261,6 @@ public final class AdCampaign {
         }
 
         /**
-         * <p>USD value attributed to schedule events. Sums the value sent with each event, normalized to USD; events without a value contribute 0.</p>
          * <p>USD value attributed to schedule events. Sums the value sent with each event, normalized to USD; events without a value contribute 0.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
@@ -2050,7 +2273,6 @@ public final class AdCampaign {
 
         /**
          * <p>Whop pixel-attributed schedule events, last-click.</p>
-         * <p>Whop pixel-attributed schedule events, last-click.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
@@ -2062,7 +2284,6 @@ public final class AdCampaign {
 
         /**
          * <p>The amount charged, in spend_currency.</p>
-         * <p>The amount charged, in spend_currency.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
@@ -2073,8 +2294,7 @@ public final class AdCampaign {
         }
 
         /**
-         * <p>The lifecycle status of the ad campaign.</p>
-         * <p>The lifecycle status of the ad campaign.</p>
+         * <p>The configured lifecycle status of the ad campaign. Billing failures preserve active or paused here and set delivery_status to payment_failed.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
@@ -2085,7 +2305,6 @@ public final class AdCampaign {
         }
 
         /**
-         * <p>USD value attributed to submit-application events. Sums the value sent with each event, normalized to USD; events without a value contribute 0.</p>
          * <p>USD value attributed to submit-application events. Sums the value sent with each event, normalized to USD; events without a value contribute 0.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
@@ -2098,7 +2317,6 @@ public final class AdCampaign {
 
         /**
          * <p>Whop pixel-attributed submit-application events, last-click.</p>
-         * <p>Whop pixel-attributed submit-application events, last-click.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
@@ -2109,7 +2327,6 @@ public final class AdCampaign {
         }
 
         /**
-         * <p>Display name of the ad campaign.</p>
          * <p>Display name of the ad campaign.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
@@ -2122,7 +2339,6 @@ public final class AdCampaign {
 
         /**
          * <p>People who clicked, reported by the Whop pixel, counted once per person.</p>
-         * <p>People who clicked, reported by the Whop pixel, counted once per person.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
@@ -2133,7 +2349,6 @@ public final class AdCampaign {
         }
 
         /**
-         * <p>When the campaign was last updated, as an ISO 8601 timestamp.</p>
          * <p>When the campaign was last updated, as an ISO 8601 timestamp.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
@@ -2146,7 +2361,6 @@ public final class AdCampaign {
 
         /**
          * <p>USD value attributed to view-content events. Sums the value sent with each event, normalized to USD; events without a value contribute 0.</p>
-         * <p>USD value attributed to view-content events. Sums the value sent with each event, normalized to USD; events without a value contribute 0.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
@@ -2157,7 +2371,6 @@ public final class AdCampaign {
         }
 
         /**
-         * <p>Whop pixel-attributed view-content events, last-click.</p>
          * <p>Whop pixel-attributed view-content events, last-click.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
@@ -2201,6 +2414,114 @@ public final class AdCampaign {
         @JsonSetter(value = "unique_click_through_rate", nulls = Nulls.SKIP)
         public _FinalStage uniqueClickThroughRate(Optional<Double> uniqueClickThroughRate) {
             this.uniqueClickThroughRate = uniqueClickThroughRate;
+            return this;
+        }
+
+        /**
+         * <p>The event <code>target_cost_per_result</code> is priced per, such as <code>purchase</code> or <code>lead</code>. <code>null</code> when the campaign has no single goal.</p>
+         * @return Reference to {@code this} so that method calls can be chained together.
+         */
+        @java.lang.Override
+        public _FinalStage targetResultEvent(Nullable<String> targetResultEvent) {
+            if (targetResultEvent.isNull()) {
+                this.targetResultEvent = null;
+            } else if (targetResultEvent.isEmpty()) {
+                this.targetResultEvent = Optional.empty();
+            } else {
+                this.targetResultEvent = Optional.of(targetResultEvent.get());
+            }
+            return this;
+        }
+
+        /**
+         * <p>The event <code>target_cost_per_result</code> is priced per, such as <code>purchase</code> or <code>lead</code>. <code>null</code> when the campaign has no single goal.</p>
+         * @return Reference to {@code this} so that method calls can be chained together.
+         */
+        @java.lang.Override
+        public _FinalStage targetResultEvent(String targetResultEvent) {
+            this.targetResultEvent = Optional.ofNullable(targetResultEvent);
+            return this;
+        }
+
+        /**
+         * <p>The event <code>target_cost_per_result</code> is priced per, such as <code>purchase</code> or <code>lead</code>. <code>null</code> when the campaign has no single goal.</p>
+         */
+        @java.lang.Override
+        @JsonSetter(value = "target_result_event", nulls = Nulls.SKIP)
+        public _FinalStage targetResultEvent(Optional<String> targetResultEvent) {
+            this.targetResultEvent = targetResultEvent;
+            return this;
+        }
+
+        /**
+         * <p>The desired cost per result for <code>target_result_event</code>, in USD. <code>null</code> when none is set.</p>
+         * @return Reference to {@code this} so that method calls can be chained together.
+         */
+        @java.lang.Override
+        public _FinalStage targetCostPerResult(Nullable<Double> targetCostPerResult) {
+            if (targetCostPerResult.isNull()) {
+                this.targetCostPerResult = null;
+            } else if (targetCostPerResult.isEmpty()) {
+                this.targetCostPerResult = Optional.empty();
+            } else {
+                this.targetCostPerResult = Optional.of(targetCostPerResult.get());
+            }
+            return this;
+        }
+
+        /**
+         * <p>The desired cost per result for <code>target_result_event</code>, in USD. <code>null</code> when none is set.</p>
+         * @return Reference to {@code this} so that method calls can be chained together.
+         */
+        @java.lang.Override
+        public _FinalStage targetCostPerResult(Double targetCostPerResult) {
+            this.targetCostPerResult = Optional.ofNullable(targetCostPerResult);
+            return this;
+        }
+
+        /**
+         * <p>The desired cost per result for <code>target_result_event</code>, in USD. <code>null</code> when none is set.</p>
+         */
+        @java.lang.Override
+        @JsonSetter(value = "target_cost_per_result", nulls = Nulls.SKIP)
+        public _FinalStage targetCostPerResult(Optional<Double> targetCostPerResult) {
+            this.targetCostPerResult = targetCostPerResult;
+            return this;
+        }
+
+        /**
+         * <p>When the campaign starts delivering, as an ISO 8601 timestamp. <code>null</code> when it starts as soon as it launches, or when its ad groups set their own schedule.</p>
+         * @return Reference to {@code this} so that method calls can be chained together.
+         */
+        @java.lang.Override
+        public _FinalStage startsAt(Nullable<String> startsAt) {
+            if (startsAt.isNull()) {
+                this.startsAt = null;
+            } else if (startsAt.isEmpty()) {
+                this.startsAt = Optional.empty();
+            } else {
+                this.startsAt = Optional.of(startsAt.get());
+            }
+            return this;
+        }
+
+        /**
+         * <p>When the campaign starts delivering, as an ISO 8601 timestamp. <code>null</code> when it starts as soon as it launches, or when its ad groups set their own schedule.</p>
+         * @return Reference to {@code this} so that method calls can be chained together.
+         */
+        @java.lang.Override
+        public _FinalStage startsAt(String startsAt) {
+            this.startsAt = Optional.ofNullable(startsAt);
+            return this;
+        }
+
+        /**
+         * <p>When the campaign starts delivering, as an ISO 8601 timestamp. <code>null</code> when it starts as soon as it launches, or when its ad groups set their own schedule.</p>
+         */
+        @java.lang.Override
+        @JsonSetter(value = "starts_at", nulls = Nulls.SKIP)
+        public _FinalStage startsAt(Optional<String> startsAt) {
+            this.startsAt = startsAt;
             return this;
         }
 
@@ -2373,43 +2694,7 @@ public final class AdCampaign {
         }
 
         /**
-         * <p>The event the campaign optimizes for when a single goal is set campaign-wide. <code>null</code> when each ad group sets its own optimization_goal.</p>
-         * @return Reference to {@code this} so that method calls can be chained together.
-         */
-        @java.lang.Override
-        public _FinalStage optimizationGoal(Nullable<String> optimizationGoal) {
-            if (optimizationGoal.isNull()) {
-                this.optimizationGoal = null;
-            } else if (optimizationGoal.isEmpty()) {
-                this.optimizationGoal = Optional.empty();
-            } else {
-                this.optimizationGoal = Optional.of(optimizationGoal.get());
-            }
-            return this;
-        }
-
-        /**
-         * <p>The event the campaign optimizes for when a single goal is set campaign-wide. <code>null</code> when each ad group sets its own optimization_goal.</p>
-         * @return Reference to {@code this} so that method calls can be chained together.
-         */
-        @java.lang.Override
-        public _FinalStage optimizationGoal(String optimizationGoal) {
-            this.optimizationGoal = Optional.ofNullable(optimizationGoal);
-            return this;
-        }
-
-        /**
-         * <p>The event the campaign optimizes for when a single goal is set campaign-wide. <code>null</code> when each ad group sets its own optimization_goal.</p>
-         */
-        @java.lang.Override
-        @JsonSetter(value = "optimization_goal", nulls = Nulls.SKIP)
-        public _FinalStage optimizationGoal(Optional<String> optimizationGoal) {
-            this.optimizationGoal = optimizationGoal;
-            return this;
-        }
-
-        /**
-         * <p>The goal the campaign optimizes toward.</p>
+         * <p>The goal the campaign optimizes toward. <code>awareness</code> appears only on campaigns created before it was retired; those campaigns can't launch.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
@@ -2425,7 +2710,7 @@ public final class AdCampaign {
         }
 
         /**
-         * <p>The goal the campaign optimizes toward.</p>
+         * <p>The goal the campaign optimizes toward. <code>awareness</code> appears only on campaigns created before it was retired; those campaigns can't launch.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
@@ -2435,7 +2720,7 @@ public final class AdCampaign {
         }
 
         /**
-         * <p>The goal the campaign optimizes toward.</p>
+         * <p>The goal the campaign optimizes toward. <code>awareness</code> appears only on campaigns created before it was retired; those campaigns can't launch.</p>
          */
         @java.lang.Override
         @JsonSetter(value = "objective", nulls = Nulls.SKIP)
@@ -2469,7 +2754,7 @@ public final class AdCampaign {
         }
 
         /**
-         * <p>Platform-reported impressions divided by reach.</p>
+         * <p>Impressions divided by reach.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
@@ -2485,7 +2770,7 @@ public final class AdCampaign {
         }
 
         /**
-         * <p>Platform-reported impressions divided by reach.</p>
+         * <p>Impressions divided by reach.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
@@ -2495,12 +2780,84 @@ public final class AdCampaign {
         }
 
         /**
-         * <p>Platform-reported impressions divided by reach.</p>
+         * <p>Impressions divided by reach.</p>
          */
         @java.lang.Override
         @JsonSetter(value = "frequency", nulls = Nulls.SKIP)
         public _FinalStage frequency(Optional<Double> frequency) {
             this.frequency = frequency;
+            return this;
+        }
+
+        /**
+         * <p>When the campaign stops delivering, as an ISO 8601 timestamp. <code>null</code> when it runs until paused, or when its ad groups set their own schedule.</p>
+         * @return Reference to {@code this} so that method calls can be chained together.
+         */
+        @java.lang.Override
+        public _FinalStage endsAt(Nullable<String> endsAt) {
+            if (endsAt.isNull()) {
+                this.endsAt = null;
+            } else if (endsAt.isEmpty()) {
+                this.endsAt = Optional.empty();
+            } else {
+                this.endsAt = Optional.of(endsAt.get());
+            }
+            return this;
+        }
+
+        /**
+         * <p>When the campaign stops delivering, as an ISO 8601 timestamp. <code>null</code> when it runs until paused, or when its ad groups set their own schedule.</p>
+         * @return Reference to {@code this} so that method calls can be chained together.
+         */
+        @java.lang.Override
+        public _FinalStage endsAt(String endsAt) {
+            this.endsAt = Optional.ofNullable(endsAt);
+            return this;
+        }
+
+        /**
+         * <p>When the campaign stops delivering, as an ISO 8601 timestamp. <code>null</code> when it runs until paused, or when its ad groups set their own schedule.</p>
+         */
+        @java.lang.Override
+        @JsonSetter(value = "ends_at", nulls = Nulls.SKIP)
+        public _FinalStage endsAt(Optional<String> endsAt) {
+            this.endsAt = endsAt;
+            return this;
+        }
+
+        /**
+         * <p>The cost per result, in USD, the advertiser wants this campaign to achieve. A target only: it is not a bid, cost cap, or bid cap, and doesn't change how the campaign's ads bid. <code>null</code> when no target is set.</p>
+         * @return Reference to {@code this} so that method calls can be chained together.
+         */
+        @java.lang.Override
+        public _FinalStage desiredCostPerResult(Nullable<Double> desiredCostPerResult) {
+            if (desiredCostPerResult.isNull()) {
+                this.desiredCostPerResult = null;
+            } else if (desiredCostPerResult.isEmpty()) {
+                this.desiredCostPerResult = Optional.empty();
+            } else {
+                this.desiredCostPerResult = Optional.of(desiredCostPerResult.get());
+            }
+            return this;
+        }
+
+        /**
+         * <p>The cost per result, in USD, the advertiser wants this campaign to achieve. A target only: it is not a bid, cost cap, or bid cap, and doesn't change how the campaign's ads bid. <code>null</code> when no target is set.</p>
+         * @return Reference to {@code this} so that method calls can be chained together.
+         */
+        @java.lang.Override
+        public _FinalStage desiredCostPerResult(Double desiredCostPerResult) {
+            this.desiredCostPerResult = Optional.ofNullable(desiredCostPerResult);
+            return this;
+        }
+
+        /**
+         * <p>The cost per result, in USD, the advertiser wants this campaign to achieve. A target only: it is not a bid, cost cap, or bid cap, and doesn't change how the campaign's ads bid. <code>null</code> when no target is set.</p>
+         */
+        @java.lang.Override
+        @JsonSetter(value = "desired_cost_per_result", nulls = Nulls.SKIP)
+        public _FinalStage desiredCostPerResult(Optional<Double> desiredCostPerResult) {
+            this.desiredCostPerResult = desiredCostPerResult;
             return this;
         }
 
@@ -3007,7 +3364,43 @@ public final class AdCampaign {
         }
 
         /**
-         * <p>The campaign's budget, in the ad account's currency. <code>null</code> when each ad group sets its own budget instead.</p>
+         * <p>The same budget stated in <code>budget_currency</code> at today's exchange rate, for display in the account's ads reporting currency. <code>null</code> when <code>budget_amount</code> is.</p>
+         * @return Reference to {@code this} so that method calls can be chained together.
+         */
+        @java.lang.Override
+        public _FinalStage budgetAmountLocal(Nullable<Double> budgetAmountLocal) {
+            if (budgetAmountLocal.isNull()) {
+                this.budgetAmountLocal = null;
+            } else if (budgetAmountLocal.isEmpty()) {
+                this.budgetAmountLocal = Optional.empty();
+            } else {
+                this.budgetAmountLocal = Optional.of(budgetAmountLocal.get());
+            }
+            return this;
+        }
+
+        /**
+         * <p>The same budget stated in <code>budget_currency</code> at today's exchange rate, for display in the account's ads reporting currency. <code>null</code> when <code>budget_amount</code> is.</p>
+         * @return Reference to {@code this} so that method calls can be chained together.
+         */
+        @java.lang.Override
+        public _FinalStage budgetAmountLocal(Double budgetAmountLocal) {
+            this.budgetAmountLocal = Optional.ofNullable(budgetAmountLocal);
+            return this;
+        }
+
+        /**
+         * <p>The same budget stated in <code>budget_currency</code> at today's exchange rate, for display in the account's ads reporting currency. <code>null</code> when <code>budget_amount</code> is.</p>
+         */
+        @java.lang.Override
+        @JsonSetter(value = "budget_amount_local", nulls = Nulls.SKIP)
+        public _FinalStage budgetAmountLocal(Optional<Double> budgetAmountLocal) {
+            this.budgetAmountLocal = budgetAmountLocal;
+            return this;
+        }
+
+        /**
+         * <p>The campaign's budget in USD, which is what it is stored and billed in. <code>null</code> when each ad group sets its own budget instead.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
@@ -3023,7 +3416,7 @@ public final class AdCampaign {
         }
 
         /**
-         * <p>The campaign's budget, in the ad account's currency. <code>null</code> when each ad group sets its own budget instead.</p>
+         * <p>The campaign's budget in USD, which is what it is stored and billed in. <code>null</code> when each ad group sets its own budget instead.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
@@ -3033,7 +3426,7 @@ public final class AdCampaign {
         }
 
         /**
-         * <p>The campaign's budget, in the ad account's currency. <code>null</code> when each ad group sets its own budget instead.</p>
+         * <p>The campaign's budget in USD, which is what it is stored and billed in. <code>null</code> when each ad group sets its own budget instead.</p>
          */
         @java.lang.Override
         @JsonSetter(value = "budget_amount", nulls = Nulls.SKIP)
@@ -3043,50 +3436,53 @@ public final class AdCampaign {
         }
 
         /**
-         * <p>How delivery bids in the ad auction: <code>minimum_cost</code> gets the most results for the budget, <code>average_target</code> holds an average cost per result, and <code>maximum_target</code> never bids above a cap.</p>
+         * <p>The business running this campaign, with the name and logo its ads show.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
-        public _FinalStage bidType(Nullable<AdCampaignBidType> bidType) {
-            if (bidType.isNull()) {
-                this.bidType = null;
-            } else if (bidType.isEmpty()) {
-                this.bidType = Optional.empty();
+        public _FinalStage account(Nullable<StorefrontAccount> account) {
+            if (account.isNull()) {
+                this.account = null;
+            } else if (account.isEmpty()) {
+                this.account = Optional.empty();
             } else {
-                this.bidType = Optional.of(bidType.get());
+                this.account = Optional.of(account.get());
             }
             return this;
         }
 
         /**
-         * <p>How delivery bids in the ad auction: <code>minimum_cost</code> gets the most results for the budget, <code>average_target</code> holds an average cost per result, and <code>maximum_target</code> never bids above a cap.</p>
+         * <p>The business running this campaign, with the name and logo its ads show.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
-        public _FinalStage bidType(AdCampaignBidType bidType) {
-            this.bidType = Optional.ofNullable(bidType);
+        public _FinalStage account(StorefrontAccount account) {
+            this.account = Optional.ofNullable(account);
             return this;
         }
 
         /**
-         * <p>How delivery bids in the ad auction: <code>minimum_cost</code> gets the most results for the budget, <code>average_target</code> holds an average cost per result, and <code>maximum_target</code> never bids above a cap.</p>
+         * <p>The business running this campaign, with the name and logo its ads show.</p>
          */
         @java.lang.Override
-        @JsonSetter(value = "bid_type", nulls = Nulls.SKIP)
-        public _FinalStage bidType(Optional<AdCampaignBidType> bidType) {
-            this.bidType = bidType;
+        @JsonSetter(value = "account", nulls = Nulls.SKIP)
+        public _FinalStage account(Optional<StorefrontAccount> account) {
+            this.account = account;
             return this;
         }
 
         @java.lang.Override
         public AdCampaign build() {
             return new AdCampaign(
+                    account,
                     addedToCartValue,
                     addedToCarts,
-                    bidType,
                     budgetAmount,
+                    budgetAmountLocal,
+                    budgetCurrency,
                     budgetOptimization,
                     budgetType,
+                    campaignType,
                     clickThroughRate,
                     clicks,
                     completedRegistrationValue,
@@ -3110,15 +3506,16 @@ public final class AdCampaign {
                     customEventCounts,
                     customEventValues,
                     deliveryStatus,
+                    desiredCostPerResult,
+                    endsAt,
                     frequency,
                     id,
                     impressions,
                     issues,
                     leadValue,
                     leads,
+                    linkClicks,
                     objective,
-                    optimizationGoal,
-                    platform,
                     purchaseValue,
                     purchases,
                     reach,
@@ -3131,9 +3528,12 @@ public final class AdCampaign {
                     specialAdCategories,
                     spend,
                     spendCurrency,
+                    startsAt,
                     status,
                     submittedApplicationValue,
                     submittedApplications,
+                    targetCostPerResult,
+                    targetResultEvent,
                     title,
                     uniqueClickThroughRate,
                     uniqueClicks,
@@ -3141,6 +3541,79 @@ public final class AdCampaign {
                     viewedContentValue,
                     viewedContents,
                     additionalProperties);
+        }
+
+        @JsonAnySetter
+        private void putAdditionalPropertyFromJson(String key, Object value) {
+            if (key.equalsIgnoreCase("account")
+                    || key.equalsIgnoreCase("added_to_cart_value")
+                    || key.equalsIgnoreCase("added_to_carts")
+                    || key.equalsIgnoreCase("budget_amount")
+                    || key.equalsIgnoreCase("budget_amount_local")
+                    || key.equalsIgnoreCase("budget_currency")
+                    || key.equalsIgnoreCase("budget_optimization")
+                    || key.equalsIgnoreCase("budget_type")
+                    || key.equalsIgnoreCase("campaign_type")
+                    || key.equalsIgnoreCase("click_through_rate")
+                    || key.equalsIgnoreCase("clicks")
+                    || key.equalsIgnoreCase("completed_registration_value")
+                    || key.equalsIgnoreCase("completed_registrations")
+                    || key.equalsIgnoreCase("contact_value")
+                    || key.equalsIgnoreCase("contacts")
+                    || key.equalsIgnoreCase("cost_per_added_to_cart")
+                    || key.equalsIgnoreCase("cost_per_click")
+                    || key.equalsIgnoreCase("cost_per_completed_registration")
+                    || key.equalsIgnoreCase("cost_per_contact")
+                    || key.equalsIgnoreCase("cost_per_lead")
+                    || key.equalsIgnoreCase("cost_per_mille")
+                    || key.equalsIgnoreCase("cost_per_purchase")
+                    || key.equalsIgnoreCase("cost_per_result")
+                    || key.equalsIgnoreCase("cost_per_schedule")
+                    || key.equalsIgnoreCase("cost_per_submitted_application")
+                    || key.equalsIgnoreCase("cost_per_unique_click")
+                    || key.equalsIgnoreCase("cost_per_viewed_content")
+                    || key.equalsIgnoreCase("created_at")
+                    || key.equalsIgnoreCase("custom_conversions")
+                    || key.equalsIgnoreCase("custom_event_counts")
+                    || key.equalsIgnoreCase("custom_event_values")
+                    || key.equalsIgnoreCase("delivery_status")
+                    || key.equalsIgnoreCase("desired_cost_per_result")
+                    || key.equalsIgnoreCase("ends_at")
+                    || key.equalsIgnoreCase("frequency")
+                    || key.equalsIgnoreCase("id")
+                    || key.equalsIgnoreCase("impressions")
+                    || key.equalsIgnoreCase("issues")
+                    || key.equalsIgnoreCase("lead_value")
+                    || key.equalsIgnoreCase("leads")
+                    || key.equalsIgnoreCase("link_clicks")
+                    || key.equalsIgnoreCase("objective")
+                    || key.equalsIgnoreCase("purchase_value")
+                    || key.equalsIgnoreCase("purchases")
+                    || key.equalsIgnoreCase("reach")
+                    || key.equalsIgnoreCase("result_event")
+                    || key.equalsIgnoreCase("result_event_name")
+                    || key.equalsIgnoreCase("results")
+                    || key.equalsIgnoreCase("return_on_ad_spend")
+                    || key.equalsIgnoreCase("schedule_value")
+                    || key.equalsIgnoreCase("schedules")
+                    || key.equalsIgnoreCase("special_ad_categories")
+                    || key.equalsIgnoreCase("spend")
+                    || key.equalsIgnoreCase("spend_currency")
+                    || key.equalsIgnoreCase("starts_at")
+                    || key.equalsIgnoreCase("status")
+                    || key.equalsIgnoreCase("submitted_application_value")
+                    || key.equalsIgnoreCase("submitted_applications")
+                    || key.equalsIgnoreCase("target_cost_per_result")
+                    || key.equalsIgnoreCase("target_result_event")
+                    || key.equalsIgnoreCase("title")
+                    || key.equalsIgnoreCase("unique_click_through_rate")
+                    || key.equalsIgnoreCase("unique_clicks")
+                    || key.equalsIgnoreCase("updated_at")
+                    || key.equalsIgnoreCase("viewed_content_value")
+                    || key.equalsIgnoreCase("viewed_contents")) {
+                return;
+            }
+            this.additionalProperties.put(key, value);
         }
 
         @java.lang.Override

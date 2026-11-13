@@ -192,7 +192,6 @@ public final class ForumPostAttachmentsItem {
 
         private Optional<String> contentType = Optional.empty();
 
-        @JsonAnySetter
         private Map<String, Object> additionalProperties = new HashMap<>();
 
         private Builder() {}
@@ -207,7 +206,6 @@ public final class ForumPostAttachmentsItem {
         }
 
         /**
-         * <p>Represents a unique identifier that is Base64 obfuscated. It is often used to refetch an object or as key for a cache. The ID type appears in a JSON response as a String; however, it is not intended to be human-readable. When expected as an input type, any string (such as <code>&quot;VXNlci0xMA==&quot;</code>) or integer (such as <code>4</code>) input value will be accepted as an ID.</p>
          * <p>Represents a unique identifier that is Base64 obfuscated. It is often used to refetch an object or as key for a cache. The ID type appears in a JSON response as a String; however, it is not intended to be human-readable. When expected as an input type, any string (such as <code>&quot;VXNlci0xMA==&quot;</code>) or integer (such as <code>4</code>) input value will be accepted as an ID.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
@@ -329,6 +327,17 @@ public final class ForumPostAttachmentsItem {
         @java.lang.Override
         public ForumPostAttachmentsItem build() {
             return new ForumPostAttachmentsItem(contentType, filename, id, url, additionalProperties);
+        }
+
+        @JsonAnySetter
+        private void putAdditionalPropertyFromJson(String key, Object value) {
+            if (key.equalsIgnoreCase("content_type")
+                    || key.equalsIgnoreCase("filename")
+                    || key.equalsIgnoreCase("id")
+                    || key.equalsIgnoreCase("url")) {
+                return;
+            }
+            this.additionalProperties.put(key, value);
         }
 
         @java.lang.Override

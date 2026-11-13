@@ -12,6 +12,7 @@ import com.fasterxml.jackson.annotation.JsonSetter;
 import com.fasterxml.jackson.annotation.Nulls;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.whop.api.core.ObjectMappers;
+import com.whop.api.types.File;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -22,6 +23,16 @@ import org.jetbrains.annotations.NotNull;
 @JsonInclude(JsonInclude.Include.NON_ABSENT)
 @JsonDeserialize(builder = CreateVerificationsResponseRequestedInformationItem.Builder.class)
 public final class CreateVerificationsResponseRequestedInformationItem {
+    private final Optional<String> actionUrl;
+
+    private final Optional<String> alternativeDocumentLabel;
+
+    private final Optional<String> detailsLabel;
+
+    private final Optional<Boolean> detailsRequired;
+
+    private final Optional<List<String>> detailsVisibleFor;
+
     private final Optional<List<CreateVerificationsResponseRequestedInformationItemErrorsItem>> errors;
 
     private final String id;
@@ -34,27 +45,101 @@ public final class CreateVerificationsResponseRequestedInformationItem {
 
     private final String requirement;
 
+    private final Optional<CreateVerificationsResponseRequestedInformationItemResponseType> responseType;
+
+    private final Optional<CreateVerificationsResponseRequestedInformationItemSelectionMode> selectionMode;
+
+    private final Optional<List<File>> supportingDocuments;
+
+    private final Optional<Boolean> supportingFilesExplanationAllowed;
+
+    private final Optional<Boolean> supportingFilesRequired;
+
+    private final Optional<List<String>> supportingFilesVisibleFor;
+
     private final String type;
 
     private final Map<String, Object> additionalProperties;
 
     private CreateVerificationsResponseRequestedInformationItem(
+            Optional<String> actionUrl,
+            Optional<String> alternativeDocumentLabel,
+            Optional<String> detailsLabel,
+            Optional<Boolean> detailsRequired,
+            Optional<List<String>> detailsVisibleFor,
             Optional<List<CreateVerificationsResponseRequestedInformationItemErrorsItem>> errors,
             String id,
             String label,
             Optional<Boolean> optional,
             Optional<List<String>> options,
             String requirement,
+            Optional<CreateVerificationsResponseRequestedInformationItemResponseType> responseType,
+            Optional<CreateVerificationsResponseRequestedInformationItemSelectionMode> selectionMode,
+            Optional<List<File>> supportingDocuments,
+            Optional<Boolean> supportingFilesExplanationAllowed,
+            Optional<Boolean> supportingFilesRequired,
+            Optional<List<String>> supportingFilesVisibleFor,
             String type,
             Map<String, Object> additionalProperties) {
+        this.actionUrl = actionUrl;
+        this.alternativeDocumentLabel = alternativeDocumentLabel;
+        this.detailsLabel = detailsLabel;
+        this.detailsRequired = detailsRequired;
+        this.detailsVisibleFor = detailsVisibleFor;
         this.errors = errors;
         this.id = id;
         this.label = label;
         this.optional = optional;
         this.options = options;
         this.requirement = requirement;
+        this.responseType = responseType;
+        this.selectionMode = selectionMode;
+        this.supportingDocuments = supportingDocuments;
+        this.supportingFilesExplanationAllowed = supportingFilesExplanationAllowed;
+        this.supportingFilesRequired = supportingFilesRequired;
+        this.supportingFilesVisibleFor = supportingFilesVisibleFor;
         this.type = type;
         this.additionalProperties = additionalProperties;
+    }
+
+    /**
+     * @return URL for a related action, such as completing liveness verification or viewing a payment. Absent when no action is available.
+     */
+    @JsonProperty("action_url")
+    public Optional<String> getActionUrl() {
+        return actionUrl;
+    }
+
+    /**
+     * @return A document that answers this item in place of <code>value</code>, such as an IRS EIN letter when the EIN could not be matched. Send its pages in <code>files</code>, with or without a corrected <code>value</code>. Absent when only <code>value</code> is accepted.
+     */
+    @JsonProperty("alternative_document_label")
+    public Optional<String> getAlternativeDocumentLabel() {
+        return alternativeDocumentLabel;
+    }
+
+    /**
+     * @return Follow-up prompt shown with this requirement.
+     */
+    @JsonProperty("details_label")
+    public Optional<String> getDetailsLabel() {
+        return detailsLabel;
+    }
+
+    /**
+     * @return Whether the follow-up response is required when visible.
+     */
+    @JsonProperty("details_required")
+    public Optional<Boolean> getDetailsRequired() {
+        return detailsRequired;
+    }
+
+    /**
+     * @return Selected option values that make the follow-up prompt visible.
+     */
+    @JsonProperty("details_visible_for")
+    public Optional<List<String>> getDetailsVisibleFor() {
+        return detailsVisibleFor;
     }
 
     /**
@@ -106,7 +191,55 @@ public final class CreateVerificationsResponseRequestedInformationItem {
     }
 
     /**
-     * @return What to send as the answer, so you never have to infer it: <code>files</code> (a document, as a list of its pages), <code>id_document</code> (send <code>documents</code> with the slot keys for the ID you are uploading), <code>text</code>, <code>date</code>, <code>phone</code> or <code>select</code> (send <code>value</code>), or <code>address</code> (send <code>address</code>).
+     * @return Optional native input format for a text response.
+     */
+    @JsonProperty("response_type")
+    public Optional<CreateVerificationsResponseRequestedInformationItemResponseType> getResponseType() {
+        return responseType;
+    }
+
+    /**
+     * @return Whether a question with <code>options</code> accepts one value or multiple values.
+     */
+    @JsonProperty("selection_mode")
+    public Optional<CreateVerificationsResponseRequestedInformationItemSelectionMode> getSelectionMode() {
+        return selectionMode;
+    }
+
+    /**
+     * @return Documents supplied with the requirement for context.
+     */
+    @JsonProperty("supporting_documents")
+    public Optional<List<File>> getSupportingDocuments() {
+        return supportingDocuments;
+    }
+
+    /**
+     * @return Whether a written explanation may replace required supporting files.
+     */
+    @JsonProperty("supporting_files_explanation_allowed")
+    public Optional<Boolean> getSupportingFilesExplanationAllowed() {
+        return supportingFilesExplanationAllowed;
+    }
+
+    /**
+     * @return Whether this requirement also needs supporting files.
+     */
+    @JsonProperty("supporting_files_required")
+    public Optional<Boolean> getSupportingFilesRequired() {
+        return supportingFilesRequired;
+    }
+
+    /**
+     * @return Selected option values that make the supporting-file input visible.
+     */
+    @JsonProperty("supporting_files_visible_for")
+    public Optional<List<String>> getSupportingFilesVisibleFor() {
+        return supportingFilesVisibleFor;
+    }
+
+    /**
+     * @return What to send as the answer, so you never have to infer it: <code>files</code> (a document, as a list of its pages), <code>id_document</code> (send <code>documents</code> with the slot keys for the ID you are uploading), <code>text</code>, <code>date</code>, <code>phone</code> or <code>select</code> (send <code>value</code>), <code>text_with_files</code> (send <code>value</code> and optional <code>files</code>), <code>address</code> (send <code>address</code>), or <code>liveness</code> (open <code>action_url</code>, then send <code>value</code> as <code>true</code> after completion).
      */
     @JsonProperty("type")
     public String getType() {
@@ -126,18 +259,47 @@ public final class CreateVerificationsResponseRequestedInformationItem {
     }
 
     private boolean equalTo(CreateVerificationsResponseRequestedInformationItem other) {
-        return errors.equals(other.errors)
+        return actionUrl.equals(other.actionUrl)
+                && alternativeDocumentLabel.equals(other.alternativeDocumentLabel)
+                && detailsLabel.equals(other.detailsLabel)
+                && detailsRequired.equals(other.detailsRequired)
+                && detailsVisibleFor.equals(other.detailsVisibleFor)
+                && errors.equals(other.errors)
                 && id.equals(other.id)
                 && label.equals(other.label)
                 && optional.equals(other.optional)
                 && options.equals(other.options)
                 && requirement.equals(other.requirement)
+                && responseType.equals(other.responseType)
+                && selectionMode.equals(other.selectionMode)
+                && supportingDocuments.equals(other.supportingDocuments)
+                && supportingFilesExplanationAllowed.equals(other.supportingFilesExplanationAllowed)
+                && supportingFilesRequired.equals(other.supportingFilesRequired)
+                && supportingFilesVisibleFor.equals(other.supportingFilesVisibleFor)
                 && type.equals(other.type);
     }
 
     @java.lang.Override
     public int hashCode() {
-        return Objects.hash(this.errors, this.id, this.label, this.optional, this.options, this.requirement, this.type);
+        return Objects.hash(
+                this.actionUrl,
+                this.alternativeDocumentLabel,
+                this.detailsLabel,
+                this.detailsRequired,
+                this.detailsVisibleFor,
+                this.errors,
+                this.id,
+                this.label,
+                this.optional,
+                this.options,
+                this.requirement,
+                this.responseType,
+                this.selectionMode,
+                this.supportingDocuments,
+                this.supportingFilesExplanationAllowed,
+                this.supportingFilesRequired,
+                this.supportingFilesVisibleFor,
+                this.type);
     }
 
     @java.lang.Override
@@ -174,7 +336,7 @@ public final class CreateVerificationsResponseRequestedInformationItem {
 
     public interface TypeStage {
         /**
-         * <p>What to send as the answer, so you never have to infer it: <code>files</code> (a document, as a list of its pages), <code>id_document</code> (send <code>documents</code> with the slot keys for the ID you are uploading), <code>text</code>, <code>date</code>, <code>phone</code> or <code>select</code> (send <code>value</code>), or <code>address</code> (send <code>address</code>).</p>
+         * <p>What to send as the answer, so you never have to infer it: <code>files</code> (a document, as a list of its pages), <code>id_document</code> (send <code>documents</code> with the slot keys for the ID you are uploading), <code>text</code>, <code>date</code>, <code>phone</code> or <code>select</code> (send <code>value</code>), <code>text_with_files</code> (send <code>value</code> and optional <code>files</code>), <code>address</code> (send <code>address</code>), or <code>liveness</code> (open <code>action_url</code>, then send <code>value</code> as <code>true</code> after completion).</p>
          */
         _FinalStage type(@NotNull String type);
     }
@@ -185,6 +347,41 @@ public final class CreateVerificationsResponseRequestedInformationItem {
         _FinalStage additionalProperty(String key, Object value);
 
         _FinalStage additionalProperties(Map<String, Object> additionalProperties);
+
+        /**
+         * <p>URL for a related action, such as completing liveness verification or viewing a payment. Absent when no action is available.</p>
+         */
+        _FinalStage actionUrl(Optional<String> actionUrl);
+
+        _FinalStage actionUrl(String actionUrl);
+
+        /**
+         * <p>A document that answers this item in place of <code>value</code>, such as an IRS EIN letter when the EIN could not be matched. Send its pages in <code>files</code>, with or without a corrected <code>value</code>. Absent when only <code>value</code> is accepted.</p>
+         */
+        _FinalStage alternativeDocumentLabel(Optional<String> alternativeDocumentLabel);
+
+        _FinalStage alternativeDocumentLabel(String alternativeDocumentLabel);
+
+        /**
+         * <p>Follow-up prompt shown with this requirement.</p>
+         */
+        _FinalStage detailsLabel(Optional<String> detailsLabel);
+
+        _FinalStage detailsLabel(String detailsLabel);
+
+        /**
+         * <p>Whether the follow-up response is required when visible.</p>
+         */
+        _FinalStage detailsRequired(Optional<Boolean> detailsRequired);
+
+        _FinalStage detailsRequired(Boolean detailsRequired);
+
+        /**
+         * <p>Selected option values that make the follow-up prompt visible.</p>
+         */
+        _FinalStage detailsVisibleFor(Optional<List<String>> detailsVisibleFor);
+
+        _FinalStage detailsVisibleFor(List<String> detailsVisibleFor);
 
         /**
          * <p>Present after a rejected submission.</p>
@@ -206,6 +403,50 @@ public final class CreateVerificationsResponseRequestedInformationItem {
         _FinalStage options(Optional<List<String>> options);
 
         _FinalStage options(List<String> options);
+
+        /**
+         * <p>Optional native input format for a text response.</p>
+         */
+        _FinalStage responseType(
+                Optional<CreateVerificationsResponseRequestedInformationItemResponseType> responseType);
+
+        _FinalStage responseType(CreateVerificationsResponseRequestedInformationItemResponseType responseType);
+
+        /**
+         * <p>Whether a question with <code>options</code> accepts one value or multiple values.</p>
+         */
+        _FinalStage selectionMode(
+                Optional<CreateVerificationsResponseRequestedInformationItemSelectionMode> selectionMode);
+
+        _FinalStage selectionMode(CreateVerificationsResponseRequestedInformationItemSelectionMode selectionMode);
+
+        /**
+         * <p>Documents supplied with the requirement for context.</p>
+         */
+        _FinalStage supportingDocuments(Optional<List<File>> supportingDocuments);
+
+        _FinalStage supportingDocuments(List<File> supportingDocuments);
+
+        /**
+         * <p>Whether a written explanation may replace required supporting files.</p>
+         */
+        _FinalStage supportingFilesExplanationAllowed(Optional<Boolean> supportingFilesExplanationAllowed);
+
+        _FinalStage supportingFilesExplanationAllowed(Boolean supportingFilesExplanationAllowed);
+
+        /**
+         * <p>Whether this requirement also needs supporting files.</p>
+         */
+        _FinalStage supportingFilesRequired(Optional<Boolean> supportingFilesRequired);
+
+        _FinalStage supportingFilesRequired(Boolean supportingFilesRequired);
+
+        /**
+         * <p>Selected option values that make the supporting-file input visible.</p>
+         */
+        _FinalStage supportingFilesVisibleFor(Optional<List<String>> supportingFilesVisibleFor);
+
+        _FinalStage supportingFilesVisibleFor(List<String> supportingFilesVisibleFor);
     }
 
     @JsonIgnoreProperties(ignoreUnknown = true)
@@ -218,31 +459,64 @@ public final class CreateVerificationsResponseRequestedInformationItem {
 
         private String type;
 
+        private Optional<List<String>> supportingFilesVisibleFor = Optional.empty();
+
+        private Optional<Boolean> supportingFilesRequired = Optional.empty();
+
+        private Optional<Boolean> supportingFilesExplanationAllowed = Optional.empty();
+
+        private Optional<List<File>> supportingDocuments = Optional.empty();
+
+        private Optional<CreateVerificationsResponseRequestedInformationItemSelectionMode> selectionMode =
+                Optional.empty();
+
+        private Optional<CreateVerificationsResponseRequestedInformationItemResponseType> responseType =
+                Optional.empty();
+
         private Optional<List<String>> options = Optional.empty();
 
         private Optional<Boolean> optional = Optional.empty();
 
         private Optional<List<CreateVerificationsResponseRequestedInformationItemErrorsItem>> errors = Optional.empty();
 
-        @JsonAnySetter
+        private Optional<List<String>> detailsVisibleFor = Optional.empty();
+
+        private Optional<Boolean> detailsRequired = Optional.empty();
+
+        private Optional<String> detailsLabel = Optional.empty();
+
+        private Optional<String> alternativeDocumentLabel = Optional.empty();
+
+        private Optional<String> actionUrl = Optional.empty();
+
         private Map<String, Object> additionalProperties = new HashMap<>();
 
         private Builder() {}
 
         @java.lang.Override
         public Builder from(CreateVerificationsResponseRequestedInformationItem other) {
+            actionUrl(other.getActionUrl());
+            alternativeDocumentLabel(other.getAlternativeDocumentLabel());
+            detailsLabel(other.getDetailsLabel());
+            detailsRequired(other.getDetailsRequired());
+            detailsVisibleFor(other.getDetailsVisibleFor());
             errors(other.getErrors());
             id(other.getId());
             label(other.getLabel());
             optional(other.getOptional());
             options(other.getOptions());
             requirement(other.getRequirement());
+            responseType(other.getResponseType());
+            selectionMode(other.getSelectionMode());
+            supportingDocuments(other.getSupportingDocuments());
+            supportingFilesExplanationAllowed(other.getSupportingFilesExplanationAllowed());
+            supportingFilesRequired(other.getSupportingFilesRequired());
+            supportingFilesVisibleFor(other.getSupportingFilesVisibleFor());
             type(other.getType());
             return this;
         }
 
         /**
-         * <p>Requested information item ID, prefixed <code>inrqi_</code>.</p>
          * <p>Requested information item ID, prefixed <code>inrqi_</code>.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
@@ -255,7 +529,6 @@ public final class CreateVerificationsResponseRequestedInformationItem {
 
         /**
          * <p>Instruction to show the user. Carries the reviewer's note verbatim when there is one.</p>
-         * <p>Instruction to show the user. Carries the reviewer's note verbatim when there is one.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
@@ -267,7 +540,6 @@ public final class CreateVerificationsResponseRequestedInformationItem {
 
         /**
          * <p>What is needed: a document name such as <code>bank_statement</code>, or a field key such as <code>ssn</code> or <code>identity_document</code>. Handle unrecognized values by <code>type</code>.</p>
-         * <p>What is needed: a document name such as <code>bank_statement</code>, or a field key such as <code>ssn</code> or <code>identity_document</code>. Handle unrecognized values by <code>type</code>.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
@@ -278,14 +550,136 @@ public final class CreateVerificationsResponseRequestedInformationItem {
         }
 
         /**
-         * <p>What to send as the answer, so you never have to infer it: <code>files</code> (a document, as a list of its pages), <code>id_document</code> (send <code>documents</code> with the slot keys for the ID you are uploading), <code>text</code>, <code>date</code>, <code>phone</code> or <code>select</code> (send <code>value</code>), or <code>address</code> (send <code>address</code>).</p>
-         * <p>What to send as the answer, so you never have to infer it: <code>files</code> (a document, as a list of its pages), <code>id_document</code> (send <code>documents</code> with the slot keys for the ID you are uploading), <code>text</code>, <code>date</code>, <code>phone</code> or <code>select</code> (send <code>value</code>), or <code>address</code> (send <code>address</code>).</p>
+         * <p>What to send as the answer, so you never have to infer it: <code>files</code> (a document, as a list of its pages), <code>id_document</code> (send <code>documents</code> with the slot keys for the ID you are uploading), <code>text</code>, <code>date</code>, <code>phone</code> or <code>select</code> (send <code>value</code>), <code>text_with_files</code> (send <code>value</code> and optional <code>files</code>), <code>address</code> (send <code>address</code>), or <code>liveness</code> (open <code>action_url</code>, then send <code>value</code> as <code>true</code> after completion).</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
         @JsonSetter("type")
         public _FinalStage type(@NotNull String type) {
             this.type = Objects.requireNonNull(type, "type must not be null");
+            return this;
+        }
+
+        /**
+         * <p>Selected option values that make the supporting-file input visible.</p>
+         * @return Reference to {@code this} so that method calls can be chained together.
+         */
+        @java.lang.Override
+        public _FinalStage supportingFilesVisibleFor(List<String> supportingFilesVisibleFor) {
+            this.supportingFilesVisibleFor = Optional.ofNullable(supportingFilesVisibleFor);
+            return this;
+        }
+
+        /**
+         * <p>Selected option values that make the supporting-file input visible.</p>
+         */
+        @java.lang.Override
+        @JsonSetter(value = "supporting_files_visible_for", nulls = Nulls.SKIP)
+        public _FinalStage supportingFilesVisibleFor(Optional<List<String>> supportingFilesVisibleFor) {
+            this.supportingFilesVisibleFor = supportingFilesVisibleFor;
+            return this;
+        }
+
+        /**
+         * <p>Whether this requirement also needs supporting files.</p>
+         * @return Reference to {@code this} so that method calls can be chained together.
+         */
+        @java.lang.Override
+        public _FinalStage supportingFilesRequired(Boolean supportingFilesRequired) {
+            this.supportingFilesRequired = Optional.ofNullable(supportingFilesRequired);
+            return this;
+        }
+
+        /**
+         * <p>Whether this requirement also needs supporting files.</p>
+         */
+        @java.lang.Override
+        @JsonSetter(value = "supporting_files_required", nulls = Nulls.SKIP)
+        public _FinalStage supportingFilesRequired(Optional<Boolean> supportingFilesRequired) {
+            this.supportingFilesRequired = supportingFilesRequired;
+            return this;
+        }
+
+        /**
+         * <p>Whether a written explanation may replace required supporting files.</p>
+         * @return Reference to {@code this} so that method calls can be chained together.
+         */
+        @java.lang.Override
+        public _FinalStage supportingFilesExplanationAllowed(Boolean supportingFilesExplanationAllowed) {
+            this.supportingFilesExplanationAllowed = Optional.ofNullable(supportingFilesExplanationAllowed);
+            return this;
+        }
+
+        /**
+         * <p>Whether a written explanation may replace required supporting files.</p>
+         */
+        @java.lang.Override
+        @JsonSetter(value = "supporting_files_explanation_allowed", nulls = Nulls.SKIP)
+        public _FinalStage supportingFilesExplanationAllowed(Optional<Boolean> supportingFilesExplanationAllowed) {
+            this.supportingFilesExplanationAllowed = supportingFilesExplanationAllowed;
+            return this;
+        }
+
+        /**
+         * <p>Documents supplied with the requirement for context.</p>
+         * @return Reference to {@code this} so that method calls can be chained together.
+         */
+        @java.lang.Override
+        public _FinalStage supportingDocuments(List<File> supportingDocuments) {
+            this.supportingDocuments = Optional.ofNullable(supportingDocuments);
+            return this;
+        }
+
+        /**
+         * <p>Documents supplied with the requirement for context.</p>
+         */
+        @java.lang.Override
+        @JsonSetter(value = "supporting_documents", nulls = Nulls.SKIP)
+        public _FinalStage supportingDocuments(Optional<List<File>> supportingDocuments) {
+            this.supportingDocuments = supportingDocuments;
+            return this;
+        }
+
+        /**
+         * <p>Whether a question with <code>options</code> accepts one value or multiple values.</p>
+         * @return Reference to {@code this} so that method calls can be chained together.
+         */
+        @java.lang.Override
+        public _FinalStage selectionMode(
+                CreateVerificationsResponseRequestedInformationItemSelectionMode selectionMode) {
+            this.selectionMode = Optional.ofNullable(selectionMode);
+            return this;
+        }
+
+        /**
+         * <p>Whether a question with <code>options</code> accepts one value or multiple values.</p>
+         */
+        @java.lang.Override
+        @JsonSetter(value = "selection_mode", nulls = Nulls.SKIP)
+        public _FinalStage selectionMode(
+                Optional<CreateVerificationsResponseRequestedInformationItemSelectionMode> selectionMode) {
+            this.selectionMode = selectionMode;
+            return this;
+        }
+
+        /**
+         * <p>Optional native input format for a text response.</p>
+         * @return Reference to {@code this} so that method calls can be chained together.
+         */
+        @java.lang.Override
+        public _FinalStage responseType(CreateVerificationsResponseRequestedInformationItemResponseType responseType) {
+            this.responseType = Optional.ofNullable(responseType);
+            return this;
+        }
+
+        /**
+         * <p>Optional native input format for a text response.</p>
+         */
+        @java.lang.Override
+        @JsonSetter(value = "response_type", nulls = Nulls.SKIP)
+        public _FinalStage responseType(
+                Optional<CreateVerificationsResponseRequestedInformationItemResponseType> responseType) {
+            this.responseType = responseType;
             return this;
         }
 
@@ -350,10 +744,153 @@ public final class CreateVerificationsResponseRequestedInformationItem {
             return this;
         }
 
+        /**
+         * <p>Selected option values that make the follow-up prompt visible.</p>
+         * @return Reference to {@code this} so that method calls can be chained together.
+         */
+        @java.lang.Override
+        public _FinalStage detailsVisibleFor(List<String> detailsVisibleFor) {
+            this.detailsVisibleFor = Optional.ofNullable(detailsVisibleFor);
+            return this;
+        }
+
+        /**
+         * <p>Selected option values that make the follow-up prompt visible.</p>
+         */
+        @java.lang.Override
+        @JsonSetter(value = "details_visible_for", nulls = Nulls.SKIP)
+        public _FinalStage detailsVisibleFor(Optional<List<String>> detailsVisibleFor) {
+            this.detailsVisibleFor = detailsVisibleFor;
+            return this;
+        }
+
+        /**
+         * <p>Whether the follow-up response is required when visible.</p>
+         * @return Reference to {@code this} so that method calls can be chained together.
+         */
+        @java.lang.Override
+        public _FinalStage detailsRequired(Boolean detailsRequired) {
+            this.detailsRequired = Optional.ofNullable(detailsRequired);
+            return this;
+        }
+
+        /**
+         * <p>Whether the follow-up response is required when visible.</p>
+         */
+        @java.lang.Override
+        @JsonSetter(value = "details_required", nulls = Nulls.SKIP)
+        public _FinalStage detailsRequired(Optional<Boolean> detailsRequired) {
+            this.detailsRequired = detailsRequired;
+            return this;
+        }
+
+        /**
+         * <p>Follow-up prompt shown with this requirement.</p>
+         * @return Reference to {@code this} so that method calls can be chained together.
+         */
+        @java.lang.Override
+        public _FinalStage detailsLabel(String detailsLabel) {
+            this.detailsLabel = Optional.ofNullable(detailsLabel);
+            return this;
+        }
+
+        /**
+         * <p>Follow-up prompt shown with this requirement.</p>
+         */
+        @java.lang.Override
+        @JsonSetter(value = "details_label", nulls = Nulls.SKIP)
+        public _FinalStage detailsLabel(Optional<String> detailsLabel) {
+            this.detailsLabel = detailsLabel;
+            return this;
+        }
+
+        /**
+         * <p>A document that answers this item in place of <code>value</code>, such as an IRS EIN letter when the EIN could not be matched. Send its pages in <code>files</code>, with or without a corrected <code>value</code>. Absent when only <code>value</code> is accepted.</p>
+         * @return Reference to {@code this} so that method calls can be chained together.
+         */
+        @java.lang.Override
+        public _FinalStage alternativeDocumentLabel(String alternativeDocumentLabel) {
+            this.alternativeDocumentLabel = Optional.ofNullable(alternativeDocumentLabel);
+            return this;
+        }
+
+        /**
+         * <p>A document that answers this item in place of <code>value</code>, such as an IRS EIN letter when the EIN could not be matched. Send its pages in <code>files</code>, with or without a corrected <code>value</code>. Absent when only <code>value</code> is accepted.</p>
+         */
+        @java.lang.Override
+        @JsonSetter(value = "alternative_document_label", nulls = Nulls.SKIP)
+        public _FinalStage alternativeDocumentLabel(Optional<String> alternativeDocumentLabel) {
+            this.alternativeDocumentLabel = alternativeDocumentLabel;
+            return this;
+        }
+
+        /**
+         * <p>URL for a related action, such as completing liveness verification or viewing a payment. Absent when no action is available.</p>
+         * @return Reference to {@code this} so that method calls can be chained together.
+         */
+        @java.lang.Override
+        public _FinalStage actionUrl(String actionUrl) {
+            this.actionUrl = Optional.ofNullable(actionUrl);
+            return this;
+        }
+
+        /**
+         * <p>URL for a related action, such as completing liveness verification or viewing a payment. Absent when no action is available.</p>
+         */
+        @java.lang.Override
+        @JsonSetter(value = "action_url", nulls = Nulls.SKIP)
+        public _FinalStage actionUrl(Optional<String> actionUrl) {
+            this.actionUrl = actionUrl;
+            return this;
+        }
+
         @java.lang.Override
         public CreateVerificationsResponseRequestedInformationItem build() {
             return new CreateVerificationsResponseRequestedInformationItem(
-                    errors, id, label, optional, options, requirement, type, additionalProperties);
+                    actionUrl,
+                    alternativeDocumentLabel,
+                    detailsLabel,
+                    detailsRequired,
+                    detailsVisibleFor,
+                    errors,
+                    id,
+                    label,
+                    optional,
+                    options,
+                    requirement,
+                    responseType,
+                    selectionMode,
+                    supportingDocuments,
+                    supportingFilesExplanationAllowed,
+                    supportingFilesRequired,
+                    supportingFilesVisibleFor,
+                    type,
+                    additionalProperties);
+        }
+
+        @JsonAnySetter
+        private void putAdditionalPropertyFromJson(String key, Object value) {
+            if (key.equalsIgnoreCase("action_url")
+                    || key.equalsIgnoreCase("alternative_document_label")
+                    || key.equalsIgnoreCase("details_label")
+                    || key.equalsIgnoreCase("details_required")
+                    || key.equalsIgnoreCase("details_visible_for")
+                    || key.equalsIgnoreCase("errors")
+                    || key.equalsIgnoreCase("id")
+                    || key.equalsIgnoreCase("label")
+                    || key.equalsIgnoreCase("optional")
+                    || key.equalsIgnoreCase("options")
+                    || key.equalsIgnoreCase("requirement")
+                    || key.equalsIgnoreCase("response_type")
+                    || key.equalsIgnoreCase("selection_mode")
+                    || key.equalsIgnoreCase("supporting_documents")
+                    || key.equalsIgnoreCase("supporting_files_explanation_allowed")
+                    || key.equalsIgnoreCase("supporting_files_required")
+                    || key.equalsIgnoreCase("supporting_files_visible_for")
+                    || key.equalsIgnoreCase("type")) {
+                return;
+            }
+            this.additionalProperties.put(key, value);
         }
 
         @java.lang.Override

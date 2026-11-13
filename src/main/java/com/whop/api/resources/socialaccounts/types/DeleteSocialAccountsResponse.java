@@ -31,17 +31,11 @@ public final class DeleteSocialAccountsResponse {
         this.additionalProperties = additionalProperties;
     }
 
-    /**
-     * @return Always true.
-     */
     @JsonProperty("deleted")
     public boolean getDeleted() {
         return deleted;
     }
 
-    /**
-     * @return ID of the disconnected social account.
-     */
     @JsonProperty("id")
     public String getId() {
         return id;
@@ -77,18 +71,12 @@ public final class DeleteSocialAccountsResponse {
     }
 
     public interface DeletedStage {
-        /**
-         * <p>Always true.</p>
-         */
         IdStage deleted(boolean deleted);
 
         Builder from(DeleteSocialAccountsResponse other);
     }
 
     public interface IdStage {
-        /**
-         * <p>ID of the disconnected social account.</p>
-         */
         _FinalStage id(@NotNull String id);
     }
 
@@ -106,7 +94,6 @@ public final class DeleteSocialAccountsResponse {
 
         private String id;
 
-        @JsonAnySetter
         private Map<String, Object> additionalProperties = new HashMap<>();
 
         private Builder() {}
@@ -118,11 +105,6 @@ public final class DeleteSocialAccountsResponse {
             return this;
         }
 
-        /**
-         * <p>Always true.</p>
-         * <p>Always true.</p>
-         * @return Reference to {@code this} so that method calls can be chained together.
-         */
         @java.lang.Override
         @JsonSetter("deleted")
         public IdStage deleted(boolean deleted) {
@@ -130,11 +112,6 @@ public final class DeleteSocialAccountsResponse {
             return this;
         }
 
-        /**
-         * <p>ID of the disconnected social account.</p>
-         * <p>ID of the disconnected social account.</p>
-         * @return Reference to {@code this} so that method calls can be chained together.
-         */
         @java.lang.Override
         @JsonSetter("id")
         public _FinalStage id(@NotNull String id) {
@@ -145,6 +122,14 @@ public final class DeleteSocialAccountsResponse {
         @java.lang.Override
         public DeleteSocialAccountsResponse build() {
             return new DeleteSocialAccountsResponse(deleted, id, additionalProperties);
+        }
+
+        @JsonAnySetter
+        private void putAdditionalPropertyFromJson(String key, Object value) {
+            if (key.equalsIgnoreCase("deleted") || key.equalsIgnoreCase("id")) {
+                return;
+            }
+            this.additionalProperties.put(key, value);
         }
 
         @java.lang.Override

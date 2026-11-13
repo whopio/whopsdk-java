@@ -22,19 +22,31 @@ import java.util.Optional;
 public final class RetrieveCardTransactionsRequest {
     private final Optional<String> accountId;
 
+    private final Optional<String> userId;
+
     private final Map<String, Object> additionalProperties;
 
-    private RetrieveCardTransactionsRequest(Optional<String> accountId, Map<String, Object> additionalProperties) {
+    private RetrieveCardTransactionsRequest(
+            Optional<String> accountId, Optional<String> userId, Map<String, Object> additionalProperties) {
         this.accountId = accountId;
+        this.userId = userId;
         this.additionalProperties = additionalProperties;
     }
 
     /**
-     * @return The account that owns the transaction, prefixed <code>biz_</code>. Defaults to the credential's account.
+     * @return The account that owns the transaction, prefixed <code>biz_</code>. Provide this or <code>user_id</code>. Defaults to the credential's account.
      */
     @JsonProperty("account_id")
     public Optional<String> getAccountId() {
         return accountId;
+    }
+
+    /**
+     * @return The user that owns the transaction, prefixed <code>user_</code>. Provide this or <code>account_id</code>. Only that user can read it.
+     */
+    @JsonProperty("user_id")
+    public Optional<String> getUserId() {
+        return userId;
     }
 
     @java.lang.Override
@@ -49,12 +61,12 @@ public final class RetrieveCardTransactionsRequest {
     }
 
     private boolean equalTo(RetrieveCardTransactionsRequest other) {
-        return accountId.equals(other.accountId);
+        return accountId.equals(other.accountId) && userId.equals(other.userId);
     }
 
     @java.lang.Override
     public int hashCode() {
-        return Objects.hash(this.accountId);
+        return Objects.hash(this.accountId, this.userId);
     }
 
     @java.lang.Override
@@ -70,18 +82,20 @@ public final class RetrieveCardTransactionsRequest {
     public static final class Builder {
         private Optional<String> accountId = Optional.empty();
 
-        @JsonAnySetter
+        private Optional<String> userId = Optional.empty();
+
         private Map<String, Object> additionalProperties = new HashMap<>();
 
         private Builder() {}
 
         public Builder from(RetrieveCardTransactionsRequest other) {
             accountId(other.getAccountId());
+            userId(other.getUserId());
             return this;
         }
 
         /**
-         * <p>The account that owns the transaction, prefixed <code>biz_</code>. Defaults to the credential's account.</p>
+         * <p>The account that owns the transaction, prefixed <code>biz_</code>. Provide this or <code>user_id</code>. Defaults to the credential's account.</p>
          */
         @JsonSetter(value = "account_id", nulls = Nulls.SKIP)
         public Builder accountId(Optional<String> accountId) {
@@ -94,8 +108,30 @@ public final class RetrieveCardTransactionsRequest {
             return this;
         }
 
+        /**
+         * <p>The user that owns the transaction, prefixed <code>user_</code>. Provide this or <code>account_id</code>. Only that user can read it.</p>
+         */
+        @JsonSetter(value = "user_id", nulls = Nulls.SKIP)
+        public Builder userId(Optional<String> userId) {
+            this.userId = userId;
+            return this;
+        }
+
+        public Builder userId(String userId) {
+            this.userId = Optional.ofNullable(userId);
+            return this;
+        }
+
         public RetrieveCardTransactionsRequest build() {
-            return new RetrieveCardTransactionsRequest(accountId, additionalProperties);
+            return new RetrieveCardTransactionsRequest(accountId, userId, additionalProperties);
+        }
+
+        @JsonAnySetter
+        private void putAdditionalPropertyFromJson(String key, Object value) {
+            if (key.equalsIgnoreCase("account_id") || key.equalsIgnoreCase("user_id")) {
+                return;
+            }
+            this.additionalProperties.put(key, value);
         }
 
         public Builder additionalProperty(String key, Object value) {

@@ -181,7 +181,6 @@ public final class AccountReserveType {
 
         private Optional<Integer> holdPeriodDays = Optional.empty();
 
-        @JsonAnySetter
         private Map<String, Object> additionalProperties = new HashMap<>();
 
         private Builder() {}
@@ -197,7 +196,6 @@ public final class AccountReserveType {
 
         /**
          * <p>Amount held for this reason, in native units, as a decimal string.</p>
-         * <p>Amount held for this reason, in native units, as a decimal string.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
@@ -208,7 +206,6 @@ public final class AccountReserveType {
         }
 
         /**
-         * <p>Why this part of the balance is held. <code>regular</code> is the account's standing risk reserve; <code>bnpl</code> and <code>sequra</code> cover buy-now-pay-later settlement; <code>preshipment_hold</code> covers a physical order that has not shipped yet; <code>fraud_hold</code> is held while activity is reviewed.</p>
          * <p>Why this part of the balance is held. <code>regular</code> is the account's standing risk reserve; <code>bnpl</code> and <code>sequra</code> cover buy-now-pay-later settlement; <code>preshipment_hold</code> covers a physical order that has not shipped yet; <code>fraud_hold</code> is held while activity is reviewed.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
@@ -294,6 +291,17 @@ public final class AccountReserveType {
         @java.lang.Override
         public AccountReserveType build() {
             return new AccountReserveType(amount, holdPeriodDays, percentage, type, additionalProperties);
+        }
+
+        @JsonAnySetter
+        private void putAdditionalPropertyFromJson(String key, Object value) {
+            if (key.equalsIgnoreCase("amount")
+                    || key.equalsIgnoreCase("hold_period_days")
+                    || key.equalsIgnoreCase("percentage")
+                    || key.equalsIgnoreCase("type")) {
+                return;
+            }
+            this.additionalProperties.put(key, value);
         }
 
         @java.lang.Override

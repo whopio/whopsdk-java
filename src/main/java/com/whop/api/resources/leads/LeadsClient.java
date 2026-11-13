@@ -31,7 +31,7 @@ public class LeadsClient {
     }
 
     /**
-     * Returns a paginated list of leads for a company, with optional filtering by product and creation date.
+     * Lists an account's leads, newest first.
      * <p>Required permissions:</p>
      * <ul>
      * <li><code>lead:basic:read</code></li>
@@ -45,7 +45,7 @@ public class LeadsClient {
     }
 
     /**
-     * Returns a paginated list of leads for a company, with optional filtering by product and creation date.
+     * Lists an account's leads, newest first.
      * <p>Required permissions:</p>
      * <ul>
      * <li><code>lead:basic:read</code></li>
@@ -59,7 +59,7 @@ public class LeadsClient {
     }
 
     /**
-     * Record a new lead for a company, capturing a potential customer's interest in a specific product.
+     * Records a lead: a potential customer's interest in an account or one of its products.
      * <p>Required permissions:</p>
      * <ul>
      * <li><code>lead:manage</code></li>
@@ -73,7 +73,7 @@ public class LeadsClient {
     }
 
     /**
-     * Record a new lead for a company, capturing a potential customer's interest in a specific product.
+     * Records a lead: a potential customer's interest in an account or one of its products.
      * <p>Required permissions:</p>
      * <ul>
      * <li><code>lead:manage</code></li>
@@ -143,7 +143,7 @@ public class LeadsClient {
     }
 
     /**
-     * Update the metadata or referrer information on an existing lead record.
+     * Updates a lead's <code>metadata</code> or <code>referrer</code>.
      * <p>Required permissions:</p>
      * <ul>
      * <li><code>lead:manage</code></li>
@@ -157,7 +157,7 @@ public class LeadsClient {
     }
 
     /**
-     * Update the metadata or referrer information on an existing lead record.
+     * Updates a lead's <code>metadata</code> or <code>referrer</code>.
      * <p>Required permissions:</p>
      * <ul>
      * <li><code>lead:manage</code></li>
@@ -171,7 +171,7 @@ public class LeadsClient {
     }
 
     /**
-     * Update the metadata or referrer information on an existing lead record.
+     * Updates a lead's <code>metadata</code> or <code>referrer</code>.
      * <p>Required permissions:</p>
      * <ul>
      * <li><code>lead:manage</code></li>
@@ -185,7 +185,7 @@ public class LeadsClient {
     }
 
     /**
-     * Update the metadata or referrer information on an existing lead record.
+     * Updates a lead's <code>metadata</code> or <code>referrer</code>.
      * <p>Required permissions:</p>
      * <ul>
      * <li><code>lead:manage</code></li>

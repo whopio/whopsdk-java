@@ -159,7 +159,6 @@ public final class MembershipMember {
 
         private Optional<String> lastAccessedAt = Optional.empty();
 
-        @JsonAnySetter
         private Map<String, Object> additionalProperties = new HashMap<>();
 
         private Builder() {}
@@ -173,7 +172,6 @@ public final class MembershipMember {
         }
 
         /**
-         * <p>What the member can reach on the account: <code>customer</code> for paying members, <code>admin</code> for team members, <code>no_access</code> once every grant has lapsed.</p>
          * <p>What the member can reach on the account: <code>customer</code> for paying members, <code>admin</code> for team members, <code>no_access</code> once every grant has lapsed.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
@@ -259,6 +257,16 @@ public final class MembershipMember {
         @java.lang.Override
         public MembershipMember build() {
             return new MembershipMember(accessLevel, lastAccessedAt, position, additionalProperties);
+        }
+
+        @JsonAnySetter
+        private void putAdditionalPropertyFromJson(String key, Object value) {
+            if (key.equalsIgnoreCase("access_level")
+                    || key.equalsIgnoreCase("last_accessed_at")
+                    || key.equalsIgnoreCase("position")) {
+                return;
+            }
+            this.additionalProperties.put(key, value);
         }
 
         @java.lang.Override

@@ -126,7 +126,6 @@ public final class CreateDepositsResponseMethodsCryptoItemSupportedCurrenciesIte
 
         private Optional<String> iconUrl = Optional.empty();
 
-        @JsonAnySetter
         private Map<String, Object> additionalProperties = new HashMap<>();
 
         private Builder() {}
@@ -139,7 +138,6 @@ public final class CreateDepositsResponseMethodsCryptoItemSupportedCurrenciesIte
         }
 
         /**
-         * <p>Token symbol.</p>
          * <p>Token symbol.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
@@ -190,6 +188,14 @@ public final class CreateDepositsResponseMethodsCryptoItemSupportedCurrenciesIte
         public CreateDepositsResponseMethodsCryptoItemSupportedCurrenciesItem build() {
             return new CreateDepositsResponseMethodsCryptoItemSupportedCurrenciesItem(
                     iconUrl, name, additionalProperties);
+        }
+
+        @JsonAnySetter
+        private void putAdditionalPropertyFromJson(String key, Object value) {
+            if (key.equalsIgnoreCase("icon_url") || key.equalsIgnoreCase("name")) {
+                return;
+            }
+            this.additionalProperties.put(key, value);
         }
 
         @java.lang.Override

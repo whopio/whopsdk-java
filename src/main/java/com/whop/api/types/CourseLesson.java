@@ -501,7 +501,6 @@ public final class CourseLesson {
 
         private List<CourseLessonAssessmentQuestionsItem> assessmentQuestions = new ArrayList<>();
 
-        @JsonAnySetter
         private Map<String, Object> additionalProperties = new HashMap<>();
 
         private Builder() {}
@@ -528,7 +527,6 @@ public final class CourseLesson {
 
         /**
          * <p>The datetime the lesson was created.</p>
-         * <p>The datetime the lesson was created.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
@@ -539,7 +537,6 @@ public final class CourseLesson {
         }
 
         /**
-         * <p>The unique identifier for the lesson.</p>
          * <p>The unique identifier for the lesson.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
@@ -552,7 +549,6 @@ public final class CourseLesson {
 
         /**
          * <p>The content format of this lesson. One of: text, video, pdf, multi, quiz, knowledge_check.</p>
-         * <p>The content format of this lesson. One of: text, video, pdf, multi, quiz, knowledge_check.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
@@ -563,7 +559,6 @@ public final class CourseLesson {
         }
 
         /**
-         * <p>The sort position of this lesson within its parent chapter, starting from zero.</p>
          * <p>The sort position of this lesson within its parent chapter, starting from zero.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
@@ -576,7 +571,6 @@ public final class CourseLesson {
 
         /**
          * <p>The display name of the lesson shown to students. Maximum 120 characters.</p>
-         * <p>The display name of the lesson shown to students. Maximum 120 characters.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
@@ -587,7 +581,6 @@ public final class CourseLesson {
         }
 
         /**
-         * <p>The visibility setting that controls whether this lesson appears to students. One of: visible, hidden.</p>
          * <p>The visibility setting that controls whether this lesson appears to students. One of: visible, hidden.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
@@ -939,6 +932,28 @@ public final class CourseLesson {
                     videoAsset,
                     visibility,
                     additionalProperties);
+        }
+
+        @JsonAnySetter
+        private void putAdditionalPropertyFromJson(String key, Object value) {
+            if (key.equalsIgnoreCase("assessment_questions")
+                    || key.equalsIgnoreCase("attachments")
+                    || key.equalsIgnoreCase("content")
+                    || key.equalsIgnoreCase("created_at")
+                    || key.equalsIgnoreCase("days_from_course_start_until_unlock")
+                    || key.equalsIgnoreCase("embed_id")
+                    || key.equalsIgnoreCase("embed_type")
+                    || key.equalsIgnoreCase("id")
+                    || key.equalsIgnoreCase("lesson_type")
+                    || key.equalsIgnoreCase("main_pdf")
+                    || key.equalsIgnoreCase("order")
+                    || key.equalsIgnoreCase("thumbnail")
+                    || key.equalsIgnoreCase("title")
+                    || key.equalsIgnoreCase("video_asset")
+                    || key.equalsIgnoreCase("visibility")) {
+                return;
+            }
+            this.additionalProperties.put(key, value);
         }
 
         @java.lang.Override

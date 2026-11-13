@@ -55,7 +55,7 @@ public final class AccountTaxIdentifier {
     }
 
     /**
-     * @return Tax ID value.
+     * @return Tax ID value, for example <code>DE123456789</code>. See the <a href="/developer/guides/tax-ids">tax IDs guide</a>.
      */
     @JsonProperty("tax_id_value")
     public String getTaxIdValue() {
@@ -109,7 +109,7 @@ public final class AccountTaxIdentifier {
 
     public interface TaxIdValueStage {
         /**
-         * <p>Tax ID value.</p>
+         * <p>Tax ID value, for example <code>DE123456789</code>. See the <a href="/developer/guides/tax-ids">tax IDs guide</a>.</p>
          */
         _FinalStage taxIdValue(@NotNull String taxIdValue);
     }
@@ -130,7 +130,6 @@ public final class AccountTaxIdentifier {
 
         private String taxIdValue;
 
-        @JsonAnySetter
         private Map<String, Object> additionalProperties = new HashMap<>();
 
         private Builder() {}
@@ -145,7 +144,6 @@ public final class AccountTaxIdentifier {
 
         /**
          * <p>Tax identifier ID.</p>
-         * <p>Tax identifier ID.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
@@ -157,7 +155,6 @@ public final class AccountTaxIdentifier {
 
         /**
          * <p>Tax ID type.</p>
-         * <p>Tax ID type.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
@@ -168,8 +165,7 @@ public final class AccountTaxIdentifier {
         }
 
         /**
-         * <p>Tax ID value.</p>
-         * <p>Tax ID value.</p>
+         * <p>Tax ID value, for example <code>DE123456789</code>. See the <a href="/developer/guides/tax-ids">tax IDs guide</a>.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
@@ -182,6 +178,16 @@ public final class AccountTaxIdentifier {
         @java.lang.Override
         public AccountTaxIdentifier build() {
             return new AccountTaxIdentifier(id, taxIdType, taxIdValue, additionalProperties);
+        }
+
+        @JsonAnySetter
+        private void putAdditionalPropertyFromJson(String key, Object value) {
+            if (key.equalsIgnoreCase("id")
+                    || key.equalsIgnoreCase("tax_id_type")
+                    || key.equalsIgnoreCase("tax_id_value")) {
+                return;
+            }
+            this.additionalProperties.put(key, value);
         }
 
         @java.lang.Override

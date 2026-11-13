@@ -110,7 +110,6 @@ public final class PaymentMethodListItemSepaDebitPaymentMethodIcons {
 
         private PaymentMethodListItemSepaDebitPaymentMethodIconsSquare square;
 
-        @JsonAnySetter
         private Map<String, Object> additionalProperties = new HashMap<>();
 
         private Builder() {}
@@ -124,7 +123,6 @@ public final class PaymentMethodListItemSepaDebitPaymentMethodIcons {
 
         /**
          * <p>The credit-card-proportioned tile (48x30).</p>
-         * <p>The credit-card-proportioned tile (48x30).</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
@@ -135,7 +133,6 @@ public final class PaymentMethodListItemSepaDebitPaymentMethodIcons {
         }
 
         /**
-         * <p>The square tile (32x32).</p>
          * <p>The square tile (32x32).</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
@@ -149,6 +146,14 @@ public final class PaymentMethodListItemSepaDebitPaymentMethodIcons {
         @java.lang.Override
         public PaymentMethodListItemSepaDebitPaymentMethodIcons build() {
             return new PaymentMethodListItemSepaDebitPaymentMethodIcons(card, square, additionalProperties);
+        }
+
+        @JsonAnySetter
+        private void putAdditionalPropertyFromJson(String key, Object value) {
+            if (key.equalsIgnoreCase("card") || key.equalsIgnoreCase("square")) {
+                return;
+            }
+            this.additionalProperties.put(key, value);
         }
 
         @java.lang.Override

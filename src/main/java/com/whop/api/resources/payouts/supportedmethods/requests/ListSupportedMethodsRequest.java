@@ -12,6 +12,7 @@ import com.fasterxml.jackson.annotation.JsonSetter;
 import com.fasterxml.jackson.annotation.Nulls;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.whop.api.core.ObjectMappers;
+import com.whop.api.resources.payouts.supportedmethods.types.ListSupportedMethodsRequestPartyType;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
@@ -34,6 +35,10 @@ public final class ListSupportedMethodsRequest {
 
     private final Optional<String> destinationCurrency;
 
+    private final Optional<ListSupportedMethodsRequestPartyType> partyType;
+
+    private final Optional<Boolean> includeIndividualBanks;
+
     private final Optional<Integer> first;
 
     private final Optional<String> after;
@@ -52,6 +57,8 @@ public final class ListSupportedMethodsRequest {
             Optional<String> currency,
             Optional<String> supportedPayoutMethodId,
             Optional<String> destinationCurrency,
+            Optional<ListSupportedMethodsRequestPartyType> partyType,
+            Optional<Boolean> includeIndividualBanks,
             Optional<Integer> first,
             Optional<String> after,
             Optional<Integer> last,
@@ -64,6 +71,8 @@ public final class ListSupportedMethodsRequest {
         this.currency = currency;
         this.supportedPayoutMethodId = supportedPayoutMethodId;
         this.destinationCurrency = destinationCurrency;
+        this.partyType = partyType;
+        this.includeIndividualBanks = includeIndividualBanks;
         this.first = first;
         this.after = after;
         this.last = last;
@@ -96,7 +105,7 @@ public final class ListSupportedMethodsRequest {
     }
 
     /**
-     * @return Optional withdrawal amount in whole currency units, for example <code>250.00</code>. When provided, each destination includes per-currency fee and delivery quotes.
+     * @return Optional payout amount in whole currency units, for example <code>250.00</code>. When provided, each destination includes per-currency fee and delivery quotes.
      */
     @JsonProperty("amount")
     public Optional<Double> getAmount() {
@@ -128,7 +137,23 @@ public final class ListSupportedMethodsRequest {
     }
 
     /**
-     * @return Number of supported payout methods to return from the start of the window.
+     * @return Who will own the payout method. <code>first_party</code> is the account itself. <code>third_party</code> is a recipient the account pays, saved with <code>recipient</code> on <code>POST /payouts/methods</code>, which needs no identity fields. Only meaningful with supported_payout_method_id.
+     */
+    @JsonProperty("party_type")
+    public Optional<ListSupportedMethodsRequestPartyType> getPartyType() {
+        return partyType;
+    }
+
+    /**
+     * @return Whether to list each bank as its own payout method in countries where people choose a bank by name. Each bank has <code>parent_id</code> set to the bank deposit method that lists it. When <code>false</code>, these countries list one bank deposit method instead.
+     */
+    @JsonProperty("include_individual_banks")
+    public Optional<Boolean> getIncludeIndividualBanks() {
+        return includeIndividualBanks;
+    }
+
+    /**
+     * @return Number of results to return from the start of the range.
      */
     @JsonProperty("first")
     public Optional<Integer> getFirst() {
@@ -136,7 +161,7 @@ public final class ListSupportedMethodsRequest {
     }
 
     /**
-     * @return Cursor to fetch the page after (from page_info.end_cursor).
+     * @return Return results after this cursor. Use <code>page_info.end_cursor</code> from the previous response to fetch the next page.
      */
     @JsonProperty("after")
     public Optional<String> getAfter() {
@@ -144,7 +169,7 @@ public final class ListSupportedMethodsRequest {
     }
 
     /**
-     * @return Number of supported payout methods to return from the end of the window.
+     * @return Number of results to return from the end of the range.
      */
     @JsonProperty("last")
     public Optional<Integer> getLast() {
@@ -152,7 +177,7 @@ public final class ListSupportedMethodsRequest {
     }
 
     /**
-     * @return Cursor to fetch the page before (from page_info.start_cursor).
+     * @return Return results before this cursor. Use <code>page_info.start_cursor</code> from the previous response to fetch the previous page.
      */
     @JsonProperty("before")
     public Optional<String> getBefore() {
@@ -178,6 +203,8 @@ public final class ListSupportedMethodsRequest {
                 && currency.equals(other.currency)
                 && supportedPayoutMethodId.equals(other.supportedPayoutMethodId)
                 && destinationCurrency.equals(other.destinationCurrency)
+                && partyType.equals(other.partyType)
+                && includeIndividualBanks.equals(other.includeIndividualBanks)
                 && first.equals(other.first)
                 && after.equals(other.after)
                 && last.equals(other.last)
@@ -194,6 +221,8 @@ public final class ListSupportedMethodsRequest {
                 this.currency,
                 this.supportedPayoutMethodId,
                 this.destinationCurrency,
+                this.partyType,
+                this.includeIndividualBanks,
                 this.first,
                 this.after,
                 this.last,
@@ -225,6 +254,10 @@ public final class ListSupportedMethodsRequest {
 
         private Optional<String> destinationCurrency = Optional.empty();
 
+        private Optional<ListSupportedMethodsRequestPartyType> partyType = Optional.empty();
+
+        private Optional<Boolean> includeIndividualBanks = Optional.empty();
+
         private Optional<Integer> first = Optional.empty();
 
         private Optional<String> after = Optional.empty();
@@ -233,7 +266,6 @@ public final class ListSupportedMethodsRequest {
 
         private Optional<String> before = Optional.empty();
 
-        @JsonAnySetter
         private Map<String, Object> additionalProperties = new HashMap<>();
 
         private Builder() {}
@@ -246,6 +278,8 @@ public final class ListSupportedMethodsRequest {
             currency(other.getCurrency());
             supportedPayoutMethodId(other.getSupportedPayoutMethodId());
             destinationCurrency(other.getDestinationCurrency());
+            partyType(other.getPartyType());
+            includeIndividualBanks(other.getIncludeIndividualBanks());
             first(other.getFirst());
             after(other.getAfter());
             last(other.getLast());
@@ -296,7 +330,7 @@ public final class ListSupportedMethodsRequest {
         }
 
         /**
-         * <p>Optional withdrawal amount in whole currency units, for example <code>250.00</code>. When provided, each destination includes per-currency fee and delivery quotes.</p>
+         * <p>Optional payout amount in whole currency units, for example <code>250.00</code>. When provided, each destination includes per-currency fee and delivery quotes.</p>
          */
         @JsonSetter(value = "amount", nulls = Nulls.SKIP)
         public Builder amount(Optional<Double> amount) {
@@ -352,7 +386,35 @@ public final class ListSupportedMethodsRequest {
         }
 
         /**
-         * <p>Number of supported payout methods to return from the start of the window.</p>
+         * <p>Who will own the payout method. <code>first_party</code> is the account itself. <code>third_party</code> is a recipient the account pays, saved with <code>recipient</code> on <code>POST /payouts/methods</code>, which needs no identity fields. Only meaningful with supported_payout_method_id.</p>
+         */
+        @JsonSetter(value = "party_type", nulls = Nulls.SKIP)
+        public Builder partyType(Optional<ListSupportedMethodsRequestPartyType> partyType) {
+            this.partyType = partyType;
+            return this;
+        }
+
+        public Builder partyType(ListSupportedMethodsRequestPartyType partyType) {
+            this.partyType = Optional.ofNullable(partyType);
+            return this;
+        }
+
+        /**
+         * <p>Whether to list each bank as its own payout method in countries where people choose a bank by name. Each bank has <code>parent_id</code> set to the bank deposit method that lists it. When <code>false</code>, these countries list one bank deposit method instead.</p>
+         */
+        @JsonSetter(value = "include_individual_banks", nulls = Nulls.SKIP)
+        public Builder includeIndividualBanks(Optional<Boolean> includeIndividualBanks) {
+            this.includeIndividualBanks = includeIndividualBanks;
+            return this;
+        }
+
+        public Builder includeIndividualBanks(Boolean includeIndividualBanks) {
+            this.includeIndividualBanks = Optional.ofNullable(includeIndividualBanks);
+            return this;
+        }
+
+        /**
+         * <p>Number of results to return from the start of the range.</p>
          */
         @JsonSetter(value = "first", nulls = Nulls.SKIP)
         public Builder first(Optional<Integer> first) {
@@ -366,7 +428,7 @@ public final class ListSupportedMethodsRequest {
         }
 
         /**
-         * <p>Cursor to fetch the page after (from page_info.end_cursor).</p>
+         * <p>Return results after this cursor. Use <code>page_info.end_cursor</code> from the previous response to fetch the next page.</p>
          */
         @JsonSetter(value = "after", nulls = Nulls.SKIP)
         public Builder after(Optional<String> after) {
@@ -380,7 +442,7 @@ public final class ListSupportedMethodsRequest {
         }
 
         /**
-         * <p>Number of supported payout methods to return from the end of the window.</p>
+         * <p>Number of results to return from the end of the range.</p>
          */
         @JsonSetter(value = "last", nulls = Nulls.SKIP)
         public Builder last(Optional<Integer> last) {
@@ -394,7 +456,7 @@ public final class ListSupportedMethodsRequest {
         }
 
         /**
-         * <p>Cursor to fetch the page before (from page_info.start_cursor).</p>
+         * <p>Return results before this cursor. Use <code>page_info.start_cursor</code> from the previous response to fetch the previous page.</p>
          */
         @JsonSetter(value = "before", nulls = Nulls.SKIP)
         public Builder before(Optional<String> before) {
@@ -416,11 +478,33 @@ public final class ListSupportedMethodsRequest {
                     currency,
                     supportedPayoutMethodId,
                     destinationCurrency,
+                    partyType,
+                    includeIndividualBanks,
                     first,
                     after,
                     last,
                     before,
                     additionalProperties);
+        }
+
+        @JsonAnySetter
+        private void putAdditionalPropertyFromJson(String key, Object value) {
+            if (key.equalsIgnoreCase("account_id")
+                    || key.equalsIgnoreCase("user_id")
+                    || key.equalsIgnoreCase("country")
+                    || key.equalsIgnoreCase("amount")
+                    || key.equalsIgnoreCase("currency")
+                    || key.equalsIgnoreCase("supported_payout_method_id")
+                    || key.equalsIgnoreCase("destination_currency")
+                    || key.equalsIgnoreCase("party_type")
+                    || key.equalsIgnoreCase("include_individual_banks")
+                    || key.equalsIgnoreCase("first")
+                    || key.equalsIgnoreCase("after")
+                    || key.equalsIgnoreCase("last")
+                    || key.equalsIgnoreCase("before")) {
+                return;
+            }
+            this.additionalProperties.put(key, value);
         }
 
         public Builder additionalProperty(String key, Object value) {

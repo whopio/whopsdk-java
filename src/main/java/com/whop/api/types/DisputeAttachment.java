@@ -224,7 +224,6 @@ public final class DisputeAttachment {
 
         private Optional<String> contentType = Optional.empty();
 
-        @JsonAnySetter
         private Map<String, Object> additionalProperties = new HashMap<>();
 
         private Builder() {}
@@ -240,7 +239,6 @@ public final class DisputeAttachment {
         }
 
         /**
-         * <p>Whether this is Whop's own hosted policy, standing in because the seller uploaded none. Sending it back on a PATCH changes nothing.</p>
          * <p>Whether this is Whop's own hosted policy, standing in because the seller uploaded none. Sending it back on a PATCH changes nothing.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
@@ -398,6 +396,18 @@ public final class DisputeAttachment {
         @java.lang.Override
         public DisputeAttachment build() {
             return new DisputeAttachment(contentType, filename, id, platform, url, additionalProperties);
+        }
+
+        @JsonAnySetter
+        private void putAdditionalPropertyFromJson(String key, Object value) {
+            if (key.equalsIgnoreCase("content_type")
+                    || key.equalsIgnoreCase("filename")
+                    || key.equalsIgnoreCase("id")
+                    || key.equalsIgnoreCase("platform")
+                    || key.equalsIgnoreCase("url")) {
+                return;
+            }
+            this.additionalProperties.put(key, value);
         }
 
         @java.lang.Override

@@ -171,7 +171,6 @@ public final class DisputeListItemPaymentPaymentInstrument {
 
         private Optional<Integer> installmentCount = Optional.empty();
 
-        @JsonAnySetter
         private Map<String, Object> additionalProperties = new HashMap<>();
 
         private Builder() {}
@@ -187,7 +186,6 @@ public final class DisputeListItemPaymentPaymentInstrument {
 
         /**
          * <p>Buyer-facing instrument name — &quot;Visa •••• 4242&quot; when the card surfaced, else the method's own name (&quot;Klarna&quot;).</p>
-         * <p>Buyer-facing instrument name — &quot;Visa •••• 4242&quot; when the card surfaced, else the method's own name (&quot;Klarna&quot;).</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
@@ -199,7 +197,6 @@ public final class DisputeListItemPaymentPaymentInstrument {
 
         /**
          * <p>The standard icon set: square and card shapes, each in light and dark colorways.</p>
-         * <p>The standard icon set: square and card shapes, each in light and dark colorways.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
@@ -210,7 +207,6 @@ public final class DisputeListItemPaymentPaymentInstrument {
         }
 
         /**
-         * <p>The payment method type identifier, e.g. <code>card</code>, <code>klarna</code>, <code>apple_pay</code>.</p>
          * <p>The payment method type identifier, e.g. <code>card</code>, <code>klarna</code>, <code>apple_pay</code>.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
@@ -261,6 +257,17 @@ public final class DisputeListItemPaymentPaymentInstrument {
         public DisputeListItemPaymentPaymentInstrument build() {
             return new DisputeListItemPaymentPaymentInstrument(
                     displayName, icons, installmentCount, paymentMethodType, additionalProperties);
+        }
+
+        @JsonAnySetter
+        private void putAdditionalPropertyFromJson(String key, Object value) {
+            if (key.equalsIgnoreCase("display_name")
+                    || key.equalsIgnoreCase("icons")
+                    || key.equalsIgnoreCase("installment_count")
+                    || key.equalsIgnoreCase("payment_method_type")) {
+                return;
+            }
+            this.additionalProperties.put(key, value);
         }
 
         @java.lang.Override

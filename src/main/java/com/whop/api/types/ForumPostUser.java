@@ -142,7 +142,6 @@ public final class ForumPostUser {
 
         private Optional<String> name = Optional.empty();
 
-        @JsonAnySetter
         private Map<String, Object> additionalProperties = new HashMap<>();
 
         private Builder() {}
@@ -157,7 +156,6 @@ public final class ForumPostUser {
 
         /**
          * <p>The unique identifier for the user.</p>
-         * <p>The unique identifier for the user.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
@@ -168,7 +166,6 @@ public final class ForumPostUser {
         }
 
         /**
-         * <p>The user's unique username shown on their public profile.</p>
          * <p>The user's unique username shown on their public profile.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
@@ -218,6 +215,14 @@ public final class ForumPostUser {
         @java.lang.Override
         public ForumPostUser build() {
             return new ForumPostUser(id, name, username, additionalProperties);
+        }
+
+        @JsonAnySetter
+        private void putAdditionalPropertyFromJson(String key, Object value) {
+            if (key.equalsIgnoreCase("id") || key.equalsIgnoreCase("name") || key.equalsIgnoreCase("username")) {
+                return;
+            }
+            this.additionalProperties.put(key, value);
         }
 
         @java.lang.Override

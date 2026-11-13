@@ -5,21 +5,16 @@ package com.whop.api.resources.partners.businesses.earnings.types;
 
 import com.fasterxml.jackson.annotation.JsonAnyGetter;
 import com.fasterxml.jackson.annotation.JsonAnySetter;
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonSetter;
-import com.fasterxml.jackson.annotation.Nulls;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
-import com.whop.api.core.Nullable;
-import com.whop.api.core.NullableNonemptyFilter;
 import com.whop.api.core.ObjectMappers;
 import java.time.OffsetDateTime;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
-import java.util.Optional;
 import org.jetbrains.annotations.NotNull;
 
 @JsonInclude(JsonInclude.Include.NON_ABSENT)
@@ -27,11 +22,9 @@ import org.jetbrains.annotations.NotNull;
 public final class ListEarningsResponseDataItemResourceCreatedAt {
     private final OffsetDateTime createdAt;
 
-    private final Optional<String> currency;
-
     private final String id;
 
-    private final Optional<String> merchantName;
+    private final ListEarningsResponseDataItemResourceCreatedAtIncomeSource incomeSource;
 
     private final ListEarningsResponseDataItemResourceCreatedAtObject object;
 
@@ -39,15 +32,13 @@ public final class ListEarningsResponseDataItemResourceCreatedAt {
 
     private ListEarningsResponseDataItemResourceCreatedAt(
             OffsetDateTime createdAt,
-            Optional<String> currency,
             String id,
-            Optional<String> merchantName,
+            ListEarningsResponseDataItemResourceCreatedAtIncomeSource incomeSource,
             ListEarningsResponseDataItemResourceCreatedAtObject object,
             Map<String, Object> additionalProperties) {
         this.createdAt = createdAt;
-        this.currency = currency;
         this.id = id;
-        this.merchantName = merchantName;
+        this.incomeSource = incomeSource;
         this.object = object;
         this.additionalProperties = additionalProperties;
     }
@@ -57,42 +48,25 @@ public final class ListEarningsResponseDataItemResourceCreatedAt {
         return createdAt;
     }
 
-    @JsonIgnore
-    public Optional<String> getCurrency() {
-        if (currency == null) {
-            return Optional.empty();
-        }
-        return currency;
-    }
-
+    /**
+     * @return The referred partner business's own commission the share was paid on, prefixed <code>afpy_</code>.
+     */
     @JsonProperty("id")
     public String getId() {
         return id;
     }
 
-    @JsonIgnore
-    public Optional<String> getMerchantName() {
-        if (merchantName == null) {
-            return Optional.empty();
-        }
-        return merchantName;
+    /**
+     * @return Which income source that commission is on.
+     */
+    @JsonProperty("income_source")
+    public ListEarningsResponseDataItemResourceCreatedAtIncomeSource getIncomeSource() {
+        return incomeSource;
     }
 
     @JsonProperty("object")
     public ListEarningsResponseDataItemResourceCreatedAtObject getObject() {
         return object;
-    }
-
-    @JsonInclude(value = JsonInclude.Include.CUSTOM, valueFilter = NullableNonemptyFilter.class)
-    @JsonProperty("currency")
-    private Optional<String> _getCurrency() {
-        return currency;
-    }
-
-    @JsonInclude(value = JsonInclude.Include.CUSTOM, valueFilter = NullableNonemptyFilter.class)
-    @JsonProperty("merchant_name")
-    private Optional<String> _getMerchantName() {
-        return merchantName;
     }
 
     @java.lang.Override
@@ -109,15 +83,14 @@ public final class ListEarningsResponseDataItemResourceCreatedAt {
 
     private boolean equalTo(ListEarningsResponseDataItemResourceCreatedAt other) {
         return createdAt.equals(other.createdAt)
-                && currency.equals(other.currency)
                 && id.equals(other.id)
-                && merchantName.equals(other.merchantName)
+                && incomeSource.equals(other.incomeSource)
                 && object.equals(other.object);
     }
 
     @java.lang.Override
     public int hashCode() {
-        return Objects.hash(this.createdAt, this.currency, this.id, this.merchantName, this.object);
+        return Objects.hash(this.createdAt, this.id, this.incomeSource, this.object);
     }
 
     @java.lang.Override
@@ -136,7 +109,17 @@ public final class ListEarningsResponseDataItemResourceCreatedAt {
     }
 
     public interface IdStage {
-        ObjectStage id(@NotNull String id);
+        /**
+         * <p>The referred partner business's own commission the share was paid on, prefixed <code>afpy_</code>.</p>
+         */
+        IncomeSourceStage id(@NotNull String id);
+    }
+
+    public interface IncomeSourceStage {
+        /**
+         * <p>Which income source that commission is on.</p>
+         */
+        ObjectStage incomeSource(@NotNull ListEarningsResponseDataItemResourceCreatedAtIncomeSource incomeSource);
     }
 
     public interface ObjectStage {
@@ -149,33 +132,18 @@ public final class ListEarningsResponseDataItemResourceCreatedAt {
         _FinalStage additionalProperty(String key, Object value);
 
         _FinalStage additionalProperties(Map<String, Object> additionalProperties);
-
-        _FinalStage currency(Optional<String> currency);
-
-        _FinalStage currency(String currency);
-
-        _FinalStage currency(Nullable<String> currency);
-
-        _FinalStage merchantName(Optional<String> merchantName);
-
-        _FinalStage merchantName(String merchantName);
-
-        _FinalStage merchantName(Nullable<String> merchantName);
     }
 
     @JsonIgnoreProperties(ignoreUnknown = true)
-    public static final class Builder implements CreatedAtStage, IdStage, ObjectStage, _FinalStage {
+    public static final class Builder implements CreatedAtStage, IdStage, IncomeSourceStage, ObjectStage, _FinalStage {
         private OffsetDateTime createdAt;
 
         private String id;
 
+        private ListEarningsResponseDataItemResourceCreatedAtIncomeSource incomeSource;
+
         private ListEarningsResponseDataItemResourceCreatedAtObject object;
 
-        private Optional<String> merchantName = Optional.empty();
-
-        private Optional<String> currency = Optional.empty();
-
-        @JsonAnySetter
         private Map<String, Object> additionalProperties = new HashMap<>();
 
         private Builder() {}
@@ -183,9 +151,8 @@ public final class ListEarningsResponseDataItemResourceCreatedAt {
         @java.lang.Override
         public Builder from(ListEarningsResponseDataItemResourceCreatedAt other) {
             createdAt(other.getCreatedAt());
-            currency(other.getCurrency());
             id(other.getId());
-            merchantName(other.getMerchantName());
+            incomeSource(other.getIncomeSource());
             object(other.getObject());
             return this;
         }
@@ -197,10 +164,26 @@ public final class ListEarningsResponseDataItemResourceCreatedAt {
             return this;
         }
 
+        /**
+         * <p>The referred partner business's own commission the share was paid on, prefixed <code>afpy_</code>.</p>
+         * @return Reference to {@code this} so that method calls can be chained together.
+         */
         @java.lang.Override
         @JsonSetter("id")
-        public ObjectStage id(@NotNull String id) {
+        public IncomeSourceStage id(@NotNull String id) {
             this.id = Objects.requireNonNull(id, "id must not be null");
+            return this;
+        }
+
+        /**
+         * <p>Which income source that commission is on.</p>
+         * @return Reference to {@code this} so that method calls can be chained together.
+         */
+        @java.lang.Override
+        @JsonSetter("income_source")
+        public ObjectStage incomeSource(
+                @NotNull ListEarningsResponseDataItemResourceCreatedAtIncomeSource incomeSource) {
+            this.incomeSource = Objects.requireNonNull(incomeSource, "incomeSource must not be null");
             return this;
         }
 
@@ -212,59 +195,20 @@ public final class ListEarningsResponseDataItemResourceCreatedAt {
         }
 
         @java.lang.Override
-        public _FinalStage merchantName(Nullable<String> merchantName) {
-            if (merchantName.isNull()) {
-                this.merchantName = null;
-            } else if (merchantName.isEmpty()) {
-                this.merchantName = Optional.empty();
-            } else {
-                this.merchantName = Optional.of(merchantName.get());
-            }
-            return this;
-        }
-
-        @java.lang.Override
-        public _FinalStage merchantName(String merchantName) {
-            this.merchantName = Optional.ofNullable(merchantName);
-            return this;
-        }
-
-        @java.lang.Override
-        @JsonSetter(value = "merchant_name", nulls = Nulls.SKIP)
-        public _FinalStage merchantName(Optional<String> merchantName) {
-            this.merchantName = merchantName;
-            return this;
-        }
-
-        @java.lang.Override
-        public _FinalStage currency(Nullable<String> currency) {
-            if (currency.isNull()) {
-                this.currency = null;
-            } else if (currency.isEmpty()) {
-                this.currency = Optional.empty();
-            } else {
-                this.currency = Optional.of(currency.get());
-            }
-            return this;
-        }
-
-        @java.lang.Override
-        public _FinalStage currency(String currency) {
-            this.currency = Optional.ofNullable(currency);
-            return this;
-        }
-
-        @java.lang.Override
-        @JsonSetter(value = "currency", nulls = Nulls.SKIP)
-        public _FinalStage currency(Optional<String> currency) {
-            this.currency = currency;
-            return this;
-        }
-
-        @java.lang.Override
         public ListEarningsResponseDataItemResourceCreatedAt build() {
             return new ListEarningsResponseDataItemResourceCreatedAt(
-                    createdAt, currency, id, merchantName, object, additionalProperties);
+                    createdAt, id, incomeSource, object, additionalProperties);
+        }
+
+        @JsonAnySetter
+        private void putAdditionalPropertyFromJson(String key, Object value) {
+            if (key.equalsIgnoreCase("created_at")
+                    || key.equalsIgnoreCase("id")
+                    || key.equalsIgnoreCase("income_source")
+                    || key.equalsIgnoreCase("object")) {
+                return;
+            }
+            this.additionalProperties.put(key, value);
         }
 
         @java.lang.Override

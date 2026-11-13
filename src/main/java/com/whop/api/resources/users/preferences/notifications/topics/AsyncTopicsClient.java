@@ -5,6 +5,7 @@ package com.whop.api.resources.users.preferences.notifications.topics;
 
 import com.whop.api.core.ClientOptions;
 import com.whop.api.core.RequestOptions;
+import com.whop.api.core.WhopApiHttpResponse;
 import com.whop.api.core.pagination.SyncPagingIterable;
 import com.whop.api.resources.users.preferences.notifications.topics.requests.ListTopicsRequest;
 import com.whop.api.types.UserNotificationPreference;
@@ -28,31 +29,67 @@ public class AsyncTopicsClient {
     }
 
     /**
-     * Lists the authenticated user's topic-scoped notification preferences, plus user-agnostic platform defaults. Each filter matches preferences scoped to its value or not narrowed on that dimension. Per-experience levels are listed separately, by <code>GET /users/me/preferences/notifications/experiences</code>.
+     * Lists the authenticated user's topic-scoped notification preferences, plus user-agnostic platform defaults. Per-experience levels are listed separately, by <code>GET /users/me/preferences/notifications/experiences</code>.
      */
     public CompletableFuture<SyncPagingIterable<UserNotificationPreference>> list() {
-        return this.rawClient.list().thenApply(response -> response.body());
+        CompletableFuture<WhopApiHttpResponse<SyncPagingIterable<UserNotificationPreference>>> rawFuture =
+                this.rawClient.list();
+        CompletableFuture<SyncPagingIterable<UserNotificationPreference>> future =
+                rawFuture.thenApply(response -> response.body());
+        future.whenComplete((result_, throwable_) -> {
+            if (future.isCancelled()) {
+                rawFuture.cancel(true);
+            }
+        });
+        return future;
     }
 
     /**
-     * Lists the authenticated user's topic-scoped notification preferences, plus user-agnostic platform defaults. Each filter matches preferences scoped to its value or not narrowed on that dimension. Per-experience levels are listed separately, by <code>GET /users/me/preferences/notifications/experiences</code>.
+     * Lists the authenticated user's topic-scoped notification preferences, plus user-agnostic platform defaults. Per-experience levels are listed separately, by <code>GET /users/me/preferences/notifications/experiences</code>.
      */
     public CompletableFuture<SyncPagingIterable<UserNotificationPreference>> list(RequestOptions requestOptions) {
-        return this.rawClient.list(requestOptions).thenApply(response -> response.body());
+        CompletableFuture<WhopApiHttpResponse<SyncPagingIterable<UserNotificationPreference>>> rawFuture =
+                this.rawClient.list(requestOptions);
+        CompletableFuture<SyncPagingIterable<UserNotificationPreference>> future =
+                rawFuture.thenApply(response -> response.body());
+        future.whenComplete((result_, throwable_) -> {
+            if (future.isCancelled()) {
+                rawFuture.cancel(true);
+            }
+        });
+        return future;
     }
 
     /**
-     * Lists the authenticated user's topic-scoped notification preferences, plus user-agnostic platform defaults. Each filter matches preferences scoped to its value or not narrowed on that dimension. Per-experience levels are listed separately, by <code>GET /users/me/preferences/notifications/experiences</code>.
+     * Lists the authenticated user's topic-scoped notification preferences, plus user-agnostic platform defaults. Per-experience levels are listed separately, by <code>GET /users/me/preferences/notifications/experiences</code>.
      */
     public CompletableFuture<SyncPagingIterable<UserNotificationPreference>> list(ListTopicsRequest request) {
-        return this.rawClient.list(request).thenApply(response -> response.body());
+        CompletableFuture<WhopApiHttpResponse<SyncPagingIterable<UserNotificationPreference>>> rawFuture =
+                this.rawClient.list(request);
+        CompletableFuture<SyncPagingIterable<UserNotificationPreference>> future =
+                rawFuture.thenApply(response -> response.body());
+        future.whenComplete((result_, throwable_) -> {
+            if (future.isCancelled()) {
+                rawFuture.cancel(true);
+            }
+        });
+        return future;
     }
 
     /**
-     * Lists the authenticated user's topic-scoped notification preferences, plus user-agnostic platform defaults. Each filter matches preferences scoped to its value or not narrowed on that dimension. Per-experience levels are listed separately, by <code>GET /users/me/preferences/notifications/experiences</code>.
+     * Lists the authenticated user's topic-scoped notification preferences, plus user-agnostic platform defaults. Per-experience levels are listed separately, by <code>GET /users/me/preferences/notifications/experiences</code>.
      */
     public CompletableFuture<SyncPagingIterable<UserNotificationPreference>> list(
             ListTopicsRequest request, RequestOptions requestOptions) {
-        return this.rawClient.list(request, requestOptions).thenApply(response -> response.body());
+        CompletableFuture<WhopApiHttpResponse<SyncPagingIterable<UserNotificationPreference>>> rawFuture =
+                this.rawClient.list(request, requestOptions);
+        CompletableFuture<SyncPagingIterable<UserNotificationPreference>> future =
+                rawFuture.thenApply(response -> response.body());
+        future.whenComplete((result_, throwable_) -> {
+            if (future.isCancelled()) {
+                rawFuture.cancel(true);
+            }
+        });
+        return future;
     }
 }

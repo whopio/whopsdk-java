@@ -20,33 +20,33 @@ import java.util.Optional;
 @JsonInclude(JsonInclude.Include.NON_ABSENT)
 @JsonDeserialize(builder = RetrievePaymentMethodsRequest.Builder.class)
 public final class RetrievePaymentMethodsRequest {
-    private final Optional<String> companyId;
-
     private final Optional<String> memberId;
+
+    private final Optional<String> accountId;
 
     private final Map<String, Object> additionalProperties;
 
     private RetrievePaymentMethodsRequest(
-            Optional<String> companyId, Optional<String> memberId, Map<String, Object> additionalProperties) {
-        this.companyId = companyId;
+            Optional<String> memberId, Optional<String> accountId, Map<String, Object> additionalProperties) {
         this.memberId = memberId;
+        this.accountId = accountId;
         this.additionalProperties = additionalProperties;
+    }
+
+    /**
+     * @return The unique identifier of the member. Provide either this or account_id, not both. Omit both to address your own saved payment methods.
+     */
+    @JsonProperty("member_id")
+    public Optional<String> getMemberId() {
+        return memberId;
     }
 
     /**
      * @return The unique identifier of the company. Provide either this or member_id, not both. Omit both to address your own saved payment methods.
      */
-    @JsonProperty("company_id")
-    public Optional<String> getCompanyId() {
-        return companyId;
-    }
-
-    /**
-     * @return The unique identifier of the member. Provide either this or company_id, not both. Omit both to address your own saved payment methods.
-     */
-    @JsonProperty("member_id")
-    public Optional<String> getMemberId() {
-        return memberId;
+    @JsonProperty("account_id")
+    public Optional<String> getAccountId() {
+        return accountId;
     }
 
     @java.lang.Override
@@ -61,12 +61,12 @@ public final class RetrievePaymentMethodsRequest {
     }
 
     private boolean equalTo(RetrievePaymentMethodsRequest other) {
-        return companyId.equals(other.companyId) && memberId.equals(other.memberId);
+        return memberId.equals(other.memberId) && accountId.equals(other.accountId);
     }
 
     @java.lang.Override
     public int hashCode() {
-        return Objects.hash(this.companyId, this.memberId);
+        return Objects.hash(this.memberId, this.accountId);
     }
 
     @java.lang.Override
@@ -80,37 +80,22 @@ public final class RetrievePaymentMethodsRequest {
 
     @JsonIgnoreProperties(ignoreUnknown = true)
     public static final class Builder {
-        private Optional<String> companyId = Optional.empty();
-
         private Optional<String> memberId = Optional.empty();
 
-        @JsonAnySetter
+        private Optional<String> accountId = Optional.empty();
+
         private Map<String, Object> additionalProperties = new HashMap<>();
 
         private Builder() {}
 
         public Builder from(RetrievePaymentMethodsRequest other) {
-            companyId(other.getCompanyId());
             memberId(other.getMemberId());
+            accountId(other.getAccountId());
             return this;
         }
 
         /**
-         * <p>The unique identifier of the company. Provide either this or member_id, not both. Omit both to address your own saved payment methods.</p>
-         */
-        @JsonSetter(value = "company_id", nulls = Nulls.SKIP)
-        public Builder companyId(Optional<String> companyId) {
-            this.companyId = companyId;
-            return this;
-        }
-
-        public Builder companyId(String companyId) {
-            this.companyId = Optional.ofNullable(companyId);
-            return this;
-        }
-
-        /**
-         * <p>The unique identifier of the member. Provide either this or company_id, not both. Omit both to address your own saved payment methods.</p>
+         * <p>The unique identifier of the member. Provide either this or account_id, not both. Omit both to address your own saved payment methods.</p>
          */
         @JsonSetter(value = "member_id", nulls = Nulls.SKIP)
         public Builder memberId(Optional<String> memberId) {
@@ -123,8 +108,30 @@ public final class RetrievePaymentMethodsRequest {
             return this;
         }
 
+        /**
+         * <p>The unique identifier of the company. Provide either this or member_id, not both. Omit both to address your own saved payment methods.</p>
+         */
+        @JsonSetter(value = "account_id", nulls = Nulls.SKIP)
+        public Builder accountId(Optional<String> accountId) {
+            this.accountId = accountId;
+            return this;
+        }
+
+        public Builder accountId(String accountId) {
+            this.accountId = Optional.ofNullable(accountId);
+            return this;
+        }
+
         public RetrievePaymentMethodsRequest build() {
-            return new RetrievePaymentMethodsRequest(companyId, memberId, additionalProperties);
+            return new RetrievePaymentMethodsRequest(memberId, accountId, additionalProperties);
+        }
+
+        @JsonAnySetter
+        private void putAdditionalPropertyFromJson(String key, Object value) {
+            if (key.equalsIgnoreCase("member_id") || key.equalsIgnoreCase("account_id")) {
+                return;
+            }
+            this.additionalProperties.put(key, value);
         }
 
         public Builder additionalProperty(String key, Object value) {

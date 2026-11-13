@@ -40,7 +40,7 @@ public final class SetNotificationsRequestPreferencesItem {
     }
 
     /**
-     * @return What the user is notified about in this scope. <code>mentions</code> is only valid for an experience level. <code>null</code> clears the preference.
+     * @return What the user is notified about in this scope. <code>mentions</code> is only valid for an experience level; a topic override is <code>all</code> or <code>nothing</code>. <code>null</code> clears the preference, so the scope inherits its default again rather than being switched off.
      */
     @JsonIgnore
     public Optional<SetNotificationsRequestPreferencesItemLevel> getLevel() {
@@ -51,7 +51,7 @@ public final class SetNotificationsRequestPreferencesItem {
     }
 
     /**
-     * @return What the preference applies to. <code>null</code> on a dimension means the preference is not narrowed there.
+     * @return What the preference applies to. <code>null</code> on a dimension means the preference is not narrowed there. A scope read back from either list endpoint can be sent as-is. A scope naming an experience with no topic sets that experience's level; any other scope sets a topic override.
      */
     @JsonProperty("scope")
     public SetNotificationsRequestPreferencesItemScope getScope() {
@@ -96,7 +96,7 @@ public final class SetNotificationsRequestPreferencesItem {
 
     public interface ScopeStage {
         /**
-         * <p>What the preference applies to. <code>null</code> on a dimension means the preference is not narrowed there.</p>
+         * <p>What the preference applies to. <code>null</code> on a dimension means the preference is not narrowed there. A scope read back from either list endpoint can be sent as-is. A scope naming an experience with no topic sets that experience's level; any other scope sets a topic override.</p>
          */
         _FinalStage scope(@NotNull SetNotificationsRequestPreferencesItemScope scope);
 
@@ -111,7 +111,7 @@ public final class SetNotificationsRequestPreferencesItem {
         _FinalStage additionalProperties(Map<String, Object> additionalProperties);
 
         /**
-         * <p>What the user is notified about in this scope. <code>mentions</code> is only valid for an experience level. <code>null</code> clears the preference.</p>
+         * <p>What the user is notified about in this scope. <code>mentions</code> is only valid for an experience level; a topic override is <code>all</code> or <code>nothing</code>. <code>null</code> clears the preference, so the scope inherits its default again rather than being switched off.</p>
          */
         _FinalStage level(Optional<SetNotificationsRequestPreferencesItemLevel> level);
 
@@ -126,7 +126,6 @@ public final class SetNotificationsRequestPreferencesItem {
 
         private Optional<SetNotificationsRequestPreferencesItemLevel> level = Optional.empty();
 
-        @JsonAnySetter
         private Map<String, Object> additionalProperties = new HashMap<>();
 
         private Builder() {}
@@ -139,8 +138,7 @@ public final class SetNotificationsRequestPreferencesItem {
         }
 
         /**
-         * <p>What the preference applies to. <code>null</code> on a dimension means the preference is not narrowed there.</p>
-         * <p>What the preference applies to. <code>null</code> on a dimension means the preference is not narrowed there.</p>
+         * <p>What the preference applies to. <code>null</code> on a dimension means the preference is not narrowed there. A scope read back from either list endpoint can be sent as-is. A scope naming an experience with no topic sets that experience's level; any other scope sets a topic override.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
@@ -151,7 +149,7 @@ public final class SetNotificationsRequestPreferencesItem {
         }
 
         /**
-         * <p>What the user is notified about in this scope. <code>mentions</code> is only valid for an experience level. <code>null</code> clears the preference.</p>
+         * <p>What the user is notified about in this scope. <code>mentions</code> is only valid for an experience level; a topic override is <code>all</code> or <code>nothing</code>. <code>null</code> clears the preference, so the scope inherits its default again rather than being switched off.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
@@ -167,7 +165,7 @@ public final class SetNotificationsRequestPreferencesItem {
         }
 
         /**
-         * <p>What the user is notified about in this scope. <code>mentions</code> is only valid for an experience level. <code>null</code> clears the preference.</p>
+         * <p>What the user is notified about in this scope. <code>mentions</code> is only valid for an experience level; a topic override is <code>all</code> or <code>nothing</code>. <code>null</code> clears the preference, so the scope inherits its default again rather than being switched off.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
@@ -177,7 +175,7 @@ public final class SetNotificationsRequestPreferencesItem {
         }
 
         /**
-         * <p>What the user is notified about in this scope. <code>mentions</code> is only valid for an experience level. <code>null</code> clears the preference.</p>
+         * <p>What the user is notified about in this scope. <code>mentions</code> is only valid for an experience level; a topic override is <code>all</code> or <code>nothing</code>. <code>null</code> clears the preference, so the scope inherits its default again rather than being switched off.</p>
          */
         @java.lang.Override
         @JsonSetter(value = "level", nulls = Nulls.SKIP)
@@ -189,6 +187,14 @@ public final class SetNotificationsRequestPreferencesItem {
         @java.lang.Override
         public SetNotificationsRequestPreferencesItem build() {
             return new SetNotificationsRequestPreferencesItem(level, scope, additionalProperties);
+        }
+
+        @JsonAnySetter
+        private void putAdditionalPropertyFromJson(String key, Object value) {
+            if (key.equalsIgnoreCase("level") || key.equalsIgnoreCase("scope")) {
+                return;
+            }
+            this.additionalProperties.put(key, value);
         }
 
         @java.lang.Override

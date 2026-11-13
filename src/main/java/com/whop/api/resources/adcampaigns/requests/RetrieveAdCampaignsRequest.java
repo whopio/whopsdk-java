@@ -118,7 +118,6 @@ public final class RetrieveAdCampaignsRequest {
 
         private Optional<RetrieveAdCampaignsRequestAttributionModel> attributionModel = Optional.empty();
 
-        @JsonAnySetter
         private Map<String, Object> additionalProperties = new HashMap<>();
 
         private Builder() {}
@@ -189,6 +188,17 @@ public final class RetrieveAdCampaignsRequest {
 
         public RetrieveAdCampaignsRequest build() {
             return new RetrieveAdCampaignsRequest(statsFrom, statsTo, timeZone, attributionModel, additionalProperties);
+        }
+
+        @JsonAnySetter
+        private void putAdditionalPropertyFromJson(String key, Object value) {
+            if (key.equalsIgnoreCase("stats_from")
+                    || key.equalsIgnoreCase("stats_to")
+                    || key.equalsIgnoreCase("time_zone")
+                    || key.equalsIgnoreCase("attribution_model")) {
+                return;
+            }
+            this.additionalProperties.put(key, value);
         }
 
         public Builder additionalProperty(String key, Object value) {

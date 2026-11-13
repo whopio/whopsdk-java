@@ -16,6 +16,7 @@ import com.whop.api.core.Nullable;
 import com.whop.api.core.NullableNonemptyFilter;
 import com.whop.api.core.ObjectMappers;
 import com.whop.api.resources.aichats.types.CreateAiChatsRequestMessageAttachmentsItem;
+import com.whop.api.types.AiChatAgentIdentifiers;
 import com.whop.api.types.AiChatMessageSourceTypes;
 import java.util.HashMap;
 import java.util.List;
@@ -27,7 +28,9 @@ import org.jetbrains.annotations.NotNull;
 @JsonInclude(JsonInclude.Include.NON_ABSENT)
 @JsonDeserialize(builder = CreateAiChatsRequest.Builder.class)
 public final class CreateAiChatsRequest {
-    private final Optional<String> currentCompanyId;
+    private final Optional<AiChatAgentIdentifiers> agentIdentifier;
+
+    private final Optional<String> currentAccountId;
 
     private final Optional<List<CreateAiChatsRequestMessageAttachmentsItem>> messageAttachments;
 
@@ -42,14 +45,16 @@ public final class CreateAiChatsRequest {
     private final Map<String, Object> additionalProperties;
 
     private CreateAiChatsRequest(
-            Optional<String> currentCompanyId,
+            Optional<AiChatAgentIdentifiers> agentIdentifier,
+            Optional<String> currentAccountId,
             Optional<List<CreateAiChatsRequestMessageAttachmentsItem>> messageAttachments,
             Optional<AiChatMessageSourceTypes> messageSource,
             String messageText,
             Optional<String> suggestionType,
             Optional<String> title,
             Map<String, Object> additionalProperties) {
-        this.currentCompanyId = currentCompanyId;
+        this.agentIdentifier = agentIdentifier;
+        this.currentAccountId = currentAccountId;
         this.messageAttachments = messageAttachments;
         this.messageSource = messageSource;
         this.messageText = messageText;
@@ -59,14 +64,25 @@ public final class CreateAiChatsRequest {
     }
 
     /**
-     * @return The unique identifier of the company to set as context for the AI chat (e.g., &quot;biz_XXXXX&quot;).
+     * @return The AI agent that handles the chat. Defaults to <code>support</code>.
      */
     @JsonIgnore
-    public Optional<String> getCurrentCompanyId() {
-        if (currentCompanyId == null) {
+    public Optional<AiChatAgentIdentifiers> getAgentIdentifier() {
+        if (agentIdentifier == null) {
             return Optional.empty();
         }
-        return currentCompanyId;
+        return agentIdentifier;
+    }
+
+    /**
+     * @return The unique identifier of the account to set as context for the AI chat (e.g., &quot;biz_XXXXX&quot;).
+     */
+    @JsonIgnore
+    public Optional<String> getCurrentAccountId() {
+        if (currentAccountId == null) {
+            return Optional.empty();
+        }
+        return currentAccountId;
     }
 
     /**
@@ -122,9 +138,15 @@ public final class CreateAiChatsRequest {
     }
 
     @JsonInclude(value = JsonInclude.Include.CUSTOM, valueFilter = NullableNonemptyFilter.class)
-    @JsonProperty("current_company_id")
-    private Optional<String> _getCurrentCompanyId() {
-        return currentCompanyId;
+    @JsonProperty("agent_identifier")
+    private Optional<AiChatAgentIdentifiers> _getAgentIdentifier() {
+        return agentIdentifier;
+    }
+
+    @JsonInclude(value = JsonInclude.Include.CUSTOM, valueFilter = NullableNonemptyFilter.class)
+    @JsonProperty("current_account_id")
+    private Optional<String> _getCurrentAccountId() {
+        return currentAccountId;
     }
 
     @JsonInclude(value = JsonInclude.Include.CUSTOM, valueFilter = NullableNonemptyFilter.class)
@@ -163,7 +185,8 @@ public final class CreateAiChatsRequest {
     }
 
     private boolean equalTo(CreateAiChatsRequest other) {
-        return currentCompanyId.equals(other.currentCompanyId)
+        return agentIdentifier.equals(other.agentIdentifier)
+                && currentAccountId.equals(other.currentAccountId)
                 && messageAttachments.equals(other.messageAttachments)
                 && messageSource.equals(other.messageSource)
                 && messageText.equals(other.messageText)
@@ -174,7 +197,8 @@ public final class CreateAiChatsRequest {
     @java.lang.Override
     public int hashCode() {
         return Objects.hash(
-                this.currentCompanyId,
+                this.agentIdentifier,
+                this.currentAccountId,
                 this.messageAttachments,
                 this.messageSource,
                 this.messageText,
@@ -208,13 +232,22 @@ public final class CreateAiChatsRequest {
         _FinalStage additionalProperties(Map<String, Object> additionalProperties);
 
         /**
-         * <p>The unique identifier of the company to set as context for the AI chat (e.g., &quot;biz_XXXXX&quot;).</p>
+         * <p>The AI agent that handles the chat. Defaults to <code>support</code>.</p>
          */
-        _FinalStage currentCompanyId(Optional<String> currentCompanyId);
+        _FinalStage agentIdentifier(Optional<AiChatAgentIdentifiers> agentIdentifier);
 
-        _FinalStage currentCompanyId(String currentCompanyId);
+        _FinalStage agentIdentifier(AiChatAgentIdentifiers agentIdentifier);
 
-        _FinalStage currentCompanyId(Nullable<String> currentCompanyId);
+        _FinalStage agentIdentifier(Nullable<AiChatAgentIdentifiers> agentIdentifier);
+
+        /**
+         * <p>The unique identifier of the account to set as context for the AI chat (e.g., &quot;biz_XXXXX&quot;).</p>
+         */
+        _FinalStage currentAccountId(Optional<String> currentAccountId);
+
+        _FinalStage currentAccountId(String currentAccountId);
+
+        _FinalStage currentAccountId(Nullable<String> currentAccountId);
 
         /**
          * <p>A list of previously uploaded file attachments to include with the first message.</p>
@@ -265,16 +298,18 @@ public final class CreateAiChatsRequest {
 
         private Optional<List<CreateAiChatsRequestMessageAttachmentsItem>> messageAttachments = Optional.empty();
 
-        private Optional<String> currentCompanyId = Optional.empty();
+        private Optional<String> currentAccountId = Optional.empty();
 
-        @JsonAnySetter
+        private Optional<AiChatAgentIdentifiers> agentIdentifier = Optional.empty();
+
         private Map<String, Object> additionalProperties = new HashMap<>();
 
         private Builder() {}
 
         @java.lang.Override
         public Builder from(CreateAiChatsRequest other) {
-            currentCompanyId(other.getCurrentCompanyId());
+            agentIdentifier(other.getAgentIdentifier());
+            currentAccountId(other.getCurrentAccountId());
             messageAttachments(other.getMessageAttachments());
             messageSource(other.getMessageSource());
             messageText(other.getMessageText());
@@ -284,7 +319,6 @@ public final class CreateAiChatsRequest {
         }
 
         /**
-         * <p>The text content of the first message to send to the AI agent.</p>
          * <p>The text content of the first message to send to the AI agent.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
@@ -442,51 +476,102 @@ public final class CreateAiChatsRequest {
         }
 
         /**
-         * <p>The unique identifier of the company to set as context for the AI chat (e.g., &quot;biz_XXXXX&quot;).</p>
+         * <p>The unique identifier of the account to set as context for the AI chat (e.g., &quot;biz_XXXXX&quot;).</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
-        public _FinalStage currentCompanyId(Nullable<String> currentCompanyId) {
-            if (currentCompanyId.isNull()) {
-                this.currentCompanyId = null;
-            } else if (currentCompanyId.isEmpty()) {
-                this.currentCompanyId = Optional.empty();
+        public _FinalStage currentAccountId(Nullable<String> currentAccountId) {
+            if (currentAccountId.isNull()) {
+                this.currentAccountId = null;
+            } else if (currentAccountId.isEmpty()) {
+                this.currentAccountId = Optional.empty();
             } else {
-                this.currentCompanyId = Optional.of(currentCompanyId.get());
+                this.currentAccountId = Optional.of(currentAccountId.get());
             }
             return this;
         }
 
         /**
-         * <p>The unique identifier of the company to set as context for the AI chat (e.g., &quot;biz_XXXXX&quot;).</p>
+         * <p>The unique identifier of the account to set as context for the AI chat (e.g., &quot;biz_XXXXX&quot;).</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
-        public _FinalStage currentCompanyId(String currentCompanyId) {
-            this.currentCompanyId = Optional.ofNullable(currentCompanyId);
+        public _FinalStage currentAccountId(String currentAccountId) {
+            this.currentAccountId = Optional.ofNullable(currentAccountId);
             return this;
         }
 
         /**
-         * <p>The unique identifier of the company to set as context for the AI chat (e.g., &quot;biz_XXXXX&quot;).</p>
+         * <p>The unique identifier of the account to set as context for the AI chat (e.g., &quot;biz_XXXXX&quot;).</p>
          */
         @java.lang.Override
-        @JsonSetter(value = "current_company_id", nulls = Nulls.SKIP)
-        public _FinalStage currentCompanyId(Optional<String> currentCompanyId) {
-            this.currentCompanyId = currentCompanyId;
+        @JsonSetter(value = "current_account_id", nulls = Nulls.SKIP)
+        public _FinalStage currentAccountId(Optional<String> currentAccountId) {
+            this.currentAccountId = currentAccountId;
+            return this;
+        }
+
+        /**
+         * <p>The AI agent that handles the chat. Defaults to <code>support</code>.</p>
+         * @return Reference to {@code this} so that method calls can be chained together.
+         */
+        @java.lang.Override
+        public _FinalStage agentIdentifier(Nullable<AiChatAgentIdentifiers> agentIdentifier) {
+            if (agentIdentifier.isNull()) {
+                this.agentIdentifier = null;
+            } else if (agentIdentifier.isEmpty()) {
+                this.agentIdentifier = Optional.empty();
+            } else {
+                this.agentIdentifier = Optional.of(agentIdentifier.get());
+            }
+            return this;
+        }
+
+        /**
+         * <p>The AI agent that handles the chat. Defaults to <code>support</code>.</p>
+         * @return Reference to {@code this} so that method calls can be chained together.
+         */
+        @java.lang.Override
+        public _FinalStage agentIdentifier(AiChatAgentIdentifiers agentIdentifier) {
+            this.agentIdentifier = Optional.ofNullable(agentIdentifier);
+            return this;
+        }
+
+        /**
+         * <p>The AI agent that handles the chat. Defaults to <code>support</code>.</p>
+         */
+        @java.lang.Override
+        @JsonSetter(value = "agent_identifier", nulls = Nulls.SKIP)
+        public _FinalStage agentIdentifier(Optional<AiChatAgentIdentifiers> agentIdentifier) {
+            this.agentIdentifier = agentIdentifier;
             return this;
         }
 
         @java.lang.Override
         public CreateAiChatsRequest build() {
             return new CreateAiChatsRequest(
-                    currentCompanyId,
+                    agentIdentifier,
+                    currentAccountId,
                     messageAttachments,
                     messageSource,
                     messageText,
                     suggestionType,
                     title,
                     additionalProperties);
+        }
+
+        @JsonAnySetter
+        private void putAdditionalPropertyFromJson(String key, Object value) {
+            if (key.equalsIgnoreCase("agent_identifier")
+                    || key.equalsIgnoreCase("current_account_id")
+                    || key.equalsIgnoreCase("message_attachments")
+                    || key.equalsIgnoreCase("message_source")
+                    || key.equalsIgnoreCase("message_text")
+                    || key.equalsIgnoreCase("suggestion_type")
+                    || key.equalsIgnoreCase("title")) {
+                return;
+            }
+            this.additionalProperties.put(key, value);
         }
 
         @java.lang.Override

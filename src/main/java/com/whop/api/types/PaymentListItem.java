@@ -99,6 +99,8 @@ public final class PaymentListItem {
 
     private final Optional<PaymentListItemShippingAddress> shippingAddress;
 
+    private final Optional<String> sku;
+
     private final Optional<ReceiptStatus> status;
 
     private final FriendlyReceiptStatus substatus;
@@ -159,6 +161,7 @@ public final class PaymentListItem {
             Currencies settlementCurrency,
             Optional<PaymentListItemShipment> shipment,
             Optional<PaymentListItemShippingAddress> shippingAddress,
+            Optional<String> sku,
             Optional<ReceiptStatus> status,
             FriendlyReceiptStatus substatus,
             Optional<Double> subtotal,
@@ -207,6 +210,7 @@ public final class PaymentListItem {
         this.settlementCurrency = settlementCurrency;
         this.shipment = shipment;
         this.shippingAddress = shippingAddress;
+        this.sku = sku;
         this.status = status;
         this.substatus = substatus;
         this.subtotal = subtotal;
@@ -566,7 +570,7 @@ public final class PaymentListItem {
     }
 
     /**
-     * @return True when the payment status is <code>open</code> and its membership is in one of the retry-eligible states (<code>active</code>, <code>trialing</code>, <code>completed</code>, or <code>past_due</code>), or when it is a failed initial billing-engine payment on a <code>drafted</code> membership with an unlimited-stock plan; otherwise false. Used to decide if Whop can attempt the charge again.
+     * @return True when the payment is <code>open</code>, its processor can be charged again, its membership is <code>active</code>, <code>trialing</code>, or <code>past_due</code> (or it is a failed initial payment on a <code>drafted</code> membership), it is not paid through an invoice link, and its one manual retry is not used up. Used to decide if the payment can be retried by hand. A retry can still be refused when the company cannot accept payments.
      */
     @JsonProperty("retryable")
     public boolean getRetryable() {
@@ -601,6 +605,17 @@ public final class PaymentListItem {
             return Optional.empty();
         }
         return shippingAddress;
+    }
+
+    /**
+     * @return The stock keeping unit of the variant this payment charged for (the first item, on a cart), as set by the seller. Accounts with billing-reason SKU suffixes enabled receive it stamped with why the charge happened: <code>-S</code> for a first subscription charge, <code>-R</code> for a renewal, <code>-C</code> for a one-time purchase, <code>-U</code> when the payment's own metadata carries <code>upsell: true</code>, <code>-F</code> when nothing was charged. Other billing reasons carry the bare SKU. Null when the variant has no SKU.
+     */
+    @JsonIgnore
+    public Optional<String> getSku() {
+        if (sku == null) {
+            return Optional.empty();
+        }
+        return sku;
     }
 
     /**
@@ -697,7 +712,7 @@ public final class PaymentListItem {
     }
 
     /**
-     * @return True when the payment is tied to a membership in <code>past_due</code>, the payment status is <code>open</code>, and the processor allows voiding payments; otherwise false.
+     * @return True when the payment can be voided or canceled. The request is rejected if the payment is no longer eligible.
      */
     @JsonProperty("voidable")
     public boolean getVoidable() {
@@ -879,6 +894,12 @@ public final class PaymentListItem {
     }
 
     @JsonInclude(value = JsonInclude.Include.CUSTOM, valueFilter = NullableNonemptyFilter.class)
+    @JsonProperty("sku")
+    private Optional<String> _getSku() {
+        return sku;
+    }
+
+    @JsonInclude(value = JsonInclude.Include.CUSTOM, valueFilter = NullableNonemptyFilter.class)
     @JsonProperty("status")
     private Optional<ReceiptStatus> _getStatus() {
         return status;
@@ -969,6 +990,7 @@ public final class PaymentListItem {
                 && settlementCurrency.equals(other.settlementCurrency)
                 && shipment.equals(other.shipment)
                 && shippingAddress.equals(other.shippingAddress)
+                && sku.equals(other.sku)
                 && status.equals(other.status)
                 && substatus.equals(other.substatus)
                 && subtotal.equals(other.subtotal)
@@ -1021,6 +1043,7 @@ public final class PaymentListItem {
                 this.settlementCurrency,
                 this.shipment,
                 this.shippingAddress,
+                this.sku,
                 this.status,
                 this.substatus,
                 this.subtotal,
@@ -1088,7 +1111,7 @@ public final class PaymentListItem {
 
     public interface RetryableStage {
         /**
-         * <p>True when the payment status is <code>open</code> and its membership is in one of the retry-eligible states (<code>active</code>, <code>trialing</code>, <code>completed</code>, or <code>past_due</code>), or when it is a failed initial billing-engine payment on a <code>drafted</code> membership with an unlimited-stock plan; otherwise false. Used to decide if Whop can attempt the charge again.</p>
+         * <p>True when the payment is <code>open</code>, its processor can be charged again, its membership is <code>active</code>, <code>trialing</code>, or <code>past_due</code> (or it is a failed initial payment on a <code>drafted</code> membership), it is not paid through an invoice link, and its one manual retry is not used up. Used to decide if the payment can be retried by hand. A retry can still be refused when the company cannot accept payments.</p>
          */
         SettlementCurrencyStage retryable(boolean retryable);
     }
@@ -1116,7 +1139,7 @@ public final class PaymentListItem {
 
     public interface VoidableStage {
         /**
-         * <p>True when the payment is tied to a membership in <code>past_due</code>, the payment status is <code>open</code>, and the processor allows voiding payments; otherwise false.</p>
+         * <p>True when the payment can be voided or canceled. The request is rejected if the payment is no longer eligible.</p>
          */
         _FinalStage voidable(boolean voidable);
     }
@@ -1390,6 +1413,15 @@ public final class PaymentListItem {
         _FinalStage shippingAddress(Nullable<PaymentListItemShippingAddress> shippingAddress);
 
         /**
+         * <p>The stock keeping unit of the variant this payment charged for (the first item, on a cart), as set by the seller. Accounts with billing-reason SKU suffixes enabled receive it stamped with why the charge happened: <code>-S</code> for a first subscription charge, <code>-R</code> for a renewal, <code>-C</code> for a one-time purchase, <code>-U</code> when the payment's own metadata carries <code>upsell: true</code>, <code>-F</code> when nothing was charged. Other billing reasons carry the bare SKU. Null when the variant has no SKU.</p>
+         */
+        _FinalStage sku(Optional<String> sku);
+
+        _FinalStage sku(String sku);
+
+        _FinalStage sku(Nullable<String> sku);
+
+        /**
          * <p>The current lifecycle state of this payment (e.g., 'draft', 'open', 'paid', 'void').</p>
          */
         _FinalStage status(Optional<ReceiptStatus> status);
@@ -1503,6 +1535,8 @@ public final class PaymentListItem {
 
         private Optional<ReceiptStatus> status = Optional.empty();
 
+        private Optional<String> sku = Optional.empty();
+
         private Optional<PaymentListItemShippingAddress> shippingAddress = Optional.empty();
 
         private Optional<PaymentListItemShipment> shipment = Optional.empty();
@@ -1561,7 +1595,6 @@ public final class PaymentListItem {
 
         private Optional<PaymentListItemApplicationFee> applicationFee = Optional.empty();
 
-        @JsonAnySetter
         private Map<String, Object> additionalProperties = new HashMap<>();
 
         private Builder() {}
@@ -1605,6 +1638,7 @@ public final class PaymentListItem {
             settlementCurrency(other.getSettlementCurrency());
             shipment(other.getShipment());
             shippingAddress(other.getShippingAddress());
+            sku(other.getSku());
             status(other.getStatus());
             substatus(other.getSubstatus());
             subtotal(other.getSubtotal());
@@ -1620,7 +1654,6 @@ public final class PaymentListItem {
 
         /**
          * <p>How much the payment is for after fees</p>
-         * <p>How much the payment is for after fees</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
@@ -1631,7 +1664,6 @@ public final class PaymentListItem {
         }
 
         /**
-         * <p>Whether this payment was auto refunded or not</p>
          * <p>Whether this payment was auto refunded or not</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
@@ -1644,7 +1676,6 @@ public final class PaymentListItem {
 
         /**
          * <p>The datetime the payment was created.</p>
-         * <p>The datetime the payment was created.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
@@ -1655,7 +1686,6 @@ public final class PaymentListItem {
         }
 
         /**
-         * <p>The three-letter ISO currency code for this payment (e.g., 'usd', 'eur').</p>
          * <p>The three-letter ISO currency code for this payment (e.g., 'usd', 'eur').</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
@@ -1668,7 +1698,6 @@ public final class PaymentListItem {
 
         /**
          * <p>The unique identifier for the payment.</p>
-         * <p>The unique identifier for the payment.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
@@ -1680,7 +1709,6 @@ public final class PaymentListItem {
 
         /**
          * <p>True only for payments that are <code>paid</code>, have not been fully refunded, and were processed by a payment processor that allows refunds.</p>
-         * <p>True only for payments that are <code>paid</code>, have not been fully refunded, and were processed by a payment processor that allows refunds.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
@@ -1691,8 +1719,7 @@ public final class PaymentListItem {
         }
 
         /**
-         * <p>True when the payment status is <code>open</code> and its membership is in one of the retry-eligible states (<code>active</code>, <code>trialing</code>, <code>completed</code>, or <code>past_due</code>), or when it is a failed initial billing-engine payment on a <code>drafted</code> membership with an unlimited-stock plan; otherwise false. Used to decide if Whop can attempt the charge again.</p>
-         * <p>True when the payment status is <code>open</code> and its membership is in one of the retry-eligible states (<code>active</code>, <code>trialing</code>, <code>completed</code>, or <code>past_due</code>), or when it is a failed initial billing-engine payment on a <code>drafted</code> membership with an unlimited-stock plan; otherwise false. Used to decide if Whop can attempt the charge again.</p>
+         * <p>True when the payment is <code>open</code>, its processor can be charged again, its membership is <code>active</code>, <code>trialing</code>, or <code>past_due</code> (or it is a failed initial payment on a <code>drafted</code> membership), it is not paid through an invoice link, and its one manual retry is not used up. Used to decide if the payment can be retried by hand. A retry can still be refused when the company cannot accept payments.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
@@ -1703,7 +1730,6 @@ public final class PaymentListItem {
         }
 
         /**
-         * <p>The three-letter ISO currency code for this payment (e.g., 'usd', 'eur').</p>
          * <p>The three-letter ISO currency code for this payment (e.g., 'usd', 'eur').</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
@@ -1716,7 +1742,6 @@ public final class PaymentListItem {
 
         /**
          * <p>The friendly status of the payment.</p>
-         * <p>The friendly status of the payment.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
@@ -1728,7 +1753,6 @@ public final class PaymentListItem {
 
         /**
          * <p>The datetime the payment was last updated.</p>
-         * <p>The datetime the payment was last updated.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
@@ -1739,8 +1763,7 @@ public final class PaymentListItem {
         }
 
         /**
-         * <p>True when the payment is tied to a membership in <code>past_due</code>, the payment status is <code>open</code>, and the processor allows voiding payments; otherwise false.</p>
-         * <p>True when the payment is tied to a membership in <code>past_due</code>, the payment status is <code>open</code>, and the processor allows voiding payments; otherwise false.</p>
+         * <p>True when the payment can be voided or canceled. The request is rejected if the payment is no longer eligible.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
@@ -1999,6 +2022,42 @@ public final class PaymentListItem {
         @JsonSetter(value = "status", nulls = Nulls.SKIP)
         public _FinalStage status(Optional<ReceiptStatus> status) {
             this.status = status;
+            return this;
+        }
+
+        /**
+         * <p>The stock keeping unit of the variant this payment charged for (the first item, on a cart), as set by the seller. Accounts with billing-reason SKU suffixes enabled receive it stamped with why the charge happened: <code>-S</code> for a first subscription charge, <code>-R</code> for a renewal, <code>-C</code> for a one-time purchase, <code>-U</code> when the payment's own metadata carries <code>upsell: true</code>, <code>-F</code> when nothing was charged. Other billing reasons carry the bare SKU. Null when the variant has no SKU.</p>
+         * @return Reference to {@code this} so that method calls can be chained together.
+         */
+        @java.lang.Override
+        public _FinalStage sku(Nullable<String> sku) {
+            if (sku.isNull()) {
+                this.sku = null;
+            } else if (sku.isEmpty()) {
+                this.sku = Optional.empty();
+            } else {
+                this.sku = Optional.of(sku.get());
+            }
+            return this;
+        }
+
+        /**
+         * <p>The stock keeping unit of the variant this payment charged for (the first item, on a cart), as set by the seller. Accounts with billing-reason SKU suffixes enabled receive it stamped with why the charge happened: <code>-S</code> for a first subscription charge, <code>-R</code> for a renewal, <code>-C</code> for a one-time purchase, <code>-U</code> when the payment's own metadata carries <code>upsell: true</code>, <code>-F</code> when nothing was charged. Other billing reasons carry the bare SKU. Null when the variant has no SKU.</p>
+         * @return Reference to {@code this} so that method calls can be chained together.
+         */
+        @java.lang.Override
+        public _FinalStage sku(String sku) {
+            this.sku = Optional.ofNullable(sku);
+            return this;
+        }
+
+        /**
+         * <p>The stock keeping unit of the variant this payment charged for (the first item, on a cart), as set by the seller. Accounts with billing-reason SKU suffixes enabled receive it stamped with why the charge happened: <code>-S</code> for a first subscription charge, <code>-R</code> for a renewal, <code>-C</code> for a one-time purchase, <code>-U</code> when the payment's own metadata carries <code>upsell: true</code>, <code>-F</code> when nothing was charged. Other billing reasons carry the bare SKU. Null when the variant has no SKU.</p>
+         */
+        @java.lang.Override
+        @JsonSetter(value = "sku", nulls = Nulls.SKIP)
+        public _FinalStage sku(Optional<String> sku) {
+            this.sku = sku;
             return this;
         }
 
@@ -3086,6 +3145,7 @@ public final class PaymentListItem {
                     settlementCurrency,
                     shipment,
                     shippingAddress,
+                    sku,
                     status,
                     substatus,
                     subtotal,
@@ -3097,6 +3157,61 @@ public final class PaymentListItem {
                     user,
                     voidable,
                     additionalProperties);
+        }
+
+        @JsonAnySetter
+        private void putAdditionalPropertyFromJson(String key, Object value) {
+            if (key.equalsIgnoreCase("amount_after_fees")
+                    || key.equalsIgnoreCase("application_fee")
+                    || key.equalsIgnoreCase("auto_refunded")
+                    || key.equalsIgnoreCase("billing_address")
+                    || key.equalsIgnoreCase("billing_reason")
+                    || key.equalsIgnoreCase("card_brand")
+                    || key.equalsIgnoreCase("card_last4")
+                    || key.equalsIgnoreCase("checkout_configuration_id")
+                    || key.equalsIgnoreCase("company")
+                    || key.equalsIgnoreCase("created_at")
+                    || key.equalsIgnoreCase("currency")
+                    || key.equalsIgnoreCase("customer_phone")
+                    || key.equalsIgnoreCase("decline_code")
+                    || key.equalsIgnoreCase("dispute_alerted_at")
+                    || key.equalsIgnoreCase("failure_message")
+                    || key.equalsIgnoreCase("id")
+                    || key.equalsIgnoreCase("last_payment_attempt")
+                    || key.equalsIgnoreCase("member")
+                    || key.equalsIgnoreCase("membership")
+                    || key.equalsIgnoreCase("metadata")
+                    || key.equalsIgnoreCase("needs_tracking")
+                    || key.equalsIgnoreCase("next_payment_attempt")
+                    || key.equalsIgnoreCase("paid_at")
+                    || key.equalsIgnoreCase("payment_instrument")
+                    || key.equalsIgnoreCase("payment_method")
+                    || key.equalsIgnoreCase("payment_method_type")
+                    || key.equalsIgnoreCase("payments_failed")
+                    || key.equalsIgnoreCase("plan")
+                    || key.equalsIgnoreCase("product")
+                    || key.equalsIgnoreCase("promo_code")
+                    || key.equalsIgnoreCase("refundable")
+                    || key.equalsIgnoreCase("refunded_amount")
+                    || key.equalsIgnoreCase("refunded_at")
+                    || key.equalsIgnoreCase("retryable")
+                    || key.equalsIgnoreCase("settlement_currency")
+                    || key.equalsIgnoreCase("shipment")
+                    || key.equalsIgnoreCase("shipping_address")
+                    || key.equalsIgnoreCase("sku")
+                    || key.equalsIgnoreCase("status")
+                    || key.equalsIgnoreCase("substatus")
+                    || key.equalsIgnoreCase("subtotal")
+                    || key.equalsIgnoreCase("tax_amount")
+                    || key.equalsIgnoreCase("tax_behavior")
+                    || key.equalsIgnoreCase("total")
+                    || key.equalsIgnoreCase("updated_at")
+                    || key.equalsIgnoreCase("usd_total")
+                    || key.equalsIgnoreCase("user")
+                    || key.equalsIgnoreCase("voidable")) {
+                return;
+            }
+            this.additionalProperties.put(key, value);
         }
 
         @java.lang.Override

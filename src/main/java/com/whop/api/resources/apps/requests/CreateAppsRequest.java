@@ -33,7 +33,11 @@ public final class CreateAppsRequest {
 
     private final Optional<String> baseUrl;
 
+    private final Optional<String> domainId;
+
     private final Optional<CreateAppsRequestIcon> icon;
+
+    private final Optional<String> importedFromUrl;
 
     private final String name;
 
@@ -47,7 +51,9 @@ public final class CreateAppsRequest {
             Optional<String> accountId,
             Optional<CreateAppsRequestAppType> appType,
             Optional<String> baseUrl,
+            Optional<String> domainId,
             Optional<CreateAppsRequestIcon> icon,
+            Optional<String> importedFromUrl,
             String name,
             Optional<List<String>> redirectUris,
             Optional<String> route,
@@ -55,7 +61,9 @@ public final class CreateAppsRequest {
         this.accountId = accountId;
         this.appType = appType;
         this.baseUrl = baseUrl;
+        this.domainId = domainId;
         this.icon = icon;
+        this.importedFromUrl = importedFromUrl;
         this.name = name;
         this.redirectUris = redirectUris;
         this.route = route;
@@ -90,11 +98,33 @@ public final class CreateAppsRequest {
     }
 
     /**
+     * @return A domain on the account (<code>dom_</code> tag) to serve the app at, such as a whop.site address claimed with <code>POST /domains</code>. Required with <code>template_id</code>.
+     */
+    @JsonIgnore
+    public Optional<String> getDomainId() {
+        if (domainId == null) {
+            return Optional.empty();
+        }
+        return domainId;
+    }
+
+    /**
      * @return The icon image for the app in PNG, JPEG, or GIF format, referencing an uploaded file: <code>{ id }</code> for an existing attachment or <code>{ direct_upload_id }</code> for a new direct upload.
      */
     @JsonProperty("icon")
     public Optional<CreateAppsRequestIcon> getIcon() {
         return icon;
+    }
+
+    /**
+     * @return The address of the existing website this app is imported from, such as <code>https://shop.example.com</code>. Must be an <code>http</code> or <code>https</code> URL.
+     */
+    @JsonIgnore
+    public Optional<String> getImportedFromUrl() {
+        if (importedFromUrl == null) {
+            return Optional.empty();
+        }
+        return importedFromUrl;
     }
 
     /**
@@ -114,7 +144,7 @@ public final class CreateAppsRequest {
     }
 
     /**
-     * @return The subdomain route where the app's hosted web builds are served, such as <code>myapp</code> for myapp.whop.app.
+     * @return Deprecated: claim an address with <code>POST /domains</code> and pass <code>domain_id</code>. The subdomain route where the app's hosted web builds are served, such as <code>myapp</code> for myapp.whop.site.
      */
     @JsonIgnore
     public Optional<String> getRoute() {
@@ -128,6 +158,18 @@ public final class CreateAppsRequest {
     @JsonProperty("base_url")
     private Optional<String> _getBaseUrl() {
         return baseUrl;
+    }
+
+    @JsonInclude(value = JsonInclude.Include.CUSTOM, valueFilter = NullableNonemptyFilter.class)
+    @JsonProperty("domain_id")
+    private Optional<String> _getDomainId() {
+        return domainId;
+    }
+
+    @JsonInclude(value = JsonInclude.Include.CUSTOM, valueFilter = NullableNonemptyFilter.class)
+    @JsonProperty("imported_from_url")
+    private Optional<String> _getImportedFromUrl() {
+        return importedFromUrl;
     }
 
     @JsonInclude(value = JsonInclude.Include.CUSTOM, valueFilter = NullableNonemptyFilter.class)
@@ -151,7 +193,9 @@ public final class CreateAppsRequest {
         return accountId.equals(other.accountId)
                 && appType.equals(other.appType)
                 && baseUrl.equals(other.baseUrl)
+                && domainId.equals(other.domainId)
                 && icon.equals(other.icon)
+                && importedFromUrl.equals(other.importedFromUrl)
                 && name.equals(other.name)
                 && redirectUris.equals(other.redirectUris)
                 && route.equals(other.route);
@@ -160,7 +204,15 @@ public final class CreateAppsRequest {
     @java.lang.Override
     public int hashCode() {
         return Objects.hash(
-                this.accountId, this.appType, this.baseUrl, this.icon, this.name, this.redirectUris, this.route);
+                this.accountId,
+                this.appType,
+                this.baseUrl,
+                this.domainId,
+                this.icon,
+                this.importedFromUrl,
+                this.name,
+                this.redirectUris,
+                this.route);
     }
 
     @java.lang.Override
@@ -212,11 +264,29 @@ public final class CreateAppsRequest {
         _FinalStage baseUrl(Nullable<String> baseUrl);
 
         /**
+         * <p>A domain on the account (<code>dom_</code> tag) to serve the app at, such as a whop.site address claimed with <code>POST /domains</code>. Required with <code>template_id</code>.</p>
+         */
+        _FinalStage domainId(Optional<String> domainId);
+
+        _FinalStage domainId(String domainId);
+
+        _FinalStage domainId(Nullable<String> domainId);
+
+        /**
          * <p>The icon image for the app in PNG, JPEG, or GIF format, referencing an uploaded file: <code>{ id }</code> for an existing attachment or <code>{ direct_upload_id }</code> for a new direct upload.</p>
          */
         _FinalStage icon(Optional<CreateAppsRequestIcon> icon);
 
         _FinalStage icon(CreateAppsRequestIcon icon);
+
+        /**
+         * <p>The address of the existing website this app is imported from, such as <code>https://shop.example.com</code>. Must be an <code>http</code> or <code>https</code> URL.</p>
+         */
+        _FinalStage importedFromUrl(Optional<String> importedFromUrl);
+
+        _FinalStage importedFromUrl(String importedFromUrl);
+
+        _FinalStage importedFromUrl(Nullable<String> importedFromUrl);
 
         /**
          * <p>The whitelisted OAuth callback URLs that users are redirected to after authorizing the app.</p>
@@ -226,7 +296,7 @@ public final class CreateAppsRequest {
         _FinalStage redirectUris(List<String> redirectUris);
 
         /**
-         * <p>The subdomain route where the app's hosted web builds are served, such as <code>myapp</code> for myapp.whop.app.</p>
+         * <p>Deprecated: claim an address with <code>POST /domains</code> and pass <code>domain_id</code>. The subdomain route where the app's hosted web builds are served, such as <code>myapp</code> for myapp.whop.site.</p>
          */
         _FinalStage route(Optional<String> route);
 
@@ -243,7 +313,11 @@ public final class CreateAppsRequest {
 
         private Optional<List<String>> redirectUris = Optional.empty();
 
+        private Optional<String> importedFromUrl = Optional.empty();
+
         private Optional<CreateAppsRequestIcon> icon = Optional.empty();
+
+        private Optional<String> domainId = Optional.empty();
 
         private Optional<String> baseUrl = Optional.empty();
 
@@ -251,7 +325,6 @@ public final class CreateAppsRequest {
 
         private Optional<String> accountId = Optional.empty();
 
-        @JsonAnySetter
         private Map<String, Object> additionalProperties = new HashMap<>();
 
         private Builder() {}
@@ -261,7 +334,9 @@ public final class CreateAppsRequest {
             accountId(other.getAccountId());
             appType(other.getAppType());
             baseUrl(other.getBaseUrl());
+            domainId(other.getDomainId());
             icon(other.getIcon());
+            importedFromUrl(other.getImportedFromUrl());
             name(other.getName());
             redirectUris(other.getRedirectUris());
             route(other.getRoute());
@@ -269,7 +344,6 @@ public final class CreateAppsRequest {
         }
 
         /**
-         * <p>The display name for the app, shown to users on the app store and product pages.</p>
          * <p>The display name for the app, shown to users on the app store and product pages.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
@@ -281,7 +355,7 @@ public final class CreateAppsRequest {
         }
 
         /**
-         * <p>The subdomain route where the app's hosted web builds are served, such as <code>myapp</code> for myapp.whop.app.</p>
+         * <p>Deprecated: claim an address with <code>POST /domains</code> and pass <code>domain_id</code>. The subdomain route where the app's hosted web builds are served, such as <code>myapp</code> for myapp.whop.site.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
@@ -297,7 +371,7 @@ public final class CreateAppsRequest {
         }
 
         /**
-         * <p>The subdomain route where the app's hosted web builds are served, such as <code>myapp</code> for myapp.whop.app.</p>
+         * <p>Deprecated: claim an address with <code>POST /domains</code> and pass <code>domain_id</code>. The subdomain route where the app's hosted web builds are served, such as <code>myapp</code> for myapp.whop.site.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
@@ -307,7 +381,7 @@ public final class CreateAppsRequest {
         }
 
         /**
-         * <p>The subdomain route where the app's hosted web builds are served, such as <code>myapp</code> for myapp.whop.app.</p>
+         * <p>Deprecated: claim an address with <code>POST /domains</code> and pass <code>domain_id</code>. The subdomain route where the app's hosted web builds are served, such as <code>myapp</code> for myapp.whop.site.</p>
          */
         @java.lang.Override
         @JsonSetter(value = "route", nulls = Nulls.SKIP)
@@ -337,6 +411,42 @@ public final class CreateAppsRequest {
         }
 
         /**
+         * <p>The address of the existing website this app is imported from, such as <code>https://shop.example.com</code>. Must be an <code>http</code> or <code>https</code> URL.</p>
+         * @return Reference to {@code this} so that method calls can be chained together.
+         */
+        @java.lang.Override
+        public _FinalStage importedFromUrl(Nullable<String> importedFromUrl) {
+            if (importedFromUrl.isNull()) {
+                this.importedFromUrl = null;
+            } else if (importedFromUrl.isEmpty()) {
+                this.importedFromUrl = Optional.empty();
+            } else {
+                this.importedFromUrl = Optional.of(importedFromUrl.get());
+            }
+            return this;
+        }
+
+        /**
+         * <p>The address of the existing website this app is imported from, such as <code>https://shop.example.com</code>. Must be an <code>http</code> or <code>https</code> URL.</p>
+         * @return Reference to {@code this} so that method calls can be chained together.
+         */
+        @java.lang.Override
+        public _FinalStage importedFromUrl(String importedFromUrl) {
+            this.importedFromUrl = Optional.ofNullable(importedFromUrl);
+            return this;
+        }
+
+        /**
+         * <p>The address of the existing website this app is imported from, such as <code>https://shop.example.com</code>. Must be an <code>http</code> or <code>https</code> URL.</p>
+         */
+        @java.lang.Override
+        @JsonSetter(value = "imported_from_url", nulls = Nulls.SKIP)
+        public _FinalStage importedFromUrl(Optional<String> importedFromUrl) {
+            this.importedFromUrl = importedFromUrl;
+            return this;
+        }
+
+        /**
          * <p>The icon image for the app in PNG, JPEG, or GIF format, referencing an uploaded file: <code>{ id }</code> for an existing attachment or <code>{ direct_upload_id }</code> for a new direct upload.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
@@ -353,6 +463,42 @@ public final class CreateAppsRequest {
         @JsonSetter(value = "icon", nulls = Nulls.SKIP)
         public _FinalStage icon(Optional<CreateAppsRequestIcon> icon) {
             this.icon = icon;
+            return this;
+        }
+
+        /**
+         * <p>A domain on the account (<code>dom_</code> tag) to serve the app at, such as a whop.site address claimed with <code>POST /domains</code>. Required with <code>template_id</code>.</p>
+         * @return Reference to {@code this} so that method calls can be chained together.
+         */
+        @java.lang.Override
+        public _FinalStage domainId(Nullable<String> domainId) {
+            if (domainId.isNull()) {
+                this.domainId = null;
+            } else if (domainId.isEmpty()) {
+                this.domainId = Optional.empty();
+            } else {
+                this.domainId = Optional.of(domainId.get());
+            }
+            return this;
+        }
+
+        /**
+         * <p>A domain on the account (<code>dom_</code> tag) to serve the app at, such as a whop.site address claimed with <code>POST /domains</code>. Required with <code>template_id</code>.</p>
+         * @return Reference to {@code this} so that method calls can be chained together.
+         */
+        @java.lang.Override
+        public _FinalStage domainId(String domainId) {
+            this.domainId = Optional.ofNullable(domainId);
+            return this;
+        }
+
+        /**
+         * <p>A domain on the account (<code>dom_</code> tag) to serve the app at, such as a whop.site address claimed with <code>POST /domains</code>. Required with <code>template_id</code>.</p>
+         */
+        @java.lang.Override
+        @JsonSetter(value = "domain_id", nulls = Nulls.SKIP)
+        public _FinalStage domainId(Optional<String> domainId) {
+            this.domainId = domainId;
             return this;
         }
 
@@ -435,7 +581,32 @@ public final class CreateAppsRequest {
         @java.lang.Override
         public CreateAppsRequest build() {
             return new CreateAppsRequest(
-                    accountId, appType, baseUrl, icon, name, redirectUris, route, additionalProperties);
+                    accountId,
+                    appType,
+                    baseUrl,
+                    domainId,
+                    icon,
+                    importedFromUrl,
+                    name,
+                    redirectUris,
+                    route,
+                    additionalProperties);
+        }
+
+        @JsonAnySetter
+        private void putAdditionalPropertyFromJson(String key, Object value) {
+            if (key.equalsIgnoreCase("account_id")
+                    || key.equalsIgnoreCase("app_type")
+                    || key.equalsIgnoreCase("base_url")
+                    || key.equalsIgnoreCase("domain_id")
+                    || key.equalsIgnoreCase("icon")
+                    || key.equalsIgnoreCase("imported_from_url")
+                    || key.equalsIgnoreCase("name")
+                    || key.equalsIgnoreCase("redirect_uris")
+                    || key.equalsIgnoreCase("route")) {
+                return;
+            }
+            this.additionalProperties.put(key, value);
         }
 
         @java.lang.Override

@@ -214,7 +214,6 @@ public final class AppProductionBuild {
 
         private Optional<String> checksum = Optional.empty();
 
-        @JsonAnySetter
         private Map<String, Object> additionalProperties = new HashMap<>();
 
         private Builder() {}
@@ -231,7 +230,6 @@ public final class AppProductionBuild {
 
         /**
          * <p>App build ID, prefixed <code>abld_</code>.</p>
-         * <p>App build ID, prefixed <code>abld_</code>.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
@@ -242,7 +240,6 @@ public final class AppProductionBuild {
         }
 
         /**
-         * <p>The build's review status.</p>
          * <p>The build's review status.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
@@ -364,6 +361,18 @@ public final class AppProductionBuild {
         @java.lang.Override
         public AppProductionBuild build() {
             return new AppProductionBuild(checksum, fileUrl, id, sourceUrl, status, additionalProperties);
+        }
+
+        @JsonAnySetter
+        private void putAdditionalPropertyFromJson(String key, Object value) {
+            if (key.equalsIgnoreCase("checksum")
+                    || key.equalsIgnoreCase("file_url")
+                    || key.equalsIgnoreCase("id")
+                    || key.equalsIgnoreCase("source_url")
+                    || key.equalsIgnoreCase("status")) {
+                return;
+            }
+            this.additionalProperties.put(key, value);
         }
 
         @java.lang.Override

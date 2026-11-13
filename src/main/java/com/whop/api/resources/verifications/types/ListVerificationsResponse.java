@@ -12,28 +12,39 @@ import com.fasterxml.jackson.annotation.JsonSetter;
 import com.fasterxml.jackson.annotation.Nulls;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.whop.api.core.ObjectMappers;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
-import java.util.Optional;
+import org.jetbrains.annotations.NotNull;
 
 @JsonInclude(JsonInclude.Include.NON_ABSENT)
 @JsonDeserialize(builder = ListVerificationsResponse.Builder.class)
 public final class ListVerificationsResponse {
-    private final Optional<List<ListVerificationsResponseDataItem>> data;
+    private final List<ListVerificationsResponseDataItem> data;
+
+    private final ListVerificationsResponsePageInfo pageInfo;
 
     private final Map<String, Object> additionalProperties;
 
     private ListVerificationsResponse(
-            Optional<List<ListVerificationsResponseDataItem>> data, Map<String, Object> additionalProperties) {
+            List<ListVerificationsResponseDataItem> data,
+            ListVerificationsResponsePageInfo pageInfo,
+            Map<String, Object> additionalProperties) {
         this.data = data;
+        this.pageInfo = pageInfo;
         this.additionalProperties = additionalProperties;
     }
 
     @JsonProperty("data")
-    public Optional<List<ListVerificationsResponseDataItem>> getData() {
+    public List<ListVerificationsResponseDataItem> getData() {
         return data;
+    }
+
+    @JsonProperty("page_info")
+    public ListVerificationsResponsePageInfo getPageInfo() {
+        return pageInfo;
     }
 
     @java.lang.Override
@@ -48,12 +59,12 @@ public final class ListVerificationsResponse {
     }
 
     private boolean equalTo(ListVerificationsResponse other) {
-        return data.equals(other.data);
+        return data.equals(other.data) && pageInfo.equals(other.pageInfo);
     }
 
     @java.lang.Override
     public int hashCode() {
-        return Objects.hash(this.data);
+        return Objects.hash(this.data, this.pageInfo);
     }
 
     @java.lang.Override
@@ -61,44 +72,98 @@ public final class ListVerificationsResponse {
         return ObjectMappers.stringify(this);
     }
 
-    public static Builder builder() {
+    public static PageInfoStage builder() {
         return new Builder();
     }
 
-    @JsonIgnoreProperties(ignoreUnknown = true)
-    public static final class Builder {
-        private Optional<List<ListVerificationsResponseDataItem>> data = Optional.empty();
+    public interface PageInfoStage {
+        _FinalStage pageInfo(@NotNull ListVerificationsResponsePageInfo pageInfo);
 
-        @JsonAnySetter
+        Builder from(ListVerificationsResponse other);
+    }
+
+    public interface _FinalStage {
+        ListVerificationsResponse build();
+
+        _FinalStage additionalProperty(String key, Object value);
+
+        _FinalStage additionalProperties(Map<String, Object> additionalProperties);
+
+        _FinalStage data(List<ListVerificationsResponseDataItem> data);
+
+        _FinalStage addData(ListVerificationsResponseDataItem data);
+
+        _FinalStage addAllData(List<ListVerificationsResponseDataItem> data);
+    }
+
+    @JsonIgnoreProperties(ignoreUnknown = true)
+    public static final class Builder implements PageInfoStage, _FinalStage {
+        private ListVerificationsResponsePageInfo pageInfo;
+
+        private List<ListVerificationsResponseDataItem> data = new ArrayList<>();
+
         private Map<String, Object> additionalProperties = new HashMap<>();
 
         private Builder() {}
 
+        @java.lang.Override
         public Builder from(ListVerificationsResponse other) {
             data(other.getData());
+            pageInfo(other.getPageInfo());
             return this;
         }
 
+        @java.lang.Override
+        @JsonSetter("page_info")
+        public _FinalStage pageInfo(@NotNull ListVerificationsResponsePageInfo pageInfo) {
+            this.pageInfo = Objects.requireNonNull(pageInfo, "pageInfo must not be null");
+            return this;
+        }
+
+        @java.lang.Override
+        public _FinalStage addAllData(List<ListVerificationsResponseDataItem> data) {
+            if (data != null) {
+                this.data.addAll(data);
+            }
+            return this;
+        }
+
+        @java.lang.Override
+        public _FinalStage addData(ListVerificationsResponseDataItem data) {
+            this.data.add(data);
+            return this;
+        }
+
+        @java.lang.Override
         @JsonSetter(value = "data", nulls = Nulls.SKIP)
-        public Builder data(Optional<List<ListVerificationsResponseDataItem>> data) {
-            this.data = data;
+        public _FinalStage data(List<ListVerificationsResponseDataItem> data) {
+            this.data.clear();
+            if (data != null) {
+                this.data.addAll(data);
+            }
             return this;
         }
 
-        public Builder data(List<ListVerificationsResponseDataItem> data) {
-            this.data = Optional.ofNullable(data);
-            return this;
-        }
-
+        @java.lang.Override
         public ListVerificationsResponse build() {
-            return new ListVerificationsResponse(data, additionalProperties);
+            return new ListVerificationsResponse(data, pageInfo, additionalProperties);
         }
 
+        @JsonAnySetter
+        private void putAdditionalPropertyFromJson(String key, Object value) {
+            if (key.equalsIgnoreCase("data") || key.equalsIgnoreCase("page_info")) {
+                return;
+            }
+            this.additionalProperties.put(key, value);
+        }
+
+        @java.lang.Override
         public Builder additionalProperty(String key, Object value) {
             this.additionalProperties.put(key, value);
             return this;
         }
 
+        @java.lang.Override
         public Builder additionalProperties(Map<String, Object> additionalProperties) {
             this.additionalProperties.putAll(additionalProperties);
             return this;

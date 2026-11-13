@@ -6,10 +6,10 @@ package com.whop.api.resources.transfers;
 import com.whop.api.core.ClientOptions;
 import com.whop.api.core.RequestOptions;
 import com.whop.api.core.pagination.SyncPagingIterable;
-import com.whop.api.resources.transfers.requests.CreateTransfersRequest;
 import com.whop.api.resources.transfers.requests.ListRecipientsTransfersRequest;
 import com.whop.api.resources.transfers.requests.ListTransfersRequest;
 import com.whop.api.resources.transfers.requests.RetrieveTransfersRequest;
+import com.whop.api.resources.transfers.types.CreateTransfersRequestBody;
 import com.whop.api.resources.transfers.types.CreateTransfersResponse;
 import com.whop.api.resources.transfers.types.ListRecipientsTransfersResponseDataItem;
 import com.whop.api.resources.transfers.types.ListTransfersResponseDataItem;
@@ -33,28 +33,28 @@ public class TransfersClient {
     }
 
     /**
-     * Lists an account's transfers.
+     * Lists the transfers you can see, sent or received, newest first by default. Optional account filters narrow the results.
      */
     public SyncPagingIterable<ListTransfersResponseDataItem> list() {
         return this.rawClient.list().body();
     }
 
     /**
-     * Lists an account's transfers.
+     * Lists the transfers you can see, sent or received, newest first by default. Optional account filters narrow the results.
      */
     public SyncPagingIterable<ListTransfersResponseDataItem> list(RequestOptions requestOptions) {
         return this.rawClient.list(requestOptions).body();
     }
 
     /**
-     * Lists an account's transfers.
+     * Lists the transfers you can see, sent or received, newest first by default. Optional account filters narrow the results.
      */
     public SyncPagingIterable<ListTransfersResponseDataItem> list(ListTransfersRequest request) {
         return this.rawClient.list(request).body();
     }
 
     /**
-     * Lists an account's transfers.
+     * Lists the transfers you can see, sent or received, newest first by default. Optional account filters narrow the results.
      */
     public SyncPagingIterable<ListTransfersResponseDataItem> list(
             ListTransfersRequest request, RequestOptions requestOptions) {
@@ -62,21 +62,21 @@ public class TransfersClient {
     }
 
     /**
-     * Moves money between accounts, or into a claim link anyone with the URL can redeem.
+     * Moves money between Whop balances or funds a claim link anyone with the URL can redeem. The <code>type</code> you send decides which object comes back.
      */
-    public CreateTransfersResponse create(CreateTransfersRequest request) {
+    public CreateTransfersResponse create(CreateTransfersRequestBody request) {
         return this.rawClient.create(request).body();
     }
 
     /**
-     * Moves money between accounts, or into a claim link anyone with the URL can redeem.
+     * Moves money between Whop balances or funds a claim link anyone with the URL can redeem. The <code>type</code> you send decides which object comes back.
      */
-    public CreateTransfersResponse create(CreateTransfersRequest request, RequestOptions requestOptions) {
+    public CreateTransfersResponse create(CreateTransfersRequestBody request, RequestOptions requestOptions) {
         return this.rawClient.create(request, requestOptions).body();
     }
 
     /**
-     * Lists the people and accounts you can send money to.
+     * Lists the people and accounts you can send money to from a balance. Pass a result's ID as <code>destination_id</code> when creating a transfer.
      */
     public SyncPagingIterable<ListRecipientsTransfersResponseDataItem> listRecipients(
             ListRecipientsTransfersRequest request) {
@@ -84,7 +84,7 @@ public class TransfersClient {
     }
 
     /**
-     * Lists the people and accounts you can send money to.
+     * Lists the people and accounts you can send money to from a balance. Pass a result's ID as <code>destination_id</code> when creating a transfer.
      */
     public SyncPagingIterable<ListRecipientsTransfersResponseDataItem> listRecipients(
             ListRecipientsTransfersRequest request, RequestOptions requestOptions) {

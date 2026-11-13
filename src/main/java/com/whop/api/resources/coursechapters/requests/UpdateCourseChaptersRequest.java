@@ -86,7 +86,6 @@ public final class UpdateCourseChaptersRequest {
     public static final class Builder implements TitleStage, _FinalStage {
         private String title;
 
-        @JsonAnySetter
         private Map<String, Object> additionalProperties = new HashMap<>();
 
         private Builder() {}
@@ -98,7 +97,6 @@ public final class UpdateCourseChaptersRequest {
         }
 
         /**
-         * <p>The new display title of the chapter (e.g., &quot;Module 1: Introduction&quot;).</p>
          * <p>The new display title of the chapter (e.g., &quot;Module 1: Introduction&quot;).</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
@@ -112,6 +110,14 @@ public final class UpdateCourseChaptersRequest {
         @java.lang.Override
         public UpdateCourseChaptersRequest build() {
             return new UpdateCourseChaptersRequest(title, additionalProperties);
+        }
+
+        @JsonAnySetter
+        private void putAdditionalPropertyFromJson(String key, Object value) {
+            if (key.equalsIgnoreCase("title")) {
+                return;
+            }
+            this.additionalProperties.put(key, value);
         }
 
         @java.lang.Override

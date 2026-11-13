@@ -12,6 +12,7 @@ import com.fasterxml.jackson.annotation.JsonSetter;
 import com.fasterxml.jackson.annotation.Nulls;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.whop.api.core.ObjectMappers;
+import java.time.OffsetDateTime;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
@@ -20,19 +21,43 @@ import java.util.Optional;
 @JsonInclude(JsonInclude.Include.NON_ABSENT)
 @JsonDeserialize(builder = UpdateMembershipsRequest.Builder.class)
 public final class UpdateMembershipsRequest {
+    private final Optional<Integer> billingPeriodDays;
+
     private final Optional<Boolean> cancelAtPeriodEnd;
 
+    private final Optional<OffsetDateTime> currentPeriodEnd;
+
     private final Optional<Map<String, Object>> metadata;
+
+    private final Optional<String> paymentMethodId;
+
+    private final Optional<Double> renewalPrice;
 
     private final Map<String, Object> additionalProperties;
 
     private UpdateMembershipsRequest(
+            Optional<Integer> billingPeriodDays,
             Optional<Boolean> cancelAtPeriodEnd,
+            Optional<OffsetDateTime> currentPeriodEnd,
             Optional<Map<String, Object>> metadata,
+            Optional<String> paymentMethodId,
+            Optional<Double> renewalPrice,
             Map<String, Object> additionalProperties) {
+        this.billingPeriodDays = billingPeriodDays;
         this.cancelAtPeriodEnd = cancelAtPeriodEnd;
+        this.currentPeriodEnd = currentPeriodEnd;
         this.metadata = metadata;
+        this.paymentMethodId = paymentMethodId;
+        this.renewalPrice = renewalPrice;
         this.additionalProperties = additionalProperties;
+    }
+
+    /**
+     * @return Number of days between recurring charges, applied to every recurring variant so future renewals use the same cadence. Sets the current period end to the current period start plus this value; when the value is a multiple of 30 or is 365, a membership that renews on a fixed day of the month (for example, after <code>current_period_end</code> was set) ends on that day instead. The new period end must remain in the future. Only for active, trialing, or past-due memberships billed automatically by Whop; invoice, externally billed, and canceling memberships are not supported. Existing non-daily memberships cannot be changed to daily billing. Cannot be combined with other fields.
+     */
+    @JsonProperty("billing_period_days")
+    public Optional<Integer> getBillingPeriodDays() {
+        return billingPeriodDays;
     }
 
     /**
@@ -44,11 +69,35 @@ public final class UpdateMembershipsRequest {
     }
 
     /**
+     * @return When the next renewal charges, as an ISO 8601 timestamp; a date without a time means midnight UTC. Must fall after today in UTC. Later renewals follow on from this date, and a membership charged automatically on a variant billed every 30, 60, 90 … 360 or 365 days keeps renewing on this day of the month in UTC, or on the month's last day when a month is shorter. Only for active or trialing renewing memberships billed by Whop whose payments are not paused. Cannot be combined with other fields.
+     */
+    @JsonProperty("current_period_end")
+    public Optional<OffsetDateTime> getCurrentPeriodEnd() {
+        return currentPeriodEnd;
+    }
+
+    /**
      * @return Key-value pairs to merge into the membership's metadata. Pass an empty object to clear it.
      */
     @JsonProperty("metadata")
     public Optional<Map<String, Object>> getMetadata() {
         return metadata;
+    }
+
+    /**
+     * @return The ID of a payment method the customer has saved with your account. Future renewals charge it, and an open past-due payment is retried on it right away. Requires the <code>member:payment_methods:manage</code> permission.
+     */
+    @JsonProperty("payment_method_id")
+    public Optional<String> getPaymentMethodId() {
+        return paymentMethodId;
+    }
+
+    /**
+     * @return The amount future renewals charge, in the membership's renewal currency. Can only lower the current renewal price; raising a price is not supported here. Moves only this membership to the new price and emails the customer the change. Only for active or trialing renewing memberships billed by Whop whose payments are not paused. Cannot be combined with other fields.
+     */
+    @JsonProperty("renewal_price")
+    public Optional<Double> getRenewalPrice() {
+        return renewalPrice;
     }
 
     @java.lang.Override
@@ -63,12 +112,23 @@ public final class UpdateMembershipsRequest {
     }
 
     private boolean equalTo(UpdateMembershipsRequest other) {
-        return cancelAtPeriodEnd.equals(other.cancelAtPeriodEnd) && metadata.equals(other.metadata);
+        return billingPeriodDays.equals(other.billingPeriodDays)
+                && cancelAtPeriodEnd.equals(other.cancelAtPeriodEnd)
+                && currentPeriodEnd.equals(other.currentPeriodEnd)
+                && metadata.equals(other.metadata)
+                && paymentMethodId.equals(other.paymentMethodId)
+                && renewalPrice.equals(other.renewalPrice);
     }
 
     @java.lang.Override
     public int hashCode() {
-        return Objects.hash(this.cancelAtPeriodEnd, this.metadata);
+        return Objects.hash(
+                this.billingPeriodDays,
+                this.cancelAtPeriodEnd,
+                this.currentPeriodEnd,
+                this.metadata,
+                this.paymentMethodId,
+                this.renewalPrice);
     }
 
     @java.lang.Override
@@ -82,18 +142,43 @@ public final class UpdateMembershipsRequest {
 
     @JsonIgnoreProperties(ignoreUnknown = true)
     public static final class Builder {
+        private Optional<Integer> billingPeriodDays = Optional.empty();
+
         private Optional<Boolean> cancelAtPeriodEnd = Optional.empty();
+
+        private Optional<OffsetDateTime> currentPeriodEnd = Optional.empty();
 
         private Optional<Map<String, Object>> metadata = Optional.empty();
 
-        @JsonAnySetter
+        private Optional<String> paymentMethodId = Optional.empty();
+
+        private Optional<Double> renewalPrice = Optional.empty();
+
         private Map<String, Object> additionalProperties = new HashMap<>();
 
         private Builder() {}
 
         public Builder from(UpdateMembershipsRequest other) {
+            billingPeriodDays(other.getBillingPeriodDays());
             cancelAtPeriodEnd(other.getCancelAtPeriodEnd());
+            currentPeriodEnd(other.getCurrentPeriodEnd());
             metadata(other.getMetadata());
+            paymentMethodId(other.getPaymentMethodId());
+            renewalPrice(other.getRenewalPrice());
+            return this;
+        }
+
+        /**
+         * <p>Number of days between recurring charges, applied to every recurring variant so future renewals use the same cadence. Sets the current period end to the current period start plus this value; when the value is a multiple of 30 or is 365, a membership that renews on a fixed day of the month (for example, after <code>current_period_end</code> was set) ends on that day instead. The new period end must remain in the future. Only for active, trialing, or past-due memberships billed automatically by Whop; invoice, externally billed, and canceling memberships are not supported. Existing non-daily memberships cannot be changed to daily billing. Cannot be combined with other fields.</p>
+         */
+        @JsonSetter(value = "billing_period_days", nulls = Nulls.SKIP)
+        public Builder billingPeriodDays(Optional<Integer> billingPeriodDays) {
+            this.billingPeriodDays = billingPeriodDays;
+            return this;
+        }
+
+        public Builder billingPeriodDays(Integer billingPeriodDays) {
+            this.billingPeriodDays = Optional.ofNullable(billingPeriodDays);
             return this;
         }
 
@@ -112,6 +197,20 @@ public final class UpdateMembershipsRequest {
         }
 
         /**
+         * <p>When the next renewal charges, as an ISO 8601 timestamp; a date without a time means midnight UTC. Must fall after today in UTC. Later renewals follow on from this date, and a membership charged automatically on a variant billed every 30, 60, 90 … 360 or 365 days keeps renewing on this day of the month in UTC, or on the month's last day when a month is shorter. Only for active or trialing renewing memberships billed by Whop whose payments are not paused. Cannot be combined with other fields.</p>
+         */
+        @JsonSetter(value = "current_period_end", nulls = Nulls.SKIP)
+        public Builder currentPeriodEnd(Optional<OffsetDateTime> currentPeriodEnd) {
+            this.currentPeriodEnd = currentPeriodEnd;
+            return this;
+        }
+
+        public Builder currentPeriodEnd(OffsetDateTime currentPeriodEnd) {
+            this.currentPeriodEnd = Optional.ofNullable(currentPeriodEnd);
+            return this;
+        }
+
+        /**
          * <p>Key-value pairs to merge into the membership's metadata. Pass an empty object to clear it.</p>
          */
         @JsonSetter(value = "metadata", nulls = Nulls.SKIP)
@@ -125,8 +224,56 @@ public final class UpdateMembershipsRequest {
             return this;
         }
 
+        /**
+         * <p>The ID of a payment method the customer has saved with your account. Future renewals charge it, and an open past-due payment is retried on it right away. Requires the <code>member:payment_methods:manage</code> permission.</p>
+         */
+        @JsonSetter(value = "payment_method_id", nulls = Nulls.SKIP)
+        public Builder paymentMethodId(Optional<String> paymentMethodId) {
+            this.paymentMethodId = paymentMethodId;
+            return this;
+        }
+
+        public Builder paymentMethodId(String paymentMethodId) {
+            this.paymentMethodId = Optional.ofNullable(paymentMethodId);
+            return this;
+        }
+
+        /**
+         * <p>The amount future renewals charge, in the membership's renewal currency. Can only lower the current renewal price; raising a price is not supported here. Moves only this membership to the new price and emails the customer the change. Only for active or trialing renewing memberships billed by Whop whose payments are not paused. Cannot be combined with other fields.</p>
+         */
+        @JsonSetter(value = "renewal_price", nulls = Nulls.SKIP)
+        public Builder renewalPrice(Optional<Double> renewalPrice) {
+            this.renewalPrice = renewalPrice;
+            return this;
+        }
+
+        public Builder renewalPrice(Double renewalPrice) {
+            this.renewalPrice = Optional.ofNullable(renewalPrice);
+            return this;
+        }
+
         public UpdateMembershipsRequest build() {
-            return new UpdateMembershipsRequest(cancelAtPeriodEnd, metadata, additionalProperties);
+            return new UpdateMembershipsRequest(
+                    billingPeriodDays,
+                    cancelAtPeriodEnd,
+                    currentPeriodEnd,
+                    metadata,
+                    paymentMethodId,
+                    renewalPrice,
+                    additionalProperties);
+        }
+
+        @JsonAnySetter
+        private void putAdditionalPropertyFromJson(String key, Object value) {
+            if (key.equalsIgnoreCase("billing_period_days")
+                    || key.equalsIgnoreCase("cancel_at_period_end")
+                    || key.equalsIgnoreCase("current_period_end")
+                    || key.equalsIgnoreCase("metadata")
+                    || key.equalsIgnoreCase("payment_method_id")
+                    || key.equalsIgnoreCase("renewal_price")) {
+                return;
+            }
+            this.additionalProperties.put(key, value);
         }
 
         public Builder additionalProperty(String key, Object value) {

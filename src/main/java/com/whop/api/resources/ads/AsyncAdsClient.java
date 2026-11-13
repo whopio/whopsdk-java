@@ -5,18 +5,23 @@ package com.whop.api.resources.ads;
 
 import com.whop.api.core.ClientOptions;
 import com.whop.api.core.RequestOptions;
+import com.whop.api.core.WhopApiHttpResponse;
 import com.whop.api.core.pagination.SyncPagingIterable;
 import com.whop.api.resources.ads.requests.CreateAdsRequest;
 import com.whop.api.resources.ads.requests.DeleteAdsRequest;
 import com.whop.api.resources.ads.requests.DuplicateAdsRequest;
 import com.whop.api.resources.ads.requests.ListAdsRequest;
 import com.whop.api.resources.ads.requests.PauseAdsRequest;
+import com.whop.api.resources.ads.requests.ReportIssuesAdsRequest;
+import com.whop.api.resources.ads.requests.ReportStatsAdsRequest;
 import com.whop.api.resources.ads.requests.RetrieveAdsRequest;
 import com.whop.api.resources.ads.requests.UnpauseAdsRequest;
 import com.whop.api.resources.ads.requests.UpdateAdsRequest;
 import com.whop.api.resources.ads.types.DeleteAdsResponse;
 import com.whop.api.resources.ads.types.DuplicateAdsResponse;
+import com.whop.api.resources.ads.types.ReportIssuesAdsResponse;
 import com.whop.api.types.Ad;
+import com.whop.api.types.AdStat;
 import java.util.concurrent.CompletableFuture;
 
 public class AsyncAdsClient {
@@ -37,108 +42,273 @@ public class AsyncAdsClient {
     }
 
     /**
+     * Reports why one of a runner's ads or ad groups can't deliver yet, and replaces what the runner reported for it before. The account running the campaign sees each issue, with what to change when it can fix it. An empty <code>issues</code> list clears the object's issues, and they also clear when the runner stops holding the campaign. Takes the runner's Whop session, a user API key, or a user OAuth token with <code>ad_campaign:update</code>. A token without that scope gets a 403, and anyone not holding the whole campaign gets a 404.
+     */
+    public CompletableFuture<ReportIssuesAdsResponse> reportIssues(ReportIssuesAdsRequest request) {
+        CompletableFuture<WhopApiHttpResponse<ReportIssuesAdsResponse>> rawFuture =
+                this.rawClient.reportIssues(request);
+        CompletableFuture<ReportIssuesAdsResponse> future = rawFuture.thenApply(response -> response.body());
+        future.whenComplete((result_, throwable_) -> {
+            if (future.isCancelled()) {
+                rawFuture.cancel(true);
+            }
+        });
+        return future;
+    }
+
+    /**
+     * Reports why one of a runner's ads or ad groups can't deliver yet, and replaces what the runner reported for it before. The account running the campaign sees each issue, with what to change when it can fix it. An empty <code>issues</code> list clears the object's issues, and they also clear when the runner stops holding the campaign. Takes the runner's Whop session, a user API key, or a user OAuth token with <code>ad_campaign:update</code>. A token without that scope gets a 403, and anyone not holding the whole campaign gets a 404.
+     */
+    public CompletableFuture<ReportIssuesAdsResponse> reportIssues(
+            ReportIssuesAdsRequest request, RequestOptions requestOptions) {
+        CompletableFuture<WhopApiHttpResponse<ReportIssuesAdsResponse>> rawFuture =
+                this.rawClient.reportIssues(request, requestOptions);
+        CompletableFuture<ReportIssuesAdsResponse> future = rawFuture.thenApply(response -> response.body());
+        future.whenComplete((result_, throwable_) -> {
+            if (future.isCancelled()) {
+                rawFuture.cancel(true);
+            }
+        });
+        return future;
+    }
+
+    /**
+     * Records a runner's stats for one of their ads in one hour, and pays them for the spend. Send the ad's totals so far for an hour that has started; they replace what the ad held for that hour, and its ad group's and campaign's hours are rebuilt from their ads. The spend can go up but never down. Hours before the runner's first report on the campaign can be reported too. The spend is recorded and paid exactly as sent, with no markup added, so send it with the runner's markup already applied. Takes the runner's Whop session, a user API key, or a user OAuth token with <code>ad_campaign:update</code>. A token without that scope gets a 403, and anyone not holding the ad's campaign gets a 404.
+     */
+    public CompletableFuture<AdStat> reportStats(ReportStatsAdsRequest request) {
+        CompletableFuture<WhopApiHttpResponse<AdStat>> rawFuture = this.rawClient.reportStats(request);
+        CompletableFuture<AdStat> future = rawFuture.thenApply(response -> response.body());
+        future.whenComplete((result_, throwable_) -> {
+            if (future.isCancelled()) {
+                rawFuture.cancel(true);
+            }
+        });
+        return future;
+    }
+
+    /**
+     * Records a runner's stats for one of their ads in one hour, and pays them for the spend. Send the ad's totals so far for an hour that has started; they replace what the ad held for that hour, and its ad group's and campaign's hours are rebuilt from their ads. The spend can go up but never down. Hours before the runner's first report on the campaign can be reported too. The spend is recorded and paid exactly as sent, with no markup added, so send it with the runner's markup already applied. Takes the runner's Whop session, a user API key, or a user OAuth token with <code>ad_campaign:update</code>. A token without that scope gets a 403, and anyone not holding the ad's campaign gets a 404.
+     */
+    public CompletableFuture<AdStat> reportStats(ReportStatsAdsRequest request, RequestOptions requestOptions) {
+        CompletableFuture<WhopApiHttpResponse<AdStat>> rawFuture = this.rawClient.reportStats(request, requestOptions);
+        CompletableFuture<AdStat> future = rawFuture.thenApply(response -> response.body());
+        future.whenComplete((result_, throwable_) -> {
+            if (future.isCancelled()) {
+                rawFuture.cancel(true);
+            }
+        });
+        return future;
+    }
+
+    /**
      * Lists the ads for an account, with stats over the requested window.
      */
     public CompletableFuture<SyncPagingIterable<Ad>> list() {
-        return this.rawClient.list().thenApply(response -> response.body());
+        CompletableFuture<WhopApiHttpResponse<SyncPagingIterable<Ad>>> rawFuture = this.rawClient.list();
+        CompletableFuture<SyncPagingIterable<Ad>> future = rawFuture.thenApply(response -> response.body());
+        future.whenComplete((result_, throwable_) -> {
+            if (future.isCancelled()) {
+                rawFuture.cancel(true);
+            }
+        });
+        return future;
     }
 
     /**
      * Lists the ads for an account, with stats over the requested window.
      */
     public CompletableFuture<SyncPagingIterable<Ad>> list(RequestOptions requestOptions) {
-        return this.rawClient.list(requestOptions).thenApply(response -> response.body());
+        CompletableFuture<WhopApiHttpResponse<SyncPagingIterable<Ad>>> rawFuture = this.rawClient.list(requestOptions);
+        CompletableFuture<SyncPagingIterable<Ad>> future = rawFuture.thenApply(response -> response.body());
+        future.whenComplete((result_, throwable_) -> {
+            if (future.isCancelled()) {
+                rawFuture.cancel(true);
+            }
+        });
+        return future;
     }
 
     /**
      * Lists the ads for an account, with stats over the requested window.
      */
     public CompletableFuture<SyncPagingIterable<Ad>> list(ListAdsRequest request) {
-        return this.rawClient.list(request).thenApply(response -> response.body());
+        CompletableFuture<WhopApiHttpResponse<SyncPagingIterable<Ad>>> rawFuture = this.rawClient.list(request);
+        CompletableFuture<SyncPagingIterable<Ad>> future = rawFuture.thenApply(response -> response.body());
+        future.whenComplete((result_, throwable_) -> {
+            if (future.isCancelled()) {
+                rawFuture.cancel(true);
+            }
+        });
+        return future;
     }
 
     /**
      * Lists the ads for an account, with stats over the requested window.
      */
     public CompletableFuture<SyncPagingIterable<Ad>> list(ListAdsRequest request, RequestOptions requestOptions) {
-        return this.rawClient.list(request, requestOptions).thenApply(response -> response.body());
+        CompletableFuture<WhopApiHttpResponse<SyncPagingIterable<Ad>>> rawFuture =
+                this.rawClient.list(request, requestOptions);
+        CompletableFuture<SyncPagingIterable<Ad>> future = rawFuture.thenApply(response -> response.body());
+        future.whenComplete((result_, throwable_) -> {
+            if (future.isCancelled()) {
+                rawFuture.cancel(true);
+            }
+        });
+        return future;
     }
 
     /**
-     * Creates an ad in an ad group.
+     * Creates an ad in an ad group. Any campaign status other than <code>draft</code> launches the campaign, which requires an ads payment method on the account.
      */
     public CompletableFuture<Ad> create() {
-        return this.rawClient.create().thenApply(response -> response.body());
+        CompletableFuture<WhopApiHttpResponse<Ad>> rawFuture = this.rawClient.create();
+        CompletableFuture<Ad> future = rawFuture.thenApply(response -> response.body());
+        future.whenComplete((result_, throwable_) -> {
+            if (future.isCancelled()) {
+                rawFuture.cancel(true);
+            }
+        });
+        return future;
     }
 
     /**
-     * Creates an ad in an ad group.
+     * Creates an ad in an ad group. Any campaign status other than <code>draft</code> launches the campaign, which requires an ads payment method on the account.
      */
     public CompletableFuture<Ad> create(RequestOptions requestOptions) {
-        return this.rawClient.create(requestOptions).thenApply(response -> response.body());
+        CompletableFuture<WhopApiHttpResponse<Ad>> rawFuture = this.rawClient.create(requestOptions);
+        CompletableFuture<Ad> future = rawFuture.thenApply(response -> response.body());
+        future.whenComplete((result_, throwable_) -> {
+            if (future.isCancelled()) {
+                rawFuture.cancel(true);
+            }
+        });
+        return future;
     }
 
     /**
-     * Creates an ad in an ad group.
+     * Creates an ad in an ad group. Any campaign status other than <code>draft</code> launches the campaign, which requires an ads payment method on the account.
      */
     public CompletableFuture<Ad> create(CreateAdsRequest request) {
-        return this.rawClient.create(request).thenApply(response -> response.body());
+        CompletableFuture<WhopApiHttpResponse<Ad>> rawFuture = this.rawClient.create(request);
+        CompletableFuture<Ad> future = rawFuture.thenApply(response -> response.body());
+        future.whenComplete((result_, throwable_) -> {
+            if (future.isCancelled()) {
+                rawFuture.cancel(true);
+            }
+        });
+        return future;
     }
 
     /**
-     * Creates an ad in an ad group.
+     * Creates an ad in an ad group. Any campaign status other than <code>draft</code> launches the campaign, which requires an ads payment method on the account.
      */
     public CompletableFuture<Ad> create(CreateAdsRequest request, RequestOptions requestOptions) {
-        return this.rawClient.create(request, requestOptions).thenApply(response -> response.body());
+        CompletableFuture<WhopApiHttpResponse<Ad>> rawFuture = this.rawClient.create(request, requestOptions);
+        CompletableFuture<Ad> future = rawFuture.thenApply(response -> response.body());
+        future.whenComplete((result_, throwable_) -> {
+            if (future.isCancelled()) {
+                rawFuture.cancel(true);
+            }
+        });
+        return future;
     }
 
     /**
      * Retrieves a single ad with stats over the requested window.
      */
     public CompletableFuture<Ad> retrieve(String id) {
-        return this.rawClient.retrieve(id).thenApply(response -> response.body());
+        CompletableFuture<WhopApiHttpResponse<Ad>> rawFuture = this.rawClient.retrieve(id);
+        CompletableFuture<Ad> future = rawFuture.thenApply(response -> response.body());
+        future.whenComplete((result_, throwable_) -> {
+            if (future.isCancelled()) {
+                rawFuture.cancel(true);
+            }
+        });
+        return future;
     }
 
     /**
      * Retrieves a single ad with stats over the requested window.
      */
     public CompletableFuture<Ad> retrieve(String id, RequestOptions requestOptions) {
-        return this.rawClient.retrieve(id, requestOptions).thenApply(response -> response.body());
+        CompletableFuture<WhopApiHttpResponse<Ad>> rawFuture = this.rawClient.retrieve(id, requestOptions);
+        CompletableFuture<Ad> future = rawFuture.thenApply(response -> response.body());
+        future.whenComplete((result_, throwable_) -> {
+            if (future.isCancelled()) {
+                rawFuture.cancel(true);
+            }
+        });
+        return future;
     }
 
     /**
      * Retrieves a single ad with stats over the requested window.
      */
     public CompletableFuture<Ad> retrieve(String id, RetrieveAdsRequest request) {
-        return this.rawClient.retrieve(id, request).thenApply(response -> response.body());
+        CompletableFuture<WhopApiHttpResponse<Ad>> rawFuture = this.rawClient.retrieve(id, request);
+        CompletableFuture<Ad> future = rawFuture.thenApply(response -> response.body());
+        future.whenComplete((result_, throwable_) -> {
+            if (future.isCancelled()) {
+                rawFuture.cancel(true);
+            }
+        });
+        return future;
     }
 
     /**
      * Retrieves a single ad with stats over the requested window.
      */
     public CompletableFuture<Ad> retrieve(String id, RetrieveAdsRequest request, RequestOptions requestOptions) {
-        return this.rawClient.retrieve(id, request, requestOptions).thenApply(response -> response.body());
+        CompletableFuture<WhopApiHttpResponse<Ad>> rawFuture = this.rawClient.retrieve(id, request, requestOptions);
+        CompletableFuture<Ad> future = rawFuture.thenApply(response -> response.body());
+        future.whenComplete((result_, throwable_) -> {
+            if (future.isCancelled()) {
+                rawFuture.cancel(true);
+            }
+        });
+        return future;
     }
 
     /**
      * Deletes an ad.
      */
     public CompletableFuture<DeleteAdsResponse> delete(String id) {
-        return this.rawClient.delete(id).thenApply(response -> response.body());
+        CompletableFuture<WhopApiHttpResponse<DeleteAdsResponse>> rawFuture = this.rawClient.delete(id);
+        CompletableFuture<DeleteAdsResponse> future = rawFuture.thenApply(response -> response.body());
+        future.whenComplete((result_, throwable_) -> {
+            if (future.isCancelled()) {
+                rawFuture.cancel(true);
+            }
+        });
+        return future;
     }
 
     /**
      * Deletes an ad.
      */
     public CompletableFuture<DeleteAdsResponse> delete(String id, RequestOptions requestOptions) {
-        return this.rawClient.delete(id, requestOptions).thenApply(response -> response.body());
+        CompletableFuture<WhopApiHttpResponse<DeleteAdsResponse>> rawFuture = this.rawClient.delete(id, requestOptions);
+        CompletableFuture<DeleteAdsResponse> future = rawFuture.thenApply(response -> response.body());
+        future.whenComplete((result_, throwable_) -> {
+            if (future.isCancelled()) {
+                rawFuture.cancel(true);
+            }
+        });
+        return future;
     }
 
     /**
      * Deletes an ad.
      */
     public CompletableFuture<DeleteAdsResponse> delete(String id, DeleteAdsRequest request) {
-        return this.rawClient.delete(id, request).thenApply(response -> response.body());
+        CompletableFuture<WhopApiHttpResponse<DeleteAdsResponse>> rawFuture = this.rawClient.delete(id, request);
+        CompletableFuture<DeleteAdsResponse> future = rawFuture.thenApply(response -> response.body());
+        future.whenComplete((result_, throwable_) -> {
+            if (future.isCancelled()) {
+                rawFuture.cancel(true);
+            }
+        });
+        return future;
     }
 
     /**
@@ -146,119 +316,241 @@ public class AsyncAdsClient {
      */
     public CompletableFuture<DeleteAdsResponse> delete(
             String id, DeleteAdsRequest request, RequestOptions requestOptions) {
-        return this.rawClient.delete(id, request, requestOptions).thenApply(response -> response.body());
+        CompletableFuture<WhopApiHttpResponse<DeleteAdsResponse>> rawFuture =
+                this.rawClient.delete(id, request, requestOptions);
+        CompletableFuture<DeleteAdsResponse> future = rawFuture.thenApply(response -> response.body());
+        future.whenComplete((result_, throwable_) -> {
+            if (future.isCancelled()) {
+                rawFuture.cancel(true);
+            }
+        });
+        return future;
     }
 
     /**
      * Updates an ad's editable fields.
      */
     public CompletableFuture<Ad> update(String id) {
-        return this.rawClient.update(id).thenApply(response -> response.body());
+        CompletableFuture<WhopApiHttpResponse<Ad>> rawFuture = this.rawClient.update(id);
+        CompletableFuture<Ad> future = rawFuture.thenApply(response -> response.body());
+        future.whenComplete((result_, throwable_) -> {
+            if (future.isCancelled()) {
+                rawFuture.cancel(true);
+            }
+        });
+        return future;
     }
 
     /**
      * Updates an ad's editable fields.
      */
     public CompletableFuture<Ad> update(String id, RequestOptions requestOptions) {
-        return this.rawClient.update(id, requestOptions).thenApply(response -> response.body());
+        CompletableFuture<WhopApiHttpResponse<Ad>> rawFuture = this.rawClient.update(id, requestOptions);
+        CompletableFuture<Ad> future = rawFuture.thenApply(response -> response.body());
+        future.whenComplete((result_, throwable_) -> {
+            if (future.isCancelled()) {
+                rawFuture.cancel(true);
+            }
+        });
+        return future;
     }
 
     /**
      * Updates an ad's editable fields.
      */
     public CompletableFuture<Ad> update(String id, UpdateAdsRequest request) {
-        return this.rawClient.update(id, request).thenApply(response -> response.body());
+        CompletableFuture<WhopApiHttpResponse<Ad>> rawFuture = this.rawClient.update(id, request);
+        CompletableFuture<Ad> future = rawFuture.thenApply(response -> response.body());
+        future.whenComplete((result_, throwable_) -> {
+            if (future.isCancelled()) {
+                rawFuture.cancel(true);
+            }
+        });
+        return future;
     }
 
     /**
      * Updates an ad's editable fields.
      */
     public CompletableFuture<Ad> update(String id, UpdateAdsRequest request, RequestOptions requestOptions) {
-        return this.rawClient.update(id, request, requestOptions).thenApply(response -> response.body());
+        CompletableFuture<WhopApiHttpResponse<Ad>> rawFuture = this.rawClient.update(id, request, requestOptions);
+        CompletableFuture<Ad> future = rawFuture.thenApply(response -> response.body());
+        future.whenComplete((result_, throwable_) -> {
+            if (future.isCancelled()) {
+                rawFuture.cancel(true);
+            }
+        });
+        return future;
     }
 
     /**
-     * Copies the ad into its own ad group, or into target_ad_group_id (which must belong to the same account and be compatible with the ad). Copies keep the source ad's active/paused state.
+     * Copies an ad into its own ad group or into another one. Copies keep the source ad's active or paused state.
      */
     public CompletableFuture<DuplicateAdsResponse> duplicate(String id) {
-        return this.rawClient.duplicate(id).thenApply(response -> response.body());
+        CompletableFuture<WhopApiHttpResponse<DuplicateAdsResponse>> rawFuture = this.rawClient.duplicate(id);
+        CompletableFuture<DuplicateAdsResponse> future = rawFuture.thenApply(response -> response.body());
+        future.whenComplete((result_, throwable_) -> {
+            if (future.isCancelled()) {
+                rawFuture.cancel(true);
+            }
+        });
+        return future;
     }
 
     /**
-     * Copies the ad into its own ad group, or into target_ad_group_id (which must belong to the same account and be compatible with the ad). Copies keep the source ad's active/paused state.
+     * Copies an ad into its own ad group or into another one. Copies keep the source ad's active or paused state.
      */
     public CompletableFuture<DuplicateAdsResponse> duplicate(String id, RequestOptions requestOptions) {
-        return this.rawClient.duplicate(id, requestOptions).thenApply(response -> response.body());
+        CompletableFuture<WhopApiHttpResponse<DuplicateAdsResponse>> rawFuture =
+                this.rawClient.duplicate(id, requestOptions);
+        CompletableFuture<DuplicateAdsResponse> future = rawFuture.thenApply(response -> response.body());
+        future.whenComplete((result_, throwable_) -> {
+            if (future.isCancelled()) {
+                rawFuture.cancel(true);
+            }
+        });
+        return future;
     }
 
     /**
-     * Copies the ad into its own ad group, or into target_ad_group_id (which must belong to the same account and be compatible with the ad). Copies keep the source ad's active/paused state.
+     * Copies an ad into its own ad group or into another one. Copies keep the source ad's active or paused state.
      */
     public CompletableFuture<DuplicateAdsResponse> duplicate(String id, DuplicateAdsRequest request) {
-        return this.rawClient.duplicate(id, request).thenApply(response -> response.body());
+        CompletableFuture<WhopApiHttpResponse<DuplicateAdsResponse>> rawFuture = this.rawClient.duplicate(id, request);
+        CompletableFuture<DuplicateAdsResponse> future = rawFuture.thenApply(response -> response.body());
+        future.whenComplete((result_, throwable_) -> {
+            if (future.isCancelled()) {
+                rawFuture.cancel(true);
+            }
+        });
+        return future;
     }
 
     /**
-     * Copies the ad into its own ad group, or into target_ad_group_id (which must belong to the same account and be compatible with the ad). Copies keep the source ad's active/paused state.
+     * Copies an ad into its own ad group or into another one. Copies keep the source ad's active or paused state.
      */
     public CompletableFuture<DuplicateAdsResponse> duplicate(
             String id, DuplicateAdsRequest request, RequestOptions requestOptions) {
-        return this.rawClient.duplicate(id, request, requestOptions).thenApply(response -> response.body());
+        CompletableFuture<WhopApiHttpResponse<DuplicateAdsResponse>> rawFuture =
+                this.rawClient.duplicate(id, request, requestOptions);
+        CompletableFuture<DuplicateAdsResponse> future = rawFuture.thenApply(response -> response.body());
+        future.whenComplete((result_, throwable_) -> {
+            if (future.isCancelled()) {
+                rawFuture.cancel(true);
+            }
+        });
+        return future;
     }
 
     /**
      * Pauses an active ad.
      */
     public CompletableFuture<Ad> pause(String id) {
-        return this.rawClient.pause(id).thenApply(response -> response.body());
+        CompletableFuture<WhopApiHttpResponse<Ad>> rawFuture = this.rawClient.pause(id);
+        CompletableFuture<Ad> future = rawFuture.thenApply(response -> response.body());
+        future.whenComplete((result_, throwable_) -> {
+            if (future.isCancelled()) {
+                rawFuture.cancel(true);
+            }
+        });
+        return future;
     }
 
     /**
      * Pauses an active ad.
      */
     public CompletableFuture<Ad> pause(String id, RequestOptions requestOptions) {
-        return this.rawClient.pause(id, requestOptions).thenApply(response -> response.body());
+        CompletableFuture<WhopApiHttpResponse<Ad>> rawFuture = this.rawClient.pause(id, requestOptions);
+        CompletableFuture<Ad> future = rawFuture.thenApply(response -> response.body());
+        future.whenComplete((result_, throwable_) -> {
+            if (future.isCancelled()) {
+                rawFuture.cancel(true);
+            }
+        });
+        return future;
     }
 
     /**
      * Pauses an active ad.
      */
     public CompletableFuture<Ad> pause(String id, PauseAdsRequest request) {
-        return this.rawClient.pause(id, request).thenApply(response -> response.body());
+        CompletableFuture<WhopApiHttpResponse<Ad>> rawFuture = this.rawClient.pause(id, request);
+        CompletableFuture<Ad> future = rawFuture.thenApply(response -> response.body());
+        future.whenComplete((result_, throwable_) -> {
+            if (future.isCancelled()) {
+                rawFuture.cancel(true);
+            }
+        });
+        return future;
     }
 
     /**
      * Pauses an active ad.
      */
     public CompletableFuture<Ad> pause(String id, PauseAdsRequest request, RequestOptions requestOptions) {
-        return this.rawClient.pause(id, request, requestOptions).thenApply(response -> response.body());
+        CompletableFuture<WhopApiHttpResponse<Ad>> rawFuture = this.rawClient.pause(id, request, requestOptions);
+        CompletableFuture<Ad> future = rawFuture.thenApply(response -> response.body());
+        future.whenComplete((result_, throwable_) -> {
+            if (future.isCancelled()) {
+                rawFuture.cancel(true);
+            }
+        });
+        return future;
     }
 
     /**
      * Resumes a paused ad.
      */
     public CompletableFuture<Ad> unpause(String id) {
-        return this.rawClient.unpause(id).thenApply(response -> response.body());
+        CompletableFuture<WhopApiHttpResponse<Ad>> rawFuture = this.rawClient.unpause(id);
+        CompletableFuture<Ad> future = rawFuture.thenApply(response -> response.body());
+        future.whenComplete((result_, throwable_) -> {
+            if (future.isCancelled()) {
+                rawFuture.cancel(true);
+            }
+        });
+        return future;
     }
 
     /**
      * Resumes a paused ad.
      */
     public CompletableFuture<Ad> unpause(String id, RequestOptions requestOptions) {
-        return this.rawClient.unpause(id, requestOptions).thenApply(response -> response.body());
+        CompletableFuture<WhopApiHttpResponse<Ad>> rawFuture = this.rawClient.unpause(id, requestOptions);
+        CompletableFuture<Ad> future = rawFuture.thenApply(response -> response.body());
+        future.whenComplete((result_, throwable_) -> {
+            if (future.isCancelled()) {
+                rawFuture.cancel(true);
+            }
+        });
+        return future;
     }
 
     /**
      * Resumes a paused ad.
      */
     public CompletableFuture<Ad> unpause(String id, UnpauseAdsRequest request) {
-        return this.rawClient.unpause(id, request).thenApply(response -> response.body());
+        CompletableFuture<WhopApiHttpResponse<Ad>> rawFuture = this.rawClient.unpause(id, request);
+        CompletableFuture<Ad> future = rawFuture.thenApply(response -> response.body());
+        future.whenComplete((result_, throwable_) -> {
+            if (future.isCancelled()) {
+                rawFuture.cancel(true);
+            }
+        });
+        return future;
     }
 
     /**
      * Resumes a paused ad.
      */
     public CompletableFuture<Ad> unpause(String id, UnpauseAdsRequest request, RequestOptions requestOptions) {
-        return this.rawClient.unpause(id, request, requestOptions).thenApply(response -> response.body());
+        CompletableFuture<WhopApiHttpResponse<Ad>> rawFuture = this.rawClient.unpause(id, request, requestOptions);
+        CompletableFuture<Ad> future = rawFuture.thenApply(response -> response.body());
+        future.whenComplete((result_, throwable_) -> {
+            if (future.isCancelled()) {
+                rawFuture.cancel(true);
+            }
+        });
+        return future;
     }
 }

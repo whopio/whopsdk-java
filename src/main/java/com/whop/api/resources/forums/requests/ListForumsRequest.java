@@ -29,9 +29,9 @@ public final class ListForumsRequest {
 
     private final Optional<Integer> last;
 
-    private final String companyId;
-
     private final Optional<String> productId;
+
+    private final String accountId;
 
     private final Map<String, Object> additionalProperties;
 
@@ -40,15 +40,15 @@ public final class ListForumsRequest {
             Optional<String> before,
             Optional<Integer> first,
             Optional<Integer> last,
-            String companyId,
             Optional<String> productId,
+            String accountId,
             Map<String, Object> additionalProperties) {
         this.after = after;
         this.before = before;
         this.first = first;
         this.last = last;
-        this.companyId = companyId;
         this.productId = productId;
+        this.accountId = accountId;
         this.additionalProperties = additionalProperties;
     }
 
@@ -85,19 +85,19 @@ public final class ListForumsRequest {
     }
 
     /**
-     * @return The unique identifier of the company to list forums for.
-     */
-    @JsonProperty("company_id")
-    public String getCompanyId() {
-        return companyId;
-    }
-
-    /**
      * @return The unique identifier of a product to filter by. When set, only forums connected to this product are returned.
      */
     @JsonProperty("product_id")
     public Optional<String> getProductId() {
         return productId;
+    }
+
+    /**
+     * @return The unique identifier of the company to list forums for.
+     */
+    @JsonProperty("account_id")
+    public String getAccountId() {
+        return accountId;
     }
 
     @java.lang.Override
@@ -116,13 +116,13 @@ public final class ListForumsRequest {
                 && before.equals(other.before)
                 && first.equals(other.first)
                 && last.equals(other.last)
-                && companyId.equals(other.companyId)
-                && productId.equals(other.productId);
+                && productId.equals(other.productId)
+                && accountId.equals(other.accountId);
     }
 
     @java.lang.Override
     public int hashCode() {
-        return Objects.hash(this.after, this.before, this.first, this.last, this.companyId, this.productId);
+        return Objects.hash(this.after, this.before, this.first, this.last, this.productId, this.accountId);
     }
 
     @java.lang.Override
@@ -130,15 +130,15 @@ public final class ListForumsRequest {
         return ObjectMappers.stringify(this);
     }
 
-    public static CompanyIdStage builder() {
+    public static AccountIdStage builder() {
         return new Builder();
     }
 
-    public interface CompanyIdStage {
+    public interface AccountIdStage {
         /**
          * <p>The unique identifier of the company to list forums for.</p>
          */
-        _FinalStage companyId(@NotNull String companyId);
+        _FinalStage accountId(@NotNull String accountId);
 
         Builder from(ListForumsRequest other);
     }
@@ -187,8 +187,8 @@ public final class ListForumsRequest {
     }
 
     @JsonIgnoreProperties(ignoreUnknown = true)
-    public static final class Builder implements CompanyIdStage, _FinalStage {
-        private String companyId;
+    public static final class Builder implements AccountIdStage, _FinalStage {
+        private String accountId;
 
         private Optional<String> productId = Optional.empty();
 
@@ -200,7 +200,6 @@ public final class ListForumsRequest {
 
         private Optional<String> after = Optional.empty();
 
-        @JsonAnySetter
         private Map<String, Object> additionalProperties = new HashMap<>();
 
         private Builder() {}
@@ -211,20 +210,19 @@ public final class ListForumsRequest {
             before(other.getBefore());
             first(other.getFirst());
             last(other.getLast());
-            companyId(other.getCompanyId());
             productId(other.getProductId());
+            accountId(other.getAccountId());
             return this;
         }
 
         /**
          * <p>The unique identifier of the company to list forums for.</p>
-         * <p>The unique identifier of the company to list forums for.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
-        @JsonSetter("company_id")
-        public _FinalStage companyId(@NotNull String companyId) {
-            this.companyId = Objects.requireNonNull(companyId, "companyId must not be null");
+        @JsonSetter("account_id")
+        public _FinalStage accountId(@NotNull String accountId) {
+            this.accountId = Objects.requireNonNull(accountId, "accountId must not be null");
             return this;
         }
 
@@ -330,7 +328,20 @@ public final class ListForumsRequest {
 
         @java.lang.Override
         public ListForumsRequest build() {
-            return new ListForumsRequest(after, before, first, last, companyId, productId, additionalProperties);
+            return new ListForumsRequest(after, before, first, last, productId, accountId, additionalProperties);
+        }
+
+        @JsonAnySetter
+        private void putAdditionalPropertyFromJson(String key, Object value) {
+            if (key.equalsIgnoreCase("after")
+                    || key.equalsIgnoreCase("before")
+                    || key.equalsIgnoreCase("first")
+                    || key.equalsIgnoreCase("last")
+                    || key.equalsIgnoreCase("product_id")
+                    || key.equalsIgnoreCase("account_id")) {
+                return;
+            }
+            this.additionalProperties.put(key, value);
         }
 
         @java.lang.Override

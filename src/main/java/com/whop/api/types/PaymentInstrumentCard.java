@@ -19,29 +19,83 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
-import org.jetbrains.annotations.NotNull;
 
 @JsonInclude(JsonInclude.Include.NON_ABSENT)
 @JsonDeserialize(builder = PaymentInstrumentCard.Builder.class)
 public final class PaymentInstrumentCard {
-    private final String brand;
+    private final Optional<String> brand;
+
+    private final Optional<Double> expMonth;
+
+    private final Optional<Double> expYear;
+
+    private final Optional<String> issuerIdentificationNumber;
 
     private final Optional<String> last4;
 
+    private final Optional<String> networkTransactionId;
+
     private final Map<String, Object> additionalProperties;
 
-    private PaymentInstrumentCard(String brand, Optional<String> last4, Map<String, Object> additionalProperties) {
+    private PaymentInstrumentCard(
+            Optional<String> brand,
+            Optional<Double> expMonth,
+            Optional<Double> expYear,
+            Optional<String> issuerIdentificationNumber,
+            Optional<String> last4,
+            Optional<String> networkTransactionId,
+            Map<String, Object> additionalProperties) {
         this.brand = brand;
+        this.expMonth = expMonth;
+        this.expYear = expYear;
+        this.issuerIdentificationNumber = issuerIdentificationNumber;
         this.last4 = last4;
+        this.networkTransactionId = networkTransactionId;
         this.additionalProperties = additionalProperties;
     }
 
     /**
-     * @return The network identifier (<code>visa</code>, <code>amex</code>, …), matching <code>card.networks</code> entries and saved card payment methods.
+     * @return The network identifier (<code>visa</code>, <code>amex</code>, …), matching <code>card.networks</code> entries and saved card payment methods. Null when the vault did not record the network.
      */
-    @JsonProperty("brand")
-    public String getBrand() {
+    @JsonIgnore
+    public Optional<String> getBrand() {
+        if (brand == null) {
+            return Optional.empty();
+        }
         return brand;
+    }
+
+    /**
+     * @return The card's expiry month, 1 to 12. Null when the vault did not record it.
+     */
+    @JsonIgnore
+    public Optional<Double> getExpMonth() {
+        if (expMonth == null) {
+            return Optional.empty();
+        }
+        return expMonth;
+    }
+
+    /**
+     * @return The card's four-digit expiry year. Null when the vault did not record it.
+     */
+    @JsonIgnore
+    public Optional<Double> getExpYear() {
+        if (expYear == null) {
+            return Optional.empty();
+        }
+        return expYear;
+    }
+
+    /**
+     * @return The issuer identification number, also called the BIN: the card's leading six or eight digits, which identify the issuing bank. Null when the processor did not report it.
+     */
+    @JsonIgnore
+    public Optional<String> getIssuerIdentificationNumber() {
+        if (issuerIdentificationNumber == null) {
+            return Optional.empty();
+        }
+        return issuerIdentificationNumber;
     }
 
     /**
@@ -55,10 +109,51 @@ public final class PaymentInstrumentCard {
         return last4;
     }
 
+    /**
+     * @return The network transaction id this account uses for the card. It's this account's own id, from its first customer-present charge or verification on the card, when Whop has one. Otherwise it's an earlier network transaction id for this card, which can come from another account's transaction or be one brought with the card. Cite it as the prior transaction on a later merchant-initiated charge of this card at this account. Null until there is one. A webhook sent as a payment is first recorded can carry <code>null</code>, so retrieve the payment to read it.
+     */
+    @JsonIgnore
+    public Optional<String> getNetworkTransactionId() {
+        if (networkTransactionId == null) {
+            return Optional.empty();
+        }
+        return networkTransactionId;
+    }
+
+    @JsonInclude(value = JsonInclude.Include.CUSTOM, valueFilter = NullableNonemptyFilter.class)
+    @JsonProperty("brand")
+    private Optional<String> _getBrand() {
+        return brand;
+    }
+
+    @JsonInclude(value = JsonInclude.Include.CUSTOM, valueFilter = NullableNonemptyFilter.class)
+    @JsonProperty("exp_month")
+    private Optional<Double> _getExpMonth() {
+        return expMonth;
+    }
+
+    @JsonInclude(value = JsonInclude.Include.CUSTOM, valueFilter = NullableNonemptyFilter.class)
+    @JsonProperty("exp_year")
+    private Optional<Double> _getExpYear() {
+        return expYear;
+    }
+
+    @JsonInclude(value = JsonInclude.Include.CUSTOM, valueFilter = NullableNonemptyFilter.class)
+    @JsonProperty("issuer_identification_number")
+    private Optional<String> _getIssuerIdentificationNumber() {
+        return issuerIdentificationNumber;
+    }
+
     @JsonInclude(value = JsonInclude.Include.CUSTOM, valueFilter = NullableNonemptyFilter.class)
     @JsonProperty("last4")
     private Optional<String> _getLast4() {
         return last4;
+    }
+
+    @JsonInclude(value = JsonInclude.Include.CUSTOM, valueFilter = NullableNonemptyFilter.class)
+    @JsonProperty("network_transaction_id")
+    private Optional<String> _getNetworkTransactionId() {
+        return networkTransactionId;
     }
 
     @java.lang.Override
@@ -73,12 +168,23 @@ public final class PaymentInstrumentCard {
     }
 
     private boolean equalTo(PaymentInstrumentCard other) {
-        return brand.equals(other.brand) && last4.equals(other.last4);
+        return brand.equals(other.brand)
+                && expMonth.equals(other.expMonth)
+                && expYear.equals(other.expYear)
+                && issuerIdentificationNumber.equals(other.issuerIdentificationNumber)
+                && last4.equals(other.last4)
+                && networkTransactionId.equals(other.networkTransactionId);
     }
 
     @java.lang.Override
     public int hashCode() {
-        return Objects.hash(this.brand, this.last4);
+        return Objects.hash(
+                this.brand,
+                this.expMonth,
+                this.expYear,
+                this.issuerIdentificationNumber,
+                this.last4,
+                this.networkTransactionId);
     }
 
     @java.lang.Override
@@ -86,72 +192,153 @@ public final class PaymentInstrumentCard {
         return ObjectMappers.stringify(this);
     }
 
-    public static BrandStage builder() {
+    public static Builder builder() {
         return new Builder();
     }
 
-    public interface BrandStage {
-        /**
-         * <p>The network identifier (<code>visa</code>, <code>amex</code>, …), matching <code>card.networks</code> entries and saved card payment methods.</p>
-         */
-        _FinalStage brand(@NotNull String brand);
-
-        Builder from(PaymentInstrumentCard other);
-    }
-
-    public interface _FinalStage {
-        PaymentInstrumentCard build();
-
-        _FinalStage additionalProperty(String key, Object value);
-
-        _FinalStage additionalProperties(Map<String, Object> additionalProperties);
-
-        /**
-         * <p>The card's last four digits, when captured.</p>
-         */
-        _FinalStage last4(Optional<String> last4);
-
-        _FinalStage last4(String last4);
-
-        _FinalStage last4(Nullable<String> last4);
-    }
-
     @JsonIgnoreProperties(ignoreUnknown = true)
-    public static final class Builder implements BrandStage, _FinalStage {
-        private String brand;
+    public static final class Builder {
+        private Optional<String> brand = Optional.empty();
+
+        private Optional<Double> expMonth = Optional.empty();
+
+        private Optional<Double> expYear = Optional.empty();
+
+        private Optional<String> issuerIdentificationNumber = Optional.empty();
 
         private Optional<String> last4 = Optional.empty();
 
-        @JsonAnySetter
+        private Optional<String> networkTransactionId = Optional.empty();
+
         private Map<String, Object> additionalProperties = new HashMap<>();
 
         private Builder() {}
 
-        @java.lang.Override
         public Builder from(PaymentInstrumentCard other) {
             brand(other.getBrand());
+            expMonth(other.getExpMonth());
+            expYear(other.getExpYear());
+            issuerIdentificationNumber(other.getIssuerIdentificationNumber());
             last4(other.getLast4());
+            networkTransactionId(other.getNetworkTransactionId());
             return this;
         }
 
         /**
-         * <p>The network identifier (<code>visa</code>, <code>amex</code>, …), matching <code>card.networks</code> entries and saved card payment methods.</p>
-         * <p>The network identifier (<code>visa</code>, <code>amex</code>, …), matching <code>card.networks</code> entries and saved card payment methods.</p>
-         * @return Reference to {@code this} so that method calls can be chained together.
+         * <p>The network identifier (<code>visa</code>, <code>amex</code>, …), matching <code>card.networks</code> entries and saved card payment methods. Null when the vault did not record the network.</p>
          */
-        @java.lang.Override
-        @JsonSetter("brand")
-        public _FinalStage brand(@NotNull String brand) {
-            this.brand = Objects.requireNonNull(brand, "brand must not be null");
+        @JsonSetter(value = "brand", nulls = Nulls.SKIP)
+        public Builder brand(Optional<String> brand) {
+            this.brand = brand;
+            return this;
+        }
+
+        public Builder brand(String brand) {
+            this.brand = Optional.ofNullable(brand);
+            return this;
+        }
+
+        public Builder brand(Nullable<String> brand) {
+            if (brand.isNull()) {
+                this.brand = null;
+            } else if (brand.isEmpty()) {
+                this.brand = Optional.empty();
+            } else {
+                this.brand = Optional.of(brand.get());
+            }
+            return this;
+        }
+
+        /**
+         * <p>The card's expiry month, 1 to 12. Null when the vault did not record it.</p>
+         */
+        @JsonSetter(value = "exp_month", nulls = Nulls.SKIP)
+        public Builder expMonth(Optional<Double> expMonth) {
+            this.expMonth = expMonth;
+            return this;
+        }
+
+        public Builder expMonth(Double expMonth) {
+            this.expMonth = Optional.ofNullable(expMonth);
+            return this;
+        }
+
+        public Builder expMonth(Nullable<Double> expMonth) {
+            if (expMonth.isNull()) {
+                this.expMonth = null;
+            } else if (expMonth.isEmpty()) {
+                this.expMonth = Optional.empty();
+            } else {
+                this.expMonth = Optional.of(expMonth.get());
+            }
+            return this;
+        }
+
+        /**
+         * <p>The card's four-digit expiry year. Null when the vault did not record it.</p>
+         */
+        @JsonSetter(value = "exp_year", nulls = Nulls.SKIP)
+        public Builder expYear(Optional<Double> expYear) {
+            this.expYear = expYear;
+            return this;
+        }
+
+        public Builder expYear(Double expYear) {
+            this.expYear = Optional.ofNullable(expYear);
+            return this;
+        }
+
+        public Builder expYear(Nullable<Double> expYear) {
+            if (expYear.isNull()) {
+                this.expYear = null;
+            } else if (expYear.isEmpty()) {
+                this.expYear = Optional.empty();
+            } else {
+                this.expYear = Optional.of(expYear.get());
+            }
+            return this;
+        }
+
+        /**
+         * <p>The issuer identification number, also called the BIN: the card's leading six or eight digits, which identify the issuing bank. Null when the processor did not report it.</p>
+         */
+        @JsonSetter(value = "issuer_identification_number", nulls = Nulls.SKIP)
+        public Builder issuerIdentificationNumber(Optional<String> issuerIdentificationNumber) {
+            this.issuerIdentificationNumber = issuerIdentificationNumber;
+            return this;
+        }
+
+        public Builder issuerIdentificationNumber(String issuerIdentificationNumber) {
+            this.issuerIdentificationNumber = Optional.ofNullable(issuerIdentificationNumber);
+            return this;
+        }
+
+        public Builder issuerIdentificationNumber(Nullable<String> issuerIdentificationNumber) {
+            if (issuerIdentificationNumber.isNull()) {
+                this.issuerIdentificationNumber = null;
+            } else if (issuerIdentificationNumber.isEmpty()) {
+                this.issuerIdentificationNumber = Optional.empty();
+            } else {
+                this.issuerIdentificationNumber = Optional.of(issuerIdentificationNumber.get());
+            }
             return this;
         }
 
         /**
          * <p>The card's last four digits, when captured.</p>
-         * @return Reference to {@code this} so that method calls can be chained together.
          */
-        @java.lang.Override
-        public _FinalStage last4(Nullable<String> last4) {
+        @JsonSetter(value = "last4", nulls = Nulls.SKIP)
+        public Builder last4(Optional<String> last4) {
+            this.last4 = last4;
+            return this;
+        }
+
+        public Builder last4(String last4) {
+            this.last4 = Optional.ofNullable(last4);
+            return this;
+        }
+
+        public Builder last4(Nullable<String> last4) {
             if (last4.isNull()) {
                 this.last4 = null;
             } else if (last4.isEmpty()) {
@@ -163,37 +350,59 @@ public final class PaymentInstrumentCard {
         }
 
         /**
-         * <p>The card's last four digits, when captured.</p>
-         * @return Reference to {@code this} so that method calls can be chained together.
+         * <p>The network transaction id this account uses for the card. It's this account's own id, from its first customer-present charge or verification on the card, when Whop has one. Otherwise it's an earlier network transaction id for this card, which can come from another account's transaction or be one brought with the card. Cite it as the prior transaction on a later merchant-initiated charge of this card at this account. Null until there is one. A webhook sent as a payment is first recorded can carry <code>null</code>, so retrieve the payment to read it.</p>
          */
-        @java.lang.Override
-        public _FinalStage last4(String last4) {
-            this.last4 = Optional.ofNullable(last4);
+        @JsonSetter(value = "network_transaction_id", nulls = Nulls.SKIP)
+        public Builder networkTransactionId(Optional<String> networkTransactionId) {
+            this.networkTransactionId = networkTransactionId;
             return this;
         }
 
-        /**
-         * <p>The card's last four digits, when captured.</p>
-         */
-        @java.lang.Override
-        @JsonSetter(value = "last4", nulls = Nulls.SKIP)
-        public _FinalStage last4(Optional<String> last4) {
-            this.last4 = last4;
+        public Builder networkTransactionId(String networkTransactionId) {
+            this.networkTransactionId = Optional.ofNullable(networkTransactionId);
             return this;
         }
 
-        @java.lang.Override
+        public Builder networkTransactionId(Nullable<String> networkTransactionId) {
+            if (networkTransactionId.isNull()) {
+                this.networkTransactionId = null;
+            } else if (networkTransactionId.isEmpty()) {
+                this.networkTransactionId = Optional.empty();
+            } else {
+                this.networkTransactionId = Optional.of(networkTransactionId.get());
+            }
+            return this;
+        }
+
         public PaymentInstrumentCard build() {
-            return new PaymentInstrumentCard(brand, last4, additionalProperties);
+            return new PaymentInstrumentCard(
+                    brand,
+                    expMonth,
+                    expYear,
+                    issuerIdentificationNumber,
+                    last4,
+                    networkTransactionId,
+                    additionalProperties);
         }
 
-        @java.lang.Override
+        @JsonAnySetter
+        private void putAdditionalPropertyFromJson(String key, Object value) {
+            if (key.equalsIgnoreCase("brand")
+                    || key.equalsIgnoreCase("exp_month")
+                    || key.equalsIgnoreCase("exp_year")
+                    || key.equalsIgnoreCase("issuer_identification_number")
+                    || key.equalsIgnoreCase("last4")
+                    || key.equalsIgnoreCase("network_transaction_id")) {
+                return;
+            }
+            this.additionalProperties.put(key, value);
+        }
+
         public Builder additionalProperty(String key, Object value) {
             this.additionalProperties.put(key, value);
             return this;
         }
 
-        @java.lang.Override
         public Builder additionalProperties(Map<String, Object> additionalProperties) {
             this.additionalProperties.putAll(additionalProperties);
             return this;

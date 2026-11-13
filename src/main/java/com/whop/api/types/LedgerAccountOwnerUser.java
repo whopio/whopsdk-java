@@ -143,7 +143,6 @@ public final class LedgerAccountOwnerUser {
 
         private Optional<String> name = Optional.empty();
 
-        @JsonAnySetter
         private Map<String, Object> additionalProperties = new HashMap<>();
 
         private Builder() {}
@@ -158,7 +157,6 @@ public final class LedgerAccountOwnerUser {
 
         /**
          * <p>The unique identifier for the user.</p>
-         * <p>The unique identifier for the user.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
@@ -169,7 +167,6 @@ public final class LedgerAccountOwnerUser {
         }
 
         /**
-         * <p>The user's unique username shown on their public profile.</p>
          * <p>The user's unique username shown on their public profile.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
@@ -219,6 +216,14 @@ public final class LedgerAccountOwnerUser {
         @java.lang.Override
         public LedgerAccountOwnerUser build() {
             return new LedgerAccountOwnerUser(id, name, username, additionalProperties);
+        }
+
+        @JsonAnySetter
+        private void putAdditionalPropertyFromJson(String key, Object value) {
+            if (key.equalsIgnoreCase("id") || key.equalsIgnoreCase("name") || key.equalsIgnoreCase("username")) {
+                return;
+            }
+            this.additionalProperties.put(key, value);
         }
 
         @java.lang.Override

@@ -192,7 +192,6 @@ public final class DmMemberListItem {
 
         private Optional<String> lastViewedAt = Optional.empty();
 
-        @JsonAnySetter
         private Map<String, Object> additionalProperties = new HashMap<>();
 
         private Builder() {}
@@ -209,7 +208,6 @@ public final class DmMemberListItem {
 
         /**
          * <p>The unique identifier of the messaging channel this membership belongs to.</p>
-         * <p>The unique identifier of the messaging channel this membership belongs to.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
@@ -220,7 +218,6 @@ public final class DmMemberListItem {
         }
 
         /**
-         * <p>The unique identifier for the entity</p>
          * <p>The unique identifier for the entity</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
@@ -233,7 +230,6 @@ public final class DmMemberListItem {
 
         /**
          * <p>The current state of this membership: requested, accepted, hidden, closed, or archived.</p>
-         * <p>The current state of this membership: requested, accepted, hidden, closed, or archived.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
@@ -244,7 +240,6 @@ public final class DmMemberListItem {
         }
 
         /**
-         * <p>The unique identifier of the user who holds this channel membership.</p>
          * <p>The unique identifier of the user who holds this channel membership.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
@@ -294,6 +289,18 @@ public final class DmMemberListItem {
         @java.lang.Override
         public DmMemberListItem build() {
             return new DmMemberListItem(channelId, id, lastViewedAt, status, userId, additionalProperties);
+        }
+
+        @JsonAnySetter
+        private void putAdditionalPropertyFromJson(String key, Object value) {
+            if (key.equalsIgnoreCase("channel_id")
+                    || key.equalsIgnoreCase("id")
+                    || key.equalsIgnoreCase("last_viewed_at")
+                    || key.equalsIgnoreCase("status")
+                    || key.equalsIgnoreCase("user_id")) {
+                return;
+            }
+            this.additionalProperties.put(key, value);
         }
 
         @java.lang.Override

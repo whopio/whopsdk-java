@@ -25,7 +25,7 @@ import java.util.Optional;
 @JsonInclude(JsonInclude.Include.NON_ABSENT)
 @JsonDeserialize(builder = CreateDmChannelsRequest.Builder.class)
 public final class CreateDmChannelsRequest {
-    private final Optional<String> companyId;
+    private final Optional<String> accountId;
 
     private final Optional<String> customName;
 
@@ -36,12 +36,12 @@ public final class CreateDmChannelsRequest {
     private final Map<String, Object> additionalProperties;
 
     private CreateDmChannelsRequest(
-            Optional<String> companyId,
+            Optional<String> accountId,
             Optional<String> customName,
             Optional<Boolean> notificationsEnabled,
             List<String> withUserIds,
             Map<String, Object> additionalProperties) {
-        this.companyId = companyId;
+        this.accountId = accountId;
         this.customName = customName;
         this.notificationsEnabled = notificationsEnabled;
         this.withUserIds = withUserIds;
@@ -52,11 +52,11 @@ public final class CreateDmChannelsRequest {
      * @return The unique identifier of the company to scope this DM channel to. When set, the channel is visible only within that company context.
      */
     @JsonIgnore
-    public Optional<String> getCompanyId() {
-        if (companyId == null) {
+    public Optional<String> getAccountId() {
+        if (accountId == null) {
             return Optional.empty();
         }
-        return companyId;
+        return accountId;
     }
 
     /**
@@ -90,9 +90,9 @@ public final class CreateDmChannelsRequest {
     }
 
     @JsonInclude(value = JsonInclude.Include.CUSTOM, valueFilter = NullableNonemptyFilter.class)
-    @JsonProperty("company_id")
-    private Optional<String> _getCompanyId() {
-        return companyId;
+    @JsonProperty("account_id")
+    private Optional<String> _getAccountId() {
+        return accountId;
     }
 
     @JsonInclude(value = JsonInclude.Include.CUSTOM, valueFilter = NullableNonemptyFilter.class)
@@ -119,7 +119,7 @@ public final class CreateDmChannelsRequest {
     }
 
     private boolean equalTo(CreateDmChannelsRequest other) {
-        return companyId.equals(other.companyId)
+        return accountId.equals(other.accountId)
                 && customName.equals(other.customName)
                 && notificationsEnabled.equals(other.notificationsEnabled)
                 && withUserIds.equals(other.withUserIds);
@@ -127,7 +127,7 @@ public final class CreateDmChannelsRequest {
 
     @java.lang.Override
     public int hashCode() {
-        return Objects.hash(this.companyId, this.customName, this.notificationsEnabled, this.withUserIds);
+        return Objects.hash(this.accountId, this.customName, this.notificationsEnabled, this.withUserIds);
     }
 
     @java.lang.Override
@@ -141,7 +141,7 @@ public final class CreateDmChannelsRequest {
 
     @JsonIgnoreProperties(ignoreUnknown = true)
     public static final class Builder {
-        private Optional<String> companyId = Optional.empty();
+        private Optional<String> accountId = Optional.empty();
 
         private Optional<String> customName = Optional.empty();
 
@@ -149,13 +149,12 @@ public final class CreateDmChannelsRequest {
 
         private List<String> withUserIds = new ArrayList<>();
 
-        @JsonAnySetter
         private Map<String, Object> additionalProperties = new HashMap<>();
 
         private Builder() {}
 
         public Builder from(CreateDmChannelsRequest other) {
-            companyId(other.getCompanyId());
+            accountId(other.getAccountId());
             customName(other.getCustomName());
             notificationsEnabled(other.getNotificationsEnabled());
             withUserIds(other.getWithUserIds());
@@ -165,24 +164,24 @@ public final class CreateDmChannelsRequest {
         /**
          * <p>The unique identifier of the company to scope this DM channel to. When set, the channel is visible only within that company context.</p>
          */
-        @JsonSetter(value = "company_id", nulls = Nulls.SKIP)
-        public Builder companyId(Optional<String> companyId) {
-            this.companyId = companyId;
+        @JsonSetter(value = "account_id", nulls = Nulls.SKIP)
+        public Builder accountId(Optional<String> accountId) {
+            this.accountId = accountId;
             return this;
         }
 
-        public Builder companyId(String companyId) {
-            this.companyId = Optional.ofNullable(companyId);
+        public Builder accountId(String accountId) {
+            this.accountId = Optional.ofNullable(accountId);
             return this;
         }
 
-        public Builder companyId(Nullable<String> companyId) {
-            if (companyId.isNull()) {
-                this.companyId = null;
-            } else if (companyId.isEmpty()) {
-                this.companyId = Optional.empty();
+        public Builder accountId(Nullable<String> accountId) {
+            if (accountId.isNull()) {
+                this.accountId = null;
+            } else if (accountId.isEmpty()) {
+                this.accountId = Optional.empty();
             } else {
-                this.companyId = Optional.of(companyId.get());
+                this.accountId = Optional.of(accountId.get());
             }
             return this;
         }
@@ -263,7 +262,18 @@ public final class CreateDmChannelsRequest {
 
         public CreateDmChannelsRequest build() {
             return new CreateDmChannelsRequest(
-                    companyId, customName, notificationsEnabled, withUserIds, additionalProperties);
+                    accountId, customName, notificationsEnabled, withUserIds, additionalProperties);
+        }
+
+        @JsonAnySetter
+        private void putAdditionalPropertyFromJson(String key, Object value) {
+            if (key.equalsIgnoreCase("account_id")
+                    || key.equalsIgnoreCase("custom_name")
+                    || key.equalsIgnoreCase("notifications_enabled")
+                    || key.equalsIgnoreCase("with_user_ids")) {
+                return;
+            }
+            this.additionalProperties.put(key, value);
         }
 
         public Builder additionalProperty(String key, Object value) {

@@ -107,7 +107,6 @@ public final class AdGroupRegions {
 
         private AdGroupGeoLocations include;
 
-        @JsonAnySetter
         private Map<String, Object> additionalProperties = new HashMap<>();
 
         private Builder() {}
@@ -121,7 +120,6 @@ public final class AdGroupRegions {
 
         /**
          * <p>Locations excluded from targeting. Country groups can't be excluded.</p>
-         * <p>Locations excluded from targeting. Country groups can't be excluded.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
@@ -132,7 +130,6 @@ public final class AdGroupRegions {
         }
 
         /**
-         * <p>Locations the ad group targets.</p>
          * <p>Locations the ad group targets.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
@@ -146,6 +143,14 @@ public final class AdGroupRegions {
         @java.lang.Override
         public AdGroupRegions build() {
             return new AdGroupRegions(exclude, include, additionalProperties);
+        }
+
+        @JsonAnySetter
+        private void putAdditionalPropertyFromJson(String key, Object value) {
+            if (key.equalsIgnoreCase("exclude") || key.equalsIgnoreCase("include")) {
+                return;
+            }
+            this.additionalProperties.put(key, value);
         }
 
         @java.lang.Override

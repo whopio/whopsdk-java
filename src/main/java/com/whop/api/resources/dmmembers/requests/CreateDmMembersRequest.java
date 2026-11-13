@@ -106,7 +106,6 @@ public final class CreateDmMembersRequest {
 
         private String userId;
 
-        @JsonAnySetter
         private Map<String, Object> additionalProperties = new HashMap<>();
 
         private Builder() {}
@@ -120,7 +119,6 @@ public final class CreateDmMembersRequest {
 
         /**
          * <p>The unique identifier of the DM channel to add the new member to.</p>
-         * <p>The unique identifier of the DM channel to add the new member to.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
@@ -131,7 +129,6 @@ public final class CreateDmMembersRequest {
         }
 
         /**
-         * <p>The unique identifier of the user to add to the DM channel. For example, 'user_xxxxx'.</p>
          * <p>The unique identifier of the user to add to the DM channel. For example, 'user_xxxxx'.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
@@ -145,6 +142,14 @@ public final class CreateDmMembersRequest {
         @java.lang.Override
         public CreateDmMembersRequest build() {
             return new CreateDmMembersRequest(channelId, userId, additionalProperties);
+        }
+
+        @JsonAnySetter
+        private void putAdditionalPropertyFromJson(String key, Object value) {
+            if (key.equalsIgnoreCase("channel_id") || key.equalsIgnoreCase("user_id")) {
+                return;
+            }
+            this.additionalProperties.put(key, value);
         }
 
         @java.lang.Override

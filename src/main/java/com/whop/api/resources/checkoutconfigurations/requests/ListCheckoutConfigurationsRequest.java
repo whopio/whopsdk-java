@@ -25,7 +25,7 @@ import org.jetbrains.annotations.NotNull;
 public final class ListCheckoutConfigurationsRequest {
     private final String accountId;
 
-    private final Optional<String> planId;
+    private final Optional<String> variantId;
 
     private final Optional<String> createdBefore;
 
@@ -43,7 +43,7 @@ public final class ListCheckoutConfigurationsRequest {
 
     private ListCheckoutConfigurationsRequest(
             String accountId,
-            Optional<String> planId,
+            Optional<String> variantId,
             Optional<String> createdBefore,
             Optional<String> createdAfter,
             Optional<ListCheckoutConfigurationsRequestOrder> order,
@@ -52,7 +52,7 @@ public final class ListCheckoutConfigurationsRequest {
             Optional<String> after,
             Map<String, Object> additionalProperties) {
         this.accountId = accountId;
-        this.planId = planId;
+        this.variantId = variantId;
         this.createdBefore = createdBefore;
         this.createdAfter = createdAfter;
         this.order = order;
@@ -71,11 +71,11 @@ public final class ListCheckoutConfigurationsRequest {
     }
 
     /**
-     * @return Only return checkout configurations for this plan ID, prefixed <code>plan_</code>.
+     * @return Only return checkout configurations for this variant ID, prefixed <code>plan_</code>.
      */
-    @JsonProperty("plan_id")
-    public Optional<String> getPlanId() {
-        return planId;
+    @JsonProperty("variant_id")
+    public Optional<String> getVariantId() {
+        return variantId;
     }
 
     /**
@@ -111,7 +111,7 @@ public final class ListCheckoutConfigurationsRequest {
     }
 
     /**
-     * @return Number of checkout configurations to return.
+     * @return Number of results to return from the start of the range.
      */
     @JsonProperty("first")
     public Optional<Integer> getFirst() {
@@ -119,7 +119,7 @@ public final class ListCheckoutConfigurationsRequest {
     }
 
     /**
-     * @return Cursor for the next page of results.
+     * @return Return results after this cursor. Use <code>page_info.end_cursor</code> from the previous response to fetch the next page.
      */
     @JsonProperty("after")
     public Optional<String> getAfter() {
@@ -139,7 +139,7 @@ public final class ListCheckoutConfigurationsRequest {
 
     private boolean equalTo(ListCheckoutConfigurationsRequest other) {
         return accountId.equals(other.accountId)
-                && planId.equals(other.planId)
+                && variantId.equals(other.variantId)
                 && createdBefore.equals(other.createdBefore)
                 && createdAfter.equals(other.createdAfter)
                 && order.equals(other.order)
@@ -152,7 +152,7 @@ public final class ListCheckoutConfigurationsRequest {
     public int hashCode() {
         return Objects.hash(
                 this.accountId,
-                this.planId,
+                this.variantId,
                 this.createdBefore,
                 this.createdAfter,
                 this.order,
@@ -187,11 +187,11 @@ public final class ListCheckoutConfigurationsRequest {
         _FinalStage additionalProperties(Map<String, Object> additionalProperties);
 
         /**
-         * <p>Only return checkout configurations for this plan ID, prefixed <code>plan_</code>.</p>
+         * <p>Only return checkout configurations for this variant ID, prefixed <code>plan_</code>.</p>
          */
-        _FinalStage planId(Optional<String> planId);
+        _FinalStage variantId(Optional<String> variantId);
 
-        _FinalStage planId(String planId);
+        _FinalStage variantId(String variantId);
 
         /**
          * <p>Only return checkout configurations created before this ISO 8601 timestamp.</p>
@@ -222,14 +222,14 @@ public final class ListCheckoutConfigurationsRequest {
         _FinalStage direction(ListCheckoutConfigurationsRequestDirection direction);
 
         /**
-         * <p>Number of checkout configurations to return.</p>
+         * <p>Number of results to return from the start of the range.</p>
          */
         _FinalStage first(Optional<Integer> first);
 
         _FinalStage first(Integer first);
 
         /**
-         * <p>Cursor for the next page of results.</p>
+         * <p>Return results after this cursor. Use <code>page_info.end_cursor</code> from the previous response to fetch the next page.</p>
          */
         _FinalStage after(Optional<String> after);
 
@@ -252,9 +252,8 @@ public final class ListCheckoutConfigurationsRequest {
 
         private Optional<String> createdBefore = Optional.empty();
 
-        private Optional<String> planId = Optional.empty();
+        private Optional<String> variantId = Optional.empty();
 
-        @JsonAnySetter
         private Map<String, Object> additionalProperties = new HashMap<>();
 
         private Builder() {}
@@ -262,7 +261,7 @@ public final class ListCheckoutConfigurationsRequest {
         @java.lang.Override
         public Builder from(ListCheckoutConfigurationsRequest other) {
             accountId(other.getAccountId());
-            planId(other.getPlanId());
+            variantId(other.getVariantId());
             createdBefore(other.getCreatedBefore());
             createdAfter(other.getCreatedAfter());
             order(other.getOrder());
@@ -274,7 +273,6 @@ public final class ListCheckoutConfigurationsRequest {
 
         /**
          * <p>Account ID, prefixed <code>biz_</code>.</p>
-         * <p>Account ID, prefixed <code>biz_</code>.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
@@ -285,7 +283,7 @@ public final class ListCheckoutConfigurationsRequest {
         }
 
         /**
-         * <p>Cursor for the next page of results.</p>
+         * <p>Return results after this cursor. Use <code>page_info.end_cursor</code> from the previous response to fetch the next page.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
@@ -295,7 +293,7 @@ public final class ListCheckoutConfigurationsRequest {
         }
 
         /**
-         * <p>Cursor for the next page of results.</p>
+         * <p>Return results after this cursor. Use <code>page_info.end_cursor</code> from the previous response to fetch the next page.</p>
          */
         @java.lang.Override
         @JsonSetter(value = "after", nulls = Nulls.SKIP)
@@ -305,7 +303,7 @@ public final class ListCheckoutConfigurationsRequest {
         }
 
         /**
-         * <p>Number of checkout configurations to return.</p>
+         * <p>Number of results to return from the start of the range.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
@@ -315,7 +313,7 @@ public final class ListCheckoutConfigurationsRequest {
         }
 
         /**
-         * <p>Number of checkout configurations to return.</p>
+         * <p>Number of results to return from the start of the range.</p>
          */
         @java.lang.Override
         @JsonSetter(value = "first", nulls = Nulls.SKIP)
@@ -405,22 +403,22 @@ public final class ListCheckoutConfigurationsRequest {
         }
 
         /**
-         * <p>Only return checkout configurations for this plan ID, prefixed <code>plan_</code>.</p>
+         * <p>Only return checkout configurations for this variant ID, prefixed <code>plan_</code>.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
-        public _FinalStage planId(String planId) {
-            this.planId = Optional.ofNullable(planId);
+        public _FinalStage variantId(String variantId) {
+            this.variantId = Optional.ofNullable(variantId);
             return this;
         }
 
         /**
-         * <p>Only return checkout configurations for this plan ID, prefixed <code>plan_</code>.</p>
+         * <p>Only return checkout configurations for this variant ID, prefixed <code>plan_</code>.</p>
          */
         @java.lang.Override
-        @JsonSetter(value = "plan_id", nulls = Nulls.SKIP)
-        public _FinalStage planId(Optional<String> planId) {
-            this.planId = planId;
+        @JsonSetter(value = "variant_id", nulls = Nulls.SKIP)
+        public _FinalStage variantId(Optional<String> variantId) {
+            this.variantId = variantId;
             return this;
         }
 
@@ -428,7 +426,7 @@ public final class ListCheckoutConfigurationsRequest {
         public ListCheckoutConfigurationsRequest build() {
             return new ListCheckoutConfigurationsRequest(
                     accountId,
-                    planId,
+                    variantId,
                     createdBefore,
                     createdAfter,
                     order,
@@ -436,6 +434,21 @@ public final class ListCheckoutConfigurationsRequest {
                     first,
                     after,
                     additionalProperties);
+        }
+
+        @JsonAnySetter
+        private void putAdditionalPropertyFromJson(String key, Object value) {
+            if (key.equalsIgnoreCase("account_id")
+                    || key.equalsIgnoreCase("variant_id")
+                    || key.equalsIgnoreCase("created_before")
+                    || key.equalsIgnoreCase("created_after")
+                    || key.equalsIgnoreCase("order")
+                    || key.equalsIgnoreCase("direction")
+                    || key.equalsIgnoreCase("first")
+                    || key.equalsIgnoreCase("after")) {
+                return;
+            }
+            this.additionalProperties.put(key, value);
         }
 
         @java.lang.Override

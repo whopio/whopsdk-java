@@ -86,7 +86,6 @@ public final class TransferMembershipsResponse {
     public static final class Builder implements UrlStage, _FinalStage {
         private String url;
 
-        @JsonAnySetter
         private Map<String, Object> additionalProperties = new HashMap<>();
 
         private Builder() {}
@@ -98,7 +97,6 @@ public final class TransferMembershipsResponse {
         }
 
         /**
-         * <p>One-use URL the destination account opens to claim the membership.</p>
          * <p>One-use URL the destination account opens to claim the membership.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
@@ -112,6 +110,14 @@ public final class TransferMembershipsResponse {
         @java.lang.Override
         public TransferMembershipsResponse build() {
             return new TransferMembershipsResponse(url, additionalProperties);
+        }
+
+        @JsonAnySetter
+        private void putAdditionalPropertyFromJson(String key, Object value) {
+            if (key.equalsIgnoreCase("url")) {
+                return;
+            }
+            this.additionalProperties.put(key, value);
         }
 
         @java.lang.Override

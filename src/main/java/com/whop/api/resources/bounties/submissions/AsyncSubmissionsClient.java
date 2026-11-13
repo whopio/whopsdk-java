@@ -5,6 +5,7 @@ package com.whop.api.resources.bounties.submissions;
 
 import com.whop.api.core.ClientOptions;
 import com.whop.api.core.RequestOptions;
+import com.whop.api.core.WhopApiHttpResponse;
 import com.whop.api.core.pagination.SyncPagingIterable;
 import com.whop.api.resources.bounties.submissions.requests.ListSubmissionsRequest;
 import com.whop.api.resources.bounties.submissions.requests.RetrieveSubmissionsRequest;
@@ -32,7 +33,16 @@ public class AsyncSubmissionsClient {
      * Lists a bounty's publicly visible work — submitted, approved, and denied submissions in the reduced public shape. Authentication is optional; a bounty that is not publicly visible returns <code>404</code>.
      */
     public CompletableFuture<SyncPagingIterable<PublicBountySubmission>> list(String bountyId) {
-        return this.rawClient.list(bountyId).thenApply(response -> response.body());
+        CompletableFuture<WhopApiHttpResponse<SyncPagingIterable<PublicBountySubmission>>> rawFuture =
+                this.rawClient.list(bountyId);
+        CompletableFuture<SyncPagingIterable<PublicBountySubmission>> future =
+                rawFuture.thenApply(response -> response.body());
+        future.whenComplete((result_, throwable_) -> {
+            if (future.isCancelled()) {
+                rawFuture.cancel(true);
+            }
+        });
+        return future;
     }
 
     /**
@@ -40,7 +50,16 @@ public class AsyncSubmissionsClient {
      */
     public CompletableFuture<SyncPagingIterable<PublicBountySubmission>> list(
             String bountyId, RequestOptions requestOptions) {
-        return this.rawClient.list(bountyId, requestOptions).thenApply(response -> response.body());
+        CompletableFuture<WhopApiHttpResponse<SyncPagingIterable<PublicBountySubmission>>> rawFuture =
+                this.rawClient.list(bountyId, requestOptions);
+        CompletableFuture<SyncPagingIterable<PublicBountySubmission>> future =
+                rawFuture.thenApply(response -> response.body());
+        future.whenComplete((result_, throwable_) -> {
+            if (future.isCancelled()) {
+                rawFuture.cancel(true);
+            }
+        });
+        return future;
     }
 
     /**
@@ -48,7 +67,16 @@ public class AsyncSubmissionsClient {
      */
     public CompletableFuture<SyncPagingIterable<PublicBountySubmission>> list(
             String bountyId, ListSubmissionsRequest request) {
-        return this.rawClient.list(bountyId, request).thenApply(response -> response.body());
+        CompletableFuture<WhopApiHttpResponse<SyncPagingIterable<PublicBountySubmission>>> rawFuture =
+                this.rawClient.list(bountyId, request);
+        CompletableFuture<SyncPagingIterable<PublicBountySubmission>> future =
+                rawFuture.thenApply(response -> response.body());
+        future.whenComplete((result_, throwable_) -> {
+            if (future.isCancelled()) {
+                rawFuture.cancel(true);
+            }
+        });
+        return future;
     }
 
     /**
@@ -56,14 +84,31 @@ public class AsyncSubmissionsClient {
      */
     public CompletableFuture<SyncPagingIterable<PublicBountySubmission>> list(
             String bountyId, ListSubmissionsRequest request, RequestOptions requestOptions) {
-        return this.rawClient.list(bountyId, request, requestOptions).thenApply(response -> response.body());
+        CompletableFuture<WhopApiHttpResponse<SyncPagingIterable<PublicBountySubmission>>> rawFuture =
+                this.rawClient.list(bountyId, request, requestOptions);
+        CompletableFuture<SyncPagingIterable<PublicBountySubmission>> future =
+                rawFuture.thenApply(response -> response.body());
+        future.whenComplete((result_, throwable_) -> {
+            if (future.isCancelled()) {
+                rawFuture.cancel(true);
+            }
+        });
+        return future;
     }
 
     /**
      * Retrieves one of a bounty's publicly visible submissions in the reduced public shape — the read behind a shared proof link, whose submission is usually outside the bounty page's capped preview. Authentication is optional; a bounty that is not publicly visible, and a submission that is not publicly visible work on it, both return <code>404</code>.
      */
     public CompletableFuture<PublicBountySubmission> retrieve(String bountyId, String id) {
-        return this.rawClient.retrieve(bountyId, id).thenApply(response -> response.body());
+        CompletableFuture<WhopApiHttpResponse<PublicBountySubmission>> rawFuture =
+                this.rawClient.retrieve(bountyId, id);
+        CompletableFuture<PublicBountySubmission> future = rawFuture.thenApply(response -> response.body());
+        future.whenComplete((result_, throwable_) -> {
+            if (future.isCancelled()) {
+                rawFuture.cancel(true);
+            }
+        });
+        return future;
     }
 
     /**
@@ -71,7 +116,15 @@ public class AsyncSubmissionsClient {
      */
     public CompletableFuture<PublicBountySubmission> retrieve(
             String bountyId, String id, RequestOptions requestOptions) {
-        return this.rawClient.retrieve(bountyId, id, requestOptions).thenApply(response -> response.body());
+        CompletableFuture<WhopApiHttpResponse<PublicBountySubmission>> rawFuture =
+                this.rawClient.retrieve(bountyId, id, requestOptions);
+        CompletableFuture<PublicBountySubmission> future = rawFuture.thenApply(response -> response.body());
+        future.whenComplete((result_, throwable_) -> {
+            if (future.isCancelled()) {
+                rawFuture.cancel(true);
+            }
+        });
+        return future;
     }
 
     /**
@@ -79,7 +132,15 @@ public class AsyncSubmissionsClient {
      */
     public CompletableFuture<PublicBountySubmission> retrieve(
             String bountyId, String id, RetrieveSubmissionsRequest request) {
-        return this.rawClient.retrieve(bountyId, id, request).thenApply(response -> response.body());
+        CompletableFuture<WhopApiHttpResponse<PublicBountySubmission>> rawFuture =
+                this.rawClient.retrieve(bountyId, id, request);
+        CompletableFuture<PublicBountySubmission> future = rawFuture.thenApply(response -> response.body());
+        future.whenComplete((result_, throwable_) -> {
+            if (future.isCancelled()) {
+                rawFuture.cancel(true);
+            }
+        });
+        return future;
     }
 
     /**
@@ -87,6 +148,14 @@ public class AsyncSubmissionsClient {
      */
     public CompletableFuture<PublicBountySubmission> retrieve(
             String bountyId, String id, RetrieveSubmissionsRequest request, RequestOptions requestOptions) {
-        return this.rawClient.retrieve(bountyId, id, request, requestOptions).thenApply(response -> response.body());
+        CompletableFuture<WhopApiHttpResponse<PublicBountySubmission>> rawFuture =
+                this.rawClient.retrieve(bountyId, id, request, requestOptions);
+        CompletableFuture<PublicBountySubmission> future = rawFuture.thenApply(response -> response.body());
+        future.whenComplete((result_, throwable_) -> {
+            if (future.isCancelled()) {
+                rawFuture.cancel(true);
+            }
+        });
+        return future;
     }
 }

@@ -122,7 +122,6 @@ public final class MessageListItemPollVotesItem {
 
         private Optional<String> optionId = Optional.empty();
 
-        @JsonAnySetter
         private Map<String, Object> additionalProperties = new HashMap<>();
 
         private Builder() {}
@@ -135,7 +134,6 @@ public final class MessageListItemPollVotesItem {
         }
 
         /**
-         * <p>The number of users who reacted</p>
          * <p>The number of users who reacted</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
@@ -185,6 +183,14 @@ public final class MessageListItemPollVotesItem {
         @java.lang.Override
         public MessageListItemPollVotesItem build() {
             return new MessageListItemPollVotesItem(count, optionId, additionalProperties);
+        }
+
+        @JsonAnySetter
+        private void putAdditionalPropertyFromJson(String key, Object value) {
+            if (key.equalsIgnoreCase("count") || key.equalsIgnoreCase("option_id")) {
+                return;
+            }
+            this.additionalProperties.put(key, value);
         }
 
         @java.lang.Override

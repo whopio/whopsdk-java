@@ -107,7 +107,6 @@ public final class UpdateLeadsRequest {
 
         private Optional<String> referrer = Optional.empty();
 
-        @JsonAnySetter
         private Map<String, Object> additionalProperties = new HashMap<>();
 
         private Builder() {}
@@ -170,6 +169,14 @@ public final class UpdateLeadsRequest {
 
         public UpdateLeadsRequest build() {
             return new UpdateLeadsRequest(metadata, referrer, additionalProperties);
+        }
+
+        @JsonAnySetter
+        private void putAdditionalPropertyFromJson(String key, Object value) {
+            if (key.equalsIgnoreCase("metadata") || key.equalsIgnoreCase("referrer")) {
+                return;
+            }
+            this.additionalProperties.put(key, value);
         }
 
         public Builder additionalProperty(String key, Object value) {

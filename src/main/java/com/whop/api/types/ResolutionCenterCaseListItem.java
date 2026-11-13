@@ -409,7 +409,6 @@ public final class ResolutionCenterCaseListItem {
 
         private Optional<ResolutionCenterCaseListItemCompany> company = Optional.empty();
 
-        @JsonAnySetter
         private Map<String, Object> additionalProperties = new HashMap<>();
 
         private Builder() {}
@@ -434,7 +433,6 @@ public final class ResolutionCenterCaseListItem {
 
         /**
          * <p>The datetime the resolution was created.</p>
-         * <p>The datetime the resolution was created.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
@@ -445,7 +443,6 @@ public final class ResolutionCenterCaseListItem {
         }
 
         /**
-         * <p>Whether the customer has filed an appeal after the initial resolution decision.</p>
          * <p>Whether the customer has filed an appeal after the initial resolution decision.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
@@ -458,7 +455,6 @@ public final class ResolutionCenterCaseListItem {
 
         /**
          * <p>The unique identifier for the resolution.</p>
-         * <p>The unique identifier for the resolution.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
@@ -469,7 +465,6 @@ public final class ResolutionCenterCaseListItem {
         }
 
         /**
-         * <p>The category of the dispute.</p>
          * <p>The category of the dispute.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
@@ -482,7 +477,6 @@ public final class ResolutionCenterCaseListItem {
 
         /**
          * <p>Whether the merchant has filed an appeal after the initial resolution decision.</p>
-         * <p>Whether the merchant has filed an appeal after the initial resolution decision.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
@@ -493,7 +487,6 @@ public final class ResolutionCenterCaseListItem {
         }
 
         /**
-         * <p>The payment record that is the subject of this resolution case.</p>
          * <p>The payment record that is the subject of this resolution case.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
@@ -506,7 +499,6 @@ public final class ResolutionCenterCaseListItem {
 
         /**
          * <p>The current status of the resolution case, indicating which party needs to respond or if the case is closed.</p>
-         * <p>The current status of the resolution case, indicating which party needs to respond or if the case is closed.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
@@ -518,7 +510,6 @@ public final class ResolutionCenterCaseListItem {
 
         /**
          * <p>The datetime the resolution was last updated.</p>
-         * <p>The datetime the resolution was last updated.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
@@ -529,7 +520,6 @@ public final class ResolutionCenterCaseListItem {
         }
 
         /**
-         * <p>The customer (buyer) who filed this resolution case.</p>
          * <p>The customer (buyer) who filed this resolution case.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
@@ -703,6 +693,26 @@ public final class ResolutionCenterCaseListItem {
                     updatedAt,
                     user,
                     additionalProperties);
+        }
+
+        @JsonAnySetter
+        private void putAdditionalPropertyFromJson(String key, Object value) {
+            if (key.equalsIgnoreCase("company")
+                    || key.equalsIgnoreCase("created_at")
+                    || key.equalsIgnoreCase("customer_appealed")
+                    || key.equalsIgnoreCase("customer_response_actions")
+                    || key.equalsIgnoreCase("due_date")
+                    || key.equalsIgnoreCase("id")
+                    || key.equalsIgnoreCase("issue")
+                    || key.equalsIgnoreCase("merchant_appealed")
+                    || key.equalsIgnoreCase("merchant_response_actions")
+                    || key.equalsIgnoreCase("payment")
+                    || key.equalsIgnoreCase("status")
+                    || key.equalsIgnoreCase("updated_at")
+                    || key.equalsIgnoreCase("user")) {
+                return;
+            }
+            this.additionalProperties.put(key, value);
         }
 
         @java.lang.Override

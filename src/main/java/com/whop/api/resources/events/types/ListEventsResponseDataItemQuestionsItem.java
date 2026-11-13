@@ -188,7 +188,6 @@ public final class ListEventsResponseDataItemQuestionsItem {
 
         private Optional<String> type = Optional.empty();
 
-        @JsonAnySetter
         private Map<String, Object> additionalProperties = new HashMap<>();
 
         private Builder() {}
@@ -338,6 +337,19 @@ public final class ListEventsResponseDataItemQuestionsItem {
         public ListEventsResponseDataItemQuestionsItem build() {
             return new ListEventsResponseDataItemQuestionsItem(
                     answer, id, key, options, question, type, additionalProperties);
+        }
+
+        @JsonAnySetter
+        private void putAdditionalPropertyFromJson(String key, Object value) {
+            if (key.equalsIgnoreCase("answer")
+                    || key.equalsIgnoreCase("id")
+                    || key.equalsIgnoreCase("key")
+                    || key.equalsIgnoreCase("options")
+                    || key.equalsIgnoreCase("question")
+                    || key.equalsIgnoreCase("type")) {
+                return;
+            }
+            this.additionalProperties.put(key, value);
         }
 
         public Builder additionalProperty(String key, Object value) {

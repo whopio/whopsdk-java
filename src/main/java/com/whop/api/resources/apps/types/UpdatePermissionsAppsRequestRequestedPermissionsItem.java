@@ -130,7 +130,6 @@ public final class UpdatePermissionsAppsRequestRequestedPermissionsItem {
 
         private String justification;
 
-        @JsonAnySetter
         private Map<String, Object> additionalProperties = new HashMap<>();
 
         private Builder() {}
@@ -145,7 +144,6 @@ public final class UpdatePermissionsAppsRequestRequestedPermissionsItem {
 
         /**
          * <p>The permission action, for example <code>company:basic:read</code>.</p>
-         * <p>The permission action, for example <code>company:basic:read</code>.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
@@ -157,7 +155,6 @@ public final class UpdatePermissionsAppsRequestRequestedPermissionsItem {
 
         /**
          * <p>Whether installing the app requires granting this permission.</p>
-         * <p>Whether installing the app requires granting this permission.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
@@ -168,7 +165,6 @@ public final class UpdatePermissionsAppsRequestRequestedPermissionsItem {
         }
 
         /**
-         * <p>Why the app needs this permission (20-512 characters), shown to the installing user.</p>
          * <p>Why the app needs this permission (20-512 characters), shown to the installing user.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
@@ -183,6 +179,16 @@ public final class UpdatePermissionsAppsRequestRequestedPermissionsItem {
         public UpdatePermissionsAppsRequestRequestedPermissionsItem build() {
             return new UpdatePermissionsAppsRequestRequestedPermissionsItem(
                     action, isRequired, justification, additionalProperties);
+        }
+
+        @JsonAnySetter
+        private void putAdditionalPropertyFromJson(String key, Object value) {
+            if (key.equalsIgnoreCase("action")
+                    || key.equalsIgnoreCase("is_required")
+                    || key.equalsIgnoreCase("justification")) {
+                return;
+            }
+            this.additionalProperties.put(key, value);
         }
 
         @java.lang.Override

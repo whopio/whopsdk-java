@@ -106,7 +106,6 @@ public final class PromoCodeProduct {
 
         private String title;
 
-        @JsonAnySetter
         private Map<String, Object> additionalProperties = new HashMap<>();
 
         private Builder() {}
@@ -120,7 +119,6 @@ public final class PromoCodeProduct {
 
         /**
          * <p>Product ID, prefixed <code>prod_</code>.</p>
-         * <p>Product ID, prefixed <code>prod_</code>.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
@@ -131,7 +129,6 @@ public final class PromoCodeProduct {
         }
 
         /**
-         * <p>Product display name.</p>
          * <p>Product display name.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
@@ -145,6 +142,14 @@ public final class PromoCodeProduct {
         @java.lang.Override
         public PromoCodeProduct build() {
             return new PromoCodeProduct(id, title, additionalProperties);
+        }
+
+        @JsonAnySetter
+        private void putAdditionalPropertyFromJson(String key, Object value) {
+            if (key.equalsIgnoreCase("id") || key.equalsIgnoreCase("title")) {
+                return;
+            }
+            this.additionalProperties.put(key, value);
         }
 
         @java.lang.Override

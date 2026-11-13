@@ -88,7 +88,6 @@ public final class DisputeListItemPaymentPaymentInstrumentIconsSquareDark {
     public static final class Builder implements SvgStage, _FinalStage {
         private String svg;
 
-        @JsonAnySetter
         private Map<String, Object> additionalProperties = new HashMap<>();
 
         private Builder() {}
@@ -100,7 +99,6 @@ public final class DisputeListItemPaymentPaymentInstrumentIconsSquareDark {
         }
 
         /**
-         * <p>The vector file. Prefer this everywhere SVG renders.</p>
          * <p>The vector file. Prefer this everywhere SVG renders.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
@@ -114,6 +112,14 @@ public final class DisputeListItemPaymentPaymentInstrumentIconsSquareDark {
         @java.lang.Override
         public DisputeListItemPaymentPaymentInstrumentIconsSquareDark build() {
             return new DisputeListItemPaymentPaymentInstrumentIconsSquareDark(svg, additionalProperties);
+        }
+
+        @JsonAnySetter
+        private void putAdditionalPropertyFromJson(String key, Object value) {
+            if (key.equalsIgnoreCase("svg")) {
+                return;
+            }
+            this.additionalProperties.put(key, value);
         }
 
         @java.lang.Override

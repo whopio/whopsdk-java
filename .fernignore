@@ -21,3 +21,6 @@
 # users().retrieve, core.ILogger, core.LogConfig, core.LogLevel and ApiKeyApiVersionDate.Value.
 src/main/java/com/whop/api/helpers/
 src/test/java/com/whop/api/helpers/
+.fern/replay.lock
+.fern/replay.yml
+.gitattributes

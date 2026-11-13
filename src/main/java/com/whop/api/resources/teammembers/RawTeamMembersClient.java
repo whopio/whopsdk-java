@@ -4,11 +4,14 @@
 package com.whop.api.resources.teammembers;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
+import com.whop.api.core.BodyProperties;
 import com.whop.api.core.ClientOptions;
 import com.whop.api.core.MediaTypes;
 import com.whop.api.core.ObjectMappers;
+import com.whop.api.core.PathSegments;
 import com.whop.api.core.QueryStringMapper;
 import com.whop.api.core.RequestOptions;
+import com.whop.api.core.RetryInterceptor;
 import com.whop.api.core.WhopApiApiException;
 import com.whop.api.core.WhopApiException;
 import com.whop.api.core.WhopApiHttpResponse;
@@ -26,7 +29,6 @@ import com.whop.api.resources.teammembers.requests.UpdateTeamMembersRequest;
 import com.whop.api.resources.teammembers.types.DeleteTeamMembersResponse;
 import com.whop.api.resources.teammembers.types.ListTeamMembersResponse;
 import com.whop.api.types.TeamMember;
-import com.whop.api.types.V1ErrorResponse;
 import java.io.IOException;
 import java.util.List;
 import java.util.Optional;
@@ -46,18 +48,18 @@ public class RawTeamMembersClient {
     }
 
     /**
-     * Lists an account's team members, including pending invites (<code>status: &quot;pending&quot;</code>, <code>ausri_</code> ids; <code>user</code> is <code>null</code> for invites sent to an email with no Whop account yet). For accepted members, <code>email</code> requires the <code>company:authorized_user:email:read</code> scope and is <code>null</code> otherwise. Listing <code>role=workforce</code> is also allowed with the <code>bounty:create</code> scope.
+     * Lists an account's team members, including pending invites. A user credential with <code>company:basic:read</code> may list only its own joined membership by passing its own <code>user_id</code> and <code>status=joined</code>. Listing <code>role=workforce</code> is also allowed with the <code>bounty:create</code> scope. A signed-in Partner, or a member others report to, without <code>company:authorized_user:read</code> lists only their own joined membership and the members who report up to them, never pending invites. Members with the view-only Partner role are listed after all other members.
      */
     public WhopApiHttpResponse<SyncPagingIterable<TeamMember>> list(ListTeamMembersRequest request) {
         return list(request, null);
     }
 
     /**
-     * Lists an account's team members, including pending invites (<code>status: &quot;pending&quot;</code>, <code>ausri_</code> ids; <code>user</code> is <code>null</code> for invites sent to an email with no Whop account yet). For accepted members, <code>email</code> requires the <code>company:authorized_user:email:read</code> scope and is <code>null</code> otherwise. Listing <code>role=workforce</code> is also allowed with the <code>bounty:create</code> scope.
+     * Lists an account's team members, including pending invites. A user credential with <code>company:basic:read</code> may list only its own joined membership by passing its own <code>user_id</code> and <code>status=joined</code>. Listing <code>role=workforce</code> is also allowed with the <code>bounty:create</code> scope. A signed-in Partner, or a member others report to, without <code>company:authorized_user:read</code> lists only their own joined membership and the members who report up to them, never pending invites. Members with the view-only Partner role are listed after all other members.
      */
     public WhopApiHttpResponse<SyncPagingIterable<TeamMember>> list(
             ListTeamMembersRequest request, RequestOptions requestOptions) {
-        HttpUrl.Builder httpUrl = HttpUrl.parse(this.clientOptions.environment().getUrl())
+        HttpUrl.Builder httpUrl = HttpUrl.parse(this.clientOptions.environment().getApiURL())
                 .newBuilder()
                 .addPathSegments("team_members");
         QueryStringMapper.addQueryParameter(httpUrl, "account_id", request.getAccountId(), false);
@@ -72,6 +74,33 @@ public class RawTeamMembersClient {
         if (request.getRole().isPresent()) {
             QueryStringMapper.addQueryParameter(
                     httpUrl, "role", request.getRole().get(), false);
+        }
+        if (request.getQuery().isPresent()) {
+            QueryStringMapper.addQueryParameter(
+                    httpUrl, "query", request.getQuery().get(), false);
+        }
+        if (request.getReportsToId().isPresent()) {
+            QueryStringMapper.addQueryParameter(
+                    httpUrl, "reports_to_id", request.getReportsToId().get(), false);
+        }
+        if (request.getDirectReportsMin().isPresent()) {
+            QueryStringMapper.addQueryParameter(
+                    httpUrl, "direct_reports_min", request.getDirectReportsMin().get(), false);
+        }
+        if (request.getDirectReportsMax().isPresent()) {
+            QueryStringMapper.addQueryParameter(
+                    httpUrl, "direct_reports_max", request.getDirectReportsMax().get(), false);
+        }
+        if (request.getTeamLeadId().isPresent()) {
+            QueryStringMapper.addQueryParameter(
+                    httpUrl, "team_lead_id", request.getTeamLeadId().get(), false);
+        }
+        if (request.getHasReferredBusinesses().isPresent()) {
+            QueryStringMapper.addQueryParameter(
+                    httpUrl,
+                    "has_referred_businesses",
+                    request.getHasReferredBusinesses().get(),
+                    false);
         }
         if (request.getCreatedBefore().isPresent()) {
             QueryStringMapper.addQueryParameter(
@@ -105,6 +134,10 @@ public class RawTeamMembersClient {
             QueryStringMapper.addQueryParameter(
                     httpUrl, "before", request.getBefore().get(), false);
         }
+        if (request.getUserIds().isPresent()) {
+            QueryStringMapper.addQueryParameter(
+                    httpUrl, "user_ids", request.getUserIds().get(), true);
+        }
         if (requestOptions != null) {
             requestOptions.getQueryParameters().forEach((_key, _value) -> {
                 httpUrl.addQueryParameter(_key, _value);
@@ -120,6 +153,15 @@ public class RawTeamMembersClient {
         if (requestOptions != null && requestOptions.getTimeout().isPresent()) {
             client = clientOptions.httpClientWithTimeout(requestOptions);
         }
+        if (requestOptions != null && requestOptions.getMaxRetries().isPresent()) {
+            okhttpRequest = okhttpRequest
+                    .newBuilder()
+                    .tag(
+                            RetryInterceptor.MaxRetriesOverride.class,
+                            new RetryInterceptor.MaxRetriesOverride(
+                                    requestOptions.getMaxRetries().get()))
+                    .build();
+        }
         try (Response response = client.newCall(okhttpRequest).execute()) {
             ResponseBody responseBody = response.body();
             String responseBodyString = responseBody != null ? responseBody.string() : "{}";
@@ -134,8 +176,11 @@ public class RawTeamMembersClient {
                 List<TeamMember> result = parsedResponse.getData();
                 return new WhopApiHttpResponse<>(
                         new SyncPagingIterable<TeamMember>(
-                                startingAfter != null, result, parsedResponse, () -> list(nextRequest, requestOptions)
-                                        .body()),
+                                startingAfter.isPresent()
+                                        && !startingAfter.get().isEmpty(),
+                                result,
+                                parsedResponse,
+                                () -> list(nextRequest, requestOptions).body()),
                         response);
             }
             try {
@@ -159,23 +204,25 @@ public class RawTeamMembersClient {
             Object errorBody = ObjectMappers.parseErrorBody(responseBodyString);
             throw new WhopApiApiException(
                     "Error with status code " + response.code(), response.code(), errorBody, response);
+        } catch (JsonProcessingException e) {
+            throw new WhopApiException("Failed to deserialize response: " + e.getMessage(), e);
         } catch (IOException e) {
             throw new WhopApiException("Network error executing HTTP request", e);
         }
     }
 
     /**
-     * Adds a member to an account's team with a system role. Identify them by exactly one of <code>user_id</code> or <code>email</code>. If the person has not yet accepted — or the email does not belong to a Whop account yet — an invitation is sent instead and the response is <code>202</code> with <code>{ &quot;object&quot;: &quot;team_member_invite&quot;, &quot;invitation_sent&quot;: true }</code>. If they already have a pending invite, the request fails with a <code>400</code>. Custom roles cannot be granted via the API. Granting the <code>workforce</code> role is also allowed with the <code>bounty:create</code> scope.
+     * Adds a member to an account's team with a system role. Identify them by exactly one of <code>user_id</code> or <code>email</code>. If the person has not yet accepted, or the email does not belong to a Whop account yet, an invitation is sent instead and the response is <code>202</code> with the pending team member, whose <code>status</code> is <code>pending</code> and whose id is prefixed <code>ausri_</code>. If they already have a pending invite, the request fails with a <code>400</code>. Granting the <code>workforce</code> role is also allowed with the <code>bounty:create</code> scope.
      */
     public WhopApiHttpResponse<TeamMember> create(CreateTeamMembersRequest request) {
         return create(request, null);
     }
 
     /**
-     * Adds a member to an account's team with a system role. Identify them by exactly one of <code>user_id</code> or <code>email</code>. If the person has not yet accepted — or the email does not belong to a Whop account yet — an invitation is sent instead and the response is <code>202</code> with <code>{ &quot;object&quot;: &quot;team_member_invite&quot;, &quot;invitation_sent&quot;: true }</code>. If they already have a pending invite, the request fails with a <code>400</code>. Custom roles cannot be granted via the API. Granting the <code>workforce</code> role is also allowed with the <code>bounty:create</code> scope.
+     * Adds a member to an account's team with a system role. Identify them by exactly one of <code>user_id</code> or <code>email</code>. If the person has not yet accepted, or the email does not belong to a Whop account yet, an invitation is sent instead and the response is <code>202</code> with the pending team member, whose <code>status</code> is <code>pending</code> and whose id is prefixed <code>ausri_</code>. If they already have a pending invite, the request fails with a <code>400</code>. Granting the <code>workforce</code> role is also allowed with the <code>bounty:create</code> scope.
      */
     public WhopApiHttpResponse<TeamMember> create(CreateTeamMembersRequest request, RequestOptions requestOptions) {
-        HttpUrl.Builder httpUrl = HttpUrl.parse(this.clientOptions.environment().getUrl())
+        HttpUrl.Builder httpUrl = HttpUrl.parse(this.clientOptions.environment().getApiURL())
                 .newBuilder()
                 .addPathSegments("team_members");
         if (requestOptions != null) {
@@ -186,7 +233,9 @@ public class RawTeamMembersClient {
         RequestBody body;
         try {
             body = RequestBody.create(
-                    ObjectMappers.JSON_MAPPER.writeValueAsBytes(request), MediaTypes.APPLICATION_JSON);
+                    ObjectMappers.JSON_MAPPER.writeValueAsBytes(BodyProperties.merge(
+                            request, requestOptions != null ? requestOptions.getBodyProperties() : null)),
+                    MediaTypes.APPLICATION_JSON);
         } catch (JsonProcessingException e) {
             throw new WhopApiException("Failed to serialize request", e);
         }
@@ -200,6 +249,15 @@ public class RawTeamMembersClient {
         OkHttpClient client = clientOptions.httpClient();
         if (requestOptions != null && requestOptions.getTimeout().isPresent()) {
             client = clientOptions.httpClientWithTimeout(requestOptions);
+        }
+        if (requestOptions != null && requestOptions.getMaxRetries().isPresent()) {
+            okhttpRequest = okhttpRequest
+                    .newBuilder()
+                    .tag(
+                            RetryInterceptor.MaxRetriesOverride.class,
+                            new RetryInterceptor.MaxRetriesOverride(
+                                    requestOptions.getMaxRetries().get()))
+                    .build();
         }
         try (Response response = client.newCall(okhttpRequest).execute()) {
             ResponseBody responseBody = response.body();
@@ -218,8 +276,7 @@ public class RawTeamMembersClient {
                                 ObjectMappers.JSON_MAPPER.readValue(responseBodyString, Object.class), response);
                     case 409:
                         throw new ConflictError(
-                                ObjectMappers.JSON_MAPPER.readValue(responseBodyString, V1ErrorResponse.class),
-                                response);
+                                ObjectMappers.JSON_MAPPER.readValue(responseBodyString, Object.class), response);
                 }
             } catch (JsonProcessingException ignored) {
                 // unable to map error response, throwing generic error
@@ -227,41 +284,43 @@ public class RawTeamMembersClient {
             Object errorBody = ObjectMappers.parseErrorBody(responseBodyString);
             throw new WhopApiApiException(
                     "Error with status code " + response.code(), response.code(), errorBody, response);
+        } catch (JsonProcessingException e) {
+            throw new WhopApiException("Failed to deserialize response: " + e.getMessage(), e);
         } catch (IOException e) {
             throw new WhopApiException("Network error executing HTTP request", e);
         }
     }
 
     /**
-     * Retrieves a team member by ID. <code>email</code> requires the <code>company:authorized_user:email:read</code> scope and is <code>null</code> otherwise.
+     * Retrieves a team member or pending invite by ID.
      */
     public WhopApiHttpResponse<TeamMember> retrieve(String id) {
         return retrieve(id, RetrieveTeamMembersRequest.builder().build());
     }
 
     /**
-     * Retrieves a team member by ID. <code>email</code> requires the <code>company:authorized_user:email:read</code> scope and is <code>null</code> otherwise.
+     * Retrieves a team member or pending invite by ID.
      */
     public WhopApiHttpResponse<TeamMember> retrieve(String id, RequestOptions requestOptions) {
         return retrieve(id, RetrieveTeamMembersRequest.builder().build(), requestOptions);
     }
 
     /**
-     * Retrieves a team member by ID. <code>email</code> requires the <code>company:authorized_user:email:read</code> scope and is <code>null</code> otherwise.
+     * Retrieves a team member or pending invite by ID.
      */
     public WhopApiHttpResponse<TeamMember> retrieve(String id, RetrieveTeamMembersRequest request) {
         return retrieve(id, request, null);
     }
 
     /**
-     * Retrieves a team member by ID. <code>email</code> requires the <code>company:authorized_user:email:read</code> scope and is <code>null</code> otherwise.
+     * Retrieves a team member or pending invite by ID.
      */
     public WhopApiHttpResponse<TeamMember> retrieve(
             String id, RetrieveTeamMembersRequest request, RequestOptions requestOptions) {
-        HttpUrl.Builder httpUrl = HttpUrl.parse(this.clientOptions.environment().getUrl())
+        HttpUrl.Builder httpUrl = HttpUrl.parse(this.clientOptions.environment().getApiURL())
                 .newBuilder()
                 .addPathSegments("team_members")
-                .addPathSegment(id);
+                .addPathSegment(PathSegments.validate(id));
         if (requestOptions != null) {
             requestOptions.getQueryParameters().forEach((_key, _value) -> {
                 httpUrl.addQueryParameter(_key, _value);
@@ -276,6 +335,15 @@ public class RawTeamMembersClient {
         OkHttpClient client = clientOptions.httpClient();
         if (requestOptions != null && requestOptions.getTimeout().isPresent()) {
             client = clientOptions.httpClientWithTimeout(requestOptions);
+        }
+        if (requestOptions != null && requestOptions.getMaxRetries().isPresent()) {
+            okhttpRequest = okhttpRequest
+                    .newBuilder()
+                    .tag(
+                            RetryInterceptor.MaxRetriesOverride.class,
+                            new RetryInterceptor.MaxRetriesOverride(
+                                    requestOptions.getMaxRetries().get()))
+                    .build();
         }
         try (Response response = client.newCall(okhttpRequest).execute()) {
             ResponseBody responseBody = response.body();
@@ -295,6 +363,8 @@ public class RawTeamMembersClient {
             Object errorBody = ObjectMappers.parseErrorBody(responseBodyString);
             throw new WhopApiApiException(
                     "Error with status code " + response.code(), response.code(), errorBody, response);
+        } catch (JsonProcessingException e) {
+            throw new WhopApiException("Failed to deserialize response: " + e.getMessage(), e);
         } catch (IOException e) {
             throw new WhopApiException("Network error executing HTTP request", e);
         }
@@ -326,10 +396,10 @@ public class RawTeamMembersClient {
      */
     public WhopApiHttpResponse<DeleteTeamMembersResponse> delete(
             String id, DeleteTeamMembersRequest request, RequestOptions requestOptions) {
-        HttpUrl.Builder httpUrl = HttpUrl.parse(this.clientOptions.environment().getUrl())
+        HttpUrl.Builder httpUrl = HttpUrl.parse(this.clientOptions.environment().getApiURL())
                 .newBuilder()
                 .addPathSegments("team_members")
-                .addPathSegment(id);
+                .addPathSegment(PathSegments.validate(id));
         if (requestOptions != null) {
             requestOptions.getQueryParameters().forEach((_key, _value) -> {
                 httpUrl.addQueryParameter(_key, _value);
@@ -337,13 +407,25 @@ public class RawTeamMembersClient {
         }
         Request.Builder _requestBuilder = new Request.Builder()
                 .url(httpUrl.build())
-                .method("DELETE", null)
+                .method(
+                        "DELETE",
+                        BodyProperties.toRequestBody(
+                                requestOptions != null ? requestOptions.getBodyProperties() : null, null))
                 .headers(Headers.of(clientOptions.headers(requestOptions)))
                 .addHeader("Accept", "application/json");
         Request okhttpRequest = _requestBuilder.build();
         OkHttpClient client = clientOptions.httpClient();
         if (requestOptions != null && requestOptions.getTimeout().isPresent()) {
             client = clientOptions.httpClientWithTimeout(requestOptions);
+        }
+        if (requestOptions != null && requestOptions.getMaxRetries().isPresent()) {
+            okhttpRequest = okhttpRequest
+                    .newBuilder()
+                    .tag(
+                            RetryInterceptor.MaxRetriesOverride.class,
+                            new RetryInterceptor.MaxRetriesOverride(
+                                    requestOptions.getMaxRetries().get()))
+                    .build();
         }
         try (Response response = client.newCall(okhttpRequest).execute()) {
             ResponseBody responseBody = response.body();
@@ -371,9 +453,25 @@ public class RawTeamMembersClient {
             Object errorBody = ObjectMappers.parseErrorBody(responseBodyString);
             throw new WhopApiApiException(
                     "Error with status code " + response.code(), response.code(), errorBody, response);
+        } catch (JsonProcessingException e) {
+            throw new WhopApiException("Failed to deserialize response: " + e.getMessage(), e);
         } catch (IOException e) {
             throw new WhopApiException("Network error executing HTTP request", e);
         }
+    }
+
+    /**
+     * Changes a team member's system role. Requires a user session — account API keys cannot change member roles. The account owner's role cannot be changed, and you cannot change your own role.
+     */
+    public WhopApiHttpResponse<TeamMember> update(String id) {
+        return update(id, UpdateTeamMembersRequest.builder().build());
+    }
+
+    /**
+     * Changes a team member's system role. Requires a user session — account API keys cannot change member roles. The account owner's role cannot be changed, and you cannot change your own role.
+     */
+    public WhopApiHttpResponse<TeamMember> update(String id, RequestOptions requestOptions) {
+        return update(id, UpdateTeamMembersRequest.builder().build(), requestOptions);
     }
 
     /**
@@ -388,10 +486,10 @@ public class RawTeamMembersClient {
      */
     public WhopApiHttpResponse<TeamMember> update(
             String id, UpdateTeamMembersRequest request, RequestOptions requestOptions) {
-        HttpUrl.Builder httpUrl = HttpUrl.parse(this.clientOptions.environment().getUrl())
+        HttpUrl.Builder httpUrl = HttpUrl.parse(this.clientOptions.environment().getApiURL())
                 .newBuilder()
                 .addPathSegments("team_members")
-                .addPathSegment(id);
+                .addPathSegment(PathSegments.validate(id));
         if (requestOptions != null) {
             requestOptions.getQueryParameters().forEach((_key, _value) -> {
                 httpUrl.addQueryParameter(_key, _value);
@@ -400,7 +498,9 @@ public class RawTeamMembersClient {
         RequestBody body;
         try {
             body = RequestBody.create(
-                    ObjectMappers.JSON_MAPPER.writeValueAsBytes(request), MediaTypes.APPLICATION_JSON);
+                    ObjectMappers.JSON_MAPPER.writeValueAsBytes(BodyProperties.merge(
+                            request, requestOptions != null ? requestOptions.getBodyProperties() : null)),
+                    MediaTypes.APPLICATION_JSON);
         } catch (JsonProcessingException e) {
             throw new WhopApiException("Failed to serialize request", e);
         }
@@ -414,6 +514,15 @@ public class RawTeamMembersClient {
         OkHttpClient client = clientOptions.httpClient();
         if (requestOptions != null && requestOptions.getTimeout().isPresent()) {
             client = clientOptions.httpClientWithTimeout(requestOptions);
+        }
+        if (requestOptions != null && requestOptions.getMaxRetries().isPresent()) {
+            okhttpRequest = okhttpRequest
+                    .newBuilder()
+                    .tag(
+                            RetryInterceptor.MaxRetriesOverride.class,
+                            new RetryInterceptor.MaxRetriesOverride(
+                                    requestOptions.getMaxRetries().get()))
+                    .build();
         }
         try (Response response = client.newCall(okhttpRequest).execute()) {
             ResponseBody responseBody = response.body();
@@ -437,6 +546,8 @@ public class RawTeamMembersClient {
             Object errorBody = ObjectMappers.parseErrorBody(responseBodyString);
             throw new WhopApiApiException(
                     "Error with status code " + response.code(), response.code(), errorBody, response);
+        } catch (JsonProcessingException e) {
+            throw new WhopApiException("Failed to deserialize response: " + e.getMessage(), e);
         } catch (IOException e) {
             throw new WhopApiException("Network error executing HTTP request", e);
         }

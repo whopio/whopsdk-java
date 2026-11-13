@@ -6,18 +6,19 @@ package com.whop.api.resources.memberships;
 import com.whop.api.core.ClientOptions;
 import com.whop.api.core.RequestOptions;
 import com.whop.api.core.pagination.SyncPagingIterable;
-import com.whop.api.resources.memberships.requests.AddFreeDaysMembershipRequest;
+import com.whop.api.resources.memberships.requests.ApplyPromoCodeMembershipsRequest;
+import com.whop.api.resources.memberships.requests.AssignAffiliateMembershipsRequest;
 import com.whop.api.resources.memberships.requests.CancelMembershipsRequest;
 import com.whop.api.resources.memberships.requests.ExtendMembershipsRequest;
+import com.whop.api.resources.memberships.requests.InviteMembershipsRequest;
 import com.whop.api.resources.memberships.requests.ListMembershipsRequest;
 import com.whop.api.resources.memberships.requests.PauseMembershipsRequest;
+import com.whop.api.resources.memberships.requests.ReactivateMembershipsRequest;
 import com.whop.api.resources.memberships.requests.ResumeMembershipsRequest;
-import com.whop.api.resources.memberships.requests.ResyncAccessMembershipRequest;
+import com.whop.api.resources.memberships.requests.ResyncAccessMembershipsRequest;
 import com.whop.api.resources.memberships.requests.RetrieveMembershipsRequest;
 import com.whop.api.resources.memberships.requests.TransferMembershipsRequest;
-import com.whop.api.resources.memberships.requests.UncancelMembershipRequest;
 import com.whop.api.resources.memberships.requests.UpdateMembershipsRequest;
-import com.whop.api.resources.memberships.types.InviteMembershipsRequestBody;
 import com.whop.api.resources.memberships.types.InviteMembershipsResponse;
 import com.whop.api.resources.memberships.types.TransferMembershipsResponse;
 import com.whop.api.types.Membership;
@@ -68,16 +69,16 @@ public class MembershipsClient {
     }
 
     /**
-     * Sends an email inviting one recipient to join the account through a free plan. Identify the recipient by exactly one of <code>user_id</code> or <code>email</code>. The invitation is bound to that recipient; after signing in, accepting it immediately grants the membership without checkout. This Experimental endpoint is available only to accounts enabled for membership invitations.
+     * Emails one recipient an invitation to a free variant's membership. The invitation is bound to that recipient; after signing in, accepting it immediately grants the membership without checkout. This Experimental endpoint is available only to accounts enabled for membership invitations.
      */
-    public InviteMembershipsResponse invite(InviteMembershipsRequestBody request) {
+    public InviteMembershipsResponse invite(InviteMembershipsRequest request) {
         return this.rawClient.invite(request).body();
     }
 
     /**
-     * Sends an email inviting one recipient to join the account through a free plan. Identify the recipient by exactly one of <code>user_id</code> or <code>email</code>. The invitation is bound to that recipient; after signing in, accepting it immediately grants the membership without checkout. This Experimental endpoint is available only to accounts enabled for membership invitations.
+     * Emails one recipient an invitation to a free variant's membership. The invitation is bound to that recipient; after signing in, accepting it immediately grants the membership without checkout. This Experimental endpoint is available only to accounts enabled for membership invitations.
      */
-    public InviteMembershipsResponse invite(InviteMembershipsRequestBody request, RequestOptions requestOptions) {
+    public InviteMembershipsResponse invite(InviteMembershipsRequest request, RequestOptions requestOptions) {
         return this.rawClient.invite(request, requestOptions).body();
     }
 
@@ -110,83 +111,86 @@ public class MembershipsClient {
     }
 
     /**
-     * Updates a membership: merge metadata key-value pairs, or toggle <code>cancel_at_period_end</code> — <code>true</code> schedules the cancellation for the end of the current billing period, <code>false</code> reverses a pending one.
+     * Updates a membership's metadata, scheduled cancellation, renewal payment method, renewal cadence, next renewal date, or renewal price.
      */
     public Membership update(String id) {
         return this.rawClient.update(id).body();
     }
 
     /**
-     * Updates a membership: merge metadata key-value pairs, or toggle <code>cancel_at_period_end</code> — <code>true</code> schedules the cancellation for the end of the current billing period, <code>false</code> reverses a pending one.
+     * Updates a membership's metadata, scheduled cancellation, renewal payment method, renewal cadence, next renewal date, or renewal price.
      */
     public Membership update(String id, RequestOptions requestOptions) {
         return this.rawClient.update(id, requestOptions).body();
     }
 
     /**
-     * Updates a membership: merge metadata key-value pairs, or toggle <code>cancel_at_period_end</code> — <code>true</code> schedules the cancellation for the end of the current billing period, <code>false</code> reverses a pending one.
+     * Updates a membership's metadata, scheduled cancellation, renewal payment method, renewal cadence, next renewal date, or renewal price.
      */
     public Membership update(String id, UpdateMembershipsRequest request) {
         return this.rawClient.update(id, request).body();
     }
 
     /**
-     * Updates a membership: merge metadata key-value pairs, or toggle <code>cancel_at_period_end</code> — <code>true</code> schedules the cancellation for the end of the current billing period, <code>false</code> reverses a pending one.
+     * Updates a membership's metadata, scheduled cancellation, renewal payment method, renewal cadence, next renewal date, or renewal price.
      */
     public Membership update(String id, UpdateMembershipsRequest request, RequestOptions requestOptions) {
         return this.rawClient.update(id, request, requestOptions).body();
     }
 
     /**
-     * Add free days to extend a membership's current billing period, expiration date, or Stripe trial.
-     * <p>Required permissions:</p>
-     * <ul>
-     * <li><code>member:manage</code></li>
-     * <li><code>member:email:read</code></li>
-     * <li><code>member:basic:read</code></li>
-     * </ul>
+     * Applies a promo code to an <code>active</code> or <code>trialing</code> membership that does not already have one and has exactly one recurring item, for Stripe-billed memberships and memberships billed by Whop's billing engine. The discount lands on the next invoice and follows the code's duration (<code>once</code>, <code>repeating</code>, or <code>forever</code>).
      */
-    public Membership addFreeDaysMembership(String id, AddFreeDaysMembershipRequest request) {
-        return this.rawClient.addFreeDaysMembership(id, request).body();
+    public Membership applyPromoCode(String id, ApplyPromoCodeMembershipsRequest request) {
+        return this.rawClient.applyPromoCode(id, request).body();
     }
 
     /**
-     * Add free days to extend a membership's current billing period, expiration date, or Stripe trial.
-     * <p>Required permissions:</p>
-     * <ul>
-     * <li><code>member:manage</code></li>
-     * <li><code>member:email:read</code></li>
-     * <li><code>member:basic:read</code></li>
-     * </ul>
+     * Applies a promo code to an <code>active</code> or <code>trialing</code> membership that does not already have one and has exactly one recurring item, for Stripe-billed memberships and memberships billed by Whop's billing engine. The discount lands on the next invoice and follows the code's duration (<code>once</code>, <code>repeating</code>, or <code>forever</code>).
      */
-    public Membership addFreeDaysMembership(
-            String id, AddFreeDaysMembershipRequest request, RequestOptions requestOptions) {
-        return this.rawClient.addFreeDaysMembership(id, request, requestOptions).body();
+    public Membership applyPromoCode(
+            String id, ApplyPromoCodeMembershipsRequest request, RequestOptions requestOptions) {
+        return this.rawClient.applyPromoCode(id, request, requestOptions).body();
     }
 
     /**
-     * Cancels a membership. Pass <code>cancel_at_period_end: true</code> to stop auto-renewal and keep access until the current billing period ends. Omit it (or pass <code>false</code>) to revoke access immediately. Buyers cannot cancel buy-now-pay-later (<code>splitit</code>, <code>sezzle</code>) or non-trial split-pay memberships.
+     * Assigns an affiliate to a membership and pays them the commission you set on its future payments; past payments are not recalculated. A user who is not yet an affiliate of your account becomes one, which also requires <code>affiliate:create</code>. Send a new <code>commission_type</code> or <code>commission_value</code> for the membership's current affiliate to change their commission; a membership that already has a different affiliate returns a conflict. Works for active or trialing memberships with one recurring variant that bill through Stripe or Whop's billing engine, and not for marketplace memberships, paused payments, or a scheduled cancellation. You cannot assign yourself.
+     */
+    public Membership assignAffiliate(String id, AssignAffiliateMembershipsRequest request) {
+        return this.rawClient.assignAffiliate(id, request).body();
+    }
+
+    /**
+     * Assigns an affiliate to a membership and pays them the commission you set on its future payments; past payments are not recalculated. A user who is not yet an affiliate of your account becomes one, which also requires <code>affiliate:create</code>. Send a new <code>commission_type</code> or <code>commission_value</code> for the membership's current affiliate to change their commission; a membership that already has a different affiliate returns a conflict. Works for active or trialing memberships with one recurring variant that bill through Stripe or Whop's billing engine, and not for marketplace memberships, paused payments, or a scheduled cancellation. You cannot assign yourself.
+     */
+    public Membership assignAffiliate(
+            String id, AssignAffiliateMembershipsRequest request, RequestOptions requestOptions) {
+        return this.rawClient.assignAffiliate(id, request, requestOptions).body();
+    }
+
+    /**
+     * Cancels a membership, either immediately or at the end of the current billing period. Buyers cannot cancel buy-now-pay-later (<code>splitit</code>, <code>sezzle</code>) or non-trial split-pay memberships.
      */
     public Membership cancel(String id) {
         return this.rawClient.cancel(id).body();
     }
 
     /**
-     * Cancels a membership. Pass <code>cancel_at_period_end: true</code> to stop auto-renewal and keep access until the current billing period ends. Omit it (or pass <code>false</code>) to revoke access immediately. Buyers cannot cancel buy-now-pay-later (<code>splitit</code>, <code>sezzle</code>) or non-trial split-pay memberships.
+     * Cancels a membership, either immediately or at the end of the current billing period. Buyers cannot cancel buy-now-pay-later (<code>splitit</code>, <code>sezzle</code>) or non-trial split-pay memberships.
      */
     public Membership cancel(String id, RequestOptions requestOptions) {
         return this.rawClient.cancel(id, requestOptions).body();
     }
 
     /**
-     * Cancels a membership. Pass <code>cancel_at_period_end: true</code> to stop auto-renewal and keep access until the current billing period ends. Omit it (or pass <code>false</code>) to revoke access immediately. Buyers cannot cancel buy-now-pay-later (<code>splitit</code>, <code>sezzle</code>) or non-trial split-pay memberships.
+     * Cancels a membership, either immediately or at the end of the current billing period. Buyers cannot cancel buy-now-pay-later (<code>splitit</code>, <code>sezzle</code>) or non-trial split-pay memberships.
      */
     public Membership cancel(String id, CancelMembershipsRequest request) {
         return this.rawClient.cancel(id, request).body();
     }
 
     /**
-     * Cancels a membership. Pass <code>cancel_at_period_end: true</code> to stop auto-renewal and keep access until the current billing period ends. Omit it (or pass <code>false</code>) to revoke access immediately. Buyers cannot cancel buy-now-pay-later (<code>splitit</code>, <code>sezzle</code>) or non-trial split-pay memberships.
+     * Cancels a membership, either immediately or at the end of the current billing period. Buyers cannot cancel buy-now-pay-later (<code>splitit</code>, <code>sezzle</code>) or non-trial split-pay memberships.
      */
     public Membership cancel(String id, CancelMembershipsRequest request, RequestOptions requestOptions) {
         return this.rawClient.cancel(id, request, requestOptions).body();
@@ -235,6 +239,34 @@ public class MembershipsClient {
     }
 
     /**
+     * Restores access to a <code>canceled</code> or <code>expired</code> membership that contains only one-time purchases and sets its <code>status</code> to <code>completed</code>. Lifetime memberships regain lifetime access; for memberships with an expiration, <code>days</code> sets the new <code>current_period_end</code>. Active and recurring memberships cannot be reactivated.
+     */
+    public Membership reactivate(String id) {
+        return this.rawClient.reactivate(id).body();
+    }
+
+    /**
+     * Restores access to a <code>canceled</code> or <code>expired</code> membership that contains only one-time purchases and sets its <code>status</code> to <code>completed</code>. Lifetime memberships regain lifetime access; for memberships with an expiration, <code>days</code> sets the new <code>current_period_end</code>. Active and recurring memberships cannot be reactivated.
+     */
+    public Membership reactivate(String id, RequestOptions requestOptions) {
+        return this.rawClient.reactivate(id, requestOptions).body();
+    }
+
+    /**
+     * Restores access to a <code>canceled</code> or <code>expired</code> membership that contains only one-time purchases and sets its <code>status</code> to <code>completed</code>. Lifetime memberships regain lifetime access; for memberships with an expiration, <code>days</code> sets the new <code>current_period_end</code>. Active and recurring memberships cannot be reactivated.
+     */
+    public Membership reactivate(String id, ReactivateMembershipsRequest request) {
+        return this.rawClient.reactivate(id, request).body();
+    }
+
+    /**
+     * Restores access to a <code>canceled</code> or <code>expired</code> membership that contains only one-time purchases and sets its <code>status</code> to <code>completed</code>. Lifetime memberships regain lifetime access; for memberships with an expiration, <code>days</code> sets the new <code>current_period_end</code>. Active and recurring memberships cannot be reactivated.
+     */
+    public Membership reactivate(String id, ReactivateMembershipsRequest request, RequestOptions requestOptions) {
+        return this.rawClient.reactivate(id, request, requestOptions).body();
+    }
+
+    /**
      * Resumes a previously paused membership's recurring payment collection. Billing resumes on the next cycle.
      */
     public Membership resume(String id) {
@@ -263,58 +295,31 @@ public class MembershipsClient {
     }
 
     /**
-     * Re-run access fulfillment for a membership. Recomputes the member's content access on Whop, re-validates their Discord link (re-adding them to the server and re-assigning roles if needed), and re-fulfills TradingView indicator access. Telegram access is invite-based and cannot be resynced here. The outcome is written to the membership's logs.
-     * <p>Required permissions:</p>
-     * <ul>
-     * <li><code>membership:resync_access</code></li>
-     * <li><code>member:email:read</code></li>
-     * <li><code>member:basic:read</code></li>
-     * </ul>
+     * Re-runs access fulfillment for a membership: recomputes the member's content access on Whop, re-validates their Discord link (re-adding them to the server and re-assigning roles if needed), and re-fulfills TradingView indicator access. Telegram access is invite-based and is not resynced. The work runs in the background and the outcome is written to the membership's logs.
      */
-    public Membership resyncAccessMembership(String id) {
-        return this.rawClient.resyncAccessMembership(id).body();
+    public Membership resyncAccess(String id) {
+        return this.rawClient.resyncAccess(id).body();
     }
 
     /**
-     * Re-run access fulfillment for a membership. Recomputes the member's content access on Whop, re-validates their Discord link (re-adding them to the server and re-assigning roles if needed), and re-fulfills TradingView indicator access. Telegram access is invite-based and cannot be resynced here. The outcome is written to the membership's logs.
-     * <p>Required permissions:</p>
-     * <ul>
-     * <li><code>membership:resync_access</code></li>
-     * <li><code>member:email:read</code></li>
-     * <li><code>member:basic:read</code></li>
-     * </ul>
+     * Re-runs access fulfillment for a membership: recomputes the member's content access on Whop, re-validates their Discord link (re-adding them to the server and re-assigning roles if needed), and re-fulfills TradingView indicator access. Telegram access is invite-based and is not resynced. The work runs in the background and the outcome is written to the membership's logs.
      */
-    public Membership resyncAccessMembership(String id, RequestOptions requestOptions) {
-        return this.rawClient.resyncAccessMembership(id, requestOptions).body();
+    public Membership resyncAccess(String id, RequestOptions requestOptions) {
+        return this.rawClient.resyncAccess(id, requestOptions).body();
     }
 
     /**
-     * Re-run access fulfillment for a membership. Recomputes the member's content access on Whop, re-validates their Discord link (re-adding them to the server and re-assigning roles if needed), and re-fulfills TradingView indicator access. Telegram access is invite-based and cannot be resynced here. The outcome is written to the membership's logs.
-     * <p>Required permissions:</p>
-     * <ul>
-     * <li><code>membership:resync_access</code></li>
-     * <li><code>member:email:read</code></li>
-     * <li><code>member:basic:read</code></li>
-     * </ul>
+     * Re-runs access fulfillment for a membership: recomputes the member's content access on Whop, re-validates their Discord link (re-adding them to the server and re-assigning roles if needed), and re-fulfills TradingView indicator access. Telegram access is invite-based and is not resynced. The work runs in the background and the outcome is written to the membership's logs.
      */
-    public Membership resyncAccessMembership(String id, ResyncAccessMembershipRequest request) {
-        return this.rawClient.resyncAccessMembership(id, request).body();
+    public Membership resyncAccess(String id, ResyncAccessMembershipsRequest request) {
+        return this.rawClient.resyncAccess(id, request).body();
     }
 
     /**
-     * Re-run access fulfillment for a membership. Recomputes the member's content access on Whop, re-validates their Discord link (re-adding them to the server and re-assigning roles if needed), and re-fulfills TradingView indicator access. Telegram access is invite-based and cannot be resynced here. The outcome is written to the membership's logs.
-     * <p>Required permissions:</p>
-     * <ul>
-     * <li><code>membership:resync_access</code></li>
-     * <li><code>member:email:read</code></li>
-     * <li><code>member:basic:read</code></li>
-     * </ul>
+     * Re-runs access fulfillment for a membership: recomputes the member's content access on Whop, re-validates their Discord link (re-adding them to the server and re-assigning roles if needed), and re-fulfills TradingView indicator access. Telegram access is invite-based and is not resynced. The work runs in the background and the outcome is written to the membership's logs.
      */
-    public Membership resyncAccessMembership(
-            String id, ResyncAccessMembershipRequest request, RequestOptions requestOptions) {
-        return this.rawClient
-                .resyncAccessMembership(id, request, requestOptions)
-                .body();
+    public Membership resyncAccess(String id, ResyncAccessMembershipsRequest request, RequestOptions requestOptions) {
+        return this.rawClient.resyncAccess(id, request, requestOptions).body();
     }
 
     /**
@@ -344,57 +349,5 @@ public class MembershipsClient {
     public TransferMembershipsResponse transfer(
             String id, TransferMembershipsRequest request, RequestOptions requestOptions) {
         return this.rawClient.transfer(id, request, requestOptions).body();
-    }
-
-    /**
-     * Reverse a pending cancellation for a membership that was scheduled to cancel at period end.
-     * <p>Required permissions:</p>
-     * <ul>
-     * <li><code>member:manage</code></li>
-     * <li><code>member:email:read</code></li>
-     * <li><code>member:basic:read</code></li>
-     * </ul>
-     */
-    public Membership uncancelMembership(String id) {
-        return this.rawClient.uncancelMembership(id).body();
-    }
-
-    /**
-     * Reverse a pending cancellation for a membership that was scheduled to cancel at period end.
-     * <p>Required permissions:</p>
-     * <ul>
-     * <li><code>member:manage</code></li>
-     * <li><code>member:email:read</code></li>
-     * <li><code>member:basic:read</code></li>
-     * </ul>
-     */
-    public Membership uncancelMembership(String id, RequestOptions requestOptions) {
-        return this.rawClient.uncancelMembership(id, requestOptions).body();
-    }
-
-    /**
-     * Reverse a pending cancellation for a membership that was scheduled to cancel at period end.
-     * <p>Required permissions:</p>
-     * <ul>
-     * <li><code>member:manage</code></li>
-     * <li><code>member:email:read</code></li>
-     * <li><code>member:basic:read</code></li>
-     * </ul>
-     */
-    public Membership uncancelMembership(String id, UncancelMembershipRequest request) {
-        return this.rawClient.uncancelMembership(id, request).body();
-    }
-
-    /**
-     * Reverse a pending cancellation for a membership that was scheduled to cancel at period end.
-     * <p>Required permissions:</p>
-     * <ul>
-     * <li><code>member:manage</code></li>
-     * <li><code>member:email:read</code></li>
-     * <li><code>member:basic:read</code></li>
-     * </ul>
-     */
-    public Membership uncancelMembership(String id, UncancelMembershipRequest request, RequestOptions requestOptions) {
-        return this.rawClient.uncancelMembership(id, request, requestOptions).body();
     }
 }

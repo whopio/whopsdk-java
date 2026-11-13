@@ -5,6 +5,7 @@ package com.whop.api.resources.leads;
 
 import com.whop.api.core.ClientOptions;
 import com.whop.api.core.RequestOptions;
+import com.whop.api.core.WhopApiHttpResponse;
 import com.whop.api.core.pagination.SyncPagingIterable;
 import com.whop.api.resources.leads.requests.CreateLeadsRequest;
 import com.whop.api.resources.leads.requests.ListLeadsRequest;
@@ -32,7 +33,7 @@ public class AsyncLeadsClient {
     }
 
     /**
-     * Returns a paginated list of leads for a company, with optional filtering by product and creation date.
+     * Lists an account's leads, newest first.
      * <p>Required permissions:</p>
      * <ul>
      * <li><code>lead:basic:read</code></li>
@@ -42,11 +43,19 @@ public class AsyncLeadsClient {
      * </ul>
      */
     public CompletableFuture<SyncPagingIterable<LeadListItem>> list(ListLeadsRequest request) {
-        return this.rawClient.list(request).thenApply(response -> response.body());
+        CompletableFuture<WhopApiHttpResponse<SyncPagingIterable<LeadListItem>>> rawFuture =
+                this.rawClient.list(request);
+        CompletableFuture<SyncPagingIterable<LeadListItem>> future = rawFuture.thenApply(response -> response.body());
+        future.whenComplete((result_, throwable_) -> {
+            if (future.isCancelled()) {
+                rawFuture.cancel(true);
+            }
+        });
+        return future;
     }
 
     /**
-     * Returns a paginated list of leads for a company, with optional filtering by product and creation date.
+     * Lists an account's leads, newest first.
      * <p>Required permissions:</p>
      * <ul>
      * <li><code>lead:basic:read</code></li>
@@ -57,11 +66,19 @@ public class AsyncLeadsClient {
      */
     public CompletableFuture<SyncPagingIterable<LeadListItem>> list(
             ListLeadsRequest request, RequestOptions requestOptions) {
-        return this.rawClient.list(request, requestOptions).thenApply(response -> response.body());
+        CompletableFuture<WhopApiHttpResponse<SyncPagingIterable<LeadListItem>>> rawFuture =
+                this.rawClient.list(request, requestOptions);
+        CompletableFuture<SyncPagingIterable<LeadListItem>> future = rawFuture.thenApply(response -> response.body());
+        future.whenComplete((result_, throwable_) -> {
+            if (future.isCancelled()) {
+                rawFuture.cancel(true);
+            }
+        });
+        return future;
     }
 
     /**
-     * Record a new lead for a company, capturing a potential customer's interest in a specific product.
+     * Records a lead: a potential customer's interest in an account or one of its products.
      * <p>Required permissions:</p>
      * <ul>
      * <li><code>lead:manage</code></li>
@@ -71,11 +88,18 @@ public class AsyncLeadsClient {
      * </ul>
      */
     public CompletableFuture<Lead> create(CreateLeadsRequest request) {
-        return this.rawClient.create(request).thenApply(response -> response.body());
+        CompletableFuture<WhopApiHttpResponse<Lead>> rawFuture = this.rawClient.create(request);
+        CompletableFuture<Lead> future = rawFuture.thenApply(response -> response.body());
+        future.whenComplete((result_, throwable_) -> {
+            if (future.isCancelled()) {
+                rawFuture.cancel(true);
+            }
+        });
+        return future;
     }
 
     /**
-     * Record a new lead for a company, capturing a potential customer's interest in a specific product.
+     * Records a lead: a potential customer's interest in an account or one of its products.
      * <p>Required permissions:</p>
      * <ul>
      * <li><code>lead:manage</code></li>
@@ -85,7 +109,14 @@ public class AsyncLeadsClient {
      * </ul>
      */
     public CompletableFuture<Lead> create(CreateLeadsRequest request, RequestOptions requestOptions) {
-        return this.rawClient.create(request, requestOptions).thenApply(response -> response.body());
+        CompletableFuture<WhopApiHttpResponse<Lead>> rawFuture = this.rawClient.create(request, requestOptions);
+        CompletableFuture<Lead> future = rawFuture.thenApply(response -> response.body());
+        future.whenComplete((result_, throwable_) -> {
+            if (future.isCancelled()) {
+                rawFuture.cancel(true);
+            }
+        });
+        return future;
     }
 
     /**
@@ -99,7 +130,14 @@ public class AsyncLeadsClient {
      * </ul>
      */
     public CompletableFuture<Lead> retrieve(String id) {
-        return this.rawClient.retrieve(id).thenApply(response -> response.body());
+        CompletableFuture<WhopApiHttpResponse<Lead>> rawFuture = this.rawClient.retrieve(id);
+        CompletableFuture<Lead> future = rawFuture.thenApply(response -> response.body());
+        future.whenComplete((result_, throwable_) -> {
+            if (future.isCancelled()) {
+                rawFuture.cancel(true);
+            }
+        });
+        return future;
     }
 
     /**
@@ -113,7 +151,14 @@ public class AsyncLeadsClient {
      * </ul>
      */
     public CompletableFuture<Lead> retrieve(String id, RequestOptions requestOptions) {
-        return this.rawClient.retrieve(id, requestOptions).thenApply(response -> response.body());
+        CompletableFuture<WhopApiHttpResponse<Lead>> rawFuture = this.rawClient.retrieve(id, requestOptions);
+        CompletableFuture<Lead> future = rawFuture.thenApply(response -> response.body());
+        future.whenComplete((result_, throwable_) -> {
+            if (future.isCancelled()) {
+                rawFuture.cancel(true);
+            }
+        });
+        return future;
     }
 
     /**
@@ -127,7 +172,14 @@ public class AsyncLeadsClient {
      * </ul>
      */
     public CompletableFuture<Lead> retrieve(String id, RetrieveLeadsRequest request) {
-        return this.rawClient.retrieve(id, request).thenApply(response -> response.body());
+        CompletableFuture<WhopApiHttpResponse<Lead>> rawFuture = this.rawClient.retrieve(id, request);
+        CompletableFuture<Lead> future = rawFuture.thenApply(response -> response.body());
+        future.whenComplete((result_, throwable_) -> {
+            if (future.isCancelled()) {
+                rawFuture.cancel(true);
+            }
+        });
+        return future;
     }
 
     /**
@@ -141,11 +193,18 @@ public class AsyncLeadsClient {
      * </ul>
      */
     public CompletableFuture<Lead> retrieve(String id, RetrieveLeadsRequest request, RequestOptions requestOptions) {
-        return this.rawClient.retrieve(id, request, requestOptions).thenApply(response -> response.body());
+        CompletableFuture<WhopApiHttpResponse<Lead>> rawFuture = this.rawClient.retrieve(id, request, requestOptions);
+        CompletableFuture<Lead> future = rawFuture.thenApply(response -> response.body());
+        future.whenComplete((result_, throwable_) -> {
+            if (future.isCancelled()) {
+                rawFuture.cancel(true);
+            }
+        });
+        return future;
     }
 
     /**
-     * Update the metadata or referrer information on an existing lead record.
+     * Updates a lead's <code>metadata</code> or <code>referrer</code>.
      * <p>Required permissions:</p>
      * <ul>
      * <li><code>lead:manage</code></li>
@@ -155,11 +214,18 @@ public class AsyncLeadsClient {
      * </ul>
      */
     public CompletableFuture<Lead> update(String id) {
-        return this.rawClient.update(id).thenApply(response -> response.body());
+        CompletableFuture<WhopApiHttpResponse<Lead>> rawFuture = this.rawClient.update(id);
+        CompletableFuture<Lead> future = rawFuture.thenApply(response -> response.body());
+        future.whenComplete((result_, throwable_) -> {
+            if (future.isCancelled()) {
+                rawFuture.cancel(true);
+            }
+        });
+        return future;
     }
 
     /**
-     * Update the metadata or referrer information on an existing lead record.
+     * Updates a lead's <code>metadata</code> or <code>referrer</code>.
      * <p>Required permissions:</p>
      * <ul>
      * <li><code>lead:manage</code></li>
@@ -169,11 +235,18 @@ public class AsyncLeadsClient {
      * </ul>
      */
     public CompletableFuture<Lead> update(String id, RequestOptions requestOptions) {
-        return this.rawClient.update(id, requestOptions).thenApply(response -> response.body());
+        CompletableFuture<WhopApiHttpResponse<Lead>> rawFuture = this.rawClient.update(id, requestOptions);
+        CompletableFuture<Lead> future = rawFuture.thenApply(response -> response.body());
+        future.whenComplete((result_, throwable_) -> {
+            if (future.isCancelled()) {
+                rawFuture.cancel(true);
+            }
+        });
+        return future;
     }
 
     /**
-     * Update the metadata or referrer information on an existing lead record.
+     * Updates a lead's <code>metadata</code> or <code>referrer</code>.
      * <p>Required permissions:</p>
      * <ul>
      * <li><code>lead:manage</code></li>
@@ -183,11 +256,18 @@ public class AsyncLeadsClient {
      * </ul>
      */
     public CompletableFuture<Lead> update(String id, UpdateLeadsRequest request) {
-        return this.rawClient.update(id, request).thenApply(response -> response.body());
+        CompletableFuture<WhopApiHttpResponse<Lead>> rawFuture = this.rawClient.update(id, request);
+        CompletableFuture<Lead> future = rawFuture.thenApply(response -> response.body());
+        future.whenComplete((result_, throwable_) -> {
+            if (future.isCancelled()) {
+                rawFuture.cancel(true);
+            }
+        });
+        return future;
     }
 
     /**
-     * Update the metadata or referrer information on an existing lead record.
+     * Updates a lead's <code>metadata</code> or <code>referrer</code>.
      * <p>Required permissions:</p>
      * <ul>
      * <li><code>lead:manage</code></li>
@@ -197,6 +277,13 @@ public class AsyncLeadsClient {
      * </ul>
      */
     public CompletableFuture<Lead> update(String id, UpdateLeadsRequest request, RequestOptions requestOptions) {
-        return this.rawClient.update(id, request, requestOptions).thenApply(response -> response.body());
+        CompletableFuture<WhopApiHttpResponse<Lead>> rawFuture = this.rawClient.update(id, request, requestOptions);
+        CompletableFuture<Lead> future = rawFuture.thenApply(response -> response.body());
+        future.whenComplete((result_, throwable_) -> {
+            if (future.isCancelled()) {
+                rawFuture.cancel(true);
+            }
+        });
+        return future;
     }
 }

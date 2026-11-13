@@ -30,6 +30,8 @@ public final class AppListItem {
 
     private final AppListItemAppType appType;
 
+    private final double averageReviewRating;
+
     private final Optional<AppBannerImage> bannerImage;
 
     private final Optional<String> baseUrl;
@@ -37,6 +39,10 @@ public final class AppListItem {
     private final int businessesCreatedCount;
 
     private final List<String> businessesCreatedLogoUrls;
+
+    private final int businessesWithRecentSalesCount;
+
+    private final Optional<AppCategory> category;
 
     private final AppCreator creator;
 
@@ -48,6 +54,8 @@ public final class AppListItem {
 
     private final String domainId;
 
+    private final List<AppDomain> domains;
+
     private final Optional<String> experiencePath;
 
     private final Optional<String> hostedUrl;
@@ -56,11 +64,17 @@ public final class AppListItem {
 
     private final String id;
 
+    private final boolean isWhopApp;
+
     private final String name;
 
     private final Optional<String> openapiPath;
 
     private final Optional<String> origin;
+
+    private final Optional<String> productCategory;
+
+    private final int publishedReviewsCount;
 
     private final Optional<String> route;
 
@@ -75,22 +89,29 @@ public final class AppListItem {
     private AppListItem(
             AccountParent account,
             AppListItemAppType appType,
+            double averageReviewRating,
             Optional<AppBannerImage> bannerImage,
             Optional<String> baseUrl,
             int businessesCreatedCount,
             List<String> businessesCreatedLogoUrls,
+            int businessesWithRecentSalesCount,
+            Optional<AppCategory> category,
             AppCreator creator,
             Optional<String> dashboardPath,
             Optional<String> description,
             Optional<String> discoverPath,
             String domainId,
+            List<AppDomain> domains,
             Optional<String> experiencePath,
             Optional<String> hostedUrl,
             AppIcon icon,
             String id,
+            boolean isWhopApp,
             String name,
             Optional<String> openapiPath,
             Optional<String> origin,
+            Optional<String> productCategory,
+            int publishedReviewsCount,
             Optional<String> route,
             Optional<String> skillsPath,
             AppListItemStatus status,
@@ -98,22 +119,29 @@ public final class AppListItem {
             Map<String, Object> additionalProperties) {
         this.account = account;
         this.appType = appType;
+        this.averageReviewRating = averageReviewRating;
         this.bannerImage = bannerImage;
         this.baseUrl = baseUrl;
         this.businessesCreatedCount = businessesCreatedCount;
         this.businessesCreatedLogoUrls = businessesCreatedLogoUrls;
+        this.businessesWithRecentSalesCount = businessesWithRecentSalesCount;
+        this.category = category;
         this.creator = creator;
         this.dashboardPath = dashboardPath;
         this.description = description;
         this.discoverPath = discoverPath;
         this.domainId = domainId;
+        this.domains = domains;
         this.experiencePath = experiencePath;
         this.hostedUrl = hostedUrl;
         this.icon = icon;
         this.id = id;
+        this.isWhopApp = isWhopApp;
         this.name = name;
         this.openapiPath = openapiPath;
         this.origin = origin;
+        this.productCategory = productCategory;
+        this.publishedReviewsCount = publishedReviewsCount;
         this.route = route;
         this.skillsPath = skillsPath;
         this.status = status;
@@ -135,6 +163,14 @@ public final class AppListItem {
     @JsonProperty("app_type")
     public AppListItemAppType getAppType() {
         return appType;
+    }
+
+    /**
+     * @return Average star rating across published reviews for this app, from <code>1.0</code> to <code>5.0</code>. Returns <code>0.0</code> when no published-review rating is available.
+     */
+    @JsonProperty("average_review_rating")
+    public double getAverageReviewRating() {
+        return averageReviewRating;
     }
 
     /**
@@ -170,6 +206,25 @@ public final class AppListItem {
     @JsonProperty("businesses_created_logo_urls")
     public List<String> getBusinessesCreatedLogoUrls() {
         return businessesCreatedLogoUrls;
+    }
+
+    /**
+     * @return Number of businesses created from this app as a template that processed a payment in the last 24 hours. Recounted hourly, so it can be up to an hour behind.
+     */
+    @JsonProperty("businesses_with_recent_sales_count")
+    public int getBusinessesWithRecentSalesCount() {
+        return businessesWithRecentSalesCount;
+    }
+
+    /**
+     * @return The app's App Store category, or <code>null</code> when none has been set. An app can show a category that <code>GET /apps/categories</code> does not list, if it was categorized before the current store categories.
+     */
+    @JsonIgnore
+    public Optional<AppCategory> getCategory() {
+        if (category == null) {
+            return Optional.empty();
+        }
+        return category;
     }
 
     /**
@@ -221,6 +276,11 @@ public final class AppListItem {
         return domainId;
     }
 
+    @JsonProperty("domains")
+    public List<AppDomain> getDomains() {
+        return domains;
+    }
+
     /**
      * @return URL path for the member-facing hub view, or <code>null</code> when not configured.
      */
@@ -234,6 +294,7 @@ public final class AppListItem {
 
     /**
      * @return Full URL where the app's hosted web build is served, or <code>null</code> if no route is claimed.
+     * DEPRECATED: Read <code>domains</code> instead.
      */
     @JsonIgnore
     public Optional<String> getHostedUrl() {
@@ -257,6 +318,14 @@ public final class AppListItem {
     @JsonProperty("id")
     public String getId() {
         return id;
+    }
+
+    /**
+     * @return Whether Whop publishes this app.
+     */
+    @JsonProperty("is_whop_app")
+    public boolean getIsWhopApp() {
+        return isWhopApp;
     }
 
     /**
@@ -290,7 +359,27 @@ public final class AppListItem {
     }
 
     /**
-     * @return Claimed subdomain route where hosted web builds are served (<code>myapp</code> for myapp.whop.app), or <code>null</code> if no route is claimed.
+     * @return Product category a business built from this app as a template sells, such as <code>pressure_washing</code>, or <code>null</code> when none has been set.
+     */
+    @JsonIgnore
+    public Optional<String> getProductCategory() {
+        if (productCategory == null) {
+            return Optional.empty();
+        }
+        return productCategory;
+    }
+
+    /**
+     * @return Published customer reviews for this app.
+     */
+    @JsonProperty("published_reviews_count")
+    public int getPublishedReviewsCount() {
+        return publishedReviewsCount;
+    }
+
+    /**
+     * @return Claimed subdomain route where hosted web builds are served (<code>myapp</code> for myapp.whop.site), or <code>null</code> if no route is claimed.
+     * DEPRECATED: Read <code>domains</code> instead.
      */
     @JsonIgnore
     public Optional<String> getRoute() {
@@ -340,6 +429,12 @@ public final class AppListItem {
     }
 
     @JsonInclude(value = JsonInclude.Include.CUSTOM, valueFilter = NullableNonemptyFilter.class)
+    @JsonProperty("category")
+    private Optional<AppCategory> _getCategory() {
+        return category;
+    }
+
+    @JsonInclude(value = JsonInclude.Include.CUSTOM, valueFilter = NullableNonemptyFilter.class)
     @JsonProperty("dashboard_path")
     private Optional<String> _getDashboardPath() {
         return dashboardPath;
@@ -382,6 +477,12 @@ public final class AppListItem {
     }
 
     @JsonInclude(value = JsonInclude.Include.CUSTOM, valueFilter = NullableNonemptyFilter.class)
+    @JsonProperty("product_category")
+    private Optional<String> _getProductCategory() {
+        return productCategory;
+    }
+
+    @JsonInclude(value = JsonInclude.Include.CUSTOM, valueFilter = NullableNonemptyFilter.class)
     @JsonProperty("route")
     private Optional<String> _getRoute() {
         return route;
@@ -407,22 +508,29 @@ public final class AppListItem {
     private boolean equalTo(AppListItem other) {
         return account.equals(other.account)
                 && appType.equals(other.appType)
+                && averageReviewRating == other.averageReviewRating
                 && bannerImage.equals(other.bannerImage)
                 && baseUrl.equals(other.baseUrl)
                 && businessesCreatedCount == other.businessesCreatedCount
                 && businessesCreatedLogoUrls.equals(other.businessesCreatedLogoUrls)
+                && businessesWithRecentSalesCount == other.businessesWithRecentSalesCount
+                && category.equals(other.category)
                 && creator.equals(other.creator)
                 && dashboardPath.equals(other.dashboardPath)
                 && description.equals(other.description)
                 && discoverPath.equals(other.discoverPath)
                 && domainId.equals(other.domainId)
+                && domains.equals(other.domains)
                 && experiencePath.equals(other.experiencePath)
                 && hostedUrl.equals(other.hostedUrl)
                 && icon.equals(other.icon)
                 && id.equals(other.id)
+                && isWhopApp == other.isWhopApp
                 && name.equals(other.name)
                 && openapiPath.equals(other.openapiPath)
                 && origin.equals(other.origin)
+                && productCategory.equals(other.productCategory)
+                && publishedReviewsCount == other.publishedReviewsCount
                 && route.equals(other.route)
                 && skillsPath.equals(other.skillsPath)
                 && status.equals(other.status)
@@ -434,22 +542,29 @@ public final class AppListItem {
         return Objects.hash(
                 this.account,
                 this.appType,
+                this.averageReviewRating,
                 this.bannerImage,
                 this.baseUrl,
                 this.businessesCreatedCount,
                 this.businessesCreatedLogoUrls,
+                this.businessesWithRecentSalesCount,
+                this.category,
                 this.creator,
                 this.dashboardPath,
                 this.description,
                 this.discoverPath,
                 this.domainId,
+                this.domains,
                 this.experiencePath,
                 this.hostedUrl,
                 this.icon,
                 this.id,
+                this.isWhopApp,
                 this.name,
                 this.openapiPath,
                 this.origin,
+                this.productCategory,
+                this.publishedReviewsCount,
                 this.route,
                 this.skillsPath,
                 this.status,
@@ -478,14 +593,28 @@ public final class AppListItem {
         /**
          * <p>The type of end-user the app is built for.</p>
          */
-        BusinessesCreatedCountStage appType(@NotNull AppListItemAppType appType);
+        AverageReviewRatingStage appType(@NotNull AppListItemAppType appType);
+    }
+
+    public interface AverageReviewRatingStage {
+        /**
+         * <p>Average star rating across published reviews for this app, from <code>1.0</code> to <code>5.0</code>. Returns <code>0.0</code> when no published-review rating is available.</p>
+         */
+        BusinessesCreatedCountStage averageReviewRating(double averageReviewRating);
     }
 
     public interface BusinessesCreatedCountStage {
         /**
          * <p>Number of businesses created from this app as a template.</p>
          */
-        CreatorStage businessesCreatedCount(int businessesCreatedCount);
+        BusinessesWithRecentSalesCountStage businessesCreatedCount(int businessesCreatedCount);
+    }
+
+    public interface BusinessesWithRecentSalesCountStage {
+        /**
+         * <p>Number of businesses created from this app as a template that processed a payment in the last 24 hours. Recounted hourly, so it can be up to an hour behind.</p>
+         */
+        CreatorStage businessesWithRecentSalesCount(int businessesWithRecentSalesCount);
     }
 
     public interface CreatorStage {
@@ -513,14 +642,28 @@ public final class AppListItem {
         /**
          * <p>App ID, prefixed <code>app_</code>.</p>
          */
-        NameStage id(@NotNull String id);
+        IsWhopAppStage id(@NotNull String id);
+    }
+
+    public interface IsWhopAppStage {
+        /**
+         * <p>Whether Whop publishes this app.</p>
+         */
+        NameStage isWhopApp(boolean isWhopApp);
     }
 
     public interface NameStage {
         /**
          * <p>Display name shown on the app store and in experience navigation.</p>
          */
-        StatusStage name(@NotNull String name);
+        PublishedReviewsCountStage name(@NotNull String name);
+    }
+
+    public interface PublishedReviewsCountStage {
+        /**
+         * <p>Published customer reviews for this app.</p>
+         */
+        StatusStage publishedReviewsCount(int publishedReviewsCount);
     }
 
     public interface StatusStage {
@@ -569,6 +712,15 @@ public final class AppListItem {
         _FinalStage addAllBusinessesCreatedLogoUrls(List<String> businessesCreatedLogoUrls);
 
         /**
+         * <p>The app's App Store category, or <code>null</code> when none has been set. An app can show a category that <code>GET /apps/categories</code> does not list, if it was categorized before the current store categories.</p>
+         */
+        _FinalStage category(Optional<AppCategory> category);
+
+        _FinalStage category(AppCategory category);
+
+        _FinalStage category(Nullable<AppCategory> category);
+
+        /**
          * <p>URL path for the account dashboard view, or <code>null</code> when not configured.</p>
          */
         _FinalStage dashboardPath(Optional<String> dashboardPath);
@@ -595,6 +747,12 @@ public final class AppListItem {
 
         _FinalStage discoverPath(Nullable<String> discoverPath);
 
+        _FinalStage domains(List<AppDomain> domains);
+
+        _FinalStage addDomains(AppDomain domains);
+
+        _FinalStage addAllDomains(List<AppDomain> domains);
+
         /**
          * <p>URL path for the member-facing hub view, or <code>null</code> when not configured.</p>
          */
@@ -605,7 +763,8 @@ public final class AppListItem {
         _FinalStage experiencePath(Nullable<String> experiencePath);
 
         /**
-         * <p>Full URL where the app's hosted web build is served, or <code>null</code> if no route is claimed.</p>
+         * <p>Full URL where the app's hosted web build is served, or <code>null</code> if no route is claimed.
+         * DEPRECATED: Read <code>domains</code> instead.</p>
          */
         _FinalStage hostedUrl(Optional<String> hostedUrl);
 
@@ -632,7 +791,17 @@ public final class AppListItem {
         _FinalStage origin(Nullable<String> origin);
 
         /**
-         * <p>Claimed subdomain route where hosted web builds are served (<code>myapp</code> for myapp.whop.app), or <code>null</code> if no route is claimed.</p>
+         * <p>Product category a business built from this app as a template sells, such as <code>pressure_washing</code>, or <code>null</code> when none has been set.</p>
+         */
+        _FinalStage productCategory(Optional<String> productCategory);
+
+        _FinalStage productCategory(String productCategory);
+
+        _FinalStage productCategory(Nullable<String> productCategory);
+
+        /**
+         * <p>Claimed subdomain route where hosted web builds are served (<code>myapp</code> for myapp.whop.site), or <code>null</code> if no route is claimed.
+         * DEPRECATED: Read <code>domains</code> instead.</p>
          */
         _FinalStage route(Optional<String> route);
 
@@ -654,12 +823,16 @@ public final class AppListItem {
     public static final class Builder
             implements AccountStage,
                     AppTypeStage,
+                    AverageReviewRatingStage,
                     BusinessesCreatedCountStage,
+                    BusinessesWithRecentSalesCountStage,
                     CreatorStage,
                     DomainIdStage,
                     IconStage,
                     IdStage,
+                    IsWhopAppStage,
                     NameStage,
+                    PublishedReviewsCountStage,
                     StatusStage,
                     VerifiedStage,
                     _FinalStage {
@@ -667,7 +840,11 @@ public final class AppListItem {
 
         private AppListItemAppType appType;
 
+        private double averageReviewRating;
+
         private int businessesCreatedCount;
+
+        private int businessesWithRecentSalesCount;
 
         private AppCreator creator;
 
@@ -677,7 +854,11 @@ public final class AppListItem {
 
         private String id;
 
+        private boolean isWhopApp;
+
         private String name;
+
+        private int publishedReviewsCount;
 
         private AppListItemStatus status;
 
@@ -687,6 +868,8 @@ public final class AppListItem {
 
         private Optional<String> route = Optional.empty();
 
+        private Optional<String> productCategory = Optional.empty();
+
         private Optional<String> origin = Optional.empty();
 
         private Optional<String> openapiPath = Optional.empty();
@@ -695,11 +878,15 @@ public final class AppListItem {
 
         private Optional<String> experiencePath = Optional.empty();
 
+        private List<AppDomain> domains = new ArrayList<>();
+
         private Optional<String> discoverPath = Optional.empty();
 
         private Optional<String> description = Optional.empty();
 
         private Optional<String> dashboardPath = Optional.empty();
+
+        private Optional<AppCategory> category = Optional.empty();
 
         private List<String> businessesCreatedLogoUrls = new ArrayList<>();
 
@@ -707,7 +894,6 @@ public final class AppListItem {
 
         private Optional<AppBannerImage> bannerImage = Optional.empty();
 
-        @JsonAnySetter
         private Map<String, Object> additionalProperties = new HashMap<>();
 
         private Builder() {}
@@ -716,22 +902,29 @@ public final class AppListItem {
         public Builder from(AppListItem other) {
             account(other.getAccount());
             appType(other.getAppType());
+            averageReviewRating(other.getAverageReviewRating());
             bannerImage(other.getBannerImage());
             baseUrl(other.getBaseUrl());
             businessesCreatedCount(other.getBusinessesCreatedCount());
             businessesCreatedLogoUrls(other.getBusinessesCreatedLogoUrls());
+            businessesWithRecentSalesCount(other.getBusinessesWithRecentSalesCount());
+            category(other.getCategory());
             creator(other.getCreator());
             dashboardPath(other.getDashboardPath());
             description(other.getDescription());
             discoverPath(other.getDiscoverPath());
             domainId(other.getDomainId());
+            domains(other.getDomains());
             experiencePath(other.getExperiencePath());
             hostedUrl(other.getHostedUrl());
             icon(other.getIcon());
             id(other.getId());
+            isWhopApp(other.getIsWhopApp());
             name(other.getName());
             openapiPath(other.getOpenapiPath());
             origin(other.getOrigin());
+            productCategory(other.getProductCategory());
+            publishedReviewsCount(other.getPublishedReviewsCount());
             route(other.getRoute());
             skillsPath(other.getSkillsPath());
             status(other.getStatus());
@@ -740,7 +933,6 @@ public final class AppListItem {
         }
 
         /**
-         * <p>The account that owns the app.</p>
          * <p>The account that owns the app.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
@@ -753,30 +945,49 @@ public final class AppListItem {
 
         /**
          * <p>The type of end-user the app is built for.</p>
-         * <p>The type of end-user the app is built for.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
         @JsonSetter("app_type")
-        public BusinessesCreatedCountStage appType(@NotNull AppListItemAppType appType) {
+        public AverageReviewRatingStage appType(@NotNull AppListItemAppType appType) {
             this.appType = Objects.requireNonNull(appType, "appType must not be null");
             return this;
         }
 
         /**
-         * <p>Number of businesses created from this app as a template.</p>
+         * <p>Average star rating across published reviews for this app, from <code>1.0</code> to <code>5.0</code>. Returns <code>0.0</code> when no published-review rating is available.</p>
+         * @return Reference to {@code this} so that method calls can be chained together.
+         */
+        @java.lang.Override
+        @JsonSetter("average_review_rating")
+        public BusinessesCreatedCountStage averageReviewRating(double averageReviewRating) {
+            this.averageReviewRating = averageReviewRating;
+            return this;
+        }
+
+        /**
          * <p>Number of businesses created from this app as a template.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
         @JsonSetter("businesses_created_count")
-        public CreatorStage businessesCreatedCount(int businessesCreatedCount) {
+        public BusinessesWithRecentSalesCountStage businessesCreatedCount(int businessesCreatedCount) {
             this.businessesCreatedCount = businessesCreatedCount;
             return this;
         }
 
         /**
-         * <p>The user who owns the publishing account.</p>
+         * <p>Number of businesses created from this app as a template that processed a payment in the last 24 hours. Recounted hourly, so it can be up to an hour behind.</p>
+         * @return Reference to {@code this} so that method calls can be chained together.
+         */
+        @java.lang.Override
+        @JsonSetter("businesses_with_recent_sales_count")
+        public CreatorStage businessesWithRecentSalesCount(int businessesWithRecentSalesCount) {
+            this.businessesWithRecentSalesCount = businessesWithRecentSalesCount;
+            return this;
+        }
+
+        /**
          * <p>The user who owns the publishing account.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
@@ -789,7 +1000,6 @@ public final class AppListItem {
 
         /**
          * <p>Subdomain identifier for the app's proxied URL, forming https://{domain_id}.apps.whop.com.</p>
-         * <p>Subdomain identifier for the app's proxied URL, forming https://{domain_id}.apps.whop.com.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
@@ -800,7 +1010,6 @@ public final class AppListItem {
         }
 
         /**
-         * <p>The app's icon. Falls back to the default app icon when none is uploaded.</p>
          * <p>The app's icon. Falls back to the default app icon when none is uploaded.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
@@ -813,30 +1022,49 @@ public final class AppListItem {
 
         /**
          * <p>App ID, prefixed <code>app_</code>.</p>
-         * <p>App ID, prefixed <code>app_</code>.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
         @JsonSetter("id")
-        public NameStage id(@NotNull String id) {
+        public IsWhopAppStage id(@NotNull String id) {
             this.id = Objects.requireNonNull(id, "id must not be null");
             return this;
         }
 
         /**
-         * <p>Display name shown on the app store and in experience navigation.</p>
+         * <p>Whether Whop publishes this app.</p>
+         * @return Reference to {@code this} so that method calls can be chained together.
+         */
+        @java.lang.Override
+        @JsonSetter("is_whop_app")
+        public NameStage isWhopApp(boolean isWhopApp) {
+            this.isWhopApp = isWhopApp;
+            return this;
+        }
+
+        /**
          * <p>Display name shown on the app store and in experience navigation.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
         @JsonSetter("name")
-        public StatusStage name(@NotNull String name) {
+        public PublishedReviewsCountStage name(@NotNull String name) {
             this.name = Objects.requireNonNull(name, "name must not be null");
             return this;
         }
 
         /**
-         * <p>Visibility on the Whop app store: <code>live</code> is publicly discoverable, <code>unlisted</code> is accessible only via direct link, <code>hidden</code> is not visible anywhere.</p>
+         * <p>Published customer reviews for this app.</p>
+         * @return Reference to {@code this} so that method calls can be chained together.
+         */
+        @java.lang.Override
+        @JsonSetter("published_reviews_count")
+        public StatusStage publishedReviewsCount(int publishedReviewsCount) {
+            this.publishedReviewsCount = publishedReviewsCount;
+            return this;
+        }
+
+        /**
          * <p>Visibility on the Whop app store: <code>live</code> is publicly discoverable, <code>unlisted</code> is accessible only via direct link, <code>hidden</code> is not visible anywhere.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
@@ -848,7 +1076,6 @@ public final class AppListItem {
         }
 
         /**
-         * <p>Whether the app has been verified by Whop and is eligible for the featured apps section.</p>
          * <p>Whether the app has been verified by Whop and is eligible for the featured apps section.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
@@ -896,7 +1123,8 @@ public final class AppListItem {
         }
 
         /**
-         * <p>Claimed subdomain route where hosted web builds are served (<code>myapp</code> for myapp.whop.app), or <code>null</code> if no route is claimed.</p>
+         * <p>Claimed subdomain route where hosted web builds are served (<code>myapp</code> for myapp.whop.site), or <code>null</code> if no route is claimed.
+         * DEPRECATED: Read <code>domains</code> instead.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
@@ -912,7 +1140,8 @@ public final class AppListItem {
         }
 
         /**
-         * <p>Claimed subdomain route where hosted web builds are served (<code>myapp</code> for myapp.whop.app), or <code>null</code> if no route is claimed.</p>
+         * <p>Claimed subdomain route where hosted web builds are served (<code>myapp</code> for myapp.whop.site), or <code>null</code> if no route is claimed.
+         * DEPRECATED: Read <code>domains</code> instead.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
@@ -922,12 +1151,49 @@ public final class AppListItem {
         }
 
         /**
-         * <p>Claimed subdomain route where hosted web builds are served (<code>myapp</code> for myapp.whop.app), or <code>null</code> if no route is claimed.</p>
+         * <p>Claimed subdomain route where hosted web builds are served (<code>myapp</code> for myapp.whop.site), or <code>null</code> if no route is claimed.
+         * DEPRECATED: Read <code>domains</code> instead.</p>
          */
         @java.lang.Override
         @JsonSetter(value = "route", nulls = Nulls.SKIP)
         public _FinalStage route(Optional<String> route) {
             this.route = route;
+            return this;
+        }
+
+        /**
+         * <p>Product category a business built from this app as a template sells, such as <code>pressure_washing</code>, or <code>null</code> when none has been set.</p>
+         * @return Reference to {@code this} so that method calls can be chained together.
+         */
+        @java.lang.Override
+        public _FinalStage productCategory(Nullable<String> productCategory) {
+            if (productCategory.isNull()) {
+                this.productCategory = null;
+            } else if (productCategory.isEmpty()) {
+                this.productCategory = Optional.empty();
+            } else {
+                this.productCategory = Optional.of(productCategory.get());
+            }
+            return this;
+        }
+
+        /**
+         * <p>Product category a business built from this app as a template sells, such as <code>pressure_washing</code>, or <code>null</code> when none has been set.</p>
+         * @return Reference to {@code this} so that method calls can be chained together.
+         */
+        @java.lang.Override
+        public _FinalStage productCategory(String productCategory) {
+            this.productCategory = Optional.ofNullable(productCategory);
+            return this;
+        }
+
+        /**
+         * <p>Product category a business built from this app as a template sells, such as <code>pressure_washing</code>, or <code>null</code> when none has been set.</p>
+         */
+        @java.lang.Override
+        @JsonSetter(value = "product_category", nulls = Nulls.SKIP)
+        public _FinalStage productCategory(Optional<String> productCategory) {
+            this.productCategory = productCategory;
             return this;
         }
 
@@ -1004,7 +1270,8 @@ public final class AppListItem {
         }
 
         /**
-         * <p>Full URL where the app's hosted web build is served, or <code>null</code> if no route is claimed.</p>
+         * <p>Full URL where the app's hosted web build is served, or <code>null</code> if no route is claimed.
+         * DEPRECATED: Read <code>domains</code> instead.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
@@ -1020,7 +1287,8 @@ public final class AppListItem {
         }
 
         /**
-         * <p>Full URL where the app's hosted web build is served, or <code>null</code> if no route is claimed.</p>
+         * <p>Full URL where the app's hosted web build is served, or <code>null</code> if no route is claimed.
+         * DEPRECATED: Read <code>domains</code> instead.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
@@ -1030,7 +1298,8 @@ public final class AppListItem {
         }
 
         /**
-         * <p>Full URL where the app's hosted web build is served, or <code>null</code> if no route is claimed.</p>
+         * <p>Full URL where the app's hosted web build is served, or <code>null</code> if no route is claimed.
+         * DEPRECATED: Read <code>domains</code> instead.</p>
          */
         @java.lang.Override
         @JsonSetter(value = "hosted_url", nulls = Nulls.SKIP)
@@ -1072,6 +1341,30 @@ public final class AppListItem {
         @JsonSetter(value = "experience_path", nulls = Nulls.SKIP)
         public _FinalStage experiencePath(Optional<String> experiencePath) {
             this.experiencePath = experiencePath;
+            return this;
+        }
+
+        @java.lang.Override
+        public _FinalStage addAllDomains(List<AppDomain> domains) {
+            if (domains != null) {
+                this.domains.addAll(domains);
+            }
+            return this;
+        }
+
+        @java.lang.Override
+        public _FinalStage addDomains(AppDomain domains) {
+            this.domains.add(domains);
+            return this;
+        }
+
+        @java.lang.Override
+        @JsonSetter(value = "domains", nulls = Nulls.SKIP)
+        public _FinalStage domains(List<AppDomain> domains) {
+            this.domains.clear();
+            if (domains != null) {
+                this.domains.addAll(domains);
+            }
             return this;
         }
 
@@ -1183,6 +1476,42 @@ public final class AppListItem {
             return this;
         }
 
+        /**
+         * <p>The app's App Store category, or <code>null</code> when none has been set. An app can show a category that <code>GET /apps/categories</code> does not list, if it was categorized before the current store categories.</p>
+         * @return Reference to {@code this} so that method calls can be chained together.
+         */
+        @java.lang.Override
+        public _FinalStage category(Nullable<AppCategory> category) {
+            if (category.isNull()) {
+                this.category = null;
+            } else if (category.isEmpty()) {
+                this.category = Optional.empty();
+            } else {
+                this.category = Optional.of(category.get());
+            }
+            return this;
+        }
+
+        /**
+         * <p>The app's App Store category, or <code>null</code> when none has been set. An app can show a category that <code>GET /apps/categories</code> does not list, if it was categorized before the current store categories.</p>
+         * @return Reference to {@code this} so that method calls can be chained together.
+         */
+        @java.lang.Override
+        public _FinalStage category(AppCategory category) {
+            this.category = Optional.ofNullable(category);
+            return this;
+        }
+
+        /**
+         * <p>The app's App Store category, or <code>null</code> when none has been set. An app can show a category that <code>GET /apps/categories</code> does not list, if it was categorized before the current store categories.</p>
+         */
+        @java.lang.Override
+        @JsonSetter(value = "category", nulls = Nulls.SKIP)
+        public _FinalStage category(Optional<AppCategory> category) {
+            this.category = category;
+            return this;
+        }
+
         @java.lang.Override
         public _FinalStage addAllBusinessesCreatedLogoUrls(List<String> businessesCreatedLogoUrls) {
             if (businessesCreatedLogoUrls != null) {
@@ -1284,27 +1613,70 @@ public final class AppListItem {
             return new AppListItem(
                     account,
                     appType,
+                    averageReviewRating,
                     bannerImage,
                     baseUrl,
                     businessesCreatedCount,
                     businessesCreatedLogoUrls,
+                    businessesWithRecentSalesCount,
+                    category,
                     creator,
                     dashboardPath,
                     description,
                     discoverPath,
                     domainId,
+                    domains,
                     experiencePath,
                     hostedUrl,
                     icon,
                     id,
+                    isWhopApp,
                     name,
                     openapiPath,
                     origin,
+                    productCategory,
+                    publishedReviewsCount,
                     route,
                     skillsPath,
                     status,
                     verified,
                     additionalProperties);
+        }
+
+        @JsonAnySetter
+        private void putAdditionalPropertyFromJson(String key, Object value) {
+            if (key.equalsIgnoreCase("account")
+                    || key.equalsIgnoreCase("app_type")
+                    || key.equalsIgnoreCase("average_review_rating")
+                    || key.equalsIgnoreCase("banner_image")
+                    || key.equalsIgnoreCase("base_url")
+                    || key.equalsIgnoreCase("businesses_created_count")
+                    || key.equalsIgnoreCase("businesses_created_logo_urls")
+                    || key.equalsIgnoreCase("businesses_with_recent_sales_count")
+                    || key.equalsIgnoreCase("category")
+                    || key.equalsIgnoreCase("creator")
+                    || key.equalsIgnoreCase("dashboard_path")
+                    || key.equalsIgnoreCase("description")
+                    || key.equalsIgnoreCase("discover_path")
+                    || key.equalsIgnoreCase("domain_id")
+                    || key.equalsIgnoreCase("domains")
+                    || key.equalsIgnoreCase("experience_path")
+                    || key.equalsIgnoreCase("hosted_url")
+                    || key.equalsIgnoreCase("icon")
+                    || key.equalsIgnoreCase("id")
+                    || key.equalsIgnoreCase("is_whop_app")
+                    || key.equalsIgnoreCase("name")
+                    || key.equalsIgnoreCase("openapi_path")
+                    || key.equalsIgnoreCase("origin")
+                    || key.equalsIgnoreCase("product_category")
+                    || key.equalsIgnoreCase("published_reviews_count")
+                    || key.equalsIgnoreCase("route")
+                    || key.equalsIgnoreCase("skills_path")
+                    || key.equalsIgnoreCase("status")
+                    || key.equalsIgnoreCase("verified")) {
+                return;
+            }
+            this.additionalProperties.put(key, value);
         }
 
         @java.lang.Override

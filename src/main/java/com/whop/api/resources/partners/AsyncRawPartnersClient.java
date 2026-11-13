@@ -4,10 +4,13 @@
 package com.whop.api.resources.partners;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
+import com.whop.api.core.BodyProperties;
 import com.whop.api.core.ClientOptions;
 import com.whop.api.core.ObjectMappers;
+import com.whop.api.core.PathSegments;
 import com.whop.api.core.QueryStringMapper;
 import com.whop.api.core.RequestOptions;
+import com.whop.api.core.RetryInterceptor;
 import com.whop.api.core.WhopApiApiException;
 import com.whop.api.core.WhopApiException;
 import com.whop.api.core.WhopApiHttpResponse;
@@ -15,14 +18,17 @@ import com.whop.api.core.pagination.SyncPagingIterable;
 import com.whop.api.errors.BadRequestError;
 import com.whop.api.errors.ConflictError;
 import com.whop.api.errors.ForbiddenError;
+import com.whop.api.errors.NotFoundError;
 import com.whop.api.errors.UnauthorizedError;
 import com.whop.api.resources.partners.requests.LeaderboardPartnersRequest;
 import com.whop.api.resources.partners.requests.ReferredUsersPartnersRequest;
+import com.whop.api.resources.partners.requests.RetrievePartnersRequest;
 import com.whop.api.resources.partners.types.CreatePartnersResponse;
+import com.whop.api.resources.partners.types.FeeOptionsPartnersResponse;
 import com.whop.api.resources.partners.types.LeaderboardPartnersResponse;
 import com.whop.api.resources.partners.types.ReferredUsersPartnersResponse;
 import com.whop.api.resources.partners.types.ReferredUsersPartnersResponseDataItem;
-import com.whop.api.types.V1ErrorResponse;
+import com.whop.api.types.Partner;
 import java.io.IOException;
 import java.util.List;
 import java.util.Optional;
@@ -57,7 +63,7 @@ public class AsyncRawPartnersClient {
      * Enrolls the calling user in the Whop partner program, making their partner businesses eligible for earnings. Idempotent — enrolling again keeps the original enrollment time.
      */
     public CompletableFuture<WhopApiHttpResponse<CreatePartnersResponse>> create(RequestOptions requestOptions) {
-        HttpUrl.Builder httpUrl = HttpUrl.parse(this.clientOptions.environment().getUrl())
+        HttpUrl.Builder httpUrl = HttpUrl.parse(this.clientOptions.environment().getApiURL())
                 .newBuilder()
                 .addPathSegments("partners");
         if (requestOptions != null) {
@@ -67,7 +73,11 @@ public class AsyncRawPartnersClient {
         }
         Request okhttpRequest = new Request.Builder()
                 .url(httpUrl.build())
-                .method("POST", RequestBody.create("", null))
+                .method(
+                        "POST",
+                        BodyProperties.toRequestBody(
+                                requestOptions != null ? requestOptions.getBodyProperties() : null,
+                                RequestBody.create("", null)))
                 .headers(Headers.of(clientOptions.headers(requestOptions)))
                 .addHeader("Accept", "application/json")
                 .build();
@@ -75,8 +85,18 @@ public class AsyncRawPartnersClient {
         if (requestOptions != null && requestOptions.getTimeout().isPresent()) {
             client = clientOptions.httpClientWithTimeout(requestOptions);
         }
+        if (requestOptions != null && requestOptions.getMaxRetries().isPresent()) {
+            okhttpRequest = okhttpRequest
+                    .newBuilder()
+                    .tag(
+                            RetryInterceptor.MaxRetriesOverride.class,
+                            new RetryInterceptor.MaxRetriesOverride(
+                                    requestOptions.getMaxRetries().get()))
+                    .build();
+        }
         CompletableFuture<WhopApiHttpResponse<CreatePartnersResponse>> future = new CompletableFuture<>();
-        client.newCall(okhttpRequest).enqueue(new Callback() {
+        RetryInterceptor.AsyncCall okhttpCall = RetryInterceptor.newAsyncCall(client, okhttpRequest);
+        okhttpCall.enqueue(new Callback() {
             @Override
             public void onResponse(@NotNull Call call, @NotNull Response response) throws IOException {
                 try (ResponseBody responseBody = response.body()) {
@@ -101,7 +121,7 @@ public class AsyncRawPartnersClient {
                                 return;
                             case 409:
                                 future.completeExceptionally(new ConflictError(
-                                        ObjectMappers.JSON_MAPPER.readValue(responseBodyString, V1ErrorResponse.class),
+                                        ObjectMappers.JSON_MAPPER.readValue(responseBodyString, Object.class),
                                         response));
                                 return;
                         }
@@ -112,6 +132,9 @@ public class AsyncRawPartnersClient {
                     future.completeExceptionally(new WhopApiApiException(
                             "Error with status code " + response.code(), response.code(), errorBody, response));
                     return;
+                } catch (JsonProcessingException e) {
+                    future.completeExceptionally(
+                            new WhopApiException("Failed to deserialize response: " + e.getMessage(), e));
                 } catch (IOException e) {
                     future.completeExceptionally(new WhopApiException("Network error executing HTTP request", e));
                 }
@@ -122,18 +145,110 @@ public class AsyncRawPartnersClient {
                 future.completeExceptionally(new WhopApiException("Network error executing HTTP request", e));
             }
         });
+        future.whenComplete((result_, throwable_) -> {
+            if (future.isCancelled()) {
+                okhttpCall.cancel();
+            }
+        });
         return future;
     }
 
     /**
-     * Ranks referrers by partner business earnings — all-time by default, or over the current day, month, year, or trailing 30 days. Authentication is optional: authenticated callers also get their own standing, anonymous callers get the rankings alone.
+     * Lists, per income stream, the fee a business the caller refers would be charged, how low the caller may price it, and the commission the caller earns on that stream. Answers for a referral that does not exist yet, so a referral flow can price the deal before the business is created. Requires <code>partner:fees:update</code>, since the floors a partner may price down to are only for a credential that can set them.
+     */
+    public CompletableFuture<WhopApiHttpResponse<FeeOptionsPartnersResponse>> feeOptions() {
+        return feeOptions(null);
+    }
+
+    /**
+     * Lists, per income stream, the fee a business the caller refers would be charged, how low the caller may price it, and the commission the caller earns on that stream. Answers for a referral that does not exist yet, so a referral flow can price the deal before the business is created. Requires <code>partner:fees:update</code>, since the floors a partner may price down to are only for a credential that can set them.
+     */
+    public CompletableFuture<WhopApiHttpResponse<FeeOptionsPartnersResponse>> feeOptions(
+            RequestOptions requestOptions) {
+        HttpUrl.Builder httpUrl = HttpUrl.parse(this.clientOptions.environment().getApiURL())
+                .newBuilder()
+                .addPathSegments("partners/fee_options");
+        if (requestOptions != null) {
+            requestOptions.getQueryParameters().forEach((_key, _value) -> {
+                httpUrl.addQueryParameter(_key, _value);
+            });
+        }
+        Request okhttpRequest = new Request.Builder()
+                .url(httpUrl.build())
+                .method("GET", null)
+                .headers(Headers.of(clientOptions.headers(requestOptions)))
+                .addHeader("Accept", "application/json")
+                .build();
+        OkHttpClient client = clientOptions.httpClient();
+        if (requestOptions != null && requestOptions.getTimeout().isPresent()) {
+            client = clientOptions.httpClientWithTimeout(requestOptions);
+        }
+        if (requestOptions != null && requestOptions.getMaxRetries().isPresent()) {
+            okhttpRequest = okhttpRequest
+                    .newBuilder()
+                    .tag(
+                            RetryInterceptor.MaxRetriesOverride.class,
+                            new RetryInterceptor.MaxRetriesOverride(
+                                    requestOptions.getMaxRetries().get()))
+                    .build();
+        }
+        CompletableFuture<WhopApiHttpResponse<FeeOptionsPartnersResponse>> future = new CompletableFuture<>();
+        RetryInterceptor.AsyncCall okhttpCall = RetryInterceptor.newAsyncCall(client, okhttpRequest);
+        okhttpCall.enqueue(new Callback() {
+            @Override
+            public void onResponse(@NotNull Call call, @NotNull Response response) throws IOException {
+                try (ResponseBody responseBody = response.body()) {
+                    String responseBodyString = responseBody != null ? responseBody.string() : "{}";
+                    if (response.isSuccessful()) {
+                        future.complete(new WhopApiHttpResponse<>(
+                                ObjectMappers.JSON_MAPPER.readValue(
+                                        responseBodyString, FeeOptionsPartnersResponse.class),
+                                response));
+                        return;
+                    }
+                    try {
+                        if (response.code() == 403) {
+                            future.completeExceptionally(new ForbiddenError(
+                                    ObjectMappers.JSON_MAPPER.readValue(responseBodyString, Object.class), response));
+                            return;
+                        }
+                    } catch (JsonProcessingException ignored) {
+                        // unable to map error response, throwing generic error
+                    }
+                    Object errorBody = ObjectMappers.parseErrorBody(responseBodyString);
+                    future.completeExceptionally(new WhopApiApiException(
+                            "Error with status code " + response.code(), response.code(), errorBody, response));
+                    return;
+                } catch (JsonProcessingException e) {
+                    future.completeExceptionally(
+                            new WhopApiException("Failed to deserialize response: " + e.getMessage(), e));
+                } catch (IOException e) {
+                    future.completeExceptionally(new WhopApiException("Network error executing HTTP request", e));
+                }
+            }
+
+            @Override
+            public void onFailure(@NotNull Call call, @NotNull IOException e) {
+                future.completeExceptionally(new WhopApiException("Network error executing HTTP request", e));
+            }
+        });
+        future.whenComplete((result_, throwable_) -> {
+            if (future.isCancelled()) {
+                okhttpCall.cancel();
+            }
+        });
+        return future;
+    }
+
+    /**
+     * Ranks referrers by partner business earnings over the chosen <code>period</code>, all-time by default. Authentication is optional: authenticated callers also get their own standing, anonymous callers get the rankings alone.
      */
     public CompletableFuture<WhopApiHttpResponse<LeaderboardPartnersResponse>> leaderboard() {
         return leaderboard(LeaderboardPartnersRequest.builder().build());
     }
 
     /**
-     * Ranks referrers by partner business earnings — all-time by default, or over the current day, month, year, or trailing 30 days. Authentication is optional: authenticated callers also get their own standing, anonymous callers get the rankings alone.
+     * Ranks referrers by partner business earnings over the chosen <code>period</code>, all-time by default. Authentication is optional: authenticated callers also get their own standing, anonymous callers get the rankings alone.
      */
     public CompletableFuture<WhopApiHttpResponse<LeaderboardPartnersResponse>> leaderboard(
             RequestOptions requestOptions) {
@@ -141,7 +256,7 @@ public class AsyncRawPartnersClient {
     }
 
     /**
-     * Ranks referrers by partner business earnings — all-time by default, or over the current day, month, year, or trailing 30 days. Authentication is optional: authenticated callers also get their own standing, anonymous callers get the rankings alone.
+     * Ranks referrers by partner business earnings over the chosen <code>period</code>, all-time by default. Authentication is optional: authenticated callers also get their own standing, anonymous callers get the rankings alone.
      */
     public CompletableFuture<WhopApiHttpResponse<LeaderboardPartnersResponse>> leaderboard(
             LeaderboardPartnersRequest request) {
@@ -149,11 +264,11 @@ public class AsyncRawPartnersClient {
     }
 
     /**
-     * Ranks referrers by partner business earnings — all-time by default, or over the current day, month, year, or trailing 30 days. Authentication is optional: authenticated callers also get their own standing, anonymous callers get the rankings alone.
+     * Ranks referrers by partner business earnings over the chosen <code>period</code>, all-time by default. Authentication is optional: authenticated callers also get their own standing, anonymous callers get the rankings alone.
      */
     public CompletableFuture<WhopApiHttpResponse<LeaderboardPartnersResponse>> leaderboard(
             LeaderboardPartnersRequest request, RequestOptions requestOptions) {
-        HttpUrl.Builder httpUrl = HttpUrl.parse(this.clientOptions.environment().getUrl())
+        HttpUrl.Builder httpUrl = HttpUrl.parse(this.clientOptions.environment().getApiURL())
                 .newBuilder()
                 .addPathSegments("partners/leaderboard");
         if (request.getPeriod().isPresent()) {
@@ -175,8 +290,18 @@ public class AsyncRawPartnersClient {
         if (requestOptions != null && requestOptions.getTimeout().isPresent()) {
             client = clientOptions.httpClientWithTimeout(requestOptions);
         }
+        if (requestOptions != null && requestOptions.getMaxRetries().isPresent()) {
+            okhttpRequest = okhttpRequest
+                    .newBuilder()
+                    .tag(
+                            RetryInterceptor.MaxRetriesOverride.class,
+                            new RetryInterceptor.MaxRetriesOverride(
+                                    requestOptions.getMaxRetries().get()))
+                    .build();
+        }
         CompletableFuture<WhopApiHttpResponse<LeaderboardPartnersResponse>> future = new CompletableFuture<>();
-        client.newCall(okhttpRequest).enqueue(new Callback() {
+        RetryInterceptor.AsyncCall okhttpCall = RetryInterceptor.newAsyncCall(client, okhttpRequest);
+        okhttpCall.enqueue(new Callback() {
             @Override
             public void onResponse(@NotNull Call call, @NotNull Response response) throws IOException {
                 try (ResponseBody responseBody = response.body()) {
@@ -201,6 +326,9 @@ public class AsyncRawPartnersClient {
                     future.completeExceptionally(new WhopApiApiException(
                             "Error with status code " + response.code(), response.code(), errorBody, response));
                     return;
+                } catch (JsonProcessingException e) {
+                    future.completeExceptionally(
+                            new WhopApiException("Failed to deserialize response: " + e.getMessage(), e));
                 } catch (IOException e) {
                     future.completeExceptionally(new WhopApiException("Network error executing HTTP request", e));
                 }
@@ -211,11 +339,16 @@ public class AsyncRawPartnersClient {
                 future.completeExceptionally(new WhopApiException("Network error executing HTTP request", e));
             }
         });
+        future.whenComplete((result_, throwable_) -> {
+            if (future.isCancelled()) {
+                okhttpCall.cancel();
+            }
+        });
         return future;
     }
 
     /**
-     * Lists the users the caller referred onto Whop (newest first), each with the second-tier earnings the caller has made from that user's businesses.
+     * Lists the users the caller referred onto Whop, newest first by default, each with the caller's total affiliate earnings from that user across all tiers. Deprecated: this list is retired and no longer appears in the API reference. It keeps responding for existing integrations and has no replacement.
      */
     public CompletableFuture<WhopApiHttpResponse<SyncPagingIterable<ReferredUsersPartnersResponseDataItem>>>
             referredUsers() {
@@ -223,7 +356,7 @@ public class AsyncRawPartnersClient {
     }
 
     /**
-     * Lists the users the caller referred onto Whop (newest first), each with the second-tier earnings the caller has made from that user's businesses.
+     * Lists the users the caller referred onto Whop, newest first by default, each with the caller's total affiliate earnings from that user across all tiers. Deprecated: this list is retired and no longer appears in the API reference. It keeps responding for existing integrations and has no replacement.
      */
     public CompletableFuture<WhopApiHttpResponse<SyncPagingIterable<ReferredUsersPartnersResponseDataItem>>>
             referredUsers(RequestOptions requestOptions) {
@@ -231,7 +364,7 @@ public class AsyncRawPartnersClient {
     }
 
     /**
-     * Lists the users the caller referred onto Whop (newest first), each with the second-tier earnings the caller has made from that user's businesses.
+     * Lists the users the caller referred onto Whop, newest first by default, each with the caller's total affiliate earnings from that user across all tiers. Deprecated: this list is retired and no longer appears in the API reference. It keeps responding for existing integrations and has no replacement.
      */
     public CompletableFuture<WhopApiHttpResponse<SyncPagingIterable<ReferredUsersPartnersResponseDataItem>>>
             referredUsers(ReferredUsersPartnersRequest request) {
@@ -239,13 +372,35 @@ public class AsyncRawPartnersClient {
     }
 
     /**
-     * Lists the users the caller referred onto Whop (newest first), each with the second-tier earnings the caller has made from that user's businesses.
+     * Lists the users the caller referred onto Whop, newest first by default, each with the caller's total affiliate earnings from that user across all tiers. Deprecated: this list is retired and no longer appears in the API reference. It keeps responding for existing integrations and has no replacement.
      */
     public CompletableFuture<WhopApiHttpResponse<SyncPagingIterable<ReferredUsersPartnersResponseDataItem>>>
             referredUsers(ReferredUsersPartnersRequest request, RequestOptions requestOptions) {
-        HttpUrl.Builder httpUrl = HttpUrl.parse(this.clientOptions.environment().getUrl())
+        HttpUrl.Builder httpUrl = HttpUrl.parse(this.clientOptions.environment().getApiURL())
                 .newBuilder()
                 .addPathSegments("partners/referred_users");
+        if (request.getEarningPartnerId().isPresent()) {
+            QueryStringMapper.addQueryParameter(
+                    httpUrl, "earning_partner_id", request.getEarningPartnerId().get(), false);
+        }
+        if (request.getEarningPartnerUsername().isPresent()) {
+            QueryStringMapper.addQueryParameter(
+                    httpUrl,
+                    "earning_partner_username",
+                    request.getEarningPartnerUsername().get(),
+                    false);
+        }
+        if (request.getReferringAccountId().isPresent()) {
+            QueryStringMapper.addQueryParameter(
+                    httpUrl,
+                    "referring_account_id",
+                    request.getReferringAccountId().get(),
+                    false);
+        }
+        if (request.getQuery().isPresent()) {
+            QueryStringMapper.addQueryParameter(
+                    httpUrl, "query", request.getQuery().get(), false);
+        }
         if (request.getHasBusinesses().isPresent()) {
             QueryStringMapper.addQueryParameter(
                     httpUrl, "has_businesses", request.getHasBusinesses().get(), false);
@@ -256,6 +411,14 @@ public class AsyncRawPartnersClient {
                     "has_earning_businesses",
                     request.getHasEarningBusinesses().get(),
                     false);
+        }
+        if (request.getOrder().isPresent()) {
+            QueryStringMapper.addQueryParameter(
+                    httpUrl, "order", request.getOrder().get(), false);
+        }
+        if (request.getDirection().isPresent()) {
+            QueryStringMapper.addQueryParameter(
+                    httpUrl, "direction", request.getDirection().get(), false);
         }
         if (request.getFirst().isPresent()) {
             QueryStringMapper.addQueryParameter(
@@ -288,9 +451,19 @@ public class AsyncRawPartnersClient {
         if (requestOptions != null && requestOptions.getTimeout().isPresent()) {
             client = clientOptions.httpClientWithTimeout(requestOptions);
         }
+        if (requestOptions != null && requestOptions.getMaxRetries().isPresent()) {
+            okhttpRequest = okhttpRequest
+                    .newBuilder()
+                    .tag(
+                            RetryInterceptor.MaxRetriesOverride.class,
+                            new RetryInterceptor.MaxRetriesOverride(
+                                    requestOptions.getMaxRetries().get()))
+                    .build();
+        }
         CompletableFuture<WhopApiHttpResponse<SyncPagingIterable<ReferredUsersPartnersResponseDataItem>>> future =
                 new CompletableFuture<>();
-        client.newCall(okhttpRequest).enqueue(new Callback() {
+        RetryInterceptor.AsyncCall okhttpCall = RetryInterceptor.newAsyncCall(client, okhttpRequest);
+        okhttpCall.enqueue(new Callback() {
             @Override
             public void onResponse(@NotNull Call call, @NotNull Response response) throws IOException {
                 try (ResponseBody responseBody = response.body()) {
@@ -307,7 +480,11 @@ public class AsyncRawPartnersClient {
                         List<ReferredUsersPartnersResponseDataItem> result = parsedResponse.getData();
                         future.complete(new WhopApiHttpResponse<>(
                                 new SyncPagingIterable<ReferredUsersPartnersResponseDataItem>(
-                                        startingAfter != null, result, parsedResponse, () -> {
+                                        startingAfter.isPresent()
+                                                && !startingAfter.get().isEmpty(),
+                                        result,
+                                        parsedResponse,
+                                        () -> {
                                             try {
                                                 return referredUsers(nextRequest, requestOptions)
                                                         .get()
@@ -320,10 +497,27 @@ public class AsyncRawPartnersClient {
                         return;
                     }
                     try {
-                        if (response.code() == 401) {
-                            future.completeExceptionally(new UnauthorizedError(
-                                    ObjectMappers.JSON_MAPPER.readValue(responseBodyString, Object.class), response));
-                            return;
+                        switch (response.code()) {
+                            case 400:
+                                future.completeExceptionally(new BadRequestError(
+                                        ObjectMappers.JSON_MAPPER.readValue(responseBodyString, Object.class),
+                                        response));
+                                return;
+                            case 401:
+                                future.completeExceptionally(new UnauthorizedError(
+                                        ObjectMappers.JSON_MAPPER.readValue(responseBodyString, Object.class),
+                                        response));
+                                return;
+                            case 403:
+                                future.completeExceptionally(new ForbiddenError(
+                                        ObjectMappers.JSON_MAPPER.readValue(responseBodyString, Object.class),
+                                        response));
+                                return;
+                            case 404:
+                                future.completeExceptionally(new NotFoundError(
+                                        ObjectMappers.JSON_MAPPER.readValue(responseBodyString, Object.class),
+                                        response));
+                                return;
                         }
                     } catch (JsonProcessingException ignored) {
                         // unable to map error response, throwing generic error
@@ -332,6 +526,9 @@ public class AsyncRawPartnersClient {
                     future.completeExceptionally(new WhopApiApiException(
                             "Error with status code " + response.code(), response.code(), errorBody, response));
                     return;
+                } catch (JsonProcessingException e) {
+                    future.completeExceptionally(
+                            new WhopApiException("Failed to deserialize response: " + e.getMessage(), e));
                 } catch (IOException e) {
                     future.completeExceptionally(new WhopApiException("Network error executing HTTP request", e));
                 }
@@ -340,6 +537,127 @@ public class AsyncRawPartnersClient {
             @Override
             public void onFailure(@NotNull Call call, @NotNull IOException e) {
                 future.completeExceptionally(new WhopApiException("Network error executing HTTP request", e));
+            }
+        });
+        future.whenComplete((result_, throwable_) -> {
+            if (future.isCancelled()) {
+                okhttpCall.cancel();
+            }
+        });
+        return future;
+    }
+
+    /**
+     * Retrieves the authenticated user's partner profile: enrollment and verification status, certification completion, active direct business referral count, and default payout rates. Other users' profiles are not accessible. To create and manage referral links, use <code>/partner_referral_requests</code>.
+     */
+    public CompletableFuture<WhopApiHttpResponse<Partner>> retrieve(String id) {
+        return retrieve(id, RetrievePartnersRequest.builder().build());
+    }
+
+    /**
+     * Retrieves the authenticated user's partner profile: enrollment and verification status, certification completion, active direct business referral count, and default payout rates. Other users' profiles are not accessible. To create and manage referral links, use <code>/partner_referral_requests</code>.
+     */
+    public CompletableFuture<WhopApiHttpResponse<Partner>> retrieve(String id, RequestOptions requestOptions) {
+        return retrieve(id, RetrievePartnersRequest.builder().build(), requestOptions);
+    }
+
+    /**
+     * Retrieves the authenticated user's partner profile: enrollment and verification status, certification completion, active direct business referral count, and default payout rates. Other users' profiles are not accessible. To create and manage referral links, use <code>/partner_referral_requests</code>.
+     */
+    public CompletableFuture<WhopApiHttpResponse<Partner>> retrieve(String id, RetrievePartnersRequest request) {
+        return retrieve(id, request, null);
+    }
+
+    /**
+     * Retrieves the authenticated user's partner profile: enrollment and verification status, certification completion, active direct business referral count, and default payout rates. Other users' profiles are not accessible. To create and manage referral links, use <code>/partner_referral_requests</code>.
+     */
+    public CompletableFuture<WhopApiHttpResponse<Partner>> retrieve(
+            String id, RetrievePartnersRequest request, RequestOptions requestOptions) {
+        HttpUrl.Builder httpUrl = HttpUrl.parse(this.clientOptions.environment().getApiURL())
+                .newBuilder()
+                .addPathSegments("partners")
+                .addPathSegment(PathSegments.validate(id));
+        if (request.getAccountId().isPresent()) {
+            QueryStringMapper.addQueryParameter(
+                    httpUrl, "account_id", request.getAccountId().get(), false);
+        }
+        if (requestOptions != null) {
+            requestOptions.getQueryParameters().forEach((_key, _value) -> {
+                httpUrl.addQueryParameter(_key, _value);
+            });
+        }
+        Request.Builder _requestBuilder = new Request.Builder()
+                .url(httpUrl.build())
+                .method("GET", null)
+                .headers(Headers.of(clientOptions.headers(requestOptions)))
+                .addHeader("Accept", "application/json");
+        Request okhttpRequest = _requestBuilder.build();
+        OkHttpClient client = clientOptions.httpClient();
+        if (requestOptions != null && requestOptions.getTimeout().isPresent()) {
+            client = clientOptions.httpClientWithTimeout(requestOptions);
+        }
+        if (requestOptions != null && requestOptions.getMaxRetries().isPresent()) {
+            okhttpRequest = okhttpRequest
+                    .newBuilder()
+                    .tag(
+                            RetryInterceptor.MaxRetriesOverride.class,
+                            new RetryInterceptor.MaxRetriesOverride(
+                                    requestOptions.getMaxRetries().get()))
+                    .build();
+        }
+        CompletableFuture<WhopApiHttpResponse<Partner>> future = new CompletableFuture<>();
+        RetryInterceptor.AsyncCall okhttpCall = RetryInterceptor.newAsyncCall(client, okhttpRequest);
+        okhttpCall.enqueue(new Callback() {
+            @Override
+            public void onResponse(@NotNull Call call, @NotNull Response response) throws IOException {
+                try (ResponseBody responseBody = response.body()) {
+                    String responseBodyString = responseBody != null ? responseBody.string() : "{}";
+                    if (response.isSuccessful()) {
+                        future.complete(new WhopApiHttpResponse<>(
+                                ObjectMappers.JSON_MAPPER.readValue(responseBodyString, Partner.class), response));
+                        return;
+                    }
+                    try {
+                        switch (response.code()) {
+                            case 401:
+                                future.completeExceptionally(new UnauthorizedError(
+                                        ObjectMappers.JSON_MAPPER.readValue(responseBodyString, Object.class),
+                                        response));
+                                return;
+                            case 403:
+                                future.completeExceptionally(new ForbiddenError(
+                                        ObjectMappers.JSON_MAPPER.readValue(responseBodyString, Object.class),
+                                        response));
+                                return;
+                            case 404:
+                                future.completeExceptionally(new NotFoundError(
+                                        ObjectMappers.JSON_MAPPER.readValue(responseBodyString, Object.class),
+                                        response));
+                                return;
+                        }
+                    } catch (JsonProcessingException ignored) {
+                        // unable to map error response, throwing generic error
+                    }
+                    Object errorBody = ObjectMappers.parseErrorBody(responseBodyString);
+                    future.completeExceptionally(new WhopApiApiException(
+                            "Error with status code " + response.code(), response.code(), errorBody, response));
+                    return;
+                } catch (JsonProcessingException e) {
+                    future.completeExceptionally(
+                            new WhopApiException("Failed to deserialize response: " + e.getMessage(), e));
+                } catch (IOException e) {
+                    future.completeExceptionally(new WhopApiException("Network error executing HTTP request", e));
+                }
+            }
+
+            @Override
+            public void onFailure(@NotNull Call call, @NotNull IOException e) {
+                future.completeExceptionally(new WhopApiException("Network error executing HTTP request", e));
+            }
+        });
+        future.whenComplete((result_, throwable_) -> {
+            if (future.isCancelled()) {
+                okhttpCall.cancel();
             }
         });
         return future;

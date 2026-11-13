@@ -40,6 +40,8 @@ public final class CardTransaction {
 
     private final boolean international;
 
+    private final Optional<Double> levelsPoints;
+
     private final Optional<Double> localAmount;
 
     private final Optional<String> merchantCategory;
@@ -69,6 +71,7 @@ public final class CardTransaction {
             Optional<String> declinedReason,
             String id,
             boolean international,
+            Optional<Double> levelsPoints,
             Optional<Double> localAmount,
             Optional<String> merchantCategory,
             Optional<String> merchantCategoryCode,
@@ -87,6 +90,7 @@ public final class CardTransaction {
         this.declinedReason = declinedReason;
         this.id = id;
         this.international = international;
+        this.levelsPoints = levelsPoints;
         this.localAmount = localAmount;
         this.merchantCategory = merchantCategory;
         this.merchantCategoryCode = merchantCategoryCode;
@@ -173,6 +177,17 @@ public final class CardTransaction {
     @JsonProperty("international")
     public boolean getInternational() {
         return international;
+    }
+
+    /**
+     * @return Whop Levels points this transaction earned for the business. Negative for a refund that takes them back. Null when it earns none: a transaction that hasn't settled, was declined, or was made on a personal card.
+     */
+    @JsonIgnore
+    public Optional<Double> getLevelsPoints() {
+        if (levelsPoints == null) {
+            return Optional.empty();
+        }
+        return levelsPoints;
     }
 
     /**
@@ -293,6 +308,12 @@ public final class CardTransaction {
     }
 
     @JsonInclude(value = JsonInclude.Include.CUSTOM, valueFilter = NullableNonemptyFilter.class)
+    @JsonProperty("levels_points")
+    private Optional<Double> _getLevelsPoints() {
+        return levelsPoints;
+    }
+
+    @JsonInclude(value = JsonInclude.Include.CUSTOM, valueFilter = NullableNonemptyFilter.class)
     @JsonProperty("local_amount")
     private Optional<Double> _getLocalAmount() {
         return localAmount;
@@ -354,6 +375,7 @@ public final class CardTransaction {
                 && declinedReason.equals(other.declinedReason)
                 && id.equals(other.id)
                 && international == other.international
+                && levelsPoints.equals(other.levelsPoints)
                 && localAmount.equals(other.localAmount)
                 && merchantCategory.equals(other.merchantCategory)
                 && merchantCategoryCode.equals(other.merchantCategoryCode)
@@ -376,6 +398,7 @@ public final class CardTransaction {
                 this.declinedReason,
                 this.id,
                 this.international,
+                this.levelsPoints,
                 this.localAmount,
                 this.merchantCategory,
                 this.merchantCategoryCode,
@@ -484,6 +507,15 @@ public final class CardTransaction {
         _FinalStage declinedReason(Nullable<String> declinedReason);
 
         /**
+         * <p>Whop Levels points this transaction earned for the business. Negative for a refund that takes them back. Null when it earns none: a transaction that hasn't settled, was declined, or was made on a personal card.</p>
+         */
+        _FinalStage levelsPoints(Optional<Double> levelsPoints);
+
+        _FinalStage levelsPoints(Double levelsPoints);
+
+        _FinalStage levelsPoints(Nullable<Double> levelsPoints);
+
+        /**
          * <p>Amount the merchant charged in their own currency. Pair with <code>currency</code>.</p>
          */
         _FinalStage localAmount(Optional<Double> localAmount);
@@ -582,6 +614,8 @@ public final class CardTransaction {
 
         private Optional<Double> localAmount = Optional.empty();
 
+        private Optional<Double> levelsPoints = Optional.empty();
+
         private Optional<String> declinedReason = Optional.empty();
 
         private Optional<String> currency = Optional.empty();
@@ -590,7 +624,6 @@ public final class CardTransaction {
 
         private Optional<String> cardholderId = Optional.empty();
 
-        @JsonAnySetter
         private Map<String, Object> additionalProperties = new HashMap<>();
 
         private Builder() {}
@@ -605,6 +638,7 @@ public final class CardTransaction {
             declinedReason(other.getDeclinedReason());
             id(other.getId());
             international(other.getInternational());
+            levelsPoints(other.getLevelsPoints());
             localAmount(other.getLocalAmount());
             merchantCategory(other.getMerchantCategory());
             merchantCategoryCode(other.getMerchantCategoryCode());
@@ -619,7 +653,6 @@ public final class CardTransaction {
 
         /**
          * <p>The card this transaction was charged to, prefixed <code>icrd_</code>.</p>
-         * <p>The card this transaction was charged to, prefixed <code>icrd_</code>.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
@@ -630,7 +663,6 @@ public final class CardTransaction {
         }
 
         /**
-         * <p>When the transaction was authorized, as an ISO 8601 timestamp.</p>
          * <p>When the transaction was authorized, as an ISO 8601 timestamp.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
@@ -643,7 +675,6 @@ public final class CardTransaction {
 
         /**
          * <p>Card transaction ID, prefixed <code>citx_</code>.</p>
-         * <p>Card transaction ID, prefixed <code>citx_</code>.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
@@ -654,7 +685,6 @@ public final class CardTransaction {
         }
 
         /**
-         * <p>True when the merchant is outside the card's home country.</p>
          * <p>True when the merchant is outside the card's home country.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
@@ -667,7 +697,6 @@ public final class CardTransaction {
 
         /**
          * <p>Current status of the transaction.</p>
-         * <p>Current status of the transaction.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
@@ -678,7 +707,6 @@ public final class CardTransaction {
         }
 
         /**
-         * <p>The kind of card transaction. Always <code>spend</code> today.</p>
          * <p>The kind of card transaction. Always <code>spend</code> today.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
@@ -942,6 +970,42 @@ public final class CardTransaction {
         }
 
         /**
+         * <p>Whop Levels points this transaction earned for the business. Negative for a refund that takes them back. Null when it earns none: a transaction that hasn't settled, was declined, or was made on a personal card.</p>
+         * @return Reference to {@code this} so that method calls can be chained together.
+         */
+        @java.lang.Override
+        public _FinalStage levelsPoints(Nullable<Double> levelsPoints) {
+            if (levelsPoints.isNull()) {
+                this.levelsPoints = null;
+            } else if (levelsPoints.isEmpty()) {
+                this.levelsPoints = Optional.empty();
+            } else {
+                this.levelsPoints = Optional.of(levelsPoints.get());
+            }
+            return this;
+        }
+
+        /**
+         * <p>Whop Levels points this transaction earned for the business. Negative for a refund that takes them back. Null when it earns none: a transaction that hasn't settled, was declined, or was made on a personal card.</p>
+         * @return Reference to {@code this} so that method calls can be chained together.
+         */
+        @java.lang.Override
+        public _FinalStage levelsPoints(Double levelsPoints) {
+            this.levelsPoints = Optional.ofNullable(levelsPoints);
+            return this;
+        }
+
+        /**
+         * <p>Whop Levels points this transaction earned for the business. Negative for a refund that takes them back. Null when it earns none: a transaction that hasn't settled, was declined, or was made on a personal card.</p>
+         */
+        @java.lang.Override
+        @JsonSetter(value = "levels_points", nulls = Nulls.SKIP)
+        public _FinalStage levelsPoints(Optional<Double> levelsPoints) {
+            this.levelsPoints = levelsPoints;
+            return this;
+        }
+
+        /**
          * <p>Why the transaction was declined. Null unless <code>status</code> is <code>declined</code>.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
@@ -1096,6 +1160,7 @@ public final class CardTransaction {
                     declinedReason,
                     id,
                     international,
+                    levelsPoints,
                     localAmount,
                     merchantCategory,
                     merchantCategoryCode,
@@ -1106,6 +1171,31 @@ public final class CardTransaction {
                     transactionType,
                     usdAmount,
                     additionalProperties);
+        }
+
+        @JsonAnySetter
+        private void putAdditionalPropertyFromJson(String key, Object value) {
+            if (key.equalsIgnoreCase("card_id")
+                    || key.equalsIgnoreCase("cardholder_id")
+                    || key.equalsIgnoreCase("cashback_usd_amount")
+                    || key.equalsIgnoreCase("created_at")
+                    || key.equalsIgnoreCase("currency")
+                    || key.equalsIgnoreCase("declined_reason")
+                    || key.equalsIgnoreCase("id")
+                    || key.equalsIgnoreCase("international")
+                    || key.equalsIgnoreCase("levels_points")
+                    || key.equalsIgnoreCase("local_amount")
+                    || key.equalsIgnoreCase("merchant_category")
+                    || key.equalsIgnoreCase("merchant_category_code")
+                    || key.equalsIgnoreCase("merchant_icon_url")
+                    || key.equalsIgnoreCase("merchant_name")
+                    || key.equalsIgnoreCase("posted_at")
+                    || key.equalsIgnoreCase("status")
+                    || key.equalsIgnoreCase("transaction_type")
+                    || key.equalsIgnoreCase("usd_amount")) {
+                return;
+            }
+            this.additionalProperties.put(key, value);
         }
 
         @java.lang.Override

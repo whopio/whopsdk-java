@@ -289,7 +289,6 @@ public final class CreateNotificationsRequest {
 
         private Optional<String> accountId = Optional.empty();
 
-        @JsonAnySetter
         private Map<String, Object> additionalProperties = new HashMap<>();
 
         private Builder() {}
@@ -309,7 +308,6 @@ public final class CreateNotificationsRequest {
 
         /**
          * <p>Main body text of the notification.</p>
-         * <p>Main body text of the notification.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
@@ -320,7 +318,6 @@ public final class CreateNotificationsRequest {
         }
 
         /**
-         * <p>Headline text of the notification.</p>
          * <p>Headline text of the notification.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
@@ -511,6 +508,21 @@ public final class CreateNotificationsRequest {
                     title,
                     userIds,
                     additionalProperties);
+        }
+
+        @JsonAnySetter
+        private void putAdditionalPropertyFromJson(String key, Object value) {
+            if (key.equalsIgnoreCase("account_id")
+                    || key.equalsIgnoreCase("content")
+                    || key.equalsIgnoreCase("experience_id")
+                    || key.equalsIgnoreCase("icon_user_id")
+                    || key.equalsIgnoreCase("rest_path")
+                    || key.equalsIgnoreCase("subtitle")
+                    || key.equalsIgnoreCase("title")
+                    || key.equalsIgnoreCase("user_ids")) {
+                return;
+            }
+            this.additionalProperties.put(key, value);
         }
 
         @java.lang.Override

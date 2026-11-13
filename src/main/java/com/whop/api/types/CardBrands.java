@@ -11,29 +11,59 @@ public final class CardBrands {
 
     public static final CardBrands UNKNOWN = new CardBrands(Value.UNKNOWN, "unknown");
 
-    public static final CardBrands MASTERCARD = new CardBrands(Value.MASTERCARD, "mastercard");
-
     public static final CardBrands GIROCARD = new CardBrands(Value.GIROCARD, "girocard");
 
     public static final CardBrands HRG_STORE_CARD = new CardBrands(Value.HRG_STORE_CARD, "hrg_store_card");
 
     public static final CardBrands RUPAY = new CardBrands(Value.RUPAY, "rupay");
 
-    public static final CardBrands HIPERCARD = new CardBrands(Value.HIPERCARD, "hipercard");
-
     public static final CardBrands AMEX = new CardBrands(Value.AMEX, "amex");
-
-    public static final CardBrands FUEL_CARD = new CardBrands(Value.FUEL_CARD, "fuel_card");
 
     public static final CardBrands TROY = new CardBrands(Value.TROY, "troy");
 
     public static final CardBrands UZCARD = new CardBrands(Value.UZCARD, "uzcard");
 
-    public static final CardBrands CMI = new CardBrands(Value.CMI, "cmi");
+    public static final CardBrands ACCEL = new CardBrands(Value.ACCEL, "accel");
+
+    public static final CardBrands SODEXO = new CardBrands(Value.SODEXO, "sodexo");
 
     public static final CardBrands TARJETA_NARANJA = new CardBrands(Value.TARJETA_NARANJA, "tarjeta_naranja");
 
     public static final CardBrands DANKORT = new CardBrands(Value.DANKORT, "dankort");
+
+    public static final CardBrands PRIVATE_LABEL = new CardBrands(Value.PRIVATE_LABEL, "private_label");
+
+    public static final CardBrands JCB = new CardBrands(Value.JCB, "jcb");
+
+    public static final CardBrands EFTPOS = new CardBrands(Value.EFTPOS, "eftpos");
+
+    public static final CardBrands MEEZA = new CardBrands(Value.MEEZA, "meeza");
+
+    public static final CardBrands ELO = new CardBrands(Value.ELO, "elo");
+
+    public static final CardBrands JCBRUPAY = new CardBrands(Value.JCBRUPAY, "jcbrupay");
+
+    public static final CardBrands MAESTRO = new CardBrands(Value.MAESTRO, "maestro");
+
+    public static final CardBrands JCBLANKAPAY = new CardBrands(Value.JCBLANKAPAY, "jcblankapay");
+
+    public static final CardBrands VISABANCONTACT = new CardBrands(Value.VISABANCONTACT, "visabancontact");
+
+    public static final CardBrands VISA = new CardBrands(Value.VISA, "visa");
+
+    public static final CardBrands MASTERCARD = new CardBrands(Value.MASTERCARD, "mastercard");
+
+    public static final CardBrands EDENRED = new CardBrands(Value.EDENRED, "edenred");
+
+    public static final CardBrands ALELO = new CardBrands(Value.ALELO, "alelo");
+
+    public static final CardBrands HIPERCARD = new CardBrands(Value.HIPERCARD, "hipercard");
+
+    public static final CardBrands NYCE = new CardBrands(Value.NYCE, "nyce");
+
+    public static final CardBrands FUEL_CARD = new CardBrands(Value.FUEL_CARD, "fuel_card");
+
+    public static final CardBrands CMI = new CardBrands(Value.CMI, "cmi");
 
     public static final CardBrands CHINA_UNION_PAYUZCARD =
             new CardBrands(Value.CHINA_UNION_PAYUZCARD, "china_union_payuzcard");
@@ -44,21 +74,11 @@ public final class CardBrands {
 
     public static final CardBrands VISADANKORT = new CardBrands(Value.VISADANKORT, "visadankort");
 
-    public static final CardBrands PRIVATE_LABEL = new CardBrands(Value.PRIVATE_LABEL, "private_label");
-
-    public static final CardBrands JCB = new CardBrands(Value.JCB, "jcb");
-
     public static final CardBrands UATP = new CardBrands(Value.UATP, "uatp");
 
     public static final CardBrands ATM_CARD = new CardBrands(Value.ATM_CARD, "atm_card");
 
     public static final CardBrands VERVE = new CardBrands(Value.VERVE, "verve");
-
-    public static final CardBrands MEEZA = new CardBrands(Value.MEEZA, "meeza");
-
-    public static final CardBrands ELO = new CardBrands(Value.ELO, "elo");
-
-    public static final CardBrands JCBRUPAY = new CardBrands(Value.JCBRUPAY, "jcbrupay");
 
     public static final CardBrands UNIONPAY = new CardBrands(Value.UNIONPAY, "unionpay");
 
@@ -66,13 +86,13 @@ public final class CardBrands {
 
     public static final CardBrands CODENSA = new CardBrands(Value.CODENSA, "codensa");
 
-    public static final CardBrands MAESTRO = new CardBrands(Value.MAESTRO, "maestro");
-
-    public static final CardBrands JCBLANKAPAY = new CardBrands(Value.JCBLANKAPAY, "jcblankapay");
+    public static final CardBrands CULIANCE = new CardBrands(Value.CULIANCE, "culiance");
 
     public static final CardBrands NSPK_MIR = new CardBrands(Value.NSPK_MIR, "nspk_mir");
 
     public static final CardBrands LOCAL_BRAND = new CardBrands(Value.LOCAL_BRAND, "local_brand");
+
+    public static final CardBrands PULSE = new CardBrands(Value.PULSE, "pulse");
 
     public static final CardBrands AURA = new CardBrands(Value.AURA, "aura");
 
@@ -82,9 +102,7 @@ public final class CardBrands {
 
     public static final CardBrands DINERS = new CardBrands(Value.DINERS, "diners");
 
-    public static final CardBrands VISABANCONTACT = new CardBrands(Value.VISABANCONTACT, "visabancontact");
-
-    public static final CardBrands VISA = new CardBrands(Value.VISA, "visa");
+    public static final CardBrands STAR = new CardBrands(Value.STAR, "star");
 
     public static final CardBrands CIRRUS = new CardBrands(Value.CIRRUS, "cirrus");
 
@@ -125,30 +143,60 @@ public final class CardBrands {
                 return visitor.visitWexcard();
             case UNKNOWN:
                 return visitor.visitUnknown();
-            case MASTERCARD:
-                return visitor.visitMastercard();
             case GIROCARD:
                 return visitor.visitGirocard();
             case HRG_STORE_CARD:
                 return visitor.visitHrgStoreCard();
             case RUPAY:
                 return visitor.visitRupay();
-            case HIPERCARD:
-                return visitor.visitHipercard();
             case AMEX:
                 return visitor.visitAmex();
-            case FUEL_CARD:
-                return visitor.visitFuelCard();
             case TROY:
                 return visitor.visitTroy();
             case UZCARD:
                 return visitor.visitUzcard();
-            case CMI:
-                return visitor.visitCmi();
+            case ACCEL:
+                return visitor.visitAccel();
+            case SODEXO:
+                return visitor.visitSodexo();
             case TARJETA_NARANJA:
                 return visitor.visitTarjetaNaranja();
             case DANKORT:
                 return visitor.visitDankort();
+            case PRIVATE_LABEL:
+                return visitor.visitPrivateLabel();
+            case JCB:
+                return visitor.visitJcb();
+            case EFTPOS:
+                return visitor.visitEftpos();
+            case MEEZA:
+                return visitor.visitMeeza();
+            case ELO:
+                return visitor.visitElo();
+            case JCBRUPAY:
+                return visitor.visitJcbrupay();
+            case MAESTRO:
+                return visitor.visitMaestro();
+            case JCBLANKAPAY:
+                return visitor.visitJcblankapay();
+            case VISABANCONTACT:
+                return visitor.visitVisabancontact();
+            case VISA:
+                return visitor.visitVisa();
+            case MASTERCARD:
+                return visitor.visitMastercard();
+            case EDENRED:
+                return visitor.visitEdenred();
+            case ALELO:
+                return visitor.visitAlelo();
+            case HIPERCARD:
+                return visitor.visitHipercard();
+            case NYCE:
+                return visitor.visitNyce();
+            case FUEL_CARD:
+                return visitor.visitFuelCard();
+            case CMI:
+                return visitor.visitCmi();
             case CHINA_UNION_PAYUZCARD:
                 return visitor.visitChinaUnionPayuzcard();
             case CARNET:
@@ -157,36 +205,26 @@ public final class CardBrands {
                 return visitor.visitCabal();
             case VISADANKORT:
                 return visitor.visitVisadankort();
-            case PRIVATE_LABEL:
-                return visitor.visitPrivateLabel();
-            case JCB:
-                return visitor.visitJcb();
             case UATP:
                 return visitor.visitUatp();
             case ATM_CARD:
                 return visitor.visitAtmCard();
             case VERVE:
                 return visitor.visitVerve();
-            case MEEZA:
-                return visitor.visitMeeza();
-            case ELO:
-                return visitor.visitElo();
-            case JCBRUPAY:
-                return visitor.visitJcbrupay();
             case UNIONPAY:
                 return visitor.visitUnionpay();
             case CHINA_UNION_PAY:
                 return visitor.visitChinaUnionPay();
             case CODENSA:
                 return visitor.visitCodensa();
-            case MAESTRO:
-                return visitor.visitMaestro();
-            case JCBLANKAPAY:
-                return visitor.visitJcblankapay();
+            case CULIANCE:
+                return visitor.visitCuliance();
             case NSPK_MIR:
                 return visitor.visitNspkMir();
             case LOCAL_BRAND:
                 return visitor.visitLocalBrand();
+            case PULSE:
+                return visitor.visitPulse();
             case AURA:
                 return visitor.visitAura();
             case LINK:
@@ -195,10 +233,8 @@ public final class CardBrands {
                 return visitor.visitDiscover();
             case DINERS:
                 return visitor.visitDiners();
-            case VISABANCONTACT:
-                return visitor.visitVisabancontact();
-            case VISA:
-                return visitor.visitVisa();
+            case STAR:
+                return visitor.visitStar();
             case CIRRUS:
                 return visitor.visitCirrus();
             case EBT:
@@ -216,30 +252,60 @@ public final class CardBrands {
                 return WEXCARD;
             case "unknown":
                 return UNKNOWN;
-            case "mastercard":
-                return MASTERCARD;
             case "girocard":
                 return GIROCARD;
             case "hrg_store_card":
                 return HRG_STORE_CARD;
             case "rupay":
                 return RUPAY;
-            case "hipercard":
-                return HIPERCARD;
             case "amex":
                 return AMEX;
-            case "fuel_card":
-                return FUEL_CARD;
             case "troy":
                 return TROY;
             case "uzcard":
                 return UZCARD;
-            case "cmi":
-                return CMI;
+            case "accel":
+                return ACCEL;
+            case "sodexo":
+                return SODEXO;
             case "tarjeta_naranja":
                 return TARJETA_NARANJA;
             case "dankort":
                 return DANKORT;
+            case "private_label":
+                return PRIVATE_LABEL;
+            case "jcb":
+                return JCB;
+            case "eftpos":
+                return EFTPOS;
+            case "meeza":
+                return MEEZA;
+            case "elo":
+                return ELO;
+            case "jcbrupay":
+                return JCBRUPAY;
+            case "maestro":
+                return MAESTRO;
+            case "jcblankapay":
+                return JCBLANKAPAY;
+            case "visabancontact":
+                return VISABANCONTACT;
+            case "visa":
+                return VISA;
+            case "mastercard":
+                return MASTERCARD;
+            case "edenred":
+                return EDENRED;
+            case "alelo":
+                return ALELO;
+            case "hipercard":
+                return HIPERCARD;
+            case "nyce":
+                return NYCE;
+            case "fuel_card":
+                return FUEL_CARD;
+            case "cmi":
+                return CMI;
             case "china_union_payuzcard":
                 return CHINA_UNION_PAYUZCARD;
             case "carnet":
@@ -248,36 +314,26 @@ public final class CardBrands {
                 return CABAL;
             case "visadankort":
                 return VISADANKORT;
-            case "private_label":
-                return PRIVATE_LABEL;
-            case "jcb":
-                return JCB;
             case "uatp":
                 return UATP;
             case "atm_card":
                 return ATM_CARD;
             case "verve":
                 return VERVE;
-            case "meeza":
-                return MEEZA;
-            case "elo":
-                return ELO;
-            case "jcbrupay":
-                return JCBRUPAY;
             case "unionpay":
                 return UNIONPAY;
             case "china_union_pay":
                 return CHINA_UNION_PAY;
             case "codensa":
                 return CODENSA;
-            case "maestro":
-                return MAESTRO;
-            case "jcblankapay":
-                return JCBLANKAPAY;
+            case "culiance":
+                return CULIANCE;
             case "nspk_mir":
                 return NSPK_MIR;
             case "local_brand":
                 return LOCAL_BRAND;
+            case "pulse":
+                return PULSE;
             case "aura":
                 return AURA;
             case "link":
@@ -286,10 +342,8 @@ public final class CardBrands {
                 return DISCOVER;
             case "diners":
                 return DINERS;
-            case "visabancontact":
-                return VISABANCONTACT;
-            case "visa":
-                return VISA;
+            case "star":
+                return STAR;
             case "cirrus":
                 return CIRRUS;
             case "ebt":
@@ -380,6 +434,24 @@ public final class CardBrands {
 
         AURA,
 
+        ACCEL,
+
+        CULIANCE,
+
+        NYCE,
+
+        PULSE,
+
+        STAR,
+
+        EFTPOS,
+
+        ALELO,
+
+        EDENRED,
+
+        SODEXO,
+
         UNKNOWN,
 
         _UNKNOWN
@@ -465,6 +537,24 @@ public final class CardBrands {
         T visitCmi();
 
         T visitAura();
+
+        T visitAccel();
+
+        T visitCuliance();
+
+        T visitNyce();
+
+        T visitPulse();
+
+        T visitStar();
+
+        T visitEftpos();
+
+        T visitAlelo();
+
+        T visitEdenred();
+
+        T visitSodexo();
 
         T visitUnknown();
 

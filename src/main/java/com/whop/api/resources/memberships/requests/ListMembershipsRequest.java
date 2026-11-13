@@ -15,7 +15,10 @@ import com.whop.api.core.ObjectMappers;
 import com.whop.api.resources.memberships.types.ListMembershipsRequestDirection;
 import com.whop.api.resources.memberships.types.ListMembershipsRequestOrder;
 import com.whop.api.resources.memberships.types.ListMembershipsRequestStatus;
+import com.whop.api.resources.memberships.types.ListMembershipsRequestStatusesItem;
+import java.util.Collections;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
@@ -23,15 +26,27 @@ import java.util.Optional;
 @JsonInclude(JsonInclude.Include.NON_ABSENT)
 @JsonDeserialize(builder = ListMembershipsRequest.Builder.class)
 public final class ListMembershipsRequest {
+    private final Optional<List<ListMembershipsRequestStatusesItem>> statuses;
+
+    private final Optional<List<String>> productIds;
+
+    private final Optional<List<String>> variantIds;
+
+    private final Optional<List<String>> promoCodeIds;
+
     private final Optional<String> accountId;
 
     private final Optional<String> userId;
+
+    private final Optional<String> memberId;
+
+    private final Optional<String> externalAccount;
 
     private final Optional<ListMembershipsRequestStatus> status;
 
     private final Optional<String> productId;
 
-    private final Optional<String> planId;
+    private final Optional<String> variantId;
 
     private final Optional<String> createdAfter;
 
@@ -49,14 +64,22 @@ public final class ListMembershipsRequest {
 
     private final Optional<String> before;
 
+    private final Optional<Boolean> includeTotalCount;
+
     private final Map<String, Object> additionalProperties;
 
     private ListMembershipsRequest(
+            Optional<List<ListMembershipsRequestStatusesItem>> statuses,
+            Optional<List<String>> productIds,
+            Optional<List<String>> variantIds,
+            Optional<List<String>> promoCodeIds,
             Optional<String> accountId,
             Optional<String> userId,
+            Optional<String> memberId,
+            Optional<String> externalAccount,
             Optional<ListMembershipsRequestStatus> status,
             Optional<String> productId,
-            Optional<String> planId,
+            Optional<String> variantId,
             Optional<String> createdAfter,
             Optional<String> createdBefore,
             Optional<ListMembershipsRequestOrder> order,
@@ -65,12 +88,19 @@ public final class ListMembershipsRequest {
             Optional<String> after,
             Optional<Integer> last,
             Optional<String> before,
+            Optional<Boolean> includeTotalCount,
             Map<String, Object> additionalProperties) {
+        this.statuses = statuses;
+        this.productIds = productIds;
+        this.variantIds = variantIds;
+        this.promoCodeIds = promoCodeIds;
         this.accountId = accountId;
         this.userId = userId;
+        this.memberId = memberId;
+        this.externalAccount = externalAccount;
         this.status = status;
         this.productId = productId;
-        this.planId = planId;
+        this.variantId = variantId;
         this.createdAfter = createdAfter;
         this.createdBefore = createdBefore;
         this.order = order;
@@ -79,7 +109,40 @@ public final class ListMembershipsRequest {
         this.after = after;
         this.last = last;
         this.before = before;
+        this.includeTotalCount = includeTotalCount;
         this.additionalProperties = additionalProperties;
+    }
+
+    /**
+     * @return Filter to memberships matching any of these billing states, with the same meanings as <code>status</code>. Repeat the parameter to pass several. Combined with <code>status</code> when both are sent.
+     */
+    @JsonProperty("statuses")
+    public Optional<List<ListMembershipsRequestStatusesItem>> getStatuses() {
+        return statuses;
+    }
+
+    /**
+     * @return Filter to memberships of any of these products, each prefixed <code>prod_</code>. Repeat the parameter to pass several.
+     */
+    @JsonProperty("product_ids")
+    public Optional<List<String>> getProductIds() {
+        return productIds;
+    }
+
+    /**
+     * @return Filter to memberships of any of these variants, each prefixed <code>plan_</code>. Repeat the parameter to pass several.
+     */
+    @JsonProperty("variant_ids")
+    public Optional<List<String>> getVariantIds() {
+        return variantIds;
+    }
+
+    /**
+     * @return Filter to memberships discounted by any of these promo codes, each prefixed <code>promo_</code>. Repeat the parameter to pass several.
+     */
+    @JsonProperty("promo_code_ids")
+    public Optional<List<String>> getPromoCodeIds() {
+        return promoCodeIds;
     }
 
     /**
@@ -99,7 +162,23 @@ public final class ListMembershipsRequest {
     }
 
     /**
-     * @return Filter by billing state. <code>canceling</code> matches active memberships set to cancel at period end; <code>paused</code> matches memberships with payment collection paused.
+     * @return Narrow to one member's memberships (<code>mber_</code> tag), including memberships bought by another business. A member outside the caller's visible set returns an empty list.
+     */
+    @JsonProperty("member_id")
+    public Optional<String> getMemberId() {
+        return memberId;
+    }
+
+    /**
+     * @return Narrow to memberships linked to one Discord or Telegram account, given as the platform's user ID prefixed with <code>discord_</code> or <code>telegram_</code>. Discord matches include memberships imported with that Discord ID. Any other format is a 400.
+     */
+    @JsonProperty("external_account")
+    public Optional<String> getExternalAccount() {
+        return externalAccount;
+    }
+
+    /**
+     * @return Filter by billing state. <code>trialing</code>, <code>active</code>, <code>past_due</code>, <code>completed</code>, <code>canceled</code>, and <code>expired</code> match the membership's <code>status</code>; <code>active</code>, <code>trialing</code>, and <code>past_due</code> exclude memberships set to cancel at period end. The other values are derived buckets that never appear as a <code>status</code>: <code>canceling</code> matches memberships set to cancel at period end; <code>paused</code> matches memberships with payment collection paused; <code>expiring</code> matches one-time purchases that have not yet expired; <code>one_time</code> matches one-time purchases that never expire; <code>unclaimed</code> matches memberships with no buyer user, including memberships bought by another business; <code>banned</code> matches memberships whose buyer is banned from the account.
      */
     @JsonProperty("status")
     public Optional<ListMembershipsRequestStatus> getStatus() {
@@ -107,7 +186,7 @@ public final class ListMembershipsRequest {
     }
 
     /**
-     * @return Filter to memberships of this product (<code>prod_</code> tag). Repeat as product_ids[] for several.
+     * @return Filter to memberships of this product (<code>prod_</code> tag).
      */
     @JsonProperty("product_id")
     public Optional<String> getProductId() {
@@ -115,11 +194,11 @@ public final class ListMembershipsRequest {
     }
 
     /**
-     * @return Filter to memberships of this plan (<code>plan_</code> tag). Repeat as plan_ids[] for several.
+     * @return Filter to memberships of this variant (<code>plan_</code> tag).
      */
-    @JsonProperty("plan_id")
-    public Optional<String> getPlanId() {
-        return planId;
+    @JsonProperty("variant_id")
+    public Optional<String> getVariantId() {
+        return variantId;
     }
 
     /**
@@ -155,7 +234,7 @@ public final class ListMembershipsRequest {
     }
 
     /**
-     * @return Number of memberships to return from the start of the window.
+     * @return Number of results to return from the start of the range.
      */
     @JsonProperty("first")
     public Optional<Integer> getFirst() {
@@ -163,7 +242,7 @@ public final class ListMembershipsRequest {
     }
 
     /**
-     * @return Cursor to paginate forwards from.
+     * @return Return results after this cursor. Use <code>page_info.end_cursor</code> from the previous response to fetch the next page.
      */
     @JsonProperty("after")
     public Optional<String> getAfter() {
@@ -171,7 +250,7 @@ public final class ListMembershipsRequest {
     }
 
     /**
-     * @return Number of memberships to return from the end of the window.
+     * @return Number of results to return from the end of the range.
      */
     @JsonProperty("last")
     public Optional<Integer> getLast() {
@@ -179,11 +258,19 @@ public final class ListMembershipsRequest {
     }
 
     /**
-     * @return Cursor to paginate backwards from.
+     * @return Return results before this cursor. Use <code>page_info.start_cursor</code> from the previous response to fetch the previous page.
      */
     @JsonProperty("before")
     public Optional<String> getBefore() {
         return before;
+    }
+
+    /**
+     * @return Set to <code>true</code> to return the number of matching results in <code>page_info.total_count</code>. Send <code>first=0</code> as well to return the count without any results.
+     */
+    @JsonProperty("include_total_count")
+    public Optional<Boolean> getIncludeTotalCount() {
+        return includeTotalCount;
     }
 
     @java.lang.Override
@@ -198,11 +285,17 @@ public final class ListMembershipsRequest {
     }
 
     private boolean equalTo(ListMembershipsRequest other) {
-        return accountId.equals(other.accountId)
+        return statuses.equals(other.statuses)
+                && productIds.equals(other.productIds)
+                && variantIds.equals(other.variantIds)
+                && promoCodeIds.equals(other.promoCodeIds)
+                && accountId.equals(other.accountId)
                 && userId.equals(other.userId)
+                && memberId.equals(other.memberId)
+                && externalAccount.equals(other.externalAccount)
                 && status.equals(other.status)
                 && productId.equals(other.productId)
-                && planId.equals(other.planId)
+                && variantId.equals(other.variantId)
                 && createdAfter.equals(other.createdAfter)
                 && createdBefore.equals(other.createdBefore)
                 && order.equals(other.order)
@@ -210,17 +303,24 @@ public final class ListMembershipsRequest {
                 && first.equals(other.first)
                 && after.equals(other.after)
                 && last.equals(other.last)
-                && before.equals(other.before);
+                && before.equals(other.before)
+                && includeTotalCount.equals(other.includeTotalCount);
     }
 
     @java.lang.Override
     public int hashCode() {
         return Objects.hash(
+                this.statuses,
+                this.productIds,
+                this.variantIds,
+                this.promoCodeIds,
                 this.accountId,
                 this.userId,
+                this.memberId,
+                this.externalAccount,
                 this.status,
                 this.productId,
-                this.planId,
+                this.variantId,
                 this.createdAfter,
                 this.createdBefore,
                 this.order,
@@ -228,7 +328,8 @@ public final class ListMembershipsRequest {
                 this.first,
                 this.after,
                 this.last,
-                this.before);
+                this.before,
+                this.includeTotalCount);
     }
 
     @java.lang.Override
@@ -242,15 +343,27 @@ public final class ListMembershipsRequest {
 
     @JsonIgnoreProperties(ignoreUnknown = true)
     public static final class Builder {
+        private Optional<List<ListMembershipsRequestStatusesItem>> statuses = Optional.empty();
+
+        private Optional<List<String>> productIds = Optional.empty();
+
+        private Optional<List<String>> variantIds = Optional.empty();
+
+        private Optional<List<String>> promoCodeIds = Optional.empty();
+
         private Optional<String> accountId = Optional.empty();
 
         private Optional<String> userId = Optional.empty();
+
+        private Optional<String> memberId = Optional.empty();
+
+        private Optional<String> externalAccount = Optional.empty();
 
         private Optional<ListMembershipsRequestStatus> status = Optional.empty();
 
         private Optional<String> productId = Optional.empty();
 
-        private Optional<String> planId = Optional.empty();
+        private Optional<String> variantId = Optional.empty();
 
         private Optional<String> createdAfter = Optional.empty();
 
@@ -268,17 +381,24 @@ public final class ListMembershipsRequest {
 
         private Optional<String> before = Optional.empty();
 
-        @JsonAnySetter
+        private Optional<Boolean> includeTotalCount = Optional.empty();
+
         private Map<String, Object> additionalProperties = new HashMap<>();
 
         private Builder() {}
 
         public Builder from(ListMembershipsRequest other) {
+            statuses(other.getStatuses());
+            productIds(other.getProductIds());
+            variantIds(other.getVariantIds());
+            promoCodeIds(other.getPromoCodeIds());
             accountId(other.getAccountId());
             userId(other.getUserId());
+            memberId(other.getMemberId());
+            externalAccount(other.getExternalAccount());
             status(other.getStatus());
             productId(other.getProductId());
-            planId(other.getPlanId());
+            variantId(other.getVariantId());
             createdAfter(other.getCreatedAfter());
             createdBefore(other.getCreatedBefore());
             order(other.getOrder());
@@ -287,6 +407,83 @@ public final class ListMembershipsRequest {
             after(other.getAfter());
             last(other.getLast());
             before(other.getBefore());
+            includeTotalCount(other.getIncludeTotalCount());
+            return this;
+        }
+
+        /**
+         * <p>Filter to memberships matching any of these billing states, with the same meanings as <code>status</code>. Repeat the parameter to pass several. Combined with <code>status</code> when both are sent.</p>
+         */
+        @JsonSetter(value = "statuses", nulls = Nulls.SKIP)
+        public Builder statuses(Optional<List<ListMembershipsRequestStatusesItem>> statuses) {
+            this.statuses = statuses;
+            return this;
+        }
+
+        public Builder statuses(List<ListMembershipsRequestStatusesItem> statuses) {
+            this.statuses = Optional.ofNullable(statuses);
+            return this;
+        }
+
+        public Builder statuses(ListMembershipsRequestStatusesItem statuses) {
+            this.statuses = Optional.of(Collections.singletonList(statuses));
+            return this;
+        }
+
+        /**
+         * <p>Filter to memberships of any of these products, each prefixed <code>prod_</code>. Repeat the parameter to pass several.</p>
+         */
+        @JsonSetter(value = "product_ids", nulls = Nulls.SKIP)
+        public Builder productIds(Optional<List<String>> productIds) {
+            this.productIds = productIds;
+            return this;
+        }
+
+        public Builder productIds(List<String> productIds) {
+            this.productIds = Optional.ofNullable(productIds);
+            return this;
+        }
+
+        public Builder productIds(String productIds) {
+            this.productIds = Optional.of(Collections.singletonList(productIds));
+            return this;
+        }
+
+        /**
+         * <p>Filter to memberships of any of these variants, each prefixed <code>plan_</code>. Repeat the parameter to pass several.</p>
+         */
+        @JsonSetter(value = "variant_ids", nulls = Nulls.SKIP)
+        public Builder variantIds(Optional<List<String>> variantIds) {
+            this.variantIds = variantIds;
+            return this;
+        }
+
+        public Builder variantIds(List<String> variantIds) {
+            this.variantIds = Optional.ofNullable(variantIds);
+            return this;
+        }
+
+        public Builder variantIds(String variantIds) {
+            this.variantIds = Optional.of(Collections.singletonList(variantIds));
+            return this;
+        }
+
+        /**
+         * <p>Filter to memberships discounted by any of these promo codes, each prefixed <code>promo_</code>. Repeat the parameter to pass several.</p>
+         */
+        @JsonSetter(value = "promo_code_ids", nulls = Nulls.SKIP)
+        public Builder promoCodeIds(Optional<List<String>> promoCodeIds) {
+            this.promoCodeIds = promoCodeIds;
+            return this;
+        }
+
+        public Builder promoCodeIds(List<String> promoCodeIds) {
+            this.promoCodeIds = Optional.ofNullable(promoCodeIds);
+            return this;
+        }
+
+        public Builder promoCodeIds(String promoCodeIds) {
+            this.promoCodeIds = Optional.of(Collections.singletonList(promoCodeIds));
             return this;
         }
 
@@ -319,7 +516,35 @@ public final class ListMembershipsRequest {
         }
 
         /**
-         * <p>Filter by billing state. <code>canceling</code> matches active memberships set to cancel at period end; <code>paused</code> matches memberships with payment collection paused.</p>
+         * <p>Narrow to one member's memberships (<code>mber_</code> tag), including memberships bought by another business. A member outside the caller's visible set returns an empty list.</p>
+         */
+        @JsonSetter(value = "member_id", nulls = Nulls.SKIP)
+        public Builder memberId(Optional<String> memberId) {
+            this.memberId = memberId;
+            return this;
+        }
+
+        public Builder memberId(String memberId) {
+            this.memberId = Optional.ofNullable(memberId);
+            return this;
+        }
+
+        /**
+         * <p>Narrow to memberships linked to one Discord or Telegram account, given as the platform's user ID prefixed with <code>discord_</code> or <code>telegram_</code>. Discord matches include memberships imported with that Discord ID. Any other format is a 400.</p>
+         */
+        @JsonSetter(value = "external_account", nulls = Nulls.SKIP)
+        public Builder externalAccount(Optional<String> externalAccount) {
+            this.externalAccount = externalAccount;
+            return this;
+        }
+
+        public Builder externalAccount(String externalAccount) {
+            this.externalAccount = Optional.ofNullable(externalAccount);
+            return this;
+        }
+
+        /**
+         * <p>Filter by billing state. <code>trialing</code>, <code>active</code>, <code>past_due</code>, <code>completed</code>, <code>canceled</code>, and <code>expired</code> match the membership's <code>status</code>; <code>active</code>, <code>trialing</code>, and <code>past_due</code> exclude memberships set to cancel at period end. The other values are derived buckets that never appear as a <code>status</code>: <code>canceling</code> matches memberships set to cancel at period end; <code>paused</code> matches memberships with payment collection paused; <code>expiring</code> matches one-time purchases that have not yet expired; <code>one_time</code> matches one-time purchases that never expire; <code>unclaimed</code> matches memberships with no buyer user, including memberships bought by another business; <code>banned</code> matches memberships whose buyer is banned from the account.</p>
          */
         @JsonSetter(value = "status", nulls = Nulls.SKIP)
         public Builder status(Optional<ListMembershipsRequestStatus> status) {
@@ -333,7 +558,7 @@ public final class ListMembershipsRequest {
         }
 
         /**
-         * <p>Filter to memberships of this product (<code>prod_</code> tag). Repeat as product_ids[] for several.</p>
+         * <p>Filter to memberships of this product (<code>prod_</code> tag).</p>
          */
         @JsonSetter(value = "product_id", nulls = Nulls.SKIP)
         public Builder productId(Optional<String> productId) {
@@ -347,16 +572,16 @@ public final class ListMembershipsRequest {
         }
 
         /**
-         * <p>Filter to memberships of this plan (<code>plan_</code> tag). Repeat as plan_ids[] for several.</p>
+         * <p>Filter to memberships of this variant (<code>plan_</code> tag).</p>
          */
-        @JsonSetter(value = "plan_id", nulls = Nulls.SKIP)
-        public Builder planId(Optional<String> planId) {
-            this.planId = planId;
+        @JsonSetter(value = "variant_id", nulls = Nulls.SKIP)
+        public Builder variantId(Optional<String> variantId) {
+            this.variantId = variantId;
             return this;
         }
 
-        public Builder planId(String planId) {
-            this.planId = Optional.ofNullable(planId);
+        public Builder variantId(String variantId) {
+            this.variantId = Optional.ofNullable(variantId);
             return this;
         }
 
@@ -417,7 +642,7 @@ public final class ListMembershipsRequest {
         }
 
         /**
-         * <p>Number of memberships to return from the start of the window.</p>
+         * <p>Number of results to return from the start of the range.</p>
          */
         @JsonSetter(value = "first", nulls = Nulls.SKIP)
         public Builder first(Optional<Integer> first) {
@@ -431,7 +656,7 @@ public final class ListMembershipsRequest {
         }
 
         /**
-         * <p>Cursor to paginate forwards from.</p>
+         * <p>Return results after this cursor. Use <code>page_info.end_cursor</code> from the previous response to fetch the next page.</p>
          */
         @JsonSetter(value = "after", nulls = Nulls.SKIP)
         public Builder after(Optional<String> after) {
@@ -445,7 +670,7 @@ public final class ListMembershipsRequest {
         }
 
         /**
-         * <p>Number of memberships to return from the end of the window.</p>
+         * <p>Number of results to return from the end of the range.</p>
          */
         @JsonSetter(value = "last", nulls = Nulls.SKIP)
         public Builder last(Optional<Integer> last) {
@@ -459,7 +684,7 @@ public final class ListMembershipsRequest {
         }
 
         /**
-         * <p>Cursor to paginate backwards from.</p>
+         * <p>Return results before this cursor. Use <code>page_info.start_cursor</code> from the previous response to fetch the previous page.</p>
          */
         @JsonSetter(value = "before", nulls = Nulls.SKIP)
         public Builder before(Optional<String> before) {
@@ -472,13 +697,33 @@ public final class ListMembershipsRequest {
             return this;
         }
 
+        /**
+         * <p>Set to <code>true</code> to return the number of matching results in <code>page_info.total_count</code>. Send <code>first=0</code> as well to return the count without any results.</p>
+         */
+        @JsonSetter(value = "include_total_count", nulls = Nulls.SKIP)
+        public Builder includeTotalCount(Optional<Boolean> includeTotalCount) {
+            this.includeTotalCount = includeTotalCount;
+            return this;
+        }
+
+        public Builder includeTotalCount(Boolean includeTotalCount) {
+            this.includeTotalCount = Optional.ofNullable(includeTotalCount);
+            return this;
+        }
+
         public ListMembershipsRequest build() {
             return new ListMembershipsRequest(
+                    statuses,
+                    productIds,
+                    variantIds,
+                    promoCodeIds,
                     accountId,
                     userId,
+                    memberId,
+                    externalAccount,
                     status,
                     productId,
-                    planId,
+                    variantId,
                     createdAfter,
                     createdBefore,
                     order,
@@ -487,7 +732,35 @@ public final class ListMembershipsRequest {
                     after,
                     last,
                     before,
+                    includeTotalCount,
                     additionalProperties);
+        }
+
+        @JsonAnySetter
+        private void putAdditionalPropertyFromJson(String key, Object value) {
+            if (key.equalsIgnoreCase("statuses")
+                    || key.equalsIgnoreCase("product_ids")
+                    || key.equalsIgnoreCase("variant_ids")
+                    || key.equalsIgnoreCase("promo_code_ids")
+                    || key.equalsIgnoreCase("account_id")
+                    || key.equalsIgnoreCase("user_id")
+                    || key.equalsIgnoreCase("member_id")
+                    || key.equalsIgnoreCase("external_account")
+                    || key.equalsIgnoreCase("status")
+                    || key.equalsIgnoreCase("product_id")
+                    || key.equalsIgnoreCase("variant_id")
+                    || key.equalsIgnoreCase("created_after")
+                    || key.equalsIgnoreCase("created_before")
+                    || key.equalsIgnoreCase("order")
+                    || key.equalsIgnoreCase("direction")
+                    || key.equalsIgnoreCase("first")
+                    || key.equalsIgnoreCase("after")
+                    || key.equalsIgnoreCase("last")
+                    || key.equalsIgnoreCase("before")
+                    || key.equalsIgnoreCase("include_total_count")) {
+                return;
+            }
+            this.additionalProperties.put(key, value);
         }
 
         public Builder additionalProperty(String key, Object value) {

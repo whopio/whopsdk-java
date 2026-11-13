@@ -5,6 +5,7 @@ package com.whop.api.resources.paymentmethoddomains;
 
 import com.whop.api.core.ClientOptions;
 import com.whop.api.core.RequestOptions;
+import com.whop.api.core.WhopApiHttpResponse;
 import com.whop.api.core.pagination.SyncPagingIterable;
 import com.whop.api.resources.paymentmethoddomains.requests.CreatePaymentMethodDomainsRequest;
 import com.whop.api.resources.paymentmethoddomains.requests.DeletePaymentMethodDomainsRequest;
@@ -33,134 +34,277 @@ public class AsyncPaymentMethodDomainsClient {
     }
 
     /**
-     * Lists payment method domains. Without <code>account_id</code>, returns the caller's own domains and those of every connected account.
+     * Lists the payment method domains registered for your account and its subaccounts. Deprecated: list domains with <code>GET /domains</code> and the <code>apple_pay</code> filter instead.
      */
     public CompletableFuture<SyncPagingIterable<PaymentMethodDomain>> list() {
-        return this.rawClient.list().thenApply(response -> response.body());
+        CompletableFuture<WhopApiHttpResponse<SyncPagingIterable<PaymentMethodDomain>>> rawFuture =
+                this.rawClient.list();
+        CompletableFuture<SyncPagingIterable<PaymentMethodDomain>> future =
+                rawFuture.thenApply(response -> response.body());
+        future.whenComplete((result_, throwable_) -> {
+            if (future.isCancelled()) {
+                rawFuture.cancel(true);
+            }
+        });
+        return future;
     }
 
     /**
-     * Lists payment method domains. Without <code>account_id</code>, returns the caller's own domains and those of every connected account.
+     * Lists the payment method domains registered for your account and its subaccounts. Deprecated: list domains with <code>GET /domains</code> and the <code>apple_pay</code> filter instead.
      */
     public CompletableFuture<SyncPagingIterable<PaymentMethodDomain>> list(RequestOptions requestOptions) {
-        return this.rawClient.list(requestOptions).thenApply(response -> response.body());
+        CompletableFuture<WhopApiHttpResponse<SyncPagingIterable<PaymentMethodDomain>>> rawFuture =
+                this.rawClient.list(requestOptions);
+        CompletableFuture<SyncPagingIterable<PaymentMethodDomain>> future =
+                rawFuture.thenApply(response -> response.body());
+        future.whenComplete((result_, throwable_) -> {
+            if (future.isCancelled()) {
+                rawFuture.cancel(true);
+            }
+        });
+        return future;
     }
 
     /**
-     * Lists payment method domains. Without <code>account_id</code>, returns the caller's own domains and those of every connected account.
+     * Lists the payment method domains registered for your account and its subaccounts. Deprecated: list domains with <code>GET /domains</code> and the <code>apple_pay</code> filter instead.
      */
     public CompletableFuture<SyncPagingIterable<PaymentMethodDomain>> list(ListPaymentMethodDomainsRequest request) {
-        return this.rawClient.list(request).thenApply(response -> response.body());
+        CompletableFuture<WhopApiHttpResponse<SyncPagingIterable<PaymentMethodDomain>>> rawFuture =
+                this.rawClient.list(request);
+        CompletableFuture<SyncPagingIterable<PaymentMethodDomain>> future =
+                rawFuture.thenApply(response -> response.body());
+        future.whenComplete((result_, throwable_) -> {
+            if (future.isCancelled()) {
+                rawFuture.cancel(true);
+            }
+        });
+        return future;
     }
 
     /**
-     * Lists payment method domains. Without <code>account_id</code>, returns the caller's own domains and those of every connected account.
+     * Lists the payment method domains registered for your account and its subaccounts. Deprecated: list domains with <code>GET /domains</code> and the <code>apple_pay</code> filter instead.
      */
     public CompletableFuture<SyncPagingIterable<PaymentMethodDomain>> list(
             ListPaymentMethodDomainsRequest request, RequestOptions requestOptions) {
-        return this.rawClient.list(request, requestOptions).thenApply(response -> response.body());
+        CompletableFuture<WhopApiHttpResponse<SyncPagingIterable<PaymentMethodDomain>>> rawFuture =
+                this.rawClient.list(request, requestOptions);
+        CompletableFuture<SyncPagingIterable<PaymentMethodDomain>> future =
+                rawFuture.thenApply(response -> response.body());
+        future.whenComplete((result_, throwable_) -> {
+            if (future.isCancelled()) {
+                rawFuture.cancel(true);
+            }
+        });
+        return future;
     }
 
     /**
-     * Registers a hostname with the wallet provider and attempts verification inline. Returns <code>verified</code> when the provider fetched the domain-association file (for Apple Pay, <code>/.well-known/apple-developer-merchantid-domain-association</code>), or <code>pending</code> when it could not — host the file, then retry with the verify endpoint.
+     * Registers a hostname with the wallet provider and attempts verification inline. Returns <code>verified</code> when the provider fetched the domain-association file (for Apple Pay, <code>/.well-known/apple-developer-merchantid-domain-association</code>), or <code>pending</code> when it could not: host the file, then retry with <code>POST /payment_method_domains/:id/verify</code>. Deprecated: add Apple Pay with <code>POST /domains</code> and <code>apple_pay: {}</code> instead.
      */
     public CompletableFuture<PaymentMethodDomain> create(CreatePaymentMethodDomainsRequest request) {
-        return this.rawClient.create(request).thenApply(response -> response.body());
+        CompletableFuture<WhopApiHttpResponse<PaymentMethodDomain>> rawFuture = this.rawClient.create(request);
+        CompletableFuture<PaymentMethodDomain> future = rawFuture.thenApply(response -> response.body());
+        future.whenComplete((result_, throwable_) -> {
+            if (future.isCancelled()) {
+                rawFuture.cancel(true);
+            }
+        });
+        return future;
     }
 
     /**
-     * Registers a hostname with the wallet provider and attempts verification inline. Returns <code>verified</code> when the provider fetched the domain-association file (for Apple Pay, <code>/.well-known/apple-developer-merchantid-domain-association</code>), or <code>pending</code> when it could not — host the file, then retry with the verify endpoint.
+     * Registers a hostname with the wallet provider and attempts verification inline. Returns <code>verified</code> when the provider fetched the domain-association file (for Apple Pay, <code>/.well-known/apple-developer-merchantid-domain-association</code>), or <code>pending</code> when it could not: host the file, then retry with <code>POST /payment_method_domains/:id/verify</code>. Deprecated: add Apple Pay with <code>POST /domains</code> and <code>apple_pay: {}</code> instead.
      */
     public CompletableFuture<PaymentMethodDomain> create(
             CreatePaymentMethodDomainsRequest request, RequestOptions requestOptions) {
-        return this.rawClient.create(request, requestOptions).thenApply(response -> response.body());
+        CompletableFuture<WhopApiHttpResponse<PaymentMethodDomain>> rawFuture =
+                this.rawClient.create(request, requestOptions);
+        CompletableFuture<PaymentMethodDomain> future = rawFuture.thenApply(response -> response.body());
+        future.whenComplete((result_, throwable_) -> {
+            if (future.isCancelled()) {
+                rawFuture.cancel(true);
+            }
+        });
+        return future;
     }
 
     /**
-     * Retrieves a payment method domain to check its verification status.
+     * Retrieves a payment method domain to check its verification status. Deprecated: retrieve the domain with <code>GET /domains/{id}</code> instead, using the same ID.
      */
     public CompletableFuture<PaymentMethodDomain> retrieve(String id) {
-        return this.rawClient.retrieve(id).thenApply(response -> response.body());
+        CompletableFuture<WhopApiHttpResponse<PaymentMethodDomain>> rawFuture = this.rawClient.retrieve(id);
+        CompletableFuture<PaymentMethodDomain> future = rawFuture.thenApply(response -> response.body());
+        future.whenComplete((result_, throwable_) -> {
+            if (future.isCancelled()) {
+                rawFuture.cancel(true);
+            }
+        });
+        return future;
     }
 
     /**
-     * Retrieves a payment method domain to check its verification status.
+     * Retrieves a payment method domain to check its verification status. Deprecated: retrieve the domain with <code>GET /domains/{id}</code> instead, using the same ID.
      */
     public CompletableFuture<PaymentMethodDomain> retrieve(String id, RequestOptions requestOptions) {
-        return this.rawClient.retrieve(id, requestOptions).thenApply(response -> response.body());
+        CompletableFuture<WhopApiHttpResponse<PaymentMethodDomain>> rawFuture =
+                this.rawClient.retrieve(id, requestOptions);
+        CompletableFuture<PaymentMethodDomain> future = rawFuture.thenApply(response -> response.body());
+        future.whenComplete((result_, throwable_) -> {
+            if (future.isCancelled()) {
+                rawFuture.cancel(true);
+            }
+        });
+        return future;
     }
 
     /**
-     * Retrieves a payment method domain to check its verification status.
+     * Retrieves a payment method domain to check its verification status. Deprecated: retrieve the domain with <code>GET /domains/{id}</code> instead, using the same ID.
      */
     public CompletableFuture<PaymentMethodDomain> retrieve(String id, RetrievePaymentMethodDomainsRequest request) {
-        return this.rawClient.retrieve(id, request).thenApply(response -> response.body());
+        CompletableFuture<WhopApiHttpResponse<PaymentMethodDomain>> rawFuture = this.rawClient.retrieve(id, request);
+        CompletableFuture<PaymentMethodDomain> future = rawFuture.thenApply(response -> response.body());
+        future.whenComplete((result_, throwable_) -> {
+            if (future.isCancelled()) {
+                rawFuture.cancel(true);
+            }
+        });
+        return future;
     }
 
     /**
-     * Retrieves a payment method domain to check its verification status.
+     * Retrieves a payment method domain to check its verification status. Deprecated: retrieve the domain with <code>GET /domains/{id}</code> instead, using the same ID.
      */
     public CompletableFuture<PaymentMethodDomain> retrieve(
             String id, RetrievePaymentMethodDomainsRequest request, RequestOptions requestOptions) {
-        return this.rawClient.retrieve(id, request, requestOptions).thenApply(response -> response.body());
+        CompletableFuture<WhopApiHttpResponse<PaymentMethodDomain>> rawFuture =
+                this.rawClient.retrieve(id, request, requestOptions);
+        CompletableFuture<PaymentMethodDomain> future = rawFuture.thenApply(response -> response.body());
+        future.whenComplete((result_, throwable_) -> {
+            if (future.isCancelled()) {
+                rawFuture.cancel(true);
+            }
+        });
+        return future;
     }
 
     /**
-     * Unregisters a payment method domain so its wallet payment methods stop rendering there.
+     * Unregisters a payment method domain so its wallet payment methods stop rendering there. Deprecated: remove Apple Pay with <code>PATCH /domains/{id}</code> and <code>apple_pay: null</code> instead. <code>DELETE /domains/{id}</code> removes the whole domain, including any website on it.
      */
     public CompletableFuture<DeletePaymentMethodDomainsResponse> delete(String id) {
-        return this.rawClient.delete(id).thenApply(response -> response.body());
+        CompletableFuture<WhopApiHttpResponse<DeletePaymentMethodDomainsResponse>> rawFuture =
+                this.rawClient.delete(id);
+        CompletableFuture<DeletePaymentMethodDomainsResponse> future = rawFuture.thenApply(response -> response.body());
+        future.whenComplete((result_, throwable_) -> {
+            if (future.isCancelled()) {
+                rawFuture.cancel(true);
+            }
+        });
+        return future;
     }
 
     /**
-     * Unregisters a payment method domain so its wallet payment methods stop rendering there.
+     * Unregisters a payment method domain so its wallet payment methods stop rendering there. Deprecated: remove Apple Pay with <code>PATCH /domains/{id}</code> and <code>apple_pay: null</code> instead. <code>DELETE /domains/{id}</code> removes the whole domain, including any website on it.
      */
     public CompletableFuture<DeletePaymentMethodDomainsResponse> delete(String id, RequestOptions requestOptions) {
-        return this.rawClient.delete(id, requestOptions).thenApply(response -> response.body());
+        CompletableFuture<WhopApiHttpResponse<DeletePaymentMethodDomainsResponse>> rawFuture =
+                this.rawClient.delete(id, requestOptions);
+        CompletableFuture<DeletePaymentMethodDomainsResponse> future = rawFuture.thenApply(response -> response.body());
+        future.whenComplete((result_, throwable_) -> {
+            if (future.isCancelled()) {
+                rawFuture.cancel(true);
+            }
+        });
+        return future;
     }
 
     /**
-     * Unregisters a payment method domain so its wallet payment methods stop rendering there.
+     * Unregisters a payment method domain so its wallet payment methods stop rendering there. Deprecated: remove Apple Pay with <code>PATCH /domains/{id}</code> and <code>apple_pay: null</code> instead. <code>DELETE /domains/{id}</code> removes the whole domain, including any website on it.
      */
     public CompletableFuture<DeletePaymentMethodDomainsResponse> delete(
             String id, DeletePaymentMethodDomainsRequest request) {
-        return this.rawClient.delete(id, request).thenApply(response -> response.body());
+        CompletableFuture<WhopApiHttpResponse<DeletePaymentMethodDomainsResponse>> rawFuture =
+                this.rawClient.delete(id, request);
+        CompletableFuture<DeletePaymentMethodDomainsResponse> future = rawFuture.thenApply(response -> response.body());
+        future.whenComplete((result_, throwable_) -> {
+            if (future.isCancelled()) {
+                rawFuture.cancel(true);
+            }
+        });
+        return future;
     }
 
     /**
-     * Unregisters a payment method domain so its wallet payment methods stop rendering there.
+     * Unregisters a payment method domain so its wallet payment methods stop rendering there. Deprecated: remove Apple Pay with <code>PATCH /domains/{id}</code> and <code>apple_pay: null</code> instead. <code>DELETE /domains/{id}</code> removes the whole domain, including any website on it.
      */
     public CompletableFuture<DeletePaymentMethodDomainsResponse> delete(
             String id, DeletePaymentMethodDomainsRequest request, RequestOptions requestOptions) {
-        return this.rawClient.delete(id, request, requestOptions).thenApply(response -> response.body());
+        CompletableFuture<WhopApiHttpResponse<DeletePaymentMethodDomainsResponse>> rawFuture =
+                this.rawClient.delete(id, request, requestOptions);
+        CompletableFuture<DeletePaymentMethodDomainsResponse> future = rawFuture.thenApply(response -> response.body());
+        future.whenComplete((result_, throwable_) -> {
+            if (future.isCancelled()) {
+                rawFuture.cancel(true);
+            }
+        });
+        return future;
     }
 
     /**
-     * Re-attempts provider verification of a pending domain once the association file is hosted. Fails with a <code>bad_request</code> explaining what to fix; verifying an already <code>verified</code> domain is a no-op.
+     * Re-attempts provider verification of a pending domain once the association file is hosted. Fails with a <code>bad_request</code> explaining what to fix; verifying an already <code>verified</code> domain is a no-op. Deprecated: check the domain with <code>POST /domains/{id}/check</code> instead.
      */
     public CompletableFuture<PaymentMethodDomain> verify(String id) {
-        return this.rawClient.verify(id).thenApply(response -> response.body());
+        CompletableFuture<WhopApiHttpResponse<PaymentMethodDomain>> rawFuture = this.rawClient.verify(id);
+        CompletableFuture<PaymentMethodDomain> future = rawFuture.thenApply(response -> response.body());
+        future.whenComplete((result_, throwable_) -> {
+            if (future.isCancelled()) {
+                rawFuture.cancel(true);
+            }
+        });
+        return future;
     }
 
     /**
-     * Re-attempts provider verification of a pending domain once the association file is hosted. Fails with a <code>bad_request</code> explaining what to fix; verifying an already <code>verified</code> domain is a no-op.
+     * Re-attempts provider verification of a pending domain once the association file is hosted. Fails with a <code>bad_request</code> explaining what to fix; verifying an already <code>verified</code> domain is a no-op. Deprecated: check the domain with <code>POST /domains/{id}/check</code> instead.
      */
     public CompletableFuture<PaymentMethodDomain> verify(String id, RequestOptions requestOptions) {
-        return this.rawClient.verify(id, requestOptions).thenApply(response -> response.body());
+        CompletableFuture<WhopApiHttpResponse<PaymentMethodDomain>> rawFuture =
+                this.rawClient.verify(id, requestOptions);
+        CompletableFuture<PaymentMethodDomain> future = rawFuture.thenApply(response -> response.body());
+        future.whenComplete((result_, throwable_) -> {
+            if (future.isCancelled()) {
+                rawFuture.cancel(true);
+            }
+        });
+        return future;
     }
 
     /**
-     * Re-attempts provider verification of a pending domain once the association file is hosted. Fails with a <code>bad_request</code> explaining what to fix; verifying an already <code>verified</code> domain is a no-op.
+     * Re-attempts provider verification of a pending domain once the association file is hosted. Fails with a <code>bad_request</code> explaining what to fix; verifying an already <code>verified</code> domain is a no-op. Deprecated: check the domain with <code>POST /domains/{id}/check</code> instead.
      */
     public CompletableFuture<PaymentMethodDomain> verify(String id, VerifyPaymentMethodDomainsRequest request) {
-        return this.rawClient.verify(id, request).thenApply(response -> response.body());
+        CompletableFuture<WhopApiHttpResponse<PaymentMethodDomain>> rawFuture = this.rawClient.verify(id, request);
+        CompletableFuture<PaymentMethodDomain> future = rawFuture.thenApply(response -> response.body());
+        future.whenComplete((result_, throwable_) -> {
+            if (future.isCancelled()) {
+                rawFuture.cancel(true);
+            }
+        });
+        return future;
     }
 
     /**
-     * Re-attempts provider verification of a pending domain once the association file is hosted. Fails with a <code>bad_request</code> explaining what to fix; verifying an already <code>verified</code> domain is a no-op.
+     * Re-attempts provider verification of a pending domain once the association file is hosted. Fails with a <code>bad_request</code> explaining what to fix; verifying an already <code>verified</code> domain is a no-op. Deprecated: check the domain with <code>POST /domains/{id}/check</code> instead.
      */
     public CompletableFuture<PaymentMethodDomain> verify(
             String id, VerifyPaymentMethodDomainsRequest request, RequestOptions requestOptions) {
-        return this.rawClient.verify(id, request, requestOptions).thenApply(response -> response.body());
+        CompletableFuture<WhopApiHttpResponse<PaymentMethodDomain>> rawFuture =
+                this.rawClient.verify(id, request, requestOptions);
+        CompletableFuture<PaymentMethodDomain> future = rawFuture.thenApply(response -> response.body());
+        future.whenComplete((result_, throwable_) -> {
+            if (future.isCancelled()) {
+                rawFuture.cancel(true);
+            }
+        });
+        return future;
     }
 }

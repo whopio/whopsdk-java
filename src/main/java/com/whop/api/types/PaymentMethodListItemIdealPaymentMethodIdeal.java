@@ -106,7 +106,6 @@ public final class PaymentMethodListItemIdealPaymentMethodIdeal {
 
         private Optional<String> bic = Optional.empty();
 
-        @JsonAnySetter
         private Map<String, Object> additionalProperties = new HashMap<>();
 
         private Builder() {}
@@ -169,6 +168,14 @@ public final class PaymentMethodListItemIdealPaymentMethodIdeal {
 
         public PaymentMethodListItemIdealPaymentMethodIdeal build() {
             return new PaymentMethodListItemIdealPaymentMethodIdeal(bank, bic, additionalProperties);
+        }
+
+        @JsonAnySetter
+        private void putAdditionalPropertyFromJson(String key, Object value) {
+            if (key.equalsIgnoreCase("bank") || key.equalsIgnoreCase("bic")) {
+                return;
+            }
+            this.additionalProperties.put(key, value);
         }
 
         public Builder additionalProperty(String key, Object value) {

@@ -289,7 +289,6 @@ public final class FormCompanyAccountsRequestFoundersItem {
 
         private Optional<String> dateOfBirth = Optional.empty();
 
-        @JsonAnySetter
         private Map<String, Object> additionalProperties = new HashMap<>();
 
         private Builder() {}
@@ -310,7 +309,6 @@ public final class FormCompanyAccountsRequestFoundersItem {
         }
 
         /**
-         * <p>Founder's personal address.</p>
          * <p>Founder's personal address.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
@@ -337,7 +335,6 @@ public final class FormCompanyAccountsRequestFoundersItem {
 
         /**
          * <p>Marks the responsible party for the filing. Exactly one founder must be primary.</p>
-         * <p>Marks the responsible party for the filing. Exactly one founder must be primary.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
@@ -355,7 +352,6 @@ public final class FormCompanyAccountsRequestFoundersItem {
         }
 
         /**
-         * <p>Phone number in E.164 format, for example <code>+12125550100</code>.</p>
          * <p>Phone number in E.164 format, for example <code>+12125550100</code>.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
@@ -460,6 +456,23 @@ public final class FormCompanyAccountsRequestFoundersItem {
                     roles,
                     ssn,
                     additionalProperties);
+        }
+
+        @JsonAnySetter
+        private void putAdditionalPropertyFromJson(String key, Object value) {
+            if (key.equalsIgnoreCase("address")
+                    || key.equalsIgnoreCase("date_of_birth")
+                    || key.equalsIgnoreCase("email")
+                    || key.equalsIgnoreCase("first_name")
+                    || key.equalsIgnoreCase("is_primary")
+                    || key.equalsIgnoreCase("last_name")
+                    || key.equalsIgnoreCase("ownership_percentage")
+                    || key.equalsIgnoreCase("phone")
+                    || key.equalsIgnoreCase("roles")
+                    || key.equalsIgnoreCase("ssn")) {
+                return;
+            }
+            this.additionalProperties.put(key, value);
         }
 
         @java.lang.Override

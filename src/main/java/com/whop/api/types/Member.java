@@ -30,15 +30,41 @@ public final class Member {
 
     private final String createdAt;
 
+    private final String displayName;
+
+    private final Optional<UserEarningsAmount> earningsUsd;
+
+    private final Optional<String> email;
+
     private final String id;
 
     private final String joinedAt;
 
     private final Optional<String> lastAccessedAt;
 
+    private final Optional<MemberLastActivityMessage> lastActivity;
+
+    private final Optional<String> lastActivityAt;
+
+    private final Optional<Map<String, Object>> metadata;
+
+    private final Optional<MemberMostRecentAction> mostRecentAction;
+
+    private final Optional<String> mostRecentActionAt;
+
+    private final Optional<String> name;
+
+    private final Optional<String> phoneNumber;
+
     private final MemberStatus status;
 
-    private final Optional<UserSummary> user;
+    private final double tokenBalance;
+
+    private final Optional<MemberUnsubscribeStatus> unsubscribeStatus;
+
+    private final Money usdTotalSpent;
+
+    private final Optional<MemberUser> user;
 
     private final Map<String, Object> additionalProperties;
 
@@ -46,19 +72,45 @@ public final class Member {
             MemberAccessLevel accessLevel,
             String accountId,
             String createdAt,
+            String displayName,
+            Optional<UserEarningsAmount> earningsUsd,
+            Optional<String> email,
             String id,
             String joinedAt,
             Optional<String> lastAccessedAt,
+            Optional<MemberLastActivityMessage> lastActivity,
+            Optional<String> lastActivityAt,
+            Optional<Map<String, Object>> metadata,
+            Optional<MemberMostRecentAction> mostRecentAction,
+            Optional<String> mostRecentActionAt,
+            Optional<String> name,
+            Optional<String> phoneNumber,
             MemberStatus status,
-            Optional<UserSummary> user,
+            double tokenBalance,
+            Optional<MemberUnsubscribeStatus> unsubscribeStatus,
+            Money usdTotalSpent,
+            Optional<MemberUser> user,
             Map<String, Object> additionalProperties) {
         this.accessLevel = accessLevel;
         this.accountId = accountId;
         this.createdAt = createdAt;
+        this.displayName = displayName;
+        this.earningsUsd = earningsUsd;
+        this.email = email;
         this.id = id;
         this.joinedAt = joinedAt;
         this.lastAccessedAt = lastAccessedAt;
+        this.lastActivity = lastActivity;
+        this.lastActivityAt = lastActivityAt;
+        this.metadata = metadata;
+        this.mostRecentAction = mostRecentAction;
+        this.mostRecentActionAt = mostRecentActionAt;
+        this.name = name;
+        this.phoneNumber = phoneNumber;
         this.status = status;
+        this.tokenBalance = tokenBalance;
+        this.unsubscribeStatus = unsubscribeStatus;
+        this.usdTotalSpent = usdTotalSpent;
         this.user = user;
         this.additionalProperties = additionalProperties;
     }
@@ -85,6 +137,36 @@ public final class Member {
     @JsonProperty("created_at")
     public String getCreatedAt() {
         return createdAt;
+    }
+
+    /**
+     * @return The name to show for this member: the user's name, or their username when they have not set one. The buying business's name when <code>user</code> is <code>null</code>.
+     */
+    @JsonProperty("display_name")
+    public String getDisplayName() {
+        return displayName;
+    }
+
+    /**
+     * @return The user's gross income across Whop, in USD, refreshed periodically. <code>null</code> when the user hides their earnings or the buyer is another business.
+     */
+    @JsonIgnore
+    public Optional<UserEarningsAmount> getEarningsUsd() {
+        if (earningsUsd == null) {
+            return Optional.empty();
+        }
+        return earningsUsd;
+    }
+
+    /**
+     * @return The user's email address. <code>null</code> without <code>member:email:read</code> on the account, when the buyer is another business, or when the user has no assigned email.
+     */
+    @JsonIgnore
+    public Optional<String> getEmail() {
+        if (email == null) {
+            return Optional.empty();
+        }
+        return email;
     }
 
     /**
@@ -115,6 +197,83 @@ public final class Member {
     }
 
     /**
+     * @return What happened at <code>last_activity_at</code>. <code>object</code> says which kind of activity it is. <code>null</code> without <code>support_chat:read</code> on the account, or when <code>last_activity_at</code> is <code>null</code>.
+     */
+    @JsonIgnore
+    public Optional<MemberLastActivityMessage> getLastActivity() {
+        if (lastActivity == null) {
+            return Optional.empty();
+        }
+        return lastActivity;
+    }
+
+    /**
+     * @return When the member and the account last interacted, as an ISO 8601 timestamp. For example, a message in the member's support chat.
+     */
+    @JsonIgnore
+    public Optional<String> getLastActivityAt() {
+        if (lastActivityAt == null) {
+            return Optional.empty();
+        }
+        return lastActivityAt;
+    }
+
+    /**
+     * @return Your own key-value data stored on this member. <code>null</code> when none is set.
+     */
+    @JsonIgnore
+    public Optional<Map<String, Object>> getMetadata() {
+        if (metadata == null) {
+            return Optional.empty();
+        }
+        return metadata;
+    }
+
+    /**
+     * @return The member's latest lifecycle state on the account, derived from their memberships, such as <code>paid_subscriber</code>, <code>canceling</code>, or <code>churned</code>. <code>null</code> until it is first computed.
+     */
+    @JsonIgnore
+    public Optional<MemberMostRecentAction> getMostRecentAction() {
+        if (mostRecentAction == null) {
+            return Optional.empty();
+        }
+        return mostRecentAction;
+    }
+
+    /**
+     * @return When <code>most_recent_action</code> took effect, as an ISO 8601 timestamp. <code>null</code> when <code>most_recent_action</code> is <code>null</code>.
+     */
+    @JsonIgnore
+    public Optional<String> getMostRecentActionAt() {
+        if (mostRecentActionAt == null) {
+            return Optional.empty();
+        }
+        return mostRecentActionAt;
+    }
+
+    /**
+     * @return The name the account gave this customer with <code>PATCH /members/:id</code>. Invoices show it as the customer name on every invoice for this member, in place of the user's own name. <code>null</code> when the account has not set one.
+     */
+    @JsonIgnore
+    public Optional<String> getName() {
+        if (name == null) {
+            return Optional.empty();
+        }
+        return name;
+    }
+
+    /**
+     * @return The member's phone number: the most recent number collected (or verified) at checkout, otherwise their account number when they have shared one with this seller. <code>null</code> without <code>member:phone:read</code> on the account, or when there is neither.
+     */
+    @JsonIgnore
+    public Optional<String> getPhoneNumber() {
+        if (phoneNumber == null) {
+            return Optional.empty();
+        }
+        return phoneNumber;
+    }
+
+    /**
      * @return <code>joined</code> while the member is part of the account, <code>left</code> after they leave.
      */
     @JsonProperty("status")
@@ -123,14 +282,53 @@ public final class Member {
     }
 
     /**
+     * @return The member's current token balance for this account, computed from token transactions.
+     */
+    @JsonProperty("token_balance")
+    public double getTokenBalance() {
+        return tokenBalance;
+    }
+
+    /**
+     * @return <code>unsubscribed</code> once the member opts out of the account's marketing communications, <code>null</code> while they're subscribed. Only the member can change it.
+     */
+    @JsonIgnore
+    public Optional<MemberUnsubscribeStatus> getUnsubscribeStatus() {
+        if (unsubscribeStatus == null) {
+            return Optional.empty();
+        }
+        return unsubscribeStatus;
+    }
+
+    /**
+     * @return How much the member has spent on the account's products, in USD.
+     */
+    @JsonProperty("usd_total_spent")
+    public Money getUsdTotalSpent() {
+        return usdTotalSpent;
+    }
+
+    /**
      * @return The user behind this member. <code>null</code> when the buyer is another business rather than a person.
      */
     @JsonIgnore
-    public Optional<UserSummary> getUser() {
+    public Optional<MemberUser> getUser() {
         if (user == null) {
             return Optional.empty();
         }
         return user;
+    }
+
+    @JsonInclude(value = JsonInclude.Include.CUSTOM, valueFilter = NullableNonemptyFilter.class)
+    @JsonProperty("earnings_usd")
+    private Optional<UserEarningsAmount> _getEarningsUsd() {
+        return earningsUsd;
+    }
+
+    @JsonInclude(value = JsonInclude.Include.CUSTOM, valueFilter = NullableNonemptyFilter.class)
+    @JsonProperty("email")
+    private Optional<String> _getEmail() {
+        return email;
     }
 
     @JsonInclude(value = JsonInclude.Include.CUSTOM, valueFilter = NullableNonemptyFilter.class)
@@ -140,8 +338,56 @@ public final class Member {
     }
 
     @JsonInclude(value = JsonInclude.Include.CUSTOM, valueFilter = NullableNonemptyFilter.class)
+    @JsonProperty("last_activity")
+    private Optional<MemberLastActivityMessage> _getLastActivity() {
+        return lastActivity;
+    }
+
+    @JsonInclude(value = JsonInclude.Include.CUSTOM, valueFilter = NullableNonemptyFilter.class)
+    @JsonProperty("last_activity_at")
+    private Optional<String> _getLastActivityAt() {
+        return lastActivityAt;
+    }
+
+    @JsonInclude(value = JsonInclude.Include.CUSTOM, valueFilter = NullableNonemptyFilter.class)
+    @JsonProperty("metadata")
+    private Optional<Map<String, Object>> _getMetadata() {
+        return metadata;
+    }
+
+    @JsonInclude(value = JsonInclude.Include.CUSTOM, valueFilter = NullableNonemptyFilter.class)
+    @JsonProperty("most_recent_action")
+    private Optional<MemberMostRecentAction> _getMostRecentAction() {
+        return mostRecentAction;
+    }
+
+    @JsonInclude(value = JsonInclude.Include.CUSTOM, valueFilter = NullableNonemptyFilter.class)
+    @JsonProperty("most_recent_action_at")
+    private Optional<String> _getMostRecentActionAt() {
+        return mostRecentActionAt;
+    }
+
+    @JsonInclude(value = JsonInclude.Include.CUSTOM, valueFilter = NullableNonemptyFilter.class)
+    @JsonProperty("name")
+    private Optional<String> _getName() {
+        return name;
+    }
+
+    @JsonInclude(value = JsonInclude.Include.CUSTOM, valueFilter = NullableNonemptyFilter.class)
+    @JsonProperty("phone_number")
+    private Optional<String> _getPhoneNumber() {
+        return phoneNumber;
+    }
+
+    @JsonInclude(value = JsonInclude.Include.CUSTOM, valueFilter = NullableNonemptyFilter.class)
+    @JsonProperty("unsubscribe_status")
+    private Optional<MemberUnsubscribeStatus> _getUnsubscribeStatus() {
+        return unsubscribeStatus;
+    }
+
+    @JsonInclude(value = JsonInclude.Include.CUSTOM, valueFilter = NullableNonemptyFilter.class)
     @JsonProperty("user")
-    private Optional<UserSummary> _getUser() {
+    private Optional<MemberUser> _getUser() {
         return user;
     }
 
@@ -160,10 +406,23 @@ public final class Member {
         return accessLevel.equals(other.accessLevel)
                 && accountId.equals(other.accountId)
                 && createdAt.equals(other.createdAt)
+                && displayName.equals(other.displayName)
+                && earningsUsd.equals(other.earningsUsd)
+                && email.equals(other.email)
                 && id.equals(other.id)
                 && joinedAt.equals(other.joinedAt)
                 && lastAccessedAt.equals(other.lastAccessedAt)
+                && lastActivity.equals(other.lastActivity)
+                && lastActivityAt.equals(other.lastActivityAt)
+                && metadata.equals(other.metadata)
+                && mostRecentAction.equals(other.mostRecentAction)
+                && mostRecentActionAt.equals(other.mostRecentActionAt)
+                && name.equals(other.name)
+                && phoneNumber.equals(other.phoneNumber)
                 && status.equals(other.status)
+                && tokenBalance == other.tokenBalance
+                && unsubscribeStatus.equals(other.unsubscribeStatus)
+                && usdTotalSpent.equals(other.usdTotalSpent)
                 && user.equals(other.user);
     }
 
@@ -173,10 +432,23 @@ public final class Member {
                 this.accessLevel,
                 this.accountId,
                 this.createdAt,
+                this.displayName,
+                this.earningsUsd,
+                this.email,
                 this.id,
                 this.joinedAt,
                 this.lastAccessedAt,
+                this.lastActivity,
+                this.lastActivityAt,
+                this.metadata,
+                this.mostRecentAction,
+                this.mostRecentActionAt,
+                this.name,
+                this.phoneNumber,
                 this.status,
+                this.tokenBalance,
+                this.unsubscribeStatus,
+                this.usdTotalSpent,
                 this.user);
     }
 
@@ -209,7 +481,14 @@ public final class Member {
         /**
          * <p>When the member record was created, as an ISO 8601 timestamp.</p>
          */
-        IdStage createdAt(@NotNull String createdAt);
+        DisplayNameStage createdAt(@NotNull String createdAt);
+    }
+
+    public interface DisplayNameStage {
+        /**
+         * <p>The name to show for this member: the user's name, or their username when they have not set one. The buying business's name when <code>user</code> is <code>null</code>.</p>
+         */
+        IdStage displayName(@NotNull String displayName);
     }
 
     public interface IdStage {
@@ -230,7 +509,21 @@ public final class Member {
         /**
          * <p><code>joined</code> while the member is part of the account, <code>left</code> after they leave.</p>
          */
-        _FinalStage status(@NotNull MemberStatus status);
+        TokenBalanceStage status(@NotNull MemberStatus status);
+    }
+
+    public interface TokenBalanceStage {
+        /**
+         * <p>The member's current token balance for this account, computed from token transactions.</p>
+         */
+        UsdTotalSpentStage tokenBalance(double tokenBalance);
+    }
+
+    public interface UsdTotalSpentStage {
+        /**
+         * <p>How much the member has spent on the account's products, in USD.</p>
+         */
+        _FinalStage usdTotalSpent(@NotNull Money usdTotalSpent);
     }
 
     public interface _FinalStage {
@@ -239,6 +532,24 @@ public final class Member {
         _FinalStage additionalProperty(String key, Object value);
 
         _FinalStage additionalProperties(Map<String, Object> additionalProperties);
+
+        /**
+         * <p>The user's gross income across Whop, in USD, refreshed periodically. <code>null</code> when the user hides their earnings or the buyer is another business.</p>
+         */
+        _FinalStage earningsUsd(Optional<UserEarningsAmount> earningsUsd);
+
+        _FinalStage earningsUsd(UserEarningsAmount earningsUsd);
+
+        _FinalStage earningsUsd(Nullable<UserEarningsAmount> earningsUsd);
+
+        /**
+         * <p>The user's email address. <code>null</code> without <code>member:email:read</code> on the account, when the buyer is another business, or when the user has no assigned email.</p>
+         */
+        _FinalStage email(Optional<String> email);
+
+        _FinalStage email(String email);
+
+        _FinalStage email(Nullable<String> email);
 
         /**
          * <p>When the member last opened the account's content, as an ISO 8601 timestamp. <code>null</code> if they never have.</p>
@@ -250,13 +561,85 @@ public final class Member {
         _FinalStage lastAccessedAt(Nullable<String> lastAccessedAt);
 
         /**
+         * <p>What happened at <code>last_activity_at</code>. <code>object</code> says which kind of activity it is. <code>null</code> without <code>support_chat:read</code> on the account, or when <code>last_activity_at</code> is <code>null</code>.</p>
+         */
+        _FinalStage lastActivity(Optional<MemberLastActivityMessage> lastActivity);
+
+        _FinalStage lastActivity(MemberLastActivityMessage lastActivity);
+
+        _FinalStage lastActivity(Nullable<MemberLastActivityMessage> lastActivity);
+
+        /**
+         * <p>When the member and the account last interacted, as an ISO 8601 timestamp. For example, a message in the member's support chat.</p>
+         */
+        _FinalStage lastActivityAt(Optional<String> lastActivityAt);
+
+        _FinalStage lastActivityAt(String lastActivityAt);
+
+        _FinalStage lastActivityAt(Nullable<String> lastActivityAt);
+
+        /**
+         * <p>Your own key-value data stored on this member. <code>null</code> when none is set.</p>
+         */
+        _FinalStage metadata(Optional<Map<String, Object>> metadata);
+
+        _FinalStage metadata(Map<String, Object> metadata);
+
+        _FinalStage metadata(Nullable<Map<String, Object>> metadata);
+
+        /**
+         * <p>The member's latest lifecycle state on the account, derived from their memberships, such as <code>paid_subscriber</code>, <code>canceling</code>, or <code>churned</code>. <code>null</code> until it is first computed.</p>
+         */
+        _FinalStage mostRecentAction(Optional<MemberMostRecentAction> mostRecentAction);
+
+        _FinalStage mostRecentAction(MemberMostRecentAction mostRecentAction);
+
+        _FinalStage mostRecentAction(Nullable<MemberMostRecentAction> mostRecentAction);
+
+        /**
+         * <p>When <code>most_recent_action</code> took effect, as an ISO 8601 timestamp. <code>null</code> when <code>most_recent_action</code> is <code>null</code>.</p>
+         */
+        _FinalStage mostRecentActionAt(Optional<String> mostRecentActionAt);
+
+        _FinalStage mostRecentActionAt(String mostRecentActionAt);
+
+        _FinalStage mostRecentActionAt(Nullable<String> mostRecentActionAt);
+
+        /**
+         * <p>The name the account gave this customer with <code>PATCH /members/:id</code>. Invoices show it as the customer name on every invoice for this member, in place of the user's own name. <code>null</code> when the account has not set one.</p>
+         */
+        _FinalStage name(Optional<String> name);
+
+        _FinalStage name(String name);
+
+        _FinalStage name(Nullable<String> name);
+
+        /**
+         * <p>The member's phone number: the most recent number collected (or verified) at checkout, otherwise their account number when they have shared one with this seller. <code>null</code> without <code>member:phone:read</code> on the account, or when there is neither.</p>
+         */
+        _FinalStage phoneNumber(Optional<String> phoneNumber);
+
+        _FinalStage phoneNumber(String phoneNumber);
+
+        _FinalStage phoneNumber(Nullable<String> phoneNumber);
+
+        /**
+         * <p><code>unsubscribed</code> once the member opts out of the account's marketing communications, <code>null</code> while they're subscribed. Only the member can change it.</p>
+         */
+        _FinalStage unsubscribeStatus(Optional<MemberUnsubscribeStatus> unsubscribeStatus);
+
+        _FinalStage unsubscribeStatus(MemberUnsubscribeStatus unsubscribeStatus);
+
+        _FinalStage unsubscribeStatus(Nullable<MemberUnsubscribeStatus> unsubscribeStatus);
+
+        /**
          * <p>The user behind this member. <code>null</code> when the buyer is another business rather than a person.</p>
          */
-        _FinalStage user(Optional<UserSummary> user);
+        _FinalStage user(Optional<MemberUser> user);
 
-        _FinalStage user(UserSummary user);
+        _FinalStage user(MemberUser user);
 
-        _FinalStage user(Nullable<UserSummary> user);
+        _FinalStage user(Nullable<MemberUser> user);
     }
 
     @JsonIgnoreProperties(ignoreUnknown = true)
@@ -264,9 +647,12 @@ public final class Member {
             implements AccessLevelStage,
                     AccountIdStage,
                     CreatedAtStage,
+                    DisplayNameStage,
                     IdStage,
                     JoinedAtStage,
                     StatusStage,
+                    TokenBalanceStage,
+                    UsdTotalSpentStage,
                     _FinalStage {
         private MemberAccessLevel accessLevel;
 
@@ -274,17 +660,42 @@ public final class Member {
 
         private String createdAt;
 
+        private String displayName;
+
         private String id;
 
         private String joinedAt;
 
         private MemberStatus status;
 
-        private Optional<UserSummary> user = Optional.empty();
+        private double tokenBalance;
+
+        private Money usdTotalSpent;
+
+        private Optional<MemberUser> user = Optional.empty();
+
+        private Optional<MemberUnsubscribeStatus> unsubscribeStatus = Optional.empty();
+
+        private Optional<String> phoneNumber = Optional.empty();
+
+        private Optional<String> name = Optional.empty();
+
+        private Optional<String> mostRecentActionAt = Optional.empty();
+
+        private Optional<MemberMostRecentAction> mostRecentAction = Optional.empty();
+
+        private Optional<Map<String, Object>> metadata = Optional.empty();
+
+        private Optional<String> lastActivityAt = Optional.empty();
+
+        private Optional<MemberLastActivityMessage> lastActivity = Optional.empty();
 
         private Optional<String> lastAccessedAt = Optional.empty();
 
-        @JsonAnySetter
+        private Optional<String> email = Optional.empty();
+
+        private Optional<UserEarningsAmount> earningsUsd = Optional.empty();
+
         private Map<String, Object> additionalProperties = new HashMap<>();
 
         private Builder() {}
@@ -294,16 +705,28 @@ public final class Member {
             accessLevel(other.getAccessLevel());
             accountId(other.getAccountId());
             createdAt(other.getCreatedAt());
+            displayName(other.getDisplayName());
+            earningsUsd(other.getEarningsUsd());
+            email(other.getEmail());
             id(other.getId());
             joinedAt(other.getJoinedAt());
             lastAccessedAt(other.getLastAccessedAt());
+            lastActivity(other.getLastActivity());
+            lastActivityAt(other.getLastActivityAt());
+            metadata(other.getMetadata());
+            mostRecentAction(other.getMostRecentAction());
+            mostRecentActionAt(other.getMostRecentActionAt());
+            name(other.getName());
+            phoneNumber(other.getPhoneNumber());
             status(other.getStatus());
+            tokenBalance(other.getTokenBalance());
+            unsubscribeStatus(other.getUnsubscribeStatus());
+            usdTotalSpent(other.getUsdTotalSpent());
             user(other.getUser());
             return this;
         }
 
         /**
-         * <p>What the member can reach on the account: <code>customer</code> for paying members, <code>admin</code> for team members, <code>no_access</code> once every grant has lapsed.</p>
          * <p>What the member can reach on the account: <code>customer</code> for paying members, <code>admin</code> for team members, <code>no_access</code> once every grant has lapsed.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
@@ -316,7 +739,6 @@ public final class Member {
 
         /**
          * <p>The account this member belongs to, prefixed <code>biz_</code>.</p>
-         * <p>The account this member belongs to, prefixed <code>biz_</code>.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
@@ -328,18 +750,27 @@ public final class Member {
 
         /**
          * <p>When the member record was created, as an ISO 8601 timestamp.</p>
-         * <p>When the member record was created, as an ISO 8601 timestamp.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
         @JsonSetter("created_at")
-        public IdStage createdAt(@NotNull String createdAt) {
+        public DisplayNameStage createdAt(@NotNull String createdAt) {
             this.createdAt = Objects.requireNonNull(createdAt, "createdAt must not be null");
             return this;
         }
 
         /**
-         * <p>Member ID, prefixed <code>mber_</code>.</p>
+         * <p>The name to show for this member: the user's name, or their username when they have not set one. The buying business's name when <code>user</code> is <code>null</code>.</p>
+         * @return Reference to {@code this} so that method calls can be chained together.
+         */
+        @java.lang.Override
+        @JsonSetter("display_name")
+        public IdStage displayName(@NotNull String displayName) {
+            this.displayName = Objects.requireNonNull(displayName, "displayName must not be null");
+            return this;
+        }
+
+        /**
          * <p>Member ID, prefixed <code>mber_</code>.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
@@ -352,7 +783,6 @@ public final class Member {
 
         /**
          * <p>When the member first joined the account, as an ISO 8601 timestamp.</p>
-         * <p>When the member first joined the account, as an ISO 8601 timestamp.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
@@ -364,13 +794,34 @@ public final class Member {
 
         /**
          * <p><code>joined</code> while the member is part of the account, <code>left</code> after they leave.</p>
-         * <p><code>joined</code> while the member is part of the account, <code>left</code> after they leave.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
         @JsonSetter("status")
-        public _FinalStage status(@NotNull MemberStatus status) {
+        public TokenBalanceStage status(@NotNull MemberStatus status) {
             this.status = Objects.requireNonNull(status, "status must not be null");
+            return this;
+        }
+
+        /**
+         * <p>The member's current token balance for this account, computed from token transactions.</p>
+         * @return Reference to {@code this} so that method calls can be chained together.
+         */
+        @java.lang.Override
+        @JsonSetter("token_balance")
+        public UsdTotalSpentStage tokenBalance(double tokenBalance) {
+            this.tokenBalance = tokenBalance;
+            return this;
+        }
+
+        /**
+         * <p>How much the member has spent on the account's products, in USD.</p>
+         * @return Reference to {@code this} so that method calls can be chained together.
+         */
+        @java.lang.Override
+        @JsonSetter("usd_total_spent")
+        public _FinalStage usdTotalSpent(@NotNull Money usdTotalSpent) {
+            this.usdTotalSpent = Objects.requireNonNull(usdTotalSpent, "usdTotalSpent must not be null");
             return this;
         }
 
@@ -379,7 +830,7 @@ public final class Member {
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
-        public _FinalStage user(Nullable<UserSummary> user) {
+        public _FinalStage user(Nullable<MemberUser> user) {
             if (user.isNull()) {
                 this.user = null;
             } else if (user.isEmpty()) {
@@ -395,7 +846,7 @@ public final class Member {
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
-        public _FinalStage user(UserSummary user) {
+        public _FinalStage user(MemberUser user) {
             this.user = Optional.ofNullable(user);
             return this;
         }
@@ -405,8 +856,296 @@ public final class Member {
          */
         @java.lang.Override
         @JsonSetter(value = "user", nulls = Nulls.SKIP)
-        public _FinalStage user(Optional<UserSummary> user) {
+        public _FinalStage user(Optional<MemberUser> user) {
             this.user = user;
+            return this;
+        }
+
+        /**
+         * <p><code>unsubscribed</code> once the member opts out of the account's marketing communications, <code>null</code> while they're subscribed. Only the member can change it.</p>
+         * @return Reference to {@code this} so that method calls can be chained together.
+         */
+        @java.lang.Override
+        public _FinalStage unsubscribeStatus(Nullable<MemberUnsubscribeStatus> unsubscribeStatus) {
+            if (unsubscribeStatus.isNull()) {
+                this.unsubscribeStatus = null;
+            } else if (unsubscribeStatus.isEmpty()) {
+                this.unsubscribeStatus = Optional.empty();
+            } else {
+                this.unsubscribeStatus = Optional.of(unsubscribeStatus.get());
+            }
+            return this;
+        }
+
+        /**
+         * <p><code>unsubscribed</code> once the member opts out of the account's marketing communications, <code>null</code> while they're subscribed. Only the member can change it.</p>
+         * @return Reference to {@code this} so that method calls can be chained together.
+         */
+        @java.lang.Override
+        public _FinalStage unsubscribeStatus(MemberUnsubscribeStatus unsubscribeStatus) {
+            this.unsubscribeStatus = Optional.ofNullable(unsubscribeStatus);
+            return this;
+        }
+
+        /**
+         * <p><code>unsubscribed</code> once the member opts out of the account's marketing communications, <code>null</code> while they're subscribed. Only the member can change it.</p>
+         */
+        @java.lang.Override
+        @JsonSetter(value = "unsubscribe_status", nulls = Nulls.SKIP)
+        public _FinalStage unsubscribeStatus(Optional<MemberUnsubscribeStatus> unsubscribeStatus) {
+            this.unsubscribeStatus = unsubscribeStatus;
+            return this;
+        }
+
+        /**
+         * <p>The member's phone number: the most recent number collected (or verified) at checkout, otherwise their account number when they have shared one with this seller. <code>null</code> without <code>member:phone:read</code> on the account, or when there is neither.</p>
+         * @return Reference to {@code this} so that method calls can be chained together.
+         */
+        @java.lang.Override
+        public _FinalStage phoneNumber(Nullable<String> phoneNumber) {
+            if (phoneNumber.isNull()) {
+                this.phoneNumber = null;
+            } else if (phoneNumber.isEmpty()) {
+                this.phoneNumber = Optional.empty();
+            } else {
+                this.phoneNumber = Optional.of(phoneNumber.get());
+            }
+            return this;
+        }
+
+        /**
+         * <p>The member's phone number: the most recent number collected (or verified) at checkout, otherwise their account number when they have shared one with this seller. <code>null</code> without <code>member:phone:read</code> on the account, or when there is neither.</p>
+         * @return Reference to {@code this} so that method calls can be chained together.
+         */
+        @java.lang.Override
+        public _FinalStage phoneNumber(String phoneNumber) {
+            this.phoneNumber = Optional.ofNullable(phoneNumber);
+            return this;
+        }
+
+        /**
+         * <p>The member's phone number: the most recent number collected (or verified) at checkout, otherwise their account number when they have shared one with this seller. <code>null</code> without <code>member:phone:read</code> on the account, or when there is neither.</p>
+         */
+        @java.lang.Override
+        @JsonSetter(value = "phone_number", nulls = Nulls.SKIP)
+        public _FinalStage phoneNumber(Optional<String> phoneNumber) {
+            this.phoneNumber = phoneNumber;
+            return this;
+        }
+
+        /**
+         * <p>The name the account gave this customer with <code>PATCH /members/:id</code>. Invoices show it as the customer name on every invoice for this member, in place of the user's own name. <code>null</code> when the account has not set one.</p>
+         * @return Reference to {@code this} so that method calls can be chained together.
+         */
+        @java.lang.Override
+        public _FinalStage name(Nullable<String> name) {
+            if (name.isNull()) {
+                this.name = null;
+            } else if (name.isEmpty()) {
+                this.name = Optional.empty();
+            } else {
+                this.name = Optional.of(name.get());
+            }
+            return this;
+        }
+
+        /**
+         * <p>The name the account gave this customer with <code>PATCH /members/:id</code>. Invoices show it as the customer name on every invoice for this member, in place of the user's own name. <code>null</code> when the account has not set one.</p>
+         * @return Reference to {@code this} so that method calls can be chained together.
+         */
+        @java.lang.Override
+        public _FinalStage name(String name) {
+            this.name = Optional.ofNullable(name);
+            return this;
+        }
+
+        /**
+         * <p>The name the account gave this customer with <code>PATCH /members/:id</code>. Invoices show it as the customer name on every invoice for this member, in place of the user's own name. <code>null</code> when the account has not set one.</p>
+         */
+        @java.lang.Override
+        @JsonSetter(value = "name", nulls = Nulls.SKIP)
+        public _FinalStage name(Optional<String> name) {
+            this.name = name;
+            return this;
+        }
+
+        /**
+         * <p>When <code>most_recent_action</code> took effect, as an ISO 8601 timestamp. <code>null</code> when <code>most_recent_action</code> is <code>null</code>.</p>
+         * @return Reference to {@code this} so that method calls can be chained together.
+         */
+        @java.lang.Override
+        public _FinalStage mostRecentActionAt(Nullable<String> mostRecentActionAt) {
+            if (mostRecentActionAt.isNull()) {
+                this.mostRecentActionAt = null;
+            } else if (mostRecentActionAt.isEmpty()) {
+                this.mostRecentActionAt = Optional.empty();
+            } else {
+                this.mostRecentActionAt = Optional.of(mostRecentActionAt.get());
+            }
+            return this;
+        }
+
+        /**
+         * <p>When <code>most_recent_action</code> took effect, as an ISO 8601 timestamp. <code>null</code> when <code>most_recent_action</code> is <code>null</code>.</p>
+         * @return Reference to {@code this} so that method calls can be chained together.
+         */
+        @java.lang.Override
+        public _FinalStage mostRecentActionAt(String mostRecentActionAt) {
+            this.mostRecentActionAt = Optional.ofNullable(mostRecentActionAt);
+            return this;
+        }
+
+        /**
+         * <p>When <code>most_recent_action</code> took effect, as an ISO 8601 timestamp. <code>null</code> when <code>most_recent_action</code> is <code>null</code>.</p>
+         */
+        @java.lang.Override
+        @JsonSetter(value = "most_recent_action_at", nulls = Nulls.SKIP)
+        public _FinalStage mostRecentActionAt(Optional<String> mostRecentActionAt) {
+            this.mostRecentActionAt = mostRecentActionAt;
+            return this;
+        }
+
+        /**
+         * <p>The member's latest lifecycle state on the account, derived from their memberships, such as <code>paid_subscriber</code>, <code>canceling</code>, or <code>churned</code>. <code>null</code> until it is first computed.</p>
+         * @return Reference to {@code this} so that method calls can be chained together.
+         */
+        @java.lang.Override
+        public _FinalStage mostRecentAction(Nullable<MemberMostRecentAction> mostRecentAction) {
+            if (mostRecentAction.isNull()) {
+                this.mostRecentAction = null;
+            } else if (mostRecentAction.isEmpty()) {
+                this.mostRecentAction = Optional.empty();
+            } else {
+                this.mostRecentAction = Optional.of(mostRecentAction.get());
+            }
+            return this;
+        }
+
+        /**
+         * <p>The member's latest lifecycle state on the account, derived from their memberships, such as <code>paid_subscriber</code>, <code>canceling</code>, or <code>churned</code>. <code>null</code> until it is first computed.</p>
+         * @return Reference to {@code this} so that method calls can be chained together.
+         */
+        @java.lang.Override
+        public _FinalStage mostRecentAction(MemberMostRecentAction mostRecentAction) {
+            this.mostRecentAction = Optional.ofNullable(mostRecentAction);
+            return this;
+        }
+
+        /**
+         * <p>The member's latest lifecycle state on the account, derived from their memberships, such as <code>paid_subscriber</code>, <code>canceling</code>, or <code>churned</code>. <code>null</code> until it is first computed.</p>
+         */
+        @java.lang.Override
+        @JsonSetter(value = "most_recent_action", nulls = Nulls.SKIP)
+        public _FinalStage mostRecentAction(Optional<MemberMostRecentAction> mostRecentAction) {
+            this.mostRecentAction = mostRecentAction;
+            return this;
+        }
+
+        /**
+         * <p>Your own key-value data stored on this member. <code>null</code> when none is set.</p>
+         * @return Reference to {@code this} so that method calls can be chained together.
+         */
+        @java.lang.Override
+        public _FinalStage metadata(Nullable<Map<String, Object>> metadata) {
+            if (metadata.isNull()) {
+                this.metadata = null;
+            } else if (metadata.isEmpty()) {
+                this.metadata = Optional.empty();
+            } else {
+                this.metadata = Optional.of(metadata.get());
+            }
+            return this;
+        }
+
+        /**
+         * <p>Your own key-value data stored on this member. <code>null</code> when none is set.</p>
+         * @return Reference to {@code this} so that method calls can be chained together.
+         */
+        @java.lang.Override
+        public _FinalStage metadata(Map<String, Object> metadata) {
+            this.metadata = Optional.ofNullable(metadata);
+            return this;
+        }
+
+        /**
+         * <p>Your own key-value data stored on this member. <code>null</code> when none is set.</p>
+         */
+        @java.lang.Override
+        @JsonSetter(value = "metadata", nulls = Nulls.SKIP)
+        public _FinalStage metadata(Optional<Map<String, Object>> metadata) {
+            this.metadata = metadata;
+            return this;
+        }
+
+        /**
+         * <p>When the member and the account last interacted, as an ISO 8601 timestamp. For example, a message in the member's support chat.</p>
+         * @return Reference to {@code this} so that method calls can be chained together.
+         */
+        @java.lang.Override
+        public _FinalStage lastActivityAt(Nullable<String> lastActivityAt) {
+            if (lastActivityAt.isNull()) {
+                this.lastActivityAt = null;
+            } else if (lastActivityAt.isEmpty()) {
+                this.lastActivityAt = Optional.empty();
+            } else {
+                this.lastActivityAt = Optional.of(lastActivityAt.get());
+            }
+            return this;
+        }
+
+        /**
+         * <p>When the member and the account last interacted, as an ISO 8601 timestamp. For example, a message in the member's support chat.</p>
+         * @return Reference to {@code this} so that method calls can be chained together.
+         */
+        @java.lang.Override
+        public _FinalStage lastActivityAt(String lastActivityAt) {
+            this.lastActivityAt = Optional.ofNullable(lastActivityAt);
+            return this;
+        }
+
+        /**
+         * <p>When the member and the account last interacted, as an ISO 8601 timestamp. For example, a message in the member's support chat.</p>
+         */
+        @java.lang.Override
+        @JsonSetter(value = "last_activity_at", nulls = Nulls.SKIP)
+        public _FinalStage lastActivityAt(Optional<String> lastActivityAt) {
+            this.lastActivityAt = lastActivityAt;
+            return this;
+        }
+
+        /**
+         * <p>What happened at <code>last_activity_at</code>. <code>object</code> says which kind of activity it is. <code>null</code> without <code>support_chat:read</code> on the account, or when <code>last_activity_at</code> is <code>null</code>.</p>
+         * @return Reference to {@code this} so that method calls can be chained together.
+         */
+        @java.lang.Override
+        public _FinalStage lastActivity(Nullable<MemberLastActivityMessage> lastActivity) {
+            if (lastActivity.isNull()) {
+                this.lastActivity = null;
+            } else if (lastActivity.isEmpty()) {
+                this.lastActivity = Optional.empty();
+            } else {
+                this.lastActivity = Optional.of(lastActivity.get());
+            }
+            return this;
+        }
+
+        /**
+         * <p>What happened at <code>last_activity_at</code>. <code>object</code> says which kind of activity it is. <code>null</code> without <code>support_chat:read</code> on the account, or when <code>last_activity_at</code> is <code>null</code>.</p>
+         * @return Reference to {@code this} so that method calls can be chained together.
+         */
+        @java.lang.Override
+        public _FinalStage lastActivity(MemberLastActivityMessage lastActivity) {
+            this.lastActivity = Optional.ofNullable(lastActivity);
+            return this;
+        }
+
+        /**
+         * <p>What happened at <code>last_activity_at</code>. <code>object</code> says which kind of activity it is. <code>null</code> without <code>support_chat:read</code> on the account, or when <code>last_activity_at</code> is <code>null</code>.</p>
+         */
+        @java.lang.Override
+        @JsonSetter(value = "last_activity", nulls = Nulls.SKIP)
+        public _FinalStage lastActivity(Optional<MemberLastActivityMessage> lastActivity) {
+            this.lastActivity = lastActivity;
             return this;
         }
 
@@ -446,18 +1185,131 @@ public final class Member {
             return this;
         }
 
+        /**
+         * <p>The user's email address. <code>null</code> without <code>member:email:read</code> on the account, when the buyer is another business, or when the user has no assigned email.</p>
+         * @return Reference to {@code this} so that method calls can be chained together.
+         */
+        @java.lang.Override
+        public _FinalStage email(Nullable<String> email) {
+            if (email.isNull()) {
+                this.email = null;
+            } else if (email.isEmpty()) {
+                this.email = Optional.empty();
+            } else {
+                this.email = Optional.of(email.get());
+            }
+            return this;
+        }
+
+        /**
+         * <p>The user's email address. <code>null</code> without <code>member:email:read</code> on the account, when the buyer is another business, or when the user has no assigned email.</p>
+         * @return Reference to {@code this} so that method calls can be chained together.
+         */
+        @java.lang.Override
+        public _FinalStage email(String email) {
+            this.email = Optional.ofNullable(email);
+            return this;
+        }
+
+        /**
+         * <p>The user's email address. <code>null</code> without <code>member:email:read</code> on the account, when the buyer is another business, or when the user has no assigned email.</p>
+         */
+        @java.lang.Override
+        @JsonSetter(value = "email", nulls = Nulls.SKIP)
+        public _FinalStage email(Optional<String> email) {
+            this.email = email;
+            return this;
+        }
+
+        /**
+         * <p>The user's gross income across Whop, in USD, refreshed periodically. <code>null</code> when the user hides their earnings or the buyer is another business.</p>
+         * @return Reference to {@code this} so that method calls can be chained together.
+         */
+        @java.lang.Override
+        public _FinalStage earningsUsd(Nullable<UserEarningsAmount> earningsUsd) {
+            if (earningsUsd.isNull()) {
+                this.earningsUsd = null;
+            } else if (earningsUsd.isEmpty()) {
+                this.earningsUsd = Optional.empty();
+            } else {
+                this.earningsUsd = Optional.of(earningsUsd.get());
+            }
+            return this;
+        }
+
+        /**
+         * <p>The user's gross income across Whop, in USD, refreshed periodically. <code>null</code> when the user hides their earnings or the buyer is another business.</p>
+         * @return Reference to {@code this} so that method calls can be chained together.
+         */
+        @java.lang.Override
+        public _FinalStage earningsUsd(UserEarningsAmount earningsUsd) {
+            this.earningsUsd = Optional.ofNullable(earningsUsd);
+            return this;
+        }
+
+        /**
+         * <p>The user's gross income across Whop, in USD, refreshed periodically. <code>null</code> when the user hides their earnings or the buyer is another business.</p>
+         */
+        @java.lang.Override
+        @JsonSetter(value = "earnings_usd", nulls = Nulls.SKIP)
+        public _FinalStage earningsUsd(Optional<UserEarningsAmount> earningsUsd) {
+            this.earningsUsd = earningsUsd;
+            return this;
+        }
+
         @java.lang.Override
         public Member build() {
             return new Member(
                     accessLevel,
                     accountId,
                     createdAt,
+                    displayName,
+                    earningsUsd,
+                    email,
                     id,
                     joinedAt,
                     lastAccessedAt,
+                    lastActivity,
+                    lastActivityAt,
+                    metadata,
+                    mostRecentAction,
+                    mostRecentActionAt,
+                    name,
+                    phoneNumber,
                     status,
+                    tokenBalance,
+                    unsubscribeStatus,
+                    usdTotalSpent,
                     user,
                     additionalProperties);
+        }
+
+        @JsonAnySetter
+        private void putAdditionalPropertyFromJson(String key, Object value) {
+            if (key.equalsIgnoreCase("access_level")
+                    || key.equalsIgnoreCase("account_id")
+                    || key.equalsIgnoreCase("created_at")
+                    || key.equalsIgnoreCase("display_name")
+                    || key.equalsIgnoreCase("earnings_usd")
+                    || key.equalsIgnoreCase("email")
+                    || key.equalsIgnoreCase("id")
+                    || key.equalsIgnoreCase("joined_at")
+                    || key.equalsIgnoreCase("last_accessed_at")
+                    || key.equalsIgnoreCase("last_activity")
+                    || key.equalsIgnoreCase("last_activity_at")
+                    || key.equalsIgnoreCase("metadata")
+                    || key.equalsIgnoreCase("most_recent_action")
+                    || key.equalsIgnoreCase("most_recent_action_at")
+                    || key.equalsIgnoreCase("name")
+                    || key.equalsIgnoreCase("phone_number")
+                    || key.equalsIgnoreCase("status")
+                    || key.equalsIgnoreCase("token_balance")
+                    || key.equalsIgnoreCase("unsubscribe_status")
+                    || key.equalsIgnoreCase("usd_total_spent")
+                    || key.equalsIgnoreCase("user")) {
+                return;
+            }
+            this.additionalProperties.put(key, value);
         }
 
         @java.lang.Override

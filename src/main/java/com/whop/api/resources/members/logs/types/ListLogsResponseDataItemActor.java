@@ -136,7 +136,6 @@ public final class ListLogsResponseDataItemActor {
 
         private Optional<String> name = Optional.empty();
 
-        @JsonAnySetter
         private Map<String, Object> additionalProperties = new HashMap<>();
 
         private Builder() {}
@@ -209,6 +208,14 @@ public final class ListLogsResponseDataItemActor {
         @java.lang.Override
         public ListLogsResponseDataItemActor build() {
             return new ListLogsResponseDataItemActor(id, name, username, additionalProperties);
+        }
+
+        @JsonAnySetter
+        private void putAdditionalPropertyFromJson(String key, Object value) {
+            if (key.equalsIgnoreCase("id") || key.equalsIgnoreCase("name") || key.equalsIgnoreCase("username")) {
+                return;
+            }
+            this.additionalProperties.put(key, value);
         }
 
         @java.lang.Override

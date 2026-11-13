@@ -13,9 +13,7 @@ import com.fasterxml.jackson.annotation.Nulls;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.whop.api.core.ObjectMappers;
 import com.whop.api.resources.socialaccounts.types.ConnectSocialAccountsRequestPlatform;
-import com.whop.api.resources.socialaccounts.types.ConnectSocialAccountsRequestScopesItem;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
@@ -28,27 +26,23 @@ public final class ConnectSocialAccountsRequest {
 
     private final ConnectSocialAccountsRequestPlatform platform;
 
-    private final Optional<String> redirectUrl;
-
-    private final Optional<List<ConnectSocialAccountsRequestScopesItem>> scopes;
+    private final String redirectUrl;
 
     private final Map<String, Object> additionalProperties;
 
     private ConnectSocialAccountsRequest(
             Optional<String> accountId,
             ConnectSocialAccountsRequestPlatform platform,
-            Optional<String> redirectUrl,
-            Optional<List<ConnectSocialAccountsRequestScopesItem>> scopes,
+            String redirectUrl,
             Map<String, Object> additionalProperties) {
         this.accountId = accountId;
         this.platform = platform;
         this.redirectUrl = redirectUrl;
-        this.scopes = scopes;
         this.additionalProperties = additionalProperties;
     }
 
     /**
-     * @return The Account (biz_ identifier) to connect the social account for. An account-scoped API key may omit this to default to its own account.
+     * @return The Account (biz_ identifier) to connect the external account for. An account-scoped API key may omit this to default to its own account. Omit for user profile connections.
      */
     @JsonProperty("account_id")
     public Optional<String> getAccountId() {
@@ -56,7 +50,7 @@ public final class ConnectSocialAccountsRequest {
     }
 
     /**
-     * @return The platform to connect the social account on. Supported options are <code>meta_business</code> and <code>tiktok</code>.
+     * @return The platform to connect the external account on. Use <code>tiktok</code> to connect the authenticated user’s TikTok profile, <code>linkedin</code> for their LinkedIn profile, <code>youtube</code> for their YouTube channel, or <code>x</code> for their X profile. Use <code>quickbooks</code> to connect the account’s QuickBooks Online company: pass <code>account_id</code>, and the user picks the company in QuickBooks.
      */
     @JsonProperty("platform")
     public ConnectSocialAccountsRequestPlatform getPlatform() {
@@ -64,19 +58,11 @@ public final class ConnectSocialAccountsRequest {
     }
 
     /**
-     * @return The Whop URL to redirect the user to after they finish connecting.
+     * @return Where to send the user once they finish connecting their accounts. Must be an <code>https</code> URL on whop.com; any other host is rejected. On success, the user is redirected with an <code>external_account_connected</code> query param naming the platform; if the connection fails, with an <code>external_account_error</code> query param instead. The same values also arrive as <code>social_account_connected</code> / <code>social_account_error</code>.
      */
     @JsonProperty("redirect_url")
-    public Optional<String> getRedirectUrl() {
+    public String getRedirectUrl() {
         return redirectUrl;
-    }
-
-    /**
-     * @return Capabilities to grant for the connected social account. Use <code>advertise</code> when connecting a Meta Business or TikTok account for ads.
-     */
-    @JsonProperty("scopes")
-    public Optional<List<ConnectSocialAccountsRequestScopesItem>> getScopes() {
-        return scopes;
     }
 
     @java.lang.Override
@@ -93,13 +79,12 @@ public final class ConnectSocialAccountsRequest {
     private boolean equalTo(ConnectSocialAccountsRequest other) {
         return accountId.equals(other.accountId)
                 && platform.equals(other.platform)
-                && redirectUrl.equals(other.redirectUrl)
-                && scopes.equals(other.scopes);
+                && redirectUrl.equals(other.redirectUrl);
     }
 
     @java.lang.Override
     public int hashCode() {
-        return Objects.hash(this.accountId, this.platform, this.redirectUrl, this.scopes);
+        return Objects.hash(this.accountId, this.platform, this.redirectUrl);
     }
 
     @java.lang.Override
@@ -113,11 +98,18 @@ public final class ConnectSocialAccountsRequest {
 
     public interface PlatformStage {
         /**
-         * <p>The platform to connect the social account on. Supported options are <code>meta_business</code> and <code>tiktok</code>.</p>
+         * <p>The platform to connect the external account on. Use <code>tiktok</code> to connect the authenticated user’s TikTok profile, <code>linkedin</code> for their LinkedIn profile, <code>youtube</code> for their YouTube channel, or <code>x</code> for their X profile. Use <code>quickbooks</code> to connect the account’s QuickBooks Online company: pass <code>account_id</code>, and the user picks the company in QuickBooks.</p>
          */
-        _FinalStage platform(@NotNull ConnectSocialAccountsRequestPlatform platform);
+        RedirectUrlStage platform(@NotNull ConnectSocialAccountsRequestPlatform platform);
 
         Builder from(ConnectSocialAccountsRequest other);
+    }
+
+    public interface RedirectUrlStage {
+        /**
+         * <p>Where to send the user once they finish connecting their accounts. Must be an <code>https</code> URL on whop.com; any other host is rejected. On success, the user is redirected with an <code>external_account_connected</code> query param naming the platform; if the connection fails, with an <code>external_account_error</code> query param instead. The same values also arrive as <code>social_account_connected</code> / <code>social_account_error</code>.</p>
+         */
+        _FinalStage redirectUrl(@NotNull String redirectUrl);
     }
 
     public interface _FinalStage {
@@ -128,38 +120,21 @@ public final class ConnectSocialAccountsRequest {
         _FinalStage additionalProperties(Map<String, Object> additionalProperties);
 
         /**
-         * <p>The Account (biz_ identifier) to connect the social account for. An account-scoped API key may omit this to default to its own account.</p>
+         * <p>The Account (biz_ identifier) to connect the external account for. An account-scoped API key may omit this to default to its own account. Omit for user profile connections.</p>
          */
         _FinalStage accountId(Optional<String> accountId);
 
         _FinalStage accountId(String accountId);
-
-        /**
-         * <p>The Whop URL to redirect the user to after they finish connecting.</p>
-         */
-        _FinalStage redirectUrl(Optional<String> redirectUrl);
-
-        _FinalStage redirectUrl(String redirectUrl);
-
-        /**
-         * <p>Capabilities to grant for the connected social account. Use <code>advertise</code> when connecting a Meta Business or TikTok account for ads.</p>
-         */
-        _FinalStage scopes(Optional<List<ConnectSocialAccountsRequestScopesItem>> scopes);
-
-        _FinalStage scopes(List<ConnectSocialAccountsRequestScopesItem> scopes);
     }
 
     @JsonIgnoreProperties(ignoreUnknown = true)
-    public static final class Builder implements PlatformStage, _FinalStage {
+    public static final class Builder implements PlatformStage, RedirectUrlStage, _FinalStage {
         private ConnectSocialAccountsRequestPlatform platform;
 
-        private Optional<List<ConnectSocialAccountsRequestScopesItem>> scopes = Optional.empty();
-
-        private Optional<String> redirectUrl = Optional.empty();
+        private String redirectUrl;
 
         private Optional<String> accountId = Optional.empty();
 
-        @JsonAnySetter
         private Map<String, Object> additionalProperties = new HashMap<>();
 
         private Builder() {}
@@ -169,64 +144,33 @@ public final class ConnectSocialAccountsRequest {
             accountId(other.getAccountId());
             platform(other.getPlatform());
             redirectUrl(other.getRedirectUrl());
-            scopes(other.getScopes());
             return this;
         }
 
         /**
-         * <p>The platform to connect the social account on. Supported options are <code>meta_business</code> and <code>tiktok</code>.</p>
-         * <p>The platform to connect the social account on. Supported options are <code>meta_business</code> and <code>tiktok</code>.</p>
+         * <p>The platform to connect the external account on. Use <code>tiktok</code> to connect the authenticated user’s TikTok profile, <code>linkedin</code> for their LinkedIn profile, <code>youtube</code> for their YouTube channel, or <code>x</code> for their X profile. Use <code>quickbooks</code> to connect the account’s QuickBooks Online company: pass <code>account_id</code>, and the user picks the company in QuickBooks.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
         @JsonSetter("platform")
-        public _FinalStage platform(@NotNull ConnectSocialAccountsRequestPlatform platform) {
+        public RedirectUrlStage platform(@NotNull ConnectSocialAccountsRequestPlatform platform) {
             this.platform = Objects.requireNonNull(platform, "platform must not be null");
             return this;
         }
 
         /**
-         * <p>Capabilities to grant for the connected social account. Use <code>advertise</code> when connecting a Meta Business or TikTok account for ads.</p>
+         * <p>Where to send the user once they finish connecting their accounts. Must be an <code>https</code> URL on whop.com; any other host is rejected. On success, the user is redirected with an <code>external_account_connected</code> query param naming the platform; if the connection fails, with an <code>external_account_error</code> query param instead. The same values also arrive as <code>social_account_connected</code> / <code>social_account_error</code>.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
-        public _FinalStage scopes(List<ConnectSocialAccountsRequestScopesItem> scopes) {
-            this.scopes = Optional.ofNullable(scopes);
+        @JsonSetter("redirect_url")
+        public _FinalStage redirectUrl(@NotNull String redirectUrl) {
+            this.redirectUrl = Objects.requireNonNull(redirectUrl, "redirectUrl must not be null");
             return this;
         }
 
         /**
-         * <p>Capabilities to grant for the connected social account. Use <code>advertise</code> when connecting a Meta Business or TikTok account for ads.</p>
-         */
-        @java.lang.Override
-        @JsonSetter(value = "scopes", nulls = Nulls.SKIP)
-        public _FinalStage scopes(Optional<List<ConnectSocialAccountsRequestScopesItem>> scopes) {
-            this.scopes = scopes;
-            return this;
-        }
-
-        /**
-         * <p>The Whop URL to redirect the user to after they finish connecting.</p>
-         * @return Reference to {@code this} so that method calls can be chained together.
-         */
-        @java.lang.Override
-        public _FinalStage redirectUrl(String redirectUrl) {
-            this.redirectUrl = Optional.ofNullable(redirectUrl);
-            return this;
-        }
-
-        /**
-         * <p>The Whop URL to redirect the user to after they finish connecting.</p>
-         */
-        @java.lang.Override
-        @JsonSetter(value = "redirect_url", nulls = Nulls.SKIP)
-        public _FinalStage redirectUrl(Optional<String> redirectUrl) {
-            this.redirectUrl = redirectUrl;
-            return this;
-        }
-
-        /**
-         * <p>The Account (biz_ identifier) to connect the social account for. An account-scoped API key may omit this to default to its own account.</p>
+         * <p>The Account (biz_ identifier) to connect the external account for. An account-scoped API key may omit this to default to its own account. Omit for user profile connections.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
@@ -236,7 +180,7 @@ public final class ConnectSocialAccountsRequest {
         }
 
         /**
-         * <p>The Account (biz_ identifier) to connect the social account for. An account-scoped API key may omit this to default to its own account.</p>
+         * <p>The Account (biz_ identifier) to connect the external account for. An account-scoped API key may omit this to default to its own account. Omit for user profile connections.</p>
          */
         @java.lang.Override
         @JsonSetter(value = "account_id", nulls = Nulls.SKIP)
@@ -247,7 +191,17 @@ public final class ConnectSocialAccountsRequest {
 
         @java.lang.Override
         public ConnectSocialAccountsRequest build() {
-            return new ConnectSocialAccountsRequest(accountId, platform, redirectUrl, scopes, additionalProperties);
+            return new ConnectSocialAccountsRequest(accountId, platform, redirectUrl, additionalProperties);
+        }
+
+        @JsonAnySetter
+        private void putAdditionalPropertyFromJson(String key, Object value) {
+            if (key.equalsIgnoreCase("account_id")
+                    || key.equalsIgnoreCase("platform")
+                    || key.equalsIgnoreCase("redirect_url")) {
+                return;
+            }
+            this.additionalProperties.put(key, value);
         }
 
         @java.lang.Override

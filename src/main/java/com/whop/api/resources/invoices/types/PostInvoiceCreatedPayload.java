@@ -15,7 +15,7 @@ import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.whop.api.core.Nullable;
 import com.whop.api.core.NullableNonemptyFilter;
 import com.whop.api.core.ObjectMappers;
-import com.whop.api.types.Invoice;
+import com.whop.api.types.InvoiceLegacy;
 import java.time.OffsetDateTime;
 import java.util.HashMap;
 import java.util.Map;
@@ -32,7 +32,7 @@ public final class PostInvoiceCreatedPayload {
 
     private final Optional<String> apiVersionDate;
 
-    private final Invoice data;
+    private final InvoiceLegacy data;
 
     private final String id;
 
@@ -48,7 +48,7 @@ public final class PostInvoiceCreatedPayload {
             Optional<String> accountId,
             PostInvoiceCreatedPayloadApiVersion apiVersion,
             Optional<String> apiVersionDate,
-            Invoice data,
+            InvoiceLegacy data,
             String id,
             Optional<Map<String, Object>> previousAttributes,
             OffsetDateTime timestamp,
@@ -96,7 +96,7 @@ public final class PostInvoiceCreatedPayload {
     }
 
     @JsonProperty("data")
-    public Invoice getData() {
+    public InvoiceLegacy getData() {
         return data;
     }
 
@@ -198,7 +198,7 @@ public final class PostInvoiceCreatedPayload {
     }
 
     public interface DataStage {
-        IdStage data(@NotNull Invoice data);
+        IdStage data(@NotNull InvoiceLegacy data);
     }
 
     public interface IdStage {
@@ -260,7 +260,7 @@ public final class PostInvoiceCreatedPayload {
             implements ApiVersionStage, DataStage, IdStage, TimestampStage, TypeStage, _FinalStage {
         private PostInvoiceCreatedPayloadApiVersion apiVersion;
 
-        private Invoice data;
+        private InvoiceLegacy data;
 
         private String id;
 
@@ -274,7 +274,6 @@ public final class PostInvoiceCreatedPayload {
 
         private Optional<String> accountId = Optional.empty();
 
-        @JsonAnySetter
         private Map<String, Object> additionalProperties = new HashMap<>();
 
         private Builder() {}
@@ -294,7 +293,6 @@ public final class PostInvoiceCreatedPayload {
 
         /**
          * <p>The API version for this webhook</p>
-         * <p>The API version for this webhook</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
@@ -306,13 +304,12 @@ public final class PostInvoiceCreatedPayload {
 
         @java.lang.Override
         @JsonSetter("data")
-        public IdStage data(@NotNull Invoice data) {
+        public IdStage data(@NotNull InvoiceLegacy data) {
             this.data = Objects.requireNonNull(data, "data must not be null");
             return this;
         }
 
         /**
-         * <p>A unique ID for every single webhook request</p>
          * <p>A unique ID for every single webhook request</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
@@ -325,7 +322,6 @@ public final class PostInvoiceCreatedPayload {
 
         /**
          * <p>The timestamp in ISO 8601 format that the webhook was sent at on the server</p>
-         * <p>The timestamp in ISO 8601 format that the webhook was sent at on the server</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
@@ -336,7 +332,6 @@ public final class PostInvoiceCreatedPayload {
         }
 
         /**
-         * <p>The webhook event type</p>
          * <p>The webhook event type</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
@@ -451,6 +446,21 @@ public final class PostInvoiceCreatedPayload {
                     timestamp,
                     type,
                     additionalProperties);
+        }
+
+        @JsonAnySetter
+        private void putAdditionalPropertyFromJson(String key, Object value) {
+            if (key.equalsIgnoreCase("account_id")
+                    || key.equalsIgnoreCase("api_version")
+                    || key.equalsIgnoreCase("api_version_date")
+                    || key.equalsIgnoreCase("data")
+                    || key.equalsIgnoreCase("id")
+                    || key.equalsIgnoreCase("previous_attributes")
+                    || key.equalsIgnoreCase("timestamp")
+                    || key.equalsIgnoreCase("type")) {
+                return;
+            }
+            this.additionalProperties.put(key, value);
         }
 
         @java.lang.Override

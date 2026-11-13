@@ -34,11 +34,11 @@ public final class ListLeadsRequest {
 
     private final Optional<Integer> last;
 
-    private final String companyId;
-
     private final Optional<OffsetDateTime> createdAfter;
 
     private final Optional<OffsetDateTime> createdBefore;
+
+    private final String accountId;
 
     private final Map<String, Object> additionalProperties;
 
@@ -48,18 +48,18 @@ public final class ListLeadsRequest {
             Optional<String> before,
             Optional<Integer> first,
             Optional<Integer> last,
-            String companyId,
             Optional<OffsetDateTime> createdAfter,
             Optional<OffsetDateTime> createdBefore,
+            String accountId,
             Map<String, Object> additionalProperties) {
         this.productIds = productIds;
         this.after = after;
         this.before = before;
         this.first = first;
         this.last = last;
-        this.companyId = companyId;
         this.createdAfter = createdAfter;
         this.createdBefore = createdBefore;
+        this.accountId = accountId;
         this.additionalProperties = additionalProperties;
     }
 
@@ -104,14 +104,6 @@ public final class ListLeadsRequest {
     }
 
     /**
-     * @return The unique identifier of the company to list leads for.
-     */
-    @JsonProperty("company_id")
-    public String getCompanyId() {
-        return companyId;
-    }
-
-    /**
      * @return Only return leads created after this timestamp.
      */
     @JsonProperty("created_after")
@@ -125,6 +117,14 @@ public final class ListLeadsRequest {
     @JsonProperty("created_before")
     public Optional<OffsetDateTime> getCreatedBefore() {
         return createdBefore;
+    }
+
+    /**
+     * @return The unique identifier of the company to list leads for.
+     */
+    @JsonProperty("account_id")
+    public String getAccountId() {
+        return accountId;
     }
 
     @java.lang.Override
@@ -144,9 +144,9 @@ public final class ListLeadsRequest {
                 && before.equals(other.before)
                 && first.equals(other.first)
                 && last.equals(other.last)
-                && companyId.equals(other.companyId)
                 && createdAfter.equals(other.createdAfter)
-                && createdBefore.equals(other.createdBefore);
+                && createdBefore.equals(other.createdBefore)
+                && accountId.equals(other.accountId);
     }
 
     @java.lang.Override
@@ -157,9 +157,9 @@ public final class ListLeadsRequest {
                 this.before,
                 this.first,
                 this.last,
-                this.companyId,
                 this.createdAfter,
-                this.createdBefore);
+                this.createdBefore,
+                this.accountId);
     }
 
     @java.lang.Override
@@ -167,15 +167,15 @@ public final class ListLeadsRequest {
         return ObjectMappers.stringify(this);
     }
 
-    public static CompanyIdStage builder() {
+    public static AccountIdStage builder() {
         return new Builder();
     }
 
-    public interface CompanyIdStage {
+    public interface AccountIdStage {
         /**
          * <p>The unique identifier of the company to list leads for.</p>
          */
-        _FinalStage companyId(@NotNull String companyId);
+        _FinalStage accountId(@NotNull String accountId);
 
         Builder from(ListLeadsRequest other);
     }
@@ -240,8 +240,8 @@ public final class ListLeadsRequest {
     }
 
     @JsonIgnoreProperties(ignoreUnknown = true)
-    public static final class Builder implements CompanyIdStage, _FinalStage {
-        private String companyId;
+    public static final class Builder implements AccountIdStage, _FinalStage {
+        private String accountId;
 
         private Optional<OffsetDateTime> createdBefore = Optional.empty();
 
@@ -257,7 +257,6 @@ public final class ListLeadsRequest {
 
         private Optional<List<String>> productIds = Optional.empty();
 
-        @JsonAnySetter
         private Map<String, Object> additionalProperties = new HashMap<>();
 
         private Builder() {}
@@ -269,21 +268,20 @@ public final class ListLeadsRequest {
             before(other.getBefore());
             first(other.getFirst());
             last(other.getLast());
-            companyId(other.getCompanyId());
             createdAfter(other.getCreatedAfter());
             createdBefore(other.getCreatedBefore());
+            accountId(other.getAccountId());
             return this;
         }
 
         /**
          * <p>The unique identifier of the company to list leads for.</p>
-         * <p>The unique identifier of the company to list leads for.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
-        @JsonSetter("company_id")
-        public _FinalStage companyId(@NotNull String companyId) {
-            this.companyId = Objects.requireNonNull(companyId, "companyId must not be null");
+        @JsonSetter("account_id")
+        public _FinalStage accountId(@NotNull String accountId) {
+            this.accountId = Objects.requireNonNull(accountId, "accountId must not be null");
             return this;
         }
 
@@ -441,10 +439,25 @@ public final class ListLeadsRequest {
                     before,
                     first,
                     last,
-                    companyId,
                     createdAfter,
                     createdBefore,
+                    accountId,
                     additionalProperties);
+        }
+
+        @JsonAnySetter
+        private void putAdditionalPropertyFromJson(String key, Object value) {
+            if (key.equalsIgnoreCase("product_ids")
+                    || key.equalsIgnoreCase("after")
+                    || key.equalsIgnoreCase("before")
+                    || key.equalsIgnoreCase("first")
+                    || key.equalsIgnoreCase("last")
+                    || key.equalsIgnoreCase("created_after")
+                    || key.equalsIgnoreCase("created_before")
+                    || key.equalsIgnoreCase("account_id")) {
+                return;
+            }
+            this.additionalProperties.put(key, value);
         }
 
         @java.lang.Override

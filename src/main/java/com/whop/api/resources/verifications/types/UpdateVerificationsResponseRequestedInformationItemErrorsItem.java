@@ -85,7 +85,6 @@ public final class UpdateVerificationsResponseRequestedInformationItemErrorsItem
 
         private Optional<String> reason = Optional.empty();
 
-        @JsonAnySetter
         private Map<String, Object> additionalProperties = new HashMap<>();
 
         private Builder() {}
@@ -127,6 +126,14 @@ public final class UpdateVerificationsResponseRequestedInformationItemErrorsItem
         public UpdateVerificationsResponseRequestedInformationItemErrorsItem build() {
             return new UpdateVerificationsResponseRequestedInformationItemErrorsItem(
                     code, reason, additionalProperties);
+        }
+
+        @JsonAnySetter
+        private void putAdditionalPropertyFromJson(String key, Object value) {
+            if (key.equalsIgnoreCase("code") || key.equalsIgnoreCase("reason")) {
+                return;
+            }
+            this.additionalProperties.put(key, value);
         }
 
         public Builder additionalProperty(String key, Object value) {

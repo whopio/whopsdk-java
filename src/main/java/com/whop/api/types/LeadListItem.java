@@ -300,7 +300,6 @@ public final class LeadListItem {
 
         private Optional<LeadListItemMember> member = Optional.empty();
 
-        @JsonAnySetter
         private Map<String, Object> additionalProperties = new HashMap<>();
 
         private Builder() {}
@@ -320,7 +319,6 @@ public final class LeadListItem {
 
         /**
          * <p>The datetime the lead was created.</p>
-         * <p>The datetime the lead was created.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
@@ -331,7 +329,6 @@ public final class LeadListItem {
         }
 
         /**
-         * <p>The unique identifier for the lead.</p>
          * <p>The unique identifier for the lead.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
@@ -344,7 +341,6 @@ public final class LeadListItem {
 
         /**
          * <p>The datetime the lead was last updated.</p>
-         * <p>The datetime the lead was last updated.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
@@ -355,7 +351,6 @@ public final class LeadListItem {
         }
 
         /**
-         * <p>The user account associated with this lead.</p>
          * <p>The user account associated with this lead.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
@@ -514,6 +509,21 @@ public final class LeadListItem {
         public LeadListItem build() {
             return new LeadListItem(
                     createdAt, id, member, metadata, product, referrer, updatedAt, user, additionalProperties);
+        }
+
+        @JsonAnySetter
+        private void putAdditionalPropertyFromJson(String key, Object value) {
+            if (key.equalsIgnoreCase("created_at")
+                    || key.equalsIgnoreCase("id")
+                    || key.equalsIgnoreCase("member")
+                    || key.equalsIgnoreCase("metadata")
+                    || key.equalsIgnoreCase("product")
+                    || key.equalsIgnoreCase("referrer")
+                    || key.equalsIgnoreCase("updated_at")
+                    || key.equalsIgnoreCase("user")) {
+                return;
+            }
+            this.additionalProperties.put(key, value);
         }
 
         @java.lang.Override

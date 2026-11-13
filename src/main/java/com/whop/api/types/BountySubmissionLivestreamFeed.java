@@ -287,7 +287,6 @@ public final class BountySubmissionLivestreamFeed {
 
         private Optional<String> endedAt = Optional.empty();
 
-        @JsonAnySetter
         private Map<String, Object> additionalProperties = new HashMap<>();
 
         private Builder() {}
@@ -306,7 +305,6 @@ public final class BountySubmissionLivestreamFeed {
 
         /**
          * <p>Livestream feed ID.</p>
-         * <p>Livestream feed ID.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
@@ -317,7 +315,6 @@ public final class BountySubmissionLivestreamFeed {
         }
 
         /**
-         * <p>Display title for the proof livestream.</p>
          * <p>Display title for the proof livestream.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
@@ -512,6 +509,20 @@ public final class BountySubmissionLivestreamFeed {
         public BountySubmissionLivestreamFeed build() {
             return new BountySubmissionLivestreamFeed(
                     endedAt, id, recordingStatus, recordingUrl, startedAt, thumbnailUrl, title, additionalProperties);
+        }
+
+        @JsonAnySetter
+        private void putAdditionalPropertyFromJson(String key, Object value) {
+            if (key.equalsIgnoreCase("ended_at")
+                    || key.equalsIgnoreCase("id")
+                    || key.equalsIgnoreCase("recording_status")
+                    || key.equalsIgnoreCase("recording_url")
+                    || key.equalsIgnoreCase("started_at")
+                    || key.equalsIgnoreCase("thumbnail_url")
+                    || key.equalsIgnoreCase("title")) {
+                return;
+            }
+            this.additionalProperties.put(key, value);
         }
 
         @java.lang.Override

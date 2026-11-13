@@ -5,17 +5,16 @@ package com.whop.api.resources.messages.requests;
 
 import com.fasterxml.jackson.annotation.JsonAnyGetter;
 import com.fasterxml.jackson.annotation.JsonAnySetter;
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonSetter;
 import com.fasterxml.jackson.annotation.Nulls;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
-import com.whop.api.core.Nullable;
-import com.whop.api.core.NullableNonemptyFilter;
 import com.whop.api.core.ObjectMappers;
 import com.whop.api.resources.messages.types.CreateMessagesRequestAttachmentsItem;
+import com.whop.api.resources.messages.types.CreateMessagesRequestGifsItem;
+import com.whop.api.resources.messages.types.CreateMessagesRequestLinkPreviewsItem;
 import com.whop.api.resources.messages.types.CreateMessagesRequestPoll;
 import java.util.HashMap;
 import java.util.List;
@@ -35,6 +34,12 @@ public final class CreateMessagesRequest {
 
     private final String content;
 
+    private final Optional<List<CreateMessagesRequestGifsItem>> gifs;
+
+    private final Optional<String> id;
+
+    private final Optional<List<CreateMessagesRequestLinkPreviewsItem>> linkPreviews;
+
     private final Optional<CreateMessagesRequestPoll> poll;
 
     private final Optional<String> replyingToMessageId;
@@ -46,6 +51,9 @@ public final class CreateMessagesRequest {
             Optional<Boolean> autoDetectLinks,
             String channelId,
             String content,
+            Optional<List<CreateMessagesRequestGifsItem>> gifs,
+            Optional<String> id,
+            Optional<List<CreateMessagesRequestLinkPreviewsItem>> linkPreviews,
             Optional<CreateMessagesRequestPoll> poll,
             Optional<String> replyingToMessageId,
             Map<String, Object> additionalProperties) {
@@ -53,35 +61,32 @@ public final class CreateMessagesRequest {
         this.autoDetectLinks = autoDetectLinks;
         this.channelId = channelId;
         this.content = content;
+        this.gifs = gifs;
+        this.id = id;
+        this.linkPreviews = linkPreviews;
         this.poll = poll;
         this.replyingToMessageId = replyingToMessageId;
         this.additionalProperties = additionalProperties;
     }
 
     /**
-     * @return A list of file attachments to include with the message, such as images or videos.
+     * @return Files to attach to the message.
      */
-    @JsonIgnore
+    @JsonProperty("attachments")
     public Optional<List<CreateMessagesRequestAttachmentsItem>> getAttachments() {
-        if (attachments == null) {
-            return Optional.empty();
-        }
         return attachments;
     }
 
     /**
-     * @return Automatically detect URLs in the message and generate link previews.
+     * @return Generate previews for URLs in content. Mutually exclusive with link_previews.
      */
-    @JsonIgnore
+    @JsonProperty("auto_detect_links")
     public Optional<Boolean> getAutoDetectLinks() {
-        if (autoDetectLinks == null) {
-            return Optional.empty();
-        }
         return autoDetectLinks;
     }
 
     /**
-     * @return The unique identifier of the channel or experience to send the message in. For example, 'exp_xxxxx' or 'feed_xxxxx'.
+     * @return Public channel ID, or an experience ID for experience chat.
      */
     @JsonProperty("channel_id")
     public String getChannelId() {
@@ -89,7 +94,7 @@ public final class CreateMessagesRequest {
     }
 
     /**
-     * @return The body of the message in Markdown format. For example, 'Hello <strong>world</strong>'.
+     * @return Markdown content. May be empty when the message contains media or a poll.
      */
     @JsonProperty("content")
     public String getContent() {
@@ -97,48 +102,39 @@ public final class CreateMessagesRequest {
     }
 
     /**
-     * @return A poll to attach to this message, allowing recipients to vote on options.
+     * @return Up to 10 GIFs to attach. URLs must use HTTPS on static.klipy.com, static1.klipy.com, or static2.klipy.com. Omit to preserve on edit; an empty list clears them.
      */
-    @JsonIgnore
+    @JsonProperty("gifs")
+    public Optional<List<CreateMessagesRequestGifsItem>> getGifs() {
+        return gifs;
+    }
+
+    /**
+     * @return Optional, for clients that show a message before the server confirms it. Use <code>post_</code> followed by 22 Base58 characters. Omit to generate an ID. Reuse the same ID and <code>Idempotency-Key</code> when retrying a send.
+     */
+    @JsonProperty("id")
+    public Optional<String> getId() {
+        return id;
+    }
+
+    /**
+     * @return Explicit URLs for the server to preview.
+     */
+    @JsonProperty("link_previews")
+    public Optional<List<CreateMessagesRequestLinkPreviewsItem>> getLinkPreviews() {
+        return linkPreviews;
+    }
+
+    @JsonProperty("poll")
     public Optional<CreateMessagesRequestPoll> getPoll() {
-        if (poll == null) {
-            return Optional.empty();
-        }
         return poll;
     }
 
     /**
-     * @return The unique identifier of the message this is replying to, creating a threaded reply.
+     * @return A live message in the same channel to reply to.
      */
-    @JsonIgnore
-    public Optional<String> getReplyingToMessageId() {
-        if (replyingToMessageId == null) {
-            return Optional.empty();
-        }
-        return replyingToMessageId;
-    }
-
-    @JsonInclude(value = JsonInclude.Include.CUSTOM, valueFilter = NullableNonemptyFilter.class)
-    @JsonProperty("attachments")
-    private Optional<List<CreateMessagesRequestAttachmentsItem>> _getAttachments() {
-        return attachments;
-    }
-
-    @JsonInclude(value = JsonInclude.Include.CUSTOM, valueFilter = NullableNonemptyFilter.class)
-    @JsonProperty("auto_detect_links")
-    private Optional<Boolean> _getAutoDetectLinks() {
-        return autoDetectLinks;
-    }
-
-    @JsonInclude(value = JsonInclude.Include.CUSTOM, valueFilter = NullableNonemptyFilter.class)
-    @JsonProperty("poll")
-    private Optional<CreateMessagesRequestPoll> _getPoll() {
-        return poll;
-    }
-
-    @JsonInclude(value = JsonInclude.Include.CUSTOM, valueFilter = NullableNonemptyFilter.class)
     @JsonProperty("replying_to_message_id")
-    private Optional<String> _getReplyingToMessageId() {
+    public Optional<String> getReplyingToMessageId() {
         return replyingToMessageId;
     }
 
@@ -158,6 +154,9 @@ public final class CreateMessagesRequest {
                 && autoDetectLinks.equals(other.autoDetectLinks)
                 && channelId.equals(other.channelId)
                 && content.equals(other.content)
+                && gifs.equals(other.gifs)
+                && id.equals(other.id)
+                && linkPreviews.equals(other.linkPreviews)
                 && poll.equals(other.poll)
                 && replyingToMessageId.equals(other.replyingToMessageId);
     }
@@ -169,6 +168,9 @@ public final class CreateMessagesRequest {
                 this.autoDetectLinks,
                 this.channelId,
                 this.content,
+                this.gifs,
+                this.id,
+                this.linkPreviews,
                 this.poll,
                 this.replyingToMessageId);
     }
@@ -184,7 +186,7 @@ public final class CreateMessagesRequest {
 
     public interface ChannelIdStage {
         /**
-         * <p>The unique identifier of the channel or experience to send the message in. For example, 'exp_xxxxx' or 'feed_xxxxx'.</p>
+         * <p>Public channel ID, or an experience ID for experience chat.</p>
          */
         ContentStage channelId(@NotNull String channelId);
 
@@ -193,7 +195,7 @@ public final class CreateMessagesRequest {
 
     public interface ContentStage {
         /**
-         * <p>The body of the message in Markdown format. For example, 'Hello <strong>world</strong>'.</p>
+         * <p>Markdown content. May be empty when the message contains media or a poll.</p>
          */
         _FinalStage content(@NotNull String content);
     }
@@ -206,40 +208,50 @@ public final class CreateMessagesRequest {
         _FinalStage additionalProperties(Map<String, Object> additionalProperties);
 
         /**
-         * <p>A list of file attachments to include with the message, such as images or videos.</p>
+         * <p>Files to attach to the message.</p>
          */
         _FinalStage attachments(Optional<List<CreateMessagesRequestAttachmentsItem>> attachments);
 
         _FinalStage attachments(List<CreateMessagesRequestAttachmentsItem> attachments);
 
-        _FinalStage attachments(Nullable<List<CreateMessagesRequestAttachmentsItem>> attachments);
-
         /**
-         * <p>Automatically detect URLs in the message and generate link previews.</p>
+         * <p>Generate previews for URLs in content. Mutually exclusive with link_previews.</p>
          */
         _FinalStage autoDetectLinks(Optional<Boolean> autoDetectLinks);
 
         _FinalStage autoDetectLinks(Boolean autoDetectLinks);
 
-        _FinalStage autoDetectLinks(Nullable<Boolean> autoDetectLinks);
+        /**
+         * <p>Up to 10 GIFs to attach. URLs must use HTTPS on static.klipy.com, static1.klipy.com, or static2.klipy.com. Omit to preserve on edit; an empty list clears them.</p>
+         */
+        _FinalStage gifs(Optional<List<CreateMessagesRequestGifsItem>> gifs);
+
+        _FinalStage gifs(List<CreateMessagesRequestGifsItem> gifs);
 
         /**
-         * <p>A poll to attach to this message, allowing recipients to vote on options.</p>
+         * <p>Optional, for clients that show a message before the server confirms it. Use <code>post_</code> followed by 22 Base58 characters. Omit to generate an ID. Reuse the same ID and <code>Idempotency-Key</code> when retrying a send.</p>
          */
+        _FinalStage id(Optional<String> id);
+
+        _FinalStage id(String id);
+
+        /**
+         * <p>Explicit URLs for the server to preview.</p>
+         */
+        _FinalStage linkPreviews(Optional<List<CreateMessagesRequestLinkPreviewsItem>> linkPreviews);
+
+        _FinalStage linkPreviews(List<CreateMessagesRequestLinkPreviewsItem> linkPreviews);
+
         _FinalStage poll(Optional<CreateMessagesRequestPoll> poll);
 
         _FinalStage poll(CreateMessagesRequestPoll poll);
 
-        _FinalStage poll(Nullable<CreateMessagesRequestPoll> poll);
-
         /**
-         * <p>The unique identifier of the message this is replying to, creating a threaded reply.</p>
+         * <p>A live message in the same channel to reply to.</p>
          */
         _FinalStage replyingToMessageId(Optional<String> replyingToMessageId);
 
         _FinalStage replyingToMessageId(String replyingToMessageId);
-
-        _FinalStage replyingToMessageId(Nullable<String> replyingToMessageId);
     }
 
     @JsonIgnoreProperties(ignoreUnknown = true)
@@ -252,11 +264,16 @@ public final class CreateMessagesRequest {
 
         private Optional<CreateMessagesRequestPoll> poll = Optional.empty();
 
+        private Optional<List<CreateMessagesRequestLinkPreviewsItem>> linkPreviews = Optional.empty();
+
+        private Optional<String> id = Optional.empty();
+
+        private Optional<List<CreateMessagesRequestGifsItem>> gifs = Optional.empty();
+
         private Optional<Boolean> autoDetectLinks = Optional.empty();
 
         private Optional<List<CreateMessagesRequestAttachmentsItem>> attachments = Optional.empty();
 
-        @JsonAnySetter
         private Map<String, Object> additionalProperties = new HashMap<>();
 
         private Builder() {}
@@ -267,14 +284,16 @@ public final class CreateMessagesRequest {
             autoDetectLinks(other.getAutoDetectLinks());
             channelId(other.getChannelId());
             content(other.getContent());
+            gifs(other.getGifs());
+            id(other.getId());
+            linkPreviews(other.getLinkPreviews());
             poll(other.getPoll());
             replyingToMessageId(other.getReplyingToMessageId());
             return this;
         }
 
         /**
-         * <p>The unique identifier of the channel or experience to send the message in. For example, 'exp_xxxxx' or 'feed_xxxxx'.</p>
-         * <p>The unique identifier of the channel or experience to send the message in. For example, 'exp_xxxxx' or 'feed_xxxxx'.</p>
+         * <p>Public channel ID, or an experience ID for experience chat.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
@@ -285,8 +304,7 @@ public final class CreateMessagesRequest {
         }
 
         /**
-         * <p>The body of the message in Markdown format. For example, 'Hello <strong>world</strong>'.</p>
-         * <p>The body of the message in Markdown format. For example, 'Hello <strong>world</strong>'.</p>
+         * <p>Markdown content. May be empty when the message contains media or a poll.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
@@ -297,23 +315,7 @@ public final class CreateMessagesRequest {
         }
 
         /**
-         * <p>The unique identifier of the message this is replying to, creating a threaded reply.</p>
-         * @return Reference to {@code this} so that method calls can be chained together.
-         */
-        @java.lang.Override
-        public _FinalStage replyingToMessageId(Nullable<String> replyingToMessageId) {
-            if (replyingToMessageId.isNull()) {
-                this.replyingToMessageId = null;
-            } else if (replyingToMessageId.isEmpty()) {
-                this.replyingToMessageId = Optional.empty();
-            } else {
-                this.replyingToMessageId = Optional.of(replyingToMessageId.get());
-            }
-            return this;
-        }
-
-        /**
-         * <p>The unique identifier of the message this is replying to, creating a threaded reply.</p>
+         * <p>A live message in the same channel to reply to.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
@@ -323,7 +325,7 @@ public final class CreateMessagesRequest {
         }
 
         /**
-         * <p>The unique identifier of the message this is replying to, creating a threaded reply.</p>
+         * <p>A live message in the same channel to reply to.</p>
          */
         @java.lang.Override
         @JsonSetter(value = "replying_to_message_id", nulls = Nulls.SKIP)
@@ -332,35 +334,12 @@ public final class CreateMessagesRequest {
             return this;
         }
 
-        /**
-         * <p>A poll to attach to this message, allowing recipients to vote on options.</p>
-         * @return Reference to {@code this} so that method calls can be chained together.
-         */
-        @java.lang.Override
-        public _FinalStage poll(Nullable<CreateMessagesRequestPoll> poll) {
-            if (poll.isNull()) {
-                this.poll = null;
-            } else if (poll.isEmpty()) {
-                this.poll = Optional.empty();
-            } else {
-                this.poll = Optional.of(poll.get());
-            }
-            return this;
-        }
-
-        /**
-         * <p>A poll to attach to this message, allowing recipients to vote on options.</p>
-         * @return Reference to {@code this} so that method calls can be chained together.
-         */
         @java.lang.Override
         public _FinalStage poll(CreateMessagesRequestPoll poll) {
             this.poll = Optional.ofNullable(poll);
             return this;
         }
 
-        /**
-         * <p>A poll to attach to this message, allowing recipients to vote on options.</p>
-         */
         @java.lang.Override
         @JsonSetter(value = "poll", nulls = Nulls.SKIP)
         public _FinalStage poll(Optional<CreateMessagesRequestPoll> poll) {
@@ -369,23 +348,67 @@ public final class CreateMessagesRequest {
         }
 
         /**
-         * <p>Automatically detect URLs in the message and generate link previews.</p>
+         * <p>Explicit URLs for the server to preview.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
-        public _FinalStage autoDetectLinks(Nullable<Boolean> autoDetectLinks) {
-            if (autoDetectLinks.isNull()) {
-                this.autoDetectLinks = null;
-            } else if (autoDetectLinks.isEmpty()) {
-                this.autoDetectLinks = Optional.empty();
-            } else {
-                this.autoDetectLinks = Optional.of(autoDetectLinks.get());
-            }
+        public _FinalStage linkPreviews(List<CreateMessagesRequestLinkPreviewsItem> linkPreviews) {
+            this.linkPreviews = Optional.ofNullable(linkPreviews);
             return this;
         }
 
         /**
-         * <p>Automatically detect URLs in the message and generate link previews.</p>
+         * <p>Explicit URLs for the server to preview.</p>
+         */
+        @java.lang.Override
+        @JsonSetter(value = "link_previews", nulls = Nulls.SKIP)
+        public _FinalStage linkPreviews(Optional<List<CreateMessagesRequestLinkPreviewsItem>> linkPreviews) {
+            this.linkPreviews = linkPreviews;
+            return this;
+        }
+
+        /**
+         * <p>Optional, for clients that show a message before the server confirms it. Use <code>post_</code> followed by 22 Base58 characters. Omit to generate an ID. Reuse the same ID and <code>Idempotency-Key</code> when retrying a send.</p>
+         * @return Reference to {@code this} so that method calls can be chained together.
+         */
+        @java.lang.Override
+        public _FinalStage id(String id) {
+            this.id = Optional.ofNullable(id);
+            return this;
+        }
+
+        /**
+         * <p>Optional, for clients that show a message before the server confirms it. Use <code>post_</code> followed by 22 Base58 characters. Omit to generate an ID. Reuse the same ID and <code>Idempotency-Key</code> when retrying a send.</p>
+         */
+        @java.lang.Override
+        @JsonSetter(value = "id", nulls = Nulls.SKIP)
+        public _FinalStage id(Optional<String> id) {
+            this.id = id;
+            return this;
+        }
+
+        /**
+         * <p>Up to 10 GIFs to attach. URLs must use HTTPS on static.klipy.com, static1.klipy.com, or static2.klipy.com. Omit to preserve on edit; an empty list clears them.</p>
+         * @return Reference to {@code this} so that method calls can be chained together.
+         */
+        @java.lang.Override
+        public _FinalStage gifs(List<CreateMessagesRequestGifsItem> gifs) {
+            this.gifs = Optional.ofNullable(gifs);
+            return this;
+        }
+
+        /**
+         * <p>Up to 10 GIFs to attach. URLs must use HTTPS on static.klipy.com, static1.klipy.com, or static2.klipy.com. Omit to preserve on edit; an empty list clears them.</p>
+         */
+        @java.lang.Override
+        @JsonSetter(value = "gifs", nulls = Nulls.SKIP)
+        public _FinalStage gifs(Optional<List<CreateMessagesRequestGifsItem>> gifs) {
+            this.gifs = gifs;
+            return this;
+        }
+
+        /**
+         * <p>Generate previews for URLs in content. Mutually exclusive with link_previews.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
@@ -395,7 +418,7 @@ public final class CreateMessagesRequest {
         }
 
         /**
-         * <p>Automatically detect URLs in the message and generate link previews.</p>
+         * <p>Generate previews for URLs in content. Mutually exclusive with link_previews.</p>
          */
         @java.lang.Override
         @JsonSetter(value = "auto_detect_links", nulls = Nulls.SKIP)
@@ -405,23 +428,7 @@ public final class CreateMessagesRequest {
         }
 
         /**
-         * <p>A list of file attachments to include with the message, such as images or videos.</p>
-         * @return Reference to {@code this} so that method calls can be chained together.
-         */
-        @java.lang.Override
-        public _FinalStage attachments(Nullable<List<CreateMessagesRequestAttachmentsItem>> attachments) {
-            if (attachments.isNull()) {
-                this.attachments = null;
-            } else if (attachments.isEmpty()) {
-                this.attachments = Optional.empty();
-            } else {
-                this.attachments = Optional.of(attachments.get());
-            }
-            return this;
-        }
-
-        /**
-         * <p>A list of file attachments to include with the message, such as images or videos.</p>
+         * <p>Files to attach to the message.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
@@ -431,7 +438,7 @@ public final class CreateMessagesRequest {
         }
 
         /**
-         * <p>A list of file attachments to include with the message, such as images or videos.</p>
+         * <p>Files to attach to the message.</p>
          */
         @java.lang.Override
         @JsonSetter(value = "attachments", nulls = Nulls.SKIP)
@@ -443,7 +450,32 @@ public final class CreateMessagesRequest {
         @java.lang.Override
         public CreateMessagesRequest build() {
             return new CreateMessagesRequest(
-                    attachments, autoDetectLinks, channelId, content, poll, replyingToMessageId, additionalProperties);
+                    attachments,
+                    autoDetectLinks,
+                    channelId,
+                    content,
+                    gifs,
+                    id,
+                    linkPreviews,
+                    poll,
+                    replyingToMessageId,
+                    additionalProperties);
+        }
+
+        @JsonAnySetter
+        private void putAdditionalPropertyFromJson(String key, Object value) {
+            if (key.equalsIgnoreCase("attachments")
+                    || key.equalsIgnoreCase("auto_detect_links")
+                    || key.equalsIgnoreCase("channel_id")
+                    || key.equalsIgnoreCase("content")
+                    || key.equalsIgnoreCase("gifs")
+                    || key.equalsIgnoreCase("id")
+                    || key.equalsIgnoreCase("link_previews")
+                    || key.equalsIgnoreCase("poll")
+                    || key.equalsIgnoreCase("replying_to_message_id")) {
+                return;
+            }
+            this.additionalProperties.put(key, value);
         }
 
         @java.lang.Override

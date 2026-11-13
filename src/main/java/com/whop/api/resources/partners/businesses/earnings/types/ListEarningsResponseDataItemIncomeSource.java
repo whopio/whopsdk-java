@@ -7,6 +7,9 @@ import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonValue;
 
 public final class ListEarningsResponseDataItemIncomeSource {
+    public static final ListEarningsResponseDataItemIncomeSource BUSINESS_REFERRAL =
+            new ListEarningsResponseDataItemIncomeSource(Value.BUSINESS_REFERRAL, "business_referral");
+
     public static final ListEarningsResponseDataItemIncomeSource CARD_INTERCHANGE =
             new ListEarningsResponseDataItemIncomeSource(Value.CARD_INTERCHANGE, "card_interchange");
 
@@ -16,8 +19,24 @@ public final class ListEarningsResponseDataItemIncomeSource {
     public static final ListEarningsResponseDataItemIncomeSource TRANSFER =
             new ListEarningsResponseDataItemIncomeSource(Value.TRANSFER, "transfer");
 
+    public static final ListEarningsResponseDataItemIncomeSource WITHDRAWAL =
+            new ListEarningsResponseDataItemIncomeSource(Value.WITHDRAWAL, "withdrawal");
+
+    public static final ListEarningsResponseDataItemIncomeSource VERIFIED_PARTNER_REFERRAL_PAYBACK =
+            new ListEarningsResponseDataItemIncomeSource(
+                    Value.VERIFIED_PARTNER_REFERRAL_PAYBACK, "verified_partner_referral_payback");
+
     public static final ListEarningsResponseDataItemIncomeSource AD_SPEND =
             new ListEarningsResponseDataItemIncomeSource(Value.AD_SPEND, "ad_spend");
+
+    public static final ListEarningsResponseDataItemIncomeSource PARTNER_REWARD =
+            new ListEarningsResponseDataItemIncomeSource(Value.PARTNER_REWARD, "partner_reward");
+
+    public static final ListEarningsResponseDataItemIncomeSource COMMISSION_ADVANCE =
+            new ListEarningsResponseDataItemIncomeSource(Value.COMMISSION_ADVANCE, "commission_advance");
+
+    public static final ListEarningsResponseDataItemIncomeSource ONBOARDING_REWARD =
+            new ListEarningsResponseDataItemIncomeSource(Value.ONBOARDING_REWARD, "onboarding_reward");
 
     private final Value value;
 
@@ -52,14 +71,26 @@ public final class ListEarningsResponseDataItemIncomeSource {
 
     public <T> T visit(Visitor<T> visitor) {
         switch (value) {
+            case BUSINESS_REFERRAL:
+                return visitor.visitBusinessReferral();
             case CARD_INTERCHANGE:
                 return visitor.visitCardInterchange();
             case SALES:
                 return visitor.visitSales();
             case TRANSFER:
                 return visitor.visitTransfer();
+            case WITHDRAWAL:
+                return visitor.visitWithdrawal();
+            case VERIFIED_PARTNER_REFERRAL_PAYBACK:
+                return visitor.visitVerifiedPartnerReferralPayback();
             case AD_SPEND:
                 return visitor.visitAdSpend();
+            case PARTNER_REWARD:
+                return visitor.visitPartnerReward();
+            case COMMISSION_ADVANCE:
+                return visitor.visitCommissionAdvance();
+            case ONBOARDING_REWARD:
+                return visitor.visitOnboardingReward();
             case UNKNOWN:
             default:
                 return visitor.visitUnknown(string);
@@ -69,14 +100,26 @@ public final class ListEarningsResponseDataItemIncomeSource {
     @JsonCreator(mode = JsonCreator.Mode.DELEGATING)
     public static ListEarningsResponseDataItemIncomeSource valueOf(String value) {
         switch (value) {
+            case "business_referral":
+                return BUSINESS_REFERRAL;
             case "card_interchange":
                 return CARD_INTERCHANGE;
             case "sales":
                 return SALES;
             case "transfer":
                 return TRANSFER;
+            case "withdrawal":
+                return WITHDRAWAL;
+            case "verified_partner_referral_payback":
+                return VERIFIED_PARTNER_REFERRAL_PAYBACK;
             case "ad_spend":
                 return AD_SPEND;
+            case "partner_reward":
+                return PARTNER_REWARD;
+            case "commission_advance":
+                return COMMISSION_ADVANCE;
+            case "onboarding_reward":
+                return ONBOARDING_REWARD;
             default:
                 return new ListEarningsResponseDataItemIncomeSource(Value.UNKNOWN, value);
         }
@@ -91,6 +134,18 @@ public final class ListEarningsResponseDataItemIncomeSource {
 
         CARD_INTERCHANGE,
 
+        WITHDRAWAL,
+
+        BUSINESS_REFERRAL,
+
+        ONBOARDING_REWARD,
+
+        PARTNER_REWARD,
+
+        VERIFIED_PARTNER_REFERRAL_PAYBACK,
+
+        COMMISSION_ADVANCE,
+
         UNKNOWN
     }
 
@@ -102,6 +157,18 @@ public final class ListEarningsResponseDataItemIncomeSource {
         T visitTransfer();
 
         T visitCardInterchange();
+
+        T visitWithdrawal();
+
+        T visitBusinessReferral();
+
+        T visitOnboardingReward();
+
+        T visitPartnerReward();
+
+        T visitVerifiedPartnerReferralPayback();
+
+        T visitCommissionAdvance();
 
         T visitUnknown(String unknownType);
     }

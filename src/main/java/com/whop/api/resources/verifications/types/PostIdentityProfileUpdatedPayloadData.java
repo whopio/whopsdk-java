@@ -87,7 +87,6 @@ public final class PostIdentityProfileUpdatedPayloadData {
     public static final class Builder implements IdStage, _FinalStage {
         private String id;
 
-        @JsonAnySetter
         private Map<String, Object> additionalProperties = new HashMap<>();
 
         private Builder() {}
@@ -99,7 +98,6 @@ public final class PostIdentityProfileUpdatedPayloadData {
         }
 
         /**
-         * <p>The identity profile id (<code>idpf_</code>). Re-fetch <code>GET /verifications</code> for its current state.</p>
          * <p>The identity profile id (<code>idpf_</code>). Re-fetch <code>GET /verifications</code> for its current state.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
@@ -113,6 +111,14 @@ public final class PostIdentityProfileUpdatedPayloadData {
         @java.lang.Override
         public PostIdentityProfileUpdatedPayloadData build() {
             return new PostIdentityProfileUpdatedPayloadData(id, additionalProperties);
+        }
+
+        @JsonAnySetter
+        private void putAdditionalPropertyFromJson(String key, Object value) {
+            if (key.equalsIgnoreCase("id")) {
+                return;
+            }
+            this.additionalProperties.put(key, value);
         }
 
         @java.lang.Override

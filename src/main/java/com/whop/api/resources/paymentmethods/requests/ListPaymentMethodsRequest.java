@@ -44,8 +44,6 @@ public final class ListPaymentMethodsRequest {
 
     private final Optional<String> memberId;
 
-    private final Optional<String> companyId;
-
     private final Optional<Direction> direction;
 
     private final Optional<OffsetDateTime> createdBefore;
@@ -60,6 +58,8 @@ public final class ListPaymentMethodsRequest {
 
     private final Optional<Boolean> broken;
 
+    private final Optional<String> accountId;
+
     private final Map<String, Object> additionalProperties;
 
     private ListPaymentMethodsRequest(
@@ -71,7 +71,6 @@ public final class ListPaymentMethodsRequest {
             Optional<Integer> first,
             Optional<Integer> last,
             Optional<String> memberId,
-            Optional<String> companyId,
             Optional<Direction> direction,
             Optional<OffsetDateTime> createdBefore,
             Optional<OffsetDateTime> createdAfter,
@@ -79,6 +78,7 @@ public final class ListPaymentMethodsRequest {
             Optional<Boolean> hasPayerDocument,
             Optional<Boolean> expired,
             Optional<Boolean> broken,
+            Optional<String> accountId,
             Map<String, Object> additionalProperties) {
         this.paymentMethodTypes = paymentMethodTypes;
         this.cardBrands = cardBrands;
@@ -88,7 +88,6 @@ public final class ListPaymentMethodsRequest {
         this.first = first;
         this.last = last;
         this.memberId = memberId;
-        this.companyId = companyId;
         this.direction = direction;
         this.createdBefore = createdBefore;
         this.createdAfter = createdAfter;
@@ -96,6 +95,7 @@ public final class ListPaymentMethodsRequest {
         this.hasPayerDocument = hasPayerDocument;
         this.expired = expired;
         this.broken = broken;
+        this.accountId = accountId;
         this.additionalProperties = additionalProperties;
     }
 
@@ -156,19 +156,11 @@ public final class ListPaymentMethodsRequest {
     }
 
     /**
-     * @return The unique identifier of the member to list payment methods for. Omit this and company_id to list your own saved payment methods.
+     * @return The unique identifier of the member to list payment methods for. Omit this and account_id to list your own saved payment methods.
      */
     @JsonProperty("member_id")
     public Optional<String> getMemberId() {
         return memberId;
-    }
-
-    /**
-     * @return The unique identifier of the company. Provide either this or member_id, not both. Omit both to address your own saved payment methods.
-     */
-    @JsonProperty("company_id")
-    public Optional<String> getCompanyId() {
-        return companyId;
     }
 
     @JsonProperty("direction")
@@ -221,6 +213,14 @@ public final class ListPaymentMethodsRequest {
         return broken;
     }
 
+    /**
+     * @return The unique identifier of the company. Provide either this or member_id, not both. Omit both to address your own saved payment methods.
+     */
+    @JsonProperty("account_id")
+    public Optional<String> getAccountId() {
+        return accountId;
+    }
+
     @java.lang.Override
     public boolean equals(Object other) {
         if (this == other) return true;
@@ -241,14 +241,14 @@ public final class ListPaymentMethodsRequest {
                 && first.equals(other.first)
                 && last.equals(other.last)
                 && memberId.equals(other.memberId)
-                && companyId.equals(other.companyId)
                 && direction.equals(other.direction)
                 && createdBefore.equals(other.createdBefore)
                 && createdAfter.equals(other.createdAfter)
                 && futureUsage.equals(other.futureUsage)
                 && hasPayerDocument.equals(other.hasPayerDocument)
                 && expired.equals(other.expired)
-                && broken.equals(other.broken);
+                && broken.equals(other.broken)
+                && accountId.equals(other.accountId);
     }
 
     @java.lang.Override
@@ -262,14 +262,14 @@ public final class ListPaymentMethodsRequest {
                 this.first,
                 this.last,
                 this.memberId,
-                this.companyId,
                 this.direction,
                 this.createdBefore,
                 this.createdAfter,
                 this.futureUsage,
                 this.hasPayerDocument,
                 this.expired,
-                this.broken);
+                this.broken,
+                this.accountId);
     }
 
     @java.lang.Override
@@ -299,8 +299,6 @@ public final class ListPaymentMethodsRequest {
 
         private Optional<String> memberId = Optional.empty();
 
-        private Optional<String> companyId = Optional.empty();
-
         private Optional<Direction> direction = Optional.empty();
 
         private Optional<OffsetDateTime> createdBefore = Optional.empty();
@@ -315,7 +313,8 @@ public final class ListPaymentMethodsRequest {
 
         private Optional<Boolean> broken = Optional.empty();
 
-        @JsonAnySetter
+        private Optional<String> accountId = Optional.empty();
+
         private Map<String, Object> additionalProperties = new HashMap<>();
 
         private Builder() {}
@@ -329,7 +328,6 @@ public final class ListPaymentMethodsRequest {
             first(other.getFirst());
             last(other.getLast());
             memberId(other.getMemberId());
-            companyId(other.getCompanyId());
             direction(other.getDirection());
             createdBefore(other.getCreatedBefore());
             createdAfter(other.getCreatedAfter());
@@ -337,6 +335,7 @@ public final class ListPaymentMethodsRequest {
             hasPayerDocument(other.getHasPayerDocument());
             expired(other.getExpired());
             broken(other.getBroken());
+            accountId(other.getAccountId());
             return this;
         }
 
@@ -454,7 +453,7 @@ public final class ListPaymentMethodsRequest {
         }
 
         /**
-         * <p>The unique identifier of the member to list payment methods for. Omit this and company_id to list your own saved payment methods.</p>
+         * <p>The unique identifier of the member to list payment methods for. Omit this and account_id to list your own saved payment methods.</p>
          */
         @JsonSetter(value = "member_id", nulls = Nulls.SKIP)
         public Builder memberId(Optional<String> memberId) {
@@ -464,20 +463,6 @@ public final class ListPaymentMethodsRequest {
 
         public Builder memberId(String memberId) {
             this.memberId = Optional.ofNullable(memberId);
-            return this;
-        }
-
-        /**
-         * <p>The unique identifier of the company. Provide either this or member_id, not both. Omit both to address your own saved payment methods.</p>
-         */
-        @JsonSetter(value = "company_id", nulls = Nulls.SKIP)
-        public Builder companyId(Optional<String> companyId) {
-            this.companyId = companyId;
-            return this;
-        }
-
-        public Builder companyId(String companyId) {
-            this.companyId = Optional.ofNullable(companyId);
             return this;
         }
 
@@ -573,6 +558,20 @@ public final class ListPaymentMethodsRequest {
             return this;
         }
 
+        /**
+         * <p>The unique identifier of the company. Provide either this or member_id, not both. Omit both to address your own saved payment methods.</p>
+         */
+        @JsonSetter(value = "account_id", nulls = Nulls.SKIP)
+        public Builder accountId(Optional<String> accountId) {
+            this.accountId = accountId;
+            return this;
+        }
+
+        public Builder accountId(String accountId) {
+            this.accountId = Optional.ofNullable(accountId);
+            return this;
+        }
+
         public ListPaymentMethodsRequest build() {
             return new ListPaymentMethodsRequest(
                     paymentMethodTypes,
@@ -583,7 +582,6 @@ public final class ListPaymentMethodsRequest {
                     first,
                     last,
                     memberId,
-                    companyId,
                     direction,
                     createdBefore,
                     createdAfter,
@@ -591,7 +589,31 @@ public final class ListPaymentMethodsRequest {
                     hasPayerDocument,
                     expired,
                     broken,
+                    accountId,
                     additionalProperties);
+        }
+
+        @JsonAnySetter
+        private void putAdditionalPropertyFromJson(String key, Object value) {
+            if (key.equalsIgnoreCase("payment_method_types")
+                    || key.equalsIgnoreCase("card_brands")
+                    || key.equalsIgnoreCase("card_funding_types")
+                    || key.equalsIgnoreCase("after")
+                    || key.equalsIgnoreCase("before")
+                    || key.equalsIgnoreCase("first")
+                    || key.equalsIgnoreCase("last")
+                    || key.equalsIgnoreCase("member_id")
+                    || key.equalsIgnoreCase("direction")
+                    || key.equalsIgnoreCase("created_before")
+                    || key.equalsIgnoreCase("created_after")
+                    || key.equalsIgnoreCase("future_usage")
+                    || key.equalsIgnoreCase("has_payer_document")
+                    || key.equalsIgnoreCase("expired")
+                    || key.equalsIgnoreCase("broken")
+                    || key.equalsIgnoreCase("account_id")) {
+                return;
+            }
+            this.additionalProperties.put(key, value);
         }
 
         public Builder additionalProperty(String key, Object value) {

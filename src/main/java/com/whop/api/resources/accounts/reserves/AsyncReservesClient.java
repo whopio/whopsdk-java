@@ -5,6 +5,7 @@ package com.whop.api.resources.accounts.reserves;
 
 import com.whop.api.core.ClientOptions;
 import com.whop.api.core.RequestOptions;
+import com.whop.api.core.WhopApiHttpResponse;
 import com.whop.api.resources.accounts.reserves.requests.ListReservesRequest;
 import com.whop.api.resources.accounts.reserves.types.ListReservesResponse;
 import java.util.concurrent.CompletableFuture;
@@ -30,21 +31,44 @@ public class AsyncReservesClient {
      * Lists what the account's held balance is made of, one entry per currency: the total held, why each part is held, and the days it unlocks.
      */
     public CompletableFuture<ListReservesResponse> list(String accountId) {
-        return this.rawClient.list(accountId).thenApply(response -> response.body());
+        CompletableFuture<WhopApiHttpResponse<ListReservesResponse>> rawFuture = this.rawClient.list(accountId);
+        CompletableFuture<ListReservesResponse> future = rawFuture.thenApply(response -> response.body());
+        future.whenComplete((result_, throwable_) -> {
+            if (future.isCancelled()) {
+                rawFuture.cancel(true);
+            }
+        });
+        return future;
     }
 
     /**
      * Lists what the account's held balance is made of, one entry per currency: the total held, why each part is held, and the days it unlocks.
      */
     public CompletableFuture<ListReservesResponse> list(String accountId, RequestOptions requestOptions) {
-        return this.rawClient.list(accountId, requestOptions).thenApply(response -> response.body());
+        CompletableFuture<WhopApiHttpResponse<ListReservesResponse>> rawFuture =
+                this.rawClient.list(accountId, requestOptions);
+        CompletableFuture<ListReservesResponse> future = rawFuture.thenApply(response -> response.body());
+        future.whenComplete((result_, throwable_) -> {
+            if (future.isCancelled()) {
+                rawFuture.cancel(true);
+            }
+        });
+        return future;
     }
 
     /**
      * Lists what the account's held balance is made of, one entry per currency: the total held, why each part is held, and the days it unlocks.
      */
     public CompletableFuture<ListReservesResponse> list(String accountId, ListReservesRequest request) {
-        return this.rawClient.list(accountId, request).thenApply(response -> response.body());
+        CompletableFuture<WhopApiHttpResponse<ListReservesResponse>> rawFuture =
+                this.rawClient.list(accountId, request);
+        CompletableFuture<ListReservesResponse> future = rawFuture.thenApply(response -> response.body());
+        future.whenComplete((result_, throwable_) -> {
+            if (future.isCancelled()) {
+                rawFuture.cancel(true);
+            }
+        });
+        return future;
     }
 
     /**
@@ -52,6 +76,14 @@ public class AsyncReservesClient {
      */
     public CompletableFuture<ListReservesResponse> list(
             String accountId, ListReservesRequest request, RequestOptions requestOptions) {
-        return this.rawClient.list(accountId, request, requestOptions).thenApply(response -> response.body());
+        CompletableFuture<WhopApiHttpResponse<ListReservesResponse>> rawFuture =
+                this.rawClient.list(accountId, request, requestOptions);
+        CompletableFuture<ListReservesResponse> future = rawFuture.thenApply(response -> response.body());
+        future.whenComplete((result_, throwable_) -> {
+            if (future.isCancelled()) {
+                rawFuture.cancel(true);
+            }
+        });
+        return future;
     }
 }

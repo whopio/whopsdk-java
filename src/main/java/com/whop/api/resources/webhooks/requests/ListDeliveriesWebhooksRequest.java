@@ -12,7 +12,12 @@ import com.fasterxml.jackson.annotation.JsonSetter;
 import com.fasterxml.jackson.annotation.Nulls;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.whop.api.core.ObjectMappers;
+import com.whop.api.resources.webhooks.types.ListDeliveriesWebhooksRequestEventsItem;
+import com.whop.api.resources.webhooks.types.ListDeliveriesWebhooksRequestStatus;
+import java.time.OffsetDateTime;
+import java.util.Collections;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
@@ -20,21 +25,51 @@ import java.util.Optional;
 @JsonInclude(JsonInclude.Include.NON_ABSENT)
 @JsonDeserialize(builder = ListDeliveriesWebhooksRequest.Builder.class)
 public final class ListDeliveriesWebhooksRequest {
+    private final Optional<List<ListDeliveriesWebhooksRequestEventsItem>> events;
+
     private final Optional<Integer> first;
 
     private final Optional<String> after;
 
+    private final Optional<OffsetDateTime> sentAfter;
+
+    private final Optional<OffsetDateTime> sentBefore;
+
+    private final Optional<ListDeliveriesWebhooksRequestStatus> status;
+
+    private final Optional<String> resourceId;
+
     private final Map<String, Object> additionalProperties;
 
     private ListDeliveriesWebhooksRequest(
-            Optional<Integer> first, Optional<String> after, Map<String, Object> additionalProperties) {
+            Optional<List<ListDeliveriesWebhooksRequestEventsItem>> events,
+            Optional<Integer> first,
+            Optional<String> after,
+            Optional<OffsetDateTime> sentAfter,
+            Optional<OffsetDateTime> sentBefore,
+            Optional<ListDeliveriesWebhooksRequestStatus> status,
+            Optional<String> resourceId,
+            Map<String, Object> additionalProperties) {
+        this.events = events;
         this.first = first;
         this.after = after;
+        this.sentAfter = sentAfter;
+        this.sentBefore = sentBefore;
+        this.status = status;
+        this.resourceId = resourceId;
         this.additionalProperties = additionalProperties;
     }
 
     /**
-     * @return The number of deliveries to return (default 50, max 100).
+     * @return Only deliveries of these event types. Repeat the parameter to pass several.
+     */
+    @JsonProperty("events")
+    public Optional<List<ListDeliveriesWebhooksRequestEventsItem>> getEvents() {
+        return events;
+    }
+
+    /**
+     * @return Number of results to return from the start of the range.
      */
     @JsonProperty("first")
     public Optional<Integer> getFirst() {
@@ -42,11 +77,43 @@ public final class ListDeliveriesWebhooksRequest {
     }
 
     /**
-     * @return A cursor; returns deliveries after this position.
+     * @return Return results after this cursor. Use <code>page_info.end_cursor</code> from the previous response to fetch the next page.
      */
     @JsonProperty("after")
     public Optional<String> getAfter() {
         return after;
+    }
+
+    /**
+     * @return Only deliveries sent at or after this ISO 8601 timestamp. Deliveries are retained for 30 days.
+     */
+    @JsonProperty("sent_after")
+    public Optional<OffsetDateTime> getSentAfter() {
+        return sentAfter;
+    }
+
+    /**
+     * @return Only deliveries sent at or before this ISO 8601 timestamp.
+     */
+    @JsonProperty("sent_before")
+    public Optional<OffsetDateTime> getSentBefore() {
+        return sentBefore;
+    }
+
+    /**
+     * @return Only deliveries with this outcome: <code>success</code> for a 2xx response, <code>error</code> otherwise.
+     */
+    @JsonProperty("status")
+    public Optional<ListDeliveriesWebhooksRequestStatus> getStatus() {
+        return status;
+    }
+
+    /**
+     * @return Only deliveries triggered by this resource.
+     */
+    @JsonProperty("resource_id")
+    public Optional<String> getResourceId() {
+        return resourceId;
     }
 
     @java.lang.Override
@@ -61,12 +128,19 @@ public final class ListDeliveriesWebhooksRequest {
     }
 
     private boolean equalTo(ListDeliveriesWebhooksRequest other) {
-        return first.equals(other.first) && after.equals(other.after);
+        return events.equals(other.events)
+                && first.equals(other.first)
+                && after.equals(other.after)
+                && sentAfter.equals(other.sentAfter)
+                && sentBefore.equals(other.sentBefore)
+                && status.equals(other.status)
+                && resourceId.equals(other.resourceId);
     }
 
     @java.lang.Override
     public int hashCode() {
-        return Objects.hash(this.first, this.after);
+        return Objects.hash(
+                this.events, this.first, this.after, this.sentAfter, this.sentBefore, this.status, this.resourceId);
     }
 
     @java.lang.Override
@@ -80,23 +154,56 @@ public final class ListDeliveriesWebhooksRequest {
 
     @JsonIgnoreProperties(ignoreUnknown = true)
     public static final class Builder {
+        private Optional<List<ListDeliveriesWebhooksRequestEventsItem>> events = Optional.empty();
+
         private Optional<Integer> first = Optional.empty();
 
         private Optional<String> after = Optional.empty();
 
-        @JsonAnySetter
+        private Optional<OffsetDateTime> sentAfter = Optional.empty();
+
+        private Optional<OffsetDateTime> sentBefore = Optional.empty();
+
+        private Optional<ListDeliveriesWebhooksRequestStatus> status = Optional.empty();
+
+        private Optional<String> resourceId = Optional.empty();
+
         private Map<String, Object> additionalProperties = new HashMap<>();
 
         private Builder() {}
 
         public Builder from(ListDeliveriesWebhooksRequest other) {
+            events(other.getEvents());
             first(other.getFirst());
             after(other.getAfter());
+            sentAfter(other.getSentAfter());
+            sentBefore(other.getSentBefore());
+            status(other.getStatus());
+            resourceId(other.getResourceId());
             return this;
         }
 
         /**
-         * <p>The number of deliveries to return (default 50, max 100).</p>
+         * <p>Only deliveries of these event types. Repeat the parameter to pass several.</p>
+         */
+        @JsonSetter(value = "events", nulls = Nulls.SKIP)
+        public Builder events(Optional<List<ListDeliveriesWebhooksRequestEventsItem>> events) {
+            this.events = events;
+            return this;
+        }
+
+        public Builder events(List<ListDeliveriesWebhooksRequestEventsItem> events) {
+            this.events = Optional.ofNullable(events);
+            return this;
+        }
+
+        public Builder events(ListDeliveriesWebhooksRequestEventsItem events) {
+            this.events = Optional.of(Collections.singletonList(events));
+            return this;
+        }
+
+        /**
+         * <p>Number of results to return from the start of the range.</p>
          */
         @JsonSetter(value = "first", nulls = Nulls.SKIP)
         public Builder first(Optional<Integer> first) {
@@ -110,7 +217,7 @@ public final class ListDeliveriesWebhooksRequest {
         }
 
         /**
-         * <p>A cursor; returns deliveries after this position.</p>
+         * <p>Return results after this cursor. Use <code>page_info.end_cursor</code> from the previous response to fetch the next page.</p>
          */
         @JsonSetter(value = "after", nulls = Nulls.SKIP)
         public Builder after(Optional<String> after) {
@@ -123,8 +230,79 @@ public final class ListDeliveriesWebhooksRequest {
             return this;
         }
 
+        /**
+         * <p>Only deliveries sent at or after this ISO 8601 timestamp. Deliveries are retained for 30 days.</p>
+         */
+        @JsonSetter(value = "sent_after", nulls = Nulls.SKIP)
+        public Builder sentAfter(Optional<OffsetDateTime> sentAfter) {
+            this.sentAfter = sentAfter;
+            return this;
+        }
+
+        public Builder sentAfter(OffsetDateTime sentAfter) {
+            this.sentAfter = Optional.ofNullable(sentAfter);
+            return this;
+        }
+
+        /**
+         * <p>Only deliveries sent at or before this ISO 8601 timestamp.</p>
+         */
+        @JsonSetter(value = "sent_before", nulls = Nulls.SKIP)
+        public Builder sentBefore(Optional<OffsetDateTime> sentBefore) {
+            this.sentBefore = sentBefore;
+            return this;
+        }
+
+        public Builder sentBefore(OffsetDateTime sentBefore) {
+            this.sentBefore = Optional.ofNullable(sentBefore);
+            return this;
+        }
+
+        /**
+         * <p>Only deliveries with this outcome: <code>success</code> for a 2xx response, <code>error</code> otherwise.</p>
+         */
+        @JsonSetter(value = "status", nulls = Nulls.SKIP)
+        public Builder status(Optional<ListDeliveriesWebhooksRequestStatus> status) {
+            this.status = status;
+            return this;
+        }
+
+        public Builder status(ListDeliveriesWebhooksRequestStatus status) {
+            this.status = Optional.ofNullable(status);
+            return this;
+        }
+
+        /**
+         * <p>Only deliveries triggered by this resource.</p>
+         */
+        @JsonSetter(value = "resource_id", nulls = Nulls.SKIP)
+        public Builder resourceId(Optional<String> resourceId) {
+            this.resourceId = resourceId;
+            return this;
+        }
+
+        public Builder resourceId(String resourceId) {
+            this.resourceId = Optional.ofNullable(resourceId);
+            return this;
+        }
+
         public ListDeliveriesWebhooksRequest build() {
-            return new ListDeliveriesWebhooksRequest(first, after, additionalProperties);
+            return new ListDeliveriesWebhooksRequest(
+                    events, first, after, sentAfter, sentBefore, status, resourceId, additionalProperties);
+        }
+
+        @JsonAnySetter
+        private void putAdditionalPropertyFromJson(String key, Object value) {
+            if (key.equalsIgnoreCase("events")
+                    || key.equalsIgnoreCase("first")
+                    || key.equalsIgnoreCase("after")
+                    || key.equalsIgnoreCase("sent_after")
+                    || key.equalsIgnoreCase("sent_before")
+                    || key.equalsIgnoreCase("status")
+                    || key.equalsIgnoreCase("resource_id")) {
+                return;
+            }
+            this.additionalProperties.put(key, value);
         }
 
         public Builder additionalProperty(String key, Object value) {

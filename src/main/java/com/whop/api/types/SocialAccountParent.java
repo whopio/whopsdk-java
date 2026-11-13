@@ -276,7 +276,6 @@ public final class SocialAccountParent {
 
         private Optional<String> externalId = Optional.empty();
 
-        @JsonAnySetter
         private Map<String, Object> additionalProperties = new HashMap<>();
 
         private Builder() {}
@@ -295,7 +294,6 @@ public final class SocialAccountParent {
 
         /**
          * <p>Social account ID, prefixed <code>sacc_</code>.</p>
-         * <p>Social account ID, prefixed <code>sacc_</code>.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
@@ -307,7 +305,6 @@ public final class SocialAccountParent {
 
         /**
          * <p>The platform the parent social account exists on.</p>
-         * <p>The platform the parent social account exists on.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
@@ -318,7 +315,6 @@ public final class SocialAccountParent {
         }
 
         /**
-         * <p>Whether the parent social account is verified on the platform.</p>
          * <p>Whether the parent social account is verified on the platform.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
@@ -477,6 +473,20 @@ public final class SocialAccountParent {
         public SocialAccountParent build() {
             return new SocialAccountParent(
                     externalId, id, name, platform, profilePictureUrl, username, verified, additionalProperties);
+        }
+
+        @JsonAnySetter
+        private void putAdditionalPropertyFromJson(String key, Object value) {
+            if (key.equalsIgnoreCase("external_id")
+                    || key.equalsIgnoreCase("id")
+                    || key.equalsIgnoreCase("name")
+                    || key.equalsIgnoreCase("platform")
+                    || key.equalsIgnoreCase("profile_picture_url")
+                    || key.equalsIgnoreCase("username")
+                    || key.equalsIgnoreCase("verified")) {
+                return;
+            }
+            this.additionalProperties.put(key, value);
         }
 
         @java.lang.Override

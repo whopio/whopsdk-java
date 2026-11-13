@@ -5,6 +5,7 @@ package com.whop.api.resources.companytokentransactions;
 
 import com.whop.api.core.ClientOptions;
 import com.whop.api.core.RequestOptions;
+import com.whop.api.core.WhopApiHttpResponse;
 import com.whop.api.core.pagination.SyncPagingIterable;
 import com.whop.api.resources.companytokentransactions.requests.ListCompanyTokenTransactionsRequest;
 import com.whop.api.resources.companytokentransactions.requests.RetrieveCompanyTokenTransactionsRequest;
@@ -31,7 +32,7 @@ public class AsyncCompanyTokenTransactionsClient {
     }
 
     /**
-     * Returns a paginated list of token transactions for a user or company, depending on the authenticated actor, with optional filtering by user and transaction type.
+     * Lists an account's token transactions, newest first.
      * <p>Required permissions:</p>
      * <ul>
      * <li><code>company_token_transaction:read</code></li>
@@ -41,11 +42,20 @@ public class AsyncCompanyTokenTransactionsClient {
      */
     public CompletableFuture<SyncPagingIterable<CompanyTokenTransactionListItem>> list(
             ListCompanyTokenTransactionsRequest request) {
-        return this.rawClient.list(request).thenApply(response -> response.body());
+        CompletableFuture<WhopApiHttpResponse<SyncPagingIterable<CompanyTokenTransactionListItem>>> rawFuture =
+                this.rawClient.list(request);
+        CompletableFuture<SyncPagingIterable<CompanyTokenTransactionListItem>> future =
+                rawFuture.thenApply(response -> response.body());
+        future.whenComplete((result_, throwable_) -> {
+            if (future.isCancelled()) {
+                rawFuture.cancel(true);
+            }
+        });
+        return future;
     }
 
     /**
-     * Returns a paginated list of token transactions for a user or company, depending on the authenticated actor, with optional filtering by user and transaction type.
+     * Lists an account's token transactions, newest first.
      * <p>Required permissions:</p>
      * <ul>
      * <li><code>company_token_transaction:read</code></li>
@@ -55,11 +65,20 @@ public class AsyncCompanyTokenTransactionsClient {
      */
     public CompletableFuture<SyncPagingIterable<CompanyTokenTransactionListItem>> list(
             ListCompanyTokenTransactionsRequest request, RequestOptions requestOptions) {
-        return this.rawClient.list(request, requestOptions).thenApply(response -> response.body());
+        CompletableFuture<WhopApiHttpResponse<SyncPagingIterable<CompanyTokenTransactionListItem>>> rawFuture =
+                this.rawClient.list(request, requestOptions);
+        CompletableFuture<SyncPagingIterable<CompanyTokenTransactionListItem>> future =
+                rawFuture.thenApply(response -> response.body());
+        future.whenComplete((result_, throwable_) -> {
+            if (future.isCancelled()) {
+                rawFuture.cancel(true);
+            }
+        });
+        return future;
     }
 
     /**
-     * Create a token transaction to add, subtract, or transfer tokens for a member within a company.
+     * Creates a token transaction that adds, subtracts, or transfers tokens for a member of an account.
      * <p>Required permissions:</p>
      * <ul>
      * <li><code>company_token_transaction:create</code></li>
@@ -68,11 +87,18 @@ public class AsyncCompanyTokenTransactionsClient {
      * </ul>
      */
     public CompletableFuture<CompanyTokenTransaction> create(CreateCompanyTokenTransactionsRequest request) {
-        return this.rawClient.create(request).thenApply(response -> response.body());
+        CompletableFuture<WhopApiHttpResponse<CompanyTokenTransaction>> rawFuture = this.rawClient.create(request);
+        CompletableFuture<CompanyTokenTransaction> future = rawFuture.thenApply(response -> response.body());
+        future.whenComplete((result_, throwable_) -> {
+            if (future.isCancelled()) {
+                rawFuture.cancel(true);
+            }
+        });
+        return future;
     }
 
     /**
-     * Create a token transaction to add, subtract, or transfer tokens for a member within a company.
+     * Creates a token transaction that adds, subtracts, or transfers tokens for a member of an account.
      * <p>Required permissions:</p>
      * <ul>
      * <li><code>company_token_transaction:create</code></li>
@@ -82,11 +108,19 @@ public class AsyncCompanyTokenTransactionsClient {
      */
     public CompletableFuture<CompanyTokenTransaction> create(
             CreateCompanyTokenTransactionsRequest request, RequestOptions requestOptions) {
-        return this.rawClient.create(request, requestOptions).thenApply(response -> response.body());
+        CompletableFuture<WhopApiHttpResponse<CompanyTokenTransaction>> rawFuture =
+                this.rawClient.create(request, requestOptions);
+        CompletableFuture<CompanyTokenTransaction> future = rawFuture.thenApply(response -> response.body());
+        future.whenComplete((result_, throwable_) -> {
+            if (future.isCancelled()) {
+                rawFuture.cancel(true);
+            }
+        });
+        return future;
     }
 
     /**
-     * Retrieves the details of an existing company token transaction.
+     * Retrieves a token transaction.
      * <p>Required permissions:</p>
      * <ul>
      * <li><code>company_token_transaction:read</code></li>
@@ -95,11 +129,18 @@ public class AsyncCompanyTokenTransactionsClient {
      * </ul>
      */
     public CompletableFuture<CompanyTokenTransaction> retrieve(String id) {
-        return this.rawClient.retrieve(id).thenApply(response -> response.body());
+        CompletableFuture<WhopApiHttpResponse<CompanyTokenTransaction>> rawFuture = this.rawClient.retrieve(id);
+        CompletableFuture<CompanyTokenTransaction> future = rawFuture.thenApply(response -> response.body());
+        future.whenComplete((result_, throwable_) -> {
+            if (future.isCancelled()) {
+                rawFuture.cancel(true);
+            }
+        });
+        return future;
     }
 
     /**
-     * Retrieves the details of an existing company token transaction.
+     * Retrieves a token transaction.
      * <p>Required permissions:</p>
      * <ul>
      * <li><code>company_token_transaction:read</code></li>
@@ -108,11 +149,19 @@ public class AsyncCompanyTokenTransactionsClient {
      * </ul>
      */
     public CompletableFuture<CompanyTokenTransaction> retrieve(String id, RequestOptions requestOptions) {
-        return this.rawClient.retrieve(id, requestOptions).thenApply(response -> response.body());
+        CompletableFuture<WhopApiHttpResponse<CompanyTokenTransaction>> rawFuture =
+                this.rawClient.retrieve(id, requestOptions);
+        CompletableFuture<CompanyTokenTransaction> future = rawFuture.thenApply(response -> response.body());
+        future.whenComplete((result_, throwable_) -> {
+            if (future.isCancelled()) {
+                rawFuture.cancel(true);
+            }
+        });
+        return future;
     }
 
     /**
-     * Retrieves the details of an existing company token transaction.
+     * Retrieves a token transaction.
      * <p>Required permissions:</p>
      * <ul>
      * <li><code>company_token_transaction:read</code></li>
@@ -122,11 +171,19 @@ public class AsyncCompanyTokenTransactionsClient {
      */
     public CompletableFuture<CompanyTokenTransaction> retrieve(
             String id, RetrieveCompanyTokenTransactionsRequest request) {
-        return this.rawClient.retrieve(id, request).thenApply(response -> response.body());
+        CompletableFuture<WhopApiHttpResponse<CompanyTokenTransaction>> rawFuture =
+                this.rawClient.retrieve(id, request);
+        CompletableFuture<CompanyTokenTransaction> future = rawFuture.thenApply(response -> response.body());
+        future.whenComplete((result_, throwable_) -> {
+            if (future.isCancelled()) {
+                rawFuture.cancel(true);
+            }
+        });
+        return future;
     }
 
     /**
-     * Retrieves the details of an existing company token transaction.
+     * Retrieves a token transaction.
      * <p>Required permissions:</p>
      * <ul>
      * <li><code>company_token_transaction:read</code></li>
@@ -136,6 +193,14 @@ public class AsyncCompanyTokenTransactionsClient {
      */
     public CompletableFuture<CompanyTokenTransaction> retrieve(
             String id, RetrieveCompanyTokenTransactionsRequest request, RequestOptions requestOptions) {
-        return this.rawClient.retrieve(id, request, requestOptions).thenApply(response -> response.body());
+        CompletableFuture<WhopApiHttpResponse<CompanyTokenTransaction>> rawFuture =
+                this.rawClient.retrieve(id, request, requestOptions);
+        CompletableFuture<CompanyTokenTransaction> future = rawFuture.thenApply(response -> response.body());
+        future.whenComplete((result_, throwable_) -> {
+            if (future.isCancelled()) {
+                rawFuture.cancel(true);
+            }
+        });
+        return future;
     }
 }

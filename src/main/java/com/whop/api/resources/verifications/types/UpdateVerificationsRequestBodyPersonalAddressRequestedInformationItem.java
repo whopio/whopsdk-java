@@ -24,32 +24,44 @@ import org.jetbrains.annotations.NotNull;
 public final class UpdateVerificationsRequestBodyPersonalAddressRequestedInformationItem {
     private final Optional<UpdateVerificationsRequestBodyPersonalAddressRequestedInformationItemAddress> address;
 
+    private final Optional<String> documentNumber;
+
     private final Optional<UpdateVerificationsRequestBodyPersonalAddressRequestedInformationItemDocuments> documents;
 
     private final Optional<List<String>> files;
 
     private final String id;
 
+    private final Optional<String> issuingCountry;
+
     private final Optional<String> value;
 
     private final Optional<UpdateVerificationsRequestBodyPersonalAddressRequestedInformationItemValueType> valueType;
+
+    private final Optional<List<String>> values;
 
     private final Map<String, Object> additionalProperties;
 
     private UpdateVerificationsRequestBodyPersonalAddressRequestedInformationItem(
             Optional<UpdateVerificationsRequestBodyPersonalAddressRequestedInformationItemAddress> address,
+            Optional<String> documentNumber,
             Optional<UpdateVerificationsRequestBodyPersonalAddressRequestedInformationItemDocuments> documents,
             Optional<List<String>> files,
             String id,
+            Optional<String> issuingCountry,
             Optional<String> value,
             Optional<UpdateVerificationsRequestBodyPersonalAddressRequestedInformationItemValueType> valueType,
+            Optional<List<String>> values,
             Map<String, Object> additionalProperties) {
         this.address = address;
+        this.documentNumber = documentNumber;
         this.documents = documents;
         this.files = files;
         this.id = id;
+        this.issuingCountry = issuingCountry;
         this.value = value;
         this.valueType = valueType;
+        this.values = values;
         this.additionalProperties = additionalProperties;
     }
 
@@ -62,6 +74,14 @@ public final class UpdateVerificationsRequestBodyPersonalAddressRequestedInforma
     }
 
     /**
+     * @return Identity number for an <code>id_document</code> answer.
+     */
+    @JsonProperty("document_number")
+    public Optional<String> getDocumentNumber() {
+        return documentNumber;
+    }
+
+    /**
      * @return Answer for an <code>id_document</code> item: the same slot keys Create Verification takes, so the key names both the document and the side. Send every slot for the ID you are uploading — <code>PASSPORT</code> is <code>passport_front</code>; <code>ID_CARD</code>, <code>DRIVERS</code> and <code>RESIDENCE_PERMIT</code> take a front and a back. Each value is a direct upload ID, or a <code>file_</code>-prefixed attachment ID to reuse an uploaded document.
      */
     @JsonProperty("documents")
@@ -70,7 +90,7 @@ public final class UpdateVerificationsRequestBodyPersonalAddressRequestedInforma
     }
 
     /**
-     * @return Answer for a <code>files</code> item — one document, as a list of its pages, first page first. Each entry is a direct upload ID, or a <code>file_</code>-prefixed attachment ID to reuse an uploaded document.
+     * @return Answer for a <code>files</code> item, optional supporting documents for <code>text_with_files</code>, or the document an item's <code>alternative_document_label</code> names — a list of pages, first page first. Each entry is a direct upload ID, or a <code>file_</code>-prefixed attachment ID to reuse an uploaded document.
      */
     @JsonProperty("files")
     public Optional<List<String>> getFiles() {
@@ -86,7 +106,15 @@ public final class UpdateVerificationsRequestBodyPersonalAddressRequestedInforma
     }
 
     /**
-     * @return Answer for <code>text</code>, <code>date</code>, <code>phone</code>, and <code>select</code> items, and the chosen document type for a <code>file</code> item that lists <code>options</code>.
+     * @return Two-letter ISO 3166-1 issuing country for an <code>id_document</code> answer.
+     */
+    @JsonProperty("issuing_country")
+    public Optional<String> getIssuingCountry() {
+        return issuingCountry;
+    }
+
+    /**
+     * @return Answer for <code>text</code>, <code>text_with_files</code>, <code>date</code>, <code>phone</code>, and <code>select</code> items, and the chosen document type for a <code>file</code> item that lists <code>options</code>.
      */
     @JsonProperty("value")
     public Optional<String> getValue() {
@@ -99,6 +127,14 @@ public final class UpdateVerificationsRequestBodyPersonalAddressRequestedInforma
     @JsonProperty("value_type")
     public Optional<UpdateVerificationsRequestBodyPersonalAddressRequestedInformationItemValueType> getValueType() {
         return valueType;
+    }
+
+    /**
+     * @return Every chosen option for a <code>select</code> item that accepts more than one answer. Use <code>value</code> for every other item.
+     */
+    @JsonProperty("values")
+    public Optional<List<String>> getValues() {
+        return values;
     }
 
     @java.lang.Override
@@ -115,16 +151,28 @@ public final class UpdateVerificationsRequestBodyPersonalAddressRequestedInforma
 
     private boolean equalTo(UpdateVerificationsRequestBodyPersonalAddressRequestedInformationItem other) {
         return address.equals(other.address)
+                && documentNumber.equals(other.documentNumber)
                 && documents.equals(other.documents)
                 && files.equals(other.files)
                 && id.equals(other.id)
+                && issuingCountry.equals(other.issuingCountry)
                 && value.equals(other.value)
-                && valueType.equals(other.valueType);
+                && valueType.equals(other.valueType)
+                && values.equals(other.values);
     }
 
     @java.lang.Override
     public int hashCode() {
-        return Objects.hash(this.address, this.documents, this.files, this.id, this.value, this.valueType);
+        return Objects.hash(
+                this.address,
+                this.documentNumber,
+                this.documents,
+                this.files,
+                this.id,
+                this.issuingCountry,
+                this.value,
+                this.valueType,
+                this.values);
     }
 
     @java.lang.Override
@@ -161,6 +209,13 @@ public final class UpdateVerificationsRequestBodyPersonalAddressRequestedInforma
         _FinalStage address(UpdateVerificationsRequestBodyPersonalAddressRequestedInformationItemAddress address);
 
         /**
+         * <p>Identity number for an <code>id_document</code> answer.</p>
+         */
+        _FinalStage documentNumber(Optional<String> documentNumber);
+
+        _FinalStage documentNumber(String documentNumber);
+
+        /**
          * <p>Answer for an <code>id_document</code> item: the same slot keys Create Verification takes, so the key names both the document and the side. Send every slot for the ID you are uploading — <code>PASSPORT</code> is <code>passport_front</code>; <code>ID_CARD</code>, <code>DRIVERS</code> and <code>RESIDENCE_PERMIT</code> take a front and a back. Each value is a direct upload ID, or a <code>file_</code>-prefixed attachment ID to reuse an uploaded document.</p>
          */
         _FinalStage documents(
@@ -169,14 +224,21 @@ public final class UpdateVerificationsRequestBodyPersonalAddressRequestedInforma
         _FinalStage documents(UpdateVerificationsRequestBodyPersonalAddressRequestedInformationItemDocuments documents);
 
         /**
-         * <p>Answer for a <code>files</code> item — one document, as a list of its pages, first page first. Each entry is a direct upload ID, or a <code>file_</code>-prefixed attachment ID to reuse an uploaded document.</p>
+         * <p>Answer for a <code>files</code> item, optional supporting documents for <code>text_with_files</code>, or the document an item's <code>alternative_document_label</code> names — a list of pages, first page first. Each entry is a direct upload ID, or a <code>file_</code>-prefixed attachment ID to reuse an uploaded document.</p>
          */
         _FinalStage files(Optional<List<String>> files);
 
         _FinalStage files(List<String> files);
 
         /**
-         * <p>Answer for <code>text</code>, <code>date</code>, <code>phone</code>, and <code>select</code> items, and the chosen document type for a <code>file</code> item that lists <code>options</code>.</p>
+         * <p>Two-letter ISO 3166-1 issuing country for an <code>id_document</code> answer.</p>
+         */
+        _FinalStage issuingCountry(Optional<String> issuingCountry);
+
+        _FinalStage issuingCountry(String issuingCountry);
+
+        /**
+         * <p>Answer for <code>text</code>, <code>text_with_files</code>, <code>date</code>, <code>phone</code>, and <code>select</code> items, and the chosen document type for a <code>file</code> item that lists <code>options</code>.</p>
          */
         _FinalStage value(Optional<String> value);
 
@@ -189,26 +251,38 @@ public final class UpdateVerificationsRequestBodyPersonalAddressRequestedInforma
                 Optional<UpdateVerificationsRequestBodyPersonalAddressRequestedInformationItemValueType> valueType);
 
         _FinalStage valueType(UpdateVerificationsRequestBodyPersonalAddressRequestedInformationItemValueType valueType);
+
+        /**
+         * <p>Every chosen option for a <code>select</code> item that accepts more than one answer. Use <code>value</code> for every other item.</p>
+         */
+        _FinalStage values(Optional<List<String>> values);
+
+        _FinalStage values(List<String> values);
     }
 
     @JsonIgnoreProperties(ignoreUnknown = true)
     public static final class Builder implements IdStage, _FinalStage {
         private String id;
 
+        private Optional<List<String>> values = Optional.empty();
+
         private Optional<UpdateVerificationsRequestBodyPersonalAddressRequestedInformationItemValueType> valueType =
                 Optional.empty();
 
         private Optional<String> value = Optional.empty();
+
+        private Optional<String> issuingCountry = Optional.empty();
 
         private Optional<List<String>> files = Optional.empty();
 
         private Optional<UpdateVerificationsRequestBodyPersonalAddressRequestedInformationItemDocuments> documents =
                 Optional.empty();
 
+        private Optional<String> documentNumber = Optional.empty();
+
         private Optional<UpdateVerificationsRequestBodyPersonalAddressRequestedInformationItemAddress> address =
                 Optional.empty();
 
-        @JsonAnySetter
         private Map<String, Object> additionalProperties = new HashMap<>();
 
         private Builder() {}
@@ -216,16 +290,18 @@ public final class UpdateVerificationsRequestBodyPersonalAddressRequestedInforma
         @java.lang.Override
         public Builder from(UpdateVerificationsRequestBodyPersonalAddressRequestedInformationItem other) {
             address(other.getAddress());
+            documentNumber(other.getDocumentNumber());
             documents(other.getDocuments());
             files(other.getFiles());
             id(other.getId());
+            issuingCountry(other.getIssuingCountry());
             value(other.getValue());
             valueType(other.getValueType());
+            values(other.getValues());
             return this;
         }
 
         /**
-         * <p>Item ID from <code>requested_information</code>.</p>
          * <p>Item ID from <code>requested_information</code>.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
@@ -233,6 +309,26 @@ public final class UpdateVerificationsRequestBodyPersonalAddressRequestedInforma
         @JsonSetter("id")
         public _FinalStage id(@NotNull String id) {
             this.id = Objects.requireNonNull(id, "id must not be null");
+            return this;
+        }
+
+        /**
+         * <p>Every chosen option for a <code>select</code> item that accepts more than one answer. Use <code>value</code> for every other item.</p>
+         * @return Reference to {@code this} so that method calls can be chained together.
+         */
+        @java.lang.Override
+        public _FinalStage values(List<String> values) {
+            this.values = Optional.ofNullable(values);
+            return this;
+        }
+
+        /**
+         * <p>Every chosen option for a <code>select</code> item that accepts more than one answer. Use <code>value</code> for every other item.</p>
+         */
+        @java.lang.Override
+        @JsonSetter(value = "values", nulls = Nulls.SKIP)
+        public _FinalStage values(Optional<List<String>> values) {
+            this.values = values;
             return this;
         }
 
@@ -259,7 +355,7 @@ public final class UpdateVerificationsRequestBodyPersonalAddressRequestedInforma
         }
 
         /**
-         * <p>Answer for <code>text</code>, <code>date</code>, <code>phone</code>, and <code>select</code> items, and the chosen document type for a <code>file</code> item that lists <code>options</code>.</p>
+         * <p>Answer for <code>text</code>, <code>text_with_files</code>, <code>date</code>, <code>phone</code>, and <code>select</code> items, and the chosen document type for a <code>file</code> item that lists <code>options</code>.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
@@ -269,7 +365,7 @@ public final class UpdateVerificationsRequestBodyPersonalAddressRequestedInforma
         }
 
         /**
-         * <p>Answer for <code>text</code>, <code>date</code>, <code>phone</code>, and <code>select</code> items, and the chosen document type for a <code>file</code> item that lists <code>options</code>.</p>
+         * <p>Answer for <code>text</code>, <code>text_with_files</code>, <code>date</code>, <code>phone</code>, and <code>select</code> items, and the chosen document type for a <code>file</code> item that lists <code>options</code>.</p>
          */
         @java.lang.Override
         @JsonSetter(value = "value", nulls = Nulls.SKIP)
@@ -279,7 +375,27 @@ public final class UpdateVerificationsRequestBodyPersonalAddressRequestedInforma
         }
 
         /**
-         * <p>Answer for a <code>files</code> item — one document, as a list of its pages, first page first. Each entry is a direct upload ID, or a <code>file_</code>-prefixed attachment ID to reuse an uploaded document.</p>
+         * <p>Two-letter ISO 3166-1 issuing country for an <code>id_document</code> answer.</p>
+         * @return Reference to {@code this} so that method calls can be chained together.
+         */
+        @java.lang.Override
+        public _FinalStage issuingCountry(String issuingCountry) {
+            this.issuingCountry = Optional.ofNullable(issuingCountry);
+            return this;
+        }
+
+        /**
+         * <p>Two-letter ISO 3166-1 issuing country for an <code>id_document</code> answer.</p>
+         */
+        @java.lang.Override
+        @JsonSetter(value = "issuing_country", nulls = Nulls.SKIP)
+        public _FinalStage issuingCountry(Optional<String> issuingCountry) {
+            this.issuingCountry = issuingCountry;
+            return this;
+        }
+
+        /**
+         * <p>Answer for a <code>files</code> item, optional supporting documents for <code>text_with_files</code>, or the document an item's <code>alternative_document_label</code> names — a list of pages, first page first. Each entry is a direct upload ID, or a <code>file_</code>-prefixed attachment ID to reuse an uploaded document.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
@@ -289,7 +405,7 @@ public final class UpdateVerificationsRequestBodyPersonalAddressRequestedInforma
         }
 
         /**
-         * <p>Answer for a <code>files</code> item — one document, as a list of its pages, first page first. Each entry is a direct upload ID, or a <code>file_</code>-prefixed attachment ID to reuse an uploaded document.</p>
+         * <p>Answer for a <code>files</code> item, optional supporting documents for <code>text_with_files</code>, or the document an item's <code>alternative_document_label</code> names — a list of pages, first page first. Each entry is a direct upload ID, or a <code>file_</code>-prefixed attachment ID to reuse an uploaded document.</p>
          */
         @java.lang.Override
         @JsonSetter(value = "files", nulls = Nulls.SKIP)
@@ -321,6 +437,26 @@ public final class UpdateVerificationsRequestBodyPersonalAddressRequestedInforma
         }
 
         /**
+         * <p>Identity number for an <code>id_document</code> answer.</p>
+         * @return Reference to {@code this} so that method calls can be chained together.
+         */
+        @java.lang.Override
+        public _FinalStage documentNumber(String documentNumber) {
+            this.documentNumber = Optional.ofNullable(documentNumber);
+            return this;
+        }
+
+        /**
+         * <p>Identity number for an <code>id_document</code> answer.</p>
+         */
+        @java.lang.Override
+        @JsonSetter(value = "document_number", nulls = Nulls.SKIP)
+        public _FinalStage documentNumber(Optional<String> documentNumber) {
+            this.documentNumber = documentNumber;
+            return this;
+        }
+
+        /**
          * <p>Answer for <code>address</code> items.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
@@ -345,7 +481,32 @@ public final class UpdateVerificationsRequestBodyPersonalAddressRequestedInforma
         @java.lang.Override
         public UpdateVerificationsRequestBodyPersonalAddressRequestedInformationItem build() {
             return new UpdateVerificationsRequestBodyPersonalAddressRequestedInformationItem(
-                    address, documents, files, id, value, valueType, additionalProperties);
+                    address,
+                    documentNumber,
+                    documents,
+                    files,
+                    id,
+                    issuingCountry,
+                    value,
+                    valueType,
+                    values,
+                    additionalProperties);
+        }
+
+        @JsonAnySetter
+        private void putAdditionalPropertyFromJson(String key, Object value) {
+            if (key.equalsIgnoreCase("address")
+                    || key.equalsIgnoreCase("document_number")
+                    || key.equalsIgnoreCase("documents")
+                    || key.equalsIgnoreCase("files")
+                    || key.equalsIgnoreCase("id")
+                    || key.equalsIgnoreCase("issuing_country")
+                    || key.equalsIgnoreCase("value")
+                    || key.equalsIgnoreCase("value_type")
+                    || key.equalsIgnoreCase("values")) {
+                return;
+            }
+            this.additionalProperties.put(key, value);
         }
 
         @java.lang.Override

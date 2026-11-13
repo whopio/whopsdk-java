@@ -143,7 +143,6 @@ public final class MembershipListItemProduct {
 
         private Optional<Map<String, Object>> metadata = Optional.empty();
 
-        @JsonAnySetter
         private Map<String, Object> additionalProperties = new HashMap<>();
 
         private Builder() {}
@@ -158,7 +157,6 @@ public final class MembershipListItemProduct {
 
         /**
          * <p>The unique identifier for the product.</p>
-         * <p>The unique identifier for the product.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
@@ -169,7 +167,6 @@ public final class MembershipListItemProduct {
         }
 
         /**
-         * <p>The display name of the product shown to customers on the product page and in search results.</p>
          * <p>The display name of the product shown to customers on the product page and in search results.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
@@ -219,6 +216,14 @@ public final class MembershipListItemProduct {
         @java.lang.Override
         public MembershipListItemProduct build() {
             return new MembershipListItemProduct(id, metadata, title, additionalProperties);
+        }
+
+        @JsonAnySetter
+        private void putAdditionalPropertyFromJson(String key, Object value) {
+            if (key.equalsIgnoreCase("id") || key.equalsIgnoreCase("metadata") || key.equalsIgnoreCase("title")) {
+                return;
+            }
+            this.additionalProperties.put(key, value);
         }
 
         @java.lang.Override

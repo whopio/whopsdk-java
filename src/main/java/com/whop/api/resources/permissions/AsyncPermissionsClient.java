@@ -5,6 +5,7 @@ package com.whop.api.resources.permissions;
 
 import com.whop.api.core.ClientOptions;
 import com.whop.api.core.RequestOptions;
+import com.whop.api.core.WhopApiHttpResponse;
 import com.whop.api.resources.permissions.requests.ListPermissionsRequest;
 import com.whop.api.resources.permissions.types.ListPermissionsResponse;
 import java.util.concurrent.CompletableFuture;
@@ -30,7 +31,14 @@ public class AsyncPermissionsClient {
      * Lists permission actions and whether the calling credential is granted each one for a resource. Answers for whichever identity authenticated the request — a user session, an OAuth token, or an account or app API key — so it never describes who else can reach the resource.
      */
     public CompletableFuture<ListPermissionsResponse> list(ListPermissionsRequest request) {
-        return this.rawClient.list(request).thenApply(response -> response.body());
+        CompletableFuture<WhopApiHttpResponse<ListPermissionsResponse>> rawFuture = this.rawClient.list(request);
+        CompletableFuture<ListPermissionsResponse> future = rawFuture.thenApply(response -> response.body());
+        future.whenComplete((result_, throwable_) -> {
+            if (future.isCancelled()) {
+                rawFuture.cancel(true);
+            }
+        });
+        return future;
     }
 
     /**
@@ -38,6 +46,14 @@ public class AsyncPermissionsClient {
      */
     public CompletableFuture<ListPermissionsResponse> list(
             ListPermissionsRequest request, RequestOptions requestOptions) {
-        return this.rawClient.list(request, requestOptions).thenApply(response -> response.body());
+        CompletableFuture<WhopApiHttpResponse<ListPermissionsResponse>> rawFuture =
+                this.rawClient.list(request, requestOptions);
+        CompletableFuture<ListPermissionsResponse> future = rawFuture.thenApply(response -> response.body());
+        future.whenComplete((result_, throwable_) -> {
+            if (future.isCancelled()) {
+                rawFuture.cancel(true);
+            }
+        });
+        return future;
     }
 }

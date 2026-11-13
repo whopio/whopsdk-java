@@ -67,7 +67,7 @@ public final class UserSummary {
     }
 
     /**
-     * @return Avatar wrapper; its <code>url</code> is always present, using a generated placeholder when the user set no picture.
+     * @return Avatar wrapper. Its <code>url</code> is always present, and is a generated placeholder when the user set no picture.
      */
     @JsonProperty("profile_picture")
     public UserProfilePicture getProfilePicture() {
@@ -131,7 +131,7 @@ public final class UserSummary {
 
     public interface ProfilePictureStage {
         /**
-         * <p>Avatar wrapper; its <code>url</code> is always present, using a generated placeholder when the user set no picture.</p>
+         * <p>Avatar wrapper. Its <code>url</code> is always present, and is a generated placeholder when the user set no picture.</p>
          */
         UsernameStage profilePicture(@NotNull UserProfilePicture profilePicture);
     }
@@ -170,7 +170,6 @@ public final class UserSummary {
 
         private Optional<String> name = Optional.empty();
 
-        @JsonAnySetter
         private Map<String, Object> additionalProperties = new HashMap<>();
 
         private Builder() {}
@@ -186,7 +185,6 @@ public final class UserSummary {
 
         /**
          * <p>User ID, prefixed <code>user_</code>.</p>
-         * <p>User ID, prefixed <code>user_</code>.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
@@ -197,8 +195,7 @@ public final class UserSummary {
         }
 
         /**
-         * <p>Avatar wrapper; its <code>url</code> is always present, using a generated placeholder when the user set no picture.</p>
-         * <p>Avatar wrapper; its <code>url</code> is always present, using a generated placeholder when the user set no picture.</p>
+         * <p>Avatar wrapper. Its <code>url</code> is always present, and is a generated placeholder when the user set no picture.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
@@ -209,7 +206,6 @@ public final class UserSummary {
         }
 
         /**
-         * <p>Public username.</p>
          * <p>Public username.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
@@ -259,6 +255,17 @@ public final class UserSummary {
         @java.lang.Override
         public UserSummary build() {
             return new UserSummary(id, name, profilePicture, username, additionalProperties);
+        }
+
+        @JsonAnySetter
+        private void putAdditionalPropertyFromJson(String key, Object value) {
+            if (key.equalsIgnoreCase("id")
+                    || key.equalsIgnoreCase("name")
+                    || key.equalsIgnoreCase("profile_picture")
+                    || key.equalsIgnoreCase("username")) {
+                return;
+            }
+            this.additionalProperties.put(key, value);
         }
 
         @java.lang.Override

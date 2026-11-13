@@ -11,6 +11,11 @@ public final class PaymentMethodTypes {
 
     public static final PaymentMethodTypes SOFORT = new PaymentMethodTypes(Value.SOFORT, "sofort");
 
+    public static final PaymentMethodTypes FLEX_PAY = new PaymentMethodTypes(Value.FLEX_PAY, "flex_pay");
+
+    public static final PaymentMethodTypes CRYPTO_SUBSCRIPTION =
+            new PaymentMethodTypes(Value.CRYPTO_SUBSCRIPTION, "crypto_subscription");
+
     public static final PaymentMethodTypes US_BANK_ACCOUNT =
             new PaymentMethodTypes(Value.US_BANK_ACCOUNT, "us_bank_account");
 
@@ -32,6 +37,8 @@ public final class PaymentMethodTypes {
 
     public static final PaymentMethodTypes SEQURA = new PaymentMethodTypes(Value.SEQURA, "sequra");
 
+    public static final PaymentMethodTypes ALIPAYHK = new PaymentMethodTypes(Value.ALIPAYHK, "alipayhk");
+
     public static final PaymentMethodTypes IDEAL = new PaymentMethodTypes(Value.IDEAL, "ideal");
 
     public static final PaymentMethodTypes KR_MARKET = new PaymentMethodTypes(Value.KR_MARKET, "kr_market");
@@ -47,12 +54,16 @@ public final class PaymentMethodTypes {
 
     public static final PaymentMethodTypes WECHAT_PAY = new PaymentMethodTypes(Value.WECHAT_PAY, "wechat_pay");
 
+    public static final PaymentMethodTypes OPAY = new PaymentMethodTypes(Value.OPAY, "opay");
+
     public static final PaymentMethodTypes SENCILLITO = new PaymentMethodTypes(Value.SENCILLITO, "sencillito");
 
     public static final PaymentMethodTypes BANCOLOMBIA = new PaymentMethodTypes(Value.BANCOLOMBIA, "bancolombia");
 
     public static final PaymentMethodTypes GB_BANK_TRANSFER =
             new PaymentMethodTypes(Value.GB_BANK_TRANSFER, "gb_bank_transfer");
+
+    public static final PaymentMethodTypes ONEY3X = new PaymentMethodTypes(Value.ONEY3X, "oney_3x");
 
     public static final PaymentMethodTypes CUSTOM = new PaymentMethodTypes(Value.CUSTOM, "custom");
 
@@ -74,9 +85,17 @@ public final class PaymentMethodTypes {
 
     public static final PaymentMethodTypes AMAZON_PAY = new PaymentMethodTypes(Value.AMAZON_PAY, "amazon_pay");
 
+    public static final PaymentMethodTypes ONEY4X = new PaymentMethodTypes(Value.ONEY4X, "oney_4x");
+
+    public static final PaymentMethodTypes PAYPAL_EXPRESS =
+            new PaymentMethodTypes(Value.PAYPAL_EXPRESS, "paypal_express");
+
     public static final PaymentMethodTypes YAPE = new PaymentMethodTypes(Value.YAPE, "yape");
 
     public static final PaymentMethodTypes GIROPAY = new PaymentMethodTypes(Value.GIROPAY, "giropay");
+
+    public static final PaymentMethodTypes PAYTO_BANK_ACCOUNT =
+            new PaymentMethodTypes(Value.PAYTO_BANK_ACCOUNT, "payto_bank_account");
 
     public static final PaymentMethodTypes TAMARA = new PaymentMethodTypes(Value.TAMARA, "tamara");
 
@@ -86,7 +105,11 @@ public final class PaymentMethodTypes {
 
     public static final PaymentMethodTypes NG_MARKET = new PaymentMethodTypes(Value.NG_MARKET, "ng_market");
 
+    public static final PaymentMethodTypes PAYTO_EMAIL = new PaymentMethodTypes(Value.PAYTO_EMAIL, "payto_email");
+
     public static final PaymentMethodTypes BACS_DEBIT = new PaymentMethodTypes(Value.BACS_DEBIT, "bacs_debit");
+
+    public static final PaymentMethodTypes TOUCH_N_GO = new PaymentMethodTypes(Value.TOUCH_N_GO, "touch_n_go");
 
     public static final PaymentMethodTypes AU_BANK_TRANSFER =
             new PaymentMethodTypes(Value.AU_BANK_TRANSFER, "au_bank_transfer");
@@ -103,11 +126,15 @@ public final class PaymentMethodTypes {
 
     public static final PaymentMethodTypes VENMO = new PaymentMethodTypes(Value.VENMO, "venmo");
 
+    public static final PaymentMethodTypes PAYTO_PHONE = new PaymentMethodTypes(Value.PAYTO_PHONE, "payto_phone");
+
     public static final PaymentMethodTypes QRIS = new PaymentMethodTypes(Value.QRIS, "qris");
 
     public static final PaymentMethodTypes SPLITIT = new PaymentMethodTypes(Value.SPLITIT, "splitit");
 
     public static final PaymentMethodTypes SEZZLE = new PaymentMethodTypes(Value.SEZZLE, "sezzle");
+
+    public static final PaymentMethodTypes ONEY = new PaymentMethodTypes(Value.ONEY, "oney");
 
     public static final PaymentMethodTypes KONBINI = new PaymentMethodTypes(Value.KONBINI, "konbini");
 
@@ -150,6 +177,9 @@ public final class PaymentMethodTypes {
     public static final PaymentMethodTypes US_BANK_TRANSFER =
             new PaymentMethodTypes(Value.US_BANK_TRANSFER, "us_bank_transfer");
 
+    public static final PaymentMethodTypes MERCADO_PAGO_MX =
+            new PaymentMethodTypes(Value.MERCADO_PAGO_MX, "mercado_pago_mx");
+
     public static final PaymentMethodTypes NAVER_PAY = new PaymentMethodTypes(Value.NAVER_PAY, "naver_pay");
 
     public static final PaymentMethodTypes AU_BECS_DEBIT = new PaymentMethodTypes(Value.AU_BECS_DEBIT, "au_becs_debit");
@@ -163,6 +193,8 @@ public final class PaymentMethodTypes {
     public static final PaymentMethodTypes SCALAPAY = new PaymentMethodTypes(Value.SCALAPAY, "scalapay");
 
     public static final PaymentMethodTypes BANCONTACT = new PaymentMethodTypes(Value.BANCONTACT, "bancontact");
+
+    public static final PaymentMethodTypes TABBY = new PaymentMethodTypes(Value.TABBY, "tabby");
 
     public static final PaymentMethodTypes GOPAY = new PaymentMethodTypes(Value.GOPAY, "gopay");
 
@@ -192,11 +224,11 @@ public final class PaymentMethodTypes {
 
     public static final PaymentMethodTypes PSE = new PaymentMethodTypes(Value.PSE, "pse");
 
+    public static final PaymentMethodTypes DUITNOW_QR = new PaymentMethodTypes(Value.DUITNOW_QR, "duitnow_qr");
+
     public static final PaymentMethodTypes PAYTO = new PaymentMethodTypes(Value.PAYTO, "payto");
 
     public static final PaymentMethodTypes ALMA = new PaymentMethodTypes(Value.ALMA, "alma");
-
-    public static final PaymentMethodTypes BIZUM = new PaymentMethodTypes(Value.BIZUM, "bizum");
 
     public static final PaymentMethodTypes RECHNUNG = new PaymentMethodTypes(Value.RECHNUNG, "rechnung");
 
@@ -212,6 +244,8 @@ public final class PaymentMethodTypes {
 
     public static final PaymentMethodTypes BOLETO = new PaymentMethodTypes(Value.BOLETO, "boleto");
 
+    public static final PaymentMethodTypes WHOP_PAY = new PaymentMethodTypes(Value.WHOP_PAY, "whop_pay");
+
     public static final PaymentMethodTypes MB_WAY = new PaymentMethodTypes(Value.MB_WAY, "mb_way");
 
     public static final PaymentMethodTypes BILLIE = new PaymentMethodTypes(Value.BILLIE, "billie");
@@ -219,6 +253,13 @@ public final class PaymentMethodTypes {
     public static final PaymentMethodTypes KRIYA = new PaymentMethodTypes(Value.KRIYA, "kriya");
 
     public static final PaymentMethodTypes SAMSUNG_PAY = new PaymentMethodTypes(Value.SAMSUNG_PAY, "samsung_pay");
+
+    public static final PaymentMethodTypes CARD_PRESENT = new PaymentMethodTypes(Value.CARD_PRESENT, "card_present");
+
+    public static final PaymentMethodTypes INTERNATIONAL_BANK_WIRE =
+            new PaymentMethodTypes(Value.INTERNATIONAL_BANK_WIRE, "international_bank_wire");
+
+    public static final PaymentMethodTypes NUPAY = new PaymentMethodTypes(Value.NUPAY, "nupay");
 
     public static final PaymentMethodTypes ADDI = new PaymentMethodTypes(Value.ADDI, "addi");
 
@@ -230,12 +271,17 @@ public final class PaymentMethodTypes {
 
     public static final PaymentMethodTypes APPLE = new PaymentMethodTypes(Value.APPLE, "apple");
 
+    public static final PaymentMethodTypes VERVE = new PaymentMethodTypes(Value.VERVE, "verve");
+
     public static final PaymentMethodTypes KLARNA_PAY_NOW =
             new PaymentMethodTypes(Value.KLARNA_PAY_NOW, "klarna_pay_now");
 
     public static final PaymentMethodTypes INTERAC = new PaymentMethodTypes(Value.INTERAC, "interac");
 
     public static final PaymentMethodTypes BRE_B = new PaymentMethodTypes(Value.BRE_B, "bre_b");
+
+    public static final PaymentMethodTypes MERCADO_PAGO_AR =
+            new PaymentMethodTypes(Value.MERCADO_PAGO_AR, "mercado_pago_ar");
 
     public static final PaymentMethodTypes PAY_BY_BANK = new PaymentMethodTypes(Value.PAY_BY_BANK, "pay_by_bank");
 
@@ -254,6 +300,8 @@ public final class PaymentMethodTypes {
     public static final PaymentMethodTypes KLARNA = new PaymentMethodTypes(Value.KLARNA, "klarna");
 
     public static final PaymentMethodTypes LINK = new PaymentMethodTypes(Value.LINK, "link");
+
+    public static final PaymentMethodTypes GCASH = new PaymentMethodTypes(Value.GCASH, "gcash");
 
     public static final PaymentMethodTypes EU_BANK_TRANSFER =
             new PaymentMethodTypes(Value.EU_BANK_TRANSFER, "eu_bank_transfer");
@@ -294,6 +342,10 @@ public final class PaymentMethodTypes {
                 return visitor.visitPix();
             case SOFORT:
                 return visitor.visitSofort();
+            case FLEX_PAY:
+                return visitor.visitFlexPay();
+            case CRYPTO_SUBSCRIPTION:
+                return visitor.visitCryptoSubscription();
             case US_BANK_ACCOUNT:
                 return visitor.visitUsBankAccount();
             case SPEI:
@@ -312,6 +364,8 @@ public final class PaymentMethodTypes {
                 return visitor.visitNzBankAccount();
             case SEQURA:
                 return visitor.visitSequra();
+            case ALIPAYHK:
+                return visitor.visitAlipayhk();
             case IDEAL:
                 return visitor.visitIdeal();
             case KR_MARKET:
@@ -326,12 +380,16 @@ public final class PaymentMethodTypes {
                 return visitor.visitCardInstallmentsThree();
             case WECHAT_PAY:
                 return visitor.visitWechatPay();
+            case OPAY:
+                return visitor.visitOpay();
             case SENCILLITO:
                 return visitor.visitSencillito();
             case BANCOLOMBIA:
                 return visitor.visitBancolombia();
             case GB_BANK_TRANSFER:
                 return visitor.visitGbBankTransfer();
+            case ONEY3X:
+                return visitor.visitOney3X();
             case CUSTOM:
                 return visitor.visitCustom();
             case PAYPAL:
@@ -352,10 +410,16 @@ public final class PaymentMethodTypes {
                 return visitor.visitEfecty();
             case AMAZON_PAY:
                 return visitor.visitAmazonPay();
+            case ONEY4X:
+                return visitor.visitOney4X();
+            case PAYPAL_EXPRESS:
+                return visitor.visitPaypalExpress();
             case YAPE:
                 return visitor.visitYape();
             case GIROPAY:
                 return visitor.visitGiropay();
+            case PAYTO_BANK_ACCOUNT:
+                return visitor.visitPaytoBankAccount();
             case TAMARA:
                 return visitor.visitTamara();
             case PAYCO:
@@ -364,8 +428,12 @@ public final class PaymentMethodTypes {
                 return visitor.visitNgBank();
             case NG_MARKET:
                 return visitor.visitNgMarket();
+            case PAYTO_EMAIL:
+                return visitor.visitPaytoEmail();
             case BACS_DEBIT:
                 return visitor.visitBacsDebit();
+            case TOUCH_N_GO:
+                return visitor.visitTouchNGo();
             case AU_BANK_TRANSFER:
                 return visitor.visitAuBankTransfer();
             case CARD_INSTALLMENTS_SIX:
@@ -378,12 +446,16 @@ public final class PaymentMethodTypes {
                 return visitor.visitCustomerBalance();
             case VENMO:
                 return visitor.visitVenmo();
+            case PAYTO_PHONE:
+                return visitor.visitPaytoPhone();
             case QRIS:
                 return visitor.visitQris();
             case SPLITIT:
                 return visitor.visitSplitit();
             case SEZZLE:
                 return visitor.visitSezzle();
+            case ONEY:
+                return visitor.visitOney();
             case KONBINI:
                 return visitor.visitKonbini();
             case AFTERPAY_CLEARPAY:
@@ -420,6 +492,8 @@ public final class PaymentMethodTypes {
                 return visitor.visitShopPay();
             case US_BANK_TRANSFER:
                 return visitor.visitUsBankTransfer();
+            case MERCADO_PAGO_MX:
+                return visitor.visitMercadoPagoMx();
             case NAVER_PAY:
                 return visitor.visitNaverPay();
             case AU_BECS_DEBIT:
@@ -434,6 +508,8 @@ public final class PaymentMethodTypes {
                 return visitor.visitScalapay();
             case BANCONTACT:
                 return visitor.visitBancontact();
+            case TABBY:
+                return visitor.visitTabby();
             case GOPAY:
                 return visitor.visitGopay();
             case SHOPEEPAY:
@@ -460,12 +536,12 @@ public final class PaymentMethodTypes {
                 return visitor.visitCardInstallmentsTwelve();
             case PSE:
                 return visitor.visitPse();
+            case DUITNOW_QR:
+                return visitor.visitDuitnowQr();
             case PAYTO:
                 return visitor.visitPayto();
             case ALMA:
                 return visitor.visitAlma();
-            case BIZUM:
-                return visitor.visitBizum();
             case RECHNUNG:
                 return visitor.visitRechnung();
             case NETBANKING:
@@ -480,6 +556,8 @@ public final class PaymentMethodTypes {
                 return visitor.visitWebpay();
             case BOLETO:
                 return visitor.visitBoleto();
+            case WHOP_PAY:
+                return visitor.visitWhopPay();
             case MB_WAY:
                 return visitor.visitMbWay();
             case BILLIE:
@@ -488,6 +566,12 @@ public final class PaymentMethodTypes {
                 return visitor.visitKriya();
             case SAMSUNG_PAY:
                 return visitor.visitSamsungPay();
+            case CARD_PRESENT:
+                return visitor.visitCardPresent();
+            case INTERNATIONAL_BANK_WIRE:
+                return visitor.visitInternationalBankWire();
+            case NUPAY:
+                return visitor.visitNupay();
             case ADDI:
                 return visitor.visitAddi();
             case ACSS_DEBIT:
@@ -498,12 +582,16 @@ public final class PaymentMethodTypes {
                 return visitor.visitKrCard();
             case APPLE:
                 return visitor.visitApple();
+            case VERVE:
+                return visitor.visitVerve();
             case KLARNA_PAY_NOW:
                 return visitor.visitKlarnaPayNow();
             case INTERAC:
                 return visitor.visitInterac();
             case BRE_B:
                 return visitor.visitBreB();
+            case MERCADO_PAGO_AR:
+                return visitor.visitMercadoPagoAr();
             case PAY_BY_BANK:
                 return visitor.visitPayByBank();
             case DEMO_PAY:
@@ -522,6 +610,8 @@ public final class PaymentMethodTypes {
                 return visitor.visitKlarna();
             case LINK:
                 return visitor.visitLink();
+            case GCASH:
+                return visitor.visitGcash();
             case EU_BANK_TRANSFER:
                 return visitor.visitEuBankTransfer();
             case _UNKNOWN:
@@ -537,6 +627,10 @@ public final class PaymentMethodTypes {
                 return PIX;
             case "sofort":
                 return SOFORT;
+            case "flex_pay":
+                return FLEX_PAY;
+            case "crypto_subscription":
+                return CRYPTO_SUBSCRIPTION;
             case "us_bank_account":
                 return US_BANK_ACCOUNT;
             case "spei":
@@ -555,6 +649,8 @@ public final class PaymentMethodTypes {
                 return NZ_BANK_ACCOUNT;
             case "sequra":
                 return SEQURA;
+            case "alipayhk":
+                return ALIPAYHK;
             case "ideal":
                 return IDEAL;
             case "kr_market":
@@ -569,12 +665,16 @@ public final class PaymentMethodTypes {
                 return CARD_INSTALLMENTS_THREE;
             case "wechat_pay":
                 return WECHAT_PAY;
+            case "opay":
+                return OPAY;
             case "sencillito":
                 return SENCILLITO;
             case "bancolombia":
                 return BANCOLOMBIA;
             case "gb_bank_transfer":
                 return GB_BANK_TRANSFER;
+            case "oney_3x":
+                return ONEY3X;
             case "custom":
                 return CUSTOM;
             case "paypal":
@@ -595,10 +695,16 @@ public final class PaymentMethodTypes {
                 return EFECTY;
             case "amazon_pay":
                 return AMAZON_PAY;
+            case "oney_4x":
+                return ONEY4X;
+            case "paypal_express":
+                return PAYPAL_EXPRESS;
             case "yape":
                 return YAPE;
             case "giropay":
                 return GIROPAY;
+            case "payto_bank_account":
+                return PAYTO_BANK_ACCOUNT;
             case "tamara":
                 return TAMARA;
             case "payco":
@@ -607,8 +713,12 @@ public final class PaymentMethodTypes {
                 return NG_BANK;
             case "ng_market":
                 return NG_MARKET;
+            case "payto_email":
+                return PAYTO_EMAIL;
             case "bacs_debit":
                 return BACS_DEBIT;
+            case "touch_n_go":
+                return TOUCH_N_GO;
             case "au_bank_transfer":
                 return AU_BANK_TRANSFER;
             case "card_installments_six":
@@ -621,12 +731,16 @@ public final class PaymentMethodTypes {
                 return CUSTOMER_BALANCE;
             case "venmo":
                 return VENMO;
+            case "payto_phone":
+                return PAYTO_PHONE;
             case "qris":
                 return QRIS;
             case "splitit":
                 return SPLITIT;
             case "sezzle":
                 return SEZZLE;
+            case "oney":
+                return ONEY;
             case "konbini":
                 return KONBINI;
             case "afterpay_clearpay":
@@ -663,6 +777,8 @@ public final class PaymentMethodTypes {
                 return SHOP_PAY;
             case "us_bank_transfer":
                 return US_BANK_TRANSFER;
+            case "mercado_pago_mx":
+                return MERCADO_PAGO_MX;
             case "naver_pay":
                 return NAVER_PAY;
             case "au_becs_debit":
@@ -677,6 +793,8 @@ public final class PaymentMethodTypes {
                 return SCALAPAY;
             case "bancontact":
                 return BANCONTACT;
+            case "tabby":
+                return TABBY;
             case "gopay":
                 return GOPAY;
             case "shopeepay":
@@ -703,12 +821,12 @@ public final class PaymentMethodTypes {
                 return CARD_INSTALLMENTS_TWELVE;
             case "pse":
                 return PSE;
+            case "duitnow_qr":
+                return DUITNOW_QR;
             case "payto":
                 return PAYTO;
             case "alma":
                 return ALMA;
-            case "bizum":
-                return BIZUM;
             case "rechnung":
                 return RECHNUNG;
             case "netbanking":
@@ -723,6 +841,8 @@ public final class PaymentMethodTypes {
                 return WEBPAY;
             case "boleto":
                 return BOLETO;
+            case "whop_pay":
+                return WHOP_PAY;
             case "mb_way":
                 return MB_WAY;
             case "billie":
@@ -731,6 +851,12 @@ public final class PaymentMethodTypes {
                 return KRIYA;
             case "samsung_pay":
                 return SAMSUNG_PAY;
+            case "card_present":
+                return CARD_PRESENT;
+            case "international_bank_wire":
+                return INTERNATIONAL_BANK_WIRE;
+            case "nupay":
+                return NUPAY;
             case "addi":
                 return ADDI;
             case "acss_debit":
@@ -741,12 +867,16 @@ public final class PaymentMethodTypes {
                 return KR_CARD;
             case "apple":
                 return APPLE;
+            case "verve":
+                return VERVE;
             case "klarna_pay_now":
                 return KLARNA_PAY_NOW;
             case "interac":
                 return INTERAC;
             case "bre_b":
                 return BRE_B;
+            case "mercado_pago_ar":
+                return MERCADO_PAGO_AR;
             case "pay_by_bank":
                 return PAY_BY_BANK;
             case "demo_pay":
@@ -765,6 +895,8 @@ public final class PaymentMethodTypes {
                 return KLARNA;
             case "link":
                 return LINK;
+            case "gcash":
+                return GCASH;
             case "eu_bank_transfer":
                 return EU_BANK_TRANSFER;
             default:
@@ -782,6 +914,8 @@ public final class PaymentMethodTypes {
         AFTERPAY_CLEARPAY,
 
         ALIPAY,
+
+        ALIPAYHK,
 
         ALMA,
 
@@ -805,8 +939,6 @@ public final class PaymentMethodTypes {
 
         BILLIE,
 
-        BIZUM,
-
         BLIK,
 
         BOLETO,
@@ -818,6 +950,8 @@ public final class PaymentMethodTypes {
         CAPCHASE_PAY,
 
         CARD,
+
+        CARD_PRESENT,
 
         CARD_INSTALLMENTS_THREE,
 
@@ -833,11 +967,15 @@ public final class PaymentMethodTypes {
 
         CRYPTO,
 
+        CRYPTO_SUBSCRIPTION,
+
         CUSTOM,
 
         CUSTOMER_BALANCE,
 
         DEMO_PAY,
+
+        DUITNOW_QR,
 
         EFECTY,
 
@@ -847,7 +985,11 @@ public final class PaymentMethodTypes {
 
         FPX,
 
+        FLEX_PAY,
+
         GB_BANK_TRANSFER,
+
+        GCASH,
 
         GIROPAY,
 
@@ -862,6 +1004,8 @@ public final class PaymentMethodTypes {
         IDEAL,
 
         INTERAC,
+
+        INTERNATIONAL_BANK_WIRE,
 
         KAKAO_PAY,
 
@@ -886,6 +1030,10 @@ public final class PaymentMethodTypes {
         M_PESA,
 
         MERCADO_PAGO,
+
+        MERCADO_PAGO_AR,
+
+        MERCADO_PAGO_MX,
 
         MOBILEPAY,
 
@@ -913,7 +1061,17 @@ public final class PaymentMethodTypes {
 
         NG_WALLET,
 
+        NUPAY,
+
         NZ_BANK_ACCOUNT,
+
+        ONEY,
+
+        ONEY3X,
+
+        ONEY4X,
+
+        OPAY,
 
         OXXO,
 
@@ -931,9 +1089,17 @@ public final class PaymentMethodTypes {
 
         PAYPAL,
 
+        PAYPAL_EXPRESS,
+
         PAYPAY,
 
         PAYTO,
+
+        PAYTO_EMAIL,
+
+        PAYTO_PHONE,
+
+        PAYTO_BANK_ACCOUNT,
 
         PIX,
 
@@ -981,7 +1147,11 @@ public final class PaymentMethodTypes {
 
         SWISH,
 
+        TABBY,
+
         TAMARA,
+
+        TOUCH_N_GO,
 
         TWINT,
 
@@ -993,11 +1163,15 @@ public final class PaymentMethodTypes {
 
         VENMO,
 
+        VERVE,
+
         VIPPS,
 
         WEBPAY,
 
         WECHAT_PAY,
+
+        WHOP_PAY,
 
         YAPE,
 
@@ -1021,6 +1195,8 @@ public final class PaymentMethodTypes {
 
         T visitAlipay();
 
+        T visitAlipayhk();
+
         T visitAlma();
 
         T visitAmazonPay();
@@ -1043,8 +1219,6 @@ public final class PaymentMethodTypes {
 
         T visitBillie();
 
-        T visitBizum();
-
         T visitBlik();
 
         T visitBoleto();
@@ -1056,6 +1230,8 @@ public final class PaymentMethodTypes {
         T visitCapchasePay();
 
         T visitCard();
+
+        T visitCardPresent();
 
         T visitCardInstallmentsThree();
 
@@ -1071,11 +1247,15 @@ public final class PaymentMethodTypes {
 
         T visitCrypto();
 
+        T visitCryptoSubscription();
+
         T visitCustom();
 
         T visitCustomerBalance();
 
         T visitDemoPay();
+
+        T visitDuitnowQr();
 
         T visitEfecty();
 
@@ -1085,7 +1265,11 @@ public final class PaymentMethodTypes {
 
         T visitFpx();
 
+        T visitFlexPay();
+
         T visitGbBankTransfer();
+
+        T visitGcash();
 
         T visitGiropay();
 
@@ -1100,6 +1284,8 @@ public final class PaymentMethodTypes {
         T visitIdeal();
 
         T visitInterac();
+
+        T visitInternationalBankWire();
 
         T visitKakaoPay();
 
@@ -1124,6 +1310,10 @@ public final class PaymentMethodTypes {
         T visitMPesa();
 
         T visitMercadoPago();
+
+        T visitMercadoPagoAr();
+
+        T visitMercadoPagoMx();
 
         T visitMobilepay();
 
@@ -1151,7 +1341,17 @@ public final class PaymentMethodTypes {
 
         T visitNgWallet();
 
+        T visitNupay();
+
         T visitNzBankAccount();
+
+        T visitOney();
+
+        T visitOney3X();
+
+        T visitOney4X();
+
+        T visitOpay();
 
         T visitOxxo();
 
@@ -1169,9 +1369,17 @@ public final class PaymentMethodTypes {
 
         T visitPaypal();
 
+        T visitPaypalExpress();
+
         T visitPaypay();
 
         T visitPayto();
+
+        T visitPaytoEmail();
+
+        T visitPaytoPhone();
+
+        T visitPaytoBankAccount();
 
         T visitPix();
 
@@ -1219,7 +1427,11 @@ public final class PaymentMethodTypes {
 
         T visitSwish();
 
+        T visitTabby();
+
         T visitTamara();
+
+        T visitTouchNGo();
 
         T visitTwint();
 
@@ -1231,11 +1443,15 @@ public final class PaymentMethodTypes {
 
         T visitVenmo();
 
+        T visitVerve();
+
         T visitVipps();
 
         T visitWebpay();
 
         T visitWechatPay();
+
+        T visitWhopPay();
 
         T visitYape();
 

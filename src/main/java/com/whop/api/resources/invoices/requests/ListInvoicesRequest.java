@@ -12,14 +12,11 @@ import com.fasterxml.jackson.annotation.JsonSetter;
 import com.fasterxml.jackson.annotation.Nulls;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.whop.api.core.ObjectMappers;
-import com.whop.api.types.Direction;
-import com.whop.api.types.InvoiceCollectionMethods;
-import com.whop.api.types.InvoiceStatuses;
-import com.whop.api.types.InvoicesSortableColumns;
+import com.whop.api.resources.invoices.types.ListInvoicesRequestDirection;
+import com.whop.api.resources.invoices.types.ListInvoicesRequestOrder;
+import com.whop.api.resources.invoices.types.ListInvoicesRequestStatus;
 import java.time.OffsetDateTime;
-import java.util.Collections;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
@@ -27,103 +24,116 @@ import java.util.Optional;
 @JsonInclude(JsonInclude.Include.NON_ABSENT)
 @JsonDeserialize(builder = ListInvoicesRequest.Builder.class)
 public final class ListInvoicesRequest {
-    private final Optional<List<String>> productIds;
+    private final Optional<String> accountId;
 
-    private final Optional<List<InvoiceCollectionMethods>> collectionMethods;
+    private final Optional<ListInvoicesRequestStatus> status;
 
-    private final Optional<List<InvoiceStatuses>> statuses;
+    private final Optional<Boolean> overdue;
 
-    private final Optional<String> after;
+    private final Optional<String> memberId;
 
-    private final Optional<String> before;
+    private final Optional<String> productId;
 
-    private final Optional<Integer> first;
-
-    private final Optional<Integer> last;
-
-    private final Optional<String> companyId;
-
-    private final Optional<Direction> direction;
-
-    private final Optional<InvoicesSortableColumns> order;
+    private final Optional<OffsetDateTime> createdAfter;
 
     private final Optional<OffsetDateTime> createdBefore;
 
-    private final Optional<OffsetDateTime> createdAfter;
+    private final Optional<ListInvoicesRequestOrder> order;
+
+    private final Optional<ListInvoicesRequestDirection> direction;
+
+    private final Optional<Integer> first;
+
+    private final Optional<String> after;
+
+    private final Optional<Integer> last;
+
+    private final Optional<String> before;
+
+    private final Optional<Boolean> includeTotalCount;
 
     private final Map<String, Object> additionalProperties;
 
     private ListInvoicesRequest(
-            Optional<List<String>> productIds,
-            Optional<List<InvoiceCollectionMethods>> collectionMethods,
-            Optional<List<InvoiceStatuses>> statuses,
-            Optional<String> after,
-            Optional<String> before,
-            Optional<Integer> first,
-            Optional<Integer> last,
-            Optional<String> companyId,
-            Optional<Direction> direction,
-            Optional<InvoicesSortableColumns> order,
-            Optional<OffsetDateTime> createdBefore,
+            Optional<String> accountId,
+            Optional<ListInvoicesRequestStatus> status,
+            Optional<Boolean> overdue,
+            Optional<String> memberId,
+            Optional<String> productId,
             Optional<OffsetDateTime> createdAfter,
+            Optional<OffsetDateTime> createdBefore,
+            Optional<ListInvoicesRequestOrder> order,
+            Optional<ListInvoicesRequestDirection> direction,
+            Optional<Integer> first,
+            Optional<String> after,
+            Optional<Integer> last,
+            Optional<String> before,
+            Optional<Boolean> includeTotalCount,
             Map<String, Object> additionalProperties) {
-        this.productIds = productIds;
-        this.collectionMethods = collectionMethods;
-        this.statuses = statuses;
-        this.after = after;
-        this.before = before;
-        this.first = first;
-        this.last = last;
-        this.companyId = companyId;
-        this.direction = direction;
-        this.order = order;
-        this.createdBefore = createdBefore;
+        this.accountId = accountId;
+        this.status = status;
+        this.overdue = overdue;
+        this.memberId = memberId;
+        this.productId = productId;
         this.createdAfter = createdAfter;
+        this.createdBefore = createdBefore;
+        this.order = order;
+        this.direction = direction;
+        this.first = first;
+        this.after = after;
+        this.last = last;
+        this.before = before;
+        this.includeTotalCount = includeTotalCount;
         this.additionalProperties = additionalProperties;
     }
 
-    /**
-     * @return Filter invoices to only those associated with these specific product identifiers.
-     */
-    @JsonProperty("product_ids")
-    public Optional<List<String>> getProductIds() {
-        return productIds;
+    @JsonProperty("account_id")
+    public Optional<String> getAccountId() {
+        return accountId;
+    }
+
+    @JsonProperty("status")
+    public Optional<ListInvoicesRequestStatus> getStatus() {
+        return status;
+    }
+
+    @JsonProperty("overdue")
+    public Optional<Boolean> getOverdue() {
+        return overdue;
+    }
+
+    @JsonProperty("member_id")
+    public Optional<String> getMemberId() {
+        return memberId;
+    }
+
+    @JsonProperty("product_id")
+    public Optional<String> getProductId() {
+        return productId;
+    }
+
+    @JsonProperty("created_after")
+    public Optional<OffsetDateTime> getCreatedAfter() {
+        return createdAfter;
+    }
+
+    @JsonProperty("created_before")
+    public Optional<OffsetDateTime> getCreatedBefore() {
+        return createdBefore;
+    }
+
+    @JsonProperty("order")
+    public Optional<ListInvoicesRequestOrder> getOrder() {
+        return order;
+    }
+
+    @JsonProperty("direction")
+    public Optional<ListInvoicesRequestDirection> getDirection() {
+        return direction;
     }
 
     /**
-     * @return Filter invoices by their collection method.
-     */
-    @JsonProperty("collection_methods")
-    public Optional<List<InvoiceCollectionMethods>> getCollectionMethods() {
-        return collectionMethods;
-    }
-
-    /**
-     * @return Filter invoices by their current status.
-     */
-    @JsonProperty("statuses")
-    public Optional<List<InvoiceStatuses>> getStatuses() {
-        return statuses;
-    }
-
-    /**
-     * @return <p>the elements in the list that come after the specified cursor.</p>
-     */
-    @JsonProperty("after")
-    public Optional<String> getAfter() {
-        return after;
-    }
-
-    /**
-     * @return <p>the elements in the list that come before the specified cursor.</p>
-     */
-    @JsonProperty("before")
-    public Optional<String> getBefore() {
-        return before;
-    }
-
-    /**
-     * @return <p>the first <em>n</em> elements from the list.</p>
+     * @return Number of results to return from the start of the range.
      */
     @JsonProperty("first")
     public Optional<Integer> getFirst() {
@@ -131,7 +141,15 @@ public final class ListInvoicesRequest {
     }
 
     /**
-     * @return <p>the last <em>n</em> elements from the list.</p>
+     * @return Return results after this cursor. Use <code>page_info.end_cursor</code> from the previous response to fetch the next page.
+     */
+    @JsonProperty("after")
+    public Optional<String> getAfter() {
+        return after;
+    }
+
+    /**
+     * @return Number of results to return from the end of the range.
      */
     @JsonProperty("last")
     public Optional<Integer> getLast() {
@@ -139,37 +157,19 @@ public final class ListInvoicesRequest {
     }
 
     /**
-     * @return The unique identifier of the company to list invoices for.
+     * @return Return results before this cursor. Use <code>page_info.start_cursor</code> from the previous response to fetch the previous page.
      */
-    @JsonProperty("company_id")
-    public Optional<String> getCompanyId() {
-        return companyId;
-    }
-
-    @JsonProperty("direction")
-    public Optional<Direction> getDirection() {
-        return direction;
-    }
-
-    @JsonProperty("order")
-    public Optional<InvoicesSortableColumns> getOrder() {
-        return order;
+    @JsonProperty("before")
+    public Optional<String> getBefore() {
+        return before;
     }
 
     /**
-     * @return Only return invoices created before this timestamp.
+     * @return Set to <code>true</code> to return the number of matching results in <code>page_info.total_count</code>. Send <code>first=0</code> as well to return the count without any results.
      */
-    @JsonProperty("created_before")
-    public Optional<OffsetDateTime> getCreatedBefore() {
-        return createdBefore;
-    }
-
-    /**
-     * @return Only return invoices created after this timestamp.
-     */
-    @JsonProperty("created_after")
-    public Optional<OffsetDateTime> getCreatedAfter() {
-        return createdAfter;
+    @JsonProperty("include_total_count")
+    public Optional<Boolean> getIncludeTotalCount() {
+        return includeTotalCount;
     }
 
     @java.lang.Override
@@ -184,35 +184,39 @@ public final class ListInvoicesRequest {
     }
 
     private boolean equalTo(ListInvoicesRequest other) {
-        return productIds.equals(other.productIds)
-                && collectionMethods.equals(other.collectionMethods)
-                && statuses.equals(other.statuses)
-                && after.equals(other.after)
-                && before.equals(other.before)
-                && first.equals(other.first)
-                && last.equals(other.last)
-                && companyId.equals(other.companyId)
-                && direction.equals(other.direction)
-                && order.equals(other.order)
+        return accountId.equals(other.accountId)
+                && status.equals(other.status)
+                && overdue.equals(other.overdue)
+                && memberId.equals(other.memberId)
+                && productId.equals(other.productId)
+                && createdAfter.equals(other.createdAfter)
                 && createdBefore.equals(other.createdBefore)
-                && createdAfter.equals(other.createdAfter);
+                && order.equals(other.order)
+                && direction.equals(other.direction)
+                && first.equals(other.first)
+                && after.equals(other.after)
+                && last.equals(other.last)
+                && before.equals(other.before)
+                && includeTotalCount.equals(other.includeTotalCount);
     }
 
     @java.lang.Override
     public int hashCode() {
         return Objects.hash(
-                this.productIds,
-                this.collectionMethods,
-                this.statuses,
-                this.after,
-                this.before,
-                this.first,
-                this.last,
-                this.companyId,
-                this.direction,
-                this.order,
+                this.accountId,
+                this.status,
+                this.overdue,
+                this.memberId,
+                this.productId,
+                this.createdAfter,
                 this.createdBefore,
-                this.createdAfter);
+                this.order,
+                this.direction,
+                this.first,
+                this.after,
+                this.last,
+                this.before,
+                this.includeTotalCount);
     }
 
     @java.lang.Override
@@ -226,138 +230,157 @@ public final class ListInvoicesRequest {
 
     @JsonIgnoreProperties(ignoreUnknown = true)
     public static final class Builder {
-        private Optional<List<String>> productIds = Optional.empty();
+        private Optional<String> accountId = Optional.empty();
 
-        private Optional<List<InvoiceCollectionMethods>> collectionMethods = Optional.empty();
+        private Optional<ListInvoicesRequestStatus> status = Optional.empty();
 
-        private Optional<List<InvoiceStatuses>> statuses = Optional.empty();
+        private Optional<Boolean> overdue = Optional.empty();
 
-        private Optional<String> after = Optional.empty();
+        private Optional<String> memberId = Optional.empty();
 
-        private Optional<String> before = Optional.empty();
-
-        private Optional<Integer> first = Optional.empty();
-
-        private Optional<Integer> last = Optional.empty();
-
-        private Optional<String> companyId = Optional.empty();
-
-        private Optional<Direction> direction = Optional.empty();
-
-        private Optional<InvoicesSortableColumns> order = Optional.empty();
-
-        private Optional<OffsetDateTime> createdBefore = Optional.empty();
+        private Optional<String> productId = Optional.empty();
 
         private Optional<OffsetDateTime> createdAfter = Optional.empty();
 
-        @JsonAnySetter
+        private Optional<OffsetDateTime> createdBefore = Optional.empty();
+
+        private Optional<ListInvoicesRequestOrder> order = Optional.empty();
+
+        private Optional<ListInvoicesRequestDirection> direction = Optional.empty();
+
+        private Optional<Integer> first = Optional.empty();
+
+        private Optional<String> after = Optional.empty();
+
+        private Optional<Integer> last = Optional.empty();
+
+        private Optional<String> before = Optional.empty();
+
+        private Optional<Boolean> includeTotalCount = Optional.empty();
+
         private Map<String, Object> additionalProperties = new HashMap<>();
 
         private Builder() {}
 
         public Builder from(ListInvoicesRequest other) {
-            productIds(other.getProductIds());
-            collectionMethods(other.getCollectionMethods());
-            statuses(other.getStatuses());
-            after(other.getAfter());
-            before(other.getBefore());
-            first(other.getFirst());
-            last(other.getLast());
-            companyId(other.getCompanyId());
-            direction(other.getDirection());
-            order(other.getOrder());
-            createdBefore(other.getCreatedBefore());
+            accountId(other.getAccountId());
+            status(other.getStatus());
+            overdue(other.getOverdue());
+            memberId(other.getMemberId());
+            productId(other.getProductId());
             createdAfter(other.getCreatedAfter());
+            createdBefore(other.getCreatedBefore());
+            order(other.getOrder());
+            direction(other.getDirection());
+            first(other.getFirst());
+            after(other.getAfter());
+            last(other.getLast());
+            before(other.getBefore());
+            includeTotalCount(other.getIncludeTotalCount());
+            return this;
+        }
+
+        @JsonSetter(value = "account_id", nulls = Nulls.SKIP)
+        public Builder accountId(Optional<String> accountId) {
+            this.accountId = accountId;
+            return this;
+        }
+
+        public Builder accountId(String accountId) {
+            this.accountId = Optional.ofNullable(accountId);
+            return this;
+        }
+
+        @JsonSetter(value = "status", nulls = Nulls.SKIP)
+        public Builder status(Optional<ListInvoicesRequestStatus> status) {
+            this.status = status;
+            return this;
+        }
+
+        public Builder status(ListInvoicesRequestStatus status) {
+            this.status = Optional.ofNullable(status);
+            return this;
+        }
+
+        @JsonSetter(value = "overdue", nulls = Nulls.SKIP)
+        public Builder overdue(Optional<Boolean> overdue) {
+            this.overdue = overdue;
+            return this;
+        }
+
+        public Builder overdue(Boolean overdue) {
+            this.overdue = Optional.ofNullable(overdue);
+            return this;
+        }
+
+        @JsonSetter(value = "member_id", nulls = Nulls.SKIP)
+        public Builder memberId(Optional<String> memberId) {
+            this.memberId = memberId;
+            return this;
+        }
+
+        public Builder memberId(String memberId) {
+            this.memberId = Optional.ofNullable(memberId);
+            return this;
+        }
+
+        @JsonSetter(value = "product_id", nulls = Nulls.SKIP)
+        public Builder productId(Optional<String> productId) {
+            this.productId = productId;
+            return this;
+        }
+
+        public Builder productId(String productId) {
+            this.productId = Optional.ofNullable(productId);
+            return this;
+        }
+
+        @JsonSetter(value = "created_after", nulls = Nulls.SKIP)
+        public Builder createdAfter(Optional<OffsetDateTime> createdAfter) {
+            this.createdAfter = createdAfter;
+            return this;
+        }
+
+        public Builder createdAfter(OffsetDateTime createdAfter) {
+            this.createdAfter = Optional.ofNullable(createdAfter);
+            return this;
+        }
+
+        @JsonSetter(value = "created_before", nulls = Nulls.SKIP)
+        public Builder createdBefore(Optional<OffsetDateTime> createdBefore) {
+            this.createdBefore = createdBefore;
+            return this;
+        }
+
+        public Builder createdBefore(OffsetDateTime createdBefore) {
+            this.createdBefore = Optional.ofNullable(createdBefore);
+            return this;
+        }
+
+        @JsonSetter(value = "order", nulls = Nulls.SKIP)
+        public Builder order(Optional<ListInvoicesRequestOrder> order) {
+            this.order = order;
+            return this;
+        }
+
+        public Builder order(ListInvoicesRequestOrder order) {
+            this.order = Optional.ofNullable(order);
+            return this;
+        }
+
+        @JsonSetter(value = "direction", nulls = Nulls.SKIP)
+        public Builder direction(Optional<ListInvoicesRequestDirection> direction) {
+            this.direction = direction;
+            return this;
+        }
+
+        public Builder direction(ListInvoicesRequestDirection direction) {
+            this.direction = Optional.ofNullable(direction);
             return this;
         }
 
         /**
-         * <p>Filter invoices to only those associated with these specific product identifiers.</p>
-         */
-        @JsonSetter(value = "product_ids", nulls = Nulls.SKIP)
-        public Builder productIds(Optional<List<String>> productIds) {
-            this.productIds = productIds;
-            return this;
-        }
-
-        public Builder productIds(List<String> productIds) {
-            this.productIds = Optional.ofNullable(productIds);
-            return this;
-        }
-
-        public Builder productIds(String productIds) {
-            this.productIds = Optional.of(Collections.singletonList(productIds));
-            return this;
-        }
-
-        /**
-         * <p>Filter invoices by their collection method.</p>
-         */
-        @JsonSetter(value = "collection_methods", nulls = Nulls.SKIP)
-        public Builder collectionMethods(Optional<List<InvoiceCollectionMethods>> collectionMethods) {
-            this.collectionMethods = collectionMethods;
-            return this;
-        }
-
-        public Builder collectionMethods(List<InvoiceCollectionMethods> collectionMethods) {
-            this.collectionMethods = Optional.ofNullable(collectionMethods);
-            return this;
-        }
-
-        public Builder collectionMethods(InvoiceCollectionMethods collectionMethods) {
-            this.collectionMethods = Optional.of(Collections.singletonList(collectionMethods));
-            return this;
-        }
-
-        /**
-         * <p>Filter invoices by their current status.</p>
-         */
-        @JsonSetter(value = "statuses", nulls = Nulls.SKIP)
-        public Builder statuses(Optional<List<InvoiceStatuses>> statuses) {
-            this.statuses = statuses;
-            return this;
-        }
-
-        public Builder statuses(List<InvoiceStatuses> statuses) {
-            this.statuses = Optional.ofNullable(statuses);
-            return this;
-        }
-
-        public Builder statuses(InvoiceStatuses statuses) {
-            this.statuses = Optional.of(Collections.singletonList(statuses));
-            return this;
-        }
-
-        /**
-         * <p>Returns the elements in the list that come after the specified cursor.</p>
-         */
-        @JsonSetter(value = "after", nulls = Nulls.SKIP)
-        public Builder after(Optional<String> after) {
-            this.after = after;
-            return this;
-        }
-
-        public Builder after(String after) {
-            this.after = Optional.ofNullable(after);
-            return this;
-        }
-
-        /**
-         * <p>Returns the elements in the list that come before the specified cursor.</p>
-         */
-        @JsonSetter(value = "before", nulls = Nulls.SKIP)
-        public Builder before(Optional<String> before) {
-            this.before = before;
-            return this;
-        }
-
-        public Builder before(String before) {
-            this.before = Optional.ofNullable(before);
-            return this;
-        }
-
-        /**
-         * <p>Returns the first <em>n</em> elements from the list.</p>
+         * <p>Number of results to return from the start of the range.</p>
          */
         @JsonSetter(value = "first", nulls = Nulls.SKIP)
         public Builder first(Optional<Integer> first) {
@@ -371,7 +394,21 @@ public final class ListInvoicesRequest {
         }
 
         /**
-         * <p>Returns the last <em>n</em> elements from the list.</p>
+         * <p>Return results after this cursor. Use <code>page_info.end_cursor</code> from the previous response to fetch the next page.</p>
+         */
+        @JsonSetter(value = "after", nulls = Nulls.SKIP)
+        public Builder after(Optional<String> after) {
+            this.after = after;
+            return this;
+        }
+
+        public Builder after(String after) {
+            this.after = Optional.ofNullable(after);
+            return this;
+        }
+
+        /**
+         * <p>Number of results to return from the end of the range.</p>
          */
         @JsonSetter(value = "last", nulls = Nulls.SKIP)
         public Builder last(Optional<Integer> last) {
@@ -385,84 +422,71 @@ public final class ListInvoicesRequest {
         }
 
         /**
-         * <p>The unique identifier of the company to list invoices for.</p>
+         * <p>Return results before this cursor. Use <code>page_info.start_cursor</code> from the previous response to fetch the previous page.</p>
          */
-        @JsonSetter(value = "company_id", nulls = Nulls.SKIP)
-        public Builder companyId(Optional<String> companyId) {
-            this.companyId = companyId;
+        @JsonSetter(value = "before", nulls = Nulls.SKIP)
+        public Builder before(Optional<String> before) {
+            this.before = before;
             return this;
         }
 
-        public Builder companyId(String companyId) {
-            this.companyId = Optional.ofNullable(companyId);
-            return this;
-        }
-
-        @JsonSetter(value = "direction", nulls = Nulls.SKIP)
-        public Builder direction(Optional<Direction> direction) {
-            this.direction = direction;
-            return this;
-        }
-
-        public Builder direction(Direction direction) {
-            this.direction = Optional.ofNullable(direction);
-            return this;
-        }
-
-        @JsonSetter(value = "order", nulls = Nulls.SKIP)
-        public Builder order(Optional<InvoicesSortableColumns> order) {
-            this.order = order;
-            return this;
-        }
-
-        public Builder order(InvoicesSortableColumns order) {
-            this.order = Optional.ofNullable(order);
+        public Builder before(String before) {
+            this.before = Optional.ofNullable(before);
             return this;
         }
 
         /**
-         * <p>Only return invoices created before this timestamp.</p>
+         * <p>Set to <code>true</code> to return the number of matching results in <code>page_info.total_count</code>. Send <code>first=0</code> as well to return the count without any results.</p>
          */
-        @JsonSetter(value = "created_before", nulls = Nulls.SKIP)
-        public Builder createdBefore(Optional<OffsetDateTime> createdBefore) {
-            this.createdBefore = createdBefore;
+        @JsonSetter(value = "include_total_count", nulls = Nulls.SKIP)
+        public Builder includeTotalCount(Optional<Boolean> includeTotalCount) {
+            this.includeTotalCount = includeTotalCount;
             return this;
         }
 
-        public Builder createdBefore(OffsetDateTime createdBefore) {
-            this.createdBefore = Optional.ofNullable(createdBefore);
-            return this;
-        }
-
-        /**
-         * <p>Only return invoices created after this timestamp.</p>
-         */
-        @JsonSetter(value = "created_after", nulls = Nulls.SKIP)
-        public Builder createdAfter(Optional<OffsetDateTime> createdAfter) {
-            this.createdAfter = createdAfter;
-            return this;
-        }
-
-        public Builder createdAfter(OffsetDateTime createdAfter) {
-            this.createdAfter = Optional.ofNullable(createdAfter);
+        public Builder includeTotalCount(Boolean includeTotalCount) {
+            this.includeTotalCount = Optional.ofNullable(includeTotalCount);
             return this;
         }
 
         public ListInvoicesRequest build() {
             return new ListInvoicesRequest(
-                    productIds,
-                    collectionMethods,
-                    statuses,
-                    after,
-                    before,
-                    first,
-                    last,
-                    companyId,
-                    direction,
-                    order,
-                    createdBefore,
+                    accountId,
+                    status,
+                    overdue,
+                    memberId,
+                    productId,
                     createdAfter,
+                    createdBefore,
+                    order,
+                    direction,
+                    first,
+                    after,
+                    last,
+                    before,
+                    includeTotalCount,
                     additionalProperties);
+        }
+
+        @JsonAnySetter
+        private void putAdditionalPropertyFromJson(String key, Object value) {
+            if (key.equalsIgnoreCase("account_id")
+                    || key.equalsIgnoreCase("status")
+                    || key.equalsIgnoreCase("overdue")
+                    || key.equalsIgnoreCase("member_id")
+                    || key.equalsIgnoreCase("product_id")
+                    || key.equalsIgnoreCase("created_after")
+                    || key.equalsIgnoreCase("created_before")
+                    || key.equalsIgnoreCase("order")
+                    || key.equalsIgnoreCase("direction")
+                    || key.equalsIgnoreCase("first")
+                    || key.equalsIgnoreCase("after")
+                    || key.equalsIgnoreCase("last")
+                    || key.equalsIgnoreCase("before")
+                    || key.equalsIgnoreCase("include_total_count")) {
+                return;
+            }
+            this.additionalProperties.put(key, value);
         }
 
         public Builder additionalProperty(String key, Object value) {

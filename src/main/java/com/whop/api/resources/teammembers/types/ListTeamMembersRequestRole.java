@@ -7,6 +7,8 @@ import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonValue;
 
 public final class ListTeamMembersRequestRole {
+    public static final ListTeamMembersRequestRole PARTNER = new ListTeamMembersRequestRole(Value.PARTNER, "partner");
+
     public static final ListTeamMembersRequestRole APP_MANAGER =
             new ListTeamMembersRequestRole(Value.APP_MANAGER, "app_manager");
 
@@ -65,6 +67,8 @@ public final class ListTeamMembersRequestRole {
 
     public <T> T visit(Visitor<T> visitor) {
         switch (value) {
+            case PARTNER:
+                return visitor.visitPartner();
             case APP_MANAGER:
                 return visitor.visitAppManager();
             case OWNER:
@@ -94,6 +98,8 @@ public final class ListTeamMembersRequestRole {
     @JsonCreator(mode = JsonCreator.Mode.DELEGATING)
     public static ListTeamMembersRequestRole valueOf(String value) {
         switch (value) {
+            case "partner":
+                return PARTNER;
             case "app_manager":
                 return APP_MANAGER;
             case "owner":
@@ -124,6 +130,8 @@ public final class ListTeamMembersRequestRole {
 
         ADMIN,
 
+        PARTNER,
+
         SALES_MANAGER,
 
         MODERATOR,
@@ -147,6 +155,8 @@ public final class ListTeamMembersRequestRole {
         T visitOwner();
 
         T visitAdmin();
+
+        T visitPartner();
 
         T visitSalesManager();
 

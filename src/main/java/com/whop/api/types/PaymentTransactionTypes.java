@@ -7,15 +7,10 @@ import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonValue;
 
 public final class PaymentTransactionTypes {
-    public static final PaymentTransactionTypes PURCHASE = new PaymentTransactionTypes(Value.PURCHASE, "purchase");
-
     public static final PaymentTransactionTypes FRAUD_SCREENING =
             new PaymentTransactionTypes(Value.FRAUD_SCREENING, "fraud_screening");
 
-    public static final PaymentTransactionTypes AUTHORIZE = new PaymentTransactionTypes(Value.AUTHORIZE, "authorize");
-
-    public static final PaymentTransactionTypes PRE_CHARGEBACK =
-            new PaymentTransactionTypes(Value.PRE_CHARGEBACK, "pre_chargeback");
+    public static final PaymentTransactionTypes DEPOSIT = new PaymentTransactionTypes(Value.DEPOSIT, "deposit");
 
     public static final PaymentTransactionTypes THREE_D_SECURE =
             new PaymentTransactionTypes(Value.THREE_D_SECURE, "three_d_secure");
@@ -23,13 +18,20 @@ public final class PaymentTransactionTypes {
     public static final PaymentTransactionTypes INSTALLMENT =
             new PaymentTransactionTypes(Value.INSTALLMENT, "installment");
 
-    public static final PaymentTransactionTypes CANCELED = new PaymentTransactionTypes(Value.CANCELED, "canceled");
-
     public static final PaymentTransactionTypes CAPTURE = new PaymentTransactionTypes(Value.CAPTURE, "capture");
 
     public static final PaymentTransactionTypes VERIFY = new PaymentTransactionTypes(Value.VERIFY, "verify");
 
     public static final PaymentTransactionTypes REFUND = new PaymentTransactionTypes(Value.REFUND, "refund");
+
+    public static final PaymentTransactionTypes PURCHASE = new PaymentTransactionTypes(Value.PURCHASE, "purchase");
+
+    public static final PaymentTransactionTypes AUTHORIZE = new PaymentTransactionTypes(Value.AUTHORIZE, "authorize");
+
+    public static final PaymentTransactionTypes PRE_CHARGEBACK =
+            new PaymentTransactionTypes(Value.PRE_CHARGEBACK, "pre_chargeback");
+
+    public static final PaymentTransactionTypes CANCELED = new PaymentTransactionTypes(Value.CANCELED, "canceled");
 
     public static final PaymentTransactionTypes CHARGEBACK =
             new PaymentTransactionTypes(Value.CHARGEBACK, "chargeback");
@@ -70,26 +72,28 @@ public final class PaymentTransactionTypes {
 
     public <T> T visit(Visitor<T> visitor) {
         switch (value) {
-            case PURCHASE:
-                return visitor.visitPurchase();
             case FRAUD_SCREENING:
                 return visitor.visitFraudScreening();
-            case AUTHORIZE:
-                return visitor.visitAuthorize();
-            case PRE_CHARGEBACK:
-                return visitor.visitPreChargeback();
+            case DEPOSIT:
+                return visitor.visitDeposit();
             case THREE_D_SECURE:
                 return visitor.visitThreeDSecure();
             case INSTALLMENT:
                 return visitor.visitInstallment();
-            case CANCELED:
-                return visitor.visitCanceled();
             case CAPTURE:
                 return visitor.visitCapture();
             case VERIFY:
                 return visitor.visitVerify();
             case REFUND:
                 return visitor.visitRefund();
+            case PURCHASE:
+                return visitor.visitPurchase();
+            case AUTHORIZE:
+                return visitor.visitAuthorize();
+            case PRE_CHARGEBACK:
+                return visitor.visitPreChargeback();
+            case CANCELED:
+                return visitor.visitCanceled();
             case CHARGEBACK:
                 return visitor.visitChargeback();
             case AUTHORIZATION:
@@ -103,26 +107,28 @@ public final class PaymentTransactionTypes {
     @JsonCreator(mode = JsonCreator.Mode.DELEGATING)
     public static PaymentTransactionTypes valueOf(String value) {
         switch (value) {
-            case "purchase":
-                return PURCHASE;
             case "fraud_screening":
                 return FRAUD_SCREENING;
-            case "authorize":
-                return AUTHORIZE;
-            case "pre_chargeback":
-                return PRE_CHARGEBACK;
+            case "deposit":
+                return DEPOSIT;
             case "three_d_secure":
                 return THREE_D_SECURE;
             case "installment":
                 return INSTALLMENT;
-            case "canceled":
-                return CANCELED;
             case "capture":
                 return CAPTURE;
             case "verify":
                 return VERIFY;
             case "refund":
                 return REFUND;
+            case "purchase":
+                return PURCHASE;
+            case "authorize":
+                return AUTHORIZE;
+            case "pre_chargeback":
+                return PRE_CHARGEBACK;
+            case "canceled":
+                return CANCELED;
             case "chargeback":
                 return CHARGEBACK;
             case "authorization":
@@ -157,6 +163,8 @@ public final class PaymentTransactionTypes {
 
         INSTALLMENT,
 
+        DEPOSIT,
+
         UNKNOWN
     }
 
@@ -184,6 +192,8 @@ public final class PaymentTransactionTypes {
         T visitAuthorization();
 
         T visitInstallment();
+
+        T visitDeposit();
 
         T visitUnknown(String unknownType);
     }

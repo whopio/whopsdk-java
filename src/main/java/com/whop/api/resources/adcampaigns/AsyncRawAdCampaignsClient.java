@@ -4,11 +4,14 @@
 package com.whop.api.resources.adcampaigns;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
+import com.whop.api.core.BodyProperties;
 import com.whop.api.core.ClientOptions;
 import com.whop.api.core.MediaTypes;
 import com.whop.api.core.ObjectMappers;
+import com.whop.api.core.PathSegments;
 import com.whop.api.core.QueryStringMapper;
 import com.whop.api.core.RequestOptions;
+import com.whop.api.core.RetryInterceptor;
 import com.whop.api.core.WhopApiApiException;
 import com.whop.api.core.WhopApiException;
 import com.whop.api.core.WhopApiHttpResponse;
@@ -17,20 +20,19 @@ import com.whop.api.errors.BadRequestError;
 import com.whop.api.errors.ConflictError;
 import com.whop.api.errors.NotFoundError;
 import com.whop.api.errors.UnauthorizedError;
+import com.whop.api.resources.adcampaigns.requests.ClaimAdCampaignsRequest;
 import com.whop.api.resources.adcampaigns.requests.CreateAdCampaignsRequest;
 import com.whop.api.resources.adcampaigns.requests.DeleteAdCampaignsRequest;
 import com.whop.api.resources.adcampaigns.requests.DuplicateAdCampaignsRequest;
 import com.whop.api.resources.adcampaigns.requests.ListAdCampaignsRequest;
 import com.whop.api.resources.adcampaigns.requests.PauseAdCampaignsRequest;
 import com.whop.api.resources.adcampaigns.requests.RetrieveAdCampaignsRequest;
-import com.whop.api.resources.adcampaigns.requests.RetryPaymentAdCampaignsRequest;
 import com.whop.api.resources.adcampaigns.requests.UnpauseAdCampaignsRequest;
 import com.whop.api.resources.adcampaigns.requests.UpdateAdCampaignsRequest;
 import com.whop.api.resources.adcampaigns.types.DeleteAdCampaignsResponse;
 import com.whop.api.resources.adcampaigns.types.DuplicateAdCampaignsResponse;
 import com.whop.api.resources.adcampaigns.types.ListAdCampaignsResponse;
 import com.whop.api.types.AdCampaign;
-import com.whop.api.types.V1ErrorResponse;
 import java.io.IOException;
 import java.util.List;
 import java.util.Optional;
@@ -80,7 +82,7 @@ public class AsyncRawAdCampaignsClient {
      */
     public CompletableFuture<WhopApiHttpResponse<SyncPagingIterable<AdCampaign>>> list(
             ListAdCampaignsRequest request, RequestOptions requestOptions) {
-        HttpUrl.Builder httpUrl = HttpUrl.parse(this.clientOptions.environment().getUrl())
+        HttpUrl.Builder httpUrl = HttpUrl.parse(this.clientOptions.environment().getApiURL())
                 .newBuilder()
                 .addPathSegments("ad_campaigns");
         if (request.getAccountId().isPresent()) {
@@ -102,6 +104,10 @@ public class AsyncRawAdCampaignsClient {
         if (request.getDirection().isPresent()) {
             QueryStringMapper.addQueryParameter(
                     httpUrl, "direction", request.getDirection().get(), false);
+        }
+        if (request.getCampaignType().isPresent()) {
+            QueryStringMapper.addQueryParameter(
+                    httpUrl, "campaign_type", request.getCampaignType().get(), false);
         }
         if (request.getCreatedBefore().isPresent()) {
             QueryStringMapper.addQueryParameter(
@@ -158,8 +164,18 @@ public class AsyncRawAdCampaignsClient {
         if (requestOptions != null && requestOptions.getTimeout().isPresent()) {
             client = clientOptions.httpClientWithTimeout(requestOptions);
         }
+        if (requestOptions != null && requestOptions.getMaxRetries().isPresent()) {
+            okhttpRequest = okhttpRequest
+                    .newBuilder()
+                    .tag(
+                            RetryInterceptor.MaxRetriesOverride.class,
+                            new RetryInterceptor.MaxRetriesOverride(
+                                    requestOptions.getMaxRetries().get()))
+                    .build();
+        }
         CompletableFuture<WhopApiHttpResponse<SyncPagingIterable<AdCampaign>>> future = new CompletableFuture<>();
-        client.newCall(okhttpRequest).enqueue(new Callback() {
+        RetryInterceptor.AsyncCall okhttpCall = RetryInterceptor.newAsyncCall(client, okhttpRequest);
+        okhttpCall.enqueue(new Callback() {
             @Override
             public void onResponse(@NotNull Call call, @NotNull Response response) throws IOException {
                 try (ResponseBody responseBody = response.body()) {
@@ -176,7 +192,11 @@ public class AsyncRawAdCampaignsClient {
                         List<AdCampaign> result = parsedResponse.getData();
                         future.complete(new WhopApiHttpResponse<>(
                                 new SyncPagingIterable<AdCampaign>(
-                                        startingAfter != null, result, parsedResponse, () -> {
+                                        startingAfter.isPresent()
+                                                && !startingAfter.get().isEmpty(),
+                                        result,
+                                        parsedResponse,
+                                        () -> {
                                             try {
                                                 return list(nextRequest, requestOptions)
                                                         .get()
@@ -208,6 +228,9 @@ public class AsyncRawAdCampaignsClient {
                     future.completeExceptionally(new WhopApiApiException(
                             "Error with status code " + response.code(), response.code(), errorBody, response));
                     return;
+                } catch (JsonProcessingException e) {
+                    future.completeExceptionally(
+                            new WhopApiException("Failed to deserialize response: " + e.getMessage(), e));
                 } catch (IOException e) {
                     future.completeExceptionally(new WhopApiException("Network error executing HTTP request", e));
                 }
@@ -218,22 +241,27 @@ public class AsyncRawAdCampaignsClient {
                 future.completeExceptionally(new WhopApiException("Network error executing HTTP request", e));
             }
         });
+        future.whenComplete((result_, throwable_) -> {
+            if (future.isCancelled()) {
+                okhttpCall.cancel();
+            }
+        });
         return future;
     }
 
     /**
-     * Creates an ad campaign for an account.
+     * Creates an ad campaign in <code>draft</code> status for an account. Nothing runs until you launch it by setting <code>status</code> to <code>active</code> with <code>PATCH /ad_campaigns/:id</code>.
      */
     public CompletableFuture<WhopApiHttpResponse<AdCampaign>> create(CreateAdCampaignsRequest request) {
         return create(request, null);
     }
 
     /**
-     * Creates an ad campaign for an account.
+     * Creates an ad campaign in <code>draft</code> status for an account. Nothing runs until you launch it by setting <code>status</code> to <code>active</code> with <code>PATCH /ad_campaigns/:id</code>.
      */
     public CompletableFuture<WhopApiHttpResponse<AdCampaign>> create(
             CreateAdCampaignsRequest request, RequestOptions requestOptions) {
-        HttpUrl.Builder httpUrl = HttpUrl.parse(this.clientOptions.environment().getUrl())
+        HttpUrl.Builder httpUrl = HttpUrl.parse(this.clientOptions.environment().getApiURL())
                 .newBuilder()
                 .addPathSegments("ad_campaigns");
         if (requestOptions != null) {
@@ -244,7 +272,9 @@ public class AsyncRawAdCampaignsClient {
         RequestBody body;
         try {
             body = RequestBody.create(
-                    ObjectMappers.JSON_MAPPER.writeValueAsBytes(request), MediaTypes.APPLICATION_JSON);
+                    ObjectMappers.JSON_MAPPER.writeValueAsBytes(BodyProperties.merge(
+                            request, requestOptions != null ? requestOptions.getBodyProperties() : null)),
+                    MediaTypes.APPLICATION_JSON);
         } catch (JsonProcessingException e) {
             throw new WhopApiException("Failed to serialize request", e);
         }
@@ -259,8 +289,18 @@ public class AsyncRawAdCampaignsClient {
         if (requestOptions != null && requestOptions.getTimeout().isPresent()) {
             client = clientOptions.httpClientWithTimeout(requestOptions);
         }
+        if (requestOptions != null && requestOptions.getMaxRetries().isPresent()) {
+            okhttpRequest = okhttpRequest
+                    .newBuilder()
+                    .tag(
+                            RetryInterceptor.MaxRetriesOverride.class,
+                            new RetryInterceptor.MaxRetriesOverride(
+                                    requestOptions.getMaxRetries().get()))
+                    .build();
+        }
         CompletableFuture<WhopApiHttpResponse<AdCampaign>> future = new CompletableFuture<>();
-        client.newCall(okhttpRequest).enqueue(new Callback() {
+        RetryInterceptor.AsyncCall okhttpCall = RetryInterceptor.newAsyncCall(client, okhttpRequest);
+        okhttpCall.enqueue(new Callback() {
             @Override
             public void onResponse(@NotNull Call call, @NotNull Response response) throws IOException {
                 try (ResponseBody responseBody = response.body()) {
@@ -279,7 +319,7 @@ public class AsyncRawAdCampaignsClient {
                                 return;
                             case 409:
                                 future.completeExceptionally(new ConflictError(
-                                        ObjectMappers.JSON_MAPPER.readValue(responseBodyString, V1ErrorResponse.class),
+                                        ObjectMappers.JSON_MAPPER.readValue(responseBodyString, Object.class),
                                         response));
                                 return;
                         }
@@ -290,6 +330,9 @@ public class AsyncRawAdCampaignsClient {
                     future.completeExceptionally(new WhopApiApiException(
                             "Error with status code " + response.code(), response.code(), errorBody, response));
                     return;
+                } catch (JsonProcessingException e) {
+                    future.completeExceptionally(
+                            new WhopApiException("Failed to deserialize response: " + e.getMessage(), e));
                 } catch (IOException e) {
                     future.completeExceptionally(new WhopApiException("Network error executing HTTP request", e));
                 }
@@ -298,6 +341,11 @@ public class AsyncRawAdCampaignsClient {
             @Override
             public void onFailure(@NotNull Call call, @NotNull IOException e) {
                 future.completeExceptionally(new WhopApiException("Network error executing HTTP request", e));
+            }
+        });
+        future.whenComplete((result_, throwable_) -> {
+            if (future.isCancelled()) {
+                okhttpCall.cancel();
             }
         });
         return future;
@@ -329,10 +377,10 @@ public class AsyncRawAdCampaignsClient {
      */
     public CompletableFuture<WhopApiHttpResponse<AdCampaign>> retrieve(
             String id, RetrieveAdCampaignsRequest request, RequestOptions requestOptions) {
-        HttpUrl.Builder httpUrl = HttpUrl.parse(this.clientOptions.environment().getUrl())
+        HttpUrl.Builder httpUrl = HttpUrl.parse(this.clientOptions.environment().getApiURL())
                 .newBuilder()
                 .addPathSegments("ad_campaigns")
-                .addPathSegment(id);
+                .addPathSegment(PathSegments.validate(id));
         if (request.getStatsFrom().isPresent()) {
             QueryStringMapper.addQueryParameter(
                     httpUrl, "stats_from", request.getStatsFrom().get(), false);
@@ -364,8 +412,18 @@ public class AsyncRawAdCampaignsClient {
         if (requestOptions != null && requestOptions.getTimeout().isPresent()) {
             client = clientOptions.httpClientWithTimeout(requestOptions);
         }
+        if (requestOptions != null && requestOptions.getMaxRetries().isPresent()) {
+            okhttpRequest = okhttpRequest
+                    .newBuilder()
+                    .tag(
+                            RetryInterceptor.MaxRetriesOverride.class,
+                            new RetryInterceptor.MaxRetriesOverride(
+                                    requestOptions.getMaxRetries().get()))
+                    .build();
+        }
         CompletableFuture<WhopApiHttpResponse<AdCampaign>> future = new CompletableFuture<>();
-        client.newCall(okhttpRequest).enqueue(new Callback() {
+        RetryInterceptor.AsyncCall okhttpCall = RetryInterceptor.newAsyncCall(client, okhttpRequest);
+        okhttpCall.enqueue(new Callback() {
             @Override
             public void onResponse(@NotNull Call call, @NotNull Response response) throws IOException {
                 try (ResponseBody responseBody = response.body()) {
@@ -388,6 +446,9 @@ public class AsyncRawAdCampaignsClient {
                     future.completeExceptionally(new WhopApiApiException(
                             "Error with status code " + response.code(), response.code(), errorBody, response));
                     return;
+                } catch (JsonProcessingException e) {
+                    future.completeExceptionally(
+                            new WhopApiException("Failed to deserialize response: " + e.getMessage(), e));
                 } catch (IOException e) {
                     future.completeExceptionally(new WhopApiException("Network error executing HTTP request", e));
                 }
@@ -398,18 +459,23 @@ public class AsyncRawAdCampaignsClient {
                 future.completeExceptionally(new WhopApiException("Network error executing HTTP request", e));
             }
         });
+        future.whenComplete((result_, throwable_) -> {
+            if (future.isCancelled()) {
+                okhttpCall.cancel();
+            }
+        });
         return future;
     }
 
     /**
-     * Deletes an ad campaign and archives it on the ad platform (cascades to ad groups and ads).
+     * Deletes an ad campaign with its ad groups and ads, and stops their delivery.
      */
     public CompletableFuture<WhopApiHttpResponse<DeleteAdCampaignsResponse>> delete(String id) {
         return delete(id, DeleteAdCampaignsRequest.builder().build());
     }
 
     /**
-     * Deletes an ad campaign and archives it on the ad platform (cascades to ad groups and ads).
+     * Deletes an ad campaign with its ad groups and ads, and stops their delivery.
      */
     public CompletableFuture<WhopApiHttpResponse<DeleteAdCampaignsResponse>> delete(
             String id, RequestOptions requestOptions) {
@@ -417,7 +483,7 @@ public class AsyncRawAdCampaignsClient {
     }
 
     /**
-     * Deletes an ad campaign and archives it on the ad platform (cascades to ad groups and ads).
+     * Deletes an ad campaign with its ad groups and ads, and stops their delivery.
      */
     public CompletableFuture<WhopApiHttpResponse<DeleteAdCampaignsResponse>> delete(
             String id, DeleteAdCampaignsRequest request) {
@@ -425,14 +491,14 @@ public class AsyncRawAdCampaignsClient {
     }
 
     /**
-     * Deletes an ad campaign and archives it on the ad platform (cascades to ad groups and ads).
+     * Deletes an ad campaign with its ad groups and ads, and stops their delivery.
      */
     public CompletableFuture<WhopApiHttpResponse<DeleteAdCampaignsResponse>> delete(
             String id, DeleteAdCampaignsRequest request, RequestOptions requestOptions) {
-        HttpUrl.Builder httpUrl = HttpUrl.parse(this.clientOptions.environment().getUrl())
+        HttpUrl.Builder httpUrl = HttpUrl.parse(this.clientOptions.environment().getApiURL())
                 .newBuilder()
                 .addPathSegments("ad_campaigns")
-                .addPathSegment(id);
+                .addPathSegment(PathSegments.validate(id));
         if (requestOptions != null) {
             requestOptions.getQueryParameters().forEach((_key, _value) -> {
                 httpUrl.addQueryParameter(_key, _value);
@@ -440,7 +506,10 @@ public class AsyncRawAdCampaignsClient {
         }
         Request.Builder _requestBuilder = new Request.Builder()
                 .url(httpUrl.build())
-                .method("DELETE", null)
+                .method(
+                        "DELETE",
+                        BodyProperties.toRequestBody(
+                                requestOptions != null ? requestOptions.getBodyProperties() : null, null))
                 .headers(Headers.of(clientOptions.headers(requestOptions)))
                 .addHeader("Accept", "application/json");
         Request okhttpRequest = _requestBuilder.build();
@@ -448,8 +517,18 @@ public class AsyncRawAdCampaignsClient {
         if (requestOptions != null && requestOptions.getTimeout().isPresent()) {
             client = clientOptions.httpClientWithTimeout(requestOptions);
         }
+        if (requestOptions != null && requestOptions.getMaxRetries().isPresent()) {
+            okhttpRequest = okhttpRequest
+                    .newBuilder()
+                    .tag(
+                            RetryInterceptor.MaxRetriesOverride.class,
+                            new RetryInterceptor.MaxRetriesOverride(
+                                    requestOptions.getMaxRetries().get()))
+                    .build();
+        }
         CompletableFuture<WhopApiHttpResponse<DeleteAdCampaignsResponse>> future = new CompletableFuture<>();
-        client.newCall(okhttpRequest).enqueue(new Callback() {
+        RetryInterceptor.AsyncCall okhttpCall = RetryInterceptor.newAsyncCall(client, okhttpRequest);
+        okhttpCall.enqueue(new Callback() {
             @Override
             public void onResponse(@NotNull Call call, @NotNull Response response) throws IOException {
                 try (ResponseBody responseBody = response.body()) {
@@ -474,6 +553,9 @@ public class AsyncRawAdCampaignsClient {
                     future.completeExceptionally(new WhopApiApiException(
                             "Error with status code " + response.code(), response.code(), errorBody, response));
                     return;
+                } catch (JsonProcessingException e) {
+                    future.completeExceptionally(
+                            new WhopApiException("Failed to deserialize response: " + e.getMessage(), e));
                 } catch (IOException e) {
                     future.completeExceptionally(new WhopApiException("Network error executing HTTP request", e));
                 }
@@ -484,39 +566,44 @@ public class AsyncRawAdCampaignsClient {
                 future.completeExceptionally(new WhopApiException("Network error executing HTTP request", e));
             }
         });
+        future.whenComplete((result_, throwable_) -> {
+            if (future.isCancelled()) {
+                okhttpCall.cancel();
+            }
+        });
         return future;
     }
 
     /**
-     * Updates an ad campaign's editable fields (title, budget, schedule, bid strategy, special ad categories, and, before launch, budget optimization), and launches a draft campaign by setting status to active. Objective, budget type and desired cost per result are fixed at creation and cannot be changed.
+     * Updates an ad campaign's settings, or launches a draft campaign by setting <code>status</code> to <code>active</code>. The objective is fixed at creation and cannot be changed.
      */
     public CompletableFuture<WhopApiHttpResponse<AdCampaign>> update(String id) {
         return update(id, UpdateAdCampaignsRequest.builder().build());
     }
 
     /**
-     * Updates an ad campaign's editable fields (title, budget, schedule, bid strategy, special ad categories, and, before launch, budget optimization), and launches a draft campaign by setting status to active. Objective, budget type and desired cost per result are fixed at creation and cannot be changed.
+     * Updates an ad campaign's settings, or launches a draft campaign by setting <code>status</code> to <code>active</code>. The objective is fixed at creation and cannot be changed.
      */
     public CompletableFuture<WhopApiHttpResponse<AdCampaign>> update(String id, RequestOptions requestOptions) {
         return update(id, UpdateAdCampaignsRequest.builder().build(), requestOptions);
     }
 
     /**
-     * Updates an ad campaign's editable fields (title, budget, schedule, bid strategy, special ad categories, and, before launch, budget optimization), and launches a draft campaign by setting status to active. Objective, budget type and desired cost per result are fixed at creation and cannot be changed.
+     * Updates an ad campaign's settings, or launches a draft campaign by setting <code>status</code> to <code>active</code>. The objective is fixed at creation and cannot be changed.
      */
     public CompletableFuture<WhopApiHttpResponse<AdCampaign>> update(String id, UpdateAdCampaignsRequest request) {
         return update(id, request, null);
     }
 
     /**
-     * Updates an ad campaign's editable fields (title, budget, schedule, bid strategy, special ad categories, and, before launch, budget optimization), and launches a draft campaign by setting status to active. Objective, budget type and desired cost per result are fixed at creation and cannot be changed.
+     * Updates an ad campaign's settings, or launches a draft campaign by setting <code>status</code> to <code>active</code>. The objective is fixed at creation and cannot be changed.
      */
     public CompletableFuture<WhopApiHttpResponse<AdCampaign>> update(
             String id, UpdateAdCampaignsRequest request, RequestOptions requestOptions) {
-        HttpUrl.Builder httpUrl = HttpUrl.parse(this.clientOptions.environment().getUrl())
+        HttpUrl.Builder httpUrl = HttpUrl.parse(this.clientOptions.environment().getApiURL())
                 .newBuilder()
                 .addPathSegments("ad_campaigns")
-                .addPathSegment(id);
+                .addPathSegment(PathSegments.validate(id));
         if (requestOptions != null) {
             requestOptions.getQueryParameters().forEach((_key, _value) -> {
                 httpUrl.addQueryParameter(_key, _value);
@@ -525,7 +612,9 @@ public class AsyncRawAdCampaignsClient {
         RequestBody body;
         try {
             body = RequestBody.create(
-                    ObjectMappers.JSON_MAPPER.writeValueAsBytes(request), MediaTypes.APPLICATION_JSON);
+                    ObjectMappers.JSON_MAPPER.writeValueAsBytes(BodyProperties.merge(
+                            request, requestOptions != null ? requestOptions.getBodyProperties() : null)),
+                    MediaTypes.APPLICATION_JSON);
         } catch (JsonProcessingException e) {
             throw new WhopApiException("Failed to serialize request", e);
         }
@@ -540,8 +629,18 @@ public class AsyncRawAdCampaignsClient {
         if (requestOptions != null && requestOptions.getTimeout().isPresent()) {
             client = clientOptions.httpClientWithTimeout(requestOptions);
         }
+        if (requestOptions != null && requestOptions.getMaxRetries().isPresent()) {
+            okhttpRequest = okhttpRequest
+                    .newBuilder()
+                    .tag(
+                            RetryInterceptor.MaxRetriesOverride.class,
+                            new RetryInterceptor.MaxRetriesOverride(
+                                    requestOptions.getMaxRetries().get()))
+                    .build();
+        }
         CompletableFuture<WhopApiHttpResponse<AdCampaign>> future = new CompletableFuture<>();
-        client.newCall(okhttpRequest).enqueue(new Callback() {
+        RetryInterceptor.AsyncCall okhttpCall = RetryInterceptor.newAsyncCall(client, okhttpRequest);
+        okhttpCall.enqueue(new Callback() {
             @Override
             public void onResponse(@NotNull Call call, @NotNull Response response) throws IOException {
                 try (ResponseBody responseBody = response.body()) {
@@ -555,6 +654,9 @@ public class AsyncRawAdCampaignsClient {
                     future.completeExceptionally(new WhopApiApiException(
                             "Error with status code " + response.code(), response.code(), errorBody, response));
                     return;
+                } catch (JsonProcessingException e) {
+                    future.completeExceptionally(
+                            new WhopApiException("Failed to deserialize response: " + e.getMessage(), e));
                 } catch (IOException e) {
                     future.completeExceptionally(new WhopApiException("Network error executing HTTP request", e));
                 }
@@ -563,6 +665,116 @@ public class AsyncRawAdCampaignsClient {
             @Override
             public void onFailure(@NotNull Call call, @NotNull IOException e) {
                 future.completeExceptionally(new WhopApiException("Network error executing HTTP request", e));
+            }
+        });
+        future.whenComplete((result_, throwable_) -> {
+            if (future.isCancelled()) {
+                okhttpCall.cancel();
+            }
+        });
+        return future;
+    }
+
+    /**
+     * Attributes the whole campaign and its daily budget to the calling user as its runner. One runner holds a campaign at a time. Takes the runner's Whop session, or a user API key with <code>ad_campaign:update</code>. The caller also needs active advertiser-supplier program access. Everyone else gets a 404. Returns 403 until the caller has verified their identity and added a phone number and a social account. Returns 403 when the claim would take the daily budget the caller holds past the limit for their score. Returns 409 when another user holds the campaign. Changes nothing when the caller already holds it.
+     */
+    public CompletableFuture<WhopApiHttpResponse<AdCampaign>> claim(String id) {
+        return claim(id, ClaimAdCampaignsRequest.builder().build());
+    }
+
+    /**
+     * Attributes the whole campaign and its daily budget to the calling user as its runner. One runner holds a campaign at a time. Takes the runner's Whop session, or a user API key with <code>ad_campaign:update</code>. The caller also needs active advertiser-supplier program access. Everyone else gets a 404. Returns 403 until the caller has verified their identity and added a phone number and a social account. Returns 403 when the claim would take the daily budget the caller holds past the limit for their score. Returns 409 when another user holds the campaign. Changes nothing when the caller already holds it.
+     */
+    public CompletableFuture<WhopApiHttpResponse<AdCampaign>> claim(String id, RequestOptions requestOptions) {
+        return claim(id, ClaimAdCampaignsRequest.builder().build(), requestOptions);
+    }
+
+    /**
+     * Attributes the whole campaign and its daily budget to the calling user as its runner. One runner holds a campaign at a time. Takes the runner's Whop session, or a user API key with <code>ad_campaign:update</code>. The caller also needs active advertiser-supplier program access. Everyone else gets a 404. Returns 403 until the caller has verified their identity and added a phone number and a social account. Returns 403 when the claim would take the daily budget the caller holds past the limit for their score. Returns 409 when another user holds the campaign. Changes nothing when the caller already holds it.
+     */
+    public CompletableFuture<WhopApiHttpResponse<AdCampaign>> claim(String id, ClaimAdCampaignsRequest request) {
+        return claim(id, request, null);
+    }
+
+    /**
+     * Attributes the whole campaign and its daily budget to the calling user as its runner. One runner holds a campaign at a time. Takes the runner's Whop session, or a user API key with <code>ad_campaign:update</code>. The caller also needs active advertiser-supplier program access. Everyone else gets a 404. Returns 403 until the caller has verified their identity and added a phone number and a social account. Returns 403 when the claim would take the daily budget the caller holds past the limit for their score. Returns 409 when another user holds the campaign. Changes nothing when the caller already holds it.
+     */
+    public CompletableFuture<WhopApiHttpResponse<AdCampaign>> claim(
+            String id, ClaimAdCampaignsRequest request, RequestOptions requestOptions) {
+        HttpUrl.Builder httpUrl = HttpUrl.parse(this.clientOptions.environment().getApiURL())
+                .newBuilder()
+                .addPathSegments("ad_campaigns")
+                .addPathSegment(PathSegments.validate(id))
+                .addPathSegments("claim");
+        if (requestOptions != null) {
+            requestOptions.getQueryParameters().forEach((_key, _value) -> {
+                httpUrl.addQueryParameter(_key, _value);
+            });
+        }
+        Request.Builder _requestBuilder = new Request.Builder()
+                .url(httpUrl.build())
+                .method(
+                        "POST",
+                        BodyProperties.toRequestBody(
+                                requestOptions != null ? requestOptions.getBodyProperties() : null,
+                                RequestBody.create("", null)))
+                .headers(Headers.of(clientOptions.headers(requestOptions)))
+                .addHeader("Accept", "application/json");
+        Request okhttpRequest = _requestBuilder.build();
+        OkHttpClient client = clientOptions.httpClient();
+        if (requestOptions != null && requestOptions.getTimeout().isPresent()) {
+            client = clientOptions.httpClientWithTimeout(requestOptions);
+        }
+        if (requestOptions != null && requestOptions.getMaxRetries().isPresent()) {
+            okhttpRequest = okhttpRequest
+                    .newBuilder()
+                    .tag(
+                            RetryInterceptor.MaxRetriesOverride.class,
+                            new RetryInterceptor.MaxRetriesOverride(
+                                    requestOptions.getMaxRetries().get()))
+                    .build();
+        }
+        CompletableFuture<WhopApiHttpResponse<AdCampaign>> future = new CompletableFuture<>();
+        RetryInterceptor.AsyncCall okhttpCall = RetryInterceptor.newAsyncCall(client, okhttpRequest);
+        okhttpCall.enqueue(new Callback() {
+            @Override
+            public void onResponse(@NotNull Call call, @NotNull Response response) throws IOException {
+                try (ResponseBody responseBody = response.body()) {
+                    String responseBodyString = responseBody != null ? responseBody.string() : "{}";
+                    if (response.isSuccessful()) {
+                        future.complete(new WhopApiHttpResponse<>(
+                                ObjectMappers.JSON_MAPPER.readValue(responseBodyString, AdCampaign.class), response));
+                        return;
+                    }
+                    try {
+                        if (response.code() == 409) {
+                            future.completeExceptionally(new ConflictError(
+                                    ObjectMappers.JSON_MAPPER.readValue(responseBodyString, Object.class), response));
+                            return;
+                        }
+                    } catch (JsonProcessingException ignored) {
+                        // unable to map error response, throwing generic error
+                    }
+                    Object errorBody = ObjectMappers.parseErrorBody(responseBodyString);
+                    future.completeExceptionally(new WhopApiApiException(
+                            "Error with status code " + response.code(), response.code(), errorBody, response));
+                    return;
+                } catch (JsonProcessingException e) {
+                    future.completeExceptionally(
+                            new WhopApiException("Failed to deserialize response: " + e.getMessage(), e));
+                } catch (IOException e) {
+                    future.completeExceptionally(new WhopApiException("Network error executing HTTP request", e));
+                }
+            }
+
+            @Override
+            public void onFailure(@NotNull Call call, @NotNull IOException e) {
+                future.completeExceptionally(new WhopApiException("Network error executing HTTP request", e));
+            }
+        });
+        future.whenComplete((result_, throwable_) -> {
+            if (future.isCancelled()) {
+                okhttpCall.cancel();
             }
         });
         return future;
@@ -596,10 +808,10 @@ public class AsyncRawAdCampaignsClient {
      */
     public CompletableFuture<WhopApiHttpResponse<DuplicateAdCampaignsResponse>> duplicate(
             String id, DuplicateAdCampaignsRequest request, RequestOptions requestOptions) {
-        HttpUrl.Builder httpUrl = HttpUrl.parse(this.clientOptions.environment().getUrl())
+        HttpUrl.Builder httpUrl = HttpUrl.parse(this.clientOptions.environment().getApiURL())
                 .newBuilder()
                 .addPathSegments("ad_campaigns")
-                .addPathSegment(id)
+                .addPathSegment(PathSegments.validate(id))
                 .addPathSegments("duplicate");
         if (requestOptions != null) {
             requestOptions.getQueryParameters().forEach((_key, _value) -> {
@@ -609,7 +821,9 @@ public class AsyncRawAdCampaignsClient {
         RequestBody body;
         try {
             body = RequestBody.create(
-                    ObjectMappers.JSON_MAPPER.writeValueAsBytes(request), MediaTypes.APPLICATION_JSON);
+                    ObjectMappers.JSON_MAPPER.writeValueAsBytes(BodyProperties.merge(
+                            request, requestOptions != null ? requestOptions.getBodyProperties() : null)),
+                    MediaTypes.APPLICATION_JSON);
         } catch (JsonProcessingException e) {
             throw new WhopApiException("Failed to serialize request", e);
         }
@@ -624,8 +838,18 @@ public class AsyncRawAdCampaignsClient {
         if (requestOptions != null && requestOptions.getTimeout().isPresent()) {
             client = clientOptions.httpClientWithTimeout(requestOptions);
         }
+        if (requestOptions != null && requestOptions.getMaxRetries().isPresent()) {
+            okhttpRequest = okhttpRequest
+                    .newBuilder()
+                    .tag(
+                            RetryInterceptor.MaxRetriesOverride.class,
+                            new RetryInterceptor.MaxRetriesOverride(
+                                    requestOptions.getMaxRetries().get()))
+                    .build();
+        }
         CompletableFuture<WhopApiHttpResponse<DuplicateAdCampaignsResponse>> future = new CompletableFuture<>();
-        client.newCall(okhttpRequest).enqueue(new Callback() {
+        RetryInterceptor.AsyncCall okhttpCall = RetryInterceptor.newAsyncCall(client, okhttpRequest);
+        okhttpCall.enqueue(new Callback() {
             @Override
             public void onResponse(@NotNull Call call, @NotNull Response response) throws IOException {
                 try (ResponseBody responseBody = response.body()) {
@@ -651,7 +875,7 @@ public class AsyncRawAdCampaignsClient {
                                 return;
                             case 409:
                                 future.completeExceptionally(new ConflictError(
-                                        ObjectMappers.JSON_MAPPER.readValue(responseBodyString, V1ErrorResponse.class),
+                                        ObjectMappers.JSON_MAPPER.readValue(responseBodyString, Object.class),
                                         response));
                                 return;
                         }
@@ -662,6 +886,9 @@ public class AsyncRawAdCampaignsClient {
                     future.completeExceptionally(new WhopApiApiException(
                             "Error with status code " + response.code(), response.code(), errorBody, response));
                     return;
+                } catch (JsonProcessingException e) {
+                    future.completeExceptionally(
+                            new WhopApiException("Failed to deserialize response: " + e.getMessage(), e));
                 } catch (IOException e) {
                     future.completeExceptionally(new WhopApiException("Network error executing HTTP request", e));
                 }
@@ -670,6 +897,11 @@ public class AsyncRawAdCampaignsClient {
             @Override
             public void onFailure(@NotNull Call call, @NotNull IOException e) {
                 future.completeExceptionally(new WhopApiException("Network error executing HTTP request", e));
+            }
+        });
+        future.whenComplete((result_, throwable_) -> {
+            if (future.isCancelled()) {
+                okhttpCall.cancel();
             }
         });
         return future;
@@ -701,10 +933,10 @@ public class AsyncRawAdCampaignsClient {
      */
     public CompletableFuture<WhopApiHttpResponse<AdCampaign>> pause(
             String id, PauseAdCampaignsRequest request, RequestOptions requestOptions) {
-        HttpUrl.Builder httpUrl = HttpUrl.parse(this.clientOptions.environment().getUrl())
+        HttpUrl.Builder httpUrl = HttpUrl.parse(this.clientOptions.environment().getApiURL())
                 .newBuilder()
                 .addPathSegments("ad_campaigns")
-                .addPathSegment(id)
+                .addPathSegment(PathSegments.validate(id))
                 .addPathSegments("pause");
         if (requestOptions != null) {
             requestOptions.getQueryParameters().forEach((_key, _value) -> {
@@ -713,7 +945,11 @@ public class AsyncRawAdCampaignsClient {
         }
         Request.Builder _requestBuilder = new Request.Builder()
                 .url(httpUrl.build())
-                .method("POST", RequestBody.create("", null))
+                .method(
+                        "POST",
+                        BodyProperties.toRequestBody(
+                                requestOptions != null ? requestOptions.getBodyProperties() : null,
+                                RequestBody.create("", null)))
                 .headers(Headers.of(clientOptions.headers(requestOptions)))
                 .addHeader("Accept", "application/json");
         Request okhttpRequest = _requestBuilder.build();
@@ -721,8 +957,18 @@ public class AsyncRawAdCampaignsClient {
         if (requestOptions != null && requestOptions.getTimeout().isPresent()) {
             client = clientOptions.httpClientWithTimeout(requestOptions);
         }
+        if (requestOptions != null && requestOptions.getMaxRetries().isPresent()) {
+            okhttpRequest = okhttpRequest
+                    .newBuilder()
+                    .tag(
+                            RetryInterceptor.MaxRetriesOverride.class,
+                            new RetryInterceptor.MaxRetriesOverride(
+                                    requestOptions.getMaxRetries().get()))
+                    .build();
+        }
         CompletableFuture<WhopApiHttpResponse<AdCampaign>> future = new CompletableFuture<>();
-        client.newCall(okhttpRequest).enqueue(new Callback() {
+        RetryInterceptor.AsyncCall okhttpCall = RetryInterceptor.newAsyncCall(client, okhttpRequest);
+        okhttpCall.enqueue(new Callback() {
             @Override
             public void onResponse(@NotNull Call call, @NotNull Response response) throws IOException {
                 try (ResponseBody responseBody = response.body()) {
@@ -735,8 +981,7 @@ public class AsyncRawAdCampaignsClient {
                     try {
                         if (response.code() == 409) {
                             future.completeExceptionally(new ConflictError(
-                                    ObjectMappers.JSON_MAPPER.readValue(responseBodyString, V1ErrorResponse.class),
-                                    response));
+                                    ObjectMappers.JSON_MAPPER.readValue(responseBodyString, Object.class), response));
                             return;
                         }
                     } catch (JsonProcessingException ignored) {
@@ -746,6 +991,9 @@ public class AsyncRawAdCampaignsClient {
                     future.completeExceptionally(new WhopApiApiException(
                             "Error with status code " + response.code(), response.code(), errorBody, response));
                     return;
+                } catch (JsonProcessingException e) {
+                    future.completeExceptionally(
+                            new WhopApiException("Failed to deserialize response: " + e.getMessage(), e));
                 } catch (IOException e) {
                     future.completeExceptionally(new WhopApiException("Network error executing HTTP request", e));
                 }
@@ -756,130 +1004,44 @@ public class AsyncRawAdCampaignsClient {
                 future.completeExceptionally(new WhopApiException("Network error executing HTTP request", e));
             }
         });
-        return future;
-    }
-
-    /**
-     * Retries billing for an ad campaign whose payment previously failed.
-     */
-    public CompletableFuture<WhopApiHttpResponse<AdCampaign>> retryPayment(String id) {
-        return retryPayment(id, RetryPaymentAdCampaignsRequest.builder().build());
-    }
-
-    /**
-     * Retries billing for an ad campaign whose payment previously failed.
-     */
-    public CompletableFuture<WhopApiHttpResponse<AdCampaign>> retryPayment(String id, RequestOptions requestOptions) {
-        return retryPayment(id, RetryPaymentAdCampaignsRequest.builder().build(), requestOptions);
-    }
-
-    /**
-     * Retries billing for an ad campaign whose payment previously failed.
-     */
-    public CompletableFuture<WhopApiHttpResponse<AdCampaign>> retryPayment(
-            String id, RetryPaymentAdCampaignsRequest request) {
-        return retryPayment(id, request, null);
-    }
-
-    /**
-     * Retries billing for an ad campaign whose payment previously failed.
-     */
-    public CompletableFuture<WhopApiHttpResponse<AdCampaign>> retryPayment(
-            String id, RetryPaymentAdCampaignsRequest request, RequestOptions requestOptions) {
-        HttpUrl.Builder httpUrl = HttpUrl.parse(this.clientOptions.environment().getUrl())
-                .newBuilder()
-                .addPathSegments("ad_campaigns")
-                .addPathSegment(id)
-                .addPathSegments("retry_payment");
-        if (requestOptions != null) {
-            requestOptions.getQueryParameters().forEach((_key, _value) -> {
-                httpUrl.addQueryParameter(_key, _value);
-            });
-        }
-        Request.Builder _requestBuilder = new Request.Builder()
-                .url(httpUrl.build())
-                .method("POST", RequestBody.create("", null))
-                .headers(Headers.of(clientOptions.headers(requestOptions)))
-                .addHeader("Accept", "application/json");
-        Request okhttpRequest = _requestBuilder.build();
-        OkHttpClient client = clientOptions.httpClient();
-        if (requestOptions != null && requestOptions.getTimeout().isPresent()) {
-            client = clientOptions.httpClientWithTimeout(requestOptions);
-        }
-        CompletableFuture<WhopApiHttpResponse<AdCampaign>> future = new CompletableFuture<>();
-        client.newCall(okhttpRequest).enqueue(new Callback() {
-            @Override
-            public void onResponse(@NotNull Call call, @NotNull Response response) throws IOException {
-                try (ResponseBody responseBody = response.body()) {
-                    String responseBodyString = responseBody != null ? responseBody.string() : "{}";
-                    if (response.isSuccessful()) {
-                        future.complete(new WhopApiHttpResponse<>(
-                                ObjectMappers.JSON_MAPPER.readValue(responseBodyString, AdCampaign.class), response));
-                        return;
-                    }
-                    try {
-                        switch (response.code()) {
-                            case 400:
-                                future.completeExceptionally(new BadRequestError(
-                                        ObjectMappers.JSON_MAPPER.readValue(responseBodyString, Object.class),
-                                        response));
-                                return;
-                            case 409:
-                                future.completeExceptionally(new ConflictError(
-                                        ObjectMappers.JSON_MAPPER.readValue(responseBodyString, V1ErrorResponse.class),
-                                        response));
-                                return;
-                        }
-                    } catch (JsonProcessingException ignored) {
-                        // unable to map error response, throwing generic error
-                    }
-                    Object errorBody = ObjectMappers.parseErrorBody(responseBodyString);
-                    future.completeExceptionally(new WhopApiApiException(
-                            "Error with status code " + response.code(), response.code(), errorBody, response));
-                    return;
-                } catch (IOException e) {
-                    future.completeExceptionally(new WhopApiException("Network error executing HTTP request", e));
-                }
-            }
-
-            @Override
-            public void onFailure(@NotNull Call call, @NotNull IOException e) {
-                future.completeExceptionally(new WhopApiException("Network error executing HTTP request", e));
+        future.whenComplete((result_, throwable_) -> {
+            if (future.isCancelled()) {
+                okhttpCall.cancel();
             }
         });
         return future;
     }
 
     /**
-     * Resumes a paused ad campaign.
+     * Resumes a paused ad campaign. Requires an ads payment method on the account.
      */
     public CompletableFuture<WhopApiHttpResponse<AdCampaign>> unpause(String id) {
         return unpause(id, UnpauseAdCampaignsRequest.builder().build());
     }
 
     /**
-     * Resumes a paused ad campaign.
+     * Resumes a paused ad campaign. Requires an ads payment method on the account.
      */
     public CompletableFuture<WhopApiHttpResponse<AdCampaign>> unpause(String id, RequestOptions requestOptions) {
         return unpause(id, UnpauseAdCampaignsRequest.builder().build(), requestOptions);
     }
 
     /**
-     * Resumes a paused ad campaign.
+     * Resumes a paused ad campaign. Requires an ads payment method on the account.
      */
     public CompletableFuture<WhopApiHttpResponse<AdCampaign>> unpause(String id, UnpauseAdCampaignsRequest request) {
         return unpause(id, request, null);
     }
 
     /**
-     * Resumes a paused ad campaign.
+     * Resumes a paused ad campaign. Requires an ads payment method on the account.
      */
     public CompletableFuture<WhopApiHttpResponse<AdCampaign>> unpause(
             String id, UnpauseAdCampaignsRequest request, RequestOptions requestOptions) {
-        HttpUrl.Builder httpUrl = HttpUrl.parse(this.clientOptions.environment().getUrl())
+        HttpUrl.Builder httpUrl = HttpUrl.parse(this.clientOptions.environment().getApiURL())
                 .newBuilder()
                 .addPathSegments("ad_campaigns")
-                .addPathSegment(id)
+                .addPathSegment(PathSegments.validate(id))
                 .addPathSegments("unpause");
         if (requestOptions != null) {
             requestOptions.getQueryParameters().forEach((_key, _value) -> {
@@ -888,7 +1050,11 @@ public class AsyncRawAdCampaignsClient {
         }
         Request.Builder _requestBuilder = new Request.Builder()
                 .url(httpUrl.build())
-                .method("POST", RequestBody.create("", null))
+                .method(
+                        "POST",
+                        BodyProperties.toRequestBody(
+                                requestOptions != null ? requestOptions.getBodyProperties() : null,
+                                RequestBody.create("", null)))
                 .headers(Headers.of(clientOptions.headers(requestOptions)))
                 .addHeader("Accept", "application/json");
         Request okhttpRequest = _requestBuilder.build();
@@ -896,8 +1062,18 @@ public class AsyncRawAdCampaignsClient {
         if (requestOptions != null && requestOptions.getTimeout().isPresent()) {
             client = clientOptions.httpClientWithTimeout(requestOptions);
         }
+        if (requestOptions != null && requestOptions.getMaxRetries().isPresent()) {
+            okhttpRequest = okhttpRequest
+                    .newBuilder()
+                    .tag(
+                            RetryInterceptor.MaxRetriesOverride.class,
+                            new RetryInterceptor.MaxRetriesOverride(
+                                    requestOptions.getMaxRetries().get()))
+                    .build();
+        }
         CompletableFuture<WhopApiHttpResponse<AdCampaign>> future = new CompletableFuture<>();
-        client.newCall(okhttpRequest).enqueue(new Callback() {
+        RetryInterceptor.AsyncCall okhttpCall = RetryInterceptor.newAsyncCall(client, okhttpRequest);
+        okhttpCall.enqueue(new Callback() {
             @Override
             public void onResponse(@NotNull Call call, @NotNull Response response) throws IOException {
                 try (ResponseBody responseBody = response.body()) {
@@ -910,8 +1086,7 @@ public class AsyncRawAdCampaignsClient {
                     try {
                         if (response.code() == 409) {
                             future.completeExceptionally(new ConflictError(
-                                    ObjectMappers.JSON_MAPPER.readValue(responseBodyString, V1ErrorResponse.class),
-                                    response));
+                                    ObjectMappers.JSON_MAPPER.readValue(responseBodyString, Object.class), response));
                             return;
                         }
                     } catch (JsonProcessingException ignored) {
@@ -921,6 +1096,9 @@ public class AsyncRawAdCampaignsClient {
                     future.completeExceptionally(new WhopApiApiException(
                             "Error with status code " + response.code(), response.code(), errorBody, response));
                     return;
+                } catch (JsonProcessingException e) {
+                    future.completeExceptionally(
+                            new WhopApiException("Failed to deserialize response: " + e.getMessage(), e));
                 } catch (IOException e) {
                     future.completeExceptionally(new WhopApiException("Network error executing HTTP request", e));
                 }
@@ -929,6 +1107,11 @@ public class AsyncRawAdCampaignsClient {
             @Override
             public void onFailure(@NotNull Call call, @NotNull IOException e) {
                 future.completeExceptionally(new WhopApiException("Network error executing HTTP request", e));
+            }
+        });
+        future.whenComplete((result_, throwable_) -> {
+            if (future.isCancelled()) {
+                okhttpCall.cancel();
             }
         });
         return future;

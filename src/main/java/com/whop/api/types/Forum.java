@@ -5,20 +5,31 @@ package com.whop.api.types;
 
 import com.fasterxml.jackson.annotation.JsonAnyGetter;
 import com.fasterxml.jackson.annotation.JsonAnySetter;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonSetter;
+import com.fasterxml.jackson.annotation.Nulls;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
+import com.whop.api.core.Nullable;
+import com.whop.api.core.NullableNonemptyFilter;
 import com.whop.api.core.ObjectMappers;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.Optional;
 import org.jetbrains.annotations.NotNull;
 
 @JsonInclude(JsonInclude.Include.NON_ABSENT)
 @JsonDeserialize(builder = Forum.Builder.class)
 public final class Forum {
+    private final List<String> bannedWords;
+
+    private final Optional<ForumBannerImage> bannerImage;
+
     private final ForumEmailNotificationPreferences emailNotificationPreference;
 
     private final ForumExperience experience;
@@ -32,18 +43,41 @@ public final class Forum {
     private final Map<String, Object> additionalProperties;
 
     private Forum(
+            List<String> bannedWords,
+            Optional<ForumBannerImage> bannerImage,
             ForumEmailNotificationPreferences emailNotificationPreference,
             ForumExperience experience,
             String id,
             ForumWhoCanCommentTypes whoCanComment,
             ForumWhoCanPostTypes whoCanPost,
             Map<String, Object> additionalProperties) {
+        this.bannedWords = bannedWords;
+        this.bannerImage = bannerImage;
         this.emailNotificationPreference = emailNotificationPreference;
         this.experience = experience;
         this.id = id;
         this.whoCanComment = whoCanComment;
         this.whoCanPost = whoCanPost;
         this.additionalProperties = additionalProperties;
+    }
+
+    /**
+     * @return A list of words that are automatically filtered from posts in this forum.
+     */
+    @JsonProperty("banned_words")
+    public List<String> getBannedWords() {
+        return bannedWords;
+    }
+
+    /**
+     * @return The banner image displayed at the top of the forum page. Null if no banner has been uploaded.
+     */
+    @JsonIgnore
+    public Optional<ForumBannerImage> getBannerImage() {
+        if (bannerImage == null) {
+            return Optional.empty();
+        }
+        return bannerImage;
     }
 
     /**
@@ -86,6 +120,12 @@ public final class Forum {
         return whoCanPost;
     }
 
+    @JsonInclude(value = JsonInclude.Include.CUSTOM, valueFilter = NullableNonemptyFilter.class)
+    @JsonProperty("banner_image")
+    private Optional<ForumBannerImage> _getBannerImage() {
+        return bannerImage;
+    }
+
     @java.lang.Override
     public boolean equals(Object other) {
         if (this == other) return true;
@@ -98,7 +138,9 @@ public final class Forum {
     }
 
     private boolean equalTo(Forum other) {
-        return emailNotificationPreference.equals(other.emailNotificationPreference)
+        return bannedWords.equals(other.bannedWords)
+                && bannerImage.equals(other.bannerImage)
+                && emailNotificationPreference.equals(other.emailNotificationPreference)
                 && experience.equals(other.experience)
                 && id.equals(other.id)
                 && whoCanComment.equals(other.whoCanComment)
@@ -108,7 +150,13 @@ public final class Forum {
     @java.lang.Override
     public int hashCode() {
         return Objects.hash(
-                this.emailNotificationPreference, this.experience, this.id, this.whoCanComment, this.whoCanPost);
+                this.bannedWords,
+                this.bannerImage,
+                this.emailNotificationPreference,
+                this.experience,
+                this.id,
+                this.whoCanComment,
+                this.whoCanPost);
     }
 
     @java.lang.Override
@@ -164,6 +212,24 @@ public final class Forum {
         _FinalStage additionalProperty(String key, Object value);
 
         _FinalStage additionalProperties(Map<String, Object> additionalProperties);
+
+        /**
+         * <p>A list of words that are automatically filtered from posts in this forum.</p>
+         */
+        _FinalStage bannedWords(List<String> bannedWords);
+
+        _FinalStage addBannedWords(String bannedWords);
+
+        _FinalStage addAllBannedWords(List<String> bannedWords);
+
+        /**
+         * <p>The banner image displayed at the top of the forum page. Null if no banner has been uploaded.</p>
+         */
+        _FinalStage bannerImage(Optional<ForumBannerImage> bannerImage);
+
+        _FinalStage bannerImage(ForumBannerImage bannerImage);
+
+        _FinalStage bannerImage(Nullable<ForumBannerImage> bannerImage);
     }
 
     @JsonIgnoreProperties(ignoreUnknown = true)
@@ -184,13 +250,18 @@ public final class Forum {
 
         private ForumWhoCanPostTypes whoCanPost;
 
-        @JsonAnySetter
+        private Optional<ForumBannerImage> bannerImage = Optional.empty();
+
+        private List<String> bannedWords = new ArrayList<>();
+
         private Map<String, Object> additionalProperties = new HashMap<>();
 
         private Builder() {}
 
         @java.lang.Override
         public Builder from(Forum other) {
+            bannedWords(other.getBannedWords());
+            bannerImage(other.getBannerImage());
             emailNotificationPreference(other.getEmailNotificationPreference());
             experience(other.getExperience());
             id(other.getId());
@@ -200,7 +271,6 @@ public final class Forum {
         }
 
         /**
-         * <p>The email notification setting that controls which posts trigger email alerts. One of: all_admin_posts, only_weekly_summary, none.</p>
          * <p>The email notification setting that controls which posts trigger email alerts. One of: all_admin_posts, only_weekly_summary, none.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
@@ -215,7 +285,6 @@ public final class Forum {
 
         /**
          * <p>The parent experience that this forum belongs to.</p>
-         * <p>The parent experience that this forum belongs to.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
@@ -226,7 +295,6 @@ public final class Forum {
         }
 
         /**
-         * <p>The unique identifier for the entity</p>
          * <p>The unique identifier for the entity</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
@@ -239,7 +307,6 @@ public final class Forum {
 
         /**
          * <p>The permission level controlling who can comment on posts. One of: everyone, admins.</p>
-         * <p>The permission level controlling who can comment on posts. One of: everyone, admins.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
@@ -251,7 +318,6 @@ public final class Forum {
 
         /**
          * <p>The permission level controlling who can create new posts. One of: everyone, admins.</p>
-         * <p>The permission level controlling who can create new posts. One of: everyone, admins.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
@@ -261,10 +327,102 @@ public final class Forum {
             return this;
         }
 
+        /**
+         * <p>The banner image displayed at the top of the forum page. Null if no banner has been uploaded.</p>
+         * @return Reference to {@code this} so that method calls can be chained together.
+         */
+        @java.lang.Override
+        public _FinalStage bannerImage(Nullable<ForumBannerImage> bannerImage) {
+            if (bannerImage.isNull()) {
+                this.bannerImage = null;
+            } else if (bannerImage.isEmpty()) {
+                this.bannerImage = Optional.empty();
+            } else {
+                this.bannerImage = Optional.of(bannerImage.get());
+            }
+            return this;
+        }
+
+        /**
+         * <p>The banner image displayed at the top of the forum page. Null if no banner has been uploaded.</p>
+         * @return Reference to {@code this} so that method calls can be chained together.
+         */
+        @java.lang.Override
+        public _FinalStage bannerImage(ForumBannerImage bannerImage) {
+            this.bannerImage = Optional.ofNullable(bannerImage);
+            return this;
+        }
+
+        /**
+         * <p>The banner image displayed at the top of the forum page. Null if no banner has been uploaded.</p>
+         */
+        @java.lang.Override
+        @JsonSetter(value = "banner_image", nulls = Nulls.SKIP)
+        public _FinalStage bannerImage(Optional<ForumBannerImage> bannerImage) {
+            this.bannerImage = bannerImage;
+            return this;
+        }
+
+        /**
+         * <p>A list of words that are automatically filtered from posts in this forum.</p>
+         * @return Reference to {@code this} so that method calls can be chained together.
+         */
+        @java.lang.Override
+        public _FinalStage addAllBannedWords(List<String> bannedWords) {
+            if (bannedWords != null) {
+                this.bannedWords.addAll(bannedWords);
+            }
+            return this;
+        }
+
+        /**
+         * <p>A list of words that are automatically filtered from posts in this forum.</p>
+         * @return Reference to {@code this} so that method calls can be chained together.
+         */
+        @java.lang.Override
+        public _FinalStage addBannedWords(String bannedWords) {
+            this.bannedWords.add(bannedWords);
+            return this;
+        }
+
+        /**
+         * <p>A list of words that are automatically filtered from posts in this forum.</p>
+         */
+        @java.lang.Override
+        @JsonSetter(value = "banned_words", nulls = Nulls.SKIP)
+        public _FinalStage bannedWords(List<String> bannedWords) {
+            this.bannedWords.clear();
+            if (bannedWords != null) {
+                this.bannedWords.addAll(bannedWords);
+            }
+            return this;
+        }
+
         @java.lang.Override
         public Forum build() {
             return new Forum(
-                    emailNotificationPreference, experience, id, whoCanComment, whoCanPost, additionalProperties);
+                    bannedWords,
+                    bannerImage,
+                    emailNotificationPreference,
+                    experience,
+                    id,
+                    whoCanComment,
+                    whoCanPost,
+                    additionalProperties);
+        }
+
+        @JsonAnySetter
+        private void putAdditionalPropertyFromJson(String key, Object value) {
+            if (key.equalsIgnoreCase("banned_words")
+                    || key.equalsIgnoreCase("banner_image")
+                    || key.equalsIgnoreCase("email_notification_preference")
+                    || key.equalsIgnoreCase("experience")
+                    || key.equalsIgnoreCase("id")
+                    || key.equalsIgnoreCase("who_can_comment")
+                    || key.equalsIgnoreCase("who_can_post")) {
+                return;
+            }
+            this.additionalProperties.put(key, value);
         }
 
         @java.lang.Override

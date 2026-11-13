@@ -4,11 +4,14 @@
 package com.whop.api.resources.cards;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
+import com.whop.api.core.BodyProperties;
 import com.whop.api.core.ClientOptions;
 import com.whop.api.core.MediaTypes;
 import com.whop.api.core.ObjectMappers;
+import com.whop.api.core.PathSegments;
 import com.whop.api.core.QueryStringMapper;
 import com.whop.api.core.RequestOptions;
+import com.whop.api.core.RetryInterceptor;
 import com.whop.api.core.WhopApiApiException;
 import com.whop.api.core.WhopApiException;
 import com.whop.api.core.WhopApiHttpResponse;
@@ -25,7 +28,6 @@ import com.whop.api.resources.cards.types.CreateCardsResponse;
 import com.whop.api.resources.cards.types.ListCardsResponse;
 import com.whop.api.resources.cards.types.RetrieveCardsResponse;
 import com.whop.api.resources.cards.types.UpdateCardsResponse;
-import com.whop.api.types.V1ErrorResponse;
 import java.io.IOException;
 import okhttp3.Headers;
 import okhttp3.HttpUrl;
@@ -67,7 +69,7 @@ public class RawCardsClient {
      * Lists the Whop cards of an account or user, including ones still being set up. Team members only see the cards assigned to them.
      */
     public WhopApiHttpResponse<ListCardsResponse> list(ListCardsRequest request, RequestOptions requestOptions) {
-        HttpUrl.Builder httpUrl = HttpUrl.parse(this.clientOptions.environment().getUrl())
+        HttpUrl.Builder httpUrl = HttpUrl.parse(this.clientOptions.environment().getApiURL())
                 .newBuilder()
                 .addPathSegments("cards");
         if (request.getAccountId().isPresent()) {
@@ -92,6 +94,15 @@ public class RawCardsClient {
         OkHttpClient client = clientOptions.httpClient();
         if (requestOptions != null && requestOptions.getTimeout().isPresent()) {
             client = clientOptions.httpClientWithTimeout(requestOptions);
+        }
+        if (requestOptions != null && requestOptions.getMaxRetries().isPresent()) {
+            okhttpRequest = okhttpRequest
+                    .newBuilder()
+                    .tag(
+                            RetryInterceptor.MaxRetriesOverride.class,
+                            new RetryInterceptor.MaxRetriesOverride(
+                                    requestOptions.getMaxRetries().get()))
+                    .build();
         }
         try (Response response = client.newCall(okhttpRequest).execute()) {
             ResponseBody responseBody = response.body();
@@ -121,37 +132,39 @@ public class RawCardsClient {
             Object errorBody = ObjectMappers.parseErrorBody(responseBodyString);
             throw new WhopApiApiException(
                     "Error with status code " + response.code(), response.code(), errorBody, response);
+        } catch (JsonProcessingException e) {
+            throw new WhopApiException("Failed to deserialize response: " + e.getMessage(), e);
         } catch (IOException e) {
             throw new WhopApiException("Network error executing HTTP request", e);
         }
     }
 
     /**
-     * Issue a virtual card, or apply for card issuing.
+     * Issues a virtual card, or applies for card issuing. An account with no application files one here and gets back a <code>202</code>; call again to issue the card once it is approved. An account whose application was denied or canceled applies again the same way, replacing that application.
      */
     public WhopApiHttpResponse<CreateCardsResponse> create() {
         return create(CreateCardsRequest.builder().build());
     }
 
     /**
-     * Issue a virtual card, or apply for card issuing.
+     * Issues a virtual card, or applies for card issuing. An account with no application files one here and gets back a <code>202</code>; call again to issue the card once it is approved. An account whose application was denied or canceled applies again the same way, replacing that application.
      */
     public WhopApiHttpResponse<CreateCardsResponse> create(RequestOptions requestOptions) {
         return create(CreateCardsRequest.builder().build(), requestOptions);
     }
 
     /**
-     * Issue a virtual card, or apply for card issuing.
+     * Issues a virtual card, or applies for card issuing. An account with no application files one here and gets back a <code>202</code>; call again to issue the card once it is approved. An account whose application was denied or canceled applies again the same way, replacing that application.
      */
     public WhopApiHttpResponse<CreateCardsResponse> create(CreateCardsRequest request) {
         return create(request, null);
     }
 
     /**
-     * Issue a virtual card, or apply for card issuing.
+     * Issues a virtual card, or applies for card issuing. An account with no application files one here and gets back a <code>202</code>; call again to issue the card once it is approved. An account whose application was denied or canceled applies again the same way, replacing that application.
      */
     public WhopApiHttpResponse<CreateCardsResponse> create(CreateCardsRequest request, RequestOptions requestOptions) {
-        HttpUrl.Builder httpUrl = HttpUrl.parse(this.clientOptions.environment().getUrl())
+        HttpUrl.Builder httpUrl = HttpUrl.parse(this.clientOptions.environment().getApiURL())
                 .newBuilder()
                 .addPathSegments("cards");
         if (requestOptions != null) {
@@ -162,7 +175,9 @@ public class RawCardsClient {
         RequestBody body;
         try {
             body = RequestBody.create(
-                    ObjectMappers.JSON_MAPPER.writeValueAsBytes(request), MediaTypes.APPLICATION_JSON);
+                    ObjectMappers.JSON_MAPPER.writeValueAsBytes(BodyProperties.merge(
+                            request, requestOptions != null ? requestOptions.getBodyProperties() : null)),
+                    MediaTypes.APPLICATION_JSON);
         } catch (JsonProcessingException e) {
             throw new WhopApiException("Failed to serialize request", e);
         }
@@ -176,6 +191,15 @@ public class RawCardsClient {
         OkHttpClient client = clientOptions.httpClient();
         if (requestOptions != null && requestOptions.getTimeout().isPresent()) {
             client = clientOptions.httpClientWithTimeout(requestOptions);
+        }
+        if (requestOptions != null && requestOptions.getMaxRetries().isPresent()) {
+            okhttpRequest = okhttpRequest
+                    .newBuilder()
+                    .tag(
+                            RetryInterceptor.MaxRetriesOverride.class,
+                            new RetryInterceptor.MaxRetriesOverride(
+                                    requestOptions.getMaxRetries().get()))
+                    .build();
         }
         try (Response response = client.newCall(okhttpRequest).execute()) {
             ResponseBody responseBody = response.body();
@@ -200,8 +224,7 @@ public class RawCardsClient {
                                 ObjectMappers.JSON_MAPPER.readValue(responseBodyString, Object.class), response);
                     case 409:
                         throw new ConflictError(
-                                ObjectMappers.JSON_MAPPER.readValue(responseBodyString, V1ErrorResponse.class),
-                                response);
+                                ObjectMappers.JSON_MAPPER.readValue(responseBodyString, Object.class), response);
                 }
             } catch (JsonProcessingException ignored) {
                 // unable to map error response, throwing generic error
@@ -209,41 +232,43 @@ public class RawCardsClient {
             Object errorBody = ObjectMappers.parseErrorBody(responseBodyString);
             throw new WhopApiApiException(
                     "Error with status code " + response.code(), response.code(), errorBody, response);
+        } catch (JsonProcessingException e) {
+            throw new WhopApiException("Failed to deserialize response: " + e.getMessage(), e);
         } catch (IOException e) {
             throw new WhopApiException("Network error executing HTTP request", e);
         }
     }
 
     /**
-     * Retrieve a single card.
+     * Retrieves a single card, including its <code>secrets</code> (card number, CVC, and PIN), which List Cards does not return.
      */
     public WhopApiHttpResponse<RetrieveCardsResponse> retrieve(String id) {
         return retrieve(id, RetrieveCardsRequest.builder().build());
     }
 
     /**
-     * Retrieve a single card.
+     * Retrieves a single card, including its <code>secrets</code> (card number, CVC, and PIN), which List Cards does not return.
      */
     public WhopApiHttpResponse<RetrieveCardsResponse> retrieve(String id, RequestOptions requestOptions) {
         return retrieve(id, RetrieveCardsRequest.builder().build(), requestOptions);
     }
 
     /**
-     * Retrieve a single card.
+     * Retrieves a single card, including its <code>secrets</code> (card number, CVC, and PIN), which List Cards does not return.
      */
     public WhopApiHttpResponse<RetrieveCardsResponse> retrieve(String id, RetrieveCardsRequest request) {
         return retrieve(id, request, null);
     }
 
     /**
-     * Retrieve a single card.
+     * Retrieves a single card, including its <code>secrets</code> (card number, CVC, and PIN), which List Cards does not return.
      */
     public WhopApiHttpResponse<RetrieveCardsResponse> retrieve(
             String id, RetrieveCardsRequest request, RequestOptions requestOptions) {
-        HttpUrl.Builder httpUrl = HttpUrl.parse(this.clientOptions.environment().getUrl())
+        HttpUrl.Builder httpUrl = HttpUrl.parse(this.clientOptions.environment().getApiURL())
                 .newBuilder()
                 .addPathSegments("cards")
-                .addPathSegment(id);
+                .addPathSegment(PathSegments.validate(id));
         if (request.getAccountId().isPresent()) {
             QueryStringMapper.addQueryParameter(
                     httpUrl, "account_id", request.getAccountId().get(), false);
@@ -267,6 +292,15 @@ public class RawCardsClient {
         if (requestOptions != null && requestOptions.getTimeout().isPresent()) {
             client = clientOptions.httpClientWithTimeout(requestOptions);
         }
+        if (requestOptions != null && requestOptions.getMaxRetries().isPresent()) {
+            okhttpRequest = okhttpRequest
+                    .newBuilder()
+                    .tag(
+                            RetryInterceptor.MaxRetriesOverride.class,
+                            new RetryInterceptor.MaxRetriesOverride(
+                                    requestOptions.getMaxRetries().get()))
+                    .build();
+        }
         try (Response response = client.newCall(okhttpRequest).execute()) {
             ResponseBody responseBody = response.body();
             String responseBodyString = responseBody != null ? responseBody.string() : "{}";
@@ -285,41 +319,43 @@ public class RawCardsClient {
             Object errorBody = ObjectMappers.parseErrorBody(responseBodyString);
             throw new WhopApiApiException(
                     "Error with status code " + response.code(), response.code(), errorBody, response);
+        } catch (JsonProcessingException e) {
+            throw new WhopApiException("Failed to deserialize response: " + e.getMessage(), e);
         } catch (IOException e) {
             throw new WhopApiException("Network error executing HTTP request", e);
         }
     }
 
     /**
-     * Update, freeze, or cancel a card. Updating the card's name, billing address, or limits requires both <code>payout:account:update</code> and <code>company:balance:read</code>; a card's assigned holder may update their own card's pin and frozen state with any user token.
+     * Updates, freezes, or cancels a card. Updating the card's name, billing address, or limits requires both <code>payout:account:update</code> and <code>company:balance:read</code>; a card's assigned holder may update their own card's pin and frozen state with any user token.
      */
     public WhopApiHttpResponse<UpdateCardsResponse> update(String id) {
         return update(id, UpdateCardsRequest.builder().build());
     }
 
     /**
-     * Update, freeze, or cancel a card. Updating the card's name, billing address, or limits requires both <code>payout:account:update</code> and <code>company:balance:read</code>; a card's assigned holder may update their own card's pin and frozen state with any user token.
+     * Updates, freezes, or cancels a card. Updating the card's name, billing address, or limits requires both <code>payout:account:update</code> and <code>company:balance:read</code>; a card's assigned holder may update their own card's pin and frozen state with any user token.
      */
     public WhopApiHttpResponse<UpdateCardsResponse> update(String id, RequestOptions requestOptions) {
         return update(id, UpdateCardsRequest.builder().build(), requestOptions);
     }
 
     /**
-     * Update, freeze, or cancel a card. Updating the card's name, billing address, or limits requires both <code>payout:account:update</code> and <code>company:balance:read</code>; a card's assigned holder may update their own card's pin and frozen state with any user token.
+     * Updates, freezes, or cancels a card. Updating the card's name, billing address, or limits requires both <code>payout:account:update</code> and <code>company:balance:read</code>; a card's assigned holder may update their own card's pin and frozen state with any user token.
      */
     public WhopApiHttpResponse<UpdateCardsResponse> update(String id, UpdateCardsRequest request) {
         return update(id, request, null);
     }
 
     /**
-     * Update, freeze, or cancel a card. Updating the card's name, billing address, or limits requires both <code>payout:account:update</code> and <code>company:balance:read</code>; a card's assigned holder may update their own card's pin and frozen state with any user token.
+     * Updates, freezes, or cancels a card. Updating the card's name, billing address, or limits requires both <code>payout:account:update</code> and <code>company:balance:read</code>; a card's assigned holder may update their own card's pin and frozen state with any user token.
      */
     public WhopApiHttpResponse<UpdateCardsResponse> update(
             String id, UpdateCardsRequest request, RequestOptions requestOptions) {
-        HttpUrl.Builder httpUrl = HttpUrl.parse(this.clientOptions.environment().getUrl())
+        HttpUrl.Builder httpUrl = HttpUrl.parse(this.clientOptions.environment().getApiURL())
                 .newBuilder()
                 .addPathSegments("cards")
-                .addPathSegment(id);
+                .addPathSegment(PathSegments.validate(id));
         if (requestOptions != null) {
             requestOptions.getQueryParameters().forEach((_key, _value) -> {
                 httpUrl.addQueryParameter(_key, _value);
@@ -328,7 +364,9 @@ public class RawCardsClient {
         RequestBody body;
         try {
             body = RequestBody.create(
-                    ObjectMappers.JSON_MAPPER.writeValueAsBytes(request), MediaTypes.APPLICATION_JSON);
+                    ObjectMappers.JSON_MAPPER.writeValueAsBytes(BodyProperties.merge(
+                            request, requestOptions != null ? requestOptions.getBodyProperties() : null)),
+                    MediaTypes.APPLICATION_JSON);
         } catch (JsonProcessingException e) {
             throw new WhopApiException("Failed to serialize request", e);
         }
@@ -342,6 +380,15 @@ public class RawCardsClient {
         OkHttpClient client = clientOptions.httpClient();
         if (requestOptions != null && requestOptions.getTimeout().isPresent()) {
             client = clientOptions.httpClientWithTimeout(requestOptions);
+        }
+        if (requestOptions != null && requestOptions.getMaxRetries().isPresent()) {
+            okhttpRequest = okhttpRequest
+                    .newBuilder()
+                    .tag(
+                            RetryInterceptor.MaxRetriesOverride.class,
+                            new RetryInterceptor.MaxRetriesOverride(
+                                    requestOptions.getMaxRetries().get()))
+                    .build();
         }
         try (Response response = client.newCall(okhttpRequest).execute()) {
             ResponseBody responseBody = response.body();
@@ -363,8 +410,7 @@ public class RawCardsClient {
                                 ObjectMappers.JSON_MAPPER.readValue(responseBodyString, Object.class), response);
                     case 409:
                         throw new ConflictError(
-                                ObjectMappers.JSON_MAPPER.readValue(responseBodyString, V1ErrorResponse.class),
-                                response);
+                                ObjectMappers.JSON_MAPPER.readValue(responseBodyString, Object.class), response);
                 }
             } catch (JsonProcessingException ignored) {
                 // unable to map error response, throwing generic error
@@ -372,6 +418,8 @@ public class RawCardsClient {
             Object errorBody = ObjectMappers.parseErrorBody(responseBodyString);
             throw new WhopApiApiException(
                     "Error with status code " + response.code(), response.code(), errorBody, response);
+        } catch (JsonProcessingException e) {
+            throw new WhopApiException("Failed to deserialize response: " + e.getMessage(), e);
         } catch (IOException e) {
             throw new WhopApiException("Network error executing HTTP request", e);
         }

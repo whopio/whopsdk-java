@@ -237,7 +237,6 @@ public final class UpdateExperiencesRequest {
 
         private Optional<String> sectionId = Optional.empty();
 
-        @JsonAnySetter
         private Map<String, Object> additionalProperties = new HashMap<>();
 
         private Builder() {}
@@ -431,6 +430,20 @@ public final class UpdateExperiencesRequest {
         public UpdateExperiencesRequest build() {
             return new UpdateExperiencesRequest(
                     accessLevel, isPublic, logo, name, notificationsEnabled, order, sectionId, additionalProperties);
+        }
+
+        @JsonAnySetter
+        private void putAdditionalPropertyFromJson(String key, Object value) {
+            if (key.equalsIgnoreCase("access_level")
+                    || key.equalsIgnoreCase("is_public")
+                    || key.equalsIgnoreCase("logo")
+                    || key.equalsIgnoreCase("name")
+                    || key.equalsIgnoreCase("notifications_enabled")
+                    || key.equalsIgnoreCase("order")
+                    || key.equalsIgnoreCase("section_id")) {
+                return;
+            }
+            this.additionalProperties.put(key, value);
         }
 
         public Builder additionalProperty(String key, Object value) {

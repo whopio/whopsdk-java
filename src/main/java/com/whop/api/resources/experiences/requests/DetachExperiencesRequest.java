@@ -86,7 +86,6 @@ public final class DetachExperiencesRequest {
     public static final class Builder implements ProductIdStage, _FinalStage {
         private String productId;
 
-        @JsonAnySetter
         private Map<String, Object> additionalProperties = new HashMap<>();
 
         private Builder() {}
@@ -98,7 +97,6 @@ public final class DetachExperiencesRequest {
         }
 
         /**
-         * <p>The unique identifier of the product to detach the experience from.</p>
          * <p>The unique identifier of the product to detach the experience from.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
@@ -112,6 +110,14 @@ public final class DetachExperiencesRequest {
         @java.lang.Override
         public DetachExperiencesRequest build() {
             return new DetachExperiencesRequest(productId, additionalProperties);
+        }
+
+        @JsonAnySetter
+        private void putAdditionalPropertyFromJson(String key, Object value) {
+            if (key.equalsIgnoreCase("product_id")) {
+                return;
+            }
+            this.additionalProperties.put(key, value);
         }
 
         @java.lang.Override

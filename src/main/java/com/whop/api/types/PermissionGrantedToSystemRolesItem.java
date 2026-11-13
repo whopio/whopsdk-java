@@ -7,6 +7,9 @@ import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonValue;
 
 public final class PermissionGrantedToSystemRolesItem {
+    public static final PermissionGrantedToSystemRolesItem PARTNER =
+            new PermissionGrantedToSystemRolesItem(Value.PARTNER, "partner");
+
     public static final PermissionGrantedToSystemRolesItem OWNER =
             new PermissionGrantedToSystemRolesItem(Value.OWNER, "owner");
 
@@ -55,6 +58,8 @@ public final class PermissionGrantedToSystemRolesItem {
 
     public <T> T visit(Visitor<T> visitor) {
         switch (value) {
+            case PARTNER:
+                return visitor.visitPartner();
             case OWNER:
                 return visitor.visitOwner();
             case ADMIN:
@@ -74,6 +79,8 @@ public final class PermissionGrantedToSystemRolesItem {
     @JsonCreator(mode = JsonCreator.Mode.DELEGATING)
     public static PermissionGrantedToSystemRolesItem valueOf(String value) {
         switch (value) {
+            case "partner":
+                return PARTNER;
             case "owner":
                 return OWNER;
             case "admin":
@@ -100,6 +107,8 @@ public final class PermissionGrantedToSystemRolesItem {
 
         ADVERTISER,
 
+        PARTNER,
+
         UNKNOWN
     }
 
@@ -113,6 +122,8 @@ public final class PermissionGrantedToSystemRolesItem {
         T visitSalesManager();
 
         T visitAdvertiser();
+
+        T visitPartner();
 
         T visitUnknown(String unknownType);
     }

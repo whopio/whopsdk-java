@@ -5,6 +5,7 @@ package com.whop.api.resources.dmmembers;
 
 import com.whop.api.core.ClientOptions;
 import com.whop.api.core.RequestOptions;
+import com.whop.api.core.WhopApiHttpResponse;
 import com.whop.api.core.pagination.SyncPagingIterable;
 import com.whop.api.resources.dmmembers.requests.CreateDmMembersRequest;
 import com.whop.api.resources.dmmembers.requests.DeleteDmMembersRequest;
@@ -41,7 +42,16 @@ public class AsyncDmMembersClient {
      * </ul>
      */
     public CompletableFuture<SyncPagingIterable<DmMemberListItem>> list(ListDmMembersRequest request) {
-        return this.rawClient.list(request).thenApply(response -> response.body());
+        CompletableFuture<WhopApiHttpResponse<SyncPagingIterable<DmMemberListItem>>> rawFuture =
+                this.rawClient.list(request);
+        CompletableFuture<SyncPagingIterable<DmMemberListItem>> future =
+                rawFuture.thenApply(response -> response.body());
+        future.whenComplete((result_, throwable_) -> {
+            if (future.isCancelled()) {
+                rawFuture.cancel(true);
+            }
+        });
+        return future;
     }
 
     /**
@@ -54,7 +64,16 @@ public class AsyncDmMembersClient {
      */
     public CompletableFuture<SyncPagingIterable<DmMemberListItem>> list(
             ListDmMembersRequest request, RequestOptions requestOptions) {
-        return this.rawClient.list(request, requestOptions).thenApply(response -> response.body());
+        CompletableFuture<WhopApiHttpResponse<SyncPagingIterable<DmMemberListItem>>> rawFuture =
+                this.rawClient.list(request, requestOptions);
+        CompletableFuture<SyncPagingIterable<DmMemberListItem>> future =
+                rawFuture.thenApply(response -> response.body());
+        future.whenComplete((result_, throwable_) -> {
+            if (future.isCancelled()) {
+                rawFuture.cancel(true);
+            }
+        });
+        return future;
     }
 
     /**
@@ -66,7 +85,14 @@ public class AsyncDmMembersClient {
      * </ul>
      */
     public CompletableFuture<DmMember> create(CreateDmMembersRequest request) {
-        return this.rawClient.create(request).thenApply(response -> response.body());
+        CompletableFuture<WhopApiHttpResponse<DmMember>> rawFuture = this.rawClient.create(request);
+        CompletableFuture<DmMember> future = rawFuture.thenApply(response -> response.body());
+        future.whenComplete((result_, throwable_) -> {
+            if (future.isCancelled()) {
+                rawFuture.cancel(true);
+            }
+        });
+        return future;
     }
 
     /**
@@ -78,7 +104,14 @@ public class AsyncDmMembersClient {
      * </ul>
      */
     public CompletableFuture<DmMember> create(CreateDmMembersRequest request, RequestOptions requestOptions) {
-        return this.rawClient.create(request, requestOptions).thenApply(response -> response.body());
+        CompletableFuture<WhopApiHttpResponse<DmMember>> rawFuture = this.rawClient.create(request, requestOptions);
+        CompletableFuture<DmMember> future = rawFuture.thenApply(response -> response.body());
+        future.whenComplete((result_, throwable_) -> {
+            if (future.isCancelled()) {
+                rawFuture.cancel(true);
+            }
+        });
+        return future;
     }
 
     /**
@@ -90,7 +123,14 @@ public class AsyncDmMembersClient {
      * </ul>
      */
     public CompletableFuture<DmMember> retrieve(String id) {
-        return this.rawClient.retrieve(id).thenApply(response -> response.body());
+        CompletableFuture<WhopApiHttpResponse<DmMember>> rawFuture = this.rawClient.retrieve(id);
+        CompletableFuture<DmMember> future = rawFuture.thenApply(response -> response.body());
+        future.whenComplete((result_, throwable_) -> {
+            if (future.isCancelled()) {
+                rawFuture.cancel(true);
+            }
+        });
+        return future;
     }
 
     /**
@@ -102,7 +142,14 @@ public class AsyncDmMembersClient {
      * </ul>
      */
     public CompletableFuture<DmMember> retrieve(String id, RequestOptions requestOptions) {
-        return this.rawClient.retrieve(id, requestOptions).thenApply(response -> response.body());
+        CompletableFuture<WhopApiHttpResponse<DmMember>> rawFuture = this.rawClient.retrieve(id, requestOptions);
+        CompletableFuture<DmMember> future = rawFuture.thenApply(response -> response.body());
+        future.whenComplete((result_, throwable_) -> {
+            if (future.isCancelled()) {
+                rawFuture.cancel(true);
+            }
+        });
+        return future;
     }
 
     /**
@@ -114,7 +161,14 @@ public class AsyncDmMembersClient {
      * </ul>
      */
     public CompletableFuture<DmMember> retrieve(String id, RetrieveDmMembersRequest request) {
-        return this.rawClient.retrieve(id, request).thenApply(response -> response.body());
+        CompletableFuture<WhopApiHttpResponse<DmMember>> rawFuture = this.rawClient.retrieve(id, request);
+        CompletableFuture<DmMember> future = rawFuture.thenApply(response -> response.body());
+        future.whenComplete((result_, throwable_) -> {
+            if (future.isCancelled()) {
+                rawFuture.cancel(true);
+            }
+        });
+        return future;
     }
 
     /**
@@ -127,7 +181,15 @@ public class AsyncDmMembersClient {
      */
     public CompletableFuture<DmMember> retrieve(
             String id, RetrieveDmMembersRequest request, RequestOptions requestOptions) {
-        return this.rawClient.retrieve(id, request, requestOptions).thenApply(response -> response.body());
+        CompletableFuture<WhopApiHttpResponse<DmMember>> rawFuture =
+                this.rawClient.retrieve(id, request, requestOptions);
+        CompletableFuture<DmMember> future = rawFuture.thenApply(response -> response.body());
+        future.whenComplete((result_, throwable_) -> {
+            if (future.isCancelled()) {
+                rawFuture.cancel(true);
+            }
+        });
+        return future;
     }
 
     /**
@@ -139,7 +201,14 @@ public class AsyncDmMembersClient {
      * </ul>
      */
     public CompletableFuture<Boolean> delete(String id) {
-        return this.rawClient.delete(id).thenApply(response -> response.body());
+        CompletableFuture<WhopApiHttpResponse<Boolean>> rawFuture = this.rawClient.delete(id);
+        CompletableFuture<Boolean> future = rawFuture.thenApply(response -> response.body());
+        future.whenComplete((result_, throwable_) -> {
+            if (future.isCancelled()) {
+                rawFuture.cancel(true);
+            }
+        });
+        return future;
     }
 
     /**
@@ -151,7 +220,14 @@ public class AsyncDmMembersClient {
      * </ul>
      */
     public CompletableFuture<Boolean> delete(String id, RequestOptions requestOptions) {
-        return this.rawClient.delete(id, requestOptions).thenApply(response -> response.body());
+        CompletableFuture<WhopApiHttpResponse<Boolean>> rawFuture = this.rawClient.delete(id, requestOptions);
+        CompletableFuture<Boolean> future = rawFuture.thenApply(response -> response.body());
+        future.whenComplete((result_, throwable_) -> {
+            if (future.isCancelled()) {
+                rawFuture.cancel(true);
+            }
+        });
+        return future;
     }
 
     /**
@@ -163,7 +239,14 @@ public class AsyncDmMembersClient {
      * </ul>
      */
     public CompletableFuture<Boolean> delete(String id, DeleteDmMembersRequest request) {
-        return this.rawClient.delete(id, request).thenApply(response -> response.body());
+        CompletableFuture<WhopApiHttpResponse<Boolean>> rawFuture = this.rawClient.delete(id, request);
+        CompletableFuture<Boolean> future = rawFuture.thenApply(response -> response.body());
+        future.whenComplete((result_, throwable_) -> {
+            if (future.isCancelled()) {
+                rawFuture.cancel(true);
+            }
+        });
+        return future;
     }
 
     /**
@@ -175,7 +258,14 @@ public class AsyncDmMembersClient {
      * </ul>
      */
     public CompletableFuture<Boolean> delete(String id, DeleteDmMembersRequest request, RequestOptions requestOptions) {
-        return this.rawClient.delete(id, request, requestOptions).thenApply(response -> response.body());
+        CompletableFuture<WhopApiHttpResponse<Boolean>> rawFuture = this.rawClient.delete(id, request, requestOptions);
+        CompletableFuture<Boolean> future = rawFuture.thenApply(response -> response.body());
+        future.whenComplete((result_, throwable_) -> {
+            if (future.isCancelled()) {
+                rawFuture.cancel(true);
+            }
+        });
+        return future;
     }
 
     /**
@@ -187,7 +277,14 @@ public class AsyncDmMembersClient {
      * </ul>
      */
     public CompletableFuture<DmMember> update(String id) {
-        return this.rawClient.update(id).thenApply(response -> response.body());
+        CompletableFuture<WhopApiHttpResponse<DmMember>> rawFuture = this.rawClient.update(id);
+        CompletableFuture<DmMember> future = rawFuture.thenApply(response -> response.body());
+        future.whenComplete((result_, throwable_) -> {
+            if (future.isCancelled()) {
+                rawFuture.cancel(true);
+            }
+        });
+        return future;
     }
 
     /**
@@ -199,7 +296,14 @@ public class AsyncDmMembersClient {
      * </ul>
      */
     public CompletableFuture<DmMember> update(String id, RequestOptions requestOptions) {
-        return this.rawClient.update(id, requestOptions).thenApply(response -> response.body());
+        CompletableFuture<WhopApiHttpResponse<DmMember>> rawFuture = this.rawClient.update(id, requestOptions);
+        CompletableFuture<DmMember> future = rawFuture.thenApply(response -> response.body());
+        future.whenComplete((result_, throwable_) -> {
+            if (future.isCancelled()) {
+                rawFuture.cancel(true);
+            }
+        });
+        return future;
     }
 
     /**
@@ -211,7 +315,14 @@ public class AsyncDmMembersClient {
      * </ul>
      */
     public CompletableFuture<DmMember> update(String id, UpdateDmMembersRequest request) {
-        return this.rawClient.update(id, request).thenApply(response -> response.body());
+        CompletableFuture<WhopApiHttpResponse<DmMember>> rawFuture = this.rawClient.update(id, request);
+        CompletableFuture<DmMember> future = rawFuture.thenApply(response -> response.body());
+        future.whenComplete((result_, throwable_) -> {
+            if (future.isCancelled()) {
+                rawFuture.cancel(true);
+            }
+        });
+        return future;
     }
 
     /**
@@ -224,6 +335,13 @@ public class AsyncDmMembersClient {
      */
     public CompletableFuture<DmMember> update(
             String id, UpdateDmMembersRequest request, RequestOptions requestOptions) {
-        return this.rawClient.update(id, request, requestOptions).thenApply(response -> response.body());
+        CompletableFuture<WhopApiHttpResponse<DmMember>> rawFuture = this.rawClient.update(id, request, requestOptions);
+        CompletableFuture<DmMember> future = rawFuture.thenApply(response -> response.body());
+        future.whenComplete((result_, throwable_) -> {
+            if (future.isCancelled()) {
+                rawFuture.cancel(true);
+            }
+        });
+        return future;
     }
 }

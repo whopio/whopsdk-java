@@ -129,7 +129,6 @@ public final class V1ErrorResponseError {
 
         private Optional<String> code = Optional.empty();
 
-        @JsonAnySetter
         private Map<String, Object> additionalProperties = new HashMap<>();
 
         private Builder() {}
@@ -144,7 +143,6 @@ public final class V1ErrorResponseError {
 
         /**
          * <p>Human-readable error message.</p>
-         * <p>Human-readable error message.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
@@ -155,7 +153,6 @@ public final class V1ErrorResponseError {
         }
 
         /**
-         * <p>Machine-readable error code.</p>
          * <p>Machine-readable error code.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
@@ -189,6 +186,14 @@ public final class V1ErrorResponseError {
         @java.lang.Override
         public V1ErrorResponseError build() {
             return new V1ErrorResponseError(code, message, type, additionalProperties);
+        }
+
+        @JsonAnySetter
+        private void putAdditionalPropertyFromJson(String key, Object value) {
+            if (key.equalsIgnoreCase("code") || key.equalsIgnoreCase("message") || key.equalsIgnoreCase("type")) {
+                return;
+            }
+            this.additionalProperties.put(key, value);
         }
 
         @java.lang.Override

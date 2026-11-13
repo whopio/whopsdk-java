@@ -12,6 +12,7 @@ import com.fasterxml.jackson.annotation.JsonSetter;
 import com.fasterxml.jackson.annotation.Nulls;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.whop.api.core.ObjectMappers;
+import com.whop.api.types.AiChatAgentIdentifiers;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
@@ -28,6 +29,10 @@ public final class ListAiChatsRequest {
 
     private final Optional<Integer> last;
 
+    private final Optional<AiChatAgentIdentifiers> agentIdentifier;
+
+    private final Optional<String> accountId;
+
     private final Optional<Boolean> onlyActiveCrons;
 
     private final Map<String, Object> additionalProperties;
@@ -37,12 +42,16 @@ public final class ListAiChatsRequest {
             Optional<String> before,
             Optional<Integer> first,
             Optional<Integer> last,
+            Optional<AiChatAgentIdentifiers> agentIdentifier,
+            Optional<String> accountId,
             Optional<Boolean> onlyActiveCrons,
             Map<String, Object> additionalProperties) {
         this.after = after;
         this.before = before;
         this.first = first;
         this.last = last;
+        this.agentIdentifier = agentIdentifier;
+        this.accountId = accountId;
         this.onlyActiveCrons = onlyActiveCrons;
         this.additionalProperties = additionalProperties;
     }
@@ -79,6 +88,19 @@ public final class ListAiChatsRequest {
         return last;
     }
 
+    @JsonProperty("agent_identifier")
+    public Optional<AiChatAgentIdentifiers> getAgentIdentifier() {
+        return agentIdentifier;
+    }
+
+    /**
+     * @return Only return chats associated with this business account.
+     */
+    @JsonProperty("account_id")
+    public Optional<String> getAccountId() {
+        return accountId;
+    }
+
     /**
      * @return When true, returns only chats with an active cron schedule
      */
@@ -103,12 +125,21 @@ public final class ListAiChatsRequest {
                 && before.equals(other.before)
                 && first.equals(other.first)
                 && last.equals(other.last)
+                && agentIdentifier.equals(other.agentIdentifier)
+                && accountId.equals(other.accountId)
                 && onlyActiveCrons.equals(other.onlyActiveCrons);
     }
 
     @java.lang.Override
     public int hashCode() {
-        return Objects.hash(this.after, this.before, this.first, this.last, this.onlyActiveCrons);
+        return Objects.hash(
+                this.after,
+                this.before,
+                this.first,
+                this.last,
+                this.agentIdentifier,
+                this.accountId,
+                this.onlyActiveCrons);
     }
 
     @java.lang.Override
@@ -130,9 +161,12 @@ public final class ListAiChatsRequest {
 
         private Optional<Integer> last = Optional.empty();
 
+        private Optional<AiChatAgentIdentifiers> agentIdentifier = Optional.empty();
+
+        private Optional<String> accountId = Optional.empty();
+
         private Optional<Boolean> onlyActiveCrons = Optional.empty();
 
-        @JsonAnySetter
         private Map<String, Object> additionalProperties = new HashMap<>();
 
         private Builder() {}
@@ -142,6 +176,8 @@ public final class ListAiChatsRequest {
             before(other.getBefore());
             first(other.getFirst());
             last(other.getLast());
+            agentIdentifier(other.getAgentIdentifier());
+            accountId(other.getAccountId());
             onlyActiveCrons(other.getOnlyActiveCrons());
             return this;
         }
@@ -202,6 +238,31 @@ public final class ListAiChatsRequest {
             return this;
         }
 
+        @JsonSetter(value = "agent_identifier", nulls = Nulls.SKIP)
+        public Builder agentIdentifier(Optional<AiChatAgentIdentifiers> agentIdentifier) {
+            this.agentIdentifier = agentIdentifier;
+            return this;
+        }
+
+        public Builder agentIdentifier(AiChatAgentIdentifiers agentIdentifier) {
+            this.agentIdentifier = Optional.ofNullable(agentIdentifier);
+            return this;
+        }
+
+        /**
+         * <p>Only return chats associated with this business account.</p>
+         */
+        @JsonSetter(value = "account_id", nulls = Nulls.SKIP)
+        public Builder accountId(Optional<String> accountId) {
+            this.accountId = accountId;
+            return this;
+        }
+
+        public Builder accountId(String accountId) {
+            this.accountId = Optional.ofNullable(accountId);
+            return this;
+        }
+
         /**
          * <p>When true, returns only chats with an active cron schedule</p>
          */
@@ -217,7 +278,22 @@ public final class ListAiChatsRequest {
         }
 
         public ListAiChatsRequest build() {
-            return new ListAiChatsRequest(after, before, first, last, onlyActiveCrons, additionalProperties);
+            return new ListAiChatsRequest(
+                    after, before, first, last, agentIdentifier, accountId, onlyActiveCrons, additionalProperties);
+        }
+
+        @JsonAnySetter
+        private void putAdditionalPropertyFromJson(String key, Object value) {
+            if (key.equalsIgnoreCase("after")
+                    || key.equalsIgnoreCase("before")
+                    || key.equalsIgnoreCase("first")
+                    || key.equalsIgnoreCase("last")
+                    || key.equalsIgnoreCase("agent_identifier")
+                    || key.equalsIgnoreCase("account_id")
+                    || key.equalsIgnoreCase("only_active_crons")) {
+                return;
+            }
+            this.additionalProperties.put(key, value);
         }
 
         public Builder additionalProperty(String key, Object value) {

@@ -4,30 +4,38 @@
 package com.whop.api.resources.messages;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
+import com.whop.api.core.BodyProperties;
 import com.whop.api.core.ClientOptions;
 import com.whop.api.core.MediaTypes;
 import com.whop.api.core.ObjectMappers;
+import com.whop.api.core.PathSegments;
 import com.whop.api.core.QueryStringMapper;
 import com.whop.api.core.RequestOptions;
+import com.whop.api.core.RetryInterceptor;
 import com.whop.api.core.WhopApiApiException;
 import com.whop.api.core.WhopApiException;
 import com.whop.api.core.WhopApiHttpResponse;
 import com.whop.api.core.pagination.SyncPagingIterable;
 import com.whop.api.errors.BadRequestError;
+import com.whop.api.errors.ConflictError;
 import com.whop.api.errors.ForbiddenError;
-import com.whop.api.errors.InternalServerError;
 import com.whop.api.errors.NotFoundError;
-import com.whop.api.errors.TooManyRequestsError;
 import com.whop.api.errors.UnauthorizedError;
-import com.whop.api.errors.UnprocessableEntityError;
 import com.whop.api.resources.messages.requests.CreateMessagesRequest;
 import com.whop.api.resources.messages.requests.DeleteMessagesRequest;
 import com.whop.api.resources.messages.requests.ListMessagesRequest;
+import com.whop.api.resources.messages.requests.ListReactionsMessagesRequest;
+import com.whop.api.resources.messages.requests.PinMessagesRequest;
+import com.whop.api.resources.messages.requests.ReactMessagesRequest;
 import com.whop.api.resources.messages.requests.RetrieveMessagesRequest;
+import com.whop.api.resources.messages.requests.UnpinMessagesRequest;
+import com.whop.api.resources.messages.requests.UnreactMessagesRequest;
 import com.whop.api.resources.messages.requests.UpdateMessagesRequest;
+import com.whop.api.resources.messages.requests.VoteMessagesRequest;
 import com.whop.api.resources.messages.types.ListMessagesResponse;
-import com.whop.api.types.Message;
-import com.whop.api.types.MessageListItem;
+import com.whop.api.resources.messages.types.ListReactionsMessagesResponse;
+import com.whop.api.types.ChatMessage;
+import com.whop.api.types.ChatReaction;
 import java.io.IOException;
 import java.util.List;
 import java.util.Optional;
@@ -52,53 +60,87 @@ public class AsyncRawMessagesClient {
     }
 
     /**
-     * Returns a paginated list of messages within a specific experience chat, DM, or group chat channel, sorted by creation time.
-     * <p>Required permissions (one of):</p>
-     * <ul>
-     * <li><code>chat:read</code></li>
-     * <li><code>dms:read</code></li>
-     * <li><code>support_chat:read</code></li>
-     * </ul>
+     * Lists messages in a channel. Existing public message and channel IDs are preserved. For reconnect synchronization, use inclusive updated_after with include_deleted=true; results use ascending change order. Follow the returned cursors and replace cached messages by ID, including when updated_at is unchanged. The returned updated_at is the stored message update time; reaction changes only affect synchronization ordering. Deleted entries contain identity and timestamps with their content redacted. To jump into history, specify channel_id and one around anchor; results use ascending creation-time order. For older messages in chronological order, use before_message_id with last and direction=asc; for newer messages, use after_message_id with first and direction=asc. Do not supply order or direction with updated_after or an around anchor. Keep message-ID filters when continuing with cursors. For around queries, omit the around anchor and continue with direction=asc.
      */
-    public CompletableFuture<WhopApiHttpResponse<SyncPagingIterable<MessageListItem>>> list(
-            ListMessagesRequest request) {
+    public CompletableFuture<WhopApiHttpResponse<SyncPagingIterable<ChatMessage>>> list(ListMessagesRequest request) {
         return list(request, null);
     }
 
     /**
-     * Returns a paginated list of messages within a specific experience chat, DM, or group chat channel, sorted by creation time.
-     * <p>Required permissions (one of):</p>
-     * <ul>
-     * <li><code>chat:read</code></li>
-     * <li><code>dms:read</code></li>
-     * <li><code>support_chat:read</code></li>
-     * </ul>
+     * Lists messages in a channel. Existing public message and channel IDs are preserved. For reconnect synchronization, use inclusive updated_after with include_deleted=true; results use ascending change order. Follow the returned cursors and replace cached messages by ID, including when updated_at is unchanged. The returned updated_at is the stored message update time; reaction changes only affect synchronization ordering. Deleted entries contain identity and timestamps with their content redacted. To jump into history, specify channel_id and one around anchor; results use ascending creation-time order. For older messages in chronological order, use before_message_id with last and direction=asc; for newer messages, use after_message_id with first and direction=asc. Do not supply order or direction with updated_after or an around anchor. Keep message-ID filters when continuing with cursors. For around queries, omit the around anchor and continue with direction=asc.
      */
-    public CompletableFuture<WhopApiHttpResponse<SyncPagingIterable<MessageListItem>>> list(
+    public CompletableFuture<WhopApiHttpResponse<SyncPagingIterable<ChatMessage>>> list(
             ListMessagesRequest request, RequestOptions requestOptions) {
-        HttpUrl.Builder httpUrl = HttpUrl.parse(this.clientOptions.environment().getUrl())
+        HttpUrl.Builder httpUrl = HttpUrl.parse(this.clientOptions.environment().getApiURL())
                 .newBuilder()
                 .addPathSegments("messages");
-        if (request.getAfter().isPresent()) {
+        QueryStringMapper.addQueryParameter(httpUrl, "channel_id", request.getChannelId(), false);
+        if (request.getReplyingToMessageId().isPresent()) {
             QueryStringMapper.addQueryParameter(
-                    httpUrl, "after", request.getAfter().get(), false);
+                    httpUrl,
+                    "replying_to_message_id",
+                    request.getReplyingToMessageId().get(),
+                    false);
         }
-        if (request.getBefore().isPresent()) {
+        if (request.getPinned().isPresent()) {
             QueryStringMapper.addQueryParameter(
-                    httpUrl, "before", request.getBefore().get(), false);
+                    httpUrl, "pinned", request.getPinned().get(), false);
+        }
+        if (request.getIncludeDeleted().isPresent()) {
+            QueryStringMapper.addQueryParameter(
+                    httpUrl, "include_deleted", request.getIncludeDeleted().get(), false);
+        }
+        if (request.getCreatedAfter().isPresent()) {
+            QueryStringMapper.addQueryParameter(
+                    httpUrl, "created_after", request.getCreatedAfter().get(), false);
+        }
+        if (request.getCreatedBefore().isPresent()) {
+            QueryStringMapper.addQueryParameter(
+                    httpUrl, "created_before", request.getCreatedBefore().get(), false);
+        }
+        if (request.getUpdatedAfter().isPresent()) {
+            QueryStringMapper.addQueryParameter(
+                    httpUrl, "updated_after", request.getUpdatedAfter().get(), false);
+        }
+        if (request.getBeforeMessageId().isPresent()) {
+            QueryStringMapper.addQueryParameter(
+                    httpUrl, "before_message_id", request.getBeforeMessageId().get(), false);
+        }
+        if (request.getAfterMessageId().isPresent()) {
+            QueryStringMapper.addQueryParameter(
+                    httpUrl, "after_message_id", request.getAfterMessageId().get(), false);
+        }
+        if (request.getAroundMessageId().isPresent()) {
+            QueryStringMapper.addQueryParameter(
+                    httpUrl, "around_message_id", request.getAroundMessageId().get(), false);
+        }
+        if (request.getAroundTimestamp().isPresent()) {
+            QueryStringMapper.addQueryParameter(
+                    httpUrl, "around_timestamp", request.getAroundTimestamp().get(), false);
+        }
+        if (request.getOrder().isPresent()) {
+            QueryStringMapper.addQueryParameter(
+                    httpUrl, "order", request.getOrder().get(), false);
+        }
+        if (request.getDirection().isPresent()) {
+            QueryStringMapper.addQueryParameter(
+                    httpUrl, "direction", request.getDirection().get(), false);
         }
         if (request.getFirst().isPresent()) {
             QueryStringMapper.addQueryParameter(
                     httpUrl, "first", request.getFirst().get(), false);
         }
+        if (request.getAfter().isPresent()) {
+            QueryStringMapper.addQueryParameter(
+                    httpUrl, "after", request.getAfter().get(), false);
+        }
         if (request.getLast().isPresent()) {
             QueryStringMapper.addQueryParameter(
                     httpUrl, "last", request.getLast().get(), false);
         }
-        QueryStringMapper.addQueryParameter(httpUrl, "channel_id", request.getChannelId(), false);
-        if (request.getDirection().isPresent()) {
+        if (request.getBefore().isPresent()) {
             QueryStringMapper.addQueryParameter(
-                    httpUrl, "direction", request.getDirection().get(), false);
+                    httpUrl, "before", request.getBefore().get(), false);
         }
         if (requestOptions != null) {
             requestOptions.getQueryParameters().forEach((_key, _value) -> {
@@ -115,8 +157,18 @@ public class AsyncRawMessagesClient {
         if (requestOptions != null && requestOptions.getTimeout().isPresent()) {
             client = clientOptions.httpClientWithTimeout(requestOptions);
         }
-        CompletableFuture<WhopApiHttpResponse<SyncPagingIterable<MessageListItem>>> future = new CompletableFuture<>();
-        client.newCall(okhttpRequest).enqueue(new Callback() {
+        if (requestOptions != null && requestOptions.getMaxRetries().isPresent()) {
+            okhttpRequest = okhttpRequest
+                    .newBuilder()
+                    .tag(
+                            RetryInterceptor.MaxRetriesOverride.class,
+                            new RetryInterceptor.MaxRetriesOverride(
+                                    requestOptions.getMaxRetries().get()))
+                    .build();
+        }
+        CompletableFuture<WhopApiHttpResponse<SyncPagingIterable<ChatMessage>>> future = new CompletableFuture<>();
+        RetryInterceptor.AsyncCall okhttpCall = RetryInterceptor.newAsyncCall(client, okhttpRequest);
+        okhttpCall.enqueue(new Callback() {
             @Override
             public void onResponse(@NotNull Call call, @NotNull Response response) throws IOException {
                 try (ResponseBody responseBody = response.body()) {
@@ -130,10 +182,14 @@ public class AsyncRawMessagesClient {
                                 .from(request)
                                 .after(startingAfter)
                                 .build();
-                        List<MessageListItem> result = parsedResponse.getData();
+                        List<ChatMessage> result = parsedResponse.getData();
                         future.complete(new WhopApiHttpResponse<>(
-                                new SyncPagingIterable<MessageListItem>(
-                                        startingAfter != null, result, parsedResponse, () -> {
+                                new SyncPagingIterable<ChatMessage>(
+                                        startingAfter.isPresent()
+                                                && !startingAfter.get().isEmpty(),
+                                        result,
+                                        parsedResponse,
+                                        () -> {
                                             try {
                                                 return list(nextRequest, requestOptions)
                                                         .get()
@@ -167,21 +223,6 @@ public class AsyncRawMessagesClient {
                                         ObjectMappers.JSON_MAPPER.readValue(responseBodyString, Object.class),
                                         response));
                                 return;
-                            case 422:
-                                future.completeExceptionally(new UnprocessableEntityError(
-                                        ObjectMappers.JSON_MAPPER.readValue(responseBodyString, Object.class),
-                                        response));
-                                return;
-                            case 429:
-                                future.completeExceptionally(new TooManyRequestsError(
-                                        ObjectMappers.JSON_MAPPER.readValue(responseBodyString, Object.class),
-                                        response));
-                                return;
-                            case 500:
-                                future.completeExceptionally(new InternalServerError(
-                                        ObjectMappers.JSON_MAPPER.readValue(responseBodyString, Object.class),
-                                        response));
-                                return;
                         }
                     } catch (JsonProcessingException ignored) {
                         // unable to map error response, throwing generic error
@@ -190,6 +231,9 @@ public class AsyncRawMessagesClient {
                     future.completeExceptionally(new WhopApiApiException(
                             "Error with status code " + response.code(), response.code(), errorBody, response));
                     return;
+                } catch (JsonProcessingException e) {
+                    future.completeExceptionally(
+                            new WhopApiException("Failed to deserialize response: " + e.getMessage(), e));
                 } catch (IOException e) {
                     future.completeExceptionally(new WhopApiException("Network error executing HTTP request", e));
                 }
@@ -200,36 +244,27 @@ public class AsyncRawMessagesClient {
                 future.completeExceptionally(new WhopApiException("Network error executing HTTP request", e));
             }
         });
+        future.whenComplete((result_, throwable_) -> {
+            if (future.isCancelled()) {
+                okhttpCall.cancel();
+            }
+        });
         return future;
     }
 
     /**
-     * Send a new message in an experience chat, DM, or group chat channel. Supports text content, attachments, polls, and replies.
-     * <p>Required permissions (one of):</p>
-     * <ul>
-     * <li><code>chat:message:create</code></li>
-     * <li><code>dms:message:manage</code></li>
-     * <li><code>livestream:chat:write</code></li>
-     * <li><code>support_chat:message:create</code></li>
-     * </ul>
+     * Sends a Markdown message as the authenticated user or app agent. Channel access, posting restrictions, moderation, and delivery follow the existing chat services. Use Idempotency-Key to safely retry a send. The response and realtime message use the same message ID. Custom author presentation and embeds are read-only.
      */
-    public CompletableFuture<WhopApiHttpResponse<Message>> create(CreateMessagesRequest request) {
+    public CompletableFuture<WhopApiHttpResponse<ChatMessage>> create(CreateMessagesRequest request) {
         return create(request, null);
     }
 
     /**
-     * Send a new message in an experience chat, DM, or group chat channel. Supports text content, attachments, polls, and replies.
-     * <p>Required permissions (one of):</p>
-     * <ul>
-     * <li><code>chat:message:create</code></li>
-     * <li><code>dms:message:manage</code></li>
-     * <li><code>livestream:chat:write</code></li>
-     * <li><code>support_chat:message:create</code></li>
-     * </ul>
+     * Sends a Markdown message as the authenticated user or app agent. Channel access, posting restrictions, moderation, and delivery follow the existing chat services. Use Idempotency-Key to safely retry a send. The response and realtime message use the same message ID. Custom author presentation and embeds are read-only.
      */
-    public CompletableFuture<WhopApiHttpResponse<Message>> create(
+    public CompletableFuture<WhopApiHttpResponse<ChatMessage>> create(
             CreateMessagesRequest request, RequestOptions requestOptions) {
-        HttpUrl.Builder httpUrl = HttpUrl.parse(this.clientOptions.environment().getUrl())
+        HttpUrl.Builder httpUrl = HttpUrl.parse(this.clientOptions.environment().getApiURL())
                 .newBuilder()
                 .addPathSegments("messages");
         if (requestOptions != null) {
@@ -240,7 +275,9 @@ public class AsyncRawMessagesClient {
         RequestBody body;
         try {
             body = RequestBody.create(
-                    ObjectMappers.JSON_MAPPER.writeValueAsBytes(request), MediaTypes.APPLICATION_JSON);
+                    ObjectMappers.JSON_MAPPER.writeValueAsBytes(BodyProperties.merge(
+                            request, requestOptions != null ? requestOptions.getBodyProperties() : null)),
+                    MediaTypes.APPLICATION_JSON);
         } catch (JsonProcessingException e) {
             throw new WhopApiException("Failed to serialize request", e);
         }
@@ -255,15 +292,25 @@ public class AsyncRawMessagesClient {
         if (requestOptions != null && requestOptions.getTimeout().isPresent()) {
             client = clientOptions.httpClientWithTimeout(requestOptions);
         }
-        CompletableFuture<WhopApiHttpResponse<Message>> future = new CompletableFuture<>();
-        client.newCall(okhttpRequest).enqueue(new Callback() {
+        if (requestOptions != null && requestOptions.getMaxRetries().isPresent()) {
+            okhttpRequest = okhttpRequest
+                    .newBuilder()
+                    .tag(
+                            RetryInterceptor.MaxRetriesOverride.class,
+                            new RetryInterceptor.MaxRetriesOverride(
+                                    requestOptions.getMaxRetries().get()))
+                    .build();
+        }
+        CompletableFuture<WhopApiHttpResponse<ChatMessage>> future = new CompletableFuture<>();
+        RetryInterceptor.AsyncCall okhttpCall = RetryInterceptor.newAsyncCall(client, okhttpRequest);
+        okhttpCall.enqueue(new Callback() {
             @Override
             public void onResponse(@NotNull Call call, @NotNull Response response) throws IOException {
                 try (ResponseBody responseBody = response.body()) {
                     String responseBodyString = responseBody != null ? responseBody.string() : "{}";
                     if (response.isSuccessful()) {
                         future.complete(new WhopApiHttpResponse<>(
-                                ObjectMappers.JSON_MAPPER.readValue(responseBodyString, Message.class), response));
+                                ObjectMappers.JSON_MAPPER.readValue(responseBodyString, ChatMessage.class), response));
                         return;
                     }
                     try {
@@ -273,33 +320,13 @@ public class AsyncRawMessagesClient {
                                         ObjectMappers.JSON_MAPPER.readValue(responseBodyString, Object.class),
                                         response));
                                 return;
-                            case 401:
-                                future.completeExceptionally(new UnauthorizedError(
-                                        ObjectMappers.JSON_MAPPER.readValue(responseBodyString, Object.class),
-                                        response));
-                                return;
                             case 403:
                                 future.completeExceptionally(new ForbiddenError(
                                         ObjectMappers.JSON_MAPPER.readValue(responseBodyString, Object.class),
                                         response));
                                 return;
-                            case 404:
-                                future.completeExceptionally(new NotFoundError(
-                                        ObjectMappers.JSON_MAPPER.readValue(responseBodyString, Object.class),
-                                        response));
-                                return;
-                            case 422:
-                                future.completeExceptionally(new UnprocessableEntityError(
-                                        ObjectMappers.JSON_MAPPER.readValue(responseBodyString, Object.class),
-                                        response));
-                                return;
-                            case 429:
-                                future.completeExceptionally(new TooManyRequestsError(
-                                        ObjectMappers.JSON_MAPPER.readValue(responseBodyString, Object.class),
-                                        response));
-                                return;
-                            case 500:
-                                future.completeExceptionally(new InternalServerError(
+                            case 409:
+                                future.completeExceptionally(new ConflictError(
                                         ObjectMappers.JSON_MAPPER.readValue(responseBodyString, Object.class),
                                         response));
                                 return;
@@ -311,6 +338,9 @@ public class AsyncRawMessagesClient {
                     future.completeExceptionally(new WhopApiApiException(
                             "Error with status code " + response.code(), response.code(), errorBody, response));
                     return;
+                } catch (JsonProcessingException e) {
+                    future.completeExceptionally(
+                            new WhopApiException("Failed to deserialize response: " + e.getMessage(), e));
                 } catch (IOException e) {
                     future.completeExceptionally(new WhopApiException("Network error executing HTTP request", e));
                 }
@@ -321,67 +351,44 @@ public class AsyncRawMessagesClient {
                 future.completeExceptionally(new WhopApiException("Network error executing HTTP request", e));
             }
         });
+        future.whenComplete((result_, throwable_) -> {
+            if (future.isCancelled()) {
+                okhttpCall.cancel();
+            }
+        });
         return future;
     }
 
     /**
-     * Retrieves the details of an existing message.
-     * <p>Required permissions (one of):</p>
-     * <ul>
-     * <li><code>chat:read</code></li>
-     * <li><code>dms:read</code></li>
-     * <li><code>livestream:chat:read</code></li>
-     * <li><code>support_chat:read</code></li>
-     * </ul>
+     * Retrieves a live message from an accessible channel. Use list synchronization to retrieve deletion entries.
      */
-    public CompletableFuture<WhopApiHttpResponse<Message>> retrieve(String id) {
+    public CompletableFuture<WhopApiHttpResponse<ChatMessage>> retrieve(String id) {
         return retrieve(id, RetrieveMessagesRequest.builder().build());
     }
 
     /**
-     * Retrieves the details of an existing message.
-     * <p>Required permissions (one of):</p>
-     * <ul>
-     * <li><code>chat:read</code></li>
-     * <li><code>dms:read</code></li>
-     * <li><code>livestream:chat:read</code></li>
-     * <li><code>support_chat:read</code></li>
-     * </ul>
+     * Retrieves a live message from an accessible channel. Use list synchronization to retrieve deletion entries.
      */
-    public CompletableFuture<WhopApiHttpResponse<Message>> retrieve(String id, RequestOptions requestOptions) {
+    public CompletableFuture<WhopApiHttpResponse<ChatMessage>> retrieve(String id, RequestOptions requestOptions) {
         return retrieve(id, RetrieveMessagesRequest.builder().build(), requestOptions);
     }
 
     /**
-     * Retrieves the details of an existing message.
-     * <p>Required permissions (one of):</p>
-     * <ul>
-     * <li><code>chat:read</code></li>
-     * <li><code>dms:read</code></li>
-     * <li><code>livestream:chat:read</code></li>
-     * <li><code>support_chat:read</code></li>
-     * </ul>
+     * Retrieves a live message from an accessible channel. Use list synchronization to retrieve deletion entries.
      */
-    public CompletableFuture<WhopApiHttpResponse<Message>> retrieve(String id, RetrieveMessagesRequest request) {
+    public CompletableFuture<WhopApiHttpResponse<ChatMessage>> retrieve(String id, RetrieveMessagesRequest request) {
         return retrieve(id, request, null);
     }
 
     /**
-     * Retrieves the details of an existing message.
-     * <p>Required permissions (one of):</p>
-     * <ul>
-     * <li><code>chat:read</code></li>
-     * <li><code>dms:read</code></li>
-     * <li><code>livestream:chat:read</code></li>
-     * <li><code>support_chat:read</code></li>
-     * </ul>
+     * Retrieves a live message from an accessible channel. Use list synchronization to retrieve deletion entries.
      */
-    public CompletableFuture<WhopApiHttpResponse<Message>> retrieve(
+    public CompletableFuture<WhopApiHttpResponse<ChatMessage>> retrieve(
             String id, RetrieveMessagesRequest request, RequestOptions requestOptions) {
-        HttpUrl.Builder httpUrl = HttpUrl.parse(this.clientOptions.environment().getUrl())
+        HttpUrl.Builder httpUrl = HttpUrl.parse(this.clientOptions.environment().getApiURL())
                 .newBuilder()
                 .addPathSegments("messages")
-                .addPathSegment(id);
+                .addPathSegment(PathSegments.validate(id));
         if (requestOptions != null) {
             requestOptions.getQueryParameters().forEach((_key, _value) -> {
                 httpUrl.addQueryParameter(_key, _value);
@@ -397,54 +404,32 @@ public class AsyncRawMessagesClient {
         if (requestOptions != null && requestOptions.getTimeout().isPresent()) {
             client = clientOptions.httpClientWithTimeout(requestOptions);
         }
-        CompletableFuture<WhopApiHttpResponse<Message>> future = new CompletableFuture<>();
-        client.newCall(okhttpRequest).enqueue(new Callback() {
+        if (requestOptions != null && requestOptions.getMaxRetries().isPresent()) {
+            okhttpRequest = okhttpRequest
+                    .newBuilder()
+                    .tag(
+                            RetryInterceptor.MaxRetriesOverride.class,
+                            new RetryInterceptor.MaxRetriesOverride(
+                                    requestOptions.getMaxRetries().get()))
+                    .build();
+        }
+        CompletableFuture<WhopApiHttpResponse<ChatMessage>> future = new CompletableFuture<>();
+        RetryInterceptor.AsyncCall okhttpCall = RetryInterceptor.newAsyncCall(client, okhttpRequest);
+        okhttpCall.enqueue(new Callback() {
             @Override
             public void onResponse(@NotNull Call call, @NotNull Response response) throws IOException {
                 try (ResponseBody responseBody = response.body()) {
                     String responseBodyString = responseBody != null ? responseBody.string() : "{}";
                     if (response.isSuccessful()) {
                         future.complete(new WhopApiHttpResponse<>(
-                                ObjectMappers.JSON_MAPPER.readValue(responseBodyString, Message.class), response));
+                                ObjectMappers.JSON_MAPPER.readValue(responseBodyString, ChatMessage.class), response));
                         return;
                     }
                     try {
-                        switch (response.code()) {
-                            case 400:
-                                future.completeExceptionally(new BadRequestError(
-                                        ObjectMappers.JSON_MAPPER.readValue(responseBodyString, Object.class),
-                                        response));
-                                return;
-                            case 401:
-                                future.completeExceptionally(new UnauthorizedError(
-                                        ObjectMappers.JSON_MAPPER.readValue(responseBodyString, Object.class),
-                                        response));
-                                return;
-                            case 403:
-                                future.completeExceptionally(new ForbiddenError(
-                                        ObjectMappers.JSON_MAPPER.readValue(responseBodyString, Object.class),
-                                        response));
-                                return;
-                            case 404:
-                                future.completeExceptionally(new NotFoundError(
-                                        ObjectMappers.JSON_MAPPER.readValue(responseBodyString, Object.class),
-                                        response));
-                                return;
-                            case 422:
-                                future.completeExceptionally(new UnprocessableEntityError(
-                                        ObjectMappers.JSON_MAPPER.readValue(responseBodyString, Object.class),
-                                        response));
-                                return;
-                            case 429:
-                                future.completeExceptionally(new TooManyRequestsError(
-                                        ObjectMappers.JSON_MAPPER.readValue(responseBodyString, Object.class),
-                                        response));
-                                return;
-                            case 500:
-                                future.completeExceptionally(new InternalServerError(
-                                        ObjectMappers.JSON_MAPPER.readValue(responseBodyString, Object.class),
-                                        response));
-                                return;
+                        if (response.code() == 404) {
+                            future.completeExceptionally(new NotFoundError(
+                                    ObjectMappers.JSON_MAPPER.readValue(responseBodyString, Object.class), response));
+                            return;
                         }
                     } catch (JsonProcessingException ignored) {
                         // unable to map error response, throwing generic error
@@ -453,6 +438,9 @@ public class AsyncRawMessagesClient {
                     future.completeExceptionally(new WhopApiApiException(
                             "Error with status code " + response.code(), response.code(), errorBody, response));
                     return;
+                } catch (JsonProcessingException e) {
+                    future.completeExceptionally(
+                            new WhopApiException("Failed to deserialize response: " + e.getMessage(), e));
                 } catch (IOException e) {
                     future.completeExceptionally(new WhopApiException("Network error executing HTTP request", e));
                 }
@@ -463,67 +451,44 @@ public class AsyncRawMessagesClient {
                 future.completeExceptionally(new WhopApiException("Network error executing HTTP request", e));
             }
         });
+        future.whenComplete((result_, throwable_) -> {
+            if (future.isCancelled()) {
+                okhttpCall.cancel();
+            }
+        });
         return future;
     }
 
     /**
-     * Permanently delete a message from an experience chat, DM, or group chat channel. Only the message author or a channel admin can delete a message.
-     * <p>Required permissions (one of):</p>
-     * <ul>
-     * <li><code>chat:message:create</code> and <code>chat:read</code></li>
-     * <li><code>dms:message:manage</code> and <code>dms:read</code></li>
-     * <li><code>livestream:chat:write</code> and <code>livestream:chat:read</code></li>
-     * <li><code>support_chat:message:create</code> and <code>support_chat:read</code></li>
-     * </ul>
+     * Deletes a message as its author or a permitted moderator. Deleted messages remain available as redacted entries through list synchronization.
      */
-    public CompletableFuture<WhopApiHttpResponse<Boolean>> delete(String id) {
+    public CompletableFuture<WhopApiHttpResponse<Void>> delete(String id) {
         return delete(id, DeleteMessagesRequest.builder().build());
     }
 
     /**
-     * Permanently delete a message from an experience chat, DM, or group chat channel. Only the message author or a channel admin can delete a message.
-     * <p>Required permissions (one of):</p>
-     * <ul>
-     * <li><code>chat:message:create</code> and <code>chat:read</code></li>
-     * <li><code>dms:message:manage</code> and <code>dms:read</code></li>
-     * <li><code>livestream:chat:write</code> and <code>livestream:chat:read</code></li>
-     * <li><code>support_chat:message:create</code> and <code>support_chat:read</code></li>
-     * </ul>
+     * Deletes a message as its author or a permitted moderator. Deleted messages remain available as redacted entries through list synchronization.
      */
-    public CompletableFuture<WhopApiHttpResponse<Boolean>> delete(String id, RequestOptions requestOptions) {
+    public CompletableFuture<WhopApiHttpResponse<Void>> delete(String id, RequestOptions requestOptions) {
         return delete(id, DeleteMessagesRequest.builder().build(), requestOptions);
     }
 
     /**
-     * Permanently delete a message from an experience chat, DM, or group chat channel. Only the message author or a channel admin can delete a message.
-     * <p>Required permissions (one of):</p>
-     * <ul>
-     * <li><code>chat:message:create</code> and <code>chat:read</code></li>
-     * <li><code>dms:message:manage</code> and <code>dms:read</code></li>
-     * <li><code>livestream:chat:write</code> and <code>livestream:chat:read</code></li>
-     * <li><code>support_chat:message:create</code> and <code>support_chat:read</code></li>
-     * </ul>
+     * Deletes a message as its author or a permitted moderator. Deleted messages remain available as redacted entries through list synchronization.
      */
-    public CompletableFuture<WhopApiHttpResponse<Boolean>> delete(String id, DeleteMessagesRequest request) {
+    public CompletableFuture<WhopApiHttpResponse<Void>> delete(String id, DeleteMessagesRequest request) {
         return delete(id, request, null);
     }
 
     /**
-     * Permanently delete a message from an experience chat, DM, or group chat channel. Only the message author or a channel admin can delete a message.
-     * <p>Required permissions (one of):</p>
-     * <ul>
-     * <li><code>chat:message:create</code> and <code>chat:read</code></li>
-     * <li><code>dms:message:manage</code> and <code>dms:read</code></li>
-     * <li><code>livestream:chat:write</code> and <code>livestream:chat:read</code></li>
-     * <li><code>support_chat:message:create</code> and <code>support_chat:read</code></li>
-     * </ul>
+     * Deletes a message as its author or a permitted moderator. Deleted messages remain available as redacted entries through list synchronization.
      */
-    public CompletableFuture<WhopApiHttpResponse<Boolean>> delete(
+    public CompletableFuture<WhopApiHttpResponse<Void>> delete(
             String id, DeleteMessagesRequest request, RequestOptions requestOptions) {
-        HttpUrl.Builder httpUrl = HttpUrl.parse(this.clientOptions.environment().getUrl())
+        HttpUrl.Builder httpUrl = HttpUrl.parse(this.clientOptions.environment().getApiURL())
                 .newBuilder()
                 .addPathSegments("messages")
-                .addPathSegment(id);
+                .addPathSegment(PathSegments.validate(id));
         if (requestOptions != null) {
             requestOptions.getQueryParameters().forEach((_key, _value) -> {
                 httpUrl.addQueryParameter(_key, _value);
@@ -531,7 +496,10 @@ public class AsyncRawMessagesClient {
         }
         Request.Builder _requestBuilder = new Request.Builder()
                 .url(httpUrl.build())
-                .method("DELETE", null)
+                .method(
+                        "DELETE",
+                        BodyProperties.toRequestBody(
+                                requestOptions != null ? requestOptions.getBodyProperties() : null, null))
                 .headers(Headers.of(clientOptions.headers(requestOptions)))
                 .addHeader("Accept", "application/json");
         Request okhttpRequest = _requestBuilder.build();
@@ -539,54 +507,31 @@ public class AsyncRawMessagesClient {
         if (requestOptions != null && requestOptions.getTimeout().isPresent()) {
             client = clientOptions.httpClientWithTimeout(requestOptions);
         }
-        CompletableFuture<WhopApiHttpResponse<Boolean>> future = new CompletableFuture<>();
-        client.newCall(okhttpRequest).enqueue(new Callback() {
+        if (requestOptions != null && requestOptions.getMaxRetries().isPresent()) {
+            okhttpRequest = okhttpRequest
+                    .newBuilder()
+                    .tag(
+                            RetryInterceptor.MaxRetriesOverride.class,
+                            new RetryInterceptor.MaxRetriesOverride(
+                                    requestOptions.getMaxRetries().get()))
+                    .build();
+        }
+        CompletableFuture<WhopApiHttpResponse<Void>> future = new CompletableFuture<>();
+        RetryInterceptor.AsyncCall okhttpCall = RetryInterceptor.newAsyncCall(client, okhttpRequest);
+        okhttpCall.enqueue(new Callback() {
             @Override
             public void onResponse(@NotNull Call call, @NotNull Response response) throws IOException {
                 try (ResponseBody responseBody = response.body()) {
-                    String responseBodyString = responseBody != null ? responseBody.string() : "{}";
                     if (response.isSuccessful()) {
-                        future.complete(new WhopApiHttpResponse<>(
-                                ObjectMappers.JSON_MAPPER.readValue(responseBodyString, boolean.class), response));
+                        future.complete(new WhopApiHttpResponse<>(null, response));
                         return;
                     }
+                    String responseBodyString = responseBody != null ? responseBody.string() : "{}";
                     try {
-                        switch (response.code()) {
-                            case 400:
-                                future.completeExceptionally(new BadRequestError(
-                                        ObjectMappers.JSON_MAPPER.readValue(responseBodyString, Object.class),
-                                        response));
-                                return;
-                            case 401:
-                                future.completeExceptionally(new UnauthorizedError(
-                                        ObjectMappers.JSON_MAPPER.readValue(responseBodyString, Object.class),
-                                        response));
-                                return;
-                            case 403:
-                                future.completeExceptionally(new ForbiddenError(
-                                        ObjectMappers.JSON_MAPPER.readValue(responseBodyString, Object.class),
-                                        response));
-                                return;
-                            case 404:
-                                future.completeExceptionally(new NotFoundError(
-                                        ObjectMappers.JSON_MAPPER.readValue(responseBodyString, Object.class),
-                                        response));
-                                return;
-                            case 422:
-                                future.completeExceptionally(new UnprocessableEntityError(
-                                        ObjectMappers.JSON_MAPPER.readValue(responseBodyString, Object.class),
-                                        response));
-                                return;
-                            case 429:
-                                future.completeExceptionally(new TooManyRequestsError(
-                                        ObjectMappers.JSON_MAPPER.readValue(responseBodyString, Object.class),
-                                        response));
-                                return;
-                            case 500:
-                                future.completeExceptionally(new InternalServerError(
-                                        ObjectMappers.JSON_MAPPER.readValue(responseBodyString, Object.class),
-                                        response));
-                                return;
+                        if (response.code() == 403) {
+                            future.completeExceptionally(new ForbiddenError(
+                                    ObjectMappers.JSON_MAPPER.readValue(responseBodyString, Object.class), response));
+                            return;
                         }
                     } catch (JsonProcessingException ignored) {
                         // unable to map error response, throwing generic error
@@ -595,6 +540,9 @@ public class AsyncRawMessagesClient {
                     future.completeExceptionally(new WhopApiApiException(
                             "Error with status code " + response.code(), response.code(), errorBody, response));
                     return;
+                } catch (JsonProcessingException e) {
+                    future.completeExceptionally(
+                            new WhopApiException("Failed to deserialize response: " + e.getMessage(), e));
                 } catch (IOException e) {
                     future.completeExceptionally(new WhopApiException("Network error executing HTTP request", e));
                 }
@@ -605,67 +553,44 @@ public class AsyncRawMessagesClient {
                 future.completeExceptionally(new WhopApiException("Network error executing HTTP request", e));
             }
         });
+        future.whenComplete((result_, throwable_) -> {
+            if (future.isCancelled()) {
+                okhttpCall.cancel();
+            }
+        });
         return future;
     }
 
     /**
-     * Edit the content, attachments, or pinned status of an existing message in an experience chat, DM, or group chat channel.
-     * <p>Required permissions (one of):</p>
-     * <ul>
-     * <li><code>chat:message:create</code></li>
-     * <li><code>dms:message:manage</code></li>
-     * <li><code>livestream:chat:write</code></li>
-     * <li><code>support_chat:message:create</code></li>
-     * </ul>
+     * Updates the author's message. Use the pin and unpin actions to change its pin state. Omitted fields are preserved; attachment and preview collections replace their previous values.
      */
-    public CompletableFuture<WhopApiHttpResponse<Message>> update(String id) {
+    public CompletableFuture<WhopApiHttpResponse<ChatMessage>> update(String id) {
         return update(id, UpdateMessagesRequest.builder().build());
     }
 
     /**
-     * Edit the content, attachments, or pinned status of an existing message in an experience chat, DM, or group chat channel.
-     * <p>Required permissions (one of):</p>
-     * <ul>
-     * <li><code>chat:message:create</code></li>
-     * <li><code>dms:message:manage</code></li>
-     * <li><code>livestream:chat:write</code></li>
-     * <li><code>support_chat:message:create</code></li>
-     * </ul>
+     * Updates the author's message. Use the pin and unpin actions to change its pin state. Omitted fields are preserved; attachment and preview collections replace their previous values.
      */
-    public CompletableFuture<WhopApiHttpResponse<Message>> update(String id, RequestOptions requestOptions) {
+    public CompletableFuture<WhopApiHttpResponse<ChatMessage>> update(String id, RequestOptions requestOptions) {
         return update(id, UpdateMessagesRequest.builder().build(), requestOptions);
     }
 
     /**
-     * Edit the content, attachments, or pinned status of an existing message in an experience chat, DM, or group chat channel.
-     * <p>Required permissions (one of):</p>
-     * <ul>
-     * <li><code>chat:message:create</code></li>
-     * <li><code>dms:message:manage</code></li>
-     * <li><code>livestream:chat:write</code></li>
-     * <li><code>support_chat:message:create</code></li>
-     * </ul>
+     * Updates the author's message. Use the pin and unpin actions to change its pin state. Omitted fields are preserved; attachment and preview collections replace their previous values.
      */
-    public CompletableFuture<WhopApiHttpResponse<Message>> update(String id, UpdateMessagesRequest request) {
+    public CompletableFuture<WhopApiHttpResponse<ChatMessage>> update(String id, UpdateMessagesRequest request) {
         return update(id, request, null);
     }
 
     /**
-     * Edit the content, attachments, or pinned status of an existing message in an experience chat, DM, or group chat channel.
-     * <p>Required permissions (one of):</p>
-     * <ul>
-     * <li><code>chat:message:create</code></li>
-     * <li><code>dms:message:manage</code></li>
-     * <li><code>livestream:chat:write</code></li>
-     * <li><code>support_chat:message:create</code></li>
-     * </ul>
+     * Updates the author's message. Use the pin and unpin actions to change its pin state. Omitted fields are preserved; attachment and preview collections replace their previous values.
      */
-    public CompletableFuture<WhopApiHttpResponse<Message>> update(
+    public CompletableFuture<WhopApiHttpResponse<ChatMessage>> update(
             String id, UpdateMessagesRequest request, RequestOptions requestOptions) {
-        HttpUrl.Builder httpUrl = HttpUrl.parse(this.clientOptions.environment().getUrl())
+        HttpUrl.Builder httpUrl = HttpUrl.parse(this.clientOptions.environment().getApiURL())
                 .newBuilder()
                 .addPathSegments("messages")
-                .addPathSegment(id);
+                .addPathSegment(PathSegments.validate(id));
         if (requestOptions != null) {
             requestOptions.getQueryParameters().forEach((_key, _value) -> {
                 httpUrl.addQueryParameter(_key, _value);
@@ -674,7 +599,9 @@ public class AsyncRawMessagesClient {
         RequestBody body;
         try {
             body = RequestBody.create(
-                    ObjectMappers.JSON_MAPPER.writeValueAsBytes(request), MediaTypes.APPLICATION_JSON);
+                    ObjectMappers.JSON_MAPPER.writeValueAsBytes(BodyProperties.merge(
+                            request, requestOptions != null ? requestOptions.getBodyProperties() : null)),
+                    MediaTypes.APPLICATION_JSON);
         } catch (JsonProcessingException e) {
             throw new WhopApiException("Failed to serialize request", e);
         }
@@ -689,29 +616,134 @@ public class AsyncRawMessagesClient {
         if (requestOptions != null && requestOptions.getTimeout().isPresent()) {
             client = clientOptions.httpClientWithTimeout(requestOptions);
         }
-        CompletableFuture<WhopApiHttpResponse<Message>> future = new CompletableFuture<>();
-        client.newCall(okhttpRequest).enqueue(new Callback() {
+        if (requestOptions != null && requestOptions.getMaxRetries().isPresent()) {
+            okhttpRequest = okhttpRequest
+                    .newBuilder()
+                    .tag(
+                            RetryInterceptor.MaxRetriesOverride.class,
+                            new RetryInterceptor.MaxRetriesOverride(
+                                    requestOptions.getMaxRetries().get()))
+                    .build();
+        }
+        CompletableFuture<WhopApiHttpResponse<ChatMessage>> future = new CompletableFuture<>();
+        RetryInterceptor.AsyncCall okhttpCall = RetryInterceptor.newAsyncCall(client, okhttpRequest);
+        okhttpCall.enqueue(new Callback() {
             @Override
             public void onResponse(@NotNull Call call, @NotNull Response response) throws IOException {
                 try (ResponseBody responseBody = response.body()) {
                     String responseBodyString = responseBody != null ? responseBody.string() : "{}";
                     if (response.isSuccessful()) {
                         future.complete(new WhopApiHttpResponse<>(
-                                ObjectMappers.JSON_MAPPER.readValue(responseBodyString, Message.class), response));
+                                ObjectMappers.JSON_MAPPER.readValue(responseBodyString, ChatMessage.class), response));
+                        return;
+                    }
+                    try {
+                        if (response.code() == 403) {
+                            future.completeExceptionally(new ForbiddenError(
+                                    ObjectMappers.JSON_MAPPER.readValue(responseBodyString, Object.class), response));
+                            return;
+                        }
+                    } catch (JsonProcessingException ignored) {
+                        // unable to map error response, throwing generic error
+                    }
+                    Object errorBody = ObjectMappers.parseErrorBody(responseBodyString);
+                    future.completeExceptionally(new WhopApiApiException(
+                            "Error with status code " + response.code(), response.code(), errorBody, response));
+                    return;
+                } catch (JsonProcessingException e) {
+                    future.completeExceptionally(
+                            new WhopApiException("Failed to deserialize response: " + e.getMessage(), e));
+                } catch (IOException e) {
+                    future.completeExceptionally(new WhopApiException("Network error executing HTTP request", e));
+                }
+            }
+
+            @Override
+            public void onFailure(@NotNull Call call, @NotNull IOException e) {
+                future.completeExceptionally(new WhopApiException("Network error executing HTTP request", e));
+            }
+        });
+        future.whenComplete((result_, throwable_) -> {
+            if (future.isCancelled()) {
+                okhttpCall.cancel();
+            }
+        });
+        return future;
+    }
+
+    /**
+     * Pins a message in its channel. Requires the channel's pin permission.
+     */
+    public CompletableFuture<WhopApiHttpResponse<ChatMessage>> pin(String id) {
+        return pin(id, PinMessagesRequest.builder().build());
+    }
+
+    /**
+     * Pins a message in its channel. Requires the channel's pin permission.
+     */
+    public CompletableFuture<WhopApiHttpResponse<ChatMessage>> pin(String id, RequestOptions requestOptions) {
+        return pin(id, PinMessagesRequest.builder().build(), requestOptions);
+    }
+
+    /**
+     * Pins a message in its channel. Requires the channel's pin permission.
+     */
+    public CompletableFuture<WhopApiHttpResponse<ChatMessage>> pin(String id, PinMessagesRequest request) {
+        return pin(id, request, null);
+    }
+
+    /**
+     * Pins a message in its channel. Requires the channel's pin permission.
+     */
+    public CompletableFuture<WhopApiHttpResponse<ChatMessage>> pin(
+            String id, PinMessagesRequest request, RequestOptions requestOptions) {
+        HttpUrl.Builder httpUrl = HttpUrl.parse(this.clientOptions.environment().getApiURL())
+                .newBuilder()
+                .addPathSegments("messages")
+                .addPathSegment(PathSegments.validate(id))
+                .addPathSegments("pin");
+        if (requestOptions != null) {
+            requestOptions.getQueryParameters().forEach((_key, _value) -> {
+                httpUrl.addQueryParameter(_key, _value);
+            });
+        }
+        Request.Builder _requestBuilder = new Request.Builder()
+                .url(httpUrl.build())
+                .method(
+                        "POST",
+                        BodyProperties.toRequestBody(
+                                requestOptions != null ? requestOptions.getBodyProperties() : null,
+                                RequestBody.create("", null)))
+                .headers(Headers.of(clientOptions.headers(requestOptions)))
+                .addHeader("Accept", "application/json");
+        Request okhttpRequest = _requestBuilder.build();
+        OkHttpClient client = clientOptions.httpClient();
+        if (requestOptions != null && requestOptions.getTimeout().isPresent()) {
+            client = clientOptions.httpClientWithTimeout(requestOptions);
+        }
+        if (requestOptions != null && requestOptions.getMaxRetries().isPresent()) {
+            okhttpRequest = okhttpRequest
+                    .newBuilder()
+                    .tag(
+                            RetryInterceptor.MaxRetriesOverride.class,
+                            new RetryInterceptor.MaxRetriesOverride(
+                                    requestOptions.getMaxRetries().get()))
+                    .build();
+        }
+        CompletableFuture<WhopApiHttpResponse<ChatMessage>> future = new CompletableFuture<>();
+        RetryInterceptor.AsyncCall okhttpCall = RetryInterceptor.newAsyncCall(client, okhttpRequest);
+        okhttpCall.enqueue(new Callback() {
+            @Override
+            public void onResponse(@NotNull Call call, @NotNull Response response) throws IOException {
+                try (ResponseBody responseBody = response.body()) {
+                    String responseBodyString = responseBody != null ? responseBody.string() : "{}";
+                    if (response.isSuccessful()) {
+                        future.complete(new WhopApiHttpResponse<>(
+                                ObjectMappers.JSON_MAPPER.readValue(responseBodyString, ChatMessage.class), response));
                         return;
                     }
                     try {
                         switch (response.code()) {
-                            case 400:
-                                future.completeExceptionally(new BadRequestError(
-                                        ObjectMappers.JSON_MAPPER.readValue(responseBodyString, Object.class),
-                                        response));
-                                return;
-                            case 401:
-                                future.completeExceptionally(new UnauthorizedError(
-                                        ObjectMappers.JSON_MAPPER.readValue(responseBodyString, Object.class),
-                                        response));
-                                return;
                             case 403:
                                 future.completeExceptionally(new ForbiddenError(
                                         ObjectMappers.JSON_MAPPER.readValue(responseBodyString, Object.class),
@@ -722,18 +754,8 @@ public class AsyncRawMessagesClient {
                                         ObjectMappers.JSON_MAPPER.readValue(responseBodyString, Object.class),
                                         response));
                                 return;
-                            case 422:
-                                future.completeExceptionally(new UnprocessableEntityError(
-                                        ObjectMappers.JSON_MAPPER.readValue(responseBodyString, Object.class),
-                                        response));
-                                return;
-                            case 429:
-                                future.completeExceptionally(new TooManyRequestsError(
-                                        ObjectMappers.JSON_MAPPER.readValue(responseBodyString, Object.class),
-                                        response));
-                                return;
-                            case 500:
-                                future.completeExceptionally(new InternalServerError(
+                            case 409:
+                                future.completeExceptionally(new ConflictError(
                                         ObjectMappers.JSON_MAPPER.readValue(responseBodyString, Object.class),
                                         response));
                                 return;
@@ -745,6 +767,9 @@ public class AsyncRawMessagesClient {
                     future.completeExceptionally(new WhopApiApiException(
                             "Error with status code " + response.code(), response.code(), errorBody, response));
                     return;
+                } catch (JsonProcessingException e) {
+                    future.completeExceptionally(
+                            new WhopApiException("Failed to deserialize response: " + e.getMessage(), e));
                 } catch (IOException e) {
                     future.completeExceptionally(new WhopApiException("Network error executing HTTP request", e));
                 }
@@ -753,6 +778,586 @@ public class AsyncRawMessagesClient {
             @Override
             public void onFailure(@NotNull Call call, @NotNull IOException e) {
                 future.completeExceptionally(new WhopApiException("Network error executing HTTP request", e));
+            }
+        });
+        future.whenComplete((result_, throwable_) -> {
+            if (future.isCancelled()) {
+                okhttpCall.cancel();
+            }
+        });
+        return future;
+    }
+
+    /**
+     * Add your emoji reaction to a message. Reacting again with the same emoji changes nothing.
+     */
+    public CompletableFuture<WhopApiHttpResponse<ChatMessage>> react(String id, ReactMessagesRequest request) {
+        return react(id, request, null);
+    }
+
+    /**
+     * Add your emoji reaction to a message. Reacting again with the same emoji changes nothing.
+     */
+    public CompletableFuture<WhopApiHttpResponse<ChatMessage>> react(
+            String id, ReactMessagesRequest request, RequestOptions requestOptions) {
+        HttpUrl.Builder httpUrl = HttpUrl.parse(this.clientOptions.environment().getApiURL())
+                .newBuilder()
+                .addPathSegments("messages")
+                .addPathSegment(PathSegments.validate(id))
+                .addPathSegments("react");
+        if (requestOptions != null) {
+            requestOptions.getQueryParameters().forEach((_key, _value) -> {
+                httpUrl.addQueryParameter(_key, _value);
+            });
+        }
+        RequestBody body;
+        try {
+            body = RequestBody.create(
+                    ObjectMappers.JSON_MAPPER.writeValueAsBytes(BodyProperties.merge(
+                            request, requestOptions != null ? requestOptions.getBodyProperties() : null)),
+                    MediaTypes.APPLICATION_JSON);
+        } catch (JsonProcessingException e) {
+            throw new WhopApiException("Failed to serialize request", e);
+        }
+        Request okhttpRequest = new Request.Builder()
+                .url(httpUrl.build())
+                .method("POST", body)
+                .headers(Headers.of(clientOptions.headers(requestOptions)))
+                .addHeader("Content-Type", "application/json")
+                .addHeader("Accept", "application/json")
+                .build();
+        OkHttpClient client = clientOptions.httpClient();
+        if (requestOptions != null && requestOptions.getTimeout().isPresent()) {
+            client = clientOptions.httpClientWithTimeout(requestOptions);
+        }
+        if (requestOptions != null && requestOptions.getMaxRetries().isPresent()) {
+            okhttpRequest = okhttpRequest
+                    .newBuilder()
+                    .tag(
+                            RetryInterceptor.MaxRetriesOverride.class,
+                            new RetryInterceptor.MaxRetriesOverride(
+                                    requestOptions.getMaxRetries().get()))
+                    .build();
+        }
+        CompletableFuture<WhopApiHttpResponse<ChatMessage>> future = new CompletableFuture<>();
+        RetryInterceptor.AsyncCall okhttpCall = RetryInterceptor.newAsyncCall(client, okhttpRequest);
+        okhttpCall.enqueue(new Callback() {
+            @Override
+            public void onResponse(@NotNull Call call, @NotNull Response response) throws IOException {
+                try (ResponseBody responseBody = response.body()) {
+                    String responseBodyString = responseBody != null ? responseBody.string() : "{}";
+                    if (response.isSuccessful()) {
+                        future.complete(new WhopApiHttpResponse<>(
+                                ObjectMappers.JSON_MAPPER.readValue(responseBodyString, ChatMessage.class), response));
+                        return;
+                    }
+                    try {
+                        switch (response.code()) {
+                            case 401:
+                                future.completeExceptionally(new UnauthorizedError(
+                                        ObjectMappers.JSON_MAPPER.readValue(responseBodyString, Object.class),
+                                        response));
+                                return;
+                            case 409:
+                                future.completeExceptionally(new ConflictError(
+                                        ObjectMappers.JSON_MAPPER.readValue(responseBodyString, Object.class),
+                                        response));
+                                return;
+                        }
+                    } catch (JsonProcessingException ignored) {
+                        // unable to map error response, throwing generic error
+                    }
+                    Object errorBody = ObjectMappers.parseErrorBody(responseBodyString);
+                    future.completeExceptionally(new WhopApiApiException(
+                            "Error with status code " + response.code(), response.code(), errorBody, response));
+                    return;
+                } catch (JsonProcessingException e) {
+                    future.completeExceptionally(
+                            new WhopApiException("Failed to deserialize response: " + e.getMessage(), e));
+                } catch (IOException e) {
+                    future.completeExceptionally(new WhopApiException("Network error executing HTTP request", e));
+                }
+            }
+
+            @Override
+            public void onFailure(@NotNull Call call, @NotNull IOException e) {
+                future.completeExceptionally(new WhopApiException("Network error executing HTTP request", e));
+            }
+        });
+        future.whenComplete((result_, throwable_) -> {
+            if (future.isCancelled()) {
+                okhttpCall.cancel();
+            }
+        });
+        return future;
+    }
+
+    /**
+     * List who reacted to a message, newest first. Optionally filter by emoji.
+     */
+    public CompletableFuture<WhopApiHttpResponse<SyncPagingIterable<ChatReaction>>> listReactions(String id) {
+        return listReactions(id, ListReactionsMessagesRequest.builder().build());
+    }
+
+    /**
+     * List who reacted to a message, newest first. Optionally filter by emoji.
+     */
+    public CompletableFuture<WhopApiHttpResponse<SyncPagingIterable<ChatReaction>>> listReactions(
+            String id, RequestOptions requestOptions) {
+        return listReactions(id, ListReactionsMessagesRequest.builder().build(), requestOptions);
+    }
+
+    /**
+     * List who reacted to a message, newest first. Optionally filter by emoji.
+     */
+    public CompletableFuture<WhopApiHttpResponse<SyncPagingIterable<ChatReaction>>> listReactions(
+            String id, ListReactionsMessagesRequest request) {
+        return listReactions(id, request, null);
+    }
+
+    /**
+     * List who reacted to a message, newest first. Optionally filter by emoji.
+     */
+    public CompletableFuture<WhopApiHttpResponse<SyncPagingIterable<ChatReaction>>> listReactions(
+            String id, ListReactionsMessagesRequest request, RequestOptions requestOptions) {
+        HttpUrl.Builder httpUrl = HttpUrl.parse(this.clientOptions.environment().getApiURL())
+                .newBuilder()
+                .addPathSegments("messages")
+                .addPathSegment(PathSegments.validate(id))
+                .addPathSegments("reactions");
+        if (request.getFirst().isPresent()) {
+            QueryStringMapper.addQueryParameter(
+                    httpUrl, "first", request.getFirst().get(), false);
+        }
+        if (request.getAfter().isPresent()) {
+            QueryStringMapper.addQueryParameter(
+                    httpUrl, "after", request.getAfter().get(), false);
+        }
+        if (request.getLast().isPresent()) {
+            QueryStringMapper.addQueryParameter(
+                    httpUrl, "last", request.getLast().get(), false);
+        }
+        if (request.getBefore().isPresent()) {
+            QueryStringMapper.addQueryParameter(
+                    httpUrl, "before", request.getBefore().get(), false);
+        }
+        if (request.getEmoji().isPresent()) {
+            QueryStringMapper.addQueryParameter(
+                    httpUrl, "emoji", request.getEmoji().get(), false);
+        }
+        if (requestOptions != null) {
+            requestOptions.getQueryParameters().forEach((_key, _value) -> {
+                httpUrl.addQueryParameter(_key, _value);
+            });
+        }
+        Request.Builder _requestBuilder = new Request.Builder()
+                .url(httpUrl.build())
+                .method("GET", null)
+                .headers(Headers.of(clientOptions.headers(requestOptions)))
+                .addHeader("Accept", "application/json");
+        Request okhttpRequest = _requestBuilder.build();
+        OkHttpClient client = clientOptions.httpClient();
+        if (requestOptions != null && requestOptions.getTimeout().isPresent()) {
+            client = clientOptions.httpClientWithTimeout(requestOptions);
+        }
+        if (requestOptions != null && requestOptions.getMaxRetries().isPresent()) {
+            okhttpRequest = okhttpRequest
+                    .newBuilder()
+                    .tag(
+                            RetryInterceptor.MaxRetriesOverride.class,
+                            new RetryInterceptor.MaxRetriesOverride(
+                                    requestOptions.getMaxRetries().get()))
+                    .build();
+        }
+        CompletableFuture<WhopApiHttpResponse<SyncPagingIterable<ChatReaction>>> future = new CompletableFuture<>();
+        RetryInterceptor.AsyncCall okhttpCall = RetryInterceptor.newAsyncCall(client, okhttpRequest);
+        okhttpCall.enqueue(new Callback() {
+            @Override
+            public void onResponse(@NotNull Call call, @NotNull Response response) throws IOException {
+                try (ResponseBody responseBody = response.body()) {
+                    String responseBodyString = responseBody != null ? responseBody.string() : "{}";
+                    if (response.isSuccessful()) {
+                        ListReactionsMessagesResponse parsedResponse = ObjectMappers.JSON_MAPPER.readValue(
+                                responseBodyString, ListReactionsMessagesResponse.class);
+                        Optional<String> startingAfter =
+                                parsedResponse.getPageInfo().getEndCursor();
+                        ListReactionsMessagesRequest nextRequest = ListReactionsMessagesRequest.builder()
+                                .from(request)
+                                .after(startingAfter)
+                                .build();
+                        List<ChatReaction> result = parsedResponse.getData();
+                        future.complete(new WhopApiHttpResponse<>(
+                                new SyncPagingIterable<ChatReaction>(
+                                        startingAfter.isPresent()
+                                                && !startingAfter.get().isEmpty(),
+                                        result,
+                                        parsedResponse,
+                                        () -> {
+                                            try {
+                                                return listReactions(id, nextRequest, requestOptions)
+                                                        .get()
+                                                        .body();
+                                            } catch (InterruptedException | ExecutionException e) {
+                                                throw new RuntimeException(e);
+                                            }
+                                        }),
+                                response));
+                        return;
+                    }
+                    try {
+                        if (response.code() == 401) {
+                            future.completeExceptionally(new UnauthorizedError(
+                                    ObjectMappers.JSON_MAPPER.readValue(responseBodyString, Object.class), response));
+                            return;
+                        }
+                    } catch (JsonProcessingException ignored) {
+                        // unable to map error response, throwing generic error
+                    }
+                    Object errorBody = ObjectMappers.parseErrorBody(responseBodyString);
+                    future.completeExceptionally(new WhopApiApiException(
+                            "Error with status code " + response.code(), response.code(), errorBody, response));
+                    return;
+                } catch (JsonProcessingException e) {
+                    future.completeExceptionally(
+                            new WhopApiException("Failed to deserialize response: " + e.getMessage(), e));
+                } catch (IOException e) {
+                    future.completeExceptionally(new WhopApiException("Network error executing HTTP request", e));
+                }
+            }
+
+            @Override
+            public void onFailure(@NotNull Call call, @NotNull IOException e) {
+                future.completeExceptionally(new WhopApiException("Network error executing HTTP request", e));
+            }
+        });
+        future.whenComplete((result_, throwable_) -> {
+            if (future.isCancelled()) {
+                okhttpCall.cancel();
+            }
+        });
+        return future;
+    }
+
+    /**
+     * Unpins a message in its channel. Requires the channel's pin permission.
+     */
+    public CompletableFuture<WhopApiHttpResponse<ChatMessage>> unpin(String id) {
+        return unpin(id, UnpinMessagesRequest.builder().build());
+    }
+
+    /**
+     * Unpins a message in its channel. Requires the channel's pin permission.
+     */
+    public CompletableFuture<WhopApiHttpResponse<ChatMessage>> unpin(String id, RequestOptions requestOptions) {
+        return unpin(id, UnpinMessagesRequest.builder().build(), requestOptions);
+    }
+
+    /**
+     * Unpins a message in its channel. Requires the channel's pin permission.
+     */
+    public CompletableFuture<WhopApiHttpResponse<ChatMessage>> unpin(String id, UnpinMessagesRequest request) {
+        return unpin(id, request, null);
+    }
+
+    /**
+     * Unpins a message in its channel. Requires the channel's pin permission.
+     */
+    public CompletableFuture<WhopApiHttpResponse<ChatMessage>> unpin(
+            String id, UnpinMessagesRequest request, RequestOptions requestOptions) {
+        HttpUrl.Builder httpUrl = HttpUrl.parse(this.clientOptions.environment().getApiURL())
+                .newBuilder()
+                .addPathSegments("messages")
+                .addPathSegment(PathSegments.validate(id))
+                .addPathSegments("unpin");
+        if (requestOptions != null) {
+            requestOptions.getQueryParameters().forEach((_key, _value) -> {
+                httpUrl.addQueryParameter(_key, _value);
+            });
+        }
+        Request.Builder _requestBuilder = new Request.Builder()
+                .url(httpUrl.build())
+                .method(
+                        "POST",
+                        BodyProperties.toRequestBody(
+                                requestOptions != null ? requestOptions.getBodyProperties() : null,
+                                RequestBody.create("", null)))
+                .headers(Headers.of(clientOptions.headers(requestOptions)))
+                .addHeader("Accept", "application/json");
+        Request okhttpRequest = _requestBuilder.build();
+        OkHttpClient client = clientOptions.httpClient();
+        if (requestOptions != null && requestOptions.getTimeout().isPresent()) {
+            client = clientOptions.httpClientWithTimeout(requestOptions);
+        }
+        if (requestOptions != null && requestOptions.getMaxRetries().isPresent()) {
+            okhttpRequest = okhttpRequest
+                    .newBuilder()
+                    .tag(
+                            RetryInterceptor.MaxRetriesOverride.class,
+                            new RetryInterceptor.MaxRetriesOverride(
+                                    requestOptions.getMaxRetries().get()))
+                    .build();
+        }
+        CompletableFuture<WhopApiHttpResponse<ChatMessage>> future = new CompletableFuture<>();
+        RetryInterceptor.AsyncCall okhttpCall = RetryInterceptor.newAsyncCall(client, okhttpRequest);
+        okhttpCall.enqueue(new Callback() {
+            @Override
+            public void onResponse(@NotNull Call call, @NotNull Response response) throws IOException {
+                try (ResponseBody responseBody = response.body()) {
+                    String responseBodyString = responseBody != null ? responseBody.string() : "{}";
+                    if (response.isSuccessful()) {
+                        future.complete(new WhopApiHttpResponse<>(
+                                ObjectMappers.JSON_MAPPER.readValue(responseBodyString, ChatMessage.class), response));
+                        return;
+                    }
+                    try {
+                        switch (response.code()) {
+                            case 403:
+                                future.completeExceptionally(new ForbiddenError(
+                                        ObjectMappers.JSON_MAPPER.readValue(responseBodyString, Object.class),
+                                        response));
+                                return;
+                            case 404:
+                                future.completeExceptionally(new NotFoundError(
+                                        ObjectMappers.JSON_MAPPER.readValue(responseBodyString, Object.class),
+                                        response));
+                                return;
+                            case 409:
+                                future.completeExceptionally(new ConflictError(
+                                        ObjectMappers.JSON_MAPPER.readValue(responseBodyString, Object.class),
+                                        response));
+                                return;
+                        }
+                    } catch (JsonProcessingException ignored) {
+                        // unable to map error response, throwing generic error
+                    }
+                    Object errorBody = ObjectMappers.parseErrorBody(responseBodyString);
+                    future.completeExceptionally(new WhopApiApiException(
+                            "Error with status code " + response.code(), response.code(), errorBody, response));
+                    return;
+                } catch (JsonProcessingException e) {
+                    future.completeExceptionally(
+                            new WhopApiException("Failed to deserialize response: " + e.getMessage(), e));
+                } catch (IOException e) {
+                    future.completeExceptionally(new WhopApiException("Network error executing HTTP request", e));
+                }
+            }
+
+            @Override
+            public void onFailure(@NotNull Call call, @NotNull IOException e) {
+                future.completeExceptionally(new WhopApiException("Network error executing HTTP request", e));
+            }
+        });
+        future.whenComplete((result_, throwable_) -> {
+            if (future.isCancelled()) {
+                okhttpCall.cancel();
+            }
+        });
+        return future;
+    }
+
+    /**
+     * Remove your emoji reaction from a message. Removing a reaction you have not added changes nothing.
+     */
+    public CompletableFuture<WhopApiHttpResponse<ChatMessage>> unreact(String id, UnreactMessagesRequest request) {
+        return unreact(id, request, null);
+    }
+
+    /**
+     * Remove your emoji reaction from a message. Removing a reaction you have not added changes nothing.
+     */
+    public CompletableFuture<WhopApiHttpResponse<ChatMessage>> unreact(
+            String id, UnreactMessagesRequest request, RequestOptions requestOptions) {
+        HttpUrl.Builder httpUrl = HttpUrl.parse(this.clientOptions.environment().getApiURL())
+                .newBuilder()
+                .addPathSegments("messages")
+                .addPathSegment(PathSegments.validate(id))
+                .addPathSegments("unreact");
+        if (requestOptions != null) {
+            requestOptions.getQueryParameters().forEach((_key, _value) -> {
+                httpUrl.addQueryParameter(_key, _value);
+            });
+        }
+        RequestBody body;
+        try {
+            body = RequestBody.create(
+                    ObjectMappers.JSON_MAPPER.writeValueAsBytes(BodyProperties.merge(
+                            request, requestOptions != null ? requestOptions.getBodyProperties() : null)),
+                    MediaTypes.APPLICATION_JSON);
+        } catch (JsonProcessingException e) {
+            throw new WhopApiException("Failed to serialize request", e);
+        }
+        Request okhttpRequest = new Request.Builder()
+                .url(httpUrl.build())
+                .method("POST", body)
+                .headers(Headers.of(clientOptions.headers(requestOptions)))
+                .addHeader("Content-Type", "application/json")
+                .addHeader("Accept", "application/json")
+                .build();
+        OkHttpClient client = clientOptions.httpClient();
+        if (requestOptions != null && requestOptions.getTimeout().isPresent()) {
+            client = clientOptions.httpClientWithTimeout(requestOptions);
+        }
+        if (requestOptions != null && requestOptions.getMaxRetries().isPresent()) {
+            okhttpRequest = okhttpRequest
+                    .newBuilder()
+                    .tag(
+                            RetryInterceptor.MaxRetriesOverride.class,
+                            new RetryInterceptor.MaxRetriesOverride(
+                                    requestOptions.getMaxRetries().get()))
+                    .build();
+        }
+        CompletableFuture<WhopApiHttpResponse<ChatMessage>> future = new CompletableFuture<>();
+        RetryInterceptor.AsyncCall okhttpCall = RetryInterceptor.newAsyncCall(client, okhttpRequest);
+        okhttpCall.enqueue(new Callback() {
+            @Override
+            public void onResponse(@NotNull Call call, @NotNull Response response) throws IOException {
+                try (ResponseBody responseBody = response.body()) {
+                    String responseBodyString = responseBody != null ? responseBody.string() : "{}";
+                    if (response.isSuccessful()) {
+                        future.complete(new WhopApiHttpResponse<>(
+                                ObjectMappers.JSON_MAPPER.readValue(responseBodyString, ChatMessage.class), response));
+                        return;
+                    }
+                    try {
+                        switch (response.code()) {
+                            case 401:
+                                future.completeExceptionally(new UnauthorizedError(
+                                        ObjectMappers.JSON_MAPPER.readValue(responseBodyString, Object.class),
+                                        response));
+                                return;
+                            case 409:
+                                future.completeExceptionally(new ConflictError(
+                                        ObjectMappers.JSON_MAPPER.readValue(responseBodyString, Object.class),
+                                        response));
+                                return;
+                        }
+                    } catch (JsonProcessingException ignored) {
+                        // unable to map error response, throwing generic error
+                    }
+                    Object errorBody = ObjectMappers.parseErrorBody(responseBodyString);
+                    future.completeExceptionally(new WhopApiApiException(
+                            "Error with status code " + response.code(), response.code(), errorBody, response));
+                    return;
+                } catch (JsonProcessingException e) {
+                    future.completeExceptionally(
+                            new WhopApiException("Failed to deserialize response: " + e.getMessage(), e));
+                } catch (IOException e) {
+                    future.completeExceptionally(new WhopApiException("Network error executing HTTP request", e));
+                }
+            }
+
+            @Override
+            public void onFailure(@NotNull Call call, @NotNull IOException e) {
+                future.completeExceptionally(new WhopApiException("Network error executing HTTP request", e));
+            }
+        });
+        future.whenComplete((result_, throwable_) -> {
+            if (future.isCancelled()) {
+                okhttpCall.cancel();
+            }
+        });
+        return future;
+    }
+
+    /**
+     * Vote for one option on a message poll. Each user can vote once per poll.
+     */
+    public CompletableFuture<WhopApiHttpResponse<ChatMessage>> vote(String id, VoteMessagesRequest request) {
+        return vote(id, request, null);
+    }
+
+    /**
+     * Vote for one option on a message poll. Each user can vote once per poll.
+     */
+    public CompletableFuture<WhopApiHttpResponse<ChatMessage>> vote(
+            String id, VoteMessagesRequest request, RequestOptions requestOptions) {
+        HttpUrl.Builder httpUrl = HttpUrl.parse(this.clientOptions.environment().getApiURL())
+                .newBuilder()
+                .addPathSegments("messages")
+                .addPathSegment(PathSegments.validate(id))
+                .addPathSegments("vote");
+        if (requestOptions != null) {
+            requestOptions.getQueryParameters().forEach((_key, _value) -> {
+                httpUrl.addQueryParameter(_key, _value);
+            });
+        }
+        RequestBody body;
+        try {
+            body = RequestBody.create(
+                    ObjectMappers.JSON_MAPPER.writeValueAsBytes(BodyProperties.merge(
+                            request, requestOptions != null ? requestOptions.getBodyProperties() : null)),
+                    MediaTypes.APPLICATION_JSON);
+        } catch (JsonProcessingException e) {
+            throw new WhopApiException("Failed to serialize request", e);
+        }
+        Request okhttpRequest = new Request.Builder()
+                .url(httpUrl.build())
+                .method("POST", body)
+                .headers(Headers.of(clientOptions.headers(requestOptions)))
+                .addHeader("Content-Type", "application/json")
+                .addHeader("Accept", "application/json")
+                .build();
+        OkHttpClient client = clientOptions.httpClient();
+        if (requestOptions != null && requestOptions.getTimeout().isPresent()) {
+            client = clientOptions.httpClientWithTimeout(requestOptions);
+        }
+        if (requestOptions != null && requestOptions.getMaxRetries().isPresent()) {
+            okhttpRequest = okhttpRequest
+                    .newBuilder()
+                    .tag(
+                            RetryInterceptor.MaxRetriesOverride.class,
+                            new RetryInterceptor.MaxRetriesOverride(
+                                    requestOptions.getMaxRetries().get()))
+                    .build();
+        }
+        CompletableFuture<WhopApiHttpResponse<ChatMessage>> future = new CompletableFuture<>();
+        RetryInterceptor.AsyncCall okhttpCall = RetryInterceptor.newAsyncCall(client, okhttpRequest);
+        okhttpCall.enqueue(new Callback() {
+            @Override
+            public void onResponse(@NotNull Call call, @NotNull Response response) throws IOException {
+                try (ResponseBody responseBody = response.body()) {
+                    String responseBodyString = responseBody != null ? responseBody.string() : "{}";
+                    if (response.isSuccessful()) {
+                        future.complete(new WhopApiHttpResponse<>(
+                                ObjectMappers.JSON_MAPPER.readValue(responseBodyString, ChatMessage.class), response));
+                        return;
+                    }
+                    try {
+                        switch (response.code()) {
+                            case 401:
+                                future.completeExceptionally(new UnauthorizedError(
+                                        ObjectMappers.JSON_MAPPER.readValue(responseBodyString, Object.class),
+                                        response));
+                                return;
+                            case 409:
+                                future.completeExceptionally(new ConflictError(
+                                        ObjectMappers.JSON_MAPPER.readValue(responseBodyString, Object.class),
+                                        response));
+                                return;
+                        }
+                    } catch (JsonProcessingException ignored) {
+                        // unable to map error response, throwing generic error
+                    }
+                    Object errorBody = ObjectMappers.parseErrorBody(responseBodyString);
+                    future.completeExceptionally(new WhopApiApiException(
+                            "Error with status code " + response.code(), response.code(), errorBody, response));
+                    return;
+                } catch (JsonProcessingException e) {
+                    future.completeExceptionally(
+                            new WhopApiException("Failed to deserialize response: " + e.getMessage(), e));
+                } catch (IOException e) {
+                    future.completeExceptionally(new WhopApiException("Network error executing HTTP request", e));
+                }
+            }
+
+            @Override
+            public void onFailure(@NotNull Call call, @NotNull IOException e) {
+                future.completeExceptionally(new WhopApiException("Network error executing HTTP request", e));
+            }
+        });
+        future.whenComplete((result_, throwable_) -> {
+            if (future.isCancelled()) {
+                okhttpCall.cancel();
             }
         });
         return future;

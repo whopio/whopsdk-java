@@ -28,6 +28,8 @@ public final class ReferredUsersPartnersResponseDataItemUser {
 
     private final Optional<String> country;
 
+    private final Optional<String> email;
+
     private final String id;
 
     private final Optional<String> name;
@@ -41,6 +43,7 @@ public final class ReferredUsersPartnersResponseDataItemUser {
     private ReferredUsersPartnersResponseDataItemUser(
             Optional<String> city,
             Optional<String> country,
+            Optional<String> email,
             String id,
             Optional<String> name,
             Optional<ReferredUsersPartnersResponseDataItemUserProfilePicture> profilePicture,
@@ -48,6 +51,7 @@ public final class ReferredUsersPartnersResponseDataItemUser {
             Map<String, Object> additionalProperties) {
         this.city = city;
         this.country = country;
+        this.email = email;
         this.id = id;
         this.name = name;
         this.profilePicture = profilePicture;
@@ -69,6 +73,17 @@ public final class ReferredUsersPartnersResponseDataItemUser {
             return Optional.empty();
         }
         return country;
+    }
+
+    /**
+     * @return The referred user's email address, so a partner can follow up with someone they brought onto Whop. Requires the <code>partner:email:read</code> scope; <code>null</code> without it, or while the account has no reachable address of its own.
+     */
+    @JsonIgnore
+    public Optional<String> getEmail() {
+        if (email == null) {
+            return Optional.empty();
+        }
+        return email;
     }
 
     @JsonProperty("id")
@@ -107,6 +122,12 @@ public final class ReferredUsersPartnersResponseDataItemUser {
     }
 
     @JsonInclude(value = JsonInclude.Include.CUSTOM, valueFilter = NullableNonemptyFilter.class)
+    @JsonProperty("email")
+    private Optional<String> _getEmail() {
+        return email;
+    }
+
+    @JsonInclude(value = JsonInclude.Include.CUSTOM, valueFilter = NullableNonemptyFilter.class)
     @JsonProperty("name")
     private Optional<String> _getName() {
         return name;
@@ -127,6 +148,7 @@ public final class ReferredUsersPartnersResponseDataItemUser {
     private boolean equalTo(ReferredUsersPartnersResponseDataItemUser other) {
         return city.equals(other.city)
                 && country.equals(other.country)
+                && email.equals(other.email)
                 && id.equals(other.id)
                 && name.equals(other.name)
                 && profilePicture.equals(other.profilePicture)
@@ -135,7 +157,8 @@ public final class ReferredUsersPartnersResponseDataItemUser {
 
     @java.lang.Override
     public int hashCode() {
-        return Objects.hash(this.city, this.country, this.id, this.name, this.profilePicture, this.username);
+        return Objects.hash(
+                this.city, this.country, this.email, this.id, this.name, this.profilePicture, this.username);
     }
 
     @java.lang.Override
@@ -176,6 +199,15 @@ public final class ReferredUsersPartnersResponseDataItemUser {
 
         _FinalStage country(Nullable<String> country);
 
+        /**
+         * <p>The referred user's email address, so a partner can follow up with someone they brought onto Whop. Requires the <code>partner:email:read</code> scope; <code>null</code> without it, or while the account has no reachable address of its own.</p>
+         */
+        _FinalStage email(Optional<String> email);
+
+        _FinalStage email(String email);
+
+        _FinalStage email(Nullable<String> email);
+
         _FinalStage name(Optional<String> name);
 
         _FinalStage name(String name);
@@ -197,11 +229,12 @@ public final class ReferredUsersPartnersResponseDataItemUser {
 
         private Optional<String> name = Optional.empty();
 
+        private Optional<String> email = Optional.empty();
+
         private Optional<String> country = Optional.empty();
 
         private Optional<String> city = Optional.empty();
 
-        @JsonAnySetter
         private Map<String, Object> additionalProperties = new HashMap<>();
 
         private Builder() {}
@@ -210,6 +243,7 @@ public final class ReferredUsersPartnersResponseDataItemUser {
         public Builder from(ReferredUsersPartnersResponseDataItemUser other) {
             city(other.getCity());
             country(other.getCountry());
+            email(other.getEmail());
             id(other.getId());
             name(other.getName());
             profilePicture(other.getProfilePicture());
@@ -270,6 +304,42 @@ public final class ReferredUsersPartnersResponseDataItemUser {
             return this;
         }
 
+        /**
+         * <p>The referred user's email address, so a partner can follow up with someone they brought onto Whop. Requires the <code>partner:email:read</code> scope; <code>null</code> without it, or while the account has no reachable address of its own.</p>
+         * @return Reference to {@code this} so that method calls can be chained together.
+         */
+        @java.lang.Override
+        public _FinalStage email(Nullable<String> email) {
+            if (email.isNull()) {
+                this.email = null;
+            } else if (email.isEmpty()) {
+                this.email = Optional.empty();
+            } else {
+                this.email = Optional.of(email.get());
+            }
+            return this;
+        }
+
+        /**
+         * <p>The referred user's email address, so a partner can follow up with someone they brought onto Whop. Requires the <code>partner:email:read</code> scope; <code>null</code> without it, or while the account has no reachable address of its own.</p>
+         * @return Reference to {@code this} so that method calls can be chained together.
+         */
+        @java.lang.Override
+        public _FinalStage email(String email) {
+            this.email = Optional.ofNullable(email);
+            return this;
+        }
+
+        /**
+         * <p>The referred user's email address, so a partner can follow up with someone they brought onto Whop. Requires the <code>partner:email:read</code> scope; <code>null</code> without it, or while the account has no reachable address of its own.</p>
+         */
+        @java.lang.Override
+        @JsonSetter(value = "email", nulls = Nulls.SKIP)
+        public _FinalStage email(Optional<String> email) {
+            this.email = email;
+            return this;
+        }
+
         @java.lang.Override
         public _FinalStage country(Nullable<String> country) {
             if (country.isNull()) {
@@ -323,7 +393,21 @@ public final class ReferredUsersPartnersResponseDataItemUser {
         @java.lang.Override
         public ReferredUsersPartnersResponseDataItemUser build() {
             return new ReferredUsersPartnersResponseDataItemUser(
-                    city, country, id, name, profilePicture, username, additionalProperties);
+                    city, country, email, id, name, profilePicture, username, additionalProperties);
+        }
+
+        @JsonAnySetter
+        private void putAdditionalPropertyFromJson(String key, Object value) {
+            if (key.equalsIgnoreCase("city")
+                    || key.equalsIgnoreCase("country")
+                    || key.equalsIgnoreCase("email")
+                    || key.equalsIgnoreCase("id")
+                    || key.equalsIgnoreCase("name")
+                    || key.equalsIgnoreCase("profile_picture")
+                    || key.equalsIgnoreCase("username")) {
+                return;
+            }
+            this.additionalProperties.put(key, value);
         }
 
         @java.lang.Override

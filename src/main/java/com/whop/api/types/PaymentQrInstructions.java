@@ -86,7 +86,6 @@ public final class PaymentQrInstructions {
     public static final class Builder implements QrStage, _FinalStage {
         private PaymentQr qr;
 
-        @JsonAnySetter
         private Map<String, Object> additionalProperties = new HashMap<>();
 
         private Builder() {}
@@ -98,7 +97,6 @@ public final class PaymentQrInstructions {
         }
 
         /**
-         * <p>The code to show.</p>
          * <p>The code to show.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
@@ -112,6 +110,14 @@ public final class PaymentQrInstructions {
         @java.lang.Override
         public PaymentQrInstructions build() {
             return new PaymentQrInstructions(qr, additionalProperties);
+        }
+
+        @JsonAnySetter
+        private void putAdditionalPropertyFromJson(String key, Object value) {
+            if (key.equalsIgnoreCase("qr")) {
+                return;
+            }
+            this.additionalProperties.put(key, value);
         }
 
         @java.lang.Override

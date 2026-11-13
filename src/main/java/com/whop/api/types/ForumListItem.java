@@ -184,7 +184,6 @@ public final class ForumListItem {
 
         private ForumWhoCanPostTypes whoCanPost;
 
-        @JsonAnySetter
         private Map<String, Object> additionalProperties = new HashMap<>();
 
         private Builder() {}
@@ -201,7 +200,6 @@ public final class ForumListItem {
 
         /**
          * <p>The email notification setting that controls which posts trigger email alerts. One of: all_admin_posts, only_weekly_summary, none.</p>
-         * <p>The email notification setting that controls which posts trigger email alerts. One of: all_admin_posts, only_weekly_summary, none.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
@@ -215,7 +213,6 @@ public final class ForumListItem {
 
         /**
          * <p>The parent experience that this forum belongs to.</p>
-         * <p>The parent experience that this forum belongs to.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
@@ -226,7 +223,6 @@ public final class ForumListItem {
         }
 
         /**
-         * <p>The unique identifier for the entity</p>
          * <p>The unique identifier for the entity</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
@@ -239,7 +235,6 @@ public final class ForumListItem {
 
         /**
          * <p>The permission level controlling who can comment on posts. One of: everyone, admins.</p>
-         * <p>The permission level controlling who can comment on posts. One of: everyone, admins.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
@@ -250,7 +245,6 @@ public final class ForumListItem {
         }
 
         /**
-         * <p>The permission level controlling who can create new posts. One of: everyone, admins.</p>
          * <p>The permission level controlling who can create new posts. One of: everyone, admins.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
@@ -265,6 +259,18 @@ public final class ForumListItem {
         public ForumListItem build() {
             return new ForumListItem(
                     emailNotificationPreference, experience, id, whoCanComment, whoCanPost, additionalProperties);
+        }
+
+        @JsonAnySetter
+        private void putAdditionalPropertyFromJson(String key, Object value) {
+            if (key.equalsIgnoreCase("email_notification_preference")
+                    || key.equalsIgnoreCase("experience")
+                    || key.equalsIgnoreCase("id")
+                    || key.equalsIgnoreCase("who_can_comment")
+                    || key.equalsIgnoreCase("who_can_post")) {
+                return;
+            }
+            this.additionalProperties.put(key, value);
         }
 
         @java.lang.Override

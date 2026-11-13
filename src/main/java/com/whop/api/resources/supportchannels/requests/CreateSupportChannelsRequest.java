@@ -24,7 +24,7 @@ import org.jetbrains.annotations.NotNull;
 @JsonInclude(JsonInclude.Include.NON_ABSENT)
 @JsonDeserialize(builder = CreateSupportChannelsRequest.Builder.class)
 public final class CreateSupportChannelsRequest {
-    private final String companyId;
+    private final String accountId;
 
     private final Optional<String> customName;
 
@@ -35,12 +35,12 @@ public final class CreateSupportChannelsRequest {
     private final Map<String, Object> additionalProperties;
 
     private CreateSupportChannelsRequest(
-            String companyId,
+            String accountId,
             Optional<String> customName,
             Optional<Boolean> notificationsEnabled,
             String userId,
             Map<String, Object> additionalProperties) {
-        this.companyId = companyId;
+        this.accountId = accountId;
         this.customName = customName;
         this.notificationsEnabled = notificationsEnabled;
         this.userId = userId;
@@ -50,9 +50,9 @@ public final class CreateSupportChannelsRequest {
     /**
      * @return The unique identifier of the company to create the support channel in.
      */
-    @JsonProperty("company_id")
-    public String getCompanyId() {
-        return companyId;
+    @JsonProperty("account_id")
+    public String getAccountId() {
+        return accountId;
     }
 
     /**
@@ -109,7 +109,7 @@ public final class CreateSupportChannelsRequest {
     }
 
     private boolean equalTo(CreateSupportChannelsRequest other) {
-        return companyId.equals(other.companyId)
+        return accountId.equals(other.accountId)
                 && customName.equals(other.customName)
                 && notificationsEnabled.equals(other.notificationsEnabled)
                 && userId.equals(other.userId);
@@ -117,7 +117,7 @@ public final class CreateSupportChannelsRequest {
 
     @java.lang.Override
     public int hashCode() {
-        return Objects.hash(this.companyId, this.customName, this.notificationsEnabled, this.userId);
+        return Objects.hash(this.accountId, this.customName, this.notificationsEnabled, this.userId);
     }
 
     @java.lang.Override
@@ -125,15 +125,15 @@ public final class CreateSupportChannelsRequest {
         return ObjectMappers.stringify(this);
     }
 
-    public static CompanyIdStage builder() {
+    public static AccountIdStage builder() {
         return new Builder();
     }
 
-    public interface CompanyIdStage {
+    public interface AccountIdStage {
         /**
          * <p>The unique identifier of the company to create the support channel in.</p>
          */
-        UserIdStage companyId(@NotNull String companyId);
+        UserIdStage accountId(@NotNull String accountId);
 
         Builder from(CreateSupportChannelsRequest other);
     }
@@ -172,8 +172,8 @@ public final class CreateSupportChannelsRequest {
     }
 
     @JsonIgnoreProperties(ignoreUnknown = true)
-    public static final class Builder implements CompanyIdStage, UserIdStage, _FinalStage {
-        private String companyId;
+    public static final class Builder implements AccountIdStage, UserIdStage, _FinalStage {
+        private String accountId;
 
         private String userId;
 
@@ -181,14 +181,13 @@ public final class CreateSupportChannelsRequest {
 
         private Optional<String> customName = Optional.empty();
 
-        @JsonAnySetter
         private Map<String, Object> additionalProperties = new HashMap<>();
 
         private Builder() {}
 
         @java.lang.Override
         public Builder from(CreateSupportChannelsRequest other) {
-            companyId(other.getCompanyId());
+            accountId(other.getAccountId());
             customName(other.getCustomName());
             notificationsEnabled(other.getNotificationsEnabled());
             userId(other.getUserId());
@@ -197,18 +196,16 @@ public final class CreateSupportChannelsRequest {
 
         /**
          * <p>The unique identifier of the company to create the support channel in.</p>
-         * <p>The unique identifier of the company to create the support channel in.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
-        @JsonSetter("company_id")
-        public UserIdStage companyId(@NotNull String companyId) {
-            this.companyId = Objects.requireNonNull(companyId, "companyId must not be null");
+        @JsonSetter("account_id")
+        public UserIdStage accountId(@NotNull String accountId) {
+            this.accountId = Objects.requireNonNull(accountId, "accountId must not be null");
             return this;
         }
 
         /**
-         * <p>The user ID (e.g. 'user_xxxxx') or username of the customer to open a support channel for.</p>
          * <p>The user ID (e.g. 'user_xxxxx') or username of the customer to open a support channel for.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
@@ -294,7 +291,18 @@ public final class CreateSupportChannelsRequest {
         @java.lang.Override
         public CreateSupportChannelsRequest build() {
             return new CreateSupportChannelsRequest(
-                    companyId, customName, notificationsEnabled, userId, additionalProperties);
+                    accountId, customName, notificationsEnabled, userId, additionalProperties);
+        }
+
+        @JsonAnySetter
+        private void putAdditionalPropertyFromJson(String key, Object value) {
+            if (key.equalsIgnoreCase("account_id")
+                    || key.equalsIgnoreCase("custom_name")
+                    || key.equalsIgnoreCase("notifications_enabled")
+                    || key.equalsIgnoreCase("user_id")) {
+                return;
+            }
+            this.additionalProperties.put(key, value);
         }
 
         @java.lang.Override

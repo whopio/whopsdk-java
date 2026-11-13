@@ -248,7 +248,6 @@ public final class UpdateMethodsResponseSupportedPayoutMethod {
 
         private Optional<String> countryCode = Optional.empty();
 
-        @JsonAnySetter
         private Map<String, Object> additionalProperties = new HashMap<>();
 
         private Builder() {}
@@ -266,7 +265,6 @@ public final class UpdateMethodsResponseSupportedPayoutMethod {
         }
 
         /**
-         * <p>How funds are delivered.</p>
          * <p>How funds are delivered.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
@@ -286,7 +284,6 @@ public final class UpdateMethodsResponseSupportedPayoutMethod {
         }
 
         /**
-         * <p>Whether the payer can link this method by signing in to their bank instead of typing account details.</p>
          * <p>Whether the payer can link this method by signing in to their bank instead of typing account details.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
@@ -401,6 +398,20 @@ public final class UpdateMethodsResponseSupportedPayoutMethod {
                     supportsPlaid,
                     supportsStandardDelivery,
                     additionalProperties);
+        }
+
+        @JsonAnySetter
+        private void putAdditionalPropertyFromJson(String key, Object value) {
+            if (key.equalsIgnoreCase("country_code")
+                    || key.equalsIgnoreCase("delivery_type")
+                    || key.equalsIgnoreCase("icon_url")
+                    || key.equalsIgnoreCase("name")
+                    || key.equalsIgnoreCase("supports_instant_delivery")
+                    || key.equalsIgnoreCase("supports_plaid")
+                    || key.equalsIgnoreCase("supports_standard_delivery")) {
+                return;
+            }
+            this.additionalProperties.put(key, value);
         }
 
         @java.lang.Override
