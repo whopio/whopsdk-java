@@ -17,6 +17,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.sun.net.httpserver.HttpServer;
 import com.whop.api.AsyncWhopApiClient;
 import com.whop.api.WhopApiClient;
+import com.whop.api.core.ClientOptions;
 import com.whop.api.core.Environment;
 import com.whop.api.core.ILogger;
 import com.whop.api.core.LogConfig;
@@ -26,6 +27,7 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.lang.reflect.Field;
 import java.net.InetSocketAddress;
 import java.nio.charset.StandardCharsets;
 import java.time.Clock;
@@ -829,8 +831,10 @@ class OidcTokenTest {
                 .baseUrl(address)
                 .build();
 
-        requestUserIgnoringTheResponse(
-                WhopOidc.clientBuilder(token).environment(Environment.custom().api(address).vault(address).build()).maxRetries(0).build());
+        requestUserIgnoringTheResponse(WhopOidc.clientBuilder(token)
+                .environment(Environment.custom().api(address).vault(address).build())
+                .maxRetries(0)
+                .build());
         WhopOidc.asyncClientBuilder(token)
                 .environment(Environment.custom().api(address).vault(address).build())
                 .maxRetries(0)
@@ -857,10 +861,10 @@ class OidcTokenTest {
         String address = serve(200, TOKEN_1);
         OidcToken token = token(address, Clock.systemUTC());
 
-        IllegalStateException unlisted =
-                assertThrows(IllegalStateException.class, () -> WhopOidc.clientBuilder(token, NoApiVersions.class)
-                        .environment(Environment.custom().api(address).vault(address).build())
-                        .build());
+        IllegalStateException unlisted = assertThrows(IllegalStateException.class, () -> WhopOidc.clientBuilder(
+                        token, NoApiVersions.class)
+                .environment(Environment.custom().api(address).vault(address).build())
+                .build());
         assertEquals("NoApiVersions lists no API versions.", unlisted.getMessage());
         assertThrows(IllegalStateException.class, () -> WhopOidc.asyncClientBuilder(token, NoApiVersions.class)
                 .environment(Environment.custom().api(address).vault(address).build())
@@ -998,6 +1002,90 @@ class OidcTokenTest {
         assertEquals("google-id-token", token);
         assertEquals("audience=https%3A%2F%2Fexample.com", recorded.get(0).query);
         assertEquals("Google", recorded.get(0).metadataFlavor);
+    }
+
+    @Test
+    void closingTheAsyncOidcClientReleasesItsOwnedHttpResources() throws Exception {
+        String address = serve(200, TOKEN_1, "{\"id\":\"user_xxxxxxxxxxxxx\"}");
+        AsyncWhopApiClient client = WhopOidc.asyncClientBuilder(OidcToken.builder()
+                        .roleId(ROLE_ID)
+                        .identityToken(() -> "id-token")
+                        .baseUrl(address)
+                        .build())
+                .environment(Environment.custom().api(address).vault(address).build())
+                .build();
+        client.users().retrieve("user_xxxxxxxxxxxxx").get(10, TimeUnit.SECONDS);
+        ClientOptions options = optionsOf(client);
+        AtomicInteger closedSockets = new AtomicInteger();
+        options.registerWebSocket(() -> closedSockets.incrementAndGet());
+
+        client.close();
+        client.close();
+
+        assertTrue(options.isClosed());
+        assertEquals(1, closedSockets.get());
+        assertThrows(IllegalStateException.class, () -> options.registerWebSocket(() -> {}));
+        assertTrue(options.httpClient().dispatcher().executorService().isShutdown());
+    }
+
+    @Test
+    void closingTheAsyncOidcClientLeavesTheCallersHttpClientUsable() throws Exception {
+        String address = serve(200, "{\"value\":\"still-open\"}");
+        OkHttpClient http = new OkHttpClient();
+        AsyncWhopApiClient client = WhopOidc.asyncClientBuilder(OidcToken.of(ROLE_ID, () -> "id-token"))
+                .httpClient(http)
+                .build();
+        try {
+            client.close();
+            assertTrue(optionsOf(client).isClosed());
+            assertFalse(http.dispatcher().executorService().isShutdown());
+            assertEquals(
+                    "still-open",
+                    IdentityTokens.githubActions(IdentityTokens.DEFAULT_AUDIENCE, http, address, "request-token")
+                            .get());
+        } finally {
+            http.dispatcher().executorService().shutdown();
+            http.connectionPool().evictAll();
+        }
+    }
+
+    @Test
+    void closingTheSyncOidcClientStillReleasesItsOwnedHttpResources() throws Exception {
+        WhopApiClient client =
+                WhopOidc.clientBuilder(OidcToken.of(ROLE_ID, () -> "id-token")).build();
+        Field field = WhopApiClient.class.getDeclaredField("clientOptions");
+        field.setAccessible(true);
+        ClientOptions options = (ClientOptions) field.get(client);
+
+        client.close();
+
+        assertTrue(options.httpClient().dispatcher().executorService().isShutdown());
+    }
+
+    @Test
+    void closingTheSyncOidcClientLeavesTheCallersHttpClientUsable() throws Exception {
+        String address = serve(200, "{\"value\":\"still-open\"}");
+        OkHttpClient http = new OkHttpClient();
+        WhopApiClient client = WhopOidc.clientBuilder(OidcToken.of(ROLE_ID, () -> "id-token"))
+                .httpClient(http)
+                .build();
+        try {
+            client.close();
+            assertFalse(http.dispatcher().executorService().isShutdown());
+            assertEquals(
+                    "still-open",
+                    IdentityTokens.githubActions(IdentityTokens.DEFAULT_AUDIENCE, http, address, "request-token")
+                            .get());
+        } finally {
+            http.dispatcher().executorService().shutdown();
+            http.connectionPool().evictAll();
+        }
+    }
+
+    private static ClientOptions optionsOf(AsyncWhopApiClient client) throws Exception {
+        Field field = AsyncWhopApiClient.class.getDeclaredField("clientOptions");
+        field.setAccessible(true);
+        return (ClientOptions) field.get(client);
     }
 
     private static final class NoApiVersions {}

@@ -1,5 +1,6 @@
 package com.whop.api.helpers.oidc;
 
+import com.whop.api.AsyncWhopApiClient;
 import com.whop.api.AsyncWhopApiClientBuilder;
 import com.whop.api.WhopApiClientBuilder;
 import com.whop.api.core.ClientOptions;
@@ -25,7 +26,7 @@ import okhttp3.Request;
  *     .build();
  * }</pre>
  *
- * <p>Unlike {@code WhopApiClient.builder()}, they send an {@code Api-Version-Date} header: the API version this SDK was
+ * <p>They send an {@code Api-Version-Date} header: the API version this SDK was
  * generated from, so responses match its types. A federated credential has no stored API version, so without the
  * header the API answers with its original 2025-01-01 shapes. Call {@code apiVersionDate(...)} to pin another version.
  * Without one, {@code build()} looks the generated version up and throws {@link IllegalStateException} if it can't.
@@ -120,16 +121,22 @@ public final class WhopOidc {
             }
 
             @Override
-            protected ClientOptions buildClientOptions() {
+            public AsyncWhopApiClient build() {
                 ClientOptions options = super.buildClientOptions();
                 OkHttpClient.Builder http = options.httpClient().newBuilder();
                 // ClientOptions.Builder.build() appends a LoggingInterceptor of its own, so drop the first one.
                 http.interceptors().removeIf(LoggingInterceptor.class::isInstance);
                 http.addInterceptor(authorization(token));
-                return ClientOptions.Builder.from(options)
+                ClientOptions authenticatedOptions = ClientOptions.Builder.from(options)
                         .httpClient(http.build())
                         .timeout(Optional.empty())
                         .build();
+                return new AsyncWhopApiClient(authenticatedOptions) {
+                    @Override
+                    public void close() {
+                        options.close();
+                    }
+                };
             }
         };
     }
