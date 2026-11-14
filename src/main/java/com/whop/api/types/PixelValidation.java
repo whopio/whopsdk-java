@@ -26,6 +26,8 @@ import java.util.Optional;
 @JsonInclude(JsonInclude.Include.NON_ABSENT)
 @JsonDeserialize(builder = PixelValidation.Builder.class)
 public final class PixelValidation {
+    private final boolean affiliateTrackingDetected;
+
     private final boolean firingDataOk;
 
     private final List<String> hostEvents;
@@ -47,6 +49,7 @@ public final class PixelValidation {
     private final Map<String, Object> additionalProperties;
 
     private PixelValidation(
+            boolean affiliateTrackingDetected,
             boolean firingDataOk,
             List<String> hostEvents,
             boolean installed,
@@ -57,6 +60,7 @@ public final class PixelValidation {
             Optional<Boolean> reachable,
             Optional<String> url,
             Map<String, Object> additionalProperties) {
+        this.affiliateTrackingDetected = affiliateTrackingDetected;
         this.firingDataOk = firingDataOk;
         this.hostEvents = hostEvents;
         this.installed = installed;
@@ -67,6 +71,14 @@ public final class PixelValidation {
         this.reachable = reachable;
         this.url = url;
         this.additionalProperties = additionalProperties;
+    }
+
+    /**
+     * @return Whether an affiliate tracking SDK was found on the page at <code>url</code>. Supported platforms: Everflow.
+     */
+    @JsonProperty("affiliate_tracking_detected")
+    public boolean getAffiliateTrackingDetected() {
+        return affiliateTrackingDetected;
     }
 
     /**
@@ -174,7 +186,8 @@ public final class PixelValidation {
     }
 
     private boolean equalTo(PixelValidation other) {
-        return firingDataOk == other.firingDataOk
+        return affiliateTrackingDetected == other.affiliateTrackingDetected
+                && firingDataOk == other.firingDataOk
                 && hostEvents.equals(other.hostEvents)
                 && installed == other.installed
                 && lastFiredDays.equals(other.lastFiredDays)
@@ -188,6 +201,7 @@ public final class PixelValidation {
     @java.lang.Override
     public int hashCode() {
         return Objects.hash(
+                this.affiliateTrackingDetected,
                 this.firingDataOk,
                 this.hostEvents,
                 this.installed,
@@ -204,8 +218,17 @@ public final class PixelValidation {
         return ObjectMappers.stringify(this);
     }
 
-    public static FiringDataOkStage builder() {
+    public static AffiliateTrackingDetectedStage builder() {
         return new Builder();
+    }
+
+    public interface AffiliateTrackingDetectedStage {
+        /**
+         * <p>Whether an affiliate tracking SDK was found on the page at <code>url</code>. Supported platforms: Everflow.</p>
+         */
+        FiringDataOkStage affiliateTrackingDetected(boolean affiliateTrackingDetected);
+
+        Builder from(PixelValidation other);
     }
 
     public interface FiringDataOkStage {
@@ -213,8 +236,6 @@ public final class PixelValidation {
          * <p>False when the event lookup failed, meaning <code>host_events</code> and <code>last_seen_days</code> are incomplete.</p>
          */
         InstalledStage firingDataOk(boolean firingDataOk);
-
-        Builder from(PixelValidation other);
     }
 
     public interface InstalledStage {
@@ -288,7 +309,14 @@ public final class PixelValidation {
     }
 
     @JsonIgnoreProperties(ignoreUnknown = true)
-    public static final class Builder implements FiringDataOkStage, InstalledStage, NativeTrackingStage, _FinalStage {
+    public static final class Builder
+            implements AffiliateTrackingDetectedStage,
+                    FiringDataOkStage,
+                    InstalledStage,
+                    NativeTrackingStage,
+                    _FinalStage {
+        private boolean affiliateTrackingDetected;
+
         private boolean firingDataOk;
 
         private boolean installed;
@@ -307,13 +335,13 @@ public final class PixelValidation {
 
         private List<String> hostEvents = new ArrayList<>();
 
-        @JsonAnySetter
         private Map<String, Object> additionalProperties = new HashMap<>();
 
         private Builder() {}
 
         @java.lang.Override
         public Builder from(PixelValidation other) {
+            affiliateTrackingDetected(other.getAffiliateTrackingDetected());
             firingDataOk(other.getFiringDataOk());
             hostEvents(other.getHostEvents());
             installed(other.getInstalled());
@@ -327,7 +355,17 @@ public final class PixelValidation {
         }
 
         /**
-         * <p>False when the event lookup failed, meaning <code>host_events</code> and <code>last_seen_days</code> are incomplete.</p>
+         * <p>Whether an affiliate tracking SDK was found on the page at <code>url</code>. Supported platforms: Everflow.</p>
+         * @return Reference to {@code this} so that method calls can be chained together.
+         */
+        @java.lang.Override
+        @JsonSetter("affiliate_tracking_detected")
+        public FiringDataOkStage affiliateTrackingDetected(boolean affiliateTrackingDetected) {
+            this.affiliateTrackingDetected = affiliateTrackingDetected;
+            return this;
+        }
+
+        /**
          * <p>False when the event lookup failed, meaning <code>host_events</code> and <code>last_seen_days</code> are incomplete.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
@@ -340,7 +378,6 @@ public final class PixelValidation {
 
         /**
          * <p>Whether the pixel was seen. Without a <code>url</code> this answers for the whole account: true when it has sent events recently. With a <code>url</code> it answers for THAT page only — true when the page is hosted on Whop, when the page itself has sent events recently, or when the pixel was found in its source. Events the account sent from other pages do not make a given <code>url</code> installed.</p>
-         * <p>Whether the pixel was seen. Without a <code>url</code> this answers for the whole account: true when it has sent events recently. With a <code>url</code> it answers for THAT page only — true when the page is hosted on Whop, when the page itself has sent events recently, or when the pixel was found in its source. Events the account sent from other pages do not make a given <code>url</code> installed.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
@@ -351,7 +388,6 @@ public final class PixelValidation {
         }
 
         /**
-         * <p>True when <code>url</code> is hosted on Whop, so no pixel snippet is required.</p>
          * <p>True when <code>url</code> is hosted on Whop, so no pixel snippet is required.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
@@ -556,6 +592,7 @@ public final class PixelValidation {
         @java.lang.Override
         public PixelValidation build() {
             return new PixelValidation(
+                    affiliateTrackingDetected,
                     firingDataOk,
                     hostEvents,
                     installed,
@@ -566,6 +603,23 @@ public final class PixelValidation {
                     reachable,
                     url,
                     additionalProperties);
+        }
+
+        @JsonAnySetter
+        private void putAdditionalPropertyFromJson(String key, Object value) {
+            if (key.equalsIgnoreCase("affiliate_tracking_detected")
+                    || key.equalsIgnoreCase("firing_data_ok")
+                    || key.equalsIgnoreCase("host_events")
+                    || key.equalsIgnoreCase("installed")
+                    || key.equalsIgnoreCase("last_fired_days")
+                    || key.equalsIgnoreCase("last_seen_days")
+                    || key.equalsIgnoreCase("native_tracking")
+                    || key.equalsIgnoreCase("page_events")
+                    || key.equalsIgnoreCase("reachable")
+                    || key.equalsIgnoreCase("url")) {
+                return;
+            }
+            this.additionalProperties.put(key, value);
         }
 
         @java.lang.Override

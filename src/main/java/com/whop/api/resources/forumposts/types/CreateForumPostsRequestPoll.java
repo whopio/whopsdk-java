@@ -72,7 +72,6 @@ public final class CreateForumPostsRequestPoll {
     public static final class Builder {
         private List<CreateForumPostsRequestPollOptionsItem> options = new ArrayList<>();
 
-        @JsonAnySetter
         private Map<String, Object> additionalProperties = new HashMap<>();
 
         private Builder() {}
@@ -108,6 +107,14 @@ public final class CreateForumPostsRequestPoll {
 
         public CreateForumPostsRequestPoll build() {
             return new CreateForumPostsRequestPoll(options, additionalProperties);
+        }
+
+        @JsonAnySetter
+        private void putAdditionalPropertyFromJson(String key, Object value) {
+            if (key.equalsIgnoreCase("options")) {
+                return;
+            }
+            this.additionalProperties.put(key, value);
         }
 
         public Builder additionalProperty(String key, Object value) {

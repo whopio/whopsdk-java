@@ -87,7 +87,6 @@ public final class CompanyTokenTransactionListItemMember {
     public static final class Builder implements IdStage, _FinalStage {
         private String id;
 
-        @JsonAnySetter
         private Map<String, Object> additionalProperties = new HashMap<>();
 
         private Builder() {}
@@ -99,7 +98,6 @@ public final class CompanyTokenTransactionListItemMember {
         }
 
         /**
-         * <p>The unique identifier for the company member.</p>
          * <p>The unique identifier for the company member.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
@@ -113,6 +111,14 @@ public final class CompanyTokenTransactionListItemMember {
         @java.lang.Override
         public CompanyTokenTransactionListItemMember build() {
             return new CompanyTokenTransactionListItemMember(id, additionalProperties);
+        }
+
+        @JsonAnySetter
+        private void putAdditionalPropertyFromJson(String key, Object value) {
+            if (key.equalsIgnoreCase("id")) {
+                return;
+            }
+            this.additionalProperties.put(key, value);
         }
 
         @java.lang.Override

@@ -22,6 +22,8 @@ import java.util.Optional;
 public final class PaymentQr {
     private final Optional<Money> amount;
 
+    private final Optional<String> copyCode;
+
     private final Optional<String> documentUrl;
 
     private final Optional<String> expiresAt;
@@ -36,6 +38,7 @@ public final class PaymentQr {
 
     private PaymentQr(
             Optional<Money> amount,
+            Optional<String> copyCode,
             Optional<String> documentUrl,
             Optional<String> expiresAt,
             Optional<String> key,
@@ -43,6 +46,7 @@ public final class PaymentQr {
             Optional<String> qrFormat,
             Map<String, Object> additionalProperties) {
         this.amount = amount;
+        this.copyCode = copyCode;
         this.documentUrl = documentUrl;
         this.expiresAt = expiresAt;
         this.key = key;
@@ -57,6 +61,14 @@ public final class PaymentQr {
     @JsonProperty("amount")
     public Optional<Money> getAmount() {
         return amount;
+    }
+
+    /**
+     * @return The code the buyer pastes into their payment app instead of scanning, such as Pix's copy-and-paste code, so they can pay from the device showing the QR. Only present for methods that accept a pasted code.
+     */
+    @JsonProperty("copy_code")
+    public Optional<String> getCopyCode() {
+        return copyCode;
     }
 
     /**
@@ -112,6 +124,7 @@ public final class PaymentQr {
 
     private boolean equalTo(PaymentQr other) {
         return amount.equals(other.amount)
+                && copyCode.equals(other.copyCode)
                 && documentUrl.equals(other.documentUrl)
                 && expiresAt.equals(other.expiresAt)
                 && key.equals(other.key)
@@ -121,7 +134,8 @@ public final class PaymentQr {
 
     @java.lang.Override
     public int hashCode() {
-        return Objects.hash(this.amount, this.documentUrl, this.expiresAt, this.key, this.qrCode, this.qrFormat);
+        return Objects.hash(
+                this.amount, this.copyCode, this.documentUrl, this.expiresAt, this.key, this.qrCode, this.qrFormat);
     }
 
     @java.lang.Override
@@ -137,6 +151,8 @@ public final class PaymentQr {
     public static final class Builder {
         private Optional<Money> amount = Optional.empty();
 
+        private Optional<String> copyCode = Optional.empty();
+
         private Optional<String> documentUrl = Optional.empty();
 
         private Optional<String> expiresAt = Optional.empty();
@@ -147,13 +163,13 @@ public final class PaymentQr {
 
         private Optional<String> qrFormat = Optional.empty();
 
-        @JsonAnySetter
         private Map<String, Object> additionalProperties = new HashMap<>();
 
         private Builder() {}
 
         public Builder from(PaymentQr other) {
             amount(other.getAmount());
+            copyCode(other.getCopyCode());
             documentUrl(other.getDocumentUrl());
             expiresAt(other.getExpiresAt());
             key(other.getKey());
@@ -173,6 +189,20 @@ public final class PaymentQr {
 
         public Builder amount(Money amount) {
             this.amount = Optional.ofNullable(amount);
+            return this;
+        }
+
+        /**
+         * <p>The code the buyer pastes into their payment app instead of scanning, such as Pix's copy-and-paste code, so they can pay from the device showing the QR. Only present for methods that accept a pasted code.</p>
+         */
+        @JsonSetter(value = "copy_code", nulls = Nulls.SKIP)
+        public Builder copyCode(Optional<String> copyCode) {
+            this.copyCode = copyCode;
+            return this;
+        }
+
+        public Builder copyCode(String copyCode) {
+            this.copyCode = Optional.ofNullable(copyCode);
             return this;
         }
 
@@ -247,7 +277,21 @@ public final class PaymentQr {
         }
 
         public PaymentQr build() {
-            return new PaymentQr(amount, documentUrl, expiresAt, key, qrCode, qrFormat, additionalProperties);
+            return new PaymentQr(amount, copyCode, documentUrl, expiresAt, key, qrCode, qrFormat, additionalProperties);
+        }
+
+        @JsonAnySetter
+        private void putAdditionalPropertyFromJson(String key, Object value) {
+            if (key.equalsIgnoreCase("amount")
+                    || key.equalsIgnoreCase("copy_code")
+                    || key.equalsIgnoreCase("document_url")
+                    || key.equalsIgnoreCase("expires_at")
+                    || key.equalsIgnoreCase("key")
+                    || key.equalsIgnoreCase("qr_code")
+                    || key.equalsIgnoreCase("qr_format")) {
+                return;
+            }
+            this.additionalProperties.put(key, value);
         }
 
         public Builder additionalProperty(String key, Object value) {

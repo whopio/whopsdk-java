@@ -4,38 +4,42 @@
 package com.whop.api.resources.payments;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
+import com.whop.api.core.BodyProperties;
 import com.whop.api.core.ClientOptions;
 import com.whop.api.core.MediaTypes;
 import com.whop.api.core.ObjectMappers;
+import com.whop.api.core.PathSegments;
 import com.whop.api.core.QueryStringMapper;
 import com.whop.api.core.RequestOptions;
+import com.whop.api.core.RetryInterceptor;
 import com.whop.api.core.WhopApiApiException;
 import com.whop.api.core.WhopApiException;
 import com.whop.api.core.WhopApiHttpResponse;
 import com.whop.api.core.pagination.SyncPagingIterable;
 import com.whop.api.errors.BadRequestError;
+import com.whop.api.errors.ConflictError;
 import com.whop.api.errors.ForbiddenError;
-import com.whop.api.errors.InternalServerError;
 import com.whop.api.errors.NotFoundError;
-import com.whop.api.errors.TooManyRequestsError;
 import com.whop.api.errors.UnauthorizedError;
-import com.whop.api.errors.UnprocessableEntityError;
+import com.whop.api.resources.payments.requests.CapturePaymentsRequest;
+import com.whop.api.resources.payments.requests.CreatePaymentsRequest;
+import com.whop.api.resources.payments.requests.GeneratePdfPaymentsRequest;
 import com.whop.api.resources.payments.requests.ListFeesPaymentsRequest;
 import com.whop.api.resources.payments.requests.ListPaymentsRequest;
 import com.whop.api.resources.payments.requests.RefundPaymentsRequest;
+import com.whop.api.resources.payments.requests.ResumePaymentsRequest;
 import com.whop.api.resources.payments.requests.RetrievePaymentsRequest;
 import com.whop.api.resources.payments.requests.RetrieveStatusPaymentsRequest;
 import com.whop.api.resources.payments.requests.RetryPaymentsRequest;
+import com.whop.api.resources.payments.requests.SummaryPaymentsRequest;
+import com.whop.api.resources.payments.requests.UpdatePaymentsRequest;
 import com.whop.api.resources.payments.requests.UpdateReturnUrlPaymentsRequest;
 import com.whop.api.resources.payments.requests.VoidPaymentsRequest;
-import com.whop.api.resources.payments.types.CreatePaymentsRequest;
-import com.whop.api.resources.payments.types.CreatePaymentsResponse;
 import com.whop.api.resources.payments.types.ListFeesPaymentsResponse;
-import com.whop.api.resources.payments.types.ListFeesPaymentsResponseDataItem;
 import com.whop.api.resources.payments.types.ListPaymentsResponse;
-import com.whop.api.resources.payments.types.RetrievePaymentsResponse;
+import com.whop.api.resources.payments.types.SummaryPaymentsResponse;
 import com.whop.api.types.Payment;
-import com.whop.api.types.PaymentListItem;
+import com.whop.api.types.PaymentPdf;
 import com.whop.api.types.PaymentStatus;
 import java.io.IOException;
 import java.util.List;
@@ -56,109 +60,88 @@ public class RawPaymentsClient {
     }
 
     /**
-     * Returns a paginated list of payments for the actor in context, with optional filtering by product, plan, status, billing reason, currency, and creation date.
-     * <p>Required permissions:</p>
-     * <ul>
-     * <li><code>payment:basic:read</code></li>
-     * <li><code>plan:basic:read</code></li>
-     * <li><code>access_pass:basic:read</code></li>
-     * <li><code>member:email:read</code></li>
-     * <li><code>member:basic:read</code></li>
-     * <li><code>member:phone:read</code></li>
-     * <li><code>promo_code:basic:read</code></li>
-     * <li><code>shipment:basic:read</code></li>
-     * </ul>
+     * Lists payments, newest first. By default, returns sales for the accounts your credential can read: an account credential's own account, or every account a user can read payments for. Set <code>mode</code> to <code>user_sales</code> to list the sales the signed-in user received personally, outside any account.
      */
-    public WhopApiHttpResponse<SyncPagingIterable<PaymentListItem>> list() {
+    public WhopApiHttpResponse<SyncPagingIterable<Payment>> list() {
         return list(ListPaymentsRequest.builder().build());
     }
 
     /**
-     * Returns a paginated list of payments for the actor in context, with optional filtering by product, plan, status, billing reason, currency, and creation date.
-     * <p>Required permissions:</p>
-     * <ul>
-     * <li><code>payment:basic:read</code></li>
-     * <li><code>plan:basic:read</code></li>
-     * <li><code>access_pass:basic:read</code></li>
-     * <li><code>member:email:read</code></li>
-     * <li><code>member:basic:read</code></li>
-     * <li><code>member:phone:read</code></li>
-     * <li><code>promo_code:basic:read</code></li>
-     * <li><code>shipment:basic:read</code></li>
-     * </ul>
+     * Lists payments, newest first. By default, returns sales for the accounts your credential can read: an account credential's own account, or every account a user can read payments for. Set <code>mode</code> to <code>user_sales</code> to list the sales the signed-in user received personally, outside any account.
      */
-    public WhopApiHttpResponse<SyncPagingIterable<PaymentListItem>> list(RequestOptions requestOptions) {
+    public WhopApiHttpResponse<SyncPagingIterable<Payment>> list(RequestOptions requestOptions) {
         return list(ListPaymentsRequest.builder().build(), requestOptions);
     }
 
     /**
-     * Returns a paginated list of payments for the actor in context, with optional filtering by product, plan, status, billing reason, currency, and creation date.
-     * <p>Required permissions:</p>
-     * <ul>
-     * <li><code>payment:basic:read</code></li>
-     * <li><code>plan:basic:read</code></li>
-     * <li><code>access_pass:basic:read</code></li>
-     * <li><code>member:email:read</code></li>
-     * <li><code>member:basic:read</code></li>
-     * <li><code>member:phone:read</code></li>
-     * <li><code>promo_code:basic:read</code></li>
-     * <li><code>shipment:basic:read</code></li>
-     * </ul>
+     * Lists payments, newest first. By default, returns sales for the accounts your credential can read: an account credential's own account, or every account a user can read payments for. Set <code>mode</code> to <code>user_sales</code> to list the sales the signed-in user received personally, outside any account.
      */
-    public WhopApiHttpResponse<SyncPagingIterable<PaymentListItem>> list(ListPaymentsRequest request) {
+    public WhopApiHttpResponse<SyncPagingIterable<Payment>> list(ListPaymentsRequest request) {
         return list(request, null);
     }
 
     /**
-     * Returns a paginated list of payments for the actor in context, with optional filtering by product, plan, status, billing reason, currency, and creation date.
-     * <p>Required permissions:</p>
-     * <ul>
-     * <li><code>payment:basic:read</code></li>
-     * <li><code>plan:basic:read</code></li>
-     * <li><code>access_pass:basic:read</code></li>
-     * <li><code>member:email:read</code></li>
-     * <li><code>member:basic:read</code></li>
-     * <li><code>member:phone:read</code></li>
-     * <li><code>promo_code:basic:read</code></li>
-     * <li><code>shipment:basic:read</code></li>
-     * </ul>
+     * Lists payments, newest first. By default, returns sales for the accounts your credential can read: an account credential's own account, or every account a user can read payments for. Set <code>mode</code> to <code>user_sales</code> to list the sales the signed-in user received personally, outside any account.
      */
-    public WhopApiHttpResponse<SyncPagingIterable<PaymentListItem>> list(
+    public WhopApiHttpResponse<SyncPagingIterable<Payment>> list(
             ListPaymentsRequest request, RequestOptions requestOptions) {
-        HttpUrl.Builder httpUrl = HttpUrl.parse(this.clientOptions.environment().getUrl())
+        HttpUrl.Builder httpUrl = HttpUrl.parse(this.clientOptions.environment().getApiURL())
                 .newBuilder()
                 .addPathSegments("payments");
-        if (request.getAfter().isPresent()) {
+        if (request.getMode().isPresent()) {
             QueryStringMapper.addQueryParameter(
-                    httpUrl, "after", request.getAfter().get(), false);
+                    httpUrl, "mode", request.getMode().get(), false);
         }
-        if (request.getBefore().isPresent()) {
+        if (request.getAccountId().isPresent()) {
             QueryStringMapper.addQueryParameter(
-                    httpUrl, "before", request.getBefore().get(), false);
+                    httpUrl, "account_id", request.getAccountId().get(), false);
         }
-        if (request.getFirst().isPresent()) {
+        if (request.getStatus().isPresent()) {
             QueryStringMapper.addQueryParameter(
-                    httpUrl, "first", request.getFirst().get(), false);
+                    httpUrl, "status", request.getStatus().get(), false);
         }
-        if (request.getLast().isPresent()) {
+        if (request.getTrackingStatus().isPresent()) {
             QueryStringMapper.addQueryParameter(
-                    httpUrl, "last", request.getLast().get(), false);
+                    httpUrl, "tracking_status", request.getTrackingStatus().get(), false);
         }
-        if (request.getCompanyId().isPresent()) {
+        if (request.getBillingReason().isPresent()) {
             QueryStringMapper.addQueryParameter(
-                    httpUrl, "company_id", request.getCompanyId().get(), false);
+                    httpUrl, "billing_reason", request.getBillingReason().get(), false);
         }
-        if (request.getDirection().isPresent()) {
+        if (request.getCurrency().isPresent()) {
             QueryStringMapper.addQueryParameter(
-                    httpUrl, "direction", request.getDirection().get(), false);
+                    httpUrl, "currency", request.getCurrency().get(), false);
         }
-        if (request.getOrder().isPresent()) {
+        if (request.getUserId().isPresent()) {
             QueryStringMapper.addQueryParameter(
-                    httpUrl, "order", request.getOrder().get(), false);
+                    httpUrl, "user_id", request.getUserId().get(), false);
         }
-        if (request.getIncludeFree().isPresent()) {
+        if (request.getQuery().isPresent()) {
             QueryStringMapper.addQueryParameter(
-                    httpUrl, "include_free", request.getIncludeFree().get(), false);
+                    httpUrl, "query", request.getQuery().get(), false);
+        }
+        if (request.getIncludeSubaccounts().isPresent()) {
+            QueryStringMapper.addQueryParameter(
+                    httpUrl,
+                    "include_subaccounts",
+                    request.getIncludeSubaccounts().get(),
+                    false);
+        }
+        if (request.getMemberId().isPresent()) {
+            QueryStringMapper.addQueryParameter(
+                    httpUrl, "member_id", request.getMemberId().get(), false);
+        }
+        if (request.getMembershipId().isPresent()) {
+            QueryStringMapper.addQueryParameter(
+                    httpUrl, "membership_id", request.getMembershipId().get(), false);
+        }
+        if (request.getProductId().isPresent()) {
+            QueryStringMapper.addQueryParameter(
+                    httpUrl, "product_id", request.getProductId().get(), false);
+        }
+        if (request.getVariantId().isPresent()) {
+            QueryStringMapper.addQueryParameter(
+                    httpUrl, "variant_id", request.getVariantId().get(), false);
         }
         if (request.getCreatedBefore().isPresent()) {
             QueryStringMapper.addQueryParameter(
@@ -168,33 +151,80 @@ public class RawPaymentsClient {
             QueryStringMapper.addQueryParameter(
                     httpUrl, "created_after", request.getCreatedAfter().get(), false);
         }
-        if (request.getUpdatedBefore().isPresent()) {
+        if (request.getMinAmount().isPresent()) {
             QueryStringMapper.addQueryParameter(
-                    httpUrl, "updated_before", request.getUpdatedBefore().get(), false);
+                    httpUrl, "min_amount", request.getMinAmount().get(), false);
         }
-        if (request.getUpdatedAfter().isPresent()) {
+        if (request.getMaxAmount().isPresent()) {
             QueryStringMapper.addQueryParameter(
-                    httpUrl, "updated_after", request.getUpdatedAfter().get(), false);
+                    httpUrl, "max_amount", request.getMaxAmount().get(), false);
         }
-        if (request.getQuery().isPresent()) {
+        if (request.getRefundedAfter().isPresent()) {
             QueryStringMapper.addQueryParameter(
-                    httpUrl, "query", request.getQuery().get(), false);
+                    httpUrl, "refunded_after", request.getRefundedAfter().get(), false);
         }
-        if (request.getProductIds().isPresent()) {
+        if (request.getRefundedBefore().isPresent()) {
             QueryStringMapper.addQueryParameter(
-                    httpUrl, "product_ids", request.getProductIds().get(), true);
+                    httpUrl, "refunded_before", request.getRefundedBefore().get(), false);
         }
-        if (request.getBillingReasons().isPresent()) {
+        if (request.getDisputeAlertedAfter().isPresent()) {
             QueryStringMapper.addQueryParameter(
-                    httpUrl, "billing_reasons", request.getBillingReasons().get(), true);
+                    httpUrl,
+                    "dispute_alerted_after",
+                    request.getDisputeAlertedAfter().get(),
+                    false);
         }
-        if (request.getCurrencies().isPresent()) {
+        if (request.getDisputeAlertedBefore().isPresent()) {
             QueryStringMapper.addQueryParameter(
-                    httpUrl, "currencies", request.getCurrencies().get(), true);
+                    httpUrl,
+                    "dispute_alerted_before",
+                    request.getDisputeAlertedBefore().get(),
+                    false);
         }
-        if (request.getPlanIds().isPresent()) {
+        if (request.getDisputeCreatedAfter().isPresent()) {
             QueryStringMapper.addQueryParameter(
-                    httpUrl, "plan_ids", request.getPlanIds().get(), true);
+                    httpUrl,
+                    "dispute_created_after",
+                    request.getDisputeCreatedAfter().get(),
+                    false);
+        }
+        if (request.getDisputeCreatedBefore().isPresent()) {
+            QueryStringMapper.addQueryParameter(
+                    httpUrl,
+                    "dispute_created_before",
+                    request.getDisputeCreatedBefore().get(),
+                    false);
+        }
+        if (request.getOrder().isPresent()) {
+            QueryStringMapper.addQueryParameter(
+                    httpUrl, "order", request.getOrder().get(), false);
+        }
+        if (request.getDirection().isPresent()) {
+            QueryStringMapper.addQueryParameter(
+                    httpUrl, "direction", request.getDirection().get(), false);
+        }
+        if (request.getFirst().isPresent()) {
+            QueryStringMapper.addQueryParameter(
+                    httpUrl, "first", request.getFirst().get(), false);
+        }
+        if (request.getAfter().isPresent()) {
+            QueryStringMapper.addQueryParameter(
+                    httpUrl, "after", request.getAfter().get(), false);
+        }
+        if (request.getLast().isPresent()) {
+            QueryStringMapper.addQueryParameter(
+                    httpUrl, "last", request.getLast().get(), false);
+        }
+        if (request.getBefore().isPresent()) {
+            QueryStringMapper.addQueryParameter(
+                    httpUrl, "before", request.getBefore().get(), false);
+        }
+        if (request.getIncludeTotalCount().isPresent()) {
+            QueryStringMapper.addQueryParameter(
+                    httpUrl,
+                    "include_total_count",
+                    request.getIncludeTotalCount().get(),
+                    false);
         }
         if (request.getStatuses().isPresent()) {
             QueryStringMapper.addQueryParameter(
@@ -204,12 +234,29 @@ public class RawPaymentsClient {
             QueryStringMapper.addQueryParameter(
                     httpUrl, "substatuses", request.getSubstatuses().get(), true);
         }
-        if (request.getCheckoutConfigurationIds().isPresent()) {
+        if (request.getBillingReasons().isPresent()) {
             QueryStringMapper.addQueryParameter(
-                    httpUrl,
-                    "checkout_configuration_ids",
-                    request.getCheckoutConfigurationIds().get(),
-                    true);
+                    httpUrl, "billing_reasons", request.getBillingReasons().get(), true);
+        }
+        if (request.getCurrencies().isPresent()) {
+            QueryStringMapper.addQueryParameter(
+                    httpUrl, "currencies", request.getCurrencies().get(), true);
+        }
+        if (request.getVariantIds().isPresent()) {
+            QueryStringMapper.addQueryParameter(
+                    httpUrl, "variant_ids", request.getVariantIds().get(), true);
+        }
+        if (request.getProductIds().isPresent()) {
+            QueryStringMapper.addQueryParameter(
+                    httpUrl, "product_ids", request.getProductIds().get(), true);
+        }
+        if (request.getPaymentMethods().isPresent()) {
+            QueryStringMapper.addQueryParameter(
+                    httpUrl, "payment_methods", request.getPaymentMethods().get(), true);
+        }
+        if (request.getTrackingStates().isPresent()) {
+            QueryStringMapper.addQueryParameter(
+                    httpUrl, "tracking_states", request.getTrackingStates().get(), true);
         }
         if (requestOptions != null) {
             requestOptions.getQueryParameters().forEach((_key, _value) -> {
@@ -225,6 +272,15 @@ public class RawPaymentsClient {
         OkHttpClient client = clientOptions.httpClient();
         if (requestOptions != null && requestOptions.getTimeout().isPresent()) {
             client = clientOptions.httpClientWithTimeout(requestOptions);
+        }
+        if (requestOptions != null && requestOptions.getMaxRetries().isPresent()) {
+            okhttpRequest = okhttpRequest
+                    .newBuilder()
+                    .tag(
+                            RetryInterceptor.MaxRetriesOverride.class,
+                            new RetryInterceptor.MaxRetriesOverride(
+                                    requestOptions.getMaxRetries().get()))
+                    .build();
         }
         try (Response response = client.newCall(okhttpRequest).execute()) {
             ResponseBody responseBody = response.body();
@@ -237,11 +293,14 @@ public class RawPaymentsClient {
                         .from(request)
                         .after(startingAfter)
                         .build();
-                List<PaymentListItem> result = parsedResponse.getData();
+                List<Payment> result = parsedResponse.getData();
                 return new WhopApiHttpResponse<>(
-                        new SyncPagingIterable<PaymentListItem>(
-                                startingAfter != null, result, parsedResponse, () -> list(nextRequest, requestOptions)
-                                        .body()),
+                        new SyncPagingIterable<Payment>(
+                                startingAfter.isPresent()
+                                        && !startingAfter.get().isEmpty(),
+                                result,
+                                parsedResponse,
+                                () -> list(nextRequest, requestOptions).body()),
                         response);
             }
             try {
@@ -255,18 +314,6 @@ public class RawPaymentsClient {
                     case 403:
                         throw new ForbiddenError(
                                 ObjectMappers.JSON_MAPPER.readValue(responseBodyString, Object.class), response);
-                    case 404:
-                        throw new NotFoundError(
-                                ObjectMappers.JSON_MAPPER.readValue(responseBodyString, Object.class), response);
-                    case 422:
-                        throw new UnprocessableEntityError(
-                                ObjectMappers.JSON_MAPPER.readValue(responseBodyString, Object.class), response);
-                    case 429:
-                        throw new TooManyRequestsError(
-                                ObjectMappers.JSON_MAPPER.readValue(responseBodyString, Object.class), response);
-                    case 500:
-                        throw new InternalServerError(
-                                ObjectMappers.JSON_MAPPER.readValue(responseBodyString, Object.class), response);
                 }
             } catch (JsonProcessingException ignored) {
                 // unable to map error response, throwing generic error
@@ -274,56 +321,25 @@ public class RawPaymentsClient {
             Object errorBody = ObjectMappers.parseErrorBody(responseBodyString);
             throw new WhopApiApiException(
                     "Error with status code " + response.code(), response.code(), errorBody, response);
+        } catch (JsonProcessingException e) {
+            throw new WhopApiException("Failed to deserialize response: " + e.getMessage(), e);
         } catch (IOException e) {
             throw new WhopApiException("Network error executing HTTP request", e);
         }
     }
 
     /**
-     * Charge an existing member off-session using one of their stored payment methods. You can provide an existing plan, or create a new one in-line. This endpoint will respond with a payment object immediately, but the payment is processed asynchronously in the background. Use webhooks to be notified when the payment succeeds or fails.
-     * <p>Required permissions:</p>
-     * <ul>
-     * <li><code>payment:charge</code></li>
-     * <li><code>plan:create</code></li>
-     * <li><code>access_pass:create</code></li>
-     * <li><code>access_pass:update</code></li>
-     * <li><code>plan:basic:read</code></li>
-     * <li><code>access_pass:basic:read</code></li>
-     * <li><code>member:email:read</code></li>
-     * <li><code>member:basic:read</code></li>
-     * <li><code>member:phone:read</code></li>
-     * <li><code>promo_code:basic:read</code></li>
-     * <li><code>shipment:basic:read</code></li>
-     * <li><code>payment:dispute:read</code></li>
-     * <li><code>payment:resolution_center_case:read</code></li>
-     * </ul>
+     * Charges a buyer for one or more variants with a payment method already on file (<code>member_id</code> and <code>payment_method_id</code>), or with a <code>confirmation_token</code> for a method the buyer just supplied. Collection runs in the background, so the response is the payment as created, not its outcome: poll Retrieve payment status for how far it has got and what the buyer must still do.
      */
-    public WhopApiHttpResponse<CreatePaymentsResponse> create(CreatePaymentsRequest request) {
+    public WhopApiHttpResponse<Payment> create(CreatePaymentsRequest request) {
         return create(request, null);
     }
 
     /**
-     * Charge an existing member off-session using one of their stored payment methods. You can provide an existing plan, or create a new one in-line. This endpoint will respond with a payment object immediately, but the payment is processed asynchronously in the background. Use webhooks to be notified when the payment succeeds or fails.
-     * <p>Required permissions:</p>
-     * <ul>
-     * <li><code>payment:charge</code></li>
-     * <li><code>plan:create</code></li>
-     * <li><code>access_pass:create</code></li>
-     * <li><code>access_pass:update</code></li>
-     * <li><code>plan:basic:read</code></li>
-     * <li><code>access_pass:basic:read</code></li>
-     * <li><code>member:email:read</code></li>
-     * <li><code>member:basic:read</code></li>
-     * <li><code>member:phone:read</code></li>
-     * <li><code>promo_code:basic:read</code></li>
-     * <li><code>shipment:basic:read</code></li>
-     * <li><code>payment:dispute:read</code></li>
-     * <li><code>payment:resolution_center_case:read</code></li>
-     * </ul>
+     * Charges a buyer for one or more variants with a payment method already on file (<code>member_id</code> and <code>payment_method_id</code>), or with a <code>confirmation_token</code> for a method the buyer just supplied. Collection runs in the background, so the response is the payment as created, not its outcome: poll Retrieve payment status for how far it has got and what the buyer must still do.
      */
-    public WhopApiHttpResponse<CreatePaymentsResponse> create(
-            CreatePaymentsRequest request, RequestOptions requestOptions) {
-        HttpUrl.Builder httpUrl = HttpUrl.parse(this.clientOptions.environment().getUrl())
+    public WhopApiHttpResponse<Payment> create(CreatePaymentsRequest request, RequestOptions requestOptions) {
+        HttpUrl.Builder httpUrl = HttpUrl.parse(this.clientOptions.environment().getApiURL())
                 .newBuilder()
                 .addPathSegments("payments");
         if (requestOptions != null) {
@@ -334,7 +350,9 @@ public class RawPaymentsClient {
         RequestBody body;
         try {
             body = RequestBody.create(
-                    ObjectMappers.JSON_MAPPER.writeValueAsBytes(request), MediaTypes.APPLICATION_JSON);
+                    ObjectMappers.JSON_MAPPER.writeValueAsBytes(BodyProperties.merge(
+                            request, requestOptions != null ? requestOptions.getBodyProperties() : null)),
+                    MediaTypes.APPLICATION_JSON);
         } catch (JsonProcessingException e) {
             throw new WhopApiException("Failed to serialize request", e);
         }
@@ -349,13 +367,21 @@ public class RawPaymentsClient {
         if (requestOptions != null && requestOptions.getTimeout().isPresent()) {
             client = clientOptions.httpClientWithTimeout(requestOptions);
         }
+        if (requestOptions != null && requestOptions.getMaxRetries().isPresent()) {
+            okhttpRequest = okhttpRequest
+                    .newBuilder()
+                    .tag(
+                            RetryInterceptor.MaxRetriesOverride.class,
+                            new RetryInterceptor.MaxRetriesOverride(
+                                    requestOptions.getMaxRetries().get()))
+                    .build();
+        }
         try (Response response = client.newCall(okhttpRequest).execute()) {
             ResponseBody responseBody = response.body();
             String responseBodyString = responseBody != null ? responseBody.string() : "{}";
             if (response.isSuccessful()) {
                 return new WhopApiHttpResponse<>(
-                        ObjectMappers.JSON_MAPPER.readValue(responseBodyString, CreatePaymentsResponse.class),
-                        response);
+                        ObjectMappers.JSON_MAPPER.readValue(responseBodyString, Payment.class), response);
             }
             try {
                 switch (response.code()) {
@@ -371,14 +397,8 @@ public class RawPaymentsClient {
                     case 404:
                         throw new NotFoundError(
                                 ObjectMappers.JSON_MAPPER.readValue(responseBodyString, Object.class), response);
-                    case 422:
-                        throw new UnprocessableEntityError(
-                                ObjectMappers.JSON_MAPPER.readValue(responseBodyString, Object.class), response);
-                    case 429:
-                        throw new TooManyRequestsError(
-                                ObjectMappers.JSON_MAPPER.readValue(responseBodyString, Object.class), response);
-                    case 500:
-                        throw new InternalServerError(
+                    case 409:
+                        throw new ConflictError(
                                 ObjectMappers.JSON_MAPPER.readValue(responseBodyString, Object.class), response);
                 }
             } catch (JsonProcessingException ignored) {
@@ -387,93 +407,217 @@ public class RawPaymentsClient {
             Object errorBody = ObjectMappers.parseErrorBody(responseBodyString);
             throw new WhopApiApiException(
                     "Error with status code " + response.code(), response.code(), errorBody, response);
+        } catch (JsonProcessingException e) {
+            throw new WhopApiException("Failed to deserialize response: " + e.getMessage(), e);
         } catch (IOException e) {
             throw new WhopApiException("Network error executing HTTP request", e);
         }
     }
 
     /**
-     * Retrieves the details of an existing payment.
-     * <p>Required permissions:</p>
-     * <ul>
-     * <li><code>payment:basic:read</code></li>
-     * <li><code>plan:basic:read</code></li>
-     * <li><code>access_pass:basic:read</code></li>
-     * <li><code>member:email:read</code></li>
-     * <li><code>member:basic:read</code></li>
-     * <li><code>member:phone:read</code></li>
-     * <li><code>promo_code:basic:read</code></li>
-     * <li><code>shipment:basic:read</code></li>
-     * <li><code>payment:dispute:read</code></li>
-     * <li><code>payment:resolution_center_case:read</code></li>
-     * </ul>
+     * Totals up the same payments the list returns, so you can build status tabs and filter options without paging through them. Takes the same filters as List Payments.
      */
-    public WhopApiHttpResponse<RetrievePaymentsResponse> retrieve(String id) {
+    public WhopApiHttpResponse<SummaryPaymentsResponse> summary() {
+        return summary(SummaryPaymentsRequest.builder().build());
+    }
+
+    /**
+     * Totals up the same payments the list returns, so you can build status tabs and filter options without paging through them. Takes the same filters as List Payments.
+     */
+    public WhopApiHttpResponse<SummaryPaymentsResponse> summary(RequestOptions requestOptions) {
+        return summary(SummaryPaymentsRequest.builder().build(), requestOptions);
+    }
+
+    /**
+     * Totals up the same payments the list returns, so you can build status tabs and filter options without paging through them. Takes the same filters as List Payments.
+     */
+    public WhopApiHttpResponse<SummaryPaymentsResponse> summary(SummaryPaymentsRequest request) {
+        return summary(request, null);
+    }
+
+    /**
+     * Totals up the same payments the list returns, so you can build status tabs and filter options without paging through them. Takes the same filters as List Payments.
+     */
+    public WhopApiHttpResponse<SummaryPaymentsResponse> summary(
+            SummaryPaymentsRequest request, RequestOptions requestOptions) {
+        HttpUrl.Builder httpUrl = HttpUrl.parse(this.clientOptions.environment().getApiURL())
+                .newBuilder()
+                .addPathSegments("payments/summary");
+        if (request.getAccountId().isPresent()) {
+            QueryStringMapper.addQueryParameter(
+                    httpUrl, "account_id", request.getAccountId().get(), false);
+        }
+        if (request.getMinAmount().isPresent()) {
+            QueryStringMapper.addQueryParameter(
+                    httpUrl, "min_amount", request.getMinAmount().get(), false);
+        }
+        if (request.getMaxAmount().isPresent()) {
+            QueryStringMapper.addQueryParameter(
+                    httpUrl, "max_amount", request.getMaxAmount().get(), false);
+        }
+        if (request.getCreatedAfter().isPresent()) {
+            QueryStringMapper.addQueryParameter(
+                    httpUrl, "created_after", request.getCreatedAfter().get(), false);
+        }
+        if (request.getCreatedBefore().isPresent()) {
+            QueryStringMapper.addQueryParameter(
+                    httpUrl, "created_before", request.getCreatedBefore().get(), false);
+        }
+        if (request.getRefundedAfter().isPresent()) {
+            QueryStringMapper.addQueryParameter(
+                    httpUrl, "refunded_after", request.getRefundedAfter().get(), false);
+        }
+        if (request.getRefundedBefore().isPresent()) {
+            QueryStringMapper.addQueryParameter(
+                    httpUrl, "refunded_before", request.getRefundedBefore().get(), false);
+        }
+        if (request.getDisputeAlertedAfter().isPresent()) {
+            QueryStringMapper.addQueryParameter(
+                    httpUrl,
+                    "dispute_alerted_after",
+                    request.getDisputeAlertedAfter().get(),
+                    false);
+        }
+        if (request.getDisputeAlertedBefore().isPresent()) {
+            QueryStringMapper.addQueryParameter(
+                    httpUrl,
+                    "dispute_alerted_before",
+                    request.getDisputeAlertedBefore().get(),
+                    false);
+        }
+        if (request.getDisputeCreatedAfter().isPresent()) {
+            QueryStringMapper.addQueryParameter(
+                    httpUrl,
+                    "dispute_created_after",
+                    request.getDisputeCreatedAfter().get(),
+                    false);
+        }
+        if (request.getDisputeCreatedBefore().isPresent()) {
+            QueryStringMapper.addQueryParameter(
+                    httpUrl,
+                    "dispute_created_before",
+                    request.getDisputeCreatedBefore().get(),
+                    false);
+        }
+        if (request.getQuery().isPresent()) {
+            QueryStringMapper.addQueryParameter(
+                    httpUrl, "query", request.getQuery().get(), false);
+        }
+        if (request.getIncludeSubaccounts().isPresent()) {
+            QueryStringMapper.addQueryParameter(
+                    httpUrl,
+                    "include_subaccounts",
+                    request.getIncludeSubaccounts().get(),
+                    false);
+        }
+        if (request.getGroups().isPresent()) {
+            QueryStringMapper.addQueryParameter(
+                    httpUrl, "groups", request.getGroups().get(), true);
+        }
+        if (request.getStatuses().isPresent()) {
+            QueryStringMapper.addQueryParameter(
+                    httpUrl, "statuses", request.getStatuses().get(), true);
+        }
+        if (request.getSubstatuses().isPresent()) {
+            QueryStringMapper.addQueryParameter(
+                    httpUrl, "substatuses", request.getSubstatuses().get(), true);
+        }
+        if (request.getBillingReasons().isPresent()) {
+            QueryStringMapper.addQueryParameter(
+                    httpUrl, "billing_reasons", request.getBillingReasons().get(), true);
+        }
+        if (request.getCurrencies().isPresent()) {
+            QueryStringMapper.addQueryParameter(
+                    httpUrl, "currencies", request.getCurrencies().get(), true);
+        }
+        if (request.getVariantIds().isPresent()) {
+            QueryStringMapper.addQueryParameter(
+                    httpUrl, "variant_ids", request.getVariantIds().get(), true);
+        }
+        if (request.getProductIds().isPresent()) {
+            QueryStringMapper.addQueryParameter(
+                    httpUrl, "product_ids", request.getProductIds().get(), true);
+        }
+        if (request.getPaymentMethods().isPresent()) {
+            QueryStringMapper.addQueryParameter(
+                    httpUrl, "payment_methods", request.getPaymentMethods().get(), true);
+        }
+        if (request.getTrackingStates().isPresent()) {
+            QueryStringMapper.addQueryParameter(
+                    httpUrl, "tracking_states", request.getTrackingStates().get(), true);
+        }
+        if (requestOptions != null) {
+            requestOptions.getQueryParameters().forEach((_key, _value) -> {
+                httpUrl.addQueryParameter(_key, _value);
+            });
+        }
+        Request.Builder _requestBuilder = new Request.Builder()
+                .url(httpUrl.build())
+                .method("GET", null)
+                .headers(Headers.of(clientOptions.headers(requestOptions)))
+                .addHeader("Accept", "application/json");
+        Request okhttpRequest = _requestBuilder.build();
+        OkHttpClient client = clientOptions.httpClient();
+        if (requestOptions != null && requestOptions.getTimeout().isPresent()) {
+            client = clientOptions.httpClientWithTimeout(requestOptions);
+        }
+        if (requestOptions != null && requestOptions.getMaxRetries().isPresent()) {
+            okhttpRequest = okhttpRequest
+                    .newBuilder()
+                    .tag(
+                            RetryInterceptor.MaxRetriesOverride.class,
+                            new RetryInterceptor.MaxRetriesOverride(
+                                    requestOptions.getMaxRetries().get()))
+                    .build();
+        }
+        try (Response response = client.newCall(okhttpRequest).execute()) {
+            ResponseBody responseBody = response.body();
+            String responseBodyString = responseBody != null ? responseBody.string() : "{}";
+            if (response.isSuccessful()) {
+                return new WhopApiHttpResponse<>(
+                        ObjectMappers.JSON_MAPPER.readValue(responseBodyString, SummaryPaymentsResponse.class),
+                        response);
+            }
+            Object errorBody = ObjectMappers.parseErrorBody(responseBodyString);
+            throw new WhopApiApiException(
+                    "Error with status code " + response.code(), response.code(), errorBody, response);
+        } catch (JsonProcessingException e) {
+            throw new WhopApiException("Failed to deserialize response: " + e.getMessage(), e);
+        } catch (IOException e) {
+            throw new WhopApiException("Network error executing HTTP request", e);
+        }
+    }
+
+    /**
+     * Returns one payment, including every purchased line item with its quantity and subtotal. Related records are ids — resolve a variant, membership, member or shipment on its own endpoint, and list this payment's refunds, disputes or Resolution Center cases with <code>?payment_id=</code>.
+     */
+    public WhopApiHttpResponse<Payment> retrieve(String id) {
         return retrieve(id, RetrievePaymentsRequest.builder().build());
     }
 
     /**
-     * Retrieves the details of an existing payment.
-     * <p>Required permissions:</p>
-     * <ul>
-     * <li><code>payment:basic:read</code></li>
-     * <li><code>plan:basic:read</code></li>
-     * <li><code>access_pass:basic:read</code></li>
-     * <li><code>member:email:read</code></li>
-     * <li><code>member:basic:read</code></li>
-     * <li><code>member:phone:read</code></li>
-     * <li><code>promo_code:basic:read</code></li>
-     * <li><code>shipment:basic:read</code></li>
-     * <li><code>payment:dispute:read</code></li>
-     * <li><code>payment:resolution_center_case:read</code></li>
-     * </ul>
+     * Returns one payment, including every purchased line item with its quantity and subtotal. Related records are ids — resolve a variant, membership, member or shipment on its own endpoint, and list this payment's refunds, disputes or Resolution Center cases with <code>?payment_id=</code>.
      */
-    public WhopApiHttpResponse<RetrievePaymentsResponse> retrieve(String id, RequestOptions requestOptions) {
+    public WhopApiHttpResponse<Payment> retrieve(String id, RequestOptions requestOptions) {
         return retrieve(id, RetrievePaymentsRequest.builder().build(), requestOptions);
     }
 
     /**
-     * Retrieves the details of an existing payment.
-     * <p>Required permissions:</p>
-     * <ul>
-     * <li><code>payment:basic:read</code></li>
-     * <li><code>plan:basic:read</code></li>
-     * <li><code>access_pass:basic:read</code></li>
-     * <li><code>member:email:read</code></li>
-     * <li><code>member:basic:read</code></li>
-     * <li><code>member:phone:read</code></li>
-     * <li><code>promo_code:basic:read</code></li>
-     * <li><code>shipment:basic:read</code></li>
-     * <li><code>payment:dispute:read</code></li>
-     * <li><code>payment:resolution_center_case:read</code></li>
-     * </ul>
+     * Returns one payment, including every purchased line item with its quantity and subtotal. Related records are ids — resolve a variant, membership, member or shipment on its own endpoint, and list this payment's refunds, disputes or Resolution Center cases with <code>?payment_id=</code>.
      */
-    public WhopApiHttpResponse<RetrievePaymentsResponse> retrieve(String id, RetrievePaymentsRequest request) {
+    public WhopApiHttpResponse<Payment> retrieve(String id, RetrievePaymentsRequest request) {
         return retrieve(id, request, null);
     }
 
     /**
-     * Retrieves the details of an existing payment.
-     * <p>Required permissions:</p>
-     * <ul>
-     * <li><code>payment:basic:read</code></li>
-     * <li><code>plan:basic:read</code></li>
-     * <li><code>access_pass:basic:read</code></li>
-     * <li><code>member:email:read</code></li>
-     * <li><code>member:basic:read</code></li>
-     * <li><code>member:phone:read</code></li>
-     * <li><code>promo_code:basic:read</code></li>
-     * <li><code>shipment:basic:read</code></li>
-     * <li><code>payment:dispute:read</code></li>
-     * <li><code>payment:resolution_center_case:read</code></li>
-     * </ul>
+     * Returns one payment, including every purchased line item with its quantity and subtotal. Related records are ids — resolve a variant, membership, member or shipment on its own endpoint, and list this payment's refunds, disputes or Resolution Center cases with <code>?payment_id=</code>.
      */
-    public WhopApiHttpResponse<RetrievePaymentsResponse> retrieve(
+    public WhopApiHttpResponse<Payment> retrieve(
             String id, RetrievePaymentsRequest request, RequestOptions requestOptions) {
-        HttpUrl.Builder httpUrl = HttpUrl.parse(this.clientOptions.environment().getUrl())
+        HttpUrl.Builder httpUrl = HttpUrl.parse(this.clientOptions.environment().getApiURL())
                 .newBuilder()
                 .addPathSegments("payments")
-                .addPathSegment(id);
+                .addPathSegment(PathSegments.validate(id));
         if (requestOptions != null) {
             requestOptions.getQueryParameters().forEach((_key, _value) -> {
                 httpUrl.addQueryParameter(_key, _value);
@@ -489,19 +633,24 @@ public class RawPaymentsClient {
         if (requestOptions != null && requestOptions.getTimeout().isPresent()) {
             client = clientOptions.httpClientWithTimeout(requestOptions);
         }
+        if (requestOptions != null && requestOptions.getMaxRetries().isPresent()) {
+            okhttpRequest = okhttpRequest
+                    .newBuilder()
+                    .tag(
+                            RetryInterceptor.MaxRetriesOverride.class,
+                            new RetryInterceptor.MaxRetriesOverride(
+                                    requestOptions.getMaxRetries().get()))
+                    .build();
+        }
         try (Response response = client.newCall(okhttpRequest).execute()) {
             ResponseBody responseBody = response.body();
             String responseBodyString = responseBody != null ? responseBody.string() : "{}";
             if (response.isSuccessful()) {
                 return new WhopApiHttpResponse<>(
-                        ObjectMappers.JSON_MAPPER.readValue(responseBodyString, RetrievePaymentsResponse.class),
-                        response);
+                        ObjectMappers.JSON_MAPPER.readValue(responseBodyString, Payment.class), response);
             }
             try {
                 switch (response.code()) {
-                    case 400:
-                        throw new BadRequestError(
-                                ObjectMappers.JSON_MAPPER.readValue(responseBodyString, Object.class), response);
                     case 401:
                         throw new UnauthorizedError(
                                 ObjectMappers.JSON_MAPPER.readValue(responseBodyString, Object.class), response);
@@ -511,15 +660,6 @@ public class RawPaymentsClient {
                     case 404:
                         throw new NotFoundError(
                                 ObjectMappers.JSON_MAPPER.readValue(responseBodyString, Object.class), response);
-                    case 422:
-                        throw new UnprocessableEntityError(
-                                ObjectMappers.JSON_MAPPER.readValue(responseBodyString, Object.class), response);
-                    case 429:
-                        throw new TooManyRequestsError(
-                                ObjectMappers.JSON_MAPPER.readValue(responseBodyString, Object.class), response);
-                    case 500:
-                        throw new InternalServerError(
-                                ObjectMappers.JSON_MAPPER.readValue(responseBodyString, Object.class), response);
                 }
             } catch (JsonProcessingException ignored) {
                 // unable to map error response, throwing generic error
@@ -527,589 +667,43 @@ public class RawPaymentsClient {
             Object errorBody = ObjectMappers.parseErrorBody(responseBodyString);
             throw new WhopApiApiException(
                     "Error with status code " + response.code(), response.code(), errorBody, response);
-        } catch (IOException e) {
-            throw new WhopApiException("Network error executing HTTP request", e);
-        }
-    }
-
-    /**
-     * Returns the list of fees associated with a specific payment, including platform fees and processing fees.
-     * <p>Required permissions:</p>
-     * <ul>
-     * <li><code>payment:basic:read</code></li>
-     * </ul>
-     */
-    public WhopApiHttpResponse<SyncPagingIterable<ListFeesPaymentsResponseDataItem>> listFees(String id) {
-        return listFees(id, ListFeesPaymentsRequest.builder().build());
-    }
-
-    /**
-     * Returns the list of fees associated with a specific payment, including platform fees and processing fees.
-     * <p>Required permissions:</p>
-     * <ul>
-     * <li><code>payment:basic:read</code></li>
-     * </ul>
-     */
-    public WhopApiHttpResponse<SyncPagingIterable<ListFeesPaymentsResponseDataItem>> listFees(
-            String id, RequestOptions requestOptions) {
-        return listFees(id, ListFeesPaymentsRequest.builder().build(), requestOptions);
-    }
-
-    /**
-     * Returns the list of fees associated with a specific payment, including platform fees and processing fees.
-     * <p>Required permissions:</p>
-     * <ul>
-     * <li><code>payment:basic:read</code></li>
-     * </ul>
-     */
-    public WhopApiHttpResponse<SyncPagingIterable<ListFeesPaymentsResponseDataItem>> listFees(
-            String id, ListFeesPaymentsRequest request) {
-        return listFees(id, request, null);
-    }
-
-    /**
-     * Returns the list of fees associated with a specific payment, including platform fees and processing fees.
-     * <p>Required permissions:</p>
-     * <ul>
-     * <li><code>payment:basic:read</code></li>
-     * </ul>
-     */
-    public WhopApiHttpResponse<SyncPagingIterable<ListFeesPaymentsResponseDataItem>> listFees(
-            String id, ListFeesPaymentsRequest request, RequestOptions requestOptions) {
-        HttpUrl.Builder httpUrl = HttpUrl.parse(this.clientOptions.environment().getUrl())
-                .newBuilder()
-                .addPathSegments("payments")
-                .addPathSegment(id)
-                .addPathSegments("fees");
-        if (request.getAfter().isPresent()) {
-            QueryStringMapper.addQueryParameter(
-                    httpUrl, "after", request.getAfter().get(), false);
-        }
-        if (request.getBefore().isPresent()) {
-            QueryStringMapper.addQueryParameter(
-                    httpUrl, "before", request.getBefore().get(), false);
-        }
-        if (request.getFirst().isPresent()) {
-            QueryStringMapper.addQueryParameter(
-                    httpUrl, "first", request.getFirst().get(), false);
-        }
-        if (request.getLast().isPresent()) {
-            QueryStringMapper.addQueryParameter(
-                    httpUrl, "last", request.getLast().get(), false);
-        }
-        if (requestOptions != null) {
-            requestOptions.getQueryParameters().forEach((_key, _value) -> {
-                httpUrl.addQueryParameter(_key, _value);
-            });
-        }
-        Request.Builder _requestBuilder = new Request.Builder()
-                .url(httpUrl.build())
-                .method("GET", null)
-                .headers(Headers.of(clientOptions.headers(requestOptions)))
-                .addHeader("Accept", "application/json");
-        Request okhttpRequest = _requestBuilder.build();
-        OkHttpClient client = clientOptions.httpClient();
-        if (requestOptions != null && requestOptions.getTimeout().isPresent()) {
-            client = clientOptions.httpClientWithTimeout(requestOptions);
-        }
-        try (Response response = client.newCall(okhttpRequest).execute()) {
-            ResponseBody responseBody = response.body();
-            String responseBodyString = responseBody != null ? responseBody.string() : "{}";
-            if (response.isSuccessful()) {
-                ListFeesPaymentsResponse parsedResponse =
-                        ObjectMappers.JSON_MAPPER.readValue(responseBodyString, ListFeesPaymentsResponse.class);
-                Optional<String> startingAfter = parsedResponse.getPageInfo().getEndCursor();
-                ListFeesPaymentsRequest nextRequest = ListFeesPaymentsRequest.builder()
-                        .from(request)
-                        .after(startingAfter)
-                        .build();
-                List<ListFeesPaymentsResponseDataItem> result = parsedResponse.getData();
-                return new WhopApiHttpResponse<>(
-                        new SyncPagingIterable<ListFeesPaymentsResponseDataItem>(
-                                startingAfter != null, result, parsedResponse, () -> listFees(
-                                                id, nextRequest, requestOptions)
-                                        .body()),
-                        response);
-            }
-            try {
-                switch (response.code()) {
-                    case 400:
-                        throw new BadRequestError(
-                                ObjectMappers.JSON_MAPPER.readValue(responseBodyString, Object.class), response);
-                    case 401:
-                        throw new UnauthorizedError(
-                                ObjectMappers.JSON_MAPPER.readValue(responseBodyString, Object.class), response);
-                    case 403:
-                        throw new ForbiddenError(
-                                ObjectMappers.JSON_MAPPER.readValue(responseBodyString, Object.class), response);
-                    case 404:
-                        throw new NotFoundError(
-                                ObjectMappers.JSON_MAPPER.readValue(responseBodyString, Object.class), response);
-                    case 422:
-                        throw new UnprocessableEntityError(
-                                ObjectMappers.JSON_MAPPER.readValue(responseBodyString, Object.class), response);
-                    case 429:
-                        throw new TooManyRequestsError(
-                                ObjectMappers.JSON_MAPPER.readValue(responseBodyString, Object.class), response);
-                    case 500:
-                        throw new InternalServerError(
-                                ObjectMappers.JSON_MAPPER.readValue(responseBodyString, Object.class), response);
-                }
-            } catch (JsonProcessingException ignored) {
-                // unable to map error response, throwing generic error
-            }
-            Object errorBody = ObjectMappers.parseErrorBody(responseBodyString);
-            throw new WhopApiApiException(
-                    "Error with status code " + response.code(), response.code(), errorBody, response);
-        } catch (IOException e) {
-            throw new WhopApiException("Network error executing HTTP request", e);
-        }
-    }
-
-    /**
-     * Issue a full or partial refund for a payment. The refund is processed through the original payment processor and the membership status is updated accordingly.
-     * <p>Required permissions:</p>
-     * <ul>
-     * <li><code>payment:manage</code></li>
-     * <li><code>plan:basic:read</code></li>
-     * <li><code>access_pass:basic:read</code></li>
-     * <li><code>member:email:read</code></li>
-     * <li><code>member:basic:read</code></li>
-     * <li><code>member:phone:read</code></li>
-     * <li><code>promo_code:basic:read</code></li>
-     * <li><code>shipment:basic:read</code></li>
-     * <li><code>payment:dispute:read</code></li>
-     * <li><code>payment:resolution_center_case:read</code></li>
-     * </ul>
-     */
-    public WhopApiHttpResponse<Payment> refund(String id) {
-        return refund(id, RefundPaymentsRequest.builder().build());
-    }
-
-    /**
-     * Issue a full or partial refund for a payment. The refund is processed through the original payment processor and the membership status is updated accordingly.
-     * <p>Required permissions:</p>
-     * <ul>
-     * <li><code>payment:manage</code></li>
-     * <li><code>plan:basic:read</code></li>
-     * <li><code>access_pass:basic:read</code></li>
-     * <li><code>member:email:read</code></li>
-     * <li><code>member:basic:read</code></li>
-     * <li><code>member:phone:read</code></li>
-     * <li><code>promo_code:basic:read</code></li>
-     * <li><code>shipment:basic:read</code></li>
-     * <li><code>payment:dispute:read</code></li>
-     * <li><code>payment:resolution_center_case:read</code></li>
-     * </ul>
-     */
-    public WhopApiHttpResponse<Payment> refund(String id, RequestOptions requestOptions) {
-        return refund(id, RefundPaymentsRequest.builder().build(), requestOptions);
-    }
-
-    /**
-     * Issue a full or partial refund for a payment. The refund is processed through the original payment processor and the membership status is updated accordingly.
-     * <p>Required permissions:</p>
-     * <ul>
-     * <li><code>payment:manage</code></li>
-     * <li><code>plan:basic:read</code></li>
-     * <li><code>access_pass:basic:read</code></li>
-     * <li><code>member:email:read</code></li>
-     * <li><code>member:basic:read</code></li>
-     * <li><code>member:phone:read</code></li>
-     * <li><code>promo_code:basic:read</code></li>
-     * <li><code>shipment:basic:read</code></li>
-     * <li><code>payment:dispute:read</code></li>
-     * <li><code>payment:resolution_center_case:read</code></li>
-     * </ul>
-     */
-    public WhopApiHttpResponse<Payment> refund(String id, RefundPaymentsRequest request) {
-        return refund(id, request, null);
-    }
-
-    /**
-     * Issue a full or partial refund for a payment. The refund is processed through the original payment processor and the membership status is updated accordingly.
-     * <p>Required permissions:</p>
-     * <ul>
-     * <li><code>payment:manage</code></li>
-     * <li><code>plan:basic:read</code></li>
-     * <li><code>access_pass:basic:read</code></li>
-     * <li><code>member:email:read</code></li>
-     * <li><code>member:basic:read</code></li>
-     * <li><code>member:phone:read</code></li>
-     * <li><code>promo_code:basic:read</code></li>
-     * <li><code>shipment:basic:read</code></li>
-     * <li><code>payment:dispute:read</code></li>
-     * <li><code>payment:resolution_center_case:read</code></li>
-     * </ul>
-     */
-    public WhopApiHttpResponse<Payment> refund(
-            String id, RefundPaymentsRequest request, RequestOptions requestOptions) {
-        HttpUrl.Builder httpUrl = HttpUrl.parse(this.clientOptions.environment().getUrl())
-                .newBuilder()
-                .addPathSegments("payments")
-                .addPathSegment(id)
-                .addPathSegments("refund");
-        if (requestOptions != null) {
-            requestOptions.getQueryParameters().forEach((_key, _value) -> {
-                httpUrl.addQueryParameter(_key, _value);
-            });
-        }
-        RequestBody body;
-        try {
-            body = RequestBody.create(
-                    ObjectMappers.JSON_MAPPER.writeValueAsBytes(request), MediaTypes.APPLICATION_JSON);
         } catch (JsonProcessingException e) {
-            throw new WhopApiException("Failed to serialize request", e);
-        }
-        Request okhttpRequest = new Request.Builder()
-                .url(httpUrl.build())
-                .method("POST", body)
-                .headers(Headers.of(clientOptions.headers(requestOptions)))
-                .addHeader("Content-Type", "application/json")
-                .addHeader("Accept", "application/json")
-                .build();
-        OkHttpClient client = clientOptions.httpClient();
-        if (requestOptions != null && requestOptions.getTimeout().isPresent()) {
-            client = clientOptions.httpClientWithTimeout(requestOptions);
-        }
-        try (Response response = client.newCall(okhttpRequest).execute()) {
-            ResponseBody responseBody = response.body();
-            String responseBodyString = responseBody != null ? responseBody.string() : "{}";
-            if (response.isSuccessful()) {
-                return new WhopApiHttpResponse<>(
-                        ObjectMappers.JSON_MAPPER.readValue(responseBodyString, Payment.class), response);
-            }
-            try {
-                switch (response.code()) {
-                    case 400:
-                        throw new BadRequestError(
-                                ObjectMappers.JSON_MAPPER.readValue(responseBodyString, Object.class), response);
-                    case 401:
-                        throw new UnauthorizedError(
-                                ObjectMappers.JSON_MAPPER.readValue(responseBodyString, Object.class), response);
-                    case 403:
-                        throw new ForbiddenError(
-                                ObjectMappers.JSON_MAPPER.readValue(responseBodyString, Object.class), response);
-                    case 404:
-                        throw new NotFoundError(
-                                ObjectMappers.JSON_MAPPER.readValue(responseBodyString, Object.class), response);
-                    case 422:
-                        throw new UnprocessableEntityError(
-                                ObjectMappers.JSON_MAPPER.readValue(responseBodyString, Object.class), response);
-                    case 429:
-                        throw new TooManyRequestsError(
-                                ObjectMappers.JSON_MAPPER.readValue(responseBodyString, Object.class), response);
-                    case 500:
-                        throw new InternalServerError(
-                                ObjectMappers.JSON_MAPPER.readValue(responseBodyString, Object.class), response);
-                }
-            } catch (JsonProcessingException ignored) {
-                // unable to map error response, throwing generic error
-            }
-            Object errorBody = ObjectMappers.parseErrorBody(responseBodyString);
-            throw new WhopApiApiException(
-                    "Error with status code " + response.code(), response.code(), errorBody, response);
+            throw new WhopApiException("Failed to deserialize response: " + e.getMessage(), e);
         } catch (IOException e) {
             throw new WhopApiException("Network error executing HTTP request", e);
         }
     }
 
     /**
-     * Retry a failed or pending payment. This re-attempts the charge using the original payment method and plan details.
-     * <p>Required permissions:</p>
-     * <ul>
-     * <li><code>payment:manage</code></li>
-     * <li><code>plan:basic:read</code></li>
-     * <li><code>access_pass:basic:read</code></li>
-     * <li><code>member:email:read</code></li>
-     * <li><code>member:basic:read</code></li>
-     * <li><code>member:phone:read</code></li>
-     * <li><code>promo_code:basic:read</code></li>
-     * <li><code>shipment:basic:read</code></li>
-     * <li><code>payment:dispute:read</code></li>
-     * <li><code>payment:resolution_center_case:read</code></li>
-     * </ul>
+     * Updates a payment's <code>shipping_address</code> or <code>return_url</code>.
      */
-    public WhopApiHttpResponse<Payment> retry(String id) {
-        return retry(id, RetryPaymentsRequest.builder().build());
+    public WhopApiHttpResponse<Payment> update(String id) {
+        return update(id, UpdatePaymentsRequest.builder().build());
     }
 
     /**
-     * Retry a failed or pending payment. This re-attempts the charge using the original payment method and plan details.
-     * <p>Required permissions:</p>
-     * <ul>
-     * <li><code>payment:manage</code></li>
-     * <li><code>plan:basic:read</code></li>
-     * <li><code>access_pass:basic:read</code></li>
-     * <li><code>member:email:read</code></li>
-     * <li><code>member:basic:read</code></li>
-     * <li><code>member:phone:read</code></li>
-     * <li><code>promo_code:basic:read</code></li>
-     * <li><code>shipment:basic:read</code></li>
-     * <li><code>payment:dispute:read</code></li>
-     * <li><code>payment:resolution_center_case:read</code></li>
-     * </ul>
+     * Updates a payment's <code>shipping_address</code> or <code>return_url</code>.
      */
-    public WhopApiHttpResponse<Payment> retry(String id, RequestOptions requestOptions) {
-        return retry(id, RetryPaymentsRequest.builder().build(), requestOptions);
+    public WhopApiHttpResponse<Payment> update(String id, RequestOptions requestOptions) {
+        return update(id, UpdatePaymentsRequest.builder().build(), requestOptions);
     }
 
     /**
-     * Retry a failed or pending payment. This re-attempts the charge using the original payment method and plan details.
-     * <p>Required permissions:</p>
-     * <ul>
-     * <li><code>payment:manage</code></li>
-     * <li><code>plan:basic:read</code></li>
-     * <li><code>access_pass:basic:read</code></li>
-     * <li><code>member:email:read</code></li>
-     * <li><code>member:basic:read</code></li>
-     * <li><code>member:phone:read</code></li>
-     * <li><code>promo_code:basic:read</code></li>
-     * <li><code>shipment:basic:read</code></li>
-     * <li><code>payment:dispute:read</code></li>
-     * <li><code>payment:resolution_center_case:read</code></li>
-     * </ul>
+     * Updates a payment's <code>shipping_address</code> or <code>return_url</code>.
      */
-    public WhopApiHttpResponse<Payment> retry(String id, RetryPaymentsRequest request) {
-        return retry(id, request, null);
+    public WhopApiHttpResponse<Payment> update(String id, UpdatePaymentsRequest request) {
+        return update(id, request, null);
     }
 
     /**
-     * Retry a failed or pending payment. This re-attempts the charge using the original payment method and plan details.
-     * <p>Required permissions:</p>
-     * <ul>
-     * <li><code>payment:manage</code></li>
-     * <li><code>plan:basic:read</code></li>
-     * <li><code>access_pass:basic:read</code></li>
-     * <li><code>member:email:read</code></li>
-     * <li><code>member:basic:read</code></li>
-     * <li><code>member:phone:read</code></li>
-     * <li><code>promo_code:basic:read</code></li>
-     * <li><code>shipment:basic:read</code></li>
-     * <li><code>payment:dispute:read</code></li>
-     * <li><code>payment:resolution_center_case:read</code></li>
-     * </ul>
+     * Updates a payment's <code>shipping_address</code> or <code>return_url</code>.
      */
-    public WhopApiHttpResponse<Payment> retry(String id, RetryPaymentsRequest request, RequestOptions requestOptions) {
-        HttpUrl.Builder httpUrl = HttpUrl.parse(this.clientOptions.environment().getUrl())
+    public WhopApiHttpResponse<Payment> update(
+            String id, UpdatePaymentsRequest request, RequestOptions requestOptions) {
+        HttpUrl.Builder httpUrl = HttpUrl.parse(this.clientOptions.environment().getApiURL())
                 .newBuilder()
                 .addPathSegments("payments")
-                .addPathSegment(id)
-                .addPathSegments("retry");
-        if (requestOptions != null) {
-            requestOptions.getQueryParameters().forEach((_key, _value) -> {
-                httpUrl.addQueryParameter(_key, _value);
-            });
-        }
-        Request.Builder _requestBuilder = new Request.Builder()
-                .url(httpUrl.build())
-                .method("POST", RequestBody.create("", null))
-                .headers(Headers.of(clientOptions.headers(requestOptions)))
-                .addHeader("Accept", "application/json");
-        Request okhttpRequest = _requestBuilder.build();
-        OkHttpClient client = clientOptions.httpClient();
-        if (requestOptions != null && requestOptions.getTimeout().isPresent()) {
-            client = clientOptions.httpClientWithTimeout(requestOptions);
-        }
-        try (Response response = client.newCall(okhttpRequest).execute()) {
-            ResponseBody responseBody = response.body();
-            String responseBodyString = responseBody != null ? responseBody.string() : "{}";
-            if (response.isSuccessful()) {
-                return new WhopApiHttpResponse<>(
-                        ObjectMappers.JSON_MAPPER.readValue(responseBodyString, Payment.class), response);
-            }
-            try {
-                switch (response.code()) {
-                    case 400:
-                        throw new BadRequestError(
-                                ObjectMappers.JSON_MAPPER.readValue(responseBodyString, Object.class), response);
-                    case 401:
-                        throw new UnauthorizedError(
-                                ObjectMappers.JSON_MAPPER.readValue(responseBodyString, Object.class), response);
-                    case 403:
-                        throw new ForbiddenError(
-                                ObjectMappers.JSON_MAPPER.readValue(responseBodyString, Object.class), response);
-                    case 404:
-                        throw new NotFoundError(
-                                ObjectMappers.JSON_MAPPER.readValue(responseBodyString, Object.class), response);
-                    case 422:
-                        throw new UnprocessableEntityError(
-                                ObjectMappers.JSON_MAPPER.readValue(responseBodyString, Object.class), response);
-                    case 429:
-                        throw new TooManyRequestsError(
-                                ObjectMappers.JSON_MAPPER.readValue(responseBodyString, Object.class), response);
-                    case 500:
-                        throw new InternalServerError(
-                                ObjectMappers.JSON_MAPPER.readValue(responseBodyString, Object.class), response);
-                }
-            } catch (JsonProcessingException ignored) {
-                // unable to map error response, throwing generic error
-            }
-            Object errorBody = ObjectMappers.parseErrorBody(responseBodyString);
-            throw new WhopApiApiException(
-                    "Error with status code " + response.code(), response.code(), errorBody, response);
-        } catch (IOException e) {
-            throw new WhopApiException("Network error executing HTTP request", e);
-        }
-    }
-
-    /**
-     * Void a payment that has not yet been settled. Voiding cancels the payment before it is captured by the payment processor.
-     * <p>Required permissions:</p>
-     * <ul>
-     * <li><code>payment:manage</code></li>
-     * <li><code>plan:basic:read</code></li>
-     * <li><code>access_pass:basic:read</code></li>
-     * <li><code>member:email:read</code></li>
-     * <li><code>member:basic:read</code></li>
-     * <li><code>member:phone:read</code></li>
-     * <li><code>promo_code:basic:read</code></li>
-     * <li><code>shipment:basic:read</code></li>
-     * <li><code>payment:dispute:read</code></li>
-     * <li><code>payment:resolution_center_case:read</code></li>
-     * </ul>
-     */
-    public WhopApiHttpResponse<Payment> void_(String id) {
-        return void_(id, VoidPaymentsRequest.builder().build());
-    }
-
-    /**
-     * Void a payment that has not yet been settled. Voiding cancels the payment before it is captured by the payment processor.
-     * <p>Required permissions:</p>
-     * <ul>
-     * <li><code>payment:manage</code></li>
-     * <li><code>plan:basic:read</code></li>
-     * <li><code>access_pass:basic:read</code></li>
-     * <li><code>member:email:read</code></li>
-     * <li><code>member:basic:read</code></li>
-     * <li><code>member:phone:read</code></li>
-     * <li><code>promo_code:basic:read</code></li>
-     * <li><code>shipment:basic:read</code></li>
-     * <li><code>payment:dispute:read</code></li>
-     * <li><code>payment:resolution_center_case:read</code></li>
-     * </ul>
-     */
-    public WhopApiHttpResponse<Payment> void_(String id, RequestOptions requestOptions) {
-        return void_(id, VoidPaymentsRequest.builder().build(), requestOptions);
-    }
-
-    /**
-     * Void a payment that has not yet been settled. Voiding cancels the payment before it is captured by the payment processor.
-     * <p>Required permissions:</p>
-     * <ul>
-     * <li><code>payment:manage</code></li>
-     * <li><code>plan:basic:read</code></li>
-     * <li><code>access_pass:basic:read</code></li>
-     * <li><code>member:email:read</code></li>
-     * <li><code>member:basic:read</code></li>
-     * <li><code>member:phone:read</code></li>
-     * <li><code>promo_code:basic:read</code></li>
-     * <li><code>shipment:basic:read</code></li>
-     * <li><code>payment:dispute:read</code></li>
-     * <li><code>payment:resolution_center_case:read</code></li>
-     * </ul>
-     */
-    public WhopApiHttpResponse<Payment> void_(String id, VoidPaymentsRequest request) {
-        return void_(id, request, null);
-    }
-
-    /**
-     * Void a payment that has not yet been settled. Voiding cancels the payment before it is captured by the payment processor.
-     * <p>Required permissions:</p>
-     * <ul>
-     * <li><code>payment:manage</code></li>
-     * <li><code>plan:basic:read</code></li>
-     * <li><code>access_pass:basic:read</code></li>
-     * <li><code>member:email:read</code></li>
-     * <li><code>member:basic:read</code></li>
-     * <li><code>member:phone:read</code></li>
-     * <li><code>promo_code:basic:read</code></li>
-     * <li><code>shipment:basic:read</code></li>
-     * <li><code>payment:dispute:read</code></li>
-     * <li><code>payment:resolution_center_case:read</code></li>
-     * </ul>
-     */
-    public WhopApiHttpResponse<Payment> void_(String id, VoidPaymentsRequest request, RequestOptions requestOptions) {
-        HttpUrl.Builder httpUrl = HttpUrl.parse(this.clientOptions.environment().getUrl())
-                .newBuilder()
-                .addPathSegments("payments")
-                .addPathSegment(id)
-                .addPathSegments("void");
-        if (requestOptions != null) {
-            requestOptions.getQueryParameters().forEach((_key, _value) -> {
-                httpUrl.addQueryParameter(_key, _value);
-            });
-        }
-        Request.Builder _requestBuilder = new Request.Builder()
-                .url(httpUrl.build())
-                .method("POST", RequestBody.create("", null))
-                .headers(Headers.of(clientOptions.headers(requestOptions)))
-                .addHeader("Accept", "application/json");
-        Request okhttpRequest = _requestBuilder.build();
-        OkHttpClient client = clientOptions.httpClient();
-        if (requestOptions != null && requestOptions.getTimeout().isPresent()) {
-            client = clientOptions.httpClientWithTimeout(requestOptions);
-        }
-        try (Response response = client.newCall(okhttpRequest).execute()) {
-            ResponseBody responseBody = response.body();
-            String responseBodyString = responseBody != null ? responseBody.string() : "{}";
-            if (response.isSuccessful()) {
-                return new WhopApiHttpResponse<>(
-                        ObjectMappers.JSON_MAPPER.readValue(responseBodyString, Payment.class), response);
-            }
-            try {
-                switch (response.code()) {
-                    case 400:
-                        throw new BadRequestError(
-                                ObjectMappers.JSON_MAPPER.readValue(responseBodyString, Object.class), response);
-                    case 401:
-                        throw new UnauthorizedError(
-                                ObjectMappers.JSON_MAPPER.readValue(responseBodyString, Object.class), response);
-                    case 403:
-                        throw new ForbiddenError(
-                                ObjectMappers.JSON_MAPPER.readValue(responseBodyString, Object.class), response);
-                    case 404:
-                        throw new NotFoundError(
-                                ObjectMappers.JSON_MAPPER.readValue(responseBodyString, Object.class), response);
-                    case 422:
-                        throw new UnprocessableEntityError(
-                                ObjectMappers.JSON_MAPPER.readValue(responseBodyString, Object.class), response);
-                    case 429:
-                        throw new TooManyRequestsError(
-                                ObjectMappers.JSON_MAPPER.readValue(responseBodyString, Object.class), response);
-                    case 500:
-                        throw new InternalServerError(
-                                ObjectMappers.JSON_MAPPER.readValue(responseBodyString, Object.class), response);
-                }
-            } catch (JsonProcessingException ignored) {
-                // unable to map error response, throwing generic error
-            }
-            Object errorBody = ObjectMappers.parseErrorBody(responseBodyString);
-            throw new WhopApiApiException(
-                    "Error with status code " + response.code(), response.code(), errorBody, response);
-        } catch (IOException e) {
-            throw new WhopApiException("Network error executing HTTP request", e);
-        }
-    }
-
-    /**
-     * Changes where the buyer lands after completing an off-site step, up until they return. Accepts either a secret key or the payment's own <code>client_secret</code>, so the surface that knows the final destination can set it.
-     */
-    public WhopApiHttpResponse<PaymentStatus> updateReturnUrl(
-            String paymentId, UpdateReturnUrlPaymentsRequest request) {
-        return updateReturnUrl(paymentId, request, null);
-    }
-
-    /**
-     * Changes where the buyer lands after completing an off-site step, up until they return. Accepts either a secret key or the payment's own <code>client_secret</code>, so the surface that knows the final destination can set it.
-     */
-    public WhopApiHttpResponse<PaymentStatus> updateReturnUrl(
-            String paymentId, UpdateReturnUrlPaymentsRequest request, RequestOptions requestOptions) {
-        HttpUrl.Builder httpUrl = HttpUrl.parse(this.clientOptions.environment().getUrl())
-                .newBuilder()
-                .addPathSegments("payments")
-                .addPathSegment(paymentId)
-                .addPathSegments("return_url");
+                .addPathSegment(PathSegments.validate(id));
         if (requestOptions != null) {
             requestOptions.getQueryParameters().forEach((_key, _value) -> {
                 httpUrl.addQueryParameter(_key, _value);
@@ -1118,7 +712,9 @@ public class RawPaymentsClient {
         RequestBody body;
         try {
             body = RequestBody.create(
-                    ObjectMappers.JSON_MAPPER.writeValueAsBytes(request), MediaTypes.APPLICATION_JSON);
+                    ObjectMappers.JSON_MAPPER.writeValueAsBytes(BodyProperties.merge(
+                            request, requestOptions != null ? requestOptions.getBodyProperties() : null)),
+                    MediaTypes.APPLICATION_JSON);
         } catch (JsonProcessingException e) {
             throw new WhopApiException("Failed to serialize request", e);
         }
@@ -1133,6 +729,761 @@ public class RawPaymentsClient {
         if (requestOptions != null && requestOptions.getTimeout().isPresent()) {
             client = clientOptions.httpClientWithTimeout(requestOptions);
         }
+        if (requestOptions != null && requestOptions.getMaxRetries().isPresent()) {
+            okhttpRequest = okhttpRequest
+                    .newBuilder()
+                    .tag(
+                            RetryInterceptor.MaxRetriesOverride.class,
+                            new RetryInterceptor.MaxRetriesOverride(
+                                    requestOptions.getMaxRetries().get()))
+                    .build();
+        }
+        try (Response response = client.newCall(okhttpRequest).execute()) {
+            ResponseBody responseBody = response.body();
+            String responseBodyString = responseBody != null ? responseBody.string() : "{}";
+            if (response.isSuccessful()) {
+                return new WhopApiHttpResponse<>(
+                        ObjectMappers.JSON_MAPPER.readValue(responseBodyString, Payment.class), response);
+            }
+            try {
+                switch (response.code()) {
+                    case 400:
+                        throw new BadRequestError(
+                                ObjectMappers.JSON_MAPPER.readValue(responseBodyString, Object.class), response);
+                    case 401:
+                        throw new UnauthorizedError(
+                                ObjectMappers.JSON_MAPPER.readValue(responseBodyString, Object.class), response);
+                    case 403:
+                        throw new ForbiddenError(
+                                ObjectMappers.JSON_MAPPER.readValue(responseBodyString, Object.class), response);
+                    case 404:
+                        throw new NotFoundError(
+                                ObjectMappers.JSON_MAPPER.readValue(responseBodyString, Object.class), response);
+                }
+            } catch (JsonProcessingException ignored) {
+                // unable to map error response, throwing generic error
+            }
+            Object errorBody = ObjectMappers.parseErrorBody(responseBodyString);
+            throw new WhopApiApiException(
+                    "Error with status code " + response.code(), response.code(), errorBody, response);
+        } catch (JsonProcessingException e) {
+            throw new WhopApiException("Failed to deserialize response: " + e.getMessage(), e);
+        } catch (IOException e) {
+            throw new WhopApiException("Network error executing HTTP request", e);
+        }
+    }
+
+    /**
+     * Captures the full amount of a card payment created with <code>capture: false</code>. The payment must still be in <code>requires_capture</code> before <code>capture_expires_at</code>. Partial capture, multiple captures, capturing more than the authorized amount, and tips are not supported.
+     */
+    public WhopApiHttpResponse<PaymentStatus> capture(String id) {
+        return capture(id, CapturePaymentsRequest.builder().build());
+    }
+
+    /**
+     * Captures the full amount of a card payment created with <code>capture: false</code>. The payment must still be in <code>requires_capture</code> before <code>capture_expires_at</code>. Partial capture, multiple captures, capturing more than the authorized amount, and tips are not supported.
+     */
+    public WhopApiHttpResponse<PaymentStatus> capture(String id, RequestOptions requestOptions) {
+        return capture(id, CapturePaymentsRequest.builder().build(), requestOptions);
+    }
+
+    /**
+     * Captures the full amount of a card payment created with <code>capture: false</code>. The payment must still be in <code>requires_capture</code> before <code>capture_expires_at</code>. Partial capture, multiple captures, capturing more than the authorized amount, and tips are not supported.
+     */
+    public WhopApiHttpResponse<PaymentStatus> capture(String id, CapturePaymentsRequest request) {
+        return capture(id, request, null);
+    }
+
+    /**
+     * Captures the full amount of a card payment created with <code>capture: false</code>. The payment must still be in <code>requires_capture</code> before <code>capture_expires_at</code>. Partial capture, multiple captures, capturing more than the authorized amount, and tips are not supported.
+     */
+    public WhopApiHttpResponse<PaymentStatus> capture(
+            String id, CapturePaymentsRequest request, RequestOptions requestOptions) {
+        HttpUrl.Builder httpUrl = HttpUrl.parse(this.clientOptions.environment().getApiURL())
+                .newBuilder()
+                .addPathSegments("payments")
+                .addPathSegment(PathSegments.validate(id))
+                .addPathSegments("capture");
+        if (requestOptions != null) {
+            requestOptions.getQueryParameters().forEach((_key, _value) -> {
+                httpUrl.addQueryParameter(_key, _value);
+            });
+        }
+        Request.Builder _requestBuilder = new Request.Builder()
+                .url(httpUrl.build())
+                .method(
+                        "POST",
+                        BodyProperties.toRequestBody(
+                                requestOptions != null ? requestOptions.getBodyProperties() : null,
+                                RequestBody.create("", null)))
+                .headers(Headers.of(clientOptions.headers(requestOptions)))
+                .addHeader("Accept", "application/json");
+        Request okhttpRequest = _requestBuilder.build();
+        OkHttpClient client = clientOptions.httpClient();
+        if (requestOptions != null && requestOptions.getTimeout().isPresent()) {
+            client = clientOptions.httpClientWithTimeout(requestOptions);
+        }
+        if (requestOptions != null && requestOptions.getMaxRetries().isPresent()) {
+            okhttpRequest = okhttpRequest
+                    .newBuilder()
+                    .tag(
+                            RetryInterceptor.MaxRetriesOverride.class,
+                            new RetryInterceptor.MaxRetriesOverride(
+                                    requestOptions.getMaxRetries().get()))
+                    .build();
+        }
+        try (Response response = client.newCall(okhttpRequest).execute()) {
+            ResponseBody responseBody = response.body();
+            String responseBodyString = responseBody != null ? responseBody.string() : "{}";
+            if (response.isSuccessful()) {
+                return new WhopApiHttpResponse<>(
+                        ObjectMappers.JSON_MAPPER.readValue(responseBodyString, PaymentStatus.class), response);
+            }
+            try {
+                switch (response.code()) {
+                    case 401:
+                        throw new UnauthorizedError(
+                                ObjectMappers.JSON_MAPPER.readValue(responseBodyString, Object.class), response);
+                    case 403:
+                        throw new ForbiddenError(
+                                ObjectMappers.JSON_MAPPER.readValue(responseBodyString, Object.class), response);
+                    case 404:
+                        throw new NotFoundError(
+                                ObjectMappers.JSON_MAPPER.readValue(responseBodyString, Object.class), response);
+                    case 409:
+                        throw new ConflictError(
+                                ObjectMappers.JSON_MAPPER.readValue(responseBodyString, Object.class), response);
+                }
+            } catch (JsonProcessingException ignored) {
+                // unable to map error response, throwing generic error
+            }
+            Object errorBody = ObjectMappers.parseErrorBody(responseBodyString);
+            throw new WhopApiApiException(
+                    "Error with status code " + response.code(), response.code(), errorBody, response);
+        } catch (JsonProcessingException e) {
+            throw new WhopApiException("Failed to deserialize response: " + e.getMessage(), e);
+        } catch (IOException e) {
+            throw new WhopApiException("Network error executing HTTP request", e);
+        }
+    }
+
+    /**
+     * Returns the fee breakdown of one payment — Whop's fee, processing, affiliate and other lines — each in the currency it was collected in and converted to the payment's settlement currency. The list is complete in one page.
+     */
+    public WhopApiHttpResponse<ListFeesPaymentsResponse> listFees(String id) {
+        return listFees(id, ListFeesPaymentsRequest.builder().build());
+    }
+
+    /**
+     * Returns the fee breakdown of one payment — Whop's fee, processing, affiliate and other lines — each in the currency it was collected in and converted to the payment's settlement currency. The list is complete in one page.
+     */
+    public WhopApiHttpResponse<ListFeesPaymentsResponse> listFees(String id, RequestOptions requestOptions) {
+        return listFees(id, ListFeesPaymentsRequest.builder().build(), requestOptions);
+    }
+
+    /**
+     * Returns the fee breakdown of one payment — Whop's fee, processing, affiliate and other lines — each in the currency it was collected in and converted to the payment's settlement currency. The list is complete in one page.
+     */
+    public WhopApiHttpResponse<ListFeesPaymentsResponse> listFees(String id, ListFeesPaymentsRequest request) {
+        return listFees(id, request, null);
+    }
+
+    /**
+     * Returns the fee breakdown of one payment — Whop's fee, processing, affiliate and other lines — each in the currency it was collected in and converted to the payment's settlement currency. The list is complete in one page.
+     */
+    public WhopApiHttpResponse<ListFeesPaymentsResponse> listFees(
+            String id, ListFeesPaymentsRequest request, RequestOptions requestOptions) {
+        HttpUrl.Builder httpUrl = HttpUrl.parse(this.clientOptions.environment().getApiURL())
+                .newBuilder()
+                .addPathSegments("payments")
+                .addPathSegment(PathSegments.validate(id))
+                .addPathSegments("fees");
+        if (requestOptions != null) {
+            requestOptions.getQueryParameters().forEach((_key, _value) -> {
+                httpUrl.addQueryParameter(_key, _value);
+            });
+        }
+        Request.Builder _requestBuilder = new Request.Builder()
+                .url(httpUrl.build())
+                .method("GET", null)
+                .headers(Headers.of(clientOptions.headers(requestOptions)))
+                .addHeader("Accept", "application/json");
+        Request okhttpRequest = _requestBuilder.build();
+        OkHttpClient client = clientOptions.httpClient();
+        if (requestOptions != null && requestOptions.getTimeout().isPresent()) {
+            client = clientOptions.httpClientWithTimeout(requestOptions);
+        }
+        if (requestOptions != null && requestOptions.getMaxRetries().isPresent()) {
+            okhttpRequest = okhttpRequest
+                    .newBuilder()
+                    .tag(
+                            RetryInterceptor.MaxRetriesOverride.class,
+                            new RetryInterceptor.MaxRetriesOverride(
+                                    requestOptions.getMaxRetries().get()))
+                    .build();
+        }
+        try (Response response = client.newCall(okhttpRequest).execute()) {
+            ResponseBody responseBody = response.body();
+            String responseBodyString = responseBody != null ? responseBody.string() : "{}";
+            if (response.isSuccessful()) {
+                return new WhopApiHttpResponse<>(
+                        ObjectMappers.JSON_MAPPER.readValue(responseBodyString, ListFeesPaymentsResponse.class),
+                        response);
+            }
+            try {
+                switch (response.code()) {
+                    case 401:
+                        throw new UnauthorizedError(
+                                ObjectMappers.JSON_MAPPER.readValue(responseBodyString, Object.class), response);
+                    case 404:
+                        throw new NotFoundError(
+                                ObjectMappers.JSON_MAPPER.readValue(responseBodyString, Object.class), response);
+                }
+            } catch (JsonProcessingException ignored) {
+                // unable to map error response, throwing generic error
+            }
+            Object errorBody = ObjectMappers.parseErrorBody(responseBodyString);
+            throw new WhopApiApiException(
+                    "Error with status code " + response.code(), response.code(), errorBody, response);
+        } catch (JsonProcessingException e) {
+            throw new WhopApiException("Failed to deserialize response: " + e.getMessage(), e);
+        } catch (IOException e) {
+            throw new WhopApiException("Network error executing HTTP request", e);
+        }
+    }
+
+    /**
+     * Generates the payment's receipt (invoice) as a PDF and returns a short-lived link to download it. Each call generates a new file and link, so this endpoint does not replay <code>Idempotency-Key</code> responses.
+     */
+    public WhopApiHttpResponse<PaymentPdf> generatePdf(String id) {
+        return generatePdf(id, GeneratePdfPaymentsRequest.builder().build());
+    }
+
+    /**
+     * Generates the payment's receipt (invoice) as a PDF and returns a short-lived link to download it. Each call generates a new file and link, so this endpoint does not replay <code>Idempotency-Key</code> responses.
+     */
+    public WhopApiHttpResponse<PaymentPdf> generatePdf(String id, RequestOptions requestOptions) {
+        return generatePdf(id, GeneratePdfPaymentsRequest.builder().build(), requestOptions);
+    }
+
+    /**
+     * Generates the payment's receipt (invoice) as a PDF and returns a short-lived link to download it. Each call generates a new file and link, so this endpoint does not replay <code>Idempotency-Key</code> responses.
+     */
+    public WhopApiHttpResponse<PaymentPdf> generatePdf(String id, GeneratePdfPaymentsRequest request) {
+        return generatePdf(id, request, null);
+    }
+
+    /**
+     * Generates the payment's receipt (invoice) as a PDF and returns a short-lived link to download it. Each call generates a new file and link, so this endpoint does not replay <code>Idempotency-Key</code> responses.
+     */
+    public WhopApiHttpResponse<PaymentPdf> generatePdf(
+            String id, GeneratePdfPaymentsRequest request, RequestOptions requestOptions) {
+        HttpUrl.Builder httpUrl = HttpUrl.parse(this.clientOptions.environment().getApiURL())
+                .newBuilder()
+                .addPathSegments("payments")
+                .addPathSegment(PathSegments.validate(id))
+                .addPathSegments("generate_pdf");
+        if (requestOptions != null) {
+            requestOptions.getQueryParameters().forEach((_key, _value) -> {
+                httpUrl.addQueryParameter(_key, _value);
+            });
+        }
+        Request.Builder _requestBuilder = new Request.Builder()
+                .url(httpUrl.build())
+                .method(
+                        "POST",
+                        BodyProperties.toRequestBody(
+                                requestOptions != null ? requestOptions.getBodyProperties() : null,
+                                RequestBody.create("", null)))
+                .headers(Headers.of(clientOptions.headers(requestOptions)))
+                .addHeader("Accept", "application/json");
+        Request okhttpRequest = _requestBuilder.build();
+        OkHttpClient client = clientOptions.httpClient();
+        if (requestOptions != null && requestOptions.getTimeout().isPresent()) {
+            client = clientOptions.httpClientWithTimeout(requestOptions);
+        }
+        if (requestOptions != null && requestOptions.getMaxRetries().isPresent()) {
+            okhttpRequest = okhttpRequest
+                    .newBuilder()
+                    .tag(
+                            RetryInterceptor.MaxRetriesOverride.class,
+                            new RetryInterceptor.MaxRetriesOverride(
+                                    requestOptions.getMaxRetries().get()))
+                    .build();
+        }
+        try (Response response = client.newCall(okhttpRequest).execute()) {
+            ResponseBody responseBody = response.body();
+            String responseBodyString = responseBody != null ? responseBody.string() : "{}";
+            if (response.isSuccessful()) {
+                return new WhopApiHttpResponse<>(
+                        ObjectMappers.JSON_MAPPER.readValue(responseBodyString, PaymentPdf.class), response);
+            }
+            try {
+                switch (response.code()) {
+                    case 401:
+                        throw new UnauthorizedError(
+                                ObjectMappers.JSON_MAPPER.readValue(responseBodyString, Object.class), response);
+                    case 403:
+                        throw new ForbiddenError(
+                                ObjectMappers.JSON_MAPPER.readValue(responseBodyString, Object.class), response);
+                    case 404:
+                        throw new NotFoundError(
+                                ObjectMappers.JSON_MAPPER.readValue(responseBodyString, Object.class), response);
+                    case 409:
+                        throw new ConflictError(
+                                ObjectMappers.JSON_MAPPER.readValue(responseBodyString, Object.class), response);
+                }
+            } catch (JsonProcessingException ignored) {
+                // unable to map error response, throwing generic error
+            }
+            Object errorBody = ObjectMappers.parseErrorBody(responseBodyString);
+            throw new WhopApiApiException(
+                    "Error with status code " + response.code(), response.code(), errorBody, response);
+        } catch (JsonProcessingException e) {
+            throw new WhopApiException("Failed to deserialize response: " + e.getMessage(), e);
+        } catch (IOException e) {
+            throw new WhopApiException("Network error executing HTTP request", e);
+        }
+    }
+
+    /**
+     * Refunds all or part of a payment through the processor that charged it, and updates its membership to match. The buyer is emailed, the affiliate commission on the payment is clawed back, and any open Resolution Center case on the payment is closed.
+     */
+    public WhopApiHttpResponse<Payment> refund(String id) {
+        return refund(id, RefundPaymentsRequest.builder().build());
+    }
+
+    /**
+     * Refunds all or part of a payment through the processor that charged it, and updates its membership to match. The buyer is emailed, the affiliate commission on the payment is clawed back, and any open Resolution Center case on the payment is closed.
+     */
+    public WhopApiHttpResponse<Payment> refund(String id, RequestOptions requestOptions) {
+        return refund(id, RefundPaymentsRequest.builder().build(), requestOptions);
+    }
+
+    /**
+     * Refunds all or part of a payment through the processor that charged it, and updates its membership to match. The buyer is emailed, the affiliate commission on the payment is clawed back, and any open Resolution Center case on the payment is closed.
+     */
+    public WhopApiHttpResponse<Payment> refund(String id, RefundPaymentsRequest request) {
+        return refund(id, request, null);
+    }
+
+    /**
+     * Refunds all or part of a payment through the processor that charged it, and updates its membership to match. The buyer is emailed, the affiliate commission on the payment is clawed back, and any open Resolution Center case on the payment is closed.
+     */
+    public WhopApiHttpResponse<Payment> refund(
+            String id, RefundPaymentsRequest request, RequestOptions requestOptions) {
+        HttpUrl.Builder httpUrl = HttpUrl.parse(this.clientOptions.environment().getApiURL())
+                .newBuilder()
+                .addPathSegments("payments")
+                .addPathSegment(PathSegments.validate(id))
+                .addPathSegments("refund");
+        if (requestOptions != null) {
+            requestOptions.getQueryParameters().forEach((_key, _value) -> {
+                httpUrl.addQueryParameter(_key, _value);
+            });
+        }
+        RequestBody body;
+        try {
+            body = RequestBody.create(
+                    ObjectMappers.JSON_MAPPER.writeValueAsBytes(BodyProperties.merge(
+                            request, requestOptions != null ? requestOptions.getBodyProperties() : null)),
+                    MediaTypes.APPLICATION_JSON);
+        } catch (JsonProcessingException e) {
+            throw new WhopApiException("Failed to serialize request", e);
+        }
+        Request okhttpRequest = new Request.Builder()
+                .url(httpUrl.build())
+                .method("POST", body)
+                .headers(Headers.of(clientOptions.headers(requestOptions)))
+                .addHeader("Content-Type", "application/json")
+                .addHeader("Accept", "application/json")
+                .build();
+        OkHttpClient client = clientOptions.httpClient();
+        if (requestOptions != null && requestOptions.getTimeout().isPresent()) {
+            client = clientOptions.httpClientWithTimeout(requestOptions);
+        }
+        if (requestOptions != null && requestOptions.getMaxRetries().isPresent()) {
+            okhttpRequest = okhttpRequest
+                    .newBuilder()
+                    .tag(
+                            RetryInterceptor.MaxRetriesOverride.class,
+                            new RetryInterceptor.MaxRetriesOverride(
+                                    requestOptions.getMaxRetries().get()))
+                    .build();
+        }
+        try (Response response = client.newCall(okhttpRequest).execute()) {
+            ResponseBody responseBody = response.body();
+            String responseBodyString = responseBody != null ? responseBody.string() : "{}";
+            if (response.isSuccessful()) {
+                return new WhopApiHttpResponse<>(
+                        ObjectMappers.JSON_MAPPER.readValue(responseBodyString, Payment.class), response);
+            }
+            try {
+                switch (response.code()) {
+                    case 400:
+                        throw new BadRequestError(
+                                ObjectMappers.JSON_MAPPER.readValue(responseBodyString, Object.class), response);
+                    case 401:
+                        throw new UnauthorizedError(
+                                ObjectMappers.JSON_MAPPER.readValue(responseBodyString, Object.class), response);
+                    case 403:
+                        throw new ForbiddenError(
+                                ObjectMappers.JSON_MAPPER.readValue(responseBodyString, Object.class), response);
+                    case 404:
+                        throw new NotFoundError(
+                                ObjectMappers.JSON_MAPPER.readValue(responseBodyString, Object.class), response);
+                    case 409:
+                        throw new ConflictError(
+                                ObjectMappers.JSON_MAPPER.readValue(responseBodyString, Object.class), response);
+                }
+            } catch (JsonProcessingException ignored) {
+                // unable to map error response, throwing generic error
+            }
+            Object errorBody = ObjectMappers.parseErrorBody(responseBodyString);
+            throw new WhopApiApiException(
+                    "Error with status code " + response.code(), response.code(), errorBody, response);
+        } catch (JsonProcessingException e) {
+            throw new WhopApiException("Failed to deserialize response: " + e.getMessage(), e);
+        } catch (IOException e) {
+            throw new WhopApiException("Network error executing HTTP request", e);
+        }
+    }
+
+    /**
+     * Charges an unpaid payment again with its original payment method and variant. A payment can typically be retried once, and only while its membership is active, trialing or past due, or when it is a membership's failed first payment.
+     */
+    public WhopApiHttpResponse<Payment> retry(String id) {
+        return retry(id, RetryPaymentsRequest.builder().build());
+    }
+
+    /**
+     * Charges an unpaid payment again with its original payment method and variant. A payment can typically be retried once, and only while its membership is active, trialing or past due, or when it is a membership's failed first payment.
+     */
+    public WhopApiHttpResponse<Payment> retry(String id, RequestOptions requestOptions) {
+        return retry(id, RetryPaymentsRequest.builder().build(), requestOptions);
+    }
+
+    /**
+     * Charges an unpaid payment again with its original payment method and variant. A payment can typically be retried once, and only while its membership is active, trialing or past due, or when it is a membership's failed first payment.
+     */
+    public WhopApiHttpResponse<Payment> retry(String id, RetryPaymentsRequest request) {
+        return retry(id, request, null);
+    }
+
+    /**
+     * Charges an unpaid payment again with its original payment method and variant. A payment can typically be retried once, and only while its membership is active, trialing or past due, or when it is a membership's failed first payment.
+     */
+    public WhopApiHttpResponse<Payment> retry(String id, RetryPaymentsRequest request, RequestOptions requestOptions) {
+        HttpUrl.Builder httpUrl = HttpUrl.parse(this.clientOptions.environment().getApiURL())
+                .newBuilder()
+                .addPathSegments("payments")
+                .addPathSegment(PathSegments.validate(id))
+                .addPathSegments("retry");
+        if (requestOptions != null) {
+            requestOptions.getQueryParameters().forEach((_key, _value) -> {
+                httpUrl.addQueryParameter(_key, _value);
+            });
+        }
+        Request.Builder _requestBuilder = new Request.Builder()
+                .url(httpUrl.build())
+                .method(
+                        "POST",
+                        BodyProperties.toRequestBody(
+                                requestOptions != null ? requestOptions.getBodyProperties() : null,
+                                RequestBody.create("", null)))
+                .headers(Headers.of(clientOptions.headers(requestOptions)))
+                .addHeader("Accept", "application/json");
+        Request okhttpRequest = _requestBuilder.build();
+        OkHttpClient client = clientOptions.httpClient();
+        if (requestOptions != null && requestOptions.getTimeout().isPresent()) {
+            client = clientOptions.httpClientWithTimeout(requestOptions);
+        }
+        if (requestOptions != null && requestOptions.getMaxRetries().isPresent()) {
+            okhttpRequest = okhttpRequest
+                    .newBuilder()
+                    .tag(
+                            RetryInterceptor.MaxRetriesOverride.class,
+                            new RetryInterceptor.MaxRetriesOverride(
+                                    requestOptions.getMaxRetries().get()))
+                    .build();
+        }
+        try (Response response = client.newCall(okhttpRequest).execute()) {
+            ResponseBody responseBody = response.body();
+            String responseBodyString = responseBody != null ? responseBody.string() : "{}";
+            if (response.isSuccessful()) {
+                return new WhopApiHttpResponse<>(
+                        ObjectMappers.JSON_MAPPER.readValue(responseBodyString, Payment.class), response);
+            }
+            try {
+                switch (response.code()) {
+                    case 401:
+                        throw new UnauthorizedError(
+                                ObjectMappers.JSON_MAPPER.readValue(responseBodyString, Object.class), response);
+                    case 404:
+                        throw new NotFoundError(
+                                ObjectMappers.JSON_MAPPER.readValue(responseBodyString, Object.class), response);
+                    case 409:
+                        throw new ConflictError(
+                                ObjectMappers.JSON_MAPPER.readValue(responseBodyString, Object.class), response);
+                }
+            } catch (JsonProcessingException ignored) {
+                // unable to map error response, throwing generic error
+            }
+            Object errorBody = ObjectMappers.parseErrorBody(responseBodyString);
+            throw new WhopApiApiException(
+                    "Error with status code " + response.code(), response.code(), errorBody, response);
+        } catch (JsonProcessingException e) {
+            throw new WhopApiException("Failed to deserialize response: " + e.getMessage(), e);
+        } catch (IOException e) {
+            throw new WhopApiException("Network error executing HTTP request", e);
+        }
+    }
+
+    /**
+     * Voids or cancels an eligible payment. The request is rejected if the payment is no longer eligible. Some processors confirm the release of a card authorization asynchronously: the payment is then returned still <code>authorized</code>, and a <code>payment.canceled</code> webhook follows once the hold is released.
+     */
+    public WhopApiHttpResponse<Payment> void_(String id) {
+        return void_(id, VoidPaymentsRequest.builder().build());
+    }
+
+    /**
+     * Voids or cancels an eligible payment. The request is rejected if the payment is no longer eligible. Some processors confirm the release of a card authorization asynchronously: the payment is then returned still <code>authorized</code>, and a <code>payment.canceled</code> webhook follows once the hold is released.
+     */
+    public WhopApiHttpResponse<Payment> void_(String id, RequestOptions requestOptions) {
+        return void_(id, VoidPaymentsRequest.builder().build(), requestOptions);
+    }
+
+    /**
+     * Voids or cancels an eligible payment. The request is rejected if the payment is no longer eligible. Some processors confirm the release of a card authorization asynchronously: the payment is then returned still <code>authorized</code>, and a <code>payment.canceled</code> webhook follows once the hold is released.
+     */
+    public WhopApiHttpResponse<Payment> void_(String id, VoidPaymentsRequest request) {
+        return void_(id, request, null);
+    }
+
+    /**
+     * Voids or cancels an eligible payment. The request is rejected if the payment is no longer eligible. Some processors confirm the release of a card authorization asynchronously: the payment is then returned still <code>authorized</code>, and a <code>payment.canceled</code> webhook follows once the hold is released.
+     */
+    public WhopApiHttpResponse<Payment> void_(String id, VoidPaymentsRequest request, RequestOptions requestOptions) {
+        HttpUrl.Builder httpUrl = HttpUrl.parse(this.clientOptions.environment().getApiURL())
+                .newBuilder()
+                .addPathSegments("payments")
+                .addPathSegment(PathSegments.validate(id))
+                .addPathSegments("void");
+        if (requestOptions != null) {
+            requestOptions.getQueryParameters().forEach((_key, _value) -> {
+                httpUrl.addQueryParameter(_key, _value);
+            });
+        }
+        Request.Builder _requestBuilder = new Request.Builder()
+                .url(httpUrl.build())
+                .method(
+                        "POST",
+                        BodyProperties.toRequestBody(
+                                requestOptions != null ? requestOptions.getBodyProperties() : null,
+                                RequestBody.create("", null)))
+                .headers(Headers.of(clientOptions.headers(requestOptions)))
+                .addHeader("Accept", "application/json");
+        Request okhttpRequest = _requestBuilder.build();
+        OkHttpClient client = clientOptions.httpClient();
+        if (requestOptions != null && requestOptions.getTimeout().isPresent()) {
+            client = clientOptions.httpClientWithTimeout(requestOptions);
+        }
+        if (requestOptions != null && requestOptions.getMaxRetries().isPresent()) {
+            okhttpRequest = okhttpRequest
+                    .newBuilder()
+                    .tag(
+                            RetryInterceptor.MaxRetriesOverride.class,
+                            new RetryInterceptor.MaxRetriesOverride(
+                                    requestOptions.getMaxRetries().get()))
+                    .build();
+        }
+        try (Response response = client.newCall(okhttpRequest).execute()) {
+            ResponseBody responseBody = response.body();
+            String responseBodyString = responseBody != null ? responseBody.string() : "{}";
+            if (response.isSuccessful()) {
+                return new WhopApiHttpResponse<>(
+                        ObjectMappers.JSON_MAPPER.readValue(responseBodyString, Payment.class), response);
+            }
+            try {
+                switch (response.code()) {
+                    case 401:
+                        throw new UnauthorizedError(
+                                ObjectMappers.JSON_MAPPER.readValue(responseBodyString, Object.class), response);
+                    case 404:
+                        throw new NotFoundError(
+                                ObjectMappers.JSON_MAPPER.readValue(responseBodyString, Object.class), response);
+                    case 409:
+                        throw new ConflictError(
+                                ObjectMappers.JSON_MAPPER.readValue(responseBodyString, Object.class), response);
+                }
+            } catch (JsonProcessingException ignored) {
+                // unable to map error response, throwing generic error
+            }
+            Object errorBody = ObjectMappers.parseErrorBody(responseBodyString);
+            throw new WhopApiApiException(
+                    "Error with status code " + response.code(), response.code(), errorBody, response);
+        } catch (JsonProcessingException e) {
+            throw new WhopApiException("Failed to deserialize response: " + e.getMessage(), e);
+        } catch (IOException e) {
+            throw new WhopApiException("Network error executing HTTP request", e);
+        }
+    }
+
+    /**
+     * Charges the saved card again, with the buyer present, for a payment their bank declined until they authenticate (such as with 3DS). Retrieve the payment afterward to get the bank's challenge from <code>next_action</code>; once the buyer completes it, they land on <code>return_url</code>, or on Whop's hosted verification page if none was given. Only the buyer can call this, with the payment's <code>client_secret</code> in the body, an OAuth token for their own account with the <code>member:payment_methods:use</code> scope, or the token from a verified <code>payment</code> session intent. An API key gets a <code>403</code>. Has no effect on a payment that is not waiting on authentication.
+     */
+    public WhopApiHttpResponse<PaymentStatus> resume(String paymentId) {
+        return resume(paymentId, ResumePaymentsRequest.builder().build());
+    }
+
+    /**
+     * Charges the saved card again, with the buyer present, for a payment their bank declined until they authenticate (such as with 3DS). Retrieve the payment afterward to get the bank's challenge from <code>next_action</code>; once the buyer completes it, they land on <code>return_url</code>, or on Whop's hosted verification page if none was given. Only the buyer can call this, with the payment's <code>client_secret</code> in the body, an OAuth token for their own account with the <code>member:payment_methods:use</code> scope, or the token from a verified <code>payment</code> session intent. An API key gets a <code>403</code>. Has no effect on a payment that is not waiting on authentication.
+     */
+    public WhopApiHttpResponse<PaymentStatus> resume(String paymentId, RequestOptions requestOptions) {
+        return resume(paymentId, ResumePaymentsRequest.builder().build(), requestOptions);
+    }
+
+    /**
+     * Charges the saved card again, with the buyer present, for a payment their bank declined until they authenticate (such as with 3DS). Retrieve the payment afterward to get the bank's challenge from <code>next_action</code>; once the buyer completes it, they land on <code>return_url</code>, or on Whop's hosted verification page if none was given. Only the buyer can call this, with the payment's <code>client_secret</code> in the body, an OAuth token for their own account with the <code>member:payment_methods:use</code> scope, or the token from a verified <code>payment</code> session intent. An API key gets a <code>403</code>. Has no effect on a payment that is not waiting on authentication.
+     */
+    public WhopApiHttpResponse<PaymentStatus> resume(String paymentId, ResumePaymentsRequest request) {
+        return resume(paymentId, request, null);
+    }
+
+    /**
+     * Charges the saved card again, with the buyer present, for a payment their bank declined until they authenticate (such as with 3DS). Retrieve the payment afterward to get the bank's challenge from <code>next_action</code>; once the buyer completes it, they land on <code>return_url</code>, or on Whop's hosted verification page if none was given. Only the buyer can call this, with the payment's <code>client_secret</code> in the body, an OAuth token for their own account with the <code>member:payment_methods:use</code> scope, or the token from a verified <code>payment</code> session intent. An API key gets a <code>403</code>. Has no effect on a payment that is not waiting on authentication.
+     */
+    public WhopApiHttpResponse<PaymentStatus> resume(
+            String paymentId, ResumePaymentsRequest request, RequestOptions requestOptions) {
+        HttpUrl.Builder httpUrl = HttpUrl.parse(this.clientOptions.environment().getApiURL())
+                .newBuilder()
+                .addPathSegments("payments")
+                .addPathSegment(PathSegments.validate(paymentId))
+                .addPathSegments("resume");
+        if (requestOptions != null) {
+            requestOptions.getQueryParameters().forEach((_key, _value) -> {
+                httpUrl.addQueryParameter(_key, _value);
+            });
+        }
+        RequestBody body;
+        try {
+            body = RequestBody.create(
+                    ObjectMappers.JSON_MAPPER.writeValueAsBytes(BodyProperties.merge(
+                            request, requestOptions != null ? requestOptions.getBodyProperties() : null)),
+                    MediaTypes.APPLICATION_JSON);
+        } catch (JsonProcessingException e) {
+            throw new WhopApiException("Failed to serialize request", e);
+        }
+        Request okhttpRequest = new Request.Builder()
+                .url(httpUrl.build())
+                .method("POST", body)
+                .headers(Headers.of(clientOptions.headers(requestOptions)))
+                .addHeader("Content-Type", "application/json")
+                .addHeader("Accept", "application/json")
+                .build();
+        OkHttpClient client = clientOptions.httpClient();
+        if (requestOptions != null && requestOptions.getTimeout().isPresent()) {
+            client = clientOptions.httpClientWithTimeout(requestOptions);
+        }
+        if (requestOptions != null && requestOptions.getMaxRetries().isPresent()) {
+            okhttpRequest = okhttpRequest
+                    .newBuilder()
+                    .tag(
+                            RetryInterceptor.MaxRetriesOverride.class,
+                            new RetryInterceptor.MaxRetriesOverride(
+                                    requestOptions.getMaxRetries().get()))
+                    .build();
+        }
+        try (Response response = client.newCall(okhttpRequest).execute()) {
+            ResponseBody responseBody = response.body();
+            String responseBodyString = responseBody != null ? responseBody.string() : "{}";
+            if (response.isSuccessful()) {
+                return new WhopApiHttpResponse<>(
+                        ObjectMappers.JSON_MAPPER.readValue(responseBodyString, PaymentStatus.class), response);
+            }
+            try {
+                switch (response.code()) {
+                    case 400:
+                        throw new BadRequestError(
+                                ObjectMappers.JSON_MAPPER.readValue(responseBodyString, Object.class), response);
+                    case 401:
+                        throw new UnauthorizedError(
+                                ObjectMappers.JSON_MAPPER.readValue(responseBodyString, Object.class), response);
+                    case 403:
+                        throw new ForbiddenError(
+                                ObjectMappers.JSON_MAPPER.readValue(responseBodyString, Object.class), response);
+                    case 404:
+                        throw new NotFoundError(
+                                ObjectMappers.JSON_MAPPER.readValue(responseBodyString, Object.class), response);
+                    case 409:
+                        throw new ConflictError(
+                                ObjectMappers.JSON_MAPPER.readValue(responseBodyString, Object.class), response);
+                }
+            } catch (JsonProcessingException ignored) {
+                // unable to map error response, throwing generic error
+            }
+            Object errorBody = ObjectMappers.parseErrorBody(responseBodyString);
+            throw new WhopApiApiException(
+                    "Error with status code " + response.code(), response.code(), errorBody, response);
+        } catch (JsonProcessingException e) {
+            throw new WhopApiException("Failed to deserialize response: " + e.getMessage(), e);
+        } catch (IOException e) {
+            throw new WhopApiException("Network error executing HTTP request", e);
+        }
+    }
+
+    /**
+     * Changes where the buyer lands after completing an off-site step, up until they return. Accepts either a secret key or the payment's own <code>client_secret</code> in the body, so the surface that knows the final destination can set it.
+     */
+    public WhopApiHttpResponse<PaymentStatus> updateReturnUrl(
+            String paymentId, UpdateReturnUrlPaymentsRequest request) {
+        return updateReturnUrl(paymentId, request, null);
+    }
+
+    /**
+     * Changes where the buyer lands after completing an off-site step, up until they return. Accepts either a secret key or the payment's own <code>client_secret</code> in the body, so the surface that knows the final destination can set it.
+     */
+    public WhopApiHttpResponse<PaymentStatus> updateReturnUrl(
+            String paymentId, UpdateReturnUrlPaymentsRequest request, RequestOptions requestOptions) {
+        HttpUrl.Builder httpUrl = HttpUrl.parse(this.clientOptions.environment().getApiURL())
+                .newBuilder()
+                .addPathSegments("payments")
+                .addPathSegment(PathSegments.validate(paymentId))
+                .addPathSegments("return_url");
+        if (requestOptions != null) {
+            requestOptions.getQueryParameters().forEach((_key, _value) -> {
+                httpUrl.addQueryParameter(_key, _value);
+            });
+        }
+        RequestBody body;
+        try {
+            body = RequestBody.create(
+                    ObjectMappers.JSON_MAPPER.writeValueAsBytes(BodyProperties.merge(
+                            request, requestOptions != null ? requestOptions.getBodyProperties() : null)),
+                    MediaTypes.APPLICATION_JSON);
+        } catch (JsonProcessingException e) {
+            throw new WhopApiException("Failed to serialize request", e);
+        }
+        Request okhttpRequest = new Request.Builder()
+                .url(httpUrl.build())
+                .method("PATCH", body)
+                .headers(Headers.of(clientOptions.headers(requestOptions)))
+                .addHeader("Content-Type", "application/json")
+                .addHeader("Accept", "application/json")
+                .build();
+        OkHttpClient client = clientOptions.httpClient();
+        if (requestOptions != null && requestOptions.getTimeout().isPresent()) {
+            client = clientOptions.httpClientWithTimeout(requestOptions);
+        }
+        if (requestOptions != null && requestOptions.getMaxRetries().isPresent()) {
+            okhttpRequest = okhttpRequest
+                    .newBuilder()
+                    .tag(
+                            RetryInterceptor.MaxRetriesOverride.class,
+                            new RetryInterceptor.MaxRetriesOverride(
+                                    requestOptions.getMaxRetries().get()))
+                    .build();
+        }
         try (Response response = client.newCall(okhttpRequest).execute()) {
             ResponseBody responseBody = response.body();
             String responseBodyString = responseBody != null ? responseBody.string() : "{}";
@@ -1155,42 +1506,48 @@ public class RawPaymentsClient {
             Object errorBody = ObjectMappers.parseErrorBody(responseBodyString);
             throw new WhopApiApiException(
                     "Error with status code " + response.code(), response.code(), errorBody, response);
+        } catch (JsonProcessingException e) {
+            throw new WhopApiException("Failed to deserialize response: " + e.getMessage(), e);
         } catch (IOException e) {
             throw new WhopApiException("Network error executing HTTP request", e);
         }
     }
 
     /**
-     * Retrieves how far a payment has got and what the buyer must do next, if anything. A payment is collected in the background, so poll this rather than reading the create response. Accepts either a secret key or the payment's own <code>client_secret</code>, so the surface collecting the payment can poll it directly.
+     * Retrieves how far a payment has got and what the buyer must do next, if anything. A payment is collected in the background, so poll this rather than reading the create response. Accepts either a secret key or the payment's own <code>client_secret</code> as a query parameter, so the surface collecting the payment can poll it directly.
      */
     public WhopApiHttpResponse<PaymentStatus> retrieveStatus(String paymentId) {
         return retrieveStatus(paymentId, RetrieveStatusPaymentsRequest.builder().build());
     }
 
     /**
-     * Retrieves how far a payment has got and what the buyer must do next, if anything. A payment is collected in the background, so poll this rather than reading the create response. Accepts either a secret key or the payment's own <code>client_secret</code>, so the surface collecting the payment can poll it directly.
+     * Retrieves how far a payment has got and what the buyer must do next, if anything. A payment is collected in the background, so poll this rather than reading the create response. Accepts either a secret key or the payment's own <code>client_secret</code> as a query parameter, so the surface collecting the payment can poll it directly.
      */
     public WhopApiHttpResponse<PaymentStatus> retrieveStatus(String paymentId, RequestOptions requestOptions) {
         return retrieveStatus(paymentId, RetrieveStatusPaymentsRequest.builder().build(), requestOptions);
     }
 
     /**
-     * Retrieves how far a payment has got and what the buyer must do next, if anything. A payment is collected in the background, so poll this rather than reading the create response. Accepts either a secret key or the payment's own <code>client_secret</code>, so the surface collecting the payment can poll it directly.
+     * Retrieves how far a payment has got and what the buyer must do next, if anything. A payment is collected in the background, so poll this rather than reading the create response. Accepts either a secret key or the payment's own <code>client_secret</code> as a query parameter, so the surface collecting the payment can poll it directly.
      */
     public WhopApiHttpResponse<PaymentStatus> retrieveStatus(String paymentId, RetrieveStatusPaymentsRequest request) {
         return retrieveStatus(paymentId, request, null);
     }
 
     /**
-     * Retrieves how far a payment has got and what the buyer must do next, if anything. A payment is collected in the background, so poll this rather than reading the create response. Accepts either a secret key or the payment's own <code>client_secret</code>, so the surface collecting the payment can poll it directly.
+     * Retrieves how far a payment has got and what the buyer must do next, if anything. A payment is collected in the background, so poll this rather than reading the create response. Accepts either a secret key or the payment's own <code>client_secret</code> as a query parameter, so the surface collecting the payment can poll it directly.
      */
     public WhopApiHttpResponse<PaymentStatus> retrieveStatus(
             String paymentId, RetrieveStatusPaymentsRequest request, RequestOptions requestOptions) {
-        HttpUrl.Builder httpUrl = HttpUrl.parse(this.clientOptions.environment().getUrl())
+        HttpUrl.Builder httpUrl = HttpUrl.parse(this.clientOptions.environment().getApiURL())
                 .newBuilder()
                 .addPathSegments("payments")
-                .addPathSegment(paymentId)
+                .addPathSegment(PathSegments.validate(paymentId))
                 .addPathSegments("status");
+        if (request.getClientSecret().isPresent()) {
+            QueryStringMapper.addQueryParameter(
+                    httpUrl, "client_secret", request.getClientSecret().get(), false);
+        }
         if (requestOptions != null) {
             requestOptions.getQueryParameters().forEach((_key, _value) -> {
                 httpUrl.addQueryParameter(_key, _value);
@@ -1205,6 +1562,15 @@ public class RawPaymentsClient {
         OkHttpClient client = clientOptions.httpClient();
         if (requestOptions != null && requestOptions.getTimeout().isPresent()) {
             client = clientOptions.httpClientWithTimeout(requestOptions);
+        }
+        if (requestOptions != null && requestOptions.getMaxRetries().isPresent()) {
+            okhttpRequest = okhttpRequest
+                    .newBuilder()
+                    .tag(
+                            RetryInterceptor.MaxRetriesOverride.class,
+                            new RetryInterceptor.MaxRetriesOverride(
+                                    requestOptions.getMaxRetries().get()))
+                    .build();
         }
         try (Response response = client.newCall(okhttpRequest).execute()) {
             ResponseBody responseBody = response.body();
@@ -1231,6 +1597,8 @@ public class RawPaymentsClient {
             Object errorBody = ObjectMappers.parseErrorBody(responseBodyString);
             throw new WhopApiApiException(
                     "Error with status code " + response.code(), response.code(), errorBody, response);
+        } catch (JsonProcessingException e) {
+            throw new WhopApiException("Failed to deserialize response: " + e.getMessage(), e);
         } catch (IOException e) {
             throw new WhopApiException("Network error executing HTTP request", e);
         }

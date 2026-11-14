@@ -6,6 +6,7 @@ package com.whop.api.resources.notifications;
 import com.whop.api.core.ClientOptions;
 import com.whop.api.core.RequestOptions;
 import com.whop.api.core.Suppliers;
+import com.whop.api.core.WhopApiHttpResponse;
 import com.whop.api.core.pagination.SyncPagingIterable;
 import com.whop.api.resources.notifications.requests.BadgesNotificationsRequest;
 import com.whop.api.resources.notifications.requests.CreateNotificationsRequest;
@@ -41,39 +42,77 @@ public class AsyncNotificationsClient {
     }
 
     /**
-     * Lists the authenticated user's notifications, newest first. Requires a user credential — an account API key has no notification feed. Without filters the feed spans every experience the user belongs to plus the teams they are a member of.
+     * Lists the authenticated user's notifications, newest first. Without filters the feed spans every experience the user belongs to plus the teams they are a member of. Requires a user credential — an account API key has no notification feed.
      */
     public CompletableFuture<SyncPagingIterable<Notification>> list() {
-        return this.rawClient.list().thenApply(response -> response.body());
+        CompletableFuture<WhopApiHttpResponse<SyncPagingIterable<Notification>>> rawFuture = this.rawClient.list();
+        CompletableFuture<SyncPagingIterable<Notification>> future = rawFuture.thenApply(response -> response.body());
+        future.whenComplete((result_, throwable_) -> {
+            if (future.isCancelled()) {
+                rawFuture.cancel(true);
+            }
+        });
+        return future;
     }
 
     /**
-     * Lists the authenticated user's notifications, newest first. Requires a user credential — an account API key has no notification feed. Without filters the feed spans every experience the user belongs to plus the teams they are a member of.
+     * Lists the authenticated user's notifications, newest first. Without filters the feed spans every experience the user belongs to plus the teams they are a member of. Requires a user credential — an account API key has no notification feed.
      */
     public CompletableFuture<SyncPagingIterable<Notification>> list(RequestOptions requestOptions) {
-        return this.rawClient.list(requestOptions).thenApply(response -> response.body());
+        CompletableFuture<WhopApiHttpResponse<SyncPagingIterable<Notification>>> rawFuture =
+                this.rawClient.list(requestOptions);
+        CompletableFuture<SyncPagingIterable<Notification>> future = rawFuture.thenApply(response -> response.body());
+        future.whenComplete((result_, throwable_) -> {
+            if (future.isCancelled()) {
+                rawFuture.cancel(true);
+            }
+        });
+        return future;
     }
 
     /**
-     * Lists the authenticated user's notifications, newest first. Requires a user credential — an account API key has no notification feed. Without filters the feed spans every experience the user belongs to plus the teams they are a member of.
+     * Lists the authenticated user's notifications, newest first. Without filters the feed spans every experience the user belongs to plus the teams they are a member of. Requires a user credential — an account API key has no notification feed.
      */
     public CompletableFuture<SyncPagingIterable<Notification>> list(ListNotificationsRequest request) {
-        return this.rawClient.list(request).thenApply(response -> response.body());
+        CompletableFuture<WhopApiHttpResponse<SyncPagingIterable<Notification>>> rawFuture =
+                this.rawClient.list(request);
+        CompletableFuture<SyncPagingIterable<Notification>> future = rawFuture.thenApply(response -> response.body());
+        future.whenComplete((result_, throwable_) -> {
+            if (future.isCancelled()) {
+                rawFuture.cancel(true);
+            }
+        });
+        return future;
     }
 
     /**
-     * Lists the authenticated user's notifications, newest first. Requires a user credential — an account API key has no notification feed. Without filters the feed spans every experience the user belongs to plus the teams they are a member of.
+     * Lists the authenticated user's notifications, newest first. Without filters the feed spans every experience the user belongs to plus the teams they are a member of. Requires a user credential — an account API key has no notification feed.
      */
     public CompletableFuture<SyncPagingIterable<Notification>> list(
             ListNotificationsRequest request, RequestOptions requestOptions) {
-        return this.rawClient.list(request, requestOptions).thenApply(response -> response.body());
+        CompletableFuture<WhopApiHttpResponse<SyncPagingIterable<Notification>>> rawFuture =
+                this.rawClient.list(request, requestOptions);
+        CompletableFuture<SyncPagingIterable<Notification>> future = rawFuture.thenApply(response -> response.body());
+        future.whenComplete((result_, throwable_) -> {
+            if (future.isCancelled()) {
+                rawFuture.cancel(true);
+            }
+        });
+        return future;
     }
 
     /**
      * Queues a notification to every user of an experience or to an account's team, processed asynchronously. Every send is attributed to an app: use an app API key, or a credential acting on behalf of an app. Narrow the audience with <code>user_ids</code> to send a mention.
      */
     public CompletableFuture<CreateNotificationsResponse> create(CreateNotificationsRequest request) {
-        return this.rawClient.create(request).thenApply(response -> response.body());
+        CompletableFuture<WhopApiHttpResponse<CreateNotificationsResponse>> rawFuture = this.rawClient.create(request);
+        CompletableFuture<CreateNotificationsResponse> future = rawFuture.thenApply(response -> response.body());
+        future.whenComplete((result_, throwable_) -> {
+            if (future.isCancelled()) {
+                rawFuture.cancel(true);
+            }
+        });
+        return future;
     }
 
     /**
@@ -81,28 +120,58 @@ public class AsyncNotificationsClient {
      */
     public CompletableFuture<CreateNotificationsResponse> create(
             CreateNotificationsRequest request, RequestOptions requestOptions) {
-        return this.rawClient.create(request, requestOptions).thenApply(response -> response.body());
+        CompletableFuture<WhopApiHttpResponse<CreateNotificationsResponse>> rawFuture =
+                this.rawClient.create(request, requestOptions);
+        CompletableFuture<CreateNotificationsResponse> future = rawFuture.thenApply(response -> response.body());
+        future.whenComplete((result_, throwable_) -> {
+            if (future.isCancelled()) {
+                rawFuture.cancel(true);
+            }
+        });
+        return future;
     }
 
     /**
      * Lists the authenticated user's per-experience unread badge state. Requires a user credential. Returns one row per experience the user belongs to (or per requested experience).
      */
     public CompletableFuture<BadgesNotificationsResponse> badges() {
-        return this.rawClient.badges().thenApply(response -> response.body());
+        CompletableFuture<WhopApiHttpResponse<BadgesNotificationsResponse>> rawFuture = this.rawClient.badges();
+        CompletableFuture<BadgesNotificationsResponse> future = rawFuture.thenApply(response -> response.body());
+        future.whenComplete((result_, throwable_) -> {
+            if (future.isCancelled()) {
+                rawFuture.cancel(true);
+            }
+        });
+        return future;
     }
 
     /**
      * Lists the authenticated user's per-experience unread badge state. Requires a user credential. Returns one row per experience the user belongs to (or per requested experience).
      */
     public CompletableFuture<BadgesNotificationsResponse> badges(RequestOptions requestOptions) {
-        return this.rawClient.badges(requestOptions).thenApply(response -> response.body());
+        CompletableFuture<WhopApiHttpResponse<BadgesNotificationsResponse>> rawFuture =
+                this.rawClient.badges(requestOptions);
+        CompletableFuture<BadgesNotificationsResponse> future = rawFuture.thenApply(response -> response.body());
+        future.whenComplete((result_, throwable_) -> {
+            if (future.isCancelled()) {
+                rawFuture.cancel(true);
+            }
+        });
+        return future;
     }
 
     /**
      * Lists the authenticated user's per-experience unread badge state. Requires a user credential. Returns one row per experience the user belongs to (or per requested experience).
      */
     public CompletableFuture<BadgesNotificationsResponse> badges(BadgesNotificationsRequest request) {
-        return this.rawClient.badges(request).thenApply(response -> response.body());
+        CompletableFuture<WhopApiHttpResponse<BadgesNotificationsResponse>> rawFuture = this.rawClient.badges(request);
+        CompletableFuture<BadgesNotificationsResponse> future = rawFuture.thenApply(response -> response.body());
+        future.whenComplete((result_, throwable_) -> {
+            if (future.isCancelled()) {
+                rawFuture.cancel(true);
+            }
+        });
+        return future;
     }
 
     /**
@@ -110,65 +179,133 @@ public class AsyncNotificationsClient {
      */
     public CompletableFuture<BadgesNotificationsResponse> badges(
             BadgesNotificationsRequest request, RequestOptions requestOptions) {
-        return this.rawClient.badges(request, requestOptions).thenApply(response -> response.body());
+        CompletableFuture<WhopApiHttpResponse<BadgesNotificationsResponse>> rawFuture =
+                this.rawClient.badges(request, requestOptions);
+        CompletableFuture<BadgesNotificationsResponse> future = rawFuture.thenApply(response -> response.body());
+        future.whenComplete((result_, throwable_) -> {
+            if (future.isCancelled()) {
+                rawFuture.cancel(true);
+            }
+        });
+        return future;
     }
 
     /**
-     * Marks the authenticated user's notifications as read: one experience's (<code>experience_id</code>) or everything (<code>all: true</code>) — exactly one of the two. Requires a user credential. Responds with the refreshed badge rows for the affected scope.
+     * Marks the authenticated user's notifications as read, for one experience or all of them, and returns the refreshed badge rows for that scope. Requires a user credential.
      */
     public CompletableFuture<MarkReadNotificationsResponse> markRead() {
-        return this.rawClient.markRead().thenApply(response -> response.body());
+        CompletableFuture<WhopApiHttpResponse<MarkReadNotificationsResponse>> rawFuture = this.rawClient.markRead();
+        CompletableFuture<MarkReadNotificationsResponse> future = rawFuture.thenApply(response -> response.body());
+        future.whenComplete((result_, throwable_) -> {
+            if (future.isCancelled()) {
+                rawFuture.cancel(true);
+            }
+        });
+        return future;
     }
 
     /**
-     * Marks the authenticated user's notifications as read: one experience's (<code>experience_id</code>) or everything (<code>all: true</code>) — exactly one of the two. Requires a user credential. Responds with the refreshed badge rows for the affected scope.
+     * Marks the authenticated user's notifications as read, for one experience or all of them, and returns the refreshed badge rows for that scope. Requires a user credential.
      */
     public CompletableFuture<MarkReadNotificationsResponse> markRead(RequestOptions requestOptions) {
-        return this.rawClient.markRead(requestOptions).thenApply(response -> response.body());
+        CompletableFuture<WhopApiHttpResponse<MarkReadNotificationsResponse>> rawFuture =
+                this.rawClient.markRead(requestOptions);
+        CompletableFuture<MarkReadNotificationsResponse> future = rawFuture.thenApply(response -> response.body());
+        future.whenComplete((result_, throwable_) -> {
+            if (future.isCancelled()) {
+                rawFuture.cancel(true);
+            }
+        });
+        return future;
     }
 
     /**
-     * Marks the authenticated user's notifications as read: one experience's (<code>experience_id</code>) or everything (<code>all: true</code>) — exactly one of the two. Requires a user credential. Responds with the refreshed badge rows for the affected scope.
+     * Marks the authenticated user's notifications as read, for one experience or all of them, and returns the refreshed badge rows for that scope. Requires a user credential.
      */
     public CompletableFuture<MarkReadNotificationsResponse> markRead(MarkReadNotificationsRequest request) {
-        return this.rawClient.markRead(request).thenApply(response -> response.body());
+        CompletableFuture<WhopApiHttpResponse<MarkReadNotificationsResponse>> rawFuture =
+                this.rawClient.markRead(request);
+        CompletableFuture<MarkReadNotificationsResponse> future = rawFuture.thenApply(response -> response.body());
+        future.whenComplete((result_, throwable_) -> {
+            if (future.isCancelled()) {
+                rawFuture.cancel(true);
+            }
+        });
+        return future;
     }
 
     /**
-     * Marks the authenticated user's notifications as read: one experience's (<code>experience_id</code>) or everything (<code>all: true</code>) — exactly one of the two. Requires a user credential. Responds with the refreshed badge rows for the affected scope.
+     * Marks the authenticated user's notifications as read, for one experience or all of them, and returns the refreshed badge rows for that scope. Requires a user credential.
      */
     public CompletableFuture<MarkReadNotificationsResponse> markRead(
             MarkReadNotificationsRequest request, RequestOptions requestOptions) {
-        return this.rawClient.markRead(request, requestOptions).thenApply(response -> response.body());
+        CompletableFuture<WhopApiHttpResponse<MarkReadNotificationsResponse>> rawFuture =
+                this.rawClient.markRead(request, requestOptions);
+        CompletableFuture<MarkReadNotificationsResponse> future = rawFuture.thenApply(response -> response.body());
+        future.whenComplete((result_, throwable_) -> {
+            if (future.isCancelled()) {
+                rawFuture.cancel(true);
+            }
+        });
+        return future;
     }
 
     /**
-     * Retrieves a single notification by id — either an <code>id</code> returned by List Notifications, or the ephemeral id delivered with a push/websocket event. Requires a user credential.
+     * Retrieves a single notification, from the feed or from a push or websocket event. Requires a user credential.
      */
     public CompletableFuture<Notification> retrieve(String id) {
-        return this.rawClient.retrieve(id).thenApply(response -> response.body());
+        CompletableFuture<WhopApiHttpResponse<Notification>> rawFuture = this.rawClient.retrieve(id);
+        CompletableFuture<Notification> future = rawFuture.thenApply(response -> response.body());
+        future.whenComplete((result_, throwable_) -> {
+            if (future.isCancelled()) {
+                rawFuture.cancel(true);
+            }
+        });
+        return future;
     }
 
     /**
-     * Retrieves a single notification by id — either an <code>id</code> returned by List Notifications, or the ephemeral id delivered with a push/websocket event. Requires a user credential.
+     * Retrieves a single notification, from the feed or from a push or websocket event. Requires a user credential.
      */
     public CompletableFuture<Notification> retrieve(String id, RequestOptions requestOptions) {
-        return this.rawClient.retrieve(id, requestOptions).thenApply(response -> response.body());
+        CompletableFuture<WhopApiHttpResponse<Notification>> rawFuture = this.rawClient.retrieve(id, requestOptions);
+        CompletableFuture<Notification> future = rawFuture.thenApply(response -> response.body());
+        future.whenComplete((result_, throwable_) -> {
+            if (future.isCancelled()) {
+                rawFuture.cancel(true);
+            }
+        });
+        return future;
     }
 
     /**
-     * Retrieves a single notification by id — either an <code>id</code> returned by List Notifications, or the ephemeral id delivered with a push/websocket event. Requires a user credential.
+     * Retrieves a single notification, from the feed or from a push or websocket event. Requires a user credential.
      */
     public CompletableFuture<Notification> retrieve(String id, RetrieveNotificationsRequest request) {
-        return this.rawClient.retrieve(id, request).thenApply(response -> response.body());
+        CompletableFuture<WhopApiHttpResponse<Notification>> rawFuture = this.rawClient.retrieve(id, request);
+        CompletableFuture<Notification> future = rawFuture.thenApply(response -> response.body());
+        future.whenComplete((result_, throwable_) -> {
+            if (future.isCancelled()) {
+                rawFuture.cancel(true);
+            }
+        });
+        return future;
     }
 
     /**
-     * Retrieves a single notification by id — either an <code>id</code> returned by List Notifications, or the ephemeral id delivered with a push/websocket event. Requires a user credential.
+     * Retrieves a single notification, from the feed or from a push or websocket event. Requires a user credential.
      */
     public CompletableFuture<Notification> retrieve(
             String id, RetrieveNotificationsRequest request, RequestOptions requestOptions) {
-        return this.rawClient.retrieve(id, request, requestOptions).thenApply(response -> response.body());
+        CompletableFuture<WhopApiHttpResponse<Notification>> rawFuture =
+                this.rawClient.retrieve(id, request, requestOptions);
+        CompletableFuture<Notification> future = rawFuture.thenApply(response -> response.body());
+        future.whenComplete((result_, throwable_) -> {
+            if (future.isCancelled()) {
+                rawFuture.cancel(true);
+            }
+        });
+        return future;
     }
 
     public AsyncTopicsClient topics() {

@@ -79,7 +79,6 @@ public final class CreateNotificationsResponse {
     public static final class Builder implements SuccessStage, _FinalStage {
         private boolean success;
 
-        @JsonAnySetter
         private Map<String, Object> additionalProperties = new HashMap<>();
 
         private Builder() {}
@@ -100,6 +99,14 @@ public final class CreateNotificationsResponse {
         @java.lang.Override
         public CreateNotificationsResponse build() {
             return new CreateNotificationsResponse(success, additionalProperties);
+        }
+
+        @JsonAnySetter
+        private void putAdditionalPropertyFromJson(String key, Object value) {
+            if (key.equalsIgnoreCase("success")) {
+                return;
+            }
+            this.additionalProperties.put(key, value);
         }
 
         @java.lang.Override

@@ -7,14 +7,11 @@ import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonValue;
 
 public final class CreateAdsRequestCallToAction {
-    public static final CreateAdsRequestCallToAction BOOK_NOW =
-            new CreateAdsRequestCallToAction(Value.BOOK_NOW, "book_now");
-
     public static final CreateAdsRequestCallToAction REQUEST_TIME =
             new CreateAdsRequestCallToAction(Value.REQUEST_TIME, "request_time");
 
-    public static final CreateAdsRequestCallToAction SIGN_UP =
-            new CreateAdsRequestCallToAction(Value.SIGN_UP, "sign_up");
+    public static final CreateAdsRequestCallToAction DONATE_NOW =
+            new CreateAdsRequestCallToAction(Value.DONATE_NOW, "donate_now");
 
     public static final CreateAdsRequestCallToAction NO_BUTTON =
             new CreateAdsRequestCallToAction(Value.NO_BUTTON, "no_button");
@@ -25,38 +22,14 @@ public final class CreateAdsRequestCallToAction {
     public static final CreateAdsRequestCallToAction OPEN_LINK =
             new CreateAdsRequestCallToAction(Value.OPEN_LINK, "open_link");
 
-    public static final CreateAdsRequestCallToAction SHOP_NOW =
-            new CreateAdsRequestCallToAction(Value.SHOP_NOW, "shop_now");
-
-    public static final CreateAdsRequestCallToAction GET_DIRECTIONS =
-            new CreateAdsRequestCallToAction(Value.GET_DIRECTIONS, "get_directions");
-
     public static final CreateAdsRequestCallToAction LISTEN_NOW =
             new CreateAdsRequestCallToAction(Value.LISTEN_NOW, "listen_now");
-
-    public static final CreateAdsRequestCallToAction MESSAGE_PAGE =
-            new CreateAdsRequestCallToAction(Value.MESSAGE_PAGE, "message_page");
-
-    public static final CreateAdsRequestCallToAction SEE_DETAILS =
-            new CreateAdsRequestCallToAction(Value.SEE_DETAILS, "see_details");
-
-    public static final CreateAdsRequestCallToAction CALL_NOW =
-            new CreateAdsRequestCallToAction(Value.CALL_NOW, "call_now");
 
     public static final CreateAdsRequestCallToAction GET_QUOTE =
             new CreateAdsRequestCallToAction(Value.GET_QUOTE, "get_quote");
 
     public static final CreateAdsRequestCallToAction ORDER_NOW =
             new CreateAdsRequestCallToAction(Value.ORDER_NOW, "order_now");
-
-    public static final CreateAdsRequestCallToAction SEE_MENU =
-            new CreateAdsRequestCallToAction(Value.SEE_MENU, "see_menu");
-
-    public static final CreateAdsRequestCallToAction SUBSCRIBE =
-            new CreateAdsRequestCallToAction(Value.SUBSCRIBE, "subscribe");
-
-    public static final CreateAdsRequestCallToAction APPLY_NOW =
-            new CreateAdsRequestCallToAction(Value.APPLY_NOW, "apply_now");
 
     public static final CreateAdsRequestCallToAction LEARN_MORE =
             new CreateAdsRequestCallToAction(Value.LEARN_MORE, "learn_more");
@@ -72,6 +45,42 @@ public final class CreateAdsRequestCallToAction {
 
     public static final CreateAdsRequestCallToAction WATCH_MORE =
             new CreateAdsRequestCallToAction(Value.WATCH_MORE, "watch_more");
+
+    public static final CreateAdsRequestCallToAction BOOK_NOW =
+            new CreateAdsRequestCallToAction(Value.BOOK_NOW, "book_now");
+
+    public static final CreateAdsRequestCallToAction SIGN_UP =
+            new CreateAdsRequestCallToAction(Value.SIGN_UP, "sign_up");
+
+    public static final CreateAdsRequestCallToAction VISIT_SITE =
+            new CreateAdsRequestCallToAction(Value.VISIT_SITE, "visit_site");
+
+    public static final CreateAdsRequestCallToAction SEE_MORE =
+            new CreateAdsRequestCallToAction(Value.SEE_MORE, "see_more");
+
+    public static final CreateAdsRequestCallToAction SHOP_NOW =
+            new CreateAdsRequestCallToAction(Value.SHOP_NOW, "shop_now");
+
+    public static final CreateAdsRequestCallToAction GET_DIRECTIONS =
+            new CreateAdsRequestCallToAction(Value.GET_DIRECTIONS, "get_directions");
+
+    public static final CreateAdsRequestCallToAction MESSAGE_PAGE =
+            new CreateAdsRequestCallToAction(Value.MESSAGE_PAGE, "message_page");
+
+    public static final CreateAdsRequestCallToAction SEE_DETAILS =
+            new CreateAdsRequestCallToAction(Value.SEE_DETAILS, "see_details");
+
+    public static final CreateAdsRequestCallToAction CALL_NOW =
+            new CreateAdsRequestCallToAction(Value.CALL_NOW, "call_now");
+
+    public static final CreateAdsRequestCallToAction SEE_MENU =
+            new CreateAdsRequestCallToAction(Value.SEE_MENU, "see_menu");
+
+    public static final CreateAdsRequestCallToAction SUBSCRIBE =
+            new CreateAdsRequestCallToAction(Value.SUBSCRIBE, "subscribe");
+
+    public static final CreateAdsRequestCallToAction APPLY_NOW =
+            new CreateAdsRequestCallToAction(Value.APPLY_NOW, "apply_now");
 
     private final Value value;
 
@@ -106,40 +115,22 @@ public final class CreateAdsRequestCallToAction {
 
     public <T> T visit(Visitor<T> visitor) {
         switch (value) {
-            case BOOK_NOW:
-                return visitor.visitBookNow();
             case REQUEST_TIME:
                 return visitor.visitRequestTime();
-            case SIGN_UP:
-                return visitor.visitSignUp();
+            case DONATE_NOW:
+                return visitor.visitDonateNow();
             case NO_BUTTON:
                 return visitor.visitNoButton();
             case GET_OFFER:
                 return visitor.visitGetOffer();
             case OPEN_LINK:
                 return visitor.visitOpenLink();
-            case SHOP_NOW:
-                return visitor.visitShopNow();
-            case GET_DIRECTIONS:
-                return visitor.visitGetDirections();
             case LISTEN_NOW:
                 return visitor.visitListenNow();
-            case MESSAGE_PAGE:
-                return visitor.visitMessagePage();
-            case SEE_DETAILS:
-                return visitor.visitSeeDetails();
-            case CALL_NOW:
-                return visitor.visitCallNow();
             case GET_QUOTE:
                 return visitor.visitGetQuote();
             case ORDER_NOW:
                 return visitor.visitOrderNow();
-            case SEE_MENU:
-                return visitor.visitSeeMenu();
-            case SUBSCRIBE:
-                return visitor.visitSubscribe();
-            case APPLY_NOW:
-                return visitor.visitApplyNow();
             case LEARN_MORE:
                 return visitor.visitLearnMore();
             case DOWNLOAD:
@@ -150,6 +141,30 @@ public final class CreateAdsRequestCallToAction {
                 return visitor.visitContactUs();
             case WATCH_MORE:
                 return visitor.visitWatchMore();
+            case BOOK_NOW:
+                return visitor.visitBookNow();
+            case SIGN_UP:
+                return visitor.visitSignUp();
+            case VISIT_SITE:
+                return visitor.visitVisitSite();
+            case SEE_MORE:
+                return visitor.visitSeeMore();
+            case SHOP_NOW:
+                return visitor.visitShopNow();
+            case GET_DIRECTIONS:
+                return visitor.visitGetDirections();
+            case MESSAGE_PAGE:
+                return visitor.visitMessagePage();
+            case SEE_DETAILS:
+                return visitor.visitSeeDetails();
+            case CALL_NOW:
+                return visitor.visitCallNow();
+            case SEE_MENU:
+                return visitor.visitSeeMenu();
+            case SUBSCRIBE:
+                return visitor.visitSubscribe();
+            case APPLY_NOW:
+                return visitor.visitApplyNow();
             case UNKNOWN:
             default:
                 return visitor.visitUnknown(string);
@@ -159,40 +174,22 @@ public final class CreateAdsRequestCallToAction {
     @JsonCreator(mode = JsonCreator.Mode.DELEGATING)
     public static CreateAdsRequestCallToAction valueOf(String value) {
         switch (value) {
-            case "book_now":
-                return BOOK_NOW;
             case "request_time":
                 return REQUEST_TIME;
-            case "sign_up":
-                return SIGN_UP;
+            case "donate_now":
+                return DONATE_NOW;
             case "no_button":
                 return NO_BUTTON;
             case "get_offer":
                 return GET_OFFER;
             case "open_link":
                 return OPEN_LINK;
-            case "shop_now":
-                return SHOP_NOW;
-            case "get_directions":
-                return GET_DIRECTIONS;
             case "listen_now":
                 return LISTEN_NOW;
-            case "message_page":
-                return MESSAGE_PAGE;
-            case "see_details":
-                return SEE_DETAILS;
-            case "call_now":
-                return CALL_NOW;
             case "get_quote":
                 return GET_QUOTE;
             case "order_now":
                 return ORDER_NOW;
-            case "see_menu":
-                return SEE_MENU;
-            case "subscribe":
-                return SUBSCRIBE;
-            case "apply_now":
-                return APPLY_NOW;
             case "learn_more":
                 return LEARN_MORE;
             case "download":
@@ -203,6 +200,30 @@ public final class CreateAdsRequestCallToAction {
                 return CONTACT_US;
             case "watch_more":
                 return WATCH_MORE;
+            case "book_now":
+                return BOOK_NOW;
+            case "sign_up":
+                return SIGN_UP;
+            case "visit_site":
+                return VISIT_SITE;
+            case "see_more":
+                return SEE_MORE;
+            case "shop_now":
+                return SHOP_NOW;
+            case "get_directions":
+                return GET_DIRECTIONS;
+            case "message_page":
+                return MESSAGE_PAGE;
+            case "see_details":
+                return SEE_DETAILS;
+            case "call_now":
+                return CALL_NOW;
+            case "see_menu":
+                return SEE_MENU;
+            case "subscribe":
+                return SUBSCRIBE;
+            case "apply_now":
+                return APPLY_NOW;
             default:
                 return new CreateAdsRequestCallToAction(Value.UNKNOWN, value);
         }
@@ -216,6 +237,8 @@ public final class CreateAdsRequestCallToAction {
         CALL_NOW,
 
         CONTACT_US,
+
+        DONATE_NOW,
 
         DOWNLOAD,
 
@@ -243,6 +266,8 @@ public final class CreateAdsRequestCallToAction {
 
         SEE_MENU,
 
+        SEE_MORE,
+
         SEND_UPDATES,
 
         SHOP_NOW,
@@ -250,6 +275,8 @@ public final class CreateAdsRequestCallToAction {
         SIGN_UP,
 
         SUBSCRIBE,
+
+        VISIT_SITE,
 
         WATCH_MORE,
 
@@ -264,6 +291,8 @@ public final class CreateAdsRequestCallToAction {
         T visitCallNow();
 
         T visitContactUs();
+
+        T visitDonateNow();
 
         T visitDownload();
 
@@ -291,6 +320,8 @@ public final class CreateAdsRequestCallToAction {
 
         T visitSeeMenu();
 
+        T visitSeeMore();
+
         T visitSendUpdates();
 
         T visitShopNow();
@@ -298,6 +329,8 @@ public final class CreateAdsRequestCallToAction {
         T visitSignUp();
 
         T visitSubscribe();
+
+        T visitVisitSite();
 
         T visitWatchMore();
 

@@ -4,11 +4,13 @@
 package com.whop.api.resources.events;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
+import com.whop.api.core.BodyProperties;
 import com.whop.api.core.ClientOptions;
 import com.whop.api.core.MediaTypes;
 import com.whop.api.core.ObjectMappers;
 import com.whop.api.core.QueryStringMapper;
 import com.whop.api.core.RequestOptions;
+import com.whop.api.core.RetryInterceptor;
 import com.whop.api.core.WhopApiApiException;
 import com.whop.api.core.WhopApiException;
 import com.whop.api.core.WhopApiHttpResponse;
@@ -28,7 +30,6 @@ import com.whop.api.resources.events.types.ListEventsResponseDataItem;
 import com.whop.api.resources.events.types.PulseEventsResponse;
 import com.whop.api.resources.events.types.PulseEventsResponseDataItem;
 import com.whop.api.types.PixelValidation;
-import com.whop.api.types.V1ErrorResponse;
 import java.io.IOException;
 import java.util.List;
 import okhttp3.Headers;
@@ -47,32 +48,32 @@ public class RawEventsClient {
     }
 
     /**
-     * Lists identity-linked events, most recent first by default. Pass identifier for one person's journey, or omit it to list events for an account within an explicit time range. Pass direction=asc to read a journey forwards from where it starts. Events are shaped like the POST /events intake: attribution in context, identity in user.
+     * Lists identity-linked events, most recent first by default. Pass <code>identifier</code> for one person's journey, or omit it to list an account's events within a time range. Events have the same shape as the <code>POST /events</code> intake: attribution in <code>context</code>, identity in <code>user</code>.
      */
     public WhopApiHttpResponse<SyncPagingIterable<ListEventsResponseDataItem>> list() {
         return list(ListEventsRequest.builder().build());
     }
 
     /**
-     * Lists identity-linked events, most recent first by default. Pass identifier for one person's journey, or omit it to list events for an account within an explicit time range. Pass direction=asc to read a journey forwards from where it starts. Events are shaped like the POST /events intake: attribution in context, identity in user.
+     * Lists identity-linked events, most recent first by default. Pass <code>identifier</code> for one person's journey, or omit it to list an account's events within a time range. Events have the same shape as the <code>POST /events</code> intake: attribution in <code>context</code>, identity in <code>user</code>.
      */
     public WhopApiHttpResponse<SyncPagingIterable<ListEventsResponseDataItem>> list(RequestOptions requestOptions) {
         return list(ListEventsRequest.builder().build(), requestOptions);
     }
 
     /**
-     * Lists identity-linked events, most recent first by default. Pass identifier for one person's journey, or omit it to list events for an account within an explicit time range. Pass direction=asc to read a journey forwards from where it starts. Events are shaped like the POST /events intake: attribution in context, identity in user.
+     * Lists identity-linked events, most recent first by default. Pass <code>identifier</code> for one person's journey, or omit it to list an account's events within a time range. Events have the same shape as the <code>POST /events</code> intake: attribution in <code>context</code>, identity in <code>user</code>.
      */
     public WhopApiHttpResponse<SyncPagingIterable<ListEventsResponseDataItem>> list(ListEventsRequest request) {
         return list(request, null);
     }
 
     /**
-     * Lists identity-linked events, most recent first by default. Pass identifier for one person's journey, or omit it to list events for an account within an explicit time range. Pass direction=asc to read a journey forwards from where it starts. Events are shaped like the POST /events intake: attribution in context, identity in user.
+     * Lists identity-linked events, most recent first by default. Pass <code>identifier</code> for one person's journey, or omit it to list an account's events within a time range. Events have the same shape as the <code>POST /events</code> intake: attribution in <code>context</code>, identity in <code>user</code>.
      */
     public WhopApiHttpResponse<SyncPagingIterable<ListEventsResponseDataItem>> list(
             ListEventsRequest request, RequestOptions requestOptions) {
-        HttpUrl.Builder httpUrl = HttpUrl.parse(this.clientOptions.environment().getUrl())
+        HttpUrl.Builder httpUrl = HttpUrl.parse(this.clientOptions.environment().getApiURL())
                 .newBuilder()
                 .addPathSegments("events");
         if (request.getIdentifier().isPresent()) {
@@ -164,6 +165,15 @@ public class RawEventsClient {
         if (requestOptions != null && requestOptions.getTimeout().isPresent()) {
             client = clientOptions.httpClientWithTimeout(requestOptions);
         }
+        if (requestOptions != null && requestOptions.getMaxRetries().isPresent()) {
+            okhttpRequest = okhttpRequest
+                    .newBuilder()
+                    .tag(
+                            RetryInterceptor.MaxRetriesOverride.class,
+                            new RetryInterceptor.MaxRetriesOverride(
+                                    requestOptions.getMaxRetries().get()))
+                    .build();
+        }
         try (Response response = client.newCall(okhttpRequest).execute()) {
             ResponseBody responseBody = response.body();
             String responseBodyString = responseBody != null ? responseBody.string() : "{}";
@@ -199,24 +209,26 @@ public class RawEventsClient {
             Object errorBody = ObjectMappers.parseErrorBody(responseBodyString);
             throw new WhopApiApiException(
                     "Error with status code " + response.code(), response.code(), errorBody, response);
+        } catch (JsonProcessingException e) {
+            throw new WhopApiException("Failed to deserialize response: " + e.getMessage(), e);
         } catch (IOException e) {
             throw new WhopApiException("Network error executing HTTP request", e);
         }
     }
 
     /**
-     * Tracks a conversion or engagement event for an account.
+     * Tracks a conversion or engagement event for an account, such as a lead or a sign-up, so it can be attributed to the ads and links that drove it. Send server-side events with an API key that has <code>event:create</code>; the browser pixel calls this without authentication.
      */
     public WhopApiHttpResponse<CreateEventsResponse> create(CreateEventsRequest request) {
         return create(request, null);
     }
 
     /**
-     * Tracks a conversion or engagement event for an account.
+     * Tracks a conversion or engagement event for an account, such as a lead or a sign-up, so it can be attributed to the ads and links that drove it. Send server-side events with an API key that has <code>event:create</code>; the browser pixel calls this without authentication.
      */
     public WhopApiHttpResponse<CreateEventsResponse> create(
             CreateEventsRequest request, RequestOptions requestOptions) {
-        HttpUrl.Builder httpUrl = HttpUrl.parse(this.clientOptions.environment().getUrl())
+        HttpUrl.Builder httpUrl = HttpUrl.parse(this.clientOptions.environment().getApiURL())
                 .newBuilder()
                 .addPathSegments("events");
         if (requestOptions != null) {
@@ -227,7 +239,9 @@ public class RawEventsClient {
         RequestBody body;
         try {
             body = RequestBody.create(
-                    ObjectMappers.JSON_MAPPER.writeValueAsBytes(request), MediaTypes.APPLICATION_JSON);
+                    ObjectMappers.JSON_MAPPER.writeValueAsBytes(BodyProperties.merge(
+                            request, requestOptions != null ? requestOptions.getBodyProperties() : null)),
+                    MediaTypes.APPLICATION_JSON);
         } catch (JsonProcessingException e) {
             throw new WhopApiException("Failed to serialize request", e);
         }
@@ -242,6 +256,15 @@ public class RawEventsClient {
         if (requestOptions != null && requestOptions.getTimeout().isPresent()) {
             client = clientOptions.httpClientWithTimeout(requestOptions);
         }
+        if (requestOptions != null && requestOptions.getMaxRetries().isPresent()) {
+            okhttpRequest = okhttpRequest
+                    .newBuilder()
+                    .tag(
+                            RetryInterceptor.MaxRetriesOverride.class,
+                            new RetryInterceptor.MaxRetriesOverride(
+                                    requestOptions.getMaxRetries().get()))
+                    .build();
+        }
         try (Response response = client.newCall(okhttpRequest).execute()) {
             ResponseBody responseBody = response.body();
             String responseBodyString = responseBody != null ? responseBody.string() : "{}";
@@ -252,7 +275,7 @@ public class RawEventsClient {
             try {
                 if (response.code() == 409) {
                     throw new ConflictError(
-                            ObjectMappers.JSON_MAPPER.readValue(responseBodyString, V1ErrorResponse.class), response);
+                            ObjectMappers.JSON_MAPPER.readValue(responseBodyString, Object.class), response);
                 }
             } catch (JsonProcessingException ignored) {
                 // unable to map error response, throwing generic error
@@ -260,38 +283,40 @@ public class RawEventsClient {
             Object errorBody = ObjectMappers.parseErrorBody(responseBodyString);
             throw new WhopApiApiException(
                     "Error with status code " + response.code(), response.code(), errorBody, response);
+        } catch (JsonProcessingException e) {
+            throw new WhopApiException("Failed to deserialize response: " + e.getMessage(), e);
         } catch (IOException e) {
             throw new WhopApiException("Network error executing HTTP request", e);
         }
     }
 
     /**
-     * Returns a fully anonymized feed of recent platform-wide money movement, most recent first: purchases, affiliate commissions, card and ad spend, app revenue, off-platform sales, wallet deposits, card loads, claimed drops, transfers between accounts, and referral bonuses. Items carry only a <code>type</code>, the underlying event name, a USD amount, a coarse location under <code>user</code>, and a timestamp coarsened to the start of the minute; missing fields are omitted, not nulled. The payload is identical for every caller; no auth is required.
+     * Returns a fully anonymized feed of recent money movement across Whop, most recent first, such as purchases, card spend, and transfers between accounts. Each item carries only its <code>type</code>, a USD amount, a coarse location, and a timestamp coarsened to the minute. The payload is identical for every caller and requires no authentication.
      */
     public WhopApiHttpResponse<SyncPagingIterable<PulseEventsResponseDataItem>> pulse() {
         return pulse(PulseEventsRequest.builder().build());
     }
 
     /**
-     * Returns a fully anonymized feed of recent platform-wide money movement, most recent first: purchases, affiliate commissions, card and ad spend, app revenue, off-platform sales, wallet deposits, card loads, claimed drops, transfers between accounts, and referral bonuses. Items carry only a <code>type</code>, the underlying event name, a USD amount, a coarse location under <code>user</code>, and a timestamp coarsened to the start of the minute; missing fields are omitted, not nulled. The payload is identical for every caller; no auth is required.
+     * Returns a fully anonymized feed of recent money movement across Whop, most recent first, such as purchases, card spend, and transfers between accounts. Each item carries only its <code>type</code>, a USD amount, a coarse location, and a timestamp coarsened to the minute. The payload is identical for every caller and requires no authentication.
      */
     public WhopApiHttpResponse<SyncPagingIterable<PulseEventsResponseDataItem>> pulse(RequestOptions requestOptions) {
         return pulse(PulseEventsRequest.builder().build(), requestOptions);
     }
 
     /**
-     * Returns a fully anonymized feed of recent platform-wide money movement, most recent first: purchases, affiliate commissions, card and ad spend, app revenue, off-platform sales, wallet deposits, card loads, claimed drops, transfers between accounts, and referral bonuses. Items carry only a <code>type</code>, the underlying event name, a USD amount, a coarse location under <code>user</code>, and a timestamp coarsened to the start of the minute; missing fields are omitted, not nulled. The payload is identical for every caller; no auth is required.
+     * Returns a fully anonymized feed of recent money movement across Whop, most recent first, such as purchases, card spend, and transfers between accounts. Each item carries only its <code>type</code>, a USD amount, a coarse location, and a timestamp coarsened to the minute. The payload is identical for every caller and requires no authentication.
      */
     public WhopApiHttpResponse<SyncPagingIterable<PulseEventsResponseDataItem>> pulse(PulseEventsRequest request) {
         return pulse(request, null);
     }
 
     /**
-     * Returns a fully anonymized feed of recent platform-wide money movement, most recent first: purchases, affiliate commissions, card and ad spend, app revenue, off-platform sales, wallet deposits, card loads, claimed drops, transfers between accounts, and referral bonuses. Items carry only a <code>type</code>, the underlying event name, a USD amount, a coarse location under <code>user</code>, and a timestamp coarsened to the start of the minute; missing fields are omitted, not nulled. The payload is identical for every caller; no auth is required.
+     * Returns a fully anonymized feed of recent money movement across Whop, most recent first, such as purchases, card spend, and transfers between accounts. Each item carries only its <code>type</code>, a USD amount, a coarse location, and a timestamp coarsened to the minute. The payload is identical for every caller and requires no authentication.
      */
     public WhopApiHttpResponse<SyncPagingIterable<PulseEventsResponseDataItem>> pulse(
             PulseEventsRequest request, RequestOptions requestOptions) {
-        HttpUrl.Builder httpUrl = HttpUrl.parse(this.clientOptions.environment().getUrl())
+        HttpUrl.Builder httpUrl = HttpUrl.parse(this.clientOptions.environment().getApiURL())
                 .newBuilder()
                 .addPathSegments("events/pulse");
         if (request.getEvent().isPresent()) {
@@ -325,6 +350,15 @@ public class RawEventsClient {
         if (requestOptions != null && requestOptions.getTimeout().isPresent()) {
             client = clientOptions.httpClientWithTimeout(requestOptions);
         }
+        if (requestOptions != null && requestOptions.getMaxRetries().isPresent()) {
+            okhttpRequest = okhttpRequest
+                    .newBuilder()
+                    .tag(
+                            RetryInterceptor.MaxRetriesOverride.class,
+                            new RetryInterceptor.MaxRetriesOverride(
+                                    requestOptions.getMaxRetries().get()))
+                    .build();
+        }
         try (Response response = client.newCall(okhttpRequest).execute()) {
             ResponseBody responseBody = response.body();
             String responseBodyString = responseBody != null ? responseBody.string() : "{}";
@@ -356,38 +390,40 @@ public class RawEventsClient {
             Object errorBody = ObjectMappers.parseErrorBody(responseBodyString);
             throw new WhopApiApiException(
                     "Error with status code " + response.code(), response.code(), errorBody, response);
+        } catch (JsonProcessingException e) {
+            throw new WhopApiException("Failed to deserialize response: " + e.getMessage(), e);
         } catch (IOException e) {
             throw new WhopApiException("Network error executing HTTP request", e);
         }
     }
 
     /**
-     * Checks whether the Whop pixel is installed for an account. Recent pixel events count as proof on their own, so an account that has sent data lately comes back installed without a <code>url</code>. Pass a <code>url</code> and events from that page settle it; conversion events are also read across the hostname because they commonly fire on a later confirmation page. If the requested page hasn't sent any events lately, it is fetched and read for the pixel and conversion events wired on it. <code>installed</code> is only true when the pixel was actually seen — in the account's events or in the page.
+     * Checks whether the Whop pixel is installed for an account, or on one page when you pass a <code>url</code>. Use it before launching an ad to confirm its destination is tracked, or in a setup flow to tell a merchant whether their install is live.
      */
     public WhopApiHttpResponse<PixelValidation> validatePixel() {
         return validatePixel(ValidatePixelEventsRequest.builder().build());
     }
 
     /**
-     * Checks whether the Whop pixel is installed for an account. Recent pixel events count as proof on their own, so an account that has sent data lately comes back installed without a <code>url</code>. Pass a <code>url</code> and events from that page settle it; conversion events are also read across the hostname because they commonly fire on a later confirmation page. If the requested page hasn't sent any events lately, it is fetched and read for the pixel and conversion events wired on it. <code>installed</code> is only true when the pixel was actually seen — in the account's events or in the page.
+     * Checks whether the Whop pixel is installed for an account, or on one page when you pass a <code>url</code>. Use it before launching an ad to confirm its destination is tracked, or in a setup flow to tell a merchant whether their install is live.
      */
     public WhopApiHttpResponse<PixelValidation> validatePixel(RequestOptions requestOptions) {
         return validatePixel(ValidatePixelEventsRequest.builder().build(), requestOptions);
     }
 
     /**
-     * Checks whether the Whop pixel is installed for an account. Recent pixel events count as proof on their own, so an account that has sent data lately comes back installed without a <code>url</code>. Pass a <code>url</code> and events from that page settle it; conversion events are also read across the hostname because they commonly fire on a later confirmation page. If the requested page hasn't sent any events lately, it is fetched and read for the pixel and conversion events wired on it. <code>installed</code> is only true when the pixel was actually seen — in the account's events or in the page.
+     * Checks whether the Whop pixel is installed for an account, or on one page when you pass a <code>url</code>. Use it before launching an ad to confirm its destination is tracked, or in a setup flow to tell a merchant whether their install is live.
      */
     public WhopApiHttpResponse<PixelValidation> validatePixel(ValidatePixelEventsRequest request) {
         return validatePixel(request, null);
     }
 
     /**
-     * Checks whether the Whop pixel is installed for an account. Recent pixel events count as proof on their own, so an account that has sent data lately comes back installed without a <code>url</code>. Pass a <code>url</code> and events from that page settle it; conversion events are also read across the hostname because they commonly fire on a later confirmation page. If the requested page hasn't sent any events lately, it is fetched and read for the pixel and conversion events wired on it. <code>installed</code> is only true when the pixel was actually seen — in the account's events or in the page.
+     * Checks whether the Whop pixel is installed for an account, or on one page when you pass a <code>url</code>. Use it before launching an ad to confirm its destination is tracked, or in a setup flow to tell a merchant whether their install is live.
      */
     public WhopApiHttpResponse<PixelValidation> validatePixel(
             ValidatePixelEventsRequest request, RequestOptions requestOptions) {
-        HttpUrl.Builder httpUrl = HttpUrl.parse(this.clientOptions.environment().getUrl())
+        HttpUrl.Builder httpUrl = HttpUrl.parse(this.clientOptions.environment().getApiURL())
                 .newBuilder()
                 .addPathSegments("events/validate_pixel");
         if (requestOptions != null) {
@@ -398,7 +434,9 @@ public class RawEventsClient {
         RequestBody body;
         try {
             body = RequestBody.create(
-                    ObjectMappers.JSON_MAPPER.writeValueAsBytes(request), MediaTypes.APPLICATION_JSON);
+                    ObjectMappers.JSON_MAPPER.writeValueAsBytes(BodyProperties.merge(
+                            request, requestOptions != null ? requestOptions.getBodyProperties() : null)),
+                    MediaTypes.APPLICATION_JSON);
         } catch (JsonProcessingException e) {
             throw new WhopApiException("Failed to serialize request", e);
         }
@@ -412,6 +450,15 @@ public class RawEventsClient {
         OkHttpClient client = clientOptions.httpClient();
         if (requestOptions != null && requestOptions.getTimeout().isPresent()) {
             client = clientOptions.httpClientWithTimeout(requestOptions);
+        }
+        if (requestOptions != null && requestOptions.getMaxRetries().isPresent()) {
+            okhttpRequest = okhttpRequest
+                    .newBuilder()
+                    .tag(
+                            RetryInterceptor.MaxRetriesOverride.class,
+                            new RetryInterceptor.MaxRetriesOverride(
+                                    requestOptions.getMaxRetries().get()))
+                    .build();
         }
         try (Response response = client.newCall(okhttpRequest).execute()) {
             ResponseBody responseBody = response.body();
@@ -433,8 +480,7 @@ public class RawEventsClient {
                                 ObjectMappers.JSON_MAPPER.readValue(responseBodyString, Object.class), response);
                     case 409:
                         throw new ConflictError(
-                                ObjectMappers.JSON_MAPPER.readValue(responseBodyString, V1ErrorResponse.class),
-                                response);
+                                ObjectMappers.JSON_MAPPER.readValue(responseBodyString, Object.class), response);
                 }
             } catch (JsonProcessingException ignored) {
                 // unable to map error response, throwing generic error
@@ -442,6 +488,8 @@ public class RawEventsClient {
             Object errorBody = ObjectMappers.parseErrorBody(responseBodyString);
             throw new WhopApiApiException(
                     "Error with status code " + response.code(), response.code(), errorBody, response);
+        } catch (JsonProcessingException e) {
+            throw new WhopApiException("Failed to deserialize response: " + e.getMessage(), e);
         } catch (IOException e) {
             throw new WhopApiException("Network error executing HTTP request", e);
         }

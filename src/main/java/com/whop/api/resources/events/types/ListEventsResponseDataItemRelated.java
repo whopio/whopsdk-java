@@ -37,11 +37,11 @@ public final class ListEventsResponseDataItemRelated {
 
     private final Optional<ListEventsResponseDataItemRelatedPayment> payment;
 
-    private final Optional<ListEventsResponseDataItemRelatedPlan> plan;
-
     private final Optional<ListEventsResponseDataItemRelatedProduct> product;
 
     private final Optional<ListEventsResponseDataItemRelatedUser> user;
+
+    private final Optional<ListEventsResponseDataItemRelatedVariant> variant;
 
     private final Map<String, Object> additionalProperties;
 
@@ -53,9 +53,9 @@ public final class ListEventsResponseDataItemRelated {
             Optional<ListEventsResponseDataItemRelatedApp> app,
             Optional<ListEventsResponseDataItemRelatedAudience> audience,
             Optional<ListEventsResponseDataItemRelatedPayment> payment,
-            Optional<ListEventsResponseDataItemRelatedPlan> plan,
             Optional<ListEventsResponseDataItemRelatedProduct> product,
             Optional<ListEventsResponseDataItemRelatedUser> user,
+            Optional<ListEventsResponseDataItemRelatedVariant> variant,
             Map<String, Object> additionalProperties) {
         this.account = account;
         this.ad = ad;
@@ -64,9 +64,9 @@ public final class ListEventsResponseDataItemRelated {
         this.app = app;
         this.audience = audience;
         this.payment = payment;
-        this.plan = plan;
         this.product = product;
         this.user = user;
+        this.variant = variant;
         this.additionalProperties = additionalProperties;
     }
 
@@ -139,14 +139,6 @@ public final class ListEventsResponseDataItemRelated {
     }
 
     @JsonIgnore
-    public Optional<ListEventsResponseDataItemRelatedPlan> getPlan() {
-        if (plan == null) {
-            return Optional.empty();
-        }
-        return plan;
-    }
-
-    @JsonIgnore
     public Optional<ListEventsResponseDataItemRelatedProduct> getProduct() {
         if (product == null) {
             return Optional.empty();
@@ -160,6 +152,14 @@ public final class ListEventsResponseDataItemRelated {
             return Optional.empty();
         }
         return user;
+    }
+
+    @JsonIgnore
+    public Optional<ListEventsResponseDataItemRelatedVariant> getVariant() {
+        if (variant == null) {
+            return Optional.empty();
+        }
+        return variant;
     }
 
     @JsonInclude(value = JsonInclude.Include.CUSTOM, valueFilter = NullableNonemptyFilter.class)
@@ -205,12 +205,6 @@ public final class ListEventsResponseDataItemRelated {
     }
 
     @JsonInclude(value = JsonInclude.Include.CUSTOM, valueFilter = NullableNonemptyFilter.class)
-    @JsonProperty("plan")
-    private Optional<ListEventsResponseDataItemRelatedPlan> _getPlan() {
-        return plan;
-    }
-
-    @JsonInclude(value = JsonInclude.Include.CUSTOM, valueFilter = NullableNonemptyFilter.class)
     @JsonProperty("product")
     private Optional<ListEventsResponseDataItemRelatedProduct> _getProduct() {
         return product;
@@ -220,6 +214,12 @@ public final class ListEventsResponseDataItemRelated {
     @JsonProperty("user")
     private Optional<ListEventsResponseDataItemRelatedUser> _getUser() {
         return user;
+    }
+
+    @JsonInclude(value = JsonInclude.Include.CUSTOM, valueFilter = NullableNonemptyFilter.class)
+    @JsonProperty("variant")
+    private Optional<ListEventsResponseDataItemRelatedVariant> _getVariant() {
+        return variant;
     }
 
     @java.lang.Override
@@ -241,9 +241,9 @@ public final class ListEventsResponseDataItemRelated {
                 && app.equals(other.app)
                 && audience.equals(other.audience)
                 && payment.equals(other.payment)
-                && plan.equals(other.plan)
                 && product.equals(other.product)
-                && user.equals(other.user);
+                && user.equals(other.user)
+                && variant.equals(other.variant);
     }
 
     @java.lang.Override
@@ -256,9 +256,9 @@ public final class ListEventsResponseDataItemRelated {
                 this.app,
                 this.audience,
                 this.payment,
-                this.plan,
                 this.product,
-                this.user);
+                this.user,
+                this.variant);
     }
 
     @java.lang.Override
@@ -286,13 +286,12 @@ public final class ListEventsResponseDataItemRelated {
 
         private Optional<ListEventsResponseDataItemRelatedPayment> payment = Optional.empty();
 
-        private Optional<ListEventsResponseDataItemRelatedPlan> plan = Optional.empty();
-
         private Optional<ListEventsResponseDataItemRelatedProduct> product = Optional.empty();
 
         private Optional<ListEventsResponseDataItemRelatedUser> user = Optional.empty();
 
-        @JsonAnySetter
+        private Optional<ListEventsResponseDataItemRelatedVariant> variant = Optional.empty();
+
         private Map<String, Object> additionalProperties = new HashMap<>();
 
         private Builder() {}
@@ -305,9 +304,9 @@ public final class ListEventsResponseDataItemRelated {
             app(other.getApp());
             audience(other.getAudience());
             payment(other.getPayment());
-            plan(other.getPlan());
             product(other.getProduct());
             user(other.getUser());
+            variant(other.getVariant());
             return this;
         }
 
@@ -477,28 +476,6 @@ public final class ListEventsResponseDataItemRelated {
             return this;
         }
 
-        @JsonSetter(value = "plan", nulls = Nulls.SKIP)
-        public Builder plan(Optional<ListEventsResponseDataItemRelatedPlan> plan) {
-            this.plan = plan;
-            return this;
-        }
-
-        public Builder plan(ListEventsResponseDataItemRelatedPlan plan) {
-            this.plan = Optional.ofNullable(plan);
-            return this;
-        }
-
-        public Builder plan(Nullable<ListEventsResponseDataItemRelatedPlan> plan) {
-            if (plan.isNull()) {
-                this.plan = null;
-            } else if (plan.isEmpty()) {
-                this.plan = Optional.empty();
-            } else {
-                this.plan = Optional.of(plan.get());
-            }
-            return this;
-        }
-
         @JsonSetter(value = "product", nulls = Nulls.SKIP)
         public Builder product(Optional<ListEventsResponseDataItemRelatedProduct> product) {
             this.product = product;
@@ -543,6 +520,28 @@ public final class ListEventsResponseDataItemRelated {
             return this;
         }
 
+        @JsonSetter(value = "variant", nulls = Nulls.SKIP)
+        public Builder variant(Optional<ListEventsResponseDataItemRelatedVariant> variant) {
+            this.variant = variant;
+            return this;
+        }
+
+        public Builder variant(ListEventsResponseDataItemRelatedVariant variant) {
+            this.variant = Optional.ofNullable(variant);
+            return this;
+        }
+
+        public Builder variant(Nullable<ListEventsResponseDataItemRelatedVariant> variant) {
+            if (variant.isNull()) {
+                this.variant = null;
+            } else if (variant.isEmpty()) {
+                this.variant = Optional.empty();
+            } else {
+                this.variant = Optional.of(variant.get());
+            }
+            return this;
+        }
+
         public ListEventsResponseDataItemRelated build() {
             return new ListEventsResponseDataItemRelated(
                     account,
@@ -552,10 +551,27 @@ public final class ListEventsResponseDataItemRelated {
                     app,
                     audience,
                     payment,
-                    plan,
                     product,
                     user,
+                    variant,
                     additionalProperties);
+        }
+
+        @JsonAnySetter
+        private void putAdditionalPropertyFromJson(String key, Object value) {
+            if (key.equalsIgnoreCase("account")
+                    || key.equalsIgnoreCase("ad")
+                    || key.equalsIgnoreCase("ad_campaign")
+                    || key.equalsIgnoreCase("ad_group")
+                    || key.equalsIgnoreCase("app")
+                    || key.equalsIgnoreCase("audience")
+                    || key.equalsIgnoreCase("payment")
+                    || key.equalsIgnoreCase("product")
+                    || key.equalsIgnoreCase("user")
+                    || key.equalsIgnoreCase("variant")) {
+                return;
+            }
+            this.additionalProperties.put(key, value);
         }
 
         public Builder additionalProperty(String key, Object value) {

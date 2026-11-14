@@ -221,7 +221,6 @@ public final class ListEarningsResponseDataItemFinancialActivityItem {
 
         private Optional<String> category = Optional.empty();
 
-        @JsonAnySetter
         private Map<String, Object> additionalProperties = new HashMap<>();
 
         private Builder() {}
@@ -239,7 +238,6 @@ public final class ListEarningsResponseDataItemFinancialActivityItem {
 
         /**
          * <p>Line amount in its native currency.</p>
-         * <p>Line amount in its native currency.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
@@ -250,7 +248,6 @@ public final class ListEarningsResponseDataItemFinancialActivityItem {
         }
 
         /**
-         * <p>Line amount in USD.</p>
          * <p>Line amount in USD.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
@@ -263,7 +260,6 @@ public final class ListEarningsResponseDataItemFinancialActivityItem {
 
         /**
          * <p>Currency of the native amount.</p>
-         * <p>Currency of the native amount.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
@@ -274,7 +270,6 @@ public final class ListEarningsResponseDataItemFinancialActivityItem {
         }
 
         /**
-         * <p>Whether the line is income Whop collected or a cost Whop paid.</p>
          * <p>Whether the line is income Whop collected or a cost Whop paid.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
@@ -350,6 +345,19 @@ public final class ListEarningsResponseDataItemFinancialActivityItem {
         public ListEarningsResponseDataItemFinancialActivityItem build() {
             return new ListEarningsResponseDataItemFinancialActivityItem(
                     amount, amountUsd, category, createdAt, currency, type, additionalProperties);
+        }
+
+        @JsonAnySetter
+        private void putAdditionalPropertyFromJson(String key, Object value) {
+            if (key.equalsIgnoreCase("amount")
+                    || key.equalsIgnoreCase("amount_usd")
+                    || key.equalsIgnoreCase("category")
+                    || key.equalsIgnoreCase("created_at")
+                    || key.equalsIgnoreCase("currency")
+                    || key.equalsIgnoreCase("type")) {
+                return;
+            }
+            this.additionalProperties.put(key, value);
         }
 
         @java.lang.Override

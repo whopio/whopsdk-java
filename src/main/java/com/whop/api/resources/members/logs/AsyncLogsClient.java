@@ -5,6 +5,7 @@ package com.whop.api.resources.members.logs;
 
 import com.whop.api.core.ClientOptions;
 import com.whop.api.core.RequestOptions;
+import com.whop.api.core.WhopApiHttpResponse;
 import com.whop.api.core.pagination.SyncPagingIterable;
 import com.whop.api.resources.members.logs.requests.ListLogsRequest;
 import com.whop.api.resources.members.logs.types.ListLogsResponseDataItem;
@@ -28,32 +29,68 @@ public class AsyncLogsClient {
     }
 
     /**
-     * Lists activity for a member and all of their non-drafted memberships, most recent first.
+     * Lists activity for a member and all of their memberships that are not <code>drafted</code>, most recent first.
      */
     public CompletableFuture<SyncPagingIterable<ListLogsResponseDataItem>> list(String id) {
-        return this.rawClient.list(id).thenApply(response -> response.body());
+        CompletableFuture<WhopApiHttpResponse<SyncPagingIterable<ListLogsResponseDataItem>>> rawFuture =
+                this.rawClient.list(id);
+        CompletableFuture<SyncPagingIterable<ListLogsResponseDataItem>> future =
+                rawFuture.thenApply(response -> response.body());
+        future.whenComplete((result_, throwable_) -> {
+            if (future.isCancelled()) {
+                rawFuture.cancel(true);
+            }
+        });
+        return future;
     }
 
     /**
-     * Lists activity for a member and all of their non-drafted memberships, most recent first.
+     * Lists activity for a member and all of their memberships that are not <code>drafted</code>, most recent first.
      */
     public CompletableFuture<SyncPagingIterable<ListLogsResponseDataItem>> list(
             String id, RequestOptions requestOptions) {
-        return this.rawClient.list(id, requestOptions).thenApply(response -> response.body());
+        CompletableFuture<WhopApiHttpResponse<SyncPagingIterable<ListLogsResponseDataItem>>> rawFuture =
+                this.rawClient.list(id, requestOptions);
+        CompletableFuture<SyncPagingIterable<ListLogsResponseDataItem>> future =
+                rawFuture.thenApply(response -> response.body());
+        future.whenComplete((result_, throwable_) -> {
+            if (future.isCancelled()) {
+                rawFuture.cancel(true);
+            }
+        });
+        return future;
     }
 
     /**
-     * Lists activity for a member and all of their non-drafted memberships, most recent first.
+     * Lists activity for a member and all of their memberships that are not <code>drafted</code>, most recent first.
      */
     public CompletableFuture<SyncPagingIterable<ListLogsResponseDataItem>> list(String id, ListLogsRequest request) {
-        return this.rawClient.list(id, request).thenApply(response -> response.body());
+        CompletableFuture<WhopApiHttpResponse<SyncPagingIterable<ListLogsResponseDataItem>>> rawFuture =
+                this.rawClient.list(id, request);
+        CompletableFuture<SyncPagingIterable<ListLogsResponseDataItem>> future =
+                rawFuture.thenApply(response -> response.body());
+        future.whenComplete((result_, throwable_) -> {
+            if (future.isCancelled()) {
+                rawFuture.cancel(true);
+            }
+        });
+        return future;
     }
 
     /**
-     * Lists activity for a member and all of their non-drafted memberships, most recent first.
+     * Lists activity for a member and all of their memberships that are not <code>drafted</code>, most recent first.
      */
     public CompletableFuture<SyncPagingIterable<ListLogsResponseDataItem>> list(
             String id, ListLogsRequest request, RequestOptions requestOptions) {
-        return this.rawClient.list(id, request, requestOptions).thenApply(response -> response.body());
+        CompletableFuture<WhopApiHttpResponse<SyncPagingIterable<ListLogsResponseDataItem>>> rawFuture =
+                this.rawClient.list(id, request, requestOptions);
+        CompletableFuture<SyncPagingIterable<ListLogsResponseDataItem>> future =
+                rawFuture.thenApply(response -> response.body());
+        future.whenComplete((result_, throwable_) -> {
+            if (future.isCancelled()) {
+                rawFuture.cancel(true);
+            }
+        });
+        return future;
     }
 }

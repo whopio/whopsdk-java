@@ -209,7 +209,6 @@ public final class LedgerActivityResourceOwnerOwnerLogoUrl {
 
         private Optional<String> logoUrl = Optional.empty();
 
-        @JsonAnySetter
         private Map<String, Object> additionalProperties = new HashMap<>();
 
         private Builder() {}
@@ -225,7 +224,6 @@ public final class LedgerActivityResourceOwnerOwnerLogoUrl {
         }
 
         /**
-         * <p>Account ID.</p>
          * <p>Account ID.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
@@ -354,6 +352,18 @@ public final class LedgerActivityResourceOwnerOwnerLogoUrl {
         @java.lang.Override
         public LedgerActivityResourceOwnerOwnerLogoUrl build() {
             return new LedgerActivityResourceOwnerOwnerLogoUrl(id, logoUrl, object, route, title, additionalProperties);
+        }
+
+        @JsonAnySetter
+        private void putAdditionalPropertyFromJson(String key, Object value) {
+            if (key.equalsIgnoreCase("id")
+                    || key.equalsIgnoreCase("logo_url")
+                    || key.equalsIgnoreCase("object")
+                    || key.equalsIgnoreCase("route")
+                    || key.equalsIgnoreCase("title")) {
+                return;
+            }
+            this.additionalProperties.put(key, value);
         }
 
         @java.lang.Override

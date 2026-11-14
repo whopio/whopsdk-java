@@ -53,7 +53,7 @@ public class ForumPostsClient {
     }
 
     /**
-     * Create a new forum post or comment within an experience. Supports text content, attachments, polls, paywalling, and pinning. Pass experience_id 'public' with a company_id to post to a company's public forum.
+     * Create a new forum post or comment within an experience. Supports text content, attachments, polls, paywalling, and pinning.
      * <p>Required permissions:</p>
      * <ul>
      * <li><code>forum:post:create</code></li>
@@ -64,7 +64,7 @@ public class ForumPostsClient {
     }
 
     /**
-     * Create a new forum post or comment within an experience. Supports text content, attachments, polls, paywalling, and pinning. Pass experience_id 'public' with a company_id to post to a company's public forum.
+     * Create a new forum post or comment within an experience. Supports text content, attachments, polls, paywalling, and pinning.
      * <p>Required permissions:</p>
      * <ul>
      * <li><code>forum:post:create</code></li>

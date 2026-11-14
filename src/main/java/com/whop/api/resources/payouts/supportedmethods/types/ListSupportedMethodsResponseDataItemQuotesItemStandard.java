@@ -113,7 +113,6 @@ public final class ListSupportedMethodsResponseDataItemQuotesItemStandard {
 
         private float totalReceived;
 
-        @JsonAnySetter
         private Map<String, Object> additionalProperties = new HashMap<>();
 
         private Builder() {}
@@ -151,6 +150,16 @@ public final class ListSupportedMethodsResponseDataItemQuotesItemStandard {
         public ListSupportedMethodsResponseDataItemQuotesItemStandard build() {
             return new ListSupportedMethodsResponseDataItemQuotesItemStandard(
                     estimatedArrival, fee, totalReceived, additionalProperties);
+        }
+
+        @JsonAnySetter
+        private void putAdditionalPropertyFromJson(String key, Object value) {
+            if (key.equalsIgnoreCase("estimated_arrival")
+                    || key.equalsIgnoreCase("fee")
+                    || key.equalsIgnoreCase("total_received")) {
+                return;
+            }
+            this.additionalProperties.put(key, value);
         }
 
         @java.lang.Override

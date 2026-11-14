@@ -36,6 +36,8 @@ public final class CreateWebhooksRequest {
 
     private final Optional<String> resourceId;
 
+    private final Optional<String> title;
+
     private final String url;
 
     private final Map<String, Object> additionalProperties;
@@ -46,6 +48,7 @@ public final class CreateWebhooksRequest {
             Optional<Boolean> enabled,
             Optional<List<CreateWebhooksRequestEventsItem>> events,
             Optional<String> resourceId,
+            Optional<String> title,
             String url,
             Map<String, Object> additionalProperties) {
         this.apiVersionDate = apiVersionDate;
@@ -53,6 +56,7 @@ public final class CreateWebhooksRequest {
         this.enabled = enabled;
         this.events = events;
         this.resourceId = resourceId;
+        this.title = title;
         this.url = url;
         this.additionalProperties = additionalProperties;
     }
@@ -69,7 +73,7 @@ public final class CreateWebhooksRequest {
     }
 
     /**
-     * @return Whether to send events for child resources. For example, if the webhook is created for an account, enabling this sends events only from its connected accounts.
+     * @return Whether to send events for child resources. For example, if the webhook is created for an account, enabling this sends events only from its subaccounts.
      */
     @JsonProperty("child_resource_events")
     public Optional<Boolean> getChildResourceEvents() {
@@ -104,6 +108,17 @@ public final class CreateWebhooksRequest {
     }
 
     /**
+     * @return A label for the webhook, shown in the dashboard. Up to 255 characters.
+     */
+    @JsonIgnore
+    public Optional<String> getTitle() {
+        if (title == null) {
+            return Optional.empty();
+        }
+        return title;
+    }
+
+    /**
      * @return The URL to send the webhook to.
      */
     @JsonProperty("url")
@@ -123,6 +138,12 @@ public final class CreateWebhooksRequest {
         return resourceId;
     }
 
+    @JsonInclude(value = JsonInclude.Include.CUSTOM, valueFilter = NullableNonemptyFilter.class)
+    @JsonProperty("title")
+    private Optional<String> _getTitle() {
+        return title;
+    }
+
     @java.lang.Override
     public boolean equals(Object other) {
         if (this == other) return true;
@@ -140,13 +161,20 @@ public final class CreateWebhooksRequest {
                 && enabled.equals(other.enabled)
                 && events.equals(other.events)
                 && resourceId.equals(other.resourceId)
+                && title.equals(other.title)
                 && url.equals(other.url);
     }
 
     @java.lang.Override
     public int hashCode() {
         return Objects.hash(
-                this.apiVersionDate, this.childResourceEvents, this.enabled, this.events, this.resourceId, this.url);
+                this.apiVersionDate,
+                this.childResourceEvents,
+                this.enabled,
+                this.events,
+                this.resourceId,
+                this.title,
+                this.url);
     }
 
     @java.lang.Override
@@ -184,7 +212,7 @@ public final class CreateWebhooksRequest {
         _FinalStage apiVersionDate(Nullable<String> apiVersionDate);
 
         /**
-         * <p>Whether to send events for child resources. For example, if the webhook is created for an account, enabling this sends events only from its connected accounts.</p>
+         * <p>Whether to send events for child resources. For example, if the webhook is created for an account, enabling this sends events only from its subaccounts.</p>
          */
         _FinalStage childResourceEvents(Optional<Boolean> childResourceEvents);
 
@@ -212,11 +240,22 @@ public final class CreateWebhooksRequest {
         _FinalStage resourceId(String resourceId);
 
         _FinalStage resourceId(Nullable<String> resourceId);
+
+        /**
+         * <p>A label for the webhook, shown in the dashboard. Up to 255 characters.</p>
+         */
+        _FinalStage title(Optional<String> title);
+
+        _FinalStage title(String title);
+
+        _FinalStage title(Nullable<String> title);
     }
 
     @JsonIgnoreProperties(ignoreUnknown = true)
     public static final class Builder implements UrlStage, _FinalStage {
         private String url;
+
+        private Optional<String> title = Optional.empty();
 
         private Optional<String> resourceId = Optional.empty();
 
@@ -228,7 +267,6 @@ public final class CreateWebhooksRequest {
 
         private Optional<String> apiVersionDate = Optional.empty();
 
-        @JsonAnySetter
         private Map<String, Object> additionalProperties = new HashMap<>();
 
         private Builder() {}
@@ -240,12 +278,12 @@ public final class CreateWebhooksRequest {
             enabled(other.getEnabled());
             events(other.getEvents());
             resourceId(other.getResourceId());
+            title(other.getTitle());
             url(other.getUrl());
             return this;
         }
 
         /**
-         * <p>The URL to send the webhook to.</p>
          * <p>The URL to send the webhook to.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
@@ -253,6 +291,42 @@ public final class CreateWebhooksRequest {
         @JsonSetter("url")
         public _FinalStage url(@NotNull String url) {
             this.url = Objects.requireNonNull(url, "url must not be null");
+            return this;
+        }
+
+        /**
+         * <p>A label for the webhook, shown in the dashboard. Up to 255 characters.</p>
+         * @return Reference to {@code this} so that method calls can be chained together.
+         */
+        @java.lang.Override
+        public _FinalStage title(Nullable<String> title) {
+            if (title.isNull()) {
+                this.title = null;
+            } else if (title.isEmpty()) {
+                this.title = Optional.empty();
+            } else {
+                this.title = Optional.of(title.get());
+            }
+            return this;
+        }
+
+        /**
+         * <p>A label for the webhook, shown in the dashboard. Up to 255 characters.</p>
+         * @return Reference to {@code this} so that method calls can be chained together.
+         */
+        @java.lang.Override
+        public _FinalStage title(String title) {
+            this.title = Optional.ofNullable(title);
+            return this;
+        }
+
+        /**
+         * <p>A label for the webhook, shown in the dashboard. Up to 255 characters.</p>
+         */
+        @java.lang.Override
+        @JsonSetter(value = "title", nulls = Nulls.SKIP)
+        public _FinalStage title(Optional<String> title) {
+            this.title = title;
             return this;
         }
 
@@ -333,7 +407,7 @@ public final class CreateWebhooksRequest {
         }
 
         /**
-         * <p>Whether to send events for child resources. For example, if the webhook is created for an account, enabling this sends events only from its connected accounts.</p>
+         * <p>Whether to send events for child resources. For example, if the webhook is created for an account, enabling this sends events only from its subaccounts.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
@@ -343,7 +417,7 @@ public final class CreateWebhooksRequest {
         }
 
         /**
-         * <p>Whether to send events for child resources. For example, if the webhook is created for an account, enabling this sends events only from its connected accounts.</p>
+         * <p>Whether to send events for child resources. For example, if the webhook is created for an account, enabling this sends events only from its subaccounts.</p>
          */
         @java.lang.Override
         @JsonSetter(value = "child_resource_events", nulls = Nulls.SKIP)
@@ -391,7 +465,21 @@ public final class CreateWebhooksRequest {
         @java.lang.Override
         public CreateWebhooksRequest build() {
             return new CreateWebhooksRequest(
-                    apiVersionDate, childResourceEvents, enabled, events, resourceId, url, additionalProperties);
+                    apiVersionDate, childResourceEvents, enabled, events, resourceId, title, url, additionalProperties);
+        }
+
+        @JsonAnySetter
+        private void putAdditionalPropertyFromJson(String key, Object value) {
+            if (key.equalsIgnoreCase("api_version_date")
+                    || key.equalsIgnoreCase("child_resource_events")
+                    || key.equalsIgnoreCase("enabled")
+                    || key.equalsIgnoreCase("events")
+                    || key.equalsIgnoreCase("resource_id")
+                    || key.equalsIgnoreCase("title")
+                    || key.equalsIgnoreCase("url")) {
+                return;
+            }
+            this.additionalProperties.put(key, value);
         }
 
         @java.lang.Override

@@ -5,6 +5,7 @@ package com.whop.api.resources.chatchannels;
 
 import com.whop.api.core.ClientOptions;
 import com.whop.api.core.RequestOptions;
+import com.whop.api.core.WhopApiHttpResponse;
 import com.whop.api.core.pagination.SyncPagingIterable;
 import com.whop.api.resources.chatchannels.requests.ListChatChannelsRequest;
 import com.whop.api.resources.chatchannels.requests.RetrieveChatChannelsRequest;
@@ -31,18 +32,27 @@ public class AsyncChatChannelsClient {
     }
 
     /**
-     * Returns a paginated list of chat channels within a specific company, with optional filtering by product.
+     * Lists the chat channels in an account.
      * <p>Required permissions:</p>
      * <ul>
      * <li><code>chat:read</code></li>
      * </ul>
      */
     public CompletableFuture<SyncPagingIterable<ChatChannelListItem>> list(ListChatChannelsRequest request) {
-        return this.rawClient.list(request).thenApply(response -> response.body());
+        CompletableFuture<WhopApiHttpResponse<SyncPagingIterable<ChatChannelListItem>>> rawFuture =
+                this.rawClient.list(request);
+        CompletableFuture<SyncPagingIterable<ChatChannelListItem>> future =
+                rawFuture.thenApply(response -> response.body());
+        future.whenComplete((result_, throwable_) -> {
+            if (future.isCancelled()) {
+                rawFuture.cancel(true);
+            }
+        });
+        return future;
     }
 
     /**
-     * Returns a paginated list of chat channels within a specific company, with optional filtering by product.
+     * Lists the chat channels in an account.
      * <p>Required permissions:</p>
      * <ul>
      * <li><code>chat:read</code></li>
@@ -50,7 +60,16 @@ public class AsyncChatChannelsClient {
      */
     public CompletableFuture<SyncPagingIterable<ChatChannelListItem>> list(
             ListChatChannelsRequest request, RequestOptions requestOptions) {
-        return this.rawClient.list(request, requestOptions).thenApply(response -> response.body());
+        CompletableFuture<WhopApiHttpResponse<SyncPagingIterable<ChatChannelListItem>>> rawFuture =
+                this.rawClient.list(request, requestOptions);
+        CompletableFuture<SyncPagingIterable<ChatChannelListItem>> future =
+                rawFuture.thenApply(response -> response.body());
+        future.whenComplete((result_, throwable_) -> {
+            if (future.isCancelled()) {
+                rawFuture.cancel(true);
+            }
+        });
+        return future;
     }
 
     /**
@@ -61,7 +80,14 @@ public class AsyncChatChannelsClient {
      * </ul>
      */
     public CompletableFuture<ChatChannel> retrieve(String id) {
-        return this.rawClient.retrieve(id).thenApply(response -> response.body());
+        CompletableFuture<WhopApiHttpResponse<ChatChannel>> rawFuture = this.rawClient.retrieve(id);
+        CompletableFuture<ChatChannel> future = rawFuture.thenApply(response -> response.body());
+        future.whenComplete((result_, throwable_) -> {
+            if (future.isCancelled()) {
+                rawFuture.cancel(true);
+            }
+        });
+        return future;
     }
 
     /**
@@ -72,7 +98,14 @@ public class AsyncChatChannelsClient {
      * </ul>
      */
     public CompletableFuture<ChatChannel> retrieve(String id, RequestOptions requestOptions) {
-        return this.rawClient.retrieve(id, requestOptions).thenApply(response -> response.body());
+        CompletableFuture<WhopApiHttpResponse<ChatChannel>> rawFuture = this.rawClient.retrieve(id, requestOptions);
+        CompletableFuture<ChatChannel> future = rawFuture.thenApply(response -> response.body());
+        future.whenComplete((result_, throwable_) -> {
+            if (future.isCancelled()) {
+                rawFuture.cancel(true);
+            }
+        });
+        return future;
     }
 
     /**
@@ -83,7 +116,14 @@ public class AsyncChatChannelsClient {
      * </ul>
      */
     public CompletableFuture<ChatChannel> retrieve(String id, RetrieveChatChannelsRequest request) {
-        return this.rawClient.retrieve(id, request).thenApply(response -> response.body());
+        CompletableFuture<WhopApiHttpResponse<ChatChannel>> rawFuture = this.rawClient.retrieve(id, request);
+        CompletableFuture<ChatChannel> future = rawFuture.thenApply(response -> response.body());
+        future.whenComplete((result_, throwable_) -> {
+            if (future.isCancelled()) {
+                rawFuture.cancel(true);
+            }
+        });
+        return future;
     }
 
     /**
@@ -95,44 +135,73 @@ public class AsyncChatChannelsClient {
      */
     public CompletableFuture<ChatChannel> retrieve(
             String id, RetrieveChatChannelsRequest request, RequestOptions requestOptions) {
-        return this.rawClient.retrieve(id, request, requestOptions).thenApply(response -> response.body());
+        CompletableFuture<WhopApiHttpResponse<ChatChannel>> rawFuture =
+                this.rawClient.retrieve(id, request, requestOptions);
+        CompletableFuture<ChatChannel> future = rawFuture.thenApply(response -> response.body());
+        future.whenComplete((result_, throwable_) -> {
+            if (future.isCancelled()) {
+                rawFuture.cancel(true);
+            }
+        });
+        return future;
     }
 
     /**
-     * Update moderation settings for a chat channel, such as who can post, banned words, and media restrictions.
+     * Updates a chat channel's moderation settings, such as who can post, banned words, and media restrictions.
      * <p>Required permissions:</p>
      * <ul>
      * <li><code>chat:moderate</code></li>
      * </ul>
      */
     public CompletableFuture<ChatChannel> update(String id) {
-        return this.rawClient.update(id).thenApply(response -> response.body());
+        CompletableFuture<WhopApiHttpResponse<ChatChannel>> rawFuture = this.rawClient.update(id);
+        CompletableFuture<ChatChannel> future = rawFuture.thenApply(response -> response.body());
+        future.whenComplete((result_, throwable_) -> {
+            if (future.isCancelled()) {
+                rawFuture.cancel(true);
+            }
+        });
+        return future;
     }
 
     /**
-     * Update moderation settings for a chat channel, such as who can post, banned words, and media restrictions.
+     * Updates a chat channel's moderation settings, such as who can post, banned words, and media restrictions.
      * <p>Required permissions:</p>
      * <ul>
      * <li><code>chat:moderate</code></li>
      * </ul>
      */
     public CompletableFuture<ChatChannel> update(String id, RequestOptions requestOptions) {
-        return this.rawClient.update(id, requestOptions).thenApply(response -> response.body());
+        CompletableFuture<WhopApiHttpResponse<ChatChannel>> rawFuture = this.rawClient.update(id, requestOptions);
+        CompletableFuture<ChatChannel> future = rawFuture.thenApply(response -> response.body());
+        future.whenComplete((result_, throwable_) -> {
+            if (future.isCancelled()) {
+                rawFuture.cancel(true);
+            }
+        });
+        return future;
     }
 
     /**
-     * Update moderation settings for a chat channel, such as who can post, banned words, and media restrictions.
+     * Updates a chat channel's moderation settings, such as who can post, banned words, and media restrictions.
      * <p>Required permissions:</p>
      * <ul>
      * <li><code>chat:moderate</code></li>
      * </ul>
      */
     public CompletableFuture<ChatChannel> update(String id, UpdateChatChannelsRequest request) {
-        return this.rawClient.update(id, request).thenApply(response -> response.body());
+        CompletableFuture<WhopApiHttpResponse<ChatChannel>> rawFuture = this.rawClient.update(id, request);
+        CompletableFuture<ChatChannel> future = rawFuture.thenApply(response -> response.body());
+        future.whenComplete((result_, throwable_) -> {
+            if (future.isCancelled()) {
+                rawFuture.cancel(true);
+            }
+        });
+        return future;
     }
 
     /**
-     * Update moderation settings for a chat channel, such as who can post, banned words, and media restrictions.
+     * Updates a chat channel's moderation settings, such as who can post, banned words, and media restrictions.
      * <p>Required permissions:</p>
      * <ul>
      * <li><code>chat:moderate</code></li>
@@ -140,6 +209,14 @@ public class AsyncChatChannelsClient {
      */
     public CompletableFuture<ChatChannel> update(
             String id, UpdateChatChannelsRequest request, RequestOptions requestOptions) {
-        return this.rawClient.update(id, request, requestOptions).thenApply(response -> response.body());
+        CompletableFuture<WhopApiHttpResponse<ChatChannel>> rawFuture =
+                this.rawClient.update(id, request, requestOptions);
+        CompletableFuture<ChatChannel> future = rawFuture.thenApply(response -> response.body());
+        future.whenComplete((result_, throwable_) -> {
+            if (future.isCancelled()) {
+                rawFuture.cancel(true);
+            }
+        });
+        return future;
     }
 }

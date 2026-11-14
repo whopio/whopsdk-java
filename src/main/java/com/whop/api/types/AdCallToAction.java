@@ -12,6 +12,8 @@ public final class AdCallToAction {
 
     public static final AdCallToAction REQUEST_TIME = new AdCallToAction(Value.REQUEST_TIME, "request_time");
 
+    public static final AdCallToAction DONATE_NOW = new AdCallToAction(Value.DONATE_NOW, "donate_now");
+
     public static final AdCallToAction NO_BUTTON = new AdCallToAction(Value.NO_BUTTON, "no_button");
 
     public static final AdCallToAction GET_STARTED = new AdCallToAction(Value.GET_STARTED, "get_started");
@@ -48,6 +50,10 @@ public final class AdCallToAction {
 
     public static final AdCallToAction VIEW_INSTAGRAM_PROFILE =
             new AdCallToAction(Value.VIEW_INSTAGRAM_PROFILE, "view_instagram_profile");
+
+    public static final AdCallToAction VISIT_SITE = new AdCallToAction(Value.VISIT_SITE, "visit_site");
+
+    public static final AdCallToAction SEE_MORE = new AdCallToAction(Value.SEE_MORE, "see_more");
 
     public static final AdCallToAction EVENT_RSVP = new AdCallToAction(Value.EVENT_RSVP, "event_rsvp");
 
@@ -109,6 +115,8 @@ public final class AdCallToAction {
                 return visitor.visitWhatsappMessage();
             case REQUEST_TIME:
                 return visitor.visitRequestTime();
+            case DONATE_NOW:
+                return visitor.visitDonateNow();
             case NO_BUTTON:
                 return visitor.visitNoButton();
             case GET_STARTED:
@@ -143,6 +151,10 @@ public final class AdCallToAction {
                 return visitor.visitGetEventTickets();
             case VIEW_INSTAGRAM_PROFILE:
                 return visitor.visitViewInstagramProfile();
+            case VISIT_SITE:
+                return visitor.visitVisitSite();
+            case SEE_MORE:
+                return visitor.visitSeeMore();
             case EVENT_RSVP:
                 return visitor.visitEventRsvp();
             case SHOP_NOW:
@@ -180,6 +192,8 @@ public final class AdCallToAction {
                 return WHATSAPP_MESSAGE;
             case "request_time":
                 return REQUEST_TIME;
+            case "donate_now":
+                return DONATE_NOW;
             case "no_button":
                 return NO_BUTTON;
             case "get_started":
@@ -214,6 +228,10 @@ public final class AdCallToAction {
                 return GET_EVENT_TICKETS;
             case "view_instagram_profile":
                 return VIEW_INSTAGRAM_PROFILE;
+            case "visit_site":
+                return VISIT_SITE;
+            case "see_more":
+                return SEE_MORE;
             case "event_rsvp":
                 return EVENT_RSVP;
             case "shop_now":
@@ -306,6 +324,12 @@ public final class AdCallToAction {
 
         VIEW_INSTAGRAM_PROFILE,
 
+        DONATE_NOW,
+
+        SEE_MORE,
+
+        VISIT_SITE,
+
         UNKNOWN
     }
 
@@ -371,6 +395,12 @@ public final class AdCallToAction {
         T visitSeeDetails();
 
         T visitViewInstagramProfile();
+
+        T visitDonateNow();
+
+        T visitSeeMore();
+
+        T visitVisitSite();
 
         T visitUnknown(String unknownType);
     }

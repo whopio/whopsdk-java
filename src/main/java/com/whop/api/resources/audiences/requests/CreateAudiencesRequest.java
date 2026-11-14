@@ -14,6 +14,7 @@ import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.whop.api.core.ObjectMappers;
 import com.whop.api.resources.audiences.types.CreateAudiencesRequestAudienceType;
 import com.whop.api.resources.audiences.types.CreateAudiencesRequestColumnMapping;
+import com.whop.api.resources.audiences.types.CreateAudiencesRequestSourceType;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
@@ -43,6 +44,8 @@ public final class CreateAudiencesRequest {
 
     private final Optional<String> sourceAudienceId;
 
+    private final Optional<CreateAudiencesRequestSourceType> sourceType;
+
     private final Map<String, Object> additionalProperties;
 
     private CreateAudiencesRequest(
@@ -56,6 +59,7 @@ public final class CreateAudiencesRequest {
             Optional<String> name,
             Optional<Integer> percentage,
             Optional<String> sourceAudienceId,
+            Optional<CreateAudiencesRequestSourceType> sourceType,
             Map<String, Object> additionalProperties) {
         this.accountId = accountId;
         this.audienceType = audienceType;
@@ -67,6 +71,7 @@ public final class CreateAudiencesRequest {
         this.name = name;
         this.percentage = percentage;
         this.sourceAudienceId = sourceAudienceId;
+        this.sourceType = sourceType;
         this.additionalProperties = additionalProperties;
     }
 
@@ -79,7 +84,7 @@ public final class CreateAudiencesRequest {
     }
 
     /**
-     * @return What to create. Defaults to <code>custom</code> (CSV upload).
+     * @return Audience type. Defaults to <code>custom</code>.
      */
     @JsonProperty("audience_type")
     public Optional<CreateAudiencesRequestAudienceType> getAudienceType() {
@@ -95,7 +100,7 @@ public final class CreateAudiencesRequest {
     }
 
     /**
-     * @return Custom audiences only. Maps supported identity fields to CSV column headers. Map at least one of <code>email</code> or <code>phone</code>.
+     * @return CSV audiences only. Maps supported identity fields to CSV column headers. Map at least one of <code>email</code> or <code>phone</code>.
      */
     @JsonProperty("column_mapping")
     public Optional<CreateAudiencesRequestColumnMapping> getColumnMapping() {
@@ -111,7 +116,7 @@ public final class CreateAudiencesRequest {
     }
 
     /**
-     * @return Custom audiences only. The uploaded customer CSV — a file id (<code>file_...</code>) returned by <code>POST /files</code>.
+     * @return CSV audiences only. The uploaded customer CSV — a file id (<code>file_...</code>) returned by <code>POST /files</code>.
      */
     @JsonProperty("file_id")
     public Optional<String> getFileId() {
@@ -119,7 +124,7 @@ public final class CreateAudiencesRequest {
     }
 
     /**
-     * @return Filter audiences only. The People filters that define membership, keyed exactly as <code>GET /people</code> accepts them — for example <code>{&quot;os&quot;: &quot;iOS&quot;, &quot;country&quot;: &quot;US&quot;}</code>. Date filters must be rolling windows — <code>first_seen_within_days</code> or <code>last_seen_within_days</code> — so the audience re-anchors on every refresh; fixed dates such as <code>first_seen_after</code> are rejected. Source values are canonical source paths (<code>whop:&lt;campaign&gt;:&lt;group&gt;:&lt;ad&gt;</code>, <code>ext:&lt;platform&gt;:...</code>, <code>referrer:&lt;domain&gt;</code>, <code>direct</code>), exact or with a trailing <code>:*</code> wildcard.
+     * @return Filter audiences only. The People filters that define membership, keyed exactly as <code>GET /people</code> accepts them — for example <code>{&quot;os&quot;: &quot;iOS&quot;, &quot;country&quot;: &quot;US&quot;}</code>. Activity dates <code>event_from</code> and <code>event_to</code> are inclusive and remain fixed on refresh. Use <code>event_within_days</code>, <code>first_seen_within_days</code> or <code>last_seen_within_days</code> for a rolling window. Source values are canonical source paths (<code>whop:&lt;campaign&gt;:&lt;group&gt;:&lt;ad&gt;</code>, <code>ext:&lt;platform&gt;:...</code>, <code>referrer:&lt;domain&gt;</code>, <code>direct</code>), exact or with a trailing <code>:*</code> wildcard.
      */
     @JsonProperty("filters")
     public Optional<Map<String, Object>> getFilters() {
@@ -135,7 +140,7 @@ public final class CreateAudiencesRequest {
     }
 
     /**
-     * @return Lookalikes only. Total similarity reach as a whole percent (1–20), sliced evenly across <code>count</code> — must be divisible by <code>count</code>.
+     * @return Lookalikes only. Total similarity reach as a whole percent (1–20), sliced evenly across <code>count</code> — must be divisible by <code>count</code>. For example, 3 audiences at 6% creates 0–2%, 2–4%, and 4–6% bands.
      */
     @JsonProperty("percentage")
     public Optional<Integer> getPercentage() {
@@ -143,11 +148,19 @@ public final class CreateAudiencesRequest {
     }
 
     /**
-     * @return Lookalikes only. The ready custom audience (<code>adaud_</code>) to build from; it needs at least 100 matched people.
+     * @return Lookalikes only. The ready custom audience (<code>adaud_</code>) to build from; uploaded and People audiences need at least 100 matched people.
      */
     @JsonProperty("source_audience_id")
     public Optional<String> getSourceAudienceId() {
         return sourceAudienceId;
+    }
+
+    /**
+     * @return Custom audience source. Inferred from <code>filters</code>, otherwise defaults to <code>csv_upload</code>. Supply only the fields for the selected source.
+     */
+    @JsonProperty("source_type")
+    public Optional<CreateAudiencesRequestSourceType> getSourceType() {
+        return sourceType;
     }
 
     @java.lang.Override
@@ -171,7 +184,8 @@ public final class CreateAudiencesRequest {
                 && filters.equals(other.filters)
                 && name.equals(other.name)
                 && percentage.equals(other.percentage)
-                && sourceAudienceId.equals(other.sourceAudienceId);
+                && sourceAudienceId.equals(other.sourceAudienceId)
+                && sourceType.equals(other.sourceType);
     }
 
     @java.lang.Override
@@ -186,7 +200,8 @@ public final class CreateAudiencesRequest {
                 this.filters,
                 this.name,
                 this.percentage,
-                this.sourceAudienceId);
+                this.sourceAudienceId,
+                this.sourceType);
     }
 
     @java.lang.Override
@@ -215,7 +230,7 @@ public final class CreateAudiencesRequest {
         _FinalStage additionalProperties(Map<String, Object> additionalProperties);
 
         /**
-         * <p>What to create. Defaults to <code>custom</code> (CSV upload).</p>
+         * <p>Audience type. Defaults to <code>custom</code>.</p>
          */
         _FinalStage audienceType(Optional<CreateAudiencesRequestAudienceType> audienceType);
 
@@ -229,7 +244,7 @@ public final class CreateAudiencesRequest {
         _FinalStage autoRefresh(Boolean autoRefresh);
 
         /**
-         * <p>Custom audiences only. Maps supported identity fields to CSV column headers. Map at least one of <code>email</code> or <code>phone</code>.</p>
+         * <p>CSV audiences only. Maps supported identity fields to CSV column headers. Map at least one of <code>email</code> or <code>phone</code>.</p>
          */
         _FinalStage columnMapping(Optional<CreateAudiencesRequestColumnMapping> columnMapping);
 
@@ -243,14 +258,14 @@ public final class CreateAudiencesRequest {
         _FinalStage count(Integer count);
 
         /**
-         * <p>Custom audiences only. The uploaded customer CSV — a file id (<code>file_...</code>) returned by <code>POST /files</code>.</p>
+         * <p>CSV audiences only. The uploaded customer CSV — a file id (<code>file_...</code>) returned by <code>POST /files</code>.</p>
          */
         _FinalStage fileId(Optional<String> fileId);
 
         _FinalStage fileId(String fileId);
 
         /**
-         * <p>Filter audiences only. The People filters that define membership, keyed exactly as <code>GET /people</code> accepts them — for example <code>{&quot;os&quot;: &quot;iOS&quot;, &quot;country&quot;: &quot;US&quot;}</code>. Date filters must be rolling windows — <code>first_seen_within_days</code> or <code>last_seen_within_days</code> — so the audience re-anchors on every refresh; fixed dates such as <code>first_seen_after</code> are rejected. Source values are canonical source paths (<code>whop:&lt;campaign&gt;:&lt;group&gt;:&lt;ad&gt;</code>, <code>ext:&lt;platform&gt;:...</code>, <code>referrer:&lt;domain&gt;</code>, <code>direct</code>), exact or with a trailing <code>:*</code> wildcard.</p>
+         * <p>Filter audiences only. The People filters that define membership, keyed exactly as <code>GET /people</code> accepts them — for example <code>{&quot;os&quot;: &quot;iOS&quot;, &quot;country&quot;: &quot;US&quot;}</code>. Activity dates <code>event_from</code> and <code>event_to</code> are inclusive and remain fixed on refresh. Use <code>event_within_days</code>, <code>first_seen_within_days</code> or <code>last_seen_within_days</code> for a rolling window. Source values are canonical source paths (<code>whop:&lt;campaign&gt;:&lt;group&gt;:&lt;ad&gt;</code>, <code>ext:&lt;platform&gt;:...</code>, <code>referrer:&lt;domain&gt;</code>, <code>direct</code>), exact or with a trailing <code>:*</code> wildcard.</p>
          */
         _FinalStage filters(Optional<Map<String, Object>> filters);
 
@@ -264,23 +279,32 @@ public final class CreateAudiencesRequest {
         _FinalStage name(String name);
 
         /**
-         * <p>Lookalikes only. Total similarity reach as a whole percent (1–20), sliced evenly across <code>count</code> — must be divisible by <code>count</code>.</p>
+         * <p>Lookalikes only. Total similarity reach as a whole percent (1–20), sliced evenly across <code>count</code> — must be divisible by <code>count</code>. For example, 3 audiences at 6% creates 0–2%, 2–4%, and 4–6% bands.</p>
          */
         _FinalStage percentage(Optional<Integer> percentage);
 
         _FinalStage percentage(Integer percentage);
 
         /**
-         * <p>Lookalikes only. The ready custom audience (<code>adaud_</code>) to build from; it needs at least 100 matched people.</p>
+         * <p>Lookalikes only. The ready custom audience (<code>adaud_</code>) to build from; uploaded and People audiences need at least 100 matched people.</p>
          */
         _FinalStage sourceAudienceId(Optional<String> sourceAudienceId);
 
         _FinalStage sourceAudienceId(String sourceAudienceId);
+
+        /**
+         * <p>Custom audience source. Inferred from <code>filters</code>, otherwise defaults to <code>csv_upload</code>. Supply only the fields for the selected source.</p>
+         */
+        _FinalStage sourceType(Optional<CreateAudiencesRequestSourceType> sourceType);
+
+        _FinalStage sourceType(CreateAudiencesRequestSourceType sourceType);
     }
 
     @JsonIgnoreProperties(ignoreUnknown = true)
     public static final class Builder implements AccountIdStage, _FinalStage {
         private String accountId;
+
+        private Optional<CreateAudiencesRequestSourceType> sourceType = Optional.empty();
 
         private Optional<String> sourceAudienceId = Optional.empty();
 
@@ -300,7 +324,6 @@ public final class CreateAudiencesRequest {
 
         private Optional<CreateAudiencesRequestAudienceType> audienceType = Optional.empty();
 
-        @JsonAnySetter
         private Map<String, Object> additionalProperties = new HashMap<>();
 
         private Builder() {}
@@ -317,11 +340,11 @@ public final class CreateAudiencesRequest {
             name(other.getName());
             percentage(other.getPercentage());
             sourceAudienceId(other.getSourceAudienceId());
+            sourceType(other.getSourceType());
             return this;
         }
 
         /**
-         * <p>Account ID, prefixed <code>biz_</code>.</p>
          * <p>Account ID, prefixed <code>biz_</code>.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
@@ -333,7 +356,27 @@ public final class CreateAudiencesRequest {
         }
 
         /**
-         * <p>Lookalikes only. The ready custom audience (<code>adaud_</code>) to build from; it needs at least 100 matched people.</p>
+         * <p>Custom audience source. Inferred from <code>filters</code>, otherwise defaults to <code>csv_upload</code>. Supply only the fields for the selected source.</p>
+         * @return Reference to {@code this} so that method calls can be chained together.
+         */
+        @java.lang.Override
+        public _FinalStage sourceType(CreateAudiencesRequestSourceType sourceType) {
+            this.sourceType = Optional.ofNullable(sourceType);
+            return this;
+        }
+
+        /**
+         * <p>Custom audience source. Inferred from <code>filters</code>, otherwise defaults to <code>csv_upload</code>. Supply only the fields for the selected source.</p>
+         */
+        @java.lang.Override
+        @JsonSetter(value = "source_type", nulls = Nulls.SKIP)
+        public _FinalStage sourceType(Optional<CreateAudiencesRequestSourceType> sourceType) {
+            this.sourceType = sourceType;
+            return this;
+        }
+
+        /**
+         * <p>Lookalikes only. The ready custom audience (<code>adaud_</code>) to build from; uploaded and People audiences need at least 100 matched people.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
@@ -343,7 +386,7 @@ public final class CreateAudiencesRequest {
         }
 
         /**
-         * <p>Lookalikes only. The ready custom audience (<code>adaud_</code>) to build from; it needs at least 100 matched people.</p>
+         * <p>Lookalikes only. The ready custom audience (<code>adaud_</code>) to build from; uploaded and People audiences need at least 100 matched people.</p>
          */
         @java.lang.Override
         @JsonSetter(value = "source_audience_id", nulls = Nulls.SKIP)
@@ -353,7 +396,7 @@ public final class CreateAudiencesRequest {
         }
 
         /**
-         * <p>Lookalikes only. Total similarity reach as a whole percent (1–20), sliced evenly across <code>count</code> — must be divisible by <code>count</code>.</p>
+         * <p>Lookalikes only. Total similarity reach as a whole percent (1–20), sliced evenly across <code>count</code> — must be divisible by <code>count</code>. For example, 3 audiences at 6% creates 0–2%, 2–4%, and 4–6% bands.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
@@ -363,7 +406,7 @@ public final class CreateAudiencesRequest {
         }
 
         /**
-         * <p>Lookalikes only. Total similarity reach as a whole percent (1–20), sliced evenly across <code>count</code> — must be divisible by <code>count</code>.</p>
+         * <p>Lookalikes only. Total similarity reach as a whole percent (1–20), sliced evenly across <code>count</code> — must be divisible by <code>count</code>. For example, 3 audiences at 6% creates 0–2%, 2–4%, and 4–6% bands.</p>
          */
         @java.lang.Override
         @JsonSetter(value = "percentage", nulls = Nulls.SKIP)
@@ -393,7 +436,7 @@ public final class CreateAudiencesRequest {
         }
 
         /**
-         * <p>Filter audiences only. The People filters that define membership, keyed exactly as <code>GET /people</code> accepts them — for example <code>{&quot;os&quot;: &quot;iOS&quot;, &quot;country&quot;: &quot;US&quot;}</code>. Date filters must be rolling windows — <code>first_seen_within_days</code> or <code>last_seen_within_days</code> — so the audience re-anchors on every refresh; fixed dates such as <code>first_seen_after</code> are rejected. Source values are canonical source paths (<code>whop:&lt;campaign&gt;:&lt;group&gt;:&lt;ad&gt;</code>, <code>ext:&lt;platform&gt;:...</code>, <code>referrer:&lt;domain&gt;</code>, <code>direct</code>), exact or with a trailing <code>:*</code> wildcard.</p>
+         * <p>Filter audiences only. The People filters that define membership, keyed exactly as <code>GET /people</code> accepts them — for example <code>{&quot;os&quot;: &quot;iOS&quot;, &quot;country&quot;: &quot;US&quot;}</code>. Activity dates <code>event_from</code> and <code>event_to</code> are inclusive and remain fixed on refresh. Use <code>event_within_days</code>, <code>first_seen_within_days</code> or <code>last_seen_within_days</code> for a rolling window. Source values are canonical source paths (<code>whop:&lt;campaign&gt;:&lt;group&gt;:&lt;ad&gt;</code>, <code>ext:&lt;platform&gt;:...</code>, <code>referrer:&lt;domain&gt;</code>, <code>direct</code>), exact or with a trailing <code>:*</code> wildcard.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
@@ -403,7 +446,7 @@ public final class CreateAudiencesRequest {
         }
 
         /**
-         * <p>Filter audiences only. The People filters that define membership, keyed exactly as <code>GET /people</code> accepts them — for example <code>{&quot;os&quot;: &quot;iOS&quot;, &quot;country&quot;: &quot;US&quot;}</code>. Date filters must be rolling windows — <code>first_seen_within_days</code> or <code>last_seen_within_days</code> — so the audience re-anchors on every refresh; fixed dates such as <code>first_seen_after</code> are rejected. Source values are canonical source paths (<code>whop:&lt;campaign&gt;:&lt;group&gt;:&lt;ad&gt;</code>, <code>ext:&lt;platform&gt;:...</code>, <code>referrer:&lt;domain&gt;</code>, <code>direct</code>), exact or with a trailing <code>:*</code> wildcard.</p>
+         * <p>Filter audiences only. The People filters that define membership, keyed exactly as <code>GET /people</code> accepts them — for example <code>{&quot;os&quot;: &quot;iOS&quot;, &quot;country&quot;: &quot;US&quot;}</code>. Activity dates <code>event_from</code> and <code>event_to</code> are inclusive and remain fixed on refresh. Use <code>event_within_days</code>, <code>first_seen_within_days</code> or <code>last_seen_within_days</code> for a rolling window. Source values are canonical source paths (<code>whop:&lt;campaign&gt;:&lt;group&gt;:&lt;ad&gt;</code>, <code>ext:&lt;platform&gt;:...</code>, <code>referrer:&lt;domain&gt;</code>, <code>direct</code>), exact or with a trailing <code>:*</code> wildcard.</p>
          */
         @java.lang.Override
         @JsonSetter(value = "filters", nulls = Nulls.SKIP)
@@ -413,7 +456,7 @@ public final class CreateAudiencesRequest {
         }
 
         /**
-         * <p>Custom audiences only. The uploaded customer CSV — a file id (<code>file_...</code>) returned by <code>POST /files</code>.</p>
+         * <p>CSV audiences only. The uploaded customer CSV — a file id (<code>file_...</code>) returned by <code>POST /files</code>.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
@@ -423,7 +466,7 @@ public final class CreateAudiencesRequest {
         }
 
         /**
-         * <p>Custom audiences only. The uploaded customer CSV — a file id (<code>file_...</code>) returned by <code>POST /files</code>.</p>
+         * <p>CSV audiences only. The uploaded customer CSV — a file id (<code>file_...</code>) returned by <code>POST /files</code>.</p>
          */
         @java.lang.Override
         @JsonSetter(value = "file_id", nulls = Nulls.SKIP)
@@ -453,7 +496,7 @@ public final class CreateAudiencesRequest {
         }
 
         /**
-         * <p>Custom audiences only. Maps supported identity fields to CSV column headers. Map at least one of <code>email</code> or <code>phone</code>.</p>
+         * <p>CSV audiences only. Maps supported identity fields to CSV column headers. Map at least one of <code>email</code> or <code>phone</code>.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
@@ -463,7 +506,7 @@ public final class CreateAudiencesRequest {
         }
 
         /**
-         * <p>Custom audiences only. Maps supported identity fields to CSV column headers. Map at least one of <code>email</code> or <code>phone</code>.</p>
+         * <p>CSV audiences only. Maps supported identity fields to CSV column headers. Map at least one of <code>email</code> or <code>phone</code>.</p>
          */
         @java.lang.Override
         @JsonSetter(value = "column_mapping", nulls = Nulls.SKIP)
@@ -493,7 +536,7 @@ public final class CreateAudiencesRequest {
         }
 
         /**
-         * <p>What to create. Defaults to <code>custom</code> (CSV upload).</p>
+         * <p>Audience type. Defaults to <code>custom</code>.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
@@ -503,7 +546,7 @@ public final class CreateAudiencesRequest {
         }
 
         /**
-         * <p>What to create. Defaults to <code>custom</code> (CSV upload).</p>
+         * <p>Audience type. Defaults to <code>custom</code>.</p>
          */
         @java.lang.Override
         @JsonSetter(value = "audience_type", nulls = Nulls.SKIP)
@@ -525,7 +568,26 @@ public final class CreateAudiencesRequest {
                     name,
                     percentage,
                     sourceAudienceId,
+                    sourceType,
                     additionalProperties);
+        }
+
+        @JsonAnySetter
+        private void putAdditionalPropertyFromJson(String key, Object value) {
+            if (key.equalsIgnoreCase("account_id")
+                    || key.equalsIgnoreCase("audience_type")
+                    || key.equalsIgnoreCase("auto_refresh")
+                    || key.equalsIgnoreCase("column_mapping")
+                    || key.equalsIgnoreCase("count")
+                    || key.equalsIgnoreCase("file_id")
+                    || key.equalsIgnoreCase("filters")
+                    || key.equalsIgnoreCase("name")
+                    || key.equalsIgnoreCase("percentage")
+                    || key.equalsIgnoreCase("source_audience_id")
+                    || key.equalsIgnoreCase("source_type")) {
+                return;
+            }
+            this.additionalProperties.put(key, value);
         }
 
         @java.lang.Override

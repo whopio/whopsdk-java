@@ -30,6 +30,10 @@ public final class PaymentNextAction {
         return new PaymentNextAction(new AwaitConfirmationValue(value));
     }
 
+    public static PaymentNextAction collectCardPresent(PaymentNextActionCollectCardPresent value) {
+        return new PaymentNextAction(new CollectCardPresentValue(value));
+    }
+
     public static PaymentNextAction displayInstructions(PaymentNextActionDisplayInstructions value) {
         return new PaymentNextAction(new DisplayInstructionsValue(value));
     }
@@ -40,6 +44,10 @@ public final class PaymentNextAction {
 
     public boolean isAwaitConfirmation() {
         return value instanceof AwaitConfirmationValue;
+    }
+
+    public boolean isCollectCardPresent() {
+        return value instanceof CollectCardPresentValue;
     }
 
     public boolean isDisplayInstructions() {
@@ -57,6 +65,13 @@ public final class PaymentNextAction {
     public Optional<PaymentNextActionAwaitConfirmation> getAwaitConfirmation() {
         if (isAwaitConfirmation()) {
             return Optional.of(((AwaitConfirmationValue) value).value);
+        }
+        return Optional.empty();
+    }
+
+    public Optional<PaymentNextActionCollectCardPresent> getCollectCardPresent() {
+        if (isCollectCardPresent()) {
+            return Optional.of(((CollectCardPresentValue) value).value);
         }
         return Optional.empty();
     }
@@ -82,18 +97,18 @@ public final class PaymentNextAction {
         return Optional.empty();
     }
 
-    @Override
+    @java.lang.Override
     public boolean equals(Object other) {
         if (this == other) return true;
         return other instanceof PaymentNextAction && value.equals(((PaymentNextAction) other).value);
     }
 
-    @Override
+    @java.lang.Override
     public int hashCode() {
         return Objects.hash(value);
     }
 
-    @Override
+    @java.lang.Override
     public String toString() {
         return value.toString();
     }
@@ -106,6 +121,8 @@ public final class PaymentNextAction {
     public interface Visitor<T> {
         T visitAwaitConfirmation(PaymentNextActionAwaitConfirmation awaitConfirmation);
 
+        T visitCollectCardPresent(PaymentNextActionCollectCardPresent collectCardPresent);
+
         T visitDisplayInstructions(PaymentNextActionDisplayInstructions displayInstructions);
 
         T visitRedirect(PaymentNextActionRedirect redirect);
@@ -116,6 +133,7 @@ public final class PaymentNextAction {
     @JsonTypeInfo(use = JsonTypeInfo.Id.NAME, property = "type", visible = true, defaultImpl = _UnknownValue.class)
     @JsonSubTypes({
         @JsonSubTypes.Type(AwaitConfirmationValue.class),
+        @JsonSubTypes.Type(CollectCardPresentValue.class),
         @JsonSubTypes.Type(DisplayInstructionsValue.class),
         @JsonSubTypes.Type(RedirectValue.class)
     })
@@ -150,6 +168,46 @@ public final class PaymentNextAction {
         }
 
         private boolean equalTo(AwaitConfirmationValue other) {
+            return value.equals(other.value);
+        }
+
+        @java.lang.Override
+        public int hashCode() {
+            return Objects.hash(this.value);
+        }
+
+        @java.lang.Override
+        public String toString() {
+            return "PaymentNextAction{" + "value: " + value + "}";
+        }
+    }
+
+    @JsonTypeName("collect_card_present")
+    @JsonIgnoreProperties("type")
+    private static final class CollectCardPresentValue implements Value {
+        @JsonUnwrapped
+        @JsonIgnoreProperties(value = "type", allowSetters = true)
+        private PaymentNextActionCollectCardPresent value;
+
+        @JsonCreator(mode = JsonCreator.Mode.PROPERTIES)
+        private CollectCardPresentValue() {}
+
+        private CollectCardPresentValue(PaymentNextActionCollectCardPresent value) {
+            this.value = value;
+        }
+
+        @java.lang.Override
+        public <T> T visit(Visitor<T> visitor) {
+            return visitor.visitCollectCardPresent(value);
+        }
+
+        @java.lang.Override
+        public boolean equals(Object other) {
+            if (this == other) return true;
+            return other instanceof CollectCardPresentValue && equalTo((CollectCardPresentValue) other);
+        }
+
+        private boolean equalTo(CollectCardPresentValue other) {
             return value.equals(other.value);
         }
 

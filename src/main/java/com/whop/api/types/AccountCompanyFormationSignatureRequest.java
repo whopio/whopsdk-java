@@ -41,7 +41,7 @@ public final class AccountCompanyFormationSignatureRequest {
     }
 
     /**
-     * @return When the signing URL expires, as an ISO 8601 timestamp. Present while <code>status</code> is <code>pending</code>.
+     * @return When the signing URL expires, as an ISO 8601 timestamp. Present only when the signing URL is included.
      */
     @JsonProperty("expires_at")
     public Optional<String> getExpiresAt() {
@@ -57,7 +57,7 @@ public final class AccountCompanyFormationSignatureRequest {
     }
 
     /**
-     * @return Hosted signing URL where the founder completes the form. Present while <code>status</code> is <code>pending</code>.
+     * @return Hosted signing URL where the founder completes the form. Present while <code>status</code> is <code>pending</code> and the caller has <code>incorporation:write</code>. Omitted from webhooks.
      */
     @JsonProperty("url")
     public Optional<String> getUrl() {
@@ -111,14 +111,14 @@ public final class AccountCompanyFormationSignatureRequest {
         _FinalStage additionalProperties(Map<String, Object> additionalProperties);
 
         /**
-         * <p>When the signing URL expires, as an ISO 8601 timestamp. Present while <code>status</code> is <code>pending</code>.</p>
+         * <p>When the signing URL expires, as an ISO 8601 timestamp. Present only when the signing URL is included.</p>
          */
         _FinalStage expiresAt(Optional<String> expiresAt);
 
         _FinalStage expiresAt(String expiresAt);
 
         /**
-         * <p>Hosted signing URL where the founder completes the form. Present while <code>status</code> is <code>pending</code>.</p>
+         * <p>Hosted signing URL where the founder completes the form. Present while <code>status</code> is <code>pending</code> and the caller has <code>incorporation:write</code>. Omitted from webhooks.</p>
          */
         _FinalStage url(Optional<String> url);
 
@@ -133,7 +133,6 @@ public final class AccountCompanyFormationSignatureRequest {
 
         private Optional<String> expiresAt = Optional.empty();
 
-        @JsonAnySetter
         private Map<String, Object> additionalProperties = new HashMap<>();
 
         private Builder() {}
@@ -148,7 +147,6 @@ public final class AccountCompanyFormationSignatureRequest {
 
         /**
          * <p><code>pending</code> when a signing session is ready for the founder; <code>unknown</code> when the signature state could not be determined.</p>
-         * <p><code>pending</code> when a signing session is ready for the founder; <code>unknown</code> when the signature state could not be determined.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
@@ -159,7 +157,7 @@ public final class AccountCompanyFormationSignatureRequest {
         }
 
         /**
-         * <p>Hosted signing URL where the founder completes the form. Present while <code>status</code> is <code>pending</code>.</p>
+         * <p>Hosted signing URL where the founder completes the form. Present while <code>status</code> is <code>pending</code> and the caller has <code>incorporation:write</code>. Omitted from webhooks.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
@@ -169,7 +167,7 @@ public final class AccountCompanyFormationSignatureRequest {
         }
 
         /**
-         * <p>Hosted signing URL where the founder completes the form. Present while <code>status</code> is <code>pending</code>.</p>
+         * <p>Hosted signing URL where the founder completes the form. Present while <code>status</code> is <code>pending</code> and the caller has <code>incorporation:write</code>. Omitted from webhooks.</p>
          */
         @java.lang.Override
         @JsonSetter(value = "url", nulls = Nulls.SKIP)
@@ -179,7 +177,7 @@ public final class AccountCompanyFormationSignatureRequest {
         }
 
         /**
-         * <p>When the signing URL expires, as an ISO 8601 timestamp. Present while <code>status</code> is <code>pending</code>.</p>
+         * <p>When the signing URL expires, as an ISO 8601 timestamp. Present only when the signing URL is included.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
@@ -189,7 +187,7 @@ public final class AccountCompanyFormationSignatureRequest {
         }
 
         /**
-         * <p>When the signing URL expires, as an ISO 8601 timestamp. Present while <code>status</code> is <code>pending</code>.</p>
+         * <p>When the signing URL expires, as an ISO 8601 timestamp. Present only when the signing URL is included.</p>
          */
         @java.lang.Override
         @JsonSetter(value = "expires_at", nulls = Nulls.SKIP)
@@ -201,6 +199,14 @@ public final class AccountCompanyFormationSignatureRequest {
         @java.lang.Override
         public AccountCompanyFormationSignatureRequest build() {
             return new AccountCompanyFormationSignatureRequest(expiresAt, status, url, additionalProperties);
+        }
+
+        @JsonAnySetter
+        private void putAdditionalPropertyFromJson(String key, Object value) {
+            if (key.equalsIgnoreCase("expires_at") || key.equalsIgnoreCase("status") || key.equalsIgnoreCase("url")) {
+                return;
+            }
+            this.additionalProperties.put(key, value);
         }
 
         @java.lang.Override

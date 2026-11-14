@@ -201,7 +201,6 @@ public final class PaymentVoucher {
 
         private Optional<String> reference = Optional.empty();
 
-        @JsonAnySetter
         private Map<String, Object> additionalProperties = new HashMap<>();
 
         private Builder() {}
@@ -357,6 +356,22 @@ public final class PaymentVoucher {
                     providerName,
                     reference,
                     additionalProperties);
+        }
+
+        @JsonAnySetter
+        private void putAdditionalPropertyFromJson(String key, Object value) {
+            if (key.equalsIgnoreCase("amount")
+                    || key.equalsIgnoreCase("barcode")
+                    || key.equalsIgnoreCase("barcode_format")
+                    || key.equalsIgnoreCase("company_name")
+                    || key.equalsIgnoreCase("document_url")
+                    || key.equalsIgnoreCase("expires_at")
+                    || key.equalsIgnoreCase("provider_logo")
+                    || key.equalsIgnoreCase("provider_name")
+                    || key.equalsIgnoreCase("reference")) {
+                return;
+            }
+            this.additionalProperties.put(key, value);
         }
 
         public Builder additionalProperty(String key, Object value) {

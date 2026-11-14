@@ -5,12 +5,14 @@ package com.whop.api.resources.verifications;
 
 import com.whop.api.core.ClientOptions;
 import com.whop.api.core.RequestOptions;
+import com.whop.api.core.pagination.SyncPagingIterable;
 import com.whop.api.resources.verifications.requests.CreateVerificationsRequest;
 import com.whop.api.resources.verifications.requests.ListVerificationsRequest;
 import com.whop.api.resources.verifications.requests.RetrieveVerificationsRequest;
 import com.whop.api.resources.verifications.requests.UpdateVerificationsRequest;
+import com.whop.api.resources.verifications.types.CreateVerificationsRequestBody;
 import com.whop.api.resources.verifications.types.CreateVerificationsResponse;
-import com.whop.api.resources.verifications.types.ListVerificationsResponse;
+import com.whop.api.resources.verifications.types.ListVerificationsResponseDataItem;
 import com.whop.api.resources.verifications.types.RetrieveVerificationsResponse;
 import com.whop.api.resources.verifications.types.UpdateVerificationsResponse;
 
@@ -32,56 +34,85 @@ public class VerificationsClient {
     }
 
     /**
-     * Returns verifications for an account, including their status and any required actions.
+     * Lists the verifications for an account or user, including their status and any required actions. Platforms list their own and every subaccount's verifications at once with <code>include_subaccounts</code>; each one's <code>account_ids</code> names its account, and a verification shared by several accounts appears once for each.
      */
-    public ListVerificationsResponse list(ListVerificationsRequest request) {
+    public SyncPagingIterable<ListVerificationsResponseDataItem> list() {
+        return this.rawClient.list().body();
+    }
+
+    /**
+     * Lists the verifications for an account or user, including their status and any required actions. Platforms list their own and every subaccount's verifications at once with <code>include_subaccounts</code>; each one's <code>account_ids</code> names its account, and a verification shared by several accounts appears once for each.
+     */
+    public SyncPagingIterable<ListVerificationsResponseDataItem> list(RequestOptions requestOptions) {
+        return this.rawClient.list(requestOptions).body();
+    }
+
+    /**
+     * Lists the verifications for an account or user, including their status and any required actions. Platforms list their own and every subaccount's verifications at once with <code>include_subaccounts</code>; each one's <code>account_ids</code> names its account, and a verification shared by several accounts appears once for each.
+     */
+    public SyncPagingIterable<ListVerificationsResponseDataItem> list(ListVerificationsRequest request) {
         return this.rawClient.list(request).body();
     }
 
     /**
-     * Returns verifications for an account, including their status and any required actions.
+     * Lists the verifications for an account or user, including their status and any required actions. Platforms list their own and every subaccount's verifications at once with <code>include_subaccounts</code>; each one's <code>account_ids</code> names its account, and a verification shared by several accounts appears once for each.
      */
-    public ListVerificationsResponse list(ListVerificationsRequest request, RequestOptions requestOptions) {
+    public SyncPagingIterable<ListVerificationsResponseDataItem> list(
+            ListVerificationsRequest request, RequestOptions requestOptions) {
         return this.rawClient.list(request, requestOptions).body();
     }
 
     /**
-     * Starts a hosted verification session for an account or user, or returns the active session when one already exists. Any fields you include in the request body are used to prefill the session. Send <code>documents</code> (with <code>document_type</code>) to instead verify the person from identity documents included in this request — no hosted session involved. Send <code>share_token</code> to reuse a verification another Sumsub account has already completed for this person, instead of verifying them again. If the account already has an <code>approved</code> verification the request is rejected; unlink it first to start a new one.
+     * Starts a hosted verification session for an account or user, or returns the active session when one already exists; any fields you send prefill it. To skip the hosted session, send <code>documents</code> to verify the person from files in this request, <code>share_token</code> to reuse a verification another Sumsub account completed, or <code>verification_id</code> to reuse one the signed-in user completed on Whop. For a business, <code>documents</code> and <code>owners</code> add company formation documents and owners to the verification, and once everything is in this call sends the business for review — call it again after Update Verification to send it. Until then it stays <code>pending</code> and the hosted session collects anything left out. Once the account has an <code>approved</code> verification, every mode except <code>verification_id</code> is rejected — unlink it first to start a new one.
+     */
+    public CreateVerificationsResponse create(CreateVerificationsRequestBody body) {
+        return this.rawClient.create(body).body();
+    }
+
+    /**
+     * Starts a hosted verification session for an account or user, or returns the active session when one already exists; any fields you send prefill it. To skip the hosted session, send <code>documents</code> to verify the person from files in this request, <code>share_token</code> to reuse a verification another Sumsub account completed, or <code>verification_id</code> to reuse one the signed-in user completed on Whop. For a business, <code>documents</code> and <code>owners</code> add company formation documents and owners to the verification, and once everything is in this call sends the business for review — call it again after Update Verification to send it. Until then it stays <code>pending</code> and the hosted session collects anything left out. Once the account has an <code>approved</code> verification, every mode except <code>verification_id</code> is rejected — unlink it first to start a new one.
+     */
+    public CreateVerificationsResponse create(CreateVerificationsRequestBody body, RequestOptions requestOptions) {
+        return this.rawClient.create(body, requestOptions).body();
+    }
+
+    /**
+     * Starts a hosted verification session for an account or user, or returns the active session when one already exists; any fields you send prefill it. To skip the hosted session, send <code>documents</code> to verify the person from files in this request, <code>share_token</code> to reuse a verification another Sumsub account completed, or <code>verification_id</code> to reuse one the signed-in user completed on Whop. For a business, <code>documents</code> and <code>owners</code> add company formation documents and owners to the verification, and once everything is in this call sends the business for review — call it again after Update Verification to send it. Until then it stays <code>pending</code> and the hosted session collects anything left out. Once the account has an <code>approved</code> verification, every mode except <code>verification_id</code> is rejected — unlink it first to start a new one.
      */
     public CreateVerificationsResponse create(CreateVerificationsRequest request) {
         return this.rawClient.create(request).body();
     }
 
     /**
-     * Starts a hosted verification session for an account or user, or returns the active session when one already exists. Any fields you include in the request body are used to prefill the session. Send <code>documents</code> (with <code>document_type</code>) to instead verify the person from identity documents included in this request — no hosted session involved. Send <code>share_token</code> to reuse a verification another Sumsub account has already completed for this person, instead of verifying them again. If the account already has an <code>approved</code> verification the request is rejected; unlink it first to start a new one.
+     * Starts a hosted verification session for an account or user, or returns the active session when one already exists; any fields you send prefill it. To skip the hosted session, send <code>documents</code> to verify the person from files in this request, <code>share_token</code> to reuse a verification another Sumsub account completed, or <code>verification_id</code> to reuse one the signed-in user completed on Whop. For a business, <code>documents</code> and <code>owners</code> add company formation documents and owners to the verification, and once everything is in this call sends the business for review — call it again after Update Verification to send it. Until then it stays <code>pending</code> and the hosted session collects anything left out. Once the account has an <code>approved</code> verification, every mode except <code>verification_id</code> is rejected — unlink it first to start a new one.
      */
     public CreateVerificationsResponse create(CreateVerificationsRequest request, RequestOptions requestOptions) {
         return this.rawClient.create(request, requestOptions).body();
     }
 
     /**
-     * Returns verifications for an account, including their status and any required actions.
+     * Retrieves a verification by ID, including its status and any information or documents still required.
      */
     public RetrieveVerificationsResponse retrieve(String id) {
         return this.rawClient.retrieve(id).body();
     }
 
     /**
-     * Returns verifications for an account, including their status and any required actions.
+     * Retrieves a verification by ID, including its status and any information or documents still required.
      */
     public RetrieveVerificationsResponse retrieve(String id, RequestOptions requestOptions) {
         return this.rawClient.retrieve(id, requestOptions).body();
     }
 
     /**
-     * Returns verifications for an account, including their status and any required actions.
+     * Retrieves a verification by ID, including its status and any information or documents still required.
      */
     public RetrieveVerificationsResponse retrieve(String id, RetrieveVerificationsRequest request) {
         return this.rawClient.retrieve(id, request).body();
     }
 
     /**
-     * Returns verifications for an account, including their status and any required actions.
+     * Retrieves a verification by ID, including its status and any information or documents still required.
      */
     public RetrieveVerificationsResponse retrieve(
             String id, RetrieveVerificationsRequest request, RequestOptions requestOptions) {
@@ -89,14 +120,14 @@ public class VerificationsClient {
     }
 
     /**
-     * Updates editable profile details or submits answers for items returned in <code>requested_information</code>. Once a verification is <code>approved</code> its profile details are locked and can no longer be edited.
+     * Updates editable profile details or submits answers for items returned in <code>requested_information</code>. On a business verification still collecting details, company details, <code>documents</code>, and <code>owners</code> also go to the verification provider; call Create Verification again to send the business for review once everything is in. Under review, <code>registration_number</code>, <code>incorporation_date</code>, <code>place_of_incorporation</code>, and <code>documents</code> are refused. While the review waits on owners, owners can still be added, changed, or removed with <code>remove</code>; otherwise only an owner's missing documents can still be sent. Once a verification is <code>approved</code> its profile details are locked and can no longer be edited.
      */
     public UpdateVerificationsResponse update(String id, UpdateVerificationsRequest request) {
         return this.rawClient.update(id, request).body();
     }
 
     /**
-     * Updates editable profile details or submits answers for items returned in <code>requested_information</code>. Once a verification is <code>approved</code> its profile details are locked and can no longer be edited.
+     * Updates editable profile details or submits answers for items returned in <code>requested_information</code>. On a business verification still collecting details, company details, <code>documents</code>, and <code>owners</code> also go to the verification provider; call Create Verification again to send the business for review once everything is in. Under review, <code>registration_number</code>, <code>incorporation_date</code>, <code>place_of_incorporation</code>, and <code>documents</code> are refused. While the review waits on owners, owners can still be added, changed, or removed with <code>remove</code>; otherwise only an owner's missing documents can still be sent. Once a verification is <code>approved</code> its profile details are locked and can no longer be edited.
      */
     public UpdateVerificationsResponse update(
             String id, UpdateVerificationsRequest request, RequestOptions requestOptions) {

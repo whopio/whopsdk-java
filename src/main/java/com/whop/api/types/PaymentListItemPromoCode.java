@@ -227,7 +227,6 @@ public final class PaymentListItemPromoCode {
 
         private Optional<String> code = Optional.empty();
 
-        @JsonAnySetter
         private Map<String, Object> additionalProperties = new HashMap<>();
 
         private Builder() {}
@@ -245,7 +244,6 @@ public final class PaymentListItemPromoCode {
 
         /**
          * <p>The discount amount. Interpretation depends on promo_type: if 'percentage', this is the percentage (e.g., 20 means 20% off); if 'flat_amount', this is dollars off (e.g., 10.00 means $10.00 off).</p>
-         * <p>The discount amount. Interpretation depends on promo_type: if 'percentage', this is the percentage (e.g., 20 means 20% off); if 'flat_amount', this is dollars off (e.g., 10.00 means $10.00 off).</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
@@ -256,7 +254,6 @@ public final class PaymentListItemPromoCode {
         }
 
         /**
-         * <p>The monetary currency of the promo code.</p>
          * <p>The monetary currency of the promo code.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
@@ -269,7 +266,6 @@ public final class PaymentListItemPromoCode {
 
         /**
          * <p>The unique identifier for the promo code.</p>
-         * <p>The unique identifier for the promo code.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
@@ -280,7 +276,6 @@ public final class PaymentListItemPromoCode {
         }
 
         /**
-         * <p>The type (% or flat amount) of the promo.</p>
          * <p>The type (% or flat amount) of the promo.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
@@ -367,6 +362,19 @@ public final class PaymentListItemPromoCode {
         public PaymentListItemPromoCode build() {
             return new PaymentListItemPromoCode(
                     amountOff, baseCurrency, code, id, numberOfIntervals, promoType, additionalProperties);
+        }
+
+        @JsonAnySetter
+        private void putAdditionalPropertyFromJson(String key, Object value) {
+            if (key.equalsIgnoreCase("amount_off")
+                    || key.equalsIgnoreCase("base_currency")
+                    || key.equalsIgnoreCase("code")
+                    || key.equalsIgnoreCase("id")
+                    || key.equalsIgnoreCase("number_of_intervals")
+                    || key.equalsIgnoreCase("promo_type")) {
+                return;
+            }
+            this.additionalProperties.put(key, value);
         }
 
         @java.lang.Override

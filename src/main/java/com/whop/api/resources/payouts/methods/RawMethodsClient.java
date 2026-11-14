@@ -4,11 +4,14 @@
 package com.whop.api.resources.payouts.methods;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
+import com.whop.api.core.BodyProperties;
 import com.whop.api.core.ClientOptions;
 import com.whop.api.core.MediaTypes;
 import com.whop.api.core.ObjectMappers;
+import com.whop.api.core.PathSegments;
 import com.whop.api.core.QueryStringMapper;
 import com.whop.api.core.RequestOptions;
+import com.whop.api.core.RetryInterceptor;
 import com.whop.api.core.WhopApiApiException;
 import com.whop.api.core.WhopApiException;
 import com.whop.api.core.WhopApiHttpResponse;
@@ -27,7 +30,6 @@ import com.whop.api.resources.payouts.methods.types.DeleteMethodsResponse;
 import com.whop.api.resources.payouts.methods.types.ListMethodsResponse;
 import com.whop.api.resources.payouts.methods.types.ListMethodsResponseDataItem;
 import com.whop.api.resources.payouts.methods.types.UpdateMethodsResponse;
-import com.whop.api.types.V1ErrorResponse;
 import java.io.IOException;
 import java.util.List;
 import java.util.Optional;
@@ -47,32 +49,32 @@ public class RawMethodsClient {
     }
 
     /**
-     * Lists the bank accounts, wallets, and crypto addresses an account or user can withdraw to, newest first.
+     * Lists the bank accounts, wallets, and crypto addresses an account or user can pay out to, newest first.
      */
     public WhopApiHttpResponse<SyncPagingIterable<ListMethodsResponseDataItem>> list() {
         return list(ListMethodsRequest.builder().build());
     }
 
     /**
-     * Lists the bank accounts, wallets, and crypto addresses an account or user can withdraw to, newest first.
+     * Lists the bank accounts, wallets, and crypto addresses an account or user can pay out to, newest first.
      */
     public WhopApiHttpResponse<SyncPagingIterable<ListMethodsResponseDataItem>> list(RequestOptions requestOptions) {
         return list(ListMethodsRequest.builder().build(), requestOptions);
     }
 
     /**
-     * Lists the bank accounts, wallets, and crypto addresses an account or user can withdraw to, newest first.
+     * Lists the bank accounts, wallets, and crypto addresses an account or user can pay out to, newest first.
      */
     public WhopApiHttpResponse<SyncPagingIterable<ListMethodsResponseDataItem>> list(ListMethodsRequest request) {
         return list(request, null);
     }
 
     /**
-     * Lists the bank accounts, wallets, and crypto addresses an account or user can withdraw to, newest first.
+     * Lists the bank accounts, wallets, and crypto addresses an account or user can pay out to, newest first.
      */
     public WhopApiHttpResponse<SyncPagingIterable<ListMethodsResponseDataItem>> list(
             ListMethodsRequest request, RequestOptions requestOptions) {
-        HttpUrl.Builder httpUrl = HttpUrl.parse(this.clientOptions.environment().getUrl())
+        HttpUrl.Builder httpUrl = HttpUrl.parse(this.clientOptions.environment().getApiURL())
                 .newBuilder()
                 .addPathSegments("payouts/methods");
         if (request.getAccountId().isPresent()) {
@@ -94,6 +96,13 @@ public class RawMethodsClient {
         if (request.getCurrency().isPresent()) {
             QueryStringMapper.addQueryParameter(
                     httpUrl, "currency", request.getCurrency().get(), false);
+        }
+        if (request.getIncludeRecipients().isPresent()) {
+            QueryStringMapper.addQueryParameter(
+                    httpUrl,
+                    "include_recipients",
+                    request.getIncludeRecipients().get(),
+                    false);
         }
         if (request.getIncludeLimits().isPresent()) {
             QueryStringMapper.addQueryParameter(
@@ -130,6 +139,15 @@ public class RawMethodsClient {
         if (requestOptions != null && requestOptions.getTimeout().isPresent()) {
             client = clientOptions.httpClientWithTimeout(requestOptions);
         }
+        if (requestOptions != null && requestOptions.getMaxRetries().isPresent()) {
+            okhttpRequest = okhttpRequest
+                    .newBuilder()
+                    .tag(
+                            RetryInterceptor.MaxRetriesOverride.class,
+                            new RetryInterceptor.MaxRetriesOverride(
+                                    requestOptions.getMaxRetries().get()))
+                    .build();
+        }
         try (Response response = client.newCall(okhttpRequest).execute()) {
             ResponseBody responseBody = response.body();
             String responseBodyString = responseBody != null ? responseBody.string() : "{}";
@@ -144,8 +162,11 @@ public class RawMethodsClient {
                 List<ListMethodsResponseDataItem> result = parsedResponse.getData();
                 return new WhopApiHttpResponse<>(
                         new SyncPagingIterable<ListMethodsResponseDataItem>(
-                                startingAfter != null, result, parsedResponse, () -> list(nextRequest, requestOptions)
-                                        .body()),
+                                startingAfter.isPresent()
+                                        && !startingAfter.get().isEmpty(),
+                                result,
+                                parsedResponse,
+                                () -> list(nextRequest, requestOptions).body()),
                         response);
             }
             try {
@@ -169,24 +190,26 @@ public class RawMethodsClient {
             Object errorBody = ObjectMappers.parseErrorBody(responseBodyString);
             throw new WhopApiApiException(
                     "Error with status code " + response.code(), response.code(), errorBody, response);
+        } catch (JsonProcessingException e) {
+            throw new WhopApiException("Failed to deserialize response: " + e.getMessage(), e);
         } catch (IOException e) {
             throw new WhopApiException("Network error executing HTTP request", e);
         }
     }
 
     /**
-     * Saves a new place an account or user can withdraw to. Sensitive details are vaulted in transit and never stored raw.
+     * Saves a bank account, wallet, or crypto address an account or user can pay out to, from a method listed by <code>GET /payouts/supported_methods</code>. Sensitive details are vaulted in transit and never stored raw.
      */
     public WhopApiHttpResponse<CreateMethodsResponse> create(CreateMethodsRequest request) {
         return create(request, null);
     }
 
     /**
-     * Saves a new place an account or user can withdraw to. Sensitive details are vaulted in transit and never stored raw.
+     * Saves a bank account, wallet, or crypto address an account or user can pay out to, from a method listed by <code>GET /payouts/supported_methods</code>. Sensitive details are vaulted in transit and never stored raw.
      */
     public WhopApiHttpResponse<CreateMethodsResponse> create(
             CreateMethodsRequest request, RequestOptions requestOptions) {
-        HttpUrl.Builder httpUrl = HttpUrl.parse(this.clientOptions.environment().getUrl())
+        HttpUrl.Builder httpUrl = HttpUrl.parse(this.clientOptions.environment().getApiURL())
                 .newBuilder()
                 .addPathSegments("payouts/methods");
         if (requestOptions != null) {
@@ -197,7 +220,9 @@ public class RawMethodsClient {
         RequestBody body;
         try {
             body = RequestBody.create(
-                    ObjectMappers.JSON_MAPPER.writeValueAsBytes(request), MediaTypes.APPLICATION_JSON);
+                    ObjectMappers.JSON_MAPPER.writeValueAsBytes(BodyProperties.merge(
+                            request, requestOptions != null ? requestOptions.getBodyProperties() : null)),
+                    MediaTypes.APPLICATION_JSON);
         } catch (JsonProcessingException e) {
             throw new WhopApiException("Failed to serialize request", e);
         }
@@ -211,6 +236,15 @@ public class RawMethodsClient {
         OkHttpClient client = clientOptions.httpClient();
         if (requestOptions != null && requestOptions.getTimeout().isPresent()) {
             client = clientOptions.httpClientWithTimeout(requestOptions);
+        }
+        if (requestOptions != null && requestOptions.getMaxRetries().isPresent()) {
+            okhttpRequest = okhttpRequest
+                    .newBuilder()
+                    .tag(
+                            RetryInterceptor.MaxRetriesOverride.class,
+                            new RetryInterceptor.MaxRetriesOverride(
+                                    requestOptions.getMaxRetries().get()))
+                    .build();
         }
         try (Response response = client.newCall(okhttpRequest).execute()) {
             ResponseBody responseBody = response.body();
@@ -235,8 +269,7 @@ public class RawMethodsClient {
                                 ObjectMappers.JSON_MAPPER.readValue(responseBodyString, Object.class), response);
                     case 409:
                         throw new ConflictError(
-                                ObjectMappers.JSON_MAPPER.readValue(responseBodyString, V1ErrorResponse.class),
-                                response);
+                                ObjectMappers.JSON_MAPPER.readValue(responseBodyString, Object.class), response);
                 }
             } catch (JsonProcessingException ignored) {
                 // unable to map error response, throwing generic error
@@ -244,6 +277,8 @@ public class RawMethodsClient {
             Object errorBody = ObjectMappers.parseErrorBody(responseBodyString);
             throw new WhopApiApiException(
                     "Error with status code " + response.code(), response.code(), errorBody, response);
+        } catch (JsonProcessingException e) {
+            throw new WhopApiException("Failed to deserialize response: " + e.getMessage(), e);
         } catch (IOException e) {
             throw new WhopApiException("Network error executing HTTP request", e);
         }
@@ -275,10 +310,10 @@ public class RawMethodsClient {
      */
     public WhopApiHttpResponse<DeleteMethodsResponse> delete(
             String id, DeleteMethodsRequest request, RequestOptions requestOptions) {
-        HttpUrl.Builder httpUrl = HttpUrl.parse(this.clientOptions.environment().getUrl())
+        HttpUrl.Builder httpUrl = HttpUrl.parse(this.clientOptions.environment().getApiURL())
                 .newBuilder()
                 .addPathSegments("payouts/methods")
-                .addPathSegment(id);
+                .addPathSegment(PathSegments.validate(id));
         if (requestOptions != null) {
             requestOptions.getQueryParameters().forEach((_key, _value) -> {
                 httpUrl.addQueryParameter(_key, _value);
@@ -286,13 +321,25 @@ public class RawMethodsClient {
         }
         Request.Builder _requestBuilder = new Request.Builder()
                 .url(httpUrl.build())
-                .method("DELETE", null)
+                .method(
+                        "DELETE",
+                        BodyProperties.toRequestBody(
+                                requestOptions != null ? requestOptions.getBodyProperties() : null, null))
                 .headers(Headers.of(clientOptions.headers(requestOptions)))
                 .addHeader("Accept", "application/json");
         Request okhttpRequest = _requestBuilder.build();
         OkHttpClient client = clientOptions.httpClient();
         if (requestOptions != null && requestOptions.getTimeout().isPresent()) {
             client = clientOptions.httpClientWithTimeout(requestOptions);
+        }
+        if (requestOptions != null && requestOptions.getMaxRetries().isPresent()) {
+            okhttpRequest = okhttpRequest
+                    .newBuilder()
+                    .tag(
+                            RetryInterceptor.MaxRetriesOverride.class,
+                            new RetryInterceptor.MaxRetriesOverride(
+                                    requestOptions.getMaxRetries().get()))
+                    .build();
         }
         try (Response response = client.newCall(okhttpRequest).execute()) {
             ResponseBody responseBody = response.body();
@@ -319,27 +366,43 @@ public class RawMethodsClient {
             Object errorBody = ObjectMappers.parseErrorBody(responseBodyString);
             throw new WhopApiApiException(
                     "Error with status code " + response.code(), response.code(), errorBody, response);
+        } catch (JsonProcessingException e) {
+            throw new WhopApiException("Failed to deserialize response: " + e.getMessage(), e);
         } catch (IOException e) {
             throw new WhopApiException("Network error executing HTTP request", e);
         }
     }
 
     /**
-     * Changes the label used to identify a saved payout method.
+     * Changes the label used to identify a saved payout method, makes it the account's default payout method, or updates the payout address on file for it. Send <code>address</code> on its own: it cannot be combined with <code>nickname</code> or <code>is_default</code>. Address updates require the <code>payout:account:update</code> scope as well, on the same account, and are supported only for bank and wallet payout methods, not recipient payout methods.
+     */
+    public WhopApiHttpResponse<UpdateMethodsResponse> update(String id) {
+        return update(id, UpdateMethodsRequest.builder().build());
+    }
+
+    /**
+     * Changes the label used to identify a saved payout method, makes it the account's default payout method, or updates the payout address on file for it. Send <code>address</code> on its own: it cannot be combined with <code>nickname</code> or <code>is_default</code>. Address updates require the <code>payout:account:update</code> scope as well, on the same account, and are supported only for bank and wallet payout methods, not recipient payout methods.
+     */
+    public WhopApiHttpResponse<UpdateMethodsResponse> update(String id, RequestOptions requestOptions) {
+        return update(id, UpdateMethodsRequest.builder().build(), requestOptions);
+    }
+
+    /**
+     * Changes the label used to identify a saved payout method, makes it the account's default payout method, or updates the payout address on file for it. Send <code>address</code> on its own: it cannot be combined with <code>nickname</code> or <code>is_default</code>. Address updates require the <code>payout:account:update</code> scope as well, on the same account, and are supported only for bank and wallet payout methods, not recipient payout methods.
      */
     public WhopApiHttpResponse<UpdateMethodsResponse> update(String id, UpdateMethodsRequest request) {
         return update(id, request, null);
     }
 
     /**
-     * Changes the label used to identify a saved payout method.
+     * Changes the label used to identify a saved payout method, makes it the account's default payout method, or updates the payout address on file for it. Send <code>address</code> on its own: it cannot be combined with <code>nickname</code> or <code>is_default</code>. Address updates require the <code>payout:account:update</code> scope as well, on the same account, and are supported only for bank and wallet payout methods, not recipient payout methods.
      */
     public WhopApiHttpResponse<UpdateMethodsResponse> update(
             String id, UpdateMethodsRequest request, RequestOptions requestOptions) {
-        HttpUrl.Builder httpUrl = HttpUrl.parse(this.clientOptions.environment().getUrl())
+        HttpUrl.Builder httpUrl = HttpUrl.parse(this.clientOptions.environment().getApiURL())
                 .newBuilder()
                 .addPathSegments("payouts/methods")
-                .addPathSegment(id);
+                .addPathSegment(PathSegments.validate(id));
         if (requestOptions != null) {
             requestOptions.getQueryParameters().forEach((_key, _value) -> {
                 httpUrl.addQueryParameter(_key, _value);
@@ -348,7 +411,9 @@ public class RawMethodsClient {
         RequestBody body;
         try {
             body = RequestBody.create(
-                    ObjectMappers.JSON_MAPPER.writeValueAsBytes(request), MediaTypes.APPLICATION_JSON);
+                    ObjectMappers.JSON_MAPPER.writeValueAsBytes(BodyProperties.merge(
+                            request, requestOptions != null ? requestOptions.getBodyProperties() : null)),
+                    MediaTypes.APPLICATION_JSON);
         } catch (JsonProcessingException e) {
             throw new WhopApiException("Failed to serialize request", e);
         }
@@ -362,6 +427,15 @@ public class RawMethodsClient {
         OkHttpClient client = clientOptions.httpClient();
         if (requestOptions != null && requestOptions.getTimeout().isPresent()) {
             client = clientOptions.httpClientWithTimeout(requestOptions);
+        }
+        if (requestOptions != null && requestOptions.getMaxRetries().isPresent()) {
+            okhttpRequest = okhttpRequest
+                    .newBuilder()
+                    .tag(
+                            RetryInterceptor.MaxRetriesOverride.class,
+                            new RetryInterceptor.MaxRetriesOverride(
+                                    requestOptions.getMaxRetries().get()))
+                    .build();
         }
         try (Response response = client.newCall(okhttpRequest).execute()) {
             ResponseBody responseBody = response.body();
@@ -391,6 +465,8 @@ public class RawMethodsClient {
             Object errorBody = ObjectMappers.parseErrorBody(responseBodyString);
             throw new WhopApiApiException(
                     "Error with status code " + response.code(), response.code(), errorBody, response);
+        } catch (JsonProcessingException e) {
+            throw new WhopApiException("Failed to deserialize response: " + e.getMessage(), e);
         } catch (IOException e) {
             throw new WhopApiException("Network error executing HTTP request", e);
         }

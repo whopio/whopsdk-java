@@ -10,6 +10,9 @@ public final class RetrieveBusinessesResponseMyPartnerTier {
     public static final RetrieveBusinessesResponseMyPartnerTier SECOND =
             new RetrieveBusinessesResponseMyPartnerTier(Value.SECOND, "second");
 
+    public static final RetrieveBusinessesResponseMyPartnerTier BLUEPRINT =
+            new RetrieveBusinessesResponseMyPartnerTier(Value.BLUEPRINT, "blueprint");
+
     public static final RetrieveBusinessesResponseMyPartnerTier FIRST =
             new RetrieveBusinessesResponseMyPartnerTier(Value.FIRST, "first");
 
@@ -48,6 +51,8 @@ public final class RetrieveBusinessesResponseMyPartnerTier {
         switch (value) {
             case SECOND:
                 return visitor.visitSecond();
+            case BLUEPRINT:
+                return visitor.visitBlueprint();
             case FIRST:
                 return visitor.visitFirst();
             case UNKNOWN:
@@ -61,6 +66,8 @@ public final class RetrieveBusinessesResponseMyPartnerTier {
         switch (value) {
             case "second":
                 return SECOND;
+            case "blueprint":
+                return BLUEPRINT;
             case "first":
                 return FIRST;
             default:
@@ -73,6 +80,8 @@ public final class RetrieveBusinessesResponseMyPartnerTier {
 
         SECOND,
 
+        BLUEPRINT,
+
         UNKNOWN
     }
 
@@ -80,6 +89,8 @@ public final class RetrieveBusinessesResponseMyPartnerTier {
         T visitFirst();
 
         T visitSecond();
+
+        T visitBlueprint();
 
         T visitUnknown(String unknownType);
     }

@@ -62,7 +62,7 @@ public final class SetNotificationsRequestPreferencesItemScope {
     }
 
     /**
-     * @return Delivery channel the preference applies to. Required when setting a topic override.
+     * @return Delivery channel the preference applies to. Omit it (or pass <code>null</code>) to apply the preference to every channel.
      */
     @JsonIgnore
     public Optional<SetNotificationsRequestPreferencesItemScopeChannel> getChannel() {
@@ -95,7 +95,7 @@ public final class SetNotificationsRequestPreferencesItemScope {
     }
 
     /**
-     * @return Notification topic to scope the preference to, <code>topic_</code> tag.
+     * @return Notification topic to scope the preference to, <code>topic_</code> tag. Topic IDs come from <code>GET /notifications/topics</code>.
      */
     @JsonIgnore
     public Optional<String> getTopicId() {
@@ -181,7 +181,6 @@ public final class SetNotificationsRequestPreferencesItemScope {
 
         private Optional<String> topicId = Optional.empty();
 
-        @JsonAnySetter
         private Map<String, Object> additionalProperties = new HashMap<>();
 
         private Builder() {}
@@ -221,7 +220,7 @@ public final class SetNotificationsRequestPreferencesItemScope {
         }
 
         /**
-         * <p>Delivery channel the preference applies to. Required when setting a topic override.</p>
+         * <p>Delivery channel the preference applies to. Omit it (or pass <code>null</code>) to apply the preference to every channel.</p>
          */
         @JsonSetter(value = "channel", nulls = Nulls.SKIP)
         public Builder channel(Optional<SetNotificationsRequestPreferencesItemScopeChannel> channel) {
@@ -296,7 +295,7 @@ public final class SetNotificationsRequestPreferencesItemScope {
         }
 
         /**
-         * <p>Notification topic to scope the preference to, <code>topic_</code> tag.</p>
+         * <p>Notification topic to scope the preference to, <code>topic_</code> tag. Topic IDs come from <code>GET /notifications/topics</code>.</p>
          */
         @JsonSetter(value = "topic_id", nulls = Nulls.SKIP)
         public Builder topicId(Optional<String> topicId) {
@@ -323,6 +322,18 @@ public final class SetNotificationsRequestPreferencesItemScope {
         public SetNotificationsRequestPreferencesItemScope build() {
             return new SetNotificationsRequestPreferencesItemScope(
                     accountId, channel, experienceId, teamAccountId, topicId, additionalProperties);
+        }
+
+        @JsonAnySetter
+        private void putAdditionalPropertyFromJson(String key, Object value) {
+            if (key.equalsIgnoreCase("account_id")
+                    || key.equalsIgnoreCase("channel")
+                    || key.equalsIgnoreCase("experience_id")
+                    || key.equalsIgnoreCase("team_account_id")
+                    || key.equalsIgnoreCase("topic_id")) {
+                return;
+            }
+            this.additionalProperties.put(key, value);
         }
 
         public Builder additionalProperty(String key, Object value) {

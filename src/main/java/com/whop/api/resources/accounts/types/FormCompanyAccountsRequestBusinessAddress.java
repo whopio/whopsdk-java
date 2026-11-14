@@ -196,7 +196,6 @@ public final class FormCompanyAccountsRequestBusinessAddress {
 
         private Optional<String> line2 = Optional.empty();
 
-        @JsonAnySetter
         private Map<String, Object> additionalProperties = new HashMap<>();
 
         private Builder() {}
@@ -221,7 +220,6 @@ public final class FormCompanyAccountsRequestBusinessAddress {
 
         /**
          * <p>Two-letter ISO 3166-1 country code, for example <code>US</code>.</p>
-         * <p>Two-letter ISO 3166-1 country code, for example <code>US</code>.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
@@ -232,7 +230,6 @@ public final class FormCompanyAccountsRequestBusinessAddress {
         }
 
         /**
-         * <p>First line of the street address.</p>
          * <p>First line of the street address.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
@@ -245,7 +242,6 @@ public final class FormCompanyAccountsRequestBusinessAddress {
 
         /**
          * <p>Postal or ZIP code.</p>
-         * <p>Postal or ZIP code.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
@@ -256,7 +252,6 @@ public final class FormCompanyAccountsRequestBusinessAddress {
         }
 
         /**
-         * <p>State or region code, for example <code>CA</code>.</p>
          * <p>State or region code, for example <code>CA</code>.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
@@ -291,6 +286,19 @@ public final class FormCompanyAccountsRequestBusinessAddress {
         public FormCompanyAccountsRequestBusinessAddress build() {
             return new FormCompanyAccountsRequestBusinessAddress(
                     city, country, line1, line2, postalCode, state, additionalProperties);
+        }
+
+        @JsonAnySetter
+        private void putAdditionalPropertyFromJson(String key, Object value) {
+            if (key.equalsIgnoreCase("city")
+                    || key.equalsIgnoreCase("country")
+                    || key.equalsIgnoreCase("line1")
+                    || key.equalsIgnoreCase("line2")
+                    || key.equalsIgnoreCase("postal_code")
+                    || key.equalsIgnoreCase("state")) {
+                return;
+            }
+            this.additionalProperties.put(key, value);
         }
 
         @java.lang.Override

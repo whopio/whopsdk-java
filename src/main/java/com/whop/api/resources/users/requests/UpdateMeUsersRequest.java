@@ -31,6 +31,8 @@ public final class UpdateMeUsersRequest {
 
     private final Optional<String> bio;
 
+    private final Optional<String> dateOfBirth;
+
     private final Optional<String> name;
 
     private final Optional<UpdateMeUsersRequestProfilePicture> profilePicture;
@@ -43,6 +45,7 @@ public final class UpdateMeUsersRequest {
             Optional<String> accountId,
             Optional<UpdateMeUsersRequestBanner> banner,
             Optional<String> bio,
+            Optional<String> dateOfBirth,
             Optional<String> name,
             Optional<UpdateMeUsersRequestProfilePicture> profilePicture,
             Optional<String> username,
@@ -50,6 +53,7 @@ public final class UpdateMeUsersRequest {
         this.accountId = accountId;
         this.banner = banner;
         this.bio = bio;
+        this.dateOfBirth = dateOfBirth;
         this.name = name;
         this.profilePicture = profilePicture;
         this.username = username;
@@ -75,6 +79,14 @@ public final class UpdateMeUsersRequest {
     @JsonProperty("bio")
     public Optional<String> getBio() {
         return bio;
+    }
+
+    /**
+     * @return The user's date of birth as an ISO 8601 date, like <code>1998-04-23</code>. The user must be at least 13. Global profile only; refused with <code>account_id</code>.
+     */
+    @JsonProperty("date_of_birth")
+    public Optional<String> getDateOfBirth() {
+        return dateOfBirth;
     }
 
     @JsonProperty("name")
@@ -113,6 +125,7 @@ public final class UpdateMeUsersRequest {
         return accountId.equals(other.accountId)
                 && banner.equals(other.banner)
                 && bio.equals(other.bio)
+                && dateOfBirth.equals(other.dateOfBirth)
                 && name.equals(other.name)
                 && profilePicture.equals(other.profilePicture)
                 && username.equals(other.username);
@@ -120,7 +133,8 @@ public final class UpdateMeUsersRequest {
 
     @java.lang.Override
     public int hashCode() {
-        return Objects.hash(this.accountId, this.banner, this.bio, this.name, this.profilePicture, this.username);
+        return Objects.hash(
+                this.accountId, this.banner, this.bio, this.dateOfBirth, this.name, this.profilePicture, this.username);
     }
 
     @java.lang.Override
@@ -140,13 +154,14 @@ public final class UpdateMeUsersRequest {
 
         private Optional<String> bio = Optional.empty();
 
+        private Optional<String> dateOfBirth = Optional.empty();
+
         private Optional<String> name = Optional.empty();
 
         private Optional<UpdateMeUsersRequestProfilePicture> profilePicture = Optional.empty();
 
         private Optional<String> username = Optional.empty();
 
-        @JsonAnySetter
         private Map<String, Object> additionalProperties = new HashMap<>();
 
         private Builder() {}
@@ -155,6 +170,7 @@ public final class UpdateMeUsersRequest {
             accountId(other.getAccountId());
             banner(other.getBanner());
             bio(other.getBio());
+            dateOfBirth(other.getDateOfBirth());
             name(other.getName());
             profilePicture(other.getProfilePicture());
             username(other.getUsername());
@@ -208,6 +224,20 @@ public final class UpdateMeUsersRequest {
             return this;
         }
 
+        /**
+         * <p>The user's date of birth as an ISO 8601 date, like <code>1998-04-23</code>. The user must be at least 13. Global profile only; refused with <code>account_id</code>.</p>
+         */
+        @JsonSetter(value = "date_of_birth", nulls = Nulls.SKIP)
+        public Builder dateOfBirth(Optional<String> dateOfBirth) {
+            this.dateOfBirth = dateOfBirth;
+            return this;
+        }
+
+        public Builder dateOfBirth(String dateOfBirth) {
+            this.dateOfBirth = Optional.ofNullable(dateOfBirth);
+            return this;
+        }
+
         @JsonSetter(value = "name", nulls = Nulls.SKIP)
         public Builder name(Optional<String> name) {
             this.name = name;
@@ -243,7 +273,20 @@ public final class UpdateMeUsersRequest {
 
         public UpdateMeUsersRequest build() {
             return new UpdateMeUsersRequest(
-                    accountId, banner, bio, name, profilePicture, username, additionalProperties);
+                    accountId, banner, bio, dateOfBirth, name, profilePicture, username, additionalProperties);
+        }
+
+        @JsonAnySetter
+        private void putAdditionalPropertyFromJson(String key, Object value) {
+            if (key.equalsIgnoreCase("banner")
+                    || key.equalsIgnoreCase("bio")
+                    || key.equalsIgnoreCase("date_of_birth")
+                    || key.equalsIgnoreCase("name")
+                    || key.equalsIgnoreCase("profile_picture")
+                    || key.equalsIgnoreCase("username")) {
+                return;
+            }
+            this.additionalProperties.put(key, value);
         }
 
         public Builder additionalProperty(String key, Object value) {

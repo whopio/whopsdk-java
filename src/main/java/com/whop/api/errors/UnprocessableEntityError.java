@@ -4,20 +4,21 @@
 package com.whop.api.errors;
 
 import com.whop.api.core.WhopApiApiException;
+import com.whop.api.types.UnprocessableEntityErrorBody;
 import okhttp3.Response;
 
 public final class UnprocessableEntityError extends WhopApiApiException {
     /**
      * The body of the response that triggered the exception.
      */
-    private final Object body;
+    private final UnprocessableEntityErrorBody body;
 
-    public UnprocessableEntityError(Object body) {
+    public UnprocessableEntityError(UnprocessableEntityErrorBody body) {
         super("UnprocessableEntityError", 422, body);
         this.body = body;
     }
 
-    public UnprocessableEntityError(Object body, Response rawResponse) {
+    public UnprocessableEntityError(UnprocessableEntityErrorBody body, Response rawResponse) {
         super("UnprocessableEntityError", 422, body, rawResponse);
         this.body = body;
     }
@@ -26,7 +27,7 @@ public final class UnprocessableEntityError extends WhopApiApiException {
      * @return the body
      */
     @java.lang.Override
-    public Object body() {
+    public UnprocessableEntityErrorBody body() {
         return this.body;
     }
 }

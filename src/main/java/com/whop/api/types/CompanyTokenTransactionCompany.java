@@ -127,7 +127,6 @@ public final class CompanyTokenTransactionCompany {
 
         private String title;
 
-        @JsonAnySetter
         private Map<String, Object> additionalProperties = new HashMap<>();
 
         private Builder() {}
@@ -142,7 +141,6 @@ public final class CompanyTokenTransactionCompany {
 
         /**
          * <p>The unique identifier for the company.</p>
-         * <p>The unique identifier for the company.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
@@ -154,7 +152,6 @@ public final class CompanyTokenTransactionCompany {
 
         /**
          * <p>The slug/route of the company on the Whop site.</p>
-         * <p>The slug/route of the company on the Whop site.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
@@ -165,7 +162,6 @@ public final class CompanyTokenTransactionCompany {
         }
 
         /**
-         * <p>The written name of the company.</p>
          * <p>The written name of the company.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
@@ -179,6 +175,14 @@ public final class CompanyTokenTransactionCompany {
         @java.lang.Override
         public CompanyTokenTransactionCompany build() {
             return new CompanyTokenTransactionCompany(id, route, title, additionalProperties);
+        }
+
+        @JsonAnySetter
+        private void putAdditionalPropertyFromJson(String key, Object value) {
+            if (key.equalsIgnoreCase("id") || key.equalsIgnoreCase("route") || key.equalsIgnoreCase("title")) {
+                return;
+            }
+            this.additionalProperties.put(key, value);
         }
 
         @java.lang.Override

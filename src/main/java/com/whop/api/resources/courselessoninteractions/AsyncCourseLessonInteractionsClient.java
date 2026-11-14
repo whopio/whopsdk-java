@@ -5,6 +5,7 @@ package com.whop.api.resources.courselessoninteractions;
 
 import com.whop.api.core.ClientOptions;
 import com.whop.api.core.RequestOptions;
+import com.whop.api.core.WhopApiHttpResponse;
 import com.whop.api.core.pagination.SyncPagingIterable;
 import com.whop.api.resources.courselessoninteractions.requests.ListCourseLessonInteractionsRequest;
 import com.whop.api.resources.courselessoninteractions.requests.RetrieveCourseLessonInteractionsRequest;
@@ -30,7 +31,7 @@ public class AsyncCourseLessonInteractionsClient {
     }
 
     /**
-     * Returns a paginated list of lesson interactions, filtered by lesson, course, user, or completion status.
+     * Returns a paginated list of lesson interactions for a lesson or course. Callers without admin access to the course's experience see only their own interactions.
      * <p>Required permissions:</p>
      * <ul>
      * <li><code>courses:read</code></li>
@@ -38,11 +39,20 @@ public class AsyncCourseLessonInteractionsClient {
      * </ul>
      */
     public CompletableFuture<SyncPagingIterable<CourseLessonInteractionListItem>> list() {
-        return this.rawClient.list().thenApply(response -> response.body());
+        CompletableFuture<WhopApiHttpResponse<SyncPagingIterable<CourseLessonInteractionListItem>>> rawFuture =
+                this.rawClient.list();
+        CompletableFuture<SyncPagingIterable<CourseLessonInteractionListItem>> future =
+                rawFuture.thenApply(response -> response.body());
+        future.whenComplete((result_, throwable_) -> {
+            if (future.isCancelled()) {
+                rawFuture.cancel(true);
+            }
+        });
+        return future;
     }
 
     /**
-     * Returns a paginated list of lesson interactions, filtered by lesson, course, user, or completion status.
+     * Returns a paginated list of lesson interactions for a lesson or course. Callers without admin access to the course's experience see only their own interactions.
      * <p>Required permissions:</p>
      * <ul>
      * <li><code>courses:read</code></li>
@@ -50,11 +60,20 @@ public class AsyncCourseLessonInteractionsClient {
      * </ul>
      */
     public CompletableFuture<SyncPagingIterable<CourseLessonInteractionListItem>> list(RequestOptions requestOptions) {
-        return this.rawClient.list(requestOptions).thenApply(response -> response.body());
+        CompletableFuture<WhopApiHttpResponse<SyncPagingIterable<CourseLessonInteractionListItem>>> rawFuture =
+                this.rawClient.list(requestOptions);
+        CompletableFuture<SyncPagingIterable<CourseLessonInteractionListItem>> future =
+                rawFuture.thenApply(response -> response.body());
+        future.whenComplete((result_, throwable_) -> {
+            if (future.isCancelled()) {
+                rawFuture.cancel(true);
+            }
+        });
+        return future;
     }
 
     /**
-     * Returns a paginated list of lesson interactions, filtered by lesson, course, user, or completion status.
+     * Returns a paginated list of lesson interactions for a lesson or course. Callers without admin access to the course's experience see only their own interactions.
      * <p>Required permissions:</p>
      * <ul>
      * <li><code>courses:read</code></li>
@@ -63,11 +82,20 @@ public class AsyncCourseLessonInteractionsClient {
      */
     public CompletableFuture<SyncPagingIterable<CourseLessonInteractionListItem>> list(
             ListCourseLessonInteractionsRequest request) {
-        return this.rawClient.list(request).thenApply(response -> response.body());
+        CompletableFuture<WhopApiHttpResponse<SyncPagingIterable<CourseLessonInteractionListItem>>> rawFuture =
+                this.rawClient.list(request);
+        CompletableFuture<SyncPagingIterable<CourseLessonInteractionListItem>> future =
+                rawFuture.thenApply(response -> response.body());
+        future.whenComplete((result_, throwable_) -> {
+            if (future.isCancelled()) {
+                rawFuture.cancel(true);
+            }
+        });
+        return future;
     }
 
     /**
-     * Returns a paginated list of lesson interactions, filtered by lesson, course, user, or completion status.
+     * Returns a paginated list of lesson interactions for a lesson or course. Callers without admin access to the course's experience see only their own interactions.
      * <p>Required permissions:</p>
      * <ul>
      * <li><code>courses:read</code></li>
@@ -76,7 +104,16 @@ public class AsyncCourseLessonInteractionsClient {
      */
     public CompletableFuture<SyncPagingIterable<CourseLessonInteractionListItem>> list(
             ListCourseLessonInteractionsRequest request, RequestOptions requestOptions) {
-        return this.rawClient.list(request, requestOptions).thenApply(response -> response.body());
+        CompletableFuture<WhopApiHttpResponse<SyncPagingIterable<CourseLessonInteractionListItem>>> rawFuture =
+                this.rawClient.list(request, requestOptions);
+        CompletableFuture<SyncPagingIterable<CourseLessonInteractionListItem>> future =
+                rawFuture.thenApply(response -> response.body());
+        future.whenComplete((result_, throwable_) -> {
+            if (future.isCancelled()) {
+                rawFuture.cancel(true);
+            }
+        });
+        return future;
     }
 
     /**
@@ -88,7 +125,14 @@ public class AsyncCourseLessonInteractionsClient {
      * </ul>
      */
     public CompletableFuture<CourseLessonInteraction> retrieve(String id) {
-        return this.rawClient.retrieve(id).thenApply(response -> response.body());
+        CompletableFuture<WhopApiHttpResponse<CourseLessonInteraction>> rawFuture = this.rawClient.retrieve(id);
+        CompletableFuture<CourseLessonInteraction> future = rawFuture.thenApply(response -> response.body());
+        future.whenComplete((result_, throwable_) -> {
+            if (future.isCancelled()) {
+                rawFuture.cancel(true);
+            }
+        });
+        return future;
     }
 
     /**
@@ -100,7 +144,15 @@ public class AsyncCourseLessonInteractionsClient {
      * </ul>
      */
     public CompletableFuture<CourseLessonInteraction> retrieve(String id, RequestOptions requestOptions) {
-        return this.rawClient.retrieve(id, requestOptions).thenApply(response -> response.body());
+        CompletableFuture<WhopApiHttpResponse<CourseLessonInteraction>> rawFuture =
+                this.rawClient.retrieve(id, requestOptions);
+        CompletableFuture<CourseLessonInteraction> future = rawFuture.thenApply(response -> response.body());
+        future.whenComplete((result_, throwable_) -> {
+            if (future.isCancelled()) {
+                rawFuture.cancel(true);
+            }
+        });
+        return future;
     }
 
     /**
@@ -113,7 +165,15 @@ public class AsyncCourseLessonInteractionsClient {
      */
     public CompletableFuture<CourseLessonInteraction> retrieve(
             String id, RetrieveCourseLessonInteractionsRequest request) {
-        return this.rawClient.retrieve(id, request).thenApply(response -> response.body());
+        CompletableFuture<WhopApiHttpResponse<CourseLessonInteraction>> rawFuture =
+                this.rawClient.retrieve(id, request);
+        CompletableFuture<CourseLessonInteraction> future = rawFuture.thenApply(response -> response.body());
+        future.whenComplete((result_, throwable_) -> {
+            if (future.isCancelled()) {
+                rawFuture.cancel(true);
+            }
+        });
+        return future;
     }
 
     /**
@@ -126,6 +186,14 @@ public class AsyncCourseLessonInteractionsClient {
      */
     public CompletableFuture<CourseLessonInteraction> retrieve(
             String id, RetrieveCourseLessonInteractionsRequest request, RequestOptions requestOptions) {
-        return this.rawClient.retrieve(id, request, requestOptions).thenApply(response -> response.body());
+        CompletableFuture<WhopApiHttpResponse<CourseLessonInteraction>> rawFuture =
+                this.rawClient.retrieve(id, request, requestOptions);
+        CompletableFuture<CourseLessonInteraction> future = rawFuture.thenApply(response -> response.body());
+        future.whenComplete((result_, throwable_) -> {
+            if (future.isCancelled()) {
+                rawFuture.cancel(true);
+            }
+        });
+        return future;
     }
 }

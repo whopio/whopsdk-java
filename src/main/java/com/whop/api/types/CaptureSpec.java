@@ -257,7 +257,6 @@ public final class CaptureSpec {
 
         private List<String> requiredMetadataFields = new ArrayList<>();
 
-        @JsonAnySetter
         private Map<String, Object> additionalProperties = new HashMap<>();
 
         private Builder() {}
@@ -277,7 +276,6 @@ public final class CaptureSpec {
 
         /**
          * <p>The naming convention for uploaded files, built from the required metadata fields.</p>
-         * <p>The naming convention for uploaded files, built from the required metadata fields.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
@@ -288,7 +286,6 @@ public final class CaptureSpec {
         }
 
         /**
-         * <p>Inertial measurement unit (IMU) recording requirements.</p>
          * <p>Inertial measurement unit (IMU) recording requirements.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
@@ -301,7 +298,6 @@ public final class CaptureSpec {
 
         /**
          * <p>Schema version the client must stamp on the capture manifest it uploads.</p>
-         * <p>Schema version the client must stamp on the capture manifest it uploads.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
@@ -312,7 +308,6 @@ public final class CaptureSpec {
         }
 
         /**
-         * <p>Minimum length of a single clip, in seconds.</p>
          * <p>Minimum length of a single clip, in seconds.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
@@ -325,7 +320,6 @@ public final class CaptureSpec {
 
         /**
          * <p>Total verified footage a submission must accumulate across all its clips before it can be submitted, in seconds. Always a whole number of hours.</p>
-         * <p>Total verified footage a submission must accumulate across all its clips before it can be submitted, in seconds. Always a whole number of hours.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
@@ -337,7 +331,6 @@ public final class CaptureSpec {
 
         /**
          * <p>Whether each clip must be one uninterrupted recording rather than stitched segments.</p>
-         * <p>Whether each clip must be one uninterrupted recording rather than stitched segments.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
@@ -348,7 +341,6 @@ public final class CaptureSpec {
         }
 
         /**
-         * <p>Video recording requirements.</p>
          * <p>Video recording requirements.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
@@ -395,6 +387,21 @@ public final class CaptureSpec {
                     singleContinuousTake,
                     video,
                     additionalProperties);
+        }
+
+        @JsonAnySetter
+        private void putAdditionalPropertyFromJson(String key, Object value) {
+            if (key.equalsIgnoreCase("filename_pattern")
+                    || key.equalsIgnoreCase("imu")
+                    || key.equalsIgnoreCase("manifest_schema_version")
+                    || key.equalsIgnoreCase("min_clip_duration_seconds")
+                    || key.equalsIgnoreCase("min_total_verified_duration_seconds")
+                    || key.equalsIgnoreCase("required_metadata_fields")
+                    || key.equalsIgnoreCase("single_continuous_take")
+                    || key.equalsIgnoreCase("video")) {
+                return;
+            }
+            this.additionalProperties.put(key, value);
         }
 
         @java.lang.Override

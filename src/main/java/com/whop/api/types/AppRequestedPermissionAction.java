@@ -106,7 +106,6 @@ public final class AppRequestedPermissionAction {
 
         private String name;
 
-        @JsonAnySetter
         private Map<String, Object> additionalProperties = new HashMap<>();
 
         private Builder() {}
@@ -120,7 +119,6 @@ public final class AppRequestedPermissionAction {
 
         /**
          * <p>The permission action's identifier, for example <code>company:basic:read</code>.</p>
-         * <p>The permission action's identifier, for example <code>company:basic:read</code>.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
@@ -131,7 +129,6 @@ public final class AppRequestedPermissionAction {
         }
 
         /**
-         * <p>Human-readable name of the action.</p>
          * <p>Human-readable name of the action.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
@@ -145,6 +142,14 @@ public final class AppRequestedPermissionAction {
         @java.lang.Override
         public AppRequestedPermissionAction build() {
             return new AppRequestedPermissionAction(action, name, additionalProperties);
+        }
+
+        @JsonAnySetter
+        private void putAdditionalPropertyFromJson(String key, Object value) {
+            if (key.equalsIgnoreCase("action") || key.equalsIgnoreCase("name")) {
+                return;
+            }
+            this.additionalProperties.put(key, value);
         }
 
         @java.lang.Override

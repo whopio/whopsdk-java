@@ -51,11 +51,6 @@ public final class PaymentMethodListItem {
         return new PaymentMethodListItem(new SepaDebitPaymentMethodValue(value));
     }
 
-    public static PaymentMethodListItem platformBalancePaymentMethod(
-            PaymentMethodListItemPlatformBalancePaymentMethod value) {
-        return new PaymentMethodListItem(new PlatformBalancePaymentMethodValue(value));
-    }
-
     public boolean isBasePaymentMethod() {
         return value instanceof BasePaymentMethodValue;
     }
@@ -78,10 +73,6 @@ public final class PaymentMethodListItem {
 
     public boolean isSepaDebitPaymentMethod() {
         return value instanceof SepaDebitPaymentMethodValue;
-    }
-
-    public boolean isPlatformBalancePaymentMethod() {
-        return value instanceof PlatformBalancePaymentMethodValue;
     }
 
     public boolean _isUnknown() {
@@ -130,13 +121,6 @@ public final class PaymentMethodListItem {
         return Optional.empty();
     }
 
-    public Optional<PaymentMethodListItemPlatformBalancePaymentMethod> getPlatformBalancePaymentMethod() {
-        if (isPlatformBalancePaymentMethod()) {
-            return Optional.of(((PlatformBalancePaymentMethodValue) value).value);
-        }
-        return Optional.empty();
-    }
-
     public Optional<Object> _getUnknown() {
         if (_isUnknown()) {
             return Optional.of(((_UnknownValue) value).value);
@@ -144,18 +128,18 @@ public final class PaymentMethodListItem {
         return Optional.empty();
     }
 
-    @Override
+    @java.lang.Override
     public boolean equals(Object other) {
         if (this == other) return true;
         return other instanceof PaymentMethodListItem && value.equals(((PaymentMethodListItem) other).value);
     }
 
-    @Override
+    @java.lang.Override
     public int hashCode() {
         return Objects.hash(value);
     }
 
-    @Override
+    @java.lang.Override
     public String toString() {
         return value.toString();
     }
@@ -178,9 +162,6 @@ public final class PaymentMethodListItem {
 
         T visitSepaDebitPaymentMethod(PaymentMethodListItemSepaDebitPaymentMethod sepaDebitPaymentMethod);
 
-        T visitPlatformBalancePaymentMethod(
-                PaymentMethodListItemPlatformBalancePaymentMethod platformBalancePaymentMethod);
-
         T _visitUnknown(Object unknownType);
     }
 
@@ -191,8 +172,7 @@ public final class PaymentMethodListItem {
         @JsonSubTypes.Type(UsBankAccountPaymentMethodValue.class),
         @JsonSubTypes.Type(CashappPaymentMethodValue.class),
         @JsonSubTypes.Type(IdealPaymentMethodValue.class),
-        @JsonSubTypes.Type(SepaDebitPaymentMethodValue.class),
-        @JsonSubTypes.Type(PlatformBalancePaymentMethodValue.class)
+        @JsonSubTypes.Type(SepaDebitPaymentMethodValue.class)
     })
     @JsonIgnoreProperties(ignoreUnknown = true)
     private interface Value {
@@ -425,47 +405,6 @@ public final class PaymentMethodListItem {
         }
 
         private boolean equalTo(SepaDebitPaymentMethodValue other) {
-            return value.equals(other.value);
-        }
-
-        @java.lang.Override
-        public int hashCode() {
-            return Objects.hash(this.value);
-        }
-
-        @java.lang.Override
-        public String toString() {
-            return "PaymentMethodListItem{" + "value: " + value + "}";
-        }
-    }
-
-    @JsonTypeName("PlatformBalancePaymentMethod")
-    @JsonIgnoreProperties("typename")
-    private static final class PlatformBalancePaymentMethodValue implements Value {
-        @JsonUnwrapped
-        @JsonIgnoreProperties(value = "typename", allowSetters = true)
-        private PaymentMethodListItemPlatformBalancePaymentMethod value;
-
-        @JsonCreator(mode = JsonCreator.Mode.PROPERTIES)
-        private PlatformBalancePaymentMethodValue() {}
-
-        private PlatformBalancePaymentMethodValue(PaymentMethodListItemPlatformBalancePaymentMethod value) {
-            this.value = value;
-        }
-
-        @java.lang.Override
-        public <T> T visit(Visitor<T> visitor) {
-            return visitor.visitPlatformBalancePaymentMethod(value);
-        }
-
-        @java.lang.Override
-        public boolean equals(Object other) {
-            if (this == other) return true;
-            return other instanceof PlatformBalancePaymentMethodValue
-                    && equalTo((PlatformBalancePaymentMethodValue) other);
-        }
-
-        private boolean equalTo(PlatformBalancePaymentMethodValue other) {
             return value.equals(other.value);
         }
 

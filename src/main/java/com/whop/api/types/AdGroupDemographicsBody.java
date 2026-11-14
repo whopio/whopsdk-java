@@ -44,7 +44,7 @@ public final class AdGroupDemographicsBody {
     }
 
     /**
-     * @return Turn on automatic audience targeting (Advantage+ on Meta): the platform can deliver beyond the ages, genders, and detailed targeting you set, treating them as suggestions.
+     * @return Turn on automatic audience targeting: delivery can reach beyond the ages and genders you set, treating them as suggestions.
      */
     @JsonProperty("automatic")
     public Optional<Boolean> getAutomatic() {
@@ -117,7 +117,6 @@ public final class AdGroupDemographicsBody {
 
         private Optional<Integer> minimumAge = Optional.empty();
 
-        @JsonAnySetter
         private Map<String, Object> additionalProperties = new HashMap<>();
 
         private Builder() {}
@@ -131,7 +130,7 @@ public final class AdGroupDemographicsBody {
         }
 
         /**
-         * <p>Turn on automatic audience targeting (Advantage+ on Meta): the platform can deliver beyond the ages, genders, and detailed targeting you set, treating them as suggestions.</p>
+         * <p>Turn on automatic audience targeting: delivery can reach beyond the ages and genders you set, treating them as suggestions.</p>
          */
         @JsonSetter(value = "automatic", nulls = Nulls.SKIP)
         public Builder automatic(Optional<Boolean> automatic) {
@@ -188,6 +187,17 @@ public final class AdGroupDemographicsBody {
 
         public AdGroupDemographicsBody build() {
             return new AdGroupDemographicsBody(automatic, gender, maximumAge, minimumAge, additionalProperties);
+        }
+
+        @JsonAnySetter
+        private void putAdditionalPropertyFromJson(String key, Object value) {
+            if (key.equalsIgnoreCase("automatic")
+                    || key.equalsIgnoreCase("gender")
+                    || key.equalsIgnoreCase("maximum_age")
+                    || key.equalsIgnoreCase("minimum_age")) {
+                return;
+            }
+            this.additionalProperties.put(key, value);
         }
 
         public Builder additionalProperty(String key, Object value) {

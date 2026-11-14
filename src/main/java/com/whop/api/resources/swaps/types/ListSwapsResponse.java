@@ -71,7 +71,6 @@ public final class ListSwapsResponse {
     public static final class Builder {
         private List<ListSwapsResponseDataItem> data = new ArrayList<>();
 
-        @JsonAnySetter
         private Map<String, Object> additionalProperties = new HashMap<>();
 
         private Builder() {}
@@ -107,6 +106,14 @@ public final class ListSwapsResponse {
 
         public ListSwapsResponse build() {
             return new ListSwapsResponse(data, additionalProperties);
+        }
+
+        @JsonAnySetter
+        private void putAdditionalPropertyFromJson(String key, Object value) {
+            if (key.equalsIgnoreCase("data")) {
+                return;
+            }
+            this.additionalProperties.put(key, value);
         }
 
         public Builder additionalProperty(String key, Object value) {

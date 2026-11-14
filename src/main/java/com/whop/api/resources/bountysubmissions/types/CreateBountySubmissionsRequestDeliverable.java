@@ -140,7 +140,6 @@ public final class CreateBountySubmissionsRequestDeliverable {
 
         private Optional<List<String>> urls = Optional.empty();
 
-        @JsonAnySetter
         private Map<String, Object> additionalProperties = new HashMap<>();
 
         private Builder() {}
@@ -233,6 +232,17 @@ public final class CreateBountySubmissionsRequestDeliverable {
 
         public CreateBountySubmissionsRequestDeliverable build() {
             return new CreateBountySubmissionsRequestDeliverable(caption, fileIds, type, urls, additionalProperties);
+        }
+
+        @JsonAnySetter
+        private void putAdditionalPropertyFromJson(String key, Object value) {
+            if (key.equalsIgnoreCase("caption")
+                    || key.equalsIgnoreCase("file_ids")
+                    || key.equalsIgnoreCase("type")
+                    || key.equalsIgnoreCase("urls")) {
+                return;
+            }
+            this.additionalProperties.put(key, value);
         }
 
         public Builder additionalProperty(String key, Object value) {

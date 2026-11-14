@@ -178,7 +178,6 @@ public final class ListDmMembersRequest {
 
         private Optional<String> after = Optional.empty();
 
-        @JsonAnySetter
         private Map<String, Object> additionalProperties = new HashMap<>();
 
         private Builder() {}
@@ -194,7 +193,6 @@ public final class ListDmMembersRequest {
         }
 
         /**
-         * <p>The unique identifier of the DM channel to list members for.</p>
          * <p>The unique identifier of the DM channel to list members for.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
@@ -288,6 +286,18 @@ public final class ListDmMembersRequest {
         @java.lang.Override
         public ListDmMembersRequest build() {
             return new ListDmMembersRequest(after, before, first, last, channelId, additionalProperties);
+        }
+
+        @JsonAnySetter
+        private void putAdditionalPropertyFromJson(String key, Object value) {
+            if (key.equalsIgnoreCase("after")
+                    || key.equalsIgnoreCase("before")
+                    || key.equalsIgnoreCase("first")
+                    || key.equalsIgnoreCase("last")
+                    || key.equalsIgnoreCase("channel_id")) {
+                return;
+            }
+            this.additionalProperties.put(key, value);
         }
 
         @java.lang.Override

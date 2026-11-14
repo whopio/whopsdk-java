@@ -12,8 +12,7 @@ import com.fasterxml.jackson.annotation.JsonSetter;
 import com.fasterxml.jackson.annotation.Nulls;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.whop.api.core.ObjectMappers;
-import com.whop.api.types.MessageListItem;
-import com.whop.api.types.PageInfo;
+import com.whop.api.types.ChatMessage;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -24,32 +23,26 @@ import org.jetbrains.annotations.NotNull;
 @JsonInclude(JsonInclude.Include.NON_ABSENT)
 @JsonDeserialize(builder = ListMessagesResponse.Builder.class)
 public final class ListMessagesResponse {
-    private final List<MessageListItem> data;
+    private final List<ChatMessage> data;
 
-    private final PageInfo pageInfo;
+    private final ListMessagesResponsePageInfo pageInfo;
 
     private final Map<String, Object> additionalProperties;
 
     private ListMessagesResponse(
-            List<MessageListItem> data, PageInfo pageInfo, Map<String, Object> additionalProperties) {
+            List<ChatMessage> data, ListMessagesResponsePageInfo pageInfo, Map<String, Object> additionalProperties) {
         this.data = data;
         this.pageInfo = pageInfo;
         this.additionalProperties = additionalProperties;
     }
 
-    /**
-     * @return A list of nodes.
-     */
     @JsonProperty("data")
-    public List<MessageListItem> getData() {
+    public List<ChatMessage> getData() {
         return data;
     }
 
-    /**
-     * @return Information to aid in pagination.
-     */
     @JsonProperty("page_info")
-    public PageInfo getPageInfo() {
+    public ListMessagesResponsePageInfo getPageInfo() {
         return pageInfo;
     }
 
@@ -83,10 +76,7 @@ public final class ListMessagesResponse {
     }
 
     public interface PageInfoStage {
-        /**
-         * <p>Information to aid in pagination.</p>
-         */
-        _FinalStage pageInfo(@NotNull PageInfo pageInfo);
+        _FinalStage pageInfo(@NotNull ListMessagesResponsePageInfo pageInfo);
 
         Builder from(ListMessagesResponse other);
     }
@@ -98,23 +88,19 @@ public final class ListMessagesResponse {
 
         _FinalStage additionalProperties(Map<String, Object> additionalProperties);
 
-        /**
-         * <p>A list of nodes.</p>
-         */
-        _FinalStage data(List<MessageListItem> data);
+        _FinalStage data(List<ChatMessage> data);
 
-        _FinalStage addData(MessageListItem data);
+        _FinalStage addData(ChatMessage data);
 
-        _FinalStage addAllData(List<MessageListItem> data);
+        _FinalStage addAllData(List<ChatMessage> data);
     }
 
     @JsonIgnoreProperties(ignoreUnknown = true)
     public static final class Builder implements PageInfoStage, _FinalStage {
-        private PageInfo pageInfo;
+        private ListMessagesResponsePageInfo pageInfo;
 
-        private List<MessageListItem> data = new ArrayList<>();
+        private List<ChatMessage> data = new ArrayList<>();
 
-        @JsonAnySetter
         private Map<String, Object> additionalProperties = new HashMap<>();
 
         private Builder() {}
@@ -126,46 +112,30 @@ public final class ListMessagesResponse {
             return this;
         }
 
-        /**
-         * <p>Information to aid in pagination.</p>
-         * <p>Information to aid in pagination.</p>
-         * @return Reference to {@code this} so that method calls can be chained together.
-         */
         @java.lang.Override
         @JsonSetter("page_info")
-        public _FinalStage pageInfo(@NotNull PageInfo pageInfo) {
+        public _FinalStage pageInfo(@NotNull ListMessagesResponsePageInfo pageInfo) {
             this.pageInfo = Objects.requireNonNull(pageInfo, "pageInfo must not be null");
             return this;
         }
 
-        /**
-         * <p>A list of nodes.</p>
-         * @return Reference to {@code this} so that method calls can be chained together.
-         */
         @java.lang.Override
-        public _FinalStage addAllData(List<MessageListItem> data) {
+        public _FinalStage addAllData(List<ChatMessage> data) {
             if (data != null) {
                 this.data.addAll(data);
             }
             return this;
         }
 
-        /**
-         * <p>A list of nodes.</p>
-         * @return Reference to {@code this} so that method calls can be chained together.
-         */
         @java.lang.Override
-        public _FinalStage addData(MessageListItem data) {
+        public _FinalStage addData(ChatMessage data) {
             this.data.add(data);
             return this;
         }
 
-        /**
-         * <p>A list of nodes.</p>
-         */
         @java.lang.Override
         @JsonSetter(value = "data", nulls = Nulls.SKIP)
-        public _FinalStage data(List<MessageListItem> data) {
+        public _FinalStage data(List<ChatMessage> data) {
             this.data.clear();
             if (data != null) {
                 this.data.addAll(data);
@@ -176,6 +146,14 @@ public final class ListMessagesResponse {
         @java.lang.Override
         public ListMessagesResponse build() {
             return new ListMessagesResponse(data, pageInfo, additionalProperties);
+        }
+
+        @JsonAnySetter
+        private void putAdditionalPropertyFromJson(String key, Object value) {
+            if (key.equalsIgnoreCase("data") || key.equalsIgnoreCase("page_info")) {
+                return;
+            }
+            this.additionalProperties.put(key, value);
         }
 
         @java.lang.Override

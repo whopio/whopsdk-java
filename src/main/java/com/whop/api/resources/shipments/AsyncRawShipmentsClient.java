@@ -4,11 +4,14 @@
 package com.whop.api.resources.shipments;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
+import com.whop.api.core.BodyProperties;
 import com.whop.api.core.ClientOptions;
 import com.whop.api.core.MediaTypes;
 import com.whop.api.core.ObjectMappers;
+import com.whop.api.core.PathSegments;
 import com.whop.api.core.QueryStringMapper;
 import com.whop.api.core.RequestOptions;
+import com.whop.api.core.RetryInterceptor;
 import com.whop.api.core.WhopApiApiException;
 import com.whop.api.core.WhopApiException;
 import com.whop.api.core.WhopApiHttpResponse;
@@ -20,11 +23,12 @@ import com.whop.api.errors.NotFoundError;
 import com.whop.api.errors.UnauthorizedError;
 import com.whop.api.resources.shipments.requests.CreateShipmentsRequest;
 import com.whop.api.resources.shipments.requests.ListShipmentsRequest;
+import com.whop.api.resources.shipments.requests.LookupShipmentsRequest;
 import com.whop.api.resources.shipments.requests.RetrieveShipmentsRequest;
 import com.whop.api.resources.shipments.requests.UpdateShipmentsRequest;
 import com.whop.api.resources.shipments.types.ListShipmentsResponse;
 import com.whop.api.types.Shipment;
-import com.whop.api.types.V1ErrorResponse;
+import com.whop.api.types.ShipmentLookup;
 import java.io.IOException;
 import java.util.List;
 import java.util.Optional;
@@ -49,32 +53,32 @@ public class AsyncRawShipmentsClient {
     }
 
     /**
-     * Returns a paginated list of shipments for an account.
+     * Lists an account's shipments.
      */
     public CompletableFuture<WhopApiHttpResponse<SyncPagingIterable<Shipment>>> list() {
         return list(ListShipmentsRequest.builder().build());
     }
 
     /**
-     * Returns a paginated list of shipments for an account.
+     * Lists an account's shipments.
      */
     public CompletableFuture<WhopApiHttpResponse<SyncPagingIterable<Shipment>>> list(RequestOptions requestOptions) {
         return list(ListShipmentsRequest.builder().build(), requestOptions);
     }
 
     /**
-     * Returns a paginated list of shipments for an account.
+     * Lists an account's shipments.
      */
     public CompletableFuture<WhopApiHttpResponse<SyncPagingIterable<Shipment>>> list(ListShipmentsRequest request) {
         return list(request, null);
     }
 
     /**
-     * Returns a paginated list of shipments for an account.
+     * Lists an account's shipments.
      */
     public CompletableFuture<WhopApiHttpResponse<SyncPagingIterable<Shipment>>> list(
             ListShipmentsRequest request, RequestOptions requestOptions) {
-        HttpUrl.Builder httpUrl = HttpUrl.parse(this.clientOptions.environment().getUrl())
+        HttpUrl.Builder httpUrl = HttpUrl.parse(this.clientOptions.environment().getApiURL())
                 .newBuilder()
                 .addPathSegments("shipments");
         if (request.getAccountId().isPresent()) {
@@ -136,8 +140,18 @@ public class AsyncRawShipmentsClient {
         if (requestOptions != null && requestOptions.getTimeout().isPresent()) {
             client = clientOptions.httpClientWithTimeout(requestOptions);
         }
+        if (requestOptions != null && requestOptions.getMaxRetries().isPresent()) {
+            okhttpRequest = okhttpRequest
+                    .newBuilder()
+                    .tag(
+                            RetryInterceptor.MaxRetriesOverride.class,
+                            new RetryInterceptor.MaxRetriesOverride(
+                                    requestOptions.getMaxRetries().get()))
+                    .build();
+        }
         CompletableFuture<WhopApiHttpResponse<SyncPagingIterable<Shipment>>> future = new CompletableFuture<>();
-        client.newCall(okhttpRequest).enqueue(new Callback() {
+        RetryInterceptor.AsyncCall okhttpCall = RetryInterceptor.newAsyncCall(client, okhttpRequest);
+        okhttpCall.enqueue(new Callback() {
             @Override
             public void onResponse(@NotNull Call call, @NotNull Response response) throws IOException {
                 try (ResponseBody responseBody = response.body()) {
@@ -153,15 +167,20 @@ public class AsyncRawShipmentsClient {
                                 .build();
                         List<Shipment> result = parsedResponse.getData();
                         future.complete(new WhopApiHttpResponse<>(
-                                new SyncPagingIterable<Shipment>(startingAfter != null, result, parsedResponse, () -> {
-                                    try {
-                                        return list(nextRequest, requestOptions)
-                                                .get()
-                                                .body();
-                                    } catch (InterruptedException | ExecutionException e) {
-                                        throw new RuntimeException(e);
-                                    }
-                                }),
+                                new SyncPagingIterable<Shipment>(
+                                        startingAfter.isPresent()
+                                                && !startingAfter.get().isEmpty(),
+                                        result,
+                                        parsedResponse,
+                                        () -> {
+                                            try {
+                                                return list(nextRequest, requestOptions)
+                                                        .get()
+                                                        .body();
+                                            } catch (InterruptedException | ExecutionException e) {
+                                                throw new RuntimeException(e);
+                                            }
+                                        }),
                                 response));
                         return;
                     }
@@ -195,6 +214,9 @@ public class AsyncRawShipmentsClient {
                     future.completeExceptionally(new WhopApiApiException(
                             "Error with status code " + response.code(), response.code(), errorBody, response));
                     return;
+                } catch (JsonProcessingException e) {
+                    future.completeExceptionally(
+                            new WhopApiException("Failed to deserialize response: " + e.getMessage(), e));
                 } catch (IOException e) {
                     future.completeExceptionally(new WhopApiException("Network error executing HTTP request", e));
                 }
@@ -203,6 +225,11 @@ public class AsyncRawShipmentsClient {
             @Override
             public void onFailure(@NotNull Call call, @NotNull IOException e) {
                 future.completeExceptionally(new WhopApiException("Network error executing HTTP request", e));
+            }
+        });
+        future.whenComplete((result_, throwable_) -> {
+            if (future.isCancelled()) {
+                okhttpCall.cancel();
             }
         });
         return future;
@@ -220,7 +247,7 @@ public class AsyncRawShipmentsClient {
      */
     public CompletableFuture<WhopApiHttpResponse<Shipment>> create(
             CreateShipmentsRequest request, RequestOptions requestOptions) {
-        HttpUrl.Builder httpUrl = HttpUrl.parse(this.clientOptions.environment().getUrl())
+        HttpUrl.Builder httpUrl = HttpUrl.parse(this.clientOptions.environment().getApiURL())
                 .newBuilder()
                 .addPathSegments("shipments");
         if (requestOptions != null) {
@@ -231,7 +258,9 @@ public class AsyncRawShipmentsClient {
         RequestBody body;
         try {
             body = RequestBody.create(
-                    ObjectMappers.JSON_MAPPER.writeValueAsBytes(request), MediaTypes.APPLICATION_JSON);
+                    ObjectMappers.JSON_MAPPER.writeValueAsBytes(BodyProperties.merge(
+                            request, requestOptions != null ? requestOptions.getBodyProperties() : null)),
+                    MediaTypes.APPLICATION_JSON);
         } catch (JsonProcessingException e) {
             throw new WhopApiException("Failed to serialize request", e);
         }
@@ -246,8 +275,18 @@ public class AsyncRawShipmentsClient {
         if (requestOptions != null && requestOptions.getTimeout().isPresent()) {
             client = clientOptions.httpClientWithTimeout(requestOptions);
         }
+        if (requestOptions != null && requestOptions.getMaxRetries().isPresent()) {
+            okhttpRequest = okhttpRequest
+                    .newBuilder()
+                    .tag(
+                            RetryInterceptor.MaxRetriesOverride.class,
+                            new RetryInterceptor.MaxRetriesOverride(
+                                    requestOptions.getMaxRetries().get()))
+                    .build();
+        }
         CompletableFuture<WhopApiHttpResponse<Shipment>> future = new CompletableFuture<>();
-        client.newCall(okhttpRequest).enqueue(new Callback() {
+        RetryInterceptor.AsyncCall okhttpCall = RetryInterceptor.newAsyncCall(client, okhttpRequest);
+        okhttpCall.enqueue(new Callback() {
             @Override
             public void onResponse(@NotNull Call call, @NotNull Response response) throws IOException {
                 try (ResponseBody responseBody = response.body()) {
@@ -276,7 +315,7 @@ public class AsyncRawShipmentsClient {
                                 return;
                             case 409:
                                 future.completeExceptionally(new ConflictError(
-                                        ObjectMappers.JSON_MAPPER.readValue(responseBodyString, V1ErrorResponse.class),
+                                        ObjectMappers.JSON_MAPPER.readValue(responseBodyString, Object.class),
                                         response));
                                 return;
                         }
@@ -287,6 +326,9 @@ public class AsyncRawShipmentsClient {
                     future.completeExceptionally(new WhopApiApiException(
                             "Error with status code " + response.code(), response.code(), errorBody, response));
                     return;
+                } catch (JsonProcessingException e) {
+                    future.completeExceptionally(
+                            new WhopApiException("Failed to deserialize response: " + e.getMessage(), e));
                 } catch (IOException e) {
                     future.completeExceptionally(new WhopApiException("Network error executing HTTP request", e));
                 }
@@ -297,39 +339,152 @@ public class AsyncRawShipmentsClient {
                 future.completeExceptionally(new WhopApiException("Network error executing HTTP request", e));
             }
         });
+        future.whenComplete((result_, throwable_) -> {
+            if (future.isCancelled()) {
+                okhttpCall.cancel();
+            }
+        });
         return future;
     }
 
     /**
-     * Retrieves a shipment by its id, or by the payment id it fulfills.
+     * Finds the delivery for a purchase from an account with customer tracking turned on, using exactly one order or tracking number plus the buyer's current receipt email. No authentication is required and no sign-in or session is created. Email matching ignores case and surrounding whitespace, but dots and +tags must match. Every miss returns the same 404: an unknown account, tracking turned off, a wrong number or email, an unpaid order or a purchase with nothing to ship. <code>shipment</code> is <code>null</code> while a paid physical purchase has no tracking yet, unless it has been fully refunded. Limited to 10 attempts per hour per order or tracking number within the account, and 30 attempts per five minutes per client IP and per email within the account. Responses are never cached or replayed with Idempotency-Key.
+     */
+    public CompletableFuture<WhopApiHttpResponse<ShipmentLookup>> lookup(LookupShipmentsRequest request) {
+        return lookup(request, null);
+    }
+
+    /**
+     * Finds the delivery for a purchase from an account with customer tracking turned on, using exactly one order or tracking number plus the buyer's current receipt email. No authentication is required and no sign-in or session is created. Email matching ignores case and surrounding whitespace, but dots and +tags must match. Every miss returns the same 404: an unknown account, tracking turned off, a wrong number or email, an unpaid order or a purchase with nothing to ship. <code>shipment</code> is <code>null</code> while a paid physical purchase has no tracking yet, unless it has been fully refunded. Limited to 10 attempts per hour per order or tracking number within the account, and 30 attempts per five minutes per client IP and per email within the account. Responses are never cached or replayed with Idempotency-Key.
+     */
+    public CompletableFuture<WhopApiHttpResponse<ShipmentLookup>> lookup(
+            LookupShipmentsRequest request, RequestOptions requestOptions) {
+        HttpUrl.Builder httpUrl = HttpUrl.parse(this.clientOptions.environment().getApiURL())
+                .newBuilder()
+                .addPathSegments("shipments/lookup");
+        if (requestOptions != null) {
+            requestOptions.getQueryParameters().forEach((_key, _value) -> {
+                httpUrl.addQueryParameter(_key, _value);
+            });
+        }
+        RequestBody body;
+        try {
+            body = RequestBody.create(
+                    ObjectMappers.JSON_MAPPER.writeValueAsBytes(BodyProperties.merge(
+                            request, requestOptions != null ? requestOptions.getBodyProperties() : null)),
+                    MediaTypes.APPLICATION_JSON);
+        } catch (JsonProcessingException e) {
+            throw new WhopApiException("Failed to serialize request", e);
+        }
+        Request okhttpRequest = new Request.Builder()
+                .url(httpUrl.build())
+                .method("POST", body)
+                .headers(Headers.of(clientOptions.headers(requestOptions)))
+                .addHeader("Content-Type", "application/json")
+                .addHeader("Accept", "application/json")
+                .build();
+        OkHttpClient client = clientOptions.httpClient();
+        if (requestOptions != null && requestOptions.getTimeout().isPresent()) {
+            client = clientOptions.httpClientWithTimeout(requestOptions);
+        }
+        if (requestOptions != null && requestOptions.getMaxRetries().isPresent()) {
+            okhttpRequest = okhttpRequest
+                    .newBuilder()
+                    .tag(
+                            RetryInterceptor.MaxRetriesOverride.class,
+                            new RetryInterceptor.MaxRetriesOverride(
+                                    requestOptions.getMaxRetries().get()))
+                    .build();
+        }
+        CompletableFuture<WhopApiHttpResponse<ShipmentLookup>> future = new CompletableFuture<>();
+        RetryInterceptor.AsyncCall okhttpCall = RetryInterceptor.newAsyncCall(client, okhttpRequest);
+        okhttpCall.enqueue(new Callback() {
+            @Override
+            public void onResponse(@NotNull Call call, @NotNull Response response) throws IOException {
+                try (ResponseBody responseBody = response.body()) {
+                    String responseBodyString = responseBody != null ? responseBody.string() : "{}";
+                    if (response.isSuccessful()) {
+                        future.complete(new WhopApiHttpResponse<>(
+                                ObjectMappers.JSON_MAPPER.readValue(responseBodyString, ShipmentLookup.class),
+                                response));
+                        return;
+                    }
+                    try {
+                        switch (response.code()) {
+                            case 400:
+                                future.completeExceptionally(new BadRequestError(
+                                        ObjectMappers.JSON_MAPPER.readValue(responseBodyString, Object.class),
+                                        response));
+                                return;
+                            case 404:
+                                future.completeExceptionally(new NotFoundError(
+                                        ObjectMappers.JSON_MAPPER.readValue(responseBodyString, Object.class),
+                                        response));
+                                return;
+                            case 409:
+                                future.completeExceptionally(new ConflictError(
+                                        ObjectMappers.JSON_MAPPER.readValue(responseBodyString, Object.class),
+                                        response));
+                                return;
+                        }
+                    } catch (JsonProcessingException ignored) {
+                        // unable to map error response, throwing generic error
+                    }
+                    Object errorBody = ObjectMappers.parseErrorBody(responseBodyString);
+                    future.completeExceptionally(new WhopApiApiException(
+                            "Error with status code " + response.code(), response.code(), errorBody, response));
+                    return;
+                } catch (JsonProcessingException e) {
+                    future.completeExceptionally(
+                            new WhopApiException("Failed to deserialize response: " + e.getMessage(), e));
+                } catch (IOException e) {
+                    future.completeExceptionally(new WhopApiException("Network error executing HTTP request", e));
+                }
+            }
+
+            @Override
+            public void onFailure(@NotNull Call call, @NotNull IOException e) {
+                future.completeExceptionally(new WhopApiException("Network error executing HTTP request", e));
+            }
+        });
+        future.whenComplete((result_, throwable_) -> {
+            if (future.isCancelled()) {
+                okhttpCall.cancel();
+            }
+        });
+        return future;
+    }
+
+    /**
+     * Retrieves a shipment by its ID, or by the ID of the payment it fulfills.
      */
     public CompletableFuture<WhopApiHttpResponse<Shipment>> retrieve(String id) {
         return retrieve(id, RetrieveShipmentsRequest.builder().build());
     }
 
     /**
-     * Retrieves a shipment by its id, or by the payment id it fulfills.
+     * Retrieves a shipment by its ID, or by the ID of the payment it fulfills.
      */
     public CompletableFuture<WhopApiHttpResponse<Shipment>> retrieve(String id, RequestOptions requestOptions) {
         return retrieve(id, RetrieveShipmentsRequest.builder().build(), requestOptions);
     }
 
     /**
-     * Retrieves a shipment by its id, or by the payment id it fulfills.
+     * Retrieves a shipment by its ID, or by the ID of the payment it fulfills.
      */
     public CompletableFuture<WhopApiHttpResponse<Shipment>> retrieve(String id, RetrieveShipmentsRequest request) {
         return retrieve(id, request, null);
     }
 
     /**
-     * Retrieves a shipment by its id, or by the payment id it fulfills.
+     * Retrieves a shipment by its ID, or by the ID of the payment it fulfills.
      */
     public CompletableFuture<WhopApiHttpResponse<Shipment>> retrieve(
             String id, RetrieveShipmentsRequest request, RequestOptions requestOptions) {
-        HttpUrl.Builder httpUrl = HttpUrl.parse(this.clientOptions.environment().getUrl())
+        HttpUrl.Builder httpUrl = HttpUrl.parse(this.clientOptions.environment().getApiURL())
                 .newBuilder()
                 .addPathSegments("shipments")
-                .addPathSegment(id);
+                .addPathSegment(PathSegments.validate(id));
         if (requestOptions != null) {
             requestOptions.getQueryParameters().forEach((_key, _value) -> {
                 httpUrl.addQueryParameter(_key, _value);
@@ -345,8 +500,18 @@ public class AsyncRawShipmentsClient {
         if (requestOptions != null && requestOptions.getTimeout().isPresent()) {
             client = clientOptions.httpClientWithTimeout(requestOptions);
         }
+        if (requestOptions != null && requestOptions.getMaxRetries().isPresent()) {
+            okhttpRequest = okhttpRequest
+                    .newBuilder()
+                    .tag(
+                            RetryInterceptor.MaxRetriesOverride.class,
+                            new RetryInterceptor.MaxRetriesOverride(
+                                    requestOptions.getMaxRetries().get()))
+                    .build();
+        }
         CompletableFuture<WhopApiHttpResponse<Shipment>> future = new CompletableFuture<>();
-        client.newCall(okhttpRequest).enqueue(new Callback() {
+        RetryInterceptor.AsyncCall okhttpCall = RetryInterceptor.newAsyncCall(client, okhttpRequest);
+        okhttpCall.enqueue(new Callback() {
             @Override
             public void onResponse(@NotNull Call call, @NotNull Response response) throws IOException {
                 try (ResponseBody responseBody = response.body()) {
@@ -381,6 +546,9 @@ public class AsyncRawShipmentsClient {
                     future.completeExceptionally(new WhopApiApiException(
                             "Error with status code " + response.code(), response.code(), errorBody, response));
                     return;
+                } catch (JsonProcessingException e) {
+                    future.completeExceptionally(
+                            new WhopApiException("Failed to deserialize response: " + e.getMessage(), e));
                 } catch (IOException e) {
                     future.completeExceptionally(new WhopApiException("Network error executing HTTP request", e));
                 }
@@ -389,6 +557,11 @@ public class AsyncRawShipmentsClient {
             @Override
             public void onFailure(@NotNull Call call, @NotNull IOException e) {
                 future.completeExceptionally(new WhopApiException("Network error executing HTTP request", e));
+            }
+        });
+        future.whenComplete((result_, throwable_) -> {
+            if (future.isCancelled()) {
+                okhttpCall.cancel();
             }
         });
         return future;
@@ -406,10 +579,10 @@ public class AsyncRawShipmentsClient {
      */
     public CompletableFuture<WhopApiHttpResponse<Shipment>> update(
             String id, UpdateShipmentsRequest request, RequestOptions requestOptions) {
-        HttpUrl.Builder httpUrl = HttpUrl.parse(this.clientOptions.environment().getUrl())
+        HttpUrl.Builder httpUrl = HttpUrl.parse(this.clientOptions.environment().getApiURL())
                 .newBuilder()
                 .addPathSegments("shipments")
-                .addPathSegment(id);
+                .addPathSegment(PathSegments.validate(id));
         if (requestOptions != null) {
             requestOptions.getQueryParameters().forEach((_key, _value) -> {
                 httpUrl.addQueryParameter(_key, _value);
@@ -418,7 +591,9 @@ public class AsyncRawShipmentsClient {
         RequestBody body;
         try {
             body = RequestBody.create(
-                    ObjectMappers.JSON_MAPPER.writeValueAsBytes(request), MediaTypes.APPLICATION_JSON);
+                    ObjectMappers.JSON_MAPPER.writeValueAsBytes(BodyProperties.merge(
+                            request, requestOptions != null ? requestOptions.getBodyProperties() : null)),
+                    MediaTypes.APPLICATION_JSON);
         } catch (JsonProcessingException e) {
             throw new WhopApiException("Failed to serialize request", e);
         }
@@ -433,8 +608,18 @@ public class AsyncRawShipmentsClient {
         if (requestOptions != null && requestOptions.getTimeout().isPresent()) {
             client = clientOptions.httpClientWithTimeout(requestOptions);
         }
+        if (requestOptions != null && requestOptions.getMaxRetries().isPresent()) {
+            okhttpRequest = okhttpRequest
+                    .newBuilder()
+                    .tag(
+                            RetryInterceptor.MaxRetriesOverride.class,
+                            new RetryInterceptor.MaxRetriesOverride(
+                                    requestOptions.getMaxRetries().get()))
+                    .build();
+        }
         CompletableFuture<WhopApiHttpResponse<Shipment>> future = new CompletableFuture<>();
-        client.newCall(okhttpRequest).enqueue(new Callback() {
+        RetryInterceptor.AsyncCall okhttpCall = RetryInterceptor.newAsyncCall(client, okhttpRequest);
+        okhttpCall.enqueue(new Callback() {
             @Override
             public void onResponse(@NotNull Call call, @NotNull Response response) throws IOException {
                 try (ResponseBody responseBody = response.body()) {
@@ -474,6 +659,9 @@ public class AsyncRawShipmentsClient {
                     future.completeExceptionally(new WhopApiApiException(
                             "Error with status code " + response.code(), response.code(), errorBody, response));
                     return;
+                } catch (JsonProcessingException e) {
+                    future.completeExceptionally(
+                            new WhopApiException("Failed to deserialize response: " + e.getMessage(), e));
                 } catch (IOException e) {
                     future.completeExceptionally(new WhopApiException("Network error executing HTTP request", e));
                 }
@@ -482,6 +670,11 @@ public class AsyncRawShipmentsClient {
             @Override
             public void onFailure(@NotNull Call call, @NotNull IOException e) {
                 future.completeExceptionally(new WhopApiException("Network error executing HTTP request", e));
+            }
+        });
+        future.whenComplete((result_, throwable_) -> {
+            if (future.isCancelled()) {
+                okhttpCall.cancel();
             }
         });
         return future;

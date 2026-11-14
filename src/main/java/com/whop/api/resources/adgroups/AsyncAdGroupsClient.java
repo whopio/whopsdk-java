@@ -5,22 +5,19 @@ package com.whop.api.resources.adgroups;
 
 import com.whop.api.core.ClientOptions;
 import com.whop.api.core.RequestOptions;
+import com.whop.api.core.WhopApiHttpResponse;
 import com.whop.api.core.pagination.SyncPagingIterable;
 import com.whop.api.resources.adgroups.requests.CreateAdGroupsRequest;
 import com.whop.api.resources.adgroups.requests.DeleteAdGroupsRequest;
 import com.whop.api.resources.adgroups.requests.DuplicateAdGroupsRequest;
-import com.whop.api.resources.adgroups.requests.EstimateReachAdGroupsRequest;
 import com.whop.api.resources.adgroups.requests.ListAdGroupsRequest;
 import com.whop.api.resources.adgroups.requests.PauseAdGroupsRequest;
 import com.whop.api.resources.adgroups.requests.RetrieveAdGroupsRequest;
-import com.whop.api.resources.adgroups.requests.SearchTargetingOptionsAdGroupsRequest;
 import com.whop.api.resources.adgroups.requests.UnpauseAdGroupsRequest;
 import com.whop.api.resources.adgroups.requests.UpdateAdGroupsRequest;
 import com.whop.api.resources.adgroups.types.DeleteAdGroupsResponse;
 import com.whop.api.resources.adgroups.types.DuplicateAdGroupsResponse;
-import com.whop.api.resources.adgroups.types.SearchTargetingOptionsAdGroupsResponse;
 import com.whop.api.types.AdGroup;
-import com.whop.api.types.ReachEstimate;
 import java.util.concurrent.CompletableFuture;
 
 public class AsyncAdGroupsClient {
@@ -44,21 +41,43 @@ public class AsyncAdGroupsClient {
      * Lists ad groups for the account, newest first.
      */
     public CompletableFuture<SyncPagingIterable<AdGroup>> list() {
-        return this.rawClient.list().thenApply(response -> response.body());
+        CompletableFuture<WhopApiHttpResponse<SyncPagingIterable<AdGroup>>> rawFuture = this.rawClient.list();
+        CompletableFuture<SyncPagingIterable<AdGroup>> future = rawFuture.thenApply(response -> response.body());
+        future.whenComplete((result_, throwable_) -> {
+            if (future.isCancelled()) {
+                rawFuture.cancel(true);
+            }
+        });
+        return future;
     }
 
     /**
      * Lists ad groups for the account, newest first.
      */
     public CompletableFuture<SyncPagingIterable<AdGroup>> list(RequestOptions requestOptions) {
-        return this.rawClient.list(requestOptions).thenApply(response -> response.body());
+        CompletableFuture<WhopApiHttpResponse<SyncPagingIterable<AdGroup>>> rawFuture =
+                this.rawClient.list(requestOptions);
+        CompletableFuture<SyncPagingIterable<AdGroup>> future = rawFuture.thenApply(response -> response.body());
+        future.whenComplete((result_, throwable_) -> {
+            if (future.isCancelled()) {
+                rawFuture.cancel(true);
+            }
+        });
+        return future;
     }
 
     /**
      * Lists ad groups for the account, newest first.
      */
     public CompletableFuture<SyncPagingIterable<AdGroup>> list(ListAdGroupsRequest request) {
-        return this.rawClient.list(request).thenApply(response -> response.body());
+        CompletableFuture<WhopApiHttpResponse<SyncPagingIterable<AdGroup>>> rawFuture = this.rawClient.list(request);
+        CompletableFuture<SyncPagingIterable<AdGroup>> future = rawFuture.thenApply(response -> response.body());
+        future.whenComplete((result_, throwable_) -> {
+            if (future.isCancelled()) {
+                rawFuture.cancel(true);
+            }
+        });
+        return future;
     }
 
     /**
@@ -66,216 +85,374 @@ public class AsyncAdGroupsClient {
      */
     public CompletableFuture<SyncPagingIterable<AdGroup>> list(
             ListAdGroupsRequest request, RequestOptions requestOptions) {
-        return this.rawClient.list(request, requestOptions).thenApply(response -> response.body());
+        CompletableFuture<WhopApiHttpResponse<SyncPagingIterable<AdGroup>>> rawFuture =
+                this.rawClient.list(request, requestOptions);
+        CompletableFuture<SyncPagingIterable<AdGroup>> future = rawFuture.thenApply(response -> response.body());
+        future.whenComplete((result_, throwable_) -> {
+            if (future.isCancelled()) {
+                rawFuture.cancel(true);
+            }
+        });
+        return future;
     }
 
     /**
      * Creates an ad group (ad set) in a campaign.
      */
     public CompletableFuture<AdGroup> create(CreateAdGroupsRequest request) {
-        return this.rawClient.create(request).thenApply(response -> response.body());
+        CompletableFuture<WhopApiHttpResponse<AdGroup>> rawFuture = this.rawClient.create(request);
+        CompletableFuture<AdGroup> future = rawFuture.thenApply(response -> response.body());
+        future.whenComplete((result_, throwable_) -> {
+            if (future.isCancelled()) {
+                rawFuture.cancel(true);
+            }
+        });
+        return future;
     }
 
     /**
      * Creates an ad group (ad set) in a campaign.
      */
     public CompletableFuture<AdGroup> create(CreateAdGroupsRequest request, RequestOptions requestOptions) {
-        return this.rawClient.create(request, requestOptions).thenApply(response -> response.body());
+        CompletableFuture<WhopApiHttpResponse<AdGroup>> rawFuture = this.rawClient.create(request, requestOptions);
+        CompletableFuture<AdGroup> future = rawFuture.thenApply(response -> response.body());
+        future.whenComplete((result_, throwable_) -> {
+            if (future.isCancelled()) {
+                rawFuture.cancel(true);
+            }
+        });
+        return future;
     }
 
     /**
-     * Estimates how many people a draft targeting spec can reach, before an ad group is created. The body takes the same targeting fields as creating an ad group — <code>regions</code>, <code>demographics</code>, <code>detailed_targeting</code>, <code>audiences</code>, <code>languages</code>, and <code>devices</code> — and nothing is persisted.
-     */
-    public CompletableFuture<ReachEstimate> estimateReach(EstimateReachAdGroupsRequest request) {
-        return this.rawClient.estimateReach(request).thenApply(response -> response.body());
-    }
-
-    /**
-     * Estimates how many people a draft targeting spec can reach, before an ad group is created. The body takes the same targeting fields as creating an ad group — <code>regions</code>, <code>demographics</code>, <code>detailed_targeting</code>, <code>audiences</code>, <code>languages</code>, and <code>devices</code> — and nothing is persisted.
-     */
-    public CompletableFuture<ReachEstimate> estimateReach(
-            EstimateReachAdGroupsRequest request, RequestOptions requestOptions) {
-        return this.rawClient.estimateReach(request, requestOptions).thenApply(response -> response.body());
-    }
-
-    /**
-     * Searches the ad platform's targeting taxonomy for options to target an ad group with. Each result comes back in the exact shape the ad-group body accepts for its <code>type</code>, so it can be used in <code>detailed_targeting</code>, <code>regions</code>, or <code>languages</code> as-is. A blank <code>query</code> browses the small fixed lists (behaviors, browse demographic categories, languages); interests, work employers, job titles, schools, majors, and locations need a search term.
-     */
-    public CompletableFuture<SearchTargetingOptionsAdGroupsResponse> searchTargetingOptions(
-            SearchTargetingOptionsAdGroupsRequest request) {
-        return this.rawClient.searchTargetingOptions(request).thenApply(response -> response.body());
-    }
-
-    /**
-     * Searches the ad platform's targeting taxonomy for options to target an ad group with. Each result comes back in the exact shape the ad-group body accepts for its <code>type</code>, so it can be used in <code>detailed_targeting</code>, <code>regions</code>, or <code>languages</code> as-is. A blank <code>query</code> browses the small fixed lists (behaviors, browse demographic categories, languages); interests, work employers, job titles, schools, majors, and locations need a search term.
-     */
-    public CompletableFuture<SearchTargetingOptionsAdGroupsResponse> searchTargetingOptions(
-            SearchTargetingOptionsAdGroupsRequest request, RequestOptions requestOptions) {
-        return this.rawClient.searchTargetingOptions(request, requestOptions).thenApply(response -> response.body());
-    }
-
-    /**
-     * Retrieves a single ad group.
+     * Retrieves an ad group, with performance stats for the window set by <code>stats_from</code> and <code>stats_to</code>.
      */
     public CompletableFuture<AdGroup> retrieve(String id) {
-        return this.rawClient.retrieve(id).thenApply(response -> response.body());
+        CompletableFuture<WhopApiHttpResponse<AdGroup>> rawFuture = this.rawClient.retrieve(id);
+        CompletableFuture<AdGroup> future = rawFuture.thenApply(response -> response.body());
+        future.whenComplete((result_, throwable_) -> {
+            if (future.isCancelled()) {
+                rawFuture.cancel(true);
+            }
+        });
+        return future;
     }
 
     /**
-     * Retrieves a single ad group.
+     * Retrieves an ad group, with performance stats for the window set by <code>stats_from</code> and <code>stats_to</code>.
      */
     public CompletableFuture<AdGroup> retrieve(String id, RequestOptions requestOptions) {
-        return this.rawClient.retrieve(id, requestOptions).thenApply(response -> response.body());
+        CompletableFuture<WhopApiHttpResponse<AdGroup>> rawFuture = this.rawClient.retrieve(id, requestOptions);
+        CompletableFuture<AdGroup> future = rawFuture.thenApply(response -> response.body());
+        future.whenComplete((result_, throwable_) -> {
+            if (future.isCancelled()) {
+                rawFuture.cancel(true);
+            }
+        });
+        return future;
     }
 
     /**
-     * Retrieves a single ad group.
+     * Retrieves an ad group, with performance stats for the window set by <code>stats_from</code> and <code>stats_to</code>.
      */
     public CompletableFuture<AdGroup> retrieve(String id, RetrieveAdGroupsRequest request) {
-        return this.rawClient.retrieve(id, request).thenApply(response -> response.body());
+        CompletableFuture<WhopApiHttpResponse<AdGroup>> rawFuture = this.rawClient.retrieve(id, request);
+        CompletableFuture<AdGroup> future = rawFuture.thenApply(response -> response.body());
+        future.whenComplete((result_, throwable_) -> {
+            if (future.isCancelled()) {
+                rawFuture.cancel(true);
+            }
+        });
+        return future;
     }
 
     /**
-     * Retrieves a single ad group.
+     * Retrieves an ad group, with performance stats for the window set by <code>stats_from</code> and <code>stats_to</code>.
      */
     public CompletableFuture<AdGroup> retrieve(
             String id, RetrieveAdGroupsRequest request, RequestOptions requestOptions) {
-        return this.rawClient.retrieve(id, request, requestOptions).thenApply(response -> response.body());
+        CompletableFuture<WhopApiHttpResponse<AdGroup>> rawFuture =
+                this.rawClient.retrieve(id, request, requestOptions);
+        CompletableFuture<AdGroup> future = rawFuture.thenApply(response -> response.body());
+        future.whenComplete((result_, throwable_) -> {
+            if (future.isCancelled()) {
+                rawFuture.cancel(true);
+            }
+        });
+        return future;
     }
 
     /**
-     * Deletes an ad group.
+     * Deletes an ad group and stops its delivery.
      */
     public CompletableFuture<DeleteAdGroupsResponse> delete(String id) {
-        return this.rawClient.delete(id).thenApply(response -> response.body());
+        CompletableFuture<WhopApiHttpResponse<DeleteAdGroupsResponse>> rawFuture = this.rawClient.delete(id);
+        CompletableFuture<DeleteAdGroupsResponse> future = rawFuture.thenApply(response -> response.body());
+        future.whenComplete((result_, throwable_) -> {
+            if (future.isCancelled()) {
+                rawFuture.cancel(true);
+            }
+        });
+        return future;
     }
 
     /**
-     * Deletes an ad group.
+     * Deletes an ad group and stops its delivery.
      */
     public CompletableFuture<DeleteAdGroupsResponse> delete(String id, RequestOptions requestOptions) {
-        return this.rawClient.delete(id, requestOptions).thenApply(response -> response.body());
+        CompletableFuture<WhopApiHttpResponse<DeleteAdGroupsResponse>> rawFuture =
+                this.rawClient.delete(id, requestOptions);
+        CompletableFuture<DeleteAdGroupsResponse> future = rawFuture.thenApply(response -> response.body());
+        future.whenComplete((result_, throwable_) -> {
+            if (future.isCancelled()) {
+                rawFuture.cancel(true);
+            }
+        });
+        return future;
     }
 
     /**
-     * Deletes an ad group.
+     * Deletes an ad group and stops its delivery.
      */
     public CompletableFuture<DeleteAdGroupsResponse> delete(String id, DeleteAdGroupsRequest request) {
-        return this.rawClient.delete(id, request).thenApply(response -> response.body());
+        CompletableFuture<WhopApiHttpResponse<DeleteAdGroupsResponse>> rawFuture = this.rawClient.delete(id, request);
+        CompletableFuture<DeleteAdGroupsResponse> future = rawFuture.thenApply(response -> response.body());
+        future.whenComplete((result_, throwable_) -> {
+            if (future.isCancelled()) {
+                rawFuture.cancel(true);
+            }
+        });
+        return future;
     }
 
     /**
-     * Deletes an ad group.
+     * Deletes an ad group and stops its delivery.
      */
     public CompletableFuture<DeleteAdGroupsResponse> delete(
             String id, DeleteAdGroupsRequest request, RequestOptions requestOptions) {
-        return this.rawClient.delete(id, request, requestOptions).thenApply(response -> response.body());
+        CompletableFuture<WhopApiHttpResponse<DeleteAdGroupsResponse>> rawFuture =
+                this.rawClient.delete(id, request, requestOptions);
+        CompletableFuture<DeleteAdGroupsResponse> future = rawFuture.thenApply(response -> response.body());
+        future.whenComplete((result_, throwable_) -> {
+            if (future.isCancelled()) {
+                rawFuture.cancel(true);
+            }
+        });
+        return future;
     }
 
     /**
      * Updates an ad group's editable fields. Only the keys you send are changed.
      */
     public CompletableFuture<AdGroup> update(String id) {
-        return this.rawClient.update(id).thenApply(response -> response.body());
+        CompletableFuture<WhopApiHttpResponse<AdGroup>> rawFuture = this.rawClient.update(id);
+        CompletableFuture<AdGroup> future = rawFuture.thenApply(response -> response.body());
+        future.whenComplete((result_, throwable_) -> {
+            if (future.isCancelled()) {
+                rawFuture.cancel(true);
+            }
+        });
+        return future;
     }
 
     /**
      * Updates an ad group's editable fields. Only the keys you send are changed.
      */
     public CompletableFuture<AdGroup> update(String id, RequestOptions requestOptions) {
-        return this.rawClient.update(id, requestOptions).thenApply(response -> response.body());
+        CompletableFuture<WhopApiHttpResponse<AdGroup>> rawFuture = this.rawClient.update(id, requestOptions);
+        CompletableFuture<AdGroup> future = rawFuture.thenApply(response -> response.body());
+        future.whenComplete((result_, throwable_) -> {
+            if (future.isCancelled()) {
+                rawFuture.cancel(true);
+            }
+        });
+        return future;
     }
 
     /**
      * Updates an ad group's editable fields. Only the keys you send are changed.
      */
     public CompletableFuture<AdGroup> update(String id, UpdateAdGroupsRequest request) {
-        return this.rawClient.update(id, request).thenApply(response -> response.body());
+        CompletableFuture<WhopApiHttpResponse<AdGroup>> rawFuture = this.rawClient.update(id, request);
+        CompletableFuture<AdGroup> future = rawFuture.thenApply(response -> response.body());
+        future.whenComplete((result_, throwable_) -> {
+            if (future.isCancelled()) {
+                rawFuture.cancel(true);
+            }
+        });
+        return future;
     }
 
     /**
      * Updates an ad group's editable fields. Only the keys you send are changed.
      */
     public CompletableFuture<AdGroup> update(String id, UpdateAdGroupsRequest request, RequestOptions requestOptions) {
-        return this.rawClient.update(id, request, requestOptions).thenApply(response -> response.body());
+        CompletableFuture<WhopApiHttpResponse<AdGroup>> rawFuture = this.rawClient.update(id, request, requestOptions);
+        CompletableFuture<AdGroup> future = rawFuture.thenApply(response -> response.body());
+        future.whenComplete((result_, throwable_) -> {
+            if (future.isCancelled()) {
+                rawFuture.cancel(true);
+            }
+        });
+        return future;
     }
 
     /**
-     * Creates copies of the ad group in <code>duplicating</code> status and returns them — into its own campaign, or into target_ad_campaign_id (which must belong to the same account and be compatible with the ad group's targeting and goals); each copy transitions to its final status (matching the source's active/paused state) once duplication completes. Poll each returned ad group until it leaves <code>duplicating</code> — a copy that could not be completed is deleted and returns 404.
+     * Starts copying an ad group and returns the copies in <code>duplicating</code> status. Poll each returned ad group until it leaves <code>duplicating</code>: it then takes the source's <code>active</code> or <code>paused</code> status, or, if the copy could not be completed, is deleted and returns 404.
      */
     public CompletableFuture<DuplicateAdGroupsResponse> duplicate(String id) {
-        return this.rawClient.duplicate(id).thenApply(response -> response.body());
+        CompletableFuture<WhopApiHttpResponse<DuplicateAdGroupsResponse>> rawFuture = this.rawClient.duplicate(id);
+        CompletableFuture<DuplicateAdGroupsResponse> future = rawFuture.thenApply(response -> response.body());
+        future.whenComplete((result_, throwable_) -> {
+            if (future.isCancelled()) {
+                rawFuture.cancel(true);
+            }
+        });
+        return future;
     }
 
     /**
-     * Creates copies of the ad group in <code>duplicating</code> status and returns them — into its own campaign, or into target_ad_campaign_id (which must belong to the same account and be compatible with the ad group's targeting and goals); each copy transitions to its final status (matching the source's active/paused state) once duplication completes. Poll each returned ad group until it leaves <code>duplicating</code> — a copy that could not be completed is deleted and returns 404.
+     * Starts copying an ad group and returns the copies in <code>duplicating</code> status. Poll each returned ad group until it leaves <code>duplicating</code>: it then takes the source's <code>active</code> or <code>paused</code> status, or, if the copy could not be completed, is deleted and returns 404.
      */
     public CompletableFuture<DuplicateAdGroupsResponse> duplicate(String id, RequestOptions requestOptions) {
-        return this.rawClient.duplicate(id, requestOptions).thenApply(response -> response.body());
+        CompletableFuture<WhopApiHttpResponse<DuplicateAdGroupsResponse>> rawFuture =
+                this.rawClient.duplicate(id, requestOptions);
+        CompletableFuture<DuplicateAdGroupsResponse> future = rawFuture.thenApply(response -> response.body());
+        future.whenComplete((result_, throwable_) -> {
+            if (future.isCancelled()) {
+                rawFuture.cancel(true);
+            }
+        });
+        return future;
     }
 
     /**
-     * Creates copies of the ad group in <code>duplicating</code> status and returns them — into its own campaign, or into target_ad_campaign_id (which must belong to the same account and be compatible with the ad group's targeting and goals); each copy transitions to its final status (matching the source's active/paused state) once duplication completes. Poll each returned ad group until it leaves <code>duplicating</code> — a copy that could not be completed is deleted and returns 404.
+     * Starts copying an ad group and returns the copies in <code>duplicating</code> status. Poll each returned ad group until it leaves <code>duplicating</code>: it then takes the source's <code>active</code> or <code>paused</code> status, or, if the copy could not be completed, is deleted and returns 404.
      */
     public CompletableFuture<DuplicateAdGroupsResponse> duplicate(String id, DuplicateAdGroupsRequest request) {
-        return this.rawClient.duplicate(id, request).thenApply(response -> response.body());
+        CompletableFuture<WhopApiHttpResponse<DuplicateAdGroupsResponse>> rawFuture =
+                this.rawClient.duplicate(id, request);
+        CompletableFuture<DuplicateAdGroupsResponse> future = rawFuture.thenApply(response -> response.body());
+        future.whenComplete((result_, throwable_) -> {
+            if (future.isCancelled()) {
+                rawFuture.cancel(true);
+            }
+        });
+        return future;
     }
 
     /**
-     * Creates copies of the ad group in <code>duplicating</code> status and returns them — into its own campaign, or into target_ad_campaign_id (which must belong to the same account and be compatible with the ad group's targeting and goals); each copy transitions to its final status (matching the source's active/paused state) once duplication completes. Poll each returned ad group until it leaves <code>duplicating</code> — a copy that could not be completed is deleted and returns 404.
+     * Starts copying an ad group and returns the copies in <code>duplicating</code> status. Poll each returned ad group until it leaves <code>duplicating</code>: it then takes the source's <code>active</code> or <code>paused</code> status, or, if the copy could not be completed, is deleted and returns 404.
      */
     public CompletableFuture<DuplicateAdGroupsResponse> duplicate(
             String id, DuplicateAdGroupsRequest request, RequestOptions requestOptions) {
-        return this.rawClient.duplicate(id, request, requestOptions).thenApply(response -> response.body());
+        CompletableFuture<WhopApiHttpResponse<DuplicateAdGroupsResponse>> rawFuture =
+                this.rawClient.duplicate(id, request, requestOptions);
+        CompletableFuture<DuplicateAdGroupsResponse> future = rawFuture.thenApply(response -> response.body());
+        future.whenComplete((result_, throwable_) -> {
+            if (future.isCancelled()) {
+                rawFuture.cancel(true);
+            }
+        });
+        return future;
     }
 
     /**
      * Pauses delivery of an ad group.
      */
     public CompletableFuture<AdGroup> pause(String id) {
-        return this.rawClient.pause(id).thenApply(response -> response.body());
+        CompletableFuture<WhopApiHttpResponse<AdGroup>> rawFuture = this.rawClient.pause(id);
+        CompletableFuture<AdGroup> future = rawFuture.thenApply(response -> response.body());
+        future.whenComplete((result_, throwable_) -> {
+            if (future.isCancelled()) {
+                rawFuture.cancel(true);
+            }
+        });
+        return future;
     }
 
     /**
      * Pauses delivery of an ad group.
      */
     public CompletableFuture<AdGroup> pause(String id, RequestOptions requestOptions) {
-        return this.rawClient.pause(id, requestOptions).thenApply(response -> response.body());
+        CompletableFuture<WhopApiHttpResponse<AdGroup>> rawFuture = this.rawClient.pause(id, requestOptions);
+        CompletableFuture<AdGroup> future = rawFuture.thenApply(response -> response.body());
+        future.whenComplete((result_, throwable_) -> {
+            if (future.isCancelled()) {
+                rawFuture.cancel(true);
+            }
+        });
+        return future;
     }
 
     /**
      * Pauses delivery of an ad group.
      */
     public CompletableFuture<AdGroup> pause(String id, PauseAdGroupsRequest request) {
-        return this.rawClient.pause(id, request).thenApply(response -> response.body());
+        CompletableFuture<WhopApiHttpResponse<AdGroup>> rawFuture = this.rawClient.pause(id, request);
+        CompletableFuture<AdGroup> future = rawFuture.thenApply(response -> response.body());
+        future.whenComplete((result_, throwable_) -> {
+            if (future.isCancelled()) {
+                rawFuture.cancel(true);
+            }
+        });
+        return future;
     }
 
     /**
      * Pauses delivery of an ad group.
      */
     public CompletableFuture<AdGroup> pause(String id, PauseAdGroupsRequest request, RequestOptions requestOptions) {
-        return this.rawClient.pause(id, request, requestOptions).thenApply(response -> response.body());
+        CompletableFuture<WhopApiHttpResponse<AdGroup>> rawFuture = this.rawClient.pause(id, request, requestOptions);
+        CompletableFuture<AdGroup> future = rawFuture.thenApply(response -> response.body());
+        future.whenComplete((result_, throwable_) -> {
+            if (future.isCancelled()) {
+                rawFuture.cancel(true);
+            }
+        });
+        return future;
     }
 
     /**
      * Resumes delivery of a paused ad group.
      */
     public CompletableFuture<AdGroup> unpause(String id) {
-        return this.rawClient.unpause(id).thenApply(response -> response.body());
+        CompletableFuture<WhopApiHttpResponse<AdGroup>> rawFuture = this.rawClient.unpause(id);
+        CompletableFuture<AdGroup> future = rawFuture.thenApply(response -> response.body());
+        future.whenComplete((result_, throwable_) -> {
+            if (future.isCancelled()) {
+                rawFuture.cancel(true);
+            }
+        });
+        return future;
     }
 
     /**
      * Resumes delivery of a paused ad group.
      */
     public CompletableFuture<AdGroup> unpause(String id, RequestOptions requestOptions) {
-        return this.rawClient.unpause(id, requestOptions).thenApply(response -> response.body());
+        CompletableFuture<WhopApiHttpResponse<AdGroup>> rawFuture = this.rawClient.unpause(id, requestOptions);
+        CompletableFuture<AdGroup> future = rawFuture.thenApply(response -> response.body());
+        future.whenComplete((result_, throwable_) -> {
+            if (future.isCancelled()) {
+                rawFuture.cancel(true);
+            }
+        });
+        return future;
     }
 
     /**
      * Resumes delivery of a paused ad group.
      */
     public CompletableFuture<AdGroup> unpause(String id, UnpauseAdGroupsRequest request) {
-        return this.rawClient.unpause(id, request).thenApply(response -> response.body());
+        CompletableFuture<WhopApiHttpResponse<AdGroup>> rawFuture = this.rawClient.unpause(id, request);
+        CompletableFuture<AdGroup> future = rawFuture.thenApply(response -> response.body());
+        future.whenComplete((result_, throwable_) -> {
+            if (future.isCancelled()) {
+                rawFuture.cancel(true);
+            }
+        });
+        return future;
     }
 
     /**
@@ -283,6 +460,13 @@ public class AsyncAdGroupsClient {
      */
     public CompletableFuture<AdGroup> unpause(
             String id, UnpauseAdGroupsRequest request, RequestOptions requestOptions) {
-        return this.rawClient.unpause(id, request, requestOptions).thenApply(response -> response.body());
+        CompletableFuture<WhopApiHttpResponse<AdGroup>> rawFuture = this.rawClient.unpause(id, request, requestOptions);
+        CompletableFuture<AdGroup> future = rawFuture.thenApply(response -> response.body());
+        future.whenComplete((result_, throwable_) -> {
+            if (future.isCancelled()) {
+                rawFuture.cancel(true);
+            }
+        });
+        return future;
     }
 }

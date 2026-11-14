@@ -4,19 +4,50 @@
 package com.whop.api.core;
 
 public final class Environment {
-    public static final Environment DEFAULT = new Environment("https://api.whop.com/api/v1");
+    public static final Environment PRODUCTION =
+            new Environment("https://api.whop.com/api/v1", "https://vault-api.whop.com/api/v1");
 
-    private final String url;
+    public static final Environment SANDBOX =
+            new Environment("https://sandbox-api.whop.com/api/v1", "https://sandbox-vault-api.whop.com/api/v1");
 
-    private Environment(String url) {
-        this.url = url;
+    private final String api;
+
+    private final String vault;
+
+    Environment(String api, String vault) {
+        this.api = api;
+        this.vault = vault;
     }
 
-    public String getUrl() {
-        return this.url;
+    public String getApiURL() {
+        return this.api;
     }
 
-    public static Environment custom(String url) {
-        return new Environment(url);
+    public String getVaultURL() {
+        return this.vault;
+    }
+
+    public static Builder custom() {
+        return new Builder();
+    }
+
+    public static class Builder {
+        private String api;
+
+        private String vault;
+
+        public Builder api(String api) {
+            this.api = api;
+            return this;
+        }
+
+        public Builder vault(String vault) {
+            this.vault = vault;
+            return this;
+        }
+
+        public Environment build() {
+            return new Environment(api, vault);
+        }
     }
 }

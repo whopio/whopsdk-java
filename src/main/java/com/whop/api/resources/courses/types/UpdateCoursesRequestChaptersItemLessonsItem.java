@@ -151,7 +151,6 @@ public final class UpdateCoursesRequestChaptersItemLessonsItem {
 
         private String title;
 
-        @JsonAnySetter
         private Map<String, Object> additionalProperties = new HashMap<>();
 
         private Builder() {}
@@ -167,7 +166,6 @@ public final class UpdateCoursesRequestChaptersItemLessonsItem {
 
         /**
          * <p>The ID of the chapter this lesson belongs to (for moving between chapters)</p>
-         * <p>The ID of the chapter this lesson belongs to (for moving between chapters)</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
@@ -178,7 +176,6 @@ public final class UpdateCoursesRequestChaptersItemLessonsItem {
         }
 
         /**
-         * <p>The ID of the lesson to update</p>
          * <p>The ID of the lesson to update</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
@@ -191,7 +188,6 @@ public final class UpdateCoursesRequestChaptersItemLessonsItem {
 
         /**
          * <p>The order of the lesson within its chapter</p>
-         * <p>The order of the lesson within its chapter</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
@@ -202,7 +198,6 @@ public final class UpdateCoursesRequestChaptersItemLessonsItem {
         }
 
         /**
-         * <p>The title of the lesson</p>
          * <p>The title of the lesson</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
@@ -216,6 +211,17 @@ public final class UpdateCoursesRequestChaptersItemLessonsItem {
         @java.lang.Override
         public UpdateCoursesRequestChaptersItemLessonsItem build() {
             return new UpdateCoursesRequestChaptersItemLessonsItem(chapterId, id, order, title, additionalProperties);
+        }
+
+        @JsonAnySetter
+        private void putAdditionalPropertyFromJson(String key, Object value) {
+            if (key.equalsIgnoreCase("chapter_id")
+                    || key.equalsIgnoreCase("id")
+                    || key.equalsIgnoreCase("order")
+                    || key.equalsIgnoreCase("title")) {
+                return;
+            }
+            this.additionalProperties.put(key, value);
         }
 
         @java.lang.Override

@@ -104,7 +104,6 @@ public final class RetrieveCheckoutConfigurationsResponseEffectivePaymentMethodC
 
         private Optional<Boolean> includePlatformDefaults = Optional.empty();
 
-        @JsonAnySetter
         private Map<String, Object> additionalProperties = new HashMap<>();
 
         private Builder() {}
@@ -161,6 +160,16 @@ public final class RetrieveCheckoutConfigurationsResponseEffectivePaymentMethodC
         public RetrieveCheckoutConfigurationsResponseEffectivePaymentMethodConfiguration build() {
             return new RetrieveCheckoutConfigurationsResponseEffectivePaymentMethodConfiguration(
                     disabled, enabled, includePlatformDefaults, additionalProperties);
+        }
+
+        @JsonAnySetter
+        private void putAdditionalPropertyFromJson(String key, Object value) {
+            if (key.equalsIgnoreCase("disabled")
+                    || key.equalsIgnoreCase("enabled")
+                    || key.equalsIgnoreCase("include_platform_defaults")) {
+                return;
+            }
+            this.additionalProperties.put(key, value);
         }
 
         public Builder additionalProperty(String key, Object value) {

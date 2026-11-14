@@ -6,8 +6,10 @@ package com.whop.api.resources.disputealerts;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.whop.api.core.ClientOptions;
 import com.whop.api.core.ObjectMappers;
+import com.whop.api.core.PathSegments;
 import com.whop.api.core.QueryStringMapper;
 import com.whop.api.core.RequestOptions;
+import com.whop.api.core.RetryInterceptor;
 import com.whop.api.core.WhopApiApiException;
 import com.whop.api.core.WhopApiException;
 import com.whop.api.core.WhopApiHttpResponse;
@@ -63,7 +65,7 @@ public class RawDisputeAlertsClient {
      */
     public WhopApiHttpResponse<SyncPagingIterable<DisputeAlert>> list(
             ListDisputeAlertsRequest request, RequestOptions requestOptions) {
-        HttpUrl.Builder httpUrl = HttpUrl.parse(this.clientOptions.environment().getUrl())
+        HttpUrl.Builder httpUrl = HttpUrl.parse(this.clientOptions.environment().getApiURL())
                 .newBuilder()
                 .addPathSegments("dispute_alerts");
         if (request.getAccountId().isPresent()) {
@@ -125,6 +127,15 @@ public class RawDisputeAlertsClient {
         if (requestOptions != null && requestOptions.getTimeout().isPresent()) {
             client = clientOptions.httpClientWithTimeout(requestOptions);
         }
+        if (requestOptions != null && requestOptions.getMaxRetries().isPresent()) {
+            okhttpRequest = okhttpRequest
+                    .newBuilder()
+                    .tag(
+                            RetryInterceptor.MaxRetriesOverride.class,
+                            new RetryInterceptor.MaxRetriesOverride(
+                                    requestOptions.getMaxRetries().get()))
+                    .build();
+        }
         try (Response response = client.newCall(okhttpRequest).execute()) {
             ResponseBody responseBody = response.body();
             String responseBodyString = responseBody != null ? responseBody.string() : "{}";
@@ -139,8 +150,11 @@ public class RawDisputeAlertsClient {
                 List<DisputeAlert> result = parsedResponse.getData();
                 return new WhopApiHttpResponse<>(
                         new SyncPagingIterable<DisputeAlert>(
-                                startingAfter != null, result, parsedResponse, () -> list(nextRequest, requestOptions)
-                                        .body()),
+                                startingAfter.isPresent()
+                                        && !startingAfter.get().isEmpty(),
+                                result,
+                                parsedResponse,
+                                () -> list(nextRequest, requestOptions).body()),
                         response);
             }
             try {
@@ -161,6 +175,8 @@ public class RawDisputeAlertsClient {
             Object errorBody = ObjectMappers.parseErrorBody(responseBodyString);
             throw new WhopApiApiException(
                     "Error with status code " + response.code(), response.code(), errorBody, response);
+        } catch (JsonProcessingException e) {
+            throw new WhopApiException("Failed to deserialize response: " + e.getMessage(), e);
         } catch (IOException e) {
             throw new WhopApiException("Network error executing HTTP request", e);
         }
@@ -192,10 +208,10 @@ public class RawDisputeAlertsClient {
      */
     public WhopApiHttpResponse<DisputeAlert> retrieve(
             String id, RetrieveDisputeAlertsRequest request, RequestOptions requestOptions) {
-        HttpUrl.Builder httpUrl = HttpUrl.parse(this.clientOptions.environment().getUrl())
+        HttpUrl.Builder httpUrl = HttpUrl.parse(this.clientOptions.environment().getApiURL())
                 .newBuilder()
                 .addPathSegments("dispute_alerts")
-                .addPathSegment(id);
+                .addPathSegment(PathSegments.validate(id));
         if (requestOptions != null) {
             requestOptions.getQueryParameters().forEach((_key, _value) -> {
                 httpUrl.addQueryParameter(_key, _value);
@@ -210,6 +226,15 @@ public class RawDisputeAlertsClient {
         OkHttpClient client = clientOptions.httpClient();
         if (requestOptions != null && requestOptions.getTimeout().isPresent()) {
             client = clientOptions.httpClientWithTimeout(requestOptions);
+        }
+        if (requestOptions != null && requestOptions.getMaxRetries().isPresent()) {
+            okhttpRequest = okhttpRequest
+                    .newBuilder()
+                    .tag(
+                            RetryInterceptor.MaxRetriesOverride.class,
+                            new RetryInterceptor.MaxRetriesOverride(
+                                    requestOptions.getMaxRetries().get()))
+                    .build();
         }
         try (Response response = client.newCall(okhttpRequest).execute()) {
             ResponseBody responseBody = response.body();
@@ -236,6 +261,8 @@ public class RawDisputeAlertsClient {
             Object errorBody = ObjectMappers.parseErrorBody(responseBodyString);
             throw new WhopApiApiException(
                     "Error with status code " + response.code(), response.code(), errorBody, response);
+        } catch (JsonProcessingException e) {
+            throw new WhopApiException("Failed to deserialize response: " + e.getMessage(), e);
         } catch (IOException e) {
             throw new WhopApiException("Network error executing HTTP request", e);
         }

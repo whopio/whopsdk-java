@@ -4,11 +4,14 @@
 package com.whop.api.resources.teammembers;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
+import com.whop.api.core.BodyProperties;
 import com.whop.api.core.ClientOptions;
 import com.whop.api.core.MediaTypes;
 import com.whop.api.core.ObjectMappers;
+import com.whop.api.core.PathSegments;
 import com.whop.api.core.QueryStringMapper;
 import com.whop.api.core.RequestOptions;
+import com.whop.api.core.RetryInterceptor;
 import com.whop.api.core.WhopApiApiException;
 import com.whop.api.core.WhopApiException;
 import com.whop.api.core.WhopApiHttpResponse;
@@ -26,7 +29,6 @@ import com.whop.api.resources.teammembers.requests.UpdateTeamMembersRequest;
 import com.whop.api.resources.teammembers.types.DeleteTeamMembersResponse;
 import com.whop.api.resources.teammembers.types.ListTeamMembersResponse;
 import com.whop.api.types.TeamMember;
-import com.whop.api.types.V1ErrorResponse;
 import java.io.IOException;
 import java.util.List;
 import java.util.Optional;
@@ -51,21 +53,38 @@ public class AsyncRawTeamMembersClient {
     }
 
     /**
-     * Lists an account's team members, including pending invites (<code>status: &quot;pending&quot;</code>, <code>ausri_</code> ids; <code>user</code> is <code>null</code> for invites sent to an email with no Whop account yet). For accepted members, <code>email</code> requires the <code>company:authorized_user:email:read</code> scope and is <code>null</code> otherwise. Listing <code>role=workforce</code> is also allowed with the <code>bounty:create</code> scope.
+     * Lists team members, including pending invites. Pass <code>account_id</code> to list one account's team. Without it, a signed-in user can pass <code>user_id=me</code> to list their own joined memberships across accounts. The list has one for each account they can read. An API key without <code>account_id</code> lists the team of its own account. With <code>company:basic:read</code>, a user can list their own joined membership on one account. To do this, pass <code>status=joined</code> and their own <code>user_id</code> with the account ID. The <code>bounty:create</code> scope also allows listing <code>role=workforce</code> members. A signed-in Partner without <code>company:authorized_user:read</code> lists only their own joined membership and the members who report up to them. A member others report to gets the same list. Neither of them sees pending invites. Members with the view-only Partner role are listed after all other members.
+     */
+    public CompletableFuture<WhopApiHttpResponse<SyncPagingIterable<TeamMember>>> list() {
+        return list(ListTeamMembersRequest.builder().build());
+    }
+
+    /**
+     * Lists team members, including pending invites. Pass <code>account_id</code> to list one account's team. Without it, a signed-in user can pass <code>user_id=me</code> to list their own joined memberships across accounts. The list has one for each account they can read. An API key without <code>account_id</code> lists the team of its own account. With <code>company:basic:read</code>, a user can list their own joined membership on one account. To do this, pass <code>status=joined</code> and their own <code>user_id</code> with the account ID. The <code>bounty:create</code> scope also allows listing <code>role=workforce</code> members. A signed-in Partner without <code>company:authorized_user:read</code> lists only their own joined membership and the members who report up to them. A member others report to gets the same list. Neither of them sees pending invites. Members with the view-only Partner role are listed after all other members.
+     */
+    public CompletableFuture<WhopApiHttpResponse<SyncPagingIterable<TeamMember>>> list(RequestOptions requestOptions) {
+        return list(ListTeamMembersRequest.builder().build(), requestOptions);
+    }
+
+    /**
+     * Lists team members, including pending invites. Pass <code>account_id</code> to list one account's team. Without it, a signed-in user can pass <code>user_id=me</code> to list their own joined memberships across accounts. The list has one for each account they can read. An API key without <code>account_id</code> lists the team of its own account. With <code>company:basic:read</code>, a user can list their own joined membership on one account. To do this, pass <code>status=joined</code> and their own <code>user_id</code> with the account ID. The <code>bounty:create</code> scope also allows listing <code>role=workforce</code> members. A signed-in Partner without <code>company:authorized_user:read</code> lists only their own joined membership and the members who report up to them. A member others report to gets the same list. Neither of them sees pending invites. Members with the view-only Partner role are listed after all other members.
      */
     public CompletableFuture<WhopApiHttpResponse<SyncPagingIterable<TeamMember>>> list(ListTeamMembersRequest request) {
         return list(request, null);
     }
 
     /**
-     * Lists an account's team members, including pending invites (<code>status: &quot;pending&quot;</code>, <code>ausri_</code> ids; <code>user</code> is <code>null</code> for invites sent to an email with no Whop account yet). For accepted members, <code>email</code> requires the <code>company:authorized_user:email:read</code> scope and is <code>null</code> otherwise. Listing <code>role=workforce</code> is also allowed with the <code>bounty:create</code> scope.
+     * Lists team members, including pending invites. Pass <code>account_id</code> to list one account's team. Without it, a signed-in user can pass <code>user_id=me</code> to list their own joined memberships across accounts. The list has one for each account they can read. An API key without <code>account_id</code> lists the team of its own account. With <code>company:basic:read</code>, a user can list their own joined membership on one account. To do this, pass <code>status=joined</code> and their own <code>user_id</code> with the account ID. The <code>bounty:create</code> scope also allows listing <code>role=workforce</code> members. A signed-in Partner without <code>company:authorized_user:read</code> lists only their own joined membership and the members who report up to them. A member others report to gets the same list. Neither of them sees pending invites. Members with the view-only Partner role are listed after all other members.
      */
     public CompletableFuture<WhopApiHttpResponse<SyncPagingIterable<TeamMember>>> list(
             ListTeamMembersRequest request, RequestOptions requestOptions) {
-        HttpUrl.Builder httpUrl = HttpUrl.parse(this.clientOptions.environment().getUrl())
+        HttpUrl.Builder httpUrl = HttpUrl.parse(this.clientOptions.environment().getApiURL())
                 .newBuilder()
                 .addPathSegments("team_members");
-        QueryStringMapper.addQueryParameter(httpUrl, "account_id", request.getAccountId(), false);
+        if (request.getAccountId().isPresent()) {
+            QueryStringMapper.addQueryParameter(
+                    httpUrl, "account_id", request.getAccountId().get(), false);
+        }
         if (request.getStatus().isPresent()) {
             QueryStringMapper.addQueryParameter(
                     httpUrl, "status", request.getStatus().get(), false);
@@ -77,6 +96,37 @@ public class AsyncRawTeamMembersClient {
         if (request.getRole().isPresent()) {
             QueryStringMapper.addQueryParameter(
                     httpUrl, "role", request.getRole().get(), false);
+        }
+        if (request.getQuery().isPresent()) {
+            QueryStringMapper.addQueryParameter(
+                    httpUrl, "query", request.getQuery().get(), false);
+        }
+        if (request.getReportsToId().isPresent()) {
+            QueryStringMapper.addQueryParameter(
+                    httpUrl, "reports_to_id", request.getReportsToId().get(), false);
+        }
+        if (request.getDirectReportsMin().isPresent()) {
+            QueryStringMapper.addQueryParameter(
+                    httpUrl, "direct_reports_min", request.getDirectReportsMin().get(), false);
+        }
+        if (request.getDirectReportsMax().isPresent()) {
+            QueryStringMapper.addQueryParameter(
+                    httpUrl, "direct_reports_max", request.getDirectReportsMax().get(), false);
+        }
+        if (request.getTeamLeadId().isPresent()) {
+            QueryStringMapper.addQueryParameter(
+                    httpUrl, "team_lead_id", request.getTeamLeadId().get(), false);
+        }
+        if (request.getHasReferredBusinesses().isPresent()) {
+            QueryStringMapper.addQueryParameter(
+                    httpUrl,
+                    "has_referred_businesses",
+                    request.getHasReferredBusinesses().get(),
+                    false);
+        }
+        if (request.getIsPartner().isPresent()) {
+            QueryStringMapper.addQueryParameter(
+                    httpUrl, "is_partner", request.getIsPartner().get(), false);
         }
         if (request.getCreatedBefore().isPresent()) {
             QueryStringMapper.addQueryParameter(
@@ -110,6 +160,10 @@ public class AsyncRawTeamMembersClient {
             QueryStringMapper.addQueryParameter(
                     httpUrl, "before", request.getBefore().get(), false);
         }
+        if (request.getUserIds().isPresent()) {
+            QueryStringMapper.addQueryParameter(
+                    httpUrl, "user_ids", request.getUserIds().get(), true);
+        }
         if (requestOptions != null) {
             requestOptions.getQueryParameters().forEach((_key, _value) -> {
                 httpUrl.addQueryParameter(_key, _value);
@@ -125,8 +179,18 @@ public class AsyncRawTeamMembersClient {
         if (requestOptions != null && requestOptions.getTimeout().isPresent()) {
             client = clientOptions.httpClientWithTimeout(requestOptions);
         }
+        if (requestOptions != null && requestOptions.getMaxRetries().isPresent()) {
+            okhttpRequest = okhttpRequest
+                    .newBuilder()
+                    .tag(
+                            RetryInterceptor.MaxRetriesOverride.class,
+                            new RetryInterceptor.MaxRetriesOverride(
+                                    requestOptions.getMaxRetries().get()))
+                    .build();
+        }
         CompletableFuture<WhopApiHttpResponse<SyncPagingIterable<TeamMember>>> future = new CompletableFuture<>();
-        client.newCall(okhttpRequest).enqueue(new Callback() {
+        RetryInterceptor.AsyncCall okhttpCall = RetryInterceptor.newAsyncCall(client, okhttpRequest);
+        okhttpCall.enqueue(new Callback() {
             @Override
             public void onResponse(@NotNull Call call, @NotNull Response response) throws IOException {
                 try (ResponseBody responseBody = response.body()) {
@@ -143,7 +207,11 @@ public class AsyncRawTeamMembersClient {
                         List<TeamMember> result = parsedResponse.getData();
                         future.complete(new WhopApiHttpResponse<>(
                                 new SyncPagingIterable<TeamMember>(
-                                        startingAfter != null, result, parsedResponse, () -> {
+                                        startingAfter.isPresent()
+                                                && !startingAfter.get().isEmpty(),
+                                        result,
+                                        parsedResponse,
+                                        () -> {
                                             try {
                                                 return list(nextRequest, requestOptions)
                                                         .get()
@@ -185,6 +253,9 @@ public class AsyncRawTeamMembersClient {
                     future.completeExceptionally(new WhopApiApiException(
                             "Error with status code " + response.code(), response.code(), errorBody, response));
                     return;
+                } catch (JsonProcessingException e) {
+                    future.completeExceptionally(
+                            new WhopApiException("Failed to deserialize response: " + e.getMessage(), e));
                 } catch (IOException e) {
                     future.completeExceptionally(new WhopApiException("Network error executing HTTP request", e));
                 }
@@ -195,22 +266,27 @@ public class AsyncRawTeamMembersClient {
                 future.completeExceptionally(new WhopApiException("Network error executing HTTP request", e));
             }
         });
+        future.whenComplete((result_, throwable_) -> {
+            if (future.isCancelled()) {
+                okhttpCall.cancel();
+            }
+        });
         return future;
     }
 
     /**
-     * Adds a member to an account's team with a system role. Identify them by exactly one of <code>user_id</code> or <code>email</code>. If the person has not yet accepted — or the email does not belong to a Whop account yet — an invitation is sent instead and the response is <code>202</code> with <code>{ &quot;object&quot;: &quot;team_member_invite&quot;, &quot;invitation_sent&quot;: true }</code>. If they already have a pending invite, the request fails with a <code>400</code>. Custom roles cannot be granted via the API. Granting the <code>workforce</code> role is also allowed with the <code>bounty:create</code> scope.
+     * Adds a member to an account's team with a system role. Identify them by exactly one of <code>user_id</code> or <code>email</code>. If the person has not yet accepted, or the email does not belong to a Whop account yet, an invitation is sent instead and the response is <code>202</code> with the pending team member, whose <code>status</code> is <code>pending</code> and whose id is prefixed <code>ausri_</code>. If they already have a pending invite, the request fails with a <code>400</code>. Granting the <code>workforce</code> role is also allowed with the <code>bounty:create</code> scope.
      */
     public CompletableFuture<WhopApiHttpResponse<TeamMember>> create(CreateTeamMembersRequest request) {
         return create(request, null);
     }
 
     /**
-     * Adds a member to an account's team with a system role. Identify them by exactly one of <code>user_id</code> or <code>email</code>. If the person has not yet accepted — or the email does not belong to a Whop account yet — an invitation is sent instead and the response is <code>202</code> with <code>{ &quot;object&quot;: &quot;team_member_invite&quot;, &quot;invitation_sent&quot;: true }</code>. If they already have a pending invite, the request fails with a <code>400</code>. Custom roles cannot be granted via the API. Granting the <code>workforce</code> role is also allowed with the <code>bounty:create</code> scope.
+     * Adds a member to an account's team with a system role. Identify them by exactly one of <code>user_id</code> or <code>email</code>. If the person has not yet accepted, or the email does not belong to a Whop account yet, an invitation is sent instead and the response is <code>202</code> with the pending team member, whose <code>status</code> is <code>pending</code> and whose id is prefixed <code>ausri_</code>. If they already have a pending invite, the request fails with a <code>400</code>. Granting the <code>workforce</code> role is also allowed with the <code>bounty:create</code> scope.
      */
     public CompletableFuture<WhopApiHttpResponse<TeamMember>> create(
             CreateTeamMembersRequest request, RequestOptions requestOptions) {
-        HttpUrl.Builder httpUrl = HttpUrl.parse(this.clientOptions.environment().getUrl())
+        HttpUrl.Builder httpUrl = HttpUrl.parse(this.clientOptions.environment().getApiURL())
                 .newBuilder()
                 .addPathSegments("team_members");
         if (requestOptions != null) {
@@ -221,7 +297,9 @@ public class AsyncRawTeamMembersClient {
         RequestBody body;
         try {
             body = RequestBody.create(
-                    ObjectMappers.JSON_MAPPER.writeValueAsBytes(request), MediaTypes.APPLICATION_JSON);
+                    ObjectMappers.JSON_MAPPER.writeValueAsBytes(BodyProperties.merge(
+                            request, requestOptions != null ? requestOptions.getBodyProperties() : null)),
+                    MediaTypes.APPLICATION_JSON);
         } catch (JsonProcessingException e) {
             throw new WhopApiException("Failed to serialize request", e);
         }
@@ -236,8 +314,18 @@ public class AsyncRawTeamMembersClient {
         if (requestOptions != null && requestOptions.getTimeout().isPresent()) {
             client = clientOptions.httpClientWithTimeout(requestOptions);
         }
+        if (requestOptions != null && requestOptions.getMaxRetries().isPresent()) {
+            okhttpRequest = okhttpRequest
+                    .newBuilder()
+                    .tag(
+                            RetryInterceptor.MaxRetriesOverride.class,
+                            new RetryInterceptor.MaxRetriesOverride(
+                                    requestOptions.getMaxRetries().get()))
+                    .build();
+        }
         CompletableFuture<WhopApiHttpResponse<TeamMember>> future = new CompletableFuture<>();
-        client.newCall(okhttpRequest).enqueue(new Callback() {
+        RetryInterceptor.AsyncCall okhttpCall = RetryInterceptor.newAsyncCall(client, okhttpRequest);
+        okhttpCall.enqueue(new Callback() {
             @Override
             public void onResponse(@NotNull Call call, @NotNull Response response) throws IOException {
                 try (ResponseBody responseBody = response.body()) {
@@ -261,7 +349,7 @@ public class AsyncRawTeamMembersClient {
                                 return;
                             case 409:
                                 future.completeExceptionally(new ConflictError(
-                                        ObjectMappers.JSON_MAPPER.readValue(responseBodyString, V1ErrorResponse.class),
+                                        ObjectMappers.JSON_MAPPER.readValue(responseBodyString, Object.class),
                                         response));
                                 return;
                         }
@@ -272,6 +360,9 @@ public class AsyncRawTeamMembersClient {
                     future.completeExceptionally(new WhopApiApiException(
                             "Error with status code " + response.code(), response.code(), errorBody, response));
                     return;
+                } catch (JsonProcessingException e) {
+                    future.completeExceptionally(
+                            new WhopApiException("Failed to deserialize response: " + e.getMessage(), e));
                 } catch (IOException e) {
                     future.completeExceptionally(new WhopApiException("Network error executing HTTP request", e));
                 }
@@ -282,39 +373,44 @@ public class AsyncRawTeamMembersClient {
                 future.completeExceptionally(new WhopApiException("Network error executing HTTP request", e));
             }
         });
+        future.whenComplete((result_, throwable_) -> {
+            if (future.isCancelled()) {
+                okhttpCall.cancel();
+            }
+        });
         return future;
     }
 
     /**
-     * Retrieves a team member by ID. <code>email</code> requires the <code>company:authorized_user:email:read</code> scope and is <code>null</code> otherwise.
+     * Retrieves a team member or pending invite by ID.
      */
     public CompletableFuture<WhopApiHttpResponse<TeamMember>> retrieve(String id) {
         return retrieve(id, RetrieveTeamMembersRequest.builder().build());
     }
 
     /**
-     * Retrieves a team member by ID. <code>email</code> requires the <code>company:authorized_user:email:read</code> scope and is <code>null</code> otherwise.
+     * Retrieves a team member or pending invite by ID.
      */
     public CompletableFuture<WhopApiHttpResponse<TeamMember>> retrieve(String id, RequestOptions requestOptions) {
         return retrieve(id, RetrieveTeamMembersRequest.builder().build(), requestOptions);
     }
 
     /**
-     * Retrieves a team member by ID. <code>email</code> requires the <code>company:authorized_user:email:read</code> scope and is <code>null</code> otherwise.
+     * Retrieves a team member or pending invite by ID.
      */
     public CompletableFuture<WhopApiHttpResponse<TeamMember>> retrieve(String id, RetrieveTeamMembersRequest request) {
         return retrieve(id, request, null);
     }
 
     /**
-     * Retrieves a team member by ID. <code>email</code> requires the <code>company:authorized_user:email:read</code> scope and is <code>null</code> otherwise.
+     * Retrieves a team member or pending invite by ID.
      */
     public CompletableFuture<WhopApiHttpResponse<TeamMember>> retrieve(
             String id, RetrieveTeamMembersRequest request, RequestOptions requestOptions) {
-        HttpUrl.Builder httpUrl = HttpUrl.parse(this.clientOptions.environment().getUrl())
+        HttpUrl.Builder httpUrl = HttpUrl.parse(this.clientOptions.environment().getApiURL())
                 .newBuilder()
                 .addPathSegments("team_members")
-                .addPathSegment(id);
+                .addPathSegment(PathSegments.validate(id));
         if (requestOptions != null) {
             requestOptions.getQueryParameters().forEach((_key, _value) -> {
                 httpUrl.addQueryParameter(_key, _value);
@@ -330,8 +426,18 @@ public class AsyncRawTeamMembersClient {
         if (requestOptions != null && requestOptions.getTimeout().isPresent()) {
             client = clientOptions.httpClientWithTimeout(requestOptions);
         }
+        if (requestOptions != null && requestOptions.getMaxRetries().isPresent()) {
+            okhttpRequest = okhttpRequest
+                    .newBuilder()
+                    .tag(
+                            RetryInterceptor.MaxRetriesOverride.class,
+                            new RetryInterceptor.MaxRetriesOverride(
+                                    requestOptions.getMaxRetries().get()))
+                    .build();
+        }
         CompletableFuture<WhopApiHttpResponse<TeamMember>> future = new CompletableFuture<>();
-        client.newCall(okhttpRequest).enqueue(new Callback() {
+        RetryInterceptor.AsyncCall okhttpCall = RetryInterceptor.newAsyncCall(client, okhttpRequest);
+        okhttpCall.enqueue(new Callback() {
             @Override
             public void onResponse(@NotNull Call call, @NotNull Response response) throws IOException {
                 try (ResponseBody responseBody = response.body()) {
@@ -354,6 +460,9 @@ public class AsyncRawTeamMembersClient {
                     future.completeExceptionally(new WhopApiApiException(
                             "Error with status code " + response.code(), response.code(), errorBody, response));
                     return;
+                } catch (JsonProcessingException e) {
+                    future.completeExceptionally(
+                            new WhopApiException("Failed to deserialize response: " + e.getMessage(), e));
                 } catch (IOException e) {
                     future.completeExceptionally(new WhopApiException("Network error executing HTTP request", e));
                 }
@@ -362,6 +471,11 @@ public class AsyncRawTeamMembersClient {
             @Override
             public void onFailure(@NotNull Call call, @NotNull IOException e) {
                 future.completeExceptionally(new WhopApiException("Network error executing HTTP request", e));
+            }
+        });
+        future.whenComplete((result_, throwable_) -> {
+            if (future.isCancelled()) {
+                okhttpCall.cancel();
             }
         });
         return future;
@@ -395,10 +509,10 @@ public class AsyncRawTeamMembersClient {
      */
     public CompletableFuture<WhopApiHttpResponse<DeleteTeamMembersResponse>> delete(
             String id, DeleteTeamMembersRequest request, RequestOptions requestOptions) {
-        HttpUrl.Builder httpUrl = HttpUrl.parse(this.clientOptions.environment().getUrl())
+        HttpUrl.Builder httpUrl = HttpUrl.parse(this.clientOptions.environment().getApiURL())
                 .newBuilder()
                 .addPathSegments("team_members")
-                .addPathSegment(id);
+                .addPathSegment(PathSegments.validate(id));
         if (requestOptions != null) {
             requestOptions.getQueryParameters().forEach((_key, _value) -> {
                 httpUrl.addQueryParameter(_key, _value);
@@ -406,7 +520,10 @@ public class AsyncRawTeamMembersClient {
         }
         Request.Builder _requestBuilder = new Request.Builder()
                 .url(httpUrl.build())
-                .method("DELETE", null)
+                .method(
+                        "DELETE",
+                        BodyProperties.toRequestBody(
+                                requestOptions != null ? requestOptions.getBodyProperties() : null, null))
                 .headers(Headers.of(clientOptions.headers(requestOptions)))
                 .addHeader("Accept", "application/json");
         Request okhttpRequest = _requestBuilder.build();
@@ -414,8 +531,18 @@ public class AsyncRawTeamMembersClient {
         if (requestOptions != null && requestOptions.getTimeout().isPresent()) {
             client = clientOptions.httpClientWithTimeout(requestOptions);
         }
+        if (requestOptions != null && requestOptions.getMaxRetries().isPresent()) {
+            okhttpRequest = okhttpRequest
+                    .newBuilder()
+                    .tag(
+                            RetryInterceptor.MaxRetriesOverride.class,
+                            new RetryInterceptor.MaxRetriesOverride(
+                                    requestOptions.getMaxRetries().get()))
+                    .build();
+        }
         CompletableFuture<WhopApiHttpResponse<DeleteTeamMembersResponse>> future = new CompletableFuture<>();
-        client.newCall(okhttpRequest).enqueue(new Callback() {
+        RetryInterceptor.AsyncCall okhttpCall = RetryInterceptor.newAsyncCall(client, okhttpRequest);
+        okhttpCall.enqueue(new Callback() {
             @Override
             public void onResponse(@NotNull Call call, @NotNull Response response) throws IOException {
                 try (ResponseBody responseBody = response.body()) {
@@ -452,6 +579,9 @@ public class AsyncRawTeamMembersClient {
                     future.completeExceptionally(new WhopApiApiException(
                             "Error with status code " + response.code(), response.code(), errorBody, response));
                     return;
+                } catch (JsonProcessingException e) {
+                    future.completeExceptionally(
+                            new WhopApiException("Failed to deserialize response: " + e.getMessage(), e));
                 } catch (IOException e) {
                     future.completeExceptionally(new WhopApiException("Network error executing HTTP request", e));
                 }
@@ -462,7 +592,26 @@ public class AsyncRawTeamMembersClient {
                 future.completeExceptionally(new WhopApiException("Network error executing HTTP request", e));
             }
         });
+        future.whenComplete((result_, throwable_) -> {
+            if (future.isCancelled()) {
+                okhttpCall.cancel();
+            }
+        });
         return future;
+    }
+
+    /**
+     * Changes a team member's system role. Requires a user session — account API keys cannot change member roles. The account owner's role cannot be changed, and you cannot change your own role.
+     */
+    public CompletableFuture<WhopApiHttpResponse<TeamMember>> update(String id) {
+        return update(id, UpdateTeamMembersRequest.builder().build());
+    }
+
+    /**
+     * Changes a team member's system role. Requires a user session — account API keys cannot change member roles. The account owner's role cannot be changed, and you cannot change your own role.
+     */
+    public CompletableFuture<WhopApiHttpResponse<TeamMember>> update(String id, RequestOptions requestOptions) {
+        return update(id, UpdateTeamMembersRequest.builder().build(), requestOptions);
     }
 
     /**
@@ -477,10 +626,10 @@ public class AsyncRawTeamMembersClient {
      */
     public CompletableFuture<WhopApiHttpResponse<TeamMember>> update(
             String id, UpdateTeamMembersRequest request, RequestOptions requestOptions) {
-        HttpUrl.Builder httpUrl = HttpUrl.parse(this.clientOptions.environment().getUrl())
+        HttpUrl.Builder httpUrl = HttpUrl.parse(this.clientOptions.environment().getApiURL())
                 .newBuilder()
                 .addPathSegments("team_members")
-                .addPathSegment(id);
+                .addPathSegment(PathSegments.validate(id));
         if (requestOptions != null) {
             requestOptions.getQueryParameters().forEach((_key, _value) -> {
                 httpUrl.addQueryParameter(_key, _value);
@@ -489,7 +638,9 @@ public class AsyncRawTeamMembersClient {
         RequestBody body;
         try {
             body = RequestBody.create(
-                    ObjectMappers.JSON_MAPPER.writeValueAsBytes(request), MediaTypes.APPLICATION_JSON);
+                    ObjectMappers.JSON_MAPPER.writeValueAsBytes(BodyProperties.merge(
+                            request, requestOptions != null ? requestOptions.getBodyProperties() : null)),
+                    MediaTypes.APPLICATION_JSON);
         } catch (JsonProcessingException e) {
             throw new WhopApiException("Failed to serialize request", e);
         }
@@ -504,8 +655,18 @@ public class AsyncRawTeamMembersClient {
         if (requestOptions != null && requestOptions.getTimeout().isPresent()) {
             client = clientOptions.httpClientWithTimeout(requestOptions);
         }
+        if (requestOptions != null && requestOptions.getMaxRetries().isPresent()) {
+            okhttpRequest = okhttpRequest
+                    .newBuilder()
+                    .tag(
+                            RetryInterceptor.MaxRetriesOverride.class,
+                            new RetryInterceptor.MaxRetriesOverride(
+                                    requestOptions.getMaxRetries().get()))
+                    .build();
+        }
         CompletableFuture<WhopApiHttpResponse<TeamMember>> future = new CompletableFuture<>();
-        client.newCall(okhttpRequest).enqueue(new Callback() {
+        RetryInterceptor.AsyncCall okhttpCall = RetryInterceptor.newAsyncCall(client, okhttpRequest);
+        okhttpCall.enqueue(new Callback() {
             @Override
             public void onResponse(@NotNull Call call, @NotNull Response response) throws IOException {
                 try (ResponseBody responseBody = response.body()) {
@@ -535,6 +696,9 @@ public class AsyncRawTeamMembersClient {
                     future.completeExceptionally(new WhopApiApiException(
                             "Error with status code " + response.code(), response.code(), errorBody, response));
                     return;
+                } catch (JsonProcessingException e) {
+                    future.completeExceptionally(
+                            new WhopApiException("Failed to deserialize response: " + e.getMessage(), e));
                 } catch (IOException e) {
                     future.completeExceptionally(new WhopApiException("Network error executing HTTP request", e));
                 }
@@ -543,6 +707,11 @@ public class AsyncRawTeamMembersClient {
             @Override
             public void onFailure(@NotNull Call call, @NotNull IOException e) {
                 future.completeExceptionally(new WhopApiException("Network error executing HTTP request", e));
+            }
+        });
+        future.whenComplete((result_, throwable_) -> {
+            if (future.isCancelled()) {
+                okhttpCall.cancel();
             }
         });
         return future;

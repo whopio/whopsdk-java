@@ -46,10 +46,6 @@ public final class ListEventsResponseDataItem {
 
     private final Optional<List<ListEventsResponseDataItemQuestionsItem>> questions;
 
-    private final Optional<String> recommendedActionChainId;
-
-    private final Optional<Integer> recommendedActionShownPosition;
-
     private final Optional<String> referrerUrl;
 
     private final Optional<ListEventsResponseDataItemRelated> related;
@@ -75,8 +71,6 @@ public final class ListEventsResponseDataItem {
             Optional<String> path,
             String personId,
             Optional<List<ListEventsResponseDataItemQuestionsItem>> questions,
-            Optional<String> recommendedActionChainId,
-            Optional<Integer> recommendedActionShownPosition,
             Optional<String> referrerUrl,
             Optional<ListEventsResponseDataItemRelated> related,
             Optional<Double> totalUsdAmount,
@@ -94,8 +88,6 @@ public final class ListEventsResponseDataItem {
         this.path = path;
         this.personId = personId;
         this.questions = questions;
-        this.recommendedActionChainId = recommendedActionChainId;
-        this.recommendedActionShownPosition = recommendedActionShownPosition;
         this.referrerUrl = referrerUrl;
         this.related = related;
         this.totalUsdAmount = totalUsdAmount;
@@ -168,22 +160,6 @@ public final class ListEventsResponseDataItem {
             return Optional.empty();
         }
         return questions;
-    }
-
-    @JsonIgnore
-    public Optional<String> getRecommendedActionChainId() {
-        if (recommendedActionChainId == null) {
-            return Optional.empty();
-        }
-        return recommendedActionChainId;
-    }
-
-    @JsonIgnore
-    public Optional<Integer> getRecommendedActionShownPosition() {
-        if (recommendedActionShownPosition == null) {
-            return Optional.empty();
-        }
-        return recommendedActionShownPosition;
     }
 
     @JsonIgnore
@@ -268,18 +244,6 @@ public final class ListEventsResponseDataItem {
     }
 
     @JsonInclude(value = JsonInclude.Include.CUSTOM, valueFilter = NullableNonemptyFilter.class)
-    @JsonProperty("recommended_action_chain_id")
-    private Optional<String> _getRecommendedActionChainId() {
-        return recommendedActionChainId;
-    }
-
-    @JsonInclude(value = JsonInclude.Include.CUSTOM, valueFilter = NullableNonemptyFilter.class)
-    @JsonProperty("recommended_action_shown_position")
-    private Optional<Integer> _getRecommendedActionShownPosition() {
-        return recommendedActionShownPosition;
-    }
-
-    @JsonInclude(value = JsonInclude.Include.CUSTOM, valueFilter = NullableNonemptyFilter.class)
     @JsonProperty("referrer_url")
     private Optional<String> _getReferrerUrl() {
         return referrerUrl;
@@ -337,8 +301,6 @@ public final class ListEventsResponseDataItem {
                 && path.equals(other.path)
                 && personId.equals(other.personId)
                 && questions.equals(other.questions)
-                && recommendedActionChainId.equals(other.recommendedActionChainId)
-                && recommendedActionShownPosition.equals(other.recommendedActionShownPosition)
                 && referrerUrl.equals(other.referrerUrl)
                 && related.equals(other.related)
                 && totalUsdAmount.equals(other.totalUsdAmount)
@@ -360,8 +322,6 @@ public final class ListEventsResponseDataItem {
                 this.path,
                 this.personId,
                 this.questions,
-                this.recommendedActionChainId,
-                this.recommendedActionShownPosition,
                 this.referrerUrl,
                 this.related,
                 this.totalUsdAmount,
@@ -438,18 +398,6 @@ public final class ListEventsResponseDataItem {
 
         _FinalStage questions(Nullable<List<ListEventsResponseDataItemQuestionsItem>> questions);
 
-        _FinalStage recommendedActionChainId(Optional<String> recommendedActionChainId);
-
-        _FinalStage recommendedActionChainId(String recommendedActionChainId);
-
-        _FinalStage recommendedActionChainId(Nullable<String> recommendedActionChainId);
-
-        _FinalStage recommendedActionShownPosition(Optional<Integer> recommendedActionShownPosition);
-
-        _FinalStage recommendedActionShownPosition(Integer recommendedActionShownPosition);
-
-        _FinalStage recommendedActionShownPosition(Nullable<Integer> recommendedActionShownPosition);
-
         _FinalStage referrerUrl(Optional<String> referrerUrl);
 
         _FinalStage referrerUrl(String referrerUrl);
@@ -515,10 +463,6 @@ public final class ListEventsResponseDataItem {
 
         private Optional<String> referrerUrl = Optional.empty();
 
-        private Optional<Integer> recommendedActionShownPosition = Optional.empty();
-
-        private Optional<String> recommendedActionChainId = Optional.empty();
-
         private Optional<List<ListEventsResponseDataItemQuestionsItem>> questions = Optional.empty();
 
         private Optional<String> path = Optional.empty();
@@ -529,7 +473,6 @@ public final class ListEventsResponseDataItem {
 
         private Optional<ListEventsResponseDataItemContext> context = Optional.empty();
 
-        @JsonAnySetter
         private Map<String, Object> additionalProperties = new HashMap<>();
 
         private Builder() {}
@@ -546,8 +489,6 @@ public final class ListEventsResponseDataItem {
             path(other.getPath());
             personId(other.getPersonId());
             questions(other.getQuestions());
-            recommendedActionChainId(other.getRecommendedActionChainId());
-            recommendedActionShownPosition(other.getRecommendedActionShownPosition());
             referrerUrl(other.getReferrerUrl());
             related(other.getRelated());
             totalUsdAmount(other.getTotalUsdAmount());
@@ -754,56 +695,6 @@ public final class ListEventsResponseDataItem {
         }
 
         @java.lang.Override
-        public _FinalStage recommendedActionShownPosition(Nullable<Integer> recommendedActionShownPosition) {
-            if (recommendedActionShownPosition.isNull()) {
-                this.recommendedActionShownPosition = null;
-            } else if (recommendedActionShownPosition.isEmpty()) {
-                this.recommendedActionShownPosition = Optional.empty();
-            } else {
-                this.recommendedActionShownPosition = Optional.of(recommendedActionShownPosition.get());
-            }
-            return this;
-        }
-
-        @java.lang.Override
-        public _FinalStage recommendedActionShownPosition(Integer recommendedActionShownPosition) {
-            this.recommendedActionShownPosition = Optional.ofNullable(recommendedActionShownPosition);
-            return this;
-        }
-
-        @java.lang.Override
-        @JsonSetter(value = "recommended_action_shown_position", nulls = Nulls.SKIP)
-        public _FinalStage recommendedActionShownPosition(Optional<Integer> recommendedActionShownPosition) {
-            this.recommendedActionShownPosition = recommendedActionShownPosition;
-            return this;
-        }
-
-        @java.lang.Override
-        public _FinalStage recommendedActionChainId(Nullable<String> recommendedActionChainId) {
-            if (recommendedActionChainId.isNull()) {
-                this.recommendedActionChainId = null;
-            } else if (recommendedActionChainId.isEmpty()) {
-                this.recommendedActionChainId = Optional.empty();
-            } else {
-                this.recommendedActionChainId = Optional.of(recommendedActionChainId.get());
-            }
-            return this;
-        }
-
-        @java.lang.Override
-        public _FinalStage recommendedActionChainId(String recommendedActionChainId) {
-            this.recommendedActionChainId = Optional.ofNullable(recommendedActionChainId);
-            return this;
-        }
-
-        @java.lang.Override
-        @JsonSetter(value = "recommended_action_chain_id", nulls = Nulls.SKIP)
-        public _FinalStage recommendedActionChainId(Optional<String> recommendedActionChainId) {
-            this.recommendedActionChainId = recommendedActionChainId;
-            return this;
-        }
-
-        @java.lang.Override
         public _FinalStage questions(Nullable<List<ListEventsResponseDataItemQuestionsItem>> questions) {
             if (questions.isNull()) {
                 this.questions = null;
@@ -941,8 +832,6 @@ public final class ListEventsResponseDataItem {
                     path,
                     personId,
                     questions,
-                    recommendedActionChainId,
-                    recommendedActionShownPosition,
                     referrerUrl,
                     related,
                     totalUsdAmount,
@@ -950,6 +839,29 @@ public final class ListEventsResponseDataItem {
                     user,
                     value,
                     additionalProperties);
+        }
+
+        @JsonAnySetter
+        private void putAdditionalPropertyFromJson(String key, Object value) {
+            if (key.equalsIgnoreCase("context")
+                    || key.equalsIgnoreCase("currency")
+                    || key.equalsIgnoreCase("custom_name")
+                    || key.equalsIgnoreCase("event_id")
+                    || key.equalsIgnoreCase("event_name")
+                    || key.equalsIgnoreCase("event_time")
+                    || key.equalsIgnoreCase("id")
+                    || key.equalsIgnoreCase("path")
+                    || key.equalsIgnoreCase("person_id")
+                    || key.equalsIgnoreCase("questions")
+                    || key.equalsIgnoreCase("referrer_url")
+                    || key.equalsIgnoreCase("related")
+                    || key.equalsIgnoreCase("total_usd_amount")
+                    || key.equalsIgnoreCase("url")
+                    || key.equalsIgnoreCase("user")
+                    || key.equalsIgnoreCase("value")) {
+                return;
+            }
+            this.additionalProperties.put(key, value);
         }
 
         @java.lang.Override

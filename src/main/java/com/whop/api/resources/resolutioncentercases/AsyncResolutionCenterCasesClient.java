@@ -5,6 +5,7 @@ package com.whop.api.resources.resolutioncentercases;
 
 import com.whop.api.core.ClientOptions;
 import com.whop.api.core.RequestOptions;
+import com.whop.api.core.WhopApiHttpResponse;
 import com.whop.api.core.pagination.SyncPagingIterable;
 import com.whop.api.resources.resolutioncentercases.requests.AcceptResolutionCenterCasesRequest;
 import com.whop.api.resources.resolutioncentercases.requests.AppealResolutionCenterCasesRequest;
@@ -43,21 +44,48 @@ public class AsyncResolutionCenterCasesClient {
      * Lists resolution center cases. Without <code>account_id</code> you get every case you can read — the ones you opened as a buyer and every account you are a team member of; the filters narrow that list.
      */
     public CompletableFuture<SyncPagingIterable<ResolutionCenterCase>> list() {
-        return this.rawClient.list().thenApply(response -> response.body());
+        CompletableFuture<WhopApiHttpResponse<SyncPagingIterable<ResolutionCenterCase>>> rawFuture =
+                this.rawClient.list();
+        CompletableFuture<SyncPagingIterable<ResolutionCenterCase>> future =
+                rawFuture.thenApply(response -> response.body());
+        future.whenComplete((result_, throwable_) -> {
+            if (future.isCancelled()) {
+                rawFuture.cancel(true);
+            }
+        });
+        return future;
     }
 
     /**
      * Lists resolution center cases. Without <code>account_id</code> you get every case you can read — the ones you opened as a buyer and every account you are a team member of; the filters narrow that list.
      */
     public CompletableFuture<SyncPagingIterable<ResolutionCenterCase>> list(RequestOptions requestOptions) {
-        return this.rawClient.list(requestOptions).thenApply(response -> response.body());
+        CompletableFuture<WhopApiHttpResponse<SyncPagingIterable<ResolutionCenterCase>>> rawFuture =
+                this.rawClient.list(requestOptions);
+        CompletableFuture<SyncPagingIterable<ResolutionCenterCase>> future =
+                rawFuture.thenApply(response -> response.body());
+        future.whenComplete((result_, throwable_) -> {
+            if (future.isCancelled()) {
+                rawFuture.cancel(true);
+            }
+        });
+        return future;
     }
 
     /**
      * Lists resolution center cases. Without <code>account_id</code> you get every case you can read — the ones you opened as a buyer and every account you are a team member of; the filters narrow that list.
      */
     public CompletableFuture<SyncPagingIterable<ResolutionCenterCase>> list(ListResolutionCenterCasesRequest request) {
-        return this.rawClient.list(request).thenApply(response -> response.body());
+        CompletableFuture<WhopApiHttpResponse<SyncPagingIterable<ResolutionCenterCase>>> rawFuture =
+                this.rawClient.list(request);
+        CompletableFuture<SyncPagingIterable<ResolutionCenterCase>> future =
+                rawFuture.thenApply(response -> response.body());
+        future.whenComplete((result_, throwable_) -> {
+            if (future.isCancelled()) {
+                rawFuture.cancel(true);
+            }
+        });
+        return future;
     }
 
     /**
@@ -65,14 +93,30 @@ public class AsyncResolutionCenterCasesClient {
      */
     public CompletableFuture<SyncPagingIterable<ResolutionCenterCase>> list(
             ListResolutionCenterCasesRequest request, RequestOptions requestOptions) {
-        return this.rawClient.list(request, requestOptions).thenApply(response -> response.body());
+        CompletableFuture<WhopApiHttpResponse<SyncPagingIterable<ResolutionCenterCase>>> rawFuture =
+                this.rawClient.list(request, requestOptions);
+        CompletableFuture<SyncPagingIterable<ResolutionCenterCase>> future =
+                rawFuture.thenApply(response -> response.body());
+        future.whenComplete((result_, throwable_) -> {
+            if (future.isCancelled()) {
+                rawFuture.cancel(true);
+            }
+        });
+        return future;
     }
 
     /**
      * Opens a case, as the customer, against one of your own payments. Provide the payment (<code>receipt_id</code>), the <code>reason</code>, and a <code>message</code>.
      */
     public CompletableFuture<ResolutionCenterCase> create(CreateResolutionCenterCasesRequest request) {
-        return this.rawClient.create(request).thenApply(response -> response.body());
+        CompletableFuture<WhopApiHttpResponse<ResolutionCenterCase>> rawFuture = this.rawClient.create(request);
+        CompletableFuture<ResolutionCenterCase> future = rawFuture.thenApply(response -> response.body());
+        future.whenComplete((result_, throwable_) -> {
+            if (future.isCancelled()) {
+                rawFuture.cancel(true);
+            }
+        });
+        return future;
     }
 
     /**
@@ -80,21 +124,47 @@ public class AsyncResolutionCenterCasesClient {
      */
     public CompletableFuture<ResolutionCenterCase> create(
             CreateResolutionCenterCasesRequest request, RequestOptions requestOptions) {
-        return this.rawClient.create(request, requestOptions).thenApply(response -> response.body());
+        CompletableFuture<WhopApiHttpResponse<ResolutionCenterCase>> rawFuture =
+                this.rawClient.create(request, requestOptions);
+        CompletableFuture<ResolutionCenterCase> future = rawFuture.thenApply(response -> response.body());
+        future.whenComplete((result_, throwable_) -> {
+            if (future.isCancelled()) {
+                rawFuture.cancel(true);
+            }
+        });
+        return future;
     }
 
     /**
      * Aggregates the same cases <code>GET /resolution_center_cases</code> lists, using the same filters. Use it to build status tabs and issue filters without paging the whole list.
      */
     public CompletableFuture<SummaryResolutionCenterCasesResponse> summary() {
-        return this.rawClient.summary().thenApply(response -> response.body());
+        CompletableFuture<WhopApiHttpResponse<SummaryResolutionCenterCasesResponse>> rawFuture =
+                this.rawClient.summary();
+        CompletableFuture<SummaryResolutionCenterCasesResponse> future =
+                rawFuture.thenApply(response -> response.body());
+        future.whenComplete((result_, throwable_) -> {
+            if (future.isCancelled()) {
+                rawFuture.cancel(true);
+            }
+        });
+        return future;
     }
 
     /**
      * Aggregates the same cases <code>GET /resolution_center_cases</code> lists, using the same filters. Use it to build status tabs and issue filters without paging the whole list.
      */
     public CompletableFuture<SummaryResolutionCenterCasesResponse> summary(RequestOptions requestOptions) {
-        return this.rawClient.summary(requestOptions).thenApply(response -> response.body());
+        CompletableFuture<WhopApiHttpResponse<SummaryResolutionCenterCasesResponse>> rawFuture =
+                this.rawClient.summary(requestOptions);
+        CompletableFuture<SummaryResolutionCenterCasesResponse> future =
+                rawFuture.thenApply(response -> response.body());
+        future.whenComplete((result_, throwable_) -> {
+            if (future.isCancelled()) {
+                rawFuture.cancel(true);
+            }
+        });
+        return future;
     }
 
     /**
@@ -102,7 +172,16 @@ public class AsyncResolutionCenterCasesClient {
      */
     public CompletableFuture<SummaryResolutionCenterCasesResponse> summary(
             SummaryResolutionCenterCasesRequest request) {
-        return this.rawClient.summary(request).thenApply(response -> response.body());
+        CompletableFuture<WhopApiHttpResponse<SummaryResolutionCenterCasesResponse>> rawFuture =
+                this.rawClient.summary(request);
+        CompletableFuture<SummaryResolutionCenterCasesResponse> future =
+                rawFuture.thenApply(response -> response.body());
+        future.whenComplete((result_, throwable_) -> {
+            if (future.isCancelled()) {
+                rawFuture.cancel(true);
+            }
+        });
+        return future;
     }
 
     /**
@@ -110,28 +189,59 @@ public class AsyncResolutionCenterCasesClient {
      */
     public CompletableFuture<SummaryResolutionCenterCasesResponse> summary(
             SummaryResolutionCenterCasesRequest request, RequestOptions requestOptions) {
-        return this.rawClient.summary(request, requestOptions).thenApply(response -> response.body());
+        CompletableFuture<WhopApiHttpResponse<SummaryResolutionCenterCasesResponse>> rawFuture =
+                this.rawClient.summary(request, requestOptions);
+        CompletableFuture<SummaryResolutionCenterCasesResponse> future =
+                rawFuture.thenApply(response -> response.body());
+        future.whenComplete((result_, throwable_) -> {
+            if (future.isCancelled()) {
+                rawFuture.cancel(true);
+            }
+        });
+        return future;
     }
 
     /**
      * Retrieves a single resolution center case with its full event timeline.
      */
     public CompletableFuture<ResolutionCenterCase> retrieve(String id) {
-        return this.rawClient.retrieve(id).thenApply(response -> response.body());
+        CompletableFuture<WhopApiHttpResponse<ResolutionCenterCase>> rawFuture = this.rawClient.retrieve(id);
+        CompletableFuture<ResolutionCenterCase> future = rawFuture.thenApply(response -> response.body());
+        future.whenComplete((result_, throwable_) -> {
+            if (future.isCancelled()) {
+                rawFuture.cancel(true);
+            }
+        });
+        return future;
     }
 
     /**
      * Retrieves a single resolution center case with its full event timeline.
      */
     public CompletableFuture<ResolutionCenterCase> retrieve(String id, RequestOptions requestOptions) {
-        return this.rawClient.retrieve(id, requestOptions).thenApply(response -> response.body());
+        CompletableFuture<WhopApiHttpResponse<ResolutionCenterCase>> rawFuture =
+                this.rawClient.retrieve(id, requestOptions);
+        CompletableFuture<ResolutionCenterCase> future = rawFuture.thenApply(response -> response.body());
+        future.whenComplete((result_, throwable_) -> {
+            if (future.isCancelled()) {
+                rawFuture.cancel(true);
+            }
+        });
+        return future;
     }
 
     /**
      * Retrieves a single resolution center case with its full event timeline.
      */
     public CompletableFuture<ResolutionCenterCase> retrieve(String id, RetrieveResolutionCenterCasesRequest request) {
-        return this.rawClient.retrieve(id, request).thenApply(response -> response.body());
+        CompletableFuture<WhopApiHttpResponse<ResolutionCenterCase>> rawFuture = this.rawClient.retrieve(id, request);
+        CompletableFuture<ResolutionCenterCase> future = rawFuture.thenApply(response -> response.body());
+        future.whenComplete((result_, throwable_) -> {
+            if (future.isCancelled()) {
+                rawFuture.cancel(true);
+            }
+        });
+        return future;
     }
 
     /**
@@ -139,28 +249,58 @@ public class AsyncResolutionCenterCasesClient {
      */
     public CompletableFuture<ResolutionCenterCase> retrieve(
             String id, RetrieveResolutionCenterCasesRequest request, RequestOptions requestOptions) {
-        return this.rawClient.retrieve(id, request, requestOptions).thenApply(response -> response.body());
+        CompletableFuture<WhopApiHttpResponse<ResolutionCenterCase>> rawFuture =
+                this.rawClient.retrieve(id, request, requestOptions);
+        CompletableFuture<ResolutionCenterCase> future = rawFuture.thenApply(response -> response.body());
+        future.whenComplete((result_, throwable_) -> {
+            if (future.isCancelled()) {
+                rawFuture.cancel(true);
+            }
+        });
+        return future;
     }
 
     /**
      * Accepts the case in the customer's favor, as the merchant: refunds the payment in full and closes the case.
      */
     public CompletableFuture<ResolutionCenterCase> accept(String id) {
-        return this.rawClient.accept(id).thenApply(response -> response.body());
+        CompletableFuture<WhopApiHttpResponse<ResolutionCenterCase>> rawFuture = this.rawClient.accept(id);
+        CompletableFuture<ResolutionCenterCase> future = rawFuture.thenApply(response -> response.body());
+        future.whenComplete((result_, throwable_) -> {
+            if (future.isCancelled()) {
+                rawFuture.cancel(true);
+            }
+        });
+        return future;
     }
 
     /**
      * Accepts the case in the customer's favor, as the merchant: refunds the payment in full and closes the case.
      */
     public CompletableFuture<ResolutionCenterCase> accept(String id, RequestOptions requestOptions) {
-        return this.rawClient.accept(id, requestOptions).thenApply(response -> response.body());
+        CompletableFuture<WhopApiHttpResponse<ResolutionCenterCase>> rawFuture =
+                this.rawClient.accept(id, requestOptions);
+        CompletableFuture<ResolutionCenterCase> future = rawFuture.thenApply(response -> response.body());
+        future.whenComplete((result_, throwable_) -> {
+            if (future.isCancelled()) {
+                rawFuture.cancel(true);
+            }
+        });
+        return future;
     }
 
     /**
      * Accepts the case in the customer's favor, as the merchant: refunds the payment in full and closes the case.
      */
     public CompletableFuture<ResolutionCenterCase> accept(String id, AcceptResolutionCenterCasesRequest request) {
-        return this.rawClient.accept(id, request).thenApply(response -> response.body());
+        CompletableFuture<WhopApiHttpResponse<ResolutionCenterCase>> rawFuture = this.rawClient.accept(id, request);
+        CompletableFuture<ResolutionCenterCase> future = rawFuture.thenApply(response -> response.body());
+        future.whenComplete((result_, throwable_) -> {
+            if (future.isCancelled()) {
+                rawFuture.cancel(true);
+            }
+        });
+        return future;
     }
 
     /**
@@ -168,29 +308,59 @@ public class AsyncResolutionCenterCasesClient {
      */
     public CompletableFuture<ResolutionCenterCase> accept(
             String id, AcceptResolutionCenterCasesRequest request, RequestOptions requestOptions) {
-        return this.rawClient.accept(id, request, requestOptions).thenApply(response -> response.body());
+        CompletableFuture<WhopApiHttpResponse<ResolutionCenterCase>> rawFuture =
+                this.rawClient.accept(id, request, requestOptions);
+        CompletableFuture<ResolutionCenterCase> future = rawFuture.thenApply(response -> response.body());
+        future.whenComplete((result_, throwable_) -> {
+            if (future.isCancelled()) {
+                rawFuture.cancel(true);
+            }
+        });
+        return future;
     }
 
     /**
-     * Appeals a decision, as the customer, on a case that closed in the merchant's favor. Escalates the case to Whop for platform review. A case can be appealed once.
+     * Appeals a decision, as the customer, on a case that closed in the merchant's favor. Escalates the case to Whop for platform review. A case can be appealed once, within 7 days of the decision.
      */
     public CompletableFuture<ResolutionCenterCase> appeal(String id, AppealResolutionCenterCasesRequest request) {
-        return this.rawClient.appeal(id, request).thenApply(response -> response.body());
+        CompletableFuture<WhopApiHttpResponse<ResolutionCenterCase>> rawFuture = this.rawClient.appeal(id, request);
+        CompletableFuture<ResolutionCenterCase> future = rawFuture.thenApply(response -> response.body());
+        future.whenComplete((result_, throwable_) -> {
+            if (future.isCancelled()) {
+                rawFuture.cancel(true);
+            }
+        });
+        return future;
     }
 
     /**
-     * Appeals a decision, as the customer, on a case that closed in the merchant's favor. Escalates the case to Whop for platform review. A case can be appealed once.
+     * Appeals a decision, as the customer, on a case that closed in the merchant's favor. Escalates the case to Whop for platform review. A case can be appealed once, within 7 days of the decision.
      */
     public CompletableFuture<ResolutionCenterCase> appeal(
             String id, AppealResolutionCenterCasesRequest request, RequestOptions requestOptions) {
-        return this.rawClient.appeal(id, request, requestOptions).thenApply(response -> response.body());
+        CompletableFuture<WhopApiHttpResponse<ResolutionCenterCase>> rawFuture =
+                this.rawClient.appeal(id, request, requestOptions);
+        CompletableFuture<ResolutionCenterCase> future = rawFuture.thenApply(response -> response.body());
+        future.whenComplete((result_, throwable_) -> {
+            if (future.isCancelled()) {
+                rawFuture.cancel(true);
+            }
+        });
+        return future;
     }
 
     /**
      * Denies the case, as the merchant: rejects the claim and closes the case with no refund.
      */
     public CompletableFuture<ResolutionCenterCase> deny(String id, DenyResolutionCenterCasesRequest request) {
-        return this.rawClient.deny(id, request).thenApply(response -> response.body());
+        CompletableFuture<WhopApiHttpResponse<ResolutionCenterCase>> rawFuture = this.rawClient.deny(id, request);
+        CompletableFuture<ResolutionCenterCase> future = rawFuture.thenApply(response -> response.body());
+        future.whenComplete((result_, throwable_) -> {
+            if (future.isCancelled()) {
+                rawFuture.cancel(true);
+            }
+        });
+        return future;
     }
 
     /**
@@ -198,21 +368,47 @@ public class AsyncResolutionCenterCasesClient {
      */
     public CompletableFuture<ResolutionCenterCase> deny(
             String id, DenyResolutionCenterCasesRequest request, RequestOptions requestOptions) {
-        return this.rawClient.deny(id, request, requestOptions).thenApply(response -> response.body());
+        CompletableFuture<WhopApiHttpResponse<ResolutionCenterCase>> rawFuture =
+                this.rawClient.deny(id, request, requestOptions);
+        CompletableFuture<ResolutionCenterCase> future = rawFuture.thenApply(response -> response.body());
+        future.whenComplete((result_, throwable_) -> {
+            if (future.isCancelled()) {
+                rawFuture.cancel(true);
+            }
+        });
+        return future;
     }
 
     /**
      * Lists the case timeline, newest first. Events the viewer is not allowed to see are omitted — a customer reads the customer-visible timeline, the merchant reads the full one.
      */
     public CompletableFuture<SyncPagingIterable<ResolutionEvent>> events(String id) {
-        return this.rawClient.events(id).thenApply(response -> response.body());
+        CompletableFuture<WhopApiHttpResponse<SyncPagingIterable<ResolutionEvent>>> rawFuture =
+                this.rawClient.events(id);
+        CompletableFuture<SyncPagingIterable<ResolutionEvent>> future =
+                rawFuture.thenApply(response -> response.body());
+        future.whenComplete((result_, throwable_) -> {
+            if (future.isCancelled()) {
+                rawFuture.cancel(true);
+            }
+        });
+        return future;
     }
 
     /**
      * Lists the case timeline, newest first. Events the viewer is not allowed to see are omitted — a customer reads the customer-visible timeline, the merchant reads the full one.
      */
     public CompletableFuture<SyncPagingIterable<ResolutionEvent>> events(String id, RequestOptions requestOptions) {
-        return this.rawClient.events(id, requestOptions).thenApply(response -> response.body());
+        CompletableFuture<WhopApiHttpResponse<SyncPagingIterable<ResolutionEvent>>> rawFuture =
+                this.rawClient.events(id, requestOptions);
+        CompletableFuture<SyncPagingIterable<ResolutionEvent>> future =
+                rawFuture.thenApply(response -> response.body());
+        future.whenComplete((result_, throwable_) -> {
+            if (future.isCancelled()) {
+                rawFuture.cancel(true);
+            }
+        });
+        return future;
     }
 
     /**
@@ -220,7 +416,16 @@ public class AsyncResolutionCenterCasesClient {
      */
     public CompletableFuture<SyncPagingIterable<ResolutionEvent>> events(
             String id, EventsResolutionCenterCasesRequest request) {
-        return this.rawClient.events(id, request).thenApply(response -> response.body());
+        CompletableFuture<WhopApiHttpResponse<SyncPagingIterable<ResolutionEvent>>> rawFuture =
+                this.rawClient.events(id, request);
+        CompletableFuture<SyncPagingIterable<ResolutionEvent>> future =
+                rawFuture.thenApply(response -> response.body());
+        future.whenComplete((result_, throwable_) -> {
+            if (future.isCancelled()) {
+                rawFuture.cancel(true);
+            }
+        });
+        return future;
     }
 
     /**
@@ -228,14 +433,30 @@ public class AsyncResolutionCenterCasesClient {
      */
     public CompletableFuture<SyncPagingIterable<ResolutionEvent>> events(
             String id, EventsResolutionCenterCasesRequest request, RequestOptions requestOptions) {
-        return this.rawClient.events(id, request, requestOptions).thenApply(response -> response.body());
+        CompletableFuture<WhopApiHttpResponse<SyncPagingIterable<ResolutionEvent>>> rawFuture =
+                this.rawClient.events(id, request, requestOptions);
+        CompletableFuture<SyncPagingIterable<ResolutionEvent>> future =
+                rawFuture.thenApply(response -> response.body());
+        future.whenComplete((result_, throwable_) -> {
+            if (future.isCancelled()) {
+                rawFuture.cancel(true);
+            }
+        });
+        return future;
     }
 
     /**
      * Replies to an open request for information on the case. As the merchant this answers Whop's request (valid while the case awaits your information); as the customer it provides the information requested from you. The actor is resolved from the credential.
      */
     public CompletableFuture<ResolutionCenterCase> reply(String id, ReplyResolutionCenterCasesRequest request) {
-        return this.rawClient.reply(id, request).thenApply(response -> response.body());
+        CompletableFuture<WhopApiHttpResponse<ResolutionCenterCase>> rawFuture = this.rawClient.reply(id, request);
+        CompletableFuture<ResolutionCenterCase> future = rawFuture.thenApply(response -> response.body());
+        future.whenComplete((result_, throwable_) -> {
+            if (future.isCancelled()) {
+                rawFuture.cancel(true);
+            }
+        });
+        return future;
     }
 
     /**
@@ -243,21 +464,44 @@ public class AsyncResolutionCenterCasesClient {
      */
     public CompletableFuture<ResolutionCenterCase> reply(
             String id, ReplyResolutionCenterCasesRequest request, RequestOptions requestOptions) {
-        return this.rawClient.reply(id, request, requestOptions).thenApply(response -> response.body());
+        CompletableFuture<WhopApiHttpResponse<ResolutionCenterCase>> rawFuture =
+                this.rawClient.reply(id, request, requestOptions);
+        CompletableFuture<ResolutionCenterCase> future = rawFuture.thenApply(response -> response.body());
+        future.whenComplete((result_, throwable_) -> {
+            if (future.isCancelled()) {
+                rawFuture.cancel(true);
+            }
+        });
+        return future;
     }
 
     /**
      * Asks the customer for more information, as the merchant. Allowed up to 3 times per case before you must accept or deny it.
      */
     public CompletableFuture<ResolutionCenterCase> requestInfo(String id) {
-        return this.rawClient.requestInfo(id).thenApply(response -> response.body());
+        CompletableFuture<WhopApiHttpResponse<ResolutionCenterCase>> rawFuture = this.rawClient.requestInfo(id);
+        CompletableFuture<ResolutionCenterCase> future = rawFuture.thenApply(response -> response.body());
+        future.whenComplete((result_, throwable_) -> {
+            if (future.isCancelled()) {
+                rawFuture.cancel(true);
+            }
+        });
+        return future;
     }
 
     /**
      * Asks the customer for more information, as the merchant. Allowed up to 3 times per case before you must accept or deny it.
      */
     public CompletableFuture<ResolutionCenterCase> requestInfo(String id, RequestOptions requestOptions) {
-        return this.rawClient.requestInfo(id, requestOptions).thenApply(response -> response.body());
+        CompletableFuture<WhopApiHttpResponse<ResolutionCenterCase>> rawFuture =
+                this.rawClient.requestInfo(id, requestOptions);
+        CompletableFuture<ResolutionCenterCase> future = rawFuture.thenApply(response -> response.body());
+        future.whenComplete((result_, throwable_) -> {
+            if (future.isCancelled()) {
+                rawFuture.cancel(true);
+            }
+        });
+        return future;
     }
 
     /**
@@ -265,7 +509,15 @@ public class AsyncResolutionCenterCasesClient {
      */
     public CompletableFuture<ResolutionCenterCase> requestInfo(
             String id, RequestInfoResolutionCenterCasesRequest request) {
-        return this.rawClient.requestInfo(id, request).thenApply(response -> response.body());
+        CompletableFuture<WhopApiHttpResponse<ResolutionCenterCase>> rawFuture =
+                this.rawClient.requestInfo(id, request);
+        CompletableFuture<ResolutionCenterCase> future = rawFuture.thenApply(response -> response.body());
+        future.whenComplete((result_, throwable_) -> {
+            if (future.isCancelled()) {
+                rawFuture.cancel(true);
+            }
+        });
+        return future;
     }
 
     /**
@@ -273,28 +525,58 @@ public class AsyncResolutionCenterCasesClient {
      */
     public CompletableFuture<ResolutionCenterCase> requestInfo(
             String id, RequestInfoResolutionCenterCasesRequest request, RequestOptions requestOptions) {
-        return this.rawClient.requestInfo(id, request, requestOptions).thenApply(response -> response.body());
+        CompletableFuture<WhopApiHttpResponse<ResolutionCenterCase>> rawFuture =
+                this.rawClient.requestInfo(id, request, requestOptions);
+        CompletableFuture<ResolutionCenterCase> future = rawFuture.thenApply(response -> response.body());
+        future.whenComplete((result_, throwable_) -> {
+            if (future.isCancelled()) {
+                rawFuture.cancel(true);
+            }
+        });
+        return future;
     }
 
     /**
      * Withdraws (cancels) a case you opened, as the customer. Only possible while the case is still open.
      */
     public CompletableFuture<ResolutionCenterCase> withdraw(String id) {
-        return this.rawClient.withdraw(id).thenApply(response -> response.body());
+        CompletableFuture<WhopApiHttpResponse<ResolutionCenterCase>> rawFuture = this.rawClient.withdraw(id);
+        CompletableFuture<ResolutionCenterCase> future = rawFuture.thenApply(response -> response.body());
+        future.whenComplete((result_, throwable_) -> {
+            if (future.isCancelled()) {
+                rawFuture.cancel(true);
+            }
+        });
+        return future;
     }
 
     /**
      * Withdraws (cancels) a case you opened, as the customer. Only possible while the case is still open.
      */
     public CompletableFuture<ResolutionCenterCase> withdraw(String id, RequestOptions requestOptions) {
-        return this.rawClient.withdraw(id, requestOptions).thenApply(response -> response.body());
+        CompletableFuture<WhopApiHttpResponse<ResolutionCenterCase>> rawFuture =
+                this.rawClient.withdraw(id, requestOptions);
+        CompletableFuture<ResolutionCenterCase> future = rawFuture.thenApply(response -> response.body());
+        future.whenComplete((result_, throwable_) -> {
+            if (future.isCancelled()) {
+                rawFuture.cancel(true);
+            }
+        });
+        return future;
     }
 
     /**
      * Withdraws (cancels) a case you opened, as the customer. Only possible while the case is still open.
      */
     public CompletableFuture<ResolutionCenterCase> withdraw(String id, WithdrawResolutionCenterCasesRequest request) {
-        return this.rawClient.withdraw(id, request).thenApply(response -> response.body());
+        CompletableFuture<WhopApiHttpResponse<ResolutionCenterCase>> rawFuture = this.rawClient.withdraw(id, request);
+        CompletableFuture<ResolutionCenterCase> future = rawFuture.thenApply(response -> response.body());
+        future.whenComplete((result_, throwable_) -> {
+            if (future.isCancelled()) {
+                rawFuture.cancel(true);
+            }
+        });
+        return future;
     }
 
     /**
@@ -302,6 +584,14 @@ public class AsyncResolutionCenterCasesClient {
      */
     public CompletableFuture<ResolutionCenterCase> withdraw(
             String id, WithdrawResolutionCenterCasesRequest request, RequestOptions requestOptions) {
-        return this.rawClient.withdraw(id, request, requestOptions).thenApply(response -> response.body());
+        CompletableFuture<WhopApiHttpResponse<ResolutionCenterCase>> rawFuture =
+                this.rawClient.withdraw(id, request, requestOptions);
+        CompletableFuture<ResolutionCenterCase> future = rawFuture.thenApply(response -> response.body());
+        future.whenComplete((result_, throwable_) -> {
+            if (future.isCancelled()) {
+                rawFuture.cancel(true);
+            }
+        });
+        return future;
     }
 }

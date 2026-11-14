@@ -6,8 +6,10 @@ package com.whop.api.resources.courselessoninteractions;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.whop.api.core.ClientOptions;
 import com.whop.api.core.ObjectMappers;
+import com.whop.api.core.PathSegments;
 import com.whop.api.core.QueryStringMapper;
 import com.whop.api.core.RequestOptions;
+import com.whop.api.core.RetryInterceptor;
 import com.whop.api.core.WhopApiApiException;
 import com.whop.api.core.WhopApiException;
 import com.whop.api.core.WhopApiHttpResponse;
@@ -24,6 +26,8 @@ import com.whop.api.resources.courselessoninteractions.requests.RetrieveCourseLe
 import com.whop.api.resources.courselessoninteractions.types.ListCourseLessonInteractionsResponse;
 import com.whop.api.types.CourseLessonInteraction;
 import com.whop.api.types.CourseLessonInteractionListItem;
+import com.whop.api.types.InternalServerErrorBody;
+import com.whop.api.types.UnprocessableEntityErrorBody;
 import java.io.IOException;
 import java.util.List;
 import java.util.Optional;
@@ -42,7 +46,7 @@ public class RawCourseLessonInteractionsClient {
     }
 
     /**
-     * Returns a paginated list of lesson interactions, filtered by lesson, course, user, or completion status.
+     * Returns a paginated list of lesson interactions for a lesson or course. Callers without admin access to the course's experience see only their own interactions.
      * <p>Required permissions:</p>
      * <ul>
      * <li><code>courses:read</code></li>
@@ -54,7 +58,7 @@ public class RawCourseLessonInteractionsClient {
     }
 
     /**
-     * Returns a paginated list of lesson interactions, filtered by lesson, course, user, or completion status.
+     * Returns a paginated list of lesson interactions for a lesson or course. Callers without admin access to the course's experience see only their own interactions.
      * <p>Required permissions:</p>
      * <ul>
      * <li><code>courses:read</code></li>
@@ -67,7 +71,7 @@ public class RawCourseLessonInteractionsClient {
     }
 
     /**
-     * Returns a paginated list of lesson interactions, filtered by lesson, course, user, or completion status.
+     * Returns a paginated list of lesson interactions for a lesson or course. Callers without admin access to the course's experience see only their own interactions.
      * <p>Required permissions:</p>
      * <ul>
      * <li><code>courses:read</code></li>
@@ -80,7 +84,7 @@ public class RawCourseLessonInteractionsClient {
     }
 
     /**
-     * Returns a paginated list of lesson interactions, filtered by lesson, course, user, or completion status.
+     * Returns a paginated list of lesson interactions for a lesson or course. Callers without admin access to the course's experience see only their own interactions.
      * <p>Required permissions:</p>
      * <ul>
      * <li><code>courses:read</code></li>
@@ -89,7 +93,7 @@ public class RawCourseLessonInteractionsClient {
      */
     public WhopApiHttpResponse<SyncPagingIterable<CourseLessonInteractionListItem>> list(
             ListCourseLessonInteractionsRequest request, RequestOptions requestOptions) {
-        HttpUrl.Builder httpUrl = HttpUrl.parse(this.clientOptions.environment().getUrl())
+        HttpUrl.Builder httpUrl = HttpUrl.parse(this.clientOptions.environment().getApiURL())
                 .newBuilder()
                 .addPathSegments("course_lesson_interactions");
         if (request.getAfter().isPresent()) {
@@ -139,6 +143,15 @@ public class RawCourseLessonInteractionsClient {
         if (requestOptions != null && requestOptions.getTimeout().isPresent()) {
             client = clientOptions.httpClientWithTimeout(requestOptions);
         }
+        if (requestOptions != null && requestOptions.getMaxRetries().isPresent()) {
+            okhttpRequest = okhttpRequest
+                    .newBuilder()
+                    .tag(
+                            RetryInterceptor.MaxRetriesOverride.class,
+                            new RetryInterceptor.MaxRetriesOverride(
+                                    requestOptions.getMaxRetries().get()))
+                    .build();
+        }
         try (Response response = client.newCall(okhttpRequest).execute()) {
             ResponseBody responseBody = response.body();
             String responseBodyString = responseBody != null ? responseBody.string() : "{}";
@@ -153,8 +166,11 @@ public class RawCourseLessonInteractionsClient {
                 List<CourseLessonInteractionListItem> result = parsedResponse.getData();
                 return new WhopApiHttpResponse<>(
                         new SyncPagingIterable<CourseLessonInteractionListItem>(
-                                startingAfter != null, result, parsedResponse, () -> list(nextRequest, requestOptions)
-                                        .body()),
+                                startingAfter.isPresent()
+                                        && !startingAfter.get().isEmpty(),
+                                result,
+                                parsedResponse,
+                                () -> list(nextRequest, requestOptions).body()),
                         response);
             }
             try {
@@ -173,13 +189,16 @@ public class RawCourseLessonInteractionsClient {
                                 ObjectMappers.JSON_MAPPER.readValue(responseBodyString, Object.class), response);
                     case 422:
                         throw new UnprocessableEntityError(
-                                ObjectMappers.JSON_MAPPER.readValue(responseBodyString, Object.class), response);
+                                ObjectMappers.JSON_MAPPER.readValue(
+                                        responseBodyString, UnprocessableEntityErrorBody.class),
+                                response);
                     case 429:
                         throw new TooManyRequestsError(
                                 ObjectMappers.JSON_MAPPER.readValue(responseBodyString, Object.class), response);
                     case 500:
                         throw new InternalServerError(
-                                ObjectMappers.JSON_MAPPER.readValue(responseBodyString, Object.class), response);
+                                ObjectMappers.JSON_MAPPER.readValue(responseBodyString, InternalServerErrorBody.class),
+                                response);
                 }
             } catch (JsonProcessingException ignored) {
                 // unable to map error response, throwing generic error
@@ -187,6 +206,8 @@ public class RawCourseLessonInteractionsClient {
             Object errorBody = ObjectMappers.parseErrorBody(responseBodyString);
             throw new WhopApiApiException(
                     "Error with status code " + response.code(), response.code(), errorBody, response);
+        } catch (JsonProcessingException e) {
+            throw new WhopApiException("Failed to deserialize response: " + e.getMessage(), e);
         } catch (IOException e) {
             throw new WhopApiException("Network error executing HTTP request", e);
         }
@@ -239,10 +260,10 @@ public class RawCourseLessonInteractionsClient {
      */
     public WhopApiHttpResponse<CourseLessonInteraction> retrieve(
             String id, RetrieveCourseLessonInteractionsRequest request, RequestOptions requestOptions) {
-        HttpUrl.Builder httpUrl = HttpUrl.parse(this.clientOptions.environment().getUrl())
+        HttpUrl.Builder httpUrl = HttpUrl.parse(this.clientOptions.environment().getApiURL())
                 .newBuilder()
                 .addPathSegments("course_lesson_interactions")
-                .addPathSegment(id);
+                .addPathSegment(PathSegments.validate(id));
         if (requestOptions != null) {
             requestOptions.getQueryParameters().forEach((_key, _value) -> {
                 httpUrl.addQueryParameter(_key, _value);
@@ -257,6 +278,15 @@ public class RawCourseLessonInteractionsClient {
         OkHttpClient client = clientOptions.httpClient();
         if (requestOptions != null && requestOptions.getTimeout().isPresent()) {
             client = clientOptions.httpClientWithTimeout(requestOptions);
+        }
+        if (requestOptions != null && requestOptions.getMaxRetries().isPresent()) {
+            okhttpRequest = okhttpRequest
+                    .newBuilder()
+                    .tag(
+                            RetryInterceptor.MaxRetriesOverride.class,
+                            new RetryInterceptor.MaxRetriesOverride(
+                                    requestOptions.getMaxRetries().get()))
+                    .build();
         }
         try (Response response = client.newCall(okhttpRequest).execute()) {
             ResponseBody responseBody = response.body();
@@ -282,13 +312,16 @@ public class RawCourseLessonInteractionsClient {
                                 ObjectMappers.JSON_MAPPER.readValue(responseBodyString, Object.class), response);
                     case 422:
                         throw new UnprocessableEntityError(
-                                ObjectMappers.JSON_MAPPER.readValue(responseBodyString, Object.class), response);
+                                ObjectMappers.JSON_MAPPER.readValue(
+                                        responseBodyString, UnprocessableEntityErrorBody.class),
+                                response);
                     case 429:
                         throw new TooManyRequestsError(
                                 ObjectMappers.JSON_MAPPER.readValue(responseBodyString, Object.class), response);
                     case 500:
                         throw new InternalServerError(
-                                ObjectMappers.JSON_MAPPER.readValue(responseBodyString, Object.class), response);
+                                ObjectMappers.JSON_MAPPER.readValue(responseBodyString, InternalServerErrorBody.class),
+                                response);
                 }
             } catch (JsonProcessingException ignored) {
                 // unable to map error response, throwing generic error
@@ -296,6 +329,8 @@ public class RawCourseLessonInteractionsClient {
             Object errorBody = ObjectMappers.parseErrorBody(responseBodyString);
             throw new WhopApiApiException(
                     "Error with status code " + response.code(), response.code(), errorBody, response);
+        } catch (JsonProcessingException e) {
+            throw new WhopApiException("Failed to deserialize response: " + e.getMessage(), e);
         } catch (IOException e) {
             throw new WhopApiException("Network error executing HTTP request", e);
         }

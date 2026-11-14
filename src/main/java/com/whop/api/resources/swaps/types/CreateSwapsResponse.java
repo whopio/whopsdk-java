@@ -26,6 +26,8 @@ import org.jetbrains.annotations.NotNull;
 public final class CreateSwapsResponse {
     private final String accountId;
 
+    private final Optional<String> amount;
+
     private final Optional<Double> amountIn;
 
     private final Optional<Double> amountOut;
@@ -48,10 +50,13 @@ public final class CreateSwapsResponse {
 
     private final Optional<CreateSwapsResponseToToken> toToken;
 
+    private final Optional<String> userId;
+
     private final Map<String, Object> additionalProperties;
 
     private CreateSwapsResponse(
             String accountId,
+            Optional<String> amount,
             Optional<Double> amountIn,
             Optional<Double> amountOut,
             Optional<String> amountOutExpected,
@@ -63,8 +68,10 @@ public final class CreateSwapsResponse {
             CreateSwapsResponseStatus status,
             Optional<String> toChain,
             Optional<CreateSwapsResponseToToken> toToken,
+            Optional<String> userId,
             Map<String, Object> additionalProperties) {
         this.accountId = accountId;
+        this.amount = amount;
         this.amountIn = amountIn;
         this.amountOut = amountOut;
         this.amountOutExpected = amountOutExpected;
@@ -76,11 +83,12 @@ public final class CreateSwapsResponse {
         this.status = status;
         this.toChain = toChain;
         this.toToken = toToken;
+        this.userId = userId;
         this.additionalProperties = additionalProperties;
     }
 
     /**
-     * @return Account ID that owns the wallet used for the swap.
+     * @return Account that owns the swap: a business ID prefixed <code>biz_</code>, or the user ID for a personal account.
      */
     @JsonProperty("account_id")
     public String getAccountId() {
@@ -88,7 +96,18 @@ public final class CreateSwapsResponse {
     }
 
     /**
-     * @return Fiat pairs only: amount of the source currency converted. Null while a stablecoin repayment is processing.
+     * @return Crypto pairs only: the from_token amount the swap spends, as a decimal string. A request for <code>all</code> returns the wallet balance it read.
+     */
+    @JsonIgnore
+    public Optional<String> getAmount() {
+        if (amount == null) {
+            return Optional.empty();
+        }
+        return amount;
+    }
+
+    /**
+     * @return Fiat pairs only: amount of the source currency converted. Null while the conversion is settling.
      */
     @JsonIgnore
     public Optional<Double> getAmountIn() {
@@ -99,7 +118,7 @@ public final class CreateSwapsResponse {
     }
 
     /**
-     * @return Fiat pairs only: amount credited in the destination currency. Null while a stablecoin repayment is processing.
+     * @return Fiat pairs only: amount credited in the destination currency. Null while the conversion is settling.
      */
     @JsonIgnore
     public Optional<Double> getAmountOut() {
@@ -158,7 +177,7 @@ public final class CreateSwapsResponse {
     }
 
     /**
-     * @return Swap status. Crypto swaps start <code>queued</code>; fiat conversions return <code>complete</code>, or <code>working</code> while a stablecoin repayment settles.
+     * @return Swap status. Crypto swaps start <code>queued</code>. Fiat conversions return <code>complete</code>, or <code>working</code> while the conversion settles.
      */
     @JsonProperty("status")
     public CreateSwapsResponseStatus getStatus() {
@@ -182,6 +201,23 @@ public final class CreateSwapsResponse {
             return Optional.empty();
         }
         return toToken;
+    }
+
+    /**
+     * @return User whose personal account owns the swap, prefixed <code>user_</code>. Null for a business account.
+     */
+    @JsonIgnore
+    public Optional<String> getUserId() {
+        if (userId == null) {
+            return Optional.empty();
+        }
+        return userId;
+    }
+
+    @JsonInclude(value = JsonInclude.Include.CUSTOM, valueFilter = NullableNonemptyFilter.class)
+    @JsonProperty("amount")
+    private Optional<String> _getAmount() {
+        return amount;
     }
 
     @JsonInclude(value = JsonInclude.Include.CUSTOM, valueFilter = NullableNonemptyFilter.class)
@@ -208,6 +244,12 @@ public final class CreateSwapsResponse {
         return toToken;
     }
 
+    @JsonInclude(value = JsonInclude.Include.CUSTOM, valueFilter = NullableNonemptyFilter.class)
+    @JsonProperty("user_id")
+    private Optional<String> _getUserId() {
+        return userId;
+    }
+
     @java.lang.Override
     public boolean equals(Object other) {
         if (this == other) return true;
@@ -221,6 +263,7 @@ public final class CreateSwapsResponse {
 
     private boolean equalTo(CreateSwapsResponse other) {
         return accountId.equals(other.accountId)
+                && amount.equals(other.amount)
                 && amountIn.equals(other.amountIn)
                 && amountOut.equals(other.amountOut)
                 && amountOutExpected.equals(other.amountOutExpected)
@@ -231,13 +274,15 @@ public final class CreateSwapsResponse {
                 && rate.equals(other.rate)
                 && status.equals(other.status)
                 && toChain.equals(other.toChain)
-                && toToken.equals(other.toToken);
+                && toToken.equals(other.toToken)
+                && userId.equals(other.userId);
     }
 
     @java.lang.Override
     public int hashCode() {
         return Objects.hash(
                 this.accountId,
+                this.amount,
                 this.amountIn,
                 this.amountOut,
                 this.amountOutExpected,
@@ -248,7 +293,8 @@ public final class CreateSwapsResponse {
                 this.rate,
                 this.status,
                 this.toChain,
-                this.toToken);
+                this.toToken,
+                this.userId);
     }
 
     @java.lang.Override
@@ -262,7 +308,7 @@ public final class CreateSwapsResponse {
 
     public interface AccountIdStage {
         /**
-         * <p>Account ID that owns the wallet used for the swap.</p>
+         * <p>Account that owns the swap: a business ID prefixed <code>biz_</code>, or the user ID for a personal account.</p>
          */
         ObjectStage accountId(@NotNull String accountId);
 
@@ -275,7 +321,7 @@ public final class CreateSwapsResponse {
 
     public interface StatusStage {
         /**
-         * <p>Swap status. Crypto swaps start <code>queued</code>; fiat conversions return <code>complete</code>, or <code>working</code> while a stablecoin repayment settles.</p>
+         * <p>Swap status. Crypto swaps start <code>queued</code>. Fiat conversions return <code>complete</code>, or <code>working</code> while the conversion settles.</p>
          */
         _FinalStage status(@NotNull CreateSwapsResponseStatus status);
     }
@@ -288,7 +334,16 @@ public final class CreateSwapsResponse {
         _FinalStage additionalProperties(Map<String, Object> additionalProperties);
 
         /**
-         * <p>Fiat pairs only: amount of the source currency converted. Null while a stablecoin repayment is processing.</p>
+         * <p>Crypto pairs only: the from_token amount the swap spends, as a decimal string. A request for <code>all</code> returns the wallet balance it read.</p>
+         */
+        _FinalStage amount(Optional<String> amount);
+
+        _FinalStage amount(String amount);
+
+        _FinalStage amount(Nullable<String> amount);
+
+        /**
+         * <p>Fiat pairs only: amount of the source currency converted. Null while the conversion is settling.</p>
          */
         _FinalStage amountIn(Optional<Double> amountIn);
 
@@ -297,7 +352,7 @@ public final class CreateSwapsResponse {
         _FinalStage amountIn(Nullable<Double> amountIn);
 
         /**
-         * <p>Fiat pairs only: amount credited in the destination currency. Null while a stablecoin repayment is processing.</p>
+         * <p>Fiat pairs only: amount credited in the destination currency. Null while the conversion is settling.</p>
          */
         _FinalStage amountOut(Optional<Double> amountOut);
 
@@ -357,6 +412,15 @@ public final class CreateSwapsResponse {
         _FinalStage toToken(CreateSwapsResponseToToken toToken);
 
         _FinalStage toToken(Nullable<CreateSwapsResponseToToken> toToken);
+
+        /**
+         * <p>User whose personal account owns the swap, prefixed <code>user_</code>. Null for a business account.</p>
+         */
+        _FinalStage userId(Optional<String> userId);
+
+        _FinalStage userId(String userId);
+
+        _FinalStage userId(Nullable<String> userId);
     }
 
     @JsonIgnoreProperties(ignoreUnknown = true)
@@ -366,6 +430,8 @@ public final class CreateSwapsResponse {
         private CreateSwapsResponseObject object;
 
         private CreateSwapsResponseStatus status;
+
+        private Optional<String> userId = Optional.empty();
 
         private Optional<CreateSwapsResponseToToken> toToken = Optional.empty();
 
@@ -385,7 +451,8 @@ public final class CreateSwapsResponse {
 
         private Optional<Double> amountIn = Optional.empty();
 
-        @JsonAnySetter
+        private Optional<String> amount = Optional.empty();
+
         private Map<String, Object> additionalProperties = new HashMap<>();
 
         private Builder() {}
@@ -393,6 +460,7 @@ public final class CreateSwapsResponse {
         @java.lang.Override
         public Builder from(CreateSwapsResponse other) {
             accountId(other.getAccountId());
+            amount(other.getAmount());
             amountIn(other.getAmountIn());
             amountOut(other.getAmountOut());
             amountOutExpected(other.getAmountOutExpected());
@@ -404,12 +472,12 @@ public final class CreateSwapsResponse {
             status(other.getStatus());
             toChain(other.getToChain());
             toToken(other.getToToken());
+            userId(other.getUserId());
             return this;
         }
 
         /**
-         * <p>Account ID that owns the wallet used for the swap.</p>
-         * <p>Account ID that owns the wallet used for the swap.</p>
+         * <p>Account that owns the swap: a business ID prefixed <code>biz_</code>, or the user ID for a personal account.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
@@ -427,14 +495,49 @@ public final class CreateSwapsResponse {
         }
 
         /**
-         * <p>Swap status. Crypto swaps start <code>queued</code>; fiat conversions return <code>complete</code>, or <code>working</code> while a stablecoin repayment settles.</p>
-         * <p>Swap status. Crypto swaps start <code>queued</code>; fiat conversions return <code>complete</code>, or <code>working</code> while a stablecoin repayment settles.</p>
+         * <p>Swap status. Crypto swaps start <code>queued</code>. Fiat conversions return <code>complete</code>, or <code>working</code> while the conversion settles.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
         @JsonSetter("status")
         public _FinalStage status(@NotNull CreateSwapsResponseStatus status) {
             this.status = Objects.requireNonNull(status, "status must not be null");
+            return this;
+        }
+
+        /**
+         * <p>User whose personal account owns the swap, prefixed <code>user_</code>. Null for a business account.</p>
+         * @return Reference to {@code this} so that method calls can be chained together.
+         */
+        @java.lang.Override
+        public _FinalStage userId(Nullable<String> userId) {
+            if (userId.isNull()) {
+                this.userId = null;
+            } else if (userId.isEmpty()) {
+                this.userId = Optional.empty();
+            } else {
+                this.userId = Optional.of(userId.get());
+            }
+            return this;
+        }
+
+        /**
+         * <p>User whose personal account owns the swap, prefixed <code>user_</code>. Null for a business account.</p>
+         * @return Reference to {@code this} so that method calls can be chained together.
+         */
+        @java.lang.Override
+        public _FinalStage userId(String userId) {
+            this.userId = Optional.ofNullable(userId);
+            return this;
+        }
+
+        /**
+         * <p>User whose personal account owns the swap, prefixed <code>user_</code>. Null for a business account.</p>
+         */
+        @java.lang.Override
+        @JsonSetter(value = "user_id", nulls = Nulls.SKIP)
+        public _FinalStage userId(Optional<String> userId) {
+            this.userId = userId;
             return this;
         }
 
@@ -611,7 +714,7 @@ public final class CreateSwapsResponse {
         }
 
         /**
-         * <p>Fiat pairs only: amount credited in the destination currency. Null while a stablecoin repayment is processing.</p>
+         * <p>Fiat pairs only: amount credited in the destination currency. Null while the conversion is settling.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
@@ -627,7 +730,7 @@ public final class CreateSwapsResponse {
         }
 
         /**
-         * <p>Fiat pairs only: amount credited in the destination currency. Null while a stablecoin repayment is processing.</p>
+         * <p>Fiat pairs only: amount credited in the destination currency. Null while the conversion is settling.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
@@ -637,7 +740,7 @@ public final class CreateSwapsResponse {
         }
 
         /**
-         * <p>Fiat pairs only: amount credited in the destination currency. Null while a stablecoin repayment is processing.</p>
+         * <p>Fiat pairs only: amount credited in the destination currency. Null while the conversion is settling.</p>
          */
         @java.lang.Override
         @JsonSetter(value = "amount_out", nulls = Nulls.SKIP)
@@ -647,7 +750,7 @@ public final class CreateSwapsResponse {
         }
 
         /**
-         * <p>Fiat pairs only: amount of the source currency converted. Null while a stablecoin repayment is processing.</p>
+         * <p>Fiat pairs only: amount of the source currency converted. Null while the conversion is settling.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
@@ -663,7 +766,7 @@ public final class CreateSwapsResponse {
         }
 
         /**
-         * <p>Fiat pairs only: amount of the source currency converted. Null while a stablecoin repayment is processing.</p>
+         * <p>Fiat pairs only: amount of the source currency converted. Null while the conversion is settling.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
@@ -673,7 +776,7 @@ public final class CreateSwapsResponse {
         }
 
         /**
-         * <p>Fiat pairs only: amount of the source currency converted. Null while a stablecoin repayment is processing.</p>
+         * <p>Fiat pairs only: amount of the source currency converted. Null while the conversion is settling.</p>
          */
         @java.lang.Override
         @JsonSetter(value = "amount_in", nulls = Nulls.SKIP)
@@ -682,10 +785,47 @@ public final class CreateSwapsResponse {
             return this;
         }
 
+        /**
+         * <p>Crypto pairs only: the from_token amount the swap spends, as a decimal string. A request for <code>all</code> returns the wallet balance it read.</p>
+         * @return Reference to {@code this} so that method calls can be chained together.
+         */
+        @java.lang.Override
+        public _FinalStage amount(Nullable<String> amount) {
+            if (amount.isNull()) {
+                this.amount = null;
+            } else if (amount.isEmpty()) {
+                this.amount = Optional.empty();
+            } else {
+                this.amount = Optional.of(amount.get());
+            }
+            return this;
+        }
+
+        /**
+         * <p>Crypto pairs only: the from_token amount the swap spends, as a decimal string. A request for <code>all</code> returns the wallet balance it read.</p>
+         * @return Reference to {@code this} so that method calls can be chained together.
+         */
+        @java.lang.Override
+        public _FinalStage amount(String amount) {
+            this.amount = Optional.ofNullable(amount);
+            return this;
+        }
+
+        /**
+         * <p>Crypto pairs only: the from_token amount the swap spends, as a decimal string. A request for <code>all</code> returns the wallet balance it read.</p>
+         */
+        @java.lang.Override
+        @JsonSetter(value = "amount", nulls = Nulls.SKIP)
+        public _FinalStage amount(Optional<String> amount) {
+            this.amount = amount;
+            return this;
+        }
+
         @java.lang.Override
         public CreateSwapsResponse build() {
             return new CreateSwapsResponse(
                     accountId,
+                    amount,
                     amountIn,
                     amountOut,
                     amountOutExpected,
@@ -697,7 +837,29 @@ public final class CreateSwapsResponse {
                     status,
                     toChain,
                     toToken,
+                    userId,
                     additionalProperties);
+        }
+
+        @JsonAnySetter
+        private void putAdditionalPropertyFromJson(String key, Object value) {
+            if (key.equalsIgnoreCase("account_id")
+                    || key.equalsIgnoreCase("amount")
+                    || key.equalsIgnoreCase("amount_in")
+                    || key.equalsIgnoreCase("amount_out")
+                    || key.equalsIgnoreCase("amount_out_expected")
+                    || key.equalsIgnoreCase("amount_out_min")
+                    || key.equalsIgnoreCase("from_token")
+                    || key.equalsIgnoreCase("id")
+                    || key.equalsIgnoreCase("object")
+                    || key.equalsIgnoreCase("rate")
+                    || key.equalsIgnoreCase("status")
+                    || key.equalsIgnoreCase("to_chain")
+                    || key.equalsIgnoreCase("to_token")
+                    || key.equalsIgnoreCase("user_id")) {
+                return;
+            }
+            this.additionalProperties.put(key, value);
         }
 
         @java.lang.Override

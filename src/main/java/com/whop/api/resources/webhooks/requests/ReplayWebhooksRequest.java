@@ -179,7 +179,6 @@ public final class ReplayWebhooksRequest {
 
         private Optional<List<String>> events = Optional.empty();
 
-        @JsonAnySetter
         private Map<String, Object> additionalProperties = new HashMap<>();
 
         private Builder() {}
@@ -195,7 +194,6 @@ public final class ReplayWebhooksRequest {
         }
 
         /**
-         * <p>Start of the delivery window to replay, as an ISO 8601 timestamp. Clamped to the 30-day delivery retention.</p>
          * <p>Start of the delivery window to replay, as an ISO 8601 timestamp. Clamped to the 30-day delivery retention.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
@@ -290,6 +288,18 @@ public final class ReplayWebhooksRequest {
         public ReplayWebhooksRequest build() {
             return new ReplayWebhooksRequest(
                     events, failedOnly, regenerateIds, sentAfter, sentBefore, additionalProperties);
+        }
+
+        @JsonAnySetter
+        private void putAdditionalPropertyFromJson(String key, Object value) {
+            if (key.equalsIgnoreCase("events")
+                    || key.equalsIgnoreCase("failed_only")
+                    || key.equalsIgnoreCase("regenerate_ids")
+                    || key.equalsIgnoreCase("sent_after")
+                    || key.equalsIgnoreCase("sent_before")) {
+                return;
+            }
+            this.additionalProperties.put(key, value);
         }
 
         @java.lang.Override

@@ -4,20 +4,19 @@
 package com.whop.api.resources.plans;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
+import com.whop.api.core.BodyProperties;
 import com.whop.api.core.ClientOptions;
 import com.whop.api.core.MediaTypes;
 import com.whop.api.core.ObjectMappers;
+import com.whop.api.core.PathSegments;
 import com.whop.api.core.QueryStringMapper;
 import com.whop.api.core.RequestOptions;
+import com.whop.api.core.RetryInterceptor;
 import com.whop.api.core.WhopApiApiException;
 import com.whop.api.core.WhopApiException;
 import com.whop.api.core.WhopApiHttpResponse;
 import com.whop.api.core.pagination.SyncPagingIterable;
-import com.whop.api.errors.BadRequestError;
 import com.whop.api.errors.ConflictError;
-import com.whop.api.errors.ForbiddenError;
-import com.whop.api.errors.NotFoundError;
-import com.whop.api.errors.UnauthorizedError;
 import com.whop.api.resources.plans.requests.CalculateTaxPlansRequest;
 import com.whop.api.resources.plans.requests.CreatePlansRequest;
 import com.whop.api.resources.plans.requests.DeletePlansRequest;
@@ -29,7 +28,6 @@ import com.whop.api.resources.plans.types.DeletePlansResponse;
 import com.whop.api.resources.plans.types.ListPlansResponse;
 import com.whop.api.types.Plan;
 import com.whop.api.types.PlanListItem;
-import com.whop.api.types.V1ErrorResponse;
 import java.io.IOException;
 import java.util.List;
 import java.util.Optional;
@@ -49,21 +47,38 @@ public class RawPlansClient {
     }
 
     /**
-     * Returns a paginated list of plans belonging to an account, with optional filtering by visibility, type, release method, and product.
+     * Deprecated compatibility endpoint. List variants with <code>GET /variants</code> instead.
+     */
+    public WhopApiHttpResponse<SyncPagingIterable<PlanListItem>> list() {
+        return list(ListPlansRequest.builder().build());
+    }
+
+    /**
+     * Deprecated compatibility endpoint. List variants with <code>GET /variants</code> instead.
+     */
+    public WhopApiHttpResponse<SyncPagingIterable<PlanListItem>> list(RequestOptions requestOptions) {
+        return list(ListPlansRequest.builder().build(), requestOptions);
+    }
+
+    /**
+     * Deprecated compatibility endpoint. List variants with <code>GET /variants</code> instead.
      */
     public WhopApiHttpResponse<SyncPagingIterable<PlanListItem>> list(ListPlansRequest request) {
         return list(request, null);
     }
 
     /**
-     * Returns a paginated list of plans belonging to an account, with optional filtering by visibility, type, release method, and product.
+     * Deprecated compatibility endpoint. List variants with <code>GET /variants</code> instead.
      */
     public WhopApiHttpResponse<SyncPagingIterable<PlanListItem>> list(
             ListPlansRequest request, RequestOptions requestOptions) {
-        HttpUrl.Builder httpUrl = HttpUrl.parse(this.clientOptions.environment().getUrl())
+        HttpUrl.Builder httpUrl = HttpUrl.parse(this.clientOptions.environment().getApiURL())
                 .newBuilder()
                 .addPathSegments("plans");
-        QueryStringMapper.addQueryParameter(httpUrl, "account_id", request.getAccountId(), false);
+        if (request.getAccountId().isPresent()) {
+            QueryStringMapper.addQueryParameter(
+                    httpUrl, "account_id", request.getAccountId().get(), false);
+        }
         if (request.getDirection().isPresent()) {
             QueryStringMapper.addQueryParameter(
                     httpUrl, "direction", request.getDirection().get(), false);
@@ -104,9 +119,9 @@ public class RawPlansClient {
             QueryStringMapper.addQueryParameter(
                     httpUrl, "visibilities", request.getVisibilities().get(), true);
         }
-        if (request.getPlanTypes().isPresent()) {
+        if (request.getBillingTypes().isPresent()) {
             QueryStringMapper.addQueryParameter(
-                    httpUrl, "plan_types", request.getPlanTypes().get(), true);
+                    httpUrl, "billing_types", request.getBillingTypes().get(), true);
         }
         if (request.getProductIds().isPresent()) {
             QueryStringMapper.addQueryParameter(
@@ -127,6 +142,15 @@ public class RawPlansClient {
         if (requestOptions != null && requestOptions.getTimeout().isPresent()) {
             client = clientOptions.httpClientWithTimeout(requestOptions);
         }
+        if (requestOptions != null && requestOptions.getMaxRetries().isPresent()) {
+            okhttpRequest = okhttpRequest
+                    .newBuilder()
+                    .tag(
+                            RetryInterceptor.MaxRetriesOverride.class,
+                            new RetryInterceptor.MaxRetriesOverride(
+                                    requestOptions.getMaxRetries().get()))
+                    .build();
+        }
         try (Response response = client.newCall(okhttpRequest).execute()) {
             ResponseBody responseBody = response.body();
             String responseBodyString = responseBody != null ? responseBody.string() : "{}";
@@ -141,56 +165,49 @@ public class RawPlansClient {
                 List<PlanListItem> result = parsedResponse.getData();
                 return new WhopApiHttpResponse<>(
                         new SyncPagingIterable<PlanListItem>(
-                                startingAfter != null, result, parsedResponse, () -> list(nextRequest, requestOptions)
-                                        .body()),
+                                startingAfter.isPresent()
+                                        && !startingAfter.get().isEmpty(),
+                                result,
+                                parsedResponse,
+                                () -> list(nextRequest, requestOptions).body()),
                         response);
-            }
-            try {
-                switch (response.code()) {
-                    case 400:
-                        throw new BadRequestError(
-                                ObjectMappers.JSON_MAPPER.readValue(responseBodyString, Object.class), response);
-                    case 401:
-                        throw new UnauthorizedError(
-                                ObjectMappers.JSON_MAPPER.readValue(responseBodyString, Object.class), response);
-                }
-            } catch (JsonProcessingException ignored) {
-                // unable to map error response, throwing generic error
             }
             Object errorBody = ObjectMappers.parseErrorBody(responseBodyString);
             throw new WhopApiApiException(
                     "Error with status code " + response.code(), response.code(), errorBody, response);
+        } catch (JsonProcessingException e) {
+            throw new WhopApiException("Failed to deserialize response: " + e.getMessage(), e);
         } catch (IOException e) {
             throw new WhopApiException("Network error executing HTTP request", e);
         }
     }
 
     /**
-     * Create a new pricing plan for a product. The plan defines the billing interval, price, and availability for customers.
+     * Deprecated compatibility endpoint. Create variants with <code>POST /variants</code> instead.
      */
     public WhopApiHttpResponse<Plan> create() {
         return create(CreatePlansRequest.builder().build());
     }
 
     /**
-     * Create a new pricing plan for a product. The plan defines the billing interval, price, and availability for customers.
+     * Deprecated compatibility endpoint. Create variants with <code>POST /variants</code> instead.
      */
     public WhopApiHttpResponse<Plan> create(RequestOptions requestOptions) {
         return create(CreatePlansRequest.builder().build(), requestOptions);
     }
 
     /**
-     * Create a new pricing plan for a product. The plan defines the billing interval, price, and availability for customers.
+     * Deprecated compatibility endpoint. Create variants with <code>POST /variants</code> instead.
      */
     public WhopApiHttpResponse<Plan> create(CreatePlansRequest request) {
         return create(request, null);
     }
 
     /**
-     * Create a new pricing plan for a product. The plan defines the billing interval, price, and availability for customers.
+     * Deprecated compatibility endpoint. Create variants with <code>POST /variants</code> instead.
      */
     public WhopApiHttpResponse<Plan> create(CreatePlansRequest request, RequestOptions requestOptions) {
-        HttpUrl.Builder httpUrl = HttpUrl.parse(this.clientOptions.environment().getUrl())
+        HttpUrl.Builder httpUrl = HttpUrl.parse(this.clientOptions.environment().getApiURL())
                 .newBuilder()
                 .addPathSegments("plans");
         if (requestOptions != null) {
@@ -201,7 +218,9 @@ public class RawPlansClient {
         RequestBody body;
         try {
             body = RequestBody.create(
-                    ObjectMappers.JSON_MAPPER.writeValueAsBytes(request), MediaTypes.APPLICATION_JSON);
+                    ObjectMappers.JSON_MAPPER.writeValueAsBytes(BodyProperties.merge(
+                            request, requestOptions != null ? requestOptions.getBodyProperties() : null)),
+                    MediaTypes.APPLICATION_JSON);
         } catch (JsonProcessingException e) {
             throw new WhopApiException("Failed to serialize request", e);
         }
@@ -216,6 +235,15 @@ public class RawPlansClient {
         if (requestOptions != null && requestOptions.getTimeout().isPresent()) {
             client = clientOptions.httpClientWithTimeout(requestOptions);
         }
+        if (requestOptions != null && requestOptions.getMaxRetries().isPresent()) {
+            okhttpRequest = okhttpRequest
+                    .newBuilder()
+                    .tag(
+                            RetryInterceptor.MaxRetriesOverride.class,
+                            new RetryInterceptor.MaxRetriesOverride(
+                                    requestOptions.getMaxRetries().get()))
+                    .build();
+        }
         try (Response response = client.newCall(okhttpRequest).execute()) {
             ResponseBody responseBody = response.body();
             String responseBodyString = responseBody != null ? responseBody.string() : "{}";
@@ -224,17 +252,9 @@ public class RawPlansClient {
                         ObjectMappers.JSON_MAPPER.readValue(responseBodyString, Plan.class), response);
             }
             try {
-                switch (response.code()) {
-                    case 400:
-                        throw new BadRequestError(
-                                ObjectMappers.JSON_MAPPER.readValue(responseBodyString, Object.class), response);
-                    case 401:
-                        throw new UnauthorizedError(
-                                ObjectMappers.JSON_MAPPER.readValue(responseBodyString, Object.class), response);
-                    case 409:
-                        throw new ConflictError(
-                                ObjectMappers.JSON_MAPPER.readValue(responseBodyString, V1ErrorResponse.class),
-                                response);
+                if (response.code() == 409) {
+                    throw new ConflictError(
+                            ObjectMappers.JSON_MAPPER.readValue(responseBodyString, Object.class), response);
                 }
             } catch (JsonProcessingException ignored) {
                 // unable to map error response, throwing generic error
@@ -242,40 +262,42 @@ public class RawPlansClient {
             Object errorBody = ObjectMappers.parseErrorBody(responseBodyString);
             throw new WhopApiApiException(
                     "Error with status code " + response.code(), response.code(), errorBody, response);
+        } catch (JsonProcessingException e) {
+            throw new WhopApiException("Failed to deserialize response: " + e.getMessage(), e);
         } catch (IOException e) {
             throw new WhopApiException("Network error executing HTTP request", e);
         }
     }
 
     /**
-     * Retrieves the details of an existing plan.
+     * Deprecated compatibility endpoint. Retrieve variants with <code>GET /variants/{id}</code> instead.
      */
     public WhopApiHttpResponse<Plan> retrieve(String id) {
         return retrieve(id, RetrievePlansRequest.builder().build());
     }
 
     /**
-     * Retrieves the details of an existing plan.
+     * Deprecated compatibility endpoint. Retrieve variants with <code>GET /variants/{id}</code> instead.
      */
     public WhopApiHttpResponse<Plan> retrieve(String id, RequestOptions requestOptions) {
         return retrieve(id, RetrievePlansRequest.builder().build(), requestOptions);
     }
 
     /**
-     * Retrieves the details of an existing plan.
+     * Deprecated compatibility endpoint. Retrieve variants with <code>GET /variants/{id}</code> instead.
      */
     public WhopApiHttpResponse<Plan> retrieve(String id, RetrievePlansRequest request) {
         return retrieve(id, request, null);
     }
 
     /**
-     * Retrieves the details of an existing plan.
+     * Deprecated compatibility endpoint. Retrieve variants with <code>GET /variants/{id}</code> instead.
      */
     public WhopApiHttpResponse<Plan> retrieve(String id, RetrievePlansRequest request, RequestOptions requestOptions) {
-        HttpUrl.Builder httpUrl = HttpUrl.parse(this.clientOptions.environment().getUrl())
+        HttpUrl.Builder httpUrl = HttpUrl.parse(this.clientOptions.environment().getApiURL())
                 .newBuilder()
                 .addPathSegments("plans")
-                .addPathSegment(id);
+                .addPathSegment(PathSegments.validate(id));
         if (requestOptions != null) {
             requestOptions.getQueryParameters().forEach((_key, _value) -> {
                 httpUrl.addQueryParameter(_key, _value);
@@ -291,6 +313,15 @@ public class RawPlansClient {
         if (requestOptions != null && requestOptions.getTimeout().isPresent()) {
             client = clientOptions.httpClientWithTimeout(requestOptions);
         }
+        if (requestOptions != null && requestOptions.getMaxRetries().isPresent()) {
+            okhttpRequest = okhttpRequest
+                    .newBuilder()
+                    .tag(
+                            RetryInterceptor.MaxRetriesOverride.class,
+                            new RetryInterceptor.MaxRetriesOverride(
+                                    requestOptions.getMaxRetries().get()))
+                    .build();
+        }
         try (Response response = client.newCall(okhttpRequest).execute()) {
             ResponseBody responseBody = response.body();
             String responseBodyString = responseBody != null ? responseBody.string() : "{}";
@@ -298,52 +329,46 @@ public class RawPlansClient {
                 return new WhopApiHttpResponse<>(
                         ObjectMappers.JSON_MAPPER.readValue(responseBodyString, Plan.class), response);
             }
-            try {
-                if (response.code() == 404) {
-                    throw new NotFoundError(
-                            ObjectMappers.JSON_MAPPER.readValue(responseBodyString, Object.class), response);
-                }
-            } catch (JsonProcessingException ignored) {
-                // unable to map error response, throwing generic error
-            }
             Object errorBody = ObjectMappers.parseErrorBody(responseBodyString);
             throw new WhopApiApiException(
                     "Error with status code " + response.code(), response.code(), errorBody, response);
+        } catch (JsonProcessingException e) {
+            throw new WhopApiException("Failed to deserialize response: " + e.getMessage(), e);
         } catch (IOException e) {
             throw new WhopApiException("Network error executing HTTP request", e);
         }
     }
 
     /**
-     * Permanently delete a plan from a product. Existing memberships on this plan will not be affected.
+     * Deprecated compatibility endpoint. Delete variants with <code>DELETE /variants/{id}</code> instead.
      */
     public WhopApiHttpResponse<DeletePlansResponse> delete(String id) {
         return delete(id, DeletePlansRequest.builder().build());
     }
 
     /**
-     * Permanently delete a plan from a product. Existing memberships on this plan will not be affected.
+     * Deprecated compatibility endpoint. Delete variants with <code>DELETE /variants/{id}</code> instead.
      */
     public WhopApiHttpResponse<DeletePlansResponse> delete(String id, RequestOptions requestOptions) {
         return delete(id, DeletePlansRequest.builder().build(), requestOptions);
     }
 
     /**
-     * Permanently delete a plan from a product. Existing memberships on this plan will not be affected.
+     * Deprecated compatibility endpoint. Delete variants with <code>DELETE /variants/{id}</code> instead.
      */
     public WhopApiHttpResponse<DeletePlansResponse> delete(String id, DeletePlansRequest request) {
         return delete(id, request, null);
     }
 
     /**
-     * Permanently delete a plan from a product. Existing memberships on this plan will not be affected.
+     * Deprecated compatibility endpoint. Delete variants with <code>DELETE /variants/{id}</code> instead.
      */
     public WhopApiHttpResponse<DeletePlansResponse> delete(
             String id, DeletePlansRequest request, RequestOptions requestOptions) {
-        HttpUrl.Builder httpUrl = HttpUrl.parse(this.clientOptions.environment().getUrl())
+        HttpUrl.Builder httpUrl = HttpUrl.parse(this.clientOptions.environment().getApiURL())
                 .newBuilder()
                 .addPathSegments("plans")
-                .addPathSegment(id);
+                .addPathSegment(PathSegments.validate(id));
         if (requestOptions != null) {
             requestOptions.getQueryParameters().forEach((_key, _value) -> {
                 httpUrl.addQueryParameter(_key, _value);
@@ -351,13 +376,25 @@ public class RawPlansClient {
         }
         Request.Builder _requestBuilder = new Request.Builder()
                 .url(httpUrl.build())
-                .method("DELETE", null)
+                .method(
+                        "DELETE",
+                        BodyProperties.toRequestBody(
+                                requestOptions != null ? requestOptions.getBodyProperties() : null, null))
                 .headers(Headers.of(clientOptions.headers(requestOptions)))
                 .addHeader("Accept", "application/json");
         Request okhttpRequest = _requestBuilder.build();
         OkHttpClient client = clientOptions.httpClient();
         if (requestOptions != null && requestOptions.getTimeout().isPresent()) {
             client = clientOptions.httpClientWithTimeout(requestOptions);
+        }
+        if (requestOptions != null && requestOptions.getMaxRetries().isPresent()) {
+            okhttpRequest = okhttpRequest
+                    .newBuilder()
+                    .tag(
+                            RetryInterceptor.MaxRetriesOverride.class,
+                            new RetryInterceptor.MaxRetriesOverride(
+                                    requestOptions.getMaxRetries().get()))
+                    .build();
         }
         try (Response response = client.newCall(okhttpRequest).execute()) {
             ResponseBody responseBody = response.body();
@@ -366,51 +403,45 @@ public class RawPlansClient {
                 return new WhopApiHttpResponse<>(
                         ObjectMappers.JSON_MAPPER.readValue(responseBodyString, DeletePlansResponse.class), response);
             }
-            try {
-                if (response.code() == 404) {
-                    throw new NotFoundError(
-                            ObjectMappers.JSON_MAPPER.readValue(responseBodyString, Object.class), response);
-                }
-            } catch (JsonProcessingException ignored) {
-                // unable to map error response, throwing generic error
-            }
             Object errorBody = ObjectMappers.parseErrorBody(responseBodyString);
             throw new WhopApiApiException(
                     "Error with status code " + response.code(), response.code(), errorBody, response);
+        } catch (JsonProcessingException e) {
+            throw new WhopApiException("Failed to deserialize response: " + e.getMessage(), e);
         } catch (IOException e) {
             throw new WhopApiException("Network error executing HTTP request", e);
         }
     }
 
     /**
-     * Update a plan's pricing, billing interval, visibility, stock, and other settings.
+     * Deprecated compatibility endpoint. Update variants with <code>PATCH /variants/{id}</code> instead.
      */
     public WhopApiHttpResponse<Plan> update(String id) {
         return update(id, UpdatePlansRequest.builder().build());
     }
 
     /**
-     * Update a plan's pricing, billing interval, visibility, stock, and other settings.
+     * Deprecated compatibility endpoint. Update variants with <code>PATCH /variants/{id}</code> instead.
      */
     public WhopApiHttpResponse<Plan> update(String id, RequestOptions requestOptions) {
         return update(id, UpdatePlansRequest.builder().build(), requestOptions);
     }
 
     /**
-     * Update a plan's pricing, billing interval, visibility, stock, and other settings.
+     * Deprecated compatibility endpoint. Update variants with <code>PATCH /variants/{id}</code> instead.
      */
     public WhopApiHttpResponse<Plan> update(String id, UpdatePlansRequest request) {
         return update(id, request, null);
     }
 
     /**
-     * Update a plan's pricing, billing interval, visibility, stock, and other settings.
+     * Deprecated compatibility endpoint. Update variants with <code>PATCH /variants/{id}</code> instead.
      */
     public WhopApiHttpResponse<Plan> update(String id, UpdatePlansRequest request, RequestOptions requestOptions) {
-        HttpUrl.Builder httpUrl = HttpUrl.parse(this.clientOptions.environment().getUrl())
+        HttpUrl.Builder httpUrl = HttpUrl.parse(this.clientOptions.environment().getApiURL())
                 .newBuilder()
                 .addPathSegments("plans")
-                .addPathSegment(id);
+                .addPathSegment(PathSegments.validate(id));
         if (requestOptions != null) {
             requestOptions.getQueryParameters().forEach((_key, _value) -> {
                 httpUrl.addQueryParameter(_key, _value);
@@ -419,7 +450,9 @@ public class RawPlansClient {
         RequestBody body;
         try {
             body = RequestBody.create(
-                    ObjectMappers.JSON_MAPPER.writeValueAsBytes(request), MediaTypes.APPLICATION_JSON);
+                    ObjectMappers.JSON_MAPPER.writeValueAsBytes(BodyProperties.merge(
+                            request, requestOptions != null ? requestOptions.getBodyProperties() : null)),
+                    MediaTypes.APPLICATION_JSON);
         } catch (JsonProcessingException e) {
             throw new WhopApiException("Failed to serialize request", e);
         }
@@ -434,6 +467,15 @@ public class RawPlansClient {
         if (requestOptions != null && requestOptions.getTimeout().isPresent()) {
             client = clientOptions.httpClientWithTimeout(requestOptions);
         }
+        if (requestOptions != null && requestOptions.getMaxRetries().isPresent()) {
+            okhttpRequest = okhttpRequest
+                    .newBuilder()
+                    .tag(
+                            RetryInterceptor.MaxRetriesOverride.class,
+                            new RetryInterceptor.MaxRetriesOverride(
+                                    requestOptions.getMaxRetries().get()))
+                    .build();
+        }
         try (Response response = client.newCall(okhttpRequest).execute()) {
             ResponseBody responseBody = response.body();
             String responseBodyString = responseBody != null ? responseBody.string() : "{}";
@@ -441,52 +483,46 @@ public class RawPlansClient {
                 return new WhopApiHttpResponse<>(
                         ObjectMappers.JSON_MAPPER.readValue(responseBodyString, Plan.class), response);
             }
-            try {
-                if (response.code() == 401) {
-                    throw new UnauthorizedError(
-                            ObjectMappers.JSON_MAPPER.readValue(responseBodyString, Object.class), response);
-                }
-            } catch (JsonProcessingException ignored) {
-                // unable to map error response, throwing generic error
-            }
             Object errorBody = ObjectMappers.parseErrorBody(responseBodyString);
             throw new WhopApiApiException(
                     "Error with status code " + response.code(), response.code(), errorBody, response);
+        } catch (JsonProcessingException e) {
+            throw new WhopApiException("Failed to deserialize response: " + e.getMessage(), e);
         } catch (IOException e) {
             throw new WhopApiException("Network error executing HTTP request", e);
         }
     }
 
     /**
-     * Previews tax for a plan before checkout, based on the buyer's location.
+     * Deprecated compatibility endpoint. Quote tax with <code>POST /payment_quotes</code> instead.
      */
     public WhopApiHttpResponse<CalculateTaxPlansResponse> calculateTax(String id) {
         return calculateTax(id, CalculateTaxPlansRequest.builder().build());
     }
 
     /**
-     * Previews tax for a plan before checkout, based on the buyer's location.
+     * Deprecated compatibility endpoint. Quote tax with <code>POST /payment_quotes</code> instead.
      */
     public WhopApiHttpResponse<CalculateTaxPlansResponse> calculateTax(String id, RequestOptions requestOptions) {
         return calculateTax(id, CalculateTaxPlansRequest.builder().build(), requestOptions);
     }
 
     /**
-     * Previews tax for a plan before checkout, based on the buyer's location.
+     * Deprecated compatibility endpoint. Quote tax with <code>POST /payment_quotes</code> instead.
      */
     public WhopApiHttpResponse<CalculateTaxPlansResponse> calculateTax(String id, CalculateTaxPlansRequest request) {
         return calculateTax(id, request, null);
     }
 
     /**
-     * Previews tax for a plan before checkout, based on the buyer's location.
+     * Deprecated compatibility endpoint. Quote tax with <code>POST /payment_quotes</code> instead.
      */
     public WhopApiHttpResponse<CalculateTaxPlansResponse> calculateTax(
             String id, CalculateTaxPlansRequest request, RequestOptions requestOptions) {
-        HttpUrl.Builder httpUrl = HttpUrl.parse(this.clientOptions.environment().getUrl())
+        HttpUrl.Builder httpUrl = HttpUrl.parse(this.clientOptions.environment().getApiURL())
                 .newBuilder()
                 .addPathSegments("plans")
-                .addPathSegment(id)
+                .addPathSegment(PathSegments.validate(id))
                 .addPathSegments("calculate_tax");
         if (requestOptions != null) {
             requestOptions.getQueryParameters().forEach((_key, _value) -> {
@@ -496,7 +532,9 @@ public class RawPlansClient {
         RequestBody body;
         try {
             body = RequestBody.create(
-                    ObjectMappers.JSON_MAPPER.writeValueAsBytes(request), MediaTypes.APPLICATION_JSON);
+                    ObjectMappers.JSON_MAPPER.writeValueAsBytes(BodyProperties.merge(
+                            request, requestOptions != null ? requestOptions.getBodyProperties() : null)),
+                    MediaTypes.APPLICATION_JSON);
         } catch (JsonProcessingException e) {
             throw new WhopApiException("Failed to serialize request", e);
         }
@@ -511,6 +549,15 @@ public class RawPlansClient {
         if (requestOptions != null && requestOptions.getTimeout().isPresent()) {
             client = clientOptions.httpClientWithTimeout(requestOptions);
         }
+        if (requestOptions != null && requestOptions.getMaxRetries().isPresent()) {
+            okhttpRequest = okhttpRequest
+                    .newBuilder()
+                    .tag(
+                            RetryInterceptor.MaxRetriesOverride.class,
+                            new RetryInterceptor.MaxRetriesOverride(
+                                    requestOptions.getMaxRetries().get()))
+                    .build();
+        }
         try (Response response = client.newCall(okhttpRequest).execute()) {
             ResponseBody responseBody = response.body();
             String responseBodyString = responseBody != null ? responseBody.string() : "{}";
@@ -520,23 +567,9 @@ public class RawPlansClient {
                         response);
             }
             try {
-                switch (response.code()) {
-                    case 400:
-                        throw new BadRequestError(
-                                ObjectMappers.JSON_MAPPER.readValue(responseBodyString, Object.class), response);
-                    case 401:
-                        throw new UnauthorizedError(
-                                ObjectMappers.JSON_MAPPER.readValue(responseBodyString, Object.class), response);
-                    case 403:
-                        throw new ForbiddenError(
-                                ObjectMappers.JSON_MAPPER.readValue(responseBodyString, Object.class), response);
-                    case 404:
-                        throw new NotFoundError(
-                                ObjectMappers.JSON_MAPPER.readValue(responseBodyString, Object.class), response);
-                    case 409:
-                        throw new ConflictError(
-                                ObjectMappers.JSON_MAPPER.readValue(responseBodyString, V1ErrorResponse.class),
-                                response);
+                if (response.code() == 409) {
+                    throw new ConflictError(
+                            ObjectMappers.JSON_MAPPER.readValue(responseBodyString, Object.class), response);
                 }
             } catch (JsonProcessingException ignored) {
                 // unable to map error response, throwing generic error
@@ -544,6 +577,8 @@ public class RawPlansClient {
             Object errorBody = ObjectMappers.parseErrorBody(responseBodyString);
             throw new WhopApiApiException(
                     "Error with status code " + response.code(), response.code(), errorBody, response);
+        } catch (JsonProcessingException e) {
+            throw new WhopApiException("Failed to deserialize response: " + e.getMessage(), e);
         } catch (IOException e) {
             throw new WhopApiException("Network error executing HTTP request", e);
         }

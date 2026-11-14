@@ -85,7 +85,6 @@ public final class UpdateDisputesRequestEvidenceRefundPolicyAttachment {
 
         private Optional<String> id = Optional.empty();
 
-        @JsonAnySetter
         private Map<String, Object> additionalProperties = new HashMap<>();
 
         private Builder() {}
@@ -126,6 +125,14 @@ public final class UpdateDisputesRequestEvidenceRefundPolicyAttachment {
 
         public UpdateDisputesRequestEvidenceRefundPolicyAttachment build() {
             return new UpdateDisputesRequestEvidenceRefundPolicyAttachment(directUploadId, id, additionalProperties);
+        }
+
+        @JsonAnySetter
+        private void putAdditionalPropertyFromJson(String key, Object value) {
+            if (key.equalsIgnoreCase("direct_upload_id") || key.equalsIgnoreCase("id")) {
+                return;
+            }
+            this.additionalProperties.put(key, value);
         }
 
         public Builder additionalProperty(String key, Object value) {

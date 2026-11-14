@@ -62,7 +62,7 @@ public final class CreateTeamMembersRequest {
     }
 
     /**
-     * @return The system role to grant.
+     * @return The system role to grant. Custom roles cannot be granted through the API. The Partner role provides view-only access.
      */
     @JsonProperty("role")
     public CreateTeamMembersRequestRole getRole() {
@@ -120,7 +120,7 @@ public final class CreateTeamMembersRequest {
 
     public interface RoleStage {
         /**
-         * <p>The system role to grant.</p>
+         * <p>The system role to grant. Custom roles cannot be granted through the API. The Partner role provides view-only access.</p>
          */
         _FinalStage role(@NotNull CreateTeamMembersRequestRole role);
     }
@@ -157,7 +157,6 @@ public final class CreateTeamMembersRequest {
 
         private Optional<String> email = Optional.empty();
 
-        @JsonAnySetter
         private Map<String, Object> additionalProperties = new HashMap<>();
 
         private Builder() {}
@@ -173,7 +172,6 @@ public final class CreateTeamMembersRequest {
 
         /**
          * <p>Account ID, prefixed <code>biz_</code>.</p>
-         * <p>Account ID, prefixed <code>biz_</code>.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
@@ -184,8 +182,7 @@ public final class CreateTeamMembersRequest {
         }
 
         /**
-         * <p>The system role to grant.</p>
-         * <p>The system role to grant.</p>
+         * <p>The system role to grant. Custom roles cannot be granted through the API. The Partner role provides view-only access.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
@@ -238,6 +235,17 @@ public final class CreateTeamMembersRequest {
         @java.lang.Override
         public CreateTeamMembersRequest build() {
             return new CreateTeamMembersRequest(accountId, email, role, userId, additionalProperties);
+        }
+
+        @JsonAnySetter
+        private void putAdditionalPropertyFromJson(String key, Object value) {
+            if (key.equalsIgnoreCase("account_id")
+                    || key.equalsIgnoreCase("email")
+                    || key.equalsIgnoreCase("role")
+                    || key.equalsIgnoreCase("user_id")) {
+                return;
+            }
+            this.additionalProperties.put(key, value);
         }
 
         @java.lang.Override

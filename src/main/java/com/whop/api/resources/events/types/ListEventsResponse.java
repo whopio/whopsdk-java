@@ -102,7 +102,6 @@ public final class ListEventsResponse {
 
         private List<ListEventsResponseDataItem> data = new ArrayList<>();
 
-        @JsonAnySetter
         private Map<String, Object> additionalProperties = new HashMap<>();
 
         private Builder() {}
@@ -148,6 +147,14 @@ public final class ListEventsResponse {
         @java.lang.Override
         public ListEventsResponse build() {
             return new ListEventsResponse(data, pageInfo, additionalProperties);
+        }
+
+        @JsonAnySetter
+        private void putAdditionalPropertyFromJson(String key, Object value) {
+            if (key.equalsIgnoreCase("data") || key.equalsIgnoreCase("page_info")) {
+                return;
+            }
+            this.additionalProperties.put(key, value);
         }
 
         @java.lang.Override

@@ -113,7 +113,6 @@ public final class ListEventsResponseDataItemRelatedProduct {
 
         private Optional<String> title = Optional.empty();
 
-        @JsonAnySetter
         private Map<String, Object> additionalProperties = new HashMap<>();
 
         private Builder() {}
@@ -182,6 +181,14 @@ public final class ListEventsResponseDataItemRelatedProduct {
 
         public ListEventsResponseDataItemRelatedProduct build() {
             return new ListEventsResponseDataItemRelatedProduct(id, route, title, additionalProperties);
+        }
+
+        @JsonAnySetter
+        private void putAdditionalPropertyFromJson(String key, Object value) {
+            if (key.equalsIgnoreCase("id") || key.equalsIgnoreCase("route") || key.equalsIgnoreCase("title")) {
+                return;
+            }
+            this.additionalProperties.put(key, value);
         }
 
         public Builder additionalProperty(String key, Object value) {

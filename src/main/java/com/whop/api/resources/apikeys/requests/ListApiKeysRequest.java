@@ -74,7 +74,7 @@ public final class ListApiKeysRequest {
     }
 
     /**
-     * @return The account (<code>biz_</code>) or app (<code>app_</code>) tag to list API keys for.
+     * @return The account (<code>biz_</code>), app (<code>app_</code>), or your own user (<code>user_</code>) tag to list API keys for.
      */
     @JsonProperty("resource_id")
     public String getResourceId() {
@@ -106,7 +106,7 @@ public final class ListApiKeysRequest {
     }
 
     /**
-     * @return The number of API keys to return (default 20, max 100).
+     * @return Number of results to return from the start of the range.
      */
     @JsonProperty("first")
     public Optional<Integer> getFirst() {
@@ -114,7 +114,7 @@ public final class ListApiKeysRequest {
     }
 
     /**
-     * @return A cursor; returns API keys after this position.
+     * @return Return results after this cursor. Use <code>page_info.end_cursor</code> from the previous response to fetch the next page.
      */
     @JsonProperty("after")
     public Optional<String> getAfter() {
@@ -122,7 +122,7 @@ public final class ListApiKeysRequest {
     }
 
     /**
-     * @return The number of API keys to return from the end of the range.
+     * @return Number of results to return from the end of the range.
      */
     @JsonProperty("last")
     public Optional<Integer> getLast() {
@@ -130,7 +130,7 @@ public final class ListApiKeysRequest {
     }
 
     /**
-     * @return A cursor; returns API keys before this position.
+     * @return Return results before this cursor. Use <code>page_info.start_cursor</code> from the previous response to fetch the previous page.
      */
     @JsonProperty("before")
     public Optional<String> getBefore() {
@@ -203,7 +203,7 @@ public final class ListApiKeysRequest {
 
     public interface ResourceIdStage {
         /**
-         * <p>The account (<code>biz_</code>) or app (<code>app_</code>) tag to list API keys for.</p>
+         * <p>The account (<code>biz_</code>), app (<code>app_</code>), or your own user (<code>user_</code>) tag to list API keys for.</p>
          */
         ResourceTypeStage resourceId(@NotNull String resourceId);
 
@@ -239,28 +239,28 @@ public final class ListApiKeysRequest {
         _FinalStage createdAfter(ListApiKeysRequestCreatedAfter createdAfter);
 
         /**
-         * <p>The number of API keys to return (default 20, max 100).</p>
+         * <p>Number of results to return from the start of the range.</p>
          */
         _FinalStage first(Optional<Integer> first);
 
         _FinalStage first(Integer first);
 
         /**
-         * <p>A cursor; returns API keys after this position.</p>
+         * <p>Return results after this cursor. Use <code>page_info.end_cursor</code> from the previous response to fetch the next page.</p>
          */
         _FinalStage after(Optional<String> after);
 
         _FinalStage after(String after);
 
         /**
-         * <p>The number of API keys to return from the end of the range.</p>
+         * <p>Number of results to return from the end of the range.</p>
          */
         _FinalStage last(Optional<Integer> last);
 
         _FinalStage last(Integer last);
 
         /**
-         * <p>A cursor; returns API keys before this position.</p>
+         * <p>Return results before this cursor. Use <code>page_info.start_cursor</code> from the previous response to fetch the previous page.</p>
          */
         _FinalStage before(Optional<String> before);
 
@@ -303,7 +303,6 @@ public final class ListApiKeysRequest {
 
         private Optional<ListApiKeysRequestCreatedBefore> createdBefore = Optional.empty();
 
-        @JsonAnySetter
         private Map<String, Object> additionalProperties = new HashMap<>();
 
         private Builder() {}
@@ -324,8 +323,7 @@ public final class ListApiKeysRequest {
         }
 
         /**
-         * <p>The account (<code>biz_</code>) or app (<code>app_</code>) tag to list API keys for.</p>
-         * <p>The account (<code>biz_</code>) or app (<code>app_</code>) tag to list API keys for.</p>
+         * <p>The account (<code>biz_</code>), app (<code>app_</code>), or your own user (<code>user_</code>) tag to list API keys for.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
@@ -336,7 +334,6 @@ public final class ListApiKeysRequest {
         }
 
         /**
-         * <p>The type of resource that owns the API keys.</p>
          * <p>The type of resource that owns the API keys.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
@@ -388,7 +385,7 @@ public final class ListApiKeysRequest {
         }
 
         /**
-         * <p>A cursor; returns API keys before this position.</p>
+         * <p>Return results before this cursor. Use <code>page_info.start_cursor</code> from the previous response to fetch the previous page.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
@@ -398,7 +395,7 @@ public final class ListApiKeysRequest {
         }
 
         /**
-         * <p>A cursor; returns API keys before this position.</p>
+         * <p>Return results before this cursor. Use <code>page_info.start_cursor</code> from the previous response to fetch the previous page.</p>
          */
         @java.lang.Override
         @JsonSetter(value = "before", nulls = Nulls.SKIP)
@@ -408,7 +405,7 @@ public final class ListApiKeysRequest {
         }
 
         /**
-         * <p>The number of API keys to return from the end of the range.</p>
+         * <p>Number of results to return from the end of the range.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
@@ -418,7 +415,7 @@ public final class ListApiKeysRequest {
         }
 
         /**
-         * <p>The number of API keys to return from the end of the range.</p>
+         * <p>Number of results to return from the end of the range.</p>
          */
         @java.lang.Override
         @JsonSetter(value = "last", nulls = Nulls.SKIP)
@@ -428,7 +425,7 @@ public final class ListApiKeysRequest {
         }
 
         /**
-         * <p>A cursor; returns API keys after this position.</p>
+         * <p>Return results after this cursor. Use <code>page_info.end_cursor</code> from the previous response to fetch the next page.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
@@ -438,7 +435,7 @@ public final class ListApiKeysRequest {
         }
 
         /**
-         * <p>A cursor; returns API keys after this position.</p>
+         * <p>Return results after this cursor. Use <code>page_info.end_cursor</code> from the previous response to fetch the next page.</p>
          */
         @java.lang.Override
         @JsonSetter(value = "after", nulls = Nulls.SKIP)
@@ -448,7 +445,7 @@ public final class ListApiKeysRequest {
         }
 
         /**
-         * <p>The number of API keys to return (default 20, max 100).</p>
+         * <p>Number of results to return from the start of the range.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
@@ -458,7 +455,7 @@ public final class ListApiKeysRequest {
         }
 
         /**
-         * <p>The number of API keys to return (default 20, max 100).</p>
+         * <p>Number of results to return from the start of the range.</p>
          */
         @java.lang.Override
         @JsonSetter(value = "first", nulls = Nulls.SKIP)
@@ -521,6 +518,23 @@ public final class ListApiKeysRequest {
                     order,
                     direction,
                     additionalProperties);
+        }
+
+        @JsonAnySetter
+        private void putAdditionalPropertyFromJson(String key, Object value) {
+            if (key.equalsIgnoreCase("resource_id")
+                    || key.equalsIgnoreCase("resource_type")
+                    || key.equalsIgnoreCase("created_before")
+                    || key.equalsIgnoreCase("created_after")
+                    || key.equalsIgnoreCase("first")
+                    || key.equalsIgnoreCase("after")
+                    || key.equalsIgnoreCase("last")
+                    || key.equalsIgnoreCase("before")
+                    || key.equalsIgnoreCase("order")
+                    || key.equalsIgnoreCase("direction")) {
+                return;
+            }
+            this.additionalProperties.put(key, value);
         }
 
         @java.lang.Override

@@ -421,7 +421,6 @@ public final class UpdateCourseLessonsRequest {
 
         private Optional<LessonVisibilities> visibility = Optional.empty();
 
-        @JsonAnySetter
         private Map<String, Object> additionalProperties = new HashMap<>();
 
         private Builder() {}
@@ -817,6 +816,27 @@ public final class UpdateCourseLessonsRequest {
                     title,
                     visibility,
                     additionalProperties);
+        }
+
+        @JsonAnySetter
+        private void putAdditionalPropertyFromJson(String key, Object value) {
+            if (key.equalsIgnoreCase("assessment_completion_requirement")
+                    || key.equalsIgnoreCase("assessment_questions")
+                    || key.equalsIgnoreCase("attachments")
+                    || key.equalsIgnoreCase("content")
+                    || key.equalsIgnoreCase("days_from_course_start_until_unlock")
+                    || key.equalsIgnoreCase("embed_id")
+                    || key.equalsIgnoreCase("embed_type")
+                    || key.equalsIgnoreCase("lesson_type")
+                    || key.equalsIgnoreCase("main_pdf")
+                    || key.equalsIgnoreCase("max_attempts")
+                    || key.equalsIgnoreCase("mux_asset_id")
+                    || key.equalsIgnoreCase("thumbnail")
+                    || key.equalsIgnoreCase("title")
+                    || key.equalsIgnoreCase("visibility")) {
+                return;
+            }
+            this.additionalProperties.put(key, value);
         }
 
         public Builder additionalProperty(String key, Object value) {

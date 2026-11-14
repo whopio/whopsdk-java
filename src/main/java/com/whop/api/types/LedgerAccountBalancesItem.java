@@ -155,7 +155,6 @@ public final class LedgerAccountBalancesItem {
 
         private double reserveBalance;
 
-        @JsonAnySetter
         private Map<String, Object> additionalProperties = new HashMap<>();
 
         private Builder() {}
@@ -171,7 +170,6 @@ public final class LedgerAccountBalancesItem {
 
         /**
          * <p>The amount of the balance.</p>
-         * <p>The amount of the balance.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
@@ -182,7 +180,6 @@ public final class LedgerAccountBalancesItem {
         }
 
         /**
-         * <p>The currency of the balance.</p>
          * <p>The currency of the balance.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
@@ -195,7 +192,6 @@ public final class LedgerAccountBalancesItem {
 
         /**
          * <p>The amount of the balance that is pending.</p>
-         * <p>The amount of the balance that is pending.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
@@ -206,7 +202,6 @@ public final class LedgerAccountBalancesItem {
         }
 
         /**
-         * <p>The amount of the balance that is reserved.</p>
          * <p>The amount of the balance that is reserved.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
@@ -221,6 +216,17 @@ public final class LedgerAccountBalancesItem {
         public LedgerAccountBalancesItem build() {
             return new LedgerAccountBalancesItem(
                     balance, currency, pendingBalance, reserveBalance, additionalProperties);
+        }
+
+        @JsonAnySetter
+        private void putAdditionalPropertyFromJson(String key, Object value) {
+            if (key.equalsIgnoreCase("balance")
+                    || key.equalsIgnoreCase("currency")
+                    || key.equalsIgnoreCase("pending_balance")
+                    || key.equalsIgnoreCase("reserve_balance")) {
+                return;
+            }
+            this.additionalProperties.put(key, value);
         }
 
         @java.lang.Override

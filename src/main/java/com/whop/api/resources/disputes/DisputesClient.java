@@ -6,13 +6,12 @@ package com.whop.api.resources.disputes;
 import com.whop.api.core.ClientOptions;
 import com.whop.api.core.RequestOptions;
 import com.whop.api.core.pagination.SyncPagingIterable;
+import com.whop.api.resources.disputes.requests.AcceptDisputesRequest;
 import com.whop.api.resources.disputes.requests.ListDisputesRequest;
 import com.whop.api.resources.disputes.requests.RetrieveDisputesRequest;
 import com.whop.api.resources.disputes.requests.SubmitDisputesRequest;
-import com.whop.api.resources.disputes.requests.SubmitEvidenceDisputeRequest;
 import com.whop.api.resources.disputes.requests.SummaryDisputesRequest;
 import com.whop.api.resources.disputes.requests.UpdateDisputesRequest;
-import com.whop.api.resources.disputes.requests.UpdateEvidenceDisputeRequest;
 import com.whop.api.resources.disputes.requests.UploadEvidenceDisputesRequest;
 import com.whop.api.resources.disputes.types.SummaryDisputesResponse;
 import com.whop.api.types.Dispute;
@@ -119,216 +118,98 @@ public class DisputesClient {
     }
 
     /**
-     * Edits a dispute's evidence, while it is still editable. Sending it is a separate call.
+     * Edits a dispute's evidence while it is still editable. When the evidence is ready, send it to the payment processor with <code>POST /disputes/:id/submit</code>.
      */
     public Dispute update(String id) {
         return this.rawClient.update(id).body();
     }
 
     /**
-     * Edits a dispute's evidence, while it is still editable. Sending it is a separate call.
+     * Edits a dispute's evidence while it is still editable. When the evidence is ready, send it to the payment processor with <code>POST /disputes/:id/submit</code>.
      */
     public Dispute update(String id, RequestOptions requestOptions) {
         return this.rawClient.update(id, requestOptions).body();
     }
 
     /**
-     * Edits a dispute's evidence, while it is still editable. Sending it is a separate call.
+     * Edits a dispute's evidence while it is still editable. When the evidence is ready, send it to the payment processor with <code>POST /disputes/:id/submit</code>.
      */
     public Dispute update(String id, UpdateDisputesRequest request) {
         return this.rawClient.update(id, request).body();
     }
 
     /**
-     * Edits a dispute's evidence, while it is still editable. Sending it is a separate call.
+     * Edits a dispute's evidence while it is still editable. When the evidence is ready, send it to the payment processor with <code>POST /disputes/:id/submit</code>.
      */
     public Dispute update(String id, UpdateDisputesRequest request, RequestOptions requestOptions) {
         return this.rawClient.update(id, request, requestOptions).body();
     }
 
     /**
-     * Sends a dispute's evidence to the payment processor. This is final — it cannot be edited or sent again.
+     * Accepts a chargeback, conceding it to the customer instead of contesting it. The payment processor closes the dispute as <code>lost</code>. This is final — the dispute cannot be contested afterwards. Only a dispute whose <code>acceptable</code> is true can be accepted.
+     */
+    public Dispute accept(String id) {
+        return this.rawClient.accept(id).body();
+    }
+
+    /**
+     * Accepts a chargeback, conceding it to the customer instead of contesting it. The payment processor closes the dispute as <code>lost</code>. This is final — the dispute cannot be contested afterwards. Only a dispute whose <code>acceptable</code> is true can be accepted.
+     */
+    public Dispute accept(String id, RequestOptions requestOptions) {
+        return this.rawClient.accept(id, requestOptions).body();
+    }
+
+    /**
+     * Accepts a chargeback, conceding it to the customer instead of contesting it. The payment processor closes the dispute as <code>lost</code>. This is final — the dispute cannot be contested afterwards. Only a dispute whose <code>acceptable</code> is true can be accepted.
+     */
+    public Dispute accept(String id, AcceptDisputesRequest request) {
+        return this.rawClient.accept(id, request).body();
+    }
+
+    /**
+     * Accepts a chargeback, conceding it to the customer instead of contesting it. The payment processor closes the dispute as <code>lost</code>. This is final — the dispute cannot be contested afterwards. Only a dispute whose <code>acceptable</code> is true can be accepted.
+     */
+    public Dispute accept(String id, AcceptDisputesRequest request, RequestOptions requestOptions) {
+        return this.rawClient.accept(id, request, requestOptions).body();
+    }
+
+    /**
+     * Sends a dispute's evidence to the payment processor. The packet is checked against the processor's limits first, so a file over a cap is refused here with the file and the limit named. Otherwise the dispute is returned as <code>generating_response</code> with its evidence locked and the filing completes in the background: the dispute moves to <code>under_review</code> with <code>evidence_submitted_at</code> set once the processor accepts it, or back to <code>needs_response</code> with <code>submission_failure_reason</code> set when the processor refuses it, so it can be fixed and sent again before <code>evidence_due_at</code>. Either move is sent as <code>dispute.updated</code>.
      */
     public Dispute submit(String id) {
         return this.rawClient.submit(id).body();
     }
 
     /**
-     * Sends a dispute's evidence to the payment processor. This is final — it cannot be edited or sent again.
+     * Sends a dispute's evidence to the payment processor. The packet is checked against the processor's limits first, so a file over a cap is refused here with the file and the limit named. Otherwise the dispute is returned as <code>generating_response</code> with its evidence locked and the filing completes in the background: the dispute moves to <code>under_review</code> with <code>evidence_submitted_at</code> set once the processor accepts it, or back to <code>needs_response</code> with <code>submission_failure_reason</code> set when the processor refuses it, so it can be fixed and sent again before <code>evidence_due_at</code>. Either move is sent as <code>dispute.updated</code>.
      */
     public Dispute submit(String id, RequestOptions requestOptions) {
         return this.rawClient.submit(id, requestOptions).body();
     }
 
     /**
-     * Sends a dispute's evidence to the payment processor. This is final — it cannot be edited or sent again.
+     * Sends a dispute's evidence to the payment processor. The packet is checked against the processor's limits first, so a file over a cap is refused here with the file and the limit named. Otherwise the dispute is returned as <code>generating_response</code> with its evidence locked and the filing completes in the background: the dispute moves to <code>under_review</code> with <code>evidence_submitted_at</code> set once the processor accepts it, or back to <code>needs_response</code> with <code>submission_failure_reason</code> set when the processor refuses it, so it can be fixed and sent again before <code>evidence_due_at</code>. Either move is sent as <code>dispute.updated</code>.
      */
     public Dispute submit(String id, SubmitDisputesRequest request) {
         return this.rawClient.submit(id, request).body();
     }
 
     /**
-     * Sends a dispute's evidence to the payment processor. This is final — it cannot be edited or sent again.
+     * Sends a dispute's evidence to the payment processor. The packet is checked against the processor's limits first, so a file over a cap is refused here with the file and the limit named. Otherwise the dispute is returned as <code>generating_response</code> with its evidence locked and the filing completes in the background: the dispute moves to <code>under_review</code> with <code>evidence_submitted_at</code> set once the processor accepts it, or back to <code>needs_response</code> with <code>submission_failure_reason</code> set when the processor refuses it, so it can be fixed and sent again before <code>evidence_due_at</code>. Either move is sent as <code>dispute.updated</code>.
      */
     public Dispute submit(String id, SubmitDisputesRequest request, RequestOptions requestOptions) {
         return this.rawClient.submit(id, request, requestOptions).body();
     }
 
     /**
-     * Submit a payment dispute to the payment processor for review. Once submitted, no further edits can be made.
-     * <p>Required permissions:</p>
-     * <ul>
-     * <li><code>payment:dispute</code></li>
-     * <li><code>plan:basic:read</code></li>
-     * <li><code>access_pass:basic:read</code></li>
-     * <li><code>company:basic:read</code></li>
-     * <li><code>payment:basic:read</code></li>
-     * <li><code>member:email:read</code></li>
-     * <li><code>member:basic:read</code></li>
-     * <li><code>member:phone:read</code></li>
-     * </ul>
-     */
-    public Dispute submitEvidenceDispute(String id) {
-        return this.rawClient.submitEvidenceDispute(id).body();
-    }
-
-    /**
-     * Submit a payment dispute to the payment processor for review. Once submitted, no further edits can be made.
-     * <p>Required permissions:</p>
-     * <ul>
-     * <li><code>payment:dispute</code></li>
-     * <li><code>plan:basic:read</code></li>
-     * <li><code>access_pass:basic:read</code></li>
-     * <li><code>company:basic:read</code></li>
-     * <li><code>payment:basic:read</code></li>
-     * <li><code>member:email:read</code></li>
-     * <li><code>member:basic:read</code></li>
-     * <li><code>member:phone:read</code></li>
-     * </ul>
-     */
-    public Dispute submitEvidenceDispute(String id, RequestOptions requestOptions) {
-        return this.rawClient.submitEvidenceDispute(id, requestOptions).body();
-    }
-
-    /**
-     * Submit a payment dispute to the payment processor for review. Once submitted, no further edits can be made.
-     * <p>Required permissions:</p>
-     * <ul>
-     * <li><code>payment:dispute</code></li>
-     * <li><code>plan:basic:read</code></li>
-     * <li><code>access_pass:basic:read</code></li>
-     * <li><code>company:basic:read</code></li>
-     * <li><code>payment:basic:read</code></li>
-     * <li><code>member:email:read</code></li>
-     * <li><code>member:basic:read</code></li>
-     * <li><code>member:phone:read</code></li>
-     * </ul>
-     */
-    public Dispute submitEvidenceDispute(String id, SubmitEvidenceDisputeRequest request) {
-        return this.rawClient.submitEvidenceDispute(id, request).body();
-    }
-
-    /**
-     * Submit a payment dispute to the payment processor for review. Once submitted, no further edits can be made.
-     * <p>Required permissions:</p>
-     * <ul>
-     * <li><code>payment:dispute</code></li>
-     * <li><code>plan:basic:read</code></li>
-     * <li><code>access_pass:basic:read</code></li>
-     * <li><code>company:basic:read</code></li>
-     * <li><code>payment:basic:read</code></li>
-     * <li><code>member:email:read</code></li>
-     * <li><code>member:basic:read</code></li>
-     * <li><code>member:phone:read</code></li>
-     * </ul>
-     */
-    public Dispute submitEvidenceDispute(
-            String id, SubmitEvidenceDisputeRequest request, RequestOptions requestOptions) {
-        return this.rawClient.submitEvidenceDispute(id, request, requestOptions).body();
-    }
-
-    /**
-     * Update a dispute with evidence data to attempt to win the dispute.
-     * <p>Required permissions:</p>
-     * <ul>
-     * <li><code>payment:dispute</code></li>
-     * <li><code>plan:basic:read</code></li>
-     * <li><code>access_pass:basic:read</code></li>
-     * <li><code>company:basic:read</code></li>
-     * <li><code>payment:basic:read</code></li>
-     * <li><code>member:email:read</code></li>
-     * <li><code>member:basic:read</code></li>
-     * <li><code>member:phone:read</code></li>
-     * </ul>
-     */
-    public Dispute updateEvidenceDispute(String id) {
-        return this.rawClient.updateEvidenceDispute(id).body();
-    }
-
-    /**
-     * Update a dispute with evidence data to attempt to win the dispute.
-     * <p>Required permissions:</p>
-     * <ul>
-     * <li><code>payment:dispute</code></li>
-     * <li><code>plan:basic:read</code></li>
-     * <li><code>access_pass:basic:read</code></li>
-     * <li><code>company:basic:read</code></li>
-     * <li><code>payment:basic:read</code></li>
-     * <li><code>member:email:read</code></li>
-     * <li><code>member:basic:read</code></li>
-     * <li><code>member:phone:read</code></li>
-     * </ul>
-     */
-    public Dispute updateEvidenceDispute(String id, RequestOptions requestOptions) {
-        return this.rawClient.updateEvidenceDispute(id, requestOptions).body();
-    }
-
-    /**
-     * Update a dispute with evidence data to attempt to win the dispute.
-     * <p>Required permissions:</p>
-     * <ul>
-     * <li><code>payment:dispute</code></li>
-     * <li><code>plan:basic:read</code></li>
-     * <li><code>access_pass:basic:read</code></li>
-     * <li><code>company:basic:read</code></li>
-     * <li><code>payment:basic:read</code></li>
-     * <li><code>member:email:read</code></li>
-     * <li><code>member:basic:read</code></li>
-     * <li><code>member:phone:read</code></li>
-     * </ul>
-     */
-    public Dispute updateEvidenceDispute(String id, UpdateEvidenceDisputeRequest request) {
-        return this.rawClient.updateEvidenceDispute(id, request).body();
-    }
-
-    /**
-     * Update a dispute with evidence data to attempt to win the dispute.
-     * <p>Required permissions:</p>
-     * <ul>
-     * <li><code>payment:dispute</code></li>
-     * <li><code>plan:basic:read</code></li>
-     * <li><code>access_pass:basic:read</code></li>
-     * <li><code>company:basic:read</code></li>
-     * <li><code>payment:basic:read</code></li>
-     * <li><code>member:email:read</code></li>
-     * <li><code>member:basic:read</code></li>
-     * <li><code>member:phone:read</code></li>
-     * </ul>
-     */
-    public Dispute updateEvidenceDispute(
-            String id, UpdateEvidenceDisputeRequest request, RequestOptions requestOptions) {
-        return this.rawClient.updateEvidenceDispute(id, request, requestOptions).body();
-    }
-
-    /**
-     * Replaces the full set of uploaded evidence documents on a dispute, beyond the four fixed evidence slots. Send the files as multipart file parts to upload and attach in one call, or reference files already stored by <code>id</code>/<code>direct_upload_id</code>. Send every document the packet should carry — up to 10, 10MB each and 25MB in total; an empty list removes them all. Accepted content types: application/pdf, application/json, image/jpeg, image/png, image/webp — any other type is rejected.
+     * Replaces the full set of uploaded evidence documents on a dispute, beyond the four fixed evidence slots. Prefer <code>PATCH /disputes/:id</code> with <code>evidence.documents</code>, which does the same replace alongside every other evidence field in one call.
      */
     public Dispute uploadEvidence(String id, UploadEvidenceDisputesRequest request) {
         return this.rawClient.uploadEvidence(id, request).body();
     }
 
     /**
-     * Replaces the full set of uploaded evidence documents on a dispute, beyond the four fixed evidence slots. Send the files as multipart file parts to upload and attach in one call, or reference files already stored by <code>id</code>/<code>direct_upload_id</code>. Send every document the packet should carry — up to 10, 10MB each and 25MB in total; an empty list removes them all. Accepted content types: application/pdf, application/json, image/jpeg, image/png, image/webp — any other type is rejected.
+     * Replaces the full set of uploaded evidence documents on a dispute, beyond the four fixed evidence slots. Prefer <code>PATCH /disputes/:id</code> with <code>evidence.documents</code>, which does the same replace alongside every other evidence field in one call.
      */
     public Dispute uploadEvidence(String id, UploadEvidenceDisputesRequest request, RequestOptions requestOptions) {
         return this.rawClient.uploadEvidence(id, request, requestOptions).body();

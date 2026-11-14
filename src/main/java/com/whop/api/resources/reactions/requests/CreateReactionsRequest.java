@@ -159,7 +159,6 @@ public final class CreateReactionsRequest {
 
         private Optional<String> emoji = Optional.empty();
 
-        @JsonAnySetter
         private Map<String, Object> additionalProperties = new HashMap<>();
 
         private Builder() {}
@@ -173,7 +172,6 @@ public final class CreateReactionsRequest {
         }
 
         /**
-         * <p>The unique identifier of the message or forum post to react to.</p>
          * <p>The unique identifier of the message or forum post to react to.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
@@ -259,6 +257,16 @@ public final class CreateReactionsRequest {
         @java.lang.Override
         public CreateReactionsRequest build() {
             return new CreateReactionsRequest(emoji, pollOptionId, resourceId, additionalProperties);
+        }
+
+        @JsonAnySetter
+        private void putAdditionalPropertyFromJson(String key, Object value) {
+            if (key.equalsIgnoreCase("emoji")
+                    || key.equalsIgnoreCase("poll_option_id")
+                    || key.equalsIgnoreCase("resource_id")) {
+                return;
+            }
+            this.additionalProperties.put(key, value);
         }
 
         @java.lang.Override

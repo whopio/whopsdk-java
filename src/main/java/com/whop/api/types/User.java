@@ -31,11 +31,21 @@ public final class User {
 
     private final Optional<UserBalanceHistory> balanceHistory;
 
+    private final List<AccountBalanceToken> balances;
+
     private final Optional<UserBanner> banner;
 
     private final Optional<String> bio;
 
+    private final Optional<AccountCards> cards;
+
+    private final Optional<String> city;
+
+    private final Optional<String> country;
+
     private final String createdAt;
+
+    private final Optional<String> dateOfBirth;
 
     private final Optional<UserEarnings> earningsUsd;
 
@@ -43,13 +53,19 @@ public final class User {
 
     private final String id;
 
+    private final Optional<OwnerLevel> level;
+
     private final Optional<String> name;
 
     private final UserProfilePicture profilePicture;
 
-    private final List<SocialAccount> socialAccounts;
+    private final List<UserSocialLink> socialLinks;
 
-    private final Optional<UserStaffAccess> staff;
+    private final Optional<String> state;
+
+    private final Optional<String> totalUsd;
+
+    private final Optional<TradingAccount> trading;
 
     private final String username;
 
@@ -57,45 +73,69 @@ public final class User {
 
     private final Optional<String> whopPartnerEnabledAt;
 
+    private final Optional<Integer> whopPartnerOnboardedAccountsCount;
+
+    private final Optional<String> whopPartnerVerifiedAt;
+
     private final Map<String, Object> additionalProperties;
 
     private User(
             Optional<UserBalance> balance,
             Optional<UserBalanceHistory> balanceHistory,
+            List<AccountBalanceToken> balances,
             Optional<UserBanner> banner,
             Optional<String> bio,
+            Optional<AccountCards> cards,
+            Optional<String> city,
+            Optional<String> country,
             String createdAt,
+            Optional<String> dateOfBirth,
             Optional<UserEarnings> earningsUsd,
             Optional<String> email,
             String id,
+            Optional<OwnerLevel> level,
             Optional<String> name,
             UserProfilePicture profilePicture,
-            List<SocialAccount> socialAccounts,
-            Optional<UserStaffAccess> staff,
+            List<UserSocialLink> socialLinks,
+            Optional<String> state,
+            Optional<String> totalUsd,
+            Optional<TradingAccount> trading,
             String username,
             Map<String, Object> verification,
             Optional<String> whopPartnerEnabledAt,
+            Optional<Integer> whopPartnerOnboardedAccountsCount,
+            Optional<String> whopPartnerVerifiedAt,
             Map<String, Object> additionalProperties) {
         this.balance = balance;
         this.balanceHistory = balanceHistory;
+        this.balances = balances;
         this.banner = banner;
         this.bio = bio;
+        this.cards = cards;
+        this.city = city;
+        this.country = country;
         this.createdAt = createdAt;
+        this.dateOfBirth = dateOfBirth;
         this.earningsUsd = earningsUsd;
         this.email = email;
         this.id = id;
+        this.level = level;
         this.name = name;
         this.profilePicture = profilePicture;
-        this.socialAccounts = socialAccounts;
-        this.staff = staff;
+        this.socialLinks = socialLinks;
+        this.state = state;
+        this.totalUsd = totalUsd;
+        this.trading = trading;
         this.username = username;
         this.verification = verification;
         this.whopPartnerEnabledAt = whopPartnerEnabledAt;
+        this.whopPartnerOnboardedAccountsCount = whopPartnerOnboardedAccountsCount;
+        this.whopPartnerVerifiedAt = whopPartnerVerifiedAt;
         this.additionalProperties = additionalProperties;
     }
 
     /**
-     * @return The user's balance: personal cash + crypto + in-flight treasury deposits, plus account balances for accounts they own. Computed only on the self view (retrieved with the reserved id <code>me</code>) for callers with balance-read scope; <code>null</code> otherwise.
+     * @return The user's balance: personal cash + other holdings + deposits still in flight, plus account balances for accounts they own. Computed only on the self view (retrieved with the reserved id <code>me</code>) for callers with balance-read scope; <code>null</code> otherwise, or when <code>include_balance=false</code>.
      */
     @JsonIgnore
     public Optional<UserBalance> getBalance() {
@@ -114,6 +154,11 @@ public final class User {
             return Optional.empty();
         }
         return balanceHistory;
+    }
+
+    @JsonProperty("balances")
+    public List<AccountBalanceToken> getBalances() {
+        return balances;
     }
 
     /**
@@ -139,6 +184,39 @@ public final class User {
     }
 
     /**
+     * @return Where the user's personal card application stands. Populated only on the self view (retrieved with the reserved id <code>me</code>) for callers with balance-read scope; <code>null</code> otherwise, or when the user has never applied for a card.
+     */
+    @JsonIgnore
+    public Optional<AccountCards> getCards() {
+        if (cards == null) {
+            return Optional.empty();
+        }
+        return cards;
+    }
+
+    /**
+     * @return The user's city, derived from their IP address. <code>null</code> when unknown or the user turned off location sharing.
+     */
+    @JsonIgnore
+    public Optional<String> getCity() {
+        if (city == null) {
+            return Optional.empty();
+        }
+        return city;
+    }
+
+    /**
+     * @return The user's country as an ISO 3166-1 alpha-2 code, derived from their IP address. <code>null</code> when unknown or the user turned off location sharing.
+     */
+    @JsonIgnore
+    public Optional<String> getCountry() {
+        if (country == null) {
+            return Optional.empty();
+        }
+        return country;
+    }
+
+    /**
      * @return When the user was created, as an ISO 8601 timestamp
      */
     @JsonProperty("created_at")
@@ -147,7 +225,18 @@ public final class User {
     }
 
     /**
-     * @return The user's gross USD income over time. Populated only on single-user self reads for callers with balance-read scope; <code>null</code> otherwise.
+     * @return The user's date of birth as an ISO 8601 date, like <code>1998-04-23</code>. Populated only on the self view (retrieved with the reserved id <code>me</code>) for callers with email-read scope; <code>null</code> otherwise, or when the user has not set one.
+     */
+    @JsonIgnore
+    public Optional<String> getDateOfBirth() {
+        if (dateOfBirth == null) {
+            return Optional.empty();
+        }
+        return dateOfBirth;
+    }
+
+    /**
+     * @return The user's gross USD income over time, including a Partner commission breakdown. Populated only on single-user self reads for callers with balance-read scope; <code>null</code> otherwise.
      */
     @JsonIgnore
     public Optional<UserEarnings> getEarningsUsd() {
@@ -177,6 +266,17 @@ public final class User {
     }
 
     /**
+     * @return The user's Whop Levels progress, counted across every account they own. Populated only on the self view (retrieved with the reserved id <code>me</code>) for callers with balance-read scope; <code>null</code> otherwise, and when none of their accounts are in Whop Levels.
+     */
+    @JsonIgnore
+    public Optional<OwnerLevel> getLevel() {
+        if (level == null) {
+            return Optional.empty();
+        }
+        return level;
+    }
+
+    /**
      * @return The user's display name
      */
     @JsonIgnore
@@ -188,27 +288,49 @@ public final class User {
     }
 
     /**
-     * @return Avatar wrapper; its <code>url</code> is always present, using a generated placeholder when the user set no picture.
+     * @return Avatar wrapper. Its <code>url</code> is always present, and is a generated placeholder when the user set no picture.
      */
     @JsonProperty("profile_picture")
     public UserProfilePicture getProfilePicture() {
         return profilePicture;
     }
 
-    @JsonProperty("social_accounts")
-    public List<SocialAccount> getSocialAccounts() {
-        return socialAccounts;
+    @JsonProperty("social_links")
+    public List<UserSocialLink> getSocialLinks() {
+        return socialLinks;
     }
 
     /**
-     * @return Whop staff access flags. Populated only on the self view (retrieved with the reserved id <code>me</code>) for callers with staff-read scope; <code>null</code> there for every user who is not Whop staff, and always <code>null</code> elsewhere.
+     * @return The user's state or region, derived from their IP address. <code>null</code> when unknown or the user turned off location sharing.
      */
     @JsonIgnore
-    public Optional<UserStaffAccess> getStaff() {
-        if (staff == null) {
+    public Optional<String> getState() {
+        if (state == null) {
             return Optional.empty();
         }
-        return staff;
+        return state;
+    }
+
+    /**
+     * @return Total USD value of the user's personal holdings in <code>balances</code>, across those with known exchange rates. Computed only on the self view (retrieved with the reserved id <code>me</code>) for callers with balance-read scope; <code>null</code> otherwise, when <code>include_balance=false</code>, or when the balance source is unavailable.
+     */
+    @JsonIgnore
+    public Optional<String> getTotalUsd() {
+        if (totalUsd == null) {
+            return Optional.empty();
+        }
+        return totalUsd;
+    }
+
+    /**
+     * @return The trading account address, a snapshot of its margin and open positions, and its WebSocket subscriptions. Opt in with <code>include_trading=true</code> when retrieving <code>me</code>. <code>null</code> otherwise, without trading permission, or without an Ethereum wallet.
+     */
+    @JsonIgnore
+    public Optional<TradingAccount> getTrading() {
+        if (trading == null) {
+            return Optional.empty();
+        }
+        return trading;
     }
 
     /**
@@ -238,6 +360,28 @@ public final class User {
         return whopPartnerEnabledAt;
     }
 
+    /**
+     * @return Number of accounts the user referred to Whop as a Whop Partner that have processed more than $1 in volume attributed to the user. Populated only when retrieving a single user who is a Verified Whop Partner; <code>null</code> otherwise.
+     */
+    @JsonIgnore
+    public Optional<Integer> getWhopPartnerOnboardedAccountsCount() {
+        if (whopPartnerOnboardedAccountsCount == null) {
+            return Optional.empty();
+        }
+        return whopPartnerOnboardedAccountsCount;
+    }
+
+    /**
+     * @return When the user became a Verified Whop Partner, as an ISO 8601 timestamp. <code>null</code> for users who are not Verified Whop Partners, including partners who left the program and suspended users.
+     */
+    @JsonIgnore
+    public Optional<String> getWhopPartnerVerifiedAt() {
+        if (whopPartnerVerifiedAt == null) {
+            return Optional.empty();
+        }
+        return whopPartnerVerifiedAt;
+    }
+
     @JsonInclude(value = JsonInclude.Include.CUSTOM, valueFilter = NullableNonemptyFilter.class)
     @JsonProperty("balance")
     private Optional<UserBalance> _getBalance() {
@@ -263,6 +407,30 @@ public final class User {
     }
 
     @JsonInclude(value = JsonInclude.Include.CUSTOM, valueFilter = NullableNonemptyFilter.class)
+    @JsonProperty("cards")
+    private Optional<AccountCards> _getCards() {
+        return cards;
+    }
+
+    @JsonInclude(value = JsonInclude.Include.CUSTOM, valueFilter = NullableNonemptyFilter.class)
+    @JsonProperty("city")
+    private Optional<String> _getCity() {
+        return city;
+    }
+
+    @JsonInclude(value = JsonInclude.Include.CUSTOM, valueFilter = NullableNonemptyFilter.class)
+    @JsonProperty("country")
+    private Optional<String> _getCountry() {
+        return country;
+    }
+
+    @JsonInclude(value = JsonInclude.Include.CUSTOM, valueFilter = NullableNonemptyFilter.class)
+    @JsonProperty("date_of_birth")
+    private Optional<String> _getDateOfBirth() {
+        return dateOfBirth;
+    }
+
+    @JsonInclude(value = JsonInclude.Include.CUSTOM, valueFilter = NullableNonemptyFilter.class)
     @JsonProperty("earnings_usd")
     private Optional<UserEarnings> _getEarningsUsd() {
         return earningsUsd;
@@ -275,21 +443,51 @@ public final class User {
     }
 
     @JsonInclude(value = JsonInclude.Include.CUSTOM, valueFilter = NullableNonemptyFilter.class)
+    @JsonProperty("level")
+    private Optional<OwnerLevel> _getLevel() {
+        return level;
+    }
+
+    @JsonInclude(value = JsonInclude.Include.CUSTOM, valueFilter = NullableNonemptyFilter.class)
     @JsonProperty("name")
     private Optional<String> _getName() {
         return name;
     }
 
     @JsonInclude(value = JsonInclude.Include.CUSTOM, valueFilter = NullableNonemptyFilter.class)
-    @JsonProperty("staff")
-    private Optional<UserStaffAccess> _getStaff() {
-        return staff;
+    @JsonProperty("state")
+    private Optional<String> _getState() {
+        return state;
+    }
+
+    @JsonInclude(value = JsonInclude.Include.CUSTOM, valueFilter = NullableNonemptyFilter.class)
+    @JsonProperty("total_usd")
+    private Optional<String> _getTotalUsd() {
+        return totalUsd;
+    }
+
+    @JsonInclude(value = JsonInclude.Include.CUSTOM, valueFilter = NullableNonemptyFilter.class)
+    @JsonProperty("trading")
+    private Optional<TradingAccount> _getTrading() {
+        return trading;
     }
 
     @JsonInclude(value = JsonInclude.Include.CUSTOM, valueFilter = NullableNonemptyFilter.class)
     @JsonProperty("whop_partner_enabled_at")
     private Optional<String> _getWhopPartnerEnabledAt() {
         return whopPartnerEnabledAt;
+    }
+
+    @JsonInclude(value = JsonInclude.Include.CUSTOM, valueFilter = NullableNonemptyFilter.class)
+    @JsonProperty("whop_partner_onboarded_accounts_count")
+    private Optional<Integer> _getWhopPartnerOnboardedAccountsCount() {
+        return whopPartnerOnboardedAccountsCount;
+    }
+
+    @JsonInclude(value = JsonInclude.Include.CUSTOM, valueFilter = NullableNonemptyFilter.class)
+    @JsonProperty("whop_partner_verified_at")
+    private Optional<String> _getWhopPartnerVerifiedAt() {
+        return whopPartnerVerifiedAt;
     }
 
     @java.lang.Override
@@ -306,19 +504,29 @@ public final class User {
     private boolean equalTo(User other) {
         return balance.equals(other.balance)
                 && balanceHistory.equals(other.balanceHistory)
+                && balances.equals(other.balances)
                 && banner.equals(other.banner)
                 && bio.equals(other.bio)
+                && cards.equals(other.cards)
+                && city.equals(other.city)
+                && country.equals(other.country)
                 && createdAt.equals(other.createdAt)
+                && dateOfBirth.equals(other.dateOfBirth)
                 && earningsUsd.equals(other.earningsUsd)
                 && email.equals(other.email)
                 && id.equals(other.id)
+                && level.equals(other.level)
                 && name.equals(other.name)
                 && profilePicture.equals(other.profilePicture)
-                && socialAccounts.equals(other.socialAccounts)
-                && staff.equals(other.staff)
+                && socialLinks.equals(other.socialLinks)
+                && state.equals(other.state)
+                && totalUsd.equals(other.totalUsd)
+                && trading.equals(other.trading)
                 && username.equals(other.username)
                 && verification.equals(other.verification)
-                && whopPartnerEnabledAt.equals(other.whopPartnerEnabledAt);
+                && whopPartnerEnabledAt.equals(other.whopPartnerEnabledAt)
+                && whopPartnerOnboardedAccountsCount.equals(other.whopPartnerOnboardedAccountsCount)
+                && whopPartnerVerifiedAt.equals(other.whopPartnerVerifiedAt);
     }
 
     @java.lang.Override
@@ -326,19 +534,29 @@ public final class User {
         return Objects.hash(
                 this.balance,
                 this.balanceHistory,
+                this.balances,
                 this.banner,
                 this.bio,
+                this.cards,
+                this.city,
+                this.country,
                 this.createdAt,
+                this.dateOfBirth,
                 this.earningsUsd,
                 this.email,
                 this.id,
+                this.level,
                 this.name,
                 this.profilePicture,
-                this.socialAccounts,
-                this.staff,
+                this.socialLinks,
+                this.state,
+                this.totalUsd,
+                this.trading,
                 this.username,
                 this.verification,
-                this.whopPartnerEnabledAt);
+                this.whopPartnerEnabledAt,
+                this.whopPartnerOnboardedAccountsCount,
+                this.whopPartnerVerifiedAt);
     }
 
     @java.lang.Override
@@ -368,7 +586,7 @@ public final class User {
 
     public interface ProfilePictureStage {
         /**
-         * <p>Avatar wrapper; its <code>url</code> is always present, using a generated placeholder when the user set no picture.</p>
+         * <p>Avatar wrapper. Its <code>url</code> is always present, and is a generated placeholder when the user set no picture.</p>
          */
         UsernameStage profilePicture(@NotNull UserProfilePicture profilePicture);
     }
@@ -388,7 +606,7 @@ public final class User {
         _FinalStage additionalProperties(Map<String, Object> additionalProperties);
 
         /**
-         * <p>The user's balance: personal cash + crypto + in-flight treasury deposits, plus account balances for accounts they own. Computed only on the self view (retrieved with the reserved id <code>me</code>) for callers with balance-read scope; <code>null</code> otherwise.</p>
+         * <p>The user's balance: personal cash + other holdings + deposits still in flight, plus account balances for accounts they own. Computed only on the self view (retrieved with the reserved id <code>me</code>) for callers with balance-read scope; <code>null</code> otherwise, or when <code>include_balance=false</code>.</p>
          */
         _FinalStage balance(Optional<UserBalance> balance);
 
@@ -404,6 +622,12 @@ public final class User {
         _FinalStage balanceHistory(UserBalanceHistory balanceHistory);
 
         _FinalStage balanceHistory(Nullable<UserBalanceHistory> balanceHistory);
+
+        _FinalStage balances(List<AccountBalanceToken> balances);
+
+        _FinalStage addBalances(AccountBalanceToken balances);
+
+        _FinalStage addAllBalances(List<AccountBalanceToken> balances);
 
         /**
          * <p>The user's profile banner wrapper. <code>null</code> when the user has no banner.</p>
@@ -424,7 +648,43 @@ public final class User {
         _FinalStage bio(Nullable<String> bio);
 
         /**
-         * <p>The user's gross USD income over time. Populated only on single-user self reads for callers with balance-read scope; <code>null</code> otherwise.</p>
+         * <p>Where the user's personal card application stands. Populated only on the self view (retrieved with the reserved id <code>me</code>) for callers with balance-read scope; <code>null</code> otherwise, or when the user has never applied for a card.</p>
+         */
+        _FinalStage cards(Optional<AccountCards> cards);
+
+        _FinalStage cards(AccountCards cards);
+
+        _FinalStage cards(Nullable<AccountCards> cards);
+
+        /**
+         * <p>The user's city, derived from their IP address. <code>null</code> when unknown or the user turned off location sharing.</p>
+         */
+        _FinalStage city(Optional<String> city);
+
+        _FinalStage city(String city);
+
+        _FinalStage city(Nullable<String> city);
+
+        /**
+         * <p>The user's country as an ISO 3166-1 alpha-2 code, derived from their IP address. <code>null</code> when unknown or the user turned off location sharing.</p>
+         */
+        _FinalStage country(Optional<String> country);
+
+        _FinalStage country(String country);
+
+        _FinalStage country(Nullable<String> country);
+
+        /**
+         * <p>The user's date of birth as an ISO 8601 date, like <code>1998-04-23</code>. Populated only on the self view (retrieved with the reserved id <code>me</code>) for callers with email-read scope; <code>null</code> otherwise, or when the user has not set one.</p>
+         */
+        _FinalStage dateOfBirth(Optional<String> dateOfBirth);
+
+        _FinalStage dateOfBirth(String dateOfBirth);
+
+        _FinalStage dateOfBirth(Nullable<String> dateOfBirth);
+
+        /**
+         * <p>The user's gross USD income over time, including a Partner commission breakdown. Populated only on single-user self reads for callers with balance-read scope; <code>null</code> otherwise.</p>
          */
         _FinalStage earningsUsd(Optional<UserEarnings> earningsUsd);
 
@@ -442,6 +702,15 @@ public final class User {
         _FinalStage email(Nullable<String> email);
 
         /**
+         * <p>The user's Whop Levels progress, counted across every account they own. Populated only on the self view (retrieved with the reserved id <code>me</code>) for callers with balance-read scope; <code>null</code> otherwise, and when none of their accounts are in Whop Levels.</p>
+         */
+        _FinalStage level(Optional<OwnerLevel> level);
+
+        _FinalStage level(OwnerLevel level);
+
+        _FinalStage level(Nullable<OwnerLevel> level);
+
+        /**
          * <p>The user's display name</p>
          */
         _FinalStage name(Optional<String> name);
@@ -450,20 +719,38 @@ public final class User {
 
         _FinalStage name(Nullable<String> name);
 
-        _FinalStage socialAccounts(List<SocialAccount> socialAccounts);
+        _FinalStage socialLinks(List<UserSocialLink> socialLinks);
 
-        _FinalStage addSocialAccounts(SocialAccount socialAccounts);
+        _FinalStage addSocialLinks(UserSocialLink socialLinks);
 
-        _FinalStage addAllSocialAccounts(List<SocialAccount> socialAccounts);
+        _FinalStage addAllSocialLinks(List<UserSocialLink> socialLinks);
 
         /**
-         * <p>Whop staff access flags. Populated only on the self view (retrieved with the reserved id <code>me</code>) for callers with staff-read scope; <code>null</code> there for every user who is not Whop staff, and always <code>null</code> elsewhere.</p>
+         * <p>The user's state or region, derived from their IP address. <code>null</code> when unknown or the user turned off location sharing.</p>
          */
-        _FinalStage staff(Optional<UserStaffAccess> staff);
+        _FinalStage state(Optional<String> state);
 
-        _FinalStage staff(UserStaffAccess staff);
+        _FinalStage state(String state);
 
-        _FinalStage staff(Nullable<UserStaffAccess> staff);
+        _FinalStage state(Nullable<String> state);
+
+        /**
+         * <p>Total USD value of the user's personal holdings in <code>balances</code>, across those with known exchange rates. Computed only on the self view (retrieved with the reserved id <code>me</code>) for callers with balance-read scope; <code>null</code> otherwise, when <code>include_balance=false</code>, or when the balance source is unavailable.</p>
+         */
+        _FinalStage totalUsd(Optional<String> totalUsd);
+
+        _FinalStage totalUsd(String totalUsd);
+
+        _FinalStage totalUsd(Nullable<String> totalUsd);
+
+        /**
+         * <p>The trading account address, a snapshot of its margin and open positions, and its WebSocket subscriptions. Opt in with <code>include_trading=true</code> when retrieving <code>me</code>. <code>null</code> otherwise, without trading permission, or without an Ethereum wallet.</p>
+         */
+        _FinalStage trading(Optional<TradingAccount> trading);
+
+        _FinalStage trading(TradingAccount trading);
+
+        _FinalStage trading(Nullable<TradingAccount> trading);
 
         /**
          * <p>Identity verification status for the user's <code>individual</code> (KYC) and <code>business</code> (KYB) profiles. Each is <code>null</code> until created, otherwise a <code>status</code> of <code>not_started</code>, <code>pending</code>, <code>approved</code>, or <code>rejected</code>.</p>
@@ -482,6 +769,24 @@ public final class User {
         _FinalStage whopPartnerEnabledAt(String whopPartnerEnabledAt);
 
         _FinalStage whopPartnerEnabledAt(Nullable<String> whopPartnerEnabledAt);
+
+        /**
+         * <p>Number of accounts the user referred to Whop as a Whop Partner that have processed more than $1 in volume attributed to the user. Populated only when retrieving a single user who is a Verified Whop Partner; <code>null</code> otherwise.</p>
+         */
+        _FinalStage whopPartnerOnboardedAccountsCount(Optional<Integer> whopPartnerOnboardedAccountsCount);
+
+        _FinalStage whopPartnerOnboardedAccountsCount(Integer whopPartnerOnboardedAccountsCount);
+
+        _FinalStage whopPartnerOnboardedAccountsCount(Nullable<Integer> whopPartnerOnboardedAccountsCount);
+
+        /**
+         * <p>When the user became a Verified Whop Partner, as an ISO 8601 timestamp. <code>null</code> for users who are not Verified Whop Partners, including partners who left the program and suspended users.</p>
+         */
+        _FinalStage whopPartnerVerifiedAt(Optional<String> whopPartnerVerifiedAt);
+
+        _FinalStage whopPartnerVerifiedAt(String whopPartnerVerifiedAt);
+
+        _FinalStage whopPartnerVerifiedAt(Nullable<String> whopPartnerVerifiedAt);
     }
 
     @JsonIgnoreProperties(ignoreUnknown = true)
@@ -495,29 +800,48 @@ public final class User {
 
         private String username;
 
+        private Optional<String> whopPartnerVerifiedAt = Optional.empty();
+
+        private Optional<Integer> whopPartnerOnboardedAccountsCount = Optional.empty();
+
         private Optional<String> whopPartnerEnabledAt = Optional.empty();
 
         private Map<String, Object> verification = new LinkedHashMap<>();
 
-        private Optional<UserStaffAccess> staff = Optional.empty();
+        private Optional<TradingAccount> trading = Optional.empty();
 
-        private List<SocialAccount> socialAccounts = new ArrayList<>();
+        private Optional<String> totalUsd = Optional.empty();
+
+        private Optional<String> state = Optional.empty();
+
+        private List<UserSocialLink> socialLinks = new ArrayList<>();
 
         private Optional<String> name = Optional.empty();
+
+        private Optional<OwnerLevel> level = Optional.empty();
 
         private Optional<String> email = Optional.empty();
 
         private Optional<UserEarnings> earningsUsd = Optional.empty();
 
+        private Optional<String> dateOfBirth = Optional.empty();
+
+        private Optional<String> country = Optional.empty();
+
+        private Optional<String> city = Optional.empty();
+
+        private Optional<AccountCards> cards = Optional.empty();
+
         private Optional<String> bio = Optional.empty();
 
         private Optional<UserBanner> banner = Optional.empty();
+
+        private List<AccountBalanceToken> balances = new ArrayList<>();
 
         private Optional<UserBalanceHistory> balanceHistory = Optional.empty();
 
         private Optional<UserBalance> balance = Optional.empty();
 
-        @JsonAnySetter
         private Map<String, Object> additionalProperties = new HashMap<>();
 
         private Builder() {}
@@ -526,24 +850,33 @@ public final class User {
         public Builder from(User other) {
             balance(other.getBalance());
             balanceHistory(other.getBalanceHistory());
+            balances(other.getBalances());
             banner(other.getBanner());
             bio(other.getBio());
+            cards(other.getCards());
+            city(other.getCity());
+            country(other.getCountry());
             createdAt(other.getCreatedAt());
+            dateOfBirth(other.getDateOfBirth());
             earningsUsd(other.getEarningsUsd());
             email(other.getEmail());
             id(other.getId());
+            level(other.getLevel());
             name(other.getName());
             profilePicture(other.getProfilePicture());
-            socialAccounts(other.getSocialAccounts());
-            staff(other.getStaff());
+            socialLinks(other.getSocialLinks());
+            state(other.getState());
+            totalUsd(other.getTotalUsd());
+            trading(other.getTrading());
             username(other.getUsername());
             verification(other.getVerification());
             whopPartnerEnabledAt(other.getWhopPartnerEnabledAt());
+            whopPartnerOnboardedAccountsCount(other.getWhopPartnerOnboardedAccountsCount());
+            whopPartnerVerifiedAt(other.getWhopPartnerVerifiedAt());
             return this;
         }
 
         /**
-         * <p>When the user was created, as an ISO 8601 timestamp</p>
          * <p>When the user was created, as an ISO 8601 timestamp</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
@@ -556,7 +889,6 @@ public final class User {
 
         /**
          * <p>User ID, prefixed <code>user_</code>.</p>
-         * <p>User ID, prefixed <code>user_</code>.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
@@ -567,8 +899,7 @@ public final class User {
         }
 
         /**
-         * <p>Avatar wrapper; its <code>url</code> is always present, using a generated placeholder when the user set no picture.</p>
-         * <p>Avatar wrapper; its <code>url</code> is always present, using a generated placeholder when the user set no picture.</p>
+         * <p>Avatar wrapper. Its <code>url</code> is always present, and is a generated placeholder when the user set no picture.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
@@ -580,13 +911,84 @@ public final class User {
 
         /**
          * <p>The user's unique username</p>
-         * <p>The user's unique username</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
         @JsonSetter("username")
         public _FinalStage username(@NotNull String username) {
             this.username = Objects.requireNonNull(username, "username must not be null");
+            return this;
+        }
+
+        /**
+         * <p>When the user became a Verified Whop Partner, as an ISO 8601 timestamp. <code>null</code> for users who are not Verified Whop Partners, including partners who left the program and suspended users.</p>
+         * @return Reference to {@code this} so that method calls can be chained together.
+         */
+        @java.lang.Override
+        public _FinalStage whopPartnerVerifiedAt(Nullable<String> whopPartnerVerifiedAt) {
+            if (whopPartnerVerifiedAt.isNull()) {
+                this.whopPartnerVerifiedAt = null;
+            } else if (whopPartnerVerifiedAt.isEmpty()) {
+                this.whopPartnerVerifiedAt = Optional.empty();
+            } else {
+                this.whopPartnerVerifiedAt = Optional.of(whopPartnerVerifiedAt.get());
+            }
+            return this;
+        }
+
+        /**
+         * <p>When the user became a Verified Whop Partner, as an ISO 8601 timestamp. <code>null</code> for users who are not Verified Whop Partners, including partners who left the program and suspended users.</p>
+         * @return Reference to {@code this} so that method calls can be chained together.
+         */
+        @java.lang.Override
+        public _FinalStage whopPartnerVerifiedAt(String whopPartnerVerifiedAt) {
+            this.whopPartnerVerifiedAt = Optional.ofNullable(whopPartnerVerifiedAt);
+            return this;
+        }
+
+        /**
+         * <p>When the user became a Verified Whop Partner, as an ISO 8601 timestamp. <code>null</code> for users who are not Verified Whop Partners, including partners who left the program and suspended users.</p>
+         */
+        @java.lang.Override
+        @JsonSetter(value = "whop_partner_verified_at", nulls = Nulls.SKIP)
+        public _FinalStage whopPartnerVerifiedAt(Optional<String> whopPartnerVerifiedAt) {
+            this.whopPartnerVerifiedAt = whopPartnerVerifiedAt;
+            return this;
+        }
+
+        /**
+         * <p>Number of accounts the user referred to Whop as a Whop Partner that have processed more than $1 in volume attributed to the user. Populated only when retrieving a single user who is a Verified Whop Partner; <code>null</code> otherwise.</p>
+         * @return Reference to {@code this} so that method calls can be chained together.
+         */
+        @java.lang.Override
+        public _FinalStage whopPartnerOnboardedAccountsCount(Nullable<Integer> whopPartnerOnboardedAccountsCount) {
+            if (whopPartnerOnboardedAccountsCount.isNull()) {
+                this.whopPartnerOnboardedAccountsCount = null;
+            } else if (whopPartnerOnboardedAccountsCount.isEmpty()) {
+                this.whopPartnerOnboardedAccountsCount = Optional.empty();
+            } else {
+                this.whopPartnerOnboardedAccountsCount = Optional.of(whopPartnerOnboardedAccountsCount.get());
+            }
+            return this;
+        }
+
+        /**
+         * <p>Number of accounts the user referred to Whop as a Whop Partner that have processed more than $1 in volume attributed to the user. Populated only when retrieving a single user who is a Verified Whop Partner; <code>null</code> otherwise.</p>
+         * @return Reference to {@code this} so that method calls can be chained together.
+         */
+        @java.lang.Override
+        public _FinalStage whopPartnerOnboardedAccountsCount(Integer whopPartnerOnboardedAccountsCount) {
+            this.whopPartnerOnboardedAccountsCount = Optional.ofNullable(whopPartnerOnboardedAccountsCount);
+            return this;
+        }
+
+        /**
+         * <p>Number of accounts the user referred to Whop as a Whop Partner that have processed more than $1 in volume attributed to the user. Populated only when retrieving a single user who is a Verified Whop Partner; <code>null</code> otherwise.</p>
+         */
+        @java.lang.Override
+        @JsonSetter(value = "whop_partner_onboarded_accounts_count", nulls = Nulls.SKIP)
+        public _FinalStage whopPartnerOnboardedAccountsCount(Optional<Integer> whopPartnerOnboardedAccountsCount) {
+            this.whopPartnerOnboardedAccountsCount = whopPartnerOnboardedAccountsCount;
             return this;
         }
 
@@ -662,61 +1064,133 @@ public final class User {
         }
 
         /**
-         * <p>Whop staff access flags. Populated only on the self view (retrieved with the reserved id <code>me</code>) for callers with staff-read scope; <code>null</code> there for every user who is not Whop staff, and always <code>null</code> elsewhere.</p>
+         * <p>The trading account address, a snapshot of its margin and open positions, and its WebSocket subscriptions. Opt in with <code>include_trading=true</code> when retrieving <code>me</code>. <code>null</code> otherwise, without trading permission, or without an Ethereum wallet.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
-        public _FinalStage staff(Nullable<UserStaffAccess> staff) {
-            if (staff.isNull()) {
-                this.staff = null;
-            } else if (staff.isEmpty()) {
-                this.staff = Optional.empty();
+        public _FinalStage trading(Nullable<TradingAccount> trading) {
+            if (trading.isNull()) {
+                this.trading = null;
+            } else if (trading.isEmpty()) {
+                this.trading = Optional.empty();
             } else {
-                this.staff = Optional.of(staff.get());
+                this.trading = Optional.of(trading.get());
             }
             return this;
         }
 
         /**
-         * <p>Whop staff access flags. Populated only on the self view (retrieved with the reserved id <code>me</code>) for callers with staff-read scope; <code>null</code> there for every user who is not Whop staff, and always <code>null</code> elsewhere.</p>
+         * <p>The trading account address, a snapshot of its margin and open positions, and its WebSocket subscriptions. Opt in with <code>include_trading=true</code> when retrieving <code>me</code>. <code>null</code> otherwise, without trading permission, or without an Ethereum wallet.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
-        public _FinalStage staff(UserStaffAccess staff) {
-            this.staff = Optional.ofNullable(staff);
+        public _FinalStage trading(TradingAccount trading) {
+            this.trading = Optional.ofNullable(trading);
             return this;
         }
 
         /**
-         * <p>Whop staff access flags. Populated only on the self view (retrieved with the reserved id <code>me</code>) for callers with staff-read scope; <code>null</code> there for every user who is not Whop staff, and always <code>null</code> elsewhere.</p>
+         * <p>The trading account address, a snapshot of its margin and open positions, and its WebSocket subscriptions. Opt in with <code>include_trading=true</code> when retrieving <code>me</code>. <code>null</code> otherwise, without trading permission, or without an Ethereum wallet.</p>
          */
         @java.lang.Override
-        @JsonSetter(value = "staff", nulls = Nulls.SKIP)
-        public _FinalStage staff(Optional<UserStaffAccess> staff) {
-            this.staff = staff;
+        @JsonSetter(value = "trading", nulls = Nulls.SKIP)
+        public _FinalStage trading(Optional<TradingAccount> trading) {
+            this.trading = trading;
+            return this;
+        }
+
+        /**
+         * <p>Total USD value of the user's personal holdings in <code>balances</code>, across those with known exchange rates. Computed only on the self view (retrieved with the reserved id <code>me</code>) for callers with balance-read scope; <code>null</code> otherwise, when <code>include_balance=false</code>, or when the balance source is unavailable.</p>
+         * @return Reference to {@code this} so that method calls can be chained together.
+         */
+        @java.lang.Override
+        public _FinalStage totalUsd(Nullable<String> totalUsd) {
+            if (totalUsd.isNull()) {
+                this.totalUsd = null;
+            } else if (totalUsd.isEmpty()) {
+                this.totalUsd = Optional.empty();
+            } else {
+                this.totalUsd = Optional.of(totalUsd.get());
+            }
+            return this;
+        }
+
+        /**
+         * <p>Total USD value of the user's personal holdings in <code>balances</code>, across those with known exchange rates. Computed only on the self view (retrieved with the reserved id <code>me</code>) for callers with balance-read scope; <code>null</code> otherwise, when <code>include_balance=false</code>, or when the balance source is unavailable.</p>
+         * @return Reference to {@code this} so that method calls can be chained together.
+         */
+        @java.lang.Override
+        public _FinalStage totalUsd(String totalUsd) {
+            this.totalUsd = Optional.ofNullable(totalUsd);
+            return this;
+        }
+
+        /**
+         * <p>Total USD value of the user's personal holdings in <code>balances</code>, across those with known exchange rates. Computed only on the self view (retrieved with the reserved id <code>me</code>) for callers with balance-read scope; <code>null</code> otherwise, when <code>include_balance=false</code>, or when the balance source is unavailable.</p>
+         */
+        @java.lang.Override
+        @JsonSetter(value = "total_usd", nulls = Nulls.SKIP)
+        public _FinalStage totalUsd(Optional<String> totalUsd) {
+            this.totalUsd = totalUsd;
+            return this;
+        }
+
+        /**
+         * <p>The user's state or region, derived from their IP address. <code>null</code> when unknown or the user turned off location sharing.</p>
+         * @return Reference to {@code this} so that method calls can be chained together.
+         */
+        @java.lang.Override
+        public _FinalStage state(Nullable<String> state) {
+            if (state.isNull()) {
+                this.state = null;
+            } else if (state.isEmpty()) {
+                this.state = Optional.empty();
+            } else {
+                this.state = Optional.of(state.get());
+            }
+            return this;
+        }
+
+        /**
+         * <p>The user's state or region, derived from their IP address. <code>null</code> when unknown or the user turned off location sharing.</p>
+         * @return Reference to {@code this} so that method calls can be chained together.
+         */
+        @java.lang.Override
+        public _FinalStage state(String state) {
+            this.state = Optional.ofNullable(state);
+            return this;
+        }
+
+        /**
+         * <p>The user's state or region, derived from their IP address. <code>null</code> when unknown or the user turned off location sharing.</p>
+         */
+        @java.lang.Override
+        @JsonSetter(value = "state", nulls = Nulls.SKIP)
+        public _FinalStage state(Optional<String> state) {
+            this.state = state;
             return this;
         }
 
         @java.lang.Override
-        public _FinalStage addAllSocialAccounts(List<SocialAccount> socialAccounts) {
-            if (socialAccounts != null) {
-                this.socialAccounts.addAll(socialAccounts);
+        public _FinalStage addAllSocialLinks(List<UserSocialLink> socialLinks) {
+            if (socialLinks != null) {
+                this.socialLinks.addAll(socialLinks);
             }
             return this;
         }
 
         @java.lang.Override
-        public _FinalStage addSocialAccounts(SocialAccount socialAccounts) {
-            this.socialAccounts.add(socialAccounts);
+        public _FinalStage addSocialLinks(UserSocialLink socialLinks) {
+            this.socialLinks.add(socialLinks);
             return this;
         }
 
         @java.lang.Override
-        @JsonSetter(value = "social_accounts", nulls = Nulls.SKIP)
-        public _FinalStage socialAccounts(List<SocialAccount> socialAccounts) {
-            this.socialAccounts.clear();
-            if (socialAccounts != null) {
-                this.socialAccounts.addAll(socialAccounts);
+        @JsonSetter(value = "social_links", nulls = Nulls.SKIP)
+        public _FinalStage socialLinks(List<UserSocialLink> socialLinks) {
+            this.socialLinks.clear();
+            if (socialLinks != null) {
+                this.socialLinks.addAll(socialLinks);
             }
             return this;
         }
@@ -758,6 +1232,42 @@ public final class User {
         }
 
         /**
+         * <p>The user's Whop Levels progress, counted across every account they own. Populated only on the self view (retrieved with the reserved id <code>me</code>) for callers with balance-read scope; <code>null</code> otherwise, and when none of their accounts are in Whop Levels.</p>
+         * @return Reference to {@code this} so that method calls can be chained together.
+         */
+        @java.lang.Override
+        public _FinalStage level(Nullable<OwnerLevel> level) {
+            if (level.isNull()) {
+                this.level = null;
+            } else if (level.isEmpty()) {
+                this.level = Optional.empty();
+            } else {
+                this.level = Optional.of(level.get());
+            }
+            return this;
+        }
+
+        /**
+         * <p>The user's Whop Levels progress, counted across every account they own. Populated only on the self view (retrieved with the reserved id <code>me</code>) for callers with balance-read scope; <code>null</code> otherwise, and when none of their accounts are in Whop Levels.</p>
+         * @return Reference to {@code this} so that method calls can be chained together.
+         */
+        @java.lang.Override
+        public _FinalStage level(OwnerLevel level) {
+            this.level = Optional.ofNullable(level);
+            return this;
+        }
+
+        /**
+         * <p>The user's Whop Levels progress, counted across every account they own. Populated only on the self view (retrieved with the reserved id <code>me</code>) for callers with balance-read scope; <code>null</code> otherwise, and when none of their accounts are in Whop Levels.</p>
+         */
+        @java.lang.Override
+        @JsonSetter(value = "level", nulls = Nulls.SKIP)
+        public _FinalStage level(Optional<OwnerLevel> level) {
+            this.level = level;
+            return this;
+        }
+
+        /**
          * <p>The user's email address. Populated only on the self view (retrieved with the reserved id <code>me</code>) for callers with email-read scope; <code>null</code> otherwise, or while the account has no confirmed email yet.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
@@ -794,7 +1304,7 @@ public final class User {
         }
 
         /**
-         * <p>The user's gross USD income over time. Populated only on single-user self reads for callers with balance-read scope; <code>null</code> otherwise.</p>
+         * <p>The user's gross USD income over time, including a Partner commission breakdown. Populated only on single-user self reads for callers with balance-read scope; <code>null</code> otherwise.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
@@ -810,7 +1320,7 @@ public final class User {
         }
 
         /**
-         * <p>The user's gross USD income over time. Populated only on single-user self reads for callers with balance-read scope; <code>null</code> otherwise.</p>
+         * <p>The user's gross USD income over time, including a Partner commission breakdown. Populated only on single-user self reads for callers with balance-read scope; <code>null</code> otherwise.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
@@ -820,12 +1330,156 @@ public final class User {
         }
 
         /**
-         * <p>The user's gross USD income over time. Populated only on single-user self reads for callers with balance-read scope; <code>null</code> otherwise.</p>
+         * <p>The user's gross USD income over time, including a Partner commission breakdown. Populated only on single-user self reads for callers with balance-read scope; <code>null</code> otherwise.</p>
          */
         @java.lang.Override
         @JsonSetter(value = "earnings_usd", nulls = Nulls.SKIP)
         public _FinalStage earningsUsd(Optional<UserEarnings> earningsUsd) {
             this.earningsUsd = earningsUsd;
+            return this;
+        }
+
+        /**
+         * <p>The user's date of birth as an ISO 8601 date, like <code>1998-04-23</code>. Populated only on the self view (retrieved with the reserved id <code>me</code>) for callers with email-read scope; <code>null</code> otherwise, or when the user has not set one.</p>
+         * @return Reference to {@code this} so that method calls can be chained together.
+         */
+        @java.lang.Override
+        public _FinalStage dateOfBirth(Nullable<String> dateOfBirth) {
+            if (dateOfBirth.isNull()) {
+                this.dateOfBirth = null;
+            } else if (dateOfBirth.isEmpty()) {
+                this.dateOfBirth = Optional.empty();
+            } else {
+                this.dateOfBirth = Optional.of(dateOfBirth.get());
+            }
+            return this;
+        }
+
+        /**
+         * <p>The user's date of birth as an ISO 8601 date, like <code>1998-04-23</code>. Populated only on the self view (retrieved with the reserved id <code>me</code>) for callers with email-read scope; <code>null</code> otherwise, or when the user has not set one.</p>
+         * @return Reference to {@code this} so that method calls can be chained together.
+         */
+        @java.lang.Override
+        public _FinalStage dateOfBirth(String dateOfBirth) {
+            this.dateOfBirth = Optional.ofNullable(dateOfBirth);
+            return this;
+        }
+
+        /**
+         * <p>The user's date of birth as an ISO 8601 date, like <code>1998-04-23</code>. Populated only on the self view (retrieved with the reserved id <code>me</code>) for callers with email-read scope; <code>null</code> otherwise, or when the user has not set one.</p>
+         */
+        @java.lang.Override
+        @JsonSetter(value = "date_of_birth", nulls = Nulls.SKIP)
+        public _FinalStage dateOfBirth(Optional<String> dateOfBirth) {
+            this.dateOfBirth = dateOfBirth;
+            return this;
+        }
+
+        /**
+         * <p>The user's country as an ISO 3166-1 alpha-2 code, derived from their IP address. <code>null</code> when unknown or the user turned off location sharing.</p>
+         * @return Reference to {@code this} so that method calls can be chained together.
+         */
+        @java.lang.Override
+        public _FinalStage country(Nullable<String> country) {
+            if (country.isNull()) {
+                this.country = null;
+            } else if (country.isEmpty()) {
+                this.country = Optional.empty();
+            } else {
+                this.country = Optional.of(country.get());
+            }
+            return this;
+        }
+
+        /**
+         * <p>The user's country as an ISO 3166-1 alpha-2 code, derived from their IP address. <code>null</code> when unknown or the user turned off location sharing.</p>
+         * @return Reference to {@code this} so that method calls can be chained together.
+         */
+        @java.lang.Override
+        public _FinalStage country(String country) {
+            this.country = Optional.ofNullable(country);
+            return this;
+        }
+
+        /**
+         * <p>The user's country as an ISO 3166-1 alpha-2 code, derived from their IP address. <code>null</code> when unknown or the user turned off location sharing.</p>
+         */
+        @java.lang.Override
+        @JsonSetter(value = "country", nulls = Nulls.SKIP)
+        public _FinalStage country(Optional<String> country) {
+            this.country = country;
+            return this;
+        }
+
+        /**
+         * <p>The user's city, derived from their IP address. <code>null</code> when unknown or the user turned off location sharing.</p>
+         * @return Reference to {@code this} so that method calls can be chained together.
+         */
+        @java.lang.Override
+        public _FinalStage city(Nullable<String> city) {
+            if (city.isNull()) {
+                this.city = null;
+            } else if (city.isEmpty()) {
+                this.city = Optional.empty();
+            } else {
+                this.city = Optional.of(city.get());
+            }
+            return this;
+        }
+
+        /**
+         * <p>The user's city, derived from their IP address. <code>null</code> when unknown or the user turned off location sharing.</p>
+         * @return Reference to {@code this} so that method calls can be chained together.
+         */
+        @java.lang.Override
+        public _FinalStage city(String city) {
+            this.city = Optional.ofNullable(city);
+            return this;
+        }
+
+        /**
+         * <p>The user's city, derived from their IP address. <code>null</code> when unknown or the user turned off location sharing.</p>
+         */
+        @java.lang.Override
+        @JsonSetter(value = "city", nulls = Nulls.SKIP)
+        public _FinalStage city(Optional<String> city) {
+            this.city = city;
+            return this;
+        }
+
+        /**
+         * <p>Where the user's personal card application stands. Populated only on the self view (retrieved with the reserved id <code>me</code>) for callers with balance-read scope; <code>null</code> otherwise, or when the user has never applied for a card.</p>
+         * @return Reference to {@code this} so that method calls can be chained together.
+         */
+        @java.lang.Override
+        public _FinalStage cards(Nullable<AccountCards> cards) {
+            if (cards.isNull()) {
+                this.cards = null;
+            } else if (cards.isEmpty()) {
+                this.cards = Optional.empty();
+            } else {
+                this.cards = Optional.of(cards.get());
+            }
+            return this;
+        }
+
+        /**
+         * <p>Where the user's personal card application stands. Populated only on the self view (retrieved with the reserved id <code>me</code>) for callers with balance-read scope; <code>null</code> otherwise, or when the user has never applied for a card.</p>
+         * @return Reference to {@code this} so that method calls can be chained together.
+         */
+        @java.lang.Override
+        public _FinalStage cards(AccountCards cards) {
+            this.cards = Optional.ofNullable(cards);
+            return this;
+        }
+
+        /**
+         * <p>Where the user's personal card application stands. Populated only on the self view (retrieved with the reserved id <code>me</code>) for callers with balance-read scope; <code>null</code> otherwise, or when the user has never applied for a card.</p>
+         */
+        @java.lang.Override
+        @JsonSetter(value = "cards", nulls = Nulls.SKIP)
+        public _FinalStage cards(Optional<AccountCards> cards) {
+            this.cards = cards;
             return this;
         }
 
@@ -901,6 +1555,30 @@ public final class User {
             return this;
         }
 
+        @java.lang.Override
+        public _FinalStage addAllBalances(List<AccountBalanceToken> balances) {
+            if (balances != null) {
+                this.balances.addAll(balances);
+            }
+            return this;
+        }
+
+        @java.lang.Override
+        public _FinalStage addBalances(AccountBalanceToken balances) {
+            this.balances.add(balances);
+            return this;
+        }
+
+        @java.lang.Override
+        @JsonSetter(value = "balances", nulls = Nulls.SKIP)
+        public _FinalStage balances(List<AccountBalanceToken> balances) {
+            this.balances.clear();
+            if (balances != null) {
+                this.balances.addAll(balances);
+            }
+            return this;
+        }
+
         /**
          * <p>The user's cumulative wallet balance over time (USD <code>{ t, v }</code> points plus last/min/max), for the balance chart. Opt in with <code>include_balance_history=true</code> when retrieving yourself with the reserved id <code>me</code>; populated only for callers with balance-read scope and <code>null</code> otherwise. A user with no wallet activity returns an empty series.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
@@ -938,7 +1616,7 @@ public final class User {
         }
 
         /**
-         * <p>The user's balance: personal cash + crypto + in-flight treasury deposits, plus account balances for accounts they own. Computed only on the self view (retrieved with the reserved id <code>me</code>) for callers with balance-read scope; <code>null</code> otherwise.</p>
+         * <p>The user's balance: personal cash + other holdings + deposits still in flight, plus account balances for accounts they own. Computed only on the self view (retrieved with the reserved id <code>me</code>) for callers with balance-read scope; <code>null</code> otherwise, or when <code>include_balance=false</code>.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
@@ -954,7 +1632,7 @@ public final class User {
         }
 
         /**
-         * <p>The user's balance: personal cash + crypto + in-flight treasury deposits, plus account balances for accounts they own. Computed only on the self view (retrieved with the reserved id <code>me</code>) for callers with balance-read scope; <code>null</code> otherwise.</p>
+         * <p>The user's balance: personal cash + other holdings + deposits still in flight, plus account balances for accounts they own. Computed only on the self view (retrieved with the reserved id <code>me</code>) for callers with balance-read scope; <code>null</code> otherwise, or when <code>include_balance=false</code>.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
@@ -964,7 +1642,7 @@ public final class User {
         }
 
         /**
-         * <p>The user's balance: personal cash + crypto + in-flight treasury deposits, plus account balances for accounts they own. Computed only on the self view (retrieved with the reserved id <code>me</code>) for callers with balance-read scope; <code>null</code> otherwise.</p>
+         * <p>The user's balance: personal cash + other holdings + deposits still in flight, plus account balances for accounts they own. Computed only on the self view (retrieved with the reserved id <code>me</code>) for callers with balance-read scope; <code>null</code> otherwise, or when <code>include_balance=false</code>.</p>
          */
         @java.lang.Override
         @JsonSetter(value = "balance", nulls = Nulls.SKIP)
@@ -978,20 +1656,62 @@ public final class User {
             return new User(
                     balance,
                     balanceHistory,
+                    balances,
                     banner,
                     bio,
+                    cards,
+                    city,
+                    country,
                     createdAt,
+                    dateOfBirth,
                     earningsUsd,
                     email,
                     id,
+                    level,
                     name,
                     profilePicture,
-                    socialAccounts,
-                    staff,
+                    socialLinks,
+                    state,
+                    totalUsd,
+                    trading,
                     username,
                     verification,
                     whopPartnerEnabledAt,
+                    whopPartnerOnboardedAccountsCount,
+                    whopPartnerVerifiedAt,
                     additionalProperties);
+        }
+
+        @JsonAnySetter
+        private void putAdditionalPropertyFromJson(String key, Object value) {
+            if (key.equalsIgnoreCase("balance")
+                    || key.equalsIgnoreCase("balance_history")
+                    || key.equalsIgnoreCase("balances")
+                    || key.equalsIgnoreCase("banner")
+                    || key.equalsIgnoreCase("bio")
+                    || key.equalsIgnoreCase("cards")
+                    || key.equalsIgnoreCase("city")
+                    || key.equalsIgnoreCase("country")
+                    || key.equalsIgnoreCase("created_at")
+                    || key.equalsIgnoreCase("date_of_birth")
+                    || key.equalsIgnoreCase("earnings_usd")
+                    || key.equalsIgnoreCase("email")
+                    || key.equalsIgnoreCase("id")
+                    || key.equalsIgnoreCase("level")
+                    || key.equalsIgnoreCase("name")
+                    || key.equalsIgnoreCase("profile_picture")
+                    || key.equalsIgnoreCase("social_links")
+                    || key.equalsIgnoreCase("state")
+                    || key.equalsIgnoreCase("total_usd")
+                    || key.equalsIgnoreCase("trading")
+                    || key.equalsIgnoreCase("username")
+                    || key.equalsIgnoreCase("verification")
+                    || key.equalsIgnoreCase("whop_partner_enabled_at")
+                    || key.equalsIgnoreCase("whop_partner_onboarded_accounts_count")
+                    || key.equalsIgnoreCase("whop_partner_verified_at")) {
+                return;
+            }
+            this.additionalProperties.put(key, value);
         }
 
         @java.lang.Override

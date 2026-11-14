@@ -336,7 +336,6 @@ public final class SubmitAssessmentCourseLessonsResponse {
 
         private Map<String, Object> resultGradedQuestions = new LinkedHashMap<>();
 
-        @JsonAnySetter
         private Map<String, Object> additionalProperties = new HashMap<>();
 
         private Builder() {}
@@ -359,7 +358,6 @@ public final class SubmitAssessmentCourseLessonsResponse {
 
         /**
          * <p>The datetime the assessment result was created.</p>
-         * <p>The datetime the assessment result was created.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
@@ -370,7 +368,6 @@ public final class SubmitAssessmentCourseLessonsResponse {
         }
 
         /**
-         * <p>The unique identifier for the assessment result.</p>
          * <p>The unique identifier for the assessment result.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
@@ -383,7 +380,6 @@ public final class SubmitAssessmentCourseLessonsResponse {
 
         /**
          * <p>The lesson this assessment result is for</p>
-         * <p>The lesson this assessment result is for</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
@@ -394,7 +390,6 @@ public final class SubmitAssessmentCourseLessonsResponse {
         }
 
         /**
-         * <p>The number of correct answers</p>
          * <p>The number of correct answers</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
@@ -407,7 +402,6 @@ public final class SubmitAssessmentCourseLessonsResponse {
 
         /**
          * <p>The grade achieved on the assessment</p>
-         * <p>The grade achieved on the assessment</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
@@ -418,7 +412,6 @@ public final class SubmitAssessmentCourseLessonsResponse {
         }
 
         /**
-         * <p>Whether the user achieved a passing grade</p>
          * <p>Whether the user achieved a passing grade</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
@@ -431,7 +424,6 @@ public final class SubmitAssessmentCourseLessonsResponse {
 
         /**
          * <p>The total number of questions in the assessment</p>
-         * <p>The total number of questions in the assessment</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
@@ -442,7 +434,6 @@ public final class SubmitAssessmentCourseLessonsResponse {
         }
 
         /**
-         * <p>The percentage score achieved on the assessment</p>
          * <p>The percentage score achieved on the assessment</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
@@ -455,7 +446,6 @@ public final class SubmitAssessmentCourseLessonsResponse {
 
         /**
          * <p>The datetime the assessment result was last updated.</p>
-         * <p>The datetime the assessment result was last updated.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
@@ -466,7 +456,6 @@ public final class SubmitAssessmentCourseLessonsResponse {
         }
 
         /**
-         * <p>The user who took the assessment</p>
          * <p>The user who took the assessment</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
@@ -527,6 +516,24 @@ public final class SubmitAssessmentCourseLessonsResponse {
                     updatedAt,
                     user,
                     additionalProperties);
+        }
+
+        @JsonAnySetter
+        private void putAdditionalPropertyFromJson(String key, Object value) {
+            if (key.equalsIgnoreCase("created_at")
+                    || key.equalsIgnoreCase("id")
+                    || key.equalsIgnoreCase("lesson")
+                    || key.equalsIgnoreCase("result_correct")
+                    || key.equalsIgnoreCase("result_grade")
+                    || key.equalsIgnoreCase("result_graded_questions")
+                    || key.equalsIgnoreCase("result_passing_grade")
+                    || key.equalsIgnoreCase("result_question_count")
+                    || key.equalsIgnoreCase("score_percent")
+                    || key.equalsIgnoreCase("updated_at")
+                    || key.equalsIgnoreCase("user")) {
+                return;
+            }
+            this.additionalProperties.put(key, value);
         }
 
         @java.lang.Override

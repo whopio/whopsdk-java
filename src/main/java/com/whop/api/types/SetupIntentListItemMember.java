@@ -123,7 +123,6 @@ public final class SetupIntentListItemMember {
 
         private Optional<SetupIntentListItemMemberUser> user = Optional.empty();
 
-        @JsonAnySetter
         private Map<String, Object> additionalProperties = new HashMap<>();
 
         private Builder() {}
@@ -136,7 +135,6 @@ public final class SetupIntentListItemMember {
         }
 
         /**
-         * <p>The unique identifier for the company member.</p>
          * <p>The unique identifier for the company member.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
@@ -186,6 +184,14 @@ public final class SetupIntentListItemMember {
         @java.lang.Override
         public SetupIntentListItemMember build() {
             return new SetupIntentListItemMember(id, user, additionalProperties);
+        }
+
+        @JsonAnySetter
+        private void putAdditionalPropertyFromJson(String key, Object value) {
+            if (key.equalsIgnoreCase("id") || key.equalsIgnoreCase("user")) {
+                return;
+            }
+            this.additionalProperties.put(key, value);
         }
 
         @java.lang.Override

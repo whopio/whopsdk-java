@@ -10,8 +10,11 @@ public final class CreatePlansRequestThreeDsLevel {
     public static final CreatePlansRequestThreeDsLevel MANDATE_CHALLENGE =
             new CreatePlansRequestThreeDsLevel(Value.MANDATE_CHALLENGE, "mandate_challenge");
 
-    public static final CreatePlansRequestThreeDsLevel FRICTIONLESS =
-            new CreatePlansRequestThreeDsLevel(Value.FRICTIONLESS, "frictionless");
+    public static final CreatePlansRequestThreeDsLevel MANDATE_IF_REQUIRED =
+            new CreatePlansRequestThreeDsLevel(Value.MANDATE_IF_REQUIRED, "mandate_if_required");
+
+    public static final CreatePlansRequestThreeDsLevel FRICTIONLESS_IF_REQUIRED =
+            new CreatePlansRequestThreeDsLevel(Value.FRICTIONLESS_IF_REQUIRED, "frictionless_if_required");
 
     private final Value value;
 
@@ -48,8 +51,10 @@ public final class CreatePlansRequestThreeDsLevel {
         switch (value) {
             case MANDATE_CHALLENGE:
                 return visitor.visitMandateChallenge();
-            case FRICTIONLESS:
-                return visitor.visitFrictionless();
+            case MANDATE_IF_REQUIRED:
+                return visitor.visitMandateIfRequired();
+            case FRICTIONLESS_IF_REQUIRED:
+                return visitor.visitFrictionlessIfRequired();
             case UNKNOWN:
             default:
                 return visitor.visitUnknown(string);
@@ -61,8 +66,10 @@ public final class CreatePlansRequestThreeDsLevel {
         switch (value) {
             case "mandate_challenge":
                 return MANDATE_CHALLENGE;
-            case "frictionless":
-                return FRICTIONLESS;
+            case "mandate_if_required":
+                return MANDATE_IF_REQUIRED;
+            case "frictionless_if_required":
+                return FRICTIONLESS_IF_REQUIRED;
             default:
                 return new CreatePlansRequestThreeDsLevel(Value.UNKNOWN, value);
         }
@@ -71,7 +78,9 @@ public final class CreatePlansRequestThreeDsLevel {
     public enum Value {
         MANDATE_CHALLENGE,
 
-        FRICTIONLESS,
+        MANDATE_IF_REQUIRED,
+
+        FRICTIONLESS_IF_REQUIRED,
 
         UNKNOWN
     }
@@ -79,7 +88,9 @@ public final class CreatePlansRequestThreeDsLevel {
     public interface Visitor<T> {
         T visitMandateChallenge();
 
-        T visitFrictionless();
+        T visitMandateIfRequired();
+
+        T visitFrictionlessIfRequired();
 
         T visitUnknown(String unknownType);
     }

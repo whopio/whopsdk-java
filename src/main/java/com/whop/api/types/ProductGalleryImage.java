@@ -154,7 +154,6 @@ public final class ProductGalleryImage {
 
         private Optional<String> contentType = Optional.empty();
 
-        @JsonAnySetter
         private Map<String, Object> additionalProperties = new HashMap<>();
 
         private Builder() {}
@@ -168,7 +167,6 @@ public final class ProductGalleryImage {
         }
 
         /**
-         * <p>Gallery image ID.</p>
          * <p>Gallery image ID.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
@@ -254,6 +252,14 @@ public final class ProductGalleryImage {
         @java.lang.Override
         public ProductGalleryImage build() {
             return new ProductGalleryImage(contentType, id, url, additionalProperties);
+        }
+
+        @JsonAnySetter
+        private void putAdditionalPropertyFromJson(String key, Object value) {
+            if (key.equalsIgnoreCase("content_type") || key.equalsIgnoreCase("id") || key.equalsIgnoreCase("url")) {
+                return;
+            }
+            this.additionalProperties.put(key, value);
         }
 
         @java.lang.Override

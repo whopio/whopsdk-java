@@ -187,7 +187,6 @@ public final class UpdateAccountsRequestBusinessAddress {
 
         private Optional<String> state = Optional.empty();
 
-        @JsonAnySetter
         private Map<String, Object> additionalProperties = new HashMap<>();
 
         private Builder() {}
@@ -333,6 +332,19 @@ public final class UpdateAccountsRequestBusinessAddress {
         public UpdateAccountsRequestBusinessAddress build() {
             return new UpdateAccountsRequestBusinessAddress(
                     city, country, line1, line2, postalCode, state, additionalProperties);
+        }
+
+        @JsonAnySetter
+        private void putAdditionalPropertyFromJson(String key, Object value) {
+            if (key.equalsIgnoreCase("city")
+                    || key.equalsIgnoreCase("country")
+                    || key.equalsIgnoreCase("line1")
+                    || key.equalsIgnoreCase("line2")
+                    || key.equalsIgnoreCase("postal_code")
+                    || key.equalsIgnoreCase("state")) {
+                return;
+            }
+            this.additionalProperties.put(key, value);
         }
 
         public Builder additionalProperty(String key, Object value) {

@@ -180,7 +180,6 @@ public final class PageInfo {
 
         private Optional<String> endCursor = Optional.empty();
 
-        @JsonAnySetter
         private Map<String, Object> additionalProperties = new HashMap<>();
 
         private Builder() {}
@@ -196,7 +195,6 @@ public final class PageInfo {
 
         /**
          * <p>When paginating forwards, are there more items?</p>
-         * <p>When paginating forwards, are there more items?</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
@@ -207,7 +205,6 @@ public final class PageInfo {
         }
 
         /**
-         * <p>When paginating backwards, are there more items?</p>
          * <p>When paginating backwards, are there more items?</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
@@ -293,6 +290,17 @@ public final class PageInfo {
         @java.lang.Override
         public PageInfo build() {
             return new PageInfo(endCursor, hasNextPage, hasPreviousPage, startCursor, additionalProperties);
+        }
+
+        @JsonAnySetter
+        private void putAdditionalPropertyFromJson(String key, Object value) {
+            if (key.equalsIgnoreCase("end_cursor")
+                    || key.equalsIgnoreCase("has_next_page")
+                    || key.equalsIgnoreCase("has_previous_page")
+                    || key.equalsIgnoreCase("start_cursor")) {
+                return;
+            }
+            this.additionalProperties.put(key, value);
         }
 
         @java.lang.Override

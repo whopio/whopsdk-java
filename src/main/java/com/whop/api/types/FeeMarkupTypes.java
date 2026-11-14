@@ -7,17 +7,30 @@ import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonValue;
 
 public final class FeeMarkupTypes {
+    public static final FeeMarkupTypes PAYMENT_MARKUP = new FeeMarkupTypes(Value.PAYMENT_MARKUP, "payment_markup");
+
     public static final FeeMarkupTypes DIGITAL_WALLET_WITHDRAWAL_MARKUP =
             new FeeMarkupTypes(Value.DIGITAL_WALLET_WITHDRAWAL_MARKUP, "digital_wallet_withdrawal_markup");
 
+    public static final FeeMarkupTypes TRANSFER_MARKUP = new FeeMarkupTypes(Value.TRANSFER_MARKUP, "transfer_markup");
+
     public static final FeeMarkupTypes BANK_WIRE_WITHDRAWAL_MARKUP =
             new FeeMarkupTypes(Value.BANK_WIRE_WITHDRAWAL_MARKUP, "bank_wire_withdrawal_markup");
+
+    public static final FeeMarkupTypes CRYPTO_SWAP_MARKUP =
+            new FeeMarkupTypes(Value.CRYPTO_SWAP_MARKUP, "crypto_swap_markup");
 
     public static final FeeMarkupTypes CRYPTO_WITHDRAWAL_MARKUP =
             new FeeMarkupTypes(Value.CRYPTO_WITHDRAWAL_MARKUP, "crypto_withdrawal_markup");
 
     public static final FeeMarkupTypes RTP_WITHDRAWAL_MARKUP =
             new FeeMarkupTypes(Value.RTP_WITHDRAWAL_MARKUP, "rtp_withdrawal_markup");
+
+    public static final FeeMarkupTypes CRYPTO_DEPOSIT_MARKUP =
+            new FeeMarkupTypes(Value.CRYPTO_DEPOSIT_MARKUP, "crypto_deposit_markup");
+
+    public static final FeeMarkupTypes BANK_DEPOSIT_MARKUP =
+            new FeeMarkupTypes(Value.BANK_DEPOSIT_MARKUP, "bank_deposit_markup");
 
     public static final FeeMarkupTypes NEXT_DAY_BANK_WITHDRAWAL_MARKUP =
             new FeeMarkupTypes(Value.NEXT_DAY_BANK_WITHDRAWAL_MARKUP, "next_day_bank_withdrawal_markup");
@@ -54,14 +67,24 @@ public final class FeeMarkupTypes {
 
     public <T> T visit(Visitor<T> visitor) {
         switch (value) {
+            case PAYMENT_MARKUP:
+                return visitor.visitPaymentMarkup();
             case DIGITAL_WALLET_WITHDRAWAL_MARKUP:
                 return visitor.visitDigitalWalletWithdrawalMarkup();
+            case TRANSFER_MARKUP:
+                return visitor.visitTransferMarkup();
             case BANK_WIRE_WITHDRAWAL_MARKUP:
                 return visitor.visitBankWireWithdrawalMarkup();
+            case CRYPTO_SWAP_MARKUP:
+                return visitor.visitCryptoSwapMarkup();
             case CRYPTO_WITHDRAWAL_MARKUP:
                 return visitor.visitCryptoWithdrawalMarkup();
             case RTP_WITHDRAWAL_MARKUP:
                 return visitor.visitRtpWithdrawalMarkup();
+            case CRYPTO_DEPOSIT_MARKUP:
+                return visitor.visitCryptoDepositMarkup();
+            case BANK_DEPOSIT_MARKUP:
+                return visitor.visitBankDepositMarkup();
             case NEXT_DAY_BANK_WITHDRAWAL_MARKUP:
                 return visitor.visitNextDayBankWithdrawalMarkup();
             case UNKNOWN:
@@ -73,14 +96,24 @@ public final class FeeMarkupTypes {
     @JsonCreator(mode = JsonCreator.Mode.DELEGATING)
     public static FeeMarkupTypes valueOf(String value) {
         switch (value) {
+            case "payment_markup":
+                return PAYMENT_MARKUP;
             case "digital_wallet_withdrawal_markup":
                 return DIGITAL_WALLET_WITHDRAWAL_MARKUP;
+            case "transfer_markup":
+                return TRANSFER_MARKUP;
             case "bank_wire_withdrawal_markup":
                 return BANK_WIRE_WITHDRAWAL_MARKUP;
+            case "crypto_swap_markup":
+                return CRYPTO_SWAP_MARKUP;
             case "crypto_withdrawal_markup":
                 return CRYPTO_WITHDRAWAL_MARKUP;
             case "rtp_withdrawal_markup":
                 return RTP_WITHDRAWAL_MARKUP;
+            case "crypto_deposit_markup":
+                return CRYPTO_DEPOSIT_MARKUP;
+            case "bank_deposit_markup":
+                return BANK_DEPOSIT_MARKUP;
             case "next_day_bank_withdrawal_markup":
                 return NEXT_DAY_BANK_WITHDRAWAL_MARKUP;
             default:
@@ -99,6 +132,16 @@ public final class FeeMarkupTypes {
 
         DIGITAL_WALLET_WITHDRAWAL_MARKUP,
 
+        TRANSFER_MARKUP,
+
+        CRYPTO_DEPOSIT_MARKUP,
+
+        BANK_DEPOSIT_MARKUP,
+
+        CRYPTO_SWAP_MARKUP,
+
+        PAYMENT_MARKUP,
+
         UNKNOWN
     }
 
@@ -112,6 +155,16 @@ public final class FeeMarkupTypes {
         T visitBankWireWithdrawalMarkup();
 
         T visitDigitalWalletWithdrawalMarkup();
+
+        T visitTransferMarkup();
+
+        T visitCryptoDepositMarkup();
+
+        T visitBankDepositMarkup();
+
+        T visitCryptoSwapMarkup();
+
+        T visitPaymentMarkup();
 
         T visitUnknown(String unknownType);
     }

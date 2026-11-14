@@ -6,9 +6,14 @@ package com.whop.api;
 import com.whop.api.core.ClientOptions;
 import com.whop.api.core.Environment;
 import com.whop.api.core.LogConfig;
+import java.time.Duration;
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.Set;
 import okhttp3.OkHttpClient;
 
 public class WhopApiClientBuilder {
@@ -16,15 +21,27 @@ public class WhopApiClientBuilder {
 
     private Optional<Integer> maxRetries = Optional.empty();
 
+    private Optional<Integer> maxConcurrentRequests = Optional.empty();
+
+    private Optional<Set<Integer>> retryOnStatusCodes = Optional.empty();
+
+    private Optional<List<Duration>> retryDelays = Optional.empty();
+
+    private Optional<Long> initialRetryDelayMillis = Optional.empty();
+
+    private Optional<Long> maxRetryDelayMillis = Optional.empty();
+
+    private Optional<Double> retryJitterFactor = Optional.empty();
+
     private final Map<String, String> customHeaders = new HashMap<>();
 
     private String token = null;
 
-    private String apiVersionDate = null;
+    private String apiVersionDate = "2026-11-13-1";
 
     private String idempotencyKey = null;
 
-    private Environment environment = Environment.DEFAULT;
+    private Environment environment = Environment.PRODUCTION;
 
     private OkHttpClient httpClient;
 
@@ -59,11 +76,6 @@ public class WhopApiClientBuilder {
         return this;
     }
 
-    public WhopApiClientBuilder url(String url) {
-        this.environment = Environment.custom(url);
-        return this;
-    }
-
     /**
      * Sets the timeout (in seconds) for the client. Defaults to 60 seconds.
      */
@@ -77,6 +89,65 @@ public class WhopApiClientBuilder {
      */
     public WhopApiClientBuilder maxRetries(int maxRetries) {
         this.maxRetries = Optional.of(maxRetries);
+        return this;
+    }
+
+    /**
+     * Caps the number of in-flight requests (sync and async) the client will have at once. Unlimited unless set; must be positive.
+     */
+    public WhopApiClientBuilder maxConcurrentRequests(int maxConcurrentRequests) {
+        this.maxConcurrentRequests = Optional.of(maxConcurrentRequests);
+        return this;
+    }
+
+    /**
+     * Restricts automatic retries to responses with one of the given HTTP status codes (for example {@code 429} only, or {@code 429} and {@code 503}), replacing the default set of 408, 429 and 5xx. Codes not listed are returned as-is. Retry-After handling and the other retry settings are unchanged.
+     */
+    public WhopApiClientBuilder retryOnStatusCodes(Set<Integer> retryOnStatusCodes) {
+        if (retryOnStatusCodes == null) {
+            throw new IllegalArgumentException("retryOnStatusCodes must not be null");
+        }
+        this.retryOnStatusCodes = Optional.of(retryOnStatusCodes);
+        return this;
+    }
+
+    /**
+     * Sets an explicit retry schedule: the n-th retry waits for the n-th duration and the request stops retrying once the list is exhausted, so the list size replaces {@code maxRetries} and the exponential backoff settings. Delays are used as-is (no jitter); a {@code Retry-After} / {@code X-RateLimit-Reset} header still takes precedence for that attempt.
+     */
+    public WhopApiClientBuilder retryDelays(List<Duration> retryDelays) {
+        if (retryDelays == null) {
+            throw new IllegalArgumentException("retryDelays must not be null");
+        }
+        for (Duration delay : retryDelays) {
+            if (delay == null || delay.isNegative()) {
+                throw new IllegalArgumentException("retryDelays must only contain non-negative durations: " + delay);
+            }
+        }
+        this.retryDelays = Optional.of(Collections.unmodifiableList(new ArrayList<>(retryDelays)));
+        return this;
+    }
+
+    /**
+     * Sets the initial delay (in milliseconds) used for exponential backoff between retries. Defaults to 1000 milliseconds.
+     */
+    public WhopApiClientBuilder initialRetryDelayMillis(long initialRetryDelayMillis) {
+        this.initialRetryDelayMillis = Optional.of(initialRetryDelayMillis);
+        return this;
+    }
+
+    /**
+     * Sets the maximum delay (in milliseconds) between retries. Defaults to 60000 milliseconds.
+     */
+    public WhopApiClientBuilder maxRetryDelayMillis(long maxRetryDelayMillis) {
+        this.maxRetryDelayMillis = Optional.of(maxRetryDelayMillis);
+        return this;
+    }
+
+    /**
+     * Sets the jitter factor (between 0 and 1) applied to retry delays. Defaults to 0.2.
+     */
+    public WhopApiClientBuilder retryJitterFactor(double retryJitterFactor) {
+        this.retryJitterFactor = Optional.of(retryJitterFactor);
         return this;
     }
 
@@ -117,6 +188,7 @@ public class WhopApiClientBuilder {
         setHttpClient(builder);
         setTimeouts(builder);
         setRetries(builder);
+        setConcurrencyLimit(builder);
         setLogging(builder);
         for (Map.Entry<String, String> header : this.customHeaders.entrySet()) {
             builder.addHeader(header.getKey(), header.getValue());
@@ -201,6 +273,33 @@ public class WhopApiClientBuilder {
     protected void setRetries(ClientOptions.Builder builder) {
         if (this.maxRetries.isPresent()) {
             builder.maxRetries(this.maxRetries.get());
+        }
+        if (this.initialRetryDelayMillis.isPresent()) {
+            builder.initialRetryDelayMillis(this.initialRetryDelayMillis.get());
+        }
+        if (this.maxRetryDelayMillis.isPresent()) {
+            builder.maxRetryDelayMillis(this.maxRetryDelayMillis.get());
+        }
+        if (this.retryJitterFactor.isPresent()) {
+            builder.retryJitterFactor(this.retryJitterFactor.get());
+        }
+        if (this.retryOnStatusCodes.isPresent()) {
+            builder.retryOnStatusCodes(this.retryOnStatusCodes.get());
+        }
+        if (this.retryDelays.isPresent()) {
+            builder.retryDelays(this.retryDelays.get());
+        }
+    }
+
+    /**
+     * Applies the in-flight request cap, if one was configured.
+     * Override this method to customize concurrency limiting.
+     *
+     * @param builder The ClientOptions.Builder to configure
+     */
+    protected void setConcurrencyLimit(ClientOptions.Builder builder) {
+        if (this.maxConcurrentRequests.isPresent()) {
+            builder.maxConcurrentRequests(this.maxConcurrentRequests.get());
         }
     }
 

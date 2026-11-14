@@ -4,11 +4,14 @@
 package com.whop.api.resources.memberships;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
+import com.whop.api.core.BodyProperties;
 import com.whop.api.core.ClientOptions;
 import com.whop.api.core.MediaTypes;
 import com.whop.api.core.ObjectMappers;
+import com.whop.api.core.PathSegments;
 import com.whop.api.core.QueryStringMapper;
 import com.whop.api.core.RequestOptions;
+import com.whop.api.core.RetryInterceptor;
 import com.whop.api.core.WhopApiApiException;
 import com.whop.api.core.WhopApiException;
 import com.whop.api.core.WhopApiHttpResponse;
@@ -16,23 +19,22 @@ import com.whop.api.core.pagination.SyncPagingIterable;
 import com.whop.api.errors.BadRequestError;
 import com.whop.api.errors.ConflictError;
 import com.whop.api.errors.ForbiddenError;
-import com.whop.api.errors.InternalServerError;
 import com.whop.api.errors.NotFoundError;
-import com.whop.api.errors.TooManyRequestsError;
+import com.whop.api.errors.ServiceUnavailableError;
 import com.whop.api.errors.UnauthorizedError;
-import com.whop.api.errors.UnprocessableEntityError;
-import com.whop.api.resources.memberships.requests.AddFreeDaysMembershipRequest;
+import com.whop.api.resources.memberships.requests.ApplyPromoCodeMembershipsRequest;
+import com.whop.api.resources.memberships.requests.AssignAffiliateMembershipsRequest;
 import com.whop.api.resources.memberships.requests.CancelMembershipsRequest;
 import com.whop.api.resources.memberships.requests.ExtendMembershipsRequest;
+import com.whop.api.resources.memberships.requests.InviteMembershipsRequest;
 import com.whop.api.resources.memberships.requests.ListMembershipsRequest;
 import com.whop.api.resources.memberships.requests.PauseMembershipsRequest;
+import com.whop.api.resources.memberships.requests.ReactivateMembershipsRequest;
 import com.whop.api.resources.memberships.requests.ResumeMembershipsRequest;
-import com.whop.api.resources.memberships.requests.ResyncAccessMembershipRequest;
+import com.whop.api.resources.memberships.requests.ResyncAccessMembershipsRequest;
 import com.whop.api.resources.memberships.requests.RetrieveMembershipsRequest;
 import com.whop.api.resources.memberships.requests.TransferMembershipsRequest;
-import com.whop.api.resources.memberships.requests.UncancelMembershipRequest;
 import com.whop.api.resources.memberships.requests.UpdateMembershipsRequest;
-import com.whop.api.resources.memberships.types.InviteMembershipsRequestBody;
 import com.whop.api.resources.memberships.types.InviteMembershipsResponse;
 import com.whop.api.resources.memberships.types.ListMembershipsResponse;
 import com.whop.api.resources.memberships.types.TransferMembershipsResponse;
@@ -82,7 +84,7 @@ public class RawMembershipsClient {
      */
     public WhopApiHttpResponse<SyncPagingIterable<Membership>> list(
             ListMembershipsRequest request, RequestOptions requestOptions) {
-        HttpUrl.Builder httpUrl = HttpUrl.parse(this.clientOptions.environment().getUrl())
+        HttpUrl.Builder httpUrl = HttpUrl.parse(this.clientOptions.environment().getApiURL())
                 .newBuilder()
                 .addPathSegments("memberships");
         if (request.getAccountId().isPresent()) {
@@ -93,6 +95,14 @@ public class RawMembershipsClient {
             QueryStringMapper.addQueryParameter(
                     httpUrl, "user_id", request.getUserId().get(), false);
         }
+        if (request.getMemberId().isPresent()) {
+            QueryStringMapper.addQueryParameter(
+                    httpUrl, "member_id", request.getMemberId().get(), false);
+        }
+        if (request.getExternalAccount().isPresent()) {
+            QueryStringMapper.addQueryParameter(
+                    httpUrl, "external_account", request.getExternalAccount().get(), false);
+        }
         if (request.getStatus().isPresent()) {
             QueryStringMapper.addQueryParameter(
                     httpUrl, "status", request.getStatus().get(), false);
@@ -101,9 +111,9 @@ public class RawMembershipsClient {
             QueryStringMapper.addQueryParameter(
                     httpUrl, "product_id", request.getProductId().get(), false);
         }
-        if (request.getPlanId().isPresent()) {
+        if (request.getVariantId().isPresent()) {
             QueryStringMapper.addQueryParameter(
-                    httpUrl, "plan_id", request.getPlanId().get(), false);
+                    httpUrl, "variant_id", request.getVariantId().get(), false);
         }
         if (request.getCreatedAfter().isPresent()) {
             QueryStringMapper.addQueryParameter(
@@ -137,6 +147,29 @@ public class RawMembershipsClient {
             QueryStringMapper.addQueryParameter(
                     httpUrl, "before", request.getBefore().get(), false);
         }
+        if (request.getIncludeTotalCount().isPresent()) {
+            QueryStringMapper.addQueryParameter(
+                    httpUrl,
+                    "include_total_count",
+                    request.getIncludeTotalCount().get(),
+                    false);
+        }
+        if (request.getStatuses().isPresent()) {
+            QueryStringMapper.addQueryParameter(
+                    httpUrl, "statuses", request.getStatuses().get(), true);
+        }
+        if (request.getProductIds().isPresent()) {
+            QueryStringMapper.addQueryParameter(
+                    httpUrl, "product_ids", request.getProductIds().get(), true);
+        }
+        if (request.getVariantIds().isPresent()) {
+            QueryStringMapper.addQueryParameter(
+                    httpUrl, "variant_ids", request.getVariantIds().get(), true);
+        }
+        if (request.getPromoCodeIds().isPresent()) {
+            QueryStringMapper.addQueryParameter(
+                    httpUrl, "promo_code_ids", request.getPromoCodeIds().get(), true);
+        }
         if (requestOptions != null) {
             requestOptions.getQueryParameters().forEach((_key, _value) -> {
                 httpUrl.addQueryParameter(_key, _value);
@@ -152,6 +185,15 @@ public class RawMembershipsClient {
         if (requestOptions != null && requestOptions.getTimeout().isPresent()) {
             client = clientOptions.httpClientWithTimeout(requestOptions);
         }
+        if (requestOptions != null && requestOptions.getMaxRetries().isPresent()) {
+            okhttpRequest = okhttpRequest
+                    .newBuilder()
+                    .tag(
+                            RetryInterceptor.MaxRetriesOverride.class,
+                            new RetryInterceptor.MaxRetriesOverride(
+                                    requestOptions.getMaxRetries().get()))
+                    .build();
+        }
         try (Response response = client.newCall(okhttpRequest).execute()) {
             ResponseBody responseBody = response.body();
             String responseBodyString = responseBody != null ? responseBody.string() : "{}";
@@ -166,8 +208,11 @@ public class RawMembershipsClient {
                 List<Membership> result = parsedResponse.getData();
                 return new WhopApiHttpResponse<>(
                         new SyncPagingIterable<Membership>(
-                                startingAfter != null, result, parsedResponse, () -> list(nextRequest, requestOptions)
-                                        .body()),
+                                startingAfter.isPresent()
+                                        && !startingAfter.get().isEmpty(),
+                                result,
+                                parsedResponse,
+                                () -> list(nextRequest, requestOptions).body()),
                         response);
             }
             try {
@@ -191,24 +236,26 @@ public class RawMembershipsClient {
             Object errorBody = ObjectMappers.parseErrorBody(responseBodyString);
             throw new WhopApiApiException(
                     "Error with status code " + response.code(), response.code(), errorBody, response);
+        } catch (JsonProcessingException e) {
+            throw new WhopApiException("Failed to deserialize response: " + e.getMessage(), e);
         } catch (IOException e) {
             throw new WhopApiException("Network error executing HTTP request", e);
         }
     }
 
     /**
-     * Sends an email inviting one recipient to join the account through a free plan. Identify the recipient by exactly one of <code>user_id</code> or <code>email</code>. The invitation is bound to that recipient; after signing in, accepting it immediately grants the membership without checkout. This Experimental endpoint is available only to accounts enabled for membership invitations.
+     * Emails one recipient an invitation to a free variant's membership. The invitation is bound to that recipient; after signing in, accepting it immediately grants the membership without checkout. This Experimental endpoint is available only to accounts enabled for membership invitations.
      */
-    public WhopApiHttpResponse<InviteMembershipsResponse> invite(InviteMembershipsRequestBody request) {
+    public WhopApiHttpResponse<InviteMembershipsResponse> invite(InviteMembershipsRequest request) {
         return invite(request, null);
     }
 
     /**
-     * Sends an email inviting one recipient to join the account through a free plan. Identify the recipient by exactly one of <code>user_id</code> or <code>email</code>. The invitation is bound to that recipient; after signing in, accepting it immediately grants the membership without checkout. This Experimental endpoint is available only to accounts enabled for membership invitations.
+     * Emails one recipient an invitation to a free variant's membership. The invitation is bound to that recipient; after signing in, accepting it immediately grants the membership without checkout. This Experimental endpoint is available only to accounts enabled for membership invitations.
      */
     public WhopApiHttpResponse<InviteMembershipsResponse> invite(
-            InviteMembershipsRequestBody request, RequestOptions requestOptions) {
-        HttpUrl.Builder httpUrl = HttpUrl.parse(this.clientOptions.environment().getUrl())
+            InviteMembershipsRequest request, RequestOptions requestOptions) {
+        HttpUrl.Builder httpUrl = HttpUrl.parse(this.clientOptions.environment().getApiURL())
                 .newBuilder()
                 .addPathSegments("memberships/invite");
         if (requestOptions != null) {
@@ -219,7 +266,9 @@ public class RawMembershipsClient {
         RequestBody body;
         try {
             body = RequestBody.create(
-                    ObjectMappers.JSON_MAPPER.writeValueAsBytes(request), MediaTypes.APPLICATION_JSON);
+                    ObjectMappers.JSON_MAPPER.writeValueAsBytes(BodyProperties.merge(
+                            request, requestOptions != null ? requestOptions.getBodyProperties() : null)),
+                    MediaTypes.APPLICATION_JSON);
         } catch (JsonProcessingException e) {
             throw new WhopApiException("Failed to serialize request", e);
         }
@@ -233,6 +282,15 @@ public class RawMembershipsClient {
         OkHttpClient client = clientOptions.httpClient();
         if (requestOptions != null && requestOptions.getTimeout().isPresent()) {
             client = clientOptions.httpClientWithTimeout(requestOptions);
+        }
+        if (requestOptions != null && requestOptions.getMaxRetries().isPresent()) {
+            okhttpRequest = okhttpRequest
+                    .newBuilder()
+                    .tag(
+                            RetryInterceptor.MaxRetriesOverride.class,
+                            new RetryInterceptor.MaxRetriesOverride(
+                                    requestOptions.getMaxRetries().get()))
+                    .build();
         }
         try (Response response = client.newCall(okhttpRequest).execute()) {
             ResponseBody responseBody = response.body();
@@ -258,8 +316,7 @@ public class RawMembershipsClient {
                                 ObjectMappers.JSON_MAPPER.readValue(responseBodyString, Object.class), response);
                     case 409:
                         throw new ConflictError(
-                                ObjectMappers.JSON_MAPPER.readValue(responseBodyString, V1ErrorResponse.class),
-                                response);
+                                ObjectMappers.JSON_MAPPER.readValue(responseBodyString, Object.class), response);
                 }
             } catch (JsonProcessingException ignored) {
                 // unable to map error response, throwing generic error
@@ -267,6 +324,8 @@ public class RawMembershipsClient {
             Object errorBody = ObjectMappers.parseErrorBody(responseBodyString);
             throw new WhopApiApiException(
                     "Error with status code " + response.code(), response.code(), errorBody, response);
+        } catch (JsonProcessingException e) {
+            throw new WhopApiException("Failed to deserialize response: " + e.getMessage(), e);
         } catch (IOException e) {
             throw new WhopApiException("Network error executing HTTP request", e);
         }
@@ -298,10 +357,10 @@ public class RawMembershipsClient {
      */
     public WhopApiHttpResponse<Membership> retrieve(
             String id, RetrieveMembershipsRequest request, RequestOptions requestOptions) {
-        HttpUrl.Builder httpUrl = HttpUrl.parse(this.clientOptions.environment().getUrl())
+        HttpUrl.Builder httpUrl = HttpUrl.parse(this.clientOptions.environment().getApiURL())
                 .newBuilder()
                 .addPathSegments("memberships")
-                .addPathSegment(id);
+                .addPathSegment(PathSegments.validate(id));
         if (requestOptions != null) {
             requestOptions.getQueryParameters().forEach((_key, _value) -> {
                 httpUrl.addQueryParameter(_key, _value);
@@ -316,6 +375,15 @@ public class RawMembershipsClient {
         OkHttpClient client = clientOptions.httpClient();
         if (requestOptions != null && requestOptions.getTimeout().isPresent()) {
             client = clientOptions.httpClientWithTimeout(requestOptions);
+        }
+        if (requestOptions != null && requestOptions.getMaxRetries().isPresent()) {
+            okhttpRequest = okhttpRequest
+                    .newBuilder()
+                    .tag(
+                            RetryInterceptor.MaxRetriesOverride.class,
+                            new RetryInterceptor.MaxRetriesOverride(
+                                    requestOptions.getMaxRetries().get()))
+                    .build();
         }
         try (Response response = client.newCall(okhttpRequest).execute()) {
             ResponseBody responseBody = response.body();
@@ -339,41 +407,43 @@ public class RawMembershipsClient {
             Object errorBody = ObjectMappers.parseErrorBody(responseBodyString);
             throw new WhopApiApiException(
                     "Error with status code " + response.code(), response.code(), errorBody, response);
+        } catch (JsonProcessingException e) {
+            throw new WhopApiException("Failed to deserialize response: " + e.getMessage(), e);
         } catch (IOException e) {
             throw new WhopApiException("Network error executing HTTP request", e);
         }
     }
 
     /**
-     * Updates a membership: merge metadata key-value pairs, or toggle <code>cancel_at_period_end</code> — <code>true</code> schedules the cancellation for the end of the current billing period, <code>false</code> reverses a pending one.
+     * Updates a membership's metadata, scheduled cancellation, renewal payment method, renewal cadence, next renewal date, or renewal price.
      */
     public WhopApiHttpResponse<Membership> update(String id) {
         return update(id, UpdateMembershipsRequest.builder().build());
     }
 
     /**
-     * Updates a membership: merge metadata key-value pairs, or toggle <code>cancel_at_period_end</code> — <code>true</code> schedules the cancellation for the end of the current billing period, <code>false</code> reverses a pending one.
+     * Updates a membership's metadata, scheduled cancellation, renewal payment method, renewal cadence, next renewal date, or renewal price.
      */
     public WhopApiHttpResponse<Membership> update(String id, RequestOptions requestOptions) {
         return update(id, UpdateMembershipsRequest.builder().build(), requestOptions);
     }
 
     /**
-     * Updates a membership: merge metadata key-value pairs, or toggle <code>cancel_at_period_end</code> — <code>true</code> schedules the cancellation for the end of the current billing period, <code>false</code> reverses a pending one.
+     * Updates a membership's metadata, scheduled cancellation, renewal payment method, renewal cadence, next renewal date, or renewal price.
      */
     public WhopApiHttpResponse<Membership> update(String id, UpdateMembershipsRequest request) {
         return update(id, request, null);
     }
 
     /**
-     * Updates a membership: merge metadata key-value pairs, or toggle <code>cancel_at_period_end</code> — <code>true</code> schedules the cancellation for the end of the current billing period, <code>false</code> reverses a pending one.
+     * Updates a membership's metadata, scheduled cancellation, renewal payment method, renewal cadence, next renewal date, or renewal price.
      */
     public WhopApiHttpResponse<Membership> update(
             String id, UpdateMembershipsRequest request, RequestOptions requestOptions) {
-        HttpUrl.Builder httpUrl = HttpUrl.parse(this.clientOptions.environment().getUrl())
+        HttpUrl.Builder httpUrl = HttpUrl.parse(this.clientOptions.environment().getApiURL())
                 .newBuilder()
                 .addPathSegments("memberships")
-                .addPathSegment(id);
+                .addPathSegment(PathSegments.validate(id));
         if (requestOptions != null) {
             requestOptions.getQueryParameters().forEach((_key, _value) -> {
                 httpUrl.addQueryParameter(_key, _value);
@@ -382,7 +452,9 @@ public class RawMembershipsClient {
         RequestBody body;
         try {
             body = RequestBody.create(
-                    ObjectMappers.JSON_MAPPER.writeValueAsBytes(request), MediaTypes.APPLICATION_JSON);
+                    ObjectMappers.JSON_MAPPER.writeValueAsBytes(BodyProperties.merge(
+                            request, requestOptions != null ? requestOptions.getBodyProperties() : null)),
+                    MediaTypes.APPLICATION_JSON);
         } catch (JsonProcessingException e) {
             throw new WhopApiException("Failed to serialize request", e);
         }
@@ -396,6 +468,15 @@ public class RawMembershipsClient {
         OkHttpClient client = clientOptions.httpClient();
         if (requestOptions != null && requestOptions.getTimeout().isPresent()) {
             client = clientOptions.httpClientWithTimeout(requestOptions);
+        }
+        if (requestOptions != null && requestOptions.getMaxRetries().isPresent()) {
+            okhttpRequest = okhttpRequest
+                    .newBuilder()
+                    .tag(
+                            RetryInterceptor.MaxRetriesOverride.class,
+                            new RetryInterceptor.MaxRetriesOverride(
+                                    requestOptions.getMaxRetries().get()))
+                    .build();
         }
         try (Response response = client.newCall(okhttpRequest).execute()) {
             ResponseBody responseBody = response.body();
@@ -419,40 +500,30 @@ public class RawMembershipsClient {
             Object errorBody = ObjectMappers.parseErrorBody(responseBodyString);
             throw new WhopApiApiException(
                     "Error with status code " + response.code(), response.code(), errorBody, response);
+        } catch (JsonProcessingException e) {
+            throw new WhopApiException("Failed to deserialize response: " + e.getMessage(), e);
         } catch (IOException e) {
             throw new WhopApiException("Network error executing HTTP request", e);
         }
     }
 
     /**
-     * Add free days to extend a membership's current billing period, expiration date, or Stripe trial.
-     * <p>Required permissions:</p>
-     * <ul>
-     * <li><code>member:manage</code></li>
-     * <li><code>member:email:read</code></li>
-     * <li><code>member:basic:read</code></li>
-     * </ul>
+     * Applies a promo code to an <code>active</code> or <code>trialing</code> membership that does not already have one and has exactly one recurring item, for Stripe-billed memberships and memberships billed by Whop's billing engine. The discount lands on the next invoice and follows the code's duration (<code>once</code>, <code>repeating</code>, or <code>forever</code>).
      */
-    public WhopApiHttpResponse<Membership> addFreeDaysMembership(String id, AddFreeDaysMembershipRequest request) {
-        return addFreeDaysMembership(id, request, null);
+    public WhopApiHttpResponse<Membership> applyPromoCode(String id, ApplyPromoCodeMembershipsRequest request) {
+        return applyPromoCode(id, request, null);
     }
 
     /**
-     * Add free days to extend a membership's current billing period, expiration date, or Stripe trial.
-     * <p>Required permissions:</p>
-     * <ul>
-     * <li><code>member:manage</code></li>
-     * <li><code>member:email:read</code></li>
-     * <li><code>member:basic:read</code></li>
-     * </ul>
+     * Applies a promo code to an <code>active</code> or <code>trialing</code> membership that does not already have one and has exactly one recurring item, for Stripe-billed memberships and memberships billed by Whop's billing engine. The discount lands on the next invoice and follows the code's duration (<code>once</code>, <code>repeating</code>, or <code>forever</code>).
      */
-    public WhopApiHttpResponse<Membership> addFreeDaysMembership(
-            String id, AddFreeDaysMembershipRequest request, RequestOptions requestOptions) {
-        HttpUrl.Builder httpUrl = HttpUrl.parse(this.clientOptions.environment().getUrl())
+    public WhopApiHttpResponse<Membership> applyPromoCode(
+            String id, ApplyPromoCodeMembershipsRequest request, RequestOptions requestOptions) {
+        HttpUrl.Builder httpUrl = HttpUrl.parse(this.clientOptions.environment().getApiURL())
                 .newBuilder()
                 .addPathSegments("memberships")
-                .addPathSegment(id)
-                .addPathSegments("add_free_days");
+                .addPathSegment(PathSegments.validate(id))
+                .addPathSegments("apply_promo_code");
         if (requestOptions != null) {
             requestOptions.getQueryParameters().forEach((_key, _value) -> {
                 httpUrl.addQueryParameter(_key, _value);
@@ -461,7 +532,9 @@ public class RawMembershipsClient {
         RequestBody body;
         try {
             body = RequestBody.create(
-                    ObjectMappers.JSON_MAPPER.writeValueAsBytes(request), MediaTypes.APPLICATION_JSON);
+                    ObjectMappers.JSON_MAPPER.writeValueAsBytes(BodyProperties.merge(
+                            request, requestOptions != null ? requestOptions.getBodyProperties() : null)),
+                    MediaTypes.APPLICATION_JSON);
         } catch (JsonProcessingException e) {
             throw new WhopApiException("Failed to serialize request", e);
         }
@@ -475,6 +548,101 @@ public class RawMembershipsClient {
         OkHttpClient client = clientOptions.httpClient();
         if (requestOptions != null && requestOptions.getTimeout().isPresent()) {
             client = clientOptions.httpClientWithTimeout(requestOptions);
+        }
+        if (requestOptions != null && requestOptions.getMaxRetries().isPresent()) {
+            okhttpRequest = okhttpRequest
+                    .newBuilder()
+                    .tag(
+                            RetryInterceptor.MaxRetriesOverride.class,
+                            new RetryInterceptor.MaxRetriesOverride(
+                                    requestOptions.getMaxRetries().get()))
+                    .build();
+        }
+        try (Response response = client.newCall(okhttpRequest).execute()) {
+            ResponseBody responseBody = response.body();
+            String responseBodyString = responseBody != null ? responseBody.string() : "{}";
+            if (response.isSuccessful()) {
+                return new WhopApiHttpResponse<>(
+                        ObjectMappers.JSON_MAPPER.readValue(responseBodyString, Membership.class), response);
+            }
+            try {
+                switch (response.code()) {
+                    case 400:
+                        throw new BadRequestError(
+                                ObjectMappers.JSON_MAPPER.readValue(responseBodyString, Object.class), response);
+                    case 401:
+                        throw new UnauthorizedError(
+                                ObjectMappers.JSON_MAPPER.readValue(responseBodyString, Object.class), response);
+                    case 403:
+                        throw new ForbiddenError(
+                                ObjectMappers.JSON_MAPPER.readValue(responseBodyString, Object.class), response);
+                    case 409:
+                        throw new ConflictError(
+                                ObjectMappers.JSON_MAPPER.readValue(responseBodyString, Object.class), response);
+                }
+            } catch (JsonProcessingException ignored) {
+                // unable to map error response, throwing generic error
+            }
+            Object errorBody = ObjectMappers.parseErrorBody(responseBodyString);
+            throw new WhopApiApiException(
+                    "Error with status code " + response.code(), response.code(), errorBody, response);
+        } catch (JsonProcessingException e) {
+            throw new WhopApiException("Failed to deserialize response: " + e.getMessage(), e);
+        } catch (IOException e) {
+            throw new WhopApiException("Network error executing HTTP request", e);
+        }
+    }
+
+    /**
+     * Assigns an affiliate to a membership and pays them the commission you set on its future payments; past payments are not recalculated. A user who is not yet an affiliate of your account becomes one, which also requires <code>affiliate:create</code>. Send a new <code>commission_type</code> or <code>commission_value</code> for the membership's current affiliate to change their commission; a membership that already has a different affiliate returns a conflict. Works for active or trialing memberships with one recurring variant that bill through Stripe or Whop's billing engine, and not for marketplace memberships, paused payments, or a scheduled cancellation. You cannot assign yourself.
+     */
+    public WhopApiHttpResponse<Membership> assignAffiliate(String id, AssignAffiliateMembershipsRequest request) {
+        return assignAffiliate(id, request, null);
+    }
+
+    /**
+     * Assigns an affiliate to a membership and pays them the commission you set on its future payments; past payments are not recalculated. A user who is not yet an affiliate of your account becomes one, which also requires <code>affiliate:create</code>. Send a new <code>commission_type</code> or <code>commission_value</code> for the membership's current affiliate to change their commission; a membership that already has a different affiliate returns a conflict. Works for active or trialing memberships with one recurring variant that bill through Stripe or Whop's billing engine, and not for marketplace memberships, paused payments, or a scheduled cancellation. You cannot assign yourself.
+     */
+    public WhopApiHttpResponse<Membership> assignAffiliate(
+            String id, AssignAffiliateMembershipsRequest request, RequestOptions requestOptions) {
+        HttpUrl.Builder httpUrl = HttpUrl.parse(this.clientOptions.environment().getApiURL())
+                .newBuilder()
+                .addPathSegments("memberships")
+                .addPathSegment(PathSegments.validate(id))
+                .addPathSegments("assign_affiliate");
+        if (requestOptions != null) {
+            requestOptions.getQueryParameters().forEach((_key, _value) -> {
+                httpUrl.addQueryParameter(_key, _value);
+            });
+        }
+        RequestBody body;
+        try {
+            body = RequestBody.create(
+                    ObjectMappers.JSON_MAPPER.writeValueAsBytes(BodyProperties.merge(
+                            request, requestOptions != null ? requestOptions.getBodyProperties() : null)),
+                    MediaTypes.APPLICATION_JSON);
+        } catch (JsonProcessingException e) {
+            throw new WhopApiException("Failed to serialize request", e);
+        }
+        Request okhttpRequest = new Request.Builder()
+                .url(httpUrl.build())
+                .method("POST", body)
+                .headers(Headers.of(clientOptions.headers(requestOptions)))
+                .addHeader("Content-Type", "application/json")
+                .addHeader("Accept", "application/json")
+                .build();
+        OkHttpClient client = clientOptions.httpClient();
+        if (requestOptions != null && requestOptions.getTimeout().isPresent()) {
+            client = clientOptions.httpClientWithTimeout(requestOptions);
+        }
+        if (requestOptions != null && requestOptions.getMaxRetries().isPresent()) {
+            okhttpRequest = okhttpRequest
+                    .newBuilder()
+                    .tag(
+                            RetryInterceptor.MaxRetriesOverride.class,
+                            new RetryInterceptor.MaxRetriesOverride(
+                                    requestOptions.getMaxRetries().get()))
+                    .build();
         }
         try (Response response = client.newCall(okhttpRequest).execute()) {
             ResponseBody responseBody = response.body();
@@ -497,15 +665,13 @@ public class RawMembershipsClient {
                     case 404:
                         throw new NotFoundError(
                                 ObjectMappers.JSON_MAPPER.readValue(responseBodyString, Object.class), response);
-                    case 422:
-                        throw new UnprocessableEntityError(
+                    case 409:
+                        throw new ConflictError(
                                 ObjectMappers.JSON_MAPPER.readValue(responseBodyString, Object.class), response);
-                    case 429:
-                        throw new TooManyRequestsError(
-                                ObjectMappers.JSON_MAPPER.readValue(responseBodyString, Object.class), response);
-                    case 500:
-                        throw new InternalServerError(
-                                ObjectMappers.JSON_MAPPER.readValue(responseBodyString, Object.class), response);
+                    case 503:
+                        throw new ServiceUnavailableError(
+                                ObjectMappers.JSON_MAPPER.readValue(responseBodyString, V1ErrorResponse.class),
+                                response);
                 }
             } catch (JsonProcessingException ignored) {
                 // unable to map error response, throwing generic error
@@ -513,41 +679,43 @@ public class RawMembershipsClient {
             Object errorBody = ObjectMappers.parseErrorBody(responseBodyString);
             throw new WhopApiApiException(
                     "Error with status code " + response.code(), response.code(), errorBody, response);
+        } catch (JsonProcessingException e) {
+            throw new WhopApiException("Failed to deserialize response: " + e.getMessage(), e);
         } catch (IOException e) {
             throw new WhopApiException("Network error executing HTTP request", e);
         }
     }
 
     /**
-     * Cancels a membership. Pass <code>cancel_at_period_end: true</code> to stop auto-renewal and keep access until the current billing period ends. Omit it (or pass <code>false</code>) to revoke access immediately. Buyers cannot cancel buy-now-pay-later (<code>splitit</code>, <code>sezzle</code>) or non-trial split-pay memberships.
+     * Cancels a membership, either immediately or at the end of the current billing period. Buyers cannot cancel buy-now-pay-later (<code>splitit</code>, <code>sezzle</code>) or non-trial split-pay memberships.
      */
     public WhopApiHttpResponse<Membership> cancel(String id) {
         return cancel(id, CancelMembershipsRequest.builder().build());
     }
 
     /**
-     * Cancels a membership. Pass <code>cancel_at_period_end: true</code> to stop auto-renewal and keep access until the current billing period ends. Omit it (or pass <code>false</code>) to revoke access immediately. Buyers cannot cancel buy-now-pay-later (<code>splitit</code>, <code>sezzle</code>) or non-trial split-pay memberships.
+     * Cancels a membership, either immediately or at the end of the current billing period. Buyers cannot cancel buy-now-pay-later (<code>splitit</code>, <code>sezzle</code>) or non-trial split-pay memberships.
      */
     public WhopApiHttpResponse<Membership> cancel(String id, RequestOptions requestOptions) {
         return cancel(id, CancelMembershipsRequest.builder().build(), requestOptions);
     }
 
     /**
-     * Cancels a membership. Pass <code>cancel_at_period_end: true</code> to stop auto-renewal and keep access until the current billing period ends. Omit it (or pass <code>false</code>) to revoke access immediately. Buyers cannot cancel buy-now-pay-later (<code>splitit</code>, <code>sezzle</code>) or non-trial split-pay memberships.
+     * Cancels a membership, either immediately or at the end of the current billing period. Buyers cannot cancel buy-now-pay-later (<code>splitit</code>, <code>sezzle</code>) or non-trial split-pay memberships.
      */
     public WhopApiHttpResponse<Membership> cancel(String id, CancelMembershipsRequest request) {
         return cancel(id, request, null);
     }
 
     /**
-     * Cancels a membership. Pass <code>cancel_at_period_end: true</code> to stop auto-renewal and keep access until the current billing period ends. Omit it (or pass <code>false</code>) to revoke access immediately. Buyers cannot cancel buy-now-pay-later (<code>splitit</code>, <code>sezzle</code>) or non-trial split-pay memberships.
+     * Cancels a membership, either immediately or at the end of the current billing period. Buyers cannot cancel buy-now-pay-later (<code>splitit</code>, <code>sezzle</code>) or non-trial split-pay memberships.
      */
     public WhopApiHttpResponse<Membership> cancel(
             String id, CancelMembershipsRequest request, RequestOptions requestOptions) {
-        HttpUrl.Builder httpUrl = HttpUrl.parse(this.clientOptions.environment().getUrl())
+        HttpUrl.Builder httpUrl = HttpUrl.parse(this.clientOptions.environment().getApiURL())
                 .newBuilder()
                 .addPathSegments("memberships")
-                .addPathSegment(id)
+                .addPathSegment(PathSegments.validate(id))
                 .addPathSegments("cancel");
         if (requestOptions != null) {
             requestOptions.getQueryParameters().forEach((_key, _value) -> {
@@ -557,7 +725,9 @@ public class RawMembershipsClient {
         RequestBody body;
         try {
             body = RequestBody.create(
-                    ObjectMappers.JSON_MAPPER.writeValueAsBytes(request), MediaTypes.APPLICATION_JSON);
+                    ObjectMappers.JSON_MAPPER.writeValueAsBytes(BodyProperties.merge(
+                            request, requestOptions != null ? requestOptions.getBodyProperties() : null)),
+                    MediaTypes.APPLICATION_JSON);
         } catch (JsonProcessingException e) {
             throw new WhopApiException("Failed to serialize request", e);
         }
@@ -571,6 +741,15 @@ public class RawMembershipsClient {
         OkHttpClient client = clientOptions.httpClient();
         if (requestOptions != null && requestOptions.getTimeout().isPresent()) {
             client = clientOptions.httpClientWithTimeout(requestOptions);
+        }
+        if (requestOptions != null && requestOptions.getMaxRetries().isPresent()) {
+            okhttpRequest = okhttpRequest
+                    .newBuilder()
+                    .tag(
+                            RetryInterceptor.MaxRetriesOverride.class,
+                            new RetryInterceptor.MaxRetriesOverride(
+                                    requestOptions.getMaxRetries().get()))
+                    .build();
         }
         try (Response response = client.newCall(okhttpRequest).execute()) {
             ResponseBody responseBody = response.body();
@@ -589,8 +768,7 @@ public class RawMembershipsClient {
                                 ObjectMappers.JSON_MAPPER.readValue(responseBodyString, Object.class), response);
                     case 409:
                         throw new ConflictError(
-                                ObjectMappers.JSON_MAPPER.readValue(responseBodyString, V1ErrorResponse.class),
-                                response);
+                                ObjectMappers.JSON_MAPPER.readValue(responseBodyString, Object.class), response);
                 }
             } catch (JsonProcessingException ignored) {
                 // unable to map error response, throwing generic error
@@ -598,6 +776,8 @@ public class RawMembershipsClient {
             Object errorBody = ObjectMappers.parseErrorBody(responseBodyString);
             throw new WhopApiApiException(
                     "Error with status code " + response.code(), response.code(), errorBody, response);
+        } catch (JsonProcessingException e) {
+            throw new WhopApiException("Failed to deserialize response: " + e.getMessage(), e);
         } catch (IOException e) {
             throw new WhopApiException("Network error executing HTTP request", e);
         }
@@ -615,10 +795,10 @@ public class RawMembershipsClient {
      */
     public WhopApiHttpResponse<Membership> extend(
             String id, ExtendMembershipsRequest request, RequestOptions requestOptions) {
-        HttpUrl.Builder httpUrl = HttpUrl.parse(this.clientOptions.environment().getUrl())
+        HttpUrl.Builder httpUrl = HttpUrl.parse(this.clientOptions.environment().getApiURL())
                 .newBuilder()
                 .addPathSegments("memberships")
-                .addPathSegment(id)
+                .addPathSegment(PathSegments.validate(id))
                 .addPathSegments("extend");
         if (requestOptions != null) {
             requestOptions.getQueryParameters().forEach((_key, _value) -> {
@@ -628,7 +808,9 @@ public class RawMembershipsClient {
         RequestBody body;
         try {
             body = RequestBody.create(
-                    ObjectMappers.JSON_MAPPER.writeValueAsBytes(request), MediaTypes.APPLICATION_JSON);
+                    ObjectMappers.JSON_MAPPER.writeValueAsBytes(BodyProperties.merge(
+                            request, requestOptions != null ? requestOptions.getBodyProperties() : null)),
+                    MediaTypes.APPLICATION_JSON);
         } catch (JsonProcessingException e) {
             throw new WhopApiException("Failed to serialize request", e);
         }
@@ -642,6 +824,15 @@ public class RawMembershipsClient {
         OkHttpClient client = clientOptions.httpClient();
         if (requestOptions != null && requestOptions.getTimeout().isPresent()) {
             client = clientOptions.httpClientWithTimeout(requestOptions);
+        }
+        if (requestOptions != null && requestOptions.getMaxRetries().isPresent()) {
+            okhttpRequest = okhttpRequest
+                    .newBuilder()
+                    .tag(
+                            RetryInterceptor.MaxRetriesOverride.class,
+                            new RetryInterceptor.MaxRetriesOverride(
+                                    requestOptions.getMaxRetries().get()))
+                    .build();
         }
         try (Response response = client.newCall(okhttpRequest).execute()) {
             ResponseBody responseBody = response.body();
@@ -660,8 +851,7 @@ public class RawMembershipsClient {
                                 ObjectMappers.JSON_MAPPER.readValue(responseBodyString, Object.class), response);
                     case 409:
                         throw new ConflictError(
-                                ObjectMappers.JSON_MAPPER.readValue(responseBodyString, V1ErrorResponse.class),
-                                response);
+                                ObjectMappers.JSON_MAPPER.readValue(responseBodyString, Object.class), response);
                 }
             } catch (JsonProcessingException ignored) {
                 // unable to map error response, throwing generic error
@@ -669,6 +859,8 @@ public class RawMembershipsClient {
             Object errorBody = ObjectMappers.parseErrorBody(responseBodyString);
             throw new WhopApiApiException(
                     "Error with status code " + response.code(), response.code(), errorBody, response);
+        } catch (JsonProcessingException e) {
+            throw new WhopApiException("Failed to deserialize response: " + e.getMessage(), e);
         } catch (IOException e) {
             throw new WhopApiException("Network error executing HTTP request", e);
         }
@@ -700,10 +892,10 @@ public class RawMembershipsClient {
      */
     public WhopApiHttpResponse<Membership> pause(
             String id, PauseMembershipsRequest request, RequestOptions requestOptions) {
-        HttpUrl.Builder httpUrl = HttpUrl.parse(this.clientOptions.environment().getUrl())
+        HttpUrl.Builder httpUrl = HttpUrl.parse(this.clientOptions.environment().getApiURL())
                 .newBuilder()
                 .addPathSegments("memberships")
-                .addPathSegment(id)
+                .addPathSegment(PathSegments.validate(id))
                 .addPathSegments("pause");
         if (requestOptions != null) {
             requestOptions.getQueryParameters().forEach((_key, _value) -> {
@@ -713,7 +905,9 @@ public class RawMembershipsClient {
         RequestBody body;
         try {
             body = RequestBody.create(
-                    ObjectMappers.JSON_MAPPER.writeValueAsBytes(request), MediaTypes.APPLICATION_JSON);
+                    ObjectMappers.JSON_MAPPER.writeValueAsBytes(BodyProperties.merge(
+                            request, requestOptions != null ? requestOptions.getBodyProperties() : null)),
+                    MediaTypes.APPLICATION_JSON);
         } catch (JsonProcessingException e) {
             throw new WhopApiException("Failed to serialize request", e);
         }
@@ -727,6 +921,15 @@ public class RawMembershipsClient {
         OkHttpClient client = clientOptions.httpClient();
         if (requestOptions != null && requestOptions.getTimeout().isPresent()) {
             client = clientOptions.httpClientWithTimeout(requestOptions);
+        }
+        if (requestOptions != null && requestOptions.getMaxRetries().isPresent()) {
+            okhttpRequest = okhttpRequest
+                    .newBuilder()
+                    .tag(
+                            RetryInterceptor.MaxRetriesOverride.class,
+                            new RetryInterceptor.MaxRetriesOverride(
+                                    requestOptions.getMaxRetries().get()))
+                    .build();
         }
         try (Response response = client.newCall(okhttpRequest).execute()) {
             ResponseBody responseBody = response.body();
@@ -745,8 +948,7 @@ public class RawMembershipsClient {
                                 ObjectMappers.JSON_MAPPER.readValue(responseBodyString, Object.class), response);
                     case 409:
                         throw new ConflictError(
-                                ObjectMappers.JSON_MAPPER.readValue(responseBodyString, V1ErrorResponse.class),
-                                response);
+                                ObjectMappers.JSON_MAPPER.readValue(responseBodyString, Object.class), response);
                 }
             } catch (JsonProcessingException ignored) {
                 // unable to map error response, throwing generic error
@@ -754,6 +956,111 @@ public class RawMembershipsClient {
             Object errorBody = ObjectMappers.parseErrorBody(responseBodyString);
             throw new WhopApiApiException(
                     "Error with status code " + response.code(), response.code(), errorBody, response);
+        } catch (JsonProcessingException e) {
+            throw new WhopApiException("Failed to deserialize response: " + e.getMessage(), e);
+        } catch (IOException e) {
+            throw new WhopApiException("Network error executing HTTP request", e);
+        }
+    }
+
+    /**
+     * Restores access to a <code>canceled</code> or <code>expired</code> membership that contains only one-time purchases and sets its <code>status</code> to <code>completed</code>. Lifetime memberships regain lifetime access; for memberships with an expiration, <code>days</code> sets the new <code>current_period_end</code>. Active and recurring memberships cannot be reactivated.
+     */
+    public WhopApiHttpResponse<Membership> reactivate(String id) {
+        return reactivate(id, ReactivateMembershipsRequest.builder().build());
+    }
+
+    /**
+     * Restores access to a <code>canceled</code> or <code>expired</code> membership that contains only one-time purchases and sets its <code>status</code> to <code>completed</code>. Lifetime memberships regain lifetime access; for memberships with an expiration, <code>days</code> sets the new <code>current_period_end</code>. Active and recurring memberships cannot be reactivated.
+     */
+    public WhopApiHttpResponse<Membership> reactivate(String id, RequestOptions requestOptions) {
+        return reactivate(id, ReactivateMembershipsRequest.builder().build(), requestOptions);
+    }
+
+    /**
+     * Restores access to a <code>canceled</code> or <code>expired</code> membership that contains only one-time purchases and sets its <code>status</code> to <code>completed</code>. Lifetime memberships regain lifetime access; for memberships with an expiration, <code>days</code> sets the new <code>current_period_end</code>. Active and recurring memberships cannot be reactivated.
+     */
+    public WhopApiHttpResponse<Membership> reactivate(String id, ReactivateMembershipsRequest request) {
+        return reactivate(id, request, null);
+    }
+
+    /**
+     * Restores access to a <code>canceled</code> or <code>expired</code> membership that contains only one-time purchases and sets its <code>status</code> to <code>completed</code>. Lifetime memberships regain lifetime access; for memberships with an expiration, <code>days</code> sets the new <code>current_period_end</code>. Active and recurring memberships cannot be reactivated.
+     */
+    public WhopApiHttpResponse<Membership> reactivate(
+            String id, ReactivateMembershipsRequest request, RequestOptions requestOptions) {
+        HttpUrl.Builder httpUrl = HttpUrl.parse(this.clientOptions.environment().getApiURL())
+                .newBuilder()
+                .addPathSegments("memberships")
+                .addPathSegment(PathSegments.validate(id))
+                .addPathSegments("reactivate");
+        if (requestOptions != null) {
+            requestOptions.getQueryParameters().forEach((_key, _value) -> {
+                httpUrl.addQueryParameter(_key, _value);
+            });
+        }
+        RequestBody body;
+        try {
+            body = RequestBody.create(
+                    ObjectMappers.JSON_MAPPER.writeValueAsBytes(BodyProperties.merge(
+                            request, requestOptions != null ? requestOptions.getBodyProperties() : null)),
+                    MediaTypes.APPLICATION_JSON);
+        } catch (JsonProcessingException e) {
+            throw new WhopApiException("Failed to serialize request", e);
+        }
+        Request okhttpRequest = new Request.Builder()
+                .url(httpUrl.build())
+                .method("POST", body)
+                .headers(Headers.of(clientOptions.headers(requestOptions)))
+                .addHeader("Content-Type", "application/json")
+                .addHeader("Accept", "application/json")
+                .build();
+        OkHttpClient client = clientOptions.httpClient();
+        if (requestOptions != null && requestOptions.getTimeout().isPresent()) {
+            client = clientOptions.httpClientWithTimeout(requestOptions);
+        }
+        if (requestOptions != null && requestOptions.getMaxRetries().isPresent()) {
+            okhttpRequest = okhttpRequest
+                    .newBuilder()
+                    .tag(
+                            RetryInterceptor.MaxRetriesOverride.class,
+                            new RetryInterceptor.MaxRetriesOverride(
+                                    requestOptions.getMaxRetries().get()))
+                    .build();
+        }
+        try (Response response = client.newCall(okhttpRequest).execute()) {
+            ResponseBody responseBody = response.body();
+            String responseBodyString = responseBody != null ? responseBody.string() : "{}";
+            if (response.isSuccessful()) {
+                return new WhopApiHttpResponse<>(
+                        ObjectMappers.JSON_MAPPER.readValue(responseBodyString, Membership.class), response);
+            }
+            try {
+                switch (response.code()) {
+                    case 400:
+                        throw new BadRequestError(
+                                ObjectMappers.JSON_MAPPER.readValue(responseBodyString, Object.class), response);
+                    case 401:
+                        throw new UnauthorizedError(
+                                ObjectMappers.JSON_MAPPER.readValue(responseBodyString, Object.class), response);
+                    case 403:
+                        throw new ForbiddenError(
+                                ObjectMappers.JSON_MAPPER.readValue(responseBodyString, Object.class), response);
+                    case 404:
+                        throw new NotFoundError(
+                                ObjectMappers.JSON_MAPPER.readValue(responseBodyString, Object.class), response);
+                    case 409:
+                        throw new ConflictError(
+                                ObjectMappers.JSON_MAPPER.readValue(responseBodyString, Object.class), response);
+                }
+            } catch (JsonProcessingException ignored) {
+                // unable to map error response, throwing generic error
+            }
+            Object errorBody = ObjectMappers.parseErrorBody(responseBodyString);
+            throw new WhopApiApiException(
+                    "Error with status code " + response.code(), response.code(), errorBody, response);
+        } catch (JsonProcessingException e) {
+            throw new WhopApiException("Failed to deserialize response: " + e.getMessage(), e);
         } catch (IOException e) {
             throw new WhopApiException("Network error executing HTTP request", e);
         }
@@ -785,10 +1092,10 @@ public class RawMembershipsClient {
      */
     public WhopApiHttpResponse<Membership> resume(
             String id, ResumeMembershipsRequest request, RequestOptions requestOptions) {
-        HttpUrl.Builder httpUrl = HttpUrl.parse(this.clientOptions.environment().getUrl())
+        HttpUrl.Builder httpUrl = HttpUrl.parse(this.clientOptions.environment().getApiURL())
                 .newBuilder()
                 .addPathSegments("memberships")
-                .addPathSegment(id)
+                .addPathSegment(PathSegments.validate(id))
                 .addPathSegments("resume");
         if (requestOptions != null) {
             requestOptions.getQueryParameters().forEach((_key, _value) -> {
@@ -797,13 +1104,26 @@ public class RawMembershipsClient {
         }
         Request.Builder _requestBuilder = new Request.Builder()
                 .url(httpUrl.build())
-                .method("POST", RequestBody.create("", null))
+                .method(
+                        "POST",
+                        BodyProperties.toRequestBody(
+                                requestOptions != null ? requestOptions.getBodyProperties() : null,
+                                RequestBody.create("", null)))
                 .headers(Headers.of(clientOptions.headers(requestOptions)))
                 .addHeader("Accept", "application/json");
         Request okhttpRequest = _requestBuilder.build();
         OkHttpClient client = clientOptions.httpClient();
         if (requestOptions != null && requestOptions.getTimeout().isPresent()) {
             client = clientOptions.httpClientWithTimeout(requestOptions);
+        }
+        if (requestOptions != null && requestOptions.getMaxRetries().isPresent()) {
+            okhttpRequest = okhttpRequest
+                    .newBuilder()
+                    .tag(
+                            RetryInterceptor.MaxRetriesOverride.class,
+                            new RetryInterceptor.MaxRetriesOverride(
+                                    requestOptions.getMaxRetries().get()))
+                    .build();
         }
         try (Response response = client.newCall(okhttpRequest).execute()) {
             ResponseBody responseBody = response.body();
@@ -822,8 +1142,7 @@ public class RawMembershipsClient {
                                 ObjectMappers.JSON_MAPPER.readValue(responseBodyString, Object.class), response);
                     case 409:
                         throw new ConflictError(
-                                ObjectMappers.JSON_MAPPER.readValue(responseBodyString, V1ErrorResponse.class),
-                                response);
+                                ObjectMappers.JSON_MAPPER.readValue(responseBodyString, Object.class), response);
                 }
             } catch (JsonProcessingException ignored) {
                 // unable to map error response, throwing generic error
@@ -831,67 +1150,43 @@ public class RawMembershipsClient {
             Object errorBody = ObjectMappers.parseErrorBody(responseBodyString);
             throw new WhopApiApiException(
                     "Error with status code " + response.code(), response.code(), errorBody, response);
+        } catch (JsonProcessingException e) {
+            throw new WhopApiException("Failed to deserialize response: " + e.getMessage(), e);
         } catch (IOException e) {
             throw new WhopApiException("Network error executing HTTP request", e);
         }
     }
 
     /**
-     * Re-run access fulfillment for a membership. Recomputes the member's content access on Whop, re-validates their Discord link (re-adding them to the server and re-assigning roles if needed), and re-fulfills TradingView indicator access. Telegram access is invite-based and cannot be resynced here. The outcome is written to the membership's logs.
-     * <p>Required permissions:</p>
-     * <ul>
-     * <li><code>membership:resync_access</code></li>
-     * <li><code>member:email:read</code></li>
-     * <li><code>member:basic:read</code></li>
-     * </ul>
+     * Re-runs access fulfillment for a membership: recomputes the member's content access on Whop, re-validates their Discord link (re-adding them to the server and re-assigning roles if needed), and re-fulfills TradingView indicator access. Telegram access is invite-based and is not resynced. The work runs in the background and the outcome is written to the membership's logs.
      */
-    public WhopApiHttpResponse<Membership> resyncAccessMembership(String id) {
-        return resyncAccessMembership(
-                id, ResyncAccessMembershipRequest.builder().build());
+    public WhopApiHttpResponse<Membership> resyncAccess(String id) {
+        return resyncAccess(id, ResyncAccessMembershipsRequest.builder().build());
     }
 
     /**
-     * Re-run access fulfillment for a membership. Recomputes the member's content access on Whop, re-validates their Discord link (re-adding them to the server and re-assigning roles if needed), and re-fulfills TradingView indicator access. Telegram access is invite-based and cannot be resynced here. The outcome is written to the membership's logs.
-     * <p>Required permissions:</p>
-     * <ul>
-     * <li><code>membership:resync_access</code></li>
-     * <li><code>member:email:read</code></li>
-     * <li><code>member:basic:read</code></li>
-     * </ul>
+     * Re-runs access fulfillment for a membership: recomputes the member's content access on Whop, re-validates their Discord link (re-adding them to the server and re-assigning roles if needed), and re-fulfills TradingView indicator access. Telegram access is invite-based and is not resynced. The work runs in the background and the outcome is written to the membership's logs.
      */
-    public WhopApiHttpResponse<Membership> resyncAccessMembership(String id, RequestOptions requestOptions) {
-        return resyncAccessMembership(
-                id, ResyncAccessMembershipRequest.builder().build(), requestOptions);
+    public WhopApiHttpResponse<Membership> resyncAccess(String id, RequestOptions requestOptions) {
+        return resyncAccess(id, ResyncAccessMembershipsRequest.builder().build(), requestOptions);
     }
 
     /**
-     * Re-run access fulfillment for a membership. Recomputes the member's content access on Whop, re-validates their Discord link (re-adding them to the server and re-assigning roles if needed), and re-fulfills TradingView indicator access. Telegram access is invite-based and cannot be resynced here. The outcome is written to the membership's logs.
-     * <p>Required permissions:</p>
-     * <ul>
-     * <li><code>membership:resync_access</code></li>
-     * <li><code>member:email:read</code></li>
-     * <li><code>member:basic:read</code></li>
-     * </ul>
+     * Re-runs access fulfillment for a membership: recomputes the member's content access on Whop, re-validates their Discord link (re-adding them to the server and re-assigning roles if needed), and re-fulfills TradingView indicator access. Telegram access is invite-based and is not resynced. The work runs in the background and the outcome is written to the membership's logs.
      */
-    public WhopApiHttpResponse<Membership> resyncAccessMembership(String id, ResyncAccessMembershipRequest request) {
-        return resyncAccessMembership(id, request, null);
+    public WhopApiHttpResponse<Membership> resyncAccess(String id, ResyncAccessMembershipsRequest request) {
+        return resyncAccess(id, request, null);
     }
 
     /**
-     * Re-run access fulfillment for a membership. Recomputes the member's content access on Whop, re-validates their Discord link (re-adding them to the server and re-assigning roles if needed), and re-fulfills TradingView indicator access. Telegram access is invite-based and cannot be resynced here. The outcome is written to the membership's logs.
-     * <p>Required permissions:</p>
-     * <ul>
-     * <li><code>membership:resync_access</code></li>
-     * <li><code>member:email:read</code></li>
-     * <li><code>member:basic:read</code></li>
-     * </ul>
+     * Re-runs access fulfillment for a membership: recomputes the member's content access on Whop, re-validates their Discord link (re-adding them to the server and re-assigning roles if needed), and re-fulfills TradingView indicator access. Telegram access is invite-based and is not resynced. The work runs in the background and the outcome is written to the membership's logs.
      */
-    public WhopApiHttpResponse<Membership> resyncAccessMembership(
-            String id, ResyncAccessMembershipRequest request, RequestOptions requestOptions) {
-        HttpUrl.Builder httpUrl = HttpUrl.parse(this.clientOptions.environment().getUrl())
+    public WhopApiHttpResponse<Membership> resyncAccess(
+            String id, ResyncAccessMembershipsRequest request, RequestOptions requestOptions) {
+        HttpUrl.Builder httpUrl = HttpUrl.parse(this.clientOptions.environment().getApiURL())
                 .newBuilder()
                 .addPathSegments("memberships")
-                .addPathSegment(id)
+                .addPathSegment(PathSegments.validate(id))
                 .addPathSegments("resync_access");
         if (requestOptions != null) {
             requestOptions.getQueryParameters().forEach((_key, _value) -> {
@@ -900,13 +1195,26 @@ public class RawMembershipsClient {
         }
         Request.Builder _requestBuilder = new Request.Builder()
                 .url(httpUrl.build())
-                .method("POST", RequestBody.create("", null))
+                .method(
+                        "POST",
+                        BodyProperties.toRequestBody(
+                                requestOptions != null ? requestOptions.getBodyProperties() : null,
+                                RequestBody.create("", null)))
                 .headers(Headers.of(clientOptions.headers(requestOptions)))
                 .addHeader("Accept", "application/json");
         Request okhttpRequest = _requestBuilder.build();
         OkHttpClient client = clientOptions.httpClient();
         if (requestOptions != null && requestOptions.getTimeout().isPresent()) {
             client = clientOptions.httpClientWithTimeout(requestOptions);
+        }
+        if (requestOptions != null && requestOptions.getMaxRetries().isPresent()) {
+            okhttpRequest = okhttpRequest
+                    .newBuilder()
+                    .tag(
+                            RetryInterceptor.MaxRetriesOverride.class,
+                            new RetryInterceptor.MaxRetriesOverride(
+                                    requestOptions.getMaxRetries().get()))
+                    .build();
         }
         try (Response response = client.newCall(okhttpRequest).execute()) {
             ResponseBody responseBody = response.body();
@@ -920,23 +1228,11 @@ public class RawMembershipsClient {
                     case 400:
                         throw new BadRequestError(
                                 ObjectMappers.JSON_MAPPER.readValue(responseBodyString, Object.class), response);
-                    case 401:
-                        throw new UnauthorizedError(
-                                ObjectMappers.JSON_MAPPER.readValue(responseBodyString, Object.class), response);
                     case 403:
                         throw new ForbiddenError(
                                 ObjectMappers.JSON_MAPPER.readValue(responseBodyString, Object.class), response);
-                    case 404:
-                        throw new NotFoundError(
-                                ObjectMappers.JSON_MAPPER.readValue(responseBodyString, Object.class), response);
-                    case 422:
-                        throw new UnprocessableEntityError(
-                                ObjectMappers.JSON_MAPPER.readValue(responseBodyString, Object.class), response);
-                    case 429:
-                        throw new TooManyRequestsError(
-                                ObjectMappers.JSON_MAPPER.readValue(responseBodyString, Object.class), response);
-                    case 500:
-                        throw new InternalServerError(
+                    case 409:
+                        throw new ConflictError(
                                 ObjectMappers.JSON_MAPPER.readValue(responseBodyString, Object.class), response);
                 }
             } catch (JsonProcessingException ignored) {
@@ -945,6 +1241,8 @@ public class RawMembershipsClient {
             Object errorBody = ObjectMappers.parseErrorBody(responseBodyString);
             throw new WhopApiApiException(
                     "Error with status code " + response.code(), response.code(), errorBody, response);
+        } catch (JsonProcessingException e) {
+            throw new WhopApiException("Failed to deserialize response: " + e.getMessage(), e);
         } catch (IOException e) {
             throw new WhopApiException("Network error executing HTTP request", e);
         }
@@ -976,10 +1274,10 @@ public class RawMembershipsClient {
      */
     public WhopApiHttpResponse<TransferMembershipsResponse> transfer(
             String id, TransferMembershipsRequest request, RequestOptions requestOptions) {
-        HttpUrl.Builder httpUrl = HttpUrl.parse(this.clientOptions.environment().getUrl())
+        HttpUrl.Builder httpUrl = HttpUrl.parse(this.clientOptions.environment().getApiURL())
                 .newBuilder()
                 .addPathSegments("memberships")
-                .addPathSegment(id)
+                .addPathSegment(PathSegments.validate(id))
                 .addPathSegments("transfer");
         if (requestOptions != null) {
             requestOptions.getQueryParameters().forEach((_key, _value) -> {
@@ -988,13 +1286,26 @@ public class RawMembershipsClient {
         }
         Request.Builder _requestBuilder = new Request.Builder()
                 .url(httpUrl.build())
-                .method("POST", RequestBody.create("", null))
+                .method(
+                        "POST",
+                        BodyProperties.toRequestBody(
+                                requestOptions != null ? requestOptions.getBodyProperties() : null,
+                                RequestBody.create("", null)))
                 .headers(Headers.of(clientOptions.headers(requestOptions)))
                 .addHeader("Accept", "application/json");
         Request okhttpRequest = _requestBuilder.build();
         OkHttpClient client = clientOptions.httpClient();
         if (requestOptions != null && requestOptions.getTimeout().isPresent()) {
             client = clientOptions.httpClientWithTimeout(requestOptions);
+        }
+        if (requestOptions != null && requestOptions.getMaxRetries().isPresent()) {
+            okhttpRequest = okhttpRequest
+                    .newBuilder()
+                    .tag(
+                            RetryInterceptor.MaxRetriesOverride.class,
+                            new RetryInterceptor.MaxRetriesOverride(
+                                    requestOptions.getMaxRetries().get()))
+                    .build();
         }
         try (Response response = client.newCall(okhttpRequest).execute()) {
             ResponseBody responseBody = response.body();
@@ -1017,119 +1328,6 @@ public class RawMembershipsClient {
                                 ObjectMappers.JSON_MAPPER.readValue(responseBodyString, Object.class), response);
                     case 409:
                         throw new ConflictError(
-                                ObjectMappers.JSON_MAPPER.readValue(responseBodyString, V1ErrorResponse.class),
-                                response);
-                }
-            } catch (JsonProcessingException ignored) {
-                // unable to map error response, throwing generic error
-            }
-            Object errorBody = ObjectMappers.parseErrorBody(responseBodyString);
-            throw new WhopApiApiException(
-                    "Error with status code " + response.code(), response.code(), errorBody, response);
-        } catch (IOException e) {
-            throw new WhopApiException("Network error executing HTTP request", e);
-        }
-    }
-
-    /**
-     * Reverse a pending cancellation for a membership that was scheduled to cancel at period end.
-     * <p>Required permissions:</p>
-     * <ul>
-     * <li><code>member:manage</code></li>
-     * <li><code>member:email:read</code></li>
-     * <li><code>member:basic:read</code></li>
-     * </ul>
-     */
-    public WhopApiHttpResponse<Membership> uncancelMembership(String id) {
-        return uncancelMembership(id, UncancelMembershipRequest.builder().build());
-    }
-
-    /**
-     * Reverse a pending cancellation for a membership that was scheduled to cancel at period end.
-     * <p>Required permissions:</p>
-     * <ul>
-     * <li><code>member:manage</code></li>
-     * <li><code>member:email:read</code></li>
-     * <li><code>member:basic:read</code></li>
-     * </ul>
-     */
-    public WhopApiHttpResponse<Membership> uncancelMembership(String id, RequestOptions requestOptions) {
-        return uncancelMembership(id, UncancelMembershipRequest.builder().build(), requestOptions);
-    }
-
-    /**
-     * Reverse a pending cancellation for a membership that was scheduled to cancel at period end.
-     * <p>Required permissions:</p>
-     * <ul>
-     * <li><code>member:manage</code></li>
-     * <li><code>member:email:read</code></li>
-     * <li><code>member:basic:read</code></li>
-     * </ul>
-     */
-    public WhopApiHttpResponse<Membership> uncancelMembership(String id, UncancelMembershipRequest request) {
-        return uncancelMembership(id, request, null);
-    }
-
-    /**
-     * Reverse a pending cancellation for a membership that was scheduled to cancel at period end.
-     * <p>Required permissions:</p>
-     * <ul>
-     * <li><code>member:manage</code></li>
-     * <li><code>member:email:read</code></li>
-     * <li><code>member:basic:read</code></li>
-     * </ul>
-     */
-    public WhopApiHttpResponse<Membership> uncancelMembership(
-            String id, UncancelMembershipRequest request, RequestOptions requestOptions) {
-        HttpUrl.Builder httpUrl = HttpUrl.parse(this.clientOptions.environment().getUrl())
-                .newBuilder()
-                .addPathSegments("memberships")
-                .addPathSegment(id)
-                .addPathSegments("uncancel");
-        if (requestOptions != null) {
-            requestOptions.getQueryParameters().forEach((_key, _value) -> {
-                httpUrl.addQueryParameter(_key, _value);
-            });
-        }
-        Request.Builder _requestBuilder = new Request.Builder()
-                .url(httpUrl.build())
-                .method("POST", RequestBody.create("", null))
-                .headers(Headers.of(clientOptions.headers(requestOptions)))
-                .addHeader("Accept", "application/json");
-        Request okhttpRequest = _requestBuilder.build();
-        OkHttpClient client = clientOptions.httpClient();
-        if (requestOptions != null && requestOptions.getTimeout().isPresent()) {
-            client = clientOptions.httpClientWithTimeout(requestOptions);
-        }
-        try (Response response = client.newCall(okhttpRequest).execute()) {
-            ResponseBody responseBody = response.body();
-            String responseBodyString = responseBody != null ? responseBody.string() : "{}";
-            if (response.isSuccessful()) {
-                return new WhopApiHttpResponse<>(
-                        ObjectMappers.JSON_MAPPER.readValue(responseBodyString, Membership.class), response);
-            }
-            try {
-                switch (response.code()) {
-                    case 400:
-                        throw new BadRequestError(
-                                ObjectMappers.JSON_MAPPER.readValue(responseBodyString, Object.class), response);
-                    case 401:
-                        throw new UnauthorizedError(
-                                ObjectMappers.JSON_MAPPER.readValue(responseBodyString, Object.class), response);
-                    case 403:
-                        throw new ForbiddenError(
-                                ObjectMappers.JSON_MAPPER.readValue(responseBodyString, Object.class), response);
-                    case 404:
-                        throw new NotFoundError(
-                                ObjectMappers.JSON_MAPPER.readValue(responseBodyString, Object.class), response);
-                    case 422:
-                        throw new UnprocessableEntityError(
-                                ObjectMappers.JSON_MAPPER.readValue(responseBodyString, Object.class), response);
-                    case 429:
-                        throw new TooManyRequestsError(
-                                ObjectMappers.JSON_MAPPER.readValue(responseBodyString, Object.class), response);
-                    case 500:
-                        throw new InternalServerError(
                                 ObjectMappers.JSON_MAPPER.readValue(responseBodyString, Object.class), response);
                 }
             } catch (JsonProcessingException ignored) {
@@ -1138,6 +1336,8 @@ public class RawMembershipsClient {
             Object errorBody = ObjectMappers.parseErrorBody(responseBodyString);
             throw new WhopApiApiException(
                     "Error with status code " + response.code(), response.code(), errorBody, response);
+        } catch (JsonProcessingException e) {
+            throw new WhopApiException("Failed to deserialize response: " + e.getMessage(), e);
         } catch (IOException e) {
             throw new WhopApiException("Network error executing HTTP request", e);
         }

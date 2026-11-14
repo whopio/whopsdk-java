@@ -94,7 +94,6 @@ public final class DeletePromoCodesResponse {
 
         private String id;
 
-        @JsonAnySetter
         private Map<String, Object> additionalProperties = new HashMap<>();
 
         private Builder() {}
@@ -123,6 +122,14 @@ public final class DeletePromoCodesResponse {
         @java.lang.Override
         public DeletePromoCodesResponse build() {
             return new DeletePromoCodesResponse(deleted, id, additionalProperties);
+        }
+
+        @JsonAnySetter
+        private void putAdditionalPropertyFromJson(String key, Object value) {
+            if (key.equalsIgnoreCase("deleted") || key.equalsIgnoreCase("id")) {
+                return;
+            }
+            this.additionalProperties.put(key, value);
         }
 
         @java.lang.Override

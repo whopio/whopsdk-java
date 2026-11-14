@@ -21,6 +21,8 @@ import org.jetbrains.annotations.NotNull;
 @JsonInclude(JsonInclude.Include.NON_ABSENT)
 @JsonDeserialize(builder = AdGroupCustomLocation.Builder.class)
 public final class AdGroupCustomLocation {
+    private final Optional<String> countryCode;
+
     private final AdGroupCustomLocationDistanceUnit distanceUnit;
 
     private final double latitude;
@@ -34,18 +36,28 @@ public final class AdGroupCustomLocation {
     private final Map<String, Object> additionalProperties;
 
     private AdGroupCustomLocation(
+            Optional<String> countryCode,
             AdGroupCustomLocationDistanceUnit distanceUnit,
             double latitude,
             double longitude,
             Optional<String> name,
             double radius,
             Map<String, Object> additionalProperties) {
+        this.countryCode = countryCode;
         this.distanceUnit = distanceUnit;
         this.latitude = latitude;
         this.longitude = longitude;
         this.name = name;
         this.radius = radius;
         this.additionalProperties = additionalProperties;
+    }
+
+    /**
+     * @return ISO 3166-1 alpha-2 country the point falls in. Send it under a special ad category, where the campaign must declare the countries its ad sets reach.
+     */
+    @JsonProperty("country_code")
+    public Optional<String> getCountryCode() {
+        return countryCode;
     }
 
     /**
@@ -100,7 +112,8 @@ public final class AdGroupCustomLocation {
     }
 
     private boolean equalTo(AdGroupCustomLocation other) {
-        return distanceUnit.equals(other.distanceUnit)
+        return countryCode.equals(other.countryCode)
+                && distanceUnit.equals(other.distanceUnit)
                 && latitude == other.latitude
                 && longitude == other.longitude
                 && name.equals(other.name)
@@ -109,7 +122,7 @@ public final class AdGroupCustomLocation {
 
     @java.lang.Override
     public int hashCode() {
-        return Objects.hash(this.distanceUnit, this.latitude, this.longitude, this.name, this.radius);
+        return Objects.hash(this.countryCode, this.distanceUnit, this.latitude, this.longitude, this.name, this.radius);
     }
 
     @java.lang.Override
@@ -159,6 +172,13 @@ public final class AdGroupCustomLocation {
         _FinalStage additionalProperties(Map<String, Object> additionalProperties);
 
         /**
+         * <p>ISO 3166-1 alpha-2 country the point falls in. Send it under a special ad category, where the campaign must declare the countries its ad sets reach.</p>
+         */
+        _FinalStage countryCode(Optional<String> countryCode);
+
+        _FinalStage countryCode(String countryCode);
+
+        /**
          * <p>Label for the location, such as a city or address. Absent when the location has no label.</p>
          */
         _FinalStage name(Optional<String> name);
@@ -179,13 +199,15 @@ public final class AdGroupCustomLocation {
 
         private Optional<String> name = Optional.empty();
 
-        @JsonAnySetter
+        private Optional<String> countryCode = Optional.empty();
+
         private Map<String, Object> additionalProperties = new HashMap<>();
 
         private Builder() {}
 
         @java.lang.Override
         public Builder from(AdGroupCustomLocation other) {
+            countryCode(other.getCountryCode());
             distanceUnit(other.getDistanceUnit());
             latitude(other.getLatitude());
             longitude(other.getLongitude());
@@ -195,7 +217,6 @@ public final class AdGroupCustomLocation {
         }
 
         /**
-         * <p>Unit for <code>radius</code>.</p>
          * <p>Unit for <code>radius</code>.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
@@ -208,7 +229,6 @@ public final class AdGroupCustomLocation {
 
         /**
          * <p>Latitude of the center point.</p>
-         * <p>Latitude of the center point.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
@@ -220,7 +240,6 @@ public final class AdGroupCustomLocation {
 
         /**
          * <p>Longitude of the center point.</p>
-         * <p>Longitude of the center point.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
@@ -231,7 +250,6 @@ public final class AdGroupCustomLocation {
         }
 
         /**
-         * <p>Radius around the center point, in <code>distance_unit</code>.</p>
          * <p>Radius around the center point, in <code>distance_unit</code>.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
@@ -262,9 +280,43 @@ public final class AdGroupCustomLocation {
             return this;
         }
 
+        /**
+         * <p>ISO 3166-1 alpha-2 country the point falls in. Send it under a special ad category, where the campaign must declare the countries its ad sets reach.</p>
+         * @return Reference to {@code this} so that method calls can be chained together.
+         */
+        @java.lang.Override
+        public _FinalStage countryCode(String countryCode) {
+            this.countryCode = Optional.ofNullable(countryCode);
+            return this;
+        }
+
+        /**
+         * <p>ISO 3166-1 alpha-2 country the point falls in. Send it under a special ad category, where the campaign must declare the countries its ad sets reach.</p>
+         */
+        @java.lang.Override
+        @JsonSetter(value = "country_code", nulls = Nulls.SKIP)
+        public _FinalStage countryCode(Optional<String> countryCode) {
+            this.countryCode = countryCode;
+            return this;
+        }
+
         @java.lang.Override
         public AdGroupCustomLocation build() {
-            return new AdGroupCustomLocation(distanceUnit, latitude, longitude, name, radius, additionalProperties);
+            return new AdGroupCustomLocation(
+                    countryCode, distanceUnit, latitude, longitude, name, radius, additionalProperties);
+        }
+
+        @JsonAnySetter
+        private void putAdditionalPropertyFromJson(String key, Object value) {
+            if (key.equalsIgnoreCase("country_code")
+                    || key.equalsIgnoreCase("distance_unit")
+                    || key.equalsIgnoreCase("latitude")
+                    || key.equalsIgnoreCase("longitude")
+                    || key.equalsIgnoreCase("name")
+                    || key.equalsIgnoreCase("radius")) {
+                return;
+            }
+            this.additionalProperties.put(key, value);
         }
 
         @java.lang.Override

@@ -105,7 +105,6 @@ public final class AcceptResolutionCenterCasesRequest {
 
         private Optional<Boolean> terminateMembership = Optional.empty();
 
-        @JsonAnySetter
         private Map<String, Object> additionalProperties = new HashMap<>();
 
         private Builder() {}
@@ -162,6 +161,16 @@ public final class AcceptResolutionCenterCasesRequest {
         public AcceptResolutionCenterCasesRequest build() {
             return new AcceptResolutionCenterCasesRequest(
                     attachments, message, terminateMembership, additionalProperties);
+        }
+
+        @JsonAnySetter
+        private void putAdditionalPropertyFromJson(String key, Object value) {
+            if (key.equalsIgnoreCase("attachments")
+                    || key.equalsIgnoreCase("message")
+                    || key.equalsIgnoreCase("terminate_membership")) {
+                return;
+            }
+            this.additionalProperties.put(key, value);
         }
 
         public Builder additionalProperty(String key, Object value) {

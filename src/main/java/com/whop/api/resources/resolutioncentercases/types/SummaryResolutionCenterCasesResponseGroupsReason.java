@@ -157,7 +157,6 @@ public final class SummaryResolutionCenterCasesResponseGroupsReason {
 
         private int subscriptionCanceled;
 
-        @JsonAnySetter
         private Map<String, Object> additionalProperties = new HashMap<>();
 
         private Builder() {}
@@ -216,6 +215,18 @@ public final class SummaryResolutionCenterCasesResponseGroupsReason {
                     productUnacceptable,
                     subscriptionCanceled,
                     additionalProperties);
+        }
+
+        @JsonAnySetter
+        private void putAdditionalPropertyFromJson(String key, Object value) {
+            if (key.equalsIgnoreCase("fraudulent")
+                    || key.equalsIgnoreCase("not_as_described")
+                    || key.equalsIgnoreCase("product_not_received")
+                    || key.equalsIgnoreCase("product_unacceptable")
+                    || key.equalsIgnoreCase("subscription_canceled")) {
+                return;
+            }
+            this.additionalProperties.put(key, value);
         }
 
         @java.lang.Override

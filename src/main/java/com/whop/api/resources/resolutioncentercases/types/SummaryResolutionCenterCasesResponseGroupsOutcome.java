@@ -109,7 +109,6 @@ public final class SummaryResolutionCenterCasesResponseGroupsOutcome {
 
         private int withdrawn;
 
-        @JsonAnySetter
         private Map<String, Object> additionalProperties = new HashMap<>();
 
         private Builder() {}
@@ -147,6 +146,16 @@ public final class SummaryResolutionCenterCasesResponseGroupsOutcome {
         public SummaryResolutionCenterCasesResponseGroupsOutcome build() {
             return new SummaryResolutionCenterCasesResponseGroupsOutcome(
                     customerWon, merchantWon, withdrawn, additionalProperties);
+        }
+
+        @JsonAnySetter
+        private void putAdditionalPropertyFromJson(String key, Object value) {
+            if (key.equalsIgnoreCase("customer_won")
+                    || key.equalsIgnoreCase("merchant_won")
+                    || key.equalsIgnoreCase("withdrawn")) {
+                return;
+            }
+            this.additionalProperties.put(key, value);
         }
 
         @java.lang.Override

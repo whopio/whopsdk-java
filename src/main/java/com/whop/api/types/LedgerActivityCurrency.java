@@ -106,7 +106,6 @@ public final class LedgerActivityCurrency {
 
         private String precision;
 
-        @JsonAnySetter
         private Map<String, Object> additionalProperties = new HashMap<>();
 
         private Builder() {}
@@ -120,7 +119,6 @@ public final class LedgerActivityCurrency {
 
         /**
          * <p>Currency code.</p>
-         * <p>Currency code.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
@@ -131,7 +129,6 @@ public final class LedgerActivityCurrency {
         }
 
         /**
-         * <p>Precision factor for the currency, for example <code>100000000</code> for USD.</p>
          * <p>Precision factor for the currency, for example <code>100000000</code> for USD.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
@@ -145,6 +142,14 @@ public final class LedgerActivityCurrency {
         @java.lang.Override
         public LedgerActivityCurrency build() {
             return new LedgerActivityCurrency(code, precision, additionalProperties);
+        }
+
+        @JsonAnySetter
+        private void putAdditionalPropertyFromJson(String key, Object value) {
+            if (key.equalsIgnoreCase("code") || key.equalsIgnoreCase("precision")) {
+                return;
+            }
+            this.additionalProperties.put(key, value);
         }
 
         @java.lang.Override

@@ -23,6 +23,8 @@ import org.jetbrains.annotations.NotNull;
 @JsonInclude(JsonInclude.Include.NON_ABSENT)
 @JsonDeserialize(builder = ListStatsResponseDataItem.Builder.class)
 public final class ListStatsResponseDataItem {
+    private final Optional<List<String>> breakdowns;
+
     private final String description;
 
     private final String key;
@@ -38,6 +40,7 @@ public final class ListStatsResponseDataItem {
     private final Map<String, Object> additionalProperties;
 
     private ListStatsResponseDataItem(
+            Optional<List<String>> breakdowns,
             String description,
             String key,
             String name,
@@ -45,6 +48,7 @@ public final class ListStatsResponseDataItem {
             ListStatsResponseDataItemUnit unit,
             Optional<List<String>> windows,
             Map<String, Object> additionalProperties) {
+        this.breakdowns = breakdowns;
         this.description = description;
         this.key = key;
         this.name = name;
@@ -52,6 +56,14 @@ public final class ListStatsResponseDataItem {
         this.unit = unit;
         this.windows = windows;
         this.additionalProperties = additionalProperties;
+    }
+
+    /**
+     * @return Supported breakdown_by values when they differ from the filter properties.
+     */
+    @JsonProperty("breakdowns")
+    public Optional<List<String>> getBreakdowns() {
+        return breakdowns;
     }
 
     /**
@@ -63,7 +75,7 @@ public final class ListStatsResponseDataItem {
     }
 
     /**
-     * @return The metric's key. Pass it to GET /stats/{metric} to query its values.
+     * @return The metric's key. Pass it to GET /stats/time_series/{metric} to query its values.
      */
     @JsonProperty("key")
     public String getKey() {
@@ -114,7 +126,8 @@ public final class ListStatsResponseDataItem {
     }
 
     private boolean equalTo(ListStatsResponseDataItem other) {
-        return description.equals(other.description)
+        return breakdowns.equals(other.breakdowns)
+                && description.equals(other.description)
                 && key.equals(other.key)
                 && name.equals(other.name)
                 && properties.equals(other.properties)
@@ -124,7 +137,8 @@ public final class ListStatsResponseDataItem {
 
     @java.lang.Override
     public int hashCode() {
-        return Objects.hash(this.description, this.key, this.name, this.properties, this.unit, this.windows);
+        return Objects.hash(
+                this.breakdowns, this.description, this.key, this.name, this.properties, this.unit, this.windows);
     }
 
     @java.lang.Override
@@ -147,7 +161,7 @@ public final class ListStatsResponseDataItem {
 
     public interface KeyStage {
         /**
-         * <p>The metric's key. Pass it to GET /stats/{metric} to query its values.</p>
+         * <p>The metric's key. Pass it to GET /stats/time_series/{metric} to query its values.</p>
          */
         NameStage key(@NotNull String key);
     }
@@ -172,6 +186,13 @@ public final class ListStatsResponseDataItem {
         _FinalStage additionalProperty(String key, Object value);
 
         _FinalStage additionalProperties(Map<String, Object> additionalProperties);
+
+        /**
+         * <p>Supported breakdown_by values when they differ from the filter properties.</p>
+         */
+        _FinalStage breakdowns(Optional<List<String>> breakdowns);
+
+        _FinalStage breakdowns(List<String> breakdowns);
 
         /**
          * <p>The properties you can use with this metric — pass one as a filter (property=value) to narrow the series, or as breakdown_by=property to split it.</p>
@@ -204,13 +225,15 @@ public final class ListStatsResponseDataItem {
 
         private List<String> properties = new ArrayList<>();
 
-        @JsonAnySetter
+        private Optional<List<String>> breakdowns = Optional.empty();
+
         private Map<String, Object> additionalProperties = new HashMap<>();
 
         private Builder() {}
 
         @java.lang.Override
         public Builder from(ListStatsResponseDataItem other) {
+            breakdowns(other.getBreakdowns());
             description(other.getDescription());
             key(other.getKey());
             name(other.getName());
@@ -222,7 +245,6 @@ public final class ListStatsResponseDataItem {
 
         /**
          * <p>A short description of what the metric measures.</p>
-         * <p>A short description of what the metric measures.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
@@ -233,8 +255,7 @@ public final class ListStatsResponseDataItem {
         }
 
         /**
-         * <p>The metric's key. Pass it to GET /stats/{metric} to query its values.</p>
-         * <p>The metric's key. Pass it to GET /stats/{metric} to query its values.</p>
+         * <p>The metric's key. Pass it to GET /stats/time_series/{metric} to query its values.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
@@ -246,7 +267,6 @@ public final class ListStatsResponseDataItem {
 
         /**
          * <p>Human-readable display name for the metric.</p>
-         * <p>Human-readable display name for the metric.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
@@ -257,7 +277,6 @@ public final class ListStatsResponseDataItem {
         }
 
         /**
-         * <p>How to read the metric's values: count is an integer, currency is a decimal amount, and percent is a number where 1.6 means 1.6%.</p>
          * <p>How to read the metric's values: count is an integer, currency is a decimal amount, and percent is a number where 1.6 means 1.6%.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
@@ -323,10 +342,44 @@ public final class ListStatsResponseDataItem {
             return this;
         }
 
+        /**
+         * <p>Supported breakdown_by values when they differ from the filter properties.</p>
+         * @return Reference to {@code this} so that method calls can be chained together.
+         */
+        @java.lang.Override
+        public _FinalStage breakdowns(List<String> breakdowns) {
+            this.breakdowns = Optional.ofNullable(breakdowns);
+            return this;
+        }
+
+        /**
+         * <p>Supported breakdown_by values when they differ from the filter properties.</p>
+         */
+        @java.lang.Override
+        @JsonSetter(value = "breakdowns", nulls = Nulls.SKIP)
+        public _FinalStage breakdowns(Optional<List<String>> breakdowns) {
+            this.breakdowns = breakdowns;
+            return this;
+        }
+
         @java.lang.Override
         public ListStatsResponseDataItem build() {
             return new ListStatsResponseDataItem(
-                    description, key, name, properties, unit, windows, additionalProperties);
+                    breakdowns, description, key, name, properties, unit, windows, additionalProperties);
+        }
+
+        @JsonAnySetter
+        private void putAdditionalPropertyFromJson(String key, Object value) {
+            if (key.equalsIgnoreCase("breakdowns")
+                    || key.equalsIgnoreCase("description")
+                    || key.equalsIgnoreCase("key")
+                    || key.equalsIgnoreCase("name")
+                    || key.equalsIgnoreCase("properties")
+                    || key.equalsIgnoreCase("unit")
+                    || key.equalsIgnoreCase("windows")) {
+                return;
+            }
+            this.additionalProperties.put(key, value);
         }
 
         @java.lang.Override

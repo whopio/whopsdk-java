@@ -215,7 +215,6 @@ public final class PlanCustomField {
 
         private Optional<String> placeholder = Optional.empty();
 
-        @JsonAnySetter
         private Map<String, Object> additionalProperties = new HashMap<>();
 
         private Builder() {}
@@ -233,7 +232,6 @@ public final class PlanCustomField {
 
         /**
          * <p>Custom field input type.</p>
-         * <p>Custom field input type.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
@@ -244,7 +242,6 @@ public final class PlanCustomField {
         }
 
         /**
-         * <p>Custom field ID, prefixed <code>field_</code>.</p>
          * <p>Custom field ID, prefixed <code>field_</code>.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
@@ -257,7 +254,6 @@ public final class PlanCustomField {
 
         /**
          * <p>Field label shown to customer at checkout.</p>
-         * <p>Field label shown to customer at checkout.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
@@ -269,7 +265,6 @@ public final class PlanCustomField {
 
         /**
          * <p>Field position on checkout form.</p>
-         * <p>Field position on checkout form.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
@@ -280,7 +275,6 @@ public final class PlanCustomField {
         }
 
         /**
-         * <p>Whether the customer must complete this field to check out.</p>
          * <p>Whether the customer must complete this field to check out.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
@@ -330,6 +324,19 @@ public final class PlanCustomField {
         @java.lang.Override
         public PlanCustomField build() {
             return new PlanCustomField(fieldType, id, name, order, placeholder, required, additionalProperties);
+        }
+
+        @JsonAnySetter
+        private void putAdditionalPropertyFromJson(String key, Object value) {
+            if (key.equalsIgnoreCase("field_type")
+                    || key.equalsIgnoreCase("id")
+                    || key.equalsIgnoreCase("name")
+                    || key.equalsIgnoreCase("order")
+                    || key.equalsIgnoreCase("placeholder")
+                    || key.equalsIgnoreCase("required")) {
+                return;
+            }
+            this.additionalProperties.put(key, value);
         }
 
         @java.lang.Override

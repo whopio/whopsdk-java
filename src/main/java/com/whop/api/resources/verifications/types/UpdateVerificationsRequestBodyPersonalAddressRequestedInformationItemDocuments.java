@@ -170,7 +170,6 @@ public final class UpdateVerificationsRequestBodyPersonalAddressRequestedInforma
 
         private Optional<String> residencePermitFront = Optional.empty();
 
-        @JsonAnySetter
         private Map<String, Object> additionalProperties = new HashMap<>();
 
         private Builder() {}
@@ -294,6 +293,20 @@ public final class UpdateVerificationsRequestBodyPersonalAddressRequestedInforma
                     residencePermitBack,
                     residencePermitFront,
                     additionalProperties);
+        }
+
+        @JsonAnySetter
+        private void putAdditionalPropertyFromJson(String key, Object value) {
+            if (key.equalsIgnoreCase("drivers_back")
+                    || key.equalsIgnoreCase("drivers_front")
+                    || key.equalsIgnoreCase("id_card_back")
+                    || key.equalsIgnoreCase("id_card_front")
+                    || key.equalsIgnoreCase("passport_front")
+                    || key.equalsIgnoreCase("residence_permit_back")
+                    || key.equalsIgnoreCase("residence_permit_front")) {
+                return;
+            }
+            this.additionalProperties.put(key, value);
         }
 
         public Builder additionalProperty(String key, Object value) {

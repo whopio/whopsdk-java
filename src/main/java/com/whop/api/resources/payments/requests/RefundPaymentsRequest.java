@@ -23,17 +23,34 @@ import java.util.Optional;
 @JsonInclude(JsonInclude.Include.NON_ABSENT)
 @JsonDeserialize(builder = RefundPaymentsRequest.Builder.class)
 public final class RefundPaymentsRequest {
+    private final Optional<Map<String, Optional<String>>> metadata;
+
     private final Optional<Double> partialAmount;
 
     private final Map<String, Object> additionalProperties;
 
-    private RefundPaymentsRequest(Optional<Double> partialAmount, Map<String, Object> additionalProperties) {
+    private RefundPaymentsRequest(
+            Optional<Map<String, Optional<String>>> metadata,
+            Optional<Double> partialAmount,
+            Map<String, Object> additionalProperties) {
+        this.metadata = metadata;
         this.partialAmount = partialAmount;
         this.additionalProperties = additionalProperties;
     }
 
     /**
-     * @return The amount to refund. For multi-currency payments, this is in the charge currency (what the buyer paid). For single-currency, this is in the payment currency. If omitted, the full payment amount is refunded.
+     * @return Your own key-value data to attach to the refund, returned on it and on its <code>refund.created</code> and <code>refund.updated</code> webhooks. At most 50 keys; keys up to 100 characters and values up to 500.
+     */
+    @JsonIgnore
+    public Optional<Map<String, Optional<String>>> getMetadata() {
+        if (metadata == null) {
+            return Optional.empty();
+        }
+        return metadata;
+    }
+
+    /**
+     * @return The amount to refund, stated in this payment's <code>currency</code> like every other amount on it. When the buyer was billed in a different currency, it is converted at the payment's own exchange rate before the refund is issued. An amount that covers everything still refundable refunds the rest of the payment — omit it to refund the rest without having to work out what that is.
      */
     @JsonIgnore
     public Optional<Double> getPartialAmount() {
@@ -41,6 +58,12 @@ public final class RefundPaymentsRequest {
             return Optional.empty();
         }
         return partialAmount;
+    }
+
+    @JsonInclude(value = JsonInclude.Include.CUSTOM, valueFilter = NullableNonemptyFilter.class)
+    @JsonProperty("metadata")
+    private Optional<Map<String, Optional<String>>> _getMetadata() {
+        return metadata;
     }
 
     @JsonInclude(value = JsonInclude.Include.CUSTOM, valueFilter = NullableNonemptyFilter.class)
@@ -61,12 +84,12 @@ public final class RefundPaymentsRequest {
     }
 
     private boolean equalTo(RefundPaymentsRequest other) {
-        return partialAmount.equals(other.partialAmount);
+        return metadata.equals(other.metadata) && partialAmount.equals(other.partialAmount);
     }
 
     @java.lang.Override
     public int hashCode() {
-        return Objects.hash(this.partialAmount);
+        return Objects.hash(this.metadata, this.partialAmount);
     }
 
     @java.lang.Override
@@ -80,20 +103,47 @@ public final class RefundPaymentsRequest {
 
     @JsonIgnoreProperties(ignoreUnknown = true)
     public static final class Builder {
+        private Optional<Map<String, Optional<String>>> metadata = Optional.empty();
+
         private Optional<Double> partialAmount = Optional.empty();
 
-        @JsonAnySetter
         private Map<String, Object> additionalProperties = new HashMap<>();
 
         private Builder() {}
 
         public Builder from(RefundPaymentsRequest other) {
+            metadata(other.getMetadata());
             partialAmount(other.getPartialAmount());
             return this;
         }
 
         /**
-         * <p>The amount to refund. For multi-currency payments, this is in the charge currency (what the buyer paid). For single-currency, this is in the payment currency. If omitted, the full payment amount is refunded.</p>
+         * <p>Your own key-value data to attach to the refund, returned on it and on its <code>refund.created</code> and <code>refund.updated</code> webhooks. At most 50 keys; keys up to 100 characters and values up to 500.</p>
+         */
+        @JsonSetter(value = "metadata", nulls = Nulls.SKIP)
+        public Builder metadata(Optional<Map<String, Optional<String>>> metadata) {
+            this.metadata = metadata;
+            return this;
+        }
+
+        public Builder metadata(Map<String, Optional<String>> metadata) {
+            this.metadata = Optional.ofNullable(metadata);
+            return this;
+        }
+
+        public Builder metadata(Nullable<Map<String, Optional<String>>> metadata) {
+            if (metadata.isNull()) {
+                this.metadata = null;
+            } else if (metadata.isEmpty()) {
+                this.metadata = Optional.empty();
+            } else {
+                this.metadata = Optional.of(metadata.get());
+            }
+            return this;
+        }
+
+        /**
+         * <p>The amount to refund, stated in this payment's <code>currency</code> like every other amount on it. When the buyer was billed in a different currency, it is converted at the payment's own exchange rate before the refund is issued. An amount that covers everything still refundable refunds the rest of the payment — omit it to refund the rest without having to work out what that is.</p>
          */
         @JsonSetter(value = "partial_amount", nulls = Nulls.SKIP)
         public Builder partialAmount(Optional<Double> partialAmount) {
@@ -118,7 +168,15 @@ public final class RefundPaymentsRequest {
         }
 
         public RefundPaymentsRequest build() {
-            return new RefundPaymentsRequest(partialAmount, additionalProperties);
+            return new RefundPaymentsRequest(metadata, partialAmount, additionalProperties);
+        }
+
+        @JsonAnySetter
+        private void putAdditionalPropertyFromJson(String key, Object value) {
+            if (key.equalsIgnoreCase("metadata") || key.equalsIgnoreCase("partial_amount")) {
+                return;
+            }
+            this.additionalProperties.put(key, value);
         }
 
         public Builder additionalProperty(String key, Object value) {

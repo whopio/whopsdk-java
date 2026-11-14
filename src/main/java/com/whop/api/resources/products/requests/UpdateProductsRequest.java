@@ -16,6 +16,7 @@ import com.whop.api.core.Nullable;
 import com.whop.api.core.NullableNonemptyFilter;
 import com.whop.api.core.ObjectMappers;
 import com.whop.api.resources.products.types.UpdateProductsRequestBannerImage;
+import com.whop.api.resources.products.types.UpdateProductsRequestGalleryImagesItem;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -28,6 +29,8 @@ public final class UpdateProductsRequest {
     private final Optional<UpdateProductsRequestBannerImage> bannerImage;
 
     private final Optional<String> description;
+
+    private final Optional<List<UpdateProductsRequestGalleryImagesItem>> galleryImages;
 
     private final Optional<String> headline;
 
@@ -48,6 +51,7 @@ public final class UpdateProductsRequest {
     private UpdateProductsRequest(
             Optional<UpdateProductsRequestBannerImage> bannerImage,
             Optional<String> description,
+            Optional<List<UpdateProductsRequestGalleryImagesItem>> galleryImages,
             Optional<String> headline,
             Optional<List<String>> labels,
             Optional<Map<String, Object>> metadata,
@@ -58,6 +62,7 @@ public final class UpdateProductsRequest {
             Map<String, Object> additionalProperties) {
         this.bannerImage = bannerImage;
         this.description = description;
+        this.galleryImages = galleryImages;
         this.headline = headline;
         this.labels = labels;
         this.metadata = metadata;
@@ -80,7 +85,7 @@ public final class UpdateProductsRequest {
     }
 
     /**
-     * @return A written description displayed on the product page.
+     * @return A written description displayed on the product page. Maximum 1,500 characters.
      */
     @JsonIgnore
     public Optional<String> getDescription() {
@@ -91,7 +96,18 @@ public final class UpdateProductsRequest {
     }
 
     /**
-     * @return A short marketing headline for the product page.
+     * @return Images or videos displayed in the product gallery, in display order. Replaces the existing gallery. Send an empty array to clear it; omit or pass null to leave it unchanged. A banner image does not populate the gallery.
+     */
+    @JsonIgnore
+    public Optional<List<UpdateProductsRequestGalleryImagesItem>> getGalleryImages() {
+        if (galleryImages == null) {
+            return Optional.empty();
+        }
+        return galleryImages;
+    }
+
+    /**
+     * @return A short marketing headline for the product page. Maximum 80 characters.
      */
     @JsonIgnore
     public Optional<String> getHeadline() {
@@ -146,7 +162,7 @@ public final class UpdateProductsRequest {
     }
 
     /**
-     * @return The display name of the product.
+     * @return The display name of the product. Maximum 80 characters.
      */
     @JsonProperty("title")
     public Optional<String> getTitle() {
@@ -171,6 +187,12 @@ public final class UpdateProductsRequest {
     @JsonProperty("description")
     private Optional<String> _getDescription() {
         return description;
+    }
+
+    @JsonInclude(value = JsonInclude.Include.CUSTOM, valueFilter = NullableNonemptyFilter.class)
+    @JsonProperty("gallery_images")
+    private Optional<List<UpdateProductsRequestGalleryImagesItem>> _getGalleryImages() {
+        return galleryImages;
     }
 
     @JsonInclude(value = JsonInclude.Include.CUSTOM, valueFilter = NullableNonemptyFilter.class)
@@ -217,6 +239,7 @@ public final class UpdateProductsRequest {
     private boolean equalTo(UpdateProductsRequest other) {
         return bannerImage.equals(other.bannerImage)
                 && description.equals(other.description)
+                && galleryImages.equals(other.galleryImages)
                 && headline.equals(other.headline)
                 && labels.equals(other.labels)
                 && metadata.equals(other.metadata)
@@ -231,6 +254,7 @@ public final class UpdateProductsRequest {
         return Objects.hash(
                 this.bannerImage,
                 this.description,
+                this.galleryImages,
                 this.headline,
                 this.labels,
                 this.metadata,
@@ -255,6 +279,8 @@ public final class UpdateProductsRequest {
 
         private Optional<String> description = Optional.empty();
 
+        private Optional<List<UpdateProductsRequestGalleryImagesItem>> galleryImages = Optional.empty();
+
         private Optional<String> headline = Optional.empty();
 
         private Optional<List<String>> labels = Optional.empty();
@@ -269,7 +295,6 @@ public final class UpdateProductsRequest {
 
         private Optional<String> visibility = Optional.empty();
 
-        @JsonAnySetter
         private Map<String, Object> additionalProperties = new HashMap<>();
 
         private Builder() {}
@@ -277,6 +302,7 @@ public final class UpdateProductsRequest {
         public Builder from(UpdateProductsRequest other) {
             bannerImage(other.getBannerImage());
             description(other.getDescription());
+            galleryImages(other.getGalleryImages());
             headline(other.getHeadline());
             labels(other.getLabels());
             metadata(other.getMetadata());
@@ -313,7 +339,7 @@ public final class UpdateProductsRequest {
         }
 
         /**
-         * <p>A written description displayed on the product page.</p>
+         * <p>A written description displayed on the product page. Maximum 1,500 characters.</p>
          */
         @JsonSetter(value = "description", nulls = Nulls.SKIP)
         public Builder description(Optional<String> description) {
@@ -338,7 +364,32 @@ public final class UpdateProductsRequest {
         }
 
         /**
-         * <p>A short marketing headline for the product page.</p>
+         * <p>Images or videos displayed in the product gallery, in display order. Replaces the existing gallery. Send an empty array to clear it; omit or pass null to leave it unchanged. A banner image does not populate the gallery.</p>
+         */
+        @JsonSetter(value = "gallery_images", nulls = Nulls.SKIP)
+        public Builder galleryImages(Optional<List<UpdateProductsRequestGalleryImagesItem>> galleryImages) {
+            this.galleryImages = galleryImages;
+            return this;
+        }
+
+        public Builder galleryImages(List<UpdateProductsRequestGalleryImagesItem> galleryImages) {
+            this.galleryImages = Optional.ofNullable(galleryImages);
+            return this;
+        }
+
+        public Builder galleryImages(Nullable<List<UpdateProductsRequestGalleryImagesItem>> galleryImages) {
+            if (galleryImages.isNull()) {
+                this.galleryImages = null;
+            } else if (galleryImages.isEmpty()) {
+                this.galleryImages = Optional.empty();
+            } else {
+                this.galleryImages = Optional.of(galleryImages.get());
+            }
+            return this;
+        }
+
+        /**
+         * <p>A short marketing headline for the product page. Maximum 80 characters.</p>
          */
         @JsonSetter(value = "headline", nulls = Nulls.SKIP)
         public Builder headline(Optional<String> headline) {
@@ -463,7 +514,7 @@ public final class UpdateProductsRequest {
         }
 
         /**
-         * <p>The display name of the product.</p>
+         * <p>The display name of the product. Maximum 80 characters.</p>
          */
         @JsonSetter(value = "title", nulls = Nulls.SKIP)
         public Builder title(Optional<String> title) {
@@ -494,6 +545,7 @@ public final class UpdateProductsRequest {
             return new UpdateProductsRequest(
                     bannerImage,
                     description,
+                    galleryImages,
                     headline,
                     labels,
                     metadata,
@@ -502,6 +554,23 @@ public final class UpdateProductsRequest {
                     title,
                     visibility,
                     additionalProperties);
+        }
+
+        @JsonAnySetter
+        private void putAdditionalPropertyFromJson(String key, Object value) {
+            if (key.equalsIgnoreCase("banner_image")
+                    || key.equalsIgnoreCase("description")
+                    || key.equalsIgnoreCase("gallery_images")
+                    || key.equalsIgnoreCase("headline")
+                    || key.equalsIgnoreCase("labels")
+                    || key.equalsIgnoreCase("metadata")
+                    || key.equalsIgnoreCase("product_tax_code_id")
+                    || key.equalsIgnoreCase("send_welcome_message")
+                    || key.equalsIgnoreCase("title")
+                    || key.equalsIgnoreCase("visibility")) {
+                return;
+            }
+            this.additionalProperties.put(key, value);
         }
 
         public Builder additionalProperty(String key, Object value) {

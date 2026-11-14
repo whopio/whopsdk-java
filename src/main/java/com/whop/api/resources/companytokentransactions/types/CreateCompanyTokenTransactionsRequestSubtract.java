@@ -24,9 +24,9 @@ import org.jetbrains.annotations.NotNull;
 @JsonInclude(JsonInclude.Include.NON_ABSENT)
 @JsonDeserialize(builder = CreateCompanyTokenTransactionsRequestSubtract.Builder.class)
 public final class CreateCompanyTokenTransactionsRequestSubtract {
-    private final double amount;
+    private final String accountId;
 
-    private final String companyId;
+    private final double amount;
 
     private final Optional<String> description;
 
@@ -37,18 +37,26 @@ public final class CreateCompanyTokenTransactionsRequestSubtract {
     private final Map<String, Object> additionalProperties;
 
     private CreateCompanyTokenTransactionsRequestSubtract(
+            String accountId,
             double amount,
-            String companyId,
             Optional<String> description,
             Optional<String> idempotencyKey,
             String userId,
             Map<String, Object> additionalProperties) {
+        this.accountId = accountId;
         this.amount = amount;
-        this.companyId = companyId;
         this.description = description;
         this.idempotencyKey = idempotencyKey;
         this.userId = userId;
         this.additionalProperties = additionalProperties;
+    }
+
+    /**
+     * @return The unique identifier of the company to create the transaction in, starting with 'biz_'.
+     */
+    @JsonProperty("account_id")
+    public String getAccountId() {
+        return accountId;
     }
 
     /**
@@ -57,14 +65,6 @@ public final class CreateCompanyTokenTransactionsRequestSubtract {
     @JsonProperty("amount")
     public double getAmount() {
         return amount;
-    }
-
-    /**
-     * @return The unique identifier of the company to create the transaction in, starting with 'biz_'.
-     */
-    @JsonProperty("company_id")
-    public String getCompanyId() {
-        return companyId;
     }
 
     /**
@@ -122,8 +122,8 @@ public final class CreateCompanyTokenTransactionsRequestSubtract {
     }
 
     private boolean equalTo(CreateCompanyTokenTransactionsRequestSubtract other) {
-        return amount == other.amount
-                && companyId.equals(other.companyId)
+        return accountId.equals(other.accountId)
+                && amount == other.amount
                 && description.equals(other.description)
                 && idempotencyKey.equals(other.idempotencyKey)
                 && userId.equals(other.userId);
@@ -131,7 +131,7 @@ public final class CreateCompanyTokenTransactionsRequestSubtract {
 
     @java.lang.Override
     public int hashCode() {
-        return Objects.hash(this.amount, this.companyId, this.description, this.idempotencyKey, this.userId);
+        return Objects.hash(this.accountId, this.amount, this.description, this.idempotencyKey, this.userId);
     }
 
     @java.lang.Override
@@ -139,24 +139,24 @@ public final class CreateCompanyTokenTransactionsRequestSubtract {
         return ObjectMappers.stringify(this);
     }
 
-    public static AmountStage builder() {
+    public static AccountIdStage builder() {
         return new Builder();
+    }
+
+    public interface AccountIdStage {
+        /**
+         * <p>The unique identifier of the company to create the transaction in, starting with 'biz_'.</p>
+         */
+        AmountStage accountId(@NotNull String accountId);
+
+        Builder from(CreateCompanyTokenTransactionsRequestSubtract other);
     }
 
     public interface AmountStage {
         /**
          * <p>The positive number of tokens to transact. For example, 100.0 for 100 tokens.</p>
          */
-        CompanyIdStage amount(double amount);
-
-        Builder from(CreateCompanyTokenTransactionsRequestSubtract other);
-    }
-
-    public interface CompanyIdStage {
-        /**
-         * <p>The unique identifier of the company to create the transaction in, starting with 'biz_'.</p>
-         */
-        UserIdStage companyId(@NotNull String companyId);
+        UserIdStage amount(double amount);
     }
 
     public interface UserIdStage {
@@ -193,10 +193,10 @@ public final class CreateCompanyTokenTransactionsRequestSubtract {
     }
 
     @JsonIgnoreProperties(ignoreUnknown = true)
-    public static final class Builder implements AmountStage, CompanyIdStage, UserIdStage, _FinalStage {
-        private double amount;
+    public static final class Builder implements AccountIdStage, AmountStage, UserIdStage, _FinalStage {
+        private String accountId;
 
-        private String companyId;
+        private double amount;
 
         private String userId;
 
@@ -204,15 +204,14 @@ public final class CreateCompanyTokenTransactionsRequestSubtract {
 
         private Optional<String> description = Optional.empty();
 
-        @JsonAnySetter
         private Map<String, Object> additionalProperties = new HashMap<>();
 
         private Builder() {}
 
         @java.lang.Override
         public Builder from(CreateCompanyTokenTransactionsRequestSubtract other) {
+            accountId(other.getAccountId());
             amount(other.getAmount());
-            companyId(other.getCompanyId());
             description(other.getDescription());
             idempotencyKey(other.getIdempotencyKey());
             userId(other.getUserId());
@@ -220,31 +219,28 @@ public final class CreateCompanyTokenTransactionsRequestSubtract {
         }
 
         /**
-         * <p>The positive number of tokens to transact. For example, 100.0 for 100 tokens.</p>
+         * <p>The unique identifier of the company to create the transaction in, starting with 'biz_'.</p>
+         * @return Reference to {@code this} so that method calls can be chained together.
+         */
+        @java.lang.Override
+        @JsonSetter("account_id")
+        public AmountStage accountId(@NotNull String accountId) {
+            this.accountId = Objects.requireNonNull(accountId, "accountId must not be null");
+            return this;
+        }
+
+        /**
          * <p>The positive number of tokens to transact. For example, 100.0 for 100 tokens.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
         @JsonSetter("amount")
-        public CompanyIdStage amount(double amount) {
+        public UserIdStage amount(double amount) {
             this.amount = amount;
             return this;
         }
 
         /**
-         * <p>The unique identifier of the company to create the transaction in, starting with 'biz_'.</p>
-         * <p>The unique identifier of the company to create the transaction in, starting with 'biz_'.</p>
-         * @return Reference to {@code this} so that method calls can be chained together.
-         */
-        @java.lang.Override
-        @JsonSetter("company_id")
-        public UserIdStage companyId(@NotNull String companyId) {
-            this.companyId = Objects.requireNonNull(companyId, "companyId must not be null");
-            return this;
-        }
-
-        /**
-         * <p>The unique identifier of the user whose token balance will be affected, starting with 'user_'.</p>
          * <p>The unique identifier of the user whose token balance will be affected, starting with 'user_'.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
@@ -330,7 +326,19 @@ public final class CreateCompanyTokenTransactionsRequestSubtract {
         @java.lang.Override
         public CreateCompanyTokenTransactionsRequestSubtract build() {
             return new CreateCompanyTokenTransactionsRequestSubtract(
-                    amount, companyId, description, idempotencyKey, userId, additionalProperties);
+                    accountId, amount, description, idempotencyKey, userId, additionalProperties);
+        }
+
+        @JsonAnySetter
+        private void putAdditionalPropertyFromJson(String key, Object value) {
+            if (key.equalsIgnoreCase("account_id")
+                    || key.equalsIgnoreCase("amount")
+                    || key.equalsIgnoreCase("description")
+                    || key.equalsIgnoreCase("idempotency_key")
+                    || key.equalsIgnoreCase("user_id")) {
+                return;
+            }
+            this.additionalProperties.put(key, value);
         }
 
         @java.lang.Override

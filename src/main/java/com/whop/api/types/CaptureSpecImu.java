@@ -211,7 +211,6 @@ public final class CaptureSpecImu {
 
         private int warmupNs;
 
-        @JsonAnySetter
         private Map<String, Object> additionalProperties = new HashMap<>();
 
         private Builder() {}
@@ -229,7 +228,6 @@ public final class CaptureSpecImu {
 
         /**
          * <p>Units for the device-motion channels, as a compact key=unit string.</p>
-         * <p>Units for the device-motion channels, as a compact key=unit string.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
@@ -240,7 +238,6 @@ public final class CaptureSpecImu {
         }
 
         /**
-         * <p>Units for the magnetometer channel.</p>
          * <p>Units for the magnetometer channel.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
@@ -253,7 +250,6 @@ public final class CaptureSpecImu {
 
         /**
          * <p>Minimum sustained IMU sample rate in hertz for a clip to pass validation.</p>
-         * <p>Minimum sustained IMU sample rate in hertz for a clip to pass validation.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
@@ -264,7 +260,6 @@ public final class CaptureSpecImu {
         }
 
         /**
-         * <p>Target IMU sample rate in hertz.</p>
          * <p>Target IMU sample rate in hertz.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
@@ -277,7 +272,6 @@ public final class CaptureSpecImu {
 
         /**
          * <p>Minimum IMU sample rate in hertz tolerated during the warmup window.</p>
-         * <p>Minimum IMU sample rate in hertz tolerated during the warmup window.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
@@ -288,7 +282,6 @@ public final class CaptureSpecImu {
         }
 
         /**
-         * <p>Startup window, in nanoseconds, during which the relaxed warmup rate applies.</p>
          * <p>Startup window, in nanoseconds, during which the relaxed warmup rate applies.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
@@ -309,6 +302,19 @@ public final class CaptureSpecImu {
                     warmupMinRateHz,
                     warmupNs,
                     additionalProperties);
+        }
+
+        @JsonAnySetter
+        private void putAdditionalPropertyFromJson(String key, Object value) {
+            if (key.equalsIgnoreCase("device_motion_units")
+                    || key.equalsIgnoreCase("magnetometer_units")
+                    || key.equalsIgnoreCase("min_rate_hz")
+                    || key.equalsIgnoreCase("target_rate_hz")
+                    || key.equalsIgnoreCase("warmup_min_rate_hz")
+                    || key.equalsIgnoreCase("warmup_ns")) {
+                return;
+            }
+            this.additionalProperties.put(key, value);
         }
 
         @java.lang.Override

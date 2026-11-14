@@ -33,28 +33,28 @@ public class AudiencesClient {
     }
 
     /**
-     * Lists uploaded customer-list audiences for an account. Pass <code>audience_id</code> to return a specific audience.
+     * Lists an account's custom and lookalike audiences.
      */
     public SyncPagingIterable<Audience> list(ListAudiencesRequest request) {
         return this.rawClient.list(request).body();
     }
 
     /**
-     * Lists uploaded customer-list audiences for an account. Pass <code>audience_id</code> to return a specific audience.
+     * Lists an account's custom and lookalike audiences.
      */
     public SyncPagingIterable<Audience> list(ListAudiencesRequest request, RequestOptions requestOptions) {
         return this.rawClient.list(request, requestOptions).body();
     }
 
     /**
-     * Creates an audience. Default (<code>audience_type</code> omitted or <code>custom</code>): creates one audience from an uploaded customer identity CSV file (<code>name</code>, <code>column_mapping</code>, and <code>file_id</code> required) and starts processing it; responds with the audience object. With <code>filters</code>: creates an audience from saved People filters (<code>name</code> required) — membership is built from the account's People data, and <code>auto_refresh</code> decides whether it keeps tracking the filters or keeps whoever matched at creation. With <code>audience_type: lookalike</code>: creates a ladder of Meta lookalike audiences from an existing ready custom audience (<code>source_audience_id</code>, <code>count</code>, and <code>percentage</code> required) — <code>count</code> equal similarity bands slicing the top <code>percentage</code>% (3 audiences at 6% = 0–2%, 2–4%, 4–6%), each returned as its own audience in a <code>{ data: [...] }</code> envelope.
+     * Creates a custom audience from a customer list or your account's Whop People data, or a lookalike audience that reaches people similar to an existing one. Processing runs asynchronously. A custom audience returns one audience; a lookalike returns the requested similarity bands in <code>data</code>.
      */
     public CreateAudiencesResponse create(CreateAudiencesRequest request) {
         return this.rawClient.create(request).body();
     }
 
     /**
-     * Creates an audience. Default (<code>audience_type</code> omitted or <code>custom</code>): creates one audience from an uploaded customer identity CSV file (<code>name</code>, <code>column_mapping</code>, and <code>file_id</code> required) and starts processing it; responds with the audience object. With <code>filters</code>: creates an audience from saved People filters (<code>name</code> required) — membership is built from the account's People data, and <code>auto_refresh</code> decides whether it keeps tracking the filters or keeps whoever matched at creation. With <code>audience_type: lookalike</code>: creates a ladder of Meta lookalike audiences from an existing ready custom audience (<code>source_audience_id</code>, <code>count</code>, and <code>percentage</code> required) — <code>count</code> equal similarity bands slicing the top <code>percentage</code>% (3 audiences at 6% = 0–2%, 2–4%, 4–6%), each returned as its own audience in a <code>{ data: [...] }</code> envelope.
+     * Creates a custom audience from a customer list or your account's Whop People data, or a lookalike audience that reaches people similar to an existing one. Processing runs asynchronously. A custom audience returns one audience; a lookalike returns the requested similarity bands in <code>data</code>.
      */
     public CreateAudiencesResponse create(CreateAudiencesRequest request, RequestOptions requestOptions) {
         return this.rawClient.create(request, requestOptions).body();

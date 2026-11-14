@@ -49,28 +49,28 @@ public class CheckoutConfigurationsClient {
     }
 
     /**
-     * Creates a reusable checkout configuration for an existing or inline plan.
+     * Creates a reusable checkout configuration for an existing or inline variant. Send customers to its <code>purchase_url</code> to check out.
      */
     public CreateCheckoutConfigurationsResponse create() {
         return this.rawClient.create().body();
     }
 
     /**
-     * Creates a reusable checkout configuration for an existing or inline plan.
+     * Creates a reusable checkout configuration for an existing or inline variant. Send customers to its <code>purchase_url</code> to check out.
      */
     public CreateCheckoutConfigurationsResponse create(RequestOptions requestOptions) {
         return this.rawClient.create(requestOptions).body();
     }
 
     /**
-     * Creates a reusable checkout configuration for an existing or inline plan.
+     * Creates a reusable checkout configuration for an existing or inline variant. Send customers to its <code>purchase_url</code> to check out.
      */
     public CreateCheckoutConfigurationsResponse create(CreateCheckoutConfigurationsRequest request) {
         return this.rawClient.create(request).body();
     }
 
     /**
-     * Creates a reusable checkout configuration for an existing or inline plan.
+     * Creates a reusable checkout configuration for an existing or inline variant. Send customers to its <code>purchase_url</code> to check out.
      */
     public CreateCheckoutConfigurationsResponse create(
             CreateCheckoutConfigurationsRequest request, RequestOptions requestOptions) {

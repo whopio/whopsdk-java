@@ -7,6 +7,10 @@ import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonValue;
 
 public final class ListFinancialActivityRequestLineTypesItem {
+    public static final ListFinancialActivityRequestLineTypesItem ECONOMIC_INTELLIGENCE_PERCENTAGE_FEE =
+            new ListFinancialActivityRequestLineTypesItem(
+                    Value.ECONOMIC_INTELLIGENCE_PERCENTAGE_FEE, "economic_intelligence_percentage_fee");
+
     public static final ListFinancialActivityRequestLineTypesItem DISPUTE_REPRESENTMENT_FEE =
             new ListFinancialActivityRequestLineTypesItem(Value.DISPUTE_REPRESENTMENT_FEE, "dispute_representment_fee");
 
@@ -30,6 +34,256 @@ public final class ListFinancialActivityRequestLineTypesItem {
     public static final ListFinancialActivityRequestLineTypesItem RESOLUTION_CENTER_REFUND =
             new ListFinancialActivityRequestLineTypesItem(Value.RESOLUTION_CENTER_REFUND, "resolution_center_refund");
 
+    public static final ListFinancialActivityRequestLineTypesItem THREE_DS_FIXED_FEE =
+            new ListFinancialActivityRequestLineTypesItem(Value.THREE_DS_FIXED_FEE, "three_ds_fixed_fee");
+
+    public static final ListFinancialActivityRequestLineTypesItem PAYMENT_REVSHARE_REFUND =
+            new ListFinancialActivityRequestLineTypesItem(Value.PAYMENT_REVSHARE_REFUND, "payment_revshare_refund");
+
+    public static final ListFinancialActivityRequestLineTypesItem ONBOARDING_REWARD =
+            new ListFinancialActivityRequestLineTypesItem(Value.ONBOARDING_REWARD, "onboarding_reward");
+
+    public static final ListFinancialActivityRequestLineTypesItem AD_AFFILIATE_PAYOUT_RECEIVED =
+            new ListFinancialActivityRequestLineTypesItem(
+                    Value.AD_AFFILIATE_PAYOUT_RECEIVED, "ad_affiliate_payout_received");
+
+    public static final ListFinancialActivityRequestLineTypesItem WITHDRAWAL_MARKUP_FEE_PAYOUT =
+            new ListFinancialActivityRequestLineTypesItem(
+                    Value.WITHDRAWAL_MARKUP_FEE_PAYOUT, "withdrawal_markup_fee_payout");
+
+    public static final ListFinancialActivityRequestLineTypesItem AIRDROP_LINK_RETURNED =
+            new ListFinancialActivityRequestLineTypesItem(Value.AIRDROP_LINK_RETURNED, "airdrop_link_returned");
+
+    public static final ListFinancialActivityRequestLineTypesItem WITHDRAWAL_MARKUP_FEE =
+            new ListFinancialActivityRequestLineTypesItem(Value.WITHDRAWAL_MARKUP_FEE, "withdrawal_markup_fee");
+
+    public static final ListFinancialActivityRequestLineTypesItem ONCHAIN_PLATFORM_TRANSFER_OUTGOING =
+            new ListFinancialActivityRequestLineTypesItem(
+                    Value.ONCHAIN_PLATFORM_TRANSFER_OUTGOING, "onchain_platform_transfer_outgoing");
+
+    public static final ListFinancialActivityRequestLineTypesItem PAYOUT_FEE =
+            new ListFinancialActivityRequestLineTypesItem(Value.PAYOUT_FEE, "payout_fee");
+
+    public static final ListFinancialActivityRequestLineTypesItem INSTALLMENT_DEFAULT =
+            new ListFinancialActivityRequestLineTypesItem(Value.INSTALLMENT_DEFAULT, "installment_default");
+
+    public static final ListFinancialActivityRequestLineTypesItem PLATFORM_BALANCE_PAYMENT =
+            new ListFinancialActivityRequestLineTypesItem(Value.PLATFORM_BALANCE_PAYMENT, "platform_balance_payment");
+
+    public static final ListFinancialActivityRequestLineTypesItem AD_PUBLISHER_PAYOUT_RECEIVED =
+            new ListFinancialActivityRequestLineTypesItem(
+                    Value.AD_PUBLISHER_PAYOUT_RECEIVED, "ad_publisher_payout_received");
+
+    public static final ListFinancialActivityRequestLineTypesItem PAYMENT_REFERRAL_REVERSAL =
+            new ListFinancialActivityRequestLineTypesItem(Value.PAYMENT_REFERRAL_REVERSAL, "payment_referral_reversal");
+
+    public static final ListFinancialActivityRequestLineTypesItem LEGACY_CRYPTO_PAYMENT =
+            new ListFinancialActivityRequestLineTypesItem(Value.LEGACY_CRYPTO_PAYMENT, "legacy_crypto_payment");
+
+    public static final ListFinancialActivityRequestLineTypesItem PLATFORM_MARKUP_FEE =
+            new ListFinancialActivityRequestLineTypesItem(Value.PLATFORM_MARKUP_FEE, "platform_markup_fee");
+
+    public static final ListFinancialActivityRequestLineTypesItem PLATFORM_BALANCE_TRANSFER_INCOMING =
+            new ListFinancialActivityRequestLineTypesItem(
+                    Value.PLATFORM_BALANCE_TRANSFER_INCOMING, "platform_balance_transfer_incoming");
+
+    public static final ListFinancialActivityRequestLineTypesItem CARD_LOAD_TRANSFER =
+            new ListFinancialActivityRequestLineTypesItem(Value.CARD_LOAD_TRANSFER, "card_load_transfer");
+
+    public static final ListFinancialActivityRequestLineTypesItem INTERNAL_WITHDRAWAL_MARKUP_FEE_REVERSAL =
+            new ListFinancialActivityRequestLineTypesItem(
+                    Value.INTERNAL_WITHDRAWAL_MARKUP_FEE_REVERSAL, "internal_withdrawal_markup_fee_reversal");
+
+    public static final ListFinancialActivityRequestLineTypesItem PAYMENT_REFERRAL =
+            new ListFinancialActivityRequestLineTypesItem(Value.PAYMENT_REFERRAL, "payment_referral");
+
+    public static final ListFinancialActivityRequestLineTypesItem INTERNAL_WITHDRAWAL_FEE =
+            new ListFinancialActivityRequestLineTypesItem(Value.INTERNAL_WITHDRAWAL_FEE, "internal_withdrawal_fee");
+
+    public static final ListFinancialActivityRequestLineTypesItem TOPUP_REVERSAL =
+            new ListFinancialActivityRequestLineTypesItem(Value.TOPUP_REVERSAL, "topup_reversal");
+
+    public static final ListFinancialActivityRequestLineTypesItem WITHDRAWAL_CLAWBACK_REVERSAL =
+            new ListFinancialActivityRequestLineTypesItem(
+                    Value.WITHDRAWAL_CLAWBACK_REVERSAL, "withdrawal_clawback_reversal");
+
+    public static final ListFinancialActivityRequestLineTypesItem CARD_SPEND_AUTHORIZATION =
+            new ListFinancialActivityRequestLineTypesItem(Value.CARD_SPEND_AUTHORIZATION, "card_spend_authorization");
+
+    public static final ListFinancialActivityRequestLineTypesItem INTERNAL_WITHDRAWAL_MARKUP_FEE_PAYOUT =
+            new ListFinancialActivityRequestLineTypesItem(
+                    Value.INTERNAL_WITHDRAWAL_MARKUP_FEE_PAYOUT, "internal_withdrawal_markup_fee_payout");
+
+    public static final ListFinancialActivityRequestLineTypesItem EXTERNAL_CARD_LOAD_DEPOSIT =
+            new ListFinancialActivityRequestLineTypesItem(
+                    Value.EXTERNAL_CARD_LOAD_DEPOSIT, "external_card_load_deposit");
+
+    public static final ListFinancialActivityRequestLineTypesItem PLATFORM_MARKUP_FEE_PAYOUT =
+            new ListFinancialActivityRequestLineTypesItem(
+                    Value.PLATFORM_MARKUP_FEE_PAYOUT, "platform_markup_fee_payout");
+
+    public static final ListFinancialActivityRequestLineTypesItem PAYMENT_REVSHARE_PAYOUT =
+            new ListFinancialActivityRequestLineTypesItem(Value.PAYMENT_REVSHARE_PAYOUT, "payment_revshare_payout");
+
+    public static final ListFinancialActivityRequestLineTypesItem ONCHAIN_INTERNAL_TRANSFER_OUTGOING =
+            new ListFinancialActivityRequestLineTypesItem(
+                    Value.ONCHAIN_INTERNAL_TRANSFER_OUTGOING, "onchain_internal_transfer_outgoing");
+
+    public static final ListFinancialActivityRequestLineTypesItem PAYMENT_REFUND_REVERSAL =
+            new ListFinancialActivityRequestLineTypesItem(Value.PAYMENT_REFUND_REVERSAL, "payment_refund_reversal");
+
+    public static final ListFinancialActivityRequestLineTypesItem FRAUD_PREVENTION_FEE =
+            new ListFinancialActivityRequestLineTypesItem(Value.FRAUD_PREVENTION_FEE, "fraud_prevention_fee");
+
+    public static final ListFinancialActivityRequestLineTypesItem PLATFORM_BALANCE_TRANSFER_OUTGOING =
+            new ListFinancialActivityRequestLineTypesItem(
+                    Value.PLATFORM_BALANCE_TRANSFER_OUTGOING, "platform_balance_transfer_outgoing");
+
+    public static final ListFinancialActivityRequestLineTypesItem CASHBACK_FUNDING =
+            new ListFinancialActivityRequestLineTypesItem(Value.CASHBACK_FUNDING, "cashback_funding");
+
+    public static final ListFinancialActivityRequestLineTypesItem PAYMENT_REFERRAL_REFUND =
+            new ListFinancialActivityRequestLineTypesItem(Value.PAYMENT_REFERRAL_REFUND, "payment_referral_refund");
+
+    public static final ListFinancialActivityRequestLineTypesItem MISC_REVERSAL =
+            new ListFinancialActivityRequestLineTypesItem(Value.MISC_REVERSAL, "misc_reversal");
+
+    public static final ListFinancialActivityRequestLineTypesItem AIRDROP_LINK_REDEEMED =
+            new ListFinancialActivityRequestLineTypesItem(Value.AIRDROP_LINK_REDEEMED, "airdrop_link_redeemed");
+
+    public static final ListFinancialActivityRequestLineTypesItem ONCHAIN_SWAP_TARGET =
+            new ListFinancialActivityRequestLineTypesItem(Value.ONCHAIN_SWAP_TARGET, "onchain_swap_target");
+
+    public static final ListFinancialActivityRequestLineTypesItem ACCOUNT_SETTLEMENT =
+            new ListFinancialActivityRequestLineTypesItem(Value.ACCOUNT_SETTLEMENT, "account_settlement");
+
+    public static final ListFinancialActivityRequestLineTypesItem AD_CAMPAIGN_BUDGET =
+            new ListFinancialActivityRequestLineTypesItem(Value.AD_CAMPAIGN_BUDGET, "ad_campaign_budget");
+
+    public static final ListFinancialActivityRequestLineTypesItem CAPITAL_WITHHOLDING_REVERSAL =
+            new ListFinancialActivityRequestLineTypesItem(
+                    Value.CAPITAL_WITHHOLDING_REVERSAL, "capital_withholding_reversal");
+
+    public static final ListFinancialActivityRequestLineTypesItem ONCHAIN_WITHDRAWAL =
+            new ListFinancialActivityRequestLineTypesItem(Value.ONCHAIN_WITHDRAWAL, "onchain_withdrawal");
+
+    public static final ListFinancialActivityRequestLineTypesItem AFFILIATE_FEE =
+            new ListFinancialActivityRequestLineTypesItem(Value.AFFILIATE_FEE, "affiliate_fee");
+
+    public static final ListFinancialActivityRequestLineTypesItem CARD_SPEND_AUTHORIZATION_VOID =
+            new ListFinancialActivityRequestLineTypesItem(
+                    Value.CARD_SPEND_AUTHORIZATION_VOID, "card_spend_authorization_void");
+
+    public static final ListFinancialActivityRequestLineTypesItem ONCHAIN_SWAP_SOURCE =
+            new ListFinancialActivityRequestLineTypesItem(Value.ONCHAIN_SWAP_SOURCE, "onchain_swap_source");
+
+    public static final ListFinancialActivityRequestLineTypesItem PAYMENT_GROSS_REVERSAL =
+            new ListFinancialActivityRequestLineTypesItem(Value.PAYMENT_GROSS_REVERSAL, "payment_gross_reversal");
+
+    public static final ListFinancialActivityRequestLineTypesItem LEGACY_PAYMENT_REFUND =
+            new ListFinancialActivityRequestLineTypesItem(Value.LEGACY_PAYMENT_REFUND, "legacy_payment_refund");
+
+    public static final ListFinancialActivityRequestLineTypesItem INTERNAL_WITHDRAWAL =
+            new ListFinancialActivityRequestLineTypesItem(Value.INTERNAL_WITHDRAWAL, "internal_withdrawal");
+
+    public static final ListFinancialActivityRequestLineTypesItem CARD_UNLOAD_TRANSFER =
+            new ListFinancialActivityRequestLineTypesItem(Value.CARD_UNLOAD_TRANSFER, "card_unload_transfer");
+
+    public static final ListFinancialActivityRequestLineTypesItem REFERRAL_BONUS =
+            new ListFinancialActivityRequestLineTypesItem(Value.REFERRAL_BONUS, "referral_bonus");
+
+    public static final ListFinancialActivityRequestLineTypesItem INTERNAL_BALANCE_TRANSFER_OUTGOING =
+            new ListFinancialActivityRequestLineTypesItem(
+                    Value.INTERNAL_BALANCE_TRANSFER_OUTGOING, "internal_balance_transfer_outgoing");
+
+    public static final ListFinancialActivityRequestLineTypesItem WITHDRAWAL_MARKUP_FEE_REVERSAL =
+            new ListFinancialActivityRequestLineTypesItem(
+                    Value.WITHDRAWAL_MARKUP_FEE_REVERSAL, "withdrawal_markup_fee_reversal");
+
+    public static final ListFinancialActivityRequestLineTypesItem BALANCE_RESERVATION_REVERSAL =
+            new ListFinancialActivityRequestLineTypesItem(
+                    Value.BALANCE_RESERVATION_REVERSAL, "balance_reservation_reversal");
+
+    public static final ListFinancialActivityRequestLineTypesItem WITHDRAWAL_CLAWBACK =
+            new ListFinancialActivityRequestLineTypesItem(Value.WITHDRAWAL_CLAWBACK, "withdrawal_clawback");
+
+    public static final ListFinancialActivityRequestLineTypesItem PLATFORM_EARNING =
+            new ListFinancialActivityRequestLineTypesItem(Value.PLATFORM_EARNING, "platform_earning");
+
+    public static final ListFinancialActivityRequestLineTypesItem CONNECTED_ACCOUNT_NEGATIVE_BALANCE =
+            new ListFinancialActivityRequestLineTypesItem(
+                    Value.CONNECTED_ACCOUNT_NEGATIVE_BALANCE, "connected_account_negative_balance");
+
+    public static final ListFinancialActivityRequestLineTypesItem PAYMENT_RETURN_FEE =
+            new ListFinancialActivityRequestLineTypesItem(Value.PAYMENT_RETURN_FEE, "payment_return_fee");
+
+    public static final ListFinancialActivityRequestLineTypesItem REVSHARE_PERCENTAGE_FEE =
+            new ListFinancialActivityRequestLineTypesItem(Value.REVSHARE_PERCENTAGE_FEE, "revshare_percentage_fee");
+
+    public static final ListFinancialActivityRequestLineTypesItem AIRDROP_REVERSAL =
+            new ListFinancialActivityRequestLineTypesItem(Value.AIRDROP_REVERSAL, "airdrop_reversal");
+
+    public static final ListFinancialActivityRequestLineTypesItem PAYMENT_REFUND =
+            new ListFinancialActivityRequestLineTypesItem(Value.PAYMENT_REFUND, "payment_refund");
+
+    public static final ListFinancialActivityRequestLineTypesItem WITHDRAWAL_FEE =
+            new ListFinancialActivityRequestLineTypesItem(Value.WITHDRAWAL_FEE, "withdrawal_fee");
+
+    public static final ListFinancialActivityRequestLineTypesItem AIRDROP_LINK_CREATED =
+            new ListFinancialActivityRequestLineTypesItem(Value.AIRDROP_LINK_CREATED, "airdrop_link_created");
+
+    public static final ListFinancialActivityRequestLineTypesItem CARD_UNLOAD_DEPOSIT =
+            new ListFinancialActivityRequestLineTypesItem(Value.CARD_UNLOAD_DEPOSIT, "card_unload_deposit");
+
+    public static final ListFinancialActivityRequestLineTypesItem WITHDRAWAL_TOPUP_ADJUSTMENT =
+            new ListFinancialActivityRequestLineTypesItem(
+                    Value.WITHDRAWAL_TOPUP_ADJUSTMENT, "withdrawal_topup_adjustment");
+
+    public static final ListFinancialActivityRequestLineTypesItem WITHDRAWAL_MARKUP_FEE_PAYOUT_REVERSAL =
+            new ListFinancialActivityRequestLineTypesItem(
+                    Value.WITHDRAWAL_MARKUP_FEE_PAYOUT_REVERSAL, "withdrawal_markup_fee_payout_reversal");
+
+    public static final ListFinancialActivityRequestLineTypesItem COMPANY_REFERRAL =
+            new ListFinancialActivityRequestLineTypesItem(Value.COMPANY_REFERRAL, "company_referral");
+
+    public static final ListFinancialActivityRequestLineTypesItem ORCHESTRATION_PERCENTAGE_FEE =
+            new ListFinancialActivityRequestLineTypesItem(
+                    Value.ORCHESTRATION_PERCENTAGE_FEE, "orchestration_percentage_fee");
+
+    public static final ListFinancialActivityRequestLineTypesItem CARD_SPEND_REFUND =
+            new ListFinancialActivityRequestLineTypesItem(Value.CARD_SPEND_REFUND, "card_spend_refund");
+
+    public static final ListFinancialActivityRequestLineTypesItem PARTNER_GRANT_REWARD =
+            new ListFinancialActivityRequestLineTypesItem(Value.PARTNER_GRANT_REWARD, "partner_grant_reward");
+
+    public static final ListFinancialActivityRequestLineTypesItem PAYMENT_REVSHARE_REVERSAL =
+            new ListFinancialActivityRequestLineTypesItem(Value.PAYMENT_REVSHARE_REVERSAL, "payment_revshare_reversal");
+
+    public static final ListFinancialActivityRequestLineTypesItem CARD_LOAD_DEPOSIT =
+            new ListFinancialActivityRequestLineTypesItem(Value.CARD_LOAD_DEPOSIT, "card_load_deposit");
+
+    public static final ListFinancialActivityRequestLineTypesItem ONCHAIN_PLATFORM_TRANSFER_INCOMING =
+            new ListFinancialActivityRequestLineTypesItem(
+                    Value.ONCHAIN_PLATFORM_TRANSFER_INCOMING, "onchain_platform_transfer_incoming");
+
+    public static final ListFinancialActivityRequestLineTypesItem MISC_REFUND =
+            new ListFinancialActivityRequestLineTypesItem(Value.MISC_REFUND, "misc_refund");
+
+    public static final ListFinancialActivityRequestLineTypesItem ONCHAIN_WALLET_TRANSFER_INCOMING =
+            new ListFinancialActivityRequestLineTypesItem(
+                    Value.ONCHAIN_WALLET_TRANSFER_INCOMING, "onchain_wallet_transfer_incoming");
+
+    public static final ListFinancialActivityRequestLineTypesItem PAYMENT_REVSHARE =
+            new ListFinancialActivityRequestLineTypesItem(Value.PAYMENT_REVSHARE, "payment_revshare");
+
+    public static final ListFinancialActivityRequestLineTypesItem PAYMENT_DISPUTE_FEE =
+            new ListFinancialActivityRequestLineTypesItem(Value.PAYMENT_DISPUTE_FEE, "payment_dispute_fee");
+
+    public static final ListFinancialActivityRequestLineTypesItem INTERNAL_WITHDRAWAL_MARKUP_FEE_PAYOUT_REVERSAL =
+            new ListFinancialActivityRequestLineTypesItem(
+                    Value.INTERNAL_WITHDRAWAL_MARKUP_FEE_PAYOUT_REVERSAL,
+                    "internal_withdrawal_markup_fee_payout_reversal");
+
     public static final ListFinancialActivityRequestLineTypesItem AD_PUBLISHER_PAYOUT =
             new ListFinancialActivityRequestLineTypesItem(Value.AD_PUBLISHER_PAYOUT, "ad_publisher_payout");
 
@@ -47,11 +301,8 @@ public final class ListFinancialActivityRequestLineTypesItem {
             new ListFinancialActivityRequestLineTypesItem(
                     Value.PAYMENT_PROCESSING_PERCENTAGE_FEE, "payment_processing_percentage_fee");
 
-    public static final ListFinancialActivityRequestLineTypesItem THREE_DS_FIXED_FEE =
-            new ListFinancialActivityRequestLineTypesItem(Value.THREE_DS_FIXED_FEE, "three_ds_fixed_fee");
-
-    public static final ListFinancialActivityRequestLineTypesItem PAYMENT_REVSHARE_REFUND =
-            new ListFinancialActivityRequestLineTypesItem(Value.PAYMENT_REVSHARE_REFUND, "payment_revshare_refund");
+    public static final ListFinancialActivityRequestLineTypesItem LEVELS_REBATE =
+            new ListFinancialActivityRequestLineTypesItem(Value.LEVELS_REBATE, "levels_rebate");
 
     public static final ListFinancialActivityRequestLineTypesItem DISPUTE_ALERT_FEE =
             new ListFinancialActivityRequestLineTypesItem(Value.DISPUTE_ALERT_FEE, "dispute_alert_fee");
@@ -59,17 +310,11 @@ public final class ListFinancialActivityRequestLineTypesItem {
     public static final ListFinancialActivityRequestLineTypesItem APPLICATION_FEE =
             new ListFinancialActivityRequestLineTypesItem(Value.APPLICATION_FEE, "application_fee");
 
-    public static final ListFinancialActivityRequestLineTypesItem AIRDROP_LINK_RETURNED =
-            new ListFinancialActivityRequestLineTypesItem(Value.AIRDROP_LINK_RETURNED, "airdrop_link_returned");
-
     public static final ListFinancialActivityRequestLineTypesItem WITHDRAWAL =
             new ListFinancialActivityRequestLineTypesItem(Value.WITHDRAWAL, "withdrawal");
 
-    public static final ListFinancialActivityRequestLineTypesItem PAYOUT_FEE =
-            new ListFinancialActivityRequestLineTypesItem(Value.PAYOUT_FEE, "payout_fee");
-
-    public static final ListFinancialActivityRequestLineTypesItem INSTALLMENT_DEFAULT =
-            new ListFinancialActivityRequestLineTypesItem(Value.INSTALLMENT_DEFAULT, "installment_default");
+    public static final ListFinancialActivityRequestLineTypesItem BALANCE_RESERVATION =
+            new ListFinancialActivityRequestLineTypesItem(Value.BALANCE_RESERVATION, "balance_reservation");
 
     public static final ListFinancialActivityRequestLineTypesItem ONCHAIN_WALLET_TRANSFER_OUTGOING =
             new ListFinancialActivityRequestLineTypesItem(
@@ -78,24 +323,19 @@ public final class ListFinancialActivityRequestLineTypesItem {
     public static final ListFinancialActivityRequestLineTypesItem LICENSE_SALE =
             new ListFinancialActivityRequestLineTypesItem(Value.LICENSE_SALE, "license_sale");
 
+    public static final ListFinancialActivityRequestLineTypesItem PLATFORM_CREDITS_PAYMENT_REFUND =
+            new ListFinancialActivityRequestLineTypesItem(
+                    Value.PLATFORM_CREDITS_PAYMENT_REFUND, "platform_credits_payment_refund");
+
     public static final ListFinancialActivityRequestLineTypesItem APPLICATION_FEE_PAYOUT =
             new ListFinancialActivityRequestLineTypesItem(Value.APPLICATION_FEE_PAYOUT, "application_fee_payout");
-
-    public static final ListFinancialActivityRequestLineTypesItem PLATFORM_BALANCE_PAYMENT =
-            new ListFinancialActivityRequestLineTypesItem(Value.PLATFORM_BALANCE_PAYMENT, "platform_balance_payment");
 
     public static final ListFinancialActivityRequestLineTypesItem LEGACY_PAYMENT =
             new ListFinancialActivityRequestLineTypesItem(Value.LEGACY_PAYMENT, "legacy_payment");
 
-    public static final ListFinancialActivityRequestLineTypesItem AD_PUBLISHER_PAYOUT_RECEIVED =
+    public static final ListFinancialActivityRequestLineTypesItem ONCHAIN_INTERNAL_TRANSFER_INCOMING =
             new ListFinancialActivityRequestLineTypesItem(
-                    Value.AD_PUBLISHER_PAYOUT_RECEIVED, "ad_publisher_payout_received");
-
-    public static final ListFinancialActivityRequestLineTypesItem PAYMENT_REFERRAL_REVERSAL =
-            new ListFinancialActivityRequestLineTypesItem(Value.PAYMENT_REFERRAL_REVERSAL, "payment_referral_reversal");
-
-    public static final ListFinancialActivityRequestLineTypesItem LEGACY_CRYPTO_PAYMENT =
-            new ListFinancialActivityRequestLineTypesItem(Value.LEGACY_CRYPTO_PAYMENT, "legacy_crypto_payment");
+                    Value.ONCHAIN_INTERNAL_TRANSFER_INCOMING, "onchain_internal_transfer_incoming");
 
     public static final ListFinancialActivityRequestLineTypesItem AD_BUDGET_RELEASE =
             new ListFinancialActivityRequestLineTypesItem(Value.AD_BUDGET_RELEASE, "ad_budget_release");
@@ -103,32 +343,22 @@ public final class ListFinancialActivityRequestLineTypesItem {
     public static final ListFinancialActivityRequestLineTypesItem AD_SPEND_CHARGE =
             new ListFinancialActivityRequestLineTypesItem(Value.AD_SPEND_CHARGE, "ad_spend_charge");
 
-    public static final ListFinancialActivityRequestLineTypesItem PLATFORM_BALANCE_TRANSFER_INCOMING =
-            new ListFinancialActivityRequestLineTypesItem(
-                    Value.PLATFORM_BALANCE_TRANSFER_INCOMING, "platform_balance_transfer_incoming");
-
-    public static final ListFinancialActivityRequestLineTypesItem PAYMENT_REFERRAL =
-            new ListFinancialActivityRequestLineTypesItem(Value.PAYMENT_REFERRAL, "payment_referral");
-
     public static final ListFinancialActivityRequestLineTypesItem PROMO_REVERSAL =
             new ListFinancialActivityRequestLineTypesItem(Value.PROMO_REVERSAL, "promo_reversal");
-
-    public static final ListFinancialActivityRequestLineTypesItem TOPUP_REVERSAL =
-            new ListFinancialActivityRequestLineTypesItem(Value.TOPUP_REVERSAL, "topup_reversal");
 
     public static final ListFinancialActivityRequestLineTypesItem PLATFORM_AFFILIATE_PAYMENT_REVERSAL =
             new ListFinancialActivityRequestLineTypesItem(
                     Value.PLATFORM_AFFILIATE_PAYMENT_REVERSAL, "platform_affiliate_payment_reversal");
 
+    public static final ListFinancialActivityRequestLineTypesItem SWAP_FEE =
+            new ListFinancialActivityRequestLineTypesItem(Value.SWAP_FEE, "swap_fee");
+
     public static final ListFinancialActivityRequestLineTypesItem AIRDROP =
             new ListFinancialActivityRequestLineTypesItem(Value.AIRDROP, "airdrop");
 
-    public static final ListFinancialActivityRequestLineTypesItem WITHDRAWAL_CLAWBACK_REVERSAL =
+    public static final ListFinancialActivityRequestLineTypesItem INTERNAL_WITHDRAWAL_FEE_REVERSAL =
             new ListFinancialActivityRequestLineTypesItem(
-                    Value.WITHDRAWAL_CLAWBACK_REVERSAL, "withdrawal_clawback_reversal");
-
-    public static final ListFinancialActivityRequestLineTypesItem CARD_SPEND_AUTHORIZATION =
-            new ListFinancialActivityRequestLineTypesItem(Value.CARD_SPEND_AUTHORIZATION, "card_spend_authorization");
+                    Value.INTERNAL_WITHDRAWAL_FEE_REVERSAL, "internal_withdrawal_fee_reversal");
 
     public static final ListFinancialActivityRequestLineTypesItem LICENSE_SALE_REVENUE =
             new ListFinancialActivityRequestLineTypesItem(Value.LICENSE_SALE_REVENUE, "license_sale_revenue");
@@ -139,25 +369,23 @@ public final class ListFinancialActivityRequestLineTypesItem {
     public static final ListFinancialActivityRequestLineTypesItem HIGH_RISK_MERCHANT_FEE =
             new ListFinancialActivityRequestLineTypesItem(Value.HIGH_RISK_MERCHANT_FEE, "high_risk_merchant_fee");
 
-    public static final ListFinancialActivityRequestLineTypesItem PAYMENT_REVSHARE_PAYOUT =
-            new ListFinancialActivityRequestLineTypesItem(Value.PAYMENT_REVSHARE_PAYOUT, "payment_revshare_payout");
-
     public static final ListFinancialActivityRequestLineTypesItem INTERNAL_BALANCE_TRANSFER_INCOMING =
             new ListFinancialActivityRequestLineTypesItem(
                     Value.INTERNAL_BALANCE_TRANSFER_INCOMING, "internal_balance_transfer_incoming");
 
-    public static final ListFinancialActivityRequestLineTypesItem PAYMENT_REFUND_REVERSAL =
-            new ListFinancialActivityRequestLineTypesItem(Value.PAYMENT_REFUND_REVERSAL, "payment_refund_reversal");
+    public static final ListFinancialActivityRequestLineTypesItem INTERNAL_WITHDRAWAL_MARKUP_FEE =
+            new ListFinancialActivityRequestLineTypesItem(
+                    Value.INTERNAL_WITHDRAWAL_MARKUP_FEE, "internal_withdrawal_markup_fee");
 
     public static final ListFinancialActivityRequestLineTypesItem ONCHAIN_DEPOSIT =
             new ListFinancialActivityRequestLineTypesItem(Value.ONCHAIN_DEPOSIT, "onchain_deposit");
 
+    public static final ListFinancialActivityRequestLineTypesItem MARKETPLACE_AFFILIATE_FEE =
+            new ListFinancialActivityRequestLineTypesItem(Value.MARKETPLACE_AFFILIATE_FEE, "marketplace_affiliate_fee");
+
     public static final ListFinancialActivityRequestLineTypesItem WITHDRAWAL_RECLASSIFICATION =
             new ListFinancialActivityRequestLineTypesItem(
                     Value.WITHDRAWAL_RECLASSIFICATION, "withdrawal_reclassification");
-
-    public static final ListFinancialActivityRequestLineTypesItem FRAUD_PREVENTION_FEE =
-            new ListFinancialActivityRequestLineTypesItem(Value.FRAUD_PREVENTION_FEE, "fraud_prevention_fee");
 
     public static final ListFinancialActivityRequestLineTypesItem STRIPE_DOMESTIC_PROCESSING_FEE =
             new ListFinancialActivityRequestLineTypesItem(
@@ -166,25 +394,12 @@ public final class ListFinancialActivityRequestLineTypesItem {
     public static final ListFinancialActivityRequestLineTypesItem MISC_PURCHASE =
             new ListFinancialActivityRequestLineTypesItem(Value.MISC_PURCHASE, "misc_purchase");
 
-    public static final ListFinancialActivityRequestLineTypesItem PLATFORM_BALANCE_TRANSFER_OUTGOING =
-            new ListFinancialActivityRequestLineTypesItem(
-                    Value.PLATFORM_BALANCE_TRANSFER_OUTGOING, "platform_balance_transfer_outgoing");
-
-    public static final ListFinancialActivityRequestLineTypesItem MISC_REVERSAL =
-            new ListFinancialActivityRequestLineTypesItem(Value.MISC_REVERSAL, "misc_reversal");
-
-    public static final ListFinancialActivityRequestLineTypesItem AIRDROP_LINK_REDEEMED =
-            new ListFinancialActivityRequestLineTypesItem(Value.AIRDROP_LINK_REDEEMED, "airdrop_link_redeemed");
-
-    public static final ListFinancialActivityRequestLineTypesItem ONCHAIN_SWAP_TARGET =
-            new ListFinancialActivityRequestLineTypesItem(Value.ONCHAIN_SWAP_TARGET, "onchain_swap_target");
-
-    public static final ListFinancialActivityRequestLineTypesItem AD_CAMPAIGN_BUDGET =
-            new ListFinancialActivityRequestLineTypesItem(Value.AD_CAMPAIGN_BUDGET, "ad_campaign_budget");
-
     public static final ListFinancialActivityRequestLineTypesItem SOFTWARE_RENTAL_TRANSACTION =
             new ListFinancialActivityRequestLineTypesItem(
                     Value.SOFTWARE_RENTAL_TRANSACTION, "software_rental_transaction");
+
+    public static final ListFinancialActivityRequestLineTypesItem WITHDRAWAL_FEE_REVERSAL =
+            new ListFinancialActivityRequestLineTypesItem(Value.WITHDRAWAL_FEE_REVERSAL, "withdrawal_fee_reversal");
 
     public static final ListFinancialActivityRequestLineTypesItem CURRENCY_CONVERSION_INCOMING =
             new ListFinancialActivityRequestLineTypesItem(
@@ -193,18 +408,8 @@ public final class ListFinancialActivityRequestLineTypesItem {
     public static final ListFinancialActivityRequestLineTypesItem FEES =
             new ListFinancialActivityRequestLineTypesItem(Value.FEES, "fees");
 
-    public static final ListFinancialActivityRequestLineTypesItem AFFILIATE_FEE =
-            new ListFinancialActivityRequestLineTypesItem(Value.AFFILIATE_FEE, "affiliate_fee");
-
-    public static final ListFinancialActivityRequestLineTypesItem CARD_SPEND_AUTHORIZATION_VOID =
-            new ListFinancialActivityRequestLineTypesItem(
-                    Value.CARD_SPEND_AUTHORIZATION_VOID, "card_spend_authorization_void");
-
-    public static final ListFinancialActivityRequestLineTypesItem PAYMENT_GROSS_REVERSAL =
-            new ListFinancialActivityRequestLineTypesItem(Value.PAYMENT_GROSS_REVERSAL, "payment_gross_reversal");
-
-    public static final ListFinancialActivityRequestLineTypesItem LEGACY_PAYMENT_REFUND =
-            new ListFinancialActivityRequestLineTypesItem(Value.LEGACY_PAYMENT_REFUND, "legacy_payment_refund");
+    public static final ListFinancialActivityRequestLineTypesItem CAPITAL_WITHHOLDING =
+            new ListFinancialActivityRequestLineTypesItem(Value.CAPITAL_WITHHOLDING, "capital_withholding");
 
     public static final ListFinancialActivityRequestLineTypesItem PASSTHROUGH_GMV =
             new ListFinancialActivityRequestLineTypesItem(Value.PASSTHROUGH_GMV, "passthrough_gmv");
@@ -212,46 +417,31 @@ public final class ListFinancialActivityRequestLineTypesItem {
     public static final ListFinancialActivityRequestLineTypesItem DISPUTE_HOLD_ADJUSTMENT =
             new ListFinancialActivityRequestLineTypesItem(Value.DISPUTE_HOLD_ADJUSTMENT, "dispute_hold_adjustment");
 
-    public static final ListFinancialActivityRequestLineTypesItem INTERNAL_WITHDRAWAL =
-            new ListFinancialActivityRequestLineTypesItem(Value.INTERNAL_WITHDRAWAL, "internal_withdrawal");
-
     public static final ListFinancialActivityRequestLineTypesItem PAYMENT_GROSS =
             new ListFinancialActivityRequestLineTypesItem(Value.PAYMENT_GROSS, "payment_gross");
-
-    public static final ListFinancialActivityRequestLineTypesItem BANK_TRANSFER =
-            new ListFinancialActivityRequestLineTypesItem(Value.BANK_TRANSFER, "bank_transfer");
-
-    public static final ListFinancialActivityRequestLineTypesItem REFERRAL_BONUS =
-            new ListFinancialActivityRequestLineTypesItem(Value.REFERRAL_BONUS, "referral_bonus");
-
-    public static final ListFinancialActivityRequestLineTypesItem INTERNAL_BALANCE_TRANSFER_OUTGOING =
-            new ListFinancialActivityRequestLineTypesItem(
-                    Value.INTERNAL_BALANCE_TRANSFER_OUTGOING, "internal_balance_transfer_outgoing");
 
     public static final ListFinancialActivityRequestLineTypesItem SALES_TAX_REMITTANCE_REVERSAL =
             new ListFinancialActivityRequestLineTypesItem(
                     Value.SALES_TAX_REMITTANCE_REVERSAL, "sales_tax_remittance_reversal");
 
-    public static final ListFinancialActivityRequestLineTypesItem WITHDRAWAL_CLAWBACK =
-            new ListFinancialActivityRequestLineTypesItem(Value.WITHDRAWAL_CLAWBACK, "withdrawal_clawback");
+    public static final ListFinancialActivityRequestLineTypesItem CARD_INTERCHANGE =
+            new ListFinancialActivityRequestLineTypesItem(Value.CARD_INTERCHANGE, "card_interchange");
+
+    public static final ListFinancialActivityRequestLineTypesItem PLATFORM_CREDITS_PAYMENT =
+            new ListFinancialActivityRequestLineTypesItem(Value.PLATFORM_CREDITS_PAYMENT, "platform_credits_payment");
 
     public static final ListFinancialActivityRequestLineTypesItem LICENSE_SALE_COMMISSION =
             new ListFinancialActivityRequestLineTypesItem(Value.LICENSE_SALE_COMMISSION, "license_sale_commission");
 
-    public static final ListFinancialActivityRequestLineTypesItem REVSHARE_PERCENTAGE_FEE =
-            new ListFinancialActivityRequestLineTypesItem(Value.REVSHARE_PERCENTAGE_FEE, "revshare_percentage_fee");
+    public static final ListFinancialActivityRequestLineTypesItem INTERNAL_WITHDRAWAL_IN_TRANSIT =
+            new ListFinancialActivityRequestLineTypesItem(
+                    Value.INTERNAL_WITHDRAWAL_IN_TRANSIT, "internal_withdrawal_in_transit");
 
     public static final ListFinancialActivityRequestLineTypesItem SALES_TAX_FEE =
             new ListFinancialActivityRequestLineTypesItem(Value.SALES_TAX_FEE, "sales_tax_fee");
 
     public static final ListFinancialActivityRequestLineTypesItem WITHDRAWAL_REVERSAL =
             new ListFinancialActivityRequestLineTypesItem(Value.WITHDRAWAL_REVERSAL, "withdrawal_reversal");
-
-    public static final ListFinancialActivityRequestLineTypesItem AIRDROP_REVERSAL =
-            new ListFinancialActivityRequestLineTypesItem(Value.AIRDROP_REVERSAL, "airdrop_reversal");
-
-    public static final ListFinancialActivityRequestLineTypesItem PAYMENT_REFUND =
-            new ListFinancialActivityRequestLineTypesItem(Value.PAYMENT_REFUND, "payment_refund");
 
     public static final ListFinancialActivityRequestLineTypesItem CROSS_BORDER_PERCENTAGE_FEE =
             new ListFinancialActivityRequestLineTypesItem(
@@ -260,28 +450,30 @@ public final class ListFinancialActivityRequestLineTypesItem {
     public static final ListFinancialActivityRequestLineTypesItem TOPUP_FEE =
             new ListFinancialActivityRequestLineTypesItem(Value.TOPUP_FEE, "topup_fee");
 
-    public static final ListFinancialActivityRequestLineTypesItem AIRDROP_LINK_CREATED =
-            new ListFinancialActivityRequestLineTypesItem(Value.AIRDROP_LINK_CREATED, "airdrop_link_created");
+    public static final ListFinancialActivityRequestLineTypesItem INTERNAL_WITHDRAWAL_COMPLETE =
+            new ListFinancialActivityRequestLineTypesItem(
+                    Value.INTERNAL_WITHDRAWAL_COMPLETE, "internal_withdrawal_complete");
+
+    public static final ListFinancialActivityRequestLineTypesItem CASHBACK =
+            new ListFinancialActivityRequestLineTypesItem(Value.CASHBACK, "cashback");
+
+    public static final ListFinancialActivityRequestLineTypesItem PLATFORM_BALANCE_TRANSFER_FEE =
+            new ListFinancialActivityRequestLineTypesItem(
+                    Value.PLATFORM_BALANCE_TRANSFER_FEE, "platform_balance_transfer_fee");
 
     public static final ListFinancialActivityRequestLineTypesItem FX_PERCENTAGE_FEE =
             new ListFinancialActivityRequestLineTypesItem(Value.FX_PERCENTAGE_FEE, "fx_percentage_fee");
+
+    public static final ListFinancialActivityRequestLineTypesItem INTERNAL_WITHDRAWAL_IN_TRANSIT_REVERSAL =
+            new ListFinancialActivityRequestLineTypesItem(
+                    Value.INTERNAL_WITHDRAWAL_IN_TRANSIT_REVERSAL, "internal_withdrawal_in_transit_reversal");
 
     public static final ListFinancialActivityRequestLineTypesItem CURRENCY_CONVERSION_OUTGOING =
             new ListFinancialActivityRequestLineTypesItem(
                     Value.CURRENCY_CONVERSION_OUTGOING, "currency_conversion_outgoing");
 
-    public static final ListFinancialActivityRequestLineTypesItem COMPANY_REFERRAL =
-            new ListFinancialActivityRequestLineTypesItem(Value.COMPANY_REFERRAL, "company_referral");
-
-    public static final ListFinancialActivityRequestLineTypesItem ORCHESTRATION_PERCENTAGE_FEE =
-            new ListFinancialActivityRequestLineTypesItem(
-                    Value.ORCHESTRATION_PERCENTAGE_FEE, "orchestration_percentage_fee");
-
-    public static final ListFinancialActivityRequestLineTypesItem CARD_SPEND_REFUND =
-            new ListFinancialActivityRequestLineTypesItem(Value.CARD_SPEND_REFUND, "card_spend_refund");
-
-    public static final ListFinancialActivityRequestLineTypesItem PAYMENT_REVSHARE_REVERSAL =
-            new ListFinancialActivityRequestLineTypesItem(Value.PAYMENT_REVSHARE_REVERSAL, "payment_revshare_reversal");
+    public static final ListFinancialActivityRequestLineTypesItem PLATFORM_CREDITS_GRANTED =
+            new ListFinancialActivityRequestLineTypesItem(Value.PLATFORM_CREDITS_GRANTED, "platform_credits_granted");
 
     public static final ListFinancialActivityRequestLineTypesItem PLATFORM_AFFILIATE_PAYMENT =
             new ListFinancialActivityRequestLineTypesItem(
@@ -289,9 +481,6 @@ public final class ListFinancialActivityRequestLineTypesItem {
 
     public static final ListFinancialActivityRequestLineTypesItem SALES_TAX_REMITTANCE =
             new ListFinancialActivityRequestLineTypesItem(Value.SALES_TAX_REMITTANCE, "sales_tax_remittance");
-
-    public static final ListFinancialActivityRequestLineTypesItem MISC_REFUND =
-            new ListFinancialActivityRequestLineTypesItem(Value.MISC_REFUND, "misc_refund");
 
     public static final ListFinancialActivityRequestLineTypesItem PAYMENT_PROCESSING_FIXED_FEE =
             new ListFinancialActivityRequestLineTypesItem(
@@ -309,16 +498,6 @@ public final class ListFinancialActivityRequestLineTypesItem {
 
     public static final ListFinancialActivityRequestLineTypesItem WHOP_PROCESSING_FEE =
             new ListFinancialActivityRequestLineTypesItem(Value.WHOP_PROCESSING_FEE, "whop_processing_fee");
-
-    public static final ListFinancialActivityRequestLineTypesItem ONCHAIN_WALLET_TRANSFER_INCOMING =
-            new ListFinancialActivityRequestLineTypesItem(
-                    Value.ONCHAIN_WALLET_TRANSFER_INCOMING, "onchain_wallet_transfer_incoming");
-
-    public static final ListFinancialActivityRequestLineTypesItem PAYMENT_REVSHARE =
-            new ListFinancialActivityRequestLineTypesItem(Value.PAYMENT_REVSHARE, "payment_revshare");
-
-    public static final ListFinancialActivityRequestLineTypesItem PAYMENT_DISPUTE_FEE =
-            new ListFinancialActivityRequestLineTypesItem(Value.PAYMENT_DISPUTE_FEE, "payment_dispute_fee");
 
     private final Value value;
 
@@ -353,6 +532,8 @@ public final class ListFinancialActivityRequestLineTypesItem {
 
     public <T> T visit(Visitor<T> visitor) {
         switch (value) {
+            case ECONOMIC_INTELLIGENCE_PERCENTAGE_FEE:
+                return visitor.visitEconomicIntelligencePercentageFee();
             case DISPUTE_REPRESENTMENT_FEE:
                 return visitor.visitDisputeRepresentmentFee();
             case PLATFORM_BALANCE_PAYMENT_REFUND:
@@ -367,6 +548,156 @@ public final class ListFinancialActivityRequestLineTypesItem {
                 return visitor.visitPlatformCoveredDispute();
             case RESOLUTION_CENTER_REFUND:
                 return visitor.visitResolutionCenterRefund();
+            case THREE_DS_FIXED_FEE:
+                return visitor.visitThreeDsFixedFee();
+            case PAYMENT_REVSHARE_REFUND:
+                return visitor.visitPaymentRevshareRefund();
+            case ONBOARDING_REWARD:
+                return visitor.visitOnboardingReward();
+            case AD_AFFILIATE_PAYOUT_RECEIVED:
+                return visitor.visitAdAffiliatePayoutReceived();
+            case WITHDRAWAL_MARKUP_FEE_PAYOUT:
+                return visitor.visitWithdrawalMarkupFeePayout();
+            case AIRDROP_LINK_RETURNED:
+                return visitor.visitAirdropLinkReturned();
+            case WITHDRAWAL_MARKUP_FEE:
+                return visitor.visitWithdrawalMarkupFee();
+            case ONCHAIN_PLATFORM_TRANSFER_OUTGOING:
+                return visitor.visitOnchainPlatformTransferOutgoing();
+            case PAYOUT_FEE:
+                return visitor.visitPayoutFee();
+            case INSTALLMENT_DEFAULT:
+                return visitor.visitInstallmentDefault();
+            case PLATFORM_BALANCE_PAYMENT:
+                return visitor.visitPlatformBalancePayment();
+            case AD_PUBLISHER_PAYOUT_RECEIVED:
+                return visitor.visitAdPublisherPayoutReceived();
+            case PAYMENT_REFERRAL_REVERSAL:
+                return visitor.visitPaymentReferralReversal();
+            case LEGACY_CRYPTO_PAYMENT:
+                return visitor.visitLegacyCryptoPayment();
+            case PLATFORM_MARKUP_FEE:
+                return visitor.visitPlatformMarkupFee();
+            case PLATFORM_BALANCE_TRANSFER_INCOMING:
+                return visitor.visitPlatformBalanceTransferIncoming();
+            case CARD_LOAD_TRANSFER:
+                return visitor.visitCardLoadTransfer();
+            case INTERNAL_WITHDRAWAL_MARKUP_FEE_REVERSAL:
+                return visitor.visitInternalWithdrawalMarkupFeeReversal();
+            case PAYMENT_REFERRAL:
+                return visitor.visitPaymentReferral();
+            case INTERNAL_WITHDRAWAL_FEE:
+                return visitor.visitInternalWithdrawalFee();
+            case TOPUP_REVERSAL:
+                return visitor.visitTopupReversal();
+            case WITHDRAWAL_CLAWBACK_REVERSAL:
+                return visitor.visitWithdrawalClawbackReversal();
+            case CARD_SPEND_AUTHORIZATION:
+                return visitor.visitCardSpendAuthorization();
+            case INTERNAL_WITHDRAWAL_MARKUP_FEE_PAYOUT:
+                return visitor.visitInternalWithdrawalMarkupFeePayout();
+            case EXTERNAL_CARD_LOAD_DEPOSIT:
+                return visitor.visitExternalCardLoadDeposit();
+            case PLATFORM_MARKUP_FEE_PAYOUT:
+                return visitor.visitPlatformMarkupFeePayout();
+            case PAYMENT_REVSHARE_PAYOUT:
+                return visitor.visitPaymentRevsharePayout();
+            case ONCHAIN_INTERNAL_TRANSFER_OUTGOING:
+                return visitor.visitOnchainInternalTransferOutgoing();
+            case PAYMENT_REFUND_REVERSAL:
+                return visitor.visitPaymentRefundReversal();
+            case FRAUD_PREVENTION_FEE:
+                return visitor.visitFraudPreventionFee();
+            case PLATFORM_BALANCE_TRANSFER_OUTGOING:
+                return visitor.visitPlatformBalanceTransferOutgoing();
+            case CASHBACK_FUNDING:
+                return visitor.visitCashbackFunding();
+            case PAYMENT_REFERRAL_REFUND:
+                return visitor.visitPaymentReferralRefund();
+            case MISC_REVERSAL:
+                return visitor.visitMiscReversal();
+            case AIRDROP_LINK_REDEEMED:
+                return visitor.visitAirdropLinkRedeemed();
+            case ONCHAIN_SWAP_TARGET:
+                return visitor.visitOnchainSwapTarget();
+            case ACCOUNT_SETTLEMENT:
+                return visitor.visitAccountSettlement();
+            case AD_CAMPAIGN_BUDGET:
+                return visitor.visitAdCampaignBudget();
+            case CAPITAL_WITHHOLDING_REVERSAL:
+                return visitor.visitCapitalWithholdingReversal();
+            case ONCHAIN_WITHDRAWAL:
+                return visitor.visitOnchainWithdrawal();
+            case AFFILIATE_FEE:
+                return visitor.visitAffiliateFee();
+            case CARD_SPEND_AUTHORIZATION_VOID:
+                return visitor.visitCardSpendAuthorizationVoid();
+            case ONCHAIN_SWAP_SOURCE:
+                return visitor.visitOnchainSwapSource();
+            case PAYMENT_GROSS_REVERSAL:
+                return visitor.visitPaymentGrossReversal();
+            case LEGACY_PAYMENT_REFUND:
+                return visitor.visitLegacyPaymentRefund();
+            case INTERNAL_WITHDRAWAL:
+                return visitor.visitInternalWithdrawal();
+            case CARD_UNLOAD_TRANSFER:
+                return visitor.visitCardUnloadTransfer();
+            case REFERRAL_BONUS:
+                return visitor.visitReferralBonus();
+            case INTERNAL_BALANCE_TRANSFER_OUTGOING:
+                return visitor.visitInternalBalanceTransferOutgoing();
+            case WITHDRAWAL_MARKUP_FEE_REVERSAL:
+                return visitor.visitWithdrawalMarkupFeeReversal();
+            case BALANCE_RESERVATION_REVERSAL:
+                return visitor.visitBalanceReservationReversal();
+            case WITHDRAWAL_CLAWBACK:
+                return visitor.visitWithdrawalClawback();
+            case PLATFORM_EARNING:
+                return visitor.visitPlatformEarning();
+            case CONNECTED_ACCOUNT_NEGATIVE_BALANCE:
+                return visitor.visitConnectedAccountNegativeBalance();
+            case PAYMENT_RETURN_FEE:
+                return visitor.visitPaymentReturnFee();
+            case REVSHARE_PERCENTAGE_FEE:
+                return visitor.visitRevsharePercentageFee();
+            case AIRDROP_REVERSAL:
+                return visitor.visitAirdropReversal();
+            case PAYMENT_REFUND:
+                return visitor.visitPaymentRefund();
+            case WITHDRAWAL_FEE:
+                return visitor.visitWithdrawalFee();
+            case AIRDROP_LINK_CREATED:
+                return visitor.visitAirdropLinkCreated();
+            case CARD_UNLOAD_DEPOSIT:
+                return visitor.visitCardUnloadDeposit();
+            case WITHDRAWAL_TOPUP_ADJUSTMENT:
+                return visitor.visitWithdrawalTopupAdjustment();
+            case WITHDRAWAL_MARKUP_FEE_PAYOUT_REVERSAL:
+                return visitor.visitWithdrawalMarkupFeePayoutReversal();
+            case COMPANY_REFERRAL:
+                return visitor.visitCompanyReferral();
+            case ORCHESTRATION_PERCENTAGE_FEE:
+                return visitor.visitOrchestrationPercentageFee();
+            case CARD_SPEND_REFUND:
+                return visitor.visitCardSpendRefund();
+            case PARTNER_GRANT_REWARD:
+                return visitor.visitPartnerGrantReward();
+            case PAYMENT_REVSHARE_REVERSAL:
+                return visitor.visitPaymentRevshareReversal();
+            case CARD_LOAD_DEPOSIT:
+                return visitor.visitCardLoadDeposit();
+            case ONCHAIN_PLATFORM_TRANSFER_INCOMING:
+                return visitor.visitOnchainPlatformTransferIncoming();
+            case MISC_REFUND:
+                return visitor.visitMiscRefund();
+            case ONCHAIN_WALLET_TRANSFER_INCOMING:
+                return visitor.visitOnchainWalletTransferIncoming();
+            case PAYMENT_REVSHARE:
+                return visitor.visitPaymentRevshare();
+            case PAYMENT_DISPUTE_FEE:
+                return visitor.visitPaymentDisputeFee();
+            case INTERNAL_WITHDRAWAL_MARKUP_FEE_PAYOUT_REVERSAL:
+                return visitor.visitInternalWithdrawalMarkupFeePayoutReversal();
             case AD_PUBLISHER_PAYOUT:
                 return visitor.visitAdPublisherPayout();
             case BILLING_PERCENTAGE_FEE:
@@ -377,158 +708,114 @@ public final class ListFinancialActivityRequestLineTypesItem {
                 return visitor.visitPaymentDisputeAdjustment();
             case PAYMENT_PROCESSING_PERCENTAGE_FEE:
                 return visitor.visitPaymentProcessingPercentageFee();
-            case THREE_DS_FIXED_FEE:
-                return visitor.visitThreeDsFixedFee();
-            case PAYMENT_REVSHARE_REFUND:
-                return visitor.visitPaymentRevshareRefund();
+            case LEVELS_REBATE:
+                return visitor.visitLevelsRebate();
             case DISPUTE_ALERT_FEE:
                 return visitor.visitDisputeAlertFee();
             case APPLICATION_FEE:
                 return visitor.visitApplicationFee();
-            case AIRDROP_LINK_RETURNED:
-                return visitor.visitAirdropLinkReturned();
             case WITHDRAWAL:
                 return visitor.visitWithdrawal();
-            case PAYOUT_FEE:
-                return visitor.visitPayoutFee();
-            case INSTALLMENT_DEFAULT:
-                return visitor.visitInstallmentDefault();
+            case BALANCE_RESERVATION:
+                return visitor.visitBalanceReservation();
             case ONCHAIN_WALLET_TRANSFER_OUTGOING:
                 return visitor.visitOnchainWalletTransferOutgoing();
             case LICENSE_SALE:
                 return visitor.visitLicenseSale();
+            case PLATFORM_CREDITS_PAYMENT_REFUND:
+                return visitor.visitPlatformCreditsPaymentRefund();
             case APPLICATION_FEE_PAYOUT:
                 return visitor.visitApplicationFeePayout();
-            case PLATFORM_BALANCE_PAYMENT:
-                return visitor.visitPlatformBalancePayment();
             case LEGACY_PAYMENT:
                 return visitor.visitLegacyPayment();
-            case AD_PUBLISHER_PAYOUT_RECEIVED:
-                return visitor.visitAdPublisherPayoutReceived();
-            case PAYMENT_REFERRAL_REVERSAL:
-                return visitor.visitPaymentReferralReversal();
-            case LEGACY_CRYPTO_PAYMENT:
-                return visitor.visitLegacyCryptoPayment();
+            case ONCHAIN_INTERNAL_TRANSFER_INCOMING:
+                return visitor.visitOnchainInternalTransferIncoming();
             case AD_BUDGET_RELEASE:
                 return visitor.visitAdBudgetRelease();
             case AD_SPEND_CHARGE:
                 return visitor.visitAdSpendCharge();
-            case PLATFORM_BALANCE_TRANSFER_INCOMING:
-                return visitor.visitPlatformBalanceTransferIncoming();
-            case PAYMENT_REFERRAL:
-                return visitor.visitPaymentReferral();
             case PROMO_REVERSAL:
                 return visitor.visitPromoReversal();
-            case TOPUP_REVERSAL:
-                return visitor.visitTopupReversal();
             case PLATFORM_AFFILIATE_PAYMENT_REVERSAL:
                 return visitor.visitPlatformAffiliatePaymentReversal();
+            case SWAP_FEE:
+                return visitor.visitSwapFee();
             case AIRDROP:
                 return visitor.visitAirdrop();
-            case WITHDRAWAL_CLAWBACK_REVERSAL:
-                return visitor.visitWithdrawalClawbackReversal();
-            case CARD_SPEND_AUTHORIZATION:
-                return visitor.visitCardSpendAuthorization();
+            case INTERNAL_WITHDRAWAL_FEE_REVERSAL:
+                return visitor.visitInternalWithdrawalFeeReversal();
             case LICENSE_SALE_REVENUE:
                 return visitor.visitLicenseSaleRevenue();
             case TOPUP:
                 return visitor.visitTopup();
             case HIGH_RISK_MERCHANT_FEE:
                 return visitor.visitHighRiskMerchantFee();
-            case PAYMENT_REVSHARE_PAYOUT:
-                return visitor.visitPaymentRevsharePayout();
             case INTERNAL_BALANCE_TRANSFER_INCOMING:
                 return visitor.visitInternalBalanceTransferIncoming();
-            case PAYMENT_REFUND_REVERSAL:
-                return visitor.visitPaymentRefundReversal();
+            case INTERNAL_WITHDRAWAL_MARKUP_FEE:
+                return visitor.visitInternalWithdrawalMarkupFee();
             case ONCHAIN_DEPOSIT:
                 return visitor.visitOnchainDeposit();
+            case MARKETPLACE_AFFILIATE_FEE:
+                return visitor.visitMarketplaceAffiliateFee();
             case WITHDRAWAL_RECLASSIFICATION:
                 return visitor.visitWithdrawalReclassification();
-            case FRAUD_PREVENTION_FEE:
-                return visitor.visitFraudPreventionFee();
             case STRIPE_DOMESTIC_PROCESSING_FEE:
                 return visitor.visitStripeDomesticProcessingFee();
             case MISC_PURCHASE:
                 return visitor.visitMiscPurchase();
-            case PLATFORM_BALANCE_TRANSFER_OUTGOING:
-                return visitor.visitPlatformBalanceTransferOutgoing();
-            case MISC_REVERSAL:
-                return visitor.visitMiscReversal();
-            case AIRDROP_LINK_REDEEMED:
-                return visitor.visitAirdropLinkRedeemed();
-            case ONCHAIN_SWAP_TARGET:
-                return visitor.visitOnchainSwapTarget();
-            case AD_CAMPAIGN_BUDGET:
-                return visitor.visitAdCampaignBudget();
             case SOFTWARE_RENTAL_TRANSACTION:
                 return visitor.visitSoftwareRentalTransaction();
+            case WITHDRAWAL_FEE_REVERSAL:
+                return visitor.visitWithdrawalFeeReversal();
             case CURRENCY_CONVERSION_INCOMING:
                 return visitor.visitCurrencyConversionIncoming();
             case FEES:
                 return visitor.visitFees();
-            case AFFILIATE_FEE:
-                return visitor.visitAffiliateFee();
-            case CARD_SPEND_AUTHORIZATION_VOID:
-                return visitor.visitCardSpendAuthorizationVoid();
-            case PAYMENT_GROSS_REVERSAL:
-                return visitor.visitPaymentGrossReversal();
-            case LEGACY_PAYMENT_REFUND:
-                return visitor.visitLegacyPaymentRefund();
+            case CAPITAL_WITHHOLDING:
+                return visitor.visitCapitalWithholding();
             case PASSTHROUGH_GMV:
                 return visitor.visitPassthroughGmv();
             case DISPUTE_HOLD_ADJUSTMENT:
                 return visitor.visitDisputeHoldAdjustment();
-            case INTERNAL_WITHDRAWAL:
-                return visitor.visitInternalWithdrawal();
             case PAYMENT_GROSS:
                 return visitor.visitPaymentGross();
-            case BANK_TRANSFER:
-                return visitor.visitBankTransfer();
-            case REFERRAL_BONUS:
-                return visitor.visitReferralBonus();
-            case INTERNAL_BALANCE_TRANSFER_OUTGOING:
-                return visitor.visitInternalBalanceTransferOutgoing();
             case SALES_TAX_REMITTANCE_REVERSAL:
                 return visitor.visitSalesTaxRemittanceReversal();
-            case WITHDRAWAL_CLAWBACK:
-                return visitor.visitWithdrawalClawback();
+            case CARD_INTERCHANGE:
+                return visitor.visitCardInterchange();
+            case PLATFORM_CREDITS_PAYMENT:
+                return visitor.visitPlatformCreditsPayment();
             case LICENSE_SALE_COMMISSION:
                 return visitor.visitLicenseSaleCommission();
-            case REVSHARE_PERCENTAGE_FEE:
-                return visitor.visitRevsharePercentageFee();
+            case INTERNAL_WITHDRAWAL_IN_TRANSIT:
+                return visitor.visitInternalWithdrawalInTransit();
             case SALES_TAX_FEE:
                 return visitor.visitSalesTaxFee();
             case WITHDRAWAL_REVERSAL:
                 return visitor.visitWithdrawalReversal();
-            case AIRDROP_REVERSAL:
-                return visitor.visitAirdropReversal();
-            case PAYMENT_REFUND:
-                return visitor.visitPaymentRefund();
             case CROSS_BORDER_PERCENTAGE_FEE:
                 return visitor.visitCrossBorderPercentageFee();
             case TOPUP_FEE:
                 return visitor.visitTopupFee();
-            case AIRDROP_LINK_CREATED:
-                return visitor.visitAirdropLinkCreated();
+            case INTERNAL_WITHDRAWAL_COMPLETE:
+                return visitor.visitInternalWithdrawalComplete();
+            case CASHBACK:
+                return visitor.visitCashback();
+            case PLATFORM_BALANCE_TRANSFER_FEE:
+                return visitor.visitPlatformBalanceTransferFee();
             case FX_PERCENTAGE_FEE:
                 return visitor.visitFxPercentageFee();
+            case INTERNAL_WITHDRAWAL_IN_TRANSIT_REVERSAL:
+                return visitor.visitInternalWithdrawalInTransitReversal();
             case CURRENCY_CONVERSION_OUTGOING:
                 return visitor.visitCurrencyConversionOutgoing();
-            case COMPANY_REFERRAL:
-                return visitor.visitCompanyReferral();
-            case ORCHESTRATION_PERCENTAGE_FEE:
-                return visitor.visitOrchestrationPercentageFee();
-            case CARD_SPEND_REFUND:
-                return visitor.visitCardSpendRefund();
-            case PAYMENT_REVSHARE_REVERSAL:
-                return visitor.visitPaymentRevshareReversal();
+            case PLATFORM_CREDITS_GRANTED:
+                return visitor.visitPlatformCreditsGranted();
             case PLATFORM_AFFILIATE_PAYMENT:
                 return visitor.visitPlatformAffiliatePayment();
             case SALES_TAX_REMITTANCE:
                 return visitor.visitSalesTaxRemittance();
-            case MISC_REFUND:
-                return visitor.visitMiscRefund();
             case PAYMENT_PROCESSING_FIXED_FEE:
                 return visitor.visitPaymentProcessingFixedFee();
             case INTERNAL_WITHDRAWAL_REVERSAL:
@@ -539,12 +826,6 @@ public final class ListFinancialActivityRequestLineTypesItem {
                 return visitor.visitBuyerFee();
             case WHOP_PROCESSING_FEE:
                 return visitor.visitWhopProcessingFee();
-            case ONCHAIN_WALLET_TRANSFER_INCOMING:
-                return visitor.visitOnchainWalletTransferIncoming();
-            case PAYMENT_REVSHARE:
-                return visitor.visitPaymentRevshare();
-            case PAYMENT_DISPUTE_FEE:
-                return visitor.visitPaymentDisputeFee();
             case UNKNOWN:
             default:
                 return visitor.visitUnknown(string);
@@ -554,6 +835,8 @@ public final class ListFinancialActivityRequestLineTypesItem {
     @JsonCreator(mode = JsonCreator.Mode.DELEGATING)
     public static ListFinancialActivityRequestLineTypesItem valueOf(String value) {
         switch (value) {
+            case "economic_intelligence_percentage_fee":
+                return ECONOMIC_INTELLIGENCE_PERCENTAGE_FEE;
             case "dispute_representment_fee":
                 return DISPUTE_REPRESENTMENT_FEE;
             case "platform_balance_payment_refund":
@@ -568,6 +851,156 @@ public final class ListFinancialActivityRequestLineTypesItem {
                 return PLATFORM_COVERED_DISPUTE;
             case "resolution_center_refund":
                 return RESOLUTION_CENTER_REFUND;
+            case "three_ds_fixed_fee":
+                return THREE_DS_FIXED_FEE;
+            case "payment_revshare_refund":
+                return PAYMENT_REVSHARE_REFUND;
+            case "onboarding_reward":
+                return ONBOARDING_REWARD;
+            case "ad_affiliate_payout_received":
+                return AD_AFFILIATE_PAYOUT_RECEIVED;
+            case "withdrawal_markup_fee_payout":
+                return WITHDRAWAL_MARKUP_FEE_PAYOUT;
+            case "airdrop_link_returned":
+                return AIRDROP_LINK_RETURNED;
+            case "withdrawal_markup_fee":
+                return WITHDRAWAL_MARKUP_FEE;
+            case "onchain_platform_transfer_outgoing":
+                return ONCHAIN_PLATFORM_TRANSFER_OUTGOING;
+            case "payout_fee":
+                return PAYOUT_FEE;
+            case "installment_default":
+                return INSTALLMENT_DEFAULT;
+            case "platform_balance_payment":
+                return PLATFORM_BALANCE_PAYMENT;
+            case "ad_publisher_payout_received":
+                return AD_PUBLISHER_PAYOUT_RECEIVED;
+            case "payment_referral_reversal":
+                return PAYMENT_REFERRAL_REVERSAL;
+            case "legacy_crypto_payment":
+                return LEGACY_CRYPTO_PAYMENT;
+            case "platform_markup_fee":
+                return PLATFORM_MARKUP_FEE;
+            case "platform_balance_transfer_incoming":
+                return PLATFORM_BALANCE_TRANSFER_INCOMING;
+            case "card_load_transfer":
+                return CARD_LOAD_TRANSFER;
+            case "internal_withdrawal_markup_fee_reversal":
+                return INTERNAL_WITHDRAWAL_MARKUP_FEE_REVERSAL;
+            case "payment_referral":
+                return PAYMENT_REFERRAL;
+            case "internal_withdrawal_fee":
+                return INTERNAL_WITHDRAWAL_FEE;
+            case "topup_reversal":
+                return TOPUP_REVERSAL;
+            case "withdrawal_clawback_reversal":
+                return WITHDRAWAL_CLAWBACK_REVERSAL;
+            case "card_spend_authorization":
+                return CARD_SPEND_AUTHORIZATION;
+            case "internal_withdrawal_markup_fee_payout":
+                return INTERNAL_WITHDRAWAL_MARKUP_FEE_PAYOUT;
+            case "external_card_load_deposit":
+                return EXTERNAL_CARD_LOAD_DEPOSIT;
+            case "platform_markup_fee_payout":
+                return PLATFORM_MARKUP_FEE_PAYOUT;
+            case "payment_revshare_payout":
+                return PAYMENT_REVSHARE_PAYOUT;
+            case "onchain_internal_transfer_outgoing":
+                return ONCHAIN_INTERNAL_TRANSFER_OUTGOING;
+            case "payment_refund_reversal":
+                return PAYMENT_REFUND_REVERSAL;
+            case "fraud_prevention_fee":
+                return FRAUD_PREVENTION_FEE;
+            case "platform_balance_transfer_outgoing":
+                return PLATFORM_BALANCE_TRANSFER_OUTGOING;
+            case "cashback_funding":
+                return CASHBACK_FUNDING;
+            case "payment_referral_refund":
+                return PAYMENT_REFERRAL_REFUND;
+            case "misc_reversal":
+                return MISC_REVERSAL;
+            case "airdrop_link_redeemed":
+                return AIRDROP_LINK_REDEEMED;
+            case "onchain_swap_target":
+                return ONCHAIN_SWAP_TARGET;
+            case "account_settlement":
+                return ACCOUNT_SETTLEMENT;
+            case "ad_campaign_budget":
+                return AD_CAMPAIGN_BUDGET;
+            case "capital_withholding_reversal":
+                return CAPITAL_WITHHOLDING_REVERSAL;
+            case "onchain_withdrawal":
+                return ONCHAIN_WITHDRAWAL;
+            case "affiliate_fee":
+                return AFFILIATE_FEE;
+            case "card_spend_authorization_void":
+                return CARD_SPEND_AUTHORIZATION_VOID;
+            case "onchain_swap_source":
+                return ONCHAIN_SWAP_SOURCE;
+            case "payment_gross_reversal":
+                return PAYMENT_GROSS_REVERSAL;
+            case "legacy_payment_refund":
+                return LEGACY_PAYMENT_REFUND;
+            case "internal_withdrawal":
+                return INTERNAL_WITHDRAWAL;
+            case "card_unload_transfer":
+                return CARD_UNLOAD_TRANSFER;
+            case "referral_bonus":
+                return REFERRAL_BONUS;
+            case "internal_balance_transfer_outgoing":
+                return INTERNAL_BALANCE_TRANSFER_OUTGOING;
+            case "withdrawal_markup_fee_reversal":
+                return WITHDRAWAL_MARKUP_FEE_REVERSAL;
+            case "balance_reservation_reversal":
+                return BALANCE_RESERVATION_REVERSAL;
+            case "withdrawal_clawback":
+                return WITHDRAWAL_CLAWBACK;
+            case "platform_earning":
+                return PLATFORM_EARNING;
+            case "connected_account_negative_balance":
+                return CONNECTED_ACCOUNT_NEGATIVE_BALANCE;
+            case "payment_return_fee":
+                return PAYMENT_RETURN_FEE;
+            case "revshare_percentage_fee":
+                return REVSHARE_PERCENTAGE_FEE;
+            case "airdrop_reversal":
+                return AIRDROP_REVERSAL;
+            case "payment_refund":
+                return PAYMENT_REFUND;
+            case "withdrawal_fee":
+                return WITHDRAWAL_FEE;
+            case "airdrop_link_created":
+                return AIRDROP_LINK_CREATED;
+            case "card_unload_deposit":
+                return CARD_UNLOAD_DEPOSIT;
+            case "withdrawal_topup_adjustment":
+                return WITHDRAWAL_TOPUP_ADJUSTMENT;
+            case "withdrawal_markup_fee_payout_reversal":
+                return WITHDRAWAL_MARKUP_FEE_PAYOUT_REVERSAL;
+            case "company_referral":
+                return COMPANY_REFERRAL;
+            case "orchestration_percentage_fee":
+                return ORCHESTRATION_PERCENTAGE_FEE;
+            case "card_spend_refund":
+                return CARD_SPEND_REFUND;
+            case "partner_grant_reward":
+                return PARTNER_GRANT_REWARD;
+            case "payment_revshare_reversal":
+                return PAYMENT_REVSHARE_REVERSAL;
+            case "card_load_deposit":
+                return CARD_LOAD_DEPOSIT;
+            case "onchain_platform_transfer_incoming":
+                return ONCHAIN_PLATFORM_TRANSFER_INCOMING;
+            case "misc_refund":
+                return MISC_REFUND;
+            case "onchain_wallet_transfer_incoming":
+                return ONCHAIN_WALLET_TRANSFER_INCOMING;
+            case "payment_revshare":
+                return PAYMENT_REVSHARE;
+            case "payment_dispute_fee":
+                return PAYMENT_DISPUTE_FEE;
+            case "internal_withdrawal_markup_fee_payout_reversal":
+                return INTERNAL_WITHDRAWAL_MARKUP_FEE_PAYOUT_REVERSAL;
             case "ad_publisher_payout":
                 return AD_PUBLISHER_PAYOUT;
             case "billing_percentage_fee":
@@ -578,158 +1011,114 @@ public final class ListFinancialActivityRequestLineTypesItem {
                 return PAYMENT_DISPUTE_ADJUSTMENT;
             case "payment_processing_percentage_fee":
                 return PAYMENT_PROCESSING_PERCENTAGE_FEE;
-            case "three_ds_fixed_fee":
-                return THREE_DS_FIXED_FEE;
-            case "payment_revshare_refund":
-                return PAYMENT_REVSHARE_REFUND;
+            case "levels_rebate":
+                return LEVELS_REBATE;
             case "dispute_alert_fee":
                 return DISPUTE_ALERT_FEE;
             case "application_fee":
                 return APPLICATION_FEE;
-            case "airdrop_link_returned":
-                return AIRDROP_LINK_RETURNED;
             case "withdrawal":
                 return WITHDRAWAL;
-            case "payout_fee":
-                return PAYOUT_FEE;
-            case "installment_default":
-                return INSTALLMENT_DEFAULT;
+            case "balance_reservation":
+                return BALANCE_RESERVATION;
             case "onchain_wallet_transfer_outgoing":
                 return ONCHAIN_WALLET_TRANSFER_OUTGOING;
             case "license_sale":
                 return LICENSE_SALE;
+            case "platform_credits_payment_refund":
+                return PLATFORM_CREDITS_PAYMENT_REFUND;
             case "application_fee_payout":
                 return APPLICATION_FEE_PAYOUT;
-            case "platform_balance_payment":
-                return PLATFORM_BALANCE_PAYMENT;
             case "legacy_payment":
                 return LEGACY_PAYMENT;
-            case "ad_publisher_payout_received":
-                return AD_PUBLISHER_PAYOUT_RECEIVED;
-            case "payment_referral_reversal":
-                return PAYMENT_REFERRAL_REVERSAL;
-            case "legacy_crypto_payment":
-                return LEGACY_CRYPTO_PAYMENT;
+            case "onchain_internal_transfer_incoming":
+                return ONCHAIN_INTERNAL_TRANSFER_INCOMING;
             case "ad_budget_release":
                 return AD_BUDGET_RELEASE;
             case "ad_spend_charge":
                 return AD_SPEND_CHARGE;
-            case "platform_balance_transfer_incoming":
-                return PLATFORM_BALANCE_TRANSFER_INCOMING;
-            case "payment_referral":
-                return PAYMENT_REFERRAL;
             case "promo_reversal":
                 return PROMO_REVERSAL;
-            case "topup_reversal":
-                return TOPUP_REVERSAL;
             case "platform_affiliate_payment_reversal":
                 return PLATFORM_AFFILIATE_PAYMENT_REVERSAL;
+            case "swap_fee":
+                return SWAP_FEE;
             case "airdrop":
                 return AIRDROP;
-            case "withdrawal_clawback_reversal":
-                return WITHDRAWAL_CLAWBACK_REVERSAL;
-            case "card_spend_authorization":
-                return CARD_SPEND_AUTHORIZATION;
+            case "internal_withdrawal_fee_reversal":
+                return INTERNAL_WITHDRAWAL_FEE_REVERSAL;
             case "license_sale_revenue":
                 return LICENSE_SALE_REVENUE;
             case "topup":
                 return TOPUP;
             case "high_risk_merchant_fee":
                 return HIGH_RISK_MERCHANT_FEE;
-            case "payment_revshare_payout":
-                return PAYMENT_REVSHARE_PAYOUT;
             case "internal_balance_transfer_incoming":
                 return INTERNAL_BALANCE_TRANSFER_INCOMING;
-            case "payment_refund_reversal":
-                return PAYMENT_REFUND_REVERSAL;
+            case "internal_withdrawal_markup_fee":
+                return INTERNAL_WITHDRAWAL_MARKUP_FEE;
             case "onchain_deposit":
                 return ONCHAIN_DEPOSIT;
+            case "marketplace_affiliate_fee":
+                return MARKETPLACE_AFFILIATE_FEE;
             case "withdrawal_reclassification":
                 return WITHDRAWAL_RECLASSIFICATION;
-            case "fraud_prevention_fee":
-                return FRAUD_PREVENTION_FEE;
             case "stripe_domestic_processing_fee":
                 return STRIPE_DOMESTIC_PROCESSING_FEE;
             case "misc_purchase":
                 return MISC_PURCHASE;
-            case "platform_balance_transfer_outgoing":
-                return PLATFORM_BALANCE_TRANSFER_OUTGOING;
-            case "misc_reversal":
-                return MISC_REVERSAL;
-            case "airdrop_link_redeemed":
-                return AIRDROP_LINK_REDEEMED;
-            case "onchain_swap_target":
-                return ONCHAIN_SWAP_TARGET;
-            case "ad_campaign_budget":
-                return AD_CAMPAIGN_BUDGET;
             case "software_rental_transaction":
                 return SOFTWARE_RENTAL_TRANSACTION;
+            case "withdrawal_fee_reversal":
+                return WITHDRAWAL_FEE_REVERSAL;
             case "currency_conversion_incoming":
                 return CURRENCY_CONVERSION_INCOMING;
             case "fees":
                 return FEES;
-            case "affiliate_fee":
-                return AFFILIATE_FEE;
-            case "card_spend_authorization_void":
-                return CARD_SPEND_AUTHORIZATION_VOID;
-            case "payment_gross_reversal":
-                return PAYMENT_GROSS_REVERSAL;
-            case "legacy_payment_refund":
-                return LEGACY_PAYMENT_REFUND;
+            case "capital_withholding":
+                return CAPITAL_WITHHOLDING;
             case "passthrough_gmv":
                 return PASSTHROUGH_GMV;
             case "dispute_hold_adjustment":
                 return DISPUTE_HOLD_ADJUSTMENT;
-            case "internal_withdrawal":
-                return INTERNAL_WITHDRAWAL;
             case "payment_gross":
                 return PAYMENT_GROSS;
-            case "bank_transfer":
-                return BANK_TRANSFER;
-            case "referral_bonus":
-                return REFERRAL_BONUS;
-            case "internal_balance_transfer_outgoing":
-                return INTERNAL_BALANCE_TRANSFER_OUTGOING;
             case "sales_tax_remittance_reversal":
                 return SALES_TAX_REMITTANCE_REVERSAL;
-            case "withdrawal_clawback":
-                return WITHDRAWAL_CLAWBACK;
+            case "card_interchange":
+                return CARD_INTERCHANGE;
+            case "platform_credits_payment":
+                return PLATFORM_CREDITS_PAYMENT;
             case "license_sale_commission":
                 return LICENSE_SALE_COMMISSION;
-            case "revshare_percentage_fee":
-                return REVSHARE_PERCENTAGE_FEE;
+            case "internal_withdrawal_in_transit":
+                return INTERNAL_WITHDRAWAL_IN_TRANSIT;
             case "sales_tax_fee":
                 return SALES_TAX_FEE;
             case "withdrawal_reversal":
                 return WITHDRAWAL_REVERSAL;
-            case "airdrop_reversal":
-                return AIRDROP_REVERSAL;
-            case "payment_refund":
-                return PAYMENT_REFUND;
             case "cross_border_percentage_fee":
                 return CROSS_BORDER_PERCENTAGE_FEE;
             case "topup_fee":
                 return TOPUP_FEE;
-            case "airdrop_link_created":
-                return AIRDROP_LINK_CREATED;
+            case "internal_withdrawal_complete":
+                return INTERNAL_WITHDRAWAL_COMPLETE;
+            case "cashback":
+                return CASHBACK;
+            case "platform_balance_transfer_fee":
+                return PLATFORM_BALANCE_TRANSFER_FEE;
             case "fx_percentage_fee":
                 return FX_PERCENTAGE_FEE;
+            case "internal_withdrawal_in_transit_reversal":
+                return INTERNAL_WITHDRAWAL_IN_TRANSIT_REVERSAL;
             case "currency_conversion_outgoing":
                 return CURRENCY_CONVERSION_OUTGOING;
-            case "company_referral":
-                return COMPANY_REFERRAL;
-            case "orchestration_percentage_fee":
-                return ORCHESTRATION_PERCENTAGE_FEE;
-            case "card_spend_refund":
-                return CARD_SPEND_REFUND;
-            case "payment_revshare_reversal":
-                return PAYMENT_REVSHARE_REVERSAL;
+            case "platform_credits_granted":
+                return PLATFORM_CREDITS_GRANTED;
             case "platform_affiliate_payment":
                 return PLATFORM_AFFILIATE_PAYMENT;
             case "sales_tax_remittance":
                 return SALES_TAX_REMITTANCE;
-            case "misc_refund":
-                return MISC_REFUND;
             case "payment_processing_fixed_fee":
                 return PAYMENT_PROCESSING_FIXED_FEE;
             case "internal_withdrawal_reversal":
@@ -740,18 +1129,16 @@ public final class ListFinancialActivityRequestLineTypesItem {
                 return BUYER_FEE;
             case "whop_processing_fee":
                 return WHOP_PROCESSING_FEE;
-            case "onchain_wallet_transfer_incoming":
-                return ONCHAIN_WALLET_TRANSFER_INCOMING;
-            case "payment_revshare":
-                return PAYMENT_REVSHARE;
-            case "payment_dispute_fee":
-                return PAYMENT_DISPUTE_FEE;
             default:
                 return new ListFinancialActivityRequestLineTypesItem(Value.UNKNOWN, value);
         }
     }
 
     public enum Value {
+        ACCOUNT_SETTLEMENT,
+
+        AD_AFFILIATE_PAYOUT_RECEIVED,
+
         AD_BUDGET_RELEASE,
 
         AD_CAMPAIGN_BUDGET,
@@ -778,11 +1165,23 @@ public final class ListFinancialActivityRequestLineTypesItem {
 
         APPLICATION_FEE_PAYOUT,
 
-        BANK_TRANSFER,
+        BALANCE_RESERVATION,
+
+        BALANCE_RESERVATION_REVERSAL,
 
         BILLING_PERCENTAGE_FEE,
 
         BUYER_FEE,
+
+        CAPITAL_WITHHOLDING,
+
+        CAPITAL_WITHHOLDING_REVERSAL,
+
+        CARD_INTERCHANGE,
+
+        CARD_LOAD_DEPOSIT,
+
+        CARD_LOAD_TRANSFER,
 
         CARD_SPEND_AUTHORIZATION,
 
@@ -790,7 +1189,17 @@ public final class ListFinancialActivityRequestLineTypesItem {
 
         CARD_SPEND_REFUND,
 
+        CARD_UNLOAD_DEPOSIT,
+
+        CARD_UNLOAD_TRANSFER,
+
+        CASHBACK,
+
+        CASHBACK_FUNDING,
+
         COMPANY_REFERRAL,
+
+        CONNECTED_ACCOUNT_NEGATIVE_BALANCE,
 
         CROSS_BORDER_PERCENTAGE_FEE,
 
@@ -803,6 +1212,10 @@ public final class ListFinancialActivityRequestLineTypesItem {
         DISPUTE_HOLD_ADJUSTMENT,
 
         DISPUTE_REPRESENTMENT_FEE,
+
+        ECONOMIC_INTELLIGENCE_PERCENTAGE_FEE,
+
+        EXTERNAL_CARD_LOAD_DEPOSIT,
 
         FEES,
 
@@ -820,6 +1233,24 @@ public final class ListFinancialActivityRequestLineTypesItem {
 
         INTERNAL_WITHDRAWAL,
 
+        INTERNAL_WITHDRAWAL_COMPLETE,
+
+        INTERNAL_WITHDRAWAL_FEE,
+
+        INTERNAL_WITHDRAWAL_FEE_REVERSAL,
+
+        INTERNAL_WITHDRAWAL_IN_TRANSIT,
+
+        INTERNAL_WITHDRAWAL_IN_TRANSIT_REVERSAL,
+
+        INTERNAL_WITHDRAWAL_MARKUP_FEE,
+
+        INTERNAL_WITHDRAWAL_MARKUP_FEE_PAYOUT,
+
+        INTERNAL_WITHDRAWAL_MARKUP_FEE_PAYOUT_REVERSAL,
+
+        INTERNAL_WITHDRAWAL_MARKUP_FEE_REVERSAL,
+
         INTERNAL_WITHDRAWAL_REVERSAL,
 
         LEGACY_CRYPTO_PAYMENT,
@@ -828,11 +1259,15 @@ public final class ListFinancialActivityRequestLineTypesItem {
 
         LEGACY_PAYMENT_REFUND,
 
+        LEVELS_REBATE,
+
         LICENSE_SALE,
 
         LICENSE_SALE_COMMISSION,
 
         LICENSE_SALE_REVENUE,
+
+        MARKETPLACE_AFFILIATE_FEE,
 
         MISC_PURCHASE,
 
@@ -840,7 +1275,19 @@ public final class ListFinancialActivityRequestLineTypesItem {
 
         MISC_REVERSAL,
 
+        ONBOARDING_REWARD,
+
         ONCHAIN_DEPOSIT,
+
+        ONCHAIN_INTERNAL_TRANSFER_INCOMING,
+
+        ONCHAIN_INTERNAL_TRANSFER_OUTGOING,
+
+        ONCHAIN_PLATFORM_TRANSFER_INCOMING,
+
+        ONCHAIN_PLATFORM_TRANSFER_OUTGOING,
+
+        ONCHAIN_SWAP_SOURCE,
 
         ONCHAIN_SWAP_TARGET,
 
@@ -848,7 +1295,11 @@ public final class ListFinancialActivityRequestLineTypesItem {
 
         ONCHAIN_WALLET_TRANSFER_OUTGOING,
 
+        ONCHAIN_WITHDRAWAL,
+
         ORCHESTRATION_PERCENTAGE_FEE,
+
+        PARTNER_GRANT_REWARD,
 
         PASSTHROUGH_GMV,
 
@@ -870,11 +1321,15 @@ public final class ListFinancialActivityRequestLineTypesItem {
 
         PAYMENT_REFERRAL,
 
+        PAYMENT_REFERRAL_REFUND,
+
         PAYMENT_REFERRAL_REVERSAL,
 
         PAYMENT_REFUND,
 
         PAYMENT_REFUND_REVERSAL,
+
+        PAYMENT_RETURN_FEE,
 
         PAYMENT_REVSHARE,
 
@@ -894,11 +1349,25 @@ public final class ListFinancialActivityRequestLineTypesItem {
 
         PLATFORM_BALANCE_PAYMENT_REFUND,
 
+        PLATFORM_BALANCE_TRANSFER_FEE,
+
         PLATFORM_BALANCE_TRANSFER_INCOMING,
 
         PLATFORM_BALANCE_TRANSFER_OUTGOING,
 
         PLATFORM_COVERED_DISPUTE,
+
+        PLATFORM_CREDITS_GRANTED,
+
+        PLATFORM_CREDITS_PAYMENT,
+
+        PLATFORM_CREDITS_PAYMENT_REFUND,
+
+        PLATFORM_EARNING,
+
+        PLATFORM_MARKUP_FEE,
+
+        PLATFORM_MARKUP_FEE_PAYOUT,
 
         PROMO_REVERSAL,
 
@@ -922,6 +1391,8 @@ public final class ListFinancialActivityRequestLineTypesItem {
 
         STRIPE_INTERNATIONAL_PROCESSING_FEE,
 
+        SWAP_FEE,
+
         THREE_DS_FIXED_FEE,
 
         TOPUP,
@@ -940,14 +1411,32 @@ public final class ListFinancialActivityRequestLineTypesItem {
 
         WITHDRAWAL_CLAWBACK_REVERSAL,
 
+        WITHDRAWAL_FEE,
+
+        WITHDRAWAL_FEE_REVERSAL,
+
+        WITHDRAWAL_MARKUP_FEE,
+
+        WITHDRAWAL_MARKUP_FEE_PAYOUT,
+
+        WITHDRAWAL_MARKUP_FEE_PAYOUT_REVERSAL,
+
+        WITHDRAWAL_MARKUP_FEE_REVERSAL,
+
         WITHDRAWAL_RECLASSIFICATION,
 
         WITHDRAWAL_REVERSAL,
+
+        WITHDRAWAL_TOPUP_ADJUSTMENT,
 
         UNKNOWN
     }
 
     public interface Visitor<T> {
+        T visitAccountSettlement();
+
+        T visitAdAffiliatePayoutReceived();
+
         T visitAdBudgetRelease();
 
         T visitAdCampaignBudget();
@@ -974,11 +1463,23 @@ public final class ListFinancialActivityRequestLineTypesItem {
 
         T visitApplicationFeePayout();
 
-        T visitBankTransfer();
+        T visitBalanceReservation();
+
+        T visitBalanceReservationReversal();
 
         T visitBillingPercentageFee();
 
         T visitBuyerFee();
+
+        T visitCapitalWithholding();
+
+        T visitCapitalWithholdingReversal();
+
+        T visitCardInterchange();
+
+        T visitCardLoadDeposit();
+
+        T visitCardLoadTransfer();
 
         T visitCardSpendAuthorization();
 
@@ -986,7 +1487,17 @@ public final class ListFinancialActivityRequestLineTypesItem {
 
         T visitCardSpendRefund();
 
+        T visitCardUnloadDeposit();
+
+        T visitCardUnloadTransfer();
+
+        T visitCashback();
+
+        T visitCashbackFunding();
+
         T visitCompanyReferral();
+
+        T visitConnectedAccountNegativeBalance();
 
         T visitCrossBorderPercentageFee();
 
@@ -999,6 +1510,10 @@ public final class ListFinancialActivityRequestLineTypesItem {
         T visitDisputeHoldAdjustment();
 
         T visitDisputeRepresentmentFee();
+
+        T visitEconomicIntelligencePercentageFee();
+
+        T visitExternalCardLoadDeposit();
 
         T visitFees();
 
@@ -1016,6 +1531,24 @@ public final class ListFinancialActivityRequestLineTypesItem {
 
         T visitInternalWithdrawal();
 
+        T visitInternalWithdrawalComplete();
+
+        T visitInternalWithdrawalFee();
+
+        T visitInternalWithdrawalFeeReversal();
+
+        T visitInternalWithdrawalInTransit();
+
+        T visitInternalWithdrawalInTransitReversal();
+
+        T visitInternalWithdrawalMarkupFee();
+
+        T visitInternalWithdrawalMarkupFeePayout();
+
+        T visitInternalWithdrawalMarkupFeePayoutReversal();
+
+        T visitInternalWithdrawalMarkupFeeReversal();
+
         T visitInternalWithdrawalReversal();
 
         T visitLegacyCryptoPayment();
@@ -1024,11 +1557,15 @@ public final class ListFinancialActivityRequestLineTypesItem {
 
         T visitLegacyPaymentRefund();
 
+        T visitLevelsRebate();
+
         T visitLicenseSale();
 
         T visitLicenseSaleCommission();
 
         T visitLicenseSaleRevenue();
+
+        T visitMarketplaceAffiliateFee();
 
         T visitMiscPurchase();
 
@@ -1036,7 +1573,19 @@ public final class ListFinancialActivityRequestLineTypesItem {
 
         T visitMiscReversal();
 
+        T visitOnboardingReward();
+
         T visitOnchainDeposit();
+
+        T visitOnchainInternalTransferIncoming();
+
+        T visitOnchainInternalTransferOutgoing();
+
+        T visitOnchainPlatformTransferIncoming();
+
+        T visitOnchainPlatformTransferOutgoing();
+
+        T visitOnchainSwapSource();
 
         T visitOnchainSwapTarget();
 
@@ -1044,7 +1593,11 @@ public final class ListFinancialActivityRequestLineTypesItem {
 
         T visitOnchainWalletTransferOutgoing();
 
+        T visitOnchainWithdrawal();
+
         T visitOrchestrationPercentageFee();
+
+        T visitPartnerGrantReward();
 
         T visitPassthroughGmv();
 
@@ -1066,11 +1619,15 @@ public final class ListFinancialActivityRequestLineTypesItem {
 
         T visitPaymentReferral();
 
+        T visitPaymentReferralRefund();
+
         T visitPaymentReferralReversal();
 
         T visitPaymentRefund();
 
         T visitPaymentRefundReversal();
+
+        T visitPaymentReturnFee();
 
         T visitPaymentRevshare();
 
@@ -1090,11 +1647,25 @@ public final class ListFinancialActivityRequestLineTypesItem {
 
         T visitPlatformBalancePaymentRefund();
 
+        T visitPlatformBalanceTransferFee();
+
         T visitPlatformBalanceTransferIncoming();
 
         T visitPlatformBalanceTransferOutgoing();
 
         T visitPlatformCoveredDispute();
+
+        T visitPlatformCreditsGranted();
+
+        T visitPlatformCreditsPayment();
+
+        T visitPlatformCreditsPaymentRefund();
+
+        T visitPlatformEarning();
+
+        T visitPlatformMarkupFee();
+
+        T visitPlatformMarkupFeePayout();
 
         T visitPromoReversal();
 
@@ -1118,6 +1689,8 @@ public final class ListFinancialActivityRequestLineTypesItem {
 
         T visitStripeInternationalProcessingFee();
 
+        T visitSwapFee();
+
         T visitThreeDsFixedFee();
 
         T visitTopup();
@@ -1136,9 +1709,23 @@ public final class ListFinancialActivityRequestLineTypesItem {
 
         T visitWithdrawalClawbackReversal();
 
+        T visitWithdrawalFee();
+
+        T visitWithdrawalFeeReversal();
+
+        T visitWithdrawalMarkupFee();
+
+        T visitWithdrawalMarkupFeePayout();
+
+        T visitWithdrawalMarkupFeePayoutReversal();
+
+        T visitWithdrawalMarkupFeeReversal();
+
         T visitWithdrawalReclassification();
 
         T visitWithdrawalReversal();
+
+        T visitWithdrawalTopupAdjustment();
 
         T visitUnknown(String unknownType);
     }

@@ -130,7 +130,6 @@ public final class ExperienceNotificationPreference {
 
         private NotificationPreferenceScope scope;
 
-        @JsonAnySetter
         private Map<String, Object> additionalProperties = new HashMap<>();
 
         private Builder() {}
@@ -145,7 +144,6 @@ public final class ExperienceNotificationPreference {
 
         /**
          * <p>What the user is notified about in the experience: <code>all</code> notifications, only <code>mentions</code>, or <code>nothing</code>.</p>
-         * <p>What the user is notified about in the experience: <code>all</code> notifications, only <code>mentions</code>, or <code>nothing</code>.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
@@ -157,7 +155,6 @@ public final class ExperienceNotificationPreference {
 
         /**
          * <p>The type of object. Always <code>experience_notification_preference</code>.</p>
-         * <p>The type of object. Always <code>experience_notification_preference</code>.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
@@ -168,7 +165,6 @@ public final class ExperienceNotificationPreference {
         }
 
         /**
-         * <p>What the preference applies to. Echo it back to <code>PATCH /users/me/preferences/notifications</code> to change this preference.</p>
          * <p>What the preference applies to. Echo it back to <code>PATCH /users/me/preferences/notifications</code> to change this preference.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
@@ -182,6 +178,14 @@ public final class ExperienceNotificationPreference {
         @java.lang.Override
         public ExperienceNotificationPreference build() {
             return new ExperienceNotificationPreference(level, object, scope, additionalProperties);
+        }
+
+        @JsonAnySetter
+        private void putAdditionalPropertyFromJson(String key, Object value) {
+            if (key.equalsIgnoreCase("level") || key.equalsIgnoreCase("object") || key.equalsIgnoreCase("scope")) {
+                return;
+            }
+            this.additionalProperties.put(key, value);
         }
 
         @java.lang.Override

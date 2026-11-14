@@ -5,6 +5,7 @@ package com.whop.api.resources.events;
 
 import com.whop.api.core.ClientOptions;
 import com.whop.api.core.RequestOptions;
+import com.whop.api.core.WhopApiHttpResponse;
 import com.whop.api.core.pagination.SyncPagingIterable;
 import com.whop.api.resources.events.requests.CreateEventsRequest;
 import com.whop.api.resources.events.requests.ListEventsRequest;
@@ -34,103 +35,220 @@ public class AsyncEventsClient {
     }
 
     /**
-     * Lists identity-linked events, most recent first by default. Pass identifier for one person's journey, or omit it to list events for an account within an explicit time range. Pass direction=asc to read a journey forwards from where it starts. Events are shaped like the POST /events intake: attribution in context, identity in user.
+     * Lists identity-linked events, most recent first by default. Pass <code>identifier</code> for one person's journey, or omit it to list an account's events within a time range. Events have the same shape as the <code>POST /events</code> intake: attribution in <code>context</code>, identity in <code>user</code>.
      */
     public CompletableFuture<SyncPagingIterable<ListEventsResponseDataItem>> list() {
-        return this.rawClient.list().thenApply(response -> response.body());
+        CompletableFuture<WhopApiHttpResponse<SyncPagingIterable<ListEventsResponseDataItem>>> rawFuture =
+                this.rawClient.list();
+        CompletableFuture<SyncPagingIterable<ListEventsResponseDataItem>> future =
+                rawFuture.thenApply(response -> response.body());
+        future.whenComplete((result_, throwable_) -> {
+            if (future.isCancelled()) {
+                rawFuture.cancel(true);
+            }
+        });
+        return future;
     }
 
     /**
-     * Lists identity-linked events, most recent first by default. Pass identifier for one person's journey, or omit it to list events for an account within an explicit time range. Pass direction=asc to read a journey forwards from where it starts. Events are shaped like the POST /events intake: attribution in context, identity in user.
+     * Lists identity-linked events, most recent first by default. Pass <code>identifier</code> for one person's journey, or omit it to list an account's events within a time range. Events have the same shape as the <code>POST /events</code> intake: attribution in <code>context</code>, identity in <code>user</code>.
      */
     public CompletableFuture<SyncPagingIterable<ListEventsResponseDataItem>> list(RequestOptions requestOptions) {
-        return this.rawClient.list(requestOptions).thenApply(response -> response.body());
+        CompletableFuture<WhopApiHttpResponse<SyncPagingIterable<ListEventsResponseDataItem>>> rawFuture =
+                this.rawClient.list(requestOptions);
+        CompletableFuture<SyncPagingIterable<ListEventsResponseDataItem>> future =
+                rawFuture.thenApply(response -> response.body());
+        future.whenComplete((result_, throwable_) -> {
+            if (future.isCancelled()) {
+                rawFuture.cancel(true);
+            }
+        });
+        return future;
     }
 
     /**
-     * Lists identity-linked events, most recent first by default. Pass identifier for one person's journey, or omit it to list events for an account within an explicit time range. Pass direction=asc to read a journey forwards from where it starts. Events are shaped like the POST /events intake: attribution in context, identity in user.
+     * Lists identity-linked events, most recent first by default. Pass <code>identifier</code> for one person's journey, or omit it to list an account's events within a time range. Events have the same shape as the <code>POST /events</code> intake: attribution in <code>context</code>, identity in <code>user</code>.
      */
     public CompletableFuture<SyncPagingIterable<ListEventsResponseDataItem>> list(ListEventsRequest request) {
-        return this.rawClient.list(request).thenApply(response -> response.body());
+        CompletableFuture<WhopApiHttpResponse<SyncPagingIterable<ListEventsResponseDataItem>>> rawFuture =
+                this.rawClient.list(request);
+        CompletableFuture<SyncPagingIterable<ListEventsResponseDataItem>> future =
+                rawFuture.thenApply(response -> response.body());
+        future.whenComplete((result_, throwable_) -> {
+            if (future.isCancelled()) {
+                rawFuture.cancel(true);
+            }
+        });
+        return future;
     }
 
     /**
-     * Lists identity-linked events, most recent first by default. Pass identifier for one person's journey, or omit it to list events for an account within an explicit time range. Pass direction=asc to read a journey forwards from where it starts. Events are shaped like the POST /events intake: attribution in context, identity in user.
+     * Lists identity-linked events, most recent first by default. Pass <code>identifier</code> for one person's journey, or omit it to list an account's events within a time range. Events have the same shape as the <code>POST /events</code> intake: attribution in <code>context</code>, identity in <code>user</code>.
      */
     public CompletableFuture<SyncPagingIterable<ListEventsResponseDataItem>> list(
             ListEventsRequest request, RequestOptions requestOptions) {
-        return this.rawClient.list(request, requestOptions).thenApply(response -> response.body());
+        CompletableFuture<WhopApiHttpResponse<SyncPagingIterable<ListEventsResponseDataItem>>> rawFuture =
+                this.rawClient.list(request, requestOptions);
+        CompletableFuture<SyncPagingIterable<ListEventsResponseDataItem>> future =
+                rawFuture.thenApply(response -> response.body());
+        future.whenComplete((result_, throwable_) -> {
+            if (future.isCancelled()) {
+                rawFuture.cancel(true);
+            }
+        });
+        return future;
     }
 
     /**
-     * Tracks a conversion or engagement event for an account.
+     * Tracks a conversion or engagement event for an account, such as a lead or a sign-up, so it can be attributed to the ads and links that drove it. Send server-side events with an API key that has <code>event:create</code>; the browser pixel calls this without authentication.
      */
     public CompletableFuture<CreateEventsResponse> create(CreateEventsRequest request) {
-        return this.rawClient.create(request).thenApply(response -> response.body());
+        CompletableFuture<WhopApiHttpResponse<CreateEventsResponse>> rawFuture = this.rawClient.create(request);
+        CompletableFuture<CreateEventsResponse> future = rawFuture.thenApply(response -> response.body());
+        future.whenComplete((result_, throwable_) -> {
+            if (future.isCancelled()) {
+                rawFuture.cancel(true);
+            }
+        });
+        return future;
     }
 
     /**
-     * Tracks a conversion or engagement event for an account.
+     * Tracks a conversion or engagement event for an account, such as a lead or a sign-up, so it can be attributed to the ads and links that drove it. Send server-side events with an API key that has <code>event:create</code>; the browser pixel calls this without authentication.
      */
     public CompletableFuture<CreateEventsResponse> create(CreateEventsRequest request, RequestOptions requestOptions) {
-        return this.rawClient.create(request, requestOptions).thenApply(response -> response.body());
+        CompletableFuture<WhopApiHttpResponse<CreateEventsResponse>> rawFuture =
+                this.rawClient.create(request, requestOptions);
+        CompletableFuture<CreateEventsResponse> future = rawFuture.thenApply(response -> response.body());
+        future.whenComplete((result_, throwable_) -> {
+            if (future.isCancelled()) {
+                rawFuture.cancel(true);
+            }
+        });
+        return future;
     }
 
     /**
-     * Returns a fully anonymized feed of recent platform-wide money movement, most recent first: purchases, affiliate commissions, card and ad spend, app revenue, off-platform sales, wallet deposits, card loads, claimed drops, transfers between accounts, and referral bonuses. Items carry only a <code>type</code>, the underlying event name, a USD amount, a coarse location under <code>user</code>, and a timestamp coarsened to the start of the minute; missing fields are omitted, not nulled. The payload is identical for every caller; no auth is required.
+     * Returns a fully anonymized feed of recent money movement across Whop, most recent first, such as purchases, card spend, and transfers between accounts. Each item carries only its <code>type</code>, a USD amount, a coarse location, and a timestamp coarsened to the minute. The payload is identical for every caller and requires no authentication.
      */
     public CompletableFuture<SyncPagingIterable<PulseEventsResponseDataItem>> pulse() {
-        return this.rawClient.pulse().thenApply(response -> response.body());
+        CompletableFuture<WhopApiHttpResponse<SyncPagingIterable<PulseEventsResponseDataItem>>> rawFuture =
+                this.rawClient.pulse();
+        CompletableFuture<SyncPagingIterable<PulseEventsResponseDataItem>> future =
+                rawFuture.thenApply(response -> response.body());
+        future.whenComplete((result_, throwable_) -> {
+            if (future.isCancelled()) {
+                rawFuture.cancel(true);
+            }
+        });
+        return future;
     }
 
     /**
-     * Returns a fully anonymized feed of recent platform-wide money movement, most recent first: purchases, affiliate commissions, card and ad spend, app revenue, off-platform sales, wallet deposits, card loads, claimed drops, transfers between accounts, and referral bonuses. Items carry only a <code>type</code>, the underlying event name, a USD amount, a coarse location under <code>user</code>, and a timestamp coarsened to the start of the minute; missing fields are omitted, not nulled. The payload is identical for every caller; no auth is required.
+     * Returns a fully anonymized feed of recent money movement across Whop, most recent first, such as purchases, card spend, and transfers between accounts. Each item carries only its <code>type</code>, a USD amount, a coarse location, and a timestamp coarsened to the minute. The payload is identical for every caller and requires no authentication.
      */
     public CompletableFuture<SyncPagingIterable<PulseEventsResponseDataItem>> pulse(RequestOptions requestOptions) {
-        return this.rawClient.pulse(requestOptions).thenApply(response -> response.body());
+        CompletableFuture<WhopApiHttpResponse<SyncPagingIterable<PulseEventsResponseDataItem>>> rawFuture =
+                this.rawClient.pulse(requestOptions);
+        CompletableFuture<SyncPagingIterable<PulseEventsResponseDataItem>> future =
+                rawFuture.thenApply(response -> response.body());
+        future.whenComplete((result_, throwable_) -> {
+            if (future.isCancelled()) {
+                rawFuture.cancel(true);
+            }
+        });
+        return future;
     }
 
     /**
-     * Returns a fully anonymized feed of recent platform-wide money movement, most recent first: purchases, affiliate commissions, card and ad spend, app revenue, off-platform sales, wallet deposits, card loads, claimed drops, transfers between accounts, and referral bonuses. Items carry only a <code>type</code>, the underlying event name, a USD amount, a coarse location under <code>user</code>, and a timestamp coarsened to the start of the minute; missing fields are omitted, not nulled. The payload is identical for every caller; no auth is required.
+     * Returns a fully anonymized feed of recent money movement across Whop, most recent first, such as purchases, card spend, and transfers between accounts. Each item carries only its <code>type</code>, a USD amount, a coarse location, and a timestamp coarsened to the minute. The payload is identical for every caller and requires no authentication.
      */
     public CompletableFuture<SyncPagingIterable<PulseEventsResponseDataItem>> pulse(PulseEventsRequest request) {
-        return this.rawClient.pulse(request).thenApply(response -> response.body());
+        CompletableFuture<WhopApiHttpResponse<SyncPagingIterable<PulseEventsResponseDataItem>>> rawFuture =
+                this.rawClient.pulse(request);
+        CompletableFuture<SyncPagingIterable<PulseEventsResponseDataItem>> future =
+                rawFuture.thenApply(response -> response.body());
+        future.whenComplete((result_, throwable_) -> {
+            if (future.isCancelled()) {
+                rawFuture.cancel(true);
+            }
+        });
+        return future;
     }
 
     /**
-     * Returns a fully anonymized feed of recent platform-wide money movement, most recent first: purchases, affiliate commissions, card and ad spend, app revenue, off-platform sales, wallet deposits, card loads, claimed drops, transfers between accounts, and referral bonuses. Items carry only a <code>type</code>, the underlying event name, a USD amount, a coarse location under <code>user</code>, and a timestamp coarsened to the start of the minute; missing fields are omitted, not nulled. The payload is identical for every caller; no auth is required.
+     * Returns a fully anonymized feed of recent money movement across Whop, most recent first, such as purchases, card spend, and transfers between accounts. Each item carries only its <code>type</code>, a USD amount, a coarse location, and a timestamp coarsened to the minute. The payload is identical for every caller and requires no authentication.
      */
     public CompletableFuture<SyncPagingIterable<PulseEventsResponseDataItem>> pulse(
             PulseEventsRequest request, RequestOptions requestOptions) {
-        return this.rawClient.pulse(request, requestOptions).thenApply(response -> response.body());
+        CompletableFuture<WhopApiHttpResponse<SyncPagingIterable<PulseEventsResponseDataItem>>> rawFuture =
+                this.rawClient.pulse(request, requestOptions);
+        CompletableFuture<SyncPagingIterable<PulseEventsResponseDataItem>> future =
+                rawFuture.thenApply(response -> response.body());
+        future.whenComplete((result_, throwable_) -> {
+            if (future.isCancelled()) {
+                rawFuture.cancel(true);
+            }
+        });
+        return future;
     }
 
     /**
-     * Checks whether the Whop pixel is installed for an account. Recent pixel events count as proof on their own, so an account that has sent data lately comes back installed without a <code>url</code>. Pass a <code>url</code> and events from that page settle it; conversion events are also read across the hostname because they commonly fire on a later confirmation page. If the requested page hasn't sent any events lately, it is fetched and read for the pixel and conversion events wired on it. <code>installed</code> is only true when the pixel was actually seen — in the account's events or in the page.
+     * Checks whether the Whop pixel is installed for an account, or on one page when you pass a <code>url</code>. Use it before launching an ad to confirm its destination is tracked, or in a setup flow to tell a merchant whether their install is live.
      */
     public CompletableFuture<PixelValidation> validatePixel() {
-        return this.rawClient.validatePixel().thenApply(response -> response.body());
+        CompletableFuture<WhopApiHttpResponse<PixelValidation>> rawFuture = this.rawClient.validatePixel();
+        CompletableFuture<PixelValidation> future = rawFuture.thenApply(response -> response.body());
+        future.whenComplete((result_, throwable_) -> {
+            if (future.isCancelled()) {
+                rawFuture.cancel(true);
+            }
+        });
+        return future;
     }
 
     /**
-     * Checks whether the Whop pixel is installed for an account. Recent pixel events count as proof on their own, so an account that has sent data lately comes back installed without a <code>url</code>. Pass a <code>url</code> and events from that page settle it; conversion events are also read across the hostname because they commonly fire on a later confirmation page. If the requested page hasn't sent any events lately, it is fetched and read for the pixel and conversion events wired on it. <code>installed</code> is only true when the pixel was actually seen — in the account's events or in the page.
+     * Checks whether the Whop pixel is installed for an account, or on one page when you pass a <code>url</code>. Use it before launching an ad to confirm its destination is tracked, or in a setup flow to tell a merchant whether their install is live.
      */
     public CompletableFuture<PixelValidation> validatePixel(RequestOptions requestOptions) {
-        return this.rawClient.validatePixel(requestOptions).thenApply(response -> response.body());
+        CompletableFuture<WhopApiHttpResponse<PixelValidation>> rawFuture =
+                this.rawClient.validatePixel(requestOptions);
+        CompletableFuture<PixelValidation> future = rawFuture.thenApply(response -> response.body());
+        future.whenComplete((result_, throwable_) -> {
+            if (future.isCancelled()) {
+                rawFuture.cancel(true);
+            }
+        });
+        return future;
     }
 
     /**
-     * Checks whether the Whop pixel is installed for an account. Recent pixel events count as proof on their own, so an account that has sent data lately comes back installed without a <code>url</code>. Pass a <code>url</code> and events from that page settle it; conversion events are also read across the hostname because they commonly fire on a later confirmation page. If the requested page hasn't sent any events lately, it is fetched and read for the pixel and conversion events wired on it. <code>installed</code> is only true when the pixel was actually seen — in the account's events or in the page.
+     * Checks whether the Whop pixel is installed for an account, or on one page when you pass a <code>url</code>. Use it before launching an ad to confirm its destination is tracked, or in a setup flow to tell a merchant whether their install is live.
      */
     public CompletableFuture<PixelValidation> validatePixel(ValidatePixelEventsRequest request) {
-        return this.rawClient.validatePixel(request).thenApply(response -> response.body());
+        CompletableFuture<WhopApiHttpResponse<PixelValidation>> rawFuture = this.rawClient.validatePixel(request);
+        CompletableFuture<PixelValidation> future = rawFuture.thenApply(response -> response.body());
+        future.whenComplete((result_, throwable_) -> {
+            if (future.isCancelled()) {
+                rawFuture.cancel(true);
+            }
+        });
+        return future;
     }
 
     /**
-     * Checks whether the Whop pixel is installed for an account. Recent pixel events count as proof on their own, so an account that has sent data lately comes back installed without a <code>url</code>. Pass a <code>url</code> and events from that page settle it; conversion events are also read across the hostname because they commonly fire on a later confirmation page. If the requested page hasn't sent any events lately, it is fetched and read for the pixel and conversion events wired on it. <code>installed</code> is only true when the pixel was actually seen — in the account's events or in the page.
+     * Checks whether the Whop pixel is installed for an account, or on one page when you pass a <code>url</code>. Use it before launching an ad to confirm its destination is tracked, or in a setup flow to tell a merchant whether their install is live.
      */
     public CompletableFuture<PixelValidation> validatePixel(
             ValidatePixelEventsRequest request, RequestOptions requestOptions) {
-        return this.rawClient.validatePixel(request, requestOptions).thenApply(response -> response.body());
+        CompletableFuture<WhopApiHttpResponse<PixelValidation>> rawFuture =
+                this.rawClient.validatePixel(request, requestOptions);
+        CompletableFuture<PixelValidation> future = rawFuture.thenApply(response -> response.body());
+        future.whenComplete((result_, throwable_) -> {
+            if (future.isCancelled()) {
+                rawFuture.cancel(true);
+            }
+        });
+        return future;
     }
 }

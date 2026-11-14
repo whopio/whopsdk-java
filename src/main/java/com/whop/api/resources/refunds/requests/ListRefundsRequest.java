@@ -12,7 +12,8 @@ import com.fasterxml.jackson.annotation.JsonSetter;
 import com.fasterxml.jackson.annotation.Nulls;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.whop.api.core.ObjectMappers;
-import com.whop.api.types.Direction;
+import com.whop.api.resources.refunds.types.ListRefundsRequestDirection;
+import com.whop.api.resources.refunds.types.ListRefundsRequestOrder;
 import java.time.OffsetDateTime;
 import java.util.HashMap;
 import java.util.Map;
@@ -22,87 +23,67 @@ import java.util.Optional;
 @JsonInclude(JsonInclude.Include.NON_ABSENT)
 @JsonDeserialize(builder = ListRefundsRequest.Builder.class)
 public final class ListRefundsRequest {
-    private final Optional<String> after;
-
-    private final Optional<String> before;
-
-    private final Optional<Integer> first;
-
-    private final Optional<Integer> last;
+    private final Optional<String> accountId;
 
     private final Optional<String> paymentId;
 
-    private final Optional<String> companyId;
-
     private final Optional<String> userId;
-
-    private final Optional<Direction> direction;
 
     private final Optional<OffsetDateTime> createdBefore;
 
     private final Optional<OffsetDateTime> createdAfter;
 
+    private final Optional<ListRefundsRequestOrder> order;
+
+    private final Optional<ListRefundsRequestDirection> direction;
+
+    private final Optional<Integer> first;
+
+    private final Optional<String> after;
+
+    private final Optional<Integer> last;
+
+    private final Optional<String> before;
+
     private final Map<String, Object> additionalProperties;
 
     private ListRefundsRequest(
-            Optional<String> after,
-            Optional<String> before,
-            Optional<Integer> first,
-            Optional<Integer> last,
+            Optional<String> accountId,
             Optional<String> paymentId,
-            Optional<String> companyId,
             Optional<String> userId,
-            Optional<Direction> direction,
             Optional<OffsetDateTime> createdBefore,
             Optional<OffsetDateTime> createdAfter,
+            Optional<ListRefundsRequestOrder> order,
+            Optional<ListRefundsRequestDirection> direction,
+            Optional<Integer> first,
+            Optional<String> after,
+            Optional<Integer> last,
+            Optional<String> before,
             Map<String, Object> additionalProperties) {
-        this.after = after;
-        this.before = before;
-        this.first = first;
-        this.last = last;
+        this.accountId = accountId;
         this.paymentId = paymentId;
-        this.companyId = companyId;
         this.userId = userId;
-        this.direction = direction;
         this.createdBefore = createdBefore;
         this.createdAfter = createdAfter;
+        this.order = order;
+        this.direction = direction;
+        this.first = first;
+        this.after = after;
+        this.last = last;
+        this.before = before;
         this.additionalProperties = additionalProperties;
     }
 
     /**
-     * @return <p>the elements in the list that come after the specified cursor.</p>
+     * @return Only refunds issued by this account, prefixed <code>biz_</code>.
      */
-    @JsonProperty("after")
-    public Optional<String> getAfter() {
-        return after;
+    @JsonProperty("account_id")
+    public Optional<String> getAccountId() {
+        return accountId;
     }
 
     /**
-     * @return <p>the elements in the list that come before the specified cursor.</p>
-     */
-    @JsonProperty("before")
-    public Optional<String> getBefore() {
-        return before;
-    }
-
-    /**
-     * @return <p>the first <em>n</em> elements from the list.</p>
-     */
-    @JsonProperty("first")
-    public Optional<Integer> getFirst() {
-        return first;
-    }
-
-    /**
-     * @return <p>the last <em>n</em> elements from the list.</p>
-     */
-    @JsonProperty("last")
-    public Optional<Integer> getLast() {
-        return last;
-    }
-
-    /**
-     * @return Filter refunds to only those associated with this specific payment.
+     * @return Only refunds of this payment, prefixed <code>pay_</code>.
      */
     @JsonProperty("payment_id")
     public Optional<String> getPaymentId() {
@@ -110,28 +91,15 @@ public final class ListRefundsRequest {
     }
 
     /**
-     * @return Filter refunds to only those belonging to this company.
-     */
-    @JsonProperty("company_id")
-    public Optional<String> getCompanyId() {
-        return companyId;
-    }
-
-    /**
-     * @return Filter refunds to only those associated with this specific user.
+     * @return Only refunds to this buyer, prefixed <code>user_</code>.
      */
     @JsonProperty("user_id")
     public Optional<String> getUserId() {
         return userId;
     }
 
-    @JsonProperty("direction")
-    public Optional<Direction> getDirection() {
-        return direction;
-    }
-
     /**
-     * @return Only return refunds created before this timestamp.
+     * @return Only refunds requested before this ISO 8601 timestamp.
      */
     @JsonProperty("created_before")
     public Optional<OffsetDateTime> getCreatedBefore() {
@@ -139,11 +107,59 @@ public final class ListRefundsRequest {
     }
 
     /**
-     * @return Only return refunds created after this timestamp.
+     * @return Only refunds requested after this ISO 8601 timestamp.
      */
     @JsonProperty("created_after")
     public Optional<OffsetDateTime> getCreatedAfter() {
         return createdAfter;
+    }
+
+    /**
+     * @return The field to sort by.
+     */
+    @JsonProperty("order")
+    public Optional<ListRefundsRequestOrder> getOrder() {
+        return order;
+    }
+
+    /**
+     * @return The sort direction.
+     */
+    @JsonProperty("direction")
+    public Optional<ListRefundsRequestDirection> getDirection() {
+        return direction;
+    }
+
+    /**
+     * @return Number of results to return from the start of the range.
+     */
+    @JsonProperty("first")
+    public Optional<Integer> getFirst() {
+        return first;
+    }
+
+    /**
+     * @return Return results after this cursor. Use <code>page_info.end_cursor</code> from the previous response to fetch the next page.
+     */
+    @JsonProperty("after")
+    public Optional<String> getAfter() {
+        return after;
+    }
+
+    /**
+     * @return Number of results to return from the end of the range.
+     */
+    @JsonProperty("last")
+    public Optional<Integer> getLast() {
+        return last;
+    }
+
+    /**
+     * @return Return results before this cursor. Use <code>page_info.start_cursor</code> from the previous response to fetch the previous page.
+     */
+    @JsonProperty("before")
+    public Optional<String> getBefore() {
+        return before;
     }
 
     @java.lang.Override
@@ -158,31 +174,33 @@ public final class ListRefundsRequest {
     }
 
     private boolean equalTo(ListRefundsRequest other) {
-        return after.equals(other.after)
-                && before.equals(other.before)
-                && first.equals(other.first)
-                && last.equals(other.last)
+        return accountId.equals(other.accountId)
                 && paymentId.equals(other.paymentId)
-                && companyId.equals(other.companyId)
                 && userId.equals(other.userId)
-                && direction.equals(other.direction)
                 && createdBefore.equals(other.createdBefore)
-                && createdAfter.equals(other.createdAfter);
+                && createdAfter.equals(other.createdAfter)
+                && order.equals(other.order)
+                && direction.equals(other.direction)
+                && first.equals(other.first)
+                && after.equals(other.after)
+                && last.equals(other.last)
+                && before.equals(other.before);
     }
 
     @java.lang.Override
     public int hashCode() {
         return Objects.hash(
-                this.after,
-                this.before,
-                this.first,
-                this.last,
+                this.accountId,
                 this.paymentId,
-                this.companyId,
                 this.userId,
-                this.direction,
                 this.createdBefore,
-                this.createdAfter);
+                this.createdAfter,
+                this.order,
+                this.direction,
+                this.first,
+                this.after,
+                this.last,
+                this.before);
     }
 
     @java.lang.Override
@@ -196,103 +214,63 @@ public final class ListRefundsRequest {
 
     @JsonIgnoreProperties(ignoreUnknown = true)
     public static final class Builder {
-        private Optional<String> after = Optional.empty();
-
-        private Optional<String> before = Optional.empty();
-
-        private Optional<Integer> first = Optional.empty();
-
-        private Optional<Integer> last = Optional.empty();
+        private Optional<String> accountId = Optional.empty();
 
         private Optional<String> paymentId = Optional.empty();
 
-        private Optional<String> companyId = Optional.empty();
-
         private Optional<String> userId = Optional.empty();
-
-        private Optional<Direction> direction = Optional.empty();
 
         private Optional<OffsetDateTime> createdBefore = Optional.empty();
 
         private Optional<OffsetDateTime> createdAfter = Optional.empty();
 
-        @JsonAnySetter
+        private Optional<ListRefundsRequestOrder> order = Optional.empty();
+
+        private Optional<ListRefundsRequestDirection> direction = Optional.empty();
+
+        private Optional<Integer> first = Optional.empty();
+
+        private Optional<String> after = Optional.empty();
+
+        private Optional<Integer> last = Optional.empty();
+
+        private Optional<String> before = Optional.empty();
+
         private Map<String, Object> additionalProperties = new HashMap<>();
 
         private Builder() {}
 
         public Builder from(ListRefundsRequest other) {
-            after(other.getAfter());
-            before(other.getBefore());
-            first(other.getFirst());
-            last(other.getLast());
+            accountId(other.getAccountId());
             paymentId(other.getPaymentId());
-            companyId(other.getCompanyId());
             userId(other.getUserId());
-            direction(other.getDirection());
             createdBefore(other.getCreatedBefore());
             createdAfter(other.getCreatedAfter());
+            order(other.getOrder());
+            direction(other.getDirection());
+            first(other.getFirst());
+            after(other.getAfter());
+            last(other.getLast());
+            before(other.getBefore());
             return this;
         }
 
         /**
-         * <p>Returns the elements in the list that come after the specified cursor.</p>
+         * <p>Only refunds issued by this account, prefixed <code>biz_</code>.</p>
          */
-        @JsonSetter(value = "after", nulls = Nulls.SKIP)
-        public Builder after(Optional<String> after) {
-            this.after = after;
+        @JsonSetter(value = "account_id", nulls = Nulls.SKIP)
+        public Builder accountId(Optional<String> accountId) {
+            this.accountId = accountId;
             return this;
         }
 
-        public Builder after(String after) {
-            this.after = Optional.ofNullable(after);
-            return this;
-        }
-
-        /**
-         * <p>Returns the elements in the list that come before the specified cursor.</p>
-         */
-        @JsonSetter(value = "before", nulls = Nulls.SKIP)
-        public Builder before(Optional<String> before) {
-            this.before = before;
-            return this;
-        }
-
-        public Builder before(String before) {
-            this.before = Optional.ofNullable(before);
+        public Builder accountId(String accountId) {
+            this.accountId = Optional.ofNullable(accountId);
             return this;
         }
 
         /**
-         * <p>Returns the first <em>n</em> elements from the list.</p>
-         */
-        @JsonSetter(value = "first", nulls = Nulls.SKIP)
-        public Builder first(Optional<Integer> first) {
-            this.first = first;
-            return this;
-        }
-
-        public Builder first(Integer first) {
-            this.first = Optional.ofNullable(first);
-            return this;
-        }
-
-        /**
-         * <p>Returns the last <em>n</em> elements from the list.</p>
-         */
-        @JsonSetter(value = "last", nulls = Nulls.SKIP)
-        public Builder last(Optional<Integer> last) {
-            this.last = last;
-            return this;
-        }
-
-        public Builder last(Integer last) {
-            this.last = Optional.ofNullable(last);
-            return this;
-        }
-
-        /**
-         * <p>Filter refunds to only those associated with this specific payment.</p>
+         * <p>Only refunds of this payment, prefixed <code>pay_</code>.</p>
          */
         @JsonSetter(value = "payment_id", nulls = Nulls.SKIP)
         public Builder paymentId(Optional<String> paymentId) {
@@ -306,21 +284,7 @@ public final class ListRefundsRequest {
         }
 
         /**
-         * <p>Filter refunds to only those belonging to this company.</p>
-         */
-        @JsonSetter(value = "company_id", nulls = Nulls.SKIP)
-        public Builder companyId(Optional<String> companyId) {
-            this.companyId = companyId;
-            return this;
-        }
-
-        public Builder companyId(String companyId) {
-            this.companyId = Optional.ofNullable(companyId);
-            return this;
-        }
-
-        /**
-         * <p>Filter refunds to only those associated with this specific user.</p>
+         * <p>Only refunds to this buyer, prefixed <code>user_</code>.</p>
          */
         @JsonSetter(value = "user_id", nulls = Nulls.SKIP)
         public Builder userId(Optional<String> userId) {
@@ -333,19 +297,8 @@ public final class ListRefundsRequest {
             return this;
         }
 
-        @JsonSetter(value = "direction", nulls = Nulls.SKIP)
-        public Builder direction(Optional<Direction> direction) {
-            this.direction = direction;
-            return this;
-        }
-
-        public Builder direction(Direction direction) {
-            this.direction = Optional.ofNullable(direction);
-            return this;
-        }
-
         /**
-         * <p>Only return refunds created before this timestamp.</p>
+         * <p>Only refunds requested before this ISO 8601 timestamp.</p>
          */
         @JsonSetter(value = "created_before", nulls = Nulls.SKIP)
         public Builder createdBefore(Optional<OffsetDateTime> createdBefore) {
@@ -359,7 +312,7 @@ public final class ListRefundsRequest {
         }
 
         /**
-         * <p>Only return refunds created after this timestamp.</p>
+         * <p>Only refunds requested after this ISO 8601 timestamp.</p>
          */
         @JsonSetter(value = "created_after", nulls = Nulls.SKIP)
         public Builder createdAfter(Optional<OffsetDateTime> createdAfter) {
@@ -372,19 +325,122 @@ public final class ListRefundsRequest {
             return this;
         }
 
+        /**
+         * <p>The field to sort by.</p>
+         */
+        @JsonSetter(value = "order", nulls = Nulls.SKIP)
+        public Builder order(Optional<ListRefundsRequestOrder> order) {
+            this.order = order;
+            return this;
+        }
+
+        public Builder order(ListRefundsRequestOrder order) {
+            this.order = Optional.ofNullable(order);
+            return this;
+        }
+
+        /**
+         * <p>The sort direction.</p>
+         */
+        @JsonSetter(value = "direction", nulls = Nulls.SKIP)
+        public Builder direction(Optional<ListRefundsRequestDirection> direction) {
+            this.direction = direction;
+            return this;
+        }
+
+        public Builder direction(ListRefundsRequestDirection direction) {
+            this.direction = Optional.ofNullable(direction);
+            return this;
+        }
+
+        /**
+         * <p>Number of results to return from the start of the range.</p>
+         */
+        @JsonSetter(value = "first", nulls = Nulls.SKIP)
+        public Builder first(Optional<Integer> first) {
+            this.first = first;
+            return this;
+        }
+
+        public Builder first(Integer first) {
+            this.first = Optional.ofNullable(first);
+            return this;
+        }
+
+        /**
+         * <p>Return results after this cursor. Use <code>page_info.end_cursor</code> from the previous response to fetch the next page.</p>
+         */
+        @JsonSetter(value = "after", nulls = Nulls.SKIP)
+        public Builder after(Optional<String> after) {
+            this.after = after;
+            return this;
+        }
+
+        public Builder after(String after) {
+            this.after = Optional.ofNullable(after);
+            return this;
+        }
+
+        /**
+         * <p>Number of results to return from the end of the range.</p>
+         */
+        @JsonSetter(value = "last", nulls = Nulls.SKIP)
+        public Builder last(Optional<Integer> last) {
+            this.last = last;
+            return this;
+        }
+
+        public Builder last(Integer last) {
+            this.last = Optional.ofNullable(last);
+            return this;
+        }
+
+        /**
+         * <p>Return results before this cursor. Use <code>page_info.start_cursor</code> from the previous response to fetch the previous page.</p>
+         */
+        @JsonSetter(value = "before", nulls = Nulls.SKIP)
+        public Builder before(Optional<String> before) {
+            this.before = before;
+            return this;
+        }
+
+        public Builder before(String before) {
+            this.before = Optional.ofNullable(before);
+            return this;
+        }
+
         public ListRefundsRequest build() {
             return new ListRefundsRequest(
-                    after,
-                    before,
-                    first,
-                    last,
+                    accountId,
                     paymentId,
-                    companyId,
                     userId,
-                    direction,
                     createdBefore,
                     createdAfter,
+                    order,
+                    direction,
+                    first,
+                    after,
+                    last,
+                    before,
                     additionalProperties);
+        }
+
+        @JsonAnySetter
+        private void putAdditionalPropertyFromJson(String key, Object value) {
+            if (key.equalsIgnoreCase("account_id")
+                    || key.equalsIgnoreCase("payment_id")
+                    || key.equalsIgnoreCase("user_id")
+                    || key.equalsIgnoreCase("created_before")
+                    || key.equalsIgnoreCase("created_after")
+                    || key.equalsIgnoreCase("order")
+                    || key.equalsIgnoreCase("direction")
+                    || key.equalsIgnoreCase("first")
+                    || key.equalsIgnoreCase("after")
+                    || key.equalsIgnoreCase("last")
+                    || key.equalsIgnoreCase("before")) {
+                return;
+            }
+            this.additionalProperties.put(key, value);
         }
 
         public Builder additionalProperty(String key, Object value) {

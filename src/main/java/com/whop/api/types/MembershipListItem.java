@@ -17,6 +17,7 @@ import com.whop.api.core.NullableNonemptyFilter;
 import com.whop.api.core.ObjectMappers;
 import java.time.OffsetDateTime;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
@@ -42,6 +43,10 @@ public final class MembershipListItem {
     private final OffsetDateTime createdAt;
 
     private final Optional<Currencies> currency;
+
+    private final Optional<List<MembershipListItemExternalAccountsItem>> externalAccounts;
+
+    private final Optional<MembershipListItemFeedbackOption> feedbackOption;
 
     private final Optional<String> formattedRenewalPrice;
 
@@ -89,6 +94,8 @@ public final class MembershipListItem {
             MembershipListItemCompany company,
             OffsetDateTime createdAt,
             Optional<Currencies> currency,
+            Optional<List<MembershipListItemExternalAccountsItem>> externalAccounts,
+            Optional<MembershipListItemFeedbackOption> feedbackOption,
             Optional<String> formattedRenewalPrice,
             String id,
             String initialPricePaid,
@@ -116,6 +123,8 @@ public final class MembershipListItem {
         this.company = company;
         this.createdAt = createdAt;
         this.currency = currency;
+        this.externalAccounts = externalAccounts;
+        this.feedbackOption = feedbackOption;
         this.formattedRenewalPrice = formattedRenewalPrice;
         this.id = id;
         this.initialPricePaid = initialPricePaid;
@@ -224,6 +233,28 @@ public final class MembershipListItem {
             return Optional.empty();
         }
         return currency;
+    }
+
+    /**
+     * @return The member's accounts on outside platforms, such as Discord and Telegram. Empty when the member has none linked. Null in webhooks.
+     */
+    @JsonIgnore
+    public Optional<List<MembershipListItemExternalAccountsItem>> getExternalAccounts() {
+        if (externalAccounts == null) {
+            return Optional.empty();
+        }
+        return externalAccounts;
+    }
+
+    /**
+     * @return The account's own cancel reason the member picked, as they saw it. <code>null</code> when the member picked a default category or gave no reason.
+     */
+    @JsonIgnore
+    public Optional<MembershipListItemFeedbackOption> getFeedbackOption() {
+        if (feedbackOption == null) {
+            return Optional.empty();
+        }
+        return feedbackOption;
     }
 
     /**
@@ -429,6 +460,18 @@ public final class MembershipListItem {
     }
 
     @JsonInclude(value = JsonInclude.Include.CUSTOM, valueFilter = NullableNonemptyFilter.class)
+    @JsonProperty("external_accounts")
+    private Optional<List<MembershipListItemExternalAccountsItem>> _getExternalAccounts() {
+        return externalAccounts;
+    }
+
+    @JsonInclude(value = JsonInclude.Include.CUSTOM, valueFilter = NullableNonemptyFilter.class)
+    @JsonProperty("feedback_option")
+    private Optional<MembershipListItemFeedbackOption> _getFeedbackOption() {
+        return feedbackOption;
+    }
+
+    @JsonInclude(value = JsonInclude.Include.CUSTOM, valueFilter = NullableNonemptyFilter.class)
     @JsonProperty("formatted_renewal_price")
     private Optional<String> _getFormattedRenewalPrice() {
         return formattedRenewalPrice;
@@ -509,6 +552,8 @@ public final class MembershipListItem {
                 && company.equals(other.company)
                 && createdAt.equals(other.createdAt)
                 && currency.equals(other.currency)
+                && externalAccounts.equals(other.externalAccounts)
+                && feedbackOption.equals(other.feedbackOption)
                 && formattedRenewalPrice.equals(other.formattedRenewalPrice)
                 && id.equals(other.id)
                 && initialPricePaid.equals(other.initialPricePaid)
@@ -540,6 +585,8 @@ public final class MembershipListItem {
                 this.company,
                 this.createdAt,
                 this.currency,
+                this.externalAccounts,
+                this.feedbackOption,
                 this.formattedRenewalPrice,
                 this.id,
                 this.initialPricePaid,
@@ -702,6 +749,24 @@ public final class MembershipListItem {
         _FinalStage currency(Nullable<Currencies> currency);
 
         /**
+         * <p>The member's accounts on outside platforms, such as Discord and Telegram. Empty when the member has none linked. Null in webhooks.</p>
+         */
+        _FinalStage externalAccounts(Optional<List<MembershipListItemExternalAccountsItem>> externalAccounts);
+
+        _FinalStage externalAccounts(List<MembershipListItemExternalAccountsItem> externalAccounts);
+
+        _FinalStage externalAccounts(Nullable<List<MembershipListItemExternalAccountsItem>> externalAccounts);
+
+        /**
+         * <p>The account's own cancel reason the member picked, as they saw it. <code>null</code> when the member picked a default category or gave no reason.</p>
+         */
+        _FinalStage feedbackOption(Optional<MembershipListItemFeedbackOption> feedbackOption);
+
+        _FinalStage feedbackOption(MembershipListItemFeedbackOption feedbackOption);
+
+        _FinalStage feedbackOption(Nullable<MembershipListItemFeedbackOption> feedbackOption);
+
+        /**
          * <p>The recurring renewal price for this membership, formatted with currency symbol and billing interval. Null if the membership is not recurring.</p>
          */
         _FinalStage formattedRenewalPrice(Optional<String> formattedRenewalPrice);
@@ -845,6 +910,10 @@ public final class MembershipListItem {
 
         private Optional<String> formattedRenewalPrice = Optional.empty();
 
+        private Optional<MembershipListItemFeedbackOption> feedbackOption = Optional.empty();
+
+        private Optional<List<MembershipListItemExternalAccountsItem>> externalAccounts = Optional.empty();
+
         private Optional<Currencies> currency = Optional.empty();
 
         private Optional<String> checkoutConfigurationId = Optional.empty();
@@ -857,7 +926,6 @@ public final class MembershipListItem {
 
         private Optional<CancelOptions> cancelOption = Optional.empty();
 
-        @JsonAnySetter
         private Map<String, Object> additionalProperties = new HashMap<>();
 
         private Builder() {}
@@ -873,6 +941,8 @@ public final class MembershipListItem {
             company(other.getCompany());
             createdAt(other.getCreatedAt());
             currency(other.getCurrency());
+            externalAccounts(other.getExternalAccounts());
+            feedbackOption(other.getFeedbackOption());
             formattedRenewalPrice(other.getFormattedRenewalPrice());
             id(other.getId());
             initialPricePaid(other.getInitialPricePaid());
@@ -895,7 +965,6 @@ public final class MembershipListItem {
 
         /**
          * <p>Whether this membership is set to cancel at the end of the current billing cycle. Only applies to memberships with a recurring plan.</p>
-         * <p>Whether this membership is set to cancel at the end of the current billing cycle. Only applies to memberships with a recurring plan.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
@@ -906,7 +975,6 @@ public final class MembershipListItem {
         }
 
         /**
-         * <p>The company this membership belongs to.</p>
          * <p>The company this membership belongs to.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
@@ -919,7 +987,6 @@ public final class MembershipListItem {
 
         /**
          * <p>The datetime the membership was created.</p>
-         * <p>The datetime the membership was created.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
@@ -930,7 +997,6 @@ public final class MembershipListItem {
         }
 
         /**
-         * <p>The unique identifier for the membership.</p>
          * <p>The unique identifier for the membership.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
@@ -943,7 +1009,6 @@ public final class MembershipListItem {
 
         /**
          * <p>The amount the customer paid when first purchasing this membership, formatted with currency symbol.</p>
-         * <p>The amount the customer paid when first purchasing this membership, formatted with currency symbol.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
@@ -954,7 +1019,6 @@ public final class MembershipListItem {
         }
 
         /**
-         * <p>Whether recurring payment collection for this membership is temporarily paused by the company.</p>
          * <p>Whether recurring payment collection for this membership is temporarily paused by the company.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
@@ -967,7 +1031,6 @@ public final class MembershipListItem {
 
         /**
          * <p>The plan the customer purchased to create this membership.</p>
-         * <p>The plan the customer purchased to create this membership.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
@@ -978,7 +1041,6 @@ public final class MembershipListItem {
         }
 
         /**
-         * <p>The product this membership grants access to.</p>
          * <p>The product this membership grants access to.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
@@ -991,7 +1053,6 @@ public final class MembershipListItem {
 
         /**
          * <p>The current lifecycle status of the membership (e.g., active, trialing, past_due, canceled, expired, completed).</p>
-         * <p>The current lifecycle status of the membership (e.g., active, trialing, past_due, canceled, expired, completed).</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
@@ -1002,7 +1063,6 @@ public final class MembershipListItem {
         }
 
         /**
-         * <p>The datetime the membership was last updated.</p>
          * <p>The datetime the membership was last updated.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
@@ -1374,6 +1434,78 @@ public final class MembershipListItem {
         }
 
         /**
+         * <p>The account's own cancel reason the member picked, as they saw it. <code>null</code> when the member picked a default category or gave no reason.</p>
+         * @return Reference to {@code this} so that method calls can be chained together.
+         */
+        @java.lang.Override
+        public _FinalStage feedbackOption(Nullable<MembershipListItemFeedbackOption> feedbackOption) {
+            if (feedbackOption.isNull()) {
+                this.feedbackOption = null;
+            } else if (feedbackOption.isEmpty()) {
+                this.feedbackOption = Optional.empty();
+            } else {
+                this.feedbackOption = Optional.of(feedbackOption.get());
+            }
+            return this;
+        }
+
+        /**
+         * <p>The account's own cancel reason the member picked, as they saw it. <code>null</code> when the member picked a default category or gave no reason.</p>
+         * @return Reference to {@code this} so that method calls can be chained together.
+         */
+        @java.lang.Override
+        public _FinalStage feedbackOption(MembershipListItemFeedbackOption feedbackOption) {
+            this.feedbackOption = Optional.ofNullable(feedbackOption);
+            return this;
+        }
+
+        /**
+         * <p>The account's own cancel reason the member picked, as they saw it. <code>null</code> when the member picked a default category or gave no reason.</p>
+         */
+        @java.lang.Override
+        @JsonSetter(value = "feedback_option", nulls = Nulls.SKIP)
+        public _FinalStage feedbackOption(Optional<MembershipListItemFeedbackOption> feedbackOption) {
+            this.feedbackOption = feedbackOption;
+            return this;
+        }
+
+        /**
+         * <p>The member's accounts on outside platforms, such as Discord and Telegram. Empty when the member has none linked. Null in webhooks.</p>
+         * @return Reference to {@code this} so that method calls can be chained together.
+         */
+        @java.lang.Override
+        public _FinalStage externalAccounts(Nullable<List<MembershipListItemExternalAccountsItem>> externalAccounts) {
+            if (externalAccounts.isNull()) {
+                this.externalAccounts = null;
+            } else if (externalAccounts.isEmpty()) {
+                this.externalAccounts = Optional.empty();
+            } else {
+                this.externalAccounts = Optional.of(externalAccounts.get());
+            }
+            return this;
+        }
+
+        /**
+         * <p>The member's accounts on outside platforms, such as Discord and Telegram. Empty when the member has none linked. Null in webhooks.</p>
+         * @return Reference to {@code this} so that method calls can be chained together.
+         */
+        @java.lang.Override
+        public _FinalStage externalAccounts(List<MembershipListItemExternalAccountsItem> externalAccounts) {
+            this.externalAccounts = Optional.ofNullable(externalAccounts);
+            return this;
+        }
+
+        /**
+         * <p>The member's accounts on outside platforms, such as Discord and Telegram. Empty when the member has none linked. Null in webhooks.</p>
+         */
+        @java.lang.Override
+        @JsonSetter(value = "external_accounts", nulls = Nulls.SKIP)
+        public _FinalStage externalAccounts(Optional<List<MembershipListItemExternalAccountsItem>> externalAccounts) {
+            this.externalAccounts = externalAccounts;
+            return this;
+        }
+
+        /**
          * <p>The three-letter ISO currency code for this membership's billing. Null if the membership is free.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
@@ -1601,6 +1733,8 @@ public final class MembershipListItem {
                     company,
                     createdAt,
                     currency,
+                    externalAccounts,
+                    feedbackOption,
                     formattedRenewalPrice,
                     id,
                     initialPricePaid,
@@ -1619,6 +1753,41 @@ public final class MembershipListItem {
                     updatedAt,
                     user,
                     additionalProperties);
+        }
+
+        @JsonAnySetter
+        private void putAdditionalPropertyFromJson(String key, Object value) {
+            if (key.equalsIgnoreCase("cancel_at_period_end")
+                    || key.equalsIgnoreCase("cancel_option")
+                    || key.equalsIgnoreCase("cancelation_status")
+                    || key.equalsIgnoreCase("canceled_at")
+                    || key.equalsIgnoreCase("cancellation_reason")
+                    || key.equalsIgnoreCase("checkout_configuration_id")
+                    || key.equalsIgnoreCase("company")
+                    || key.equalsIgnoreCase("created_at")
+                    || key.equalsIgnoreCase("currency")
+                    || key.equalsIgnoreCase("external_accounts")
+                    || key.equalsIgnoreCase("feedback_option")
+                    || key.equalsIgnoreCase("formatted_renewal_price")
+                    || key.equalsIgnoreCase("id")
+                    || key.equalsIgnoreCase("initial_price_paid")
+                    || key.equalsIgnoreCase("joined_at")
+                    || key.equalsIgnoreCase("license_key")
+                    || key.equalsIgnoreCase("manage_url")
+                    || key.equalsIgnoreCase("member")
+                    || key.equalsIgnoreCase("metadata")
+                    || key.equalsIgnoreCase("payment_collection_paused")
+                    || key.equalsIgnoreCase("plan")
+                    || key.equalsIgnoreCase("product")
+                    || key.equalsIgnoreCase("promo_code")
+                    || key.equalsIgnoreCase("renewal_period_end")
+                    || key.equalsIgnoreCase("renewal_period_start")
+                    || key.equalsIgnoreCase("status")
+                    || key.equalsIgnoreCase("updated_at")
+                    || key.equalsIgnoreCase("user")) {
+                return;
+            }
+            this.additionalProperties.put(key, value);
         }
 
         @java.lang.Override

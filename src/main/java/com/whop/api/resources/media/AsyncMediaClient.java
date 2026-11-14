@@ -5,6 +5,7 @@ package com.whop.api.resources.media;
 
 import com.whop.api.core.ClientOptions;
 import com.whop.api.core.RequestOptions;
+import com.whop.api.core.WhopApiHttpResponse;
 import com.whop.api.resources.media.requests.GenerateMediaRequest;
 import com.whop.api.resources.media.requests.RetrieveMediaRequest;
 import com.whop.api.types.MediaAsset;
@@ -31,35 +32,70 @@ public class AsyncMediaClient {
      * Starts an AI media generation job billed from the account's balance. Generation is asynchronous — poll <code>GET /media/{id}</code> until the asset is <code>ready</code>, then use <code>file.id</code> anywhere attachments are accepted.
      */
     public CompletableFuture<MediaAsset> generate(GenerateMediaRequest request) {
-        return this.rawClient.generate(request).thenApply(response -> response.body());
+        CompletableFuture<WhopApiHttpResponse<MediaAsset>> rawFuture = this.rawClient.generate(request);
+        CompletableFuture<MediaAsset> future = rawFuture.thenApply(response -> response.body());
+        future.whenComplete((result_, throwable_) -> {
+            if (future.isCancelled()) {
+                rawFuture.cancel(true);
+            }
+        });
+        return future;
     }
 
     /**
      * Starts an AI media generation job billed from the account's balance. Generation is asynchronous — poll <code>GET /media/{id}</code> until the asset is <code>ready</code>, then use <code>file.id</code> anywhere attachments are accepted.
      */
     public CompletableFuture<MediaAsset> generate(GenerateMediaRequest request, RequestOptions requestOptions) {
-        return this.rawClient.generate(request, requestOptions).thenApply(response -> response.body());
+        CompletableFuture<WhopApiHttpResponse<MediaAsset>> rawFuture = this.rawClient.generate(request, requestOptions);
+        CompletableFuture<MediaAsset> future = rawFuture.thenApply(response -> response.body());
+        future.whenComplete((result_, throwable_) -> {
+            if (future.isCancelled()) {
+                rawFuture.cancel(true);
+            }
+        });
+        return future;
     }
 
     /**
      * Retrieves a media asset by ID. Poll this while the asset is <code>processing</code>.
      */
     public CompletableFuture<MediaAsset> retrieve(String id) {
-        return this.rawClient.retrieve(id).thenApply(response -> response.body());
+        CompletableFuture<WhopApiHttpResponse<MediaAsset>> rawFuture = this.rawClient.retrieve(id);
+        CompletableFuture<MediaAsset> future = rawFuture.thenApply(response -> response.body());
+        future.whenComplete((result_, throwable_) -> {
+            if (future.isCancelled()) {
+                rawFuture.cancel(true);
+            }
+        });
+        return future;
     }
 
     /**
      * Retrieves a media asset by ID. Poll this while the asset is <code>processing</code>.
      */
     public CompletableFuture<MediaAsset> retrieve(String id, RequestOptions requestOptions) {
-        return this.rawClient.retrieve(id, requestOptions).thenApply(response -> response.body());
+        CompletableFuture<WhopApiHttpResponse<MediaAsset>> rawFuture = this.rawClient.retrieve(id, requestOptions);
+        CompletableFuture<MediaAsset> future = rawFuture.thenApply(response -> response.body());
+        future.whenComplete((result_, throwable_) -> {
+            if (future.isCancelled()) {
+                rawFuture.cancel(true);
+            }
+        });
+        return future;
     }
 
     /**
      * Retrieves a media asset by ID. Poll this while the asset is <code>processing</code>.
      */
     public CompletableFuture<MediaAsset> retrieve(String id, RetrieveMediaRequest request) {
-        return this.rawClient.retrieve(id, request).thenApply(response -> response.body());
+        CompletableFuture<WhopApiHttpResponse<MediaAsset>> rawFuture = this.rawClient.retrieve(id, request);
+        CompletableFuture<MediaAsset> future = rawFuture.thenApply(response -> response.body());
+        future.whenComplete((result_, throwable_) -> {
+            if (future.isCancelled()) {
+                rawFuture.cancel(true);
+            }
+        });
+        return future;
     }
 
     /**
@@ -67,6 +103,14 @@ public class AsyncMediaClient {
      */
     public CompletableFuture<MediaAsset> retrieve(
             String id, RetrieveMediaRequest request, RequestOptions requestOptions) {
-        return this.rawClient.retrieve(id, request, requestOptions).thenApply(response -> response.body());
+        CompletableFuture<WhopApiHttpResponse<MediaAsset>> rawFuture =
+                this.rawClient.retrieve(id, request, requestOptions);
+        CompletableFuture<MediaAsset> future = rawFuture.thenApply(response -> response.body());
+        future.whenComplete((result_, throwable_) -> {
+            if (future.isCancelled()) {
+                rawFuture.cancel(true);
+            }
+        });
+        return future;
     }
 }

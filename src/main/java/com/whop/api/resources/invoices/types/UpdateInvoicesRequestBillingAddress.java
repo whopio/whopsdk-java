@@ -15,20 +15,20 @@ import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.whop.api.core.Nullable;
 import com.whop.api.core.NullableNonemptyFilter;
 import com.whop.api.core.ObjectMappers;
-import com.whop.api.types.TaxIdentifierTypes;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
+import org.jetbrains.annotations.NotNull;
 
 @JsonInclude(JsonInclude.Include.NON_ABSENT)
 @JsonDeserialize(builder = UpdateInvoicesRequestBillingAddress.Builder.class)
 public final class UpdateInvoicesRequestBillingAddress {
-    private final Optional<String> city;
+    private final String city;
 
-    private final Optional<String> country;
+    private final String country;
 
-    private final Optional<String> line1;
+    private final String line1;
 
     private final Optional<String> line2;
 
@@ -36,27 +36,21 @@ public final class UpdateInvoicesRequestBillingAddress {
 
     private final Optional<String> phone;
 
-    private final Optional<String> postalCode;
+    private final String postalCode;
 
     private final Optional<String> state;
-
-    private final Optional<TaxIdentifierTypes> taxIdType;
-
-    private final Optional<String> taxIdValue;
 
     private final Map<String, Object> additionalProperties;
 
     private UpdateInvoicesRequestBillingAddress(
-            Optional<String> city,
-            Optional<String> country,
-            Optional<String> line1,
+            String city,
+            String country,
+            String line1,
             Optional<String> line2,
             Optional<String> name,
             Optional<String> phone,
-            Optional<String> postalCode,
+            String postalCode,
             Optional<String> state,
-            Optional<TaxIdentifierTypes> taxIdType,
-            Optional<String> taxIdValue,
             Map<String, Object> additionalProperties) {
         this.city = city;
         this.country = country;
@@ -66,47 +60,27 @@ public final class UpdateInvoicesRequestBillingAddress {
         this.phone = phone;
         this.postalCode = postalCode;
         this.state = state;
-        this.taxIdType = taxIdType;
-        this.taxIdValue = taxIdValue;
         this.additionalProperties = additionalProperties;
     }
 
-    /**
-     * @return The city of the address.
-     */
-    @JsonIgnore
-    public Optional<String> getCity() {
-        if (city == null) {
-            return Optional.empty();
-        }
+    @JsonProperty("city")
+    public String getCity() {
         return city;
     }
 
     /**
-     * @return The country of the address.
+     * @return ISO 3166-1 alpha-2 country code.
      */
-    @JsonIgnore
-    public Optional<String> getCountry() {
-        if (country == null) {
-            return Optional.empty();
-        }
+    @JsonProperty("country")
+    public String getCountry() {
         return country;
     }
 
-    /**
-     * @return The line 1 of the address.
-     */
-    @JsonIgnore
-    public Optional<String> getLine1() {
-        if (line1 == null) {
-            return Optional.empty();
-        }
+    @JsonProperty("line1")
+    public String getLine1() {
         return line1;
     }
 
-    /**
-     * @return The line 2 of the address.
-     */
     @JsonIgnore
     public Optional<String> getLine2() {
         if (line2 == null) {
@@ -115,9 +89,6 @@ public final class UpdateInvoicesRequestBillingAddress {
         return line2;
     }
 
-    /**
-     * @return The name of the customer.
-     */
     @JsonIgnore
     public Optional<String> getName() {
         if (name == null) {
@@ -126,9 +97,6 @@ public final class UpdateInvoicesRequestBillingAddress {
         return name;
     }
 
-    /**
-     * @return The phone number of the customer.
-     */
     @JsonIgnore
     public Optional<String> getPhone() {
         if (phone == null) {
@@ -137,66 +105,17 @@ public final class UpdateInvoicesRequestBillingAddress {
         return phone;
     }
 
-    /**
-     * @return The postal code of the address.
-     */
-    @JsonIgnore
-    public Optional<String> getPostalCode() {
-        if (postalCode == null) {
-            return Optional.empty();
-        }
+    @JsonProperty("postal_code")
+    public String getPostalCode() {
         return postalCode;
     }
 
-    /**
-     * @return The state of the address.
-     */
     @JsonIgnore
     public Optional<String> getState() {
         if (state == null) {
             return Optional.empty();
         }
         return state;
-    }
-
-    /**
-     * @return The type of tax identifier.
-     */
-    @JsonIgnore
-    public Optional<TaxIdentifierTypes> getTaxIdType() {
-        if (taxIdType == null) {
-            return Optional.empty();
-        }
-        return taxIdType;
-    }
-
-    /**
-     * @return The value of the tax identifier.
-     */
-    @JsonIgnore
-    public Optional<String> getTaxIdValue() {
-        if (taxIdValue == null) {
-            return Optional.empty();
-        }
-        return taxIdValue;
-    }
-
-    @JsonInclude(value = JsonInclude.Include.CUSTOM, valueFilter = NullableNonemptyFilter.class)
-    @JsonProperty("city")
-    private Optional<String> _getCity() {
-        return city;
-    }
-
-    @JsonInclude(value = JsonInclude.Include.CUSTOM, valueFilter = NullableNonemptyFilter.class)
-    @JsonProperty("country")
-    private Optional<String> _getCountry() {
-        return country;
-    }
-
-    @JsonInclude(value = JsonInclude.Include.CUSTOM, valueFilter = NullableNonemptyFilter.class)
-    @JsonProperty("line1")
-    private Optional<String> _getLine1() {
-        return line1;
     }
 
     @JsonInclude(value = JsonInclude.Include.CUSTOM, valueFilter = NullableNonemptyFilter.class)
@@ -218,27 +137,9 @@ public final class UpdateInvoicesRequestBillingAddress {
     }
 
     @JsonInclude(value = JsonInclude.Include.CUSTOM, valueFilter = NullableNonemptyFilter.class)
-    @JsonProperty("postal_code")
-    private Optional<String> _getPostalCode() {
-        return postalCode;
-    }
-
-    @JsonInclude(value = JsonInclude.Include.CUSTOM, valueFilter = NullableNonemptyFilter.class)
     @JsonProperty("state")
     private Optional<String> _getState() {
         return state;
-    }
-
-    @JsonInclude(value = JsonInclude.Include.CUSTOM, valueFilter = NullableNonemptyFilter.class)
-    @JsonProperty("tax_id_type")
-    private Optional<TaxIdentifierTypes> _getTaxIdType() {
-        return taxIdType;
-    }
-
-    @JsonInclude(value = JsonInclude.Include.CUSTOM, valueFilter = NullableNonemptyFilter.class)
-    @JsonProperty("tax_id_value")
-    private Optional<String> _getTaxIdValue() {
-        return taxIdValue;
     }
 
     @java.lang.Override
@@ -261,24 +162,13 @@ public final class UpdateInvoicesRequestBillingAddress {
                 && name.equals(other.name)
                 && phone.equals(other.phone)
                 && postalCode.equals(other.postalCode)
-                && state.equals(other.state)
-                && taxIdType.equals(other.taxIdType)
-                && taxIdValue.equals(other.taxIdValue);
+                && state.equals(other.state);
     }
 
     @java.lang.Override
     public int hashCode() {
         return Objects.hash(
-                this.city,
-                this.country,
-                this.line1,
-                this.line2,
-                this.name,
-                this.phone,
-                this.postalCode,
-                this.state,
-                this.taxIdType,
-                this.taxIdValue);
+                this.city, this.country, this.line1, this.line2, this.name, this.phone, this.postalCode, this.state);
     }
 
     @java.lang.Override
@@ -286,37 +176,86 @@ public final class UpdateInvoicesRequestBillingAddress {
         return ObjectMappers.stringify(this);
     }
 
-    public static Builder builder() {
+    public static CityStage builder() {
         return new Builder();
     }
 
+    public interface CityStage {
+        CountryStage city(@NotNull String city);
+
+        Builder from(UpdateInvoicesRequestBillingAddress other);
+    }
+
+    public interface CountryStage {
+        /**
+         * <p>ISO 3166-1 alpha-2 country code.</p>
+         */
+        Line1Stage country(@NotNull String country);
+    }
+
+    public interface Line1Stage {
+        PostalCodeStage line1(@NotNull String line1);
+    }
+
+    public interface PostalCodeStage {
+        _FinalStage postalCode(@NotNull String postalCode);
+    }
+
+    public interface _FinalStage {
+        UpdateInvoicesRequestBillingAddress build();
+
+        _FinalStage additionalProperty(String key, Object value);
+
+        _FinalStage additionalProperties(Map<String, Object> additionalProperties);
+
+        _FinalStage line2(Optional<String> line2);
+
+        _FinalStage line2(String line2);
+
+        _FinalStage line2(Nullable<String> line2);
+
+        _FinalStage name(Optional<String> name);
+
+        _FinalStage name(String name);
+
+        _FinalStage name(Nullable<String> name);
+
+        _FinalStage phone(Optional<String> phone);
+
+        _FinalStage phone(String phone);
+
+        _FinalStage phone(Nullable<String> phone);
+
+        _FinalStage state(Optional<String> state);
+
+        _FinalStage state(String state);
+
+        _FinalStage state(Nullable<String> state);
+    }
+
     @JsonIgnoreProperties(ignoreUnknown = true)
-    public static final class Builder {
-        private Optional<String> city = Optional.empty();
+    public static final class Builder implements CityStage, CountryStage, Line1Stage, PostalCodeStage, _FinalStage {
+        private String city;
 
-        private Optional<String> country = Optional.empty();
+        private String country;
 
-        private Optional<String> line1 = Optional.empty();
+        private String line1;
 
-        private Optional<String> line2 = Optional.empty();
-
-        private Optional<String> name = Optional.empty();
-
-        private Optional<String> phone = Optional.empty();
-
-        private Optional<String> postalCode = Optional.empty();
+        private String postalCode;
 
         private Optional<String> state = Optional.empty();
 
-        private Optional<TaxIdentifierTypes> taxIdType = Optional.empty();
+        private Optional<String> phone = Optional.empty();
 
-        private Optional<String> taxIdValue = Optional.empty();
+        private Optional<String> name = Optional.empty();
 
-        @JsonAnySetter
+        private Optional<String> line2 = Optional.empty();
+
         private Map<String, Object> additionalProperties = new HashMap<>();
 
         private Builder() {}
 
+        @java.lang.Override
         public Builder from(UpdateInvoicesRequestBillingAddress other) {
             city(other.getCity());
             country(other.getCountry());
@@ -326,201 +265,43 @@ public final class UpdateInvoicesRequestBillingAddress {
             phone(other.getPhone());
             postalCode(other.getPostalCode());
             state(other.getState());
-            taxIdType(other.getTaxIdType());
-            taxIdValue(other.getTaxIdValue());
+            return this;
+        }
+
+        @java.lang.Override
+        @JsonSetter("city")
+        public CountryStage city(@NotNull String city) {
+            this.city = Objects.requireNonNull(city, "city must not be null");
             return this;
         }
 
         /**
-         * <p>The city of the address.</p>
+         * <p>ISO 3166-1 alpha-2 country code.</p>
+         * @return Reference to {@code this} so that method calls can be chained together.
          */
-        @JsonSetter(value = "city", nulls = Nulls.SKIP)
-        public Builder city(Optional<String> city) {
-            this.city = city;
+        @java.lang.Override
+        @JsonSetter("country")
+        public Line1Stage country(@NotNull String country) {
+            this.country = Objects.requireNonNull(country, "country must not be null");
             return this;
         }
 
-        public Builder city(String city) {
-            this.city = Optional.ofNullable(city);
+        @java.lang.Override
+        @JsonSetter("line1")
+        public PostalCodeStage line1(@NotNull String line1) {
+            this.line1 = Objects.requireNonNull(line1, "line1 must not be null");
             return this;
         }
 
-        public Builder city(Nullable<String> city) {
-            if (city.isNull()) {
-                this.city = null;
-            } else if (city.isEmpty()) {
-                this.city = Optional.empty();
-            } else {
-                this.city = Optional.of(city.get());
-            }
+        @java.lang.Override
+        @JsonSetter("postal_code")
+        public _FinalStage postalCode(@NotNull String postalCode) {
+            this.postalCode = Objects.requireNonNull(postalCode, "postalCode must not be null");
             return this;
         }
 
-        /**
-         * <p>The country of the address.</p>
-         */
-        @JsonSetter(value = "country", nulls = Nulls.SKIP)
-        public Builder country(Optional<String> country) {
-            this.country = country;
-            return this;
-        }
-
-        public Builder country(String country) {
-            this.country = Optional.ofNullable(country);
-            return this;
-        }
-
-        public Builder country(Nullable<String> country) {
-            if (country.isNull()) {
-                this.country = null;
-            } else if (country.isEmpty()) {
-                this.country = Optional.empty();
-            } else {
-                this.country = Optional.of(country.get());
-            }
-            return this;
-        }
-
-        /**
-         * <p>The line 1 of the address.</p>
-         */
-        @JsonSetter(value = "line1", nulls = Nulls.SKIP)
-        public Builder line1(Optional<String> line1) {
-            this.line1 = line1;
-            return this;
-        }
-
-        public Builder line1(String line1) {
-            this.line1 = Optional.ofNullable(line1);
-            return this;
-        }
-
-        public Builder line1(Nullable<String> line1) {
-            if (line1.isNull()) {
-                this.line1 = null;
-            } else if (line1.isEmpty()) {
-                this.line1 = Optional.empty();
-            } else {
-                this.line1 = Optional.of(line1.get());
-            }
-            return this;
-        }
-
-        /**
-         * <p>The line 2 of the address.</p>
-         */
-        @JsonSetter(value = "line2", nulls = Nulls.SKIP)
-        public Builder line2(Optional<String> line2) {
-            this.line2 = line2;
-            return this;
-        }
-
-        public Builder line2(String line2) {
-            this.line2 = Optional.ofNullable(line2);
-            return this;
-        }
-
-        public Builder line2(Nullable<String> line2) {
-            if (line2.isNull()) {
-                this.line2 = null;
-            } else if (line2.isEmpty()) {
-                this.line2 = Optional.empty();
-            } else {
-                this.line2 = Optional.of(line2.get());
-            }
-            return this;
-        }
-
-        /**
-         * <p>The name of the customer.</p>
-         */
-        @JsonSetter(value = "name", nulls = Nulls.SKIP)
-        public Builder name(Optional<String> name) {
-            this.name = name;
-            return this;
-        }
-
-        public Builder name(String name) {
-            this.name = Optional.ofNullable(name);
-            return this;
-        }
-
-        public Builder name(Nullable<String> name) {
-            if (name.isNull()) {
-                this.name = null;
-            } else if (name.isEmpty()) {
-                this.name = Optional.empty();
-            } else {
-                this.name = Optional.of(name.get());
-            }
-            return this;
-        }
-
-        /**
-         * <p>The phone number of the customer.</p>
-         */
-        @JsonSetter(value = "phone", nulls = Nulls.SKIP)
-        public Builder phone(Optional<String> phone) {
-            this.phone = phone;
-            return this;
-        }
-
-        public Builder phone(String phone) {
-            this.phone = Optional.ofNullable(phone);
-            return this;
-        }
-
-        public Builder phone(Nullable<String> phone) {
-            if (phone.isNull()) {
-                this.phone = null;
-            } else if (phone.isEmpty()) {
-                this.phone = Optional.empty();
-            } else {
-                this.phone = Optional.of(phone.get());
-            }
-            return this;
-        }
-
-        /**
-         * <p>The postal code of the address.</p>
-         */
-        @JsonSetter(value = "postal_code", nulls = Nulls.SKIP)
-        public Builder postalCode(Optional<String> postalCode) {
-            this.postalCode = postalCode;
-            return this;
-        }
-
-        public Builder postalCode(String postalCode) {
-            this.postalCode = Optional.ofNullable(postalCode);
-            return this;
-        }
-
-        public Builder postalCode(Nullable<String> postalCode) {
-            if (postalCode.isNull()) {
-                this.postalCode = null;
-            } else if (postalCode.isEmpty()) {
-                this.postalCode = Optional.empty();
-            } else {
-                this.postalCode = Optional.of(postalCode.get());
-            }
-            return this;
-        }
-
-        /**
-         * <p>The state of the address.</p>
-         */
-        @JsonSetter(value = "state", nulls = Nulls.SKIP)
-        public Builder state(Optional<String> state) {
-            this.state = state;
-            return this;
-        }
-
-        public Builder state(String state) {
-            this.state = Optional.ofNullable(state);
-            return this;
-        }
-
-        public Builder state(Nullable<String> state) {
+        @java.lang.Override
+        public _FinalStage state(Nullable<String> state) {
             if (state.isNull()) {
                 this.state = null;
             } else if (state.isEmpty()) {
@@ -531,76 +312,122 @@ public final class UpdateInvoicesRequestBillingAddress {
             return this;
         }
 
-        /**
-         * <p>The type of tax identifier.</p>
-         */
-        @JsonSetter(value = "tax_id_type", nulls = Nulls.SKIP)
-        public Builder taxIdType(Optional<TaxIdentifierTypes> taxIdType) {
-            this.taxIdType = taxIdType;
+        @java.lang.Override
+        public _FinalStage state(String state) {
+            this.state = Optional.ofNullable(state);
             return this;
         }
 
-        public Builder taxIdType(TaxIdentifierTypes taxIdType) {
-            this.taxIdType = Optional.ofNullable(taxIdType);
+        @java.lang.Override
+        @JsonSetter(value = "state", nulls = Nulls.SKIP)
+        public _FinalStage state(Optional<String> state) {
+            this.state = state;
             return this;
         }
 
-        public Builder taxIdType(Nullable<TaxIdentifierTypes> taxIdType) {
-            if (taxIdType.isNull()) {
-                this.taxIdType = null;
-            } else if (taxIdType.isEmpty()) {
-                this.taxIdType = Optional.empty();
+        @java.lang.Override
+        public _FinalStage phone(Nullable<String> phone) {
+            if (phone.isNull()) {
+                this.phone = null;
+            } else if (phone.isEmpty()) {
+                this.phone = Optional.empty();
             } else {
-                this.taxIdType = Optional.of(taxIdType.get());
+                this.phone = Optional.of(phone.get());
             }
             return this;
         }
 
-        /**
-         * <p>The value of the tax identifier.</p>
-         */
-        @JsonSetter(value = "tax_id_value", nulls = Nulls.SKIP)
-        public Builder taxIdValue(Optional<String> taxIdValue) {
-            this.taxIdValue = taxIdValue;
+        @java.lang.Override
+        public _FinalStage phone(String phone) {
+            this.phone = Optional.ofNullable(phone);
             return this;
         }
 
-        public Builder taxIdValue(String taxIdValue) {
-            this.taxIdValue = Optional.ofNullable(taxIdValue);
+        @java.lang.Override
+        @JsonSetter(value = "phone", nulls = Nulls.SKIP)
+        public _FinalStage phone(Optional<String> phone) {
+            this.phone = phone;
             return this;
         }
 
-        public Builder taxIdValue(Nullable<String> taxIdValue) {
-            if (taxIdValue.isNull()) {
-                this.taxIdValue = null;
-            } else if (taxIdValue.isEmpty()) {
-                this.taxIdValue = Optional.empty();
+        @java.lang.Override
+        public _FinalStage name(Nullable<String> name) {
+            if (name.isNull()) {
+                this.name = null;
+            } else if (name.isEmpty()) {
+                this.name = Optional.empty();
             } else {
-                this.taxIdValue = Optional.of(taxIdValue.get());
+                this.name = Optional.of(name.get());
             }
             return this;
         }
 
+        @java.lang.Override
+        public _FinalStage name(String name) {
+            this.name = Optional.ofNullable(name);
+            return this;
+        }
+
+        @java.lang.Override
+        @JsonSetter(value = "name", nulls = Nulls.SKIP)
+        public _FinalStage name(Optional<String> name) {
+            this.name = name;
+            return this;
+        }
+
+        @java.lang.Override
+        public _FinalStage line2(Nullable<String> line2) {
+            if (line2.isNull()) {
+                this.line2 = null;
+            } else if (line2.isEmpty()) {
+                this.line2 = Optional.empty();
+            } else {
+                this.line2 = Optional.of(line2.get());
+            }
+            return this;
+        }
+
+        @java.lang.Override
+        public _FinalStage line2(String line2) {
+            this.line2 = Optional.ofNullable(line2);
+            return this;
+        }
+
+        @java.lang.Override
+        @JsonSetter(value = "line2", nulls = Nulls.SKIP)
+        public _FinalStage line2(Optional<String> line2) {
+            this.line2 = line2;
+            return this;
+        }
+
+        @java.lang.Override
         public UpdateInvoicesRequestBillingAddress build() {
             return new UpdateInvoicesRequestBillingAddress(
-                    city,
-                    country,
-                    line1,
-                    line2,
-                    name,
-                    phone,
-                    postalCode,
-                    state,
-                    taxIdType,
-                    taxIdValue,
-                    additionalProperties);
+                    city, country, line1, line2, name, phone, postalCode, state, additionalProperties);
         }
 
+        @JsonAnySetter
+        private void putAdditionalPropertyFromJson(String key, Object value) {
+            if (key.equalsIgnoreCase("city")
+                    || key.equalsIgnoreCase("country")
+                    || key.equalsIgnoreCase("line1")
+                    || key.equalsIgnoreCase("line2")
+                    || key.equalsIgnoreCase("name")
+                    || key.equalsIgnoreCase("phone")
+                    || key.equalsIgnoreCase("postal_code")
+                    || key.equalsIgnoreCase("state")) {
+                return;
+            }
+            this.additionalProperties.put(key, value);
+        }
+
+        @java.lang.Override
         public Builder additionalProperty(String key, Object value) {
             this.additionalProperties.put(key, value);
             return this;
         }
 
+        @java.lang.Override
         public Builder additionalProperties(Map<String, Object> additionalProperties) {
             this.additionalProperties.putAll(additionalProperties);
             return this;

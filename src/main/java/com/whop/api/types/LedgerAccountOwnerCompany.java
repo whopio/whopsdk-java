@@ -126,7 +126,6 @@ public final class LedgerAccountOwnerCompany {
 
         private String title;
 
-        @JsonAnySetter
         private Map<String, Object> additionalProperties = new HashMap<>();
 
         private Builder() {}
@@ -141,7 +140,6 @@ public final class LedgerAccountOwnerCompany {
 
         /**
          * <p>The unique identifier for the company.</p>
-         * <p>The unique identifier for the company.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
@@ -153,7 +151,6 @@ public final class LedgerAccountOwnerCompany {
 
         /**
          * <p>The URL slug for the company's store page.</p>
-         * <p>The URL slug for the company's store page.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
@@ -164,7 +161,6 @@ public final class LedgerAccountOwnerCompany {
         }
 
         /**
-         * <p>The display name of the company shown to customers.</p>
          * <p>The display name of the company shown to customers.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
@@ -178,6 +174,14 @@ public final class LedgerAccountOwnerCompany {
         @java.lang.Override
         public LedgerAccountOwnerCompany build() {
             return new LedgerAccountOwnerCompany(id, route, title, additionalProperties);
+        }
+
+        @JsonAnySetter
+        private void putAdditionalPropertyFromJson(String key, Object value) {
+            if (key.equalsIgnoreCase("id") || key.equalsIgnoreCase("route") || key.equalsIgnoreCase("title")) {
+                return;
+            }
+            this.additionalProperties.put(key, value);
         }
 
         @java.lang.Override

@@ -29,7 +29,7 @@ public final class ListPayoutMethodRequest {
 
     private final Optional<Integer> last;
 
-    private final String companyId;
+    private final String accountId;
 
     private final Map<String, Object> additionalProperties;
 
@@ -38,13 +38,13 @@ public final class ListPayoutMethodRequest {
             Optional<String> before,
             Optional<Integer> first,
             Optional<Integer> last,
-            String companyId,
+            String accountId,
             Map<String, Object> additionalProperties) {
         this.after = after;
         this.before = before;
         this.first = first;
         this.last = last;
-        this.companyId = companyId;
+        this.accountId = accountId;
         this.additionalProperties = additionalProperties;
     }
 
@@ -83,9 +83,9 @@ public final class ListPayoutMethodRequest {
     /**
      * @return The unique identifier of the company to list payout methods for.
      */
-    @JsonProperty("company_id")
-    public String getCompanyId() {
-        return companyId;
+    @JsonProperty("account_id")
+    public String getAccountId() {
+        return accountId;
     }
 
     @java.lang.Override
@@ -104,12 +104,12 @@ public final class ListPayoutMethodRequest {
                 && before.equals(other.before)
                 && first.equals(other.first)
                 && last.equals(other.last)
-                && companyId.equals(other.companyId);
+                && accountId.equals(other.accountId);
     }
 
     @java.lang.Override
     public int hashCode() {
-        return Objects.hash(this.after, this.before, this.first, this.last, this.companyId);
+        return Objects.hash(this.after, this.before, this.first, this.last, this.accountId);
     }
 
     @java.lang.Override
@@ -117,15 +117,15 @@ public final class ListPayoutMethodRequest {
         return ObjectMappers.stringify(this);
     }
 
-    public static CompanyIdStage builder() {
+    public static AccountIdStage builder() {
         return new Builder();
     }
 
-    public interface CompanyIdStage {
+    public interface AccountIdStage {
         /**
          * <p>The unique identifier of the company to list payout methods for.</p>
          */
-        _FinalStage companyId(@NotNull String companyId);
+        _FinalStage accountId(@NotNull String accountId);
 
         Builder from(ListPayoutMethodRequest other);
     }
@@ -167,8 +167,8 @@ public final class ListPayoutMethodRequest {
     }
 
     @JsonIgnoreProperties(ignoreUnknown = true)
-    public static final class Builder implements CompanyIdStage, _FinalStage {
-        private String companyId;
+    public static final class Builder implements AccountIdStage, _FinalStage {
+        private String accountId;
 
         private Optional<Integer> last = Optional.empty();
 
@@ -178,7 +178,6 @@ public final class ListPayoutMethodRequest {
 
         private Optional<String> after = Optional.empty();
 
-        @JsonAnySetter
         private Map<String, Object> additionalProperties = new HashMap<>();
 
         private Builder() {}
@@ -189,19 +188,18 @@ public final class ListPayoutMethodRequest {
             before(other.getBefore());
             first(other.getFirst());
             last(other.getLast());
-            companyId(other.getCompanyId());
+            accountId(other.getAccountId());
             return this;
         }
 
         /**
          * <p>The unique identifier of the company to list payout methods for.</p>
-         * <p>The unique identifier of the company to list payout methods for.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
-        @JsonSetter("company_id")
-        public _FinalStage companyId(@NotNull String companyId) {
-            this.companyId = Objects.requireNonNull(companyId, "companyId must not be null");
+        @JsonSetter("account_id")
+        public _FinalStage accountId(@NotNull String accountId) {
+            this.accountId = Objects.requireNonNull(accountId, "accountId must not be null");
             return this;
         }
 
@@ -287,7 +285,19 @@ public final class ListPayoutMethodRequest {
 
         @java.lang.Override
         public ListPayoutMethodRequest build() {
-            return new ListPayoutMethodRequest(after, before, first, last, companyId, additionalProperties);
+            return new ListPayoutMethodRequest(after, before, first, last, accountId, additionalProperties);
+        }
+
+        @JsonAnySetter
+        private void putAdditionalPropertyFromJson(String key, Object value) {
+            if (key.equalsIgnoreCase("after")
+                    || key.equalsIgnoreCase("before")
+                    || key.equalsIgnoreCase("first")
+                    || key.equalsIgnoreCase("last")
+                    || key.equalsIgnoreCase("account_id")) {
+                return;
+            }
+            this.additionalProperties.put(key, value);
         }
 
         @java.lang.Override

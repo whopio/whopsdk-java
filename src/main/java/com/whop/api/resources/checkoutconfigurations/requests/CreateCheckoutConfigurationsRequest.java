@@ -17,8 +17,8 @@ import com.whop.api.core.NullableNonemptyFilter;
 import com.whop.api.core.ObjectMappers;
 import com.whop.api.resources.checkoutconfigurations.types.CreateCheckoutConfigurationsRequestMode;
 import com.whop.api.resources.checkoutconfigurations.types.CreateCheckoutConfigurationsRequestPaymentMethodConfiguration;
-import com.whop.api.resources.checkoutconfigurations.types.CreateCheckoutConfigurationsRequestPlan;
 import com.whop.api.resources.checkoutconfigurations.types.CreateCheckoutConfigurationsRequestThreeDsLevel;
+import com.whop.api.resources.checkoutconfigurations.types.CreateCheckoutConfigurationsRequestVariant;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
@@ -39,13 +39,13 @@ public final class CreateCheckoutConfigurationsRequest {
 
     private final Optional<CreateCheckoutConfigurationsRequestPaymentMethodConfiguration> paymentMethodConfiguration;
 
-    private final Optional<CreateCheckoutConfigurationsRequestPlan> plan;
-
-    private final Optional<String> planId;
-
     private final Optional<String> redirectUrl;
 
     private final Optional<CreateCheckoutConfigurationsRequestThreeDsLevel> threeDsLevel;
+
+    private final Optional<CreateCheckoutConfigurationsRequestVariant> variant;
+
+    private final Optional<String> variantId;
 
     private final Map<String, Object> additionalProperties;
 
@@ -56,10 +56,10 @@ public final class CreateCheckoutConfigurationsRequest {
             Optional<Map<String, Object>> metadata,
             Optional<CreateCheckoutConfigurationsRequestMode> mode,
             Optional<CreateCheckoutConfigurationsRequestPaymentMethodConfiguration> paymentMethodConfiguration,
-            Optional<CreateCheckoutConfigurationsRequestPlan> plan,
-            Optional<String> planId,
             Optional<String> redirectUrl,
             Optional<CreateCheckoutConfigurationsRequestThreeDsLevel> threeDsLevel,
+            Optional<CreateCheckoutConfigurationsRequestVariant> variant,
+            Optional<String> variantId,
             Map<String, Object> additionalProperties) {
         this.accountId = accountId;
         this.affiliateCode = affiliateCode;
@@ -67,10 +67,10 @@ public final class CreateCheckoutConfigurationsRequest {
         this.metadata = metadata;
         this.mode = mode;
         this.paymentMethodConfiguration = paymentMethodConfiguration;
-        this.plan = plan;
-        this.planId = planId;
         this.redirectUrl = redirectUrl;
         this.threeDsLevel = threeDsLevel;
+        this.variant = variant;
+        this.variantId = variantId;
         this.additionalProperties = additionalProperties;
     }
 
@@ -124,7 +124,7 @@ public final class CreateCheckoutConfigurationsRequest {
     }
 
     /**
-     * @return Payment method overrides for this checkout. <code>null</code> uses the plan or platform defaults.
+     * @return Payment method overrides for this checkout. <code>null</code> uses the variant or platform defaults.
      */
     @JsonIgnore
     public Optional<CreateCheckoutConfigurationsRequestPaymentMethodConfiguration> getPaymentMethodConfiguration() {
@@ -132,28 +132,6 @@ public final class CreateCheckoutConfigurationsRequest {
             return Optional.empty();
         }
         return paymentMethodConfiguration;
-    }
-
-    /**
-     * @return Plan attributes used to create or find a plan for this checkout configuration. Mutually exclusive with <code>plan_id</code>.
-     */
-    @JsonIgnore
-    public Optional<CreateCheckoutConfigurationsRequestPlan> getPlan() {
-        if (plan == null) {
-            return Optional.empty();
-        }
-        return plan;
-    }
-
-    /**
-     * @return Existing plan ID, prefixed <code>plan_</code>. Mutually exclusive with <code>plan</code>.
-     */
-    @JsonIgnore
-    public Optional<String> getPlanId() {
-        if (planId == null) {
-            return Optional.empty();
-        }
-        return planId;
     }
 
     /**
@@ -168,7 +146,7 @@ public final class CreateCheckoutConfigurationsRequest {
     }
 
     /**
-     * @return 3D Secure behavior for this checkout.
+     * @return 3D Secure behavior for supported on-session card payments. <code>mandate_challenge</code> requires a 3DS challenge before payment processing; <code>mandate_if_required</code> mandates a challenge only when the payment processor requires it; <code>frictionless_if_required</code> uses the regular frictionless 3DS flow. Payments of $1,000 or more use <code>mandate_if_required</code> unless <code>mandate_challenge</code> is selected. Risk and authentication recovery requirements can override the preference. Applies in setup mode; <code>null</code> uses frictionless 3DS. Payment mode uses the variant policy.
      */
     @JsonIgnore
     public Optional<CreateCheckoutConfigurationsRequestThreeDsLevel> getThreeDsLevel() {
@@ -176,6 +154,28 @@ public final class CreateCheckoutConfigurationsRequest {
             return Optional.empty();
         }
         return threeDsLevel;
+    }
+
+    /**
+     * @return Variant attributes used to create or find a variant for this checkout configuration. Mutually exclusive with <code>variant_id</code>.
+     */
+    @JsonIgnore
+    public Optional<CreateCheckoutConfigurationsRequestVariant> getVariant() {
+        if (variant == null) {
+            return Optional.empty();
+        }
+        return variant;
+    }
+
+    /**
+     * @return Existing variant ID, prefixed <code>plan_</code>. Mutually exclusive with <code>variant</code>.
+     */
+    @JsonIgnore
+    public Optional<String> getVariantId() {
+        if (variantId == null) {
+            return Optional.empty();
+        }
+        return variantId;
     }
 
     @JsonInclude(value = JsonInclude.Include.CUSTOM, valueFilter = NullableNonemptyFilter.class)
@@ -203,18 +203,6 @@ public final class CreateCheckoutConfigurationsRequest {
     }
 
     @JsonInclude(value = JsonInclude.Include.CUSTOM, valueFilter = NullableNonemptyFilter.class)
-    @JsonProperty("plan")
-    private Optional<CreateCheckoutConfigurationsRequestPlan> _getPlan() {
-        return plan;
-    }
-
-    @JsonInclude(value = JsonInclude.Include.CUSTOM, valueFilter = NullableNonemptyFilter.class)
-    @JsonProperty("plan_id")
-    private Optional<String> _getPlanId() {
-        return planId;
-    }
-
-    @JsonInclude(value = JsonInclude.Include.CUSTOM, valueFilter = NullableNonemptyFilter.class)
     @JsonProperty("redirect_url")
     private Optional<String> _getRedirectUrl() {
         return redirectUrl;
@@ -224,6 +212,18 @@ public final class CreateCheckoutConfigurationsRequest {
     @JsonProperty("three_ds_level")
     private Optional<CreateCheckoutConfigurationsRequestThreeDsLevel> _getThreeDsLevel() {
         return threeDsLevel;
+    }
+
+    @JsonInclude(value = JsonInclude.Include.CUSTOM, valueFilter = NullableNonemptyFilter.class)
+    @JsonProperty("variant")
+    private Optional<CreateCheckoutConfigurationsRequestVariant> _getVariant() {
+        return variant;
+    }
+
+    @JsonInclude(value = JsonInclude.Include.CUSTOM, valueFilter = NullableNonemptyFilter.class)
+    @JsonProperty("variant_id")
+    private Optional<String> _getVariantId() {
+        return variantId;
     }
 
     @java.lang.Override
@@ -245,10 +245,10 @@ public final class CreateCheckoutConfigurationsRequest {
                 && metadata.equals(other.metadata)
                 && mode.equals(other.mode)
                 && paymentMethodConfiguration.equals(other.paymentMethodConfiguration)
-                && plan.equals(other.plan)
-                && planId.equals(other.planId)
                 && redirectUrl.equals(other.redirectUrl)
-                && threeDsLevel.equals(other.threeDsLevel);
+                && threeDsLevel.equals(other.threeDsLevel)
+                && variant.equals(other.variant)
+                && variantId.equals(other.variantId);
     }
 
     @java.lang.Override
@@ -260,10 +260,10 @@ public final class CreateCheckoutConfigurationsRequest {
                 this.metadata,
                 this.mode,
                 this.paymentMethodConfiguration,
-                this.plan,
-                this.planId,
                 this.redirectUrl,
-                this.threeDsLevel);
+                this.threeDsLevel,
+                this.variant,
+                this.variantId);
     }
 
     @java.lang.Override
@@ -290,15 +290,14 @@ public final class CreateCheckoutConfigurationsRequest {
         private Optional<CreateCheckoutConfigurationsRequestPaymentMethodConfiguration> paymentMethodConfiguration =
                 Optional.empty();
 
-        private Optional<CreateCheckoutConfigurationsRequestPlan> plan = Optional.empty();
-
-        private Optional<String> planId = Optional.empty();
-
         private Optional<String> redirectUrl = Optional.empty();
 
         private Optional<CreateCheckoutConfigurationsRequestThreeDsLevel> threeDsLevel = Optional.empty();
 
-        @JsonAnySetter
+        private Optional<CreateCheckoutConfigurationsRequestVariant> variant = Optional.empty();
+
+        private Optional<String> variantId = Optional.empty();
+
         private Map<String, Object> additionalProperties = new HashMap<>();
 
         private Builder() {}
@@ -310,10 +309,10 @@ public final class CreateCheckoutConfigurationsRequest {
             metadata(other.getMetadata());
             mode(other.getMode());
             paymentMethodConfiguration(other.getPaymentMethodConfiguration());
-            plan(other.getPlan());
-            planId(other.getPlanId());
             redirectUrl(other.getRedirectUrl());
             threeDsLevel(other.getThreeDsLevel());
+            variant(other.getVariant());
+            variantId(other.getVariantId());
             return this;
         }
 
@@ -421,7 +420,7 @@ public final class CreateCheckoutConfigurationsRequest {
         }
 
         /**
-         * <p>Payment method overrides for this checkout. <code>null</code> uses the plan or platform defaults.</p>
+         * <p>Payment method overrides for this checkout. <code>null</code> uses the variant or platform defaults.</p>
          */
         @JsonSetter(value = "payment_method_configuration", nulls = Nulls.SKIP)
         public Builder paymentMethodConfiguration(
@@ -444,56 +443,6 @@ public final class CreateCheckoutConfigurationsRequest {
                 this.paymentMethodConfiguration = Optional.empty();
             } else {
                 this.paymentMethodConfiguration = Optional.of(paymentMethodConfiguration.get());
-            }
-            return this;
-        }
-
-        /**
-         * <p>Plan attributes used to create or find a plan for this checkout configuration. Mutually exclusive with <code>plan_id</code>.</p>
-         */
-        @JsonSetter(value = "plan", nulls = Nulls.SKIP)
-        public Builder plan(Optional<CreateCheckoutConfigurationsRequestPlan> plan) {
-            this.plan = plan;
-            return this;
-        }
-
-        public Builder plan(CreateCheckoutConfigurationsRequestPlan plan) {
-            this.plan = Optional.ofNullable(plan);
-            return this;
-        }
-
-        public Builder plan(Nullable<CreateCheckoutConfigurationsRequestPlan> plan) {
-            if (plan.isNull()) {
-                this.plan = null;
-            } else if (plan.isEmpty()) {
-                this.plan = Optional.empty();
-            } else {
-                this.plan = Optional.of(plan.get());
-            }
-            return this;
-        }
-
-        /**
-         * <p>Existing plan ID, prefixed <code>plan_</code>. Mutually exclusive with <code>plan</code>.</p>
-         */
-        @JsonSetter(value = "plan_id", nulls = Nulls.SKIP)
-        public Builder planId(Optional<String> planId) {
-            this.planId = planId;
-            return this;
-        }
-
-        public Builder planId(String planId) {
-            this.planId = Optional.ofNullable(planId);
-            return this;
-        }
-
-        public Builder planId(Nullable<String> planId) {
-            if (planId.isNull()) {
-                this.planId = null;
-            } else if (planId.isEmpty()) {
-                this.planId = Optional.empty();
-            } else {
-                this.planId = Optional.of(planId.get());
             }
             return this;
         }
@@ -524,7 +473,7 @@ public final class CreateCheckoutConfigurationsRequest {
         }
 
         /**
-         * <p>3D Secure behavior for this checkout.</p>
+         * <p>3D Secure behavior for supported on-session card payments. <code>mandate_challenge</code> requires a 3DS challenge before payment processing; <code>mandate_if_required</code> mandates a challenge only when the payment processor requires it; <code>frictionless_if_required</code> uses the regular frictionless 3DS flow. Payments of $1,000 or more use <code>mandate_if_required</code> unless <code>mandate_challenge</code> is selected. Risk and authentication recovery requirements can override the preference. Applies in setup mode; <code>null</code> uses frictionless 3DS. Payment mode uses the variant policy.</p>
          */
         @JsonSetter(value = "three_ds_level", nulls = Nulls.SKIP)
         public Builder threeDsLevel(Optional<CreateCheckoutConfigurationsRequestThreeDsLevel> threeDsLevel) {
@@ -548,6 +497,56 @@ public final class CreateCheckoutConfigurationsRequest {
             return this;
         }
 
+        /**
+         * <p>Variant attributes used to create or find a variant for this checkout configuration. Mutually exclusive with <code>variant_id</code>.</p>
+         */
+        @JsonSetter(value = "variant", nulls = Nulls.SKIP)
+        public Builder variant(Optional<CreateCheckoutConfigurationsRequestVariant> variant) {
+            this.variant = variant;
+            return this;
+        }
+
+        public Builder variant(CreateCheckoutConfigurationsRequestVariant variant) {
+            this.variant = Optional.ofNullable(variant);
+            return this;
+        }
+
+        public Builder variant(Nullable<CreateCheckoutConfigurationsRequestVariant> variant) {
+            if (variant.isNull()) {
+                this.variant = null;
+            } else if (variant.isEmpty()) {
+                this.variant = Optional.empty();
+            } else {
+                this.variant = Optional.of(variant.get());
+            }
+            return this;
+        }
+
+        /**
+         * <p>Existing variant ID, prefixed <code>plan_</code>. Mutually exclusive with <code>variant</code>.</p>
+         */
+        @JsonSetter(value = "variant_id", nulls = Nulls.SKIP)
+        public Builder variantId(Optional<String> variantId) {
+            this.variantId = variantId;
+            return this;
+        }
+
+        public Builder variantId(String variantId) {
+            this.variantId = Optional.ofNullable(variantId);
+            return this;
+        }
+
+        public Builder variantId(Nullable<String> variantId) {
+            if (variantId.isNull()) {
+                this.variantId = null;
+            } else if (variantId.isEmpty()) {
+                this.variantId = Optional.empty();
+            } else {
+                this.variantId = Optional.of(variantId.get());
+            }
+            return this;
+        }
+
         public CreateCheckoutConfigurationsRequest build() {
             return new CreateCheckoutConfigurationsRequest(
                     accountId,
@@ -556,11 +555,28 @@ public final class CreateCheckoutConfigurationsRequest {
                     metadata,
                     mode,
                     paymentMethodConfiguration,
-                    plan,
-                    planId,
                     redirectUrl,
                     threeDsLevel,
+                    variant,
+                    variantId,
                     additionalProperties);
+        }
+
+        @JsonAnySetter
+        private void putAdditionalPropertyFromJson(String key, Object value) {
+            if (key.equalsIgnoreCase("account_id")
+                    || key.equalsIgnoreCase("affiliate_code")
+                    || key.equalsIgnoreCase("currency")
+                    || key.equalsIgnoreCase("metadata")
+                    || key.equalsIgnoreCase("mode")
+                    || key.equalsIgnoreCase("payment_method_configuration")
+                    || key.equalsIgnoreCase("redirect_url")
+                    || key.equalsIgnoreCase("three_ds_level")
+                    || key.equalsIgnoreCase("variant")
+                    || key.equalsIgnoreCase("variant_id")) {
+                return;
+            }
+            this.additionalProperties.put(key, value);
         }
 
         public Builder additionalProperty(String key, Object value) {

@@ -150,7 +150,6 @@ public final class PostChatReactionCreatedPayloadData {
 
         private String reason;
 
-        @JsonAnySetter
         private Map<String, Object> additionalProperties = new HashMap<>();
 
         private Builder() {}
@@ -204,6 +203,18 @@ public final class PostChatReactionCreatedPayloadData {
         public PostChatReactionCreatedPayloadData build() {
             return new PostChatReactionCreatedPayloadData(
                     audience, channel, message, reaction, reason, additionalProperties);
+        }
+
+        @JsonAnySetter
+        private void putAdditionalPropertyFromJson(String key, Object value) {
+            if (key.equalsIgnoreCase("audience")
+                    || key.equalsIgnoreCase("channel")
+                    || key.equalsIgnoreCase("message")
+                    || key.equalsIgnoreCase("reaction")
+                    || key.equalsIgnoreCase("reason")) {
+                return;
+            }
+            this.additionalProperties.put(key, value);
         }
 
         @java.lang.Override

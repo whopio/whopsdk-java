@@ -12,6 +12,7 @@ import com.fasterxml.jackson.annotation.JsonSetter;
 import com.fasterxml.jackson.annotation.Nulls;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.whop.api.core.ObjectMappers;
+import com.whop.api.types.PaymentMethodTypes;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -21,17 +22,17 @@ import java.util.Optional;
 @JsonInclude(JsonInclude.Include.NON_ABSENT)
 @JsonDeserialize(builder = CreatePlansRequestPaymentMethodConfiguration.Builder.class)
 public final class CreatePlansRequestPaymentMethodConfiguration {
-    private final Optional<List<String>> disabled;
+    private final Optional<List<PaymentMethodTypes>> disabled;
 
-    private final Optional<List<String>> enabled;
+    private final Optional<List<PaymentMethodTypes>> enabled;
 
     private final Optional<Boolean> includePlatformDefaults;
 
     private final Map<String, Object> additionalProperties;
 
     private CreatePlansRequestPaymentMethodConfiguration(
-            Optional<List<String>> disabled,
-            Optional<List<String>> enabled,
+            Optional<List<PaymentMethodTypes>> disabled,
+            Optional<List<PaymentMethodTypes>> enabled,
             Optional<Boolean> includePlatformDefaults,
             Map<String, Object> additionalProperties) {
         this.disabled = disabled;
@@ -41,12 +42,12 @@ public final class CreatePlansRequestPaymentMethodConfiguration {
     }
 
     @JsonProperty("disabled")
-    public Optional<List<String>> getDisabled() {
+    public Optional<List<PaymentMethodTypes>> getDisabled() {
         return disabled;
     }
 
     @JsonProperty("enabled")
-    public Optional<List<String>> getEnabled() {
+    public Optional<List<PaymentMethodTypes>> getEnabled() {
         return enabled;
     }
 
@@ -89,13 +90,12 @@ public final class CreatePlansRequestPaymentMethodConfiguration {
 
     @JsonIgnoreProperties(ignoreUnknown = true)
     public static final class Builder {
-        private Optional<List<String>> disabled = Optional.empty();
+        private Optional<List<PaymentMethodTypes>> disabled = Optional.empty();
 
-        private Optional<List<String>> enabled = Optional.empty();
+        private Optional<List<PaymentMethodTypes>> enabled = Optional.empty();
 
         private Optional<Boolean> includePlatformDefaults = Optional.empty();
 
-        @JsonAnySetter
         private Map<String, Object> additionalProperties = new HashMap<>();
 
         private Builder() {}
@@ -108,23 +108,23 @@ public final class CreatePlansRequestPaymentMethodConfiguration {
         }
 
         @JsonSetter(value = "disabled", nulls = Nulls.SKIP)
-        public Builder disabled(Optional<List<String>> disabled) {
+        public Builder disabled(Optional<List<PaymentMethodTypes>> disabled) {
             this.disabled = disabled;
             return this;
         }
 
-        public Builder disabled(List<String> disabled) {
+        public Builder disabled(List<PaymentMethodTypes> disabled) {
             this.disabled = Optional.ofNullable(disabled);
             return this;
         }
 
         @JsonSetter(value = "enabled", nulls = Nulls.SKIP)
-        public Builder enabled(Optional<List<String>> enabled) {
+        public Builder enabled(Optional<List<PaymentMethodTypes>> enabled) {
             this.enabled = enabled;
             return this;
         }
 
-        public Builder enabled(List<String> enabled) {
+        public Builder enabled(List<PaymentMethodTypes> enabled) {
             this.enabled = Optional.ofNullable(enabled);
             return this;
         }
@@ -143,6 +143,16 @@ public final class CreatePlansRequestPaymentMethodConfiguration {
         public CreatePlansRequestPaymentMethodConfiguration build() {
             return new CreatePlansRequestPaymentMethodConfiguration(
                     disabled, enabled, includePlatformDefaults, additionalProperties);
+        }
+
+        @JsonAnySetter
+        private void putAdditionalPropertyFromJson(String key, Object value) {
+            if (key.equalsIgnoreCase("disabled")
+                    || key.equalsIgnoreCase("enabled")
+                    || key.equalsIgnoreCase("include_platform_defaults")) {
+                return;
+            }
+            this.additionalProperties.put(key, value);
         }
 
         public Builder additionalProperty(String key, Object value) {

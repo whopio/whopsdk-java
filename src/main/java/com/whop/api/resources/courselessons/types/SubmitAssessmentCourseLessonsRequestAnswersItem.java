@@ -161,7 +161,6 @@ public final class SubmitAssessmentCourseLessonsRequestAnswersItem {
 
         private Optional<String> answerText = Optional.empty();
 
-        @JsonAnySetter
         private Map<String, Object> additionalProperties = new HashMap<>();
 
         private Builder() {}
@@ -175,7 +174,6 @@ public final class SubmitAssessmentCourseLessonsRequestAnswersItem {
         }
 
         /**
-         * <p>The ID of the question being answered</p>
          * <p>The ID of the question being answered</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
@@ -262,6 +260,16 @@ public final class SubmitAssessmentCourseLessonsRequestAnswersItem {
         public SubmitAssessmentCourseLessonsRequestAnswersItem build() {
             return new SubmitAssessmentCourseLessonsRequestAnswersItem(
                     answerText, questionId, selectedOptionIds, additionalProperties);
+        }
+
+        @JsonAnySetter
+        private void putAdditionalPropertyFromJson(String key, Object value) {
+            if (key.equalsIgnoreCase("answer_text")
+                    || key.equalsIgnoreCase("question_id")
+                    || key.equalsIgnoreCase("selected_option_ids")) {
+                return;
+            }
+            this.additionalProperties.put(key, value);
         }
 
         @java.lang.Override

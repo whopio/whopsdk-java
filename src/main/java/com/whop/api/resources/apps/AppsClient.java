@@ -5,7 +5,9 @@ package com.whop.api.resources.apps;
 
 import com.whop.api.core.ClientOptions;
 import com.whop.api.core.RequestOptions;
+import com.whop.api.core.Suppliers;
 import com.whop.api.core.pagination.SyncPagingIterable;
+import com.whop.api.resources.apps.categories.CategoriesClient;
 import com.whop.api.resources.apps.requests.CreateAppsRequest;
 import com.whop.api.resources.apps.requests.DeleteAppsRequest;
 import com.whop.api.resources.apps.requests.DeployAppsRequest;
@@ -13,22 +15,25 @@ import com.whop.api.resources.apps.requests.ListAppsRequest;
 import com.whop.api.resources.apps.requests.LogsAppsRequest;
 import com.whop.api.resources.apps.requests.RetrieveAppsRequest;
 import com.whop.api.resources.apps.requests.UpdateAppsRequest;
-import com.whop.api.resources.apps.requests.UpdatePermissionsAppRequest;
 import com.whop.api.resources.apps.requests.UpdatePermissionsAppsRequest;
 import com.whop.api.resources.apps.types.DeleteAppsResponse;
 import com.whop.api.resources.apps.types.LogsAppsResponseDataItem;
 import com.whop.api.types.App;
 import com.whop.api.types.AppDeployment;
 import com.whop.api.types.AppListItem;
+import java.util.function.Supplier;
 
 public class AppsClient {
     protected final ClientOptions clientOptions;
 
     private final RawAppsClient rawClient;
 
+    protected final Supplier<CategoriesClient> categoriesClient;
+
     public AppsClient(ClientOptions clientOptions) {
         this.clientOptions = clientOptions;
         this.rawClient = new RawAppsClient(clientOptions);
+        this.categoriesClient = Suppliers.memoize(() -> new CategoriesClient(clientOptions));
     }
 
     /**
@@ -39,28 +44,28 @@ public class AppsClient {
     }
 
     /**
-     * Lists apps on the Whop platform: the app store's live apps, or — with <code>account_id</code> and developer access to that account — every app the account owns. Requires authentication, except for the publicly readable lists: <code>verified_apps_only=true</code>, and <code>app_type=website</code> with no <code>account_id</code>, which returns every live deployed website that Whop has not verified — verified templates are the curated <code>verified_apps_only=true</code> list instead.
+     * Lists published apps approved for the app store without authentication. With <code>account_id</code> and developer access, also includes unpublished apps that the account owns. Public website discovery includes built official blueprints and built, live community blueprints that Whop recommends.
      */
     public SyncPagingIterable<AppListItem> list() {
         return this.rawClient.list().body();
     }
 
     /**
-     * Lists apps on the Whop platform: the app store's live apps, or — with <code>account_id</code> and developer access to that account — every app the account owns. Requires authentication, except for the publicly readable lists: <code>verified_apps_only=true</code>, and <code>app_type=website</code> with no <code>account_id</code>, which returns every live deployed website that Whop has not verified — verified templates are the curated <code>verified_apps_only=true</code> list instead.
+     * Lists published apps approved for the app store without authentication. With <code>account_id</code> and developer access, also includes unpublished apps that the account owns. Public website discovery includes built official blueprints and built, live community blueprints that Whop recommends.
      */
     public SyncPagingIterable<AppListItem> list(RequestOptions requestOptions) {
         return this.rawClient.list(requestOptions).body();
     }
 
     /**
-     * Lists apps on the Whop platform: the app store's live apps, or — with <code>account_id</code> and developer access to that account — every app the account owns. Requires authentication, except for the publicly readable lists: <code>verified_apps_only=true</code>, and <code>app_type=website</code> with no <code>account_id</code>, which returns every live deployed website that Whop has not verified — verified templates are the curated <code>verified_apps_only=true</code> list instead.
+     * Lists published apps approved for the app store without authentication. With <code>account_id</code> and developer access, also includes unpublished apps that the account owns. Public website discovery includes built official blueprints and built, live community blueprints that Whop recommends.
      */
     public SyncPagingIterable<AppListItem> list(ListAppsRequest request) {
         return this.rawClient.list(request).body();
     }
 
     /**
-     * Lists apps on the Whop platform: the app store's live apps, or — with <code>account_id</code> and developer access to that account — every app the account owns. Requires authentication, except for the publicly readable lists: <code>verified_apps_only=true</code>, and <code>app_type=website</code> with no <code>account_id</code>, which returns every live deployed website that Whop has not verified — verified templates are the curated <code>verified_apps_only=true</code> list instead.
+     * Lists published apps approved for the app store without authentication. With <code>account_id</code> and developer access, also includes unpublished apps that the account owns. Public website discovery includes built official blueprints and built, live community blueprints that Whop recommends.
      */
     public SyncPagingIterable<AppListItem> list(ListAppsRequest request, RequestOptions requestOptions) {
         return this.rawClient.list(request, requestOptions).body();
@@ -81,53 +86,28 @@ public class AppsClient {
     }
 
     /**
-     * Updates the permission requirements for an app
-     * <p>Required permissions:</p>
-     * <ul>
-     * <li><code>developer:update_app_authorization</code></li>
-     * </ul>
-     */
-    public boolean updatePermissionsApp(String appId, UpdatePermissionsAppRequest request) {
-        return this.rawClient.updatePermissionsApp(appId, request).body();
-    }
-
-    /**
-     * Updates the permission requirements for an app
-     * <p>Required permissions:</p>
-     * <ul>
-     * <li><code>developer:update_app_authorization</code></li>
-     * </ul>
-     */
-    public boolean updatePermissionsApp(
-            String appId, UpdatePermissionsAppRequest request, RequestOptions requestOptions) {
-        return this.rawClient
-                .updatePermissionsApp(appId, request, requestOptions)
-                .body();
-    }
-
-    /**
-     * Retrieves an app by ID, claimed route, or proxy domain id. Credential fields (api_key, default_api_key, secrets) render <code>null</code> unless the caller has the corresponding developer permission on the owning account.
+     * Retrieves an app by ID, claimed route, active verified custom hostname, or proxy domain id. Authentication is optional; credential fields stay <code>null</code> unless you have the matching developer permission on the owning account.
      */
     public App retrieve(String id) {
         return this.rawClient.retrieve(id).body();
     }
 
     /**
-     * Retrieves an app by ID, claimed route, or proxy domain id. Credential fields (api_key, default_api_key, secrets) render <code>null</code> unless the caller has the corresponding developer permission on the owning account.
+     * Retrieves an app by ID, claimed route, active verified custom hostname, or proxy domain id. Authentication is optional; credential fields stay <code>null</code> unless you have the matching developer permission on the owning account.
      */
     public App retrieve(String id, RequestOptions requestOptions) {
         return this.rawClient.retrieve(id, requestOptions).body();
     }
 
     /**
-     * Retrieves an app by ID, claimed route, or proxy domain id. Credential fields (api_key, default_api_key, secrets) render <code>null</code> unless the caller has the corresponding developer permission on the owning account.
+     * Retrieves an app by ID, claimed route, active verified custom hostname, or proxy domain id. Authentication is optional; credential fields stay <code>null</code> unless you have the matching developer permission on the owning account.
      */
     public App retrieve(String id, RetrieveAppsRequest request) {
         return this.rawClient.retrieve(id, request).body();
     }
 
     /**
-     * Retrieves an app by ID, claimed route, or proxy domain id. Credential fields (api_key, default_api_key, secrets) render <code>null</code> unless the caller has the corresponding developer permission on the owning account.
+     * Retrieves an app by ID, claimed route, active verified custom hostname, or proxy domain id. Authentication is optional; credential fields stay <code>null</code> unless you have the matching developer permission on the owning account.
      */
     public App retrieve(String id, RetrieveAppsRequest request, RequestOptions requestOptions) {
         return this.rawClient.retrieve(id, request, requestOptions).body();
@@ -218,28 +198,28 @@ public class AppsClient {
     }
 
     /**
-     * Lists a hosted app's server runtime logs, most recent first: console output, uncaught exceptions, and failed-request summaries captured on whop.app hosting. Logs are retained for 7 days.
+     * Lists a hosted app's server runtime logs, most recent first: console output, uncaught exceptions, and failed-request summaries captured on whop.site hosting. Logs are retained for 7 days.
      */
     public SyncPagingIterable<LogsAppsResponseDataItem> logs(String id) {
         return this.rawClient.logs(id).body();
     }
 
     /**
-     * Lists a hosted app's server runtime logs, most recent first: console output, uncaught exceptions, and failed-request summaries captured on whop.app hosting. Logs are retained for 7 days.
+     * Lists a hosted app's server runtime logs, most recent first: console output, uncaught exceptions, and failed-request summaries captured on whop.site hosting. Logs are retained for 7 days.
      */
     public SyncPagingIterable<LogsAppsResponseDataItem> logs(String id, RequestOptions requestOptions) {
         return this.rawClient.logs(id, requestOptions).body();
     }
 
     /**
-     * Lists a hosted app's server runtime logs, most recent first: console output, uncaught exceptions, and failed-request summaries captured on whop.app hosting. Logs are retained for 7 days.
+     * Lists a hosted app's server runtime logs, most recent first: console output, uncaught exceptions, and failed-request summaries captured on whop.site hosting. Logs are retained for 7 days.
      */
     public SyncPagingIterable<LogsAppsResponseDataItem> logs(String id, LogsAppsRequest request) {
         return this.rawClient.logs(id, request).body();
     }
 
     /**
-     * Lists a hosted app's server runtime logs, most recent first: console output, uncaught exceptions, and failed-request summaries captured on whop.app hosting. Logs are retained for 7 days.
+     * Lists a hosted app's server runtime logs, most recent first: console output, uncaught exceptions, and failed-request summaries captured on whop.site hosting. Logs are retained for 7 days.
      */
     public SyncPagingIterable<LogsAppsResponseDataItem> logs(
             String id, LogsAppsRequest request, RequestOptions requestOptions) {
@@ -258,5 +238,9 @@ public class AppsClient {
      */
     public App updatePermissions(String id, UpdatePermissionsAppsRequest request, RequestOptions requestOptions) {
         return this.rawClient.updatePermissions(id, request, requestOptions).body();
+    }
+
+    public CategoriesClient categories() {
+        return this.categoriesClient.get();
     }
 }

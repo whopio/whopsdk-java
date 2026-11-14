@@ -19,6 +19,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
+import org.jetbrains.annotations.NotNull;
 
 @JsonInclude(JsonInclude.Include.NON_ABSENT)
 @JsonDeserialize(builder = RetrievePayoutsResponsePayoutMethod.Builder.class)
@@ -27,14 +28,18 @@ public final class RetrievePayoutsResponsePayoutMethod {
 
     private final Optional<RetrievePayoutsResponsePayoutMethodSupportedPayoutMethod> supportedPayoutMethod;
 
+    private final RetrievePayoutsResponsePayoutMethodType type;
+
     private final Map<String, Object> additionalProperties;
 
     private RetrievePayoutsResponsePayoutMethod(
             Optional<String> nickname,
             Optional<RetrievePayoutsResponsePayoutMethodSupportedPayoutMethod> supportedPayoutMethod,
+            RetrievePayoutsResponsePayoutMethodType type,
             Map<String, Object> additionalProperties) {
         this.nickname = nickname;
         this.supportedPayoutMethod = supportedPayoutMethod;
+        this.type = type;
         this.additionalProperties = additionalProperties;
     }
 
@@ -58,6 +63,14 @@ public final class RetrievePayoutsResponsePayoutMethod {
             return Optional.empty();
         }
         return supportedPayoutMethod;
+    }
+
+    /**
+     * @return The kind of payout method the payout used. <code>external</code> sent funds out of Whop. <code>whop_card</code> moved funds onto the account's own Whop Card.
+     */
+    @JsonProperty("type")
+    public RetrievePayoutsResponsePayoutMethodType getType() {
+        return type;
     }
 
     @JsonInclude(value = JsonInclude.Include.CUSTOM, valueFilter = NullableNonemptyFilter.class)
@@ -85,12 +98,14 @@ public final class RetrievePayoutsResponsePayoutMethod {
     }
 
     private boolean equalTo(RetrievePayoutsResponsePayoutMethod other) {
-        return nickname.equals(other.nickname) && supportedPayoutMethod.equals(other.supportedPayoutMethod);
+        return nickname.equals(other.nickname)
+                && supportedPayoutMethod.equals(other.supportedPayoutMethod)
+                && type.equals(other.type);
     }
 
     @java.lang.Override
     public int hashCode() {
-        return Objects.hash(this.nickname, this.supportedPayoutMethod);
+        return Objects.hash(this.nickname, this.supportedPayoutMethod, this.type);
     }
 
     @java.lang.Override
@@ -98,70 +113,86 @@ public final class RetrievePayoutsResponsePayoutMethod {
         return ObjectMappers.stringify(this);
     }
 
-    public static Builder builder() {
+    public static TypeStage builder() {
         return new Builder();
     }
 
-    @JsonIgnoreProperties(ignoreUnknown = true)
-    public static final class Builder {
-        private Optional<String> nickname = Optional.empty();
+    public interface TypeStage {
+        /**
+         * <p>The kind of payout method the payout used. <code>external</code> sent funds out of Whop. <code>whop_card</code> moved funds onto the account's own Whop Card.</p>
+         */
+        _FinalStage type(@NotNull RetrievePayoutsResponsePayoutMethodType type);
 
-        private Optional<RetrievePayoutsResponsePayoutMethodSupportedPayoutMethod> supportedPayoutMethod =
-                Optional.empty();
+        Builder from(RetrievePayoutsResponsePayoutMethod other);
+    }
 
-        @JsonAnySetter
-        private Map<String, Object> additionalProperties = new HashMap<>();
+    public interface _FinalStage {
+        RetrievePayoutsResponsePayoutMethod build();
 
-        private Builder() {}
+        _FinalStage additionalProperty(String key, Object value);
 
-        public Builder from(RetrievePayoutsResponsePayoutMethod other) {
-            nickname(other.getNickname());
-            supportedPayoutMethod(other.getSupportedPayoutMethod());
-            return this;
-        }
+        _FinalStage additionalProperties(Map<String, Object> additionalProperties);
 
         /**
          * <p>Saved payout method nickname.</p>
          */
-        @JsonSetter(value = "nickname", nulls = Nulls.SKIP)
-        public Builder nickname(Optional<String> nickname) {
-            this.nickname = nickname;
+        _FinalStage nickname(Optional<String> nickname);
+
+        _FinalStage nickname(String nickname);
+
+        _FinalStage nickname(Nullable<String> nickname);
+
+        /**
+         * <p>Supported payout method display details.</p>
+         */
+        _FinalStage supportedPayoutMethod(
+                Optional<RetrievePayoutsResponsePayoutMethodSupportedPayoutMethod> supportedPayoutMethod);
+
+        _FinalStage supportedPayoutMethod(
+                RetrievePayoutsResponsePayoutMethodSupportedPayoutMethod supportedPayoutMethod);
+
+        _FinalStage supportedPayoutMethod(
+                Nullable<RetrievePayoutsResponsePayoutMethodSupportedPayoutMethod> supportedPayoutMethod);
+    }
+
+    @JsonIgnoreProperties(ignoreUnknown = true)
+    public static final class Builder implements TypeStage, _FinalStage {
+        private RetrievePayoutsResponsePayoutMethodType type;
+
+        private Optional<RetrievePayoutsResponsePayoutMethodSupportedPayoutMethod> supportedPayoutMethod =
+                Optional.empty();
+
+        private Optional<String> nickname = Optional.empty();
+
+        private Map<String, Object> additionalProperties = new HashMap<>();
+
+        private Builder() {}
+
+        @java.lang.Override
+        public Builder from(RetrievePayoutsResponsePayoutMethod other) {
+            nickname(other.getNickname());
+            supportedPayoutMethod(other.getSupportedPayoutMethod());
+            type(other.getType());
             return this;
         }
 
-        public Builder nickname(String nickname) {
-            this.nickname = Optional.ofNullable(nickname);
-            return this;
-        }
-
-        public Builder nickname(Nullable<String> nickname) {
-            if (nickname.isNull()) {
-                this.nickname = null;
-            } else if (nickname.isEmpty()) {
-                this.nickname = Optional.empty();
-            } else {
-                this.nickname = Optional.of(nickname.get());
-            }
+        /**
+         * <p>The kind of payout method the payout used. <code>external</code> sent funds out of Whop. <code>whop_card</code> moved funds onto the account's own Whop Card.</p>
+         * @return Reference to {@code this} so that method calls can be chained together.
+         */
+        @java.lang.Override
+        @JsonSetter("type")
+        public _FinalStage type(@NotNull RetrievePayoutsResponsePayoutMethodType type) {
+            this.type = Objects.requireNonNull(type, "type must not be null");
             return this;
         }
 
         /**
          * <p>Supported payout method display details.</p>
+         * @return Reference to {@code this} so that method calls can be chained together.
          */
-        @JsonSetter(value = "supported_payout_method", nulls = Nulls.SKIP)
-        public Builder supportedPayoutMethod(
-                Optional<RetrievePayoutsResponsePayoutMethodSupportedPayoutMethod> supportedPayoutMethod) {
-            this.supportedPayoutMethod = supportedPayoutMethod;
-            return this;
-        }
-
-        public Builder supportedPayoutMethod(
-                RetrievePayoutsResponsePayoutMethodSupportedPayoutMethod supportedPayoutMethod) {
-            this.supportedPayoutMethod = Optional.ofNullable(supportedPayoutMethod);
-            return this;
-        }
-
-        public Builder supportedPayoutMethod(
+        @java.lang.Override
+        public _FinalStage supportedPayoutMethod(
                 Nullable<RetrievePayoutsResponsePayoutMethodSupportedPayoutMethod> supportedPayoutMethod) {
             if (supportedPayoutMethod.isNull()) {
                 this.supportedPayoutMethod = null;
@@ -173,15 +204,86 @@ public final class RetrievePayoutsResponsePayoutMethod {
             return this;
         }
 
-        public RetrievePayoutsResponsePayoutMethod build() {
-            return new RetrievePayoutsResponsePayoutMethod(nickname, supportedPayoutMethod, additionalProperties);
+        /**
+         * <p>Supported payout method display details.</p>
+         * @return Reference to {@code this} so that method calls can be chained together.
+         */
+        @java.lang.Override
+        public _FinalStage supportedPayoutMethod(
+                RetrievePayoutsResponsePayoutMethodSupportedPayoutMethod supportedPayoutMethod) {
+            this.supportedPayoutMethod = Optional.ofNullable(supportedPayoutMethod);
+            return this;
         }
 
+        /**
+         * <p>Supported payout method display details.</p>
+         */
+        @java.lang.Override
+        @JsonSetter(value = "supported_payout_method", nulls = Nulls.SKIP)
+        public _FinalStage supportedPayoutMethod(
+                Optional<RetrievePayoutsResponsePayoutMethodSupportedPayoutMethod> supportedPayoutMethod) {
+            this.supportedPayoutMethod = supportedPayoutMethod;
+            return this;
+        }
+
+        /**
+         * <p>Saved payout method nickname.</p>
+         * @return Reference to {@code this} so that method calls can be chained together.
+         */
+        @java.lang.Override
+        public _FinalStage nickname(Nullable<String> nickname) {
+            if (nickname.isNull()) {
+                this.nickname = null;
+            } else if (nickname.isEmpty()) {
+                this.nickname = Optional.empty();
+            } else {
+                this.nickname = Optional.of(nickname.get());
+            }
+            return this;
+        }
+
+        /**
+         * <p>Saved payout method nickname.</p>
+         * @return Reference to {@code this} so that method calls can be chained together.
+         */
+        @java.lang.Override
+        public _FinalStage nickname(String nickname) {
+            this.nickname = Optional.ofNullable(nickname);
+            return this;
+        }
+
+        /**
+         * <p>Saved payout method nickname.</p>
+         */
+        @java.lang.Override
+        @JsonSetter(value = "nickname", nulls = Nulls.SKIP)
+        public _FinalStage nickname(Optional<String> nickname) {
+            this.nickname = nickname;
+            return this;
+        }
+
+        @java.lang.Override
+        public RetrievePayoutsResponsePayoutMethod build() {
+            return new RetrievePayoutsResponsePayoutMethod(nickname, supportedPayoutMethod, type, additionalProperties);
+        }
+
+        @JsonAnySetter
+        private void putAdditionalPropertyFromJson(String key, Object value) {
+            if (key.equalsIgnoreCase("nickname")
+                    || key.equalsIgnoreCase("supported_payout_method")
+                    || key.equalsIgnoreCase("type")) {
+                return;
+            }
+            this.additionalProperties.put(key, value);
+        }
+
+        @java.lang.Override
         public Builder additionalProperty(String key, Object value) {
             this.additionalProperties.put(key, value);
             return this;
         }
 
+        @java.lang.Override
         public Builder additionalProperties(Map<String, Object> additionalProperties) {
             this.additionalProperties.putAll(additionalProperties);
             return this;

@@ -106,7 +106,6 @@ public final class ApiKeyGrantAction {
 
         private boolean granted;
 
-        @JsonAnySetter
         private Map<String, Object> additionalProperties = new HashMap<>();
 
         private Builder() {}
@@ -120,7 +119,6 @@ public final class ApiKeyGrantAction {
 
         /**
          * <p>The permission action's identifier, for example <code>company:basic:read</code>.</p>
-         * <p>The permission action's identifier, for example <code>company:basic:read</code>.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
@@ -131,7 +129,6 @@ public final class ApiKeyGrantAction {
         }
 
         /**
-         * <p>Whether the key holds the action on the grant's resource.</p>
          * <p>Whether the key holds the action on the grant's resource.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
@@ -145,6 +142,14 @@ public final class ApiKeyGrantAction {
         @java.lang.Override
         public ApiKeyGrantAction build() {
             return new ApiKeyGrantAction(action, granted, additionalProperties);
+        }
+
+        @JsonAnySetter
+        private void putAdditionalPropertyFromJson(String key, Object value) {
+            if (key.equalsIgnoreCase("action") || key.equalsIgnoreCase("granted")) {
+                return;
+            }
+            this.additionalProperties.put(key, value);
         }
 
         @java.lang.Override

@@ -30,6 +30,8 @@ public final class AdCreative {
 
     private final String id;
 
+    private final Optional<String> language;
+
     private final Optional<String> mediaType;
 
     private final Optional<String> url;
@@ -40,12 +42,14 @@ public final class AdCreative {
             Optional<AdCreativeCrop> crop,
             Optional<AdCreativeFormat> format,
             String id,
+            Optional<String> language,
             Optional<String> mediaType,
             Optional<String> url,
             Map<String, Object> additionalProperties) {
         this.crop = crop;
         this.format = format;
         this.id = id;
+        this.language = language;
         this.mediaType = mediaType;
         this.url = url;
         this.additionalProperties = additionalProperties;
@@ -79,6 +83,17 @@ public final class AdCreative {
     @JsonProperty("id")
     public String getId() {
         return id;
+    }
+
+    /**
+     * @return Always <code>null</code>. Translations are no longer available.
+     */
+    @JsonIgnore
+    public Optional<String> getLanguage() {
+        if (language == null) {
+            return Optional.empty();
+        }
+        return language;
     }
 
     /**
@@ -116,6 +131,12 @@ public final class AdCreative {
     }
 
     @JsonInclude(value = JsonInclude.Include.CUSTOM, valueFilter = NullableNonemptyFilter.class)
+    @JsonProperty("language")
+    private Optional<String> _getLanguage() {
+        return language;
+    }
+
+    @JsonInclude(value = JsonInclude.Include.CUSTOM, valueFilter = NullableNonemptyFilter.class)
     @JsonProperty("media_type")
     private Optional<String> _getMediaType() {
         return mediaType;
@@ -142,13 +163,14 @@ public final class AdCreative {
         return crop.equals(other.crop)
                 && format.equals(other.format)
                 && id.equals(other.id)
+                && language.equals(other.language)
                 && mediaType.equals(other.mediaType)
                 && url.equals(other.url);
     }
 
     @java.lang.Override
     public int hashCode() {
-        return Objects.hash(this.crop, this.format, this.id, this.mediaType, this.url);
+        return Objects.hash(this.crop, this.format, this.id, this.language, this.mediaType, this.url);
     }
 
     @java.lang.Override
@@ -195,6 +217,15 @@ public final class AdCreative {
         _FinalStage format(Nullable<AdCreativeFormat> format);
 
         /**
+         * <p>Always <code>null</code>. Translations are no longer available.</p>
+         */
+        _FinalStage language(Optional<String> language);
+
+        _FinalStage language(String language);
+
+        _FinalStage language(Nullable<String> language);
+
+        /**
          * <p>The kind of asset, image or video.</p>
          */
         _FinalStage mediaType(Optional<String> mediaType);
@@ -221,11 +252,12 @@ public final class AdCreative {
 
         private Optional<String> mediaType = Optional.empty();
 
+        private Optional<String> language = Optional.empty();
+
         private Optional<AdCreativeFormat> format = Optional.empty();
 
         private Optional<AdCreativeCrop> crop = Optional.empty();
 
-        @JsonAnySetter
         private Map<String, Object> additionalProperties = new HashMap<>();
 
         private Builder() {}
@@ -235,13 +267,13 @@ public final class AdCreative {
             crop(other.getCrop());
             format(other.getFormat());
             id(other.getId());
+            language(other.getLanguage());
             mediaType(other.getMediaType());
             url(other.getUrl());
             return this;
         }
 
         /**
-         * <p>The creative attachment's file id.</p>
          * <p>The creative attachment's file id.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
@@ -325,6 +357,42 @@ public final class AdCreative {
         }
 
         /**
+         * <p>Always <code>null</code>. Translations are no longer available.</p>
+         * @return Reference to {@code this} so that method calls can be chained together.
+         */
+        @java.lang.Override
+        public _FinalStage language(Nullable<String> language) {
+            if (language.isNull()) {
+                this.language = null;
+            } else if (language.isEmpty()) {
+                this.language = Optional.empty();
+            } else {
+                this.language = Optional.of(language.get());
+            }
+            return this;
+        }
+
+        /**
+         * <p>Always <code>null</code>. Translations are no longer available.</p>
+         * @return Reference to {@code this} so that method calls can be chained together.
+         */
+        @java.lang.Override
+        public _FinalStage language(String language) {
+            this.language = Optional.ofNullable(language);
+            return this;
+        }
+
+        /**
+         * <p>Always <code>null</code>. Translations are no longer available.</p>
+         */
+        @java.lang.Override
+        @JsonSetter(value = "language", nulls = Nulls.SKIP)
+        public _FinalStage language(Optional<String> language) {
+            this.language = language;
+            return this;
+        }
+
+        /**
          * <p>The placement variant this asset covers, or null for the original asset.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
@@ -398,7 +466,20 @@ public final class AdCreative {
 
         @java.lang.Override
         public AdCreative build() {
-            return new AdCreative(crop, format, id, mediaType, url, additionalProperties);
+            return new AdCreative(crop, format, id, language, mediaType, url, additionalProperties);
+        }
+
+        @JsonAnySetter
+        private void putAdditionalPropertyFromJson(String key, Object value) {
+            if (key.equalsIgnoreCase("crop")
+                    || key.equalsIgnoreCase("format")
+                    || key.equalsIgnoreCase("id")
+                    || key.equalsIgnoreCase("language")
+                    || key.equalsIgnoreCase("media_type")
+                    || key.equalsIgnoreCase("url")) {
+                return;
+            }
+            this.additionalProperties.put(key, value);
         }
 
         @java.lang.Override

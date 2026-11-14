@@ -74,7 +74,6 @@ public final class SubmitAssessmentCourseLessonsRequest {
     public static final class Builder {
         private List<SubmitAssessmentCourseLessonsRequestAnswersItem> answers = new ArrayList<>();
 
-        @JsonAnySetter
         private Map<String, Object> additionalProperties = new HashMap<>();
 
         private Builder() {}
@@ -110,6 +109,14 @@ public final class SubmitAssessmentCourseLessonsRequest {
 
         public SubmitAssessmentCourseLessonsRequest build() {
             return new SubmitAssessmentCourseLessonsRequest(answers, additionalProperties);
+        }
+
+        @JsonAnySetter
+        private void putAdditionalPropertyFromJson(String key, Object value) {
+            if (key.equalsIgnoreCase("answers")) {
+                return;
+            }
+            this.additionalProperties.put(key, value);
         }
 
         public Builder additionalProperty(String key, Object value) {

@@ -6,13 +6,17 @@ package com.whop.api.resources.partners;
 import com.whop.api.core.ClientOptions;
 import com.whop.api.core.RequestOptions;
 import com.whop.api.core.Suppliers;
+import com.whop.api.core.WhopApiHttpResponse;
 import com.whop.api.core.pagination.SyncPagingIterable;
 import com.whop.api.resources.partners.businesses.AsyncBusinessesClient;
 import com.whop.api.resources.partners.requests.LeaderboardPartnersRequest;
 import com.whop.api.resources.partners.requests.ReferredUsersPartnersRequest;
+import com.whop.api.resources.partners.requests.RetrievePartnersRequest;
 import com.whop.api.resources.partners.types.CreatePartnersResponse;
+import com.whop.api.resources.partners.types.FeeOptionsPartnersResponse;
 import com.whop.api.resources.partners.types.LeaderboardPartnersResponse;
 import com.whop.api.resources.partners.types.ReferredUsersPartnersResponseDataItem;
+import com.whop.api.types.Partner;
 import java.util.concurrent.CompletableFuture;
 import java.util.function.Supplier;
 
@@ -40,74 +44,243 @@ public class AsyncPartnersClient {
      * Enrolls the calling user in the Whop partner program, making their partner businesses eligible for earnings. Idempotent — enrolling again keeps the original enrollment time.
      */
     public CompletableFuture<CreatePartnersResponse> create() {
-        return this.rawClient.create().thenApply(response -> response.body());
+        CompletableFuture<WhopApiHttpResponse<CreatePartnersResponse>> rawFuture = this.rawClient.create();
+        CompletableFuture<CreatePartnersResponse> future = rawFuture.thenApply(response -> response.body());
+        future.whenComplete((result_, throwable_) -> {
+            if (future.isCancelled()) {
+                rawFuture.cancel(true);
+            }
+        });
+        return future;
     }
 
     /**
      * Enrolls the calling user in the Whop partner program, making their partner businesses eligible for earnings. Idempotent — enrolling again keeps the original enrollment time.
      */
     public CompletableFuture<CreatePartnersResponse> create(RequestOptions requestOptions) {
-        return this.rawClient.create(requestOptions).thenApply(response -> response.body());
+        CompletableFuture<WhopApiHttpResponse<CreatePartnersResponse>> rawFuture =
+                this.rawClient.create(requestOptions);
+        CompletableFuture<CreatePartnersResponse> future = rawFuture.thenApply(response -> response.body());
+        future.whenComplete((result_, throwable_) -> {
+            if (future.isCancelled()) {
+                rawFuture.cancel(true);
+            }
+        });
+        return future;
     }
 
     /**
-     * Ranks referrers by partner business earnings — all-time by default, or over the current day, month, year, or trailing 30 days. Authentication is optional: authenticated callers also get their own standing, anonymous callers get the rankings alone.
+     * Lists, per income stream, the fee a business the caller refers would be charged, how low the caller may price it, and the commission the caller earns on that stream. Answers for a referral that does not exist yet, so a referral flow can price the deal before the business is created. Requires <code>partner:fees:update</code>, since the floors a partner may price down to are only for a credential that can set them.
+     */
+    public CompletableFuture<FeeOptionsPartnersResponse> feeOptions() {
+        CompletableFuture<WhopApiHttpResponse<FeeOptionsPartnersResponse>> rawFuture = this.rawClient.feeOptions();
+        CompletableFuture<FeeOptionsPartnersResponse> future = rawFuture.thenApply(response -> response.body());
+        future.whenComplete((result_, throwable_) -> {
+            if (future.isCancelled()) {
+                rawFuture.cancel(true);
+            }
+        });
+        return future;
+    }
+
+    /**
+     * Lists, per income stream, the fee a business the caller refers would be charged, how low the caller may price it, and the commission the caller earns on that stream. Answers for a referral that does not exist yet, so a referral flow can price the deal before the business is created. Requires <code>partner:fees:update</code>, since the floors a partner may price down to are only for a credential that can set them.
+     */
+    public CompletableFuture<FeeOptionsPartnersResponse> feeOptions(RequestOptions requestOptions) {
+        CompletableFuture<WhopApiHttpResponse<FeeOptionsPartnersResponse>> rawFuture =
+                this.rawClient.feeOptions(requestOptions);
+        CompletableFuture<FeeOptionsPartnersResponse> future = rawFuture.thenApply(response -> response.body());
+        future.whenComplete((result_, throwable_) -> {
+            if (future.isCancelled()) {
+                rawFuture.cancel(true);
+            }
+        });
+        return future;
+    }
+
+    /**
+     * Ranks referrers by partner business earnings over the chosen <code>period</code>, all-time by default. Authentication is optional: authenticated callers also get their own standing, anonymous callers get the rankings alone.
      */
     public CompletableFuture<LeaderboardPartnersResponse> leaderboard() {
-        return this.rawClient.leaderboard().thenApply(response -> response.body());
+        CompletableFuture<WhopApiHttpResponse<LeaderboardPartnersResponse>> rawFuture = this.rawClient.leaderboard();
+        CompletableFuture<LeaderboardPartnersResponse> future = rawFuture.thenApply(response -> response.body());
+        future.whenComplete((result_, throwable_) -> {
+            if (future.isCancelled()) {
+                rawFuture.cancel(true);
+            }
+        });
+        return future;
     }
 
     /**
-     * Ranks referrers by partner business earnings — all-time by default, or over the current day, month, year, or trailing 30 days. Authentication is optional: authenticated callers also get their own standing, anonymous callers get the rankings alone.
+     * Ranks referrers by partner business earnings over the chosen <code>period</code>, all-time by default. Authentication is optional: authenticated callers also get their own standing, anonymous callers get the rankings alone.
      */
     public CompletableFuture<LeaderboardPartnersResponse> leaderboard(RequestOptions requestOptions) {
-        return this.rawClient.leaderboard(requestOptions).thenApply(response -> response.body());
+        CompletableFuture<WhopApiHttpResponse<LeaderboardPartnersResponse>> rawFuture =
+                this.rawClient.leaderboard(requestOptions);
+        CompletableFuture<LeaderboardPartnersResponse> future = rawFuture.thenApply(response -> response.body());
+        future.whenComplete((result_, throwable_) -> {
+            if (future.isCancelled()) {
+                rawFuture.cancel(true);
+            }
+        });
+        return future;
     }
 
     /**
-     * Ranks referrers by partner business earnings — all-time by default, or over the current day, month, year, or trailing 30 days. Authentication is optional: authenticated callers also get their own standing, anonymous callers get the rankings alone.
+     * Ranks referrers by partner business earnings over the chosen <code>period</code>, all-time by default. Authentication is optional: authenticated callers also get their own standing, anonymous callers get the rankings alone.
      */
     public CompletableFuture<LeaderboardPartnersResponse> leaderboard(LeaderboardPartnersRequest request) {
-        return this.rawClient.leaderboard(request).thenApply(response -> response.body());
+        CompletableFuture<WhopApiHttpResponse<LeaderboardPartnersResponse>> rawFuture =
+                this.rawClient.leaderboard(request);
+        CompletableFuture<LeaderboardPartnersResponse> future = rawFuture.thenApply(response -> response.body());
+        future.whenComplete((result_, throwable_) -> {
+            if (future.isCancelled()) {
+                rawFuture.cancel(true);
+            }
+        });
+        return future;
     }
 
     /**
-     * Ranks referrers by partner business earnings — all-time by default, or over the current day, month, year, or trailing 30 days. Authentication is optional: authenticated callers also get their own standing, anonymous callers get the rankings alone.
+     * Ranks referrers by partner business earnings over the chosen <code>period</code>, all-time by default. Authentication is optional: authenticated callers also get their own standing, anonymous callers get the rankings alone.
      */
     public CompletableFuture<LeaderboardPartnersResponse> leaderboard(
             LeaderboardPartnersRequest request, RequestOptions requestOptions) {
-        return this.rawClient.leaderboard(request, requestOptions).thenApply(response -> response.body());
+        CompletableFuture<WhopApiHttpResponse<LeaderboardPartnersResponse>> rawFuture =
+                this.rawClient.leaderboard(request, requestOptions);
+        CompletableFuture<LeaderboardPartnersResponse> future = rawFuture.thenApply(response -> response.body());
+        future.whenComplete((result_, throwable_) -> {
+            if (future.isCancelled()) {
+                rawFuture.cancel(true);
+            }
+        });
+        return future;
     }
 
     /**
-     * Lists the users the caller referred onto Whop (newest first), each with the second-tier earnings the caller has made from that user's businesses.
+     * Lists the users the caller referred onto Whop, newest first by default, each with the caller's total affiliate earnings from that user across all tiers. Deprecated: this list is retired and no longer appears in the API reference. It keeps responding for existing integrations and has no replacement.
      */
     public CompletableFuture<SyncPagingIterable<ReferredUsersPartnersResponseDataItem>> referredUsers() {
-        return this.rawClient.referredUsers().thenApply(response -> response.body());
+        CompletableFuture<WhopApiHttpResponse<SyncPagingIterable<ReferredUsersPartnersResponseDataItem>>> rawFuture =
+                this.rawClient.referredUsers();
+        CompletableFuture<SyncPagingIterable<ReferredUsersPartnersResponseDataItem>> future =
+                rawFuture.thenApply(response -> response.body());
+        future.whenComplete((result_, throwable_) -> {
+            if (future.isCancelled()) {
+                rawFuture.cancel(true);
+            }
+        });
+        return future;
     }
 
     /**
-     * Lists the users the caller referred onto Whop (newest first), each with the second-tier earnings the caller has made from that user's businesses.
+     * Lists the users the caller referred onto Whop, newest first by default, each with the caller's total affiliate earnings from that user across all tiers. Deprecated: this list is retired and no longer appears in the API reference. It keeps responding for existing integrations and has no replacement.
      */
     public CompletableFuture<SyncPagingIterable<ReferredUsersPartnersResponseDataItem>> referredUsers(
             RequestOptions requestOptions) {
-        return this.rawClient.referredUsers(requestOptions).thenApply(response -> response.body());
+        CompletableFuture<WhopApiHttpResponse<SyncPagingIterable<ReferredUsersPartnersResponseDataItem>>> rawFuture =
+                this.rawClient.referredUsers(requestOptions);
+        CompletableFuture<SyncPagingIterable<ReferredUsersPartnersResponseDataItem>> future =
+                rawFuture.thenApply(response -> response.body());
+        future.whenComplete((result_, throwable_) -> {
+            if (future.isCancelled()) {
+                rawFuture.cancel(true);
+            }
+        });
+        return future;
     }
 
     /**
-     * Lists the users the caller referred onto Whop (newest first), each with the second-tier earnings the caller has made from that user's businesses.
+     * Lists the users the caller referred onto Whop, newest first by default, each with the caller's total affiliate earnings from that user across all tiers. Deprecated: this list is retired and no longer appears in the API reference. It keeps responding for existing integrations and has no replacement.
      */
     public CompletableFuture<SyncPagingIterable<ReferredUsersPartnersResponseDataItem>> referredUsers(
             ReferredUsersPartnersRequest request) {
-        return this.rawClient.referredUsers(request).thenApply(response -> response.body());
+        CompletableFuture<WhopApiHttpResponse<SyncPagingIterable<ReferredUsersPartnersResponseDataItem>>> rawFuture =
+                this.rawClient.referredUsers(request);
+        CompletableFuture<SyncPagingIterable<ReferredUsersPartnersResponseDataItem>> future =
+                rawFuture.thenApply(response -> response.body());
+        future.whenComplete((result_, throwable_) -> {
+            if (future.isCancelled()) {
+                rawFuture.cancel(true);
+            }
+        });
+        return future;
     }
 
     /**
-     * Lists the users the caller referred onto Whop (newest first), each with the second-tier earnings the caller has made from that user's businesses.
+     * Lists the users the caller referred onto Whop, newest first by default, each with the caller's total affiliate earnings from that user across all tiers. Deprecated: this list is retired and no longer appears in the API reference. It keeps responding for existing integrations and has no replacement.
      */
     public CompletableFuture<SyncPagingIterable<ReferredUsersPartnersResponseDataItem>> referredUsers(
             ReferredUsersPartnersRequest request, RequestOptions requestOptions) {
-        return this.rawClient.referredUsers(request, requestOptions).thenApply(response -> response.body());
+        CompletableFuture<WhopApiHttpResponse<SyncPagingIterable<ReferredUsersPartnersResponseDataItem>>> rawFuture =
+                this.rawClient.referredUsers(request, requestOptions);
+        CompletableFuture<SyncPagingIterable<ReferredUsersPartnersResponseDataItem>> future =
+                rawFuture.thenApply(response -> response.body());
+        future.whenComplete((result_, throwable_) -> {
+            if (future.isCancelled()) {
+                rawFuture.cancel(true);
+            }
+        });
+        return future;
+    }
+
+    /**
+     * Retrieves the authenticated user's partner profile: enrollment and verification status, certification completion, active direct business referral count, and default payout rates. Other users' profiles are not accessible. To create and manage referral links, use <code>/partner_referral_requests</code>.
+     */
+    public CompletableFuture<Partner> retrieve(String id) {
+        CompletableFuture<WhopApiHttpResponse<Partner>> rawFuture = this.rawClient.retrieve(id);
+        CompletableFuture<Partner> future = rawFuture.thenApply(response -> response.body());
+        future.whenComplete((result_, throwable_) -> {
+            if (future.isCancelled()) {
+                rawFuture.cancel(true);
+            }
+        });
+        return future;
+    }
+
+    /**
+     * Retrieves the authenticated user's partner profile: enrollment and verification status, certification completion, active direct business referral count, and default payout rates. Other users' profiles are not accessible. To create and manage referral links, use <code>/partner_referral_requests</code>.
+     */
+    public CompletableFuture<Partner> retrieve(String id, RequestOptions requestOptions) {
+        CompletableFuture<WhopApiHttpResponse<Partner>> rawFuture = this.rawClient.retrieve(id, requestOptions);
+        CompletableFuture<Partner> future = rawFuture.thenApply(response -> response.body());
+        future.whenComplete((result_, throwable_) -> {
+            if (future.isCancelled()) {
+                rawFuture.cancel(true);
+            }
+        });
+        return future;
+    }
+
+    /**
+     * Retrieves the authenticated user's partner profile: enrollment and verification status, certification completion, active direct business referral count, and default payout rates. Other users' profiles are not accessible. To create and manage referral links, use <code>/partner_referral_requests</code>.
+     */
+    public CompletableFuture<Partner> retrieve(String id, RetrievePartnersRequest request) {
+        CompletableFuture<WhopApiHttpResponse<Partner>> rawFuture = this.rawClient.retrieve(id, request);
+        CompletableFuture<Partner> future = rawFuture.thenApply(response -> response.body());
+        future.whenComplete((result_, throwable_) -> {
+            if (future.isCancelled()) {
+                rawFuture.cancel(true);
+            }
+        });
+        return future;
+    }
+
+    /**
+     * Retrieves the authenticated user's partner profile: enrollment and verification status, certification completion, active direct business referral count, and default payout rates. Other users' profiles are not accessible. To create and manage referral links, use <code>/partner_referral_requests</code>.
+     */
+    public CompletableFuture<Partner> retrieve(
+            String id, RetrievePartnersRequest request, RequestOptions requestOptions) {
+        CompletableFuture<WhopApiHttpResponse<Partner>> rawFuture =
+                this.rawClient.retrieve(id, request, requestOptions);
+        CompletableFuture<Partner> future = rawFuture.thenApply(response -> response.body());
+        future.whenComplete((result_, throwable_) -> {
+            if (future.isCancelled()) {
+                rawFuture.cancel(true);
+            }
+        });
+        return future;
     }
 
     public AsyncBusinessesClient businesses() {

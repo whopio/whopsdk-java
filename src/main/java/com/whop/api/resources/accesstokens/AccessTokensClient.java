@@ -26,28 +26,28 @@ public class AccessTokensClient {
     }
 
     /**
-     * Create a short-lived access token for authenticating API requests. When using API key authentication, provide company_id or user_id. When using OAuth, the user is derived from the token. Use this token with Whop's web and mobile embedded components.
+     * Creates a short-lived access token for Whop's web and mobile embedded components. With API key authentication, pass <code>account_id</code> or <code>user_id</code>; with OAuth, the token is issued for the OAuth user.
      */
     public AccessToken create() {
         return this.rawClient.create().body();
     }
 
     /**
-     * Create a short-lived access token for authenticating API requests. When using API key authentication, provide company_id or user_id. When using OAuth, the user is derived from the token. Use this token with Whop's web and mobile embedded components.
+     * Creates a short-lived access token for Whop's web and mobile embedded components. With API key authentication, pass <code>account_id</code> or <code>user_id</code>; with OAuth, the token is issued for the OAuth user.
      */
     public AccessToken create(RequestOptions requestOptions) {
         return this.rawClient.create(requestOptions).body();
     }
 
     /**
-     * Create a short-lived access token for authenticating API requests. When using API key authentication, provide company_id or user_id. When using OAuth, the user is derived from the token. Use this token with Whop's web and mobile embedded components.
+     * Creates a short-lived access token for Whop's web and mobile embedded components. With API key authentication, pass <code>account_id</code> or <code>user_id</code>; with OAuth, the token is issued for the OAuth user.
      */
     public AccessToken create(CreateAccessTokensRequest request) {
         return this.rawClient.create(request).body();
     }
 
     /**
-     * Create a short-lived access token for authenticating API requests. When using API key authentication, provide company_id or user_id. When using OAuth, the user is derived from the token. Use this token with Whop's web and mobile embedded components.
+     * Creates a short-lived access token for Whop's web and mobile embedded components. With API key authentication, pass <code>account_id</code> or <code>user_id</code>; with OAuth, the token is issued for the OAuth user.
      */
     public AccessToken create(CreateAccessTokensRequest request, RequestOptions requestOptions) {
         return this.rawClient.create(request, requestOptions).body();

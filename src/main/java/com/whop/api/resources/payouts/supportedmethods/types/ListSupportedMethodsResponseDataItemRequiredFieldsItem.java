@@ -338,7 +338,6 @@ public final class ListSupportedMethodsResponseDataItemRequiredFieldsItem {
 
         private Optional<List<String>> options = Optional.empty();
 
-        @JsonAnySetter
         private Map<String, Object> additionalProperties = new HashMap<>();
 
         private Builder() {}
@@ -360,7 +359,6 @@ public final class ListSupportedMethodsResponseDataItemRequiredFieldsItem {
 
         /**
          * <p>Stable field ID (<code>fld_</code> + the semantic type), used as the field key when creating the payout method. Safe to hardcode — it never changes for a given field.</p>
-         * <p>Stable field ID (<code>fld_</code> + the semantic type), used as the field key when creating the payout method. Safe to hardcode — it never changes for a given field.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
@@ -372,7 +370,6 @@ public final class ListSupportedMethodsResponseDataItemRequiredFieldsItem {
 
         /**
          * <p>How to collect the value: <code>text</code>, <code>options</code>, or <code>date</code>.</p>
-         * <p>How to collect the value: <code>text</code>, <code>options</code>, or <code>date</code>.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
@@ -383,7 +380,6 @@ public final class ListSupportedMethodsResponseDataItemRequiredFieldsItem {
         }
 
         /**
-         * <p>Human-readable field name.</p>
          * <p>Human-readable field name.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
@@ -403,7 +399,6 @@ public final class ListSupportedMethodsResponseDataItemRequiredFieldsItem {
 
         /**
          * <p>Whether the field must be provided.</p>
-         * <p>Whether the field must be provided.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
@@ -415,7 +410,6 @@ public final class ListSupportedMethodsResponseDataItemRequiredFieldsItem {
 
         /**
          * <p>Whether the value is vaulted in transit and never stored raw.</p>
-         * <p>Whether the value is vaulted in transit and never stored raw.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
@@ -426,7 +420,6 @@ public final class ListSupportedMethodsResponseDataItemRequiredFieldsItem {
         }
 
         /**
-         * <p>Semantic field type, for example <code>bank_account_number</code> or <code>swift</code>.</p>
          * <p>Semantic field type, for example <code>bank_account_number</code> or <code>swift</code>.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
@@ -559,6 +552,23 @@ public final class ListSupportedMethodsResponseDataItemRequiredFieldsItem {
                     type,
                     validation,
                     additionalProperties);
+        }
+
+        @JsonAnySetter
+        private void putAdditionalPropertyFromJson(String key, Object value) {
+            if (key.equalsIgnoreCase("id")
+                    || key.equalsIgnoreCase("input_type")
+                    || key.equalsIgnoreCase("label")
+                    || key.equalsIgnoreCase("object")
+                    || key.equalsIgnoreCase("options")
+                    || key.equalsIgnoreCase("placeholder")
+                    || key.equalsIgnoreCase("required")
+                    || key.equalsIgnoreCase("sensitive")
+                    || key.equalsIgnoreCase("type")
+                    || key.equalsIgnoreCase("validation")) {
+                return;
+            }
+            this.additionalProperties.put(key, value);
         }
 
         @java.lang.Override

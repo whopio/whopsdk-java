@@ -178,7 +178,6 @@ public final class LeaderboardPartnersResponseLeadersItemUser {
 
         private Optional<String> username = Optional.empty();
 
-        @JsonAnySetter
         private Map<String, Object> additionalProperties = new HashMap<>();
 
         private Builder() {}
@@ -314,6 +313,19 @@ public final class LeaderboardPartnersResponseLeadersItemUser {
         public LeaderboardPartnersResponseLeadersItemUser build() {
             return new LeaderboardPartnersResponseLeadersItemUser(
                     city, country, id, name, profilePicture, username, additionalProperties);
+        }
+
+        @JsonAnySetter
+        private void putAdditionalPropertyFromJson(String key, Object value) {
+            if (key.equalsIgnoreCase("city")
+                    || key.equalsIgnoreCase("country")
+                    || key.equalsIgnoreCase("id")
+                    || key.equalsIgnoreCase("name")
+                    || key.equalsIgnoreCase("profile_picture")
+                    || key.equalsIgnoreCase("username")) {
+                return;
+            }
+            this.additionalProperties.put(key, value);
         }
 
         public Builder additionalProperty(String key, Object value) {

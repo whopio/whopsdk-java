@@ -115,7 +115,6 @@ public final class ListCompanyTokenTransactionsResponse {
 
         private List<CompanyTokenTransactionListItem> data = new ArrayList<>();
 
-        @JsonAnySetter
         private Map<String, Object> additionalProperties = new HashMap<>();
 
         private Builder() {}
@@ -128,7 +127,6 @@ public final class ListCompanyTokenTransactionsResponse {
         }
 
         /**
-         * <p>Information to aid in pagination.</p>
          * <p>Information to aid in pagination.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
@@ -177,6 +175,14 @@ public final class ListCompanyTokenTransactionsResponse {
         @java.lang.Override
         public ListCompanyTokenTransactionsResponse build() {
             return new ListCompanyTokenTransactionsResponse(data, pageInfo, additionalProperties);
+        }
+
+        @JsonAnySetter
+        private void putAdditionalPropertyFromJson(String key, Object value) {
+            if (key.equalsIgnoreCase("data") || key.equalsIgnoreCase("page_info")) {
+                return;
+            }
+            this.additionalProperties.put(key, value);
         }
 
         @java.lang.Override

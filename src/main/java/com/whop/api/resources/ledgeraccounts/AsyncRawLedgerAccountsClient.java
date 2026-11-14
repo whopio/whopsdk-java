@@ -6,7 +6,9 @@ package com.whop.api.resources.ledgeraccounts;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.whop.api.core.ClientOptions;
 import com.whop.api.core.ObjectMappers;
+import com.whop.api.core.PathSegments;
 import com.whop.api.core.RequestOptions;
+import com.whop.api.core.RetryInterceptor;
 import com.whop.api.core.WhopApiApiException;
 import com.whop.api.core.WhopApiException;
 import com.whop.api.core.WhopApiHttpResponse;
@@ -18,7 +20,9 @@ import com.whop.api.errors.TooManyRequestsError;
 import com.whop.api.errors.UnauthorizedError;
 import com.whop.api.errors.UnprocessableEntityError;
 import com.whop.api.resources.ledgeraccounts.requests.RetrieveLedgerAccountsRequest;
+import com.whop.api.types.InternalServerErrorBody;
 import com.whop.api.types.LedgerAccount;
+import com.whop.api.types.UnprocessableEntityErrorBody;
 import java.io.IOException;
 import java.util.concurrent.CompletableFuture;
 import okhttp3.Call;
@@ -85,10 +89,10 @@ public class AsyncRawLedgerAccountsClient {
      */
     public CompletableFuture<WhopApiHttpResponse<LedgerAccount>> retrieve(
             String id, RetrieveLedgerAccountsRequest request, RequestOptions requestOptions) {
-        HttpUrl.Builder httpUrl = HttpUrl.parse(this.clientOptions.environment().getUrl())
+        HttpUrl.Builder httpUrl = HttpUrl.parse(this.clientOptions.environment().getApiURL())
                 .newBuilder()
                 .addPathSegments("ledger_accounts")
-                .addPathSegment(id);
+                .addPathSegment(PathSegments.validate(id));
         if (requestOptions != null) {
             requestOptions.getQueryParameters().forEach((_key, _value) -> {
                 httpUrl.addQueryParameter(_key, _value);
@@ -104,8 +108,18 @@ public class AsyncRawLedgerAccountsClient {
         if (requestOptions != null && requestOptions.getTimeout().isPresent()) {
             client = clientOptions.httpClientWithTimeout(requestOptions);
         }
+        if (requestOptions != null && requestOptions.getMaxRetries().isPresent()) {
+            okhttpRequest = okhttpRequest
+                    .newBuilder()
+                    .tag(
+                            RetryInterceptor.MaxRetriesOverride.class,
+                            new RetryInterceptor.MaxRetriesOverride(
+                                    requestOptions.getMaxRetries().get()))
+                    .build();
+        }
         CompletableFuture<WhopApiHttpResponse<LedgerAccount>> future = new CompletableFuture<>();
-        client.newCall(okhttpRequest).enqueue(new Callback() {
+        RetryInterceptor.AsyncCall okhttpCall = RetryInterceptor.newAsyncCall(client, okhttpRequest);
+        okhttpCall.enqueue(new Callback() {
             @Override
             public void onResponse(@NotNull Call call, @NotNull Response response) throws IOException {
                 try (ResponseBody responseBody = response.body()) {
@@ -140,7 +154,8 @@ public class AsyncRawLedgerAccountsClient {
                                 return;
                             case 422:
                                 future.completeExceptionally(new UnprocessableEntityError(
-                                        ObjectMappers.JSON_MAPPER.readValue(responseBodyString, Object.class),
+                                        ObjectMappers.JSON_MAPPER.readValue(
+                                                responseBodyString, UnprocessableEntityErrorBody.class),
                                         response));
                                 return;
                             case 429:
@@ -150,7 +165,8 @@ public class AsyncRawLedgerAccountsClient {
                                 return;
                             case 500:
                                 future.completeExceptionally(new InternalServerError(
-                                        ObjectMappers.JSON_MAPPER.readValue(responseBodyString, Object.class),
+                                        ObjectMappers.JSON_MAPPER.readValue(
+                                                responseBodyString, InternalServerErrorBody.class),
                                         response));
                                 return;
                         }
@@ -161,6 +177,9 @@ public class AsyncRawLedgerAccountsClient {
                     future.completeExceptionally(new WhopApiApiException(
                             "Error with status code " + response.code(), response.code(), errorBody, response));
                     return;
+                } catch (JsonProcessingException e) {
+                    future.completeExceptionally(
+                            new WhopApiException("Failed to deserialize response: " + e.getMessage(), e));
                 } catch (IOException e) {
                     future.completeExceptionally(new WhopApiException("Network error executing HTTP request", e));
                 }
@@ -169,6 +188,11 @@ public class AsyncRawLedgerAccountsClient {
             @Override
             public void onFailure(@NotNull Call call, @NotNull IOException e) {
                 future.completeExceptionally(new WhopApiException("Network error executing HTTP request", e));
+            }
+        });
+        future.whenComplete((result_, throwable_) -> {
+            if (future.isCancelled()) {
+                okhttpCall.cancel();
             }
         });
         return future;

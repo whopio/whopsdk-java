@@ -153,7 +153,6 @@ public final class CreateBountiesRequestCaptureSpec {
 
         private Optional<CreateBountiesRequestCaptureSpecStabilizationMode> stabilizationMode = Optional.empty();
 
-        @JsonAnySetter
         private Map<String, Object> additionalProperties = new HashMap<>();
 
         private Builder() {}
@@ -262,6 +261,19 @@ public final class CreateBountiesRequestCaptureSpec {
                     minTotalVerifiedDurationSeconds,
                     stabilizationMode,
                     additionalProperties);
+        }
+
+        @JsonAnySetter
+        private void putAdditionalPropertyFromJson(String key, Object value) {
+            if (key.equalsIgnoreCase("bitrate_target_mbps")
+                    || key.equalsIgnoreCase("embed_camera_metadata")
+                    || key.equalsIgnoreCase("frame_gap_tolerance_ms")
+                    || key.equalsIgnoreCase("min_clip_duration_seconds")
+                    || key.equalsIgnoreCase("min_total_verified_duration_seconds")
+                    || key.equalsIgnoreCase("stabilization_mode")) {
+                return;
+            }
+            this.additionalProperties.put(key, value);
         }
 
         public Builder additionalProperty(String key, Object value) {

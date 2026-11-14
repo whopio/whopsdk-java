@@ -5,6 +5,7 @@ package com.whop.api.resources.people;
 
 import com.whop.api.core.ClientOptions;
 import com.whop.api.core.RequestOptions;
+import com.whop.api.core.WhopApiHttpResponse;
 import com.whop.api.core.pagination.SyncPagingIterable;
 import com.whop.api.resources.people.requests.ListPeopleRequest;
 import com.whop.api.resources.people.requests.RetrievePeopleRequest;
@@ -30,60 +31,126 @@ public class AsyncPeopleClient {
     }
 
     /**
-     * Lists the people (visitors and customers) of an account: the identity-linked person profiles aggregated from every pixel, payment, and platform event — identities, purchases and LTV, geo/device profile, traffic sources, and first/last marketing touches.
+     * Lists the people (visitors and customers) of an account: identity-linked profiles assembled from every pixel, payment, and platform event. Filter and sort them to segment an account's audience.
      */
     public CompletableFuture<SyncPagingIterable<ListPeopleResponseDataItem>> list() {
-        return this.rawClient.list().thenApply(response -> response.body());
+        CompletableFuture<WhopApiHttpResponse<SyncPagingIterable<ListPeopleResponseDataItem>>> rawFuture =
+                this.rawClient.list();
+        CompletableFuture<SyncPagingIterable<ListPeopleResponseDataItem>> future =
+                rawFuture.thenApply(response -> response.body());
+        future.whenComplete((result_, throwable_) -> {
+            if (future.isCancelled()) {
+                rawFuture.cancel(true);
+            }
+        });
+        return future;
     }
 
     /**
-     * Lists the people (visitors and customers) of an account: the identity-linked person profiles aggregated from every pixel, payment, and platform event — identities, purchases and LTV, geo/device profile, traffic sources, and first/last marketing touches.
+     * Lists the people (visitors and customers) of an account: identity-linked profiles assembled from every pixel, payment, and platform event. Filter and sort them to segment an account's audience.
      */
     public CompletableFuture<SyncPagingIterable<ListPeopleResponseDataItem>> list(RequestOptions requestOptions) {
-        return this.rawClient.list(requestOptions).thenApply(response -> response.body());
+        CompletableFuture<WhopApiHttpResponse<SyncPagingIterable<ListPeopleResponseDataItem>>> rawFuture =
+                this.rawClient.list(requestOptions);
+        CompletableFuture<SyncPagingIterable<ListPeopleResponseDataItem>> future =
+                rawFuture.thenApply(response -> response.body());
+        future.whenComplete((result_, throwable_) -> {
+            if (future.isCancelled()) {
+                rawFuture.cancel(true);
+            }
+        });
+        return future;
     }
 
     /**
-     * Lists the people (visitors and customers) of an account: the identity-linked person profiles aggregated from every pixel, payment, and platform event — identities, purchases and LTV, geo/device profile, traffic sources, and first/last marketing touches.
+     * Lists the people (visitors and customers) of an account: identity-linked profiles assembled from every pixel, payment, and platform event. Filter and sort them to segment an account's audience.
      */
     public CompletableFuture<SyncPagingIterable<ListPeopleResponseDataItem>> list(ListPeopleRequest request) {
-        return this.rawClient.list(request).thenApply(response -> response.body());
+        CompletableFuture<WhopApiHttpResponse<SyncPagingIterable<ListPeopleResponseDataItem>>> rawFuture =
+                this.rawClient.list(request);
+        CompletableFuture<SyncPagingIterable<ListPeopleResponseDataItem>> future =
+                rawFuture.thenApply(response -> response.body());
+        future.whenComplete((result_, throwable_) -> {
+            if (future.isCancelled()) {
+                rawFuture.cancel(true);
+            }
+        });
+        return future;
     }
 
     /**
-     * Lists the people (visitors and customers) of an account: the identity-linked person profiles aggregated from every pixel, payment, and platform event — identities, purchases and LTV, geo/device profile, traffic sources, and first/last marketing touches.
+     * Lists the people (visitors and customers) of an account: identity-linked profiles assembled from every pixel, payment, and platform event. Filter and sort them to segment an account's audience.
      */
     public CompletableFuture<SyncPagingIterable<ListPeopleResponseDataItem>> list(
             ListPeopleRequest request, RequestOptions requestOptions) {
-        return this.rawClient.list(request, requestOptions).thenApply(response -> response.body());
+        CompletableFuture<WhopApiHttpResponse<SyncPagingIterable<ListPeopleResponseDataItem>>> rawFuture =
+                this.rawClient.list(request, requestOptions);
+        CompletableFuture<SyncPagingIterable<ListPeopleResponseDataItem>> future =
+                rawFuture.thenApply(response -> response.body());
+        future.whenComplete((result_, throwable_) -> {
+            if (future.isCancelled()) {
+                rawFuture.cancel(true);
+            }
+        });
+        return future;
     }
 
     /**
-     * Retrieves one person for an account. The identifier can be a person ID (prefixed <code>prsn_</code>), a user ID (prefixed <code>user_</code>), an email address, or a phone number — merged people resolve to the surviving profile.
+     * Retrieves one person for an account, looked up by person ID, user ID, email address, or phone number.
      */
     public CompletableFuture<RetrievePeopleResponse> retrieve(String id) {
-        return this.rawClient.retrieve(id).thenApply(response -> response.body());
+        CompletableFuture<WhopApiHttpResponse<RetrievePeopleResponse>> rawFuture = this.rawClient.retrieve(id);
+        CompletableFuture<RetrievePeopleResponse> future = rawFuture.thenApply(response -> response.body());
+        future.whenComplete((result_, throwable_) -> {
+            if (future.isCancelled()) {
+                rawFuture.cancel(true);
+            }
+        });
+        return future;
     }
 
     /**
-     * Retrieves one person for an account. The identifier can be a person ID (prefixed <code>prsn_</code>), a user ID (prefixed <code>user_</code>), an email address, or a phone number — merged people resolve to the surviving profile.
+     * Retrieves one person for an account, looked up by person ID, user ID, email address, or phone number.
      */
     public CompletableFuture<RetrievePeopleResponse> retrieve(String id, RequestOptions requestOptions) {
-        return this.rawClient.retrieve(id, requestOptions).thenApply(response -> response.body());
+        CompletableFuture<WhopApiHttpResponse<RetrievePeopleResponse>> rawFuture =
+                this.rawClient.retrieve(id, requestOptions);
+        CompletableFuture<RetrievePeopleResponse> future = rawFuture.thenApply(response -> response.body());
+        future.whenComplete((result_, throwable_) -> {
+            if (future.isCancelled()) {
+                rawFuture.cancel(true);
+            }
+        });
+        return future;
     }
 
     /**
-     * Retrieves one person for an account. The identifier can be a person ID (prefixed <code>prsn_</code>), a user ID (prefixed <code>user_</code>), an email address, or a phone number — merged people resolve to the surviving profile.
+     * Retrieves one person for an account, looked up by person ID, user ID, email address, or phone number.
      */
     public CompletableFuture<RetrievePeopleResponse> retrieve(String id, RetrievePeopleRequest request) {
-        return this.rawClient.retrieve(id, request).thenApply(response -> response.body());
+        CompletableFuture<WhopApiHttpResponse<RetrievePeopleResponse>> rawFuture = this.rawClient.retrieve(id, request);
+        CompletableFuture<RetrievePeopleResponse> future = rawFuture.thenApply(response -> response.body());
+        future.whenComplete((result_, throwable_) -> {
+            if (future.isCancelled()) {
+                rawFuture.cancel(true);
+            }
+        });
+        return future;
     }
 
     /**
-     * Retrieves one person for an account. The identifier can be a person ID (prefixed <code>prsn_</code>), a user ID (prefixed <code>user_</code>), an email address, or a phone number — merged people resolve to the surviving profile.
+     * Retrieves one person for an account, looked up by person ID, user ID, email address, or phone number.
      */
     public CompletableFuture<RetrievePeopleResponse> retrieve(
             String id, RetrievePeopleRequest request, RequestOptions requestOptions) {
-        return this.rawClient.retrieve(id, request, requestOptions).thenApply(response -> response.body());
+        CompletableFuture<WhopApiHttpResponse<RetrievePeopleResponse>> rawFuture =
+                this.rawClient.retrieve(id, request, requestOptions);
+        CompletableFuture<RetrievePeopleResponse> future = rawFuture.thenApply(response -> response.body());
+        future.whenComplete((result_, throwable_) -> {
+            if (future.isCancelled()) {
+                rawFuture.cancel(true);
+            }
+        });
+        return future;
     }
 }

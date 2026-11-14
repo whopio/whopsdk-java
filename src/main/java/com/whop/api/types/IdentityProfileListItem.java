@@ -633,7 +633,6 @@ public final class IdentityProfileListItem {
 
         private Optional<IdentityProfileListItemBusinessAddress> businessAddress = Optional.empty();
 
-        @JsonAnySetter
         private Map<String, Object> additionalProperties = new HashMap<>();
 
         private Builder() {}
@@ -664,7 +663,6 @@ public final class IdentityProfileListItem {
 
         /**
          * <p>When the identity profile was first created.</p>
-         * <p>When the identity profile was first created.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
@@ -675,7 +673,6 @@ public final class IdentityProfileListItem {
         }
 
         /**
-         * <p>The tag of the identity profile (idpf_xxx).</p>
          * <p>The tag of the identity profile (idpf_xxx).</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
@@ -688,7 +685,6 @@ public final class IdentityProfileListItem {
 
         /**
          * <p>Progress of payout-account setup for this profile, independent of holds. <code>connected</code> means onboarding is complete; a <code>connected</code> status paired with <code>payouts_enabled: false</code> indicates an active account restriction rather than incomplete setup.</p>
-         * <p>Progress of payout-account setup for this profile, independent of holds. <code>connected</code> means onboarding is complete; a <code>connected</code> status paired with <code>payouts_enabled: false</code> indicates an active account restriction rather than incomplete setup.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
@@ -699,7 +695,6 @@ public final class IdentityProfileListItem {
         }
 
         /**
-         * <p>Whether this profile can receive payouts right now. True only when payout onboarding is complete and no payout holds are active on the linked account. Treat this as the single source of truth for payout readiness.</p>
          * <p>Whether this profile can receive payouts right now. True only when payout onboarding is complete and no payout holds are active on the linked account. Treat this as the single source of truth for payout readiness.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
@@ -712,7 +707,6 @@ public final class IdentityProfileListItem {
 
         /**
          * <p>Whether this is an 'individual' or 'business' profile.</p>
-         * <p>Whether this is an 'individual' or 'business' profile.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
@@ -724,7 +718,6 @@ public final class IdentityProfileListItem {
 
         /**
          * <p>Derived verification status across all linked verifications. Returns <code>action_required</code> whenever the profile has an open request for information (whether a verification, payout, or audit RFI) — i.e. the merchant must submit something before it is in good standing.</p>
-         * <p>Derived verification status across all linked verifications. Returns <code>action_required</code> whenever the profile has an open request for information (whether a verification, payout, or audit RFI) — i.e. the merchant must submit something before it is in good standing.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
@@ -735,7 +728,6 @@ public final class IdentityProfileListItem {
         }
 
         /**
-         * <p>When the identity profile was last synced from a verification.</p>
          * <p>When the identity profile was last synced from a verification.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
@@ -1199,6 +1191,32 @@ public final class IdentityProfileListItem {
                     updatedAt,
                     verifications,
                     additionalProperties);
+        }
+
+        @JsonAnySetter
+        private void putAdditionalPropertyFromJson(String key, Object value) {
+            if (key.equalsIgnoreCase("business_address")
+                    || key.equalsIgnoreCase("business_name")
+                    || key.equalsIgnoreCase("business_structure")
+                    || key.equalsIgnoreCase("country")
+                    || key.equalsIgnoreCase("created_at")
+                    || key.equalsIgnoreCase("date_of_birth")
+                    || key.equalsIgnoreCase("email")
+                    || key.equalsIgnoreCase("first_name")
+                    || key.equalsIgnoreCase("id")
+                    || key.equalsIgnoreCase("last_name")
+                    || key.equalsIgnoreCase("linked_companies")
+                    || key.equalsIgnoreCase("payout_status")
+                    || key.equalsIgnoreCase("payouts_enabled")
+                    || key.equalsIgnoreCase("personal_address")
+                    || key.equalsIgnoreCase("phone")
+                    || key.equalsIgnoreCase("profile_type")
+                    || key.equalsIgnoreCase("status")
+                    || key.equalsIgnoreCase("updated_at")
+                    || key.equalsIgnoreCase("verifications")) {
+                return;
+            }
+            this.additionalProperties.put(key, value);
         }
 
         @java.lang.Override

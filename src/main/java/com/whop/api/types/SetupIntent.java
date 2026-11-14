@@ -15,7 +15,6 @@ import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.whop.api.core.Nullable;
 import com.whop.api.core.NullableNonemptyFilter;
 import com.whop.api.core.ObjectMappers;
-import java.time.OffsetDateTime;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
@@ -25,96 +24,124 @@ import org.jetbrains.annotations.NotNull;
 @JsonInclude(JsonInclude.Include.NON_ABSENT)
 @JsonDeserialize(builder = SetupIntent.Builder.class)
 public final class SetupIntent {
-    private final Optional<SetupIntentCheckoutConfiguration> checkoutConfiguration;
+    private final Optional<String> accountId;
 
-    private final Optional<SetupIntentCompany> company;
+    private final Optional<String> checkoutConfigurationId;
 
-    private final OffsetDateTime createdAt;
+    private final Optional<String> clientSecret;
 
-    private final Optional<String> errorMessage;
+    private final String createdAt;
 
     private final String id;
 
-    private final Optional<SetupIntentMember> member;
+    private final Optional<SetupLastSetupError> lastSetupError;
+
+    private final Optional<String> memberId;
 
     private final Optional<Map<String, Object>> metadata;
 
-    private final Optional<SetupIntentPaymentMethod> paymentMethod;
+    private final Optional<PaymentInstrument> paymentInstrument;
 
-    private final SetupIntentStatuses status;
+    private final Optional<String> paymentMethodId;
+
+    private final Optional<PaymentMethodTypes> paymentMethodType;
+
+    private final Optional<String> returnUrl;
+
+    private final SetupIntentStatus status;
+
+    private final Optional<SetupIntentThreeDsLevel> threeDsLevel;
 
     private final boolean threeDsVerified;
+
+    private final String updatedAt;
+
+    private final Optional<UserSummary> user;
 
     private final Map<String, Object> additionalProperties;
 
     private SetupIntent(
-            Optional<SetupIntentCheckoutConfiguration> checkoutConfiguration,
-            Optional<SetupIntentCompany> company,
-            OffsetDateTime createdAt,
-            Optional<String> errorMessage,
+            Optional<String> accountId,
+            Optional<String> checkoutConfigurationId,
+            Optional<String> clientSecret,
+            String createdAt,
             String id,
-            Optional<SetupIntentMember> member,
+            Optional<SetupLastSetupError> lastSetupError,
+            Optional<String> memberId,
             Optional<Map<String, Object>> metadata,
-            Optional<SetupIntentPaymentMethod> paymentMethod,
-            SetupIntentStatuses status,
+            Optional<PaymentInstrument> paymentInstrument,
+            Optional<String> paymentMethodId,
+            Optional<PaymentMethodTypes> paymentMethodType,
+            Optional<String> returnUrl,
+            SetupIntentStatus status,
+            Optional<SetupIntentThreeDsLevel> threeDsLevel,
             boolean threeDsVerified,
+            String updatedAt,
+            Optional<UserSummary> user,
             Map<String, Object> additionalProperties) {
-        this.checkoutConfiguration = checkoutConfiguration;
-        this.company = company;
+        this.accountId = accountId;
+        this.checkoutConfigurationId = checkoutConfigurationId;
+        this.clientSecret = clientSecret;
         this.createdAt = createdAt;
-        this.errorMessage = errorMessage;
         this.id = id;
-        this.member = member;
+        this.lastSetupError = lastSetupError;
+        this.memberId = memberId;
         this.metadata = metadata;
-        this.paymentMethod = paymentMethod;
+        this.paymentInstrument = paymentInstrument;
+        this.paymentMethodId = paymentMethodId;
+        this.paymentMethodType = paymentMethodType;
+        this.returnUrl = returnUrl;
         this.status = status;
+        this.threeDsLevel = threeDsLevel;
         this.threeDsVerified = threeDsVerified;
+        this.updatedAt = updatedAt;
+        this.user = user;
         this.additionalProperties = additionalProperties;
     }
 
     /**
-     * @return The checkout session configuration associated with this setup intent. Null if no checkout session was used.
+     * @return The account the payment method is saved for, prefixed <code>biz_</code>.
      */
     @JsonIgnore
-    public Optional<SetupIntentCheckoutConfiguration> getCheckoutConfiguration() {
-        if (checkoutConfiguration == null) {
+    public Optional<String> getAccountId() {
+        if (accountId == null) {
             return Optional.empty();
         }
-        return checkoutConfiguration;
+        return accountId;
     }
 
     /**
-     * @return The company that initiated this setup intent. Null if the company has been deleted.
+     * @return The checkout configuration this setup was created through, prefixed <code>ch_</code>. Null for a setup created through this API rather than a hosted checkout.
      */
     @JsonIgnore
-    public Optional<SetupIntentCompany> getCompany() {
-        if (company == null) {
+    public Optional<String> getCheckoutConfigurationId() {
+        if (checkoutConfigurationId == null) {
             return Optional.empty();
         }
-        return company;
+        return checkoutConfigurationId;
     }
 
     /**
-     * @return The datetime the setup intent was created.
+     * @return The credential a buyer's surface presents to poll this setup and set its return URL — hand it to the elements' <code>handleNextAction</code>. Only on setups created through this API, and always null in list responses — retrieve the setup intent for it.
+     */
+    @JsonIgnore
+    public Optional<String> getClientSecret() {
+        if (clientSecret == null) {
+            return Optional.empty();
+        }
+        return clientSecret;
+    }
+
+    /**
+     * @return When the setup intent was created, as an ISO 8601 timestamp.
      */
     @JsonProperty("created_at")
-    public OffsetDateTime getCreatedAt() {
+    public String getCreatedAt() {
         return createdAt;
     }
 
     /**
-     * @return A human-readable error message explaining why the setup intent failed. Null if no error occurred.
-     */
-    @JsonIgnore
-    public Optional<String> getErrorMessage() {
-        if (errorMessage == null) {
-            return Optional.empty();
-        }
-        return errorMessage;
-    }
-
-    /**
-     * @return The unique identifier for the setup intent.
+     * @return Setup intent ID, prefixed <code>sint_</code>.
      */
     @JsonProperty("id")
     public String getId() {
@@ -122,18 +149,29 @@ public final class SetupIntent {
     }
 
     /**
-     * @return The company member associated with this setup intent. Null if the user is not a member.
+     * @return Why the setup ended where it did, or <code>null</code> when nothing has failed. Present on <code>canceled</code> — a buyer who abandoned carries no code, one refused by the provider does. Dropped once the setup succeeds.
      */
     @JsonIgnore
-    public Optional<SetupIntentMember> getMember() {
-        if (member == null) {
+    public Optional<SetupLastSetupError> getLastSetupError() {
+        if (lastSetupError == null) {
             return Optional.empty();
         }
-        return member;
+        return lastSetupError;
     }
 
     /**
-     * @return Custom key-value pairs attached to this setup intent. Null if no metadata was provided.
+     * @return The buyer's member record on the account, prefixed <code>mber_</code>. Null without the member:basic:read permission, unless the caller is the buyer.
+     */
+    @JsonIgnore
+    public Optional<String> getMemberId() {
+        if (memberId == null) {
+            return Optional.empty();
+        }
+        return memberId;
+    }
+
+    /**
+     * @return Your own key-value data attached when the setup intent was created.
      */
     @JsonIgnore
     public Optional<Map<String, Object>> getMetadata() {
@@ -144,54 +182,123 @@ public final class SetupIntent {
     }
 
     /**
-     * @return The saved payment method created by this setup intent. Null if the setup has not completed successfully.
+     * @return The method behind this setup shaped for display: a buyer-facing name, the standard icon set, and the card's brand, last four, issuer identification number, expiry, and network transaction id when it was a card. Null until a method was collected.
      */
     @JsonIgnore
-    public Optional<SetupIntentPaymentMethod> getPaymentMethod() {
-        if (paymentMethod == null) {
+    public Optional<PaymentInstrument> getPaymentInstrument() {
+        if (paymentInstrument == null) {
             return Optional.empty();
         }
-        return paymentMethod;
+        return paymentInstrument;
     }
 
     /**
-     * @return The current status of the setup intent.
+     * @return The saved payment method, prefixed <code>payt_</code>, ready to charge with Create Payment. Null until the setup has <code>succeeded</code>.
+     */
+    @JsonIgnore
+    public Optional<String> getPaymentMethodId() {
+        if (paymentMethodId == null) {
+            return Optional.empty();
+        }
+        return paymentMethodId;
+    }
+
+    /**
+     * @return The kind of instrument being saved, for example <code>card</code> or <code>us_bank_account</code>.
+     */
+    @JsonIgnore
+    public Optional<PaymentMethodTypes> getPaymentMethodType() {
+        if (paymentMethodType == null) {
+            return Optional.empty();
+        }
+        return paymentMethodType;
+    }
+
+    /**
+     * @return Where the buyer lands after completing an off-site step, or <code>null</code> to leave them where they are.
+     */
+    @JsonIgnore
+    public Optional<String> getReturnUrl() {
+        if (returnUrl == null) {
+            return Optional.empty();
+        }
+        return returnUrl;
+    }
+
+    /**
+     * @return How far the setup has got. <strong>A 201 or 200 means we answered, not that the method was saved — always branch on this.</strong> <code>requires_action</code> — the buyer has a step outstanding; hand <code>client_secret</code> to the elements or poll Retrieve setup status. <code>processing</code> — the processor is deciding. <code>succeeded</code> — the method is saved, and only this one means saved. <code>canceled</code> — abandoned or refused; see <code>last_setup_error</code>.
      */
     @JsonProperty("status")
-    public SetupIntentStatuses getStatus() {
+    public SetupIntentStatus getStatus() {
         return status;
     }
 
     /**
-     * @return Whether 3D Secure authentication was completed when this payment method was set up.
+     * @return 3D Secure behavior for supported on-session card payments. <code>mandate_challenge</code> requires a 3DS challenge before payment processing; <code>mandate_if_required</code> mandates a challenge only when the payment processor requires it; <code>frictionless_if_required</code> uses the regular frictionless 3DS flow. Payments of $1,000 or more use <code>mandate_if_required</code> unless <code>mandate_challenge</code> is selected. Risk and authentication recovery requirements can override the preference. The setting requested for this setup, or <code>null</code> when unset.
+     */
+    @JsonIgnore
+    public Optional<SetupIntentThreeDsLevel> getThreeDsLevel() {
+        if (threeDsLevel == null) {
+            return Optional.empty();
+        }
+        return threeDsLevel;
+    }
+
+    /**
+     * @return True when the buyer completed 3D Secure while saving this payment method.
      */
     @JsonProperty("three_ds_verified")
     public boolean getThreeDsVerified() {
         return threeDsVerified;
     }
 
-    @JsonInclude(value = JsonInclude.Include.CUSTOM, valueFilter = NullableNonemptyFilter.class)
-    @JsonProperty("checkout_configuration")
-    private Optional<SetupIntentCheckoutConfiguration> _getCheckoutConfiguration() {
-        return checkoutConfiguration;
+    /**
+     * @return When the setup intent was last updated, as an ISO 8601 timestamp.
+     */
+    @JsonProperty("updated_at")
+    public String getUpdatedAt() {
+        return updatedAt;
+    }
+
+    /**
+     * @return The user saving the payment method. Null when the buyer is a company rather than a user.
+     */
+    @JsonIgnore
+    public Optional<UserSummary> getUser() {
+        if (user == null) {
+            return Optional.empty();
+        }
+        return user;
     }
 
     @JsonInclude(value = JsonInclude.Include.CUSTOM, valueFilter = NullableNonemptyFilter.class)
-    @JsonProperty("company")
-    private Optional<SetupIntentCompany> _getCompany() {
-        return company;
+    @JsonProperty("account_id")
+    private Optional<String> _getAccountId() {
+        return accountId;
     }
 
     @JsonInclude(value = JsonInclude.Include.CUSTOM, valueFilter = NullableNonemptyFilter.class)
-    @JsonProperty("error_message")
-    private Optional<String> _getErrorMessage() {
-        return errorMessage;
+    @JsonProperty("checkout_configuration_id")
+    private Optional<String> _getCheckoutConfigurationId() {
+        return checkoutConfigurationId;
     }
 
     @JsonInclude(value = JsonInclude.Include.CUSTOM, valueFilter = NullableNonemptyFilter.class)
-    @JsonProperty("member")
-    private Optional<SetupIntentMember> _getMember() {
-        return member;
+    @JsonProperty("client_secret")
+    private Optional<String> _getClientSecret() {
+        return clientSecret;
+    }
+
+    @JsonInclude(value = JsonInclude.Include.CUSTOM, valueFilter = NullableNonemptyFilter.class)
+    @JsonProperty("last_setup_error")
+    private Optional<SetupLastSetupError> _getLastSetupError() {
+        return lastSetupError;
+    }
+
+    @JsonInclude(value = JsonInclude.Include.CUSTOM, valueFilter = NullableNonemptyFilter.class)
+    @JsonProperty("member_id")
+    private Optional<String> _getMemberId() {
+        return memberId;
     }
 
     @JsonInclude(value = JsonInclude.Include.CUSTOM, valueFilter = NullableNonemptyFilter.class)
@@ -201,9 +308,39 @@ public final class SetupIntent {
     }
 
     @JsonInclude(value = JsonInclude.Include.CUSTOM, valueFilter = NullableNonemptyFilter.class)
-    @JsonProperty("payment_method")
-    private Optional<SetupIntentPaymentMethod> _getPaymentMethod() {
-        return paymentMethod;
+    @JsonProperty("payment_instrument")
+    private Optional<PaymentInstrument> _getPaymentInstrument() {
+        return paymentInstrument;
+    }
+
+    @JsonInclude(value = JsonInclude.Include.CUSTOM, valueFilter = NullableNonemptyFilter.class)
+    @JsonProperty("payment_method_id")
+    private Optional<String> _getPaymentMethodId() {
+        return paymentMethodId;
+    }
+
+    @JsonInclude(value = JsonInclude.Include.CUSTOM, valueFilter = NullableNonemptyFilter.class)
+    @JsonProperty("payment_method_type")
+    private Optional<PaymentMethodTypes> _getPaymentMethodType() {
+        return paymentMethodType;
+    }
+
+    @JsonInclude(value = JsonInclude.Include.CUSTOM, valueFilter = NullableNonemptyFilter.class)
+    @JsonProperty("return_url")
+    private Optional<String> _getReturnUrl() {
+        return returnUrl;
+    }
+
+    @JsonInclude(value = JsonInclude.Include.CUSTOM, valueFilter = NullableNonemptyFilter.class)
+    @JsonProperty("three_ds_level")
+    private Optional<SetupIntentThreeDsLevel> _getThreeDsLevel() {
+        return threeDsLevel;
+    }
+
+    @JsonInclude(value = JsonInclude.Include.CUSTOM, valueFilter = NullableNonemptyFilter.class)
+    @JsonProperty("user")
+    private Optional<UserSummary> _getUser() {
+        return user;
     }
 
     @java.lang.Override
@@ -218,31 +355,45 @@ public final class SetupIntent {
     }
 
     private boolean equalTo(SetupIntent other) {
-        return checkoutConfiguration.equals(other.checkoutConfiguration)
-                && company.equals(other.company)
+        return accountId.equals(other.accountId)
+                && checkoutConfigurationId.equals(other.checkoutConfigurationId)
+                && clientSecret.equals(other.clientSecret)
                 && createdAt.equals(other.createdAt)
-                && errorMessage.equals(other.errorMessage)
                 && id.equals(other.id)
-                && member.equals(other.member)
+                && lastSetupError.equals(other.lastSetupError)
+                && memberId.equals(other.memberId)
                 && metadata.equals(other.metadata)
-                && paymentMethod.equals(other.paymentMethod)
+                && paymentInstrument.equals(other.paymentInstrument)
+                && paymentMethodId.equals(other.paymentMethodId)
+                && paymentMethodType.equals(other.paymentMethodType)
+                && returnUrl.equals(other.returnUrl)
                 && status.equals(other.status)
-                && threeDsVerified == other.threeDsVerified;
+                && threeDsLevel.equals(other.threeDsLevel)
+                && threeDsVerified == other.threeDsVerified
+                && updatedAt.equals(other.updatedAt)
+                && user.equals(other.user);
     }
 
     @java.lang.Override
     public int hashCode() {
         return Objects.hash(
-                this.checkoutConfiguration,
-                this.company,
+                this.accountId,
+                this.checkoutConfigurationId,
+                this.clientSecret,
                 this.createdAt,
-                this.errorMessage,
                 this.id,
-                this.member,
+                this.lastSetupError,
+                this.memberId,
                 this.metadata,
-                this.paymentMethod,
+                this.paymentInstrument,
+                this.paymentMethodId,
+                this.paymentMethodType,
+                this.returnUrl,
                 this.status,
-                this.threeDsVerified);
+                this.threeDsLevel,
+                this.threeDsVerified,
+                this.updatedAt,
+                this.user);
     }
 
     @java.lang.Override
@@ -256,32 +407,39 @@ public final class SetupIntent {
 
     public interface CreatedAtStage {
         /**
-         * <p>The datetime the setup intent was created.</p>
+         * <p>When the setup intent was created, as an ISO 8601 timestamp.</p>
          */
-        IdStage createdAt(@NotNull OffsetDateTime createdAt);
+        IdStage createdAt(@NotNull String createdAt);
 
         Builder from(SetupIntent other);
     }
 
     public interface IdStage {
         /**
-         * <p>The unique identifier for the setup intent.</p>
+         * <p>Setup intent ID, prefixed <code>sint_</code>.</p>
          */
         StatusStage id(@NotNull String id);
     }
 
     public interface StatusStage {
         /**
-         * <p>The current status of the setup intent.</p>
+         * <p>How far the setup has got. <strong>A 201 or 200 means we answered, not that the method was saved — always branch on this.</strong> <code>requires_action</code> — the buyer has a step outstanding; hand <code>client_secret</code> to the elements or poll Retrieve setup status. <code>processing</code> — the processor is deciding. <code>succeeded</code> — the method is saved, and only this one means saved. <code>canceled</code> — abandoned or refused; see <code>last_setup_error</code>.</p>
          */
-        ThreeDsVerifiedStage status(@NotNull SetupIntentStatuses status);
+        ThreeDsVerifiedStage status(@NotNull SetupIntentStatus status);
     }
 
     public interface ThreeDsVerifiedStage {
         /**
-         * <p>Whether 3D Secure authentication was completed when this payment method was set up.</p>
+         * <p>True when the buyer completed 3D Secure while saving this payment method.</p>
          */
-        _FinalStage threeDsVerified(boolean threeDsVerified);
+        UpdatedAtStage threeDsVerified(boolean threeDsVerified);
+    }
+
+    public interface UpdatedAtStage {
+        /**
+         * <p>When the setup intent was last updated, as an ISO 8601 timestamp.</p>
+         */
+        _FinalStage updatedAt(@NotNull String updatedAt);
     }
 
     public interface _FinalStage {
@@ -292,43 +450,52 @@ public final class SetupIntent {
         _FinalStage additionalProperties(Map<String, Object> additionalProperties);
 
         /**
-         * <p>The checkout session configuration associated with this setup intent. Null if no checkout session was used.</p>
+         * <p>The account the payment method is saved for, prefixed <code>biz_</code>.</p>
          */
-        _FinalStage checkoutConfiguration(Optional<SetupIntentCheckoutConfiguration> checkoutConfiguration);
+        _FinalStage accountId(Optional<String> accountId);
 
-        _FinalStage checkoutConfiguration(SetupIntentCheckoutConfiguration checkoutConfiguration);
+        _FinalStage accountId(String accountId);
 
-        _FinalStage checkoutConfiguration(Nullable<SetupIntentCheckoutConfiguration> checkoutConfiguration);
+        _FinalStage accountId(Nullable<String> accountId);
 
         /**
-         * <p>The company that initiated this setup intent. Null if the company has been deleted.</p>
+         * <p>The checkout configuration this setup was created through, prefixed <code>ch_</code>. Null for a setup created through this API rather than a hosted checkout.</p>
          */
-        _FinalStage company(Optional<SetupIntentCompany> company);
+        _FinalStage checkoutConfigurationId(Optional<String> checkoutConfigurationId);
 
-        _FinalStage company(SetupIntentCompany company);
+        _FinalStage checkoutConfigurationId(String checkoutConfigurationId);
 
-        _FinalStage company(Nullable<SetupIntentCompany> company);
+        _FinalStage checkoutConfigurationId(Nullable<String> checkoutConfigurationId);
 
         /**
-         * <p>A human-readable error message explaining why the setup intent failed. Null if no error occurred.</p>
+         * <p>The credential a buyer's surface presents to poll this setup and set its return URL — hand it to the elements' <code>handleNextAction</code>. Only on setups created through this API, and always null in list responses — retrieve the setup intent for it.</p>
          */
-        _FinalStage errorMessage(Optional<String> errorMessage);
+        _FinalStage clientSecret(Optional<String> clientSecret);
 
-        _FinalStage errorMessage(String errorMessage);
+        _FinalStage clientSecret(String clientSecret);
 
-        _FinalStage errorMessage(Nullable<String> errorMessage);
+        _FinalStage clientSecret(Nullable<String> clientSecret);
 
         /**
-         * <p>The company member associated with this setup intent. Null if the user is not a member.</p>
+         * <p>Why the setup ended where it did, or <code>null</code> when nothing has failed. Present on <code>canceled</code> — a buyer who abandoned carries no code, one refused by the provider does. Dropped once the setup succeeds.</p>
          */
-        _FinalStage member(Optional<SetupIntentMember> member);
+        _FinalStage lastSetupError(Optional<SetupLastSetupError> lastSetupError);
 
-        _FinalStage member(SetupIntentMember member);
+        _FinalStage lastSetupError(SetupLastSetupError lastSetupError);
 
-        _FinalStage member(Nullable<SetupIntentMember> member);
+        _FinalStage lastSetupError(Nullable<SetupLastSetupError> lastSetupError);
 
         /**
-         * <p>Custom key-value pairs attached to this setup intent. Null if no metadata was provided.</p>
+         * <p>The buyer's member record on the account, prefixed <code>mber_</code>. Null without the member:basic:read permission, unless the caller is the buyer.</p>
+         */
+        _FinalStage memberId(Optional<String> memberId);
+
+        _FinalStage memberId(String memberId);
+
+        _FinalStage memberId(Nullable<String> memberId);
+
+        /**
+         * <p>Your own key-value data attached when the setup intent was created.</p>
          */
         _FinalStage metadata(Optional<Map<String, Object>> metadata);
 
@@ -337,73 +504,136 @@ public final class SetupIntent {
         _FinalStage metadata(Nullable<Map<String, Object>> metadata);
 
         /**
-         * <p>The saved payment method created by this setup intent. Null if the setup has not completed successfully.</p>
+         * <p>The method behind this setup shaped for display: a buyer-facing name, the standard icon set, and the card's brand, last four, issuer identification number, expiry, and network transaction id when it was a card. Null until a method was collected.</p>
          */
-        _FinalStage paymentMethod(Optional<SetupIntentPaymentMethod> paymentMethod);
+        _FinalStage paymentInstrument(Optional<PaymentInstrument> paymentInstrument);
 
-        _FinalStage paymentMethod(SetupIntentPaymentMethod paymentMethod);
+        _FinalStage paymentInstrument(PaymentInstrument paymentInstrument);
 
-        _FinalStage paymentMethod(Nullable<SetupIntentPaymentMethod> paymentMethod);
+        _FinalStage paymentInstrument(Nullable<PaymentInstrument> paymentInstrument);
+
+        /**
+         * <p>The saved payment method, prefixed <code>payt_</code>, ready to charge with Create Payment. Null until the setup has <code>succeeded</code>.</p>
+         */
+        _FinalStage paymentMethodId(Optional<String> paymentMethodId);
+
+        _FinalStage paymentMethodId(String paymentMethodId);
+
+        _FinalStage paymentMethodId(Nullable<String> paymentMethodId);
+
+        /**
+         * <p>The kind of instrument being saved, for example <code>card</code> or <code>us_bank_account</code>.</p>
+         */
+        _FinalStage paymentMethodType(Optional<PaymentMethodTypes> paymentMethodType);
+
+        _FinalStage paymentMethodType(PaymentMethodTypes paymentMethodType);
+
+        _FinalStage paymentMethodType(Nullable<PaymentMethodTypes> paymentMethodType);
+
+        /**
+         * <p>Where the buyer lands after completing an off-site step, or <code>null</code> to leave them where they are.</p>
+         */
+        _FinalStage returnUrl(Optional<String> returnUrl);
+
+        _FinalStage returnUrl(String returnUrl);
+
+        _FinalStage returnUrl(Nullable<String> returnUrl);
+
+        /**
+         * <p>3D Secure behavior for supported on-session card payments. <code>mandate_challenge</code> requires a 3DS challenge before payment processing; <code>mandate_if_required</code> mandates a challenge only when the payment processor requires it; <code>frictionless_if_required</code> uses the regular frictionless 3DS flow. Payments of $1,000 or more use <code>mandate_if_required</code> unless <code>mandate_challenge</code> is selected. Risk and authentication recovery requirements can override the preference. The setting requested for this setup, or <code>null</code> when unset.</p>
+         */
+        _FinalStage threeDsLevel(Optional<SetupIntentThreeDsLevel> threeDsLevel);
+
+        _FinalStage threeDsLevel(SetupIntentThreeDsLevel threeDsLevel);
+
+        _FinalStage threeDsLevel(Nullable<SetupIntentThreeDsLevel> threeDsLevel);
+
+        /**
+         * <p>The user saving the payment method. Null when the buyer is a company rather than a user.</p>
+         */
+        _FinalStage user(Optional<UserSummary> user);
+
+        _FinalStage user(UserSummary user);
+
+        _FinalStage user(Nullable<UserSummary> user);
     }
 
     @JsonIgnoreProperties(ignoreUnknown = true)
     public static final class Builder
-            implements CreatedAtStage, IdStage, StatusStage, ThreeDsVerifiedStage, _FinalStage {
-        private OffsetDateTime createdAt;
+            implements CreatedAtStage, IdStage, StatusStage, ThreeDsVerifiedStage, UpdatedAtStage, _FinalStage {
+        private String createdAt;
 
         private String id;
 
-        private SetupIntentStatuses status;
+        private SetupIntentStatus status;
 
         private boolean threeDsVerified;
 
-        private Optional<SetupIntentPaymentMethod> paymentMethod = Optional.empty();
+        private String updatedAt;
+
+        private Optional<UserSummary> user = Optional.empty();
+
+        private Optional<SetupIntentThreeDsLevel> threeDsLevel = Optional.empty();
+
+        private Optional<String> returnUrl = Optional.empty();
+
+        private Optional<PaymentMethodTypes> paymentMethodType = Optional.empty();
+
+        private Optional<String> paymentMethodId = Optional.empty();
+
+        private Optional<PaymentInstrument> paymentInstrument = Optional.empty();
 
         private Optional<Map<String, Object>> metadata = Optional.empty();
 
-        private Optional<SetupIntentMember> member = Optional.empty();
+        private Optional<String> memberId = Optional.empty();
 
-        private Optional<String> errorMessage = Optional.empty();
+        private Optional<SetupLastSetupError> lastSetupError = Optional.empty();
 
-        private Optional<SetupIntentCompany> company = Optional.empty();
+        private Optional<String> clientSecret = Optional.empty();
 
-        private Optional<SetupIntentCheckoutConfiguration> checkoutConfiguration = Optional.empty();
+        private Optional<String> checkoutConfigurationId = Optional.empty();
 
-        @JsonAnySetter
+        private Optional<String> accountId = Optional.empty();
+
         private Map<String, Object> additionalProperties = new HashMap<>();
 
         private Builder() {}
 
         @java.lang.Override
         public Builder from(SetupIntent other) {
-            checkoutConfiguration(other.getCheckoutConfiguration());
-            company(other.getCompany());
+            accountId(other.getAccountId());
+            checkoutConfigurationId(other.getCheckoutConfigurationId());
+            clientSecret(other.getClientSecret());
             createdAt(other.getCreatedAt());
-            errorMessage(other.getErrorMessage());
             id(other.getId());
-            member(other.getMember());
+            lastSetupError(other.getLastSetupError());
+            memberId(other.getMemberId());
             metadata(other.getMetadata());
-            paymentMethod(other.getPaymentMethod());
+            paymentInstrument(other.getPaymentInstrument());
+            paymentMethodId(other.getPaymentMethodId());
+            paymentMethodType(other.getPaymentMethodType());
+            returnUrl(other.getReturnUrl());
             status(other.getStatus());
+            threeDsLevel(other.getThreeDsLevel());
             threeDsVerified(other.getThreeDsVerified());
+            updatedAt(other.getUpdatedAt());
+            user(other.getUser());
             return this;
         }
 
         /**
-         * <p>The datetime the setup intent was created.</p>
-         * <p>The datetime the setup intent was created.</p>
+         * <p>When the setup intent was created, as an ISO 8601 timestamp.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
         @JsonSetter("created_at")
-        public IdStage createdAt(@NotNull OffsetDateTime createdAt) {
+        public IdStage createdAt(@NotNull String createdAt) {
             this.createdAt = Objects.requireNonNull(createdAt, "createdAt must not be null");
             return this;
         }
 
         /**
-         * <p>The unique identifier for the setup intent.</p>
-         * <p>The unique identifier for the setup intent.</p>
+         * <p>Setup intent ID, prefixed <code>sint_</code>.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
@@ -414,67 +644,256 @@ public final class SetupIntent {
         }
 
         /**
-         * <p>The current status of the setup intent.</p>
-         * <p>The current status of the setup intent.</p>
+         * <p>How far the setup has got. <strong>A 201 or 200 means we answered, not that the method was saved — always branch on this.</strong> <code>requires_action</code> — the buyer has a step outstanding; hand <code>client_secret</code> to the elements or poll Retrieve setup status. <code>processing</code> — the processor is deciding. <code>succeeded</code> — the method is saved, and only this one means saved. <code>canceled</code> — abandoned or refused; see <code>last_setup_error</code>.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
         @JsonSetter("status")
-        public ThreeDsVerifiedStage status(@NotNull SetupIntentStatuses status) {
+        public ThreeDsVerifiedStage status(@NotNull SetupIntentStatus status) {
             this.status = Objects.requireNonNull(status, "status must not be null");
             return this;
         }
 
         /**
-         * <p>Whether 3D Secure authentication was completed when this payment method was set up.</p>
-         * <p>Whether 3D Secure authentication was completed when this payment method was set up.</p>
+         * <p>True when the buyer completed 3D Secure while saving this payment method.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
         @JsonSetter("three_ds_verified")
-        public _FinalStage threeDsVerified(boolean threeDsVerified) {
+        public UpdatedAtStage threeDsVerified(boolean threeDsVerified) {
             this.threeDsVerified = threeDsVerified;
             return this;
         }
 
         /**
-         * <p>The saved payment method created by this setup intent. Null if the setup has not completed successfully.</p>
+         * <p>When the setup intent was last updated, as an ISO 8601 timestamp.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
-        public _FinalStage paymentMethod(Nullable<SetupIntentPaymentMethod> paymentMethod) {
-            if (paymentMethod.isNull()) {
-                this.paymentMethod = null;
-            } else if (paymentMethod.isEmpty()) {
-                this.paymentMethod = Optional.empty();
+        @JsonSetter("updated_at")
+        public _FinalStage updatedAt(@NotNull String updatedAt) {
+            this.updatedAt = Objects.requireNonNull(updatedAt, "updatedAt must not be null");
+            return this;
+        }
+
+        /**
+         * <p>The user saving the payment method. Null when the buyer is a company rather than a user.</p>
+         * @return Reference to {@code this} so that method calls can be chained together.
+         */
+        @java.lang.Override
+        public _FinalStage user(Nullable<UserSummary> user) {
+            if (user.isNull()) {
+                this.user = null;
+            } else if (user.isEmpty()) {
+                this.user = Optional.empty();
             } else {
-                this.paymentMethod = Optional.of(paymentMethod.get());
+                this.user = Optional.of(user.get());
             }
             return this;
         }
 
         /**
-         * <p>The saved payment method created by this setup intent. Null if the setup has not completed successfully.</p>
+         * <p>The user saving the payment method. Null when the buyer is a company rather than a user.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
-        public _FinalStage paymentMethod(SetupIntentPaymentMethod paymentMethod) {
-            this.paymentMethod = Optional.ofNullable(paymentMethod);
+        public _FinalStage user(UserSummary user) {
+            this.user = Optional.ofNullable(user);
             return this;
         }
 
         /**
-         * <p>The saved payment method created by this setup intent. Null if the setup has not completed successfully.</p>
+         * <p>The user saving the payment method. Null when the buyer is a company rather than a user.</p>
          */
         @java.lang.Override
-        @JsonSetter(value = "payment_method", nulls = Nulls.SKIP)
-        public _FinalStage paymentMethod(Optional<SetupIntentPaymentMethod> paymentMethod) {
-            this.paymentMethod = paymentMethod;
+        @JsonSetter(value = "user", nulls = Nulls.SKIP)
+        public _FinalStage user(Optional<UserSummary> user) {
+            this.user = user;
             return this;
         }
 
         /**
-         * <p>Custom key-value pairs attached to this setup intent. Null if no metadata was provided.</p>
+         * <p>3D Secure behavior for supported on-session card payments. <code>mandate_challenge</code> requires a 3DS challenge before payment processing; <code>mandate_if_required</code> mandates a challenge only when the payment processor requires it; <code>frictionless_if_required</code> uses the regular frictionless 3DS flow. Payments of $1,000 or more use <code>mandate_if_required</code> unless <code>mandate_challenge</code> is selected. Risk and authentication recovery requirements can override the preference. The setting requested for this setup, or <code>null</code> when unset.</p>
+         * @return Reference to {@code this} so that method calls can be chained together.
+         */
+        @java.lang.Override
+        public _FinalStage threeDsLevel(Nullable<SetupIntentThreeDsLevel> threeDsLevel) {
+            if (threeDsLevel.isNull()) {
+                this.threeDsLevel = null;
+            } else if (threeDsLevel.isEmpty()) {
+                this.threeDsLevel = Optional.empty();
+            } else {
+                this.threeDsLevel = Optional.of(threeDsLevel.get());
+            }
+            return this;
+        }
+
+        /**
+         * <p>3D Secure behavior for supported on-session card payments. <code>mandate_challenge</code> requires a 3DS challenge before payment processing; <code>mandate_if_required</code> mandates a challenge only when the payment processor requires it; <code>frictionless_if_required</code> uses the regular frictionless 3DS flow. Payments of $1,000 or more use <code>mandate_if_required</code> unless <code>mandate_challenge</code> is selected. Risk and authentication recovery requirements can override the preference. The setting requested for this setup, or <code>null</code> when unset.</p>
+         * @return Reference to {@code this} so that method calls can be chained together.
+         */
+        @java.lang.Override
+        public _FinalStage threeDsLevel(SetupIntentThreeDsLevel threeDsLevel) {
+            this.threeDsLevel = Optional.ofNullable(threeDsLevel);
+            return this;
+        }
+
+        /**
+         * <p>3D Secure behavior for supported on-session card payments. <code>mandate_challenge</code> requires a 3DS challenge before payment processing; <code>mandate_if_required</code> mandates a challenge only when the payment processor requires it; <code>frictionless_if_required</code> uses the regular frictionless 3DS flow. Payments of $1,000 or more use <code>mandate_if_required</code> unless <code>mandate_challenge</code> is selected. Risk and authentication recovery requirements can override the preference. The setting requested for this setup, or <code>null</code> when unset.</p>
+         */
+        @java.lang.Override
+        @JsonSetter(value = "three_ds_level", nulls = Nulls.SKIP)
+        public _FinalStage threeDsLevel(Optional<SetupIntentThreeDsLevel> threeDsLevel) {
+            this.threeDsLevel = threeDsLevel;
+            return this;
+        }
+
+        /**
+         * <p>Where the buyer lands after completing an off-site step, or <code>null</code> to leave them where they are.</p>
+         * @return Reference to {@code this} so that method calls can be chained together.
+         */
+        @java.lang.Override
+        public _FinalStage returnUrl(Nullable<String> returnUrl) {
+            if (returnUrl.isNull()) {
+                this.returnUrl = null;
+            } else if (returnUrl.isEmpty()) {
+                this.returnUrl = Optional.empty();
+            } else {
+                this.returnUrl = Optional.of(returnUrl.get());
+            }
+            return this;
+        }
+
+        /**
+         * <p>Where the buyer lands after completing an off-site step, or <code>null</code> to leave them where they are.</p>
+         * @return Reference to {@code this} so that method calls can be chained together.
+         */
+        @java.lang.Override
+        public _FinalStage returnUrl(String returnUrl) {
+            this.returnUrl = Optional.ofNullable(returnUrl);
+            return this;
+        }
+
+        /**
+         * <p>Where the buyer lands after completing an off-site step, or <code>null</code> to leave them where they are.</p>
+         */
+        @java.lang.Override
+        @JsonSetter(value = "return_url", nulls = Nulls.SKIP)
+        public _FinalStage returnUrl(Optional<String> returnUrl) {
+            this.returnUrl = returnUrl;
+            return this;
+        }
+
+        /**
+         * <p>The kind of instrument being saved, for example <code>card</code> or <code>us_bank_account</code>.</p>
+         * @return Reference to {@code this} so that method calls can be chained together.
+         */
+        @java.lang.Override
+        public _FinalStage paymentMethodType(Nullable<PaymentMethodTypes> paymentMethodType) {
+            if (paymentMethodType.isNull()) {
+                this.paymentMethodType = null;
+            } else if (paymentMethodType.isEmpty()) {
+                this.paymentMethodType = Optional.empty();
+            } else {
+                this.paymentMethodType = Optional.of(paymentMethodType.get());
+            }
+            return this;
+        }
+
+        /**
+         * <p>The kind of instrument being saved, for example <code>card</code> or <code>us_bank_account</code>.</p>
+         * @return Reference to {@code this} so that method calls can be chained together.
+         */
+        @java.lang.Override
+        public _FinalStage paymentMethodType(PaymentMethodTypes paymentMethodType) {
+            this.paymentMethodType = Optional.ofNullable(paymentMethodType);
+            return this;
+        }
+
+        /**
+         * <p>The kind of instrument being saved, for example <code>card</code> or <code>us_bank_account</code>.</p>
+         */
+        @java.lang.Override
+        @JsonSetter(value = "payment_method_type", nulls = Nulls.SKIP)
+        public _FinalStage paymentMethodType(Optional<PaymentMethodTypes> paymentMethodType) {
+            this.paymentMethodType = paymentMethodType;
+            return this;
+        }
+
+        /**
+         * <p>The saved payment method, prefixed <code>payt_</code>, ready to charge with Create Payment. Null until the setup has <code>succeeded</code>.</p>
+         * @return Reference to {@code this} so that method calls can be chained together.
+         */
+        @java.lang.Override
+        public _FinalStage paymentMethodId(Nullable<String> paymentMethodId) {
+            if (paymentMethodId.isNull()) {
+                this.paymentMethodId = null;
+            } else if (paymentMethodId.isEmpty()) {
+                this.paymentMethodId = Optional.empty();
+            } else {
+                this.paymentMethodId = Optional.of(paymentMethodId.get());
+            }
+            return this;
+        }
+
+        /**
+         * <p>The saved payment method, prefixed <code>payt_</code>, ready to charge with Create Payment. Null until the setup has <code>succeeded</code>.</p>
+         * @return Reference to {@code this} so that method calls can be chained together.
+         */
+        @java.lang.Override
+        public _FinalStage paymentMethodId(String paymentMethodId) {
+            this.paymentMethodId = Optional.ofNullable(paymentMethodId);
+            return this;
+        }
+
+        /**
+         * <p>The saved payment method, prefixed <code>payt_</code>, ready to charge with Create Payment. Null until the setup has <code>succeeded</code>.</p>
+         */
+        @java.lang.Override
+        @JsonSetter(value = "payment_method_id", nulls = Nulls.SKIP)
+        public _FinalStage paymentMethodId(Optional<String> paymentMethodId) {
+            this.paymentMethodId = paymentMethodId;
+            return this;
+        }
+
+        /**
+         * <p>The method behind this setup shaped for display: a buyer-facing name, the standard icon set, and the card's brand, last four, issuer identification number, expiry, and network transaction id when it was a card. Null until a method was collected.</p>
+         * @return Reference to {@code this} so that method calls can be chained together.
+         */
+        @java.lang.Override
+        public _FinalStage paymentInstrument(Nullable<PaymentInstrument> paymentInstrument) {
+            if (paymentInstrument.isNull()) {
+                this.paymentInstrument = null;
+            } else if (paymentInstrument.isEmpty()) {
+                this.paymentInstrument = Optional.empty();
+            } else {
+                this.paymentInstrument = Optional.of(paymentInstrument.get());
+            }
+            return this;
+        }
+
+        /**
+         * <p>The method behind this setup shaped for display: a buyer-facing name, the standard icon set, and the card's brand, last four, issuer identification number, expiry, and network transaction id when it was a card. Null until a method was collected.</p>
+         * @return Reference to {@code this} so that method calls can be chained together.
+         */
+        @java.lang.Override
+        public _FinalStage paymentInstrument(PaymentInstrument paymentInstrument) {
+            this.paymentInstrument = Optional.ofNullable(paymentInstrument);
+            return this;
+        }
+
+        /**
+         * <p>The method behind this setup shaped for display: a buyer-facing name, the standard icon set, and the card's brand, last four, issuer identification number, expiry, and network transaction id when it was a card. Null until a method was collected.</p>
+         */
+        @java.lang.Override
+        @JsonSetter(value = "payment_instrument", nulls = Nulls.SKIP)
+        public _FinalStage paymentInstrument(Optional<PaymentInstrument> paymentInstrument) {
+            this.paymentInstrument = paymentInstrument;
+            return this;
+        }
+
+        /**
+         * <p>Your own key-value data attached when the setup intent was created.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
@@ -490,7 +909,7 @@ public final class SetupIntent {
         }
 
         /**
-         * <p>Custom key-value pairs attached to this setup intent. Null if no metadata was provided.</p>
+         * <p>Your own key-value data attached when the setup intent was created.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
@@ -500,7 +919,7 @@ public final class SetupIntent {
         }
 
         /**
-         * <p>Custom key-value pairs attached to this setup intent. Null if no metadata was provided.</p>
+         * <p>Your own key-value data attached when the setup intent was created.</p>
          */
         @java.lang.Override
         @JsonSetter(value = "metadata", nulls = Nulls.SKIP)
@@ -510,163 +929,230 @@ public final class SetupIntent {
         }
 
         /**
-         * <p>The company member associated with this setup intent. Null if the user is not a member.</p>
+         * <p>The buyer's member record on the account, prefixed <code>mber_</code>. Null without the member:basic:read permission, unless the caller is the buyer.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
-        public _FinalStage member(Nullable<SetupIntentMember> member) {
-            if (member.isNull()) {
-                this.member = null;
-            } else if (member.isEmpty()) {
-                this.member = Optional.empty();
+        public _FinalStage memberId(Nullable<String> memberId) {
+            if (memberId.isNull()) {
+                this.memberId = null;
+            } else if (memberId.isEmpty()) {
+                this.memberId = Optional.empty();
             } else {
-                this.member = Optional.of(member.get());
+                this.memberId = Optional.of(memberId.get());
             }
             return this;
         }
 
         /**
-         * <p>The company member associated with this setup intent. Null if the user is not a member.</p>
+         * <p>The buyer's member record on the account, prefixed <code>mber_</code>. Null without the member:basic:read permission, unless the caller is the buyer.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
-        public _FinalStage member(SetupIntentMember member) {
-            this.member = Optional.ofNullable(member);
+        public _FinalStage memberId(String memberId) {
+            this.memberId = Optional.ofNullable(memberId);
             return this;
         }
 
         /**
-         * <p>The company member associated with this setup intent. Null if the user is not a member.</p>
+         * <p>The buyer's member record on the account, prefixed <code>mber_</code>. Null without the member:basic:read permission, unless the caller is the buyer.</p>
          */
         @java.lang.Override
-        @JsonSetter(value = "member", nulls = Nulls.SKIP)
-        public _FinalStage member(Optional<SetupIntentMember> member) {
-            this.member = member;
+        @JsonSetter(value = "member_id", nulls = Nulls.SKIP)
+        public _FinalStage memberId(Optional<String> memberId) {
+            this.memberId = memberId;
             return this;
         }
 
         /**
-         * <p>A human-readable error message explaining why the setup intent failed. Null if no error occurred.</p>
+         * <p>Why the setup ended where it did, or <code>null</code> when nothing has failed. Present on <code>canceled</code> — a buyer who abandoned carries no code, one refused by the provider does. Dropped once the setup succeeds.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
-        public _FinalStage errorMessage(Nullable<String> errorMessage) {
-            if (errorMessage.isNull()) {
-                this.errorMessage = null;
-            } else if (errorMessage.isEmpty()) {
-                this.errorMessage = Optional.empty();
+        public _FinalStage lastSetupError(Nullable<SetupLastSetupError> lastSetupError) {
+            if (lastSetupError.isNull()) {
+                this.lastSetupError = null;
+            } else if (lastSetupError.isEmpty()) {
+                this.lastSetupError = Optional.empty();
             } else {
-                this.errorMessage = Optional.of(errorMessage.get());
+                this.lastSetupError = Optional.of(lastSetupError.get());
             }
             return this;
         }
 
         /**
-         * <p>A human-readable error message explaining why the setup intent failed. Null if no error occurred.</p>
+         * <p>Why the setup ended where it did, or <code>null</code> when nothing has failed. Present on <code>canceled</code> — a buyer who abandoned carries no code, one refused by the provider does. Dropped once the setup succeeds.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
-        public _FinalStage errorMessage(String errorMessage) {
-            this.errorMessage = Optional.ofNullable(errorMessage);
+        public _FinalStage lastSetupError(SetupLastSetupError lastSetupError) {
+            this.lastSetupError = Optional.ofNullable(lastSetupError);
             return this;
         }
 
         /**
-         * <p>A human-readable error message explaining why the setup intent failed. Null if no error occurred.</p>
+         * <p>Why the setup ended where it did, or <code>null</code> when nothing has failed. Present on <code>canceled</code> — a buyer who abandoned carries no code, one refused by the provider does. Dropped once the setup succeeds.</p>
          */
         @java.lang.Override
-        @JsonSetter(value = "error_message", nulls = Nulls.SKIP)
-        public _FinalStage errorMessage(Optional<String> errorMessage) {
-            this.errorMessage = errorMessage;
+        @JsonSetter(value = "last_setup_error", nulls = Nulls.SKIP)
+        public _FinalStage lastSetupError(Optional<SetupLastSetupError> lastSetupError) {
+            this.lastSetupError = lastSetupError;
             return this;
         }
 
         /**
-         * <p>The company that initiated this setup intent. Null if the company has been deleted.</p>
+         * <p>The credential a buyer's surface presents to poll this setup and set its return URL — hand it to the elements' <code>handleNextAction</code>. Only on setups created through this API, and always null in list responses — retrieve the setup intent for it.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
-        public _FinalStage company(Nullable<SetupIntentCompany> company) {
-            if (company.isNull()) {
-                this.company = null;
-            } else if (company.isEmpty()) {
-                this.company = Optional.empty();
+        public _FinalStage clientSecret(Nullable<String> clientSecret) {
+            if (clientSecret.isNull()) {
+                this.clientSecret = null;
+            } else if (clientSecret.isEmpty()) {
+                this.clientSecret = Optional.empty();
             } else {
-                this.company = Optional.of(company.get());
+                this.clientSecret = Optional.of(clientSecret.get());
             }
             return this;
         }
 
         /**
-         * <p>The company that initiated this setup intent. Null if the company has been deleted.</p>
+         * <p>The credential a buyer's surface presents to poll this setup and set its return URL — hand it to the elements' <code>handleNextAction</code>. Only on setups created through this API, and always null in list responses — retrieve the setup intent for it.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
-        public _FinalStage company(SetupIntentCompany company) {
-            this.company = Optional.ofNullable(company);
+        public _FinalStage clientSecret(String clientSecret) {
+            this.clientSecret = Optional.ofNullable(clientSecret);
             return this;
         }
 
         /**
-         * <p>The company that initiated this setup intent. Null if the company has been deleted.</p>
+         * <p>The credential a buyer's surface presents to poll this setup and set its return URL — hand it to the elements' <code>handleNextAction</code>. Only on setups created through this API, and always null in list responses — retrieve the setup intent for it.</p>
          */
         @java.lang.Override
-        @JsonSetter(value = "company", nulls = Nulls.SKIP)
-        public _FinalStage company(Optional<SetupIntentCompany> company) {
-            this.company = company;
+        @JsonSetter(value = "client_secret", nulls = Nulls.SKIP)
+        public _FinalStage clientSecret(Optional<String> clientSecret) {
+            this.clientSecret = clientSecret;
             return this;
         }
 
         /**
-         * <p>The checkout session configuration associated with this setup intent. Null if no checkout session was used.</p>
+         * <p>The checkout configuration this setup was created through, prefixed <code>ch_</code>. Null for a setup created through this API rather than a hosted checkout.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
-        public _FinalStage checkoutConfiguration(Nullable<SetupIntentCheckoutConfiguration> checkoutConfiguration) {
-            if (checkoutConfiguration.isNull()) {
-                this.checkoutConfiguration = null;
-            } else if (checkoutConfiguration.isEmpty()) {
-                this.checkoutConfiguration = Optional.empty();
+        public _FinalStage checkoutConfigurationId(Nullable<String> checkoutConfigurationId) {
+            if (checkoutConfigurationId.isNull()) {
+                this.checkoutConfigurationId = null;
+            } else if (checkoutConfigurationId.isEmpty()) {
+                this.checkoutConfigurationId = Optional.empty();
             } else {
-                this.checkoutConfiguration = Optional.of(checkoutConfiguration.get());
+                this.checkoutConfigurationId = Optional.of(checkoutConfigurationId.get());
             }
             return this;
         }
 
         /**
-         * <p>The checkout session configuration associated with this setup intent. Null if no checkout session was used.</p>
+         * <p>The checkout configuration this setup was created through, prefixed <code>ch_</code>. Null for a setup created through this API rather than a hosted checkout.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
-        public _FinalStage checkoutConfiguration(SetupIntentCheckoutConfiguration checkoutConfiguration) {
-            this.checkoutConfiguration = Optional.ofNullable(checkoutConfiguration);
+        public _FinalStage checkoutConfigurationId(String checkoutConfigurationId) {
+            this.checkoutConfigurationId = Optional.ofNullable(checkoutConfigurationId);
             return this;
         }
 
         /**
-         * <p>The checkout session configuration associated with this setup intent. Null if no checkout session was used.</p>
+         * <p>The checkout configuration this setup was created through, prefixed <code>ch_</code>. Null for a setup created through this API rather than a hosted checkout.</p>
          */
         @java.lang.Override
-        @JsonSetter(value = "checkout_configuration", nulls = Nulls.SKIP)
-        public _FinalStage checkoutConfiguration(Optional<SetupIntentCheckoutConfiguration> checkoutConfiguration) {
-            this.checkoutConfiguration = checkoutConfiguration;
+        @JsonSetter(value = "checkout_configuration_id", nulls = Nulls.SKIP)
+        public _FinalStage checkoutConfigurationId(Optional<String> checkoutConfigurationId) {
+            this.checkoutConfigurationId = checkoutConfigurationId;
+            return this;
+        }
+
+        /**
+         * <p>The account the payment method is saved for, prefixed <code>biz_</code>.</p>
+         * @return Reference to {@code this} so that method calls can be chained together.
+         */
+        @java.lang.Override
+        public _FinalStage accountId(Nullable<String> accountId) {
+            if (accountId.isNull()) {
+                this.accountId = null;
+            } else if (accountId.isEmpty()) {
+                this.accountId = Optional.empty();
+            } else {
+                this.accountId = Optional.of(accountId.get());
+            }
+            return this;
+        }
+
+        /**
+         * <p>The account the payment method is saved for, prefixed <code>biz_</code>.</p>
+         * @return Reference to {@code this} so that method calls can be chained together.
+         */
+        @java.lang.Override
+        public _FinalStage accountId(String accountId) {
+            this.accountId = Optional.ofNullable(accountId);
+            return this;
+        }
+
+        /**
+         * <p>The account the payment method is saved for, prefixed <code>biz_</code>.</p>
+         */
+        @java.lang.Override
+        @JsonSetter(value = "account_id", nulls = Nulls.SKIP)
+        public _FinalStage accountId(Optional<String> accountId) {
+            this.accountId = accountId;
             return this;
         }
 
         @java.lang.Override
         public SetupIntent build() {
             return new SetupIntent(
-                    checkoutConfiguration,
-                    company,
+                    accountId,
+                    checkoutConfigurationId,
+                    clientSecret,
                     createdAt,
-                    errorMessage,
                     id,
-                    member,
+                    lastSetupError,
+                    memberId,
                     metadata,
-                    paymentMethod,
+                    paymentInstrument,
+                    paymentMethodId,
+                    paymentMethodType,
+                    returnUrl,
                     status,
+                    threeDsLevel,
                     threeDsVerified,
+                    updatedAt,
+                    user,
                     additionalProperties);
+        }
+
+        @JsonAnySetter
+        private void putAdditionalPropertyFromJson(String key, Object value) {
+            if (key.equalsIgnoreCase("account_id")
+                    || key.equalsIgnoreCase("checkout_configuration_id")
+                    || key.equalsIgnoreCase("client_secret")
+                    || key.equalsIgnoreCase("created_at")
+                    || key.equalsIgnoreCase("id")
+                    || key.equalsIgnoreCase("last_setup_error")
+                    || key.equalsIgnoreCase("member_id")
+                    || key.equalsIgnoreCase("metadata")
+                    || key.equalsIgnoreCase("payment_instrument")
+                    || key.equalsIgnoreCase("payment_method_id")
+                    || key.equalsIgnoreCase("payment_method_type")
+                    || key.equalsIgnoreCase("return_url")
+                    || key.equalsIgnoreCase("status")
+                    || key.equalsIgnoreCase("three_ds_level")
+                    || key.equalsIgnoreCase("three_ds_verified")
+                    || key.equalsIgnoreCase("updated_at")
+                    || key.equalsIgnoreCase("user")) {
+                return;
+            }
+            this.additionalProperties.put(key, value);
         }
 
         @java.lang.Override

@@ -71,7 +71,7 @@ public final class ListAudiencesRequest {
     }
 
     /**
-     * @return Filter by audience type: <code>custom</code> (uploaded lists) or <code>lookalike</code>.
+     * @return Filter by custom or lookalike audiences.
      */
     @JsonProperty("audience_type")
     public Optional<ListAudiencesRequestAudienceType> getAudienceType() {
@@ -79,7 +79,7 @@ public final class ListAudiencesRequest {
     }
 
     /**
-     * @return Filter by member source: <code>csv_upload</code> (uploaded lists) or <code>people_filter</code> (automatic audiences built from saved People filters).
+     * @return Filter by uploaded customer lists, Whop People filters, or social engagement.
      */
     @JsonProperty("source_type")
     public Optional<ListAudiencesRequestSourceType> getSourceType() {
@@ -87,7 +87,7 @@ public final class ListAudiencesRequest {
     }
 
     /**
-     * @return Number of audiences to return. Defaults to 20; maximum 100.
+     * @return Number of results to return from the start of the range.
      */
     @JsonProperty("first")
     public Optional<Integer> getFirst() {
@@ -95,7 +95,7 @@ public final class ListAudiencesRequest {
     }
 
     /**
-     * @return Cursor for the next page of audiences.
+     * @return Return results after this cursor. Use <code>page_info.end_cursor</code> from the previous response to fetch the next page.
      */
     @JsonProperty("after")
     public Optional<String> getAfter() {
@@ -161,28 +161,28 @@ public final class ListAudiencesRequest {
         _FinalStage audienceId(String audienceId);
 
         /**
-         * <p>Filter by audience type: <code>custom</code> (uploaded lists) or <code>lookalike</code>.</p>
+         * <p>Filter by custom or lookalike audiences.</p>
          */
         _FinalStage audienceType(Optional<ListAudiencesRequestAudienceType> audienceType);
 
         _FinalStage audienceType(ListAudiencesRequestAudienceType audienceType);
 
         /**
-         * <p>Filter by member source: <code>csv_upload</code> (uploaded lists) or <code>people_filter</code> (automatic audiences built from saved People filters).</p>
+         * <p>Filter by uploaded customer lists, Whop People filters, or social engagement.</p>
          */
         _FinalStage sourceType(Optional<ListAudiencesRequestSourceType> sourceType);
 
         _FinalStage sourceType(ListAudiencesRequestSourceType sourceType);
 
         /**
-         * <p>Number of audiences to return. Defaults to 20; maximum 100.</p>
+         * <p>Number of results to return from the start of the range.</p>
          */
         _FinalStage first(Optional<Integer> first);
 
         _FinalStage first(Integer first);
 
         /**
-         * <p>Cursor for the next page of audiences.</p>
+         * <p>Return results after this cursor. Use <code>page_info.end_cursor</code> from the previous response to fetch the next page.</p>
          */
         _FinalStage after(Optional<String> after);
 
@@ -203,7 +203,6 @@ public final class ListAudiencesRequest {
 
         private Optional<String> audienceId = Optional.empty();
 
-        @JsonAnySetter
         private Map<String, Object> additionalProperties = new HashMap<>();
 
         private Builder() {}
@@ -221,7 +220,6 @@ public final class ListAudiencesRequest {
 
         /**
          * <p>Account ID, prefixed <code>biz_</code>.</p>
-         * <p>Account ID, prefixed <code>biz_</code>.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
@@ -232,7 +230,7 @@ public final class ListAudiencesRequest {
         }
 
         /**
-         * <p>Cursor for the next page of audiences.</p>
+         * <p>Return results after this cursor. Use <code>page_info.end_cursor</code> from the previous response to fetch the next page.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
@@ -242,7 +240,7 @@ public final class ListAudiencesRequest {
         }
 
         /**
-         * <p>Cursor for the next page of audiences.</p>
+         * <p>Return results after this cursor. Use <code>page_info.end_cursor</code> from the previous response to fetch the next page.</p>
          */
         @java.lang.Override
         @JsonSetter(value = "after", nulls = Nulls.SKIP)
@@ -252,7 +250,7 @@ public final class ListAudiencesRequest {
         }
 
         /**
-         * <p>Number of audiences to return. Defaults to 20; maximum 100.</p>
+         * <p>Number of results to return from the start of the range.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
@@ -262,7 +260,7 @@ public final class ListAudiencesRequest {
         }
 
         /**
-         * <p>Number of audiences to return. Defaults to 20; maximum 100.</p>
+         * <p>Number of results to return from the start of the range.</p>
          */
         @java.lang.Override
         @JsonSetter(value = "first", nulls = Nulls.SKIP)
@@ -272,7 +270,7 @@ public final class ListAudiencesRequest {
         }
 
         /**
-         * <p>Filter by member source: <code>csv_upload</code> (uploaded lists) or <code>people_filter</code> (automatic audiences built from saved People filters).</p>
+         * <p>Filter by uploaded customer lists, Whop People filters, or social engagement.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
@@ -282,7 +280,7 @@ public final class ListAudiencesRequest {
         }
 
         /**
-         * <p>Filter by member source: <code>csv_upload</code> (uploaded lists) or <code>people_filter</code> (automatic audiences built from saved People filters).</p>
+         * <p>Filter by uploaded customer lists, Whop People filters, or social engagement.</p>
          */
         @java.lang.Override
         @JsonSetter(value = "source_type", nulls = Nulls.SKIP)
@@ -292,7 +290,7 @@ public final class ListAudiencesRequest {
         }
 
         /**
-         * <p>Filter by audience type: <code>custom</code> (uploaded lists) or <code>lookalike</code>.</p>
+         * <p>Filter by custom or lookalike audiences.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
@@ -302,7 +300,7 @@ public final class ListAudiencesRequest {
         }
 
         /**
-         * <p>Filter by audience type: <code>custom</code> (uploaded lists) or <code>lookalike</code>.</p>
+         * <p>Filter by custom or lookalike audiences.</p>
          */
         @java.lang.Override
         @JsonSetter(value = "audience_type", nulls = Nulls.SKIP)
@@ -335,6 +333,19 @@ public final class ListAudiencesRequest {
         public ListAudiencesRequest build() {
             return new ListAudiencesRequest(
                     accountId, audienceId, audienceType, sourceType, first, after, additionalProperties);
+        }
+
+        @JsonAnySetter
+        private void putAdditionalPropertyFromJson(String key, Object value) {
+            if (key.equalsIgnoreCase("account_id")
+                    || key.equalsIgnoreCase("audience_id")
+                    || key.equalsIgnoreCase("audience_type")
+                    || key.equalsIgnoreCase("source_type")
+                    || key.equalsIgnoreCase("first")
+                    || key.equalsIgnoreCase("after")) {
+                return;
+            }
+            this.additionalProperties.put(key, value);
         }
 
         @java.lang.Override

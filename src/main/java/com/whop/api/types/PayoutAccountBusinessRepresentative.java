@@ -157,7 +157,6 @@ public final class PayoutAccountBusinessRepresentative {
 
         private Optional<String> middleName = Optional.empty();
 
-        @JsonAnySetter
         private Map<String, Object> additionalProperties = new HashMap<>();
 
         private Builder() {}
@@ -273,6 +272,17 @@ public final class PayoutAccountBusinessRepresentative {
         public PayoutAccountBusinessRepresentative build() {
             return new PayoutAccountBusinessRepresentative(
                     dateOfBirth, firstName, lastName, middleName, additionalProperties);
+        }
+
+        @JsonAnySetter
+        private void putAdditionalPropertyFromJson(String key, Object value) {
+            if (key.equalsIgnoreCase("date_of_birth")
+                    || key.equalsIgnoreCase("first_name")
+                    || key.equalsIgnoreCase("last_name")
+                    || key.equalsIgnoreCase("middle_name")) {
+                return;
+            }
+            this.additionalProperties.put(key, value);
         }
 
         public Builder additionalProperty(String key, Object value) {

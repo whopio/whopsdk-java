@@ -70,7 +70,6 @@ public final class DeleteReactionsRequest {
     public static final class Builder {
         private Optional<String> emoji = Optional.empty();
 
-        @JsonAnySetter
         private Map<String, Object> additionalProperties = new HashMap<>();
 
         private Builder() {}
@@ -96,6 +95,14 @@ public final class DeleteReactionsRequest {
 
         public DeleteReactionsRequest build() {
             return new DeleteReactionsRequest(emoji, additionalProperties);
+        }
+
+        @JsonAnySetter
+        private void putAdditionalPropertyFromJson(String key, Object value) {
+            if (key.equalsIgnoreCase("emoji")) {
+                return;
+            }
+            this.additionalProperties.put(key, value);
         }
 
         public Builder additionalProperty(String key, Object value) {

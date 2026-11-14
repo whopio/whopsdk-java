@@ -86,7 +86,6 @@ public final class UpdateShipmentsRequest {
     public static final class Builder implements TrackingNumberStage, _FinalStage {
         private String trackingNumber;
 
-        @JsonAnySetter
         private Map<String, Object> additionalProperties = new HashMap<>();
 
         private Builder() {}
@@ -98,7 +97,6 @@ public final class UpdateShipmentsRequest {
         }
 
         /**
-         * <p>The new carrier-assigned tracking number.</p>
          * <p>The new carrier-assigned tracking number.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
@@ -112,6 +110,14 @@ public final class UpdateShipmentsRequest {
         @java.lang.Override
         public UpdateShipmentsRequest build() {
             return new UpdateShipmentsRequest(trackingNumber, additionalProperties);
+        }
+
+        @JsonAnySetter
+        private void putAdditionalPropertyFromJson(String key, Object value) {
+            if (key.equalsIgnoreCase("tracking_number")) {
+                return;
+            }
+            this.additionalProperties.put(key, value);
         }
 
         @java.lang.Override

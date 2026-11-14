@@ -14,10 +14,9 @@ import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.whop.api.core.ObjectMappers;
 import com.whop.api.resources.ads.types.UpdateAdsRequestCallToAction;
 import com.whop.api.resources.ads.types.UpdateAdsRequestCreativesItem;
-import com.whop.api.resources.ads.types.UpdateAdsRequestLeadForm;
-import com.whop.api.resources.ads.types.UpdateAdsRequestMessagingConfig;
-import com.whop.api.resources.ads.types.UpdateAdsRequestPostSource;
-import com.whop.api.resources.ads.types.UpdateAdsRequestSocialAccountsItem;
+import com.whop.api.resources.ads.types.UpdateAdsRequestDescriptionsItem;
+import com.whop.api.resources.ads.types.UpdateAdsRequestHeadlinesItem;
+import com.whop.api.resources.ads.types.UpdateAdsRequestPrimaryTextsItem;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -31,25 +30,11 @@ public final class UpdateAdsRequest {
 
     private final Optional<List<UpdateAdsRequestCreativesItem>> creatives;
 
-    private final Optional<List<String>> descriptions;
+    private final Optional<List<UpdateAdsRequestDescriptionsItem>> descriptions;
 
-    private final Optional<List<String>> headlines;
+    private final Optional<List<UpdateAdsRequestHeadlinesItem>> headlines;
 
-    private final Optional<UpdateAdsRequestLeadForm> leadForm;
-
-    private final Optional<String> leadFormId;
-
-    private final Optional<UpdateAdsRequestMessagingConfig> messagingConfig;
-
-    private final Optional<Boolean> multiAdvertiserAds;
-
-    private final Optional<String> postId;
-
-    private final Optional<UpdateAdsRequestPostSource> postSource;
-
-    private final Optional<List<String>> primaryTexts;
-
-    private final Optional<List<UpdateAdsRequestSocialAccountsItem>> socialAccounts;
+    private final Optional<List<UpdateAdsRequestPrimaryTextsItem>> primaryTexts;
 
     private final Optional<String> title;
 
@@ -62,16 +47,9 @@ public final class UpdateAdsRequest {
     private UpdateAdsRequest(
             Optional<UpdateAdsRequestCallToAction> callToAction,
             Optional<List<UpdateAdsRequestCreativesItem>> creatives,
-            Optional<List<String>> descriptions,
-            Optional<List<String>> headlines,
-            Optional<UpdateAdsRequestLeadForm> leadForm,
-            Optional<String> leadFormId,
-            Optional<UpdateAdsRequestMessagingConfig> messagingConfig,
-            Optional<Boolean> multiAdvertiserAds,
-            Optional<String> postId,
-            Optional<UpdateAdsRequestPostSource> postSource,
-            Optional<List<String>> primaryTexts,
-            Optional<List<UpdateAdsRequestSocialAccountsItem>> socialAccounts,
+            Optional<List<UpdateAdsRequestDescriptionsItem>> descriptions,
+            Optional<List<UpdateAdsRequestHeadlinesItem>> headlines,
+            Optional<List<UpdateAdsRequestPrimaryTextsItem>> primaryTexts,
             Optional<String> title,
             Optional<String> url,
             Optional<Map<String, Object>> urlParameters,
@@ -80,14 +58,7 @@ public final class UpdateAdsRequest {
         this.creatives = creatives;
         this.descriptions = descriptions;
         this.headlines = headlines;
-        this.leadForm = leadForm;
-        this.leadFormId = leadFormId;
-        this.messagingConfig = messagingConfig;
-        this.multiAdvertiserAds = multiAdvertiserAds;
-        this.postId = postId;
-        this.postSource = postSource;
         this.primaryTexts = primaryTexts;
-        this.socialAccounts = socialAccounts;
         this.title = title;
         this.url = url;
         this.urlParameters = urlParameters;
@@ -103,7 +74,7 @@ public final class UpdateAdsRequest {
     }
 
     /**
-     * @return The ad's creative assets. Each entry is an uploaded file id with an optional format; omit format for the original asset. Replaces a live ad's creative on the platform. Two or more entries with no format replace it with a carousel (2-10 attachments), in order, sharing the ad's copy.
+     * @return The ad's creative assets. Each entry is an uploaded file id with an optional format; omit format for the original asset. Replaces a live ad's creative. Entries with no format replace it with a carousel's ordered cards.
      */
     @JsonProperty("creatives")
     public Optional<List<UpdateAdsRequestCreativesItem>> getCreatives() {
@@ -111,83 +82,27 @@ public final class UpdateAdsRequest {
     }
 
     /**
-     * @return The description variants shown on the ad.
+     * @return The description shown on the ad.
      */
     @JsonProperty("descriptions")
-    public Optional<List<String>> getDescriptions() {
+    public Optional<List<UpdateAdsRequestDescriptionsItem>> getDescriptions() {
         return descriptions;
     }
 
     /**
-     * @return The headline variants shown on the ad.
+     * @return The headline shown on the ad.
      */
     @JsonProperty("headlines")
-    public Optional<List<String>> getHeadlines() {
+    public Optional<List<UpdateAdsRequestHeadlinesItem>> getHeadlines() {
         return headlines;
     }
 
     /**
-     * @return Instant lead form for the ad. Only allowed when the ad group's conversion_location is an instant-form destination (instant_forms, instant_forms_and_messenger, website_and_instant_forms). Mutually exclusive with lead_form_id.
-     */
-    @JsonProperty("lead_form")
-    public Optional<UpdateAdsRequestLeadForm> getLeadForm() {
-        return leadForm;
-    }
-
-    /**
-     * @return Use an existing instant form instead of creating one — the form's platform ID, from a form already on the ad's Facebook page. Only allowed when the ad group's conversion_location is an instant-form destination. Mutually exclusive with lead_form. Replaces a stored lead_form.
-     */
-    @JsonProperty("lead_form_id")
-    public Optional<String> getLeadFormId() {
-        return leadFormId;
-    }
-
-    /**
-     * @return Click-to-message welcome copy: the greeting (message) and the ice-breaker prompt (keyword).
-     */
-    @JsonProperty("messaging_config")
-    public Optional<UpdateAdsRequestMessagingConfig> getMessagingConfig() {
-        return messagingConfig;
-    }
-
-    /**
-     * @return Whether the ad can appear alongside other advertisers' ads in the same unit. Defaults to true.
-     */
-    @JsonProperty("multi_advertiser_ads")
-    public Optional<Boolean> getMultiAdvertiserAds() {
-        return multiAdvertiserAds;
-    }
-
-    /**
-     * @return Promote an existing post instead of uploading creatives — a Facebook post or Instagram media id. Mutually exclusive with creatives. Pair with post_source.
-     */
-    @JsonProperty("post_id")
-    public Optional<String> getPostId() {
-        return postId;
-    }
-
-    /**
-     * @return Identifies the network that owns <code>post_id</code>. The source is inferred from the ID shape when omitted.
-     */
-    @JsonProperty("post_source")
-    public Optional<UpdateAdsRequestPostSource> getPostSource() {
-        return postSource;
-    }
-
-    /**
-     * @return The primary text variants shown in the ad body.
+     * @return The primary text shown in the ad body. Several entries make text variations.
      */
     @JsonProperty("primary_texts")
-    public Optional<List<String>> getPrimaryTexts() {
+    public Optional<List<UpdateAdsRequestPrimaryTextsItem>> getPrimaryTexts() {
         return primaryTexts;
-    }
-
-    /**
-     * @return The social accounts the ad runs under — a connected Facebook page and, optionally, an Instagram profile.
-     */
-    @JsonProperty("social_accounts")
-    public Optional<List<UpdateAdsRequestSocialAccountsItem>> getSocialAccounts() {
-        return socialAccounts;
     }
 
     /**
@@ -207,7 +122,7 @@ public final class UpdateAdsRequest {
     }
 
     /**
-     * @return Query parameters to append to the destination URL, keyed by parameter name. Merged with any query string on <code>url</code>. Whop adds its own click-attribution parameters; those are reserved and rejected if you set them (utm_meta_ad_id, utm_meta_adset_id, utm_meta_campaign_id, utm_source, utm_placement, utm_medium, utm_content, utm_adset, utm_whop, wacid, wasid, waid, tw_source, tw_adid).
+     * @return Query parameters to append to the destination URL, keyed by parameter name. Merged with any query string on <code>url</code>. Whop adds its own click-attribution parameters; those are reserved, and setting one returns an error that names it.
      */
     @JsonProperty("url_parameters")
     public Optional<Map<String, Object>> getUrlParameters() {
@@ -230,14 +145,7 @@ public final class UpdateAdsRequest {
                 && creatives.equals(other.creatives)
                 && descriptions.equals(other.descriptions)
                 && headlines.equals(other.headlines)
-                && leadForm.equals(other.leadForm)
-                && leadFormId.equals(other.leadFormId)
-                && messagingConfig.equals(other.messagingConfig)
-                && multiAdvertiserAds.equals(other.multiAdvertiserAds)
-                && postId.equals(other.postId)
-                && postSource.equals(other.postSource)
                 && primaryTexts.equals(other.primaryTexts)
-                && socialAccounts.equals(other.socialAccounts)
                 && title.equals(other.title)
                 && url.equals(other.url)
                 && urlParameters.equals(other.urlParameters);
@@ -250,14 +158,7 @@ public final class UpdateAdsRequest {
                 this.creatives,
                 this.descriptions,
                 this.headlines,
-                this.leadForm,
-                this.leadFormId,
-                this.messagingConfig,
-                this.multiAdvertiserAds,
-                this.postId,
-                this.postSource,
                 this.primaryTexts,
-                this.socialAccounts,
                 this.title,
                 this.url,
                 this.urlParameters);
@@ -278,25 +179,11 @@ public final class UpdateAdsRequest {
 
         private Optional<List<UpdateAdsRequestCreativesItem>> creatives = Optional.empty();
 
-        private Optional<List<String>> descriptions = Optional.empty();
+        private Optional<List<UpdateAdsRequestDescriptionsItem>> descriptions = Optional.empty();
 
-        private Optional<List<String>> headlines = Optional.empty();
+        private Optional<List<UpdateAdsRequestHeadlinesItem>> headlines = Optional.empty();
 
-        private Optional<UpdateAdsRequestLeadForm> leadForm = Optional.empty();
-
-        private Optional<String> leadFormId = Optional.empty();
-
-        private Optional<UpdateAdsRequestMessagingConfig> messagingConfig = Optional.empty();
-
-        private Optional<Boolean> multiAdvertiserAds = Optional.empty();
-
-        private Optional<String> postId = Optional.empty();
-
-        private Optional<UpdateAdsRequestPostSource> postSource = Optional.empty();
-
-        private Optional<List<String>> primaryTexts = Optional.empty();
-
-        private Optional<List<UpdateAdsRequestSocialAccountsItem>> socialAccounts = Optional.empty();
+        private Optional<List<UpdateAdsRequestPrimaryTextsItem>> primaryTexts = Optional.empty();
 
         private Optional<String> title = Optional.empty();
 
@@ -304,7 +191,6 @@ public final class UpdateAdsRequest {
 
         private Optional<Map<String, Object>> urlParameters = Optional.empty();
 
-        @JsonAnySetter
         private Map<String, Object> additionalProperties = new HashMap<>();
 
         private Builder() {}
@@ -314,14 +200,7 @@ public final class UpdateAdsRequest {
             creatives(other.getCreatives());
             descriptions(other.getDescriptions());
             headlines(other.getHeadlines());
-            leadForm(other.getLeadForm());
-            leadFormId(other.getLeadFormId());
-            messagingConfig(other.getMessagingConfig());
-            multiAdvertiserAds(other.getMultiAdvertiserAds());
-            postId(other.getPostId());
-            postSource(other.getPostSource());
             primaryTexts(other.getPrimaryTexts());
-            socialAccounts(other.getSocialAccounts());
             title(other.getTitle());
             url(other.getUrl());
             urlParameters(other.getUrlParameters());
@@ -343,7 +222,7 @@ public final class UpdateAdsRequest {
         }
 
         /**
-         * <p>The ad's creative assets. Each entry is an uploaded file id with an optional format; omit format for the original asset. Replaces a live ad's creative on the platform. Two or more entries with no format replace it with a carousel (2-10 attachments), in order, sharing the ad's copy.</p>
+         * <p>The ad's creative assets. Each entry is an uploaded file id with an optional format; omit format for the original asset. Replaces a live ad's creative. Entries with no format replace it with a carousel's ordered cards.</p>
          */
         @JsonSetter(value = "creatives", nulls = Nulls.SKIP)
         public Builder creatives(Optional<List<UpdateAdsRequestCreativesItem>> creatives) {
@@ -357,142 +236,44 @@ public final class UpdateAdsRequest {
         }
 
         /**
-         * <p>The description variants shown on the ad.</p>
+         * <p>The description shown on the ad.</p>
          */
         @JsonSetter(value = "descriptions", nulls = Nulls.SKIP)
-        public Builder descriptions(Optional<List<String>> descriptions) {
+        public Builder descriptions(Optional<List<UpdateAdsRequestDescriptionsItem>> descriptions) {
             this.descriptions = descriptions;
             return this;
         }
 
-        public Builder descriptions(List<String> descriptions) {
+        public Builder descriptions(List<UpdateAdsRequestDescriptionsItem> descriptions) {
             this.descriptions = Optional.ofNullable(descriptions);
             return this;
         }
 
         /**
-         * <p>The headline variants shown on the ad.</p>
+         * <p>The headline shown on the ad.</p>
          */
         @JsonSetter(value = "headlines", nulls = Nulls.SKIP)
-        public Builder headlines(Optional<List<String>> headlines) {
+        public Builder headlines(Optional<List<UpdateAdsRequestHeadlinesItem>> headlines) {
             this.headlines = headlines;
             return this;
         }
 
-        public Builder headlines(List<String> headlines) {
+        public Builder headlines(List<UpdateAdsRequestHeadlinesItem> headlines) {
             this.headlines = Optional.ofNullable(headlines);
             return this;
         }
 
         /**
-         * <p>Instant lead form for the ad. Only allowed when the ad group's conversion_location is an instant-form destination (instant_forms, instant_forms_and_messenger, website_and_instant_forms). Mutually exclusive with lead_form_id.</p>
-         */
-        @JsonSetter(value = "lead_form", nulls = Nulls.SKIP)
-        public Builder leadForm(Optional<UpdateAdsRequestLeadForm> leadForm) {
-            this.leadForm = leadForm;
-            return this;
-        }
-
-        public Builder leadForm(UpdateAdsRequestLeadForm leadForm) {
-            this.leadForm = Optional.ofNullable(leadForm);
-            return this;
-        }
-
-        /**
-         * <p>Use an existing instant form instead of creating one — the form's platform ID, from a form already on the ad's Facebook page. Only allowed when the ad group's conversion_location is an instant-form destination. Mutually exclusive with lead_form. Replaces a stored lead_form.</p>
-         */
-        @JsonSetter(value = "lead_form_id", nulls = Nulls.SKIP)
-        public Builder leadFormId(Optional<String> leadFormId) {
-            this.leadFormId = leadFormId;
-            return this;
-        }
-
-        public Builder leadFormId(String leadFormId) {
-            this.leadFormId = Optional.ofNullable(leadFormId);
-            return this;
-        }
-
-        /**
-         * <p>Click-to-message welcome copy: the greeting (message) and the ice-breaker prompt (keyword).</p>
-         */
-        @JsonSetter(value = "messaging_config", nulls = Nulls.SKIP)
-        public Builder messagingConfig(Optional<UpdateAdsRequestMessagingConfig> messagingConfig) {
-            this.messagingConfig = messagingConfig;
-            return this;
-        }
-
-        public Builder messagingConfig(UpdateAdsRequestMessagingConfig messagingConfig) {
-            this.messagingConfig = Optional.ofNullable(messagingConfig);
-            return this;
-        }
-
-        /**
-         * <p>Whether the ad can appear alongside other advertisers' ads in the same unit. Defaults to true.</p>
-         */
-        @JsonSetter(value = "multi_advertiser_ads", nulls = Nulls.SKIP)
-        public Builder multiAdvertiserAds(Optional<Boolean> multiAdvertiserAds) {
-            this.multiAdvertiserAds = multiAdvertiserAds;
-            return this;
-        }
-
-        public Builder multiAdvertiserAds(Boolean multiAdvertiserAds) {
-            this.multiAdvertiserAds = Optional.ofNullable(multiAdvertiserAds);
-            return this;
-        }
-
-        /**
-         * <p>Promote an existing post instead of uploading creatives — a Facebook post or Instagram media id. Mutually exclusive with creatives. Pair with post_source.</p>
-         */
-        @JsonSetter(value = "post_id", nulls = Nulls.SKIP)
-        public Builder postId(Optional<String> postId) {
-            this.postId = postId;
-            return this;
-        }
-
-        public Builder postId(String postId) {
-            this.postId = Optional.ofNullable(postId);
-            return this;
-        }
-
-        /**
-         * <p>Identifies the network that owns <code>post_id</code>. The source is inferred from the ID shape when omitted.</p>
-         */
-        @JsonSetter(value = "post_source", nulls = Nulls.SKIP)
-        public Builder postSource(Optional<UpdateAdsRequestPostSource> postSource) {
-            this.postSource = postSource;
-            return this;
-        }
-
-        public Builder postSource(UpdateAdsRequestPostSource postSource) {
-            this.postSource = Optional.ofNullable(postSource);
-            return this;
-        }
-
-        /**
-         * <p>The primary text variants shown in the ad body.</p>
+         * <p>The primary text shown in the ad body. Several entries make text variations.</p>
          */
         @JsonSetter(value = "primary_texts", nulls = Nulls.SKIP)
-        public Builder primaryTexts(Optional<List<String>> primaryTexts) {
+        public Builder primaryTexts(Optional<List<UpdateAdsRequestPrimaryTextsItem>> primaryTexts) {
             this.primaryTexts = primaryTexts;
             return this;
         }
 
-        public Builder primaryTexts(List<String> primaryTexts) {
+        public Builder primaryTexts(List<UpdateAdsRequestPrimaryTextsItem> primaryTexts) {
             this.primaryTexts = Optional.ofNullable(primaryTexts);
-            return this;
-        }
-
-        /**
-         * <p>The social accounts the ad runs under — a connected Facebook page and, optionally, an Instagram profile.</p>
-         */
-        @JsonSetter(value = "social_accounts", nulls = Nulls.SKIP)
-        public Builder socialAccounts(Optional<List<UpdateAdsRequestSocialAccountsItem>> socialAccounts) {
-            this.socialAccounts = socialAccounts;
-            return this;
-        }
-
-        public Builder socialAccounts(List<UpdateAdsRequestSocialAccountsItem> socialAccounts) {
-            this.socialAccounts = Optional.ofNullable(socialAccounts);
             return this;
         }
 
@@ -525,7 +306,7 @@ public final class UpdateAdsRequest {
         }
 
         /**
-         * <p>Query parameters to append to the destination URL, keyed by parameter name. Merged with any query string on <code>url</code>. Whop adds its own click-attribution parameters; those are reserved and rejected if you set them (utm_meta_ad_id, utm_meta_adset_id, utm_meta_campaign_id, utm_source, utm_placement, utm_medium, utm_content, utm_adset, utm_whop, wacid, wasid, waid, tw_source, tw_adid).</p>
+         * <p>Query parameters to append to the destination URL, keyed by parameter name. Merged with any query string on <code>url</code>. Whop adds its own click-attribution parameters; those are reserved, and setting one returns an error that names it.</p>
          */
         @JsonSetter(value = "url_parameters", nulls = Nulls.SKIP)
         public Builder urlParameters(Optional<Map<String, Object>> urlParameters) {
@@ -544,18 +325,26 @@ public final class UpdateAdsRequest {
                     creatives,
                     descriptions,
                     headlines,
-                    leadForm,
-                    leadFormId,
-                    messagingConfig,
-                    multiAdvertiserAds,
-                    postId,
-                    postSource,
                     primaryTexts,
-                    socialAccounts,
                     title,
                     url,
                     urlParameters,
                     additionalProperties);
+        }
+
+        @JsonAnySetter
+        private void putAdditionalPropertyFromJson(String key, Object value) {
+            if (key.equalsIgnoreCase("call_to_action")
+                    || key.equalsIgnoreCase("creatives")
+                    || key.equalsIgnoreCase("descriptions")
+                    || key.equalsIgnoreCase("headlines")
+                    || key.equalsIgnoreCase("primary_texts")
+                    || key.equalsIgnoreCase("title")
+                    || key.equalsIgnoreCase("url")
+                    || key.equalsIgnoreCase("url_parameters")) {
+                return;
+            }
+            this.additionalProperties.put(key, value);
         }
 
         public Builder additionalProperty(String key, Object value) {

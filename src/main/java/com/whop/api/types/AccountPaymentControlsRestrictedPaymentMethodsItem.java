@@ -7,19 +7,142 @@ import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonValue;
 
 public final class AccountPaymentControlsRestrictedPaymentMethodsItem {
+    public static final AccountPaymentControlsRestrictedPaymentMethodsItem MONDU =
+            new AccountPaymentControlsRestrictedPaymentMethodsItem(Value.MONDU, "mondu");
+
+    public static final AccountPaymentControlsRestrictedPaymentMethodsItem AFTERPAY_CLEARPAY =
+            new AccountPaymentControlsRestrictedPaymentMethodsItem(Value.AFTERPAY_CLEARPAY, "afterpay_clearpay");
+
+    public static final AccountPaymentControlsRestrictedPaymentMethodsItem FLEX_PAY =
+            new AccountPaymentControlsRestrictedPaymentMethodsItem(Value.FLEX_PAY, "flex_pay");
+
+    public static final AccountPaymentControlsRestrictedPaymentMethodsItem SEPA_DEBIT =
+            new AccountPaymentControlsRestrictedPaymentMethodsItem(Value.SEPA_DEBIT, "sepa_debit");
+
+    public static final AccountPaymentControlsRestrictedPaymentMethodsItem CARD_MASTERCARD =
+            new AccountPaymentControlsRestrictedPaymentMethodsItem(Value.CARD_MASTERCARD, "card_mastercard");
+
+    public static final AccountPaymentControlsRestrictedPaymentMethodsItem CARD_INSTALLMENTS_TWELVE =
+            new AccountPaymentControlsRestrictedPaymentMethodsItem(
+                    Value.CARD_INSTALLMENTS_TWELVE, "card_installments_twelve");
+
+    public static final AccountPaymentControlsRestrictedPaymentMethodsItem SUNBIT =
+            new AccountPaymentControlsRestrictedPaymentMethodsItem(Value.SUNBIT, "sunbit");
+
+    public static final AccountPaymentControlsRestrictedPaymentMethodsItem PAYTO =
+            new AccountPaymentControlsRestrictedPaymentMethodsItem(Value.PAYTO, "payto");
+
+    public static final AccountPaymentControlsRestrictedPaymentMethodsItem ALMA =
+            new AccountPaymentControlsRestrictedPaymentMethodsItem(Value.ALMA, "alma");
+
+    public static final AccountPaymentControlsRestrictedPaymentMethodsItem US_BANK_ACCOUNT =
+            new AccountPaymentControlsRestrictedPaymentMethodsItem(Value.US_BANK_ACCOUNT, "us_bank_account");
+
+    public static final AccountPaymentControlsRestrictedPaymentMethodsItem AFFIRM =
+            new AccountPaymentControlsRestrictedPaymentMethodsItem(Value.AFFIRM, "affirm");
+
+    public static final AccountPaymentControlsRestrictedPaymentMethodsItem AMAZON_PAY =
+            new AccountPaymentControlsRestrictedPaymentMethodsItem(Value.AMAZON_PAY, "amazon_pay");
+
+    public static final AccountPaymentControlsRestrictedPaymentMethodsItem ONEY4X =
+            new AccountPaymentControlsRestrictedPaymentMethodsItem(Value.ONEY4X, "oney_4x");
+
+    public static final AccountPaymentControlsRestrictedPaymentMethodsItem CASHAPP =
+            new AccountPaymentControlsRestrictedPaymentMethodsItem(Value.CASHAPP, "cashapp");
+
+    public static final AccountPaymentControlsRestrictedPaymentMethodsItem BILLIE =
+            new AccountPaymentControlsRestrictedPaymentMethodsItem(Value.BILLIE, "billie");
+
+    public static final AccountPaymentControlsRestrictedPaymentMethodsItem KRIYA =
+            new AccountPaymentControlsRestrictedPaymentMethodsItem(Value.KRIYA, "kriya");
+
+    public static final AccountPaymentControlsRestrictedPaymentMethodsItem SEQURA =
+            new AccountPaymentControlsRestrictedPaymentMethodsItem(Value.SEQURA, "sequra");
+
+    public static final AccountPaymentControlsRestrictedPaymentMethodsItem CARD_DISCOVER_GLOBAL_NETWORK =
+            new AccountPaymentControlsRestrictedPaymentMethodsItem(
+                    Value.CARD_DISCOVER_GLOBAL_NETWORK, "card_discover_global_network");
+
+    public static final AccountPaymentControlsRestrictedPaymentMethodsItem TAMARA =
+            new AccountPaymentControlsRestrictedPaymentMethodsItem(Value.TAMARA, "tamara");
+
     public static final AccountPaymentControlsRestrictedPaymentMethodsItem CARD_VISA =
             new AccountPaymentControlsRestrictedPaymentMethodsItem(Value.CARD_VISA, "card_visa");
+
+    public static final AccountPaymentControlsRestrictedPaymentMethodsItem BACS_DEBIT =
+            new AccountPaymentControlsRestrictedPaymentMethodsItem(Value.BACS_DEBIT, "bacs_debit");
+
+    public static final AccountPaymentControlsRestrictedPaymentMethodsItem ADDI =
+            new AccountPaymentControlsRestrictedPaymentMethodsItem(Value.ADDI, "addi");
+
+    public static final AccountPaymentControlsRestrictedPaymentMethodsItem ACSS_DEBIT =
+            new AccountPaymentControlsRestrictedPaymentMethodsItem(Value.ACSS_DEBIT, "acss_debit");
+
+    public static final AccountPaymentControlsRestrictedPaymentMethodsItem CLARITYPAY =
+            new AccountPaymentControlsRestrictedPaymentMethodsItem(Value.CLARITYPAY, "claritypay");
+
+    public static final AccountPaymentControlsRestrictedPaymentMethodsItem ZIP =
+            new AccountPaymentControlsRestrictedPaymentMethodsItem(Value.ZIP, "zip");
+
+    public static final AccountPaymentControlsRestrictedPaymentMethodsItem CARD_INSTALLMENTS_SIX =
+            new AccountPaymentControlsRestrictedPaymentMethodsItem(
+                    Value.CARD_INSTALLMENTS_SIX, "card_installments_six");
+
+    public static final AccountPaymentControlsRestrictedPaymentMethodsItem CARD_INSTALLMENTS_THREE =
+            new AccountPaymentControlsRestrictedPaymentMethodsItem(
+                    Value.CARD_INSTALLMENTS_THREE, "card_installments_three");
+
+    public static final AccountPaymentControlsRestrictedPaymentMethodsItem KLARNA_PAY_NOW =
+            new AccountPaymentControlsRestrictedPaymentMethodsItem(Value.KLARNA_PAY_NOW, "klarna_pay_now");
+
+    public static final AccountPaymentControlsRestrictedPaymentMethodsItem WECHAT_PAY =
+            new AccountPaymentControlsRestrictedPaymentMethodsItem(Value.WECHAT_PAY, "wechat_pay");
+
+    public static final AccountPaymentControlsRestrictedPaymentMethodsItem PAY_BY_BANK =
+            new AccountPaymentControlsRestrictedPaymentMethodsItem(Value.PAY_BY_BANK, "pay_by_bank");
+
+    public static final AccountPaymentControlsRestrictedPaymentMethodsItem VENMO =
+            new AccountPaymentControlsRestrictedPaymentMethodsItem(Value.VENMO, "venmo");
+
+    public static final AccountPaymentControlsRestrictedPaymentMethodsItem SPLITIT =
+            new AccountPaymentControlsRestrictedPaymentMethodsItem(Value.SPLITIT, "splitit");
+
+    public static final AccountPaymentControlsRestrictedPaymentMethodsItem SEZZLE =
+            new AccountPaymentControlsRestrictedPaymentMethodsItem(Value.SEZZLE, "sezzle");
+
+    public static final AccountPaymentControlsRestrictedPaymentMethodsItem AU_BECS_DEBIT =
+            new AccountPaymentControlsRestrictedPaymentMethodsItem(Value.AU_BECS_DEBIT, "au_becs_debit");
+
+    public static final AccountPaymentControlsRestrictedPaymentMethodsItem SCALAPAY =
+            new AccountPaymentControlsRestrictedPaymentMethodsItem(Value.SCALAPAY, "scalapay");
+
+    public static final AccountPaymentControlsRestrictedPaymentMethodsItem TABBY =
+            new AccountPaymentControlsRestrictedPaymentMethodsItem(Value.TABBY, "tabby");
+
+    public static final AccountPaymentControlsRestrictedPaymentMethodsItem ONEY3X =
+            new AccountPaymentControlsRestrictedPaymentMethodsItem(Value.ONEY3X, "oney_3x");
 
     public static final AccountPaymentControlsRestrictedPaymentMethodsItem CARD_AMERICAN_EXPRESS =
             new AccountPaymentControlsRestrictedPaymentMethodsItem(
                     Value.CARD_AMERICAN_EXPRESS, "card_american_express");
 
-    public static final AccountPaymentControlsRestrictedPaymentMethodsItem CARD_MASTERCARD =
-            new AccountPaymentControlsRestrictedPaymentMethodsItem(Value.CARD_MASTERCARD, "card_mastercard");
+    public static final AccountPaymentControlsRestrictedPaymentMethodsItem ONEY =
+            new AccountPaymentControlsRestrictedPaymentMethodsItem(Value.ONEY, "oney");
 
-    public static final AccountPaymentControlsRestrictedPaymentMethodsItem CARD_DISCOVER_GLOBAL_NETWORK =
-            new AccountPaymentControlsRestrictedPaymentMethodsItem(
-                    Value.CARD_DISCOVER_GLOBAL_NETWORK, "card_discover_global_network");
+    public static final AccountPaymentControlsRestrictedPaymentMethodsItem KLARNA =
+            new AccountPaymentControlsRestrictedPaymentMethodsItem(Value.KLARNA, "klarna");
+
+    public static final AccountPaymentControlsRestrictedPaymentMethodsItem PAYPAL =
+            new AccountPaymentControlsRestrictedPaymentMethodsItem(Value.PAYPAL, "paypal");
+
+    public static final AccountPaymentControlsRestrictedPaymentMethodsItem LINK =
+            new AccountPaymentControlsRestrictedPaymentMethodsItem(Value.LINK, "link");
+
+    public static final AccountPaymentControlsRestrictedPaymentMethodsItem KUESKI =
+            new AccountPaymentControlsRestrictedPaymentMethodsItem(Value.KUESKI, "kueski");
+
+    public static final AccountPaymentControlsRestrictedPaymentMethodsItem CAPCHASE_PAY =
+            new AccountPaymentControlsRestrictedPaymentMethodsItem(Value.CAPCHASE_PAY, "capchase_pay");
 
     private final Value value;
 
@@ -54,14 +177,94 @@ public final class AccountPaymentControlsRestrictedPaymentMethodsItem {
 
     public <T> T visit(Visitor<T> visitor) {
         switch (value) {
-            case CARD_VISA:
-                return visitor.visitCardVisa();
-            case CARD_AMERICAN_EXPRESS:
-                return visitor.visitCardAmericanExpress();
+            case MONDU:
+                return visitor.visitMondu();
+            case AFTERPAY_CLEARPAY:
+                return visitor.visitAfterpayClearpay();
+            case FLEX_PAY:
+                return visitor.visitFlexPay();
+            case SEPA_DEBIT:
+                return visitor.visitSepaDebit();
             case CARD_MASTERCARD:
                 return visitor.visitCardMastercard();
+            case CARD_INSTALLMENTS_TWELVE:
+                return visitor.visitCardInstallmentsTwelve();
+            case SUNBIT:
+                return visitor.visitSunbit();
+            case PAYTO:
+                return visitor.visitPayto();
+            case ALMA:
+                return visitor.visitAlma();
+            case US_BANK_ACCOUNT:
+                return visitor.visitUsBankAccount();
+            case AFFIRM:
+                return visitor.visitAffirm();
+            case AMAZON_PAY:
+                return visitor.visitAmazonPay();
+            case ONEY4X:
+                return visitor.visitOney4X();
+            case CASHAPP:
+                return visitor.visitCashapp();
+            case BILLIE:
+                return visitor.visitBillie();
+            case KRIYA:
+                return visitor.visitKriya();
+            case SEQURA:
+                return visitor.visitSequra();
             case CARD_DISCOVER_GLOBAL_NETWORK:
                 return visitor.visitCardDiscoverGlobalNetwork();
+            case TAMARA:
+                return visitor.visitTamara();
+            case CARD_VISA:
+                return visitor.visitCardVisa();
+            case BACS_DEBIT:
+                return visitor.visitBacsDebit();
+            case ADDI:
+                return visitor.visitAddi();
+            case ACSS_DEBIT:
+                return visitor.visitAcssDebit();
+            case CLARITYPAY:
+                return visitor.visitClaritypay();
+            case ZIP:
+                return visitor.visitZip();
+            case CARD_INSTALLMENTS_SIX:
+                return visitor.visitCardInstallmentsSix();
+            case CARD_INSTALLMENTS_THREE:
+                return visitor.visitCardInstallmentsThree();
+            case KLARNA_PAY_NOW:
+                return visitor.visitKlarnaPayNow();
+            case WECHAT_PAY:
+                return visitor.visitWechatPay();
+            case PAY_BY_BANK:
+                return visitor.visitPayByBank();
+            case VENMO:
+                return visitor.visitVenmo();
+            case SPLITIT:
+                return visitor.visitSplitit();
+            case SEZZLE:
+                return visitor.visitSezzle();
+            case AU_BECS_DEBIT:
+                return visitor.visitAuBecsDebit();
+            case SCALAPAY:
+                return visitor.visitScalapay();
+            case TABBY:
+                return visitor.visitTabby();
+            case ONEY3X:
+                return visitor.visitOney3X();
+            case CARD_AMERICAN_EXPRESS:
+                return visitor.visitCardAmericanExpress();
+            case ONEY:
+                return visitor.visitOney();
+            case KLARNA:
+                return visitor.visitKlarna();
+            case PAYPAL:
+                return visitor.visitPaypal();
+            case LINK:
+                return visitor.visitLink();
+            case KUESKI:
+                return visitor.visitKueski();
+            case CAPCHASE_PAY:
+                return visitor.visitCapchasePay();
             case UNKNOWN:
             default:
                 return visitor.visitUnknown(string);
@@ -71,14 +274,94 @@ public final class AccountPaymentControlsRestrictedPaymentMethodsItem {
     @JsonCreator(mode = JsonCreator.Mode.DELEGATING)
     public static AccountPaymentControlsRestrictedPaymentMethodsItem valueOf(String value) {
         switch (value) {
-            case "card_visa":
-                return CARD_VISA;
-            case "card_american_express":
-                return CARD_AMERICAN_EXPRESS;
+            case "mondu":
+                return MONDU;
+            case "afterpay_clearpay":
+                return AFTERPAY_CLEARPAY;
+            case "flex_pay":
+                return FLEX_PAY;
+            case "sepa_debit":
+                return SEPA_DEBIT;
             case "card_mastercard":
                 return CARD_MASTERCARD;
+            case "card_installments_twelve":
+                return CARD_INSTALLMENTS_TWELVE;
+            case "sunbit":
+                return SUNBIT;
+            case "payto":
+                return PAYTO;
+            case "alma":
+                return ALMA;
+            case "us_bank_account":
+                return US_BANK_ACCOUNT;
+            case "affirm":
+                return AFFIRM;
+            case "amazon_pay":
+                return AMAZON_PAY;
+            case "oney_4x":
+                return ONEY4X;
+            case "cashapp":
+                return CASHAPP;
+            case "billie":
+                return BILLIE;
+            case "kriya":
+                return KRIYA;
+            case "sequra":
+                return SEQURA;
             case "card_discover_global_network":
                 return CARD_DISCOVER_GLOBAL_NETWORK;
+            case "tamara":
+                return TAMARA;
+            case "card_visa":
+                return CARD_VISA;
+            case "bacs_debit":
+                return BACS_DEBIT;
+            case "addi":
+                return ADDI;
+            case "acss_debit":
+                return ACSS_DEBIT;
+            case "claritypay":
+                return CLARITYPAY;
+            case "zip":
+                return ZIP;
+            case "card_installments_six":
+                return CARD_INSTALLMENTS_SIX;
+            case "card_installments_three":
+                return CARD_INSTALLMENTS_THREE;
+            case "klarna_pay_now":
+                return KLARNA_PAY_NOW;
+            case "wechat_pay":
+                return WECHAT_PAY;
+            case "pay_by_bank":
+                return PAY_BY_BANK;
+            case "venmo":
+                return VENMO;
+            case "splitit":
+                return SPLITIT;
+            case "sezzle":
+                return SEZZLE;
+            case "au_becs_debit":
+                return AU_BECS_DEBIT;
+            case "scalapay":
+                return SCALAPAY;
+            case "tabby":
+                return TABBY;
+            case "oney_3x":
+                return ONEY3X;
+            case "card_american_express":
+                return CARD_AMERICAN_EXPRESS;
+            case "oney":
+                return ONEY;
+            case "klarna":
+                return KLARNA;
+            case "paypal":
+                return PAYPAL;
+            case "link":
+                return LINK;
+            case "kueski":
+                return KUESKI;
+            case "capchase_pay":
+                return CAPCHASE_PAY;
             default:
                 return new AccountPaymentControlsRestrictedPaymentMethodsItem(Value.UNKNOWN, value);
         }
@@ -93,6 +376,86 @@ public final class AccountPaymentControlsRestrictedPaymentMethodsItem {
 
         CARD_DISCOVER_GLOBAL_NETWORK,
 
+        ADDI,
+
+        AFFIRM,
+
+        AFTERPAY_CLEARPAY,
+
+        ALMA,
+
+        BILLIE,
+
+        CAPCHASE_PAY,
+
+        CLARITYPAY,
+
+        FLEX_PAY,
+
+        KLARNA,
+
+        KRIYA,
+
+        KUESKI,
+
+        MONDU,
+
+        ONEY,
+
+        SCALAPAY,
+
+        SEQURA,
+
+        SEZZLE,
+
+        SPLITIT,
+
+        SUNBIT,
+
+        TABBY,
+
+        TAMARA,
+
+        ZIP,
+
+        CARD_INSTALLMENTS_THREE,
+
+        CARD_INSTALLMENTS_SIX,
+
+        CARD_INSTALLMENTS_TWELVE,
+
+        ONEY3X,
+
+        ONEY4X,
+
+        KLARNA_PAY_NOW,
+
+        US_BANK_ACCOUNT,
+
+        SEPA_DEBIT,
+
+        BACS_DEBIT,
+
+        AU_BECS_DEBIT,
+
+        ACSS_DEBIT,
+
+        PAY_BY_BANK,
+
+        PAYTO,
+
+        PAYPAL,
+
+        CASHAPP,
+
+        VENMO,
+
+        AMAZON_PAY,
+
+        LINK,
+
+        WECHAT_PAY,
+
         UNKNOWN
     }
 
@@ -104,6 +467,86 @@ public final class AccountPaymentControlsRestrictedPaymentMethodsItem {
         T visitCardAmericanExpress();
 
         T visitCardDiscoverGlobalNetwork();
+
+        T visitAddi();
+
+        T visitAffirm();
+
+        T visitAfterpayClearpay();
+
+        T visitAlma();
+
+        T visitBillie();
+
+        T visitCapchasePay();
+
+        T visitClaritypay();
+
+        T visitFlexPay();
+
+        T visitKlarna();
+
+        T visitKriya();
+
+        T visitKueski();
+
+        T visitMondu();
+
+        T visitOney();
+
+        T visitScalapay();
+
+        T visitSequra();
+
+        T visitSezzle();
+
+        T visitSplitit();
+
+        T visitSunbit();
+
+        T visitTabby();
+
+        T visitTamara();
+
+        T visitZip();
+
+        T visitCardInstallmentsThree();
+
+        T visitCardInstallmentsSix();
+
+        T visitCardInstallmentsTwelve();
+
+        T visitOney3X();
+
+        T visitOney4X();
+
+        T visitKlarnaPayNow();
+
+        T visitUsBankAccount();
+
+        T visitSepaDebit();
+
+        T visitBacsDebit();
+
+        T visitAuBecsDebit();
+
+        T visitAcssDebit();
+
+        T visitPayByBank();
+
+        T visitPayto();
+
+        T visitPaypal();
+
+        T visitCashapp();
+
+        T visitVenmo();
+
+        T visitAmazonPay();
+
+        T visitLink();
+
+        T visitWechatPay();
 
         T visitUnknown(String unknownType);
     }

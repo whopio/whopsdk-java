@@ -11,6 +11,8 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonSetter;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.whop.api.core.ObjectMappers;
+import com.whop.api.types.Money;
+import java.time.OffsetDateTime;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
@@ -19,23 +21,63 @@ import org.jetbrains.annotations.NotNull;
 @JsonInclude(JsonInclude.Include.NON_ABSENT)
 @JsonDeserialize(builder = ReferredUsersPartnersResponseDataItem.Builder.class)
 public final class ReferredUsersPartnersResponseDataItem {
+    private final int businessCount;
+
+    private final Money earnings;
+
+    private final OffsetDateTime joinedAt;
+
     private final String totalEarningsUsd;
 
     private final String totalVolumeUsd;
 
     private final ReferredUsersPartnersResponseDataItemUser user;
 
+    private final Money volume30D;
+
     private final Map<String, Object> additionalProperties;
 
     private ReferredUsersPartnersResponseDataItem(
+            int businessCount,
+            Money earnings,
+            OffsetDateTime joinedAt,
             String totalEarningsUsd,
             String totalVolumeUsd,
             ReferredUsersPartnersResponseDataItemUser user,
+            Money volume30D,
             Map<String, Object> additionalProperties) {
+        this.businessCount = businessCount;
+        this.earnings = earnings;
+        this.joinedAt = joinedAt;
         this.totalEarningsUsd = totalEarningsUsd;
         this.totalVolumeUsd = totalVolumeUsd;
         this.user = user;
+        this.volume30D = volume30D;
         this.additionalProperties = additionalProperties;
+    }
+
+    /**
+     * @return Number of active businesses this user referred that credit the caller as a second-tier partner, or any earning partner in global mode. An earning-partner filter narrows the count to that partner. Excludes deleted businesses.
+     */
+    @JsonProperty("business_count")
+    public int getBusinessCount() {
+        return businessCount;
+    }
+
+    /**
+     * @return Total pending and completed affiliate earnings from this user for their current primary referrer, across all tiers, in USD. Includes historical earnings from removed referrals and deleted businesses.
+     */
+    @JsonProperty("earnings")
+    public Money getEarnings() {
+        return earnings;
+    }
+
+    /**
+     * @return When the referred user joined Whop, as an ISO 8601 timestamp.
+     */
+    @JsonProperty("joined_at")
+    public OffsetDateTime getJoinedAt() {
+        return joinedAt;
     }
 
     @JsonProperty("total_earnings_usd")
@@ -53,6 +95,14 @@ public final class ReferredUsersPartnersResponseDataItem {
         return user;
     }
 
+    /**
+     * @return Attributed volume over the last 30 days across the business referrals included in business_count, in USD.
+     */
+    @JsonProperty("volume_30d")
+    public Money getVolume30D() {
+        return volume30D;
+    }
+
     @java.lang.Override
     public boolean equals(Object other) {
         if (this == other) return true;
@@ -66,14 +116,25 @@ public final class ReferredUsersPartnersResponseDataItem {
     }
 
     private boolean equalTo(ReferredUsersPartnersResponseDataItem other) {
-        return totalEarningsUsd.equals(other.totalEarningsUsd)
+        return businessCount == other.businessCount
+                && earnings.equals(other.earnings)
+                && joinedAt.equals(other.joinedAt)
+                && totalEarningsUsd.equals(other.totalEarningsUsd)
                 && totalVolumeUsd.equals(other.totalVolumeUsd)
-                && user.equals(other.user);
+                && user.equals(other.user)
+                && volume30D.equals(other.volume30D);
     }
 
     @java.lang.Override
     public int hashCode() {
-        return Objects.hash(this.totalEarningsUsd, this.totalVolumeUsd, this.user);
+        return Objects.hash(
+                this.businessCount,
+                this.earnings,
+                this.joinedAt,
+                this.totalEarningsUsd,
+                this.totalVolumeUsd,
+                this.user,
+                this.volume30D);
     }
 
     @java.lang.Override
@@ -81,14 +142,35 @@ public final class ReferredUsersPartnersResponseDataItem {
         return ObjectMappers.stringify(this);
     }
 
-    public static TotalEarningsUsdStage builder() {
+    public static BusinessCountStage builder() {
         return new Builder();
+    }
+
+    public interface BusinessCountStage {
+        /**
+         * <p>Number of active businesses this user referred that credit the caller as a second-tier partner, or any earning partner in global mode. An earning-partner filter narrows the count to that partner. Excludes deleted businesses.</p>
+         */
+        EarningsStage businessCount(int businessCount);
+
+        Builder from(ReferredUsersPartnersResponseDataItem other);
+    }
+
+    public interface EarningsStage {
+        /**
+         * <p>Total pending and completed affiliate earnings from this user for their current primary referrer, across all tiers, in USD. Includes historical earnings from removed referrals and deleted businesses.</p>
+         */
+        JoinedAtStage earnings(@NotNull Money earnings);
+    }
+
+    public interface JoinedAtStage {
+        /**
+         * <p>When the referred user joined Whop, as an ISO 8601 timestamp.</p>
+         */
+        TotalEarningsUsdStage joinedAt(@NotNull OffsetDateTime joinedAt);
     }
 
     public interface TotalEarningsUsdStage {
         TotalVolumeUsdStage totalEarningsUsd(@NotNull String totalEarningsUsd);
-
-        Builder from(ReferredUsersPartnersResponseDataItem other);
     }
 
     public interface TotalVolumeUsdStage {
@@ -96,7 +178,14 @@ public final class ReferredUsersPartnersResponseDataItem {
     }
 
     public interface UserStage {
-        _FinalStage user(@NotNull ReferredUsersPartnersResponseDataItemUser user);
+        Volume30DStage user(@NotNull ReferredUsersPartnersResponseDataItemUser user);
+    }
+
+    public interface Volume30DStage {
+        /**
+         * <p>Attributed volume over the last 30 days across the business referrals included in business_count, in USD.</p>
+         */
+        _FinalStage volume30D(@NotNull Money volume30D);
     }
 
     public interface _FinalStage {
@@ -108,23 +197,75 @@ public final class ReferredUsersPartnersResponseDataItem {
     }
 
     @JsonIgnoreProperties(ignoreUnknown = true)
-    public static final class Builder implements TotalEarningsUsdStage, TotalVolumeUsdStage, UserStage, _FinalStage {
+    public static final class Builder
+            implements BusinessCountStage,
+                    EarningsStage,
+                    JoinedAtStage,
+                    TotalEarningsUsdStage,
+                    TotalVolumeUsdStage,
+                    UserStage,
+                    Volume30DStage,
+                    _FinalStage {
+        private int businessCount;
+
+        private Money earnings;
+
+        private OffsetDateTime joinedAt;
+
         private String totalEarningsUsd;
 
         private String totalVolumeUsd;
 
         private ReferredUsersPartnersResponseDataItemUser user;
 
-        @JsonAnySetter
+        private Money volume30D;
+
         private Map<String, Object> additionalProperties = new HashMap<>();
 
         private Builder() {}
 
         @java.lang.Override
         public Builder from(ReferredUsersPartnersResponseDataItem other) {
+            businessCount(other.getBusinessCount());
+            earnings(other.getEarnings());
+            joinedAt(other.getJoinedAt());
             totalEarningsUsd(other.getTotalEarningsUsd());
             totalVolumeUsd(other.getTotalVolumeUsd());
             user(other.getUser());
+            volume30D(other.getVolume30D());
+            return this;
+        }
+
+        /**
+         * <p>Number of active businesses this user referred that credit the caller as a second-tier partner, or any earning partner in global mode. An earning-partner filter narrows the count to that partner. Excludes deleted businesses.</p>
+         * @return Reference to {@code this} so that method calls can be chained together.
+         */
+        @java.lang.Override
+        @JsonSetter("business_count")
+        public EarningsStage businessCount(int businessCount) {
+            this.businessCount = businessCount;
+            return this;
+        }
+
+        /**
+         * <p>Total pending and completed affiliate earnings from this user for their current primary referrer, across all tiers, in USD. Includes historical earnings from removed referrals and deleted businesses.</p>
+         * @return Reference to {@code this} so that method calls can be chained together.
+         */
+        @java.lang.Override
+        @JsonSetter("earnings")
+        public JoinedAtStage earnings(@NotNull Money earnings) {
+            this.earnings = Objects.requireNonNull(earnings, "earnings must not be null");
+            return this;
+        }
+
+        /**
+         * <p>When the referred user joined Whop, as an ISO 8601 timestamp.</p>
+         * @return Reference to {@code this} so that method calls can be chained together.
+         */
+        @java.lang.Override
+        @JsonSetter("joined_at")
+        public TotalEarningsUsdStage joinedAt(@NotNull OffsetDateTime joinedAt) {
+            this.joinedAt = Objects.requireNonNull(joinedAt, "joinedAt must not be null");
             return this;
         }
 
@@ -144,15 +285,47 @@ public final class ReferredUsersPartnersResponseDataItem {
 
         @java.lang.Override
         @JsonSetter("user")
-        public _FinalStage user(@NotNull ReferredUsersPartnersResponseDataItemUser user) {
+        public Volume30DStage user(@NotNull ReferredUsersPartnersResponseDataItemUser user) {
             this.user = Objects.requireNonNull(user, "user must not be null");
+            return this;
+        }
+
+        /**
+         * <p>Attributed volume over the last 30 days across the business referrals included in business_count, in USD.</p>
+         * @return Reference to {@code this} so that method calls can be chained together.
+         */
+        @java.lang.Override
+        @JsonSetter("volume_30d")
+        public _FinalStage volume30D(@NotNull Money volume30D) {
+            this.volume30D = Objects.requireNonNull(volume30D, "volume30D must not be null");
             return this;
         }
 
         @java.lang.Override
         public ReferredUsersPartnersResponseDataItem build() {
             return new ReferredUsersPartnersResponseDataItem(
-                    totalEarningsUsd, totalVolumeUsd, user, additionalProperties);
+                    businessCount,
+                    earnings,
+                    joinedAt,
+                    totalEarningsUsd,
+                    totalVolumeUsd,
+                    user,
+                    volume30D,
+                    additionalProperties);
+        }
+
+        @JsonAnySetter
+        private void putAdditionalPropertyFromJson(String key, Object value) {
+            if (key.equalsIgnoreCase("business_count")
+                    || key.equalsIgnoreCase("earnings")
+                    || key.equalsIgnoreCase("joined_at")
+                    || key.equalsIgnoreCase("total_earnings_usd")
+                    || key.equalsIgnoreCase("total_volume_usd")
+                    || key.equalsIgnoreCase("user")
+                    || key.equalsIgnoreCase("volume_30d")) {
+                return;
+            }
+            this.additionalProperties.put(key, value);
         }
 
         @java.lang.Override

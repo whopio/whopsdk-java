@@ -55,9 +55,6 @@ public final class CalculateTaxPlansRequestAddress {
         this.additionalProperties = additionalProperties;
     }
 
-    /**
-     * @return City name.
-     */
     @JsonIgnore
     public Optional<String> getCity() {
         if (city == null) {
@@ -66,17 +63,11 @@ public final class CalculateTaxPlansRequestAddress {
         return city;
     }
 
-    /**
-     * @return ISO 3166-1 alpha-2 country code, such as <code>US</code>, <code>DE</code>, or <code>GB</code>.
-     */
     @JsonProperty("country")
     public String getCountry() {
         return country;
     }
 
-    /**
-     * @return First line of the street address.
-     */
     @JsonIgnore
     public Optional<String> getLine1() {
         if (line1 == null) {
@@ -85,9 +76,6 @@ public final class CalculateTaxPlansRequestAddress {
         return line1;
     }
 
-    /**
-     * @return Second line of the street address.
-     */
     @JsonIgnore
     public Optional<String> getLine2() {
         if (line2 == null) {
@@ -96,9 +84,6 @@ public final class CalculateTaxPlansRequestAddress {
         return line2;
     }
 
-    /**
-     * @return Postal or ZIP code.
-     */
     @JsonIgnore
     public Optional<String> getPostalCode() {
         if (postalCode == null) {
@@ -107,9 +92,6 @@ public final class CalculateTaxPlansRequestAddress {
         return postalCode;
     }
 
-    /**
-     * @return State, province, or region code, such as <code>CA</code>.
-     */
     @JsonIgnore
     public Optional<String> getState() {
         if (state == null) {
@@ -183,9 +165,6 @@ public final class CalculateTaxPlansRequestAddress {
     }
 
     public interface CountryStage {
-        /**
-         * <p>ISO 3166-1 alpha-2 country code, such as <code>US</code>, <code>DE</code>, or <code>GB</code>.</p>
-         */
         _FinalStage country(@NotNull String country);
 
         Builder from(CalculateTaxPlansRequestAddress other);
@@ -198,45 +177,30 @@ public final class CalculateTaxPlansRequestAddress {
 
         _FinalStage additionalProperties(Map<String, Object> additionalProperties);
 
-        /**
-         * <p>City name.</p>
-         */
         _FinalStage city(Optional<String> city);
 
         _FinalStage city(String city);
 
         _FinalStage city(Nullable<String> city);
 
-        /**
-         * <p>First line of the street address.</p>
-         */
         _FinalStage line1(Optional<String> line1);
 
         _FinalStage line1(String line1);
 
         _FinalStage line1(Nullable<String> line1);
 
-        /**
-         * <p>Second line of the street address.</p>
-         */
         _FinalStage line2(Optional<String> line2);
 
         _FinalStage line2(String line2);
 
         _FinalStage line2(Nullable<String> line2);
 
-        /**
-         * <p>Postal or ZIP code.</p>
-         */
         _FinalStage postalCode(Optional<String> postalCode);
 
         _FinalStage postalCode(String postalCode);
 
         _FinalStage postalCode(Nullable<String> postalCode);
 
-        /**
-         * <p>State, province, or region code, such as <code>CA</code>.</p>
-         */
         _FinalStage state(Optional<String> state);
 
         _FinalStage state(String state);
@@ -258,7 +222,6 @@ public final class CalculateTaxPlansRequestAddress {
 
         private Optional<String> city = Optional.empty();
 
-        @JsonAnySetter
         private Map<String, Object> additionalProperties = new HashMap<>();
 
         private Builder() {}
@@ -274,11 +237,6 @@ public final class CalculateTaxPlansRequestAddress {
             return this;
         }
 
-        /**
-         * <p>ISO 3166-1 alpha-2 country code, such as <code>US</code>, <code>DE</code>, or <code>GB</code>.</p>
-         * <p>ISO 3166-1 alpha-2 country code, such as <code>US</code>, <code>DE</code>, or <code>GB</code>.</p>
-         * @return Reference to {@code this} so that method calls can be chained together.
-         */
         @java.lang.Override
         @JsonSetter("country")
         public _FinalStage country(@NotNull String country) {
@@ -286,10 +244,6 @@ public final class CalculateTaxPlansRequestAddress {
             return this;
         }
 
-        /**
-         * <p>State, province, or region code, such as <code>CA</code>.</p>
-         * @return Reference to {@code this} so that method calls can be chained together.
-         */
         @java.lang.Override
         public _FinalStage state(Nullable<String> state) {
             if (state.isNull()) {
@@ -302,19 +256,12 @@ public final class CalculateTaxPlansRequestAddress {
             return this;
         }
 
-        /**
-         * <p>State, province, or region code, such as <code>CA</code>.</p>
-         * @return Reference to {@code this} so that method calls can be chained together.
-         */
         @java.lang.Override
         public _FinalStage state(String state) {
             this.state = Optional.ofNullable(state);
             return this;
         }
 
-        /**
-         * <p>State, province, or region code, such as <code>CA</code>.</p>
-         */
         @java.lang.Override
         @JsonSetter(value = "state", nulls = Nulls.SKIP)
         public _FinalStage state(Optional<String> state) {
@@ -322,10 +269,6 @@ public final class CalculateTaxPlansRequestAddress {
             return this;
         }
 
-        /**
-         * <p>Postal or ZIP code.</p>
-         * @return Reference to {@code this} so that method calls can be chained together.
-         */
         @java.lang.Override
         public _FinalStage postalCode(Nullable<String> postalCode) {
             if (postalCode.isNull()) {
@@ -338,19 +281,12 @@ public final class CalculateTaxPlansRequestAddress {
             return this;
         }
 
-        /**
-         * <p>Postal or ZIP code.</p>
-         * @return Reference to {@code this} so that method calls can be chained together.
-         */
         @java.lang.Override
         public _FinalStage postalCode(String postalCode) {
             this.postalCode = Optional.ofNullable(postalCode);
             return this;
         }
 
-        /**
-         * <p>Postal or ZIP code.</p>
-         */
         @java.lang.Override
         @JsonSetter(value = "postal_code", nulls = Nulls.SKIP)
         public _FinalStage postalCode(Optional<String> postalCode) {
@@ -358,10 +294,6 @@ public final class CalculateTaxPlansRequestAddress {
             return this;
         }
 
-        /**
-         * <p>Second line of the street address.</p>
-         * @return Reference to {@code this} so that method calls can be chained together.
-         */
         @java.lang.Override
         public _FinalStage line2(Nullable<String> line2) {
             if (line2.isNull()) {
@@ -374,19 +306,12 @@ public final class CalculateTaxPlansRequestAddress {
             return this;
         }
 
-        /**
-         * <p>Second line of the street address.</p>
-         * @return Reference to {@code this} so that method calls can be chained together.
-         */
         @java.lang.Override
         public _FinalStage line2(String line2) {
             this.line2 = Optional.ofNullable(line2);
             return this;
         }
 
-        /**
-         * <p>Second line of the street address.</p>
-         */
         @java.lang.Override
         @JsonSetter(value = "line2", nulls = Nulls.SKIP)
         public _FinalStage line2(Optional<String> line2) {
@@ -394,10 +319,6 @@ public final class CalculateTaxPlansRequestAddress {
             return this;
         }
 
-        /**
-         * <p>First line of the street address.</p>
-         * @return Reference to {@code this} so that method calls can be chained together.
-         */
         @java.lang.Override
         public _FinalStage line1(Nullable<String> line1) {
             if (line1.isNull()) {
@@ -410,19 +331,12 @@ public final class CalculateTaxPlansRequestAddress {
             return this;
         }
 
-        /**
-         * <p>First line of the street address.</p>
-         * @return Reference to {@code this} so that method calls can be chained together.
-         */
         @java.lang.Override
         public _FinalStage line1(String line1) {
             this.line1 = Optional.ofNullable(line1);
             return this;
         }
 
-        /**
-         * <p>First line of the street address.</p>
-         */
         @java.lang.Override
         @JsonSetter(value = "line1", nulls = Nulls.SKIP)
         public _FinalStage line1(Optional<String> line1) {
@@ -430,10 +344,6 @@ public final class CalculateTaxPlansRequestAddress {
             return this;
         }
 
-        /**
-         * <p>City name.</p>
-         * @return Reference to {@code this} so that method calls can be chained together.
-         */
         @java.lang.Override
         public _FinalStage city(Nullable<String> city) {
             if (city.isNull()) {
@@ -446,19 +356,12 @@ public final class CalculateTaxPlansRequestAddress {
             return this;
         }
 
-        /**
-         * <p>City name.</p>
-         * @return Reference to {@code this} so that method calls can be chained together.
-         */
         @java.lang.Override
         public _FinalStage city(String city) {
             this.city = Optional.ofNullable(city);
             return this;
         }
 
-        /**
-         * <p>City name.</p>
-         */
         @java.lang.Override
         @JsonSetter(value = "city", nulls = Nulls.SKIP)
         public _FinalStage city(Optional<String> city) {
@@ -470,6 +373,19 @@ public final class CalculateTaxPlansRequestAddress {
         public CalculateTaxPlansRequestAddress build() {
             return new CalculateTaxPlansRequestAddress(
                     city, country, line1, line2, postalCode, state, additionalProperties);
+        }
+
+        @JsonAnySetter
+        private void putAdditionalPropertyFromJson(String key, Object value) {
+            if (key.equalsIgnoreCase("city")
+                    || key.equalsIgnoreCase("country")
+                    || key.equalsIgnoreCase("line1")
+                    || key.equalsIgnoreCase("line2")
+                    || key.equalsIgnoreCase("postal_code")
+                    || key.equalsIgnoreCase("state")) {
+                return;
+            }
+            this.additionalProperties.put(key, value);
         }
 
         @java.lang.Override

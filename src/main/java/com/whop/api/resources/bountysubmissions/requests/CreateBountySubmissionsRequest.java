@@ -194,7 +194,6 @@ public final class CreateBountySubmissionsRequest {
 
         private Optional<String> affiliateCode = Optional.empty();
 
-        @JsonAnySetter
         private Map<String, Object> additionalProperties = new HashMap<>();
 
         private Builder() {}
@@ -209,7 +208,6 @@ public final class CreateBountySubmissionsRequest {
         }
 
         /**
-         * <p>The bounty to submit to (<code>bnty_</code> tag).</p>
          * <p>The bounty to submit to (<code>bnty_</code> tag).</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
@@ -332,6 +330,17 @@ public final class CreateBountySubmissionsRequest {
         public CreateBountySubmissionsRequest build() {
             return new CreateBountySubmissionsRequest(
                     affiliateCode, bountyId, deliverable, metadata, additionalProperties);
+        }
+
+        @JsonAnySetter
+        private void putAdditionalPropertyFromJson(String key, Object value) {
+            if (key.equalsIgnoreCase("affiliate_code")
+                    || key.equalsIgnoreCase("bounty_id")
+                    || key.equalsIgnoreCase("deliverable")
+                    || key.equalsIgnoreCase("metadata")) {
+                return;
+            }
+            this.additionalProperties.put(key, value);
         }
 
         @java.lang.Override

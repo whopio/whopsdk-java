@@ -38,7 +38,7 @@ public class AffiliatesClient {
     }
 
     /**
-     * Returns a paginated list of affiliates for the actor in context, with optional filtering by status, search, and sorting.
+     * Lists the affiliates of an account.
      * <p>Required permissions:</p>
      * <ul>
      * <li><code>affiliate:basic:read</code></li>
@@ -49,7 +49,7 @@ public class AffiliatesClient {
     }
 
     /**
-     * Returns a paginated list of affiliates for the actor in context, with optional filtering by status, search, and sorting.
+     * Lists the affiliates of an account.
      * <p>Required permissions:</p>
      * <ul>
      * <li><code>affiliate:basic:read</code></li>
@@ -60,7 +60,7 @@ public class AffiliatesClient {
     }
 
     /**
-     * Creates or finds an affiliate for a company and user.
+     * Creates an affiliate for a user on an account. If the user is already an affiliate of the account, returns that affiliate, reactivating it if it was archived.
      * <p>Required permissions:</p>
      * <ul>
      * <li><code>affiliate:create</code></li>
@@ -71,7 +71,7 @@ public class AffiliatesClient {
     }
 
     /**
-     * Creates or finds an affiliate for a company and user.
+     * Creates an affiliate for a user on an account. If the user is already an affiliate of the account, returns that affiliate, reactivating it if it was archived.
      * <p>Required permissions:</p>
      * <ul>
      * <li><code>affiliate:create</code></li>
@@ -126,7 +126,7 @@ public class AffiliatesClient {
     }
 
     /**
-     * Archives an existing Affiliate
+     * Archives an affiliate. The affiliate that handles Whop marketplace referrals cannot be archived.
      * <p>Required permissions:</p>
      * <ul>
      * <li><code>affiliate:update</code></li>
@@ -137,7 +137,7 @@ public class AffiliatesClient {
     }
 
     /**
-     * Archives an existing Affiliate
+     * Archives an affiliate. The affiliate that handles Whop marketplace referrals cannot be archived.
      * <p>Required permissions:</p>
      * <ul>
      * <li><code>affiliate:update</code></li>
@@ -148,7 +148,7 @@ public class AffiliatesClient {
     }
 
     /**
-     * Archives an existing Affiliate
+     * Archives an affiliate. The affiliate that handles Whop marketplace referrals cannot be archived.
      * <p>Required permissions:</p>
      * <ul>
      * <li><code>affiliate:update</code></li>
@@ -159,7 +159,7 @@ public class AffiliatesClient {
     }
 
     /**
-     * Archives an existing Affiliate
+     * Archives an affiliate. The affiliate that handles Whop marketplace referrals cannot be archived.
      * <p>Required permissions:</p>
      * <ul>
      * <li><code>affiliate:update</code></li>
@@ -170,7 +170,7 @@ public class AffiliatesClient {
     }
 
     /**
-     * Unarchives an existing Affiliate
+     * Unarchives an archived affiliate.
      * <p>Required permissions:</p>
      * <ul>
      * <li><code>affiliate:update</code></li>
@@ -181,7 +181,7 @@ public class AffiliatesClient {
     }
 
     /**
-     * Unarchives an existing Affiliate
+     * Unarchives an archived affiliate.
      * <p>Required permissions:</p>
      * <ul>
      * <li><code>affiliate:update</code></li>
@@ -192,7 +192,7 @@ public class AffiliatesClient {
     }
 
     /**
-     * Unarchives an existing Affiliate
+     * Unarchives an archived affiliate.
      * <p>Required permissions:</p>
      * <ul>
      * <li><code>affiliate:update</code></li>
@@ -203,7 +203,7 @@ public class AffiliatesClient {
     }
 
     /**
-     * Unarchives an existing Affiliate
+     * Unarchives an archived affiliate.
      * <p>Required permissions:</p>
      * <ul>
      * <li><code>affiliate:update</code></li>

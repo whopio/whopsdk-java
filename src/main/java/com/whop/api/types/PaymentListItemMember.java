@@ -122,7 +122,6 @@ public final class PaymentListItemMember {
 
         private Optional<String> phone = Optional.empty();
 
-        @JsonAnySetter
         private Map<String, Object> additionalProperties = new HashMap<>();
 
         private Builder() {}
@@ -135,7 +134,6 @@ public final class PaymentListItemMember {
         }
 
         /**
-         * <p>The unique identifier for the company member.</p>
          * <p>The unique identifier for the company member.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
@@ -185,6 +183,14 @@ public final class PaymentListItemMember {
         @java.lang.Override
         public PaymentListItemMember build() {
             return new PaymentListItemMember(id, phone, additionalProperties);
+        }
+
+        @JsonAnySetter
+        private void putAdditionalPropertyFromJson(String key, Object value) {
+            if (key.equalsIgnoreCase("id") || key.equalsIgnoreCase("phone")) {
+                return;
+            }
+            this.additionalProperties.put(key, value);
         }
 
         @java.lang.Override

@@ -29,7 +29,7 @@ public final class UpdateMessagesRequestAttachmentsItem {
     }
 
     /**
-     * @return The ID of an existing file object.
+     * @return Uploaded file ID.
      */
     @JsonProperty("id")
     public String getId() {
@@ -68,7 +68,7 @@ public final class UpdateMessagesRequestAttachmentsItem {
 
     public interface IdStage {
         /**
-         * <p>The ID of an existing file object.</p>
+         * <p>Uploaded file ID.</p>
          */
         _FinalStage id(@NotNull String id);
 
@@ -87,7 +87,6 @@ public final class UpdateMessagesRequestAttachmentsItem {
     public static final class Builder implements IdStage, _FinalStage {
         private String id;
 
-        @JsonAnySetter
         private Map<String, Object> additionalProperties = new HashMap<>();
 
         private Builder() {}
@@ -99,8 +98,7 @@ public final class UpdateMessagesRequestAttachmentsItem {
         }
 
         /**
-         * <p>The ID of an existing file object.</p>
-         * <p>The ID of an existing file object.</p>
+         * <p>Uploaded file ID.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
@@ -113,6 +111,14 @@ public final class UpdateMessagesRequestAttachmentsItem {
         @java.lang.Override
         public UpdateMessagesRequestAttachmentsItem build() {
             return new UpdateMessagesRequestAttachmentsItem(id, additionalProperties);
+        }
+
+        @JsonAnySetter
+        private void putAdditionalPropertyFromJson(String key, Object value) {
+            if (key.equalsIgnoreCase("id")) {
+                return;
+            }
+            this.additionalProperties.put(key, value);
         }
 
         @java.lang.Override

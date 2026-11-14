@@ -6,6 +6,7 @@ package com.whop.api.resources.users.preferences.notifications;
 import com.whop.api.core.ClientOptions;
 import com.whop.api.core.RequestOptions;
 import com.whop.api.core.Suppliers;
+import com.whop.api.core.WhopApiHttpResponse;
 import com.whop.api.resources.users.preferences.notifications.experiences.AsyncExperiencesClient;
 import com.whop.api.resources.users.preferences.notifications.requests.SetNotificationsRequest;
 import com.whop.api.resources.users.preferences.notifications.topics.AsyncTopicsClient;
@@ -37,24 +38,33 @@ public class AsyncNotificationsClient {
     }
 
     /**
-     * Sets the authenticated user's notification preferences. Each preference is addressed by <code>scope</code>, not by id, so a scope read back from either list endpoint can be sent straight here.
-     * <p>A scope naming an experience with no topic sets that experience's level, and accepts all three levels. Any other scope sets a topic override, which is binary — <code>all</code> or <code>nothing</code> — and requires a <code>channel</code>.</p>
-     * <p><code>level: null</code> clears the preference. Preferences are stored as overrides, so clearing one means the scope inherits its default again rather than being switched off.</p>
-     * <p>The batch is applied in one transaction: if any entry is rejected, none are written. Experience levels are applied before topic overrides, because setting a level replaces every topic preference for that experience — so an override sent alongside a level wins. The response reports what each scope now resolves to, in the order the entries were sent.</p>
+     * Sets the authenticated user's notification preferences, each addressed by <code>scope</code> rather than by ID. The batch is applied in one transaction: if any entry is rejected, none are written. Experience levels are applied before topic overrides, because setting a level replaces every topic preference for that experience, so an override sent alongside a level wins. The response reports what each scope now resolves to, in the order the entries were sent.
      */
     public CompletableFuture<SetNotificationsResponse> set(SetNotificationsRequest request) {
-        return this.rawClient.set(request).thenApply(response -> response.body());
+        CompletableFuture<WhopApiHttpResponse<SetNotificationsResponse>> rawFuture = this.rawClient.set(request);
+        CompletableFuture<SetNotificationsResponse> future = rawFuture.thenApply(response -> response.body());
+        future.whenComplete((result_, throwable_) -> {
+            if (future.isCancelled()) {
+                rawFuture.cancel(true);
+            }
+        });
+        return future;
     }
 
     /**
-     * Sets the authenticated user's notification preferences. Each preference is addressed by <code>scope</code>, not by id, so a scope read back from either list endpoint can be sent straight here.
-     * <p>A scope naming an experience with no topic sets that experience's level, and accepts all three levels. Any other scope sets a topic override, which is binary — <code>all</code> or <code>nothing</code> — and requires a <code>channel</code>.</p>
-     * <p><code>level: null</code> clears the preference. Preferences are stored as overrides, so clearing one means the scope inherits its default again rather than being switched off.</p>
-     * <p>The batch is applied in one transaction: if any entry is rejected, none are written. Experience levels are applied before topic overrides, because setting a level replaces every topic preference for that experience — so an override sent alongside a level wins. The response reports what each scope now resolves to, in the order the entries were sent.</p>
+     * Sets the authenticated user's notification preferences, each addressed by <code>scope</code> rather than by ID. The batch is applied in one transaction: if any entry is rejected, none are written. Experience levels are applied before topic overrides, because setting a level replaces every topic preference for that experience, so an override sent alongside a level wins. The response reports what each scope now resolves to, in the order the entries were sent.
      */
     public CompletableFuture<SetNotificationsResponse> set(
             SetNotificationsRequest request, RequestOptions requestOptions) {
-        return this.rawClient.set(request, requestOptions).thenApply(response -> response.body());
+        CompletableFuture<WhopApiHttpResponse<SetNotificationsResponse>> rawFuture =
+                this.rawClient.set(request, requestOptions);
+        CompletableFuture<SetNotificationsResponse> future = rawFuture.thenApply(response -> response.body());
+        future.whenComplete((result_, throwable_) -> {
+            if (future.isCancelled()) {
+                rawFuture.cancel(true);
+            }
+        });
+        return future;
     }
 
     public AsyncExperiencesClient experiences() {

@@ -7,16 +7,13 @@ import com.whop.api.core.ClientOptions;
 import com.whop.api.core.RequestOptions;
 import com.whop.api.core.pagination.SyncPagingIterable;
 import com.whop.api.resources.socialaccounts.requests.ConnectSocialAccountsRequest;
-import com.whop.api.resources.socialaccounts.requests.CreateSocialAccountsRequest;
 import com.whop.api.resources.socialaccounts.requests.DeleteSocialAccountsRequest;
-import com.whop.api.resources.socialaccounts.requests.LeadFormsSocialAccountsRequest;
 import com.whop.api.resources.socialaccounts.requests.ListSocialAccountsRequest;
-import com.whop.api.resources.socialaccounts.requests.PostsSocialAccountsRequest;
+import com.whop.api.resources.socialaccounts.requests.RefreshSocialAccountsRequest;
 import com.whop.api.resources.socialaccounts.types.ConnectSocialAccountsResponse;
+import com.whop.api.resources.socialaccounts.types.CreateSocialAccountsRequestBody;
 import com.whop.api.resources.socialaccounts.types.DeleteSocialAccountsResponse;
-import com.whop.api.resources.socialaccounts.types.LeadFormsSocialAccountsResponse;
 import com.whop.api.types.SocialAccount;
-import com.whop.api.types.SocialAccountPost;
 
 public class SocialAccountsClient {
     protected final ClientOptions clientOptions;
@@ -36,84 +33,84 @@ public class SocialAccountsClient {
     }
 
     /**
-     * Lists the social accounts linked to an account or user.
+     * Deprecated compatibility endpoint. List external accounts with <code>GET /external_accounts</code> instead.
      */
     public SyncPagingIterable<SocialAccount> list() {
         return this.rawClient.list().body();
     }
 
     /**
-     * Lists the social accounts linked to an account or user.
+     * Deprecated compatibility endpoint. List external accounts with <code>GET /external_accounts</code> instead.
      */
     public SyncPagingIterable<SocialAccount> list(RequestOptions requestOptions) {
         return this.rawClient.list(requestOptions).body();
     }
 
     /**
-     * Lists the social accounts linked to an account or user.
+     * Deprecated compatibility endpoint. List external accounts with <code>GET /external_accounts</code> instead.
      */
     public SyncPagingIterable<SocialAccount> list(ListSocialAccountsRequest request) {
         return this.rawClient.list(request).body();
     }
 
     /**
-     * Lists the social accounts linked to an account or user.
+     * Deprecated compatibility endpoint. List external accounts with <code>GET /external_accounts</code> instead.
      */
     public SyncPagingIterable<SocialAccount> list(ListSocialAccountsRequest request, RequestOptions requestOptions) {
         return this.rawClient.list(request, requestOptions).body();
     }
 
     /**
-     * Creates or returns a Whop-managed Facebook page for an account.
+     * Deprecated compatibility endpoint. Create external accounts with <code>POST /external_accounts</code> instead.
      */
-    public SocialAccount create(CreateSocialAccountsRequest request) {
+    public SocialAccount create(CreateSocialAccountsRequestBody request) {
         return this.rawClient.create(request).body();
     }
 
     /**
-     * Creates or returns a Whop-managed Facebook page for an account.
+     * Deprecated compatibility endpoint. Create external accounts with <code>POST /external_accounts</code> instead.
      */
-    public SocialAccount create(CreateSocialAccountsRequest request, RequestOptions requestOptions) {
+    public SocialAccount create(CreateSocialAccountsRequestBody request, RequestOptions requestOptions) {
         return this.rawClient.create(request, requestOptions).body();
     }
 
     /**
-     * Starts an OAuth connection flow and returns an authorize_url where the user can connect a social account.
+     * Deprecated compatibility endpoint. Connect external accounts with <code>POST /external_accounts/connect</code> instead.
      */
     public ConnectSocialAccountsResponse connect(ConnectSocialAccountsRequest request) {
         return this.rawClient.connect(request).body();
     }
 
     /**
-     * Starts an OAuth connection flow and returns an authorize_url where the user can connect a social account.
+     * Deprecated compatibility endpoint. Connect external accounts with <code>POST /external_accounts/connect</code> instead.
      */
     public ConnectSocialAccountsResponse connect(ConnectSocialAccountsRequest request, RequestOptions requestOptions) {
         return this.rawClient.connect(request, requestOptions).body();
     }
 
     /**
-     * Disconnects a social account from an account or user without deleting the underlying platform account.
+     * Deprecated compatibility endpoint. Disconnect external accounts with <code>DELETE /external_accounts/{id}</code> instead.
      */
     public DeleteSocialAccountsResponse delete(String id) {
         return this.rawClient.delete(id).body();
     }
 
     /**
-     * Disconnects a social account from an account or user without deleting the underlying platform account.
+     * Deprecated compatibility endpoint. Disconnect external accounts with <code>DELETE /external_accounts/{id}</code> instead.
      */
     public DeleteSocialAccountsResponse delete(String id, RequestOptions requestOptions) {
         return this.rawClient.delete(id, requestOptions).body();
     }
 
     /**
-     * Disconnects a social account from an account or user without deleting the underlying platform account.
+     * Deprecated compatibility endpoint. Disconnect external accounts with <code>DELETE /external_accounts/{id}</code> instead.
      */
     public DeleteSocialAccountsResponse delete(String id, DeleteSocialAccountsRequest request) {
         return this.rawClient.delete(id, request).body();
     }
 
     /**
-     * Disconnects a social account from an account or user without deleting the underlying platform account.
+     * Deprecated compatibility endpoint. Disconnect external accounts with <code>DELETE /external_accounts/{id}</code> instead.
      */
     public DeleteSocialAccountsResponse delete(
             String id, DeleteSocialAccountsRequest request, RequestOptions requestOptions) {
@@ -121,32 +118,30 @@ public class SocialAccountsClient {
     }
 
     /**
-     * Lists the active lead (instant) forms that already exist on a connected Facebook page, so an ad can reuse one as its <code>lead_gen_form_id</code> instead of authoring a new form. Every active form comes back in a single response — the list is not paginated.
+     * Deprecated compatibility endpoint. Refresh external accounts with <code>POST /external_accounts/{id}/refresh</code> instead.
      */
-    public LeadFormsSocialAccountsResponse leadForms(String id, LeadFormsSocialAccountsRequest request) {
-        return this.rawClient.leadForms(id, request).body();
+    public SocialAccount refresh(String id) {
+        return this.rawClient.refresh(id).body();
     }
 
     /**
-     * Lists the active lead (instant) forms that already exist on a connected Facebook page, so an ad can reuse one as its <code>lead_gen_form_id</code> instead of authoring a new form. Every active form comes back in a single response — the list is not paginated.
+     * Deprecated compatibility endpoint. Refresh external accounts with <code>POST /external_accounts/{id}/refresh</code> instead.
      */
-    public LeadFormsSocialAccountsResponse leadForms(
-            String id, LeadFormsSocialAccountsRequest request, RequestOptions requestOptions) {
-        return this.rawClient.leadForms(id, request, requestOptions).body();
+    public SocialAccount refresh(String id, RequestOptions requestOptions) {
+        return this.rawClient.refresh(id, requestOptions).body();
     }
 
     /**
-     * Lists the existing posts of a connected Facebook page, Instagram account, or TikTok account.
+     * Deprecated compatibility endpoint. Refresh external accounts with <code>POST /external_accounts/{id}/refresh</code> instead.
      */
-    public SyncPagingIterable<SocialAccountPost> posts(String id, PostsSocialAccountsRequest request) {
-        return this.rawClient.posts(id, request).body();
+    public SocialAccount refresh(String id, RefreshSocialAccountsRequest request) {
+        return this.rawClient.refresh(id, request).body();
     }
 
     /**
-     * Lists the existing posts of a connected Facebook page, Instagram account, or TikTok account.
+     * Deprecated compatibility endpoint. Refresh external accounts with <code>POST /external_accounts/{id}/refresh</code> instead.
      */
-    public SyncPagingIterable<SocialAccountPost> posts(
-            String id, PostsSocialAccountsRequest request, RequestOptions requestOptions) {
-        return this.rawClient.posts(id, request, requestOptions).body();
+    public SocialAccount refresh(String id, RefreshSocialAccountsRequest request, RequestOptions requestOptions) {
+        return this.rawClient.refresh(id, request, requestOptions).body();
     }
 }

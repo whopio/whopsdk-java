@@ -123,7 +123,6 @@ public final class PaymentNextActionRedirectData {
 
         private Optional<Integer> frameMaxWidth = Optional.empty();
 
-        @JsonAnySetter
         private Map<String, Object> additionalProperties = new HashMap<>();
 
         private Builder() {}
@@ -136,7 +135,6 @@ public final class PaymentNextActionRedirectData {
         }
 
         /**
-         * <p>The provider's page for this payment, as an absolute URL — take the buyer there.</p>
          * <p>The provider's page for this payment, as an absolute URL — take the buyer there.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
@@ -186,6 +184,14 @@ public final class PaymentNextActionRedirectData {
         @java.lang.Override
         public PaymentNextActionRedirectData build() {
             return new PaymentNextActionRedirectData(frameMaxWidth, url, additionalProperties);
+        }
+
+        @JsonAnySetter
+        private void putAdditionalPropertyFromJson(String key, Object value) {
+            if (key.equalsIgnoreCase("frame_max_width") || key.equalsIgnoreCase("url")) {
+                return;
+            }
+            this.additionalProperties.put(key, value);
         }
 
         @java.lang.Override

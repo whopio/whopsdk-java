@@ -9,7 +9,6 @@ import com.whop.api.core.pagination.SyncPagingIterable;
 import com.whop.api.resources.refunds.requests.ListRefundsRequest;
 import com.whop.api.resources.refunds.requests.RetrieveRefundsRequest;
 import com.whop.api.types.Refund;
-import com.whop.api.types.RefundListItem;
 
 public class RefundsClient {
     protected final ClientOptions clientOptions;
@@ -29,108 +28,56 @@ public class RefundsClient {
     }
 
     /**
-     * Returns a paginated list of refunds, with optional filtering by payment, company, user, and creation date.
-     * <p>Required permissions:</p>
-     * <ul>
-     * <li><code>payment:basic:read</code></li>
-     * </ul>
+     * Lists refunds the caller can read, newest first. Filter by payment, account, or buyer to narrow the results.
      */
-    public SyncPagingIterable<RefundListItem> list() {
+    public SyncPagingIterable<Refund> list() {
         return this.rawClient.list().body();
     }
 
     /**
-     * Returns a paginated list of refunds, with optional filtering by payment, company, user, and creation date.
-     * <p>Required permissions:</p>
-     * <ul>
-     * <li><code>payment:basic:read</code></li>
-     * </ul>
+     * Lists refunds the caller can read, newest first. Filter by payment, account, or buyer to narrow the results.
      */
-    public SyncPagingIterable<RefundListItem> list(RequestOptions requestOptions) {
+    public SyncPagingIterable<Refund> list(RequestOptions requestOptions) {
         return this.rawClient.list(requestOptions).body();
     }
 
     /**
-     * Returns a paginated list of refunds, with optional filtering by payment, company, user, and creation date.
-     * <p>Required permissions:</p>
-     * <ul>
-     * <li><code>payment:basic:read</code></li>
-     * </ul>
+     * Lists refunds the caller can read, newest first. Filter by payment, account, or buyer to narrow the results.
      */
-    public SyncPagingIterable<RefundListItem> list(ListRefundsRequest request) {
+    public SyncPagingIterable<Refund> list(ListRefundsRequest request) {
         return this.rawClient.list(request).body();
     }
 
     /**
-     * Returns a paginated list of refunds, with optional filtering by payment, company, user, and creation date.
-     * <p>Required permissions:</p>
-     * <ul>
-     * <li><code>payment:basic:read</code></li>
-     * </ul>
+     * Lists refunds the caller can read, newest first. Filter by payment, account, or buyer to narrow the results.
      */
-    public SyncPagingIterable<RefundListItem> list(ListRefundsRequest request, RequestOptions requestOptions) {
+    public SyncPagingIterable<Refund> list(ListRefundsRequest request, RequestOptions requestOptions) {
         return this.rawClient.list(request, requestOptions).body();
     }
 
     /**
-     * Retrieves the details of an existing refund.
-     * <p>Required permissions:</p>
-     * <ul>
-     * <li><code>payment:basic:read</code></li>
-     * <li><code>plan:basic:read</code></li>
-     * <li><code>access_pass:basic:read</code></li>
-     * <li><code>member:email:read</code></li>
-     * <li><code>member:basic:read</code></li>
-     * <li><code>member:phone:read</code></li>
-     * </ul>
+     * Returns one refund.
      */
     public Refund retrieve(String id) {
         return this.rawClient.retrieve(id).body();
     }
 
     /**
-     * Retrieves the details of an existing refund.
-     * <p>Required permissions:</p>
-     * <ul>
-     * <li><code>payment:basic:read</code></li>
-     * <li><code>plan:basic:read</code></li>
-     * <li><code>access_pass:basic:read</code></li>
-     * <li><code>member:email:read</code></li>
-     * <li><code>member:basic:read</code></li>
-     * <li><code>member:phone:read</code></li>
-     * </ul>
+     * Returns one refund.
      */
     public Refund retrieve(String id, RequestOptions requestOptions) {
         return this.rawClient.retrieve(id, requestOptions).body();
     }
 
     /**
-     * Retrieves the details of an existing refund.
-     * <p>Required permissions:</p>
-     * <ul>
-     * <li><code>payment:basic:read</code></li>
-     * <li><code>plan:basic:read</code></li>
-     * <li><code>access_pass:basic:read</code></li>
-     * <li><code>member:email:read</code></li>
-     * <li><code>member:basic:read</code></li>
-     * <li><code>member:phone:read</code></li>
-     * </ul>
+     * Returns one refund.
      */
     public Refund retrieve(String id, RetrieveRefundsRequest request) {
         return this.rawClient.retrieve(id, request).body();
     }
 
     /**
-     * Retrieves the details of an existing refund.
-     * <p>Required permissions:</p>
-     * <ul>
-     * <li><code>payment:basic:read</code></li>
-     * <li><code>plan:basic:read</code></li>
-     * <li><code>access_pass:basic:read</code></li>
-     * <li><code>member:email:read</code></li>
-     * <li><code>member:basic:read</code></li>
-     * <li><code>member:phone:read</code></li>
-     * </ul>
+     * Returns one refund.
      */
     public Refund retrieve(String id, RetrieveRefundsRequest request, RequestOptions requestOptions) {
         return this.rawClient.retrieve(id, request, requestOptions).body();

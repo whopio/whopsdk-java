@@ -400,7 +400,6 @@ public final class CheckoutConfigurationListItemPlan {
 
         private Optional<Integer> billingPeriod = Optional.empty();
 
-        @JsonAnySetter
         private Map<String, Object> additionalProperties = new HashMap<>();
 
         private Builder() {}
@@ -424,7 +423,6 @@ public final class CheckoutConfigurationListItemPlan {
 
         /**
          * <p>Whether the creator has turned on adaptive pricing for this plan. Raw setting — does not check processor compatibility or feature flags.</p>
-         * <p>Whether the creator has turned on adaptive pricing for this plan. Raw setting — does not check processor compatibility or feature flags.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
@@ -435,7 +433,6 @@ public final class CheckoutConfigurationListItemPlan {
         }
 
         /**
-         * <p>The currency used for all prices on this plan (e.g., 'usd', 'eur'). All monetary amounts on the plan are denominated in this currency.</p>
          * <p>The currency used for all prices on this plan (e.g., 'usd', 'eur'). All monetary amounts on the plan are denominated in this currency.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
@@ -448,7 +445,6 @@ public final class CheckoutConfigurationListItemPlan {
 
         /**
          * <p>The unique identifier for the plan.</p>
-         * <p>The unique identifier for the plan.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
@@ -459,7 +455,6 @@ public final class CheckoutConfigurationListItemPlan {
         }
 
         /**
-         * <p>The initial purchase price in the plan's base_currency (e.g., 49.99 for $49.99). For one-time plans, this is the full price. For renewal plans, this is charged on top of the first renewal_price.</p>
          * <p>The initial purchase price in the plan's base_currency (e.g., 49.99 for $49.99). For one-time plans, this is the full price. For renewal plans, this is charged on top of the first renewal_price.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
@@ -472,7 +467,6 @@ public final class CheckoutConfigurationListItemPlan {
 
         /**
          * <p>The billing model for this plan: 'renewal' for recurring subscriptions or 'one_time' for single payments.</p>
-         * <p>The billing model for this plan: 'renewal' for recurring subscriptions or 'one_time' for single payments.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
@@ -483,7 +477,6 @@ public final class CheckoutConfigurationListItemPlan {
         }
 
         /**
-         * <p>Sales method for this plan: <code>buy_now</code> for immediate purchase or <code>waitlist</code> for waitlist-based access.</p>
          * <p>Sales method for this plan: <code>buy_now</code> for immediate purchase or <code>waitlist</code> for waitlist-based access.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
@@ -496,7 +489,6 @@ public final class CheckoutConfigurationListItemPlan {
 
         /**
          * <p>The recurring price charged every billing_period in the plan's base_currency (e.g., 9.99 for $9.99/period). Zero for one-time plans.</p>
-         * <p>The recurring price charged every billing_period in the plan's base_currency (e.g., 9.99 for $9.99/period). Zero for one-time plans.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
@@ -507,7 +499,6 @@ public final class CheckoutConfigurationListItemPlan {
         }
 
         /**
-         * <p>Controls whether the plan is visible to customers. When set to 'hidden', the plan is only accessible via direct link.</p>
          * <p>Controls whether the plan is visible to customers. When set to 'hidden', the plan is only accessible via direct link.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
@@ -678,6 +669,25 @@ public final class CheckoutConfigurationListItemPlan {
                     trialPeriodDays,
                     visibility,
                     additionalProperties);
+        }
+
+        @JsonAnySetter
+        private void putAdditionalPropertyFromJson(String key, Object value) {
+            if (key.equalsIgnoreCase("adaptive_pricing_enabled")
+                    || key.equalsIgnoreCase("billing_period")
+                    || key.equalsIgnoreCase("currency")
+                    || key.equalsIgnoreCase("expiration_days")
+                    || key.equalsIgnoreCase("id")
+                    || key.equalsIgnoreCase("initial_price")
+                    || key.equalsIgnoreCase("plan_type")
+                    || key.equalsIgnoreCase("release_method")
+                    || key.equalsIgnoreCase("renewal_price")
+                    || key.equalsIgnoreCase("three_ds_level")
+                    || key.equalsIgnoreCase("trial_period_days")
+                    || key.equalsIgnoreCase("visibility")) {
+                return;
+            }
+            this.additionalProperties.put(key, value);
         }
 
         @java.lang.Override

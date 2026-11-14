@@ -123,7 +123,6 @@ public final class AccountDisputeAlertAutoRefundControl {
 
         private Optional<Double> thresholdUsd = Optional.empty();
 
-        @JsonAnySetter
         private Map<String, Object> additionalProperties = new HashMap<>();
 
         private Builder() {}
@@ -136,7 +135,6 @@ public final class AccountDisputeAlertAutoRefundControl {
         }
 
         /**
-         * <p>Whether the account owner is prevented from changing this threshold.</p>
          * <p>Whether the account owner is prevented from changing this threshold.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
@@ -186,6 +184,14 @@ public final class AccountDisputeAlertAutoRefundControl {
         @java.lang.Override
         public AccountDisputeAlertAutoRefundControl build() {
             return new AccountDisputeAlertAutoRefundControl(locked, thresholdUsd, additionalProperties);
+        }
+
+        @JsonAnySetter
+        private void putAdditionalPropertyFromJson(String key, Object value) {
+            if (key.equalsIgnoreCase("locked") || key.equalsIgnoreCase("threshold_usd")) {
+                return;
+            }
+            this.additionalProperties.put(key, value);
         }
 
         @java.lang.Override

@@ -33,28 +33,28 @@ public class MethodsClient {
     }
 
     /**
-     * Lists the bank accounts, wallets, and crypto addresses an account or user can withdraw to, newest first.
+     * Lists the bank accounts, wallets, and crypto addresses an account or user can pay out to, newest first.
      */
     public SyncPagingIterable<ListMethodsResponseDataItem> list() {
         return this.rawClient.list().body();
     }
 
     /**
-     * Lists the bank accounts, wallets, and crypto addresses an account or user can withdraw to, newest first.
+     * Lists the bank accounts, wallets, and crypto addresses an account or user can pay out to, newest first.
      */
     public SyncPagingIterable<ListMethodsResponseDataItem> list(RequestOptions requestOptions) {
         return this.rawClient.list(requestOptions).body();
     }
 
     /**
-     * Lists the bank accounts, wallets, and crypto addresses an account or user can withdraw to, newest first.
+     * Lists the bank accounts, wallets, and crypto addresses an account or user can pay out to, newest first.
      */
     public SyncPagingIterable<ListMethodsResponseDataItem> list(ListMethodsRequest request) {
         return this.rawClient.list(request).body();
     }
 
     /**
-     * Lists the bank accounts, wallets, and crypto addresses an account or user can withdraw to, newest first.
+     * Lists the bank accounts, wallets, and crypto addresses an account or user can pay out to, newest first.
      */
     public SyncPagingIterable<ListMethodsResponseDataItem> list(
             ListMethodsRequest request, RequestOptions requestOptions) {
@@ -62,14 +62,14 @@ public class MethodsClient {
     }
 
     /**
-     * Saves a new place an account or user can withdraw to. Sensitive details are vaulted in transit and never stored raw.
+     * Saves a bank account, wallet, or crypto address an account or user can pay out to, from a method listed by <code>GET /payouts/supported_methods</code>. Sensitive details are vaulted in transit and never stored raw.
      */
     public CreateMethodsResponse create(CreateMethodsRequest request) {
         return this.rawClient.create(request).body();
     }
 
     /**
-     * Saves a new place an account or user can withdraw to. Sensitive details are vaulted in transit and never stored raw.
+     * Saves a bank account, wallet, or crypto address an account or user can pay out to, from a method listed by <code>GET /payouts/supported_methods</code>. Sensitive details are vaulted in transit and never stored raw.
      */
     public CreateMethodsResponse create(CreateMethodsRequest request, RequestOptions requestOptions) {
         return this.rawClient.create(request, requestOptions).body();
@@ -104,14 +104,28 @@ public class MethodsClient {
     }
 
     /**
-     * Changes the label used to identify a saved payout method.
+     * Changes the label used to identify a saved payout method, makes it the account's default payout method, or updates the payout address on file for it. Send <code>address</code> on its own: it cannot be combined with <code>nickname</code> or <code>is_default</code>. Address updates require the <code>payout:account:update</code> scope as well, on the same account, and are supported only for bank and wallet payout methods, not recipient payout methods.
+     */
+    public UpdateMethodsResponse update(String id) {
+        return this.rawClient.update(id).body();
+    }
+
+    /**
+     * Changes the label used to identify a saved payout method, makes it the account's default payout method, or updates the payout address on file for it. Send <code>address</code> on its own: it cannot be combined with <code>nickname</code> or <code>is_default</code>. Address updates require the <code>payout:account:update</code> scope as well, on the same account, and are supported only for bank and wallet payout methods, not recipient payout methods.
+     */
+    public UpdateMethodsResponse update(String id, RequestOptions requestOptions) {
+        return this.rawClient.update(id, requestOptions).body();
+    }
+
+    /**
+     * Changes the label used to identify a saved payout method, makes it the account's default payout method, or updates the payout address on file for it. Send <code>address</code> on its own: it cannot be combined with <code>nickname</code> or <code>is_default</code>. Address updates require the <code>payout:account:update</code> scope as well, on the same account, and are supported only for bank and wallet payout methods, not recipient payout methods.
      */
     public UpdateMethodsResponse update(String id, UpdateMethodsRequest request) {
         return this.rawClient.update(id, request).body();
     }
 
     /**
-     * Changes the label used to identify a saved payout method.
+     * Changes the label used to identify a saved payout method, makes it the account's default payout method, or updates the payout address on file for it. Send <code>address</code> on its own: it cannot be combined with <code>nickname</code> or <code>is_default</code>. Address updates require the <code>payout:account:update</code> scope as well, on the same account, and are supported only for bank and wallet payout methods, not recipient payout methods.
      */
     public UpdateMethodsResponse update(String id, UpdateMethodsRequest request, RequestOptions requestOptions) {
         return this.rawClient.update(id, request, requestOptions).body();

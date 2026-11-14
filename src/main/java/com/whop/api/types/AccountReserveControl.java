@@ -122,7 +122,6 @@ public final class AccountReserveControl {
 
         private Optional<Double> percentage = Optional.empty();
 
-        @JsonAnySetter
         private Map<String, Object> additionalProperties = new HashMap<>();
 
         private Builder() {}
@@ -135,7 +134,6 @@ public final class AccountReserveControl {
         }
 
         /**
-         * <p>Number of days reserved funds are held before release.</p>
          * <p>Number of days reserved funds are held before release.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
@@ -185,6 +183,14 @@ public final class AccountReserveControl {
         @java.lang.Override
         public AccountReserveControl build() {
             return new AccountReserveControl(holdPeriodDays, percentage, additionalProperties);
+        }
+
+        @JsonAnySetter
+        private void putAdditionalPropertyFromJson(String key, Object value) {
+            if (key.equalsIgnoreCase("hold_period_days") || key.equalsIgnoreCase("percentage")) {
+                return;
+            }
+            this.additionalProperties.put(key, value);
         }
 
         @java.lang.Override

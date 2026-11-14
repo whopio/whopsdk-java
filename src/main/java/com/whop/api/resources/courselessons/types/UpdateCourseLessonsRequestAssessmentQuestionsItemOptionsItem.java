@@ -144,7 +144,6 @@ public final class UpdateCourseLessonsRequestAssessmentQuestionsItemOptionsItem 
 
         private Optional<String> id = Optional.empty();
 
-        @JsonAnySetter
         private Map<String, Object> additionalProperties = new HashMap<>();
 
         private Builder() {}
@@ -159,7 +158,6 @@ public final class UpdateCourseLessonsRequestAssessmentQuestionsItemOptionsItem 
 
         /**
          * <p>Whether this option is a correct answer</p>
-         * <p>Whether this option is a correct answer</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
@@ -170,7 +168,6 @@ public final class UpdateCourseLessonsRequestAssessmentQuestionsItemOptionsItem 
         }
 
         /**
-         * <p>The text of the answer option</p>
          * <p>The text of the answer option</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
@@ -221,6 +218,16 @@ public final class UpdateCourseLessonsRequestAssessmentQuestionsItemOptionsItem 
         public UpdateCourseLessonsRequestAssessmentQuestionsItemOptionsItem build() {
             return new UpdateCourseLessonsRequestAssessmentQuestionsItemOptionsItem(
                     id, isCorrect, optionText, additionalProperties);
+        }
+
+        @JsonAnySetter
+        private void putAdditionalPropertyFromJson(String key, Object value) {
+            if (key.equalsIgnoreCase("id")
+                    || key.equalsIgnoreCase("is_correct")
+                    || key.equalsIgnoreCase("option_text")) {
+                return;
+            }
+            this.additionalProperties.put(key, value);
         }
 
         @java.lang.Override

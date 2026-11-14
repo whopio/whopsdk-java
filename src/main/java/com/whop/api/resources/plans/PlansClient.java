@@ -35,154 +35,168 @@ public class PlansClient {
     }
 
     /**
-     * Returns a paginated list of plans belonging to an account, with optional filtering by visibility, type, release method, and product.
+     * Deprecated compatibility endpoint. List variants with <code>GET /variants</code> instead.
+     */
+    public SyncPagingIterable<PlanListItem> list() {
+        return this.rawClient.list().body();
+    }
+
+    /**
+     * Deprecated compatibility endpoint. List variants with <code>GET /variants</code> instead.
+     */
+    public SyncPagingIterable<PlanListItem> list(RequestOptions requestOptions) {
+        return this.rawClient.list(requestOptions).body();
+    }
+
+    /**
+     * Deprecated compatibility endpoint. List variants with <code>GET /variants</code> instead.
      */
     public SyncPagingIterable<PlanListItem> list(ListPlansRequest request) {
         return this.rawClient.list(request).body();
     }
 
     /**
-     * Returns a paginated list of plans belonging to an account, with optional filtering by visibility, type, release method, and product.
+     * Deprecated compatibility endpoint. List variants with <code>GET /variants</code> instead.
      */
     public SyncPagingIterable<PlanListItem> list(ListPlansRequest request, RequestOptions requestOptions) {
         return this.rawClient.list(request, requestOptions).body();
     }
 
     /**
-     * Create a new pricing plan for a product. The plan defines the billing interval, price, and availability for customers.
+     * Deprecated compatibility endpoint. Create variants with <code>POST /variants</code> instead.
      */
     public Plan create() {
         return this.rawClient.create().body();
     }
 
     /**
-     * Create a new pricing plan for a product. The plan defines the billing interval, price, and availability for customers.
+     * Deprecated compatibility endpoint. Create variants with <code>POST /variants</code> instead.
      */
     public Plan create(RequestOptions requestOptions) {
         return this.rawClient.create(requestOptions).body();
     }
 
     /**
-     * Create a new pricing plan for a product. The plan defines the billing interval, price, and availability for customers.
+     * Deprecated compatibility endpoint. Create variants with <code>POST /variants</code> instead.
      */
     public Plan create(CreatePlansRequest request) {
         return this.rawClient.create(request).body();
     }
 
     /**
-     * Create a new pricing plan for a product. The plan defines the billing interval, price, and availability for customers.
+     * Deprecated compatibility endpoint. Create variants with <code>POST /variants</code> instead.
      */
     public Plan create(CreatePlansRequest request, RequestOptions requestOptions) {
         return this.rawClient.create(request, requestOptions).body();
     }
 
     /**
-     * Retrieves the details of an existing plan.
+     * Deprecated compatibility endpoint. Retrieve variants with <code>GET /variants/{id}</code> instead.
      */
     public Plan retrieve(String id) {
         return this.rawClient.retrieve(id).body();
     }
 
     /**
-     * Retrieves the details of an existing plan.
+     * Deprecated compatibility endpoint. Retrieve variants with <code>GET /variants/{id}</code> instead.
      */
     public Plan retrieve(String id, RequestOptions requestOptions) {
         return this.rawClient.retrieve(id, requestOptions).body();
     }
 
     /**
-     * Retrieves the details of an existing plan.
+     * Deprecated compatibility endpoint. Retrieve variants with <code>GET /variants/{id}</code> instead.
      */
     public Plan retrieve(String id, RetrievePlansRequest request) {
         return this.rawClient.retrieve(id, request).body();
     }
 
     /**
-     * Retrieves the details of an existing plan.
+     * Deprecated compatibility endpoint. Retrieve variants with <code>GET /variants/{id}</code> instead.
      */
     public Plan retrieve(String id, RetrievePlansRequest request, RequestOptions requestOptions) {
         return this.rawClient.retrieve(id, request, requestOptions).body();
     }
 
     /**
-     * Permanently delete a plan from a product. Existing memberships on this plan will not be affected.
+     * Deprecated compatibility endpoint. Delete variants with <code>DELETE /variants/{id}</code> instead.
      */
     public DeletePlansResponse delete(String id) {
         return this.rawClient.delete(id).body();
     }
 
     /**
-     * Permanently delete a plan from a product. Existing memberships on this plan will not be affected.
+     * Deprecated compatibility endpoint. Delete variants with <code>DELETE /variants/{id}</code> instead.
      */
     public DeletePlansResponse delete(String id, RequestOptions requestOptions) {
         return this.rawClient.delete(id, requestOptions).body();
     }
 
     /**
-     * Permanently delete a plan from a product. Existing memberships on this plan will not be affected.
+     * Deprecated compatibility endpoint. Delete variants with <code>DELETE /variants/{id}</code> instead.
      */
     public DeletePlansResponse delete(String id, DeletePlansRequest request) {
         return this.rawClient.delete(id, request).body();
     }
 
     /**
-     * Permanently delete a plan from a product. Existing memberships on this plan will not be affected.
+     * Deprecated compatibility endpoint. Delete variants with <code>DELETE /variants/{id}</code> instead.
      */
     public DeletePlansResponse delete(String id, DeletePlansRequest request, RequestOptions requestOptions) {
         return this.rawClient.delete(id, request, requestOptions).body();
     }
 
     /**
-     * Update a plan's pricing, billing interval, visibility, stock, and other settings.
+     * Deprecated compatibility endpoint. Update variants with <code>PATCH /variants/{id}</code> instead.
      */
     public Plan update(String id) {
         return this.rawClient.update(id).body();
     }
 
     /**
-     * Update a plan's pricing, billing interval, visibility, stock, and other settings.
+     * Deprecated compatibility endpoint. Update variants with <code>PATCH /variants/{id}</code> instead.
      */
     public Plan update(String id, RequestOptions requestOptions) {
         return this.rawClient.update(id, requestOptions).body();
     }
 
     /**
-     * Update a plan's pricing, billing interval, visibility, stock, and other settings.
+     * Deprecated compatibility endpoint. Update variants with <code>PATCH /variants/{id}</code> instead.
      */
     public Plan update(String id, UpdatePlansRequest request) {
         return this.rawClient.update(id, request).body();
     }
 
     /**
-     * Update a plan's pricing, billing interval, visibility, stock, and other settings.
+     * Deprecated compatibility endpoint. Update variants with <code>PATCH /variants/{id}</code> instead.
      */
     public Plan update(String id, UpdatePlansRequest request, RequestOptions requestOptions) {
         return this.rawClient.update(id, request, requestOptions).body();
     }
 
     /**
-     * Previews tax for a plan before checkout, based on the buyer's location.
+     * Deprecated compatibility endpoint. Quote tax with <code>POST /payment_quotes</code> instead.
      */
     public CalculateTaxPlansResponse calculateTax(String id) {
         return this.rawClient.calculateTax(id).body();
     }
 
     /**
-     * Previews tax for a plan before checkout, based on the buyer's location.
+     * Deprecated compatibility endpoint. Quote tax with <code>POST /payment_quotes</code> instead.
      */
     public CalculateTaxPlansResponse calculateTax(String id, RequestOptions requestOptions) {
         return this.rawClient.calculateTax(id, requestOptions).body();
     }
 
     /**
-     * Previews tax for a plan before checkout, based on the buyer's location.
+     * Deprecated compatibility endpoint. Quote tax with <code>POST /payment_quotes</code> instead.
      */
     public CalculateTaxPlansResponse calculateTax(String id, CalculateTaxPlansRequest request) {
         return this.rawClient.calculateTax(id, request).body();
     }
 
     /**
-     * Previews tax for a plan before checkout, based on the buyer's location.
+     * Deprecated compatibility endpoint. Quote tax with <code>POST /payment_quotes</code> instead.
      */
     public CalculateTaxPlansResponse calculateTax(
             String id, CalculateTaxPlansRequest request, RequestOptions requestOptions) {

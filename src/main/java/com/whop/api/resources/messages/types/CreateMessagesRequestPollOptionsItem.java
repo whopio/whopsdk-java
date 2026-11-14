@@ -31,17 +31,11 @@ public final class CreateMessagesRequestPollOptionsItem {
         this.additionalProperties = additionalProperties;
     }
 
-    /**
-     * @return Sequential ID for the poll option (starting from '1')
-     */
     @JsonProperty("id")
     public String getId() {
         return id;
     }
 
-    /**
-     * @return The text of the poll option
-     */
     @JsonProperty("text")
     public String getText() {
         return text;
@@ -78,18 +72,12 @@ public final class CreateMessagesRequestPollOptionsItem {
     }
 
     public interface IdStage {
-        /**
-         * <p>Sequential ID for the poll option (starting from '1')</p>
-         */
         TextStage id(@NotNull String id);
 
         Builder from(CreateMessagesRequestPollOptionsItem other);
     }
 
     public interface TextStage {
-        /**
-         * <p>The text of the poll option</p>
-         */
         _FinalStage text(@NotNull String text);
     }
 
@@ -107,7 +95,6 @@ public final class CreateMessagesRequestPollOptionsItem {
 
         private String text;
 
-        @JsonAnySetter
         private Map<String, Object> additionalProperties = new HashMap<>();
 
         private Builder() {}
@@ -119,11 +106,6 @@ public final class CreateMessagesRequestPollOptionsItem {
             return this;
         }
 
-        /**
-         * <p>Sequential ID for the poll option (starting from '1')</p>
-         * <p>Sequential ID for the poll option (starting from '1')</p>
-         * @return Reference to {@code this} so that method calls can be chained together.
-         */
         @java.lang.Override
         @JsonSetter("id")
         public TextStage id(@NotNull String id) {
@@ -131,11 +113,6 @@ public final class CreateMessagesRequestPollOptionsItem {
             return this;
         }
 
-        /**
-         * <p>The text of the poll option</p>
-         * <p>The text of the poll option</p>
-         * @return Reference to {@code this} so that method calls can be chained together.
-         */
         @java.lang.Override
         @JsonSetter("text")
         public _FinalStage text(@NotNull String text) {
@@ -146,6 +123,14 @@ public final class CreateMessagesRequestPollOptionsItem {
         @java.lang.Override
         public CreateMessagesRequestPollOptionsItem build() {
             return new CreateMessagesRequestPollOptionsItem(id, text, additionalProperties);
+        }
+
+        @JsonAnySetter
+        private void putAdditionalPropertyFromJson(String key, Object value) {
+            if (key.equalsIgnoreCase("id") || key.equalsIgnoreCase("text")) {
+                return;
+            }
+            this.additionalProperties.put(key, value);
         }
 
         @java.lang.Override

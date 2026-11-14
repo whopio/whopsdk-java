@@ -114,7 +114,7 @@ public final class Audience {
     }
 
     /**
-     * @return <code>custom</code> = a customer list (uploaded, or built from saved People filters); <code>lookalike</code> = Meta lookalike built from a custom audience.
+     * @return Whether the audience targets a defined group of people or people similar to an existing audience.
      */
     @JsonProperty("audience_type")
     public AudienceAudienceType getAudienceType() {
@@ -122,7 +122,7 @@ public final class Audience {
     }
 
     /**
-     * @return Whether membership keeps updating. <code>true</code> rebuilds it from the saved filters twice a day, so people join and leave as they start and stop matching. <code>false</code> keeps whoever matched when it was built and never rebuilds. Always <code>false</code> for uploaded lists and lookalikes.
+     * @return Whether Whop rebuilds membership from saved People filters twice a day. When <code>false</code>, People audiences keep the members matched at creation. Always <code>false</code> for uploaded lists, lookalikes, and engagement audiences.
      */
     @JsonProperty("auto_refresh")
     public boolean getAutoRefresh() {
@@ -138,7 +138,7 @@ public final class Audience {
     }
 
     /**
-     * @return Processing error message. <code>null</code> unless processing is partial or failed.
+     * @return Why a <code>pending</code> audience hasn't started, or why a <code>partial</code> or <code>failed</code> one isn't fully built. <code>null</code> when there is nothing to report.
      */
     @JsonIgnore
     public Optional<String> getErrorMessage() {
@@ -149,7 +149,7 @@ public final class Audience {
     }
 
     /**
-     * @return For audiences built from People filters: the filters that define membership, keyed exactly as <code>GET /people</code> accepts them — for example <code>{&quot;os&quot;: &quot;iOS&quot;, &quot;country&quot;: &quot;US&quot;}</code>. <code>null</code> for uploaded lists and lookalikes.
+     * @return Saved Whop People filters that define membership, using the same keys as <code>GET /people</code>. <code>null</code> for uploaded lists, engagement audiences, and lookalikes.
      */
     @JsonIgnore
     public Optional<Map<String, Object>> getFilters() {
@@ -206,7 +206,7 @@ public final class Audience {
     }
 
     /**
-     * @return Members successfully uploaded to connected ad accounts. Always 0 for lookalikes.
+     * @return Members successfully uploaded to connected ad accounts. Always 0 for lookalikes and engagement audiences.
      */
     @JsonProperty("matched_rows")
     public double getMatchedRows() {
@@ -227,7 +227,7 @@ public final class Audience {
     }
 
     /**
-     * @return Members processed from the source so far. Always 0 for lookalikes.
+     * @return Members processed from the source so far. Always 0 for lookalikes and engagement audiences.
      */
     @JsonProperty("processed_rows")
     public double getProcessedRows() {
@@ -254,7 +254,7 @@ public final class Audience {
     }
 
     /**
-     * @return Where members come from. <code>csv_upload</code> = an uploaded customer list; <code>people_filter</code> = built from saved People filters. See <code>auto_refresh</code> for whether a <code>people_filter</code> audience keeps updating.
+     * @return Membership source: an uploaded CSV, Whop People filters, or social engagement. Engagement audiences can no longer be created.
      */
     @JsonProperty("source_type")
     public AudienceSourceType getSourceType() {
@@ -262,7 +262,7 @@ public final class Audience {
     }
 
     /**
-     * @return Current state of the audience import. <code>syncing</code> means Whop is sending matched rows to connected ad accounts. When status is <code>partial</code> or <code>failed</code>, <code>error_message</code> explains what went wrong.
+     * @return Current state of audience creation. When a <code>pending</code> audience is waiting on something, such as an ad account to upload to, <code>error_message</code> says what. When status is <code>partial</code> or <code>failed</code>, <code>error_message</code> explains what went wrong.
      */
     @JsonProperty("status")
     public AudienceStatus getStatus() {
@@ -270,7 +270,7 @@ public final class Audience {
     }
 
     /**
-     * @return Total members detected in the source — CSV rows for uploaded lists, matching people for automatic audiences. Always 0 for lookalikes.
+     * @return Total members detected in the source — CSV rows for uploaded lists, matching people for automatic audiences. Always 0 for lookalikes and engagement audiences.
      */
     @JsonProperty("total_rows")
     public double getTotalRows() {
@@ -391,7 +391,7 @@ public final class Audience {
 
     public interface AudienceTypeStage {
         /**
-         * <p><code>custom</code> = a customer list (uploaded, or built from saved People filters); <code>lookalike</code> = Meta lookalike built from a custom audience.</p>
+         * <p>Whether the audience targets a defined group of people or people similar to an existing audience.</p>
          */
         AutoRefreshStage audienceType(@NotNull AudienceAudienceType audienceType);
 
@@ -400,7 +400,7 @@ public final class Audience {
 
     public interface AutoRefreshStage {
         /**
-         * <p>Whether membership keeps updating. <code>true</code> rebuilds it from the saved filters twice a day, so people join and leave as they start and stop matching. <code>false</code> keeps whoever matched when it was built and never rebuilds. Always <code>false</code> for uploaded lists and lookalikes.</p>
+         * <p>Whether Whop rebuilds membership from saved People filters twice a day. When <code>false</code>, People audiences keep the members matched at creation. Always <code>false</code> for uploaded lists, lookalikes, and engagement audiences.</p>
          */
         CreatedAtStage autoRefresh(boolean autoRefresh);
     }
@@ -421,7 +421,7 @@ public final class Audience {
 
     public interface MatchedRowsStage {
         /**
-         * <p>Members successfully uploaded to connected ad accounts. Always 0 for lookalikes.</p>
+         * <p>Members successfully uploaded to connected ad accounts. Always 0 for lookalikes and engagement audiences.</p>
          */
         NameStage matchedRows(double matchedRows);
     }
@@ -435,7 +435,7 @@ public final class Audience {
 
     public interface ProcessedRowsStage {
         /**
-         * <p>Members processed from the source so far. Always 0 for lookalikes.</p>
+         * <p>Members processed from the source so far. Always 0 for lookalikes and engagement audiences.</p>
          */
         ProgressPercentStage processedRows(double processedRows);
     }
@@ -449,21 +449,21 @@ public final class Audience {
 
     public interface SourceTypeStage {
         /**
-         * <p>Where members come from. <code>csv_upload</code> = an uploaded customer list; <code>people_filter</code> = built from saved People filters. See <code>auto_refresh</code> for whether a <code>people_filter</code> audience keeps updating.</p>
+         * <p>Membership source: an uploaded CSV, Whop People filters, or social engagement. Engagement audiences can no longer be created.</p>
          */
         StatusStage sourceType(@NotNull AudienceSourceType sourceType);
     }
 
     public interface StatusStage {
         /**
-         * <p>Current state of the audience import. <code>syncing</code> means Whop is sending matched rows to connected ad accounts. When status is <code>partial</code> or <code>failed</code>, <code>error_message</code> explains what went wrong.</p>
+         * <p>Current state of audience creation. When a <code>pending</code> audience is waiting on something, such as an ad account to upload to, <code>error_message</code> says what. When status is <code>partial</code> or <code>failed</code>, <code>error_message</code> explains what went wrong.</p>
          */
         TotalRowsStage status(@NotNull AudienceStatus status);
     }
 
     public interface TotalRowsStage {
         /**
-         * <p>Total members detected in the source — CSV rows for uploaded lists, matching people for automatic audiences. Always 0 for lookalikes.</p>
+         * <p>Total members detected in the source — CSV rows for uploaded lists, matching people for automatic audiences. Always 0 for lookalikes and engagement audiences.</p>
          */
         UpdatedAtStage totalRows(double totalRows);
     }
@@ -483,7 +483,7 @@ public final class Audience {
         _FinalStage additionalProperties(Map<String, Object> additionalProperties);
 
         /**
-         * <p>Processing error message. <code>null</code> unless processing is partial or failed.</p>
+         * <p>Why a <code>pending</code> audience hasn't started, or why a <code>partial</code> or <code>failed</code> one isn't fully built. <code>null</code> when there is nothing to report.</p>
          */
         _FinalStage errorMessage(Optional<String> errorMessage);
 
@@ -492,7 +492,7 @@ public final class Audience {
         _FinalStage errorMessage(Nullable<String> errorMessage);
 
         /**
-         * <p>For audiences built from People filters: the filters that define membership, keyed exactly as <code>GET /people</code> accepts them — for example <code>{&quot;os&quot;: &quot;iOS&quot;, &quot;country&quot;: &quot;US&quot;}</code>. <code>null</code> for uploaded lists and lookalikes.</p>
+         * <p>Saved Whop People filters that define membership, using the same keys as <code>GET /people</code>. <code>null</code> for uploaded lists, engagement audiences, and lookalikes.</p>
          */
         _FinalStage filters(Optional<Map<String, Object>> filters);
 
@@ -604,7 +604,6 @@ public final class Audience {
 
         private Optional<String> errorMessage = Optional.empty();
 
-        @JsonAnySetter
         private Map<String, Object> additionalProperties = new HashMap<>();
 
         private Builder() {}
@@ -635,8 +634,7 @@ public final class Audience {
         }
 
         /**
-         * <p><code>custom</code> = a customer list (uploaded, or built from saved People filters); <code>lookalike</code> = Meta lookalike built from a custom audience.</p>
-         * <p><code>custom</code> = a customer list (uploaded, or built from saved People filters); <code>lookalike</code> = Meta lookalike built from a custom audience.</p>
+         * <p>Whether the audience targets a defined group of people or people similar to an existing audience.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
@@ -647,8 +645,7 @@ public final class Audience {
         }
 
         /**
-         * <p>Whether membership keeps updating. <code>true</code> rebuilds it from the saved filters twice a day, so people join and leave as they start and stop matching. <code>false</code> keeps whoever matched when it was built and never rebuilds. Always <code>false</code> for uploaded lists and lookalikes.</p>
-         * <p>Whether membership keeps updating. <code>true</code> rebuilds it from the saved filters twice a day, so people join and leave as they start and stop matching. <code>false</code> keeps whoever matched when it was built and never rebuilds. Always <code>false</code> for uploaded lists and lookalikes.</p>
+         * <p>Whether Whop rebuilds membership from saved People filters twice a day. When <code>false</code>, People audiences keep the members matched at creation. Always <code>false</code> for uploaded lists, lookalikes, and engagement audiences.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
@@ -659,7 +656,6 @@ public final class Audience {
         }
 
         /**
-         * <p>When the audience was created, as an ISO 8601 timestamp.</p>
          * <p>When the audience was created, as an ISO 8601 timestamp.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
@@ -672,7 +668,6 @@ public final class Audience {
 
         /**
          * <p>Audience ID, prefixed <code>adaud_</code>.</p>
-         * <p>Audience ID, prefixed <code>adaud_</code>.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
@@ -683,8 +678,7 @@ public final class Audience {
         }
 
         /**
-         * <p>Members successfully uploaded to connected ad accounts. Always 0 for lookalikes.</p>
-         * <p>Members successfully uploaded to connected ad accounts. Always 0 for lookalikes.</p>
+         * <p>Members successfully uploaded to connected ad accounts. Always 0 for lookalikes and engagement audiences.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
@@ -696,7 +690,6 @@ public final class Audience {
 
         /**
          * <p>Audience display name.</p>
-         * <p>Audience display name.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
@@ -707,8 +700,7 @@ public final class Audience {
         }
 
         /**
-         * <p>Members processed from the source so far. Always 0 for lookalikes.</p>
-         * <p>Members processed from the source so far. Always 0 for lookalikes.</p>
+         * <p>Members processed from the source so far. Always 0 for lookalikes and engagement audiences.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
@@ -720,7 +712,6 @@ public final class Audience {
 
         /**
          * <p>Processing progress from 0 to 100.</p>
-         * <p>Processing progress from 0 to 100.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
@@ -731,8 +722,7 @@ public final class Audience {
         }
 
         /**
-         * <p>Where members come from. <code>csv_upload</code> = an uploaded customer list; <code>people_filter</code> = built from saved People filters. See <code>auto_refresh</code> for whether a <code>people_filter</code> audience keeps updating.</p>
-         * <p>Where members come from. <code>csv_upload</code> = an uploaded customer list; <code>people_filter</code> = built from saved People filters. See <code>auto_refresh</code> for whether a <code>people_filter</code> audience keeps updating.</p>
+         * <p>Membership source: an uploaded CSV, Whop People filters, or social engagement. Engagement audiences can no longer be created.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
@@ -743,8 +733,7 @@ public final class Audience {
         }
 
         /**
-         * <p>Current state of the audience import. <code>syncing</code> means Whop is sending matched rows to connected ad accounts. When status is <code>partial</code> or <code>failed</code>, <code>error_message</code> explains what went wrong.</p>
-         * <p>Current state of the audience import. <code>syncing</code> means Whop is sending matched rows to connected ad accounts. When status is <code>partial</code> or <code>failed</code>, <code>error_message</code> explains what went wrong.</p>
+         * <p>Current state of audience creation. When a <code>pending</code> audience is waiting on something, such as an ad account to upload to, <code>error_message</code> says what. When status is <code>partial</code> or <code>failed</code>, <code>error_message</code> explains what went wrong.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
@@ -755,8 +744,7 @@ public final class Audience {
         }
 
         /**
-         * <p>Total members detected in the source — CSV rows for uploaded lists, matching people for automatic audiences. Always 0 for lookalikes.</p>
-         * <p>Total members detected in the source — CSV rows for uploaded lists, matching people for automatic audiences. Always 0 for lookalikes.</p>
+         * <p>Total members detected in the source — CSV rows for uploaded lists, matching people for automatic audiences. Always 0 for lookalikes and engagement audiences.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
@@ -767,7 +755,6 @@ public final class Audience {
         }
 
         /**
-         * <p>When the audience was last updated, as an ISO 8601 timestamp.</p>
          * <p>When the audience was last updated, as an ISO 8601 timestamp.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
@@ -971,7 +958,7 @@ public final class Audience {
         }
 
         /**
-         * <p>For audiences built from People filters: the filters that define membership, keyed exactly as <code>GET /people</code> accepts them — for example <code>{&quot;os&quot;: &quot;iOS&quot;, &quot;country&quot;: &quot;US&quot;}</code>. <code>null</code> for uploaded lists and lookalikes.</p>
+         * <p>Saved Whop People filters that define membership, using the same keys as <code>GET /people</code>. <code>null</code> for uploaded lists, engagement audiences, and lookalikes.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
@@ -987,7 +974,7 @@ public final class Audience {
         }
 
         /**
-         * <p>For audiences built from People filters: the filters that define membership, keyed exactly as <code>GET /people</code> accepts them — for example <code>{&quot;os&quot;: &quot;iOS&quot;, &quot;country&quot;: &quot;US&quot;}</code>. <code>null</code> for uploaded lists and lookalikes.</p>
+         * <p>Saved Whop People filters that define membership, using the same keys as <code>GET /people</code>. <code>null</code> for uploaded lists, engagement audiences, and lookalikes.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
@@ -997,7 +984,7 @@ public final class Audience {
         }
 
         /**
-         * <p>For audiences built from People filters: the filters that define membership, keyed exactly as <code>GET /people</code> accepts them — for example <code>{&quot;os&quot;: &quot;iOS&quot;, &quot;country&quot;: &quot;US&quot;}</code>. <code>null</code> for uploaded lists and lookalikes.</p>
+         * <p>Saved Whop People filters that define membership, using the same keys as <code>GET /people</code>. <code>null</code> for uploaded lists, engagement audiences, and lookalikes.</p>
          */
         @java.lang.Override
         @JsonSetter(value = "filters", nulls = Nulls.SKIP)
@@ -1007,7 +994,7 @@ public final class Audience {
         }
 
         /**
-         * <p>Processing error message. <code>null</code> unless processing is partial or failed.</p>
+         * <p>Why a <code>pending</code> audience hasn't started, or why a <code>partial</code> or <code>failed</code> one isn't fully built. <code>null</code> when there is nothing to report.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
@@ -1023,7 +1010,7 @@ public final class Audience {
         }
 
         /**
-         * <p>Processing error message. <code>null</code> unless processing is partial or failed.</p>
+         * <p>Why a <code>pending</code> audience hasn't started, or why a <code>partial</code> or <code>failed</code> one isn't fully built. <code>null</code> when there is nothing to report.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
@@ -1033,7 +1020,7 @@ public final class Audience {
         }
 
         /**
-         * <p>Processing error message. <code>null</code> unless processing is partial or failed.</p>
+         * <p>Why a <code>pending</code> audience hasn't started, or why a <code>partial</code> or <code>failed</code> one isn't fully built. <code>null</code> when there is nothing to report.</p>
          */
         @java.lang.Override
         @JsonSetter(value = "error_message", nulls = Nulls.SKIP)
@@ -1066,6 +1053,33 @@ public final class Audience {
                     totalRows,
                     updatedAt,
                     additionalProperties);
+        }
+
+        @JsonAnySetter
+        private void putAdditionalPropertyFromJson(String key, Object value) {
+            if (key.equalsIgnoreCase("audience_type")
+                    || key.equalsIgnoreCase("auto_refresh")
+                    || key.equalsIgnoreCase("created_at")
+                    || key.equalsIgnoreCase("error_message")
+                    || key.equalsIgnoreCase("filters")
+                    || key.equalsIgnoreCase("id")
+                    || key.equalsIgnoreCase("last_refreshed_at")
+                    || key.equalsIgnoreCase("lookalike_ratio")
+                    || key.equalsIgnoreCase("lookalike_starting_ratio")
+                    || key.equalsIgnoreCase("match_rates")
+                    || key.equalsIgnoreCase("matched_rows")
+                    || key.equalsIgnoreCase("name")
+                    || key.equalsIgnoreCase("platform_audience_ids")
+                    || key.equalsIgnoreCase("processed_rows")
+                    || key.equalsIgnoreCase("progress_percent")
+                    || key.equalsIgnoreCase("source_audience_id")
+                    || key.equalsIgnoreCase("source_type")
+                    || key.equalsIgnoreCase("status")
+                    || key.equalsIgnoreCase("total_rows")
+                    || key.equalsIgnoreCase("updated_at")) {
+                return;
+            }
+            this.additionalProperties.put(key, value);
         }
 
         @java.lang.Override

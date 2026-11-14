@@ -87,7 +87,6 @@ public final class CreateOverridesRequest {
     public static final class Builder implements BodyStage, _FinalStage {
         private CreateOverridesRequestBody body;
 
-        @JsonAnySetter
         private Map<String, Object> additionalProperties = new HashMap<>();
 
         private Builder() {}
@@ -99,7 +98,6 @@ public final class CreateOverridesRequest {
         }
 
         /**
-         * <p>Parameters for CreateAffiliateOverride</p>
          * <p>Parameters for CreateAffiliateOverride</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
@@ -113,6 +111,14 @@ public final class CreateOverridesRequest {
         @java.lang.Override
         public CreateOverridesRequest build() {
             return new CreateOverridesRequest(body, additionalProperties);
+        }
+
+        @JsonAnySetter
+        private void putAdditionalPropertyFromJson(String key, Object value) {
+            if (key.equalsIgnoreCase("body")) {
+                return;
+            }
+            this.additionalProperties.put(key, value);
         }
 
         @java.lang.Override

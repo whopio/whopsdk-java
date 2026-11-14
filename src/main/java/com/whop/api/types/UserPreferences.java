@@ -25,7 +25,7 @@ import java.util.Optional;
 public final class UserPreferences {
     private final boolean bountyWorkerOnboardingDismissed;
 
-    private final boolean investigationEnabled;
+    private final boolean cardsAutoTopUp;
 
     private final boolean termsAccepted;
 
@@ -35,12 +35,12 @@ public final class UserPreferences {
 
     private UserPreferences(
             boolean bountyWorkerOnboardingDismissed,
-            boolean investigationEnabled,
+            boolean cardsAutoTopUp,
             boolean termsAccepted,
             Optional<String> termsAcceptedAt,
             Map<String, Object> additionalProperties) {
         this.bountyWorkerOnboardingDismissed = bountyWorkerOnboardingDismissed;
-        this.investigationEnabled = investigationEnabled;
+        this.cardsAutoTopUp = cardsAutoTopUp;
         this.termsAccepted = termsAccepted;
         this.termsAcceptedAt = termsAcceptedAt;
         this.additionalProperties = additionalProperties;
@@ -55,11 +55,11 @@ public final class UserPreferences {
     }
 
     /**
-     * @return Whether investigation mode is enabled for the user. Only meaningful for staff users with investigation access.
+     * @return Whether incoming funds, including pending balance, are automatically moved to the user's personal cards balance. <code>false</code> when the user has no cards balance.
      */
-    @JsonProperty("investigation_enabled")
-    public boolean getInvestigationEnabled() {
-        return investigationEnabled;
+    @JsonProperty("cards_auto_top_up")
+    public boolean getCardsAutoTopUp() {
+        return cardsAutoTopUp;
     }
 
     /**
@@ -100,7 +100,7 @@ public final class UserPreferences {
 
     private boolean equalTo(UserPreferences other) {
         return bountyWorkerOnboardingDismissed == other.bountyWorkerOnboardingDismissed
-                && investigationEnabled == other.investigationEnabled
+                && cardsAutoTopUp == other.cardsAutoTopUp
                 && termsAccepted == other.termsAccepted
                 && termsAcceptedAt.equals(other.termsAcceptedAt);
     }
@@ -108,10 +108,7 @@ public final class UserPreferences {
     @java.lang.Override
     public int hashCode() {
         return Objects.hash(
-                this.bountyWorkerOnboardingDismissed,
-                this.investigationEnabled,
-                this.termsAccepted,
-                this.termsAcceptedAt);
+                this.bountyWorkerOnboardingDismissed, this.cardsAutoTopUp, this.termsAccepted, this.termsAcceptedAt);
     }
 
     @java.lang.Override
@@ -127,16 +124,16 @@ public final class UserPreferences {
         /**
          * <p>Whether the user has dismissed the first-time bounty worker onboarding. Set to <code>false</code> to show it again.</p>
          */
-        InvestigationEnabledStage bountyWorkerOnboardingDismissed(boolean bountyWorkerOnboardingDismissed);
+        CardsAutoTopUpStage bountyWorkerOnboardingDismissed(boolean bountyWorkerOnboardingDismissed);
 
         Builder from(UserPreferences other);
     }
 
-    public interface InvestigationEnabledStage {
+    public interface CardsAutoTopUpStage {
         /**
-         * <p>Whether investigation mode is enabled for the user. Only meaningful for staff users with investigation access.</p>
+         * <p>Whether incoming funds, including pending balance, are automatically moved to the user's personal cards balance. <code>false</code> when the user has no cards balance.</p>
          */
-        TermsAcceptedStage investigationEnabled(boolean investigationEnabled);
+        TermsAcceptedStage cardsAutoTopUp(boolean cardsAutoTopUp);
     }
 
     public interface TermsAcceptedStage {
@@ -165,19 +162,15 @@ public final class UserPreferences {
 
     @JsonIgnoreProperties(ignoreUnknown = true)
     public static final class Builder
-            implements BountyWorkerOnboardingDismissedStage,
-                    InvestigationEnabledStage,
-                    TermsAcceptedStage,
-                    _FinalStage {
+            implements BountyWorkerOnboardingDismissedStage, CardsAutoTopUpStage, TermsAcceptedStage, _FinalStage {
         private boolean bountyWorkerOnboardingDismissed;
 
-        private boolean investigationEnabled;
+        private boolean cardsAutoTopUp;
 
         private boolean termsAccepted;
 
         private Optional<String> termsAcceptedAt = Optional.empty();
 
-        @JsonAnySetter
         private Map<String, Object> additionalProperties = new HashMap<>();
 
         private Builder() {}
@@ -185,7 +178,7 @@ public final class UserPreferences {
         @java.lang.Override
         public Builder from(UserPreferences other) {
             bountyWorkerOnboardingDismissed(other.getBountyWorkerOnboardingDismissed());
-            investigationEnabled(other.getInvestigationEnabled());
+            cardsAutoTopUp(other.getCardsAutoTopUp());
             termsAccepted(other.getTermsAccepted());
             termsAcceptedAt(other.getTermsAcceptedAt());
             return this;
@@ -193,30 +186,27 @@ public final class UserPreferences {
 
         /**
          * <p>Whether the user has dismissed the first-time bounty worker onboarding. Set to <code>false</code> to show it again.</p>
-         * <p>Whether the user has dismissed the first-time bounty worker onboarding. Set to <code>false</code> to show it again.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
         @JsonSetter("bounty_worker_onboarding_dismissed")
-        public InvestigationEnabledStage bountyWorkerOnboardingDismissed(boolean bountyWorkerOnboardingDismissed) {
+        public CardsAutoTopUpStage bountyWorkerOnboardingDismissed(boolean bountyWorkerOnboardingDismissed) {
             this.bountyWorkerOnboardingDismissed = bountyWorkerOnboardingDismissed;
             return this;
         }
 
         /**
-         * <p>Whether investigation mode is enabled for the user. Only meaningful for staff users with investigation access.</p>
-         * <p>Whether investigation mode is enabled for the user. Only meaningful for staff users with investigation access.</p>
+         * <p>Whether incoming funds, including pending balance, are automatically moved to the user's personal cards balance. <code>false</code> when the user has no cards balance.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
-        @JsonSetter("investigation_enabled")
-        public TermsAcceptedStage investigationEnabled(boolean investigationEnabled) {
-            this.investigationEnabled = investigationEnabled;
+        @JsonSetter("cards_auto_top_up")
+        public TermsAcceptedStage cardsAutoTopUp(boolean cardsAutoTopUp) {
+            this.cardsAutoTopUp = cardsAutoTopUp;
             return this;
         }
 
         /**
-         * <p>Whether the user has accepted Whop's terms and policies. <code>false</code> until recorded via <code>PATCH</code> with <code>terms_accepted: true</code>.</p>
          * <p>Whether the user has accepted Whop's terms and policies. <code>false</code> until recorded via <code>PATCH</code> with <code>terms_accepted: true</code>.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
@@ -267,10 +257,21 @@ public final class UserPreferences {
         public UserPreferences build() {
             return new UserPreferences(
                     bountyWorkerOnboardingDismissed,
-                    investigationEnabled,
+                    cardsAutoTopUp,
                     termsAccepted,
                     termsAcceptedAt,
                     additionalProperties);
+        }
+
+        @JsonAnySetter
+        private void putAdditionalPropertyFromJson(String key, Object value) {
+            if (key.equalsIgnoreCase("bounty_worker_onboarding_dismissed")
+                    || key.equalsIgnoreCase("cards_auto_top_up")
+                    || key.equalsIgnoreCase("terms_accepted")
+                    || key.equalsIgnoreCase("terms_accepted_at")) {
+                return;
+            }
+            this.additionalProperties.put(key, value);
         }
 
         @java.lang.Override

@@ -29,19 +29,23 @@ public final class LeaderboardPartnersResponse {
 
     private final Optional<LeaderboardPartnersResponseMe> me;
 
+    private final List<LeaderboardPartnersResponseNearbyItem> nearby;
+
     private final Map<String, Object> additionalProperties;
 
     private LeaderboardPartnersResponse(
             List<LeaderboardPartnersResponseLeadersItem> leaders,
             Optional<LeaderboardPartnersResponseMe> me,
+            List<LeaderboardPartnersResponseNearbyItem> nearby,
             Map<String, Object> additionalProperties) {
         this.leaders = leaders;
         this.me = me;
+        this.nearby = nearby;
         this.additionalProperties = additionalProperties;
     }
 
     /**
-     * @return The top referrers by total earnings, best first.
+     * @return The top 10 referrers by total earnings, best first.
      */
     @JsonProperty("leaders")
     public List<LeaderboardPartnersResponseLeadersItem> getLeaders() {
@@ -57,6 +61,14 @@ public final class LeaderboardPartnersResponse {
             return Optional.empty();
         }
         return me;
+    }
+
+    /**
+     * @return The referrers ranked within five places of the caller, including the caller, best first. Empty when the caller has no referral earnings or is anonymous.
+     */
+    @JsonProperty("nearby")
+    public List<LeaderboardPartnersResponseNearbyItem> getNearby() {
+        return nearby;
     }
 
     @JsonInclude(value = JsonInclude.Include.CUSTOM, valueFilter = NullableNonemptyFilter.class)
@@ -77,12 +89,12 @@ public final class LeaderboardPartnersResponse {
     }
 
     private boolean equalTo(LeaderboardPartnersResponse other) {
-        return leaders.equals(other.leaders) && me.equals(other.me);
+        return leaders.equals(other.leaders) && me.equals(other.me) && nearby.equals(other.nearby);
     }
 
     @java.lang.Override
     public int hashCode() {
-        return Objects.hash(this.leaders, this.me);
+        return Objects.hash(this.leaders, this.me, this.nearby);
     }
 
     @java.lang.Override
@@ -100,7 +112,8 @@ public final class LeaderboardPartnersResponse {
 
         private Optional<LeaderboardPartnersResponseMe> me = Optional.empty();
 
-        @JsonAnySetter
+        private List<LeaderboardPartnersResponseNearbyItem> nearby = new ArrayList<>();
+
         private Map<String, Object> additionalProperties = new HashMap<>();
 
         private Builder() {}
@@ -108,11 +121,12 @@ public final class LeaderboardPartnersResponse {
         public Builder from(LeaderboardPartnersResponse other) {
             leaders(other.getLeaders());
             me(other.getMe());
+            nearby(other.getNearby());
             return this;
         }
 
         /**
-         * <p>The top referrers by total earnings, best first.</p>
+         * <p>The top 10 referrers by total earnings, best first.</p>
          */
         @JsonSetter(value = "leaders", nulls = Nulls.SKIP)
         public Builder leaders(List<LeaderboardPartnersResponseLeadersItem> leaders) {
@@ -160,8 +174,40 @@ public final class LeaderboardPartnersResponse {
             return this;
         }
 
+        /**
+         * <p>The referrers ranked within five places of the caller, including the caller, best first. Empty when the caller has no referral earnings or is anonymous.</p>
+         */
+        @JsonSetter(value = "nearby", nulls = Nulls.SKIP)
+        public Builder nearby(List<LeaderboardPartnersResponseNearbyItem> nearby) {
+            this.nearby.clear();
+            if (nearby != null) {
+                this.nearby.addAll(nearby);
+            }
+            return this;
+        }
+
+        public Builder addNearby(LeaderboardPartnersResponseNearbyItem nearby) {
+            this.nearby.add(nearby);
+            return this;
+        }
+
+        public Builder addAllNearby(List<LeaderboardPartnersResponseNearbyItem> nearby) {
+            if (nearby != null) {
+                this.nearby.addAll(nearby);
+            }
+            return this;
+        }
+
         public LeaderboardPartnersResponse build() {
-            return new LeaderboardPartnersResponse(leaders, me, additionalProperties);
+            return new LeaderboardPartnersResponse(leaders, me, nearby, additionalProperties);
+        }
+
+        @JsonAnySetter
+        private void putAdditionalPropertyFromJson(String key, Object value) {
+            if (key.equalsIgnoreCase("leaders") || key.equalsIgnoreCase("me") || key.equalsIgnoreCase("nearby")) {
+                return;
+            }
+            this.additionalProperties.put(key, value);
         }
 
         public Builder additionalProperty(String key, Object value) {

@@ -34,6 +34,8 @@ public final class App {
 
     private final AppAppType appType;
 
+    private final double averageReviewRating;
+
     private final Optional<AppBannerImage> bannerImage;
 
     private final Optional<String> baseUrl;
@@ -41,6 +43,10 @@ public final class App {
     private final int businessesCreatedCount;
 
     private final List<String> businessesCreatedLogoUrls;
+
+    private final int businessesWithRecentSalesCount;
+
+    private final Optional<AppCategory> category;
 
     private final AppCreator creator;
 
@@ -56,6 +62,10 @@ public final class App {
 
     private final String domainId;
 
+    private final List<AppDomain> domains;
+
+    private final List<AppElementsUsedItem> elementsUsed;
+
     private final Optional<String> experiencePath;
 
     private final Optional<String> hostedUrl;
@@ -63,6 +73,12 @@ public final class App {
     private final AppIcon icon;
 
     private final String id;
+
+    private final Optional<String> importedFromUrl;
+
+    private final boolean isAppStoreListed;
+
+    private final boolean isWhopApp;
 
     private final Optional<AppMarketplaceStatus> marketplaceStatus;
 
@@ -74,6 +90,12 @@ public final class App {
 
     private final Optional<String> origin;
 
+    private final Optional<String> perInstallSchedule;
+
+    private final Optional<String> previewToken;
+
+    private final Optional<String> productCategory;
+
     private final Optional<String> productId;
 
     private final Optional<AppProductionBuild> productionAndroidBuild;
@@ -82,6 +104,8 @@ public final class App {
 
     private final Optional<AppProductionBuild> productionWebBuild;
 
+    private final int publishedReviewsCount;
+
     private final List<String> redirectUris;
 
     private final List<AppRequestedPermission> requestedPermissions;
@@ -89,6 +113,8 @@ public final class App {
     private final List<AppRequiredScopesItem> requiredScopes;
 
     private final Optional<String> route;
+
+    private final Optional<String> schedule;
 
     private final Optional<Map<String, Object>> secrets;
 
@@ -105,10 +131,13 @@ public final class App {
             Optional<AppApiKey> apiKey,
             Optional<String> appStoreDescription,
             AppAppType appType,
+            double averageReviewRating,
             Optional<AppBannerImage> bannerImage,
             Optional<String> baseUrl,
             int businessesCreatedCount,
             List<String> businessesCreatedLogoUrls,
+            int businessesWithRecentSalesCount,
+            Optional<AppCategory> category,
             AppCreator creator,
             Optional<String> dashboardPath,
             Optional<AppDefaultApiKey> defaultApiKey,
@@ -116,23 +145,33 @@ public final class App {
             Optional<String> description,
             Optional<String> discoverPath,
             String domainId,
+            List<AppDomain> domains,
+            List<AppElementsUsedItem> elementsUsed,
             Optional<String> experiencePath,
             Optional<String> hostedUrl,
             AppIcon icon,
             String id,
+            Optional<String> importedFromUrl,
+            boolean isAppStoreListed,
+            boolean isWhopApp,
             Optional<AppMarketplaceStatus> marketplaceStatus,
             String name,
             AppOauthClientType oauthClientType,
             Optional<String> openapiPath,
             Optional<String> origin,
+            Optional<String> perInstallSchedule,
+            Optional<String> previewToken,
+            Optional<String> productCategory,
             Optional<String> productId,
             Optional<AppProductionBuild> productionAndroidBuild,
             Optional<AppProductionBuild> productionIosBuild,
             Optional<AppProductionBuild> productionWebBuild,
+            int publishedReviewsCount,
             List<String> redirectUris,
             List<AppRequestedPermission> requestedPermissions,
             List<AppRequiredScopesItem> requiredScopes,
             Optional<String> route,
+            Optional<String> schedule,
             Optional<Map<String, Object>> secrets,
             Optional<String> skillsPath,
             AppStatus status,
@@ -142,10 +181,13 @@ public final class App {
         this.apiKey = apiKey;
         this.appStoreDescription = appStoreDescription;
         this.appType = appType;
+        this.averageReviewRating = averageReviewRating;
         this.bannerImage = bannerImage;
         this.baseUrl = baseUrl;
         this.businessesCreatedCount = businessesCreatedCount;
         this.businessesCreatedLogoUrls = businessesCreatedLogoUrls;
+        this.businessesWithRecentSalesCount = businessesWithRecentSalesCount;
+        this.category = category;
         this.creator = creator;
         this.dashboardPath = dashboardPath;
         this.defaultApiKey = defaultApiKey;
@@ -153,23 +195,33 @@ public final class App {
         this.description = description;
         this.discoverPath = discoverPath;
         this.domainId = domainId;
+        this.domains = domains;
+        this.elementsUsed = elementsUsed;
         this.experiencePath = experiencePath;
         this.hostedUrl = hostedUrl;
         this.icon = icon;
         this.id = id;
+        this.importedFromUrl = importedFromUrl;
+        this.isAppStoreListed = isAppStoreListed;
+        this.isWhopApp = isWhopApp;
         this.marketplaceStatus = marketplaceStatus;
         this.name = name;
         this.oauthClientType = oauthClientType;
         this.openapiPath = openapiPath;
         this.origin = origin;
+        this.perInstallSchedule = perInstallSchedule;
+        this.previewToken = previewToken;
+        this.productCategory = productCategory;
         this.productId = productId;
         this.productionAndroidBuild = productionAndroidBuild;
         this.productionIosBuild = productionIosBuild;
         this.productionWebBuild = productionWebBuild;
+        this.publishedReviewsCount = publishedReviewsCount;
         this.redirectUris = redirectUris;
         this.requestedPermissions = requestedPermissions;
         this.requiredScopes = requiredScopes;
         this.route = route;
+        this.schedule = schedule;
         this.secrets = secrets;
         this.skillsPath = skillsPath;
         this.status = status;
@@ -216,6 +268,14 @@ public final class App {
     }
 
     /**
+     * @return Average star rating across published reviews for this app, from <code>1.0</code> to <code>5.0</code>. Returns <code>0.0</code> when no published-review rating is available.
+     */
+    @JsonProperty("average_review_rating")
+    public double getAverageReviewRating() {
+        return averageReviewRating;
+    }
+
+    /**
      * @return Banner image from the app's product listing, or <code>null</code> when none is uploaded.
      */
     @JsonIgnore
@@ -248,6 +308,25 @@ public final class App {
     @JsonProperty("businesses_created_logo_urls")
     public List<String> getBusinessesCreatedLogoUrls() {
         return businessesCreatedLogoUrls;
+    }
+
+    /**
+     * @return Website businesses created from this app as a template that processed a payment in the last 24 hours. Recounted hourly, so it can be up to an hour behind.
+     */
+    @JsonProperty("businesses_with_recent_sales_count")
+    public int getBusinessesWithRecentSalesCount() {
+        return businessesWithRecentSalesCount;
+    }
+
+    /**
+     * @return The app's App Store category, or <code>null</code> when none has been set. An app can show a category that <code>GET /apps/categories</code> does not list, if it was categorized before the current store categories.
+     */
+    @JsonIgnore
+    public Optional<AppCategory> getCategory() {
+        if (category == null) {
+            return Optional.empty();
+        }
+        return category;
     }
 
     /**
@@ -321,6 +400,16 @@ public final class App {
         return domainId;
     }
 
+    @JsonProperty("domains")
+    public List<AppDomain> getDomains() {
+        return domains;
+    }
+
+    @JsonProperty("elements_used")
+    public List<AppElementsUsedItem> getElementsUsed() {
+        return elementsUsed;
+    }
+
     /**
      * @return URL path for the member-facing hub view, or <code>null</code> when not configured.
      */
@@ -334,6 +423,7 @@ public final class App {
 
     /**
      * @return Full URL where the app's hosted web build is served, or <code>null</code> if no route is claimed.
+     * DEPRECATED: Read <code>domains</code> instead.
      */
     @JsonIgnore
     public Optional<String> getHostedUrl() {
@@ -357,6 +447,33 @@ public final class App {
     @JsonProperty("id")
     public String getId() {
         return id;
+    }
+
+    /**
+     * @return The address of the existing website this app was imported from, such as <code>https://shop.example.com</code>. <code>null</code> if the app was not imported from another site, or if the caller lacks the <code>developer:basic:read</code> permission on the app's account.
+     */
+    @JsonIgnore
+    public Optional<String> getImportedFromUrl() {
+        if (importedFromUrl == null) {
+            return Optional.empty();
+        }
+        return importedFromUrl;
+    }
+
+    /**
+     * @return Whether the app is published, approved, and visible in the public app store.
+     */
+    @JsonProperty("is_app_store_listed")
+    public boolean getIsAppStoreListed() {
+        return isAppStoreListed;
+    }
+
+    /**
+     * @return Whether Whop publishes this app.
+     */
+    @JsonProperty("is_whop_app")
+    public boolean getIsWhopApp() {
+        return isWhopApp;
     }
 
     /**
@@ -409,6 +526,39 @@ public final class App {
     }
 
     /**
+     * @return Five-field cron expression, read in UTC, on which Whop runs the production web build's <code>scheduled()</code> export once for every installation, with the installation in <code>ctx.props.app_installation</code>, no more often than every 15 minutes. Slots are skipped while the app has no production web build with a server entry. <code>null</code> when the app has no per-install schedule, or if the caller lacks the <code>developer:basic:read</code> permission on the app's account.
+     */
+    @JsonIgnore
+    public Optional<String> getPerInstallSchedule() {
+        if (perInstallSchedule == null) {
+            return Optional.empty();
+        }
+        return perInstallSchedule;
+    }
+
+    /**
+     * @return A short-lived signed pass scoping the caller to this app's gated preview hosts — every build preview and the live dev-server sandbox. Add it to a preview host as the <code>__whop_preview</code> query param (or <code>x-whop-preview-token</code> header). <code>null</code> unless the caller is a team member who can read the app's developer settings.
+     */
+    @JsonIgnore
+    public Optional<String> getPreviewToken() {
+        if (previewToken == null) {
+            return Optional.empty();
+        }
+        return previewToken;
+    }
+
+    /**
+     * @return Product category a business built from this app as a template sells, such as <code>pressure_washing</code>, or <code>null</code> when none has been set.
+     */
+    @JsonIgnore
+    public Optional<String> getProductCategory() {
+        if (productCategory == null) {
+            return Optional.empty();
+        }
+        return productCategory;
+    }
+
+    /**
      * @return ID of the app's product listing on the Whop app store, or <code>null</code> when the app has no associated product.
      */
     @JsonIgnore
@@ -452,6 +602,14 @@ public final class App {
         return productionWebBuild;
     }
 
+    /**
+     * @return Published customer reviews for this app.
+     */
+    @JsonProperty("published_reviews_count")
+    public int getPublishedReviewsCount() {
+        return publishedReviewsCount;
+    }
+
     @JsonProperty("redirect_uris")
     public List<String> getRedirectUris() {
         return redirectUris;
@@ -468,7 +626,8 @@ public final class App {
     }
 
     /**
-     * @return Claimed subdomain route where hosted web builds are served (<code>myapp</code> for myapp.whop.app), or <code>null</code> if no route is claimed.
+     * @return Claimed subdomain route where hosted web builds are served (<code>myapp</code> for myapp.whop.site), or <code>null</code> if no route is claimed.
+     * DEPRECATED: Read <code>domains</code> instead.
      */
     @JsonIgnore
     public Optional<String> getRoute() {
@@ -476,6 +635,17 @@ public final class App {
             return Optional.empty();
         }
         return route;
+    }
+
+    /**
+     * @return Five-field cron expression, read in UTC, on which Whop runs the production web build's <code>scheduled()</code> export once per slot. Slots are skipped while the app has no production web build with a server entry. <code>null</code> when the app has no global schedule, or if the caller lacks the <code>developer:basic:read</code> permission on the app's account.
+     */
+    @JsonIgnore
+    public Optional<String> getSchedule() {
+        if (schedule == null) {
+            return Optional.empty();
+        }
+        return schedule;
     }
 
     /**
@@ -541,6 +711,12 @@ public final class App {
     }
 
     @JsonInclude(value = JsonInclude.Include.CUSTOM, valueFilter = NullableNonemptyFilter.class)
+    @JsonProperty("category")
+    private Optional<AppCategory> _getCategory() {
+        return category;
+    }
+
+    @JsonInclude(value = JsonInclude.Include.CUSTOM, valueFilter = NullableNonemptyFilter.class)
     @JsonProperty("dashboard_path")
     private Optional<String> _getDashboardPath() {
         return dashboardPath;
@@ -583,6 +759,12 @@ public final class App {
     }
 
     @JsonInclude(value = JsonInclude.Include.CUSTOM, valueFilter = NullableNonemptyFilter.class)
+    @JsonProperty("imported_from_url")
+    private Optional<String> _getImportedFromUrl() {
+        return importedFromUrl;
+    }
+
+    @JsonInclude(value = JsonInclude.Include.CUSTOM, valueFilter = NullableNonemptyFilter.class)
     @JsonProperty("marketplace_status")
     private Optional<AppMarketplaceStatus> _getMarketplaceStatus() {
         return marketplaceStatus;
@@ -598,6 +780,24 @@ public final class App {
     @JsonProperty("origin")
     private Optional<String> _getOrigin() {
         return origin;
+    }
+
+    @JsonInclude(value = JsonInclude.Include.CUSTOM, valueFilter = NullableNonemptyFilter.class)
+    @JsonProperty("per_install_schedule")
+    private Optional<String> _getPerInstallSchedule() {
+        return perInstallSchedule;
+    }
+
+    @JsonInclude(value = JsonInclude.Include.CUSTOM, valueFilter = NullableNonemptyFilter.class)
+    @JsonProperty("preview_token")
+    private Optional<String> _getPreviewToken() {
+        return previewToken;
+    }
+
+    @JsonInclude(value = JsonInclude.Include.CUSTOM, valueFilter = NullableNonemptyFilter.class)
+    @JsonProperty("product_category")
+    private Optional<String> _getProductCategory() {
+        return productCategory;
     }
 
     @JsonInclude(value = JsonInclude.Include.CUSTOM, valueFilter = NullableNonemptyFilter.class)
@@ -631,6 +831,12 @@ public final class App {
     }
 
     @JsonInclude(value = JsonInclude.Include.CUSTOM, valueFilter = NullableNonemptyFilter.class)
+    @JsonProperty("schedule")
+    private Optional<String> _getSchedule() {
+        return schedule;
+    }
+
+    @JsonInclude(value = JsonInclude.Include.CUSTOM, valueFilter = NullableNonemptyFilter.class)
     @JsonProperty("secrets")
     private Optional<Map<String, Object>> _getSecrets() {
         return secrets;
@@ -658,10 +864,13 @@ public final class App {
                 && apiKey.equals(other.apiKey)
                 && appStoreDescription.equals(other.appStoreDescription)
                 && appType.equals(other.appType)
+                && averageReviewRating == other.averageReviewRating
                 && bannerImage.equals(other.bannerImage)
                 && baseUrl.equals(other.baseUrl)
                 && businessesCreatedCount == other.businessesCreatedCount
                 && businessesCreatedLogoUrls.equals(other.businessesCreatedLogoUrls)
+                && businessesWithRecentSalesCount == other.businessesWithRecentSalesCount
+                && category.equals(other.category)
                 && creator.equals(other.creator)
                 && dashboardPath.equals(other.dashboardPath)
                 && defaultApiKey.equals(other.defaultApiKey)
@@ -669,23 +878,33 @@ public final class App {
                 && description.equals(other.description)
                 && discoverPath.equals(other.discoverPath)
                 && domainId.equals(other.domainId)
+                && domains.equals(other.domains)
+                && elementsUsed.equals(other.elementsUsed)
                 && experiencePath.equals(other.experiencePath)
                 && hostedUrl.equals(other.hostedUrl)
                 && icon.equals(other.icon)
                 && id.equals(other.id)
+                && importedFromUrl.equals(other.importedFromUrl)
+                && isAppStoreListed == other.isAppStoreListed
+                && isWhopApp == other.isWhopApp
                 && marketplaceStatus.equals(other.marketplaceStatus)
                 && name.equals(other.name)
                 && oauthClientType.equals(other.oauthClientType)
                 && openapiPath.equals(other.openapiPath)
                 && origin.equals(other.origin)
+                && perInstallSchedule.equals(other.perInstallSchedule)
+                && previewToken.equals(other.previewToken)
+                && productCategory.equals(other.productCategory)
                 && productId.equals(other.productId)
                 && productionAndroidBuild.equals(other.productionAndroidBuild)
                 && productionIosBuild.equals(other.productionIosBuild)
                 && productionWebBuild.equals(other.productionWebBuild)
+                && publishedReviewsCount == other.publishedReviewsCount
                 && redirectUris.equals(other.redirectUris)
                 && requestedPermissions.equals(other.requestedPermissions)
                 && requiredScopes.equals(other.requiredScopes)
                 && route.equals(other.route)
+                && schedule.equals(other.schedule)
                 && secrets.equals(other.secrets)
                 && skillsPath.equals(other.skillsPath)
                 && status.equals(other.status)
@@ -699,10 +918,13 @@ public final class App {
                 this.apiKey,
                 this.appStoreDescription,
                 this.appType,
+                this.averageReviewRating,
                 this.bannerImage,
                 this.baseUrl,
                 this.businessesCreatedCount,
                 this.businessesCreatedLogoUrls,
+                this.businessesWithRecentSalesCount,
+                this.category,
                 this.creator,
                 this.dashboardPath,
                 this.defaultApiKey,
@@ -710,23 +932,33 @@ public final class App {
                 this.description,
                 this.discoverPath,
                 this.domainId,
+                this.domains,
+                this.elementsUsed,
                 this.experiencePath,
                 this.hostedUrl,
                 this.icon,
                 this.id,
+                this.importedFromUrl,
+                this.isAppStoreListed,
+                this.isWhopApp,
                 this.marketplaceStatus,
                 this.name,
                 this.oauthClientType,
                 this.openapiPath,
                 this.origin,
+                this.perInstallSchedule,
+                this.previewToken,
+                this.productCategory,
                 this.productId,
                 this.productionAndroidBuild,
                 this.productionIosBuild,
                 this.productionWebBuild,
+                this.publishedReviewsCount,
                 this.redirectUris,
                 this.requestedPermissions,
                 this.requiredScopes,
                 this.route,
+                this.schedule,
                 this.secrets,
                 this.skillsPath,
                 this.status,
@@ -755,14 +987,28 @@ public final class App {
         /**
          * <p>The type of end-user the app is built for.</p>
          */
-        BusinessesCreatedCountStage appType(@NotNull AppAppType appType);
+        AverageReviewRatingStage appType(@NotNull AppAppType appType);
+    }
+
+    public interface AverageReviewRatingStage {
+        /**
+         * <p>Average star rating across published reviews for this app, from <code>1.0</code> to <code>5.0</code>. Returns <code>0.0</code> when no published-review rating is available.</p>
+         */
+        BusinessesCreatedCountStage averageReviewRating(double averageReviewRating);
     }
 
     public interface BusinessesCreatedCountStage {
         /**
          * <p>Website businesses created from this app as a template.</p>
          */
-        CreatorStage businessesCreatedCount(int businessesCreatedCount);
+        BusinessesWithRecentSalesCountStage businessesCreatedCount(int businessesCreatedCount);
+    }
+
+    public interface BusinessesWithRecentSalesCountStage {
+        /**
+         * <p>Website businesses created from this app as a template that processed a payment in the last 24 hours. Recounted hourly, so it can be up to an hour behind.</p>
+         */
+        CreatorStage businessesWithRecentSalesCount(int businessesWithRecentSalesCount);
     }
 
     public interface CreatorStage {
@@ -790,7 +1036,21 @@ public final class App {
         /**
          * <p>App ID, prefixed <code>app_</code>.</p>
          */
-        NameStage id(@NotNull String id);
+        IsAppStoreListedStage id(@NotNull String id);
+    }
+
+    public interface IsAppStoreListedStage {
+        /**
+         * <p>Whether the app is published, approved, and visible in the public app store.</p>
+         */
+        IsWhopAppStage isAppStoreListed(boolean isAppStoreListed);
+    }
+
+    public interface IsWhopAppStage {
+        /**
+         * <p>Whether Whop publishes this app.</p>
+         */
+        NameStage isWhopApp(boolean isWhopApp);
     }
 
     public interface NameStage {
@@ -804,7 +1064,14 @@ public final class App {
         /**
          * <p>How the app authenticates at the OAuth token endpoint.</p>
          */
-        StatusStage oauthClientType(@NotNull AppOauthClientType oauthClientType);
+        PublishedReviewsCountStage oauthClientType(@NotNull AppOauthClientType oauthClientType);
+    }
+
+    public interface PublishedReviewsCountStage {
+        /**
+         * <p>Published customer reviews for this app.</p>
+         */
+        StatusStage publishedReviewsCount(int publishedReviewsCount);
     }
 
     public interface StatusStage {
@@ -871,6 +1138,15 @@ public final class App {
         _FinalStage addAllBusinessesCreatedLogoUrls(List<String> businessesCreatedLogoUrls);
 
         /**
+         * <p>The app's App Store category, or <code>null</code> when none has been set. An app can show a category that <code>GET /apps/categories</code> does not list, if it was categorized before the current store categories.</p>
+         */
+        _FinalStage category(Optional<AppCategory> category);
+
+        _FinalStage category(AppCategory category);
+
+        _FinalStage category(Nullable<AppCategory> category);
+
+        /**
          * <p>URL path for the account dashboard view, or <code>null</code> when not configured.</p>
          */
         _FinalStage dashboardPath(Optional<String> dashboardPath);
@@ -915,6 +1191,18 @@ public final class App {
 
         _FinalStage discoverPath(Nullable<String> discoverPath);
 
+        _FinalStage domains(List<AppDomain> domains);
+
+        _FinalStage addDomains(AppDomain domains);
+
+        _FinalStage addAllDomains(List<AppDomain> domains);
+
+        _FinalStage elementsUsed(List<AppElementsUsedItem> elementsUsed);
+
+        _FinalStage addElementsUsed(AppElementsUsedItem elementsUsed);
+
+        _FinalStage addAllElementsUsed(List<AppElementsUsedItem> elementsUsed);
+
         /**
          * <p>URL path for the member-facing hub view, or <code>null</code> when not configured.</p>
          */
@@ -925,13 +1213,23 @@ public final class App {
         _FinalStage experiencePath(Nullable<String> experiencePath);
 
         /**
-         * <p>Full URL where the app's hosted web build is served, or <code>null</code> if no route is claimed.</p>
+         * <p>Full URL where the app's hosted web build is served, or <code>null</code> if no route is claimed.
+         * DEPRECATED: Read <code>domains</code> instead.</p>
          */
         _FinalStage hostedUrl(Optional<String> hostedUrl);
 
         _FinalStage hostedUrl(String hostedUrl);
 
         _FinalStage hostedUrl(Nullable<String> hostedUrl);
+
+        /**
+         * <p>The address of the existing website this app was imported from, such as <code>https://shop.example.com</code>. <code>null</code> if the app was not imported from another site, or if the caller lacks the <code>developer:basic:read</code> permission on the app's account.</p>
+         */
+        _FinalStage importedFromUrl(Optional<String> importedFromUrl);
+
+        _FinalStage importedFromUrl(String importedFromUrl);
+
+        _FinalStage importedFromUrl(Nullable<String> importedFromUrl);
 
         /**
          * <p>Approval status of the app's product listing on the Whop app store, or <code>null</code> when the app has no associated product.</p>
@@ -959,6 +1257,33 @@ public final class App {
         _FinalStage origin(String origin);
 
         _FinalStage origin(Nullable<String> origin);
+
+        /**
+         * <p>Five-field cron expression, read in UTC, on which Whop runs the production web build's <code>scheduled()</code> export once for every installation, with the installation in <code>ctx.props.app_installation</code>, no more often than every 15 minutes. Slots are skipped while the app has no production web build with a server entry. <code>null</code> when the app has no per-install schedule, or if the caller lacks the <code>developer:basic:read</code> permission on the app's account.</p>
+         */
+        _FinalStage perInstallSchedule(Optional<String> perInstallSchedule);
+
+        _FinalStage perInstallSchedule(String perInstallSchedule);
+
+        _FinalStage perInstallSchedule(Nullable<String> perInstallSchedule);
+
+        /**
+         * <p>A short-lived signed pass scoping the caller to this app's gated preview hosts — every build preview and the live dev-server sandbox. Add it to a preview host as the <code>__whop_preview</code> query param (or <code>x-whop-preview-token</code> header). <code>null</code> unless the caller is a team member who can read the app's developer settings.</p>
+         */
+        _FinalStage previewToken(Optional<String> previewToken);
+
+        _FinalStage previewToken(String previewToken);
+
+        _FinalStage previewToken(Nullable<String> previewToken);
+
+        /**
+         * <p>Product category a business built from this app as a template sells, such as <code>pressure_washing</code>, or <code>null</code> when none has been set.</p>
+         */
+        _FinalStage productCategory(Optional<String> productCategory);
+
+        _FinalStage productCategory(String productCategory);
+
+        _FinalStage productCategory(Nullable<String> productCategory);
 
         /**
          * <p>ID of the app's product listing on the Whop app store, or <code>null</code> when the app has no associated product.</p>
@@ -1015,13 +1340,23 @@ public final class App {
         _FinalStage addAllRequiredScopes(List<AppRequiredScopesItem> requiredScopes);
 
         /**
-         * <p>Claimed subdomain route where hosted web builds are served (<code>myapp</code> for myapp.whop.app), or <code>null</code> if no route is claimed.</p>
+         * <p>Claimed subdomain route where hosted web builds are served (<code>myapp</code> for myapp.whop.site), or <code>null</code> if no route is claimed.
+         * DEPRECATED: Read <code>domains</code> instead.</p>
          */
         _FinalStage route(Optional<String> route);
 
         _FinalStage route(String route);
 
         _FinalStage route(Nullable<String> route);
+
+        /**
+         * <p>Five-field cron expression, read in UTC, on which Whop runs the production web build's <code>scheduled()</code> export once per slot. Slots are skipped while the app has no production web build with a server entry. <code>null</code> when the app has no global schedule, or if the caller lacks the <code>developer:basic:read</code> permission on the app's account.</p>
+         */
+        _FinalStage schedule(Optional<String> schedule);
+
+        _FinalStage schedule(String schedule);
+
+        _FinalStage schedule(Nullable<String> schedule);
 
         /**
          * <p>The app's production secrets as an object of string values, injected into the hosted server runtime. <code>null</code> when the caller lacks the <code>developer:update_app</code> permission.</p>
@@ -1046,13 +1381,18 @@ public final class App {
     public static final class Builder
             implements AccountStage,
                     AppTypeStage,
+                    AverageReviewRatingStage,
                     BusinessesCreatedCountStage,
+                    BusinessesWithRecentSalesCountStage,
                     CreatorStage,
                     DomainIdStage,
                     IconStage,
                     IdStage,
+                    IsAppStoreListedStage,
+                    IsWhopAppStage,
                     NameStage,
                     OauthClientTypeStage,
+                    PublishedReviewsCountStage,
                     StatusStage,
                     VerifiedStage,
                     _FinalStage {
@@ -1060,7 +1400,11 @@ public final class App {
 
         private AppAppType appType;
 
+        private double averageReviewRating;
+
         private int businessesCreatedCount;
+
+        private int businessesWithRecentSalesCount;
 
         private AppCreator creator;
 
@@ -1070,9 +1414,15 @@ public final class App {
 
         private String id;
 
+        private boolean isAppStoreListed;
+
+        private boolean isWhopApp;
+
         private String name;
 
         private AppOauthClientType oauthClientType;
+
+        private int publishedReviewsCount;
 
         private AppStatus status;
 
@@ -1081,6 +1431,8 @@ public final class App {
         private Optional<String> skillsPath = Optional.empty();
 
         private Optional<Map<String, Object>> secrets = Optional.empty();
+
+        private Optional<String> schedule = Optional.empty();
 
         private Optional<String> route = Optional.empty();
 
@@ -1098,15 +1450,27 @@ public final class App {
 
         private Optional<String> productId = Optional.empty();
 
+        private Optional<String> productCategory = Optional.empty();
+
+        private Optional<String> previewToken = Optional.empty();
+
+        private Optional<String> perInstallSchedule = Optional.empty();
+
         private Optional<String> origin = Optional.empty();
 
         private Optional<String> openapiPath = Optional.empty();
 
         private Optional<AppMarketplaceStatus> marketplaceStatus = Optional.empty();
 
+        private Optional<String> importedFromUrl = Optional.empty();
+
         private Optional<String> hostedUrl = Optional.empty();
 
         private Optional<String> experiencePath = Optional.empty();
+
+        private List<AppElementsUsedItem> elementsUsed = new ArrayList<>();
+
+        private List<AppDomain> domains = new ArrayList<>();
 
         private Optional<String> discoverPath = Optional.empty();
 
@@ -1118,6 +1482,8 @@ public final class App {
 
         private Optional<String> dashboardPath = Optional.empty();
 
+        private Optional<AppCategory> category = Optional.empty();
+
         private List<String> businessesCreatedLogoUrls = new ArrayList<>();
 
         private Optional<String> baseUrl = Optional.empty();
@@ -1128,7 +1494,6 @@ public final class App {
 
         private Optional<AppApiKey> apiKey = Optional.empty();
 
-        @JsonAnySetter
         private Map<String, Object> additionalProperties = new HashMap<>();
 
         private Builder() {}
@@ -1139,10 +1504,13 @@ public final class App {
             apiKey(other.getApiKey());
             appStoreDescription(other.getAppStoreDescription());
             appType(other.getAppType());
+            averageReviewRating(other.getAverageReviewRating());
             bannerImage(other.getBannerImage());
             baseUrl(other.getBaseUrl());
             businessesCreatedCount(other.getBusinessesCreatedCount());
             businessesCreatedLogoUrls(other.getBusinessesCreatedLogoUrls());
+            businessesWithRecentSalesCount(other.getBusinessesWithRecentSalesCount());
+            category(other.getCategory());
             creator(other.getCreator());
             dashboardPath(other.getDashboardPath());
             defaultApiKey(other.getDefaultApiKey());
@@ -1150,23 +1518,33 @@ public final class App {
             description(other.getDescription());
             discoverPath(other.getDiscoverPath());
             domainId(other.getDomainId());
+            domains(other.getDomains());
+            elementsUsed(other.getElementsUsed());
             experiencePath(other.getExperiencePath());
             hostedUrl(other.getHostedUrl());
             icon(other.getIcon());
             id(other.getId());
+            importedFromUrl(other.getImportedFromUrl());
+            isAppStoreListed(other.getIsAppStoreListed());
+            isWhopApp(other.getIsWhopApp());
             marketplaceStatus(other.getMarketplaceStatus());
             name(other.getName());
             oauthClientType(other.getOauthClientType());
             openapiPath(other.getOpenapiPath());
             origin(other.getOrigin());
+            perInstallSchedule(other.getPerInstallSchedule());
+            previewToken(other.getPreviewToken());
+            productCategory(other.getProductCategory());
             productId(other.getProductId());
             productionAndroidBuild(other.getProductionAndroidBuild());
             productionIosBuild(other.getProductionIosBuild());
             productionWebBuild(other.getProductionWebBuild());
+            publishedReviewsCount(other.getPublishedReviewsCount());
             redirectUris(other.getRedirectUris());
             requestedPermissions(other.getRequestedPermissions());
             requiredScopes(other.getRequiredScopes());
             route(other.getRoute());
+            schedule(other.getSchedule());
             secrets(other.getSecrets());
             skillsPath(other.getSkillsPath());
             status(other.getStatus());
@@ -1175,7 +1553,6 @@ public final class App {
         }
 
         /**
-         * <p>The account that owns the app.</p>
          * <p>The account that owns the app.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
@@ -1188,30 +1565,49 @@ public final class App {
 
         /**
          * <p>The type of end-user the app is built for.</p>
-         * <p>The type of end-user the app is built for.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
         @JsonSetter("app_type")
-        public BusinessesCreatedCountStage appType(@NotNull AppAppType appType) {
+        public AverageReviewRatingStage appType(@NotNull AppAppType appType) {
             this.appType = Objects.requireNonNull(appType, "appType must not be null");
             return this;
         }
 
         /**
-         * <p>Website businesses created from this app as a template.</p>
+         * <p>Average star rating across published reviews for this app, from <code>1.0</code> to <code>5.0</code>. Returns <code>0.0</code> when no published-review rating is available.</p>
+         * @return Reference to {@code this} so that method calls can be chained together.
+         */
+        @java.lang.Override
+        @JsonSetter("average_review_rating")
+        public BusinessesCreatedCountStage averageReviewRating(double averageReviewRating) {
+            this.averageReviewRating = averageReviewRating;
+            return this;
+        }
+
+        /**
          * <p>Website businesses created from this app as a template.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
         @JsonSetter("businesses_created_count")
-        public CreatorStage businessesCreatedCount(int businessesCreatedCount) {
+        public BusinessesWithRecentSalesCountStage businessesCreatedCount(int businessesCreatedCount) {
             this.businessesCreatedCount = businessesCreatedCount;
             return this;
         }
 
         /**
-         * <p>The user who owns the publishing account.</p>
+         * <p>Website businesses created from this app as a template that processed a payment in the last 24 hours. Recounted hourly, so it can be up to an hour behind.</p>
+         * @return Reference to {@code this} so that method calls can be chained together.
+         */
+        @java.lang.Override
+        @JsonSetter("businesses_with_recent_sales_count")
+        public CreatorStage businessesWithRecentSalesCount(int businessesWithRecentSalesCount) {
+            this.businessesWithRecentSalesCount = businessesWithRecentSalesCount;
+            return this;
+        }
+
+        /**
          * <p>The user who owns the publishing account.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
@@ -1224,7 +1620,6 @@ public final class App {
 
         /**
          * <p>Subdomain identifier for the app's proxied URL, forming https://{domain_id}.apps.whop.com.</p>
-         * <p>Subdomain identifier for the app's proxied URL, forming https://{domain_id}.apps.whop.com.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
@@ -1235,7 +1630,6 @@ public final class App {
         }
 
         /**
-         * <p>The app's icon. Falls back to the default app icon when none is uploaded.</p>
          * <p>The app's icon. Falls back to the default app icon when none is uploaded.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
@@ -1248,18 +1642,38 @@ public final class App {
 
         /**
          * <p>App ID, prefixed <code>app_</code>.</p>
-         * <p>App ID, prefixed <code>app_</code>.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
         @JsonSetter("id")
-        public NameStage id(@NotNull String id) {
+        public IsAppStoreListedStage id(@NotNull String id) {
             this.id = Objects.requireNonNull(id, "id must not be null");
             return this;
         }
 
         /**
-         * <p>Display name shown on the app store and in experience navigation.</p>
+         * <p>Whether the app is published, approved, and visible in the public app store.</p>
+         * @return Reference to {@code this} so that method calls can be chained together.
+         */
+        @java.lang.Override
+        @JsonSetter("is_app_store_listed")
+        public IsWhopAppStage isAppStoreListed(boolean isAppStoreListed) {
+            this.isAppStoreListed = isAppStoreListed;
+            return this;
+        }
+
+        /**
+         * <p>Whether Whop publishes this app.</p>
+         * @return Reference to {@code this} so that method calls can be chained together.
+         */
+        @java.lang.Override
+        @JsonSetter("is_whop_app")
+        public NameStage isWhopApp(boolean isWhopApp) {
+            this.isWhopApp = isWhopApp;
+            return this;
+        }
+
+        /**
          * <p>Display name shown on the app store and in experience navigation.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
@@ -1272,18 +1686,27 @@ public final class App {
 
         /**
          * <p>How the app authenticates at the OAuth token endpoint.</p>
-         * <p>How the app authenticates at the OAuth token endpoint.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
         @JsonSetter("oauth_client_type")
-        public StatusStage oauthClientType(@NotNull AppOauthClientType oauthClientType) {
+        public PublishedReviewsCountStage oauthClientType(@NotNull AppOauthClientType oauthClientType) {
             this.oauthClientType = Objects.requireNonNull(oauthClientType, "oauthClientType must not be null");
             return this;
         }
 
         /**
-         * <p>Visibility on the Whop app store: <code>live</code> is publicly discoverable, <code>unlisted</code> is accessible only via direct link, <code>hidden</code> is not visible anywhere.</p>
+         * <p>Published customer reviews for this app.</p>
+         * @return Reference to {@code this} so that method calls can be chained together.
+         */
+        @java.lang.Override
+        @JsonSetter("published_reviews_count")
+        public StatusStage publishedReviewsCount(int publishedReviewsCount) {
+            this.publishedReviewsCount = publishedReviewsCount;
+            return this;
+        }
+
+        /**
          * <p>Visibility on the Whop app store: <code>live</code> is publicly discoverable, <code>unlisted</code> is accessible only via direct link, <code>hidden</code> is not visible anywhere.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
@@ -1295,7 +1718,6 @@ public final class App {
         }
 
         /**
-         * <p>Whether the app has been verified by Whop and is eligible for the featured apps section.</p>
          * <p>Whether the app has been verified by Whop and is eligible for the featured apps section.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
@@ -1379,7 +1801,44 @@ public final class App {
         }
 
         /**
-         * <p>Claimed subdomain route where hosted web builds are served (<code>myapp</code> for myapp.whop.app), or <code>null</code> if no route is claimed.</p>
+         * <p>Five-field cron expression, read in UTC, on which Whop runs the production web build's <code>scheduled()</code> export once per slot. Slots are skipped while the app has no production web build with a server entry. <code>null</code> when the app has no global schedule, or if the caller lacks the <code>developer:basic:read</code> permission on the app's account.</p>
+         * @return Reference to {@code this} so that method calls can be chained together.
+         */
+        @java.lang.Override
+        public _FinalStage schedule(Nullable<String> schedule) {
+            if (schedule.isNull()) {
+                this.schedule = null;
+            } else if (schedule.isEmpty()) {
+                this.schedule = Optional.empty();
+            } else {
+                this.schedule = Optional.of(schedule.get());
+            }
+            return this;
+        }
+
+        /**
+         * <p>Five-field cron expression, read in UTC, on which Whop runs the production web build's <code>scheduled()</code> export once per slot. Slots are skipped while the app has no production web build with a server entry. <code>null</code> when the app has no global schedule, or if the caller lacks the <code>developer:basic:read</code> permission on the app's account.</p>
+         * @return Reference to {@code this} so that method calls can be chained together.
+         */
+        @java.lang.Override
+        public _FinalStage schedule(String schedule) {
+            this.schedule = Optional.ofNullable(schedule);
+            return this;
+        }
+
+        /**
+         * <p>Five-field cron expression, read in UTC, on which Whop runs the production web build's <code>scheduled()</code> export once per slot. Slots are skipped while the app has no production web build with a server entry. <code>null</code> when the app has no global schedule, or if the caller lacks the <code>developer:basic:read</code> permission on the app's account.</p>
+         */
+        @java.lang.Override
+        @JsonSetter(value = "schedule", nulls = Nulls.SKIP)
+        public _FinalStage schedule(Optional<String> schedule) {
+            this.schedule = schedule;
+            return this;
+        }
+
+        /**
+         * <p>Claimed subdomain route where hosted web builds are served (<code>myapp</code> for myapp.whop.site), or <code>null</code> if no route is claimed.
+         * DEPRECATED: Read <code>domains</code> instead.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
@@ -1395,7 +1854,8 @@ public final class App {
         }
 
         /**
-         * <p>Claimed subdomain route where hosted web builds are served (<code>myapp</code> for myapp.whop.app), or <code>null</code> if no route is claimed.</p>
+         * <p>Claimed subdomain route where hosted web builds are served (<code>myapp</code> for myapp.whop.site), or <code>null</code> if no route is claimed.
+         * DEPRECATED: Read <code>domains</code> instead.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
@@ -1405,7 +1865,8 @@ public final class App {
         }
 
         /**
-         * <p>Claimed subdomain route where hosted web builds are served (<code>myapp</code> for myapp.whop.app), or <code>null</code> if no route is claimed.</p>
+         * <p>Claimed subdomain route where hosted web builds are served (<code>myapp</code> for myapp.whop.site), or <code>null</code> if no route is claimed.
+         * DEPRECATED: Read <code>domains</code> instead.</p>
          */
         @java.lang.Override
         @JsonSetter(value = "route", nulls = Nulls.SKIP)
@@ -1631,6 +2092,114 @@ public final class App {
         }
 
         /**
+         * <p>Product category a business built from this app as a template sells, such as <code>pressure_washing</code>, or <code>null</code> when none has been set.</p>
+         * @return Reference to {@code this} so that method calls can be chained together.
+         */
+        @java.lang.Override
+        public _FinalStage productCategory(Nullable<String> productCategory) {
+            if (productCategory.isNull()) {
+                this.productCategory = null;
+            } else if (productCategory.isEmpty()) {
+                this.productCategory = Optional.empty();
+            } else {
+                this.productCategory = Optional.of(productCategory.get());
+            }
+            return this;
+        }
+
+        /**
+         * <p>Product category a business built from this app as a template sells, such as <code>pressure_washing</code>, or <code>null</code> when none has been set.</p>
+         * @return Reference to {@code this} so that method calls can be chained together.
+         */
+        @java.lang.Override
+        public _FinalStage productCategory(String productCategory) {
+            this.productCategory = Optional.ofNullable(productCategory);
+            return this;
+        }
+
+        /**
+         * <p>Product category a business built from this app as a template sells, such as <code>pressure_washing</code>, or <code>null</code> when none has been set.</p>
+         */
+        @java.lang.Override
+        @JsonSetter(value = "product_category", nulls = Nulls.SKIP)
+        public _FinalStage productCategory(Optional<String> productCategory) {
+            this.productCategory = productCategory;
+            return this;
+        }
+
+        /**
+         * <p>A short-lived signed pass scoping the caller to this app's gated preview hosts — every build preview and the live dev-server sandbox. Add it to a preview host as the <code>__whop_preview</code> query param (or <code>x-whop-preview-token</code> header). <code>null</code> unless the caller is a team member who can read the app's developer settings.</p>
+         * @return Reference to {@code this} so that method calls can be chained together.
+         */
+        @java.lang.Override
+        public _FinalStage previewToken(Nullable<String> previewToken) {
+            if (previewToken.isNull()) {
+                this.previewToken = null;
+            } else if (previewToken.isEmpty()) {
+                this.previewToken = Optional.empty();
+            } else {
+                this.previewToken = Optional.of(previewToken.get());
+            }
+            return this;
+        }
+
+        /**
+         * <p>A short-lived signed pass scoping the caller to this app's gated preview hosts — every build preview and the live dev-server sandbox. Add it to a preview host as the <code>__whop_preview</code> query param (or <code>x-whop-preview-token</code> header). <code>null</code> unless the caller is a team member who can read the app's developer settings.</p>
+         * @return Reference to {@code this} so that method calls can be chained together.
+         */
+        @java.lang.Override
+        public _FinalStage previewToken(String previewToken) {
+            this.previewToken = Optional.ofNullable(previewToken);
+            return this;
+        }
+
+        /**
+         * <p>A short-lived signed pass scoping the caller to this app's gated preview hosts — every build preview and the live dev-server sandbox. Add it to a preview host as the <code>__whop_preview</code> query param (or <code>x-whop-preview-token</code> header). <code>null</code> unless the caller is a team member who can read the app's developer settings.</p>
+         */
+        @java.lang.Override
+        @JsonSetter(value = "preview_token", nulls = Nulls.SKIP)
+        public _FinalStage previewToken(Optional<String> previewToken) {
+            this.previewToken = previewToken;
+            return this;
+        }
+
+        /**
+         * <p>Five-field cron expression, read in UTC, on which Whop runs the production web build's <code>scheduled()</code> export once for every installation, with the installation in <code>ctx.props.app_installation</code>, no more often than every 15 minutes. Slots are skipped while the app has no production web build with a server entry. <code>null</code> when the app has no per-install schedule, or if the caller lacks the <code>developer:basic:read</code> permission on the app's account.</p>
+         * @return Reference to {@code this} so that method calls can be chained together.
+         */
+        @java.lang.Override
+        public _FinalStage perInstallSchedule(Nullable<String> perInstallSchedule) {
+            if (perInstallSchedule.isNull()) {
+                this.perInstallSchedule = null;
+            } else if (perInstallSchedule.isEmpty()) {
+                this.perInstallSchedule = Optional.empty();
+            } else {
+                this.perInstallSchedule = Optional.of(perInstallSchedule.get());
+            }
+            return this;
+        }
+
+        /**
+         * <p>Five-field cron expression, read in UTC, on which Whop runs the production web build's <code>scheduled()</code> export once for every installation, with the installation in <code>ctx.props.app_installation</code>, no more often than every 15 minutes. Slots are skipped while the app has no production web build with a server entry. <code>null</code> when the app has no per-install schedule, or if the caller lacks the <code>developer:basic:read</code> permission on the app's account.</p>
+         * @return Reference to {@code this} so that method calls can be chained together.
+         */
+        @java.lang.Override
+        public _FinalStage perInstallSchedule(String perInstallSchedule) {
+            this.perInstallSchedule = Optional.ofNullable(perInstallSchedule);
+            return this;
+        }
+
+        /**
+         * <p>Five-field cron expression, read in UTC, on which Whop runs the production web build's <code>scheduled()</code> export once for every installation, with the installation in <code>ctx.props.app_installation</code>, no more often than every 15 minutes. Slots are skipped while the app has no production web build with a server entry. <code>null</code> when the app has no per-install schedule, or if the caller lacks the <code>developer:basic:read</code> permission on the app's account.</p>
+         */
+        @java.lang.Override
+        @JsonSetter(value = "per_install_schedule", nulls = Nulls.SKIP)
+        public _FinalStage perInstallSchedule(Optional<String> perInstallSchedule) {
+            this.perInstallSchedule = perInstallSchedule;
+            return this;
+        }
+
+        /**
          * <p>Full origin URL of the app's proxied domain, for example https://ab1c2d3e4f.apps.whop.com.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
@@ -1739,7 +2308,44 @@ public final class App {
         }
 
         /**
-         * <p>Full URL where the app's hosted web build is served, or <code>null</code> if no route is claimed.</p>
+         * <p>The address of the existing website this app was imported from, such as <code>https://shop.example.com</code>. <code>null</code> if the app was not imported from another site, or if the caller lacks the <code>developer:basic:read</code> permission on the app's account.</p>
+         * @return Reference to {@code this} so that method calls can be chained together.
+         */
+        @java.lang.Override
+        public _FinalStage importedFromUrl(Nullable<String> importedFromUrl) {
+            if (importedFromUrl.isNull()) {
+                this.importedFromUrl = null;
+            } else if (importedFromUrl.isEmpty()) {
+                this.importedFromUrl = Optional.empty();
+            } else {
+                this.importedFromUrl = Optional.of(importedFromUrl.get());
+            }
+            return this;
+        }
+
+        /**
+         * <p>The address of the existing website this app was imported from, such as <code>https://shop.example.com</code>. <code>null</code> if the app was not imported from another site, or if the caller lacks the <code>developer:basic:read</code> permission on the app's account.</p>
+         * @return Reference to {@code this} so that method calls can be chained together.
+         */
+        @java.lang.Override
+        public _FinalStage importedFromUrl(String importedFromUrl) {
+            this.importedFromUrl = Optional.ofNullable(importedFromUrl);
+            return this;
+        }
+
+        /**
+         * <p>The address of the existing website this app was imported from, such as <code>https://shop.example.com</code>. <code>null</code> if the app was not imported from another site, or if the caller lacks the <code>developer:basic:read</code> permission on the app's account.</p>
+         */
+        @java.lang.Override
+        @JsonSetter(value = "imported_from_url", nulls = Nulls.SKIP)
+        public _FinalStage importedFromUrl(Optional<String> importedFromUrl) {
+            this.importedFromUrl = importedFromUrl;
+            return this;
+        }
+
+        /**
+         * <p>Full URL where the app's hosted web build is served, or <code>null</code> if no route is claimed.
+         * DEPRECATED: Read <code>domains</code> instead.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
@@ -1755,7 +2361,8 @@ public final class App {
         }
 
         /**
-         * <p>Full URL where the app's hosted web build is served, or <code>null</code> if no route is claimed.</p>
+         * <p>Full URL where the app's hosted web build is served, or <code>null</code> if no route is claimed.
+         * DEPRECATED: Read <code>domains</code> instead.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
@@ -1765,7 +2372,8 @@ public final class App {
         }
 
         /**
-         * <p>Full URL where the app's hosted web build is served, or <code>null</code> if no route is claimed.</p>
+         * <p>Full URL where the app's hosted web build is served, or <code>null</code> if no route is claimed.
+         * DEPRECATED: Read <code>domains</code> instead.</p>
          */
         @java.lang.Override
         @JsonSetter(value = "hosted_url", nulls = Nulls.SKIP)
@@ -1807,6 +2415,54 @@ public final class App {
         @JsonSetter(value = "experience_path", nulls = Nulls.SKIP)
         public _FinalStage experiencePath(Optional<String> experiencePath) {
             this.experiencePath = experiencePath;
+            return this;
+        }
+
+        @java.lang.Override
+        public _FinalStage addAllElementsUsed(List<AppElementsUsedItem> elementsUsed) {
+            if (elementsUsed != null) {
+                this.elementsUsed.addAll(elementsUsed);
+            }
+            return this;
+        }
+
+        @java.lang.Override
+        public _FinalStage addElementsUsed(AppElementsUsedItem elementsUsed) {
+            this.elementsUsed.add(elementsUsed);
+            return this;
+        }
+
+        @java.lang.Override
+        @JsonSetter(value = "elements_used", nulls = Nulls.SKIP)
+        public _FinalStage elementsUsed(List<AppElementsUsedItem> elementsUsed) {
+            this.elementsUsed.clear();
+            if (elementsUsed != null) {
+                this.elementsUsed.addAll(elementsUsed);
+            }
+            return this;
+        }
+
+        @java.lang.Override
+        public _FinalStage addAllDomains(List<AppDomain> domains) {
+            if (domains != null) {
+                this.domains.addAll(domains);
+            }
+            return this;
+        }
+
+        @java.lang.Override
+        public _FinalStage addDomains(AppDomain domains) {
+            this.domains.add(domains);
+            return this;
+        }
+
+        @java.lang.Override
+        @JsonSetter(value = "domains", nulls = Nulls.SKIP)
+        public _FinalStage domains(List<AppDomain> domains) {
+            this.domains.clear();
+            if (domains != null) {
+                this.domains.addAll(domains);
+            }
             return this;
         }
 
@@ -1990,6 +2646,42 @@ public final class App {
             return this;
         }
 
+        /**
+         * <p>The app's App Store category, or <code>null</code> when none has been set. An app can show a category that <code>GET /apps/categories</code> does not list, if it was categorized before the current store categories.</p>
+         * @return Reference to {@code this} so that method calls can be chained together.
+         */
+        @java.lang.Override
+        public _FinalStage category(Nullable<AppCategory> category) {
+            if (category.isNull()) {
+                this.category = null;
+            } else if (category.isEmpty()) {
+                this.category = Optional.empty();
+            } else {
+                this.category = Optional.of(category.get());
+            }
+            return this;
+        }
+
+        /**
+         * <p>The app's App Store category, or <code>null</code> when none has been set. An app can show a category that <code>GET /apps/categories</code> does not list, if it was categorized before the current store categories.</p>
+         * @return Reference to {@code this} so that method calls can be chained together.
+         */
+        @java.lang.Override
+        public _FinalStage category(AppCategory category) {
+            this.category = Optional.ofNullable(category);
+            return this;
+        }
+
+        /**
+         * <p>The app's App Store category, or <code>null</code> when none has been set. An app can show a category that <code>GET /apps/categories</code> does not list, if it was categorized before the current store categories.</p>
+         */
+        @java.lang.Override
+        @JsonSetter(value = "category", nulls = Nulls.SKIP)
+        public _FinalStage category(Optional<AppCategory> category) {
+            this.category = category;
+            return this;
+        }
+
         @java.lang.Override
         public _FinalStage addAllBusinessesCreatedLogoUrls(List<String> businessesCreatedLogoUrls) {
             if (businessesCreatedLogoUrls != null) {
@@ -2165,10 +2857,13 @@ public final class App {
                     apiKey,
                     appStoreDescription,
                     appType,
+                    averageReviewRating,
                     bannerImage,
                     baseUrl,
                     businessesCreatedCount,
                     businessesCreatedLogoUrls,
+                    businessesWithRecentSalesCount,
+                    category,
                     creator,
                     dashboardPath,
                     defaultApiKey,
@@ -2176,28 +2871,94 @@ public final class App {
                     description,
                     discoverPath,
                     domainId,
+                    domains,
+                    elementsUsed,
                     experiencePath,
                     hostedUrl,
                     icon,
                     id,
+                    importedFromUrl,
+                    isAppStoreListed,
+                    isWhopApp,
                     marketplaceStatus,
                     name,
                     oauthClientType,
                     openapiPath,
                     origin,
+                    perInstallSchedule,
+                    previewToken,
+                    productCategory,
                     productId,
                     productionAndroidBuild,
                     productionIosBuild,
                     productionWebBuild,
+                    publishedReviewsCount,
                     redirectUris,
                     requestedPermissions,
                     requiredScopes,
                     route,
+                    schedule,
                     secrets,
                     skillsPath,
                     status,
                     verified,
                     additionalProperties);
+        }
+
+        @JsonAnySetter
+        private void putAdditionalPropertyFromJson(String key, Object value) {
+            if (key.equalsIgnoreCase("account")
+                    || key.equalsIgnoreCase("api_key")
+                    || key.equalsIgnoreCase("app_store_description")
+                    || key.equalsIgnoreCase("app_type")
+                    || key.equalsIgnoreCase("average_review_rating")
+                    || key.equalsIgnoreCase("banner_image")
+                    || key.equalsIgnoreCase("base_url")
+                    || key.equalsIgnoreCase("businesses_created_count")
+                    || key.equalsIgnoreCase("businesses_created_logo_urls")
+                    || key.equalsIgnoreCase("businesses_with_recent_sales_count")
+                    || key.equalsIgnoreCase("category")
+                    || key.equalsIgnoreCase("creator")
+                    || key.equalsIgnoreCase("dashboard_path")
+                    || key.equalsIgnoreCase("default_api_key")
+                    || key.equalsIgnoreCase("deployment")
+                    || key.equalsIgnoreCase("description")
+                    || key.equalsIgnoreCase("discover_path")
+                    || key.equalsIgnoreCase("domain_id")
+                    || key.equalsIgnoreCase("domains")
+                    || key.equalsIgnoreCase("elements_used")
+                    || key.equalsIgnoreCase("experience_path")
+                    || key.equalsIgnoreCase("hosted_url")
+                    || key.equalsIgnoreCase("icon")
+                    || key.equalsIgnoreCase("id")
+                    || key.equalsIgnoreCase("imported_from_url")
+                    || key.equalsIgnoreCase("is_app_store_listed")
+                    || key.equalsIgnoreCase("is_whop_app")
+                    || key.equalsIgnoreCase("marketplace_status")
+                    || key.equalsIgnoreCase("name")
+                    || key.equalsIgnoreCase("oauth_client_type")
+                    || key.equalsIgnoreCase("openapi_path")
+                    || key.equalsIgnoreCase("origin")
+                    || key.equalsIgnoreCase("per_install_schedule")
+                    || key.equalsIgnoreCase("preview_token")
+                    || key.equalsIgnoreCase("product_category")
+                    || key.equalsIgnoreCase("product_id")
+                    || key.equalsIgnoreCase("production_android_build")
+                    || key.equalsIgnoreCase("production_ios_build")
+                    || key.equalsIgnoreCase("production_web_build")
+                    || key.equalsIgnoreCase("published_reviews_count")
+                    || key.equalsIgnoreCase("redirect_uris")
+                    || key.equalsIgnoreCase("requested_permissions")
+                    || key.equalsIgnoreCase("required_scopes")
+                    || key.equalsIgnoreCase("route")
+                    || key.equalsIgnoreCase("schedule")
+                    || key.equalsIgnoreCase("secrets")
+                    || key.equalsIgnoreCase("skills_path")
+                    || key.equalsIgnoreCase("status")
+                    || key.equalsIgnoreCase("verified")) {
+                return;
+            }
+            this.additionalProperties.put(key, value);
         }
 
         @java.lang.Override

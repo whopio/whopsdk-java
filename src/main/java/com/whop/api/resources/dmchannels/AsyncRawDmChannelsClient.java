@@ -4,11 +4,14 @@
 package com.whop.api.resources.dmchannels;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
+import com.whop.api.core.BodyProperties;
 import com.whop.api.core.ClientOptions;
 import com.whop.api.core.MediaTypes;
 import com.whop.api.core.ObjectMappers;
+import com.whop.api.core.PathSegments;
 import com.whop.api.core.QueryStringMapper;
 import com.whop.api.core.RequestOptions;
+import com.whop.api.core.RetryInterceptor;
 import com.whop.api.core.WhopApiApiException;
 import com.whop.api.core.WhopApiException;
 import com.whop.api.core.WhopApiHttpResponse;
@@ -28,6 +31,8 @@ import com.whop.api.resources.dmchannels.requests.UpdateDmChannelsRequest;
 import com.whop.api.resources.dmchannels.types.ListDmChannelsResponse;
 import com.whop.api.types.DmChannel;
 import com.whop.api.types.DmChannelListItem;
+import com.whop.api.types.InternalServerErrorBody;
+import com.whop.api.types.UnprocessableEntityErrorBody;
 import java.io.IOException;
 import java.util.List;
 import java.util.Optional;
@@ -52,7 +57,7 @@ public class AsyncRawDmChannelsClient {
     }
 
     /**
-     * Returns a paginated list of DM channels for the currently authenticated user, sorted by most recently active.
+     * Lists the authenticated user's DM channels, most recently active first.
      * <p>Required permissions:</p>
      * <ul>
      * <li><code>dms:read</code></li>
@@ -63,7 +68,7 @@ public class AsyncRawDmChannelsClient {
     }
 
     /**
-     * Returns a paginated list of DM channels for the currently authenticated user, sorted by most recently active.
+     * Lists the authenticated user's DM channels, most recently active first.
      * <p>Required permissions:</p>
      * <ul>
      * <li><code>dms:read</code></li>
@@ -75,7 +80,7 @@ public class AsyncRawDmChannelsClient {
     }
 
     /**
-     * Returns a paginated list of DM channels for the currently authenticated user, sorted by most recently active.
+     * Lists the authenticated user's DM channels, most recently active first.
      * <p>Required permissions:</p>
      * <ul>
      * <li><code>dms:read</code></li>
@@ -87,7 +92,7 @@ public class AsyncRawDmChannelsClient {
     }
 
     /**
-     * Returns a paginated list of DM channels for the currently authenticated user, sorted by most recently active.
+     * Lists the authenticated user's DM channels, most recently active first.
      * <p>Required permissions:</p>
      * <ul>
      * <li><code>dms:read</code></li>
@@ -95,7 +100,7 @@ public class AsyncRawDmChannelsClient {
      */
     public CompletableFuture<WhopApiHttpResponse<SyncPagingIterable<DmChannelListItem>>> list(
             ListDmChannelsRequest request, RequestOptions requestOptions) {
-        HttpUrl.Builder httpUrl = HttpUrl.parse(this.clientOptions.environment().getUrl())
+        HttpUrl.Builder httpUrl = HttpUrl.parse(this.clientOptions.environment().getApiURL())
                 .newBuilder()
                 .addPathSegments("dm_channels");
         if (request.getAfter().isPresent()) {
@@ -114,9 +119,9 @@ public class AsyncRawDmChannelsClient {
             QueryStringMapper.addQueryParameter(
                     httpUrl, "last", request.getLast().get(), false);
         }
-        if (request.getCompanyId().isPresent()) {
+        if (request.getAccountId().isPresent()) {
             QueryStringMapper.addQueryParameter(
-                    httpUrl, "company_id", request.getCompanyId().get(), false);
+                    httpUrl, "account_id", request.getAccountId().get(), false);
         }
         if (requestOptions != null) {
             requestOptions.getQueryParameters().forEach((_key, _value) -> {
@@ -133,9 +138,19 @@ public class AsyncRawDmChannelsClient {
         if (requestOptions != null && requestOptions.getTimeout().isPresent()) {
             client = clientOptions.httpClientWithTimeout(requestOptions);
         }
+        if (requestOptions != null && requestOptions.getMaxRetries().isPresent()) {
+            okhttpRequest = okhttpRequest
+                    .newBuilder()
+                    .tag(
+                            RetryInterceptor.MaxRetriesOverride.class,
+                            new RetryInterceptor.MaxRetriesOverride(
+                                    requestOptions.getMaxRetries().get()))
+                    .build();
+        }
         CompletableFuture<WhopApiHttpResponse<SyncPagingIterable<DmChannelListItem>>> future =
                 new CompletableFuture<>();
-        client.newCall(okhttpRequest).enqueue(new Callback() {
+        RetryInterceptor.AsyncCall okhttpCall = RetryInterceptor.newAsyncCall(client, okhttpRequest);
+        okhttpCall.enqueue(new Callback() {
             @Override
             public void onResponse(@NotNull Call call, @NotNull Response response) throws IOException {
                 try (ResponseBody responseBody = response.body()) {
@@ -152,7 +167,11 @@ public class AsyncRawDmChannelsClient {
                         List<DmChannelListItem> result = parsedResponse.getData();
                         future.complete(new WhopApiHttpResponse<>(
                                 new SyncPagingIterable<DmChannelListItem>(
-                                        startingAfter != null, result, parsedResponse, () -> {
+                                        startingAfter.isPresent()
+                                                && !startingAfter.get().isEmpty(),
+                                        result,
+                                        parsedResponse,
+                                        () -> {
                                             try {
                                                 return list(nextRequest, requestOptions)
                                                         .get()
@@ -188,7 +207,8 @@ public class AsyncRawDmChannelsClient {
                                 return;
                             case 422:
                                 future.completeExceptionally(new UnprocessableEntityError(
-                                        ObjectMappers.JSON_MAPPER.readValue(responseBodyString, Object.class),
+                                        ObjectMappers.JSON_MAPPER.readValue(
+                                                responseBodyString, UnprocessableEntityErrorBody.class),
                                         response));
                                 return;
                             case 429:
@@ -198,7 +218,8 @@ public class AsyncRawDmChannelsClient {
                                 return;
                             case 500:
                                 future.completeExceptionally(new InternalServerError(
-                                        ObjectMappers.JSON_MAPPER.readValue(responseBodyString, Object.class),
+                                        ObjectMappers.JSON_MAPPER.readValue(
+                                                responseBodyString, InternalServerErrorBody.class),
                                         response));
                                 return;
                         }
@@ -209,6 +230,9 @@ public class AsyncRawDmChannelsClient {
                     future.completeExceptionally(new WhopApiApiException(
                             "Error with status code " + response.code(), response.code(), errorBody, response));
                     return;
+                } catch (JsonProcessingException e) {
+                    future.completeExceptionally(
+                            new WhopApiException("Failed to deserialize response: " + e.getMessage(), e));
                 } catch (IOException e) {
                     future.completeExceptionally(new WhopApiException("Network error executing HTTP request", e));
                 }
@@ -219,11 +243,16 @@ public class AsyncRawDmChannelsClient {
                 future.completeExceptionally(new WhopApiException("Network error executing HTTP request", e));
             }
         });
+        future.whenComplete((result_, throwable_) -> {
+            if (future.isCancelled()) {
+                okhttpCall.cancel();
+            }
+        });
         return future;
     }
 
     /**
-     * Create a new DM channel between two or more users, optionally scoped to a specific company. Returns the existing channel if one already exists.
+     * Creates a DM channel between two or more users, optionally scoped to an account. Returns the existing channel if one already exists.
      * <p>Required permissions:</p>
      * <ul>
      * <li><code>dms:channel:manage</code></li>
@@ -234,7 +263,7 @@ public class AsyncRawDmChannelsClient {
     }
 
     /**
-     * Create a new DM channel between two or more users, optionally scoped to a specific company. Returns the existing channel if one already exists.
+     * Creates a DM channel between two or more users, optionally scoped to an account. Returns the existing channel if one already exists.
      * <p>Required permissions:</p>
      * <ul>
      * <li><code>dms:channel:manage</code></li>
@@ -242,7 +271,7 @@ public class AsyncRawDmChannelsClient {
      */
     public CompletableFuture<WhopApiHttpResponse<DmChannel>> create(
             CreateDmChannelsRequest request, RequestOptions requestOptions) {
-        HttpUrl.Builder httpUrl = HttpUrl.parse(this.clientOptions.environment().getUrl())
+        HttpUrl.Builder httpUrl = HttpUrl.parse(this.clientOptions.environment().getApiURL())
                 .newBuilder()
                 .addPathSegments("dm_channels");
         if (requestOptions != null) {
@@ -253,7 +282,9 @@ public class AsyncRawDmChannelsClient {
         RequestBody body;
         try {
             body = RequestBody.create(
-                    ObjectMappers.JSON_MAPPER.writeValueAsBytes(request), MediaTypes.APPLICATION_JSON);
+                    ObjectMappers.JSON_MAPPER.writeValueAsBytes(BodyProperties.merge(
+                            request, requestOptions != null ? requestOptions.getBodyProperties() : null)),
+                    MediaTypes.APPLICATION_JSON);
         } catch (JsonProcessingException e) {
             throw new WhopApiException("Failed to serialize request", e);
         }
@@ -268,8 +299,18 @@ public class AsyncRawDmChannelsClient {
         if (requestOptions != null && requestOptions.getTimeout().isPresent()) {
             client = clientOptions.httpClientWithTimeout(requestOptions);
         }
+        if (requestOptions != null && requestOptions.getMaxRetries().isPresent()) {
+            okhttpRequest = okhttpRequest
+                    .newBuilder()
+                    .tag(
+                            RetryInterceptor.MaxRetriesOverride.class,
+                            new RetryInterceptor.MaxRetriesOverride(
+                                    requestOptions.getMaxRetries().get()))
+                    .build();
+        }
         CompletableFuture<WhopApiHttpResponse<DmChannel>> future = new CompletableFuture<>();
-        client.newCall(okhttpRequest).enqueue(new Callback() {
+        RetryInterceptor.AsyncCall okhttpCall = RetryInterceptor.newAsyncCall(client, okhttpRequest);
+        okhttpCall.enqueue(new Callback() {
             @Override
             public void onResponse(@NotNull Call call, @NotNull Response response) throws IOException {
                 try (ResponseBody responseBody = response.body()) {
@@ -303,7 +344,8 @@ public class AsyncRawDmChannelsClient {
                                 return;
                             case 422:
                                 future.completeExceptionally(new UnprocessableEntityError(
-                                        ObjectMappers.JSON_MAPPER.readValue(responseBodyString, Object.class),
+                                        ObjectMappers.JSON_MAPPER.readValue(
+                                                responseBodyString, UnprocessableEntityErrorBody.class),
                                         response));
                                 return;
                             case 429:
@@ -313,7 +355,8 @@ public class AsyncRawDmChannelsClient {
                                 return;
                             case 500:
                                 future.completeExceptionally(new InternalServerError(
-                                        ObjectMappers.JSON_MAPPER.readValue(responseBodyString, Object.class),
+                                        ObjectMappers.JSON_MAPPER.readValue(
+                                                responseBodyString, InternalServerErrorBody.class),
                                         response));
                                 return;
                         }
@@ -324,6 +367,9 @@ public class AsyncRawDmChannelsClient {
                     future.completeExceptionally(new WhopApiApiException(
                             "Error with status code " + response.code(), response.code(), errorBody, response));
                     return;
+                } catch (JsonProcessingException e) {
+                    future.completeExceptionally(
+                            new WhopApiException("Failed to deserialize response: " + e.getMessage(), e));
                 } catch (IOException e) {
                     future.completeExceptionally(new WhopApiException("Network error executing HTTP request", e));
                 }
@@ -332,6 +378,11 @@ public class AsyncRawDmChannelsClient {
             @Override
             public void onFailure(@NotNull Call call, @NotNull IOException e) {
                 future.completeExceptionally(new WhopApiException("Network error executing HTTP request", e));
+            }
+        });
+        future.whenComplete((result_, throwable_) -> {
+            if (future.isCancelled()) {
+                okhttpCall.cancel();
             }
         });
         return future;
@@ -383,10 +434,10 @@ public class AsyncRawDmChannelsClient {
      */
     public CompletableFuture<WhopApiHttpResponse<DmChannel>> retrieve(
             String id, RetrieveDmChannelsRequest request, RequestOptions requestOptions) {
-        HttpUrl.Builder httpUrl = HttpUrl.parse(this.clientOptions.environment().getUrl())
+        HttpUrl.Builder httpUrl = HttpUrl.parse(this.clientOptions.environment().getApiURL())
                 .newBuilder()
                 .addPathSegments("dm_channels")
-                .addPathSegment(id);
+                .addPathSegment(PathSegments.validate(id));
         if (requestOptions != null) {
             requestOptions.getQueryParameters().forEach((_key, _value) -> {
                 httpUrl.addQueryParameter(_key, _value);
@@ -402,8 +453,18 @@ public class AsyncRawDmChannelsClient {
         if (requestOptions != null && requestOptions.getTimeout().isPresent()) {
             client = clientOptions.httpClientWithTimeout(requestOptions);
         }
+        if (requestOptions != null && requestOptions.getMaxRetries().isPresent()) {
+            okhttpRequest = okhttpRequest
+                    .newBuilder()
+                    .tag(
+                            RetryInterceptor.MaxRetriesOverride.class,
+                            new RetryInterceptor.MaxRetriesOverride(
+                                    requestOptions.getMaxRetries().get()))
+                    .build();
+        }
         CompletableFuture<WhopApiHttpResponse<DmChannel>> future = new CompletableFuture<>();
-        client.newCall(okhttpRequest).enqueue(new Callback() {
+        RetryInterceptor.AsyncCall okhttpCall = RetryInterceptor.newAsyncCall(client, okhttpRequest);
+        okhttpCall.enqueue(new Callback() {
             @Override
             public void onResponse(@NotNull Call call, @NotNull Response response) throws IOException {
                 try (ResponseBody responseBody = response.body()) {
@@ -437,7 +498,8 @@ public class AsyncRawDmChannelsClient {
                                 return;
                             case 422:
                                 future.completeExceptionally(new UnprocessableEntityError(
-                                        ObjectMappers.JSON_MAPPER.readValue(responseBodyString, Object.class),
+                                        ObjectMappers.JSON_MAPPER.readValue(
+                                                responseBodyString, UnprocessableEntityErrorBody.class),
                                         response));
                                 return;
                             case 429:
@@ -447,7 +509,8 @@ public class AsyncRawDmChannelsClient {
                                 return;
                             case 500:
                                 future.completeExceptionally(new InternalServerError(
-                                        ObjectMappers.JSON_MAPPER.readValue(responseBodyString, Object.class),
+                                        ObjectMappers.JSON_MAPPER.readValue(
+                                                responseBodyString, InternalServerErrorBody.class),
                                         response));
                                 return;
                         }
@@ -458,6 +521,9 @@ public class AsyncRawDmChannelsClient {
                     future.completeExceptionally(new WhopApiApiException(
                             "Error with status code " + response.code(), response.code(), errorBody, response));
                     return;
+                } catch (JsonProcessingException e) {
+                    future.completeExceptionally(
+                            new WhopApiException("Failed to deserialize response: " + e.getMessage(), e));
                 } catch (IOException e) {
                     future.completeExceptionally(new WhopApiException("Network error executing HTTP request", e));
                 }
@@ -468,11 +534,16 @@ public class AsyncRawDmChannelsClient {
                 future.completeExceptionally(new WhopApiException("Network error executing HTTP request", e));
             }
         });
+        future.whenComplete((result_, throwable_) -> {
+            if (future.isCancelled()) {
+                okhttpCall.cancel();
+            }
+        });
         return future;
     }
 
     /**
-     * Permanently delete a DM channel and all of its messages. Only an admin of the channel can perform this action.
+     * Permanently deletes a DM channel and all of its messages. Only a channel admin can delete it.
      * <p>Required permissions (one of):</p>
      * <ul>
      * <li><code>dms:channel:manage</code></li>
@@ -484,7 +555,7 @@ public class AsyncRawDmChannelsClient {
     }
 
     /**
-     * Permanently delete a DM channel and all of its messages. Only an admin of the channel can perform this action.
+     * Permanently deletes a DM channel and all of its messages. Only a channel admin can delete it.
      * <p>Required permissions (one of):</p>
      * <ul>
      * <li><code>dms:channel:manage</code></li>
@@ -496,7 +567,7 @@ public class AsyncRawDmChannelsClient {
     }
 
     /**
-     * Permanently delete a DM channel and all of its messages. Only an admin of the channel can perform this action.
+     * Permanently deletes a DM channel and all of its messages. Only a channel admin can delete it.
      * <p>Required permissions (one of):</p>
      * <ul>
      * <li><code>dms:channel:manage</code></li>
@@ -508,7 +579,7 @@ public class AsyncRawDmChannelsClient {
     }
 
     /**
-     * Permanently delete a DM channel and all of its messages. Only an admin of the channel can perform this action.
+     * Permanently deletes a DM channel and all of its messages. Only a channel admin can delete it.
      * <p>Required permissions (one of):</p>
      * <ul>
      * <li><code>dms:channel:manage</code></li>
@@ -517,10 +588,10 @@ public class AsyncRawDmChannelsClient {
      */
     public CompletableFuture<WhopApiHttpResponse<Boolean>> delete(
             String id, DeleteDmChannelsRequest request, RequestOptions requestOptions) {
-        HttpUrl.Builder httpUrl = HttpUrl.parse(this.clientOptions.environment().getUrl())
+        HttpUrl.Builder httpUrl = HttpUrl.parse(this.clientOptions.environment().getApiURL())
                 .newBuilder()
                 .addPathSegments("dm_channels")
-                .addPathSegment(id);
+                .addPathSegment(PathSegments.validate(id));
         if (requestOptions != null) {
             requestOptions.getQueryParameters().forEach((_key, _value) -> {
                 httpUrl.addQueryParameter(_key, _value);
@@ -528,7 +599,10 @@ public class AsyncRawDmChannelsClient {
         }
         Request.Builder _requestBuilder = new Request.Builder()
                 .url(httpUrl.build())
-                .method("DELETE", null)
+                .method(
+                        "DELETE",
+                        BodyProperties.toRequestBody(
+                                requestOptions != null ? requestOptions.getBodyProperties() : null, null))
                 .headers(Headers.of(clientOptions.headers(requestOptions)))
                 .addHeader("Accept", "application/json");
         Request okhttpRequest = _requestBuilder.build();
@@ -536,8 +610,18 @@ public class AsyncRawDmChannelsClient {
         if (requestOptions != null && requestOptions.getTimeout().isPresent()) {
             client = clientOptions.httpClientWithTimeout(requestOptions);
         }
+        if (requestOptions != null && requestOptions.getMaxRetries().isPresent()) {
+            okhttpRequest = okhttpRequest
+                    .newBuilder()
+                    .tag(
+                            RetryInterceptor.MaxRetriesOverride.class,
+                            new RetryInterceptor.MaxRetriesOverride(
+                                    requestOptions.getMaxRetries().get()))
+                    .build();
+        }
         CompletableFuture<WhopApiHttpResponse<Boolean>> future = new CompletableFuture<>();
-        client.newCall(okhttpRequest).enqueue(new Callback() {
+        RetryInterceptor.AsyncCall okhttpCall = RetryInterceptor.newAsyncCall(client, okhttpRequest);
+        okhttpCall.enqueue(new Callback() {
             @Override
             public void onResponse(@NotNull Call call, @NotNull Response response) throws IOException {
                 try (ResponseBody responseBody = response.body()) {
@@ -571,7 +655,8 @@ public class AsyncRawDmChannelsClient {
                                 return;
                             case 422:
                                 future.completeExceptionally(new UnprocessableEntityError(
-                                        ObjectMappers.JSON_MAPPER.readValue(responseBodyString, Object.class),
+                                        ObjectMappers.JSON_MAPPER.readValue(
+                                                responseBodyString, UnprocessableEntityErrorBody.class),
                                         response));
                                 return;
                             case 429:
@@ -581,7 +666,8 @@ public class AsyncRawDmChannelsClient {
                                 return;
                             case 500:
                                 future.completeExceptionally(new InternalServerError(
-                                        ObjectMappers.JSON_MAPPER.readValue(responseBodyString, Object.class),
+                                        ObjectMappers.JSON_MAPPER.readValue(
+                                                responseBodyString, InternalServerErrorBody.class),
                                         response));
                                 return;
                         }
@@ -592,6 +678,9 @@ public class AsyncRawDmChannelsClient {
                     future.completeExceptionally(new WhopApiApiException(
                             "Error with status code " + response.code(), response.code(), errorBody, response));
                     return;
+                } catch (JsonProcessingException e) {
+                    future.completeExceptionally(
+                            new WhopApiException("Failed to deserialize response: " + e.getMessage(), e));
                 } catch (IOException e) {
                     future.completeExceptionally(new WhopApiException("Network error executing HTTP request", e));
                 }
@@ -602,11 +691,16 @@ public class AsyncRawDmChannelsClient {
                 future.completeExceptionally(new WhopApiException("Network error executing HTTP request", e));
             }
         });
+        future.whenComplete((result_, throwable_) -> {
+            if (future.isCancelled()) {
+                okhttpCall.cancel();
+            }
+        });
         return future;
     }
 
     /**
-     * Update the settings of an existing DM channel, such as its display name. Only an admin of the channel can perform this action.
+     * Updates a DM channel's settings, such as its display name. Only a channel admin can update it.
      * <p>Required permissions (one of):</p>
      * <ul>
      * <li><code>dms:channel:manage</code></li>
@@ -618,7 +712,7 @@ public class AsyncRawDmChannelsClient {
     }
 
     /**
-     * Update the settings of an existing DM channel, such as its display name. Only an admin of the channel can perform this action.
+     * Updates a DM channel's settings, such as its display name. Only a channel admin can update it.
      * <p>Required permissions (one of):</p>
      * <ul>
      * <li><code>dms:channel:manage</code></li>
@@ -630,7 +724,7 @@ public class AsyncRawDmChannelsClient {
     }
 
     /**
-     * Update the settings of an existing DM channel, such as its display name. Only an admin of the channel can perform this action.
+     * Updates a DM channel's settings, such as its display name. Only a channel admin can update it.
      * <p>Required permissions (one of):</p>
      * <ul>
      * <li><code>dms:channel:manage</code></li>
@@ -642,7 +736,7 @@ public class AsyncRawDmChannelsClient {
     }
 
     /**
-     * Update the settings of an existing DM channel, such as its display name. Only an admin of the channel can perform this action.
+     * Updates a DM channel's settings, such as its display name. Only a channel admin can update it.
      * <p>Required permissions (one of):</p>
      * <ul>
      * <li><code>dms:channel:manage</code></li>
@@ -651,10 +745,10 @@ public class AsyncRawDmChannelsClient {
      */
     public CompletableFuture<WhopApiHttpResponse<DmChannel>> update(
             String id, UpdateDmChannelsRequest request, RequestOptions requestOptions) {
-        HttpUrl.Builder httpUrl = HttpUrl.parse(this.clientOptions.environment().getUrl())
+        HttpUrl.Builder httpUrl = HttpUrl.parse(this.clientOptions.environment().getApiURL())
                 .newBuilder()
                 .addPathSegments("dm_channels")
-                .addPathSegment(id);
+                .addPathSegment(PathSegments.validate(id));
         if (requestOptions != null) {
             requestOptions.getQueryParameters().forEach((_key, _value) -> {
                 httpUrl.addQueryParameter(_key, _value);
@@ -663,7 +757,9 @@ public class AsyncRawDmChannelsClient {
         RequestBody body;
         try {
             body = RequestBody.create(
-                    ObjectMappers.JSON_MAPPER.writeValueAsBytes(request), MediaTypes.APPLICATION_JSON);
+                    ObjectMappers.JSON_MAPPER.writeValueAsBytes(BodyProperties.merge(
+                            request, requestOptions != null ? requestOptions.getBodyProperties() : null)),
+                    MediaTypes.APPLICATION_JSON);
         } catch (JsonProcessingException e) {
             throw new WhopApiException("Failed to serialize request", e);
         }
@@ -678,8 +774,18 @@ public class AsyncRawDmChannelsClient {
         if (requestOptions != null && requestOptions.getTimeout().isPresent()) {
             client = clientOptions.httpClientWithTimeout(requestOptions);
         }
+        if (requestOptions != null && requestOptions.getMaxRetries().isPresent()) {
+            okhttpRequest = okhttpRequest
+                    .newBuilder()
+                    .tag(
+                            RetryInterceptor.MaxRetriesOverride.class,
+                            new RetryInterceptor.MaxRetriesOverride(
+                                    requestOptions.getMaxRetries().get()))
+                    .build();
+        }
         CompletableFuture<WhopApiHttpResponse<DmChannel>> future = new CompletableFuture<>();
-        client.newCall(okhttpRequest).enqueue(new Callback() {
+        RetryInterceptor.AsyncCall okhttpCall = RetryInterceptor.newAsyncCall(client, okhttpRequest);
+        okhttpCall.enqueue(new Callback() {
             @Override
             public void onResponse(@NotNull Call call, @NotNull Response response) throws IOException {
                 try (ResponseBody responseBody = response.body()) {
@@ -713,7 +819,8 @@ public class AsyncRawDmChannelsClient {
                                 return;
                             case 422:
                                 future.completeExceptionally(new UnprocessableEntityError(
-                                        ObjectMappers.JSON_MAPPER.readValue(responseBodyString, Object.class),
+                                        ObjectMappers.JSON_MAPPER.readValue(
+                                                responseBodyString, UnprocessableEntityErrorBody.class),
                                         response));
                                 return;
                             case 429:
@@ -723,7 +830,8 @@ public class AsyncRawDmChannelsClient {
                                 return;
                             case 500:
                                 future.completeExceptionally(new InternalServerError(
-                                        ObjectMappers.JSON_MAPPER.readValue(responseBodyString, Object.class),
+                                        ObjectMappers.JSON_MAPPER.readValue(
+                                                responseBodyString, InternalServerErrorBody.class),
                                         response));
                                 return;
                         }
@@ -734,6 +842,9 @@ public class AsyncRawDmChannelsClient {
                     future.completeExceptionally(new WhopApiApiException(
                             "Error with status code " + response.code(), response.code(), errorBody, response));
                     return;
+                } catch (JsonProcessingException e) {
+                    future.completeExceptionally(
+                            new WhopApiException("Failed to deserialize response: " + e.getMessage(), e));
                 } catch (IOException e) {
                     future.completeExceptionally(new WhopApiException("Network error executing HTTP request", e));
                 }
@@ -742,6 +853,11 @@ public class AsyncRawDmChannelsClient {
             @Override
             public void onFailure(@NotNull Call call, @NotNull IOException e) {
                 future.completeExceptionally(new WhopApiException("Network error executing HTTP request", e));
+            }
+        });
+        future.whenComplete((result_, throwable_) -> {
+            if (future.isCancelled()) {
+                okhttpCall.cancel();
             }
         });
         return future;

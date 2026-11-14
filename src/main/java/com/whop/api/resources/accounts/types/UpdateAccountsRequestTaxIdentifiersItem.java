@@ -35,7 +35,7 @@ public final class UpdateAccountsRequestTaxIdentifiersItem {
     }
 
     /**
-     * @return Tax ID type, for example <code>eu_vat</code>, <code>gb_vat</code>, or <code>us_ein</code>.
+     * @return Tax ID type, for example <code>eu_vat</code>, <code>gb_vat</code>, or <code>us_ein</code>. See the <a href="/developer/guides/tax-ids">tax IDs guide</a> for an example of each type.
      */
     @JsonProperty("tax_id_type")
     public UpdateAccountsRequestTaxIdentifiersItemTaxIdType getTaxIdType() {
@@ -43,7 +43,7 @@ public final class UpdateAccountsRequestTaxIdentifiersItem {
     }
 
     /**
-     * @return Tax ID value, for example <code>DE123456789</code>.
+     * @return Tax ID value, for example <code>DE123456789</code>. An <code>eu_vat</code> number must start with its two-letter country code (Greece uses <code>EL</code>); spaces, dots, and dashes are removed and letters are uppercased. See the <a href="/developer/guides/tax-ids">tax IDs guide</a>.
      */
     @JsonProperty("tax_id_value")
     public String getTaxIdValue() {
@@ -82,7 +82,7 @@ public final class UpdateAccountsRequestTaxIdentifiersItem {
 
     public interface TaxIdTypeStage {
         /**
-         * <p>Tax ID type, for example <code>eu_vat</code>, <code>gb_vat</code>, or <code>us_ein</code>.</p>
+         * <p>Tax ID type, for example <code>eu_vat</code>, <code>gb_vat</code>, or <code>us_ein</code>. See the <a href="/developer/guides/tax-ids">tax IDs guide</a> for an example of each type.</p>
          */
         TaxIdValueStage taxIdType(@NotNull UpdateAccountsRequestTaxIdentifiersItemTaxIdType taxIdType);
 
@@ -91,7 +91,7 @@ public final class UpdateAccountsRequestTaxIdentifiersItem {
 
     public interface TaxIdValueStage {
         /**
-         * <p>Tax ID value, for example <code>DE123456789</code>.</p>
+         * <p>Tax ID value, for example <code>DE123456789</code>. An <code>eu_vat</code> number must start with its two-letter country code (Greece uses <code>EL</code>); spaces, dots, and dashes are removed and letters are uppercased. See the <a href="/developer/guides/tax-ids">tax IDs guide</a>.</p>
          */
         _FinalStage taxIdValue(@NotNull String taxIdValue);
     }
@@ -110,7 +110,6 @@ public final class UpdateAccountsRequestTaxIdentifiersItem {
 
         private String taxIdValue;
 
-        @JsonAnySetter
         private Map<String, Object> additionalProperties = new HashMap<>();
 
         private Builder() {}
@@ -123,8 +122,7 @@ public final class UpdateAccountsRequestTaxIdentifiersItem {
         }
 
         /**
-         * <p>Tax ID type, for example <code>eu_vat</code>, <code>gb_vat</code>, or <code>us_ein</code>.</p>
-         * <p>Tax ID type, for example <code>eu_vat</code>, <code>gb_vat</code>, or <code>us_ein</code>.</p>
+         * <p>Tax ID type, for example <code>eu_vat</code>, <code>gb_vat</code>, or <code>us_ein</code>. See the <a href="/developer/guides/tax-ids">tax IDs guide</a> for an example of each type.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
@@ -135,8 +133,7 @@ public final class UpdateAccountsRequestTaxIdentifiersItem {
         }
 
         /**
-         * <p>Tax ID value, for example <code>DE123456789</code>.</p>
-         * <p>Tax ID value, for example <code>DE123456789</code>.</p>
+         * <p>Tax ID value, for example <code>DE123456789</code>. An <code>eu_vat</code> number must start with its two-letter country code (Greece uses <code>EL</code>); spaces, dots, and dashes are removed and letters are uppercased. See the <a href="/developer/guides/tax-ids">tax IDs guide</a>.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
@@ -149,6 +146,14 @@ public final class UpdateAccountsRequestTaxIdentifiersItem {
         @java.lang.Override
         public UpdateAccountsRequestTaxIdentifiersItem build() {
             return new UpdateAccountsRequestTaxIdentifiersItem(taxIdType, taxIdValue, additionalProperties);
+        }
+
+        @JsonAnySetter
+        private void putAdditionalPropertyFromJson(String key, Object value) {
+            if (key.equalsIgnoreCase("tax_id_type") || key.equalsIgnoreCase("tax_id_value")) {
+                return;
+            }
+            this.additionalProperties.put(key, value);
         }
 
         @java.lang.Override

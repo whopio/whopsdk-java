@@ -118,7 +118,6 @@ public final class ListVerificationsIdentityProfileRequest {
 
         private Optional<Integer> last = Optional.empty();
 
-        @JsonAnySetter
         private Map<String, Object> additionalProperties = new HashMap<>();
 
         private Builder() {}
@@ -189,6 +188,17 @@ public final class ListVerificationsIdentityProfileRequest {
 
         public ListVerificationsIdentityProfileRequest build() {
             return new ListVerificationsIdentityProfileRequest(after, before, first, last, additionalProperties);
+        }
+
+        @JsonAnySetter
+        private void putAdditionalPropertyFromJson(String key, Object value) {
+            if (key.equalsIgnoreCase("after")
+                    || key.equalsIgnoreCase("before")
+                    || key.equalsIgnoreCase("first")
+                    || key.equalsIgnoreCase("last")) {
+                return;
+            }
+            this.additionalProperties.put(key, value);
         }
 
         public Builder additionalProperty(String key, Object value) {

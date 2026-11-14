@@ -178,7 +178,6 @@ public final class CourseLessonInteractionListItem {
 
         private CourseLessonInteractionListItemUser user;
 
-        @JsonAnySetter
         private Map<String, Object> additionalProperties = new HashMap<>();
 
         private Builder() {}
@@ -195,7 +194,6 @@ public final class CourseLessonInteractionListItem {
 
         /**
          * <p>Whether the user has finished this lesson.</p>
-         * <p>Whether the user has finished this lesson.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
@@ -206,7 +204,6 @@ public final class CourseLessonInteractionListItem {
         }
 
         /**
-         * <p>The datetime the lesson interaction was created.</p>
          * <p>The datetime the lesson interaction was created.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
@@ -219,7 +216,6 @@ public final class CourseLessonInteractionListItem {
 
         /**
          * <p>The unique identifier for the lesson interaction.</p>
-         * <p>The unique identifier for the lesson interaction.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
@@ -231,7 +227,6 @@ public final class CourseLessonInteractionListItem {
 
         /**
          * <p>The lesson that this progress record belongs to.</p>
-         * <p>The lesson that this progress record belongs to.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
@@ -242,7 +237,6 @@ public final class CourseLessonInteractionListItem {
         }
 
         /**
-         * <p>The user whose progress is being tracked.</p>
          * <p>The user whose progress is being tracked.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
@@ -256,6 +250,18 @@ public final class CourseLessonInteractionListItem {
         @java.lang.Override
         public CourseLessonInteractionListItem build() {
             return new CourseLessonInteractionListItem(completed, createdAt, id, lesson, user, additionalProperties);
+        }
+
+        @JsonAnySetter
+        private void putAdditionalPropertyFromJson(String key, Object value) {
+            if (key.equalsIgnoreCase("completed")
+                    || key.equalsIgnoreCase("created_at")
+                    || key.equalsIgnoreCase("id")
+                    || key.equalsIgnoreCase("lesson")
+                    || key.equalsIgnoreCase("user")) {
+                return;
+            }
+            this.additionalProperties.put(key, value);
         }
 
         @java.lang.Override

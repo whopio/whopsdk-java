@@ -203,7 +203,6 @@ public final class NotificationBadge {
 
         private Optional<String> accountId = Optional.empty();
 
-        @JsonAnySetter
         private Map<String, Object> additionalProperties = new HashMap<>();
 
         private Builder() {}
@@ -220,7 +219,6 @@ public final class NotificationBadge {
 
         /**
          * <p>Experience the badge counts, prefixed <code>exp_</code>.</p>
-         * <p>Experience the badge counts, prefixed <code>exp_</code>.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
@@ -232,7 +230,6 @@ public final class NotificationBadge {
 
         /**
          * <p>Whether the caller has unread notifications in this experience.</p>
-         * <p>Whether the caller has unread notifications in this experience.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
@@ -243,7 +240,6 @@ public final class NotificationBadge {
         }
 
         /**
-         * <p>Number of unread important (mention) notifications in this experience.</p>
          * <p>Number of unread important (mention) notifications in this experience.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
@@ -330,6 +326,18 @@ public final class NotificationBadge {
         public NotificationBadge build() {
             return new NotificationBadge(
                     accountId, experienceId, hasUnread, importantCount, lastViewedAt, additionalProperties);
+        }
+
+        @JsonAnySetter
+        private void putAdditionalPropertyFromJson(String key, Object value) {
+            if (key.equalsIgnoreCase("account_id")
+                    || key.equalsIgnoreCase("experience_id")
+                    || key.equalsIgnoreCase("has_unread")
+                    || key.equalsIgnoreCase("important_count")
+                    || key.equalsIgnoreCase("last_viewed_at")) {
+                return;
+            }
+            this.additionalProperties.put(key, value);
         }
 
         @java.lang.Override

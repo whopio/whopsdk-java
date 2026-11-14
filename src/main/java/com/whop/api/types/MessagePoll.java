@@ -83,7 +83,6 @@ public final class MessagePoll {
     public static final class Builder {
         private Optional<List<MessagePollOptionsItem>> options = Optional.empty();
 
-        @JsonAnySetter
         private Map<String, Object> additionalProperties = new HashMap<>();
 
         private Builder() {}
@@ -120,6 +119,14 @@ public final class MessagePoll {
 
         public MessagePoll build() {
             return new MessagePoll(options, additionalProperties);
+        }
+
+        @JsonAnySetter
+        private void putAdditionalPropertyFromJson(String key, Object value) {
+            if (key.equalsIgnoreCase("options")) {
+                return;
+            }
+            this.additionalProperties.put(key, value);
         }
 
         public Builder additionalProperty(String key, Object value) {

@@ -4,11 +4,14 @@
 package com.whop.api.resources.experiences;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
+import com.whop.api.core.BodyProperties;
 import com.whop.api.core.ClientOptions;
 import com.whop.api.core.MediaTypes;
 import com.whop.api.core.ObjectMappers;
+import com.whop.api.core.PathSegments;
 import com.whop.api.core.QueryStringMapper;
 import com.whop.api.core.RequestOptions;
+import com.whop.api.core.RetryInterceptor;
 import com.whop.api.core.WhopApiApiException;
 import com.whop.api.core.WhopApiException;
 import com.whop.api.core.WhopApiHttpResponse;
@@ -31,6 +34,8 @@ import com.whop.api.resources.experiences.requests.UpdateExperiencesRequest;
 import com.whop.api.resources.experiences.types.ListExperiencesResponse;
 import com.whop.api.types.Experience;
 import com.whop.api.types.ExperienceListItem;
+import com.whop.api.types.InternalServerErrorBody;
+import com.whop.api.types.UnprocessableEntityErrorBody;
 import java.io.IOException;
 import java.util.List;
 import java.util.Optional;
@@ -50,18 +55,18 @@ public class RawExperiencesClient {
     }
 
     /**
-     * Returns a paginated list of experiences belonging to a company, with optional filtering by product and app.
+     * Lists the experiences in an account, optionally filtered to those attached to one product or powered by one app.
      */
     public WhopApiHttpResponse<SyncPagingIterable<ExperienceListItem>> list(ListExperiencesRequest request) {
         return list(request, null);
     }
 
     /**
-     * Returns a paginated list of experiences belonging to a company, with optional filtering by product and app.
+     * Lists the experiences in an account, optionally filtered to those attached to one product or powered by one app.
      */
     public WhopApiHttpResponse<SyncPagingIterable<ExperienceListItem>> list(
             ListExperiencesRequest request, RequestOptions requestOptions) {
-        HttpUrl.Builder httpUrl = HttpUrl.parse(this.clientOptions.environment().getUrl())
+        HttpUrl.Builder httpUrl = HttpUrl.parse(this.clientOptions.environment().getApiURL())
                 .newBuilder()
                 .addPathSegments("experiences");
         if (request.getAfter().isPresent()) {
@@ -80,7 +85,6 @@ public class RawExperiencesClient {
             QueryStringMapper.addQueryParameter(
                     httpUrl, "last", request.getLast().get(), false);
         }
-        QueryStringMapper.addQueryParameter(httpUrl, "company_id", request.getCompanyId(), false);
         if (request.getProductId().isPresent()) {
             QueryStringMapper.addQueryParameter(
                     httpUrl, "product_id", request.getProductId().get(), false);
@@ -97,6 +101,7 @@ public class RawExperiencesClient {
             QueryStringMapper.addQueryParameter(
                     httpUrl, "created_after", request.getCreatedAfter().get(), false);
         }
+        QueryStringMapper.addQueryParameter(httpUrl, "account_id", request.getAccountId(), false);
         if (requestOptions != null) {
             requestOptions.getQueryParameters().forEach((_key, _value) -> {
                 httpUrl.addQueryParameter(_key, _value);
@@ -112,6 +117,15 @@ public class RawExperiencesClient {
         if (requestOptions != null && requestOptions.getTimeout().isPresent()) {
             client = clientOptions.httpClientWithTimeout(requestOptions);
         }
+        if (requestOptions != null && requestOptions.getMaxRetries().isPresent()) {
+            okhttpRequest = okhttpRequest
+                    .newBuilder()
+                    .tag(
+                            RetryInterceptor.MaxRetriesOverride.class,
+                            new RetryInterceptor.MaxRetriesOverride(
+                                    requestOptions.getMaxRetries().get()))
+                    .build();
+        }
         try (Response response = client.newCall(okhttpRequest).execute()) {
             ResponseBody responseBody = response.body();
             String responseBodyString = responseBody != null ? responseBody.string() : "{}";
@@ -126,8 +140,11 @@ public class RawExperiencesClient {
                 List<ExperienceListItem> result = parsedResponse.getData();
                 return new WhopApiHttpResponse<>(
                         new SyncPagingIterable<ExperienceListItem>(
-                                startingAfter != null, result, parsedResponse, () -> list(nextRequest, requestOptions)
-                                        .body()),
+                                startingAfter.isPresent()
+                                        && !startingAfter.get().isEmpty(),
+                                result,
+                                parsedResponse,
+                                () -> list(nextRequest, requestOptions).body()),
                         response);
             }
             try {
@@ -146,13 +163,16 @@ public class RawExperiencesClient {
                                 ObjectMappers.JSON_MAPPER.readValue(responseBodyString, Object.class), response);
                     case 422:
                         throw new UnprocessableEntityError(
-                                ObjectMappers.JSON_MAPPER.readValue(responseBodyString, Object.class), response);
+                                ObjectMappers.JSON_MAPPER.readValue(
+                                        responseBodyString, UnprocessableEntityErrorBody.class),
+                                response);
                     case 429:
                         throw new TooManyRequestsError(
                                 ObjectMappers.JSON_MAPPER.readValue(responseBodyString, Object.class), response);
                     case 500:
                         throw new InternalServerError(
-                                ObjectMappers.JSON_MAPPER.readValue(responseBodyString, Object.class), response);
+                                ObjectMappers.JSON_MAPPER.readValue(responseBodyString, InternalServerErrorBody.class),
+                                response);
                 }
             } catch (JsonProcessingException ignored) {
                 // unable to map error response, throwing generic error
@@ -160,13 +180,16 @@ public class RawExperiencesClient {
             Object errorBody = ObjectMappers.parseErrorBody(responseBodyString);
             throw new WhopApiApiException(
                     "Error with status code " + response.code(), response.code(), errorBody, response);
+        } catch (JsonProcessingException e) {
+            throw new WhopApiException("Failed to deserialize response: " + e.getMessage(), e);
         } catch (IOException e) {
             throw new WhopApiException("Network error executing HTTP request", e);
         }
     }
 
     /**
-     * Required permissions:
+     * Creates an experience for an account, powered by an app such as courses, forums, or chat. Attach it to a product with <code>POST /experiences/:id/attach</code> to give that product's customers access.
+     * <p>Required permissions:</p>
      * <ul>
      * <li><code>experience:create</code></li>
      * </ul>
@@ -176,13 +199,14 @@ public class RawExperiencesClient {
     }
 
     /**
-     * Required permissions:
+     * Creates an experience for an account, powered by an app such as courses, forums, or chat. Attach it to a product with <code>POST /experiences/:id/attach</code> to give that product's customers access.
+     * <p>Required permissions:</p>
      * <ul>
      * <li><code>experience:create</code></li>
      * </ul>
      */
     public WhopApiHttpResponse<Experience> create(CreateExperiencesRequest request, RequestOptions requestOptions) {
-        HttpUrl.Builder httpUrl = HttpUrl.parse(this.clientOptions.environment().getUrl())
+        HttpUrl.Builder httpUrl = HttpUrl.parse(this.clientOptions.environment().getApiURL())
                 .newBuilder()
                 .addPathSegments("experiences");
         if (requestOptions != null) {
@@ -193,7 +217,9 @@ public class RawExperiencesClient {
         RequestBody body;
         try {
             body = RequestBody.create(
-                    ObjectMappers.JSON_MAPPER.writeValueAsBytes(request), MediaTypes.APPLICATION_JSON);
+                    ObjectMappers.JSON_MAPPER.writeValueAsBytes(BodyProperties.merge(
+                            request, requestOptions != null ? requestOptions.getBodyProperties() : null)),
+                    MediaTypes.APPLICATION_JSON);
         } catch (JsonProcessingException e) {
             throw new WhopApiException("Failed to serialize request", e);
         }
@@ -207,6 +233,15 @@ public class RawExperiencesClient {
         OkHttpClient client = clientOptions.httpClient();
         if (requestOptions != null && requestOptions.getTimeout().isPresent()) {
             client = clientOptions.httpClientWithTimeout(requestOptions);
+        }
+        if (requestOptions != null && requestOptions.getMaxRetries().isPresent()) {
+            okhttpRequest = okhttpRequest
+                    .newBuilder()
+                    .tag(
+                            RetryInterceptor.MaxRetriesOverride.class,
+                            new RetryInterceptor.MaxRetriesOverride(
+                                    requestOptions.getMaxRetries().get()))
+                    .build();
         }
         try (Response response = client.newCall(okhttpRequest).execute()) {
             ResponseBody responseBody = response.body();
@@ -231,13 +266,16 @@ public class RawExperiencesClient {
                                 ObjectMappers.JSON_MAPPER.readValue(responseBodyString, Object.class), response);
                     case 422:
                         throw new UnprocessableEntityError(
-                                ObjectMappers.JSON_MAPPER.readValue(responseBodyString, Object.class), response);
+                                ObjectMappers.JSON_MAPPER.readValue(
+                                        responseBodyString, UnprocessableEntityErrorBody.class),
+                                response);
                     case 429:
                         throw new TooManyRequestsError(
                                 ObjectMappers.JSON_MAPPER.readValue(responseBodyString, Object.class), response);
                     case 500:
                         throw new InternalServerError(
-                                ObjectMappers.JSON_MAPPER.readValue(responseBodyString, Object.class), response);
+                                ObjectMappers.JSON_MAPPER.readValue(responseBodyString, InternalServerErrorBody.class),
+                                response);
                 }
             } catch (JsonProcessingException ignored) {
                 // unable to map error response, throwing generic error
@@ -245,6 +283,8 @@ public class RawExperiencesClient {
             Object errorBody = ObjectMappers.parseErrorBody(responseBodyString);
             throw new WhopApiApiException(
                     "Error with status code " + response.code(), response.code(), errorBody, response);
+        } catch (JsonProcessingException e) {
+            throw new WhopApiException("Failed to deserialize response: " + e.getMessage(), e);
         } catch (IOException e) {
             throw new WhopApiException("Network error executing HTTP request", e);
         }
@@ -276,10 +316,10 @@ public class RawExperiencesClient {
      */
     public WhopApiHttpResponse<Experience> retrieve(
             String id, RetrieveExperiencesRequest request, RequestOptions requestOptions) {
-        HttpUrl.Builder httpUrl = HttpUrl.parse(this.clientOptions.environment().getUrl())
+        HttpUrl.Builder httpUrl = HttpUrl.parse(this.clientOptions.environment().getApiURL())
                 .newBuilder()
                 .addPathSegments("experiences")
-                .addPathSegment(id);
+                .addPathSegment(PathSegments.validate(id));
         if (requestOptions != null) {
             requestOptions.getQueryParameters().forEach((_key, _value) -> {
                 httpUrl.addQueryParameter(_key, _value);
@@ -294,6 +334,15 @@ public class RawExperiencesClient {
         OkHttpClient client = clientOptions.httpClient();
         if (requestOptions != null && requestOptions.getTimeout().isPresent()) {
             client = clientOptions.httpClientWithTimeout(requestOptions);
+        }
+        if (requestOptions != null && requestOptions.getMaxRetries().isPresent()) {
+            okhttpRequest = okhttpRequest
+                    .newBuilder()
+                    .tag(
+                            RetryInterceptor.MaxRetriesOverride.class,
+                            new RetryInterceptor.MaxRetriesOverride(
+                                    requestOptions.getMaxRetries().get()))
+                    .build();
         }
         try (Response response = client.newCall(okhttpRequest).execute()) {
             ResponseBody responseBody = response.body();
@@ -318,13 +367,16 @@ public class RawExperiencesClient {
                                 ObjectMappers.JSON_MAPPER.readValue(responseBodyString, Object.class), response);
                     case 422:
                         throw new UnprocessableEntityError(
-                                ObjectMappers.JSON_MAPPER.readValue(responseBodyString, Object.class), response);
+                                ObjectMappers.JSON_MAPPER.readValue(
+                                        responseBodyString, UnprocessableEntityErrorBody.class),
+                                response);
                     case 429:
                         throw new TooManyRequestsError(
                                 ObjectMappers.JSON_MAPPER.readValue(responseBodyString, Object.class), response);
                     case 500:
                         throw new InternalServerError(
-                                ObjectMappers.JSON_MAPPER.readValue(responseBodyString, Object.class), response);
+                                ObjectMappers.JSON_MAPPER.readValue(responseBodyString, InternalServerErrorBody.class),
+                                response);
                 }
             } catch (JsonProcessingException ignored) {
                 // unable to map error response, throwing generic error
@@ -332,13 +384,16 @@ public class RawExperiencesClient {
             Object errorBody = ObjectMappers.parseErrorBody(responseBodyString);
             throw new WhopApiApiException(
                     "Error with status code " + response.code(), response.code(), errorBody, response);
+        } catch (JsonProcessingException e) {
+            throw new WhopApiException("Failed to deserialize response: " + e.getMessage(), e);
         } catch (IOException e) {
             throw new WhopApiException("Network error executing HTTP request", e);
         }
     }
 
     /**
-     * Required permissions:
+     * Deletes an experience and detaches it from every product, removing customer access to it. Returns <code>true</code> on success.
+     * <p>Required permissions:</p>
      * <ul>
      * <li><code>experience:delete</code></li>
      * </ul>
@@ -348,7 +403,8 @@ public class RawExperiencesClient {
     }
 
     /**
-     * Required permissions:
+     * Deletes an experience and detaches it from every product, removing customer access to it. Returns <code>true</code> on success.
+     * <p>Required permissions:</p>
      * <ul>
      * <li><code>experience:delete</code></li>
      * </ul>
@@ -358,7 +414,8 @@ public class RawExperiencesClient {
     }
 
     /**
-     * Required permissions:
+     * Deletes an experience and detaches it from every product, removing customer access to it. Returns <code>true</code> on success.
+     * <p>Required permissions:</p>
      * <ul>
      * <li><code>experience:delete</code></li>
      * </ul>
@@ -368,17 +425,18 @@ public class RawExperiencesClient {
     }
 
     /**
-     * Required permissions:
+     * Deletes an experience and detaches it from every product, removing customer access to it. Returns <code>true</code> on success.
+     * <p>Required permissions:</p>
      * <ul>
      * <li><code>experience:delete</code></li>
      * </ul>
      */
     public WhopApiHttpResponse<Boolean> delete(
             String id, DeleteExperiencesRequest request, RequestOptions requestOptions) {
-        HttpUrl.Builder httpUrl = HttpUrl.parse(this.clientOptions.environment().getUrl())
+        HttpUrl.Builder httpUrl = HttpUrl.parse(this.clientOptions.environment().getApiURL())
                 .newBuilder()
                 .addPathSegments("experiences")
-                .addPathSegment(id);
+                .addPathSegment(PathSegments.validate(id));
         if (requestOptions != null) {
             requestOptions.getQueryParameters().forEach((_key, _value) -> {
                 httpUrl.addQueryParameter(_key, _value);
@@ -386,13 +444,25 @@ public class RawExperiencesClient {
         }
         Request.Builder _requestBuilder = new Request.Builder()
                 .url(httpUrl.build())
-                .method("DELETE", null)
+                .method(
+                        "DELETE",
+                        BodyProperties.toRequestBody(
+                                requestOptions != null ? requestOptions.getBodyProperties() : null, null))
                 .headers(Headers.of(clientOptions.headers(requestOptions)))
                 .addHeader("Accept", "application/json");
         Request okhttpRequest = _requestBuilder.build();
         OkHttpClient client = clientOptions.httpClient();
         if (requestOptions != null && requestOptions.getTimeout().isPresent()) {
             client = clientOptions.httpClientWithTimeout(requestOptions);
+        }
+        if (requestOptions != null && requestOptions.getMaxRetries().isPresent()) {
+            okhttpRequest = okhttpRequest
+                    .newBuilder()
+                    .tag(
+                            RetryInterceptor.MaxRetriesOverride.class,
+                            new RetryInterceptor.MaxRetriesOverride(
+                                    requestOptions.getMaxRetries().get()))
+                    .build();
         }
         try (Response response = client.newCall(okhttpRequest).execute()) {
             ResponseBody responseBody = response.body();
@@ -417,13 +487,16 @@ public class RawExperiencesClient {
                                 ObjectMappers.JSON_MAPPER.readValue(responseBodyString, Object.class), response);
                     case 422:
                         throw new UnprocessableEntityError(
-                                ObjectMappers.JSON_MAPPER.readValue(responseBodyString, Object.class), response);
+                                ObjectMappers.JSON_MAPPER.readValue(
+                                        responseBodyString, UnprocessableEntityErrorBody.class),
+                                response);
                     case 429:
                         throw new TooManyRequestsError(
                                 ObjectMappers.JSON_MAPPER.readValue(responseBodyString, Object.class), response);
                     case 500:
                         throw new InternalServerError(
-                                ObjectMappers.JSON_MAPPER.readValue(responseBodyString, Object.class), response);
+                                ObjectMappers.JSON_MAPPER.readValue(responseBodyString, InternalServerErrorBody.class),
+                                response);
                 }
             } catch (JsonProcessingException ignored) {
                 // unable to map error response, throwing generic error
@@ -431,13 +504,16 @@ public class RawExperiencesClient {
             Object errorBody = ObjectMappers.parseErrorBody(responseBodyString);
             throw new WhopApiApiException(
                     "Error with status code " + response.code(), response.code(), errorBody, response);
+        } catch (JsonProcessingException e) {
+            throw new WhopApiException("Failed to deserialize response: " + e.getMessage(), e);
         } catch (IOException e) {
             throw new WhopApiException("Network error executing HTTP request", e);
         }
     }
 
     /**
-     * Required permissions:
+     * Updates an experience's name, logo, visibility, or notification setting, or moves it to another section or position.
+     * <p>Required permissions:</p>
      * <ul>
      * <li><code>experience:update</code></li>
      * </ul>
@@ -447,7 +523,8 @@ public class RawExperiencesClient {
     }
 
     /**
-     * Required permissions:
+     * Updates an experience's name, logo, visibility, or notification setting, or moves it to another section or position.
+     * <p>Required permissions:</p>
      * <ul>
      * <li><code>experience:update</code></li>
      * </ul>
@@ -457,7 +534,8 @@ public class RawExperiencesClient {
     }
 
     /**
-     * Required permissions:
+     * Updates an experience's name, logo, visibility, or notification setting, or moves it to another section or position.
+     * <p>Required permissions:</p>
      * <ul>
      * <li><code>experience:update</code></li>
      * </ul>
@@ -467,17 +545,18 @@ public class RawExperiencesClient {
     }
 
     /**
-     * Required permissions:
+     * Updates an experience's name, logo, visibility, or notification setting, or moves it to another section or position.
+     * <p>Required permissions:</p>
      * <ul>
      * <li><code>experience:update</code></li>
      * </ul>
      */
     public WhopApiHttpResponse<Experience> update(
             String id, UpdateExperiencesRequest request, RequestOptions requestOptions) {
-        HttpUrl.Builder httpUrl = HttpUrl.parse(this.clientOptions.environment().getUrl())
+        HttpUrl.Builder httpUrl = HttpUrl.parse(this.clientOptions.environment().getApiURL())
                 .newBuilder()
                 .addPathSegments("experiences")
-                .addPathSegment(id);
+                .addPathSegment(PathSegments.validate(id));
         if (requestOptions != null) {
             requestOptions.getQueryParameters().forEach((_key, _value) -> {
                 httpUrl.addQueryParameter(_key, _value);
@@ -486,7 +565,9 @@ public class RawExperiencesClient {
         RequestBody body;
         try {
             body = RequestBody.create(
-                    ObjectMappers.JSON_MAPPER.writeValueAsBytes(request), MediaTypes.APPLICATION_JSON);
+                    ObjectMappers.JSON_MAPPER.writeValueAsBytes(BodyProperties.merge(
+                            request, requestOptions != null ? requestOptions.getBodyProperties() : null)),
+                    MediaTypes.APPLICATION_JSON);
         } catch (JsonProcessingException e) {
             throw new WhopApiException("Failed to serialize request", e);
         }
@@ -501,6 +582,15 @@ public class RawExperiencesClient {
         if (requestOptions != null && requestOptions.getTimeout().isPresent()) {
             client = clientOptions.httpClientWithTimeout(requestOptions);
         }
+        if (requestOptions != null && requestOptions.getMaxRetries().isPresent()) {
+            okhttpRequest = okhttpRequest
+                    .newBuilder()
+                    .tag(
+                            RetryInterceptor.MaxRetriesOverride.class,
+                            new RetryInterceptor.MaxRetriesOverride(
+                                    requestOptions.getMaxRetries().get()))
+                    .build();
+        }
         try (Response response = client.newCall(okhttpRequest).execute()) {
             ResponseBody responseBody = response.body();
             String responseBodyString = responseBody != null ? responseBody.string() : "{}";
@@ -524,13 +614,16 @@ public class RawExperiencesClient {
                                 ObjectMappers.JSON_MAPPER.readValue(responseBodyString, Object.class), response);
                     case 422:
                         throw new UnprocessableEntityError(
-                                ObjectMappers.JSON_MAPPER.readValue(responseBodyString, Object.class), response);
+                                ObjectMappers.JSON_MAPPER.readValue(
+                                        responseBodyString, UnprocessableEntityErrorBody.class),
+                                response);
                     case 429:
                         throw new TooManyRequestsError(
                                 ObjectMappers.JSON_MAPPER.readValue(responseBodyString, Object.class), response);
                     case 500:
                         throw new InternalServerError(
-                                ObjectMappers.JSON_MAPPER.readValue(responseBodyString, Object.class), response);
+                                ObjectMappers.JSON_MAPPER.readValue(responseBodyString, InternalServerErrorBody.class),
+                                response);
                 }
             } catch (JsonProcessingException ignored) {
                 // unable to map error response, throwing generic error
@@ -538,13 +631,15 @@ public class RawExperiencesClient {
             Object errorBody = ObjectMappers.parseErrorBody(responseBodyString);
             throw new WhopApiApiException(
                     "Error with status code " + response.code(), response.code(), errorBody, response);
+        } catch (JsonProcessingException e) {
+            throw new WhopApiException("Failed to deserialize response: " + e.getMessage(), e);
         } catch (IOException e) {
             throw new WhopApiException("Network error executing HTTP request", e);
         }
     }
 
     /**
-     * Attach an experience to a product, making it accessible to the product's customers.
+     * Attaches an experience to a product, giving the product's customers access to it.
      * <p>Required permissions:</p>
      * <ul>
      * <li><code>experience:attach</code></li>
@@ -555,7 +650,7 @@ public class RawExperiencesClient {
     }
 
     /**
-     * Attach an experience to a product, making it accessible to the product's customers.
+     * Attaches an experience to a product, giving the product's customers access to it.
      * <p>Required permissions:</p>
      * <ul>
      * <li><code>experience:attach</code></li>
@@ -563,10 +658,10 @@ public class RawExperiencesClient {
      */
     public WhopApiHttpResponse<Experience> attach(
             String id, AttachExperiencesRequest request, RequestOptions requestOptions) {
-        HttpUrl.Builder httpUrl = HttpUrl.parse(this.clientOptions.environment().getUrl())
+        HttpUrl.Builder httpUrl = HttpUrl.parse(this.clientOptions.environment().getApiURL())
                 .newBuilder()
                 .addPathSegments("experiences")
-                .addPathSegment(id)
+                .addPathSegment(PathSegments.validate(id))
                 .addPathSegments("attach");
         if (requestOptions != null) {
             requestOptions.getQueryParameters().forEach((_key, _value) -> {
@@ -576,7 +671,9 @@ public class RawExperiencesClient {
         RequestBody body;
         try {
             body = RequestBody.create(
-                    ObjectMappers.JSON_MAPPER.writeValueAsBytes(request), MediaTypes.APPLICATION_JSON);
+                    ObjectMappers.JSON_MAPPER.writeValueAsBytes(BodyProperties.merge(
+                            request, requestOptions != null ? requestOptions.getBodyProperties() : null)),
+                    MediaTypes.APPLICATION_JSON);
         } catch (JsonProcessingException e) {
             throw new WhopApiException("Failed to serialize request", e);
         }
@@ -590,6 +687,15 @@ public class RawExperiencesClient {
         OkHttpClient client = clientOptions.httpClient();
         if (requestOptions != null && requestOptions.getTimeout().isPresent()) {
             client = clientOptions.httpClientWithTimeout(requestOptions);
+        }
+        if (requestOptions != null && requestOptions.getMaxRetries().isPresent()) {
+            okhttpRequest = okhttpRequest
+                    .newBuilder()
+                    .tag(
+                            RetryInterceptor.MaxRetriesOverride.class,
+                            new RetryInterceptor.MaxRetriesOverride(
+                                    requestOptions.getMaxRetries().get()))
+                    .build();
         }
         try (Response response = client.newCall(okhttpRequest).execute()) {
             ResponseBody responseBody = response.body();
@@ -614,13 +720,16 @@ public class RawExperiencesClient {
                                 ObjectMappers.JSON_MAPPER.readValue(responseBodyString, Object.class), response);
                     case 422:
                         throw new UnprocessableEntityError(
-                                ObjectMappers.JSON_MAPPER.readValue(responseBodyString, Object.class), response);
+                                ObjectMappers.JSON_MAPPER.readValue(
+                                        responseBodyString, UnprocessableEntityErrorBody.class),
+                                response);
                     case 429:
                         throw new TooManyRequestsError(
                                 ObjectMappers.JSON_MAPPER.readValue(responseBodyString, Object.class), response);
                     case 500:
                         throw new InternalServerError(
-                                ObjectMappers.JSON_MAPPER.readValue(responseBodyString, Object.class), response);
+                                ObjectMappers.JSON_MAPPER.readValue(responseBodyString, InternalServerErrorBody.class),
+                                response);
                 }
             } catch (JsonProcessingException ignored) {
                 // unable to map error response, throwing generic error
@@ -628,13 +737,15 @@ public class RawExperiencesClient {
             Object errorBody = ObjectMappers.parseErrorBody(responseBodyString);
             throw new WhopApiApiException(
                     "Error with status code " + response.code(), response.code(), errorBody, response);
+        } catch (JsonProcessingException e) {
+            throw new WhopApiException("Failed to deserialize response: " + e.getMessage(), e);
         } catch (IOException e) {
             throw new WhopApiException("Network error executing HTTP request", e);
         }
     }
 
     /**
-     * Detach an experience from a product, removing customer access to it through that product.
+     * Detaches an experience from a product, removing customer access to it through that product.
      * <p>Required permissions:</p>
      * <ul>
      * <li><code>experience:detach</code></li>
@@ -645,7 +756,7 @@ public class RawExperiencesClient {
     }
 
     /**
-     * Detach an experience from a product, removing customer access to it through that product.
+     * Detaches an experience from a product, removing customer access to it through that product.
      * <p>Required permissions:</p>
      * <ul>
      * <li><code>experience:detach</code></li>
@@ -653,10 +764,10 @@ public class RawExperiencesClient {
      */
     public WhopApiHttpResponse<Experience> detach(
             String id, DetachExperiencesRequest request, RequestOptions requestOptions) {
-        HttpUrl.Builder httpUrl = HttpUrl.parse(this.clientOptions.environment().getUrl())
+        HttpUrl.Builder httpUrl = HttpUrl.parse(this.clientOptions.environment().getApiURL())
                 .newBuilder()
                 .addPathSegments("experiences")
-                .addPathSegment(id)
+                .addPathSegment(PathSegments.validate(id))
                 .addPathSegments("detach");
         if (requestOptions != null) {
             requestOptions.getQueryParameters().forEach((_key, _value) -> {
@@ -666,7 +777,9 @@ public class RawExperiencesClient {
         RequestBody body;
         try {
             body = RequestBody.create(
-                    ObjectMappers.JSON_MAPPER.writeValueAsBytes(request), MediaTypes.APPLICATION_JSON);
+                    ObjectMappers.JSON_MAPPER.writeValueAsBytes(BodyProperties.merge(
+                            request, requestOptions != null ? requestOptions.getBodyProperties() : null)),
+                    MediaTypes.APPLICATION_JSON);
         } catch (JsonProcessingException e) {
             throw new WhopApiException("Failed to serialize request", e);
         }
@@ -680,6 +793,15 @@ public class RawExperiencesClient {
         OkHttpClient client = clientOptions.httpClient();
         if (requestOptions != null && requestOptions.getTimeout().isPresent()) {
             client = clientOptions.httpClientWithTimeout(requestOptions);
+        }
+        if (requestOptions != null && requestOptions.getMaxRetries().isPresent()) {
+            okhttpRequest = okhttpRequest
+                    .newBuilder()
+                    .tag(
+                            RetryInterceptor.MaxRetriesOverride.class,
+                            new RetryInterceptor.MaxRetriesOverride(
+                                    requestOptions.getMaxRetries().get()))
+                    .build();
         }
         try (Response response = client.newCall(okhttpRequest).execute()) {
             ResponseBody responseBody = response.body();
@@ -704,13 +826,16 @@ public class RawExperiencesClient {
                                 ObjectMappers.JSON_MAPPER.readValue(responseBodyString, Object.class), response);
                     case 422:
                         throw new UnprocessableEntityError(
-                                ObjectMappers.JSON_MAPPER.readValue(responseBodyString, Object.class), response);
+                                ObjectMappers.JSON_MAPPER.readValue(
+                                        responseBodyString, UnprocessableEntityErrorBody.class),
+                                response);
                     case 429:
                         throw new TooManyRequestsError(
                                 ObjectMappers.JSON_MAPPER.readValue(responseBodyString, Object.class), response);
                     case 500:
                         throw new InternalServerError(
-                                ObjectMappers.JSON_MAPPER.readValue(responseBodyString, Object.class), response);
+                                ObjectMappers.JSON_MAPPER.readValue(responseBodyString, InternalServerErrorBody.class),
+                                response);
                 }
             } catch (JsonProcessingException ignored) {
                 // unable to map error response, throwing generic error
@@ -718,15 +843,15 @@ public class RawExperiencesClient {
             Object errorBody = ObjectMappers.parseErrorBody(responseBodyString);
             throw new WhopApiApiException(
                     "Error with status code " + response.code(), response.code(), errorBody, response);
+        } catch (JsonProcessingException e) {
+            throw new WhopApiException("Failed to deserialize response: " + e.getMessage(), e);
         } catch (IOException e) {
             throw new WhopApiException("Network error executing HTTP request", e);
         }
     }
 
     /**
-     * Duplicates an existing experience. The name will be copied, unless provided. The new experience will be attached to the same products as the original experience.
-     * If duplicating a Forum or Chat experience, the new experience will have the same settings as the original experience, e.g. who can post, who can comment, etc.
-     * No content, e.g. posts, messages, lessons from within the original experience will be copied.
+     * Duplicates an experience and attaches the copy to the same products as the original. Forum and chat copies keep the original's settings, such as who can post or comment. No content, such as posts, messages, or lessons, is copied.
      * <p>Required permissions:</p>
      * <ul>
      * <li><code>experience:create</code></li>
@@ -737,9 +862,7 @@ public class RawExperiencesClient {
     }
 
     /**
-     * Duplicates an existing experience. The name will be copied, unless provided. The new experience will be attached to the same products as the original experience.
-     * If duplicating a Forum or Chat experience, the new experience will have the same settings as the original experience, e.g. who can post, who can comment, etc.
-     * No content, e.g. posts, messages, lessons from within the original experience will be copied.
+     * Duplicates an experience and attaches the copy to the same products as the original. Forum and chat copies keep the original's settings, such as who can post or comment. No content, such as posts, messages, or lessons, is copied.
      * <p>Required permissions:</p>
      * <ul>
      * <li><code>experience:create</code></li>
@@ -750,9 +873,7 @@ public class RawExperiencesClient {
     }
 
     /**
-     * Duplicates an existing experience. The name will be copied, unless provided. The new experience will be attached to the same products as the original experience.
-     * If duplicating a Forum or Chat experience, the new experience will have the same settings as the original experience, e.g. who can post, who can comment, etc.
-     * No content, e.g. posts, messages, lessons from within the original experience will be copied.
+     * Duplicates an experience and attaches the copy to the same products as the original. Forum and chat copies keep the original's settings, such as who can post or comment. No content, such as posts, messages, or lessons, is copied.
      * <p>Required permissions:</p>
      * <ul>
      * <li><code>experience:create</code></li>
@@ -763,9 +884,7 @@ public class RawExperiencesClient {
     }
 
     /**
-     * Duplicates an existing experience. The name will be copied, unless provided. The new experience will be attached to the same products as the original experience.
-     * If duplicating a Forum or Chat experience, the new experience will have the same settings as the original experience, e.g. who can post, who can comment, etc.
-     * No content, e.g. posts, messages, lessons from within the original experience will be copied.
+     * Duplicates an experience and attaches the copy to the same products as the original. Forum and chat copies keep the original's settings, such as who can post or comment. No content, such as posts, messages, or lessons, is copied.
      * <p>Required permissions:</p>
      * <ul>
      * <li><code>experience:create</code></li>
@@ -773,10 +892,10 @@ public class RawExperiencesClient {
      */
     public WhopApiHttpResponse<Experience> duplicate(
             String id, DuplicateExperiencesRequest request, RequestOptions requestOptions) {
-        HttpUrl.Builder httpUrl = HttpUrl.parse(this.clientOptions.environment().getUrl())
+        HttpUrl.Builder httpUrl = HttpUrl.parse(this.clientOptions.environment().getApiURL())
                 .newBuilder()
                 .addPathSegments("experiences")
-                .addPathSegment(id)
+                .addPathSegment(PathSegments.validate(id))
                 .addPathSegments("duplicate");
         if (requestOptions != null) {
             requestOptions.getQueryParameters().forEach((_key, _value) -> {
@@ -786,7 +905,9 @@ public class RawExperiencesClient {
         RequestBody body;
         try {
             body = RequestBody.create(
-                    ObjectMappers.JSON_MAPPER.writeValueAsBytes(request), MediaTypes.APPLICATION_JSON);
+                    ObjectMappers.JSON_MAPPER.writeValueAsBytes(BodyProperties.merge(
+                            request, requestOptions != null ? requestOptions.getBodyProperties() : null)),
+                    MediaTypes.APPLICATION_JSON);
         } catch (JsonProcessingException e) {
             throw new WhopApiException("Failed to serialize request", e);
         }
@@ -800,6 +921,15 @@ public class RawExperiencesClient {
         OkHttpClient client = clientOptions.httpClient();
         if (requestOptions != null && requestOptions.getTimeout().isPresent()) {
             client = clientOptions.httpClientWithTimeout(requestOptions);
+        }
+        if (requestOptions != null && requestOptions.getMaxRetries().isPresent()) {
+            okhttpRequest = okhttpRequest
+                    .newBuilder()
+                    .tag(
+                            RetryInterceptor.MaxRetriesOverride.class,
+                            new RetryInterceptor.MaxRetriesOverride(
+                                    requestOptions.getMaxRetries().get()))
+                    .build();
         }
         try (Response response = client.newCall(okhttpRequest).execute()) {
             ResponseBody responseBody = response.body();
@@ -824,13 +954,16 @@ public class RawExperiencesClient {
                                 ObjectMappers.JSON_MAPPER.readValue(responseBodyString, Object.class), response);
                     case 422:
                         throw new UnprocessableEntityError(
-                                ObjectMappers.JSON_MAPPER.readValue(responseBodyString, Object.class), response);
+                                ObjectMappers.JSON_MAPPER.readValue(
+                                        responseBodyString, UnprocessableEntityErrorBody.class),
+                                response);
                     case 429:
                         throw new TooManyRequestsError(
                                 ObjectMappers.JSON_MAPPER.readValue(responseBodyString, Object.class), response);
                     case 500:
                         throw new InternalServerError(
-                                ObjectMappers.JSON_MAPPER.readValue(responseBodyString, Object.class), response);
+                                ObjectMappers.JSON_MAPPER.readValue(responseBodyString, InternalServerErrorBody.class),
+                                response);
                 }
             } catch (JsonProcessingException ignored) {
                 // unable to map error response, throwing generic error
@@ -838,6 +971,8 @@ public class RawExperiencesClient {
             Object errorBody = ObjectMappers.parseErrorBody(responseBodyString);
             throw new WhopApiApiException(
                     "Error with status code " + response.code(), response.code(), errorBody, response);
+        } catch (JsonProcessingException e) {
+            throw new WhopApiException("Failed to deserialize response: " + e.getMessage(), e);
         } catch (IOException e) {
             throw new WhopApiException("Network error executing HTTP request", e);
         }

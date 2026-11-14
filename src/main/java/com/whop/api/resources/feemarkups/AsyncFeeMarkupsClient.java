@@ -5,6 +5,7 @@ package com.whop.api.resources.feemarkups;
 
 import com.whop.api.core.ClientOptions;
 import com.whop.api.core.RequestOptions;
+import com.whop.api.core.WhopApiHttpResponse;
 import com.whop.api.core.pagination.SyncPagingIterable;
 import com.whop.api.resources.feemarkups.requests.CreateFeeMarkupsRequest;
 import com.whop.api.resources.feemarkups.requests.DeleteFeeMarkupsRequest;
@@ -31,18 +32,27 @@ public class AsyncFeeMarkupsClient {
     }
 
     /**
-     * Returns a paginated list of fee markups configured for a company. If the company is a platform account, returns the platform default markups.
+     * Lists the fee markups configured for an account. For a platform account, returns the platform's default markups.
      * <p>Required permissions:</p>
      * <ul>
      * <li><code>company:update_child_fees</code></li>
      * </ul>
      */
     public CompletableFuture<SyncPagingIterable<FeeMarkupListItem>> list(ListFeeMarkupsRequest request) {
-        return this.rawClient.list(request).thenApply(response -> response.body());
+        CompletableFuture<WhopApiHttpResponse<SyncPagingIterable<FeeMarkupListItem>>> rawFuture =
+                this.rawClient.list(request);
+        CompletableFuture<SyncPagingIterable<FeeMarkupListItem>> future =
+                rawFuture.thenApply(response -> response.body());
+        future.whenComplete((result_, throwable_) -> {
+            if (future.isCancelled()) {
+                rawFuture.cancel(true);
+            }
+        });
+        return future;
     }
 
     /**
-     * Returns a paginated list of fee markups configured for a company. If the company is a platform account, returns the platform default markups.
+     * Lists the fee markups configured for an account. For a platform account, returns the platform's default markups.
      * <p>Required permissions:</p>
      * <ul>
      * <li><code>company:update_child_fees</code></li>
@@ -50,66 +60,110 @@ public class AsyncFeeMarkupsClient {
      */
     public CompletableFuture<SyncPagingIterable<FeeMarkupListItem>> list(
             ListFeeMarkupsRequest request, RequestOptions requestOptions) {
-        return this.rawClient.list(request, requestOptions).thenApply(response -> response.body());
+        CompletableFuture<WhopApiHttpResponse<SyncPagingIterable<FeeMarkupListItem>>> rawFuture =
+                this.rawClient.list(request, requestOptions);
+        CompletableFuture<SyncPagingIterable<FeeMarkupListItem>> future =
+                rawFuture.thenApply(response -> response.body());
+        future.whenComplete((result_, throwable_) -> {
+            if (future.isCancelled()) {
+                rawFuture.cancel(true);
+            }
+        });
+        return future;
     }
 
     /**
-     * Create or update a fee markup for a company. If a markup for the specified fee type already exists, it will be updated with the new values.
+     * Creates or updates an account's markup for one fee type. If the account already has a markup for that <code>fee_type</code>, it is updated with the new values.
      * <p>Required permissions:</p>
      * <ul>
      * <li><code>company:update_child_fees</code></li>
      * </ul>
      */
     public CompletableFuture<FeeMarkup> create(CreateFeeMarkupsRequest request) {
-        return this.rawClient.create(request).thenApply(response -> response.body());
+        CompletableFuture<WhopApiHttpResponse<FeeMarkup>> rawFuture = this.rawClient.create(request);
+        CompletableFuture<FeeMarkup> future = rawFuture.thenApply(response -> response.body());
+        future.whenComplete((result_, throwable_) -> {
+            if (future.isCancelled()) {
+                rawFuture.cancel(true);
+            }
+        });
+        return future;
     }
 
     /**
-     * Create or update a fee markup for a company. If a markup for the specified fee type already exists, it will be updated with the new values.
+     * Creates or updates an account's markup for one fee type. If the account already has a markup for that <code>fee_type</code>, it is updated with the new values.
      * <p>Required permissions:</p>
      * <ul>
      * <li><code>company:update_child_fees</code></li>
      * </ul>
      */
     public CompletableFuture<FeeMarkup> create(CreateFeeMarkupsRequest request, RequestOptions requestOptions) {
-        return this.rawClient.create(request, requestOptions).thenApply(response -> response.body());
+        CompletableFuture<WhopApiHttpResponse<FeeMarkup>> rawFuture = this.rawClient.create(request, requestOptions);
+        CompletableFuture<FeeMarkup> future = rawFuture.thenApply(response -> response.body());
+        future.whenComplete((result_, throwable_) -> {
+            if (future.isCancelled()) {
+                rawFuture.cancel(true);
+            }
+        });
+        return future;
     }
 
     /**
-     * Delete a fee markup configuration for a company. This removes the custom fee override and reverts to the parent company's default fees.
+     * Deletes a fee markup, removing the custom fee override so the account reverts to its parent account's default fees.
      * <p>Required permissions:</p>
      * <ul>
      * <li><code>company:update_child_fees</code></li>
      * </ul>
      */
     public CompletableFuture<Boolean> delete(String id) {
-        return this.rawClient.delete(id).thenApply(response -> response.body());
+        CompletableFuture<WhopApiHttpResponse<Boolean>> rawFuture = this.rawClient.delete(id);
+        CompletableFuture<Boolean> future = rawFuture.thenApply(response -> response.body());
+        future.whenComplete((result_, throwable_) -> {
+            if (future.isCancelled()) {
+                rawFuture.cancel(true);
+            }
+        });
+        return future;
     }
 
     /**
-     * Delete a fee markup configuration for a company. This removes the custom fee override and reverts to the parent company's default fees.
+     * Deletes a fee markup, removing the custom fee override so the account reverts to its parent account's default fees.
      * <p>Required permissions:</p>
      * <ul>
      * <li><code>company:update_child_fees</code></li>
      * </ul>
      */
     public CompletableFuture<Boolean> delete(String id, RequestOptions requestOptions) {
-        return this.rawClient.delete(id, requestOptions).thenApply(response -> response.body());
+        CompletableFuture<WhopApiHttpResponse<Boolean>> rawFuture = this.rawClient.delete(id, requestOptions);
+        CompletableFuture<Boolean> future = rawFuture.thenApply(response -> response.body());
+        future.whenComplete((result_, throwable_) -> {
+            if (future.isCancelled()) {
+                rawFuture.cancel(true);
+            }
+        });
+        return future;
     }
 
     /**
-     * Delete a fee markup configuration for a company. This removes the custom fee override and reverts to the parent company's default fees.
+     * Deletes a fee markup, removing the custom fee override so the account reverts to its parent account's default fees.
      * <p>Required permissions:</p>
      * <ul>
      * <li><code>company:update_child_fees</code></li>
      * </ul>
      */
     public CompletableFuture<Boolean> delete(String id, DeleteFeeMarkupsRequest request) {
-        return this.rawClient.delete(id, request).thenApply(response -> response.body());
+        CompletableFuture<WhopApiHttpResponse<Boolean>> rawFuture = this.rawClient.delete(id, request);
+        CompletableFuture<Boolean> future = rawFuture.thenApply(response -> response.body());
+        future.whenComplete((result_, throwable_) -> {
+            if (future.isCancelled()) {
+                rawFuture.cancel(true);
+            }
+        });
+        return future;
     }
 
     /**
-     * Delete a fee markup configuration for a company. This removes the custom fee override and reverts to the parent company's default fees.
+     * Deletes a fee markup, removing the custom fee override so the account reverts to its parent account's default fees.
      * <p>Required permissions:</p>
      * <ul>
      * <li><code>company:update_child_fees</code></li>
@@ -117,6 +171,13 @@ public class AsyncFeeMarkupsClient {
      */
     public CompletableFuture<Boolean> delete(
             String id, DeleteFeeMarkupsRequest request, RequestOptions requestOptions) {
-        return this.rawClient.delete(id, request, requestOptions).thenApply(response -> response.body());
+        CompletableFuture<WhopApiHttpResponse<Boolean>> rawFuture = this.rawClient.delete(id, request, requestOptions);
+        CompletableFuture<Boolean> future = rawFuture.thenApply(response -> response.body());
+        future.whenComplete((result_, throwable_) -> {
+            if (future.isCancelled()) {
+                rawFuture.cancel(true);
+            }
+        });
+        return future;
     }
 }

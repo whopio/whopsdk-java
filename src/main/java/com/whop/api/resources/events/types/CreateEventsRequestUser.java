@@ -535,7 +535,6 @@ public final class CreateEventsRequestUser {
 
         private Optional<String> username = Optional.empty();
 
-        @JsonAnySetter
         private Map<String, Object> additionalProperties = new HashMap<>();
 
         private Builder() {}
@@ -1060,6 +1059,32 @@ public final class CreateEventsRequestUser {
                     userId,
                     username,
                     additionalProperties);
+        }
+
+        @JsonAnySetter
+        private void putAdditionalPropertyFromJson(String key, Object value) {
+            if (key.equalsIgnoreCase("anonymous_id")
+                    || key.equalsIgnoreCase("birthdate")
+                    || key.equalsIgnoreCase("city")
+                    || key.equalsIgnoreCase("country")
+                    || key.equalsIgnoreCase("email")
+                    || key.equalsIgnoreCase("external_id")
+                    || key.equalsIgnoreCase("first_name")
+                    || key.equalsIgnoreCase("gender")
+                    || key.equalsIgnoreCase("last_name")
+                    || key.equalsIgnoreCase("linked_anonymous_id")
+                    || key.equalsIgnoreCase("linked_wuid")
+                    || key.equalsIgnoreCase("member_id")
+                    || key.equalsIgnoreCase("membership_id")
+                    || key.equalsIgnoreCase("name")
+                    || key.equalsIgnoreCase("phone")
+                    || key.equalsIgnoreCase("postal_code")
+                    || key.equalsIgnoreCase("state")
+                    || key.equalsIgnoreCase("user_id")
+                    || key.equalsIgnoreCase("username")) {
+                return;
+            }
+            this.additionalProperties.put(key, value);
         }
 
         public Builder additionalProperty(String key, Object value) {

@@ -6,8 +6,10 @@ package com.whop.api.resources.reviews;
 import com.whop.api.core.ClientOptions;
 import com.whop.api.core.RequestOptions;
 import com.whop.api.core.pagination.SyncPagingIterable;
+import com.whop.api.resources.reviews.requests.DeleteReviewsRequest;
 import com.whop.api.resources.reviews.requests.ListReviewsRequest;
 import com.whop.api.resources.reviews.requests.RetrieveReviewsRequest;
+import com.whop.api.resources.reviews.types.DeleteReviewsResponse;
 import com.whop.api.types.Review;
 import com.whop.api.types.ReviewListItem;
 
@@ -29,44 +31,86 @@ public class ReviewsClient {
     }
 
     /**
-     * Returns a paginated list of customer reviews for a specific product, with optional filtering by star rating and creation date.
+     * Lists the published reviews for a product or account. Without <code>account_id</code> or <code>product_id</code>, a user lists the reviews they wrote, an account or app API key lists its account's reviews, and a request without credentials returns 400.
+     */
+    public SyncPagingIterable<ReviewListItem> list() {
+        return this.rawClient.list().body();
+    }
+
+    /**
+     * Lists the published reviews for a product or account. Without <code>account_id</code> or <code>product_id</code>, a user lists the reviews they wrote, an account or app API key lists its account's reviews, and a request without credentials returns 400.
+     */
+    public SyncPagingIterable<ReviewListItem> list(RequestOptions requestOptions) {
+        return this.rawClient.list(requestOptions).body();
+    }
+
+    /**
+     * Lists the published reviews for a product or account. Without <code>account_id</code> or <code>product_id</code>, a user lists the reviews they wrote, an account or app API key lists its account's reviews, and a request without credentials returns 400.
      */
     public SyncPagingIterable<ReviewListItem> list(ListReviewsRequest request) {
         return this.rawClient.list(request).body();
     }
 
     /**
-     * Returns a paginated list of customer reviews for a specific product, with optional filtering by star rating and creation date.
+     * Lists the published reviews for a product or account. Without <code>account_id</code> or <code>product_id</code>, a user lists the reviews they wrote, an account or app API key lists its account's reviews, and a request without credentials returns 400.
      */
     public SyncPagingIterable<ReviewListItem> list(ListReviewsRequest request, RequestOptions requestOptions) {
         return this.rawClient.list(request, requestOptions).body();
     }
 
     /**
-     * Retrieves the details of an existing review.
+     * Retrieves a published review. Reviews that are not published return 404.
      */
     public Review retrieve(String id) {
         return this.rawClient.retrieve(id).body();
     }
 
     /**
-     * Retrieves the details of an existing review.
+     * Retrieves a published review. Reviews that are not published return 404.
      */
     public Review retrieve(String id, RequestOptions requestOptions) {
         return this.rawClient.retrieve(id, requestOptions).body();
     }
 
     /**
-     * Retrieves the details of an existing review.
+     * Retrieves a published review. Reviews that are not published return 404.
      */
     public Review retrieve(String id, RetrieveReviewsRequest request) {
         return this.rawClient.retrieve(id, request).body();
     }
 
     /**
-     * Retrieves the details of an existing review.
+     * Retrieves a published review. Reviews that are not published return 404.
      */
     public Review retrieve(String id, RetrieveReviewsRequest request, RequestOptions requestOptions) {
         return this.rawClient.retrieve(id, request, requestOptions).body();
+    }
+
+    /**
+     * Deletes a review the signed-in user wrote. Requires the <code>review:delete</code> scope, and returns 404 for a review another user wrote.
+     */
+    public DeleteReviewsResponse delete(String id) {
+        return this.rawClient.delete(id).body();
+    }
+
+    /**
+     * Deletes a review the signed-in user wrote. Requires the <code>review:delete</code> scope, and returns 404 for a review another user wrote.
+     */
+    public DeleteReviewsResponse delete(String id, RequestOptions requestOptions) {
+        return this.rawClient.delete(id, requestOptions).body();
+    }
+
+    /**
+     * Deletes a review the signed-in user wrote. Requires the <code>review:delete</code> scope, and returns 404 for a review another user wrote.
+     */
+    public DeleteReviewsResponse delete(String id, DeleteReviewsRequest request) {
+        return this.rawClient.delete(id, request).body();
+    }
+
+    /**
+     * Deletes a review the signed-in user wrote. Requires the <code>review:delete</code> scope, and returns 404 for a review another user wrote.
+     */
+    public DeleteReviewsResponse delete(String id, DeleteReviewsRequest request, RequestOptions requestOptions) {
+        return this.rawClient.delete(id, request, requestOptions).body();
     }
 }

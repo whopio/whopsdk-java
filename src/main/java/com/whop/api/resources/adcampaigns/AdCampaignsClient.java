@@ -6,13 +6,13 @@ package com.whop.api.resources.adcampaigns;
 import com.whop.api.core.ClientOptions;
 import com.whop.api.core.RequestOptions;
 import com.whop.api.core.pagination.SyncPagingIterable;
+import com.whop.api.resources.adcampaigns.requests.ClaimAdCampaignsRequest;
 import com.whop.api.resources.adcampaigns.requests.CreateAdCampaignsRequest;
 import com.whop.api.resources.adcampaigns.requests.DeleteAdCampaignsRequest;
 import com.whop.api.resources.adcampaigns.requests.DuplicateAdCampaignsRequest;
 import com.whop.api.resources.adcampaigns.requests.ListAdCampaignsRequest;
 import com.whop.api.resources.adcampaigns.requests.PauseAdCampaignsRequest;
 import com.whop.api.resources.adcampaigns.requests.RetrieveAdCampaignsRequest;
-import com.whop.api.resources.adcampaigns.requests.RetryPaymentAdCampaignsRequest;
 import com.whop.api.resources.adcampaigns.requests.UnpauseAdCampaignsRequest;
 import com.whop.api.resources.adcampaigns.requests.UpdateAdCampaignsRequest;
 import com.whop.api.resources.adcampaigns.types.DeleteAdCampaignsResponse;
@@ -65,14 +65,14 @@ public class AdCampaignsClient {
     }
 
     /**
-     * Creates an ad campaign for an account.
+     * Creates an ad campaign in <code>draft</code> status for an account. Nothing runs until you launch it by setting <code>status</code> to <code>active</code> with <code>PATCH /ad_campaigns/:id</code>.
      */
     public AdCampaign create(CreateAdCampaignsRequest request) {
         return this.rawClient.create(request).body();
     }
 
     /**
-     * Creates an ad campaign for an account.
+     * Creates an ad campaign in <code>draft</code> status for an account. Nothing runs until you launch it by setting <code>status</code> to <code>active</code> with <code>PATCH /ad_campaigns/:id</code>.
      */
     public AdCampaign create(CreateAdCampaignsRequest request, RequestOptions requestOptions) {
         return this.rawClient.create(request, requestOptions).body();
@@ -107,28 +107,28 @@ public class AdCampaignsClient {
     }
 
     /**
-     * Deletes an ad campaign and archives it on the ad platform (cascades to ad groups and ads).
+     * Deletes an ad campaign with its ad groups and ads, and stops their delivery.
      */
     public DeleteAdCampaignsResponse delete(String id) {
         return this.rawClient.delete(id).body();
     }
 
     /**
-     * Deletes an ad campaign and archives it on the ad platform (cascades to ad groups and ads).
+     * Deletes an ad campaign with its ad groups and ads, and stops their delivery.
      */
     public DeleteAdCampaignsResponse delete(String id, RequestOptions requestOptions) {
         return this.rawClient.delete(id, requestOptions).body();
     }
 
     /**
-     * Deletes an ad campaign and archives it on the ad platform (cascades to ad groups and ads).
+     * Deletes an ad campaign with its ad groups and ads, and stops their delivery.
      */
     public DeleteAdCampaignsResponse delete(String id, DeleteAdCampaignsRequest request) {
         return this.rawClient.delete(id, request).body();
     }
 
     /**
-     * Deletes an ad campaign and archives it on the ad platform (cascades to ad groups and ads).
+     * Deletes an ad campaign with its ad groups and ads, and stops their delivery.
      */
     public DeleteAdCampaignsResponse delete(
             String id, DeleteAdCampaignsRequest request, RequestOptions requestOptions) {
@@ -136,31 +136,59 @@ public class AdCampaignsClient {
     }
 
     /**
-     * Updates an ad campaign's editable fields (title, budget, schedule, bid strategy, special ad categories, and, before launch, budget optimization), and launches a draft campaign by setting status to active. Objective, budget type and desired cost per result are fixed at creation and cannot be changed.
+     * Updates an ad campaign's settings, or launches a draft campaign by setting <code>status</code> to <code>active</code>. The objective is fixed at creation and cannot be changed.
      */
     public AdCampaign update(String id) {
         return this.rawClient.update(id).body();
     }
 
     /**
-     * Updates an ad campaign's editable fields (title, budget, schedule, bid strategy, special ad categories, and, before launch, budget optimization), and launches a draft campaign by setting status to active. Objective, budget type and desired cost per result are fixed at creation and cannot be changed.
+     * Updates an ad campaign's settings, or launches a draft campaign by setting <code>status</code> to <code>active</code>. The objective is fixed at creation and cannot be changed.
      */
     public AdCampaign update(String id, RequestOptions requestOptions) {
         return this.rawClient.update(id, requestOptions).body();
     }
 
     /**
-     * Updates an ad campaign's editable fields (title, budget, schedule, bid strategy, special ad categories, and, before launch, budget optimization), and launches a draft campaign by setting status to active. Objective, budget type and desired cost per result are fixed at creation and cannot be changed.
+     * Updates an ad campaign's settings, or launches a draft campaign by setting <code>status</code> to <code>active</code>. The objective is fixed at creation and cannot be changed.
      */
     public AdCampaign update(String id, UpdateAdCampaignsRequest request) {
         return this.rawClient.update(id, request).body();
     }
 
     /**
-     * Updates an ad campaign's editable fields (title, budget, schedule, bid strategy, special ad categories, and, before launch, budget optimization), and launches a draft campaign by setting status to active. Objective, budget type and desired cost per result are fixed at creation and cannot be changed.
+     * Updates an ad campaign's settings, or launches a draft campaign by setting <code>status</code> to <code>active</code>. The objective is fixed at creation and cannot be changed.
      */
     public AdCampaign update(String id, UpdateAdCampaignsRequest request, RequestOptions requestOptions) {
         return this.rawClient.update(id, request, requestOptions).body();
+    }
+
+    /**
+     * Attributes the whole campaign and its daily budget to the calling user as its runner. One runner holds a campaign at a time. Takes the runner's Whop session, or a user API key with <code>ad_campaign:update</code>. The caller also needs active advertiser-supplier program access. Everyone else gets a 404. Returns 403 until the caller has verified their identity and added a phone number and a social account. Returns 403 when the claim would take the daily budget the caller holds past the limit for their score. Returns 409 when another user holds the campaign. Changes nothing when the caller already holds it.
+     */
+    public AdCampaign claim(String id) {
+        return this.rawClient.claim(id).body();
+    }
+
+    /**
+     * Attributes the whole campaign and its daily budget to the calling user as its runner. One runner holds a campaign at a time. Takes the runner's Whop session, or a user API key with <code>ad_campaign:update</code>. The caller also needs active advertiser-supplier program access. Everyone else gets a 404. Returns 403 until the caller has verified their identity and added a phone number and a social account. Returns 403 when the claim would take the daily budget the caller holds past the limit for their score. Returns 409 when another user holds the campaign. Changes nothing when the caller already holds it.
+     */
+    public AdCampaign claim(String id, RequestOptions requestOptions) {
+        return this.rawClient.claim(id, requestOptions).body();
+    }
+
+    /**
+     * Attributes the whole campaign and its daily budget to the calling user as its runner. One runner holds a campaign at a time. Takes the runner's Whop session, or a user API key with <code>ad_campaign:update</code>. The caller also needs active advertiser-supplier program access. Everyone else gets a 404. Returns 403 until the caller has verified their identity and added a phone number and a social account. Returns 403 when the claim would take the daily budget the caller holds past the limit for their score. Returns 409 when another user holds the campaign. Changes nothing when the caller already holds it.
+     */
+    public AdCampaign claim(String id, ClaimAdCampaignsRequest request) {
+        return this.rawClient.claim(id, request).body();
+    }
+
+    /**
+     * Attributes the whole campaign and its daily budget to the calling user as its runner. One runner holds a campaign at a time. Takes the runner's Whop session, or a user API key with <code>ad_campaign:update</code>. The caller also needs active advertiser-supplier program access. Everyone else gets a 404. Returns 403 until the caller has verified their identity and added a phone number and a social account. Returns 403 when the claim would take the daily budget the caller holds past the limit for their score. Returns 409 when another user holds the campaign. Changes nothing when the caller already holds it.
+     */
+    public AdCampaign claim(String id, ClaimAdCampaignsRequest request, RequestOptions requestOptions) {
+        return this.rawClient.claim(id, request, requestOptions).body();
     }
 
     /**
@@ -221,56 +249,28 @@ public class AdCampaignsClient {
     }
 
     /**
-     * Retries billing for an ad campaign whose payment previously failed.
-     */
-    public AdCampaign retryPayment(String id) {
-        return this.rawClient.retryPayment(id).body();
-    }
-
-    /**
-     * Retries billing for an ad campaign whose payment previously failed.
-     */
-    public AdCampaign retryPayment(String id, RequestOptions requestOptions) {
-        return this.rawClient.retryPayment(id, requestOptions).body();
-    }
-
-    /**
-     * Retries billing for an ad campaign whose payment previously failed.
-     */
-    public AdCampaign retryPayment(String id, RetryPaymentAdCampaignsRequest request) {
-        return this.rawClient.retryPayment(id, request).body();
-    }
-
-    /**
-     * Retries billing for an ad campaign whose payment previously failed.
-     */
-    public AdCampaign retryPayment(String id, RetryPaymentAdCampaignsRequest request, RequestOptions requestOptions) {
-        return this.rawClient.retryPayment(id, request, requestOptions).body();
-    }
-
-    /**
-     * Resumes a paused ad campaign.
+     * Resumes a paused ad campaign. Requires an ads payment method on the account.
      */
     public AdCampaign unpause(String id) {
         return this.rawClient.unpause(id).body();
     }
 
     /**
-     * Resumes a paused ad campaign.
+     * Resumes a paused ad campaign. Requires an ads payment method on the account.
      */
     public AdCampaign unpause(String id, RequestOptions requestOptions) {
         return this.rawClient.unpause(id, requestOptions).body();
     }
 
     /**
-     * Resumes a paused ad campaign.
+     * Resumes a paused ad campaign. Requires an ads payment method on the account.
      */
     public AdCampaign unpause(String id, UnpauseAdCampaignsRequest request) {
         return this.rawClient.unpause(id, request).body();
     }
 
     /**
-     * Resumes a paused ad campaign.
+     * Resumes a paused ad campaign. Requires an ads payment method on the account.
      */
     public AdCampaign unpause(String id, UnpauseAdCampaignsRequest request, RequestOptions requestOptions) {
         return this.rawClient.unpause(id, request, requestOptions).body();

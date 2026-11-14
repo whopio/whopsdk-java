@@ -85,10 +85,12 @@
 .github/workflows/publish-main.yml
 .github/release.gradle
 .github/stamp-version.py
+.github/package-smoke/
 gradle.properties
 LICENSE
 src/main/java/com/whop/api/helpers
 src/test/java/com/whop/api/helpers
+MIGRATING.md
 
 # src/main/java/com/whop/api/helpers/oidc is the hand-written OIDC helper. OidcToken and
 # IdentityTokens trade a cloud provider's identity token for a short-lived Whop access token and
@@ -98,7 +100,8 @@ src/test/java/com/whop/api/helpers
 #     WhopOidc subclasses both; apiVersionDate(String), overridden to note a pinned version; the
 #     protected setAuthentication hook, overridden; the protected setCustomHeaders hook,
 #     overridden to call super and add Api-Version-Date when none is pinned; and the async
-#     builder's protected buildClientOptions, overridden to call super and rebuild its options.
+#     builder's build, overridden to authenticate a derived client while retaining the original
+#     options' HTTP-client ownership and close behavior.
 #   - core.ClientOptions: httpClient(), Builder.from, Builder.addHeader(String, Supplier),
 #     Builder.addHeader(String, String), Builder.httpClient, Builder.timeout(Optional) and
 #     Builder.build.
@@ -109,3 +112,6 @@ src/test/java/com/whop/api/helpers
 # A regeneration that renames a class or method above fails the helper's compile. Its tests live
 # beside it so a regeneration cannot prune them; they also use WhopApiClient, AsyncWhopApiClient,
 # users().retrieve, core.ILogger, core.LogConfig, core.LogLevel and ApiKeyApiVersionDate.Value.
+.fern/replay.lock
+.fern/replay.yml
+.gitattributes

@@ -121,7 +121,6 @@ public final class RetrievePeopleResponseLocation {
 
         private Optional<String> country = Optional.empty();
 
-        @JsonAnySetter
         private Map<String, Object> additionalProperties = new HashMap<>();
 
         private Builder() {}
@@ -201,6 +200,14 @@ public final class RetrievePeopleResponseLocation {
 
         public RetrievePeopleResponseLocation build() {
             return new RetrievePeopleResponseLocation(city, continent, country, additionalProperties);
+        }
+
+        @JsonAnySetter
+        private void putAdditionalPropertyFromJson(String key, Object value) {
+            if (key.equalsIgnoreCase("city") || key.equalsIgnoreCase("continent") || key.equalsIgnoreCase("country")) {
+                return;
+            }
+            this.additionalProperties.put(key, value);
         }
 
         public Builder additionalProperty(String key, Object value) {

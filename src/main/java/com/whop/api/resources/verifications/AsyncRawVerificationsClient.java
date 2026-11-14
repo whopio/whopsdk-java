@@ -4,14 +4,18 @@
 package com.whop.api.resources.verifications;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
+import com.whop.api.core.BodyProperties;
 import com.whop.api.core.ClientOptions;
 import com.whop.api.core.MediaTypes;
 import com.whop.api.core.ObjectMappers;
+import com.whop.api.core.PathSegments;
 import com.whop.api.core.QueryStringMapper;
 import com.whop.api.core.RequestOptions;
+import com.whop.api.core.RetryInterceptor;
 import com.whop.api.core.WhopApiApiException;
 import com.whop.api.core.WhopApiException;
 import com.whop.api.core.WhopApiHttpResponse;
+import com.whop.api.core.pagination.SyncPagingIterable;
 import com.whop.api.errors.BadRequestError;
 import com.whop.api.errors.ConflictError;
 import com.whop.api.errors.ForbiddenError;
@@ -21,13 +25,17 @@ import com.whop.api.resources.verifications.requests.CreateVerificationsRequest;
 import com.whop.api.resources.verifications.requests.ListVerificationsRequest;
 import com.whop.api.resources.verifications.requests.RetrieveVerificationsRequest;
 import com.whop.api.resources.verifications.requests.UpdateVerificationsRequest;
+import com.whop.api.resources.verifications.types.CreateVerificationsRequestBody;
 import com.whop.api.resources.verifications.types.CreateVerificationsResponse;
 import com.whop.api.resources.verifications.types.ListVerificationsResponse;
+import com.whop.api.resources.verifications.types.ListVerificationsResponseDataItem;
 import com.whop.api.resources.verifications.types.RetrieveVerificationsResponse;
 import com.whop.api.resources.verifications.types.UpdateVerificationsResponse;
-import com.whop.api.types.V1ErrorResponse;
 import java.io.IOException;
+import java.util.List;
+import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.ExecutionException;
 import okhttp3.Call;
 import okhttp3.Callback;
 import okhttp3.Headers;
@@ -47,21 +55,67 @@ public class AsyncRawVerificationsClient {
     }
 
     /**
-     * Returns verifications for an account, including their status and any required actions.
+     * Lists the verifications for an account or user, including their status and any required actions. Platforms list their own and every subaccount's verifications at once with <code>include_subaccounts</code>; each one's <code>account_ids</code> names its account, and a verification shared by several accounts appears once for each.
      */
-    public CompletableFuture<WhopApiHttpResponse<ListVerificationsResponse>> list(ListVerificationsRequest request) {
+    public CompletableFuture<WhopApiHttpResponse<SyncPagingIterable<ListVerificationsResponseDataItem>>> list() {
+        return list(ListVerificationsRequest.builder().build());
+    }
+
+    /**
+     * Lists the verifications for an account or user, including their status and any required actions. Platforms list their own and every subaccount's verifications at once with <code>include_subaccounts</code>; each one's <code>account_ids</code> names its account, and a verification shared by several accounts appears once for each.
+     */
+    public CompletableFuture<WhopApiHttpResponse<SyncPagingIterable<ListVerificationsResponseDataItem>>> list(
+            RequestOptions requestOptions) {
+        return list(ListVerificationsRequest.builder().build(), requestOptions);
+    }
+
+    /**
+     * Lists the verifications for an account or user, including their status and any required actions. Platforms list their own and every subaccount's verifications at once with <code>include_subaccounts</code>; each one's <code>account_ids</code> names its account, and a verification shared by several accounts appears once for each.
+     */
+    public CompletableFuture<WhopApiHttpResponse<SyncPagingIterable<ListVerificationsResponseDataItem>>> list(
+            ListVerificationsRequest request) {
         return list(request, null);
     }
 
     /**
-     * Returns verifications for an account, including their status and any required actions.
+     * Lists the verifications for an account or user, including their status and any required actions. Platforms list their own and every subaccount's verifications at once with <code>include_subaccounts</code>; each one's <code>account_ids</code> names its account, and a verification shared by several accounts appears once for each.
      */
-    public CompletableFuture<WhopApiHttpResponse<ListVerificationsResponse>> list(
+    public CompletableFuture<WhopApiHttpResponse<SyncPagingIterable<ListVerificationsResponseDataItem>>> list(
             ListVerificationsRequest request, RequestOptions requestOptions) {
-        HttpUrl.Builder httpUrl = HttpUrl.parse(this.clientOptions.environment().getUrl())
+        HttpUrl.Builder httpUrl = HttpUrl.parse(this.clientOptions.environment().getApiURL())
                 .newBuilder()
                 .addPathSegments("verifications");
-        QueryStringMapper.addQueryParameter(httpUrl, "account_id", request.getAccountId(), false);
+        if (request.getAccountId().isPresent()) {
+            QueryStringMapper.addQueryParameter(
+                    httpUrl, "account_id", request.getAccountId().get(), false);
+        }
+        if (request.getUserId().isPresent()) {
+            QueryStringMapper.addQueryParameter(
+                    httpUrl, "user_id", request.getUserId().get(), false);
+        }
+        if (request.getIncludeSubaccounts().isPresent()) {
+            QueryStringMapper.addQueryParameter(
+                    httpUrl,
+                    "include_subaccounts",
+                    request.getIncludeSubaccounts().get(),
+                    false);
+        }
+        if (request.getFirst().isPresent()) {
+            QueryStringMapper.addQueryParameter(
+                    httpUrl, "first", request.getFirst().get(), false);
+        }
+        if (request.getAfter().isPresent()) {
+            QueryStringMapper.addQueryParameter(
+                    httpUrl, "after", request.getAfter().get(), false);
+        }
+        if (request.getLast().isPresent()) {
+            QueryStringMapper.addQueryParameter(
+                    httpUrl, "last", request.getLast().get(), false);
+        }
+        if (request.getBefore().isPresent()) {
+            QueryStringMapper.addQueryParameter(
+                    httpUrl, "before", request.getBefore().get(), false);
+        }
         if (request.getOrder().isPresent()) {
             QueryStringMapper.addQueryParameter(
                     httpUrl, "order", request.getOrder().get(), false);
@@ -85,16 +139,48 @@ public class AsyncRawVerificationsClient {
         if (requestOptions != null && requestOptions.getTimeout().isPresent()) {
             client = clientOptions.httpClientWithTimeout(requestOptions);
         }
-        CompletableFuture<WhopApiHttpResponse<ListVerificationsResponse>> future = new CompletableFuture<>();
-        client.newCall(okhttpRequest).enqueue(new Callback() {
+        if (requestOptions != null && requestOptions.getMaxRetries().isPresent()) {
+            okhttpRequest = okhttpRequest
+                    .newBuilder()
+                    .tag(
+                            RetryInterceptor.MaxRetriesOverride.class,
+                            new RetryInterceptor.MaxRetriesOverride(
+                                    requestOptions.getMaxRetries().get()))
+                    .build();
+        }
+        CompletableFuture<WhopApiHttpResponse<SyncPagingIterable<ListVerificationsResponseDataItem>>> future =
+                new CompletableFuture<>();
+        RetryInterceptor.AsyncCall okhttpCall = RetryInterceptor.newAsyncCall(client, okhttpRequest);
+        okhttpCall.enqueue(new Callback() {
             @Override
             public void onResponse(@NotNull Call call, @NotNull Response response) throws IOException {
                 try (ResponseBody responseBody = response.body()) {
                     String responseBodyString = responseBody != null ? responseBody.string() : "{}";
                     if (response.isSuccessful()) {
+                        ListVerificationsResponse parsedResponse = ObjectMappers.JSON_MAPPER.readValue(
+                                responseBodyString, ListVerificationsResponse.class);
+                        Optional<String> startingAfter =
+                                parsedResponse.getPageInfo().getEndCursor();
+                        ListVerificationsRequest nextRequest = ListVerificationsRequest.builder()
+                                .from(request)
+                                .after(startingAfter)
+                                .build();
+                        List<ListVerificationsResponseDataItem> result = parsedResponse.getData();
                         future.complete(new WhopApiHttpResponse<>(
-                                ObjectMappers.JSON_MAPPER.readValue(
-                                        responseBodyString, ListVerificationsResponse.class),
+                                new SyncPagingIterable<ListVerificationsResponseDataItem>(
+                                        startingAfter.isPresent()
+                                                && !startingAfter.get().isEmpty(),
+                                        result,
+                                        parsedResponse,
+                                        () -> {
+                                            try {
+                                                return list(nextRequest, requestOptions)
+                                                        .get()
+                                                        .body();
+                                            } catch (InterruptedException | ExecutionException e) {
+                                                throw new RuntimeException(e);
+                                            }
+                                        }),
                                 response));
                         return;
                     }
@@ -123,6 +209,9 @@ public class AsyncRawVerificationsClient {
                     future.completeExceptionally(new WhopApiApiException(
                             "Error with status code " + response.code(), response.code(), errorBody, response));
                     return;
+                } catch (JsonProcessingException e) {
+                    future.completeExceptionally(
+                            new WhopApiException("Failed to deserialize response: " + e.getMessage(), e));
                 } catch (IOException e) {
                     future.completeExceptionally(new WhopApiException("Network error executing HTTP request", e));
                 }
@@ -133,11 +222,32 @@ public class AsyncRawVerificationsClient {
                 future.completeExceptionally(new WhopApiException("Network error executing HTTP request", e));
             }
         });
+        future.whenComplete((result_, throwable_) -> {
+            if (future.isCancelled()) {
+                okhttpCall.cancel();
+            }
+        });
         return future;
     }
 
     /**
-     * Starts a hosted verification session for an account or user, or returns the active session when one already exists. Any fields you include in the request body are used to prefill the session. Send <code>documents</code> (with <code>document_type</code>) to instead verify the person from identity documents included in this request — no hosted session involved. Send <code>share_token</code> to reuse a verification another Sumsub account has already completed for this person, instead of verifying them again. If the account already has an <code>approved</code> verification the request is rejected; unlink it first to start a new one.
+     * Starts a hosted verification session for an account or user, or returns the active session when one already exists; any fields you send prefill it. To skip the hosted session, send <code>documents</code> to verify the person from files in this request, <code>share_token</code> to reuse a verification another Sumsub account completed, or <code>verification_id</code> to reuse one the signed-in user completed on Whop. For a business, <code>documents</code> and <code>owners</code> add company formation documents and owners to the verification, and once everything is in this call sends the business for review — call it again after Update Verification to send it. Until then it stays <code>pending</code> and the hosted session collects anything left out. Once the account has an <code>approved</code> verification, every mode except <code>verification_id</code> is rejected — unlink it first to start a new one.
+     */
+    public CompletableFuture<WhopApiHttpResponse<CreateVerificationsResponse>> create(
+            CreateVerificationsRequestBody body) {
+        return create(CreateVerificationsRequest.builder().body(body).build());
+    }
+
+    /**
+     * Starts a hosted verification session for an account or user, or returns the active session when one already exists; any fields you send prefill it. To skip the hosted session, send <code>documents</code> to verify the person from files in this request, <code>share_token</code> to reuse a verification another Sumsub account completed, or <code>verification_id</code> to reuse one the signed-in user completed on Whop. For a business, <code>documents</code> and <code>owners</code> add company formation documents and owners to the verification, and once everything is in this call sends the business for review — call it again after Update Verification to send it. Until then it stays <code>pending</code> and the hosted session collects anything left out. Once the account has an <code>approved</code> verification, every mode except <code>verification_id</code> is rejected — unlink it first to start a new one.
+     */
+    public CompletableFuture<WhopApiHttpResponse<CreateVerificationsResponse>> create(
+            CreateVerificationsRequestBody body, RequestOptions requestOptions) {
+        return create(CreateVerificationsRequest.builder().body(body).build(), requestOptions);
+    }
+
+    /**
+     * Starts a hosted verification session for an account or user, or returns the active session when one already exists; any fields you send prefill it. To skip the hosted session, send <code>documents</code> to verify the person from files in this request, <code>share_token</code> to reuse a verification another Sumsub account completed, or <code>verification_id</code> to reuse one the signed-in user completed on Whop. For a business, <code>documents</code> and <code>owners</code> add company formation documents and owners to the verification, and once everything is in this call sends the business for review — call it again after Update Verification to send it. Until then it stays <code>pending</code> and the hosted session collects anything left out. Once the account has an <code>approved</code> verification, every mode except <code>verification_id</code> is rejected — unlink it first to start a new one.
      */
     public CompletableFuture<WhopApiHttpResponse<CreateVerificationsResponse>> create(
             CreateVerificationsRequest request) {
@@ -145,14 +255,21 @@ public class AsyncRawVerificationsClient {
     }
 
     /**
-     * Starts a hosted verification session for an account or user, or returns the active session when one already exists. Any fields you include in the request body are used to prefill the session. Send <code>documents</code> (with <code>document_type</code>) to instead verify the person from identity documents included in this request — no hosted session involved. Send <code>share_token</code> to reuse a verification another Sumsub account has already completed for this person, instead of verifying them again. If the account already has an <code>approved</code> verification the request is rejected; unlink it first to start a new one.
+     * Starts a hosted verification session for an account or user, or returns the active session when one already exists; any fields you send prefill it. To skip the hosted session, send <code>documents</code> to verify the person from files in this request, <code>share_token</code> to reuse a verification another Sumsub account completed, or <code>verification_id</code> to reuse one the signed-in user completed on Whop. For a business, <code>documents</code> and <code>owners</code> add company formation documents and owners to the verification, and once everything is in this call sends the business for review — call it again after Update Verification to send it. Until then it stays <code>pending</code> and the hosted session collects anything left out. Once the account has an <code>approved</code> verification, every mode except <code>verification_id</code> is rejected — unlink it first to start a new one.
      */
     public CompletableFuture<WhopApiHttpResponse<CreateVerificationsResponse>> create(
             CreateVerificationsRequest request, RequestOptions requestOptions) {
-        HttpUrl.Builder httpUrl = HttpUrl.parse(this.clientOptions.environment().getUrl())
+        HttpUrl.Builder httpUrl = HttpUrl.parse(this.clientOptions.environment().getApiURL())
                 .newBuilder()
                 .addPathSegments("verifications");
-        QueryStringMapper.addQueryParameter(httpUrl, "account_id", request.getAccountId(), false);
+        if (request.getAccountId().isPresent()) {
+            QueryStringMapper.addQueryParameter(
+                    httpUrl, "account_id", request.getAccountId().get(), false);
+        }
+        if (request.getUserId().isPresent()) {
+            QueryStringMapper.addQueryParameter(
+                    httpUrl, "user_id", request.getUserId().get(), false);
+        }
         if (requestOptions != null) {
             requestOptions.getQueryParameters().forEach((_key, _value) -> {
                 httpUrl.addQueryParameter(_key, _value);
@@ -161,7 +278,9 @@ public class AsyncRawVerificationsClient {
         RequestBody body;
         try {
             body = RequestBody.create(
-                    ObjectMappers.JSON_MAPPER.writeValueAsBytes(request.getBody()), MediaTypes.APPLICATION_JSON);
+                    ObjectMappers.JSON_MAPPER.writeValueAsBytes(BodyProperties.merge(
+                            request.getBody(), requestOptions != null ? requestOptions.getBodyProperties() : null)),
+                    MediaTypes.APPLICATION_JSON);
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
@@ -176,8 +295,18 @@ public class AsyncRawVerificationsClient {
         if (requestOptions != null && requestOptions.getTimeout().isPresent()) {
             client = clientOptions.httpClientWithTimeout(requestOptions);
         }
+        if (requestOptions != null && requestOptions.getMaxRetries().isPresent()) {
+            okhttpRequest = okhttpRequest
+                    .newBuilder()
+                    .tag(
+                            RetryInterceptor.MaxRetriesOverride.class,
+                            new RetryInterceptor.MaxRetriesOverride(
+                                    requestOptions.getMaxRetries().get()))
+                    .build();
+        }
         CompletableFuture<WhopApiHttpResponse<CreateVerificationsResponse>> future = new CompletableFuture<>();
-        client.newCall(okhttpRequest).enqueue(new Callback() {
+        RetryInterceptor.AsyncCall okhttpCall = RetryInterceptor.newAsyncCall(client, okhttpRequest);
+        okhttpCall.enqueue(new Callback() {
             @Override
             public void onResponse(@NotNull Call call, @NotNull Response response) throws IOException {
                 try (ResponseBody responseBody = response.body()) {
@@ -213,7 +342,7 @@ public class AsyncRawVerificationsClient {
                                 return;
                             case 409:
                                 future.completeExceptionally(new ConflictError(
-                                        ObjectMappers.JSON_MAPPER.readValue(responseBodyString, V1ErrorResponse.class),
+                                        ObjectMappers.JSON_MAPPER.readValue(responseBodyString, Object.class),
                                         response));
                                 return;
                         }
@@ -224,6 +353,9 @@ public class AsyncRawVerificationsClient {
                     future.completeExceptionally(new WhopApiApiException(
                             "Error with status code " + response.code(), response.code(), errorBody, response));
                     return;
+                } catch (JsonProcessingException e) {
+                    future.completeExceptionally(
+                            new WhopApiException("Failed to deserialize response: " + e.getMessage(), e));
                 } catch (IOException e) {
                     future.completeExceptionally(new WhopApiException("Network error executing HTTP request", e));
                 }
@@ -234,18 +366,23 @@ public class AsyncRawVerificationsClient {
                 future.completeExceptionally(new WhopApiException("Network error executing HTTP request", e));
             }
         });
+        future.whenComplete((result_, throwable_) -> {
+            if (future.isCancelled()) {
+                okhttpCall.cancel();
+            }
+        });
         return future;
     }
 
     /**
-     * Returns verifications for an account, including their status and any required actions.
+     * Retrieves a verification by ID, including its status and any information or documents still required.
      */
     public CompletableFuture<WhopApiHttpResponse<RetrieveVerificationsResponse>> retrieve(String id) {
         return retrieve(id, RetrieveVerificationsRequest.builder().build());
     }
 
     /**
-     * Returns verifications for an account, including their status and any required actions.
+     * Retrieves a verification by ID, including its status and any information or documents still required.
      */
     public CompletableFuture<WhopApiHttpResponse<RetrieveVerificationsResponse>> retrieve(
             String id, RequestOptions requestOptions) {
@@ -253,7 +390,7 @@ public class AsyncRawVerificationsClient {
     }
 
     /**
-     * Returns verifications for an account, including their status and any required actions.
+     * Retrieves a verification by ID, including its status and any information or documents still required.
      */
     public CompletableFuture<WhopApiHttpResponse<RetrieveVerificationsResponse>> retrieve(
             String id, RetrieveVerificationsRequest request) {
@@ -261,14 +398,14 @@ public class AsyncRawVerificationsClient {
     }
 
     /**
-     * Returns verifications for an account, including their status and any required actions.
+     * Retrieves a verification by ID, including its status and any information or documents still required.
      */
     public CompletableFuture<WhopApiHttpResponse<RetrieveVerificationsResponse>> retrieve(
             String id, RetrieveVerificationsRequest request, RequestOptions requestOptions) {
-        HttpUrl.Builder httpUrl = HttpUrl.parse(this.clientOptions.environment().getUrl())
+        HttpUrl.Builder httpUrl = HttpUrl.parse(this.clientOptions.environment().getApiURL())
                 .newBuilder()
                 .addPathSegments("verifications")
-                .addPathSegment(id);
+                .addPathSegment(PathSegments.validate(id));
         if (requestOptions != null) {
             requestOptions.getQueryParameters().forEach((_key, _value) -> {
                 httpUrl.addQueryParameter(_key, _value);
@@ -284,8 +421,18 @@ public class AsyncRawVerificationsClient {
         if (requestOptions != null && requestOptions.getTimeout().isPresent()) {
             client = clientOptions.httpClientWithTimeout(requestOptions);
         }
+        if (requestOptions != null && requestOptions.getMaxRetries().isPresent()) {
+            okhttpRequest = okhttpRequest
+                    .newBuilder()
+                    .tag(
+                            RetryInterceptor.MaxRetriesOverride.class,
+                            new RetryInterceptor.MaxRetriesOverride(
+                                    requestOptions.getMaxRetries().get()))
+                    .build();
+        }
         CompletableFuture<WhopApiHttpResponse<RetrieveVerificationsResponse>> future = new CompletableFuture<>();
-        client.newCall(okhttpRequest).enqueue(new Callback() {
+        RetryInterceptor.AsyncCall okhttpCall = RetryInterceptor.newAsyncCall(client, okhttpRequest);
+        okhttpCall.enqueue(new Callback() {
             @Override
             public void onResponse(@NotNull Call call, @NotNull Response response) throws IOException {
                 try (ResponseBody responseBody = response.body()) {
@@ -317,6 +464,9 @@ public class AsyncRawVerificationsClient {
                     future.completeExceptionally(new WhopApiApiException(
                             "Error with status code " + response.code(), response.code(), errorBody, response));
                     return;
+                } catch (JsonProcessingException e) {
+                    future.completeExceptionally(
+                            new WhopApiException("Failed to deserialize response: " + e.getMessage(), e));
                 } catch (IOException e) {
                     future.completeExceptionally(new WhopApiException("Network error executing HTTP request", e));
                 }
@@ -327,11 +477,16 @@ public class AsyncRawVerificationsClient {
                 future.completeExceptionally(new WhopApiException("Network error executing HTTP request", e));
             }
         });
+        future.whenComplete((result_, throwable_) -> {
+            if (future.isCancelled()) {
+                okhttpCall.cancel();
+            }
+        });
         return future;
     }
 
     /**
-     * Updates editable profile details or submits answers for items returned in <code>requested_information</code>. Once a verification is <code>approved</code> its profile details are locked and can no longer be edited.
+     * Updates editable profile details or submits answers for items returned in <code>requested_information</code>. On a business verification still collecting details, company details, <code>documents</code>, and <code>owners</code> also go to the verification provider; call Create Verification again to send the business for review once everything is in. Under review, <code>registration_number</code>, <code>incorporation_date</code>, <code>place_of_incorporation</code>, and <code>documents</code> are refused. While the review waits on owners, owners can still be added, changed, or removed with <code>remove</code>; otherwise only an owner's missing documents can still be sent. Once a verification is <code>approved</code> its profile details are locked and can no longer be edited.
      */
     public CompletableFuture<WhopApiHttpResponse<UpdateVerificationsResponse>> update(
             String id, UpdateVerificationsRequest request) {
@@ -339,14 +494,14 @@ public class AsyncRawVerificationsClient {
     }
 
     /**
-     * Updates editable profile details or submits answers for items returned in <code>requested_information</code>. Once a verification is <code>approved</code> its profile details are locked and can no longer be edited.
+     * Updates editable profile details or submits answers for items returned in <code>requested_information</code>. On a business verification still collecting details, company details, <code>documents</code>, and <code>owners</code> also go to the verification provider; call Create Verification again to send the business for review once everything is in. Under review, <code>registration_number</code>, <code>incorporation_date</code>, <code>place_of_incorporation</code>, and <code>documents</code> are refused. While the review waits on owners, owners can still be added, changed, or removed with <code>remove</code>; otherwise only an owner's missing documents can still be sent. Once a verification is <code>approved</code> its profile details are locked and can no longer be edited.
      */
     public CompletableFuture<WhopApiHttpResponse<UpdateVerificationsResponse>> update(
             String id, UpdateVerificationsRequest request, RequestOptions requestOptions) {
-        HttpUrl.Builder httpUrl = HttpUrl.parse(this.clientOptions.environment().getUrl())
+        HttpUrl.Builder httpUrl = HttpUrl.parse(this.clientOptions.environment().getApiURL())
                 .newBuilder()
                 .addPathSegments("verifications")
-                .addPathSegment(id);
+                .addPathSegment(PathSegments.validate(id));
         if (requestOptions != null) {
             requestOptions.getQueryParameters().forEach((_key, _value) -> {
                 httpUrl.addQueryParameter(_key, _value);
@@ -355,7 +510,9 @@ public class AsyncRawVerificationsClient {
         RequestBody body;
         try {
             body = RequestBody.create(
-                    ObjectMappers.JSON_MAPPER.writeValueAsBytes(request.getBody()), MediaTypes.APPLICATION_JSON);
+                    ObjectMappers.JSON_MAPPER.writeValueAsBytes(BodyProperties.merge(
+                            request.getBody(), requestOptions != null ? requestOptions.getBodyProperties() : null)),
+                    MediaTypes.APPLICATION_JSON);
         } catch (JsonProcessingException e) {
             throw new WhopApiException("Failed to serialize request", e);
         }
@@ -370,8 +527,18 @@ public class AsyncRawVerificationsClient {
         if (requestOptions != null && requestOptions.getTimeout().isPresent()) {
             client = clientOptions.httpClientWithTimeout(requestOptions);
         }
+        if (requestOptions != null && requestOptions.getMaxRetries().isPresent()) {
+            okhttpRequest = okhttpRequest
+                    .newBuilder()
+                    .tag(
+                            RetryInterceptor.MaxRetriesOverride.class,
+                            new RetryInterceptor.MaxRetriesOverride(
+                                    requestOptions.getMaxRetries().get()))
+                    .build();
+        }
         CompletableFuture<WhopApiHttpResponse<UpdateVerificationsResponse>> future = new CompletableFuture<>();
-        client.newCall(okhttpRequest).enqueue(new Callback() {
+        RetryInterceptor.AsyncCall okhttpCall = RetryInterceptor.newAsyncCall(client, okhttpRequest);
+        okhttpCall.enqueue(new Callback() {
             @Override
             public void onResponse(@NotNull Call call, @NotNull Response response) throws IOException {
                 try (ResponseBody responseBody = response.body()) {
@@ -413,6 +580,9 @@ public class AsyncRawVerificationsClient {
                     future.completeExceptionally(new WhopApiApiException(
                             "Error with status code " + response.code(), response.code(), errorBody, response));
                     return;
+                } catch (JsonProcessingException e) {
+                    future.completeExceptionally(
+                            new WhopApiException("Failed to deserialize response: " + e.getMessage(), e));
                 } catch (IOException e) {
                     future.completeExceptionally(new WhopApiException("Network error executing HTTP request", e));
                 }
@@ -421,6 +591,11 @@ public class AsyncRawVerificationsClient {
             @Override
             public void onFailure(@NotNull Call call, @NotNull IOException e) {
                 future.completeExceptionally(new WhopApiException("Network error executing HTTP request", e));
+            }
+        });
+        future.whenComplete((result_, throwable_) -> {
+            if (future.isCancelled()) {
+                okhttpCall.cancel();
             }
         });
         return future;

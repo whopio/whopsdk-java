@@ -55,7 +55,7 @@ public final class ApiKeyGrant {
     }
 
     /**
-     * @return The type of resource the actions apply to, such as <code>account</code>, <code>product</code>, or <code>app</code>.
+     * @return The type of resource the actions apply to, such as <code>account</code>, <code>product</code>, <code>app</code>, or <code>user</code>.
      */
     @JsonProperty("resource_type")
     public String getResourceType() {
@@ -104,7 +104,7 @@ public final class ApiKeyGrant {
 
     public interface ResourceTypeStage {
         /**
-         * <p>The type of resource the actions apply to, such as <code>account</code>, <code>product</code>, or <code>app</code>.</p>
+         * <p>The type of resource the actions apply to, such as <code>account</code>, <code>product</code>, <code>app</code>, or <code>user</code>.</p>
          */
         _FinalStage resourceType(@NotNull String resourceType);
     }
@@ -131,7 +131,6 @@ public final class ApiKeyGrant {
 
         private List<ApiKeyGrantAction> actions = new ArrayList<>();
 
-        @JsonAnySetter
         private Map<String, Object> additionalProperties = new HashMap<>();
 
         private Builder() {}
@@ -146,7 +145,6 @@ public final class ApiKeyGrant {
 
         /**
          * <p>ID of the resource the actions apply to.</p>
-         * <p>ID of the resource the actions apply to.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
@@ -157,8 +155,7 @@ public final class ApiKeyGrant {
         }
 
         /**
-         * <p>The type of resource the actions apply to, such as <code>account</code>, <code>product</code>, or <code>app</code>.</p>
-         * <p>The type of resource the actions apply to, such as <code>account</code>, <code>product</code>, or <code>app</code>.</p>
+         * <p>The type of resource the actions apply to, such as <code>account</code>, <code>product</code>, <code>app</code>, or <code>user</code>.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
@@ -195,6 +192,16 @@ public final class ApiKeyGrant {
         @java.lang.Override
         public ApiKeyGrant build() {
             return new ApiKeyGrant(actions, resourceId, resourceType, additionalProperties);
+        }
+
+        @JsonAnySetter
+        private void putAdditionalPropertyFromJson(String key, Object value) {
+            if (key.equalsIgnoreCase("actions")
+                    || key.equalsIgnoreCase("resource_id")
+                    || key.equalsIgnoreCase("resource_type")) {
+                return;
+            }
+            this.additionalProperties.put(key, value);
         }
 
         @java.lang.Override

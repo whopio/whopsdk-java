@@ -102,7 +102,6 @@ public final class ListSupportedMethodsResponse {
 
         private List<ListSupportedMethodsResponseDataItem> data = new ArrayList<>();
 
-        @JsonAnySetter
         private Map<String, Object> additionalProperties = new HashMap<>();
 
         private Builder() {}
@@ -148,6 +147,14 @@ public final class ListSupportedMethodsResponse {
         @java.lang.Override
         public ListSupportedMethodsResponse build() {
             return new ListSupportedMethodsResponse(data, pageInfo, additionalProperties);
+        }
+
+        @JsonAnySetter
+        private void putAdditionalPropertyFromJson(String key, Object value) {
+            if (key.equalsIgnoreCase("data") || key.equalsIgnoreCase("page_info")) {
+                return;
+            }
+            this.additionalProperties.put(key, value);
         }
 
         @java.lang.Override

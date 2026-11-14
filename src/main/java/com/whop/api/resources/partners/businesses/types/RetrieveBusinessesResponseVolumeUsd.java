@@ -23,14 +23,21 @@ public final class RetrieveBusinessesResponseVolumeUsd {
 
     private final String awaitingSettlement;
 
+    private final String last30D;
+
     private final String settled;
 
     private final Map<String, Object> additionalProperties;
 
     private RetrieveBusinessesResponseVolumeUsd(
-            String attributed, String awaitingSettlement, String settled, Map<String, Object> additionalProperties) {
+            String attributed,
+            String awaitingSettlement,
+            String last30D,
+            String settled,
+            Map<String, Object> additionalProperties) {
         this.attributed = attributed;
         this.awaitingSettlement = awaitingSettlement;
+        this.last30D = last30D;
         this.settled = settled;
         this.additionalProperties = additionalProperties;
     }
@@ -49,6 +56,14 @@ public final class RetrieveBusinessesResponseVolumeUsd {
     @JsonProperty("awaiting_settlement")
     public String getAwaitingSettlement() {
         return awaitingSettlement;
+    }
+
+    /**
+     * @return Credited GMV from the trailing 30 days (awaiting_settlement + settled), in USD.
+     */
+    @JsonProperty("last_30d")
+    public String getLast30D() {
+        return last30D;
     }
 
     /**
@@ -74,12 +89,13 @@ public final class RetrieveBusinessesResponseVolumeUsd {
     private boolean equalTo(RetrieveBusinessesResponseVolumeUsd other) {
         return attributed.equals(other.attributed)
                 && awaitingSettlement.equals(other.awaitingSettlement)
+                && last30D.equals(other.last30D)
                 && settled.equals(other.settled);
     }
 
     @java.lang.Override
     public int hashCode() {
-        return Objects.hash(this.attributed, this.awaitingSettlement, this.settled);
+        return Objects.hash(this.attributed, this.awaitingSettlement, this.last30D, this.settled);
     }
 
     @java.lang.Override
@@ -104,7 +120,14 @@ public final class RetrieveBusinessesResponseVolumeUsd {
         /**
          * <p>GMV awaiting settlement (commission not yet computed), in USD.</p>
          */
-        SettledStage awaitingSettlement(@NotNull String awaitingSettlement);
+        Last30DStage awaitingSettlement(@NotNull String awaitingSettlement);
+    }
+
+    public interface Last30DStage {
+        /**
+         * <p>Credited GMV from the trailing 30 days (awaiting_settlement + settled), in USD.</p>
+         */
+        SettledStage last30D(@NotNull String last30D);
     }
 
     public interface SettledStage {
@@ -123,14 +146,16 @@ public final class RetrieveBusinessesResponseVolumeUsd {
     }
 
     @JsonIgnoreProperties(ignoreUnknown = true)
-    public static final class Builder implements AttributedStage, AwaitingSettlementStage, SettledStage, _FinalStage {
+    public static final class Builder
+            implements AttributedStage, AwaitingSettlementStage, Last30DStage, SettledStage, _FinalStage {
         private String attributed;
 
         private String awaitingSettlement;
 
+        private String last30D;
+
         private String settled;
 
-        @JsonAnySetter
         private Map<String, Object> additionalProperties = new HashMap<>();
 
         private Builder() {}
@@ -139,12 +164,12 @@ public final class RetrieveBusinessesResponseVolumeUsd {
         public Builder from(RetrieveBusinessesResponseVolumeUsd other) {
             attributed(other.getAttributed());
             awaitingSettlement(other.getAwaitingSettlement());
+            last30D(other.getLast30D());
             settled(other.getSettled());
             return this;
         }
 
         /**
-         * <p>Credited GMV (awaiting_settlement + settled); excludes canceled and reversed, in USD.</p>
          * <p>Credited GMV (awaiting_settlement + settled); excludes canceled and reversed, in USD.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
@@ -157,18 +182,27 @@ public final class RetrieveBusinessesResponseVolumeUsd {
 
         /**
          * <p>GMV awaiting settlement (commission not yet computed), in USD.</p>
-         * <p>GMV awaiting settlement (commission not yet computed), in USD.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
         @JsonSetter("awaiting_settlement")
-        public SettledStage awaitingSettlement(@NotNull String awaitingSettlement) {
+        public Last30DStage awaitingSettlement(@NotNull String awaitingSettlement) {
             this.awaitingSettlement = Objects.requireNonNull(awaitingSettlement, "awaitingSettlement must not be null");
             return this;
         }
 
         /**
-         * <p>GMV of pending + completed payments, in USD.</p>
+         * <p>Credited GMV from the trailing 30 days (awaiting_settlement + settled), in USD.</p>
+         * @return Reference to {@code this} so that method calls can be chained together.
+         */
+        @java.lang.Override
+        @JsonSetter("last_30d")
+        public SettledStage last30D(@NotNull String last30D) {
+            this.last30D = Objects.requireNonNull(last30D, "last30D must not be null");
+            return this;
+        }
+
+        /**
          * <p>GMV of pending + completed payments, in USD.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
@@ -182,7 +216,18 @@ public final class RetrieveBusinessesResponseVolumeUsd {
         @java.lang.Override
         public RetrieveBusinessesResponseVolumeUsd build() {
             return new RetrieveBusinessesResponseVolumeUsd(
-                    attributed, awaitingSettlement, settled, additionalProperties);
+                    attributed, awaitingSettlement, last30D, settled, additionalProperties);
+        }
+
+        @JsonAnySetter
+        private void putAdditionalPropertyFromJson(String key, Object value) {
+            if (key.equalsIgnoreCase("attributed")
+                    || key.equalsIgnoreCase("awaiting_settlement")
+                    || key.equalsIgnoreCase("last_30d")
+                    || key.equalsIgnoreCase("settled")) {
+                return;
+            }
+            this.additionalProperties.put(key, value);
         }
 
         @java.lang.Override

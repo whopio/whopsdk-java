@@ -191,7 +191,6 @@ public final class AccountStorePageConfig {
 
         private Optional<AccountStorePageConfigAccentColor> accentColor = Optional.empty();
 
-        @JsonAnySetter
         private Map<String, Object> additionalProperties = new HashMap<>();
 
         private Builder() {}
@@ -206,7 +205,6 @@ public final class AccountStorePageConfig {
         }
 
         /**
-         * <p>Whether the account store page shows a Whop affiliate link.</p>
          * <p>Whether the account store page shows a Whop affiliate link.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
@@ -329,6 +327,17 @@ public final class AccountStorePageConfig {
         public AccountStorePageConfig build() {
             return new AccountStorePageConfig(
                     accentColor, layout, profileVariant, whopAffiliateLink, additionalProperties);
+        }
+
+        @JsonAnySetter
+        private void putAdditionalPropertyFromJson(String key, Object value) {
+            if (key.equalsIgnoreCase("accent_color")
+                    || key.equalsIgnoreCase("layout")
+                    || key.equalsIgnoreCase("profile_variant")
+                    || key.equalsIgnoreCase("whop_affiliate_link")) {
+                return;
+            }
+            this.additionalProperties.put(key, value);
         }
 
         @java.lang.Override

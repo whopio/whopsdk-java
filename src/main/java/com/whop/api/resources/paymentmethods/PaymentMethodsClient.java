@@ -30,7 +30,7 @@ public class PaymentMethodsClient {
     }
 
     /**
-     * Returns a paginated list of payment methods for a member or company, or for the authenticated user when neither is given, with optional filtering by creation date. A payment method is a stored representation of how a customer intends to pay, such as a card, bank account, or digital wallet.
+     * Returns a paginated list of saved payment methods for a member or account, or for the authenticated user when you pass neither.
      * <p>Required permissions:</p>
      * <ul>
      * <li><code>member:payment_methods:read</code></li>
@@ -41,7 +41,7 @@ public class PaymentMethodsClient {
     }
 
     /**
-     * Returns a paginated list of payment methods for a member or company, or for the authenticated user when neither is given, with optional filtering by creation date. A payment method is a stored representation of how a customer intends to pay, such as a card, bank account, or digital wallet.
+     * Returns a paginated list of saved payment methods for a member or account, or for the authenticated user when you pass neither.
      * <p>Required permissions:</p>
      * <ul>
      * <li><code>member:payment_methods:read</code></li>
@@ -52,7 +52,7 @@ public class PaymentMethodsClient {
     }
 
     /**
-     * Returns a paginated list of payment methods for a member or company, or for the authenticated user when neither is given, with optional filtering by creation date. A payment method is a stored representation of how a customer intends to pay, such as a card, bank account, or digital wallet.
+     * Returns a paginated list of saved payment methods for a member or account, or for the authenticated user when you pass neither.
      * <p>Required permissions:</p>
      * <ul>
      * <li><code>member:payment_methods:read</code></li>
@@ -63,7 +63,7 @@ public class PaymentMethodsClient {
     }
 
     /**
-     * Returns a paginated list of payment methods for a member or company, or for the authenticated user when neither is given, with optional filtering by creation date. A payment method is a stored representation of how a customer intends to pay, such as a card, bank account, or digital wallet.
+     * Returns a paginated list of saved payment methods for a member or account, or for the authenticated user when you pass neither.
      * <p>Required permissions:</p>
      * <ul>
      * <li><code>member:payment_methods:read</code></li>
@@ -75,7 +75,7 @@ public class PaymentMethodsClient {
     }
 
     /**
-     * Retrieves the details of an existing payment method. Addresses a member's wallet when member_id or company_id is given, otherwise your own.
+     * Retrieves a saved payment method from a member's wallet when you pass <code>member_id</code> or <code>account_id</code>, or from your own otherwise.
      * <p>Required permissions:</p>
      * <ul>
      * <li><code>member:payment_methods:read</code></li>
@@ -86,7 +86,7 @@ public class PaymentMethodsClient {
     }
 
     /**
-     * Retrieves the details of an existing payment method. Addresses a member's wallet when member_id or company_id is given, otherwise your own.
+     * Retrieves a saved payment method from a member's wallet when you pass <code>member_id</code> or <code>account_id</code>, or from your own otherwise.
      * <p>Required permissions:</p>
      * <ul>
      * <li><code>member:payment_methods:read</code></li>
@@ -97,7 +97,7 @@ public class PaymentMethodsClient {
     }
 
     /**
-     * Retrieves the details of an existing payment method. Addresses a member's wallet when member_id or company_id is given, otherwise your own.
+     * Retrieves a saved payment method from a member's wallet when you pass <code>member_id</code> or <code>account_id</code>, or from your own otherwise.
      * <p>Required permissions:</p>
      * <ul>
      * <li><code>member:payment_methods:read</code></li>
@@ -108,7 +108,7 @@ public class PaymentMethodsClient {
     }
 
     /**
-     * Retrieves the details of an existing payment method. Addresses a member's wallet when member_id or company_id is given, otherwise your own.
+     * Retrieves a saved payment method from a member's wallet when you pass <code>member_id</code> or <code>account_id</code>, or from your own otherwise.
      * <p>Required permissions:</p>
      * <ul>
      * <li><code>member:payment_methods:read</code></li>

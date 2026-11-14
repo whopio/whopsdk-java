@@ -126,7 +126,6 @@ public final class PaymentListItemCompany {
 
         private String title;
 
-        @JsonAnySetter
         private Map<String, Object> additionalProperties = new HashMap<>();
 
         private Builder() {}
@@ -141,7 +140,6 @@ public final class PaymentListItemCompany {
 
         /**
          * <p>The unique identifier for the company.</p>
-         * <p>The unique identifier for the company.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
@@ -153,7 +151,6 @@ public final class PaymentListItemCompany {
 
         /**
          * <p>The slug/route of the company on the Whop site.</p>
-         * <p>The slug/route of the company on the Whop site.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
@@ -164,7 +161,6 @@ public final class PaymentListItemCompany {
         }
 
         /**
-         * <p>The written name of the company.</p>
          * <p>The written name of the company.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
@@ -178,6 +174,14 @@ public final class PaymentListItemCompany {
         @java.lang.Override
         public PaymentListItemCompany build() {
             return new PaymentListItemCompany(id, route, title, additionalProperties);
+        }
+
+        @JsonAnySetter
+        private void putAdditionalPropertyFromJson(String key, Object value) {
+            if (key.equalsIgnoreCase("id") || key.equalsIgnoreCase("route") || key.equalsIgnoreCase("title")) {
+                return;
+            }
+            this.additionalProperties.put(key, value);
         }
 
         @java.lang.Override

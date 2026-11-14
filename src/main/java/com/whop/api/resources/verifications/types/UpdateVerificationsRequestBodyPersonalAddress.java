@@ -217,7 +217,6 @@ public final class UpdateVerificationsRequestBodyPersonalAddress {
 
         private Optional<String> taxIdentificationNumber = Optional.empty();
 
-        @JsonAnySetter
         private Map<String, Object> additionalProperties = new HashMap<>();
 
         private Builder() {}
@@ -387,6 +386,23 @@ public final class UpdateVerificationsRequestBodyPersonalAddress {
                     requestedInformation,
                     taxIdentificationNumber,
                     additionalProperties);
+        }
+
+        @JsonAnySetter
+        private void putAdditionalPropertyFromJson(String key, Object value) {
+            if (key.equalsIgnoreCase("business_name")
+                    || key.equalsIgnoreCase("business_structure")
+                    || key.equalsIgnoreCase("business_tax_identification_number")
+                    || key.equalsIgnoreCase("country")
+                    || key.equalsIgnoreCase("date_of_birth")
+                    || key.equalsIgnoreCase("first_name")
+                    || key.equalsIgnoreCase("last_name")
+                    || key.equalsIgnoreCase("personal_address")
+                    || key.equalsIgnoreCase("requested_information")
+                    || key.equalsIgnoreCase("tax_identification_number")) {
+                return;
+            }
+            this.additionalProperties.put(key, value);
         }
 
         public Builder additionalProperty(String key, Object value) {

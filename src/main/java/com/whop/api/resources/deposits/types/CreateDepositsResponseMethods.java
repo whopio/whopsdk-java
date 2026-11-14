@@ -27,15 +27,19 @@ import java.util.Optional;
 public final class CreateDepositsResponseMethods {
     private final Optional<CreateDepositsResponseMethodsBank> bank;
 
+    private final Optional<CreateDepositsResponseMethodsCard> card;
+
     private final List<CreateDepositsResponseMethodsCryptoItem> crypto;
 
     private final Map<String, Object> additionalProperties;
 
     private CreateDepositsResponseMethods(
             Optional<CreateDepositsResponseMethodsBank> bank,
+            Optional<CreateDepositsResponseMethodsCard> card,
             List<CreateDepositsResponseMethodsCryptoItem> crypto,
             Map<String, Object> additionalProperties) {
         this.bank = bank;
+        this.card = card;
         this.crypto = crypto;
         this.additionalProperties = additionalProperties;
     }
@@ -52,7 +56,18 @@ public final class CreateDepositsResponseMethods {
     }
 
     /**
-     * @return Crypto networks available for this deposit, each with its on-chain deposit address and the tokens accepted on that network.
+     * @return The charge to a saved payment method. Null unless <code>payment_method_id</code> was passed.
+     */
+    @JsonIgnore
+    public Optional<CreateDepositsResponseMethodsCard> getCard() {
+        if (card == null) {
+            return Optional.empty();
+        }
+        return card;
+    }
+
+    /**
+     * @return Crypto networks available for this deposit, each with its on-chain deposit address and the tokens accepted on that network. Crypto deposits require a $10 minimum.
      */
     @JsonProperty("crypto")
     public List<CreateDepositsResponseMethodsCryptoItem> getCrypto() {
@@ -63,6 +78,12 @@ public final class CreateDepositsResponseMethods {
     @JsonProperty("bank")
     private Optional<CreateDepositsResponseMethodsBank> _getBank() {
         return bank;
+    }
+
+    @JsonInclude(value = JsonInclude.Include.CUSTOM, valueFilter = NullableNonemptyFilter.class)
+    @JsonProperty("card")
+    private Optional<CreateDepositsResponseMethodsCard> _getCard() {
+        return card;
     }
 
     @java.lang.Override
@@ -77,12 +98,12 @@ public final class CreateDepositsResponseMethods {
     }
 
     private boolean equalTo(CreateDepositsResponseMethods other) {
-        return bank.equals(other.bank) && crypto.equals(other.crypto);
+        return bank.equals(other.bank) && card.equals(other.card) && crypto.equals(other.crypto);
     }
 
     @java.lang.Override
     public int hashCode() {
-        return Objects.hash(this.bank, this.crypto);
+        return Objects.hash(this.bank, this.card, this.crypto);
     }
 
     @java.lang.Override
@@ -98,15 +119,17 @@ public final class CreateDepositsResponseMethods {
     public static final class Builder {
         private Optional<CreateDepositsResponseMethodsBank> bank = Optional.empty();
 
+        private Optional<CreateDepositsResponseMethodsCard> card = Optional.empty();
+
         private List<CreateDepositsResponseMethodsCryptoItem> crypto = new ArrayList<>();
 
-        @JsonAnySetter
         private Map<String, Object> additionalProperties = new HashMap<>();
 
         private Builder() {}
 
         public Builder from(CreateDepositsResponseMethods other) {
             bank(other.getBank());
+            card(other.getCard());
             crypto(other.getCrypto());
             return this;
         }
@@ -137,7 +160,32 @@ public final class CreateDepositsResponseMethods {
         }
 
         /**
-         * <p>Crypto networks available for this deposit, each with its on-chain deposit address and the tokens accepted on that network.</p>
+         * <p>The charge to a saved payment method. Null unless <code>payment_method_id</code> was passed.</p>
+         */
+        @JsonSetter(value = "card", nulls = Nulls.SKIP)
+        public Builder card(Optional<CreateDepositsResponseMethodsCard> card) {
+            this.card = card;
+            return this;
+        }
+
+        public Builder card(CreateDepositsResponseMethodsCard card) {
+            this.card = Optional.ofNullable(card);
+            return this;
+        }
+
+        public Builder card(Nullable<CreateDepositsResponseMethodsCard> card) {
+            if (card.isNull()) {
+                this.card = null;
+            } else if (card.isEmpty()) {
+                this.card = Optional.empty();
+            } else {
+                this.card = Optional.of(card.get());
+            }
+            return this;
+        }
+
+        /**
+         * <p>Crypto networks available for this deposit, each with its on-chain deposit address and the tokens accepted on that network. Crypto deposits require a $10 minimum.</p>
          */
         @JsonSetter(value = "crypto", nulls = Nulls.SKIP)
         public Builder crypto(List<CreateDepositsResponseMethodsCryptoItem> crypto) {
@@ -161,7 +209,15 @@ public final class CreateDepositsResponseMethods {
         }
 
         public CreateDepositsResponseMethods build() {
-            return new CreateDepositsResponseMethods(bank, crypto, additionalProperties);
+            return new CreateDepositsResponseMethods(bank, card, crypto, additionalProperties);
+        }
+
+        @JsonAnySetter
+        private void putAdditionalPropertyFromJson(String key, Object value) {
+            if (key.equalsIgnoreCase("bank") || key.equalsIgnoreCase("card") || key.equalsIgnoreCase("crypto")) {
+                return;
+            }
+            this.additionalProperties.put(key, value);
         }
 
         public Builder additionalProperty(String key, Object value) {

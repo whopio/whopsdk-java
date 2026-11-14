@@ -15,7 +15,17 @@ public final class SocialAccountPlatform {
 
     public static final SocialAccountPlatform DISCORD = new SocialAccountPlatform(Value.DISCORD, "discord");
 
+    public static final SocialAccountPlatform SNAPCHAT = new SocialAccountPlatform(Value.SNAPCHAT, "snapchat");
+
+    public static final SocialAccountPlatform KLAVIYO = new SocialAccountPlatform(Value.KLAVIYO, "klaviyo");
+
+    public static final SocialAccountPlatform AIMERCE = new SocialAccountPlatform(Value.AIMERCE, "aimerce");
+
     public static final SocialAccountPlatform TELEGRAM = new SocialAccountPlatform(Value.TELEGRAM, "telegram");
+
+    public static final SocialAccountPlatform QUICKBOOKS = new SocialAccountPlatform(Value.QUICKBOOKS, "quickbooks");
+
+    public static final SocialAccountPlatform LINKEDIN = new SocialAccountPlatform(Value.LINKEDIN, "linkedin");
 
     public static final SocialAccountPlatform X = new SocialAccountPlatform(Value.X, "x");
 
@@ -62,8 +72,18 @@ public final class SocialAccountPlatform {
                 return visitor.visitYoutube();
             case DISCORD:
                 return visitor.visitDiscord();
+            case SNAPCHAT:
+                return visitor.visitSnapchat();
+            case KLAVIYO:
+                return visitor.visitKlaviyo();
+            case AIMERCE:
+                return visitor.visitAimerce();
             case TELEGRAM:
                 return visitor.visitTelegram();
+            case QUICKBOOKS:
+                return visitor.visitQuickbooks();
+            case LINKEDIN:
+                return visitor.visitLinkedin();
             case X:
                 return visitor.visitX();
             case TIKTOK:
@@ -85,8 +105,18 @@ public final class SocialAccountPlatform {
                 return YOUTUBE;
             case "discord":
                 return DISCORD;
+            case "snapchat":
+                return SNAPCHAT;
+            case "klaviyo":
+                return KLAVIYO;
+            case "aimerce":
+                return AIMERCE;
             case "telegram":
                 return TELEGRAM;
+            case "quickbooks":
+                return QUICKBOOKS;
+            case "linkedin":
+                return LINKEDIN;
             case "x":
                 return X;
             case "tiktok":
@@ -111,6 +141,16 @@ public final class SocialAccountPlatform {
 
         TELEGRAM,
 
+        LINKEDIN,
+
+        SNAPCHAT,
+
+        KLAVIYO,
+
+        QUICKBOOKS,
+
+        AIMERCE,
+
         UNKNOWN
     }
 
@@ -128,6 +168,16 @@ public final class SocialAccountPlatform {
         T visitDiscord();
 
         T visitTelegram();
+
+        T visitLinkedin();
+
+        T visitSnapchat();
+
+        T visitKlaviyo();
+
+        T visitQuickbooks();
+
+        T visitAimerce();
 
         T visitUnknown(String unknownType);
     }

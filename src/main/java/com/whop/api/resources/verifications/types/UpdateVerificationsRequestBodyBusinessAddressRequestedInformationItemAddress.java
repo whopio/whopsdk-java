@@ -63,7 +63,7 @@ public final class UpdateVerificationsRequestBodyBusinessAddressRequestedInforma
     }
 
     /**
-     * @return Two-letter ISO 3166-1 country code, for example <code>US</code>, <code>DE</code>, or <code>GB</code>.
+     * @return Two-letter ISO 3166-1 country code, for example <code>US</code>, <code>DE</code>, or <code>GB</code>. An address in a <a href="/trust-and-safety/trust-safety-overview/sanctioned-countries">sanctioned country or region</a> is rejected with the error code <code>address_country_sanctioned</code>.
      */
     @JsonIgnore
     public Optional<String> getCountry() {
@@ -202,7 +202,6 @@ public final class UpdateVerificationsRequestBodyBusinessAddressRequestedInforma
 
         private Optional<String> state = Optional.empty();
 
-        @JsonAnySetter
         private Map<String, Object> additionalProperties = new HashMap<>();
 
         private Builder() {}
@@ -240,7 +239,7 @@ public final class UpdateVerificationsRequestBodyBusinessAddressRequestedInforma
         }
 
         /**
-         * <p>Two-letter ISO 3166-1 country code, for example <code>US</code>, <code>DE</code>, or <code>GB</code>.</p>
+         * <p>Two-letter ISO 3166-1 country code, for example <code>US</code>, <code>DE</code>, or <code>GB</code>. An address in a <a href="/trust-and-safety/trust-safety-overview/sanctioned-countries">sanctioned country or region</a> is rejected with the error code <code>address_country_sanctioned</code>.</p>
          */
         @JsonSetter(value = "country", nulls = Nulls.SKIP)
         public Builder country(Optional<String> country) {
@@ -367,6 +366,19 @@ public final class UpdateVerificationsRequestBodyBusinessAddressRequestedInforma
         public UpdateVerificationsRequestBodyBusinessAddressRequestedInformationItemAddress build() {
             return new UpdateVerificationsRequestBodyBusinessAddressRequestedInformationItemAddress(
                     city, country, line1, line2, postalCode, state, additionalProperties);
+        }
+
+        @JsonAnySetter
+        private void putAdditionalPropertyFromJson(String key, Object value) {
+            if (key.equalsIgnoreCase("city")
+                    || key.equalsIgnoreCase("country")
+                    || key.equalsIgnoreCase("line1")
+                    || key.equalsIgnoreCase("line2")
+                    || key.equalsIgnoreCase("postal_code")
+                    || key.equalsIgnoreCase("state")) {
+                return;
+            }
+            this.additionalProperties.put(key, value);
         }
 
         public Builder additionalProperty(String key, Object value) {

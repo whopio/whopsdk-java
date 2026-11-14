@@ -107,7 +107,6 @@ public final class AccountLink {
 
         private String url;
 
-        @JsonAnySetter
         private Map<String, Object> additionalProperties = new HashMap<>();
 
         private Builder() {}
@@ -121,7 +120,6 @@ public final class AccountLink {
 
         /**
          * <p>The timestamp after which this account link URL is no longer valid.</p>
-         * <p>The timestamp after which this account link URL is no longer valid.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
@@ -132,7 +130,6 @@ public final class AccountLink {
         }
 
         /**
-         * <p>The temporary URL to redirect the user to for account access. Expires at the time specified by expires_at.</p>
          * <p>The temporary URL to redirect the user to for account access. Expires at the time specified by expires_at.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
@@ -146,6 +143,14 @@ public final class AccountLink {
         @java.lang.Override
         public AccountLink build() {
             return new AccountLink(expiresAt, url, additionalProperties);
+        }
+
+        @JsonAnySetter
+        private void putAdditionalPropertyFromJson(String key, Object value) {
+            if (key.equalsIgnoreCase("expires_at") || key.equalsIgnoreCase("url")) {
+                return;
+            }
+            this.additionalProperties.put(key, value);
         }
 
         @java.lang.Override

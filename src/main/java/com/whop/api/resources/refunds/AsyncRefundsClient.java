@@ -5,11 +5,11 @@ package com.whop.api.resources.refunds;
 
 import com.whop.api.core.ClientOptions;
 import com.whop.api.core.RequestOptions;
+import com.whop.api.core.WhopApiHttpResponse;
 import com.whop.api.core.pagination.SyncPagingIterable;
 import com.whop.api.resources.refunds.requests.ListRefundsRequest;
 import com.whop.api.resources.refunds.requests.RetrieveRefundsRequest;
 import com.whop.api.types.Refund;
-import com.whop.api.types.RefundListItem;
 import java.util.concurrent.CompletableFuture;
 
 public class AsyncRefundsClient {
@@ -30,112 +30,118 @@ public class AsyncRefundsClient {
     }
 
     /**
-     * Returns a paginated list of refunds, with optional filtering by payment, company, user, and creation date.
-     * <p>Required permissions:</p>
-     * <ul>
-     * <li><code>payment:basic:read</code></li>
-     * </ul>
+     * Lists refunds the caller can read, newest first. Filter by payment, account, or buyer to narrow the results.
      */
-    public CompletableFuture<SyncPagingIterable<RefundListItem>> list() {
-        return this.rawClient.list().thenApply(response -> response.body());
+    public CompletableFuture<SyncPagingIterable<Refund>> list() {
+        CompletableFuture<WhopApiHttpResponse<SyncPagingIterable<Refund>>> rawFuture = this.rawClient.list();
+        CompletableFuture<SyncPagingIterable<Refund>> future = rawFuture.thenApply(response -> response.body());
+        future.whenComplete((result_, throwable_) -> {
+            if (future.isCancelled()) {
+                rawFuture.cancel(true);
+            }
+        });
+        return future;
     }
 
     /**
-     * Returns a paginated list of refunds, with optional filtering by payment, company, user, and creation date.
-     * <p>Required permissions:</p>
-     * <ul>
-     * <li><code>payment:basic:read</code></li>
-     * </ul>
+     * Lists refunds the caller can read, newest first. Filter by payment, account, or buyer to narrow the results.
      */
-    public CompletableFuture<SyncPagingIterable<RefundListItem>> list(RequestOptions requestOptions) {
-        return this.rawClient.list(requestOptions).thenApply(response -> response.body());
+    public CompletableFuture<SyncPagingIterable<Refund>> list(RequestOptions requestOptions) {
+        CompletableFuture<WhopApiHttpResponse<SyncPagingIterable<Refund>>> rawFuture =
+                this.rawClient.list(requestOptions);
+        CompletableFuture<SyncPagingIterable<Refund>> future = rawFuture.thenApply(response -> response.body());
+        future.whenComplete((result_, throwable_) -> {
+            if (future.isCancelled()) {
+                rawFuture.cancel(true);
+            }
+        });
+        return future;
     }
 
     /**
-     * Returns a paginated list of refunds, with optional filtering by payment, company, user, and creation date.
-     * <p>Required permissions:</p>
-     * <ul>
-     * <li><code>payment:basic:read</code></li>
-     * </ul>
+     * Lists refunds the caller can read, newest first. Filter by payment, account, or buyer to narrow the results.
      */
-    public CompletableFuture<SyncPagingIterable<RefundListItem>> list(ListRefundsRequest request) {
-        return this.rawClient.list(request).thenApply(response -> response.body());
+    public CompletableFuture<SyncPagingIterable<Refund>> list(ListRefundsRequest request) {
+        CompletableFuture<WhopApiHttpResponse<SyncPagingIterable<Refund>>> rawFuture = this.rawClient.list(request);
+        CompletableFuture<SyncPagingIterable<Refund>> future = rawFuture.thenApply(response -> response.body());
+        future.whenComplete((result_, throwable_) -> {
+            if (future.isCancelled()) {
+                rawFuture.cancel(true);
+            }
+        });
+        return future;
     }
 
     /**
-     * Returns a paginated list of refunds, with optional filtering by payment, company, user, and creation date.
-     * <p>Required permissions:</p>
-     * <ul>
-     * <li><code>payment:basic:read</code></li>
-     * </ul>
+     * Lists refunds the caller can read, newest first. Filter by payment, account, or buyer to narrow the results.
      */
-    public CompletableFuture<SyncPagingIterable<RefundListItem>> list(
+    public CompletableFuture<SyncPagingIterable<Refund>> list(
             ListRefundsRequest request, RequestOptions requestOptions) {
-        return this.rawClient.list(request, requestOptions).thenApply(response -> response.body());
+        CompletableFuture<WhopApiHttpResponse<SyncPagingIterable<Refund>>> rawFuture =
+                this.rawClient.list(request, requestOptions);
+        CompletableFuture<SyncPagingIterable<Refund>> future = rawFuture.thenApply(response -> response.body());
+        future.whenComplete((result_, throwable_) -> {
+            if (future.isCancelled()) {
+                rawFuture.cancel(true);
+            }
+        });
+        return future;
     }
 
     /**
-     * Retrieves the details of an existing refund.
-     * <p>Required permissions:</p>
-     * <ul>
-     * <li><code>payment:basic:read</code></li>
-     * <li><code>plan:basic:read</code></li>
-     * <li><code>access_pass:basic:read</code></li>
-     * <li><code>member:email:read</code></li>
-     * <li><code>member:basic:read</code></li>
-     * <li><code>member:phone:read</code></li>
-     * </ul>
+     * Returns one refund.
      */
     public CompletableFuture<Refund> retrieve(String id) {
-        return this.rawClient.retrieve(id).thenApply(response -> response.body());
+        CompletableFuture<WhopApiHttpResponse<Refund>> rawFuture = this.rawClient.retrieve(id);
+        CompletableFuture<Refund> future = rawFuture.thenApply(response -> response.body());
+        future.whenComplete((result_, throwable_) -> {
+            if (future.isCancelled()) {
+                rawFuture.cancel(true);
+            }
+        });
+        return future;
     }
 
     /**
-     * Retrieves the details of an existing refund.
-     * <p>Required permissions:</p>
-     * <ul>
-     * <li><code>payment:basic:read</code></li>
-     * <li><code>plan:basic:read</code></li>
-     * <li><code>access_pass:basic:read</code></li>
-     * <li><code>member:email:read</code></li>
-     * <li><code>member:basic:read</code></li>
-     * <li><code>member:phone:read</code></li>
-     * </ul>
+     * Returns one refund.
      */
     public CompletableFuture<Refund> retrieve(String id, RequestOptions requestOptions) {
-        return this.rawClient.retrieve(id, requestOptions).thenApply(response -> response.body());
+        CompletableFuture<WhopApiHttpResponse<Refund>> rawFuture = this.rawClient.retrieve(id, requestOptions);
+        CompletableFuture<Refund> future = rawFuture.thenApply(response -> response.body());
+        future.whenComplete((result_, throwable_) -> {
+            if (future.isCancelled()) {
+                rawFuture.cancel(true);
+            }
+        });
+        return future;
     }
 
     /**
-     * Retrieves the details of an existing refund.
-     * <p>Required permissions:</p>
-     * <ul>
-     * <li><code>payment:basic:read</code></li>
-     * <li><code>plan:basic:read</code></li>
-     * <li><code>access_pass:basic:read</code></li>
-     * <li><code>member:email:read</code></li>
-     * <li><code>member:basic:read</code></li>
-     * <li><code>member:phone:read</code></li>
-     * </ul>
+     * Returns one refund.
      */
     public CompletableFuture<Refund> retrieve(String id, RetrieveRefundsRequest request) {
-        return this.rawClient.retrieve(id, request).thenApply(response -> response.body());
+        CompletableFuture<WhopApiHttpResponse<Refund>> rawFuture = this.rawClient.retrieve(id, request);
+        CompletableFuture<Refund> future = rawFuture.thenApply(response -> response.body());
+        future.whenComplete((result_, throwable_) -> {
+            if (future.isCancelled()) {
+                rawFuture.cancel(true);
+            }
+        });
+        return future;
     }
 
     /**
-     * Retrieves the details of an existing refund.
-     * <p>Required permissions:</p>
-     * <ul>
-     * <li><code>payment:basic:read</code></li>
-     * <li><code>plan:basic:read</code></li>
-     * <li><code>access_pass:basic:read</code></li>
-     * <li><code>member:email:read</code></li>
-     * <li><code>member:basic:read</code></li>
-     * <li><code>member:phone:read</code></li>
-     * </ul>
+     * Returns one refund.
      */
     public CompletableFuture<Refund> retrieve(
             String id, RetrieveRefundsRequest request, RequestOptions requestOptions) {
-        return this.rawClient.retrieve(id, request, requestOptions).thenApply(response -> response.body());
+        CompletableFuture<WhopApiHttpResponse<Refund>> rawFuture = this.rawClient.retrieve(id, request, requestOptions);
+        CompletableFuture<Refund> future = rawFuture.thenApply(response -> response.body());
+        future.whenComplete((result_, throwable_) -> {
+            if (future.isCancelled()) {
+                rawFuture.cancel(true);
+            }
+        });
+        return future;
     }
 }

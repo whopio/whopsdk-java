@@ -147,7 +147,6 @@ public final class AccountCompanyFormationDocument {
 
         private String url;
 
-        @JsonAnySetter
         private Map<String, Object> additionalProperties = new HashMap<>();
 
         private Builder() {}
@@ -163,7 +162,6 @@ public final class AccountCompanyFormationDocument {
 
         /**
          * <p>Document ID, prefixed <code>file_</code>.</p>
-         * <p>Document ID, prefixed <code>file_</code>.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
@@ -174,7 +172,6 @@ public final class AccountCompanyFormationDocument {
         }
 
         /**
-         * <p>Human-readable document name, such as <code>Articles of Organization</code>.</p>
          * <p>Human-readable document name, such as <code>Articles of Organization</code>.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
@@ -187,7 +184,6 @@ public final class AccountCompanyFormationDocument {
 
         /**
          * <p>Document category: <code>articles_of_organization</code>, <code>operating_agreement</code>, <code>ein_letter</code>, <code>signed_ss4</code>, <code>signed_form8821</code>, or <code>mail</code> for postal correspondence received on the company's behalf.</p>
-         * <p>Document category: <code>articles_of_organization</code>, <code>operating_agreement</code>, <code>ein_letter</code>, <code>signed_ss4</code>, <code>signed_form8821</code>, or <code>mail</code> for postal correspondence received on the company's behalf.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
@@ -198,7 +194,6 @@ public final class AccountCompanyFormationDocument {
         }
 
         /**
-         * <p>CDN URL for downloading the document.</p>
          * <p>CDN URL for downloading the document.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
@@ -212,6 +207,17 @@ public final class AccountCompanyFormationDocument {
         @java.lang.Override
         public AccountCompanyFormationDocument build() {
             return new AccountCompanyFormationDocument(id, name, type, url, additionalProperties);
+        }
+
+        @JsonAnySetter
+        private void putAdditionalPropertyFromJson(String key, Object value) {
+            if (key.equalsIgnoreCase("id")
+                    || key.equalsIgnoreCase("name")
+                    || key.equalsIgnoreCase("type")
+                    || key.equalsIgnoreCase("url")) {
+                return;
+            }
+            this.additionalProperties.put(key, value);
         }
 
         @java.lang.Override

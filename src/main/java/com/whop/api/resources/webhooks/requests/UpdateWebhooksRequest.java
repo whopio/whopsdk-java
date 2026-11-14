@@ -33,6 +33,8 @@ public final class UpdateWebhooksRequest {
 
     private final Optional<List<UpdateWebhooksRequestEventsItem>> events;
 
+    private final Optional<String> title;
+
     private final Optional<String> url;
 
     private final Map<String, Object> additionalProperties;
@@ -42,12 +44,14 @@ public final class UpdateWebhooksRequest {
             Optional<Boolean> childResourceEvents,
             Optional<Boolean> enabled,
             Optional<List<UpdateWebhooksRequestEventsItem>> events,
+            Optional<String> title,
             Optional<String> url,
             Map<String, Object> additionalProperties) {
         this.apiVersionDate = apiVersionDate;
         this.childResourceEvents = childResourceEvents;
         this.enabled = enabled;
         this.events = events;
+        this.title = title;
         this.url = url;
         this.additionalProperties = additionalProperties;
     }
@@ -88,6 +92,17 @@ public final class UpdateWebhooksRequest {
     }
 
     /**
+     * @return A label for the webhook, shown in the dashboard. Up to 255 characters. Pass <code>null</code> or an empty string to remove it.
+     */
+    @JsonIgnore
+    public Optional<String> getTitle() {
+        if (title == null) {
+            return Optional.empty();
+        }
+        return title;
+    }
+
+    /**
      * @return The URL to send the webhook to.
      */
     @JsonProperty("url")
@@ -99,6 +114,12 @@ public final class UpdateWebhooksRequest {
     @JsonProperty("api_version_date")
     private Optional<String> _getApiVersionDate() {
         return apiVersionDate;
+    }
+
+    @JsonInclude(value = JsonInclude.Include.CUSTOM, valueFilter = NullableNonemptyFilter.class)
+    @JsonProperty("title")
+    private Optional<String> _getTitle() {
+        return title;
     }
 
     @java.lang.Override
@@ -117,12 +138,14 @@ public final class UpdateWebhooksRequest {
                 && childResourceEvents.equals(other.childResourceEvents)
                 && enabled.equals(other.enabled)
                 && events.equals(other.events)
+                && title.equals(other.title)
                 && url.equals(other.url);
     }
 
     @java.lang.Override
     public int hashCode() {
-        return Objects.hash(this.apiVersionDate, this.childResourceEvents, this.enabled, this.events, this.url);
+        return Objects.hash(
+                this.apiVersionDate, this.childResourceEvents, this.enabled, this.events, this.title, this.url);
     }
 
     @java.lang.Override
@@ -144,9 +167,10 @@ public final class UpdateWebhooksRequest {
 
         private Optional<List<UpdateWebhooksRequestEventsItem>> events = Optional.empty();
 
+        private Optional<String> title = Optional.empty();
+
         private Optional<String> url = Optional.empty();
 
-        @JsonAnySetter
         private Map<String, Object> additionalProperties = new HashMap<>();
 
         private Builder() {}
@@ -156,6 +180,7 @@ public final class UpdateWebhooksRequest {
             childResourceEvents(other.getChildResourceEvents());
             enabled(other.getEnabled());
             events(other.getEvents());
+            title(other.getTitle());
             url(other.getUrl());
             return this;
         }
@@ -228,6 +253,31 @@ public final class UpdateWebhooksRequest {
         }
 
         /**
+         * <p>A label for the webhook, shown in the dashboard. Up to 255 characters. Pass <code>null</code> or an empty string to remove it.</p>
+         */
+        @JsonSetter(value = "title", nulls = Nulls.SKIP)
+        public Builder title(Optional<String> title) {
+            this.title = title;
+            return this;
+        }
+
+        public Builder title(String title) {
+            this.title = Optional.ofNullable(title);
+            return this;
+        }
+
+        public Builder title(Nullable<String> title) {
+            if (title.isNull()) {
+                this.title = null;
+            } else if (title.isEmpty()) {
+                this.title = Optional.empty();
+            } else {
+                this.title = Optional.of(title.get());
+            }
+            return this;
+        }
+
+        /**
          * <p>The URL to send the webhook to.</p>
          */
         @JsonSetter(value = "url", nulls = Nulls.SKIP)
@@ -243,7 +293,20 @@ public final class UpdateWebhooksRequest {
 
         public UpdateWebhooksRequest build() {
             return new UpdateWebhooksRequest(
-                    apiVersionDate, childResourceEvents, enabled, events, url, additionalProperties);
+                    apiVersionDate, childResourceEvents, enabled, events, title, url, additionalProperties);
+        }
+
+        @JsonAnySetter
+        private void putAdditionalPropertyFromJson(String key, Object value) {
+            if (key.equalsIgnoreCase("api_version_date")
+                    || key.equalsIgnoreCase("child_resource_events")
+                    || key.equalsIgnoreCase("enabled")
+                    || key.equalsIgnoreCase("events")
+                    || key.equalsIgnoreCase("title")
+                    || key.equalsIgnoreCase("url")) {
+                return;
+            }
+            this.additionalProperties.put(key, value);
         }
 
         public Builder additionalProperty(String key, Object value) {

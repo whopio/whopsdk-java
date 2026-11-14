@@ -91,7 +91,7 @@ public final class UpdateChatChannelsRequest {
     }
 
     /**
-     * @return The minimum number of seconds a user must wait between sending messages in this chat channel.
+     * @return The minimum number of seconds a user must wait between sending messages in this chat channel. Pass null or 0 to remove the cooldown.
      */
     @JsonIgnore
     public Optional<Integer> getUserPostsCooldownSeconds() {
@@ -213,7 +213,6 @@ public final class UpdateChatChannelsRequest {
 
         private Optional<WhoCanReactTypes> whoCanReact = Optional.empty();
 
-        @JsonAnySetter
         private Map<String, Object> additionalProperties = new HashMap<>();
 
         private Builder() {}
@@ -304,7 +303,7 @@ public final class UpdateChatChannelsRequest {
         }
 
         /**
-         * <p>The minimum number of seconds a user must wait between sending messages in this chat channel.</p>
+         * <p>The minimum number of seconds a user must wait between sending messages in this chat channel. Pass null or 0 to remove the cooldown.</p>
          */
         @JsonSetter(value = "user_posts_cooldown_seconds", nulls = Nulls.SKIP)
         public Builder userPostsCooldownSeconds(Optional<Integer> userPostsCooldownSeconds) {
@@ -387,6 +386,19 @@ public final class UpdateChatChannelsRequest {
                     whoCanPost,
                     whoCanReact,
                     additionalProperties);
+        }
+
+        @JsonAnySetter
+        private void putAdditionalPropertyFromJson(String key, Object value) {
+            if (key.equalsIgnoreCase("ban_media")
+                    || key.equalsIgnoreCase("ban_urls")
+                    || key.equalsIgnoreCase("banned_words")
+                    || key.equalsIgnoreCase("user_posts_cooldown_seconds")
+                    || key.equalsIgnoreCase("who_can_post")
+                    || key.equalsIgnoreCase("who_can_react")) {
+                return;
+            }
+            this.additionalProperties.put(key, value);
         }
 
         public Builder additionalProperty(String key, Object value) {

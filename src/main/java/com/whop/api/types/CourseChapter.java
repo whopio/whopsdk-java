@@ -159,7 +159,6 @@ public final class CourseChapter {
 
         private List<CourseChapterLessonsItem> lessons = new ArrayList<>();
 
-        @JsonAnySetter
         private Map<String, Object> additionalProperties = new HashMap<>();
 
         private Builder() {}
@@ -175,7 +174,6 @@ public final class CourseChapter {
 
         /**
          * <p>The unique identifier for the chapter.</p>
-         * <p>The unique identifier for the chapter.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
@@ -187,7 +185,6 @@ public final class CourseChapter {
 
         /**
          * <p>The sort position of this chapter within its parent course, starting from zero.</p>
-         * <p>The sort position of this chapter within its parent course, starting from zero.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
@@ -198,7 +195,6 @@ public final class CourseChapter {
         }
 
         /**
-         * <p>The display name of the chapter shown to students. Maximum 150 characters.</p>
          * <p>The display name of the chapter shown to students. Maximum 150 characters.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
@@ -247,6 +243,17 @@ public final class CourseChapter {
         @java.lang.Override
         public CourseChapter build() {
             return new CourseChapter(id, lessons, order, title, additionalProperties);
+        }
+
+        @JsonAnySetter
+        private void putAdditionalPropertyFromJson(String key, Object value) {
+            if (key.equalsIgnoreCase("id")
+                    || key.equalsIgnoreCase("lessons")
+                    || key.equalsIgnoreCase("order")
+                    || key.equalsIgnoreCase("title")) {
+                return;
+            }
+            this.additionalProperties.put(key, value);
         }
 
         @java.lang.Override

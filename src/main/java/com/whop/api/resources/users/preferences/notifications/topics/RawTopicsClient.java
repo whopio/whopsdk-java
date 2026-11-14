@@ -8,6 +8,7 @@ import com.whop.api.core.ClientOptions;
 import com.whop.api.core.ObjectMappers;
 import com.whop.api.core.QueryStringMapper;
 import com.whop.api.core.RequestOptions;
+import com.whop.api.core.RetryInterceptor;
 import com.whop.api.core.WhopApiApiException;
 import com.whop.api.core.WhopApiException;
 import com.whop.api.core.WhopApiHttpResponse;
@@ -34,32 +35,32 @@ public class RawTopicsClient {
     }
 
     /**
-     * Lists the authenticated user's topic-scoped notification preferences, plus user-agnostic platform defaults. Each filter matches preferences scoped to its value or not narrowed on that dimension. Per-experience levels are listed separately, by <code>GET /users/me/preferences/notifications/experiences</code>.
+     * Lists the authenticated user's topic-scoped notification preferences, plus user-agnostic platform defaults. Per-experience levels are listed separately, by <code>GET /users/me/preferences/notifications/experiences</code>.
      */
     public WhopApiHttpResponse<SyncPagingIterable<UserNotificationPreference>> list() {
         return list(ListTopicsRequest.builder().build());
     }
 
     /**
-     * Lists the authenticated user's topic-scoped notification preferences, plus user-agnostic platform defaults. Each filter matches preferences scoped to its value or not narrowed on that dimension. Per-experience levels are listed separately, by <code>GET /users/me/preferences/notifications/experiences</code>.
+     * Lists the authenticated user's topic-scoped notification preferences, plus user-agnostic platform defaults. Per-experience levels are listed separately, by <code>GET /users/me/preferences/notifications/experiences</code>.
      */
     public WhopApiHttpResponse<SyncPagingIterable<UserNotificationPreference>> list(RequestOptions requestOptions) {
         return list(ListTopicsRequest.builder().build(), requestOptions);
     }
 
     /**
-     * Lists the authenticated user's topic-scoped notification preferences, plus user-agnostic platform defaults. Each filter matches preferences scoped to its value or not narrowed on that dimension. Per-experience levels are listed separately, by <code>GET /users/me/preferences/notifications/experiences</code>.
+     * Lists the authenticated user's topic-scoped notification preferences, plus user-agnostic platform defaults. Per-experience levels are listed separately, by <code>GET /users/me/preferences/notifications/experiences</code>.
      */
     public WhopApiHttpResponse<SyncPagingIterable<UserNotificationPreference>> list(ListTopicsRequest request) {
         return list(request, null);
     }
 
     /**
-     * Lists the authenticated user's topic-scoped notification preferences, plus user-agnostic platform defaults. Each filter matches preferences scoped to its value or not narrowed on that dimension. Per-experience levels are listed separately, by <code>GET /users/me/preferences/notifications/experiences</code>.
+     * Lists the authenticated user's topic-scoped notification preferences, plus user-agnostic platform defaults. Per-experience levels are listed separately, by <code>GET /users/me/preferences/notifications/experiences</code>.
      */
     public WhopApiHttpResponse<SyncPagingIterable<UserNotificationPreference>> list(
             ListTopicsRequest request, RequestOptions requestOptions) {
-        HttpUrl.Builder httpUrl = HttpUrl.parse(this.clientOptions.environment().getUrl())
+        HttpUrl.Builder httpUrl = HttpUrl.parse(this.clientOptions.environment().getApiURL())
                 .newBuilder()
                 .addPathSegments("users/me/preferences/notifications/topics");
         if (request.getChannel().isPresent()) {
@@ -105,6 +106,15 @@ public class RawTopicsClient {
         if (requestOptions != null && requestOptions.getTimeout().isPresent()) {
             client = clientOptions.httpClientWithTimeout(requestOptions);
         }
+        if (requestOptions != null && requestOptions.getMaxRetries().isPresent()) {
+            okhttpRequest = okhttpRequest
+                    .newBuilder()
+                    .tag(
+                            RetryInterceptor.MaxRetriesOverride.class,
+                            new RetryInterceptor.MaxRetriesOverride(
+                                    requestOptions.getMaxRetries().get()))
+                    .build();
+        }
         try (Response response = client.newCall(okhttpRequest).execute()) {
             ResponseBody responseBody = response.body();
             String responseBodyString = responseBody != null ? responseBody.string() : "{}";
@@ -119,8 +129,11 @@ public class RawTopicsClient {
                 List<UserNotificationPreference> result = parsedResponse.getData();
                 return new WhopApiHttpResponse<>(
                         new SyncPagingIterable<UserNotificationPreference>(
-                                startingAfter != null, result, parsedResponse, () -> list(nextRequest, requestOptions)
-                                        .body()),
+                                startingAfter.isPresent()
+                                        && !startingAfter.get().isEmpty(),
+                                result,
+                                parsedResponse,
+                                () -> list(nextRequest, requestOptions).body()),
                         response);
             }
             try {
@@ -134,6 +147,8 @@ public class RawTopicsClient {
             Object errorBody = ObjectMappers.parseErrorBody(responseBodyString);
             throw new WhopApiApiException(
                     "Error with status code " + response.code(), response.code(), errorBody, response);
+        } catch (JsonProcessingException e) {
+            throw new WhopApiException("Failed to deserialize response: " + e.getMessage(), e);
         } catch (IOException e) {
             throw new WhopApiException("Network error executing HTTP request", e);
         }

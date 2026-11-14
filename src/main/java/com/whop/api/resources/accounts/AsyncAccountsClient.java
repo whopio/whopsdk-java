@@ -6,18 +6,30 @@ package com.whop.api.resources.accounts;
 import com.whop.api.core.ClientOptions;
 import com.whop.api.core.RequestOptions;
 import com.whop.api.core.Suppliers;
+import com.whop.api.core.WhopApiHttpResponse;
 import com.whop.api.core.pagination.SyncPagingIterable;
+import com.whop.api.resources.accounts.customertracking.AsyncCustomerTrackingClient;
+import com.whop.api.resources.accounts.fees.AsyncFeesClient;
+import com.whop.api.resources.accounts.financingproviders.AsyncFinancingProvidersClient;
 import com.whop.api.resources.accounts.preferences.AsyncPreferencesClient;
 import com.whop.api.resources.accounts.requests.CreateAccountsRequest;
+import com.whop.api.resources.accounts.requests.DeleteAccountsRequest;
 import com.whop.api.resources.accounts.requests.FormCompanyAccountsRequest;
 import com.whop.api.resources.accounts.requests.ListAccountsRequest;
+import com.whop.api.resources.accounts.requests.MeAccountsRequest;
 import com.whop.api.resources.accounts.requests.RetrieveAccountsRequest;
+import com.whop.api.resources.accounts.requests.RetryAdsPaymentAccountsRequest;
+import com.whop.api.resources.accounts.requests.SearchAccountsRequest;
+import com.whop.api.resources.accounts.requests.SuspendAccountsRequest;
 import com.whop.api.resources.accounts.requests.TransferOwnershipAccountsRequest;
 import com.whop.api.resources.accounts.requests.UpdateAccountsRequest;
 import com.whop.api.resources.accounts.reserves.AsyncReservesClient;
+import com.whop.api.resources.accounts.types.DeleteAccountsResponse;
 import com.whop.api.resources.accounts.types.FormCompanyAccountsResponse;
+import com.whop.api.resources.accounts.types.RetryAdsPaymentAccountsResponse;
 import com.whop.api.resources.accounts.types.TransferOwnershipAccountsResponse;
 import com.whop.api.types.Account;
+import com.whop.api.types.AccountSearchResult;
 import java.util.concurrent.CompletableFuture;
 import java.util.function.Supplier;
 
@@ -26,6 +38,12 @@ public class AsyncAccountsClient {
 
     private final AsyncRawAccountsClient rawClient;
 
+    protected final Supplier<AsyncCustomerTrackingClient> customerTrackingClient;
+
+    protected final Supplier<AsyncFeesClient> feesClient;
+
+    protected final Supplier<AsyncFinancingProvidersClient> financingProvidersClient;
+
     protected final Supplier<AsyncPreferencesClient> preferencesClient;
 
     protected final Supplier<AsyncReservesClient> reservesClient;
@@ -33,6 +51,9 @@ public class AsyncAccountsClient {
     public AsyncAccountsClient(ClientOptions clientOptions) {
         this.clientOptions = clientOptions;
         this.rawClient = new AsyncRawAccountsClient(clientOptions);
+        this.customerTrackingClient = Suppliers.memoize(() -> new AsyncCustomerTrackingClient(clientOptions));
+        this.feesClient = Suppliers.memoize(() -> new AsyncFeesClient(clientOptions));
+        this.financingProvidersClient = Suppliers.memoize(() -> new AsyncFinancingProvidersClient(clientOptions));
         this.preferencesClient = Suppliers.memoize(() -> new AsyncPreferencesClient(clientOptions));
         this.reservesClient = Suppliers.memoize(() -> new AsyncReservesClient(clientOptions));
     }
@@ -45,162 +66,575 @@ public class AsyncAccountsClient {
     }
 
     /**
-     * Lists accounts visible to the credential. User tokens return the user's business accounts; Account API keys return the requesting account and its connected accounts. Pass <code>parent_account_id</code> to return only that parent account's connected accounts.
+     * Lists accounts visible to the credential. User tokens return the user's business accounts; Account API keys return the requesting account and its subaccounts.
      */
     public CompletableFuture<SyncPagingIterable<Account>> list() {
-        return this.rawClient.list().thenApply(response -> response.body());
+        CompletableFuture<WhopApiHttpResponse<SyncPagingIterable<Account>>> rawFuture = this.rawClient.list();
+        CompletableFuture<SyncPagingIterable<Account>> future = rawFuture.thenApply(response -> response.body());
+        future.whenComplete((result_, throwable_) -> {
+            if (future.isCancelled()) {
+                rawFuture.cancel(true);
+            }
+        });
+        return future;
     }
 
     /**
-     * Lists accounts visible to the credential. User tokens return the user's business accounts; Account API keys return the requesting account and its connected accounts. Pass <code>parent_account_id</code> to return only that parent account's connected accounts.
+     * Lists accounts visible to the credential. User tokens return the user's business accounts; Account API keys return the requesting account and its subaccounts.
      */
     public CompletableFuture<SyncPagingIterable<Account>> list(RequestOptions requestOptions) {
-        return this.rawClient.list(requestOptions).thenApply(response -> response.body());
+        CompletableFuture<WhopApiHttpResponse<SyncPagingIterable<Account>>> rawFuture =
+                this.rawClient.list(requestOptions);
+        CompletableFuture<SyncPagingIterable<Account>> future = rawFuture.thenApply(response -> response.body());
+        future.whenComplete((result_, throwable_) -> {
+            if (future.isCancelled()) {
+                rawFuture.cancel(true);
+            }
+        });
+        return future;
     }
 
     /**
-     * Lists accounts visible to the credential. User tokens return the user's business accounts; Account API keys return the requesting account and its connected accounts. Pass <code>parent_account_id</code> to return only that parent account's connected accounts.
+     * Lists accounts visible to the credential. User tokens return the user's business accounts; Account API keys return the requesting account and its subaccounts.
      */
     public CompletableFuture<SyncPagingIterable<Account>> list(ListAccountsRequest request) {
-        return this.rawClient.list(request).thenApply(response -> response.body());
+        CompletableFuture<WhopApiHttpResponse<SyncPagingIterable<Account>>> rawFuture = this.rawClient.list(request);
+        CompletableFuture<SyncPagingIterable<Account>> future = rawFuture.thenApply(response -> response.body());
+        future.whenComplete((result_, throwable_) -> {
+            if (future.isCancelled()) {
+                rawFuture.cancel(true);
+            }
+        });
+        return future;
     }
 
     /**
-     * Lists accounts visible to the credential. User tokens return the user's business accounts; Account API keys return the requesting account and its connected accounts. Pass <code>parent_account_id</code> to return only that parent account's connected accounts.
+     * Lists accounts visible to the credential. User tokens return the user's business accounts; Account API keys return the requesting account and its subaccounts.
      */
     public CompletableFuture<SyncPagingIterable<Account>> list(
             ListAccountsRequest request, RequestOptions requestOptions) {
-        return this.rawClient.list(request, requestOptions).thenApply(response -> response.body());
+        CompletableFuture<WhopApiHttpResponse<SyncPagingIterable<Account>>> rawFuture =
+                this.rawClient.list(request, requestOptions);
+        CompletableFuture<SyncPagingIterable<Account>> future = rawFuture.thenApply(response -> response.body());
+        future.whenComplete((result_, throwable_) -> {
+            if (future.isCancelled()) {
+                rawFuture.cancel(true);
+            }
+        });
+        return future;
     }
 
     /**
-     * Creates an account. User tokens create business accounts; Account API keys create connected accounts. Tax fields (<code>tax_remitted_by</code>, <code>tax_type</code>, <code>product_tax_code_id</code>, <code>business_address</code>, <code>tax_identifiers</code>) are configured with Update Account, not at creation.
+     * Creates an account. User tokens create business accounts; Account API keys create subaccounts. Tax fields (<code>tax_remitted_by</code>, <code>tax_type</code>, <code>product_tax_code_id</code>, <code>business_address</code>, <code>tax_identifiers</code>) are configured with Update Account, not at creation.
      */
     public CompletableFuture<Account> create() {
-        return this.rawClient.create().thenApply(response -> response.body());
+        CompletableFuture<WhopApiHttpResponse<Account>> rawFuture = this.rawClient.create();
+        CompletableFuture<Account> future = rawFuture.thenApply(response -> response.body());
+        future.whenComplete((result_, throwable_) -> {
+            if (future.isCancelled()) {
+                rawFuture.cancel(true);
+            }
+        });
+        return future;
     }
 
     /**
-     * Creates an account. User tokens create business accounts; Account API keys create connected accounts. Tax fields (<code>tax_remitted_by</code>, <code>tax_type</code>, <code>product_tax_code_id</code>, <code>business_address</code>, <code>tax_identifiers</code>) are configured with Update Account, not at creation.
+     * Creates an account. User tokens create business accounts; Account API keys create subaccounts. Tax fields (<code>tax_remitted_by</code>, <code>tax_type</code>, <code>product_tax_code_id</code>, <code>business_address</code>, <code>tax_identifiers</code>) are configured with Update Account, not at creation.
      */
     public CompletableFuture<Account> create(RequestOptions requestOptions) {
-        return this.rawClient.create(requestOptions).thenApply(response -> response.body());
+        CompletableFuture<WhopApiHttpResponse<Account>> rawFuture = this.rawClient.create(requestOptions);
+        CompletableFuture<Account> future = rawFuture.thenApply(response -> response.body());
+        future.whenComplete((result_, throwable_) -> {
+            if (future.isCancelled()) {
+                rawFuture.cancel(true);
+            }
+        });
+        return future;
     }
 
     /**
-     * Creates an account. User tokens create business accounts; Account API keys create connected accounts. Tax fields (<code>tax_remitted_by</code>, <code>tax_type</code>, <code>product_tax_code_id</code>, <code>business_address</code>, <code>tax_identifiers</code>) are configured with Update Account, not at creation.
+     * Creates an account. User tokens create business accounts; Account API keys create subaccounts. Tax fields (<code>tax_remitted_by</code>, <code>tax_type</code>, <code>product_tax_code_id</code>, <code>business_address</code>, <code>tax_identifiers</code>) are configured with Update Account, not at creation.
      */
     public CompletableFuture<Account> create(CreateAccountsRequest request) {
-        return this.rawClient.create(request).thenApply(response -> response.body());
+        CompletableFuture<WhopApiHttpResponse<Account>> rawFuture = this.rawClient.create(request);
+        CompletableFuture<Account> future = rawFuture.thenApply(response -> response.body());
+        future.whenComplete((result_, throwable_) -> {
+            if (future.isCancelled()) {
+                rawFuture.cancel(true);
+            }
+        });
+        return future;
     }
 
     /**
-     * Creates an account. User tokens create business accounts; Account API keys create connected accounts. Tax fields (<code>tax_remitted_by</code>, <code>tax_type</code>, <code>product_tax_code_id</code>, <code>business_address</code>, <code>tax_identifiers</code>) are configured with Update Account, not at creation.
+     * Creates an account. User tokens create business accounts; Account API keys create subaccounts. Tax fields (<code>tax_remitted_by</code>, <code>tax_type</code>, <code>product_tax_code_id</code>, <code>business_address</code>, <code>tax_identifiers</code>) are configured with Update Account, not at creation.
      */
     public CompletableFuture<Account> create(CreateAccountsRequest request, RequestOptions requestOptions) {
-        return this.rawClient.create(request, requestOptions).thenApply(response -> response.body());
+        CompletableFuture<WhopApiHttpResponse<Account>> rawFuture = this.rawClient.create(request, requestOptions);
+        CompletableFuture<Account> future = rawFuture.thenApply(response -> response.body());
+        future.whenComplete((result_, throwable_) -> {
+            if (future.isCancelled()) {
+                rawFuture.cancel(true);
+            }
+        });
+        return future;
     }
 
     /**
      * Retrieves the account associated with the current Account API key.
      */
     public CompletableFuture<Account> me() {
-        return this.rawClient.me().thenApply(response -> response.body());
+        CompletableFuture<WhopApiHttpResponse<Account>> rawFuture = this.rawClient.me();
+        CompletableFuture<Account> future = rawFuture.thenApply(response -> response.body());
+        future.whenComplete((result_, throwable_) -> {
+            if (future.isCancelled()) {
+                rawFuture.cancel(true);
+            }
+        });
+        return future;
     }
 
     /**
      * Retrieves the account associated with the current Account API key.
      */
     public CompletableFuture<Account> me(RequestOptions requestOptions) {
-        return this.rawClient.me(requestOptions).thenApply(response -> response.body());
+        CompletableFuture<WhopApiHttpResponse<Account>> rawFuture = this.rawClient.me(requestOptions);
+        CompletableFuture<Account> future = rawFuture.thenApply(response -> response.body());
+        future.whenComplete((result_, throwable_) -> {
+            if (future.isCancelled()) {
+                rawFuture.cancel(true);
+            }
+        });
+        return future;
     }
 
     /**
-     * Retrieves a single account by ID or public route when it is visible to the credential, including its crypto wallet. The reserved id <code>me</code> retrieves the account associated with the current Account API key; user tokens have no single account, so they must address one by ID or route.
+     * Retrieves the account associated with the current Account API key.
+     */
+    public CompletableFuture<Account> me(MeAccountsRequest request) {
+        CompletableFuture<WhopApiHttpResponse<Account>> rawFuture = this.rawClient.me(request);
+        CompletableFuture<Account> future = rawFuture.thenApply(response -> response.body());
+        future.whenComplete((result_, throwable_) -> {
+            if (future.isCancelled()) {
+                rawFuture.cancel(true);
+            }
+        });
+        return future;
+    }
+
+    /**
+     * Retrieves the account associated with the current Account API key.
+     */
+    public CompletableFuture<Account> me(MeAccountsRequest request, RequestOptions requestOptions) {
+        CompletableFuture<WhopApiHttpResponse<Account>> rawFuture = this.rawClient.me(request, requestOptions);
+        CompletableFuture<Account> future = rawFuture.thenApply(response -> response.body());
+        future.whenComplete((result_, throwable_) -> {
+            if (future.isCancelled()) {
+                rawFuture.cancel(true);
+            }
+        });
+        return future;
+    }
+
+    /**
+     * Finds accounts by name among the accounts the credential can list. Support searches cover every company and return only the 50 best matches.
+     */
+    public CompletableFuture<SyncPagingIterable<AccountSearchResult>> search(SearchAccountsRequest request) {
+        CompletableFuture<WhopApiHttpResponse<SyncPagingIterable<AccountSearchResult>>> rawFuture =
+                this.rawClient.search(request);
+        CompletableFuture<SyncPagingIterable<AccountSearchResult>> future =
+                rawFuture.thenApply(response -> response.body());
+        future.whenComplete((result_, throwable_) -> {
+            if (future.isCancelled()) {
+                rawFuture.cancel(true);
+            }
+        });
+        return future;
+    }
+
+    /**
+     * Finds accounts by name among the accounts the credential can list. Support searches cover every company and return only the 50 best matches.
+     */
+    public CompletableFuture<SyncPagingIterable<AccountSearchResult>> search(
+            SearchAccountsRequest request, RequestOptions requestOptions) {
+        CompletableFuture<WhopApiHttpResponse<SyncPagingIterable<AccountSearchResult>>> rawFuture =
+                this.rawClient.search(request, requestOptions);
+        CompletableFuture<SyncPagingIterable<AccountSearchResult>> future =
+                rawFuture.thenApply(response -> response.body());
+        future.whenComplete((result_, throwable_) -> {
+            if (future.isCancelled()) {
+                rawFuture.cancel(true);
+            }
+        });
+        return future;
+    }
+
+    /**
+     * Retrieves an account visible to the credential by ID or public route, including its crypto wallet.
      */
     public CompletableFuture<Account> retrieve(String id) {
-        return this.rawClient.retrieve(id).thenApply(response -> response.body());
+        CompletableFuture<WhopApiHttpResponse<Account>> rawFuture = this.rawClient.retrieve(id);
+        CompletableFuture<Account> future = rawFuture.thenApply(response -> response.body());
+        future.whenComplete((result_, throwable_) -> {
+            if (future.isCancelled()) {
+                rawFuture.cancel(true);
+            }
+        });
+        return future;
     }
 
     /**
-     * Retrieves a single account by ID or public route when it is visible to the credential, including its crypto wallet. The reserved id <code>me</code> retrieves the account associated with the current Account API key; user tokens have no single account, so they must address one by ID or route.
+     * Retrieves an account visible to the credential by ID or public route, including its crypto wallet.
      */
     public CompletableFuture<Account> retrieve(String id, RequestOptions requestOptions) {
-        return this.rawClient.retrieve(id, requestOptions).thenApply(response -> response.body());
+        CompletableFuture<WhopApiHttpResponse<Account>> rawFuture = this.rawClient.retrieve(id, requestOptions);
+        CompletableFuture<Account> future = rawFuture.thenApply(response -> response.body());
+        future.whenComplete((result_, throwable_) -> {
+            if (future.isCancelled()) {
+                rawFuture.cancel(true);
+            }
+        });
+        return future;
     }
 
     /**
-     * Retrieves a single account by ID or public route when it is visible to the credential, including its crypto wallet. The reserved id <code>me</code> retrieves the account associated with the current Account API key; user tokens have no single account, so they must address one by ID or route.
+     * Retrieves an account visible to the credential by ID or public route, including its crypto wallet.
      */
     public CompletableFuture<Account> retrieve(String id, RetrieveAccountsRequest request) {
-        return this.rawClient.retrieve(id, request).thenApply(response -> response.body());
+        CompletableFuture<WhopApiHttpResponse<Account>> rawFuture = this.rawClient.retrieve(id, request);
+        CompletableFuture<Account> future = rawFuture.thenApply(response -> response.body());
+        future.whenComplete((result_, throwable_) -> {
+            if (future.isCancelled()) {
+                rawFuture.cancel(true);
+            }
+        });
+        return future;
     }
 
     /**
-     * Retrieves a single account by ID or public route when it is visible to the credential, including its crypto wallet. The reserved id <code>me</code> retrieves the account associated with the current Account API key; user tokens have no single account, so they must address one by ID or route.
+     * Retrieves an account visible to the credential by ID or public route, including its crypto wallet.
      */
     public CompletableFuture<Account> retrieve(
             String id, RetrieveAccountsRequest request, RequestOptions requestOptions) {
-        return this.rawClient.retrieve(id, request, requestOptions).thenApply(response -> response.body());
+        CompletableFuture<WhopApiHttpResponse<Account>> rawFuture =
+                this.rawClient.retrieve(id, request, requestOptions);
+        CompletableFuture<Account> future = rawFuture.thenApply(response -> response.body());
+        future.whenComplete((result_, throwable_) -> {
+            if (future.isCancelled()) {
+                rawFuture.cancel(true);
+            }
+        });
+        return future;
     }
 
     /**
-     * Updates an account. User tokens can update business accounts; Account API keys can update connected accounts. The reserved id <code>me</code> — accepted on Retrieve Account — resolves to the requesting account, which an Account API key cannot edit, so updates must name the connected account by its <code>biz_</code> id.
+     * Deletes a subaccount directly owned by the authenticated platform account. The account must have no settled, pending, or reserved balance in any currency and no active, trialing, or past-due memberships. The account stops resolving immediately, and its products, plans, and team access are removed in the background; payment history is retained. Deletion cannot be undone through the API. This cannot delete the platform account itself or an account owned by another platform.
+     */
+    public CompletableFuture<DeleteAccountsResponse> delete(String id) {
+        CompletableFuture<WhopApiHttpResponse<DeleteAccountsResponse>> rawFuture = this.rawClient.delete(id);
+        CompletableFuture<DeleteAccountsResponse> future = rawFuture.thenApply(response -> response.body());
+        future.whenComplete((result_, throwable_) -> {
+            if (future.isCancelled()) {
+                rawFuture.cancel(true);
+            }
+        });
+        return future;
+    }
+
+    /**
+     * Deletes a subaccount directly owned by the authenticated platform account. The account must have no settled, pending, or reserved balance in any currency and no active, trialing, or past-due memberships. The account stops resolving immediately, and its products, plans, and team access are removed in the background; payment history is retained. Deletion cannot be undone through the API. This cannot delete the platform account itself or an account owned by another platform.
+     */
+    public CompletableFuture<DeleteAccountsResponse> delete(String id, RequestOptions requestOptions) {
+        CompletableFuture<WhopApiHttpResponse<DeleteAccountsResponse>> rawFuture =
+                this.rawClient.delete(id, requestOptions);
+        CompletableFuture<DeleteAccountsResponse> future = rawFuture.thenApply(response -> response.body());
+        future.whenComplete((result_, throwable_) -> {
+            if (future.isCancelled()) {
+                rawFuture.cancel(true);
+            }
+        });
+        return future;
+    }
+
+    /**
+     * Deletes a subaccount directly owned by the authenticated platform account. The account must have no settled, pending, or reserved balance in any currency and no active, trialing, or past-due memberships. The account stops resolving immediately, and its products, plans, and team access are removed in the background; payment history is retained. Deletion cannot be undone through the API. This cannot delete the platform account itself or an account owned by another platform.
+     */
+    public CompletableFuture<DeleteAccountsResponse> delete(String id, DeleteAccountsRequest request) {
+        CompletableFuture<WhopApiHttpResponse<DeleteAccountsResponse>> rawFuture = this.rawClient.delete(id, request);
+        CompletableFuture<DeleteAccountsResponse> future = rawFuture.thenApply(response -> response.body());
+        future.whenComplete((result_, throwable_) -> {
+            if (future.isCancelled()) {
+                rawFuture.cancel(true);
+            }
+        });
+        return future;
+    }
+
+    /**
+     * Deletes a subaccount directly owned by the authenticated platform account. The account must have no settled, pending, or reserved balance in any currency and no active, trialing, or past-due memberships. The account stops resolving immediately, and its products, plans, and team access are removed in the background; payment history is retained. Deletion cannot be undone through the API. This cannot delete the platform account itself or an account owned by another platform.
+     */
+    public CompletableFuture<DeleteAccountsResponse> delete(
+            String id, DeleteAccountsRequest request, RequestOptions requestOptions) {
+        CompletableFuture<WhopApiHttpResponse<DeleteAccountsResponse>> rawFuture =
+                this.rawClient.delete(id, request, requestOptions);
+        CompletableFuture<DeleteAccountsResponse> future = rawFuture.thenApply(response -> response.body());
+        future.whenComplete((result_, throwable_) -> {
+            if (future.isCancelled()) {
+                rawFuture.cancel(true);
+            }
+        });
+        return future;
+    }
+
+    /**
+     * Updates an account. User tokens can update business accounts; Account API keys can update subaccounts.
      */
     public CompletableFuture<Account> update(String id) {
-        return this.rawClient.update(id).thenApply(response -> response.body());
+        CompletableFuture<WhopApiHttpResponse<Account>> rawFuture = this.rawClient.update(id);
+        CompletableFuture<Account> future = rawFuture.thenApply(response -> response.body());
+        future.whenComplete((result_, throwable_) -> {
+            if (future.isCancelled()) {
+                rawFuture.cancel(true);
+            }
+        });
+        return future;
     }
 
     /**
-     * Updates an account. User tokens can update business accounts; Account API keys can update connected accounts. The reserved id <code>me</code> — accepted on Retrieve Account — resolves to the requesting account, which an Account API key cannot edit, so updates must name the connected account by its <code>biz_</code> id.
+     * Updates an account. User tokens can update business accounts; Account API keys can update subaccounts.
      */
     public CompletableFuture<Account> update(String id, RequestOptions requestOptions) {
-        return this.rawClient.update(id, requestOptions).thenApply(response -> response.body());
+        CompletableFuture<WhopApiHttpResponse<Account>> rawFuture = this.rawClient.update(id, requestOptions);
+        CompletableFuture<Account> future = rawFuture.thenApply(response -> response.body());
+        future.whenComplete((result_, throwable_) -> {
+            if (future.isCancelled()) {
+                rawFuture.cancel(true);
+            }
+        });
+        return future;
     }
 
     /**
-     * Updates an account. User tokens can update business accounts; Account API keys can update connected accounts. The reserved id <code>me</code> — accepted on Retrieve Account — resolves to the requesting account, which an Account API key cannot edit, so updates must name the connected account by its <code>biz_</code> id.
+     * Updates an account. User tokens can update business accounts; Account API keys can update subaccounts.
      */
     public CompletableFuture<Account> update(String id, UpdateAccountsRequest request) {
-        return this.rawClient.update(id, request).thenApply(response -> response.body());
+        CompletableFuture<WhopApiHttpResponse<Account>> rawFuture = this.rawClient.update(id, request);
+        CompletableFuture<Account> future = rawFuture.thenApply(response -> response.body());
+        future.whenComplete((result_, throwable_) -> {
+            if (future.isCancelled()) {
+                rawFuture.cancel(true);
+            }
+        });
+        return future;
     }
 
     /**
-     * Updates an account. User tokens can update business accounts; Account API keys can update connected accounts. The reserved id <code>me</code> — accepted on Retrieve Account — resolves to the requesting account, which an Account API key cannot edit, so updates must name the connected account by its <code>biz_</code> id.
+     * Updates an account. User tokens can update business accounts; Account API keys can update subaccounts.
      */
     public CompletableFuture<Account> update(String id, UpdateAccountsRequest request, RequestOptions requestOptions) {
-        return this.rawClient.update(id, request, requestOptions).thenApply(response -> response.body());
+        CompletableFuture<WhopApiHttpResponse<Account>> rawFuture = this.rawClient.update(id, request, requestOptions);
+        CompletableFuture<Account> future = rawFuture.thenApply(response -> response.body());
+        future.whenComplete((result_, throwable_) -> {
+            if (future.isCancelled()) {
+                rawFuture.cancel(true);
+            }
+        });
+        return future;
     }
 
     /**
-     * Starts an LLC or C-Corp formation for a business account. Defaults to an LLC; set <code>entity_type</code> to <code>c_corp</code> to form a C-Corp, which additionally requires <code>share_structure</code> and officer <code>roles</code> on every founder. On submission, the application is validated and the response returns a hosted checkout URL. Once paid, the filing is submitted. Track progress through the account's <a href="/api-reference/beta/accounts/retrieve-account"><code>company_formation</code></a> field on Retrieve Account.
+     * Starts an LLC or C-Corp formation for a business account. The application is validated and the response returns a hosted checkout URL; once paid, the filing is submitted. Track progress through the account's <a href="/api-reference/accounts/retrieve-account"><code>company_formation</code></a> field on Retrieve Account.
      */
     public CompletableFuture<FormCompanyAccountsResponse> formCompany(String id, FormCompanyAccountsRequest request) {
-        return this.rawClient.formCompany(id, request).thenApply(response -> response.body());
+        CompletableFuture<WhopApiHttpResponse<FormCompanyAccountsResponse>> rawFuture =
+                this.rawClient.formCompany(id, request);
+        CompletableFuture<FormCompanyAccountsResponse> future = rawFuture.thenApply(response -> response.body());
+        future.whenComplete((result_, throwable_) -> {
+            if (future.isCancelled()) {
+                rawFuture.cancel(true);
+            }
+        });
+        return future;
     }
 
     /**
-     * Starts an LLC or C-Corp formation for a business account. Defaults to an LLC; set <code>entity_type</code> to <code>c_corp</code> to form a C-Corp, which additionally requires <code>share_structure</code> and officer <code>roles</code> on every founder. On submission, the application is validated and the response returns a hosted checkout URL. Once paid, the filing is submitted. Track progress through the account's <a href="/api-reference/beta/accounts/retrieve-account"><code>company_formation</code></a> field on Retrieve Account.
+     * Starts an LLC or C-Corp formation for a business account. The application is validated and the response returns a hosted checkout URL; once paid, the filing is submitted. Track progress through the account's <a href="/api-reference/accounts/retrieve-account"><code>company_formation</code></a> field on Retrieve Account.
      */
     public CompletableFuture<FormCompanyAccountsResponse> formCompany(
             String id, FormCompanyAccountsRequest request, RequestOptions requestOptions) {
-        return this.rawClient.formCompany(id, request, requestOptions).thenApply(response -> response.body());
+        CompletableFuture<WhopApiHttpResponse<FormCompanyAccountsResponse>> rawFuture =
+                this.rawClient.formCompany(id, request, requestOptions);
+        CompletableFuture<FormCompanyAccountsResponse> future = rawFuture.thenApply(response -> response.body());
+        future.whenComplete((result_, throwable_) -> {
+            if (future.isCancelled()) {
+                rawFuture.cancel(true);
+            }
+        });
+        return future;
     }
 
     /**
-     * Transfers ownership of the account to another user, identified by user ID or email address. If the recipient already holds the owner role, ownership moves immediately; otherwise they get an invite and ownership moves when they accept.
+     * Queues one background retry of the account's failed ads payments across its campaigns, using the account's configured ads payment methods. A queued response does not mean payment succeeded; read each campaign's <code>delivery_status</code> and <code>issues</code> for the outcome. Successful settlement clears the payment block without changing a configured <code>active</code> or <code>paused</code> status; a legacy <code>payment_failed</code> status becomes <code>paused</code>. Returns an error when the account has no failed ads payments, or while a previous retry for the account is queued or running.
+     */
+    public CompletableFuture<RetryAdsPaymentAccountsResponse> retryAdsPayment(String id) {
+        CompletableFuture<WhopApiHttpResponse<RetryAdsPaymentAccountsResponse>> rawFuture =
+                this.rawClient.retryAdsPayment(id);
+        CompletableFuture<RetryAdsPaymentAccountsResponse> future = rawFuture.thenApply(response -> response.body());
+        future.whenComplete((result_, throwable_) -> {
+            if (future.isCancelled()) {
+                rawFuture.cancel(true);
+            }
+        });
+        return future;
+    }
+
+    /**
+     * Queues one background retry of the account's failed ads payments across its campaigns, using the account's configured ads payment methods. A queued response does not mean payment succeeded; read each campaign's <code>delivery_status</code> and <code>issues</code> for the outcome. Successful settlement clears the payment block without changing a configured <code>active</code> or <code>paused</code> status; a legacy <code>payment_failed</code> status becomes <code>paused</code>. Returns an error when the account has no failed ads payments, or while a previous retry for the account is queued or running.
+     */
+    public CompletableFuture<RetryAdsPaymentAccountsResponse> retryAdsPayment(
+            String id, RequestOptions requestOptions) {
+        CompletableFuture<WhopApiHttpResponse<RetryAdsPaymentAccountsResponse>> rawFuture =
+                this.rawClient.retryAdsPayment(id, requestOptions);
+        CompletableFuture<RetryAdsPaymentAccountsResponse> future = rawFuture.thenApply(response -> response.body());
+        future.whenComplete((result_, throwable_) -> {
+            if (future.isCancelled()) {
+                rawFuture.cancel(true);
+            }
+        });
+        return future;
+    }
+
+    /**
+     * Queues one background retry of the account's failed ads payments across its campaigns, using the account's configured ads payment methods. A queued response does not mean payment succeeded; read each campaign's <code>delivery_status</code> and <code>issues</code> for the outcome. Successful settlement clears the payment block without changing a configured <code>active</code> or <code>paused</code> status; a legacy <code>payment_failed</code> status becomes <code>paused</code>. Returns an error when the account has no failed ads payments, or while a previous retry for the account is queued or running.
+     */
+    public CompletableFuture<RetryAdsPaymentAccountsResponse> retryAdsPayment(
+            String id, RetryAdsPaymentAccountsRequest request) {
+        CompletableFuture<WhopApiHttpResponse<RetryAdsPaymentAccountsResponse>> rawFuture =
+                this.rawClient.retryAdsPayment(id, request);
+        CompletableFuture<RetryAdsPaymentAccountsResponse> future = rawFuture.thenApply(response -> response.body());
+        future.whenComplete((result_, throwable_) -> {
+            if (future.isCancelled()) {
+                rawFuture.cancel(true);
+            }
+        });
+        return future;
+    }
+
+    /**
+     * Queues one background retry of the account's failed ads payments across its campaigns, using the account's configured ads payment methods. A queued response does not mean payment succeeded; read each campaign's <code>delivery_status</code> and <code>issues</code> for the outcome. Successful settlement clears the payment block without changing a configured <code>active</code> or <code>paused</code> status; a legacy <code>payment_failed</code> status becomes <code>paused</code>. Returns an error when the account has no failed ads payments, or while a previous retry for the account is queued or running.
+     */
+    public CompletableFuture<RetryAdsPaymentAccountsResponse> retryAdsPayment(
+            String id, RetryAdsPaymentAccountsRequest request, RequestOptions requestOptions) {
+        CompletableFuture<WhopApiHttpResponse<RetryAdsPaymentAccountsResponse>> rawFuture =
+                this.rawClient.retryAdsPayment(id, request, requestOptions);
+        CompletableFuture<RetryAdsPaymentAccountsResponse> future = rawFuture.thenApply(response -> response.body());
+        future.whenComplete((result_, throwable_) -> {
+            if (future.isCancelled()) {
+                rawFuture.cancel(true);
+            }
+        });
+        return future;
+    }
+
+    /**
+     * Suspends a subaccount directly owned by the authenticated platform account. This cannot suspend the platform account itself or an account owned by another platform.
+     */
+    public CompletableFuture<Account> suspend(String id) {
+        CompletableFuture<WhopApiHttpResponse<Account>> rawFuture = this.rawClient.suspend(id);
+        CompletableFuture<Account> future = rawFuture.thenApply(response -> response.body());
+        future.whenComplete((result_, throwable_) -> {
+            if (future.isCancelled()) {
+                rawFuture.cancel(true);
+            }
+        });
+        return future;
+    }
+
+    /**
+     * Suspends a subaccount directly owned by the authenticated platform account. This cannot suspend the platform account itself or an account owned by another platform.
+     */
+    public CompletableFuture<Account> suspend(String id, RequestOptions requestOptions) {
+        CompletableFuture<WhopApiHttpResponse<Account>> rawFuture = this.rawClient.suspend(id, requestOptions);
+        CompletableFuture<Account> future = rawFuture.thenApply(response -> response.body());
+        future.whenComplete((result_, throwable_) -> {
+            if (future.isCancelled()) {
+                rawFuture.cancel(true);
+            }
+        });
+        return future;
+    }
+
+    /**
+     * Suspends a subaccount directly owned by the authenticated platform account. This cannot suspend the platform account itself or an account owned by another platform.
+     */
+    public CompletableFuture<Account> suspend(String id, SuspendAccountsRequest request) {
+        CompletableFuture<WhopApiHttpResponse<Account>> rawFuture = this.rawClient.suspend(id, request);
+        CompletableFuture<Account> future = rawFuture.thenApply(response -> response.body());
+        future.whenComplete((result_, throwable_) -> {
+            if (future.isCancelled()) {
+                rawFuture.cancel(true);
+            }
+        });
+        return future;
+    }
+
+    /**
+     * Suspends a subaccount directly owned by the authenticated platform account. This cannot suspend the platform account itself or an account owned by another platform.
+     */
+    public CompletableFuture<Account> suspend(
+            String id, SuspendAccountsRequest request, RequestOptions requestOptions) {
+        CompletableFuture<WhopApiHttpResponse<Account>> rawFuture = this.rawClient.suspend(id, request, requestOptions);
+        CompletableFuture<Account> future = rawFuture.thenApply(response -> response.body());
+        future.whenComplete((result_, throwable_) -> {
+            if (future.isCancelled()) {
+                rawFuture.cancel(true);
+            }
+        });
+        return future;
+    }
+
+    /**
+     * Transfers ownership of the account to another user, identified by user ID or email address. If the recipient already holds the owner role, ownership moves immediately; otherwise they get an invite and ownership moves when they accept. The Whop CLI and MCP can hand off a business their user owns as a partner (<code>as_partner: true</code>) with the <code>partner:handoff</code> scope; other OAuth apps cannot transfer ownership.
      */
     public CompletableFuture<TransferOwnershipAccountsResponse> transferOwnership(
             String id, TransferOwnershipAccountsRequest request) {
-        return this.rawClient.transferOwnership(id, request).thenApply(response -> response.body());
+        CompletableFuture<WhopApiHttpResponse<TransferOwnershipAccountsResponse>> rawFuture =
+                this.rawClient.transferOwnership(id, request);
+        CompletableFuture<TransferOwnershipAccountsResponse> future = rawFuture.thenApply(response -> response.body());
+        future.whenComplete((result_, throwable_) -> {
+            if (future.isCancelled()) {
+                rawFuture.cancel(true);
+            }
+        });
+        return future;
     }
 
     /**
-     * Transfers ownership of the account to another user, identified by user ID or email address. If the recipient already holds the owner role, ownership moves immediately; otherwise they get an invite and ownership moves when they accept.
+     * Transfers ownership of the account to another user, identified by user ID or email address. If the recipient already holds the owner role, ownership moves immediately; otherwise they get an invite and ownership moves when they accept. The Whop CLI and MCP can hand off a business their user owns as a partner (<code>as_partner: true</code>) with the <code>partner:handoff</code> scope; other OAuth apps cannot transfer ownership.
      */
     public CompletableFuture<TransferOwnershipAccountsResponse> transferOwnership(
             String id, TransferOwnershipAccountsRequest request, RequestOptions requestOptions) {
-        return this.rawClient.transferOwnership(id, request, requestOptions).thenApply(response -> response.body());
+        CompletableFuture<WhopApiHttpResponse<TransferOwnershipAccountsResponse>> rawFuture =
+                this.rawClient.transferOwnership(id, request, requestOptions);
+        CompletableFuture<TransferOwnershipAccountsResponse> future = rawFuture.thenApply(response -> response.body());
+        future.whenComplete((result_, throwable_) -> {
+            if (future.isCancelled()) {
+                rawFuture.cancel(true);
+            }
+        });
+        return future;
+    }
+
+    public AsyncCustomerTrackingClient customerTracking() {
+        return this.customerTrackingClient.get();
+    }
+
+    public AsyncFeesClient fees() {
+        return this.feesClient.get();
+    }
+
+    public AsyncFinancingProvidersClient financingProviders() {
+        return this.financingProvidersClient.get();
     }
 
     public AsyncPreferencesClient preferences() {

@@ -48,6 +48,8 @@ public final class CreateVerificationsRequestBodyIndividual {
 
     private final Optional<String> taxIdentificationNumber;
 
+    private final Optional<String> verificationId;
+
     private final Map<String, Object> additionalProperties;
 
     private CreateVerificationsRequestBodyIndividual(
@@ -65,6 +67,7 @@ public final class CreateVerificationsRequestBodyIndividual {
             Optional<String> phone,
             Optional<String> shareToken,
             Optional<String> taxIdentificationNumber,
+            Optional<String> verificationId,
             Map<String, Object> additionalProperties) {
         this.address = address;
         this.businessName = businessName;
@@ -80,6 +83,7 @@ public final class CreateVerificationsRequestBodyIndividual {
         this.phone = phone;
         this.shareToken = shareToken;
         this.taxIdentificationNumber = taxIdentificationNumber;
+        this.verificationId = verificationId;
         this.additionalProperties = additionalProperties;
     }
 
@@ -140,7 +144,7 @@ public final class CreateVerificationsRequestBodyIndividual {
     }
 
     /**
-     * @return Identity document being sent, when verifying with <code>documents</code>. Decides exactly which file slots to send: <code>ID_CARD</code> → <code>id_card_front</code> + <code>id_card_back</code> + <code>selfie</code>; <code>DRIVERS</code> → <code>drivers_front</code> + <code>drivers_back</code> + <code>selfie</code>; <code>RESIDENCE_PERMIT</code> → <code>residence_permit_front</code> + <code>residence_permit_back</code> + <code>selfie</code>; <code>PASSPORT</code> → <code>passport_front</code> + <code>selfie</code>. See <a href="/developer/verification/identity-documents">Identity documents</a>.
+     * @return Identity document being sent, when verifying with <code>documents</code>. Decides exactly which file slots to send: <code>id_card</code> → <code>id_card_front</code> + <code>id_card_back</code> + <code>selfie</code>; <code>drivers</code> → <code>drivers_front</code> + <code>drivers_back</code> + <code>selfie</code>; <code>residence_permit</code> → <code>residence_permit_front</code> + <code>residence_permit_back</code> + <code>selfie</code>; <code>passport</code> → <code>passport_front</code> + <code>selfie</code>. See <a href="/developer/verification/identity-documents">Identity documents</a>.
      */
     @JsonProperty("document_type")
     public Optional<CreateVerificationsRequestBodyIndividualDocumentType> getDocumentType() {
@@ -186,6 +190,14 @@ public final class CreateVerificationsRequestBodyIndividual {
         return taxIdentificationNumber;
     }
 
+    /**
+     * @return ID of an <code>approved</code> verification to reuse on this account instead of verifying the person again, for example <code>idpf_XXXXXXXX</code>. The verification becomes this account's current one for its kind — replacing whichever verification of that kind the account already has, and carrying its payout account across — and the response is that same verification, unchanged. Only the signed-in Whop user who started the original verification can reuse it: API keys, OAuth tokens, and onboarding links are refused. <code>kind</code> is the only other field it accepts, and must match the reused verification. An account whose verification was denied or is still under review cannot reuse one.
+     */
+    @JsonProperty("verification_id")
+    public Optional<String> getVerificationId() {
+        return verificationId;
+    }
+
     @java.lang.Override
     public boolean equals(Object other) {
         if (this == other) return true;
@@ -212,7 +224,8 @@ public final class CreateVerificationsRequestBodyIndividual {
                 && lastName.equals(other.lastName)
                 && phone.equals(other.phone)
                 && shareToken.equals(other.shareToken)
-                && taxIdentificationNumber.equals(other.taxIdentificationNumber);
+                && taxIdentificationNumber.equals(other.taxIdentificationNumber)
+                && verificationId.equals(other.verificationId);
     }
 
     @java.lang.Override
@@ -231,7 +244,8 @@ public final class CreateVerificationsRequestBodyIndividual {
                 this.lastName,
                 this.phone,
                 this.shareToken,
-                this.taxIdentificationNumber);
+                this.taxIdentificationNumber,
+                this.verificationId);
     }
 
     @java.lang.Override
@@ -273,7 +287,8 @@ public final class CreateVerificationsRequestBodyIndividual {
 
         private Optional<String> taxIdentificationNumber = Optional.empty();
 
-        @JsonAnySetter
+        private Optional<String> verificationId = Optional.empty();
+
         private Map<String, Object> additionalProperties = new HashMap<>();
 
         private Builder() {}
@@ -293,6 +308,7 @@ public final class CreateVerificationsRequestBodyIndividual {
             phone(other.getPhone());
             shareToken(other.getShareToken());
             taxIdentificationNumber(other.getTaxIdentificationNumber());
+            verificationId(other.getVerificationId());
             return this;
         }
 
@@ -395,7 +411,7 @@ public final class CreateVerificationsRequestBodyIndividual {
         }
 
         /**
-         * <p>Identity document being sent, when verifying with <code>documents</code>. Decides exactly which file slots to send: <code>ID_CARD</code> → <code>id_card_front</code> + <code>id_card_back</code> + <code>selfie</code>; <code>DRIVERS</code> → <code>drivers_front</code> + <code>drivers_back</code> + <code>selfie</code>; <code>RESIDENCE_PERMIT</code> → <code>residence_permit_front</code> + <code>residence_permit_back</code> + <code>selfie</code>; <code>PASSPORT</code> → <code>passport_front</code> + <code>selfie</code>. See <a href="/developer/verification/identity-documents">Identity documents</a>.</p>
+         * <p>Identity document being sent, when verifying with <code>documents</code>. Decides exactly which file slots to send: <code>id_card</code> → <code>id_card_front</code> + <code>id_card_back</code> + <code>selfie</code>; <code>drivers</code> → <code>drivers_front</code> + <code>drivers_back</code> + <code>selfie</code>; <code>residence_permit</code> → <code>residence_permit_front</code> + <code>residence_permit_back</code> + <code>selfie</code>; <code>passport</code> → <code>passport_front</code> + <code>selfie</code>. See <a href="/developer/verification/identity-documents">Identity documents</a>.</p>
          */
         @JsonSetter(value = "document_type", nulls = Nulls.SKIP)
         public Builder documentType(Optional<CreateVerificationsRequestBodyIndividualDocumentType> documentType) {
@@ -483,6 +499,20 @@ public final class CreateVerificationsRequestBodyIndividual {
             return this;
         }
 
+        /**
+         * <p>ID of an <code>approved</code> verification to reuse on this account instead of verifying the person again, for example <code>idpf_XXXXXXXX</code>. The verification becomes this account's current one for its kind — replacing whichever verification of that kind the account already has, and carrying its payout account across — and the response is that same verification, unchanged. Only the signed-in Whop user who started the original verification can reuse it: API keys, OAuth tokens, and onboarding links are refused. <code>kind</code> is the only other field it accepts, and must match the reused verification. An account whose verification was denied or is still under review cannot reuse one.</p>
+         */
+        @JsonSetter(value = "verification_id", nulls = Nulls.SKIP)
+        public Builder verificationId(Optional<String> verificationId) {
+            this.verificationId = verificationId;
+            return this;
+        }
+
+        public Builder verificationId(String verificationId) {
+            this.verificationId = Optional.ofNullable(verificationId);
+            return this;
+        }
+
         public CreateVerificationsRequestBodyIndividual build() {
             return new CreateVerificationsRequestBodyIndividual(
                     address,
@@ -499,7 +529,30 @@ public final class CreateVerificationsRequestBodyIndividual {
                     phone,
                     shareToken,
                     taxIdentificationNumber,
+                    verificationId,
                     additionalProperties);
+        }
+
+        @JsonAnySetter
+        private void putAdditionalPropertyFromJson(String key, Object value) {
+            if (key.equalsIgnoreCase("address")
+                    || key.equalsIgnoreCase("business_name")
+                    || key.equalsIgnoreCase("business_structure")
+                    || key.equalsIgnoreCase("business_tax_identification_number")
+                    || key.equalsIgnoreCase("business_website")
+                    || key.equalsIgnoreCase("country")
+                    || key.equalsIgnoreCase("date_of_birth")
+                    || key.equalsIgnoreCase("document_type")
+                    || key.equalsIgnoreCase("documents")
+                    || key.equalsIgnoreCase("first_name")
+                    || key.equalsIgnoreCase("last_name")
+                    || key.equalsIgnoreCase("phone")
+                    || key.equalsIgnoreCase("share_token")
+                    || key.equalsIgnoreCase("tax_identification_number")
+                    || key.equalsIgnoreCase("verification_id")) {
+                return;
+            }
+            this.additionalProperties.put(key, value);
         }
 
         public Builder additionalProperty(String key, Object value) {

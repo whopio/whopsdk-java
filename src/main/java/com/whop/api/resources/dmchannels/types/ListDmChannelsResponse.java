@@ -114,7 +114,6 @@ public final class ListDmChannelsResponse {
 
         private List<DmChannelListItem> data = new ArrayList<>();
 
-        @JsonAnySetter
         private Map<String, Object> additionalProperties = new HashMap<>();
 
         private Builder() {}
@@ -127,7 +126,6 @@ public final class ListDmChannelsResponse {
         }
 
         /**
-         * <p>Information to aid in pagination.</p>
          * <p>Information to aid in pagination.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
@@ -176,6 +174,14 @@ public final class ListDmChannelsResponse {
         @java.lang.Override
         public ListDmChannelsResponse build() {
             return new ListDmChannelsResponse(data, pageInfo, additionalProperties);
+        }
+
+        @JsonAnySetter
+        private void putAdditionalPropertyFromJson(String key, Object value) {
+            if (key.equalsIgnoreCase("data") || key.equalsIgnoreCase("page_info")) {
+                return;
+            }
+            this.additionalProperties.put(key, value);
         }
 
         @java.lang.Override

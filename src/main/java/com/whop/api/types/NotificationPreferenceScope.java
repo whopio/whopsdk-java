@@ -180,7 +180,6 @@ public final class NotificationPreferenceScope {
 
         private Optional<String> topicId = Optional.empty();
 
-        @JsonAnySetter
         private Map<String, Object> additionalProperties = new HashMap<>();
 
         private Builder() {}
@@ -322,6 +321,18 @@ public final class NotificationPreferenceScope {
         public NotificationPreferenceScope build() {
             return new NotificationPreferenceScope(
                     accountId, channel, experienceId, teamAccountId, topicId, additionalProperties);
+        }
+
+        @JsonAnySetter
+        private void putAdditionalPropertyFromJson(String key, Object value) {
+            if (key.equalsIgnoreCase("account_id")
+                    || key.equalsIgnoreCase("channel")
+                    || key.equalsIgnoreCase("experience_id")
+                    || key.equalsIgnoreCase("team_account_id")
+                    || key.equalsIgnoreCase("topic_id")) {
+                return;
+            }
+            this.additionalProperties.put(key, value);
         }
 
         public Builder additionalProperty(String key, Object value) {

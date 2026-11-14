@@ -333,7 +333,6 @@ public final class AccountRecommendedAction {
 
         private List<String> blockedCapabilities = new ArrayList<>();
 
-        @JsonAnySetter
         private Map<String, Object> additionalProperties = new HashMap<>();
 
         private Builder() {}
@@ -355,7 +354,6 @@ public final class AccountRecommendedAction {
 
         /**
          * <p>The recommendation; new values may be added, so handle unknown actions gracefully</p>
-         * <p>The recommendation; new values may be added, so handle unknown actions gracefully</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
@@ -366,7 +364,6 @@ public final class AccountRecommendedAction {
         }
 
         /**
-         * <p>The URL the call-to-action links to</p>
          * <p>The URL the call-to-action links to</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
@@ -379,7 +376,6 @@ public final class AccountRecommendedAction {
 
         /**
          * <p>Button label</p>
-         * <p>Button label</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
@@ -390,7 +386,6 @@ public final class AccountRecommendedAction {
         }
 
         /**
-         * <p>Supporting copy, or empty</p>
          * <p>Supporting copy, or empty</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
@@ -403,7 +398,6 @@ public final class AccountRecommendedAction {
 
         /**
          * <p>Always optional — never blocking</p>
-         * <p>Always optional — never blocking</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
@@ -414,7 +408,6 @@ public final class AccountRecommendedAction {
         }
 
         /**
-         * <p>Headline for the recommendation</p>
          * <p>Headline for the recommendation</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
@@ -571,6 +564,23 @@ public final class AccountRecommendedAction {
                     status,
                     title,
                     additionalProperties);
+        }
+
+        @JsonAnySetter
+        private void putAdditionalPropertyFromJson(String key, Object value) {
+            if (key.equalsIgnoreCase("action")
+                    || key.equalsIgnoreCase("blocked_capabilities")
+                    || key.equalsIgnoreCase("cta")
+                    || key.equalsIgnoreCase("cta_label")
+                    || key.equalsIgnoreCase("description")
+                    || key.equalsIgnoreCase("icon_url")
+                    || key.equalsIgnoreCase("impact_score")
+                    || key.equalsIgnoreCase("reasoning")
+                    || key.equalsIgnoreCase("status")
+                    || key.equalsIgnoreCase("title")) {
+                return;
+            }
+            this.additionalProperties.put(key, value);
         }
 
         @java.lang.Override

@@ -311,7 +311,6 @@ public final class ListEventsResponseDataItemContext {
 
         private Optional<String> utmTerm = Optional.empty();
 
-        @JsonAnySetter
         private Map<String, Object> additionalProperties = new HashMap<>();
 
         private Builder() {}
@@ -596,6 +595,24 @@ public final class ListEventsResponseDataItemContext {
                     utmSource,
                     utmTerm,
                     additionalProperties);
+        }
+
+        @JsonAnySetter
+        private void putAdditionalPropertyFromJson(String key, Object value) {
+            if (key.equalsIgnoreCase("ad_campaign_id")
+                    || key.equalsIgnoreCase("ad_click_id")
+                    || key.equalsIgnoreCase("ad_click_type")
+                    || key.equalsIgnoreCase("ad_id")
+                    || key.equalsIgnoreCase("ad_set_id")
+                    || key.equalsIgnoreCase("source_type")
+                    || key.equalsIgnoreCase("utm_campaign")
+                    || key.equalsIgnoreCase("utm_content")
+                    || key.equalsIgnoreCase("utm_medium")
+                    || key.equalsIgnoreCase("utm_source")
+                    || key.equalsIgnoreCase("utm_term")) {
+                return;
+            }
+            this.additionalProperties.put(key, value);
         }
 
         public Builder additionalProperty(String key, Object value) {

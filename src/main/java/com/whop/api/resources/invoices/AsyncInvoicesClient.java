@@ -5,28 +5,39 @@ package com.whop.api.resources.invoices;
 
 import com.whop.api.core.ClientOptions;
 import com.whop.api.core.RequestOptions;
+import com.whop.api.core.Suppliers;
+import com.whop.api.core.WhopApiHttpResponse;
 import com.whop.api.core.pagination.SyncPagingIterable;
+import com.whop.api.resources.invoices.requests.ChargeInvoicesRequest;
+import com.whop.api.resources.invoices.requests.CreateInvoicesRequest;
 import com.whop.api.resources.invoices.requests.DeleteInvoicesRequest;
+import com.whop.api.resources.invoices.requests.GeneratePdfInvoicesRequest;
+import com.whop.api.resources.invoices.requests.IssueInvoicesRequest;
 import com.whop.api.resources.invoices.requests.ListInvoicesRequest;
-import com.whop.api.resources.invoices.requests.MarkPaidInvoicesRequest;
 import com.whop.api.resources.invoices.requests.MarkUncollectibleInvoicesRequest;
-import com.whop.api.resources.invoices.requests.ResendInvoicesRequest;
 import com.whop.api.resources.invoices.requests.RetrieveInvoicesRequest;
+import com.whop.api.resources.invoices.requests.SendInvoicesRequest;
+import com.whop.api.resources.invoices.requests.UnscheduleInvoicesRequest;
 import com.whop.api.resources.invoices.requests.UpdateInvoicesRequest;
 import com.whop.api.resources.invoices.requests.VoidInvoicesRequest;
-import com.whop.api.resources.invoices.types.CreateInvoicesRequest;
+import com.whop.api.resources.invoices.sends.AsyncSendsClient;
+import com.whop.api.resources.invoices.types.DeleteInvoicesResponse;
 import com.whop.api.types.Invoice;
-import com.whop.api.types.InvoiceListItem;
+import com.whop.api.types.InvoicePdf;
 import java.util.concurrent.CompletableFuture;
+import java.util.function.Supplier;
 
 public class AsyncInvoicesClient {
     protected final ClientOptions clientOptions;
 
     private final AsyncRawInvoicesClient rawClient;
 
+    protected final Supplier<AsyncSendsClient> sendsClient;
+
     public AsyncInvoicesClient(ClientOptions clientOptions) {
         this.clientOptions = clientOptions;
         this.rawClient = new AsyncRawInvoicesClient(clientOptions);
+        this.sendsClient = Suppliers.memoize(() -> new AsyncSendsClient(clientOptions));
     }
 
     /**
@@ -37,410 +48,665 @@ public class AsyncInvoicesClient {
     }
 
     /**
-     * Returns a paginated list of invoices for a company, with optional filtering by product, status, collection method, and creation date.
-     * <p>Required permissions:</p>
-     * <ul>
-     * <li><code>invoice:basic:read</code></li>
-     * </ul>
+     * Lists receipt-backed invoices for accounts the caller can read. Legacy invoices are excluded.
      */
-    public CompletableFuture<SyncPagingIterable<InvoiceListItem>> list() {
-        return this.rawClient.list().thenApply(response -> response.body());
+    public CompletableFuture<SyncPagingIterable<Invoice>> list() {
+        CompletableFuture<WhopApiHttpResponse<SyncPagingIterable<Invoice>>> rawFuture = this.rawClient.list();
+        CompletableFuture<SyncPagingIterable<Invoice>> future = rawFuture.thenApply(response -> response.body());
+        future.whenComplete((result_, throwable_) -> {
+            if (future.isCancelled()) {
+                rawFuture.cancel(true);
+            }
+        });
+        return future;
     }
 
     /**
-     * Returns a paginated list of invoices for a company, with optional filtering by product, status, collection method, and creation date.
-     * <p>Required permissions:</p>
-     * <ul>
-     * <li><code>invoice:basic:read</code></li>
-     * </ul>
+     * Lists receipt-backed invoices for accounts the caller can read. Legacy invoices are excluded.
      */
-    public CompletableFuture<SyncPagingIterable<InvoiceListItem>> list(RequestOptions requestOptions) {
-        return this.rawClient.list(requestOptions).thenApply(response -> response.body());
+    public CompletableFuture<SyncPagingIterable<Invoice>> list(RequestOptions requestOptions) {
+        CompletableFuture<WhopApiHttpResponse<SyncPagingIterable<Invoice>>> rawFuture =
+                this.rawClient.list(requestOptions);
+        CompletableFuture<SyncPagingIterable<Invoice>> future = rawFuture.thenApply(response -> response.body());
+        future.whenComplete((result_, throwable_) -> {
+            if (future.isCancelled()) {
+                rawFuture.cancel(true);
+            }
+        });
+        return future;
     }
 
     /**
-     * Returns a paginated list of invoices for a company, with optional filtering by product, status, collection method, and creation date.
-     * <p>Required permissions:</p>
-     * <ul>
-     * <li><code>invoice:basic:read</code></li>
-     * </ul>
+     * Lists receipt-backed invoices for accounts the caller can read. Legacy invoices are excluded.
      */
-    public CompletableFuture<SyncPagingIterable<InvoiceListItem>> list(ListInvoicesRequest request) {
-        return this.rawClient.list(request).thenApply(response -> response.body());
+    public CompletableFuture<SyncPagingIterable<Invoice>> list(ListInvoicesRequest request) {
+        CompletableFuture<WhopApiHttpResponse<SyncPagingIterable<Invoice>>> rawFuture = this.rawClient.list(request);
+        CompletableFuture<SyncPagingIterable<Invoice>> future = rawFuture.thenApply(response -> response.body());
+        future.whenComplete((result_, throwable_) -> {
+            if (future.isCancelled()) {
+                rawFuture.cancel(true);
+            }
+        });
+        return future;
     }
 
     /**
-     * Returns a paginated list of invoices for a company, with optional filtering by product, status, collection method, and creation date.
-     * <p>Required permissions:</p>
-     * <ul>
-     * <li><code>invoice:basic:read</code></li>
-     * </ul>
+     * Lists receipt-backed invoices for accounts the caller can read. Legacy invoices are excluded.
      */
-    public CompletableFuture<SyncPagingIterable<InvoiceListItem>> list(
+    public CompletableFuture<SyncPagingIterable<Invoice>> list(
             ListInvoicesRequest request, RequestOptions requestOptions) {
-        return this.rawClient.list(request, requestOptions).thenApply(response -> response.body());
+        CompletableFuture<WhopApiHttpResponse<SyncPagingIterable<Invoice>>> rawFuture =
+                this.rawClient.list(request, requestOptions);
+        CompletableFuture<SyncPagingIterable<Invoice>> future = rawFuture.thenApply(response -> response.body());
+        future.whenComplete((result_, throwable_) -> {
+            if (future.isCancelled()) {
+                rawFuture.cancel(true);
+            }
+        });
+        return future;
     }
 
     /**
-     * Create an invoice for a customer. The invoice can be charged automatically using a stored payment method, or sent to the customer for manual payment.
-     * <p>Required permissions:</p>
-     * <ul>
-     * <li><code>invoice:create</code></li>
-     * <li><code>member:email:read</code></li>
-     * <li><code>member:basic:read</code></li>
-     * <li><code>payment:basic:read</code></li>
-     * </ul>
+     * Creates a draft invoice backed by a receipt, with saved items, quantities, prices, and recipients. Issue the draft to resolve final tax and open the invoice. The pay_ ID stays the same when paid. Needs <code>invoice:create</code> or <code>payment:charge</code>; a <code>payment_method_id</code> needs <code>payment:charge</code>.
      */
     public CompletableFuture<Invoice> create(CreateInvoicesRequest request) {
-        return this.rawClient.create(request).thenApply(response -> response.body());
+        CompletableFuture<WhopApiHttpResponse<Invoice>> rawFuture = this.rawClient.create(request);
+        CompletableFuture<Invoice> future = rawFuture.thenApply(response -> response.body());
+        future.whenComplete((result_, throwable_) -> {
+            if (future.isCancelled()) {
+                rawFuture.cancel(true);
+            }
+        });
+        return future;
     }
 
     /**
-     * Create an invoice for a customer. The invoice can be charged automatically using a stored payment method, or sent to the customer for manual payment.
-     * <p>Required permissions:</p>
-     * <ul>
-     * <li><code>invoice:create</code></li>
-     * <li><code>member:email:read</code></li>
-     * <li><code>member:basic:read</code></li>
-     * <li><code>payment:basic:read</code></li>
-     * </ul>
+     * Creates a draft invoice backed by a receipt, with saved items, quantities, prices, and recipients. Issue the draft to resolve final tax and open the invoice. The pay_ ID stays the same when paid. Needs <code>invoice:create</code> or <code>payment:charge</code>; a <code>payment_method_id</code> needs <code>payment:charge</code>.
      */
     public CompletableFuture<Invoice> create(CreateInvoicesRequest request, RequestOptions requestOptions) {
-        return this.rawClient.create(request, requestOptions).thenApply(response -> response.body());
+        CompletableFuture<WhopApiHttpResponse<Invoice>> rawFuture = this.rawClient.create(request, requestOptions);
+        CompletableFuture<Invoice> future = rawFuture.thenApply(response -> response.body());
+        future.whenComplete((result_, throwable_) -> {
+            if (future.isCancelled()) {
+                rawFuture.cancel(true);
+            }
+        });
+        return future;
     }
 
     /**
-     * Retrieves the details of an existing invoice.
-     * <p>Required permissions:</p>
-     * <ul>
-     * <li><code>invoice:basic:read</code></li>
-     * <li><code>member:email:read</code></li>
-     * <li><code>member:basic:read</code></li>
-     * <li><code>payment:basic:read</code></li>
-     * </ul>
+     * Retrieves a receipt-backed invoice by its pay_ ID.
      */
     public CompletableFuture<Invoice> retrieve(String id) {
-        return this.rawClient.retrieve(id).thenApply(response -> response.body());
+        CompletableFuture<WhopApiHttpResponse<Invoice>> rawFuture = this.rawClient.retrieve(id);
+        CompletableFuture<Invoice> future = rawFuture.thenApply(response -> response.body());
+        future.whenComplete((result_, throwable_) -> {
+            if (future.isCancelled()) {
+                rawFuture.cancel(true);
+            }
+        });
+        return future;
     }
 
     /**
-     * Retrieves the details of an existing invoice.
-     * <p>Required permissions:</p>
-     * <ul>
-     * <li><code>invoice:basic:read</code></li>
-     * <li><code>member:email:read</code></li>
-     * <li><code>member:basic:read</code></li>
-     * <li><code>payment:basic:read</code></li>
-     * </ul>
+     * Retrieves a receipt-backed invoice by its pay_ ID.
      */
     public CompletableFuture<Invoice> retrieve(String id, RequestOptions requestOptions) {
-        return this.rawClient.retrieve(id, requestOptions).thenApply(response -> response.body());
+        CompletableFuture<WhopApiHttpResponse<Invoice>> rawFuture = this.rawClient.retrieve(id, requestOptions);
+        CompletableFuture<Invoice> future = rawFuture.thenApply(response -> response.body());
+        future.whenComplete((result_, throwable_) -> {
+            if (future.isCancelled()) {
+                rawFuture.cancel(true);
+            }
+        });
+        return future;
     }
 
     /**
-     * Retrieves the details of an existing invoice.
-     * <p>Required permissions:</p>
-     * <ul>
-     * <li><code>invoice:basic:read</code></li>
-     * <li><code>member:email:read</code></li>
-     * <li><code>member:basic:read</code></li>
-     * <li><code>payment:basic:read</code></li>
-     * </ul>
+     * Retrieves a receipt-backed invoice by its pay_ ID.
      */
     public CompletableFuture<Invoice> retrieve(String id, RetrieveInvoicesRequest request) {
-        return this.rawClient.retrieve(id, request).thenApply(response -> response.body());
+        CompletableFuture<WhopApiHttpResponse<Invoice>> rawFuture = this.rawClient.retrieve(id, request);
+        CompletableFuture<Invoice> future = rawFuture.thenApply(response -> response.body());
+        future.whenComplete((result_, throwable_) -> {
+            if (future.isCancelled()) {
+                rawFuture.cancel(true);
+            }
+        });
+        return future;
     }
 
     /**
-     * Retrieves the details of an existing invoice.
-     * <p>Required permissions:</p>
-     * <ul>
-     * <li><code>invoice:basic:read</code></li>
-     * <li><code>member:email:read</code></li>
-     * <li><code>member:basic:read</code></li>
-     * <li><code>payment:basic:read</code></li>
-     * </ul>
+     * Retrieves a receipt-backed invoice by its pay_ ID.
      */
     public CompletableFuture<Invoice> retrieve(
             String id, RetrieveInvoicesRequest request, RequestOptions requestOptions) {
-        return this.rawClient.retrieve(id, request, requestOptions).thenApply(response -> response.body());
+        CompletableFuture<WhopApiHttpResponse<Invoice>> rawFuture =
+                this.rawClient.retrieve(id, request, requestOptions);
+        CompletableFuture<Invoice> future = rawFuture.thenApply(response -> response.body());
+        future.whenComplete((result_, throwable_) -> {
+            if (future.isCancelled()) {
+                rawFuture.cancel(true);
+            }
+        });
+        return future;
     }
 
     /**
-     * Delete a draft invoice.
-     * <p>Required permissions:</p>
-     * <ul>
-     * <li><code>invoice:update</code></li>
-     * </ul>
+     * Deletes a draft or void invoice. A deleted invoice no longer appears in invoice or payment lists, and its ID returns a <code>404</code>. Deleting can't be undone. Void an open invoice before you delete it. A draft with a scheduled send or charge must be unscheduled first. A draft renewal invoice can't be deleted, and neither can a void invoice that collected money or still awaits a bank wire. The invoice's <code>deletable</code> field is <code>true</code> when this call can delete it.
      */
-    public CompletableFuture<Boolean> delete(String id) {
-        return this.rawClient.delete(id).thenApply(response -> response.body());
+    public CompletableFuture<DeleteInvoicesResponse> delete(String id) {
+        CompletableFuture<WhopApiHttpResponse<DeleteInvoicesResponse>> rawFuture = this.rawClient.delete(id);
+        CompletableFuture<DeleteInvoicesResponse> future = rawFuture.thenApply(response -> response.body());
+        future.whenComplete((result_, throwable_) -> {
+            if (future.isCancelled()) {
+                rawFuture.cancel(true);
+            }
+        });
+        return future;
     }
 
     /**
-     * Delete a draft invoice.
-     * <p>Required permissions:</p>
-     * <ul>
-     * <li><code>invoice:update</code></li>
-     * </ul>
+     * Deletes a draft or void invoice. A deleted invoice no longer appears in invoice or payment lists, and its ID returns a <code>404</code>. Deleting can't be undone. Void an open invoice before you delete it. A draft with a scheduled send or charge must be unscheduled first. A draft renewal invoice can't be deleted, and neither can a void invoice that collected money or still awaits a bank wire. The invoice's <code>deletable</code> field is <code>true</code> when this call can delete it.
      */
-    public CompletableFuture<Boolean> delete(String id, RequestOptions requestOptions) {
-        return this.rawClient.delete(id, requestOptions).thenApply(response -> response.body());
+    public CompletableFuture<DeleteInvoicesResponse> delete(String id, RequestOptions requestOptions) {
+        CompletableFuture<WhopApiHttpResponse<DeleteInvoicesResponse>> rawFuture =
+                this.rawClient.delete(id, requestOptions);
+        CompletableFuture<DeleteInvoicesResponse> future = rawFuture.thenApply(response -> response.body());
+        future.whenComplete((result_, throwable_) -> {
+            if (future.isCancelled()) {
+                rawFuture.cancel(true);
+            }
+        });
+        return future;
     }
 
     /**
-     * Delete a draft invoice.
-     * <p>Required permissions:</p>
-     * <ul>
-     * <li><code>invoice:update</code></li>
-     * </ul>
+     * Deletes a draft or void invoice. A deleted invoice no longer appears in invoice or payment lists, and its ID returns a <code>404</code>. Deleting can't be undone. Void an open invoice before you delete it. A draft with a scheduled send or charge must be unscheduled first. A draft renewal invoice can't be deleted, and neither can a void invoice that collected money or still awaits a bank wire. The invoice's <code>deletable</code> field is <code>true</code> when this call can delete it.
      */
-    public CompletableFuture<Boolean> delete(String id, DeleteInvoicesRequest request) {
-        return this.rawClient.delete(id, request).thenApply(response -> response.body());
+    public CompletableFuture<DeleteInvoicesResponse> delete(String id, DeleteInvoicesRequest request) {
+        CompletableFuture<WhopApiHttpResponse<DeleteInvoicesResponse>> rawFuture = this.rawClient.delete(id, request);
+        CompletableFuture<DeleteInvoicesResponse> future = rawFuture.thenApply(response -> response.body());
+        future.whenComplete((result_, throwable_) -> {
+            if (future.isCancelled()) {
+                rawFuture.cancel(true);
+            }
+        });
+        return future;
     }
 
     /**
-     * Delete a draft invoice.
-     * <p>Required permissions:</p>
-     * <ul>
-     * <li><code>invoice:update</code></li>
-     * </ul>
+     * Deletes a draft or void invoice. A deleted invoice no longer appears in invoice or payment lists, and its ID returns a <code>404</code>. Deleting can't be undone. Void an open invoice before you delete it. A draft with a scheduled send or charge must be unscheduled first. A draft renewal invoice can't be deleted, and neither can a void invoice that collected money or still awaits a bank wire. The invoice's <code>deletable</code> field is <code>true</code> when this call can delete it.
      */
-    public CompletableFuture<Boolean> delete(String id, DeleteInvoicesRequest request, RequestOptions requestOptions) {
-        return this.rawClient.delete(id, request, requestOptions).thenApply(response -> response.body());
+    public CompletableFuture<DeleteInvoicesResponse> delete(
+            String id, DeleteInvoicesRequest request, RequestOptions requestOptions) {
+        CompletableFuture<WhopApiHttpResponse<DeleteInvoicesResponse>> rawFuture =
+                this.rawClient.delete(id, request, requestOptions);
+        CompletableFuture<DeleteInvoicesResponse> future = rawFuture.thenApply(response -> response.body());
+        future.whenComplete((result_, throwable_) -> {
+            if (future.isCancelled()) {
+                rawFuture.cancel(true);
+            }
+        });
+        return future;
     }
 
     /**
-     * Update a draft invoice's details.
-     * <p>Required permissions:</p>
-     * <ul>
-     * <li><code>invoice:update</code></li>
-     * <li><code>member:email:read</code></li>
-     * <li><code>member:basic:read</code></li>
-     * <li><code>payment:basic:read</code></li>
-     * </ul>
+     * Updates draft invoice items and billing fields. Updates of only <code>recipient_emails</code> and <code>memo</code> are also allowed on unpaid invoices. The customer is set when the draft is created and can't change. To bill someone else, first void the draft. Then create a new invoice. Edit customer contact details through the member API. A draft with no saved payment method and no scheduled send needs <code>invoice:update</code>, <code>invoice:create</code>, or <code>payment:charge</code>; every other update, and setting <code>payment_method_id</code>, needs <code>payment:charge</code>.
      */
     public CompletableFuture<Invoice> update(String id) {
-        return this.rawClient.update(id).thenApply(response -> response.body());
+        CompletableFuture<WhopApiHttpResponse<Invoice>> rawFuture = this.rawClient.update(id);
+        CompletableFuture<Invoice> future = rawFuture.thenApply(response -> response.body());
+        future.whenComplete((result_, throwable_) -> {
+            if (future.isCancelled()) {
+                rawFuture.cancel(true);
+            }
+        });
+        return future;
     }
 
     /**
-     * Update a draft invoice's details.
-     * <p>Required permissions:</p>
-     * <ul>
-     * <li><code>invoice:update</code></li>
-     * <li><code>member:email:read</code></li>
-     * <li><code>member:basic:read</code></li>
-     * <li><code>payment:basic:read</code></li>
-     * </ul>
+     * Updates draft invoice items and billing fields. Updates of only <code>recipient_emails</code> and <code>memo</code> are also allowed on unpaid invoices. The customer is set when the draft is created and can't change. To bill someone else, first void the draft. Then create a new invoice. Edit customer contact details through the member API. A draft with no saved payment method and no scheduled send needs <code>invoice:update</code>, <code>invoice:create</code>, or <code>payment:charge</code>; every other update, and setting <code>payment_method_id</code>, needs <code>payment:charge</code>.
      */
     public CompletableFuture<Invoice> update(String id, RequestOptions requestOptions) {
-        return this.rawClient.update(id, requestOptions).thenApply(response -> response.body());
+        CompletableFuture<WhopApiHttpResponse<Invoice>> rawFuture = this.rawClient.update(id, requestOptions);
+        CompletableFuture<Invoice> future = rawFuture.thenApply(response -> response.body());
+        future.whenComplete((result_, throwable_) -> {
+            if (future.isCancelled()) {
+                rawFuture.cancel(true);
+            }
+        });
+        return future;
     }
 
     /**
-     * Update a draft invoice's details.
-     * <p>Required permissions:</p>
-     * <ul>
-     * <li><code>invoice:update</code></li>
-     * <li><code>member:email:read</code></li>
-     * <li><code>member:basic:read</code></li>
-     * <li><code>payment:basic:read</code></li>
-     * </ul>
+     * Updates draft invoice items and billing fields. Updates of only <code>recipient_emails</code> and <code>memo</code> are also allowed on unpaid invoices. The customer is set when the draft is created and can't change. To bill someone else, first void the draft. Then create a new invoice. Edit customer contact details through the member API. A draft with no saved payment method and no scheduled send needs <code>invoice:update</code>, <code>invoice:create</code>, or <code>payment:charge</code>; every other update, and setting <code>payment_method_id</code>, needs <code>payment:charge</code>.
      */
     public CompletableFuture<Invoice> update(String id, UpdateInvoicesRequest request) {
-        return this.rawClient.update(id, request).thenApply(response -> response.body());
+        CompletableFuture<WhopApiHttpResponse<Invoice>> rawFuture = this.rawClient.update(id, request);
+        CompletableFuture<Invoice> future = rawFuture.thenApply(response -> response.body());
+        future.whenComplete((result_, throwable_) -> {
+            if (future.isCancelled()) {
+                rawFuture.cancel(true);
+            }
+        });
+        return future;
     }
 
     /**
-     * Update a draft invoice's details.
-     * <p>Required permissions:</p>
-     * <ul>
-     * <li><code>invoice:update</code></li>
-     * <li><code>member:email:read</code></li>
-     * <li><code>member:basic:read</code></li>
-     * <li><code>payment:basic:read</code></li>
-     * </ul>
+     * Updates draft invoice items and billing fields. Updates of only <code>recipient_emails</code> and <code>memo</code> are also allowed on unpaid invoices. The customer is set when the draft is created and can't change. To bill someone else, first void the draft. Then create a new invoice. Edit customer contact details through the member API. A draft with no saved payment method and no scheduled send needs <code>invoice:update</code>, <code>invoice:create</code>, or <code>payment:charge</code>; every other update, and setting <code>payment_method_id</code>, needs <code>payment:charge</code>.
      */
     public CompletableFuture<Invoice> update(String id, UpdateInvoicesRequest request, RequestOptions requestOptions) {
-        return this.rawClient.update(id, request, requestOptions).thenApply(response -> response.body());
+        CompletableFuture<WhopApiHttpResponse<Invoice>> rawFuture = this.rawClient.update(id, request, requestOptions);
+        CompletableFuture<Invoice> future = rawFuture.thenApply(response -> response.body());
+        future.whenComplete((result_, throwable_) -> {
+            if (future.isCancelled()) {
+                rawFuture.cancel(true);
+            }
+        });
+        return future;
     }
 
     /**
-     * Mark an open invoice as paid when payment was collected outside of Whop.
-     * <p>Required permissions:</p>
-     * <ul>
-     * <li><code>invoice:update</code></li>
-     * </ul>
+     * Charges an open invoice now to one of its customer's saved payment methods, canceling any charge scheduled for later. The charge completes asynchronously: the invoice becomes <code>paid</code>, or, if declined, stays <code>open</code> and its recipients are emailed the <code>checkout_link</code>. Refused for drafts and while another payment is in progress.
      */
-    public CompletableFuture<Boolean> markPaid(String id) {
-        return this.rawClient.markPaid(id).thenApply(response -> response.body());
+    public CompletableFuture<Invoice> charge(String id) {
+        CompletableFuture<WhopApiHttpResponse<Invoice>> rawFuture = this.rawClient.charge(id);
+        CompletableFuture<Invoice> future = rawFuture.thenApply(response -> response.body());
+        future.whenComplete((result_, throwable_) -> {
+            if (future.isCancelled()) {
+                rawFuture.cancel(true);
+            }
+        });
+        return future;
     }
 
     /**
-     * Mark an open invoice as paid when payment was collected outside of Whop.
-     * <p>Required permissions:</p>
-     * <ul>
-     * <li><code>invoice:update</code></li>
-     * </ul>
+     * Charges an open invoice now to one of its customer's saved payment methods, canceling any charge scheduled for later. The charge completes asynchronously: the invoice becomes <code>paid</code>, or, if declined, stays <code>open</code> and its recipients are emailed the <code>checkout_link</code>. Refused for drafts and while another payment is in progress.
      */
-    public CompletableFuture<Boolean> markPaid(String id, RequestOptions requestOptions) {
-        return this.rawClient.markPaid(id, requestOptions).thenApply(response -> response.body());
+    public CompletableFuture<Invoice> charge(String id, RequestOptions requestOptions) {
+        CompletableFuture<WhopApiHttpResponse<Invoice>> rawFuture = this.rawClient.charge(id, requestOptions);
+        CompletableFuture<Invoice> future = rawFuture.thenApply(response -> response.body());
+        future.whenComplete((result_, throwable_) -> {
+            if (future.isCancelled()) {
+                rawFuture.cancel(true);
+            }
+        });
+        return future;
     }
 
     /**
-     * Mark an open invoice as paid when payment was collected outside of Whop.
-     * <p>Required permissions:</p>
-     * <ul>
-     * <li><code>invoice:update</code></li>
-     * </ul>
+     * Charges an open invoice now to one of its customer's saved payment methods, canceling any charge scheduled for later. The charge completes asynchronously: the invoice becomes <code>paid</code>, or, if declined, stays <code>open</code> and its recipients are emailed the <code>checkout_link</code>. Refused for drafts and while another payment is in progress.
      */
-    public CompletableFuture<Boolean> markPaid(String id, MarkPaidInvoicesRequest request) {
-        return this.rawClient.markPaid(id, request).thenApply(response -> response.body());
+    public CompletableFuture<Invoice> charge(String id, ChargeInvoicesRequest request) {
+        CompletableFuture<WhopApiHttpResponse<Invoice>> rawFuture = this.rawClient.charge(id, request);
+        CompletableFuture<Invoice> future = rawFuture.thenApply(response -> response.body());
+        future.whenComplete((result_, throwable_) -> {
+            if (future.isCancelled()) {
+                rawFuture.cancel(true);
+            }
+        });
+        return future;
     }
 
     /**
-     * Mark an open invoice as paid when payment was collected outside of Whop.
-     * <p>Required permissions:</p>
-     * <ul>
-     * <li><code>invoice:update</code></li>
-     * </ul>
+     * Charges an open invoice now to one of its customer's saved payment methods, canceling any charge scheduled for later. The charge completes asynchronously: the invoice becomes <code>paid</code>, or, if declined, stays <code>open</code> and its recipients are emailed the <code>checkout_link</code>. Refused for drafts and while another payment is in progress.
      */
-    public CompletableFuture<Boolean> markPaid(
-            String id, MarkPaidInvoicesRequest request, RequestOptions requestOptions) {
-        return this.rawClient.markPaid(id, request, requestOptions).thenApply(response -> response.body());
+    public CompletableFuture<Invoice> charge(String id, ChargeInvoicesRequest request, RequestOptions requestOptions) {
+        CompletableFuture<WhopApiHttpResponse<Invoice>> rawFuture = this.rawClient.charge(id, request, requestOptions);
+        CompletableFuture<Invoice> future = rawFuture.thenApply(response -> response.body());
+        future.whenComplete((result_, throwable_) -> {
+            if (future.isCancelled()) {
+                rawFuture.cancel(true);
+            }
+        });
+        return future;
     }
 
     /**
-     * Mark an open invoice as uncollectible when payment is not expected.
-     * <p>Required permissions:</p>
-     * <ul>
-     * <li><code>invoice:update</code></li>
-     * </ul>
+     * Generates the invoice as a PDF and returns a short-lived link to download it. A draft shows its estimated totals. The buyer's name and email need <code>member:basic:read</code> and <code>member:email:read</code>, and the Pay now link on an open invoice needs <code>payment:charge</code>, or <code>invoice:create</code> or <code>invoice:update</code> when it has no <code>payment_method_id</code>. Each call generates a new file and link, so this endpoint does not replay <code>Idempotency-Key</code> responses.
      */
-    public CompletableFuture<Boolean> markUncollectible(String id) {
-        return this.rawClient.markUncollectible(id).thenApply(response -> response.body());
+    public CompletableFuture<InvoicePdf> generatePdf(String id) {
+        CompletableFuture<WhopApiHttpResponse<InvoicePdf>> rawFuture = this.rawClient.generatePdf(id);
+        CompletableFuture<InvoicePdf> future = rawFuture.thenApply(response -> response.body());
+        future.whenComplete((result_, throwable_) -> {
+            if (future.isCancelled()) {
+                rawFuture.cancel(true);
+            }
+        });
+        return future;
     }
 
     /**
-     * Mark an open invoice as uncollectible when payment is not expected.
-     * <p>Required permissions:</p>
-     * <ul>
-     * <li><code>invoice:update</code></li>
-     * </ul>
+     * Generates the invoice as a PDF and returns a short-lived link to download it. A draft shows its estimated totals. The buyer's name and email need <code>member:basic:read</code> and <code>member:email:read</code>, and the Pay now link on an open invoice needs <code>payment:charge</code>, or <code>invoice:create</code> or <code>invoice:update</code> when it has no <code>payment_method_id</code>. Each call generates a new file and link, so this endpoint does not replay <code>Idempotency-Key</code> responses.
      */
-    public CompletableFuture<Boolean> markUncollectible(String id, RequestOptions requestOptions) {
-        return this.rawClient.markUncollectible(id, requestOptions).thenApply(response -> response.body());
+    public CompletableFuture<InvoicePdf> generatePdf(String id, RequestOptions requestOptions) {
+        CompletableFuture<WhopApiHttpResponse<InvoicePdf>> rawFuture = this.rawClient.generatePdf(id, requestOptions);
+        CompletableFuture<InvoicePdf> future = rawFuture.thenApply(response -> response.body());
+        future.whenComplete((result_, throwable_) -> {
+            if (future.isCancelled()) {
+                rawFuture.cancel(true);
+            }
+        });
+        return future;
     }
 
     /**
-     * Mark an open invoice as uncollectible when payment is not expected.
-     * <p>Required permissions:</p>
-     * <ul>
-     * <li><code>invoice:update</code></li>
-     * </ul>
+     * Generates the invoice as a PDF and returns a short-lived link to download it. A draft shows its estimated totals. The buyer's name and email need <code>member:basic:read</code> and <code>member:email:read</code>, and the Pay now link on an open invoice needs <code>payment:charge</code>, or <code>invoice:create</code> or <code>invoice:update</code> when it has no <code>payment_method_id</code>. Each call generates a new file and link, so this endpoint does not replay <code>Idempotency-Key</code> responses.
      */
-    public CompletableFuture<Boolean> markUncollectible(String id, MarkUncollectibleInvoicesRequest request) {
-        return this.rawClient.markUncollectible(id, request).thenApply(response -> response.body());
+    public CompletableFuture<InvoicePdf> generatePdf(String id, GeneratePdfInvoicesRequest request) {
+        CompletableFuture<WhopApiHttpResponse<InvoicePdf>> rawFuture = this.rawClient.generatePdf(id, request);
+        CompletableFuture<InvoicePdf> future = rawFuture.thenApply(response -> response.body());
+        future.whenComplete((result_, throwable_) -> {
+            if (future.isCancelled()) {
+                rawFuture.cancel(true);
+            }
+        });
+        return future;
     }
 
     /**
-     * Mark an open invoice as uncollectible when payment is not expected.
-     * <p>Required permissions:</p>
-     * <ul>
-     * <li><code>invoice:update</code></li>
-     * </ul>
+     * Generates the invoice as a PDF and returns a short-lived link to download it. A draft shows its estimated totals. The buyer's name and email need <code>member:basic:read</code> and <code>member:email:read</code>, and the Pay now link on an open invoice needs <code>payment:charge</code>, or <code>invoice:create</code> or <code>invoice:update</code> when it has no <code>payment_method_id</code>. Each call generates a new file and link, so this endpoint does not replay <code>Idempotency-Key</code> responses.
      */
-    public CompletableFuture<Boolean> markUncollectible(
+    public CompletableFuture<InvoicePdf> generatePdf(
+            String id, GeneratePdfInvoicesRequest request, RequestOptions requestOptions) {
+        CompletableFuture<WhopApiHttpResponse<InvoicePdf>> rawFuture =
+                this.rawClient.generatePdf(id, request, requestOptions);
+        CompletableFuture<InvoicePdf> future = rawFuture.thenApply(response -> response.body());
+        future.whenComplete((result_, throwable_) -> {
+            if (future.isCancelled()) {
+                rawFuture.cancel(true);
+            }
+        });
+        return future;
+    }
+
+    /**
+     * Resolves final tax and opens a draft invoice without emailing it. An invoice with a <code>payment_method_id</code> is charged to it off-session, as <code>POST /payments</code> charges a saved payment method: at <code>charge_at</code> if given, otherwise on <code>due_at</code> while it is still ahead, otherwise right away (see <code>scheduled_charge_at</code>). With a future <code>due_at</code> and no <code>charge_at</code>, the customer is charged on the due date without being emailed first. Issuing an open invoice again retains its totals and charges nothing.
+     */
+    public CompletableFuture<Invoice> issue(String id) {
+        CompletableFuture<WhopApiHttpResponse<Invoice>> rawFuture = this.rawClient.issue(id);
+        CompletableFuture<Invoice> future = rawFuture.thenApply(response -> response.body());
+        future.whenComplete((result_, throwable_) -> {
+            if (future.isCancelled()) {
+                rawFuture.cancel(true);
+            }
+        });
+        return future;
+    }
+
+    /**
+     * Resolves final tax and opens a draft invoice without emailing it. An invoice with a <code>payment_method_id</code> is charged to it off-session, as <code>POST /payments</code> charges a saved payment method: at <code>charge_at</code> if given, otherwise on <code>due_at</code> while it is still ahead, otherwise right away (see <code>scheduled_charge_at</code>). With a future <code>due_at</code> and no <code>charge_at</code>, the customer is charged on the due date without being emailed first. Issuing an open invoice again retains its totals and charges nothing.
+     */
+    public CompletableFuture<Invoice> issue(String id, RequestOptions requestOptions) {
+        CompletableFuture<WhopApiHttpResponse<Invoice>> rawFuture = this.rawClient.issue(id, requestOptions);
+        CompletableFuture<Invoice> future = rawFuture.thenApply(response -> response.body());
+        future.whenComplete((result_, throwable_) -> {
+            if (future.isCancelled()) {
+                rawFuture.cancel(true);
+            }
+        });
+        return future;
+    }
+
+    /**
+     * Resolves final tax and opens a draft invoice without emailing it. An invoice with a <code>payment_method_id</code> is charged to it off-session, as <code>POST /payments</code> charges a saved payment method: at <code>charge_at</code> if given, otherwise on <code>due_at</code> while it is still ahead, otherwise right away (see <code>scheduled_charge_at</code>). With a future <code>due_at</code> and no <code>charge_at</code>, the customer is charged on the due date without being emailed first. Issuing an open invoice again retains its totals and charges nothing.
+     */
+    public CompletableFuture<Invoice> issue(String id, IssueInvoicesRequest request) {
+        CompletableFuture<WhopApiHttpResponse<Invoice>> rawFuture = this.rawClient.issue(id, request);
+        CompletableFuture<Invoice> future = rawFuture.thenApply(response -> response.body());
+        future.whenComplete((result_, throwable_) -> {
+            if (future.isCancelled()) {
+                rawFuture.cancel(true);
+            }
+        });
+        return future;
+    }
+
+    /**
+     * Resolves final tax and opens a draft invoice without emailing it. An invoice with a <code>payment_method_id</code> is charged to it off-session, as <code>POST /payments</code> charges a saved payment method: at <code>charge_at</code> if given, otherwise on <code>due_at</code> while it is still ahead, otherwise right away (see <code>scheduled_charge_at</code>). With a future <code>due_at</code> and no <code>charge_at</code>, the customer is charged on the due date without being emailed first. Issuing an open invoice again retains its totals and charges nothing.
+     */
+    public CompletableFuture<Invoice> issue(String id, IssueInvoicesRequest request, RequestOptions requestOptions) {
+        CompletableFuture<WhopApiHttpResponse<Invoice>> rawFuture = this.rawClient.issue(id, request, requestOptions);
+        CompletableFuture<Invoice> future = rawFuture.thenApply(response -> response.body());
+        future.whenComplete((result_, throwable_) -> {
+            if (future.isCancelled()) {
+                rawFuture.cancel(true);
+            }
+        });
+        return future;
+    }
+
+    /**
+     * Marks an open invoice as uncollectible. Its checkout link stops working.
+     */
+    public CompletableFuture<Invoice> markUncollectible(String id) {
+        CompletableFuture<WhopApiHttpResponse<Invoice>> rawFuture = this.rawClient.markUncollectible(id);
+        CompletableFuture<Invoice> future = rawFuture.thenApply(response -> response.body());
+        future.whenComplete((result_, throwable_) -> {
+            if (future.isCancelled()) {
+                rawFuture.cancel(true);
+            }
+        });
+        return future;
+    }
+
+    /**
+     * Marks an open invoice as uncollectible. Its checkout link stops working.
+     */
+    public CompletableFuture<Invoice> markUncollectible(String id, RequestOptions requestOptions) {
+        CompletableFuture<WhopApiHttpResponse<Invoice>> rawFuture =
+                this.rawClient.markUncollectible(id, requestOptions);
+        CompletableFuture<Invoice> future = rawFuture.thenApply(response -> response.body());
+        future.whenComplete((result_, throwable_) -> {
+            if (future.isCancelled()) {
+                rawFuture.cancel(true);
+            }
+        });
+        return future;
+    }
+
+    /**
+     * Marks an open invoice as uncollectible. Its checkout link stops working.
+     */
+    public CompletableFuture<Invoice> markUncollectible(String id, MarkUncollectibleInvoicesRequest request) {
+        CompletableFuture<WhopApiHttpResponse<Invoice>> rawFuture = this.rawClient.markUncollectible(id, request);
+        CompletableFuture<Invoice> future = rawFuture.thenApply(response -> response.body());
+        future.whenComplete((result_, throwable_) -> {
+            if (future.isCancelled()) {
+                rawFuture.cancel(true);
+            }
+        });
+        return future;
+    }
+
+    /**
+     * Marks an open invoice as uncollectible. Its checkout link stops working.
+     */
+    public CompletableFuture<Invoice> markUncollectible(
             String id, MarkUncollectibleInvoicesRequest request, RequestOptions requestOptions) {
-        return this.rawClient.markUncollectible(id, request, requestOptions).thenApply(response -> response.body());
+        CompletableFuture<WhopApiHttpResponse<Invoice>> rawFuture =
+                this.rawClient.markUncollectible(id, request, requestOptions);
+        CompletableFuture<Invoice> future = rawFuture.thenApply(response -> response.body());
+        future.whenComplete((result_, throwable_) -> {
+            if (future.isCancelled()) {
+                rawFuture.cancel(true);
+            }
+        });
+        return future;
     }
 
     /**
-     * Resend the notification email for an existing invoice to the customer.
-     * <p>Required permissions:</p>
-     * <ul>
-     * <li><code>invoice:update</code></li>
-     * </ul>
+     * Issues a draft and emails it to its recipients, with reminders after the due date. A draft with no <code>payment_method_id</code> needs <code>invoice:update</code>, <code>invoice:create</code>, or <code>payment:charge</code>, and is never charged. A draft with a <code>payment_method_id</code> needs <code>payment:charge</code>: with a <code>charge_at</code>, or when its <code>due_at</code> is still ahead, it is emailed now and charged to that method at that time (see <code>scheduled_charge_at</code>); otherwise it is charged right away instead of emailed. Voiding the invoice, marking it uncollectible, or paying it first cancels the scheduled charge, and its recipients get the payment link if a charge fails. Sending an open invoice needs <code>payment:charge</code> and emails it again, up to three emails a day including the first send. With <code>send_at</code>, the draft is sent at that time instead, and cannot be edited, except its recipients, until it is sent or unscheduled. Each email, reminders included, is sent separately to the customer email shown on the invoice and to each address in <code>recipient_emails</code>, so recipients never see each other's addresses.
      */
-    public CompletableFuture<Boolean> resend(String id) {
-        return this.rawClient.resend(id).thenApply(response -> response.body());
+    public CompletableFuture<Invoice> send(String id) {
+        CompletableFuture<WhopApiHttpResponse<Invoice>> rawFuture = this.rawClient.send(id);
+        CompletableFuture<Invoice> future = rawFuture.thenApply(response -> response.body());
+        future.whenComplete((result_, throwable_) -> {
+            if (future.isCancelled()) {
+                rawFuture.cancel(true);
+            }
+        });
+        return future;
     }
 
     /**
-     * Resend the notification email for an existing invoice to the customer.
-     * <p>Required permissions:</p>
-     * <ul>
-     * <li><code>invoice:update</code></li>
-     * </ul>
+     * Issues a draft and emails it to its recipients, with reminders after the due date. A draft with no <code>payment_method_id</code> needs <code>invoice:update</code>, <code>invoice:create</code>, or <code>payment:charge</code>, and is never charged. A draft with a <code>payment_method_id</code> needs <code>payment:charge</code>: with a <code>charge_at</code>, or when its <code>due_at</code> is still ahead, it is emailed now and charged to that method at that time (see <code>scheduled_charge_at</code>); otherwise it is charged right away instead of emailed. Voiding the invoice, marking it uncollectible, or paying it first cancels the scheduled charge, and its recipients get the payment link if a charge fails. Sending an open invoice needs <code>payment:charge</code> and emails it again, up to three emails a day including the first send. With <code>send_at</code>, the draft is sent at that time instead, and cannot be edited, except its recipients, until it is sent or unscheduled. Each email, reminders included, is sent separately to the customer email shown on the invoice and to each address in <code>recipient_emails</code>, so recipients never see each other's addresses.
      */
-    public CompletableFuture<Boolean> resend(String id, RequestOptions requestOptions) {
-        return this.rawClient.resend(id, requestOptions).thenApply(response -> response.body());
+    public CompletableFuture<Invoice> send(String id, RequestOptions requestOptions) {
+        CompletableFuture<WhopApiHttpResponse<Invoice>> rawFuture = this.rawClient.send(id, requestOptions);
+        CompletableFuture<Invoice> future = rawFuture.thenApply(response -> response.body());
+        future.whenComplete((result_, throwable_) -> {
+            if (future.isCancelled()) {
+                rawFuture.cancel(true);
+            }
+        });
+        return future;
     }
 
     /**
-     * Resend the notification email for an existing invoice to the customer.
-     * <p>Required permissions:</p>
-     * <ul>
-     * <li><code>invoice:update</code></li>
-     * </ul>
+     * Issues a draft and emails it to its recipients, with reminders after the due date. A draft with no <code>payment_method_id</code> needs <code>invoice:update</code>, <code>invoice:create</code>, or <code>payment:charge</code>, and is never charged. A draft with a <code>payment_method_id</code> needs <code>payment:charge</code>: with a <code>charge_at</code>, or when its <code>due_at</code> is still ahead, it is emailed now and charged to that method at that time (see <code>scheduled_charge_at</code>); otherwise it is charged right away instead of emailed. Voiding the invoice, marking it uncollectible, or paying it first cancels the scheduled charge, and its recipients get the payment link if a charge fails. Sending an open invoice needs <code>payment:charge</code> and emails it again, up to three emails a day including the first send. With <code>send_at</code>, the draft is sent at that time instead, and cannot be edited, except its recipients, until it is sent or unscheduled. Each email, reminders included, is sent separately to the customer email shown on the invoice and to each address in <code>recipient_emails</code>, so recipients never see each other's addresses.
      */
-    public CompletableFuture<Boolean> resend(String id, ResendInvoicesRequest request) {
-        return this.rawClient.resend(id, request).thenApply(response -> response.body());
+    public CompletableFuture<Invoice> send(String id, SendInvoicesRequest request) {
+        CompletableFuture<WhopApiHttpResponse<Invoice>> rawFuture = this.rawClient.send(id, request);
+        CompletableFuture<Invoice> future = rawFuture.thenApply(response -> response.body());
+        future.whenComplete((result_, throwable_) -> {
+            if (future.isCancelled()) {
+                rawFuture.cancel(true);
+            }
+        });
+        return future;
     }
 
     /**
-     * Resend the notification email for an existing invoice to the customer.
-     * <p>Required permissions:</p>
-     * <ul>
-     * <li><code>invoice:update</code></li>
-     * </ul>
+     * Issues a draft and emails it to its recipients, with reminders after the due date. A draft with no <code>payment_method_id</code> needs <code>invoice:update</code>, <code>invoice:create</code>, or <code>payment:charge</code>, and is never charged. A draft with a <code>payment_method_id</code> needs <code>payment:charge</code>: with a <code>charge_at</code>, or when its <code>due_at</code> is still ahead, it is emailed now and charged to that method at that time (see <code>scheduled_charge_at</code>); otherwise it is charged right away instead of emailed. Voiding the invoice, marking it uncollectible, or paying it first cancels the scheduled charge, and its recipients get the payment link if a charge fails. Sending an open invoice needs <code>payment:charge</code> and emails it again, up to three emails a day including the first send. With <code>send_at</code>, the draft is sent at that time instead, and cannot be edited, except its recipients, until it is sent or unscheduled. Each email, reminders included, is sent separately to the customer email shown on the invoice and to each address in <code>recipient_emails</code>, so recipients never see each other's addresses.
      */
-    public CompletableFuture<Boolean> resend(String id, ResendInvoicesRequest request, RequestOptions requestOptions) {
-        return this.rawClient.resend(id, request, requestOptions).thenApply(response -> response.body());
+    public CompletableFuture<Invoice> send(String id, SendInvoicesRequest request, RequestOptions requestOptions) {
+        CompletableFuture<WhopApiHttpResponse<Invoice>> rawFuture = this.rawClient.send(id, request, requestOptions);
+        CompletableFuture<Invoice> future = rawFuture.thenApply(response -> response.body());
+        future.whenComplete((result_, throwable_) -> {
+            if (future.isCancelled()) {
+                rawFuture.cancel(true);
+            }
+        });
+        return future;
     }
 
     /**
-     * Void an open invoice so it can no longer be paid. Voiding is permanent and cannot be undone.
-     * <p>Required permissions:</p>
-     * <ul>
-     * <li><code>invoice:update</code></li>
-     * </ul>
+     * Cancels a draft's scheduled send, so it can be edited again. An invoice with no scheduled send is returned unchanged. A draft with no <code>payment_method_id</code> needs <code>invoice:update</code>, <code>invoice:create</code>, or <code>payment:charge</code>; any other invoice needs <code>payment:charge</code>.
      */
-    public CompletableFuture<Boolean> void_(String id) {
-        return this.rawClient.void_(id).thenApply(response -> response.body());
+    public CompletableFuture<Invoice> unschedule(String id) {
+        CompletableFuture<WhopApiHttpResponse<Invoice>> rawFuture = this.rawClient.unschedule(id);
+        CompletableFuture<Invoice> future = rawFuture.thenApply(response -> response.body());
+        future.whenComplete((result_, throwable_) -> {
+            if (future.isCancelled()) {
+                rawFuture.cancel(true);
+            }
+        });
+        return future;
     }
 
     /**
-     * Void an open invoice so it can no longer be paid. Voiding is permanent and cannot be undone.
-     * <p>Required permissions:</p>
-     * <ul>
-     * <li><code>invoice:update</code></li>
-     * </ul>
+     * Cancels a draft's scheduled send, so it can be edited again. An invoice with no scheduled send is returned unchanged. A draft with no <code>payment_method_id</code> needs <code>invoice:update</code>, <code>invoice:create</code>, or <code>payment:charge</code>; any other invoice needs <code>payment:charge</code>.
      */
-    public CompletableFuture<Boolean> void_(String id, RequestOptions requestOptions) {
-        return this.rawClient.void_(id, requestOptions).thenApply(response -> response.body());
+    public CompletableFuture<Invoice> unschedule(String id, RequestOptions requestOptions) {
+        CompletableFuture<WhopApiHttpResponse<Invoice>> rawFuture = this.rawClient.unschedule(id, requestOptions);
+        CompletableFuture<Invoice> future = rawFuture.thenApply(response -> response.body());
+        future.whenComplete((result_, throwable_) -> {
+            if (future.isCancelled()) {
+                rawFuture.cancel(true);
+            }
+        });
+        return future;
     }
 
     /**
-     * Void an open invoice so it can no longer be paid. Voiding is permanent and cannot be undone.
-     * <p>Required permissions:</p>
-     * <ul>
-     * <li><code>invoice:update</code></li>
-     * </ul>
+     * Cancels a draft's scheduled send, so it can be edited again. An invoice with no scheduled send is returned unchanged. A draft with no <code>payment_method_id</code> needs <code>invoice:update</code>, <code>invoice:create</code>, or <code>payment:charge</code>; any other invoice needs <code>payment:charge</code>.
      */
-    public CompletableFuture<Boolean> void_(String id, VoidInvoicesRequest request) {
-        return this.rawClient.void_(id, request).thenApply(response -> response.body());
+    public CompletableFuture<Invoice> unschedule(String id, UnscheduleInvoicesRequest request) {
+        CompletableFuture<WhopApiHttpResponse<Invoice>> rawFuture = this.rawClient.unschedule(id, request);
+        CompletableFuture<Invoice> future = rawFuture.thenApply(response -> response.body());
+        future.whenComplete((result_, throwable_) -> {
+            if (future.isCancelled()) {
+                rawFuture.cancel(true);
+            }
+        });
+        return future;
     }
 
     /**
-     * Void an open invoice so it can no longer be paid. Voiding is permanent and cannot be undone.
-     * <p>Required permissions:</p>
-     * <ul>
-     * <li><code>invoice:update</code></li>
-     * </ul>
+     * Cancels a draft's scheduled send, so it can be edited again. An invoice with no scheduled send is returned unchanged. A draft with no <code>payment_method_id</code> needs <code>invoice:update</code>, <code>invoice:create</code>, or <code>payment:charge</code>; any other invoice needs <code>payment:charge</code>.
      */
-    public CompletableFuture<Boolean> void_(String id, VoidInvoicesRequest request, RequestOptions requestOptions) {
-        return this.rawClient.void_(id, request, requestOptions).thenApply(response -> response.body());
+    public CompletableFuture<Invoice> unschedule(
+            String id, UnscheduleInvoicesRequest request, RequestOptions requestOptions) {
+        CompletableFuture<WhopApiHttpResponse<Invoice>> rawFuture =
+                this.rawClient.unschedule(id, request, requestOptions);
+        CompletableFuture<Invoice> future = rawFuture.thenApply(response -> response.body());
+        future.whenComplete((result_, throwable_) -> {
+            if (future.isCancelled()) {
+                rawFuture.cancel(true);
+            }
+        });
+        return future;
+    }
+
+    /**
+     * Voids a draft or unpaid invoice.
+     */
+    public CompletableFuture<Invoice> void_(String id) {
+        CompletableFuture<WhopApiHttpResponse<Invoice>> rawFuture = this.rawClient.void_(id);
+        CompletableFuture<Invoice> future = rawFuture.thenApply(response -> response.body());
+        future.whenComplete((result_, throwable_) -> {
+            if (future.isCancelled()) {
+                rawFuture.cancel(true);
+            }
+        });
+        return future;
+    }
+
+    /**
+     * Voids a draft or unpaid invoice.
+     */
+    public CompletableFuture<Invoice> void_(String id, RequestOptions requestOptions) {
+        CompletableFuture<WhopApiHttpResponse<Invoice>> rawFuture = this.rawClient.void_(id, requestOptions);
+        CompletableFuture<Invoice> future = rawFuture.thenApply(response -> response.body());
+        future.whenComplete((result_, throwable_) -> {
+            if (future.isCancelled()) {
+                rawFuture.cancel(true);
+            }
+        });
+        return future;
+    }
+
+    /**
+     * Voids a draft or unpaid invoice.
+     */
+    public CompletableFuture<Invoice> void_(String id, VoidInvoicesRequest request) {
+        CompletableFuture<WhopApiHttpResponse<Invoice>> rawFuture = this.rawClient.void_(id, request);
+        CompletableFuture<Invoice> future = rawFuture.thenApply(response -> response.body());
+        future.whenComplete((result_, throwable_) -> {
+            if (future.isCancelled()) {
+                rawFuture.cancel(true);
+            }
+        });
+        return future;
+    }
+
+    /**
+     * Voids a draft or unpaid invoice.
+     */
+    public CompletableFuture<Invoice> void_(String id, VoidInvoicesRequest request, RequestOptions requestOptions) {
+        CompletableFuture<WhopApiHttpResponse<Invoice>> rawFuture = this.rawClient.void_(id, request, requestOptions);
+        CompletableFuture<Invoice> future = rawFuture.thenApply(response -> response.body());
+        future.whenComplete((result_, throwable_) -> {
+            if (future.isCancelled()) {
+                rawFuture.cancel(true);
+            }
+        });
+        return future;
+    }
+
+    public AsyncSendsClient sends() {
+        return this.sendsClient.get();
     }
 }

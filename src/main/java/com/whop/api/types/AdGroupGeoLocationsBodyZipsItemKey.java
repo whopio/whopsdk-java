@@ -29,7 +29,7 @@ public final class AdGroupGeoLocationsBodyZipsItemKey {
     }
 
     /**
-     * @return The ZIP or postal code.
+     * @return The ZIP or postal code's key, as <code>COUNTRY:CODE</code>.
      */
     @JsonProperty("key")
     public String getKey() {
@@ -68,7 +68,7 @@ public final class AdGroupGeoLocationsBodyZipsItemKey {
 
     public interface KeyStage {
         /**
-         * <p>The ZIP or postal code.</p>
+         * <p>The ZIP or postal code's key, as <code>COUNTRY:CODE</code>.</p>
          */
         _FinalStage key(@NotNull String key);
 
@@ -87,7 +87,6 @@ public final class AdGroupGeoLocationsBodyZipsItemKey {
     public static final class Builder implements KeyStage, _FinalStage {
         private String key;
 
-        @JsonAnySetter
         private Map<String, Object> additionalProperties = new HashMap<>();
 
         private Builder() {}
@@ -99,8 +98,7 @@ public final class AdGroupGeoLocationsBodyZipsItemKey {
         }
 
         /**
-         * <p>The ZIP or postal code.</p>
-         * <p>The ZIP or postal code.</p>
+         * <p>The ZIP or postal code's key, as <code>COUNTRY:CODE</code>.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
@@ -113,6 +111,14 @@ public final class AdGroupGeoLocationsBodyZipsItemKey {
         @java.lang.Override
         public AdGroupGeoLocationsBodyZipsItemKey build() {
             return new AdGroupGeoLocationsBodyZipsItemKey(key, additionalProperties);
+        }
+
+        @JsonAnySetter
+        private void putAdditionalPropertyFromJson(String key, Object value) {
+            if (key.equalsIgnoreCase("key")) {
+                return;
+            }
+            this.additionalProperties.put(key, value);
         }
 
         @java.lang.Override

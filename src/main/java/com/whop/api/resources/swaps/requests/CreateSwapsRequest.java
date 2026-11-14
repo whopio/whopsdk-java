@@ -26,7 +26,7 @@ import org.jetbrains.annotations.NotNull;
 @JsonInclude(JsonInclude.Include.NON_ABSENT)
 @JsonDeserialize(builder = CreateSwapsRequest.Builder.class)
 public final class CreateSwapsRequest {
-    private final String accountId;
+    private final Optional<String> accountId;
 
     private final Optional<String> amount;
 
@@ -42,10 +42,12 @@ public final class CreateSwapsRequest {
 
     private final String toToken;
 
+    private final Optional<String> userId;
+
     private final Map<String, Object> additionalProperties;
 
     private CreateSwapsRequest(
-            String accountId,
+            Optional<String> accountId,
             Optional<String> amount,
             Optional<CreateSwapsRequestFromChain> fromChain,
             String fromToken,
@@ -53,6 +55,7 @@ public final class CreateSwapsRequest {
             Optional<String> toAmount,
             Optional<CreateSwapsRequestToChain> toChain,
             String toToken,
+            Optional<String> userId,
             Map<String, Object> additionalProperties) {
         this.accountId = accountId;
         this.amount = amount;
@@ -62,19 +65,20 @@ public final class CreateSwapsRequest {
         this.toAmount = toAmount;
         this.toChain = toChain;
         this.toToken = toToken;
+        this.userId = userId;
         this.additionalProperties = additionalProperties;
     }
 
     /**
-     * @return Business or user account ID (biz_* / user_*).
+     * @return Business account that makes the swap, prefixed <code>biz_</code>. Provide this or <code>user_id</code>.
      */
     @JsonProperty("account_id")
-    public String getAccountId() {
+    public Optional<String> getAccountId() {
         return accountId;
     }
 
     /**
-     * @return Source token amount. Required for crypto swaps. For fiat pairs: the amount of from_token to convert at the mid-market rate; omit (along with to_amount) to repay the full negative to_token balance instead.
+     * @return Source token amount. Required for a crypto pair: a decimal amount, or <code>all</code> to swap the whole from_token balance in the account's wallet, read from the chain when the swap is created (any token but USDT). An amount above that balance is rejected when the balance can be read. For fiat pairs: the amount of from_token to convert; omit (along with to_amount) to repay the full negative to_token balance instead.
      */
     @JsonIgnore
     public Optional<String> getAmount() {
@@ -144,6 +148,14 @@ public final class CreateSwapsRequest {
         return toToken;
     }
 
+    /**
+     * @return The caller's own user ID, prefixed <code>user_</code>, to swap in their personal account. Provide this or <code>account_id</code>.
+     */
+    @JsonProperty("user_id")
+    public Optional<String> getUserId() {
+        return userId;
+    }
+
     @JsonInclude(value = JsonInclude.Include.CUSTOM, valueFilter = NullableNonemptyFilter.class)
     @JsonProperty("amount")
     private Optional<String> _getAmount() {
@@ -193,7 +205,8 @@ public final class CreateSwapsRequest {
                 && slippageBps.equals(other.slippageBps)
                 && toAmount.equals(other.toAmount)
                 && toChain.equals(other.toChain)
-                && toToken.equals(other.toToken);
+                && toToken.equals(other.toToken)
+                && userId.equals(other.userId);
     }
 
     @java.lang.Override
@@ -206,7 +219,8 @@ public final class CreateSwapsRequest {
                 this.slippageBps,
                 this.toAmount,
                 this.toChain,
-                this.toToken);
+                this.toToken,
+                this.userId);
     }
 
     @java.lang.Override
@@ -214,17 +228,8 @@ public final class CreateSwapsRequest {
         return ObjectMappers.stringify(this);
     }
 
-    public static AccountIdStage builder() {
+    public static FromTokenStage builder() {
         return new Builder();
-    }
-
-    public interface AccountIdStage {
-        /**
-         * <p>Business or user account ID (biz_* / user_*).</p>
-         */
-        FromTokenStage accountId(@NotNull String accountId);
-
-        Builder from(CreateSwapsRequest other);
     }
 
     public interface FromTokenStage {
@@ -232,6 +237,8 @@ public final class CreateSwapsRequest {
          * <p>Source token contract address or ticker symbol, such as &quot;USDT&quot;.</p>
          */
         ToTokenStage fromToken(@NotNull String fromToken);
+
+        Builder from(CreateSwapsRequest other);
     }
 
     public interface ToTokenStage {
@@ -249,7 +256,14 @@ public final class CreateSwapsRequest {
         _FinalStage additionalProperties(Map<String, Object> additionalProperties);
 
         /**
-         * <p>Source token amount. Required for crypto swaps. For fiat pairs: the amount of from_token to convert at the mid-market rate; omit (along with to_amount) to repay the full negative to_token balance instead.</p>
+         * <p>Business account that makes the swap, prefixed <code>biz_</code>. Provide this or <code>user_id</code>.</p>
+         */
+        _FinalStage accountId(Optional<String> accountId);
+
+        _FinalStage accountId(String accountId);
+
+        /**
+         * <p>Source token amount. Required for a crypto pair: a decimal amount, or <code>all</code> to swap the whole from_token balance in the account's wallet, read from the chain when the swap is created (any token but USDT). An amount above that balance is rejected when the balance can be read. For fiat pairs: the amount of from_token to convert; omit (along with to_amount) to repay the full negative to_token balance instead.</p>
          */
         _FinalStage amount(Optional<String> amount);
 
@@ -292,15 +306,22 @@ public final class CreateSwapsRequest {
         _FinalStage toChain(CreateSwapsRequestToChain toChain);
 
         _FinalStage toChain(Nullable<CreateSwapsRequestToChain> toChain);
+
+        /**
+         * <p>The caller's own user ID, prefixed <code>user_</code>, to swap in their personal account. Provide this or <code>account_id</code>.</p>
+         */
+        _FinalStage userId(Optional<String> userId);
+
+        _FinalStage userId(String userId);
     }
 
     @JsonIgnoreProperties(ignoreUnknown = true)
-    public static final class Builder implements AccountIdStage, FromTokenStage, ToTokenStage, _FinalStage {
-        private String accountId;
-
+    public static final class Builder implements FromTokenStage, ToTokenStage, _FinalStage {
         private String fromToken;
 
         private String toToken;
+
+        private Optional<String> userId = Optional.empty();
 
         private Optional<CreateSwapsRequestToChain> toChain = Optional.empty();
 
@@ -312,7 +333,8 @@ public final class CreateSwapsRequest {
 
         private Optional<String> amount = Optional.empty();
 
-        @JsonAnySetter
+        private Optional<String> accountId = Optional.empty();
+
         private Map<String, Object> additionalProperties = new HashMap<>();
 
         private Builder() {}
@@ -327,23 +349,11 @@ public final class CreateSwapsRequest {
             toAmount(other.getToAmount());
             toChain(other.getToChain());
             toToken(other.getToToken());
+            userId(other.getUserId());
             return this;
         }
 
         /**
-         * <p>Business or user account ID (biz_* / user_*).</p>
-         * <p>Business or user account ID (biz_* / user_*).</p>
-         * @return Reference to {@code this} so that method calls can be chained together.
-         */
-        @java.lang.Override
-        @JsonSetter("account_id")
-        public FromTokenStage accountId(@NotNull String accountId) {
-            this.accountId = Objects.requireNonNull(accountId, "accountId must not be null");
-            return this;
-        }
-
-        /**
-         * <p>Source token contract address or ticker symbol, such as &quot;USDT&quot;.</p>
          * <p>Source token contract address or ticker symbol, such as &quot;USDT&quot;.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
@@ -356,13 +366,32 @@ public final class CreateSwapsRequest {
 
         /**
          * <p>Destination token contract address or ticker symbol, such as &quot;XAUT&quot;.</p>
-         * <p>Destination token contract address or ticker symbol, such as &quot;XAUT&quot;.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
         @JsonSetter("to_token")
         public _FinalStage toToken(@NotNull String toToken) {
             this.toToken = Objects.requireNonNull(toToken, "toToken must not be null");
+            return this;
+        }
+
+        /**
+         * <p>The caller's own user ID, prefixed <code>user_</code>, to swap in their personal account. Provide this or <code>account_id</code>.</p>
+         * @return Reference to {@code this} so that method calls can be chained together.
+         */
+        @java.lang.Override
+        public _FinalStage userId(String userId) {
+            this.userId = Optional.ofNullable(userId);
+            return this;
+        }
+
+        /**
+         * <p>The caller's own user ID, prefixed <code>user_</code>, to swap in their personal account. Provide this or <code>account_id</code>.</p>
+         */
+        @java.lang.Override
+        @JsonSetter(value = "user_id", nulls = Nulls.SKIP)
+        public _FinalStage userId(Optional<String> userId) {
+            this.userId = userId;
             return this;
         }
 
@@ -511,7 +540,7 @@ public final class CreateSwapsRequest {
         }
 
         /**
-         * <p>Source token amount. Required for crypto swaps. For fiat pairs: the amount of from_token to convert at the mid-market rate; omit (along with to_amount) to repay the full negative to_token balance instead.</p>
+         * <p>Source token amount. Required for a crypto pair: a decimal amount, or <code>all</code> to swap the whole from_token balance in the account's wallet, read from the chain when the swap is created (any token but USDT). An amount above that balance is rejected when the balance can be read. For fiat pairs: the amount of from_token to convert; omit (along with to_amount) to repay the full negative to_token balance instead.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
@@ -527,7 +556,7 @@ public final class CreateSwapsRequest {
         }
 
         /**
-         * <p>Source token amount. Required for crypto swaps. For fiat pairs: the amount of from_token to convert at the mid-market rate; omit (along with to_amount) to repay the full negative to_token balance instead.</p>
+         * <p>Source token amount. Required for a crypto pair: a decimal amount, or <code>all</code> to swap the whole from_token balance in the account's wallet, read from the chain when the swap is created (any token but USDT). An amount above that balance is rejected when the balance can be read. For fiat pairs: the amount of from_token to convert; omit (along with to_amount) to repay the full negative to_token balance instead.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
@@ -537,12 +566,32 @@ public final class CreateSwapsRequest {
         }
 
         /**
-         * <p>Source token amount. Required for crypto swaps. For fiat pairs: the amount of from_token to convert at the mid-market rate; omit (along with to_amount) to repay the full negative to_token balance instead.</p>
+         * <p>Source token amount. Required for a crypto pair: a decimal amount, or <code>all</code> to swap the whole from_token balance in the account's wallet, read from the chain when the swap is created (any token but USDT). An amount above that balance is rejected when the balance can be read. For fiat pairs: the amount of from_token to convert; omit (along with to_amount) to repay the full negative to_token balance instead.</p>
          */
         @java.lang.Override
         @JsonSetter(value = "amount", nulls = Nulls.SKIP)
         public _FinalStage amount(Optional<String> amount) {
             this.amount = amount;
+            return this;
+        }
+
+        /**
+         * <p>Business account that makes the swap, prefixed <code>biz_</code>. Provide this or <code>user_id</code>.</p>
+         * @return Reference to {@code this} so that method calls can be chained together.
+         */
+        @java.lang.Override
+        public _FinalStage accountId(String accountId) {
+            this.accountId = Optional.ofNullable(accountId);
+            return this;
+        }
+
+        /**
+         * <p>Business account that makes the swap, prefixed <code>biz_</code>. Provide this or <code>user_id</code>.</p>
+         */
+        @java.lang.Override
+        @JsonSetter(value = "account_id", nulls = Nulls.SKIP)
+        public _FinalStage accountId(Optional<String> accountId) {
+            this.accountId = accountId;
             return this;
         }
 
@@ -557,7 +606,24 @@ public final class CreateSwapsRequest {
                     toAmount,
                     toChain,
                     toToken,
+                    userId,
                     additionalProperties);
+        }
+
+        @JsonAnySetter
+        private void putAdditionalPropertyFromJson(String key, Object value) {
+            if (key.equalsIgnoreCase("account_id")
+                    || key.equalsIgnoreCase("amount")
+                    || key.equalsIgnoreCase("from_chain")
+                    || key.equalsIgnoreCase("from_token")
+                    || key.equalsIgnoreCase("slippage_bps")
+                    || key.equalsIgnoreCase("to_amount")
+                    || key.equalsIgnoreCase("to_chain")
+                    || key.equalsIgnoreCase("to_token")
+                    || key.equalsIgnoreCase("user_id")) {
+                return;
+            }
+            this.additionalProperties.put(key, value);
         }
 
         @java.lang.Override

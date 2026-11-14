@@ -16,6 +16,7 @@ import com.whop.api.core.Nullable;
 import com.whop.api.core.NullableNonemptyFilter;
 import com.whop.api.core.ObjectMappers;
 import com.whop.api.resources.products.types.CreateProductsRequestCustomCta;
+import com.whop.api.resources.products.types.CreateProductsRequestGalleryImagesItem;
 import com.whop.api.resources.products.types.CreateProductsRequestGlobalAffiliateStatus;
 import com.whop.api.resources.products.types.CreateProductsRequestMemberAffiliateStatus;
 import java.util.HashMap;
@@ -39,6 +40,8 @@ public final class CreateProductsRequest {
     private final Optional<String> customStatementDescriptor;
 
     private final Optional<String> description;
+
+    private final Optional<List<CreateProductsRequestGalleryImagesItem>> galleryImages;
 
     private final Optional<Double> globalAffiliatePercentage;
 
@@ -75,6 +78,7 @@ public final class CreateProductsRequest {
             Optional<String> customCtaUrl,
             Optional<String> customStatementDescriptor,
             Optional<String> description,
+            Optional<List<CreateProductsRequestGalleryImagesItem>> galleryImages,
             Optional<Double> globalAffiliatePercentage,
             Optional<CreateProductsRequestGlobalAffiliateStatus> globalAffiliateStatus,
             Optional<String> headline,
@@ -95,6 +99,7 @@ public final class CreateProductsRequest {
         this.customCtaUrl = customCtaUrl;
         this.customStatementDescriptor = customStatementDescriptor;
         this.description = description;
+        this.galleryImages = galleryImages;
         this.globalAffiliatePercentage = globalAffiliatePercentage;
         this.globalAffiliateStatus = globalAffiliateStatus;
         this.headline = headline;
@@ -164,7 +169,7 @@ public final class CreateProductsRequest {
     }
 
     /**
-     * @return A written description displayed on the product page.
+     * @return A written description displayed on the product page. Maximum 1,500 characters.
      */
     @JsonIgnore
     public Optional<String> getDescription() {
@@ -172,6 +177,17 @@ public final class CreateProductsRequest {
             return Optional.empty();
         }
         return description;
+    }
+
+    /**
+     * @return Images or videos displayed in the product gallery, in display order. Replaces the existing gallery. Send an empty array to clear it; omit or pass null to leave it unchanged. A banner image does not populate the gallery.
+     */
+    @JsonIgnore
+    public Optional<List<CreateProductsRequestGalleryImagesItem>> getGalleryImages() {
+        if (galleryImages == null) {
+            return Optional.empty();
+        }
+        return galleryImages;
     }
 
     /**
@@ -194,7 +210,7 @@ public final class CreateProductsRequest {
     }
 
     /**
-     * @return A short marketing headline for the product page.
+     * @return A short marketing headline for the product page. Maximum 80 characters.
      */
     @JsonIgnore
     public Optional<String> getHeadline() {
@@ -336,6 +352,12 @@ public final class CreateProductsRequest {
     }
 
     @JsonInclude(value = JsonInclude.Include.CUSTOM, valueFilter = NullableNonemptyFilter.class)
+    @JsonProperty("gallery_images")
+    private Optional<List<CreateProductsRequestGalleryImagesItem>> _getGalleryImages() {
+        return galleryImages;
+    }
+
+    @JsonInclude(value = JsonInclude.Include.CUSTOM, valueFilter = NullableNonemptyFilter.class)
     @JsonProperty("global_affiliate_percentage")
     private Optional<Double> _getGlobalAffiliatePercentage() {
         return globalAffiliatePercentage;
@@ -407,6 +429,7 @@ public final class CreateProductsRequest {
                 && customCtaUrl.equals(other.customCtaUrl)
                 && customStatementDescriptor.equals(other.customStatementDescriptor)
                 && description.equals(other.description)
+                && galleryImages.equals(other.galleryImages)
                 && globalAffiliatePercentage.equals(other.globalAffiliatePercentage)
                 && globalAffiliateStatus.equals(other.globalAffiliateStatus)
                 && headline.equals(other.headline)
@@ -431,6 +454,7 @@ public final class CreateProductsRequest {
                 this.customCtaUrl,
                 this.customStatementDescriptor,
                 this.description,
+                this.galleryImages,
                 this.globalAffiliatePercentage,
                 this.globalAffiliateStatus,
                 this.headline,
@@ -515,13 +539,22 @@ public final class CreateProductsRequest {
         _FinalStage customStatementDescriptor(Nullable<String> customStatementDescriptor);
 
         /**
-         * <p>A written description displayed on the product page.</p>
+         * <p>A written description displayed on the product page. Maximum 1,500 characters.</p>
          */
         _FinalStage description(Optional<String> description);
 
         _FinalStage description(String description);
 
         _FinalStage description(Nullable<String> description);
+
+        /**
+         * <p>Images or videos displayed in the product gallery, in display order. Replaces the existing gallery. Send an empty array to clear it; omit or pass null to leave it unchanged. A banner image does not populate the gallery.</p>
+         */
+        _FinalStage galleryImages(Optional<List<CreateProductsRequestGalleryImagesItem>> galleryImages);
+
+        _FinalStage galleryImages(List<CreateProductsRequestGalleryImagesItem> galleryImages);
+
+        _FinalStage galleryImages(Nullable<List<CreateProductsRequestGalleryImagesItem>> galleryImages);
 
         /**
          * <p>The commission rate affiliates earn.</p>
@@ -540,7 +573,7 @@ public final class CreateProductsRequest {
         _FinalStage globalAffiliateStatus(CreateProductsRequestGlobalAffiliateStatus globalAffiliateStatus);
 
         /**
-         * <p>A short marketing headline for the product page.</p>
+         * <p>A short marketing headline for the product page. Maximum 80 characters.</p>
          */
         _FinalStage headline(Optional<String> headline);
 
@@ -654,6 +687,8 @@ public final class CreateProductsRequest {
 
         private Optional<Double> globalAffiliatePercentage = Optional.empty();
 
+        private Optional<List<CreateProductsRequestGalleryImagesItem>> galleryImages = Optional.empty();
+
         private Optional<String> description = Optional.empty();
 
         private Optional<String> customStatementDescriptor = Optional.empty();
@@ -666,7 +701,6 @@ public final class CreateProductsRequest {
 
         private Optional<String> accountId = Optional.empty();
 
-        @JsonAnySetter
         private Map<String, Object> additionalProperties = new HashMap<>();
 
         private Builder() {}
@@ -679,6 +713,7 @@ public final class CreateProductsRequest {
             customCtaUrl(other.getCustomCtaUrl());
             customStatementDescriptor(other.getCustomStatementDescriptor());
             description(other.getDescription());
+            galleryImages(other.getGalleryImages());
             globalAffiliatePercentage(other.getGlobalAffiliatePercentage());
             globalAffiliateStatus(other.getGlobalAffiliateStatus());
             headline(other.getHeadline());
@@ -696,7 +731,6 @@ public final class CreateProductsRequest {
         }
 
         /**
-         * <p>The display name of the product. Maximum 80 characters.</p>
          * <p>The display name of the product. Maximum 80 characters.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
@@ -1001,7 +1035,7 @@ public final class CreateProductsRequest {
         }
 
         /**
-         * <p>A short marketing headline for the product page.</p>
+         * <p>A short marketing headline for the product page. Maximum 80 characters.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
@@ -1017,7 +1051,7 @@ public final class CreateProductsRequest {
         }
 
         /**
-         * <p>A short marketing headline for the product page.</p>
+         * <p>A short marketing headline for the product page. Maximum 80 characters.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
@@ -1027,7 +1061,7 @@ public final class CreateProductsRequest {
         }
 
         /**
-         * <p>A short marketing headline for the product page.</p>
+         * <p>A short marketing headline for the product page. Maximum 80 characters.</p>
          */
         @java.lang.Override
         @JsonSetter(value = "headline", nulls = Nulls.SKIP)
@@ -1094,7 +1128,43 @@ public final class CreateProductsRequest {
         }
 
         /**
-         * <p>A written description displayed on the product page.</p>
+         * <p>Images or videos displayed in the product gallery, in display order. Replaces the existing gallery. Send an empty array to clear it; omit or pass null to leave it unchanged. A banner image does not populate the gallery.</p>
+         * @return Reference to {@code this} so that method calls can be chained together.
+         */
+        @java.lang.Override
+        public _FinalStage galleryImages(Nullable<List<CreateProductsRequestGalleryImagesItem>> galleryImages) {
+            if (galleryImages.isNull()) {
+                this.galleryImages = null;
+            } else if (galleryImages.isEmpty()) {
+                this.galleryImages = Optional.empty();
+            } else {
+                this.galleryImages = Optional.of(galleryImages.get());
+            }
+            return this;
+        }
+
+        /**
+         * <p>Images or videos displayed in the product gallery, in display order. Replaces the existing gallery. Send an empty array to clear it; omit or pass null to leave it unchanged. A banner image does not populate the gallery.</p>
+         * @return Reference to {@code this} so that method calls can be chained together.
+         */
+        @java.lang.Override
+        public _FinalStage galleryImages(List<CreateProductsRequestGalleryImagesItem> galleryImages) {
+            this.galleryImages = Optional.ofNullable(galleryImages);
+            return this;
+        }
+
+        /**
+         * <p>Images or videos displayed in the product gallery, in display order. Replaces the existing gallery. Send an empty array to clear it; omit or pass null to leave it unchanged. A banner image does not populate the gallery.</p>
+         */
+        @java.lang.Override
+        @JsonSetter(value = "gallery_images", nulls = Nulls.SKIP)
+        public _FinalStage galleryImages(Optional<List<CreateProductsRequestGalleryImagesItem>> galleryImages) {
+            this.galleryImages = galleryImages;
+            return this;
+        }
+
+        /**
+         * <p>A written description displayed on the product page. Maximum 1,500 characters.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
@@ -1110,7 +1180,7 @@ public final class CreateProductsRequest {
         }
 
         /**
-         * <p>A written description displayed on the product page.</p>
+         * <p>A written description displayed on the product page. Maximum 1,500 characters.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
@@ -1120,7 +1190,7 @@ public final class CreateProductsRequest {
         }
 
         /**
-         * <p>A written description displayed on the product page.</p>
+         * <p>A written description displayed on the product page. Maximum 1,500 characters.</p>
          */
         @java.lang.Override
         @JsonSetter(value = "description", nulls = Nulls.SKIP)
@@ -1302,6 +1372,7 @@ public final class CreateProductsRequest {
                     customCtaUrl,
                     customStatementDescriptor,
                     description,
+                    galleryImages,
                     globalAffiliatePercentage,
                     globalAffiliateStatus,
                     headline,
@@ -1316,6 +1387,33 @@ public final class CreateProductsRequest {
                     title,
                     visibility,
                     additionalProperties);
+        }
+
+        @JsonAnySetter
+        private void putAdditionalPropertyFromJson(String key, Object value) {
+            if (key.equalsIgnoreCase("account_id")
+                    || key.equalsIgnoreCase("collect_shipping_address")
+                    || key.equalsIgnoreCase("custom_cta")
+                    || key.equalsIgnoreCase("custom_cta_url")
+                    || key.equalsIgnoreCase("custom_statement_descriptor")
+                    || key.equalsIgnoreCase("description")
+                    || key.equalsIgnoreCase("gallery_images")
+                    || key.equalsIgnoreCase("global_affiliate_percentage")
+                    || key.equalsIgnoreCase("global_affiliate_status")
+                    || key.equalsIgnoreCase("headline")
+                    || key.equalsIgnoreCase("labels")
+                    || key.equalsIgnoreCase("member_affiliate_percentage")
+                    || key.equalsIgnoreCase("member_affiliate_status")
+                    || key.equalsIgnoreCase("metadata")
+                    || key.equalsIgnoreCase("product_tax_code_id")
+                    || key.equalsIgnoreCase("redirect_purchase_url")
+                    || key.equalsIgnoreCase("route")
+                    || key.equalsIgnoreCase("send_welcome_message")
+                    || key.equalsIgnoreCase("title")
+                    || key.equalsIgnoreCase("visibility")) {
+                return;
+            }
+            this.additionalProperties.put(key, value);
         }
 
         @java.lang.Override

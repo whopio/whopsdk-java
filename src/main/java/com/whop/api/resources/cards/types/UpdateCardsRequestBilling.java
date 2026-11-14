@@ -31,7 +31,7 @@ public final class UpdateCardsRequestBilling {
 
     private final String postalCode;
 
-    private final String region;
+    private final Optional<String> region;
 
     private final Map<String, Object> additionalProperties;
 
@@ -41,7 +41,7 @@ public final class UpdateCardsRequestBilling {
             String line1,
             Optional<String> line2,
             String postalCode,
-            String region,
+            Optional<String> region,
             Map<String, Object> additionalProperties) {
         this.city = city;
         this.countryCode = countryCode;
@@ -93,10 +93,10 @@ public final class UpdateCardsRequestBilling {
     }
 
     /**
-     * @return Billing region or state.
+     * @return Billing region or state. Required when updating an issued card's billing address.
      */
     @JsonProperty("region")
-    public String getRegion() {
+    public Optional<String> getRegion() {
         return region;
     }
 
@@ -161,14 +161,7 @@ public final class UpdateCardsRequestBilling {
         /**
          * <p>Billing postal code.</p>
          */
-        RegionStage postalCode(@NotNull String postalCode);
-    }
-
-    public interface RegionStage {
-        /**
-         * <p>Billing region or state.</p>
-         */
-        _FinalStage region(@NotNull String region);
+        _FinalStage postalCode(@NotNull String postalCode);
     }
 
     public interface _FinalStage {
@@ -184,11 +177,17 @@ public final class UpdateCardsRequestBilling {
         _FinalStage line2(Optional<String> line2);
 
         _FinalStage line2(String line2);
+
+        /**
+         * <p>Billing region or state. Required when updating an issued card's billing address.</p>
+         */
+        _FinalStage region(Optional<String> region);
+
+        _FinalStage region(String region);
     }
 
     @JsonIgnoreProperties(ignoreUnknown = true)
-    public static final class Builder
-            implements CityStage, CountryCodeStage, Line1Stage, PostalCodeStage, RegionStage, _FinalStage {
+    public static final class Builder implements CityStage, CountryCodeStage, Line1Stage, PostalCodeStage, _FinalStage {
         private String city;
 
         private String countryCode;
@@ -197,11 +196,10 @@ public final class UpdateCardsRequestBilling {
 
         private String postalCode;
 
-        private String region;
+        private Optional<String> region = Optional.empty();
 
         private Optional<String> line2 = Optional.empty();
 
-        @JsonAnySetter
         private Map<String, Object> additionalProperties = new HashMap<>();
 
         private Builder() {}
@@ -219,7 +217,6 @@ public final class UpdateCardsRequestBilling {
 
         /**
          * <p>Billing city.</p>
-         * <p>Billing city.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
@@ -230,7 +227,6 @@ public final class UpdateCardsRequestBilling {
         }
 
         /**
-         * <p>Billing country code, ISO 3166-1 alpha-2.</p>
          * <p>Billing country code, ISO 3166-1 alpha-2.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
@@ -243,7 +239,6 @@ public final class UpdateCardsRequestBilling {
 
         /**
          * <p>Street address line 1.</p>
-         * <p>Street address line 1.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
@@ -255,25 +250,32 @@ public final class UpdateCardsRequestBilling {
 
         /**
          * <p>Billing postal code.</p>
-         * <p>Billing postal code.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
         @JsonSetter("postal_code")
-        public RegionStage postalCode(@NotNull String postalCode) {
+        public _FinalStage postalCode(@NotNull String postalCode) {
             this.postalCode = Objects.requireNonNull(postalCode, "postalCode must not be null");
             return this;
         }
 
         /**
-         * <p>Billing region or state.</p>
-         * <p>Billing region or state.</p>
+         * <p>Billing region or state. Required when updating an issued card's billing address.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
-        @JsonSetter("region")
-        public _FinalStage region(@NotNull String region) {
-            this.region = Objects.requireNonNull(region, "region must not be null");
+        public _FinalStage region(String region) {
+            this.region = Optional.ofNullable(region);
+            return this;
+        }
+
+        /**
+         * <p>Billing region or state. Required when updating an issued card's billing address.</p>
+         */
+        @java.lang.Override
+        @JsonSetter(value = "region", nulls = Nulls.SKIP)
+        public _FinalStage region(Optional<String> region) {
+            this.region = region;
             return this;
         }
 
@@ -301,6 +303,19 @@ public final class UpdateCardsRequestBilling {
         public UpdateCardsRequestBilling build() {
             return new UpdateCardsRequestBilling(
                     city, countryCode, line1, line2, postalCode, region, additionalProperties);
+        }
+
+        @JsonAnySetter
+        private void putAdditionalPropertyFromJson(String key, Object value) {
+            if (key.equalsIgnoreCase("city")
+                    || key.equalsIgnoreCase("country_code")
+                    || key.equalsIgnoreCase("line1")
+                    || key.equalsIgnoreCase("line2")
+                    || key.equalsIgnoreCase("postal_code")
+                    || key.equalsIgnoreCase("region")) {
+                return;
+            }
+            this.additionalProperties.put(key, value);
         }
 
         @java.lang.Override

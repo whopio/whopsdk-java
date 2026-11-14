@@ -165,7 +165,6 @@ public final class PostCardApplicationApprovedPayloadData {
 
         private Optional<String> hostedUrl = Optional.empty();
 
-        @JsonAnySetter
         private Map<String, Object> additionalProperties = new HashMap<>();
 
         private Builder() {}
@@ -180,7 +179,6 @@ public final class PostCardApplicationApprovedPayloadData {
         }
 
         /**
-         * <p>Card application ID, prefixed <code>ciac_</code>.</p>
          * <p>Card application ID, prefixed <code>ciac_</code>.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
@@ -199,7 +197,6 @@ public final class PostCardApplicationApprovedPayloadData {
         }
 
         /**
-         * <p>The application status.</p>
          * <p>The application status.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
@@ -249,6 +246,17 @@ public final class PostCardApplicationApprovedPayloadData {
         @java.lang.Override
         public PostCardApplicationApprovedPayloadData build() {
             return new PostCardApplicationApprovedPayloadData(hostedUrl, id, object, status, additionalProperties);
+        }
+
+        @JsonAnySetter
+        private void putAdditionalPropertyFromJson(String key, Object value) {
+            if (key.equalsIgnoreCase("hosted_url")
+                    || key.equalsIgnoreCase("id")
+                    || key.equalsIgnoreCase("object")
+                    || key.equalsIgnoreCase("status")) {
+                return;
+            }
+            this.additionalProperties.put(key, value);
         }
 
         @java.lang.Override

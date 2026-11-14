@@ -2,6 +2,9 @@ gradle.projectsLoaded {
     gradle.rootProject { root ->
         root.afterEvaluate {
             root.base.archivesName = 'whop-java'
+            root.tasks.named('jar') {
+                manifest.attributes('Implementation-Version': root.version)
+            }
 
             root.publishing {
                 publications {

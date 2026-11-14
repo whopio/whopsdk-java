@@ -106,7 +106,6 @@ public final class ChatChannelListItemExperience {
 
         private String name;
 
-        @JsonAnySetter
         private Map<String, Object> additionalProperties = new HashMap<>();
 
         private Builder() {}
@@ -120,7 +119,6 @@ public final class ChatChannelListItemExperience {
 
         /**
          * <p>The unique identifier for the experience.</p>
-         * <p>The unique identifier for the experience.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
@@ -131,7 +129,6 @@ public final class ChatChannelListItemExperience {
         }
 
         /**
-         * <p>The display name of this experience shown to users in the product navigation. Maximum 255 characters.</p>
          * <p>The display name of this experience shown to users in the product navigation. Maximum 255 characters.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
@@ -145,6 +142,14 @@ public final class ChatChannelListItemExperience {
         @java.lang.Override
         public ChatChannelListItemExperience build() {
             return new ChatChannelListItemExperience(id, name, additionalProperties);
+        }
+
+        @JsonAnySetter
+        private void putAdditionalPropertyFromJson(String key, Object value) {
+            if (key.equalsIgnoreCase("id") || key.equalsIgnoreCase("name")) {
+                return;
+            }
+            this.additionalProperties.put(key, value);
         }
 
         @java.lang.Override

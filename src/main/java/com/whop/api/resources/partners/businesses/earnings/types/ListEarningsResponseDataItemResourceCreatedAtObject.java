@@ -7,8 +7,8 @@ import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonValue;
 
 public final class ListEarningsResponseDataItemResourceCreatedAtObject {
-    public static final ListEarningsResponseDataItemResourceCreatedAtObject CARD_TRANSACTION =
-            new ListEarningsResponseDataItemResourceCreatedAtObject(Value.CARD_TRANSACTION, "card_transaction");
+    public static final ListEarningsResponseDataItemResourceCreatedAtObject COMMISSION =
+            new ListEarningsResponseDataItemResourceCreatedAtObject(Value.COMMISSION, "commission");
 
     private final Value value;
 
@@ -43,8 +43,8 @@ public final class ListEarningsResponseDataItemResourceCreatedAtObject {
 
     public <T> T visit(Visitor<T> visitor) {
         switch (value) {
-            case CARD_TRANSACTION:
-                return visitor.visitCardTransaction();
+            case COMMISSION:
+                return visitor.visitCommission();
             case UNKNOWN:
             default:
                 return visitor.visitUnknown(string);
@@ -54,21 +54,21 @@ public final class ListEarningsResponseDataItemResourceCreatedAtObject {
     @JsonCreator(mode = JsonCreator.Mode.DELEGATING)
     public static ListEarningsResponseDataItemResourceCreatedAtObject valueOf(String value) {
         switch (value) {
-            case "card_transaction":
-                return CARD_TRANSACTION;
+            case "commission":
+                return COMMISSION;
             default:
                 return new ListEarningsResponseDataItemResourceCreatedAtObject(Value.UNKNOWN, value);
         }
     }
 
     public enum Value {
-        CARD_TRANSACTION,
+        COMMISSION,
 
         UNKNOWN
     }
 
     public interface Visitor<T> {
-        T visitCardTransaction();
+        T visitCommission();
 
         T visitUnknown(String unknownType);
     }

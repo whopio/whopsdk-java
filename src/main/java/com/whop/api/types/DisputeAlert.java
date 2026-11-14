@@ -26,15 +26,19 @@ import org.jetbrains.annotations.NotNull;
 public final class DisputeAlert {
     private final Optional<String> accountId;
 
-    private final boolean actionable;
-
     private final double amount;
 
+    private final boolean autoRefunded;
+
     private final Optional<String> cardBrand;
+
+    private final Optional<DisputeAlertCategory> category;
 
     private final String createdAt;
 
     private final String currency;
+
+    private final Optional<Money> fee;
 
     private final boolean feeCharged;
 
@@ -42,13 +46,13 @@ public final class DisputeAlert {
 
     private final Optional<String> issuer;
 
-    private final Optional<DisputeAlertNotActionableReason> notActionableReason;
-
     private final Optional<String> paymentId;
 
     private final Optional<String> productId;
 
     private final String reportedAt;
+
+    private final Optional<DisputeAlertSource> source;
 
     private final Optional<String> transactionAt;
 
@@ -60,35 +64,39 @@ public final class DisputeAlert {
 
     private DisputeAlert(
             Optional<String> accountId,
-            boolean actionable,
             double amount,
+            boolean autoRefunded,
             Optional<String> cardBrand,
+            Optional<DisputeAlertCategory> category,
             String createdAt,
             String currency,
+            Optional<Money> fee,
             boolean feeCharged,
             String id,
             Optional<String> issuer,
-            Optional<DisputeAlertNotActionableReason> notActionableReason,
             Optional<String> paymentId,
             Optional<String> productId,
             String reportedAt,
+            Optional<DisputeAlertSource> source,
             Optional<String> transactionAt,
             DisputeAlertType type,
             String updatedAt,
             Map<String, Object> additionalProperties) {
         this.accountId = accountId;
-        this.actionable = actionable;
         this.amount = amount;
+        this.autoRefunded = autoRefunded;
         this.cardBrand = cardBrand;
+        this.category = category;
         this.createdAt = createdAt;
         this.currency = currency;
+        this.fee = fee;
         this.feeCharged = feeCharged;
         this.id = id;
         this.issuer = issuer;
-        this.notActionableReason = notActionableReason;
         this.paymentId = paymentId;
         this.productId = productId;
         this.reportedAt = reportedAt;
+        this.source = source;
         this.transactionAt = transactionAt;
         this.type = type;
         this.updatedAt = updatedAt;
@@ -107,19 +115,19 @@ public final class DisputeAlert {
     }
 
     /**
-     * @return Whether refunding the payment can still avoid a chargeback. <code>false</code> once the payment has been disputed or fully refunded, or when the alert could not be matched to a payment — <code>not_actionable_reason</code> says which.
-     */
-    @JsonProperty("actionable")
-    public boolean getActionable() {
-        return actionable;
-    }
-
-    /**
      * @return The alerted amount, in whole units of <code>currency</code>. This is what the issuer reported, which can differ from the payment's own amount.
      */
     @JsonProperty("amount")
     public double getAmount() {
         return amount;
+    }
+
+    /**
+     * @return Whether Whop automatically refunded the alerted payment. Reflects the payment, so it can be <code>true</code> for a refund issued by another flow (RDR, resolution) on the same payment.
+     */
+    @JsonProperty("auto_refunded")
+    public boolean getAutoRefunded() {
+        return autoRefunded;
     }
 
     /**
@@ -131,6 +139,17 @@ public final class DisputeAlert {
             return Optional.empty();
         }
         return cardBrand;
+    }
+
+    /**
+     * @return What the cardholder claims. <code>fraud</code> when they say they didn't make the payment: always for an <code>early_fraud_warning</code>, and for Ethoca fraud alerts and Visa RDR cases filed under a fraud reason. <code>customer_dispute</code> when they made the payment but dispute it, such as a product not received or a canceled subscription. <code>null</code> when the alert carries no claim, such as an issuer's request for transaction documents.
+     */
+    @JsonIgnore
+    public Optional<DisputeAlertCategory> getCategory() {
+        if (category == null) {
+            return Optional.empty();
+        }
+        return category;
     }
 
     /**
@@ -150,6 +169,17 @@ public final class DisputeAlert {
     }
 
     /**
+     * @return The alert fee charged to the account, in the currency it was collected in. <code>null</code> when <code>fee_charged</code> is false.
+     */
+    @JsonIgnore
+    public Optional<Money> getFee() {
+        if (fee == null) {
+            return Optional.empty();
+        }
+        return fee;
+    }
+
+    /**
      * @return Whether Whop charged the account an alert fee for this one. Always <code>false</code> for <code>early_fraud_warning</code>, which Whop is not billed for and never passes on.
      */
     @JsonProperty("fee_charged")
@@ -166,7 +196,8 @@ public final class DisputeAlert {
     }
 
     /**
-     * @return Name of the bank that issued the card and filed the report.
+     * @return Deprecated: always <code>null</code> outside Whop's own dashboard. Name of the bank that issued the card and filed the report.
+     * DEPRECATED: Always null outside Whop's own dashboard.
      */
     @JsonIgnore
     public Optional<String> getIssuer() {
@@ -174,17 +205,6 @@ public final class DisputeAlert {
             return Optional.empty();
         }
         return issuer;
-    }
-
-    /**
-     * @return Why refunding can no longer avoid a chargeback. <code>network_resolved</code> when a Visa RDR already closed the case, <code>payment_unmatched</code> when no payment matched, <code>payment_not_captured</code> when it never captured money, <code>payment_disputed</code> once the payment carries a dispute, <code>payment_refunded</code> once fully refunded. <code>null</code> while <code>actionable</code> is true.
-     */
-    @JsonIgnore
-    public Optional<DisputeAlertNotActionableReason> getNotActionableReason() {
-        if (notActionableReason == null) {
-            return Optional.empty();
-        }
-        return notActionableReason;
     }
 
     /**
@@ -218,7 +238,18 @@ public final class DisputeAlert {
     }
 
     /**
-     * @return When the reported transaction was made, as an ISO 8601 timestamp.
+     * @return The network program that sent the alert, which <code>type</code> alone doesn't tell apart. <code>ethoca</code> for Mastercard Ethoca, <code>cdrn</code> for Visa Verifi CDRN, <code>rdr</code> for Visa RDR, <code>tc40</code> / <code>safe</code> for a Visa / Mastercard fraud report, <code>paypal</code> for a PayPal alert. <code>null</code> when the network didn't say.
+     */
+    @JsonIgnore
+    public Optional<DisputeAlertSource> getSource() {
+        if (source == null) {
+            return Optional.empty();
+        }
+        return source;
+    }
+
+    /**
+     * @return When the reported transaction was made, as an ISO 8601 timestamp — falls back to when the matched payment was made if the issuer's own report didn't carry one. Should not be <code>null</code> in practice; treat one as a data issue rather than expected behavior.
      */
     @JsonIgnore
     public Optional<String> getTransactionAt() {
@@ -257,15 +288,21 @@ public final class DisputeAlert {
     }
 
     @JsonInclude(value = JsonInclude.Include.CUSTOM, valueFilter = NullableNonemptyFilter.class)
-    @JsonProperty("issuer")
-    private Optional<String> _getIssuer() {
-        return issuer;
+    @JsonProperty("category")
+    private Optional<DisputeAlertCategory> _getCategory() {
+        return category;
     }
 
     @JsonInclude(value = JsonInclude.Include.CUSTOM, valueFilter = NullableNonemptyFilter.class)
-    @JsonProperty("not_actionable_reason")
-    private Optional<DisputeAlertNotActionableReason> _getNotActionableReason() {
-        return notActionableReason;
+    @JsonProperty("fee")
+    private Optional<Money> _getFee() {
+        return fee;
+    }
+
+    @JsonInclude(value = JsonInclude.Include.CUSTOM, valueFilter = NullableNonemptyFilter.class)
+    @JsonProperty("issuer")
+    private Optional<String> _getIssuer() {
+        return issuer;
     }
 
     @JsonInclude(value = JsonInclude.Include.CUSTOM, valueFilter = NullableNonemptyFilter.class)
@@ -278,6 +315,12 @@ public final class DisputeAlert {
     @JsonProperty("product_id")
     private Optional<String> _getProductId() {
         return productId;
+    }
+
+    @JsonInclude(value = JsonInclude.Include.CUSTOM, valueFilter = NullableNonemptyFilter.class)
+    @JsonProperty("source")
+    private Optional<DisputeAlertSource> _getSource() {
+        return source;
     }
 
     @JsonInclude(value = JsonInclude.Include.CUSTOM, valueFilter = NullableNonemptyFilter.class)
@@ -299,18 +342,20 @@ public final class DisputeAlert {
 
     private boolean equalTo(DisputeAlert other) {
         return accountId.equals(other.accountId)
-                && actionable == other.actionable
                 && amount == other.amount
+                && autoRefunded == other.autoRefunded
                 && cardBrand.equals(other.cardBrand)
+                && category.equals(other.category)
                 && createdAt.equals(other.createdAt)
                 && currency.equals(other.currency)
+                && fee.equals(other.fee)
                 && feeCharged == other.feeCharged
                 && id.equals(other.id)
                 && issuer.equals(other.issuer)
-                && notActionableReason.equals(other.notActionableReason)
                 && paymentId.equals(other.paymentId)
                 && productId.equals(other.productId)
                 && reportedAt.equals(other.reportedAt)
+                && source.equals(other.source)
                 && transactionAt.equals(other.transactionAt)
                 && type.equals(other.type)
                 && updatedAt.equals(other.updatedAt);
@@ -320,18 +365,20 @@ public final class DisputeAlert {
     public int hashCode() {
         return Objects.hash(
                 this.accountId,
-                this.actionable,
                 this.amount,
+                this.autoRefunded,
                 this.cardBrand,
+                this.category,
                 this.createdAt,
                 this.currency,
+                this.fee,
                 this.feeCharged,
                 this.id,
                 this.issuer,
-                this.notActionableReason,
                 this.paymentId,
                 this.productId,
                 this.reportedAt,
+                this.source,
                 this.transactionAt,
                 this.type,
                 this.updatedAt);
@@ -342,24 +389,24 @@ public final class DisputeAlert {
         return ObjectMappers.stringify(this);
     }
 
-    public static ActionableStage builder() {
+    public static AmountStage builder() {
         return new Builder();
-    }
-
-    public interface ActionableStage {
-        /**
-         * <p>Whether refunding the payment can still avoid a chargeback. <code>false</code> once the payment has been disputed or fully refunded, or when the alert could not be matched to a payment — <code>not_actionable_reason</code> says which.</p>
-         */
-        AmountStage actionable(boolean actionable);
-
-        Builder from(DisputeAlert other);
     }
 
     public interface AmountStage {
         /**
          * <p>The alerted amount, in whole units of <code>currency</code>. This is what the issuer reported, which can differ from the payment's own amount.</p>
          */
-        CreatedAtStage amount(double amount);
+        AutoRefundedStage amount(double amount);
+
+        Builder from(DisputeAlert other);
+    }
+
+    public interface AutoRefundedStage {
+        /**
+         * <p>Whether Whop automatically refunded the alerted payment. Reflects the payment, so it can be <code>true</code> for a refund issued by another flow (RDR, resolution) on the same payment.</p>
+         */
+        CreatedAtStage autoRefunded(boolean autoRefunded);
     }
 
     public interface CreatedAtStage {
@@ -437,22 +484,32 @@ public final class DisputeAlert {
         _FinalStage cardBrand(Nullable<String> cardBrand);
 
         /**
-         * <p>Name of the bank that issued the card and filed the report.</p>
+         * <p>What the cardholder claims. <code>fraud</code> when they say they didn't make the payment: always for an <code>early_fraud_warning</code>, and for Ethoca fraud alerts and Visa RDR cases filed under a fraud reason. <code>customer_dispute</code> when they made the payment but dispute it, such as a product not received or a canceled subscription. <code>null</code> when the alert carries no claim, such as an issuer's request for transaction documents.</p>
+         */
+        _FinalStage category(Optional<DisputeAlertCategory> category);
+
+        _FinalStage category(DisputeAlertCategory category);
+
+        _FinalStage category(Nullable<DisputeAlertCategory> category);
+
+        /**
+         * <p>The alert fee charged to the account, in the currency it was collected in. <code>null</code> when <code>fee_charged</code> is false.</p>
+         */
+        _FinalStage fee(Optional<Money> fee);
+
+        _FinalStage fee(Money fee);
+
+        _FinalStage fee(Nullable<Money> fee);
+
+        /**
+         * <p>Deprecated: always <code>null</code> outside Whop's own dashboard. Name of the bank that issued the card and filed the report.
+         * DEPRECATED: Always null outside Whop's own dashboard.</p>
          */
         _FinalStage issuer(Optional<String> issuer);
 
         _FinalStage issuer(String issuer);
 
         _FinalStage issuer(Nullable<String> issuer);
-
-        /**
-         * <p>Why refunding can no longer avoid a chargeback. <code>network_resolved</code> when a Visa RDR already closed the case, <code>payment_unmatched</code> when no payment matched, <code>payment_not_captured</code> when it never captured money, <code>payment_disputed</code> once the payment carries a dispute, <code>payment_refunded</code> once fully refunded. <code>null</code> while <code>actionable</code> is true.</p>
-         */
-        _FinalStage notActionableReason(Optional<DisputeAlertNotActionableReason> notActionableReason);
-
-        _FinalStage notActionableReason(DisputeAlertNotActionableReason notActionableReason);
-
-        _FinalStage notActionableReason(Nullable<DisputeAlertNotActionableReason> notActionableReason);
 
         /**
          * <p>The payment the issuer reported, prefixed <code>pay_</code>. <code>null</code> when Whop could not match the report to a payment.</p>
@@ -473,7 +530,16 @@ public final class DisputeAlert {
         _FinalStage productId(Nullable<String> productId);
 
         /**
-         * <p>When the reported transaction was made, as an ISO 8601 timestamp.</p>
+         * <p>The network program that sent the alert, which <code>type</code> alone doesn't tell apart. <code>ethoca</code> for Mastercard Ethoca, <code>cdrn</code> for Visa Verifi CDRN, <code>rdr</code> for Visa RDR, <code>tc40</code> / <code>safe</code> for a Visa / Mastercard fraud report, <code>paypal</code> for a PayPal alert. <code>null</code> when the network didn't say.</p>
+         */
+        _FinalStage source(Optional<DisputeAlertSource> source);
+
+        _FinalStage source(DisputeAlertSource source);
+
+        _FinalStage source(Nullable<DisputeAlertSource> source);
+
+        /**
+         * <p>When the reported transaction was made, as an ISO 8601 timestamp — falls back to when the matched payment was made if the issuer's own report didn't carry one. Should not be <code>null</code> in practice; treat one as a data issue rather than expected behavior.</p>
          */
         _FinalStage transactionAt(Optional<String> transactionAt);
 
@@ -484,8 +550,8 @@ public final class DisputeAlert {
 
     @JsonIgnoreProperties(ignoreUnknown = true)
     public static final class Builder
-            implements ActionableStage,
-                    AmountStage,
+            implements AmountStage,
+                    AutoRefundedStage,
                     CreatedAtStage,
                     CurrencyStage,
                     FeeChargedStage,
@@ -494,9 +560,9 @@ public final class DisputeAlert {
                     TypeStage,
                     UpdatedAtStage,
                     _FinalStage {
-        private boolean actionable;
-
         private double amount;
+
+        private boolean autoRefunded;
 
         private String createdAt;
 
@@ -514,19 +580,22 @@ public final class DisputeAlert {
 
         private Optional<String> transactionAt = Optional.empty();
 
+        private Optional<DisputeAlertSource> source = Optional.empty();
+
         private Optional<String> productId = Optional.empty();
 
         private Optional<String> paymentId = Optional.empty();
 
-        private Optional<DisputeAlertNotActionableReason> notActionableReason = Optional.empty();
-
         private Optional<String> issuer = Optional.empty();
+
+        private Optional<Money> fee = Optional.empty();
+
+        private Optional<DisputeAlertCategory> category = Optional.empty();
 
         private Optional<String> cardBrand = Optional.empty();
 
         private Optional<String> accountId = Optional.empty();
 
-        @JsonAnySetter
         private Map<String, Object> additionalProperties = new HashMap<>();
 
         private Builder() {}
@@ -534,18 +603,20 @@ public final class DisputeAlert {
         @java.lang.Override
         public Builder from(DisputeAlert other) {
             accountId(other.getAccountId());
-            actionable(other.getActionable());
             amount(other.getAmount());
+            autoRefunded(other.getAutoRefunded());
             cardBrand(other.getCardBrand());
+            category(other.getCategory());
             createdAt(other.getCreatedAt());
             currency(other.getCurrency());
+            fee(other.getFee());
             feeCharged(other.getFeeCharged());
             id(other.getId());
             issuer(other.getIssuer());
-            notActionableReason(other.getNotActionableReason());
             paymentId(other.getPaymentId());
             productId(other.getProductId());
             reportedAt(other.getReportedAt());
+            source(other.getSource());
             transactionAt(other.getTransactionAt());
             type(other.getType());
             updatedAt(other.getUpdatedAt());
@@ -553,31 +624,28 @@ public final class DisputeAlert {
         }
 
         /**
-         * <p>Whether refunding the payment can still avoid a chargeback. <code>false</code> once the payment has been disputed or fully refunded, or when the alert could not be matched to a payment — <code>not_actionable_reason</code> says which.</p>
-         * <p>Whether refunding the payment can still avoid a chargeback. <code>false</code> once the payment has been disputed or fully refunded, or when the alert could not be matched to a payment — <code>not_actionable_reason</code> says which.</p>
-         * @return Reference to {@code this} so that method calls can be chained together.
-         */
-        @java.lang.Override
-        @JsonSetter("actionable")
-        public AmountStage actionable(boolean actionable) {
-            this.actionable = actionable;
-            return this;
-        }
-
-        /**
-         * <p>The alerted amount, in whole units of <code>currency</code>. This is what the issuer reported, which can differ from the payment's own amount.</p>
          * <p>The alerted amount, in whole units of <code>currency</code>. This is what the issuer reported, which can differ from the payment's own amount.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
         @JsonSetter("amount")
-        public CreatedAtStage amount(double amount) {
+        public AutoRefundedStage amount(double amount) {
             this.amount = amount;
             return this;
         }
 
         /**
-         * <p>When Whop received the alert, as an ISO 8601 timestamp.</p>
+         * <p>Whether Whop automatically refunded the alerted payment. Reflects the payment, so it can be <code>true</code> for a refund issued by another flow (RDR, resolution) on the same payment.</p>
+         * @return Reference to {@code this} so that method calls can be chained together.
+         */
+        @java.lang.Override
+        @JsonSetter("auto_refunded")
+        public CreatedAtStage autoRefunded(boolean autoRefunded) {
+            this.autoRefunded = autoRefunded;
+            return this;
+        }
+
+        /**
          * <p>When Whop received the alert, as an ISO 8601 timestamp.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
@@ -590,7 +658,6 @@ public final class DisputeAlert {
 
         /**
          * <p>Three-letter ISO currency code of the alerted amount.</p>
-         * <p>Three-letter ISO currency code of the alerted amount.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
@@ -601,7 +668,6 @@ public final class DisputeAlert {
         }
 
         /**
-         * <p>Whether Whop charged the account an alert fee for this one. Always <code>false</code> for <code>early_fraud_warning</code>, which Whop is not billed for and never passes on.</p>
          * <p>Whether Whop charged the account an alert fee for this one. Always <code>false</code> for <code>early_fraud_warning</code>, which Whop is not billed for and never passes on.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
@@ -614,7 +680,6 @@ public final class DisputeAlert {
 
         /**
          * <p>Dispute alert ID, prefixed <code>dspa_</code>.</p>
-         * <p>Dispute alert ID, prefixed <code>dspa_</code>.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
@@ -625,7 +690,6 @@ public final class DisputeAlert {
         }
 
         /**
-         * <p>When the issuer filed the report, as an ISO 8601 timestamp. Earlier than <code>created_at</code>, which is when Whop received it.</p>
          * <p>When the issuer filed the report, as an ISO 8601 timestamp. Earlier than <code>created_at</code>, which is when Whop received it.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
@@ -638,7 +702,6 @@ public final class DisputeAlert {
 
         /**
          * <p>What the issuer sent. <code>early_fraud_warning</code> is a fraud report on a settled payment (Visa TC40 / Mastercard SAFE) — refunding still avoids the chargeback, and Whop never charges a fee for one. <code>dispute_alert</code> is a pre-dispute notice from the issuer's alert network, which Whop pays for and passes on as a fee. <code>rapid_dispute_resolution</code> is a Visa RDR case the network already closed by refunding the payment — nothing is left to act on.</p>
-         * <p>What the issuer sent. <code>early_fraud_warning</code> is a fraud report on a settled payment (Visa TC40 / Mastercard SAFE) — refunding still avoids the chargeback, and Whop never charges a fee for one. <code>dispute_alert</code> is a pre-dispute notice from the issuer's alert network, which Whop pays for and passes on as a fee. <code>rapid_dispute_resolution</code> is a Visa RDR case the network already closed by refunding the payment — nothing is left to act on.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
@@ -650,7 +713,6 @@ public final class DisputeAlert {
 
         /**
          * <p>When the alert was last changed, as an ISO 8601 timestamp.</p>
-         * <p>When the alert was last changed, as an ISO 8601 timestamp.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
@@ -661,7 +723,7 @@ public final class DisputeAlert {
         }
 
         /**
-         * <p>When the reported transaction was made, as an ISO 8601 timestamp.</p>
+         * <p>When the reported transaction was made, as an ISO 8601 timestamp — falls back to when the matched payment was made if the issuer's own report didn't carry one. Should not be <code>null</code> in practice; treat one as a data issue rather than expected behavior.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
@@ -677,7 +739,7 @@ public final class DisputeAlert {
         }
 
         /**
-         * <p>When the reported transaction was made, as an ISO 8601 timestamp.</p>
+         * <p>When the reported transaction was made, as an ISO 8601 timestamp — falls back to when the matched payment was made if the issuer's own report didn't carry one. Should not be <code>null</code> in practice; treat one as a data issue rather than expected behavior.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
@@ -687,12 +749,48 @@ public final class DisputeAlert {
         }
 
         /**
-         * <p>When the reported transaction was made, as an ISO 8601 timestamp.</p>
+         * <p>When the reported transaction was made, as an ISO 8601 timestamp — falls back to when the matched payment was made if the issuer's own report didn't carry one. Should not be <code>null</code> in practice; treat one as a data issue rather than expected behavior.</p>
          */
         @java.lang.Override
         @JsonSetter(value = "transaction_at", nulls = Nulls.SKIP)
         public _FinalStage transactionAt(Optional<String> transactionAt) {
             this.transactionAt = transactionAt;
+            return this;
+        }
+
+        /**
+         * <p>The network program that sent the alert, which <code>type</code> alone doesn't tell apart. <code>ethoca</code> for Mastercard Ethoca, <code>cdrn</code> for Visa Verifi CDRN, <code>rdr</code> for Visa RDR, <code>tc40</code> / <code>safe</code> for a Visa / Mastercard fraud report, <code>paypal</code> for a PayPal alert. <code>null</code> when the network didn't say.</p>
+         * @return Reference to {@code this} so that method calls can be chained together.
+         */
+        @java.lang.Override
+        public _FinalStage source(Nullable<DisputeAlertSource> source) {
+            if (source.isNull()) {
+                this.source = null;
+            } else if (source.isEmpty()) {
+                this.source = Optional.empty();
+            } else {
+                this.source = Optional.of(source.get());
+            }
+            return this;
+        }
+
+        /**
+         * <p>The network program that sent the alert, which <code>type</code> alone doesn't tell apart. <code>ethoca</code> for Mastercard Ethoca, <code>cdrn</code> for Visa Verifi CDRN, <code>rdr</code> for Visa RDR, <code>tc40</code> / <code>safe</code> for a Visa / Mastercard fraud report, <code>paypal</code> for a PayPal alert. <code>null</code> when the network didn't say.</p>
+         * @return Reference to {@code this} so that method calls can be chained together.
+         */
+        @java.lang.Override
+        public _FinalStage source(DisputeAlertSource source) {
+            this.source = Optional.ofNullable(source);
+            return this;
+        }
+
+        /**
+         * <p>The network program that sent the alert, which <code>type</code> alone doesn't tell apart. <code>ethoca</code> for Mastercard Ethoca, <code>cdrn</code> for Visa Verifi CDRN, <code>rdr</code> for Visa RDR, <code>tc40</code> / <code>safe</code> for a Visa / Mastercard fraud report, <code>paypal</code> for a PayPal alert. <code>null</code> when the network didn't say.</p>
+         */
+        @java.lang.Override
+        @JsonSetter(value = "source", nulls = Nulls.SKIP)
+        public _FinalStage source(Optional<DisputeAlertSource> source) {
+            this.source = source;
             return this;
         }
 
@@ -769,43 +867,8 @@ public final class DisputeAlert {
         }
 
         /**
-         * <p>Why refunding can no longer avoid a chargeback. <code>network_resolved</code> when a Visa RDR already closed the case, <code>payment_unmatched</code> when no payment matched, <code>payment_not_captured</code> when it never captured money, <code>payment_disputed</code> once the payment carries a dispute, <code>payment_refunded</code> once fully refunded. <code>null</code> while <code>actionable</code> is true.</p>
-         * @return Reference to {@code this} so that method calls can be chained together.
-         */
-        @java.lang.Override
-        public _FinalStage notActionableReason(Nullable<DisputeAlertNotActionableReason> notActionableReason) {
-            if (notActionableReason.isNull()) {
-                this.notActionableReason = null;
-            } else if (notActionableReason.isEmpty()) {
-                this.notActionableReason = Optional.empty();
-            } else {
-                this.notActionableReason = Optional.of(notActionableReason.get());
-            }
-            return this;
-        }
-
-        /**
-         * <p>Why refunding can no longer avoid a chargeback. <code>network_resolved</code> when a Visa RDR already closed the case, <code>payment_unmatched</code> when no payment matched, <code>payment_not_captured</code> when it never captured money, <code>payment_disputed</code> once the payment carries a dispute, <code>payment_refunded</code> once fully refunded. <code>null</code> while <code>actionable</code> is true.</p>
-         * @return Reference to {@code this} so that method calls can be chained together.
-         */
-        @java.lang.Override
-        public _FinalStage notActionableReason(DisputeAlertNotActionableReason notActionableReason) {
-            this.notActionableReason = Optional.ofNullable(notActionableReason);
-            return this;
-        }
-
-        /**
-         * <p>Why refunding can no longer avoid a chargeback. <code>network_resolved</code> when a Visa RDR already closed the case, <code>payment_unmatched</code> when no payment matched, <code>payment_not_captured</code> when it never captured money, <code>payment_disputed</code> once the payment carries a dispute, <code>payment_refunded</code> once fully refunded. <code>null</code> while <code>actionable</code> is true.</p>
-         */
-        @java.lang.Override
-        @JsonSetter(value = "not_actionable_reason", nulls = Nulls.SKIP)
-        public _FinalStage notActionableReason(Optional<DisputeAlertNotActionableReason> notActionableReason) {
-            this.notActionableReason = notActionableReason;
-            return this;
-        }
-
-        /**
-         * <p>Name of the bank that issued the card and filed the report.</p>
+         * <p>Deprecated: always <code>null</code> outside Whop's own dashboard. Name of the bank that issued the card and filed the report.
+         * DEPRECATED: Always null outside Whop's own dashboard.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
@@ -821,7 +884,8 @@ public final class DisputeAlert {
         }
 
         /**
-         * <p>Name of the bank that issued the card and filed the report.</p>
+         * <p>Deprecated: always <code>null</code> outside Whop's own dashboard. Name of the bank that issued the card and filed the report.
+         * DEPRECATED: Always null outside Whop's own dashboard.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
@@ -831,12 +895,85 @@ public final class DisputeAlert {
         }
 
         /**
-         * <p>Name of the bank that issued the card and filed the report.</p>
+         * <p>Deprecated: always <code>null</code> outside Whop's own dashboard. Name of the bank that issued the card and filed the report.
+         * DEPRECATED: Always null outside Whop's own dashboard.</p>
          */
         @java.lang.Override
         @JsonSetter(value = "issuer", nulls = Nulls.SKIP)
         public _FinalStage issuer(Optional<String> issuer) {
             this.issuer = issuer;
+            return this;
+        }
+
+        /**
+         * <p>The alert fee charged to the account, in the currency it was collected in. <code>null</code> when <code>fee_charged</code> is false.</p>
+         * @return Reference to {@code this} so that method calls can be chained together.
+         */
+        @java.lang.Override
+        public _FinalStage fee(Nullable<Money> fee) {
+            if (fee.isNull()) {
+                this.fee = null;
+            } else if (fee.isEmpty()) {
+                this.fee = Optional.empty();
+            } else {
+                this.fee = Optional.of(fee.get());
+            }
+            return this;
+        }
+
+        /**
+         * <p>The alert fee charged to the account, in the currency it was collected in. <code>null</code> when <code>fee_charged</code> is false.</p>
+         * @return Reference to {@code this} so that method calls can be chained together.
+         */
+        @java.lang.Override
+        public _FinalStage fee(Money fee) {
+            this.fee = Optional.ofNullable(fee);
+            return this;
+        }
+
+        /**
+         * <p>The alert fee charged to the account, in the currency it was collected in. <code>null</code> when <code>fee_charged</code> is false.</p>
+         */
+        @java.lang.Override
+        @JsonSetter(value = "fee", nulls = Nulls.SKIP)
+        public _FinalStage fee(Optional<Money> fee) {
+            this.fee = fee;
+            return this;
+        }
+
+        /**
+         * <p>What the cardholder claims. <code>fraud</code> when they say they didn't make the payment: always for an <code>early_fraud_warning</code>, and for Ethoca fraud alerts and Visa RDR cases filed under a fraud reason. <code>customer_dispute</code> when they made the payment but dispute it, such as a product not received or a canceled subscription. <code>null</code> when the alert carries no claim, such as an issuer's request for transaction documents.</p>
+         * @return Reference to {@code this} so that method calls can be chained together.
+         */
+        @java.lang.Override
+        public _FinalStage category(Nullable<DisputeAlertCategory> category) {
+            if (category.isNull()) {
+                this.category = null;
+            } else if (category.isEmpty()) {
+                this.category = Optional.empty();
+            } else {
+                this.category = Optional.of(category.get());
+            }
+            return this;
+        }
+
+        /**
+         * <p>What the cardholder claims. <code>fraud</code> when they say they didn't make the payment: always for an <code>early_fraud_warning</code>, and for Ethoca fraud alerts and Visa RDR cases filed under a fraud reason. <code>customer_dispute</code> when they made the payment but dispute it, such as a product not received or a canceled subscription. <code>null</code> when the alert carries no claim, such as an issuer's request for transaction documents.</p>
+         * @return Reference to {@code this} so that method calls can be chained together.
+         */
+        @java.lang.Override
+        public _FinalStage category(DisputeAlertCategory category) {
+            this.category = Optional.ofNullable(category);
+            return this;
+        }
+
+        /**
+         * <p>What the cardholder claims. <code>fraud</code> when they say they didn't make the payment: always for an <code>early_fraud_warning</code>, and for Ethoca fraud alerts and Visa RDR cases filed under a fraud reason. <code>customer_dispute</code> when they made the payment but dispute it, such as a product not received or a canceled subscription. <code>null</code> when the alert carries no claim, such as an issuer's request for transaction documents.</p>
+         */
+        @java.lang.Override
+        @JsonSetter(value = "category", nulls = Nulls.SKIP)
+        public _FinalStage category(Optional<DisputeAlertCategory> category) {
+            this.category = category;
             return this;
         }
 
@@ -916,22 +1053,49 @@ public final class DisputeAlert {
         public DisputeAlert build() {
             return new DisputeAlert(
                     accountId,
-                    actionable,
                     amount,
+                    autoRefunded,
                     cardBrand,
+                    category,
                     createdAt,
                     currency,
+                    fee,
                     feeCharged,
                     id,
                     issuer,
-                    notActionableReason,
                     paymentId,
                     productId,
                     reportedAt,
+                    source,
                     transactionAt,
                     type,
                     updatedAt,
                     additionalProperties);
+        }
+
+        @JsonAnySetter
+        private void putAdditionalPropertyFromJson(String key, Object value) {
+            if (key.equalsIgnoreCase("account_id")
+                    || key.equalsIgnoreCase("amount")
+                    || key.equalsIgnoreCase("auto_refunded")
+                    || key.equalsIgnoreCase("card_brand")
+                    || key.equalsIgnoreCase("category")
+                    || key.equalsIgnoreCase("created_at")
+                    || key.equalsIgnoreCase("currency")
+                    || key.equalsIgnoreCase("fee")
+                    || key.equalsIgnoreCase("fee_charged")
+                    || key.equalsIgnoreCase("id")
+                    || key.equalsIgnoreCase("issuer")
+                    || key.equalsIgnoreCase("payment_id")
+                    || key.equalsIgnoreCase("product_id")
+                    || key.equalsIgnoreCase("reported_at")
+                    || key.equalsIgnoreCase("source")
+                    || key.equalsIgnoreCase("transaction_at")
+                    || key.equalsIgnoreCase("type")
+                    || key.equalsIgnoreCase("updated_at")) {
+                return;
+            }
+            this.additionalProperties.put(key, value);
         }
 
         @java.lang.Override

@@ -5,6 +5,7 @@ package com.whop.api.resources.promocodes;
 
 import com.whop.api.core.ClientOptions;
 import com.whop.api.core.RequestOptions;
+import com.whop.api.core.WhopApiHttpResponse;
 import com.whop.api.core.pagination.SyncPagingIterable;
 import com.whop.api.resources.promocodes.requests.ActivatePromoCodesRequest;
 import com.whop.api.resources.promocodes.requests.CreatePromoCodesRequest;
@@ -35,53 +36,106 @@ public class AsyncPromoCodesClient {
     }
 
     /**
-     * Lists promo codes for an account with cursor pagination, filters, and sorting.
+     * Lists an account's promo codes.
      */
     public CompletableFuture<SyncPagingIterable<PromoCodeListItem>> list(ListPromoCodesRequest request) {
-        return this.rawClient.list(request).thenApply(response -> response.body());
+        CompletableFuture<WhopApiHttpResponse<SyncPagingIterable<PromoCodeListItem>>> rawFuture =
+                this.rawClient.list(request);
+        CompletableFuture<SyncPagingIterable<PromoCodeListItem>> future =
+                rawFuture.thenApply(response -> response.body());
+        future.whenComplete((result_, throwable_) -> {
+            if (future.isCancelled()) {
+                rawFuture.cancel(true);
+            }
+        });
+        return future;
     }
 
     /**
-     * Lists promo codes for an account with cursor pagination, filters, and sorting.
+     * Lists an account's promo codes.
      */
     public CompletableFuture<SyncPagingIterable<PromoCodeListItem>> list(
             ListPromoCodesRequest request, RequestOptions requestOptions) {
-        return this.rawClient.list(request, requestOptions).thenApply(response -> response.body());
+        CompletableFuture<WhopApiHttpResponse<SyncPagingIterable<PromoCodeListItem>>> rawFuture =
+                this.rawClient.list(request, requestOptions);
+        CompletableFuture<SyncPagingIterable<PromoCodeListItem>> future =
+                rawFuture.thenApply(response -> response.body());
+        future.whenComplete((result_, throwable_) -> {
+            if (future.isCancelled()) {
+                rawFuture.cancel(true);
+            }
+        });
+        return future;
     }
 
     /**
-     * Creates a promo code for an account. First-party sessions may attach an affiliate.
+     * Creates a promo code for an account.
      */
     public CompletableFuture<PromoCode> create(CreatePromoCodesRequest request) {
-        return this.rawClient.create(request).thenApply(response -> response.body());
+        CompletableFuture<WhopApiHttpResponse<PromoCode>> rawFuture = this.rawClient.create(request);
+        CompletableFuture<PromoCode> future = rawFuture.thenApply(response -> response.body());
+        future.whenComplete((result_, throwable_) -> {
+            if (future.isCancelled()) {
+                rawFuture.cancel(true);
+            }
+        });
+        return future;
     }
 
     /**
-     * Creates a promo code for an account. First-party sessions may attach an affiliate.
+     * Creates a promo code for an account.
      */
     public CompletableFuture<PromoCode> create(CreatePromoCodesRequest request, RequestOptions requestOptions) {
-        return this.rawClient.create(request, requestOptions).thenApply(response -> response.body());
+        CompletableFuture<WhopApiHttpResponse<PromoCode>> rawFuture = this.rawClient.create(request, requestOptions);
+        CompletableFuture<PromoCode> future = rawFuture.thenApply(response -> response.body());
+        future.whenComplete((result_, throwable_) -> {
+            if (future.isCancelled()) {
+                rawFuture.cancel(true);
+            }
+        });
+        return future;
     }
 
     /**
      * Retrieves a promo code by ID.
      */
     public CompletableFuture<PromoCode> retrieve(String id) {
-        return this.rawClient.retrieve(id).thenApply(response -> response.body());
+        CompletableFuture<WhopApiHttpResponse<PromoCode>> rawFuture = this.rawClient.retrieve(id);
+        CompletableFuture<PromoCode> future = rawFuture.thenApply(response -> response.body());
+        future.whenComplete((result_, throwable_) -> {
+            if (future.isCancelled()) {
+                rawFuture.cancel(true);
+            }
+        });
+        return future;
     }
 
     /**
      * Retrieves a promo code by ID.
      */
     public CompletableFuture<PromoCode> retrieve(String id, RequestOptions requestOptions) {
-        return this.rawClient.retrieve(id, requestOptions).thenApply(response -> response.body());
+        CompletableFuture<WhopApiHttpResponse<PromoCode>> rawFuture = this.rawClient.retrieve(id, requestOptions);
+        CompletableFuture<PromoCode> future = rawFuture.thenApply(response -> response.body());
+        future.whenComplete((result_, throwable_) -> {
+            if (future.isCancelled()) {
+                rawFuture.cancel(true);
+            }
+        });
+        return future;
     }
 
     /**
      * Retrieves a promo code by ID.
      */
     public CompletableFuture<PromoCode> retrieve(String id, RetrievePromoCodesRequest request) {
-        return this.rawClient.retrieve(id, request).thenApply(response -> response.body());
+        CompletableFuture<WhopApiHttpResponse<PromoCode>> rawFuture = this.rawClient.retrieve(id, request);
+        CompletableFuture<PromoCode> future = rawFuture.thenApply(response -> response.body());
+        future.whenComplete((result_, throwable_) -> {
+            if (future.isCancelled()) {
+                rawFuture.cancel(true);
+            }
+        });
+        return future;
     }
 
     /**
@@ -89,28 +143,58 @@ public class AsyncPromoCodesClient {
      */
     public CompletableFuture<PromoCode> retrieve(
             String id, RetrievePromoCodesRequest request, RequestOptions requestOptions) {
-        return this.rawClient.retrieve(id, request, requestOptions).thenApply(response -> response.body());
+        CompletableFuture<WhopApiHttpResponse<PromoCode>> rawFuture =
+                this.rawClient.retrieve(id, request, requestOptions);
+        CompletableFuture<PromoCode> future = rawFuture.thenApply(response -> response.body());
+        future.whenComplete((result_, throwable_) -> {
+            if (future.isCancelled()) {
+                rawFuture.cancel(true);
+            }
+        });
+        return future;
     }
 
     /**
      * Archives a promo code so it cannot be used in future checkouts.
      */
     public CompletableFuture<DeletePromoCodesResponse> delete(String id) {
-        return this.rawClient.delete(id).thenApply(response -> response.body());
+        CompletableFuture<WhopApiHttpResponse<DeletePromoCodesResponse>> rawFuture = this.rawClient.delete(id);
+        CompletableFuture<DeletePromoCodesResponse> future = rawFuture.thenApply(response -> response.body());
+        future.whenComplete((result_, throwable_) -> {
+            if (future.isCancelled()) {
+                rawFuture.cancel(true);
+            }
+        });
+        return future;
     }
 
     /**
      * Archives a promo code so it cannot be used in future checkouts.
      */
     public CompletableFuture<DeletePromoCodesResponse> delete(String id, RequestOptions requestOptions) {
-        return this.rawClient.delete(id, requestOptions).thenApply(response -> response.body());
+        CompletableFuture<WhopApiHttpResponse<DeletePromoCodesResponse>> rawFuture =
+                this.rawClient.delete(id, requestOptions);
+        CompletableFuture<DeletePromoCodesResponse> future = rawFuture.thenApply(response -> response.body());
+        future.whenComplete((result_, throwable_) -> {
+            if (future.isCancelled()) {
+                rawFuture.cancel(true);
+            }
+        });
+        return future;
     }
 
     /**
      * Archives a promo code so it cannot be used in future checkouts.
      */
     public CompletableFuture<DeletePromoCodesResponse> delete(String id, DeletePromoCodesRequest request) {
-        return this.rawClient.delete(id, request).thenApply(response -> response.body());
+        CompletableFuture<WhopApiHttpResponse<DeletePromoCodesResponse>> rawFuture = this.rawClient.delete(id, request);
+        CompletableFuture<DeletePromoCodesResponse> future = rawFuture.thenApply(response -> response.body());
+        future.whenComplete((result_, throwable_) -> {
+            if (future.isCancelled()) {
+                rawFuture.cancel(true);
+            }
+        });
+        return future;
     }
 
     /**
@@ -118,28 +202,57 @@ public class AsyncPromoCodesClient {
      */
     public CompletableFuture<DeletePromoCodesResponse> delete(
             String id, DeletePromoCodesRequest request, RequestOptions requestOptions) {
-        return this.rawClient.delete(id, request, requestOptions).thenApply(response -> response.body());
+        CompletableFuture<WhopApiHttpResponse<DeletePromoCodesResponse>> rawFuture =
+                this.rawClient.delete(id, request, requestOptions);
+        CompletableFuture<DeletePromoCodesResponse> future = rawFuture.thenApply(response -> response.body());
+        future.whenComplete((result_, throwable_) -> {
+            if (future.isCancelled()) {
+                rawFuture.cancel(true);
+            }
+        });
+        return future;
     }
 
     /**
      * Turns an inactive promo code back on so it can be redeemed at checkout.
      */
     public CompletableFuture<PromoCode> activate(String id) {
-        return this.rawClient.activate(id).thenApply(response -> response.body());
+        CompletableFuture<WhopApiHttpResponse<PromoCode>> rawFuture = this.rawClient.activate(id);
+        CompletableFuture<PromoCode> future = rawFuture.thenApply(response -> response.body());
+        future.whenComplete((result_, throwable_) -> {
+            if (future.isCancelled()) {
+                rawFuture.cancel(true);
+            }
+        });
+        return future;
     }
 
     /**
      * Turns an inactive promo code back on so it can be redeemed at checkout.
      */
     public CompletableFuture<PromoCode> activate(String id, RequestOptions requestOptions) {
-        return this.rawClient.activate(id, requestOptions).thenApply(response -> response.body());
+        CompletableFuture<WhopApiHttpResponse<PromoCode>> rawFuture = this.rawClient.activate(id, requestOptions);
+        CompletableFuture<PromoCode> future = rawFuture.thenApply(response -> response.body());
+        future.whenComplete((result_, throwable_) -> {
+            if (future.isCancelled()) {
+                rawFuture.cancel(true);
+            }
+        });
+        return future;
     }
 
     /**
      * Turns an inactive promo code back on so it can be redeemed at checkout.
      */
     public CompletableFuture<PromoCode> activate(String id, ActivatePromoCodesRequest request) {
-        return this.rawClient.activate(id, request).thenApply(response -> response.body());
+        CompletableFuture<WhopApiHttpResponse<PromoCode>> rawFuture = this.rawClient.activate(id, request);
+        CompletableFuture<PromoCode> future = rawFuture.thenApply(response -> response.body());
+        future.whenComplete((result_, throwable_) -> {
+            if (future.isCancelled()) {
+                rawFuture.cancel(true);
+            }
+        });
+        return future;
     }
 
     /**
@@ -147,28 +260,57 @@ public class AsyncPromoCodesClient {
      */
     public CompletableFuture<PromoCode> activate(
             String id, ActivatePromoCodesRequest request, RequestOptions requestOptions) {
-        return this.rawClient.activate(id, request, requestOptions).thenApply(response -> response.body());
+        CompletableFuture<WhopApiHttpResponse<PromoCode>> rawFuture =
+                this.rawClient.activate(id, request, requestOptions);
+        CompletableFuture<PromoCode> future = rawFuture.thenApply(response -> response.body());
+        future.whenComplete((result_, throwable_) -> {
+            if (future.isCancelled()) {
+                rawFuture.cancel(true);
+            }
+        });
+        return future;
     }
 
     /**
      * Turns off an active promo code so it can no longer be redeemed at checkout.
      */
     public CompletableFuture<PromoCode> deactivate(String id) {
-        return this.rawClient.deactivate(id).thenApply(response -> response.body());
+        CompletableFuture<WhopApiHttpResponse<PromoCode>> rawFuture = this.rawClient.deactivate(id);
+        CompletableFuture<PromoCode> future = rawFuture.thenApply(response -> response.body());
+        future.whenComplete((result_, throwable_) -> {
+            if (future.isCancelled()) {
+                rawFuture.cancel(true);
+            }
+        });
+        return future;
     }
 
     /**
      * Turns off an active promo code so it can no longer be redeemed at checkout.
      */
     public CompletableFuture<PromoCode> deactivate(String id, RequestOptions requestOptions) {
-        return this.rawClient.deactivate(id, requestOptions).thenApply(response -> response.body());
+        CompletableFuture<WhopApiHttpResponse<PromoCode>> rawFuture = this.rawClient.deactivate(id, requestOptions);
+        CompletableFuture<PromoCode> future = rawFuture.thenApply(response -> response.body());
+        future.whenComplete((result_, throwable_) -> {
+            if (future.isCancelled()) {
+                rawFuture.cancel(true);
+            }
+        });
+        return future;
     }
 
     /**
      * Turns off an active promo code so it can no longer be redeemed at checkout.
      */
     public CompletableFuture<PromoCode> deactivate(String id, DeactivatePromoCodesRequest request) {
-        return this.rawClient.deactivate(id, request).thenApply(response -> response.body());
+        CompletableFuture<WhopApiHttpResponse<PromoCode>> rawFuture = this.rawClient.deactivate(id, request);
+        CompletableFuture<PromoCode> future = rawFuture.thenApply(response -> response.body());
+        future.whenComplete((result_, throwable_) -> {
+            if (future.isCancelled()) {
+                rawFuture.cancel(true);
+            }
+        });
+        return future;
     }
 
     /**
@@ -176,6 +318,14 @@ public class AsyncPromoCodesClient {
      */
     public CompletableFuture<PromoCode> deactivate(
             String id, DeactivatePromoCodesRequest request, RequestOptions requestOptions) {
-        return this.rawClient.deactivate(id, request, requestOptions).thenApply(response -> response.body());
+        CompletableFuture<WhopApiHttpResponse<PromoCode>> rawFuture =
+                this.rawClient.deactivate(id, request, requestOptions);
+        CompletableFuture<PromoCode> future = rawFuture.thenApply(response -> response.body());
+        future.whenComplete((result_, throwable_) -> {
+            if (future.isCancelled()) {
+                rawFuture.cancel(true);
+            }
+        });
+        return future;
     }
 }

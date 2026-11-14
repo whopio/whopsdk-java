@@ -4,31 +4,30 @@
 package com.whop.api.resources.setupintents;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
+import com.whop.api.core.BodyProperties;
 import com.whop.api.core.ClientOptions;
 import com.whop.api.core.MediaTypes;
 import com.whop.api.core.ObjectMappers;
+import com.whop.api.core.PathSegments;
 import com.whop.api.core.QueryStringMapper;
 import com.whop.api.core.RequestOptions;
+import com.whop.api.core.RetryInterceptor;
 import com.whop.api.core.WhopApiApiException;
 import com.whop.api.core.WhopApiException;
 import com.whop.api.core.WhopApiHttpResponse;
 import com.whop.api.core.pagination.SyncPagingIterable;
 import com.whop.api.errors.BadRequestError;
+import com.whop.api.errors.ConflictError;
 import com.whop.api.errors.ForbiddenError;
-import com.whop.api.errors.InternalServerError;
 import com.whop.api.errors.NotFoundError;
-import com.whop.api.errors.TooManyRequestsError;
 import com.whop.api.errors.UnauthorizedError;
-import com.whop.api.errors.UnprocessableEntityError;
+import com.whop.api.resources.setupintents.requests.CreateSetupIntentsRequest;
 import com.whop.api.resources.setupintents.requests.ListSetupIntentsRequest;
 import com.whop.api.resources.setupintents.requests.RetrieveSetupIntentsRequest;
 import com.whop.api.resources.setupintents.requests.RetrieveStatusSetupIntentsRequest;
 import com.whop.api.resources.setupintents.requests.UpdateReturnUrlSetupIntentsRequest;
-import com.whop.api.resources.setupintents.types.CreateSetupIntentsRequest;
-import com.whop.api.resources.setupintents.types.CreateSetupIntentsResponse;
 import com.whop.api.resources.setupintents.types.ListSetupIntentsResponse;
 import com.whop.api.types.SetupIntent;
-import com.whop.api.types.SetupIntentListItem;
 import com.whop.api.types.SetupStatus;
 import java.io.IOException;
 import java.util.List;
@@ -54,53 +53,42 @@ public class AsyncRawSetupIntentsClient {
     }
 
     /**
-     * Returns a paginated list of setup intents for a company, with optional filtering by creation date. A setup intent securely collects and stores a member's payment method for future use without charging them immediately.
-     * <p>Required permissions:</p>
-     * <ul>
-     * <li><code>payment:setup_intent:read</code></li>
-     * <li><code>member:basic:read</code></li>
-     * <li><code>member:email:read</code></li>
-     * </ul>
+     * Lists setup intents newest first. An account API key lists its own account; a user token lists every account it can read, or one account with <code>account_id</code>.
      */
-    public CompletableFuture<WhopApiHttpResponse<SyncPagingIterable<SetupIntentListItem>>> list(
+    public CompletableFuture<WhopApiHttpResponse<SyncPagingIterable<SetupIntent>>> list() {
+        return list(ListSetupIntentsRequest.builder().build());
+    }
+
+    /**
+     * Lists setup intents newest first. An account API key lists its own account; a user token lists every account it can read, or one account with <code>account_id</code>.
+     */
+    public CompletableFuture<WhopApiHttpResponse<SyncPagingIterable<SetupIntent>>> list(RequestOptions requestOptions) {
+        return list(ListSetupIntentsRequest.builder().build(), requestOptions);
+    }
+
+    /**
+     * Lists setup intents newest first. An account API key lists its own account; a user token lists every account it can read, or one account with <code>account_id</code>.
+     */
+    public CompletableFuture<WhopApiHttpResponse<SyncPagingIterable<SetupIntent>>> list(
             ListSetupIntentsRequest request) {
         return list(request, null);
     }
 
     /**
-     * Returns a paginated list of setup intents for a company, with optional filtering by creation date. A setup intent securely collects and stores a member's payment method for future use without charging them immediately.
-     * <p>Required permissions:</p>
-     * <ul>
-     * <li><code>payment:setup_intent:read</code></li>
-     * <li><code>member:basic:read</code></li>
-     * <li><code>member:email:read</code></li>
-     * </ul>
+     * Lists setup intents newest first. An account API key lists its own account; a user token lists every account it can read, or one account with <code>account_id</code>.
      */
-    public CompletableFuture<WhopApiHttpResponse<SyncPagingIterable<SetupIntentListItem>>> list(
+    public CompletableFuture<WhopApiHttpResponse<SyncPagingIterable<SetupIntent>>> list(
             ListSetupIntentsRequest request, RequestOptions requestOptions) {
-        HttpUrl.Builder httpUrl = HttpUrl.parse(this.clientOptions.environment().getUrl())
+        HttpUrl.Builder httpUrl = HttpUrl.parse(this.clientOptions.environment().getApiURL())
                 .newBuilder()
                 .addPathSegments("setup_intents");
-        if (request.getAfter().isPresent()) {
+        if (request.getAccountId().isPresent()) {
             QueryStringMapper.addQueryParameter(
-                    httpUrl, "after", request.getAfter().get(), false);
+                    httpUrl, "account_id", request.getAccountId().get(), false);
         }
-        if (request.getBefore().isPresent()) {
+        if (request.getStatus().isPresent()) {
             QueryStringMapper.addQueryParameter(
-                    httpUrl, "before", request.getBefore().get(), false);
-        }
-        if (request.getFirst().isPresent()) {
-            QueryStringMapper.addQueryParameter(
-                    httpUrl, "first", request.getFirst().get(), false);
-        }
-        if (request.getLast().isPresent()) {
-            QueryStringMapper.addQueryParameter(
-                    httpUrl, "last", request.getLast().get(), false);
-        }
-        QueryStringMapper.addQueryParameter(httpUrl, "company_id", request.getCompanyId(), false);
-        if (request.getDirection().isPresent()) {
-            QueryStringMapper.addQueryParameter(
-                    httpUrl, "direction", request.getDirection().get(), false);
+                    httpUrl, "status", request.getStatus().get(), false);
         }
         if (request.getCreatedBefore().isPresent()) {
             QueryStringMapper.addQueryParameter(
@@ -109,6 +97,30 @@ public class AsyncRawSetupIntentsClient {
         if (request.getCreatedAfter().isPresent()) {
             QueryStringMapper.addQueryParameter(
                     httpUrl, "created_after", request.getCreatedAfter().get(), false);
+        }
+        if (request.getOrder().isPresent()) {
+            QueryStringMapper.addQueryParameter(
+                    httpUrl, "order", request.getOrder().get(), false);
+        }
+        if (request.getDirection().isPresent()) {
+            QueryStringMapper.addQueryParameter(
+                    httpUrl, "direction", request.getDirection().get(), false);
+        }
+        if (request.getFirst().isPresent()) {
+            QueryStringMapper.addQueryParameter(
+                    httpUrl, "first", request.getFirst().get(), false);
+        }
+        if (request.getAfter().isPresent()) {
+            QueryStringMapper.addQueryParameter(
+                    httpUrl, "after", request.getAfter().get(), false);
+        }
+        if (request.getLast().isPresent()) {
+            QueryStringMapper.addQueryParameter(
+                    httpUrl, "last", request.getLast().get(), false);
+        }
+        if (request.getBefore().isPresent()) {
+            QueryStringMapper.addQueryParameter(
+                    httpUrl, "before", request.getBefore().get(), false);
         }
         if (requestOptions != null) {
             requestOptions.getQueryParameters().forEach((_key, _value) -> {
@@ -125,9 +137,18 @@ public class AsyncRawSetupIntentsClient {
         if (requestOptions != null && requestOptions.getTimeout().isPresent()) {
             client = clientOptions.httpClientWithTimeout(requestOptions);
         }
-        CompletableFuture<WhopApiHttpResponse<SyncPagingIterable<SetupIntentListItem>>> future =
-                new CompletableFuture<>();
-        client.newCall(okhttpRequest).enqueue(new Callback() {
+        if (requestOptions != null && requestOptions.getMaxRetries().isPresent()) {
+            okhttpRequest = okhttpRequest
+                    .newBuilder()
+                    .tag(
+                            RetryInterceptor.MaxRetriesOverride.class,
+                            new RetryInterceptor.MaxRetriesOverride(
+                                    requestOptions.getMaxRetries().get()))
+                    .build();
+        }
+        CompletableFuture<WhopApiHttpResponse<SyncPagingIterable<SetupIntent>>> future = new CompletableFuture<>();
+        RetryInterceptor.AsyncCall okhttpCall = RetryInterceptor.newAsyncCall(client, okhttpRequest);
+        okhttpCall.enqueue(new Callback() {
             @Override
             public void onResponse(@NotNull Call call, @NotNull Response response) throws IOException {
                 try (ResponseBody responseBody = response.body()) {
@@ -141,10 +162,14 @@ public class AsyncRawSetupIntentsClient {
                                 .from(request)
                                 .after(startingAfter)
                                 .build();
-                        List<SetupIntentListItem> result = parsedResponse.getData();
+                        List<SetupIntent> result = parsedResponse.getData();
                         future.complete(new WhopApiHttpResponse<>(
-                                new SyncPagingIterable<SetupIntentListItem>(
-                                        startingAfter != null, result, parsedResponse, () -> {
+                                new SyncPagingIterable<SetupIntent>(
+                                        startingAfter.isPresent()
+                                                && !startingAfter.get().isEmpty(),
+                                        result,
+                                        parsedResponse,
+                                        () -> {
                                             try {
                                                 return list(nextRequest, requestOptions)
                                                         .get()
@@ -173,26 +198,6 @@ public class AsyncRawSetupIntentsClient {
                                         ObjectMappers.JSON_MAPPER.readValue(responseBodyString, Object.class),
                                         response));
                                 return;
-                            case 404:
-                                future.completeExceptionally(new NotFoundError(
-                                        ObjectMappers.JSON_MAPPER.readValue(responseBodyString, Object.class),
-                                        response));
-                                return;
-                            case 422:
-                                future.completeExceptionally(new UnprocessableEntityError(
-                                        ObjectMappers.JSON_MAPPER.readValue(responseBodyString, Object.class),
-                                        response));
-                                return;
-                            case 429:
-                                future.completeExceptionally(new TooManyRequestsError(
-                                        ObjectMappers.JSON_MAPPER.readValue(responseBodyString, Object.class),
-                                        response));
-                                return;
-                            case 500:
-                                future.completeExceptionally(new InternalServerError(
-                                        ObjectMappers.JSON_MAPPER.readValue(responseBodyString, Object.class),
-                                        response));
-                                return;
                         }
                     } catch (JsonProcessingException ignored) {
                         // unable to map error response, throwing generic error
@@ -201,6 +206,9 @@ public class AsyncRawSetupIntentsClient {
                     future.completeExceptionally(new WhopApiApiException(
                             "Error with status code " + response.code(), response.code(), errorBody, response));
                     return;
+                } catch (JsonProcessingException e) {
+                    future.completeExceptionally(
+                            new WhopApiException("Failed to deserialize response: " + e.getMessage(), e));
                 } catch (IOException e) {
                     future.completeExceptionally(new WhopApiException("Network error executing HTTP request", e));
                 }
@@ -211,35 +219,27 @@ public class AsyncRawSetupIntentsClient {
                 future.completeExceptionally(new WhopApiException("Network error executing HTTP request", e));
             }
         });
+        future.whenComplete((result_, throwable_) -> {
+            if (future.isCancelled()) {
+                okhttpCall.cancel();
+            }
+        });
         return future;
     }
 
     /**
-     * Save a buyer's payment method for later without charging it. Provide a confirmation token for a method the buyer just supplied, or an existing payment method to re-verify. The buyer may still have a step to complete — 3D Secure, a hosted enrollment, linking a bank account — so poll the setup intent's status endpoint for what to do next.
-     * <p>Required permissions:</p>
-     * <ul>
-     * <li><code>payment:charge</code></li>
-     * <li><code>member:basic:read</code></li>
-     * <li><code>member:email:read</code></li>
-     * </ul>
+     * Saves a buyer's payment method for later without charging it — one the buyer just supplied through the payment elements in setup mode, or one already on file to re-verify. The setup completes in the background, so the response is the setup intent as created, not its outcome: hand <code>client_secret</code> to the elements' <code>handleNextAction</code>, or poll Retrieve setup status. A buyer's own token holding <code>member:payment_methods:use</code> may create a setup intent for itself from a confirmation token.
      */
-    public CompletableFuture<WhopApiHttpResponse<CreateSetupIntentsResponse>> create(
-            CreateSetupIntentsRequest request) {
+    public CompletableFuture<WhopApiHttpResponse<SetupIntent>> create(CreateSetupIntentsRequest request) {
         return create(request, null);
     }
 
     /**
-     * Save a buyer's payment method for later without charging it. Provide a confirmation token for a method the buyer just supplied, or an existing payment method to re-verify. The buyer may still have a step to complete — 3D Secure, a hosted enrollment, linking a bank account — so poll the setup intent's status endpoint for what to do next.
-     * <p>Required permissions:</p>
-     * <ul>
-     * <li><code>payment:charge</code></li>
-     * <li><code>member:basic:read</code></li>
-     * <li><code>member:email:read</code></li>
-     * </ul>
+     * Saves a buyer's payment method for later without charging it — one the buyer just supplied through the payment elements in setup mode, or one already on file to re-verify. The setup completes in the background, so the response is the setup intent as created, not its outcome: hand <code>client_secret</code> to the elements' <code>handleNextAction</code>, or poll Retrieve setup status. A buyer's own token holding <code>member:payment_methods:use</code> may create a setup intent for itself from a confirmation token.
      */
-    public CompletableFuture<WhopApiHttpResponse<CreateSetupIntentsResponse>> create(
+    public CompletableFuture<WhopApiHttpResponse<SetupIntent>> create(
             CreateSetupIntentsRequest request, RequestOptions requestOptions) {
-        HttpUrl.Builder httpUrl = HttpUrl.parse(this.clientOptions.environment().getUrl())
+        HttpUrl.Builder httpUrl = HttpUrl.parse(this.clientOptions.environment().getApiURL())
                 .newBuilder()
                 .addPathSegments("setup_intents");
         if (requestOptions != null) {
@@ -250,7 +250,9 @@ public class AsyncRawSetupIntentsClient {
         RequestBody body;
         try {
             body = RequestBody.create(
-                    ObjectMappers.JSON_MAPPER.writeValueAsBytes(request), MediaTypes.APPLICATION_JSON);
+                    ObjectMappers.JSON_MAPPER.writeValueAsBytes(BodyProperties.merge(
+                            request, requestOptions != null ? requestOptions.getBodyProperties() : null)),
+                    MediaTypes.APPLICATION_JSON);
         } catch (JsonProcessingException e) {
             throw new WhopApiException("Failed to serialize request", e);
         }
@@ -265,149 +267,18 @@ public class AsyncRawSetupIntentsClient {
         if (requestOptions != null && requestOptions.getTimeout().isPresent()) {
             client = clientOptions.httpClientWithTimeout(requestOptions);
         }
-        CompletableFuture<WhopApiHttpResponse<CreateSetupIntentsResponse>> future = new CompletableFuture<>();
-        client.newCall(okhttpRequest).enqueue(new Callback() {
-            @Override
-            public void onResponse(@NotNull Call call, @NotNull Response response) throws IOException {
-                try (ResponseBody responseBody = response.body()) {
-                    String responseBodyString = responseBody != null ? responseBody.string() : "{}";
-                    if (response.isSuccessful()) {
-                        future.complete(new WhopApiHttpResponse<>(
-                                ObjectMappers.JSON_MAPPER.readValue(
-                                        responseBodyString, CreateSetupIntentsResponse.class),
-                                response));
-                        return;
-                    }
-                    try {
-                        switch (response.code()) {
-                            case 400:
-                                future.completeExceptionally(new BadRequestError(
-                                        ObjectMappers.JSON_MAPPER.readValue(responseBodyString, Object.class),
-                                        response));
-                                return;
-                            case 401:
-                                future.completeExceptionally(new UnauthorizedError(
-                                        ObjectMappers.JSON_MAPPER.readValue(responseBodyString, Object.class),
-                                        response));
-                                return;
-                            case 403:
-                                future.completeExceptionally(new ForbiddenError(
-                                        ObjectMappers.JSON_MAPPER.readValue(responseBodyString, Object.class),
-                                        response));
-                                return;
-                            case 404:
-                                future.completeExceptionally(new NotFoundError(
-                                        ObjectMappers.JSON_MAPPER.readValue(responseBodyString, Object.class),
-                                        response));
-                                return;
-                            case 422:
-                                future.completeExceptionally(new UnprocessableEntityError(
-                                        ObjectMappers.JSON_MAPPER.readValue(responseBodyString, Object.class),
-                                        response));
-                                return;
-                            case 429:
-                                future.completeExceptionally(new TooManyRequestsError(
-                                        ObjectMappers.JSON_MAPPER.readValue(responseBodyString, Object.class),
-                                        response));
-                                return;
-                            case 500:
-                                future.completeExceptionally(new InternalServerError(
-                                        ObjectMappers.JSON_MAPPER.readValue(responseBodyString, Object.class),
-                                        response));
-                                return;
-                        }
-                    } catch (JsonProcessingException ignored) {
-                        // unable to map error response, throwing generic error
-                    }
-                    Object errorBody = ObjectMappers.parseErrorBody(responseBodyString);
-                    future.completeExceptionally(new WhopApiApiException(
-                            "Error with status code " + response.code(), response.code(), errorBody, response));
-                    return;
-                } catch (IOException e) {
-                    future.completeExceptionally(new WhopApiException("Network error executing HTTP request", e));
-                }
-            }
-
-            @Override
-            public void onFailure(@NotNull Call call, @NotNull IOException e) {
-                future.completeExceptionally(new WhopApiException("Network error executing HTTP request", e));
-            }
-        });
-        return future;
-    }
-
-    /**
-     * Retrieves the details of an existing setup intent.
-     * <p>Required permissions:</p>
-     * <ul>
-     * <li><code>payment:setup_intent:read</code></li>
-     * <li><code>member:basic:read</code></li>
-     * <li><code>member:email:read</code></li>
-     * </ul>
-     */
-    public CompletableFuture<WhopApiHttpResponse<SetupIntent>> retrieve(String id) {
-        return retrieve(id, RetrieveSetupIntentsRequest.builder().build());
-    }
-
-    /**
-     * Retrieves the details of an existing setup intent.
-     * <p>Required permissions:</p>
-     * <ul>
-     * <li><code>payment:setup_intent:read</code></li>
-     * <li><code>member:basic:read</code></li>
-     * <li><code>member:email:read</code></li>
-     * </ul>
-     */
-    public CompletableFuture<WhopApiHttpResponse<SetupIntent>> retrieve(String id, RequestOptions requestOptions) {
-        return retrieve(id, RetrieveSetupIntentsRequest.builder().build(), requestOptions);
-    }
-
-    /**
-     * Retrieves the details of an existing setup intent.
-     * <p>Required permissions:</p>
-     * <ul>
-     * <li><code>payment:setup_intent:read</code></li>
-     * <li><code>member:basic:read</code></li>
-     * <li><code>member:email:read</code></li>
-     * </ul>
-     */
-    public CompletableFuture<WhopApiHttpResponse<SetupIntent>> retrieve(
-            String id, RetrieveSetupIntentsRequest request) {
-        return retrieve(id, request, null);
-    }
-
-    /**
-     * Retrieves the details of an existing setup intent.
-     * <p>Required permissions:</p>
-     * <ul>
-     * <li><code>payment:setup_intent:read</code></li>
-     * <li><code>member:basic:read</code></li>
-     * <li><code>member:email:read</code></li>
-     * </ul>
-     */
-    public CompletableFuture<WhopApiHttpResponse<SetupIntent>> retrieve(
-            String id, RetrieveSetupIntentsRequest request, RequestOptions requestOptions) {
-        HttpUrl.Builder httpUrl = HttpUrl.parse(this.clientOptions.environment().getUrl())
-                .newBuilder()
-                .addPathSegments("setup_intents")
-                .addPathSegment(id);
-        if (requestOptions != null) {
-            requestOptions.getQueryParameters().forEach((_key, _value) -> {
-                httpUrl.addQueryParameter(_key, _value);
-            });
-        }
-        Request.Builder _requestBuilder = new Request.Builder()
-                .url(httpUrl.build())
-                .method("GET", null)
-                .headers(Headers.of(clientOptions.headers(requestOptions)))
-                .addHeader("Accept", "application/json");
-        Request okhttpRequest = _requestBuilder.build();
-        OkHttpClient client = clientOptions.httpClient();
-        if (requestOptions != null && requestOptions.getTimeout().isPresent()) {
-            client = clientOptions.httpClientWithTimeout(requestOptions);
+        if (requestOptions != null && requestOptions.getMaxRetries().isPresent()) {
+            okhttpRequest = okhttpRequest
+                    .newBuilder()
+                    .tag(
+                            RetryInterceptor.MaxRetriesOverride.class,
+                            new RetryInterceptor.MaxRetriesOverride(
+                                    requestOptions.getMaxRetries().get()))
+                    .build();
         }
         CompletableFuture<WhopApiHttpResponse<SetupIntent>> future = new CompletableFuture<>();
-        client.newCall(okhttpRequest).enqueue(new Callback() {
+        RetryInterceptor.AsyncCall okhttpCall = RetryInterceptor.newAsyncCall(client, okhttpRequest);
+        okhttpCall.enqueue(new Callback() {
             @Override
             public void onResponse(@NotNull Call call, @NotNull Response response) throws IOException {
                 try (ResponseBody responseBody = response.body()) {
@@ -439,18 +310,8 @@ public class AsyncRawSetupIntentsClient {
                                         ObjectMappers.JSON_MAPPER.readValue(responseBodyString, Object.class),
                                         response));
                                 return;
-                            case 422:
-                                future.completeExceptionally(new UnprocessableEntityError(
-                                        ObjectMappers.JSON_MAPPER.readValue(responseBodyString, Object.class),
-                                        response));
-                                return;
-                            case 429:
-                                future.completeExceptionally(new TooManyRequestsError(
-                                        ObjectMappers.JSON_MAPPER.readValue(responseBodyString, Object.class),
-                                        response));
-                                return;
-                            case 500:
-                                future.completeExceptionally(new InternalServerError(
+                            case 409:
+                                future.completeExceptionally(new ConflictError(
                                         ObjectMappers.JSON_MAPPER.readValue(responseBodyString, Object.class),
                                         response));
                                 return;
@@ -462,6 +323,9 @@ public class AsyncRawSetupIntentsClient {
                     future.completeExceptionally(new WhopApiApiException(
                             "Error with status code " + response.code(), response.code(), errorBody, response));
                     return;
+                } catch (JsonProcessingException e) {
+                    future.completeExceptionally(
+                            new WhopApiException("Failed to deserialize response: " + e.getMessage(), e));
                 } catch (IOException e) {
                     future.completeExceptionally(new WhopApiException("Network error executing HTTP request", e));
                 }
@@ -472,11 +336,129 @@ public class AsyncRawSetupIntentsClient {
                 future.completeExceptionally(new WhopApiException("Network error executing HTTP request", e));
             }
         });
+        future.whenComplete((result_, throwable_) -> {
+            if (future.isCancelled()) {
+                okhttpCall.cancel();
+            }
+        });
         return future;
     }
 
     /**
-     * Changes where the buyer lands after completing an off-site step, up until they return. Accepts either a secret key or the setup's own <code>client_secret</code>, so the surface that knows the final destination can set it.
+     * Retrieves a setup intent. Once its <code>status</code> is <code>succeeded</code>, charge the saved method by its <code>payment_method_id</code>. The buyer's own token may retrieve a setup intent that belongs to it.
+     */
+    public CompletableFuture<WhopApiHttpResponse<SetupIntent>> retrieve(String id) {
+        return retrieve(id, RetrieveSetupIntentsRequest.builder().build());
+    }
+
+    /**
+     * Retrieves a setup intent. Once its <code>status</code> is <code>succeeded</code>, charge the saved method by its <code>payment_method_id</code>. The buyer's own token may retrieve a setup intent that belongs to it.
+     */
+    public CompletableFuture<WhopApiHttpResponse<SetupIntent>> retrieve(String id, RequestOptions requestOptions) {
+        return retrieve(id, RetrieveSetupIntentsRequest.builder().build(), requestOptions);
+    }
+
+    /**
+     * Retrieves a setup intent. Once its <code>status</code> is <code>succeeded</code>, charge the saved method by its <code>payment_method_id</code>. The buyer's own token may retrieve a setup intent that belongs to it.
+     */
+    public CompletableFuture<WhopApiHttpResponse<SetupIntent>> retrieve(
+            String id, RetrieveSetupIntentsRequest request) {
+        return retrieve(id, request, null);
+    }
+
+    /**
+     * Retrieves a setup intent. Once its <code>status</code> is <code>succeeded</code>, charge the saved method by its <code>payment_method_id</code>. The buyer's own token may retrieve a setup intent that belongs to it.
+     */
+    public CompletableFuture<WhopApiHttpResponse<SetupIntent>> retrieve(
+            String id, RetrieveSetupIntentsRequest request, RequestOptions requestOptions) {
+        HttpUrl.Builder httpUrl = HttpUrl.parse(this.clientOptions.environment().getApiURL())
+                .newBuilder()
+                .addPathSegments("setup_intents")
+                .addPathSegment(PathSegments.validate(id));
+        if (requestOptions != null) {
+            requestOptions.getQueryParameters().forEach((_key, _value) -> {
+                httpUrl.addQueryParameter(_key, _value);
+            });
+        }
+        Request.Builder _requestBuilder = new Request.Builder()
+                .url(httpUrl.build())
+                .method("GET", null)
+                .headers(Headers.of(clientOptions.headers(requestOptions)))
+                .addHeader("Accept", "application/json");
+        Request okhttpRequest = _requestBuilder.build();
+        OkHttpClient client = clientOptions.httpClient();
+        if (requestOptions != null && requestOptions.getTimeout().isPresent()) {
+            client = clientOptions.httpClientWithTimeout(requestOptions);
+        }
+        if (requestOptions != null && requestOptions.getMaxRetries().isPresent()) {
+            okhttpRequest = okhttpRequest
+                    .newBuilder()
+                    .tag(
+                            RetryInterceptor.MaxRetriesOverride.class,
+                            new RetryInterceptor.MaxRetriesOverride(
+                                    requestOptions.getMaxRetries().get()))
+                    .build();
+        }
+        CompletableFuture<WhopApiHttpResponse<SetupIntent>> future = new CompletableFuture<>();
+        RetryInterceptor.AsyncCall okhttpCall = RetryInterceptor.newAsyncCall(client, okhttpRequest);
+        okhttpCall.enqueue(new Callback() {
+            @Override
+            public void onResponse(@NotNull Call call, @NotNull Response response) throws IOException {
+                try (ResponseBody responseBody = response.body()) {
+                    String responseBodyString = responseBody != null ? responseBody.string() : "{}";
+                    if (response.isSuccessful()) {
+                        future.complete(new WhopApiHttpResponse<>(
+                                ObjectMappers.JSON_MAPPER.readValue(responseBodyString, SetupIntent.class), response));
+                        return;
+                    }
+                    try {
+                        switch (response.code()) {
+                            case 401:
+                                future.completeExceptionally(new UnauthorizedError(
+                                        ObjectMappers.JSON_MAPPER.readValue(responseBodyString, Object.class),
+                                        response));
+                                return;
+                            case 403:
+                                future.completeExceptionally(new ForbiddenError(
+                                        ObjectMappers.JSON_MAPPER.readValue(responseBodyString, Object.class),
+                                        response));
+                                return;
+                            case 404:
+                                future.completeExceptionally(new NotFoundError(
+                                        ObjectMappers.JSON_MAPPER.readValue(responseBodyString, Object.class),
+                                        response));
+                                return;
+                        }
+                    } catch (JsonProcessingException ignored) {
+                        // unable to map error response, throwing generic error
+                    }
+                    Object errorBody = ObjectMappers.parseErrorBody(responseBodyString);
+                    future.completeExceptionally(new WhopApiApiException(
+                            "Error with status code " + response.code(), response.code(), errorBody, response));
+                    return;
+                } catch (JsonProcessingException e) {
+                    future.completeExceptionally(
+                            new WhopApiException("Failed to deserialize response: " + e.getMessage(), e));
+                } catch (IOException e) {
+                    future.completeExceptionally(new WhopApiException("Network error executing HTTP request", e));
+                }
+            }
+
+            @Override
+            public void onFailure(@NotNull Call call, @NotNull IOException e) {
+                future.completeExceptionally(new WhopApiException("Network error executing HTTP request", e));
+            }
+        });
+        future.whenComplete((result_, throwable_) -> {
+            if (future.isCancelled()) {
+                okhttpCall.cancel();
+            }
+        });
+        return future;
+    }
+
+    /**
+     * Changes where the buyer lands after completing an off-site step, up until they return. Accepts either a secret key or the setup's own <code>client_secret</code> in the body, so the surface that knows the final destination can set it.
      */
     public CompletableFuture<WhopApiHttpResponse<SetupStatus>> updateReturnUrl(
             String setupIntentId, UpdateReturnUrlSetupIntentsRequest request) {
@@ -484,14 +466,14 @@ public class AsyncRawSetupIntentsClient {
     }
 
     /**
-     * Changes where the buyer lands after completing an off-site step, up until they return. Accepts either a secret key or the setup's own <code>client_secret</code>, so the surface that knows the final destination can set it.
+     * Changes where the buyer lands after completing an off-site step, up until they return. Accepts either a secret key or the setup's own <code>client_secret</code> in the body, so the surface that knows the final destination can set it.
      */
     public CompletableFuture<WhopApiHttpResponse<SetupStatus>> updateReturnUrl(
             String setupIntentId, UpdateReturnUrlSetupIntentsRequest request, RequestOptions requestOptions) {
-        HttpUrl.Builder httpUrl = HttpUrl.parse(this.clientOptions.environment().getUrl())
+        HttpUrl.Builder httpUrl = HttpUrl.parse(this.clientOptions.environment().getApiURL())
                 .newBuilder()
                 .addPathSegments("setup_intents")
-                .addPathSegment(setupIntentId)
+                .addPathSegment(PathSegments.validate(setupIntentId))
                 .addPathSegments("return_url");
         if (requestOptions != null) {
             requestOptions.getQueryParameters().forEach((_key, _value) -> {
@@ -501,7 +483,9 @@ public class AsyncRawSetupIntentsClient {
         RequestBody body;
         try {
             body = RequestBody.create(
-                    ObjectMappers.JSON_MAPPER.writeValueAsBytes(request), MediaTypes.APPLICATION_JSON);
+                    ObjectMappers.JSON_MAPPER.writeValueAsBytes(BodyProperties.merge(
+                            request, requestOptions != null ? requestOptions.getBodyProperties() : null)),
+                    MediaTypes.APPLICATION_JSON);
         } catch (JsonProcessingException e) {
             throw new WhopApiException("Failed to serialize request", e);
         }
@@ -516,8 +500,18 @@ public class AsyncRawSetupIntentsClient {
         if (requestOptions != null && requestOptions.getTimeout().isPresent()) {
             client = clientOptions.httpClientWithTimeout(requestOptions);
         }
+        if (requestOptions != null && requestOptions.getMaxRetries().isPresent()) {
+            okhttpRequest = okhttpRequest
+                    .newBuilder()
+                    .tag(
+                            RetryInterceptor.MaxRetriesOverride.class,
+                            new RetryInterceptor.MaxRetriesOverride(
+                                    requestOptions.getMaxRetries().get()))
+                    .build();
+        }
         CompletableFuture<WhopApiHttpResponse<SetupStatus>> future = new CompletableFuture<>();
-        client.newCall(okhttpRequest).enqueue(new Callback() {
+        RetryInterceptor.AsyncCall okhttpCall = RetryInterceptor.newAsyncCall(client, okhttpRequest);
+        okhttpCall.enqueue(new Callback() {
             @Override
             public void onResponse(@NotNull Call call, @NotNull Response response) throws IOException {
                 try (ResponseBody responseBody = response.body()) {
@@ -552,6 +546,9 @@ public class AsyncRawSetupIntentsClient {
                     future.completeExceptionally(new WhopApiApiException(
                             "Error with status code " + response.code(), response.code(), errorBody, response));
                     return;
+                } catch (JsonProcessingException e) {
+                    future.completeExceptionally(
+                            new WhopApiException("Failed to deserialize response: " + e.getMessage(), e));
                 } catch (IOException e) {
                     future.completeExceptionally(new WhopApiException("Network error executing HTTP request", e));
                 }
@@ -562,11 +559,16 @@ public class AsyncRawSetupIntentsClient {
                 future.completeExceptionally(new WhopApiException("Network error executing HTTP request", e));
             }
         });
+        future.whenComplete((result_, throwable_) -> {
+            if (future.isCancelled()) {
+                okhttpCall.cancel();
+            }
+        });
         return future;
     }
 
     /**
-     * Retrieves how far a setup has got and what the buyer must do next, if anything. Collection runs in the background, so poll this rather than reading the create response. Accepts either a secret key or the setup's own <code>client_secret</code>, so the surface collecting the payment method can poll it directly.
+     * Retrieves how far a setup has got and what the buyer must do next, if anything. Collection runs in the background, so poll this rather than reading the create response. Accepts either a secret key or the setup's own <code>client_secret</code> as a query parameter, so the surface collecting the payment method can poll it directly.
      */
     public CompletableFuture<WhopApiHttpResponse<SetupStatus>> retrieveStatus(String setupIntentId) {
         return retrieveStatus(
@@ -574,7 +576,7 @@ public class AsyncRawSetupIntentsClient {
     }
 
     /**
-     * Retrieves how far a setup has got and what the buyer must do next, if anything. Collection runs in the background, so poll this rather than reading the create response. Accepts either a secret key or the setup's own <code>client_secret</code>, so the surface collecting the payment method can poll it directly.
+     * Retrieves how far a setup has got and what the buyer must do next, if anything. Collection runs in the background, so poll this rather than reading the create response. Accepts either a secret key or the setup's own <code>client_secret</code> as a query parameter, so the surface collecting the payment method can poll it directly.
      */
     public CompletableFuture<WhopApiHttpResponse<SetupStatus>> retrieveStatus(
             String setupIntentId, RequestOptions requestOptions) {
@@ -583,7 +585,7 @@ public class AsyncRawSetupIntentsClient {
     }
 
     /**
-     * Retrieves how far a setup has got and what the buyer must do next, if anything. Collection runs in the background, so poll this rather than reading the create response. Accepts either a secret key or the setup's own <code>client_secret</code>, so the surface collecting the payment method can poll it directly.
+     * Retrieves how far a setup has got and what the buyer must do next, if anything. Collection runs in the background, so poll this rather than reading the create response. Accepts either a secret key or the setup's own <code>client_secret</code> as a query parameter, so the surface collecting the payment method can poll it directly.
      */
     public CompletableFuture<WhopApiHttpResponse<SetupStatus>> retrieveStatus(
             String setupIntentId, RetrieveStatusSetupIntentsRequest request) {
@@ -591,15 +593,19 @@ public class AsyncRawSetupIntentsClient {
     }
 
     /**
-     * Retrieves how far a setup has got and what the buyer must do next, if anything. Collection runs in the background, so poll this rather than reading the create response. Accepts either a secret key or the setup's own <code>client_secret</code>, so the surface collecting the payment method can poll it directly.
+     * Retrieves how far a setup has got and what the buyer must do next, if anything. Collection runs in the background, so poll this rather than reading the create response. Accepts either a secret key or the setup's own <code>client_secret</code> as a query parameter, so the surface collecting the payment method can poll it directly.
      */
     public CompletableFuture<WhopApiHttpResponse<SetupStatus>> retrieveStatus(
             String setupIntentId, RetrieveStatusSetupIntentsRequest request, RequestOptions requestOptions) {
-        HttpUrl.Builder httpUrl = HttpUrl.parse(this.clientOptions.environment().getUrl())
+        HttpUrl.Builder httpUrl = HttpUrl.parse(this.clientOptions.environment().getApiURL())
                 .newBuilder()
                 .addPathSegments("setup_intents")
-                .addPathSegment(setupIntentId)
+                .addPathSegment(PathSegments.validate(setupIntentId))
                 .addPathSegments("status");
+        if (request.getClientSecret().isPresent()) {
+            QueryStringMapper.addQueryParameter(
+                    httpUrl, "client_secret", request.getClientSecret().get(), false);
+        }
         if (requestOptions != null) {
             requestOptions.getQueryParameters().forEach((_key, _value) -> {
                 httpUrl.addQueryParameter(_key, _value);
@@ -615,8 +621,18 @@ public class AsyncRawSetupIntentsClient {
         if (requestOptions != null && requestOptions.getTimeout().isPresent()) {
             client = clientOptions.httpClientWithTimeout(requestOptions);
         }
+        if (requestOptions != null && requestOptions.getMaxRetries().isPresent()) {
+            okhttpRequest = okhttpRequest
+                    .newBuilder()
+                    .tag(
+                            RetryInterceptor.MaxRetriesOverride.class,
+                            new RetryInterceptor.MaxRetriesOverride(
+                                    requestOptions.getMaxRetries().get()))
+                    .build();
+        }
         CompletableFuture<WhopApiHttpResponse<SetupStatus>> future = new CompletableFuture<>();
-        client.newCall(okhttpRequest).enqueue(new Callback() {
+        RetryInterceptor.AsyncCall okhttpCall = RetryInterceptor.newAsyncCall(client, okhttpRequest);
+        okhttpCall.enqueue(new Callback() {
             @Override
             public void onResponse(@NotNull Call call, @NotNull Response response) throws IOException {
                 try (ResponseBody responseBody = response.body()) {
@@ -651,6 +667,9 @@ public class AsyncRawSetupIntentsClient {
                     future.completeExceptionally(new WhopApiApiException(
                             "Error with status code " + response.code(), response.code(), errorBody, response));
                     return;
+                } catch (JsonProcessingException e) {
+                    future.completeExceptionally(
+                            new WhopApiException("Failed to deserialize response: " + e.getMessage(), e));
                 } catch (IOException e) {
                     future.completeExceptionally(new WhopApiException("Network error executing HTTP request", e));
                 }
@@ -659,6 +678,11 @@ public class AsyncRawSetupIntentsClient {
             @Override
             public void onFailure(@NotNull Call call, @NotNull IOException e) {
                 future.completeExceptionally(new WhopApiException("Network error executing HTTP request", e));
+            }
+        });
+        future.whenComplete((result_, throwable_) -> {
+            if (future.isCancelled()) {
+                okhttpCall.cancel();
             }
         });
         return future;

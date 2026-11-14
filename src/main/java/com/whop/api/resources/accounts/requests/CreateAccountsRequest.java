@@ -25,33 +25,61 @@ import java.util.Optional;
 public final class CreateAccountsRequest {
     private final Optional<String> affiliateCode;
 
+    private final Optional<String> blueprintId;
+
     private final Optional<String> country;
+
+    private final Optional<Boolean> disputeFighterEnabled;
 
     private final Optional<String> email;
 
+    private final Optional<String> externalId;
+
     private final Optional<Map<String, Object>> metadata;
 
+    private final Optional<Boolean> orchestrationEnabled;
+
+    private final Optional<Boolean> reassignExternalId;
+
+    private final Optional<Boolean> sendCustomerEmails;
+
     private final Optional<String> title;
+
+    private final Optional<String> website;
 
     private final Map<String, Object> additionalProperties;
 
     private CreateAccountsRequest(
             Optional<String> affiliateCode,
+            Optional<String> blueprintId,
             Optional<String> country,
+            Optional<Boolean> disputeFighterEnabled,
             Optional<String> email,
+            Optional<String> externalId,
             Optional<Map<String, Object>> metadata,
+            Optional<Boolean> orchestrationEnabled,
+            Optional<Boolean> reassignExternalId,
+            Optional<Boolean> sendCustomerEmails,
             Optional<String> title,
+            Optional<String> website,
             Map<String, Object> additionalProperties) {
         this.affiliateCode = affiliateCode;
+        this.blueprintId = blueprintId;
         this.country = country;
+        this.disputeFighterEnabled = disputeFighterEnabled;
         this.email = email;
+        this.externalId = externalId;
         this.metadata = metadata;
+        this.orchestrationEnabled = orchestrationEnabled;
+        this.reassignExternalId = reassignExternalId;
+        this.sendCustomerEmails = sendCustomerEmails;
         this.title = title;
+        this.website = website;
         this.additionalProperties = additionalProperties;
     }
 
     /**
-     * @return The username, if any, of the partner who referred this account
+     * @return A saved partner referral link code for this new business account. An existing primary user referral takes priority. Used with user tokens creating top-level accounts.
      */
     @JsonIgnore
     public Optional<String> getAffiliateCode() {
@@ -62,7 +90,18 @@ public final class CreateAccountsRequest {
     }
 
     /**
-     * @return The ISO 3166-1 alpha-2 country code where the account's business is located (e.g. <code>US</code>). Defaults to the parent account's country for connected accounts.
+     * @return The blueprint App ID, prefixed <code>app_</code>. Creates a hosted website for the account and queues its deployment asynchronously; the Account response does not report deployment completion.
+     */
+    @JsonIgnore
+    public Optional<String> getBlueprintId() {
+        if (blueprintId == null) {
+            return Optional.empty();
+        }
+        return blueprintId;
+    }
+
+    /**
+     * @return The ISO 3166-1 alpha-2 country code where the account's business is located (e.g. <code>US</code>). Defaults to the parent account's country for subaccounts.
      */
     @JsonProperty("country")
     public Optional<String> getCountry() {
@@ -70,7 +109,15 @@ public final class CreateAccountsRequest {
     }
 
     /**
-     * @return The email address of the account owner. Required for Account API key requests.
+     * @return Whether Whop assembles and files dispute evidence for this account. Enabling it opts into the success fee charged on disputes it wins. Requires payment:dispute. Omit to preserve the existing setting or creation default.
+     */
+    @JsonProperty("dispute_fighter_enabled")
+    public Optional<Boolean> getDisputeFighterEnabled() {
+        return disputeFighterEnabled;
+    }
+
+    /**
+     * @return The email address of the account owner. Required when creating a subaccount.
      */
     @JsonProperty("email")
     public Optional<String> getEmail() {
@@ -78,7 +125,18 @@ public final class CreateAccountsRequest {
     }
 
     /**
-     * @return Arbitrary key/value metadata to store on the account.
+     * @return Your platform's own identifier for this subaccount, such as your user or store ID. Unique among your subaccounts: creating a second account with the same <code>external_id</code> and a different <code>email</code> returns a 409, unless <code>reassign_external_id</code> is <code>true</code>. Retrying with the same <code>email</code> and <code>external_id</code> returns the existing account. Subaccounts only.
+     */
+    @JsonIgnore
+    public Optional<String> getExternalId() {
+        if (externalId == null) {
+            return Optional.empty();
+        }
+        return externalId;
+    }
+
+    /**
+     * @return Arbitrary key/value metadata to store on the account. When <code>external_id</code> is not sent, an <code>external_id</code> key here sets <code>external_id</code> and follows its rules. It must be unique among your subaccounts unless <code>reassign_external_id</code> is <code>true</code>. It stays in <code>metadata</code> as sent. Changing it later does not change <code>external_id</code>.
      */
     @JsonProperty("metadata")
     public Optional<Map<String, Object>> getMetadata() {
@@ -86,17 +144,70 @@ public final class CreateAccountsRequest {
     }
 
     /**
-     * @return The display name of the account. Defaults to <code>metadata.external_id</code> or the owner's email when omitted.
+     * @return Whether payment orchestration is enabled for this account. Requires payout:account:update. Omit to preserve the existing setting or creation default.
+     */
+    @JsonProperty("orchestration_enabled")
+    public Optional<Boolean> getOrchestrationEnabled() {
+        return orchestrationEnabled;
+    }
+
+    /**
+     * @return Pass <code>true</code> to move <code>external_id</code> to the new subaccount when another of your subaccounts already has it. Without it, that request returns a 409. The subaccount that had it is not deleted. It stays active with <code>external_id</code> set to <code>null</code>, and its <code>metadata</code> is unchanged. Requires <code>external_id</code>. Also requires the <code>company:update</code> permission on your platform account, in addition to <code>company:create_child</code>. Ignored when the same <code>email</code> already has the <code>external_id</code>, which returns that account.
+     */
+    @JsonProperty("reassign_external_id")
+    public Optional<Boolean> getReassignExternalId() {
+        return reassignExternalId;
+    }
+
+    /**
+     * @return Whether Whop sends transactional emails to customers on behalf of the subaccount.
+     */
+    @JsonProperty("send_customer_emails")
+    public Optional<Boolean> getSendCustomerEmails() {
+        return sendCustomerEmails;
+    }
+
+    /**
+     * @return The display name of the account. Defaults to <code>external_id</code> or the owner's email when omitted.
      */
     @JsonProperty("title")
     public Optional<String> getTitle() {
         return title;
     }
 
+    /**
+     * @return The account's business website, as an <code>http</code> or <code>https</code> URL of at most 255 characters. Also added to the account's <code>social_links</code> as a <code>website</code> entry.
+     */
+    @JsonIgnore
+    public Optional<String> getWebsite() {
+        if (website == null) {
+            return Optional.empty();
+        }
+        return website;
+    }
+
     @JsonInclude(value = JsonInclude.Include.CUSTOM, valueFilter = NullableNonemptyFilter.class)
     @JsonProperty("affiliate_code")
     private Optional<String> _getAffiliateCode() {
         return affiliateCode;
+    }
+
+    @JsonInclude(value = JsonInclude.Include.CUSTOM, valueFilter = NullableNonemptyFilter.class)
+    @JsonProperty("blueprint_id")
+    private Optional<String> _getBlueprintId() {
+        return blueprintId;
+    }
+
+    @JsonInclude(value = JsonInclude.Include.CUSTOM, valueFilter = NullableNonemptyFilter.class)
+    @JsonProperty("external_id")
+    private Optional<String> _getExternalId() {
+        return externalId;
+    }
+
+    @JsonInclude(value = JsonInclude.Include.CUSTOM, valueFilter = NullableNonemptyFilter.class)
+    @JsonProperty("website")
+    private Optional<String> _getWebsite() {
+        return website;
     }
 
     @java.lang.Override
@@ -112,15 +223,34 @@ public final class CreateAccountsRequest {
 
     private boolean equalTo(CreateAccountsRequest other) {
         return affiliateCode.equals(other.affiliateCode)
+                && blueprintId.equals(other.blueprintId)
                 && country.equals(other.country)
+                && disputeFighterEnabled.equals(other.disputeFighterEnabled)
                 && email.equals(other.email)
+                && externalId.equals(other.externalId)
                 && metadata.equals(other.metadata)
-                && title.equals(other.title);
+                && orchestrationEnabled.equals(other.orchestrationEnabled)
+                && reassignExternalId.equals(other.reassignExternalId)
+                && sendCustomerEmails.equals(other.sendCustomerEmails)
+                && title.equals(other.title)
+                && website.equals(other.website);
     }
 
     @java.lang.Override
     public int hashCode() {
-        return Objects.hash(this.affiliateCode, this.country, this.email, this.metadata, this.title);
+        return Objects.hash(
+                this.affiliateCode,
+                this.blueprintId,
+                this.country,
+                this.disputeFighterEnabled,
+                this.email,
+                this.externalId,
+                this.metadata,
+                this.orchestrationEnabled,
+                this.reassignExternalId,
+                this.sendCustomerEmails,
+                this.title,
+                this.website);
     }
 
     @java.lang.Override
@@ -136,30 +266,50 @@ public final class CreateAccountsRequest {
     public static final class Builder {
         private Optional<String> affiliateCode = Optional.empty();
 
+        private Optional<String> blueprintId = Optional.empty();
+
         private Optional<String> country = Optional.empty();
+
+        private Optional<Boolean> disputeFighterEnabled = Optional.empty();
 
         private Optional<String> email = Optional.empty();
 
+        private Optional<String> externalId = Optional.empty();
+
         private Optional<Map<String, Object>> metadata = Optional.empty();
+
+        private Optional<Boolean> orchestrationEnabled = Optional.empty();
+
+        private Optional<Boolean> reassignExternalId = Optional.empty();
+
+        private Optional<Boolean> sendCustomerEmails = Optional.empty();
 
         private Optional<String> title = Optional.empty();
 
-        @JsonAnySetter
+        private Optional<String> website = Optional.empty();
+
         private Map<String, Object> additionalProperties = new HashMap<>();
 
         private Builder() {}
 
         public Builder from(CreateAccountsRequest other) {
             affiliateCode(other.getAffiliateCode());
+            blueprintId(other.getBlueprintId());
             country(other.getCountry());
+            disputeFighterEnabled(other.getDisputeFighterEnabled());
             email(other.getEmail());
+            externalId(other.getExternalId());
             metadata(other.getMetadata());
+            orchestrationEnabled(other.getOrchestrationEnabled());
+            reassignExternalId(other.getReassignExternalId());
+            sendCustomerEmails(other.getSendCustomerEmails());
             title(other.getTitle());
+            website(other.getWebsite());
             return this;
         }
 
         /**
-         * <p>The username, if any, of the partner who referred this account</p>
+         * <p>A saved partner referral link code for this new business account. An existing primary user referral takes priority. Used with user tokens creating top-level accounts.</p>
          */
         @JsonSetter(value = "affiliate_code", nulls = Nulls.SKIP)
         public Builder affiliateCode(Optional<String> affiliateCode) {
@@ -184,7 +334,32 @@ public final class CreateAccountsRequest {
         }
 
         /**
-         * <p>The ISO 3166-1 alpha-2 country code where the account's business is located (e.g. <code>US</code>). Defaults to the parent account's country for connected accounts.</p>
+         * <p>The blueprint App ID, prefixed <code>app_</code>. Creates a hosted website for the account and queues its deployment asynchronously; the Account response does not report deployment completion.</p>
+         */
+        @JsonSetter(value = "blueprint_id", nulls = Nulls.SKIP)
+        public Builder blueprintId(Optional<String> blueprintId) {
+            this.blueprintId = blueprintId;
+            return this;
+        }
+
+        public Builder blueprintId(String blueprintId) {
+            this.blueprintId = Optional.ofNullable(blueprintId);
+            return this;
+        }
+
+        public Builder blueprintId(Nullable<String> blueprintId) {
+            if (blueprintId.isNull()) {
+                this.blueprintId = null;
+            } else if (blueprintId.isEmpty()) {
+                this.blueprintId = Optional.empty();
+            } else {
+                this.blueprintId = Optional.of(blueprintId.get());
+            }
+            return this;
+        }
+
+        /**
+         * <p>The ISO 3166-1 alpha-2 country code where the account's business is located (e.g. <code>US</code>). Defaults to the parent account's country for subaccounts.</p>
          */
         @JsonSetter(value = "country", nulls = Nulls.SKIP)
         public Builder country(Optional<String> country) {
@@ -198,7 +373,21 @@ public final class CreateAccountsRequest {
         }
 
         /**
-         * <p>The email address of the account owner. Required for Account API key requests.</p>
+         * <p>Whether Whop assembles and files dispute evidence for this account. Enabling it opts into the success fee charged on disputes it wins. Requires payment:dispute. Omit to preserve the existing setting or creation default.</p>
+         */
+        @JsonSetter(value = "dispute_fighter_enabled", nulls = Nulls.SKIP)
+        public Builder disputeFighterEnabled(Optional<Boolean> disputeFighterEnabled) {
+            this.disputeFighterEnabled = disputeFighterEnabled;
+            return this;
+        }
+
+        public Builder disputeFighterEnabled(Boolean disputeFighterEnabled) {
+            this.disputeFighterEnabled = Optional.ofNullable(disputeFighterEnabled);
+            return this;
+        }
+
+        /**
+         * <p>The email address of the account owner. Required when creating a subaccount.</p>
          */
         @JsonSetter(value = "email", nulls = Nulls.SKIP)
         public Builder email(Optional<String> email) {
@@ -212,7 +401,32 @@ public final class CreateAccountsRequest {
         }
 
         /**
-         * <p>Arbitrary key/value metadata to store on the account.</p>
+         * <p>Your platform's own identifier for this subaccount, such as your user or store ID. Unique among your subaccounts: creating a second account with the same <code>external_id</code> and a different <code>email</code> returns a 409, unless <code>reassign_external_id</code> is <code>true</code>. Retrying with the same <code>email</code> and <code>external_id</code> returns the existing account. Subaccounts only.</p>
+         */
+        @JsonSetter(value = "external_id", nulls = Nulls.SKIP)
+        public Builder externalId(Optional<String> externalId) {
+            this.externalId = externalId;
+            return this;
+        }
+
+        public Builder externalId(String externalId) {
+            this.externalId = Optional.ofNullable(externalId);
+            return this;
+        }
+
+        public Builder externalId(Nullable<String> externalId) {
+            if (externalId.isNull()) {
+                this.externalId = null;
+            } else if (externalId.isEmpty()) {
+                this.externalId = Optional.empty();
+            } else {
+                this.externalId = Optional.of(externalId.get());
+            }
+            return this;
+        }
+
+        /**
+         * <p>Arbitrary key/value metadata to store on the account. When <code>external_id</code> is not sent, an <code>external_id</code> key here sets <code>external_id</code> and follows its rules. It must be unique among your subaccounts unless <code>reassign_external_id</code> is <code>true</code>. It stays in <code>metadata</code> as sent. Changing it later does not change <code>external_id</code>.</p>
          */
         @JsonSetter(value = "metadata", nulls = Nulls.SKIP)
         public Builder metadata(Optional<Map<String, Object>> metadata) {
@@ -226,7 +440,49 @@ public final class CreateAccountsRequest {
         }
 
         /**
-         * <p>The display name of the account. Defaults to <code>metadata.external_id</code> or the owner's email when omitted.</p>
+         * <p>Whether payment orchestration is enabled for this account. Requires payout:account:update. Omit to preserve the existing setting or creation default.</p>
+         */
+        @JsonSetter(value = "orchestration_enabled", nulls = Nulls.SKIP)
+        public Builder orchestrationEnabled(Optional<Boolean> orchestrationEnabled) {
+            this.orchestrationEnabled = orchestrationEnabled;
+            return this;
+        }
+
+        public Builder orchestrationEnabled(Boolean orchestrationEnabled) {
+            this.orchestrationEnabled = Optional.ofNullable(orchestrationEnabled);
+            return this;
+        }
+
+        /**
+         * <p>Pass <code>true</code> to move <code>external_id</code> to the new subaccount when another of your subaccounts already has it. Without it, that request returns a 409. The subaccount that had it is not deleted. It stays active with <code>external_id</code> set to <code>null</code>, and its <code>metadata</code> is unchanged. Requires <code>external_id</code>. Also requires the <code>company:update</code> permission on your platform account, in addition to <code>company:create_child</code>. Ignored when the same <code>email</code> already has the <code>external_id</code>, which returns that account.</p>
+         */
+        @JsonSetter(value = "reassign_external_id", nulls = Nulls.SKIP)
+        public Builder reassignExternalId(Optional<Boolean> reassignExternalId) {
+            this.reassignExternalId = reassignExternalId;
+            return this;
+        }
+
+        public Builder reassignExternalId(Boolean reassignExternalId) {
+            this.reassignExternalId = Optional.ofNullable(reassignExternalId);
+            return this;
+        }
+
+        /**
+         * <p>Whether Whop sends transactional emails to customers on behalf of the subaccount.</p>
+         */
+        @JsonSetter(value = "send_customer_emails", nulls = Nulls.SKIP)
+        public Builder sendCustomerEmails(Optional<Boolean> sendCustomerEmails) {
+            this.sendCustomerEmails = sendCustomerEmails;
+            return this;
+        }
+
+        public Builder sendCustomerEmails(Boolean sendCustomerEmails) {
+            this.sendCustomerEmails = Optional.ofNullable(sendCustomerEmails);
+            return this;
+        }
+
+        /**
+         * <p>The display name of the account. Defaults to <code>external_id</code> or the owner's email when omitted.</p>
          */
         @JsonSetter(value = "title", nulls = Nulls.SKIP)
         public Builder title(Optional<String> title) {
@@ -239,8 +495,65 @@ public final class CreateAccountsRequest {
             return this;
         }
 
+        /**
+         * <p>The account's business website, as an <code>http</code> or <code>https</code> URL of at most 255 characters. Also added to the account's <code>social_links</code> as a <code>website</code> entry.</p>
+         */
+        @JsonSetter(value = "website", nulls = Nulls.SKIP)
+        public Builder website(Optional<String> website) {
+            this.website = website;
+            return this;
+        }
+
+        public Builder website(String website) {
+            this.website = Optional.ofNullable(website);
+            return this;
+        }
+
+        public Builder website(Nullable<String> website) {
+            if (website.isNull()) {
+                this.website = null;
+            } else if (website.isEmpty()) {
+                this.website = Optional.empty();
+            } else {
+                this.website = Optional.of(website.get());
+            }
+            return this;
+        }
+
         public CreateAccountsRequest build() {
-            return new CreateAccountsRequest(affiliateCode, country, email, metadata, title, additionalProperties);
+            return new CreateAccountsRequest(
+                    affiliateCode,
+                    blueprintId,
+                    country,
+                    disputeFighterEnabled,
+                    email,
+                    externalId,
+                    metadata,
+                    orchestrationEnabled,
+                    reassignExternalId,
+                    sendCustomerEmails,
+                    title,
+                    website,
+                    additionalProperties);
+        }
+
+        @JsonAnySetter
+        private void putAdditionalPropertyFromJson(String key, Object value) {
+            if (key.equalsIgnoreCase("affiliate_code")
+                    || key.equalsIgnoreCase("blueprint_id")
+                    || key.equalsIgnoreCase("country")
+                    || key.equalsIgnoreCase("dispute_fighter_enabled")
+                    || key.equalsIgnoreCase("email")
+                    || key.equalsIgnoreCase("external_id")
+                    || key.equalsIgnoreCase("metadata")
+                    || key.equalsIgnoreCase("orchestration_enabled")
+                    || key.equalsIgnoreCase("reassign_external_id")
+                    || key.equalsIgnoreCase("send_customer_emails")
+                    || key.equalsIgnoreCase("title")
+                    || key.equalsIgnoreCase("website")) {
+                return;
+            }
+            this.additionalProperties.put(key, value);
         }
 
         public Builder additionalProperty(String key, Object value) {

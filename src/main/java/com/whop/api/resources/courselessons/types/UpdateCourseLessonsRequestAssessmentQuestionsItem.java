@@ -240,7 +240,6 @@ public final class UpdateCourseLessonsRequestAssessmentQuestionsItem {
 
         private Optional<String> id = Optional.empty();
 
-        @JsonAnySetter
         private Map<String, Object> additionalProperties = new HashMap<>();
 
         private Builder() {}
@@ -258,7 +257,6 @@ public final class UpdateCourseLessonsRequestAssessmentQuestionsItem {
 
         /**
          * <p>The correct answer for the question. Used for short answer questions</p>
-         * <p>The correct answer for the question. Used for short answer questions</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
@@ -270,7 +268,6 @@ public final class UpdateCourseLessonsRequestAssessmentQuestionsItem {
 
         /**
          * <p>The text of the question</p>
-         * <p>The text of the question</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
@@ -281,7 +278,6 @@ public final class UpdateCourseLessonsRequestAssessmentQuestionsItem {
         }
 
         /**
-         * <p>The type of the question</p>
          * <p>The type of the question</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
@@ -406,6 +402,19 @@ public final class UpdateCourseLessonsRequestAssessmentQuestionsItem {
         public UpdateCourseLessonsRequestAssessmentQuestionsItem build() {
             return new UpdateCourseLessonsRequestAssessmentQuestionsItem(
                     correctAnswer, id, image, options, questionText, questionType, additionalProperties);
+        }
+
+        @JsonAnySetter
+        private void putAdditionalPropertyFromJson(String key, Object value) {
+            if (key.equalsIgnoreCase("correct_answer")
+                    || key.equalsIgnoreCase("id")
+                    || key.equalsIgnoreCase("image")
+                    || key.equalsIgnoreCase("options")
+                    || key.equalsIgnoreCase("question_text")
+                    || key.equalsIgnoreCase("question_type")) {
+                return;
+            }
+            this.additionalProperties.put(key, value);
         }
 
         @java.lang.Override

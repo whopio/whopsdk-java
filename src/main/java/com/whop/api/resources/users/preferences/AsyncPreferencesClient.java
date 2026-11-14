@@ -6,6 +6,7 @@ package com.whop.api.resources.users.preferences;
 import com.whop.api.core.ClientOptions;
 import com.whop.api.core.RequestOptions;
 import com.whop.api.core.Suppliers;
+import com.whop.api.core.WhopApiHttpResponse;
 import com.whop.api.resources.users.preferences.notifications.AsyncNotificationsClient;
 import com.whop.api.resources.users.preferences.requests.UpdatePreferencesRequest;
 import com.whop.api.types.UserPreferences;
@@ -33,45 +34,88 @@ public class AsyncPreferencesClient {
     }
 
     /**
-     * Retrieves the authenticated user's settings document. Addressed only as <code>me</code> — the document always belongs to the session user.
+     * Retrieves the authenticated user's settings document.
      */
     public CompletableFuture<UserPreferences> retrieve() {
-        return this.rawClient.retrieve().thenApply(response -> response.body());
+        CompletableFuture<WhopApiHttpResponse<UserPreferences>> rawFuture = this.rawClient.retrieve();
+        CompletableFuture<UserPreferences> future = rawFuture.thenApply(response -> response.body());
+        future.whenComplete((result_, throwable_) -> {
+            if (future.isCancelled()) {
+                rawFuture.cancel(true);
+            }
+        });
+        return future;
     }
 
     /**
-     * Retrieves the authenticated user's settings document. Addressed only as <code>me</code> — the document always belongs to the session user.
+     * Retrieves the authenticated user's settings document.
      */
     public CompletableFuture<UserPreferences> retrieve(RequestOptions requestOptions) {
-        return this.rawClient.retrieve(requestOptions).thenApply(response -> response.body());
+        CompletableFuture<WhopApiHttpResponse<UserPreferences>> rawFuture = this.rawClient.retrieve(requestOptions);
+        CompletableFuture<UserPreferences> future = rawFuture.thenApply(response -> response.body());
+        future.whenComplete((result_, throwable_) -> {
+            if (future.isCancelled()) {
+                rawFuture.cancel(true);
+            }
+        });
+        return future;
     }
 
     /**
      * Updates the authenticated user's settings document. Replaces the top-level keys it is given and leaves the rest untouched.
      */
     public CompletableFuture<UserPreferences> update() {
-        return this.rawClient.update().thenApply(response -> response.body());
+        CompletableFuture<WhopApiHttpResponse<UserPreferences>> rawFuture = this.rawClient.update();
+        CompletableFuture<UserPreferences> future = rawFuture.thenApply(response -> response.body());
+        future.whenComplete((result_, throwable_) -> {
+            if (future.isCancelled()) {
+                rawFuture.cancel(true);
+            }
+        });
+        return future;
     }
 
     /**
      * Updates the authenticated user's settings document. Replaces the top-level keys it is given and leaves the rest untouched.
      */
     public CompletableFuture<UserPreferences> update(RequestOptions requestOptions) {
-        return this.rawClient.update(requestOptions).thenApply(response -> response.body());
+        CompletableFuture<WhopApiHttpResponse<UserPreferences>> rawFuture = this.rawClient.update(requestOptions);
+        CompletableFuture<UserPreferences> future = rawFuture.thenApply(response -> response.body());
+        future.whenComplete((result_, throwable_) -> {
+            if (future.isCancelled()) {
+                rawFuture.cancel(true);
+            }
+        });
+        return future;
     }
 
     /**
      * Updates the authenticated user's settings document. Replaces the top-level keys it is given and leaves the rest untouched.
      */
     public CompletableFuture<UserPreferences> update(UpdatePreferencesRequest request) {
-        return this.rawClient.update(request).thenApply(response -> response.body());
+        CompletableFuture<WhopApiHttpResponse<UserPreferences>> rawFuture = this.rawClient.update(request);
+        CompletableFuture<UserPreferences> future = rawFuture.thenApply(response -> response.body());
+        future.whenComplete((result_, throwable_) -> {
+            if (future.isCancelled()) {
+                rawFuture.cancel(true);
+            }
+        });
+        return future;
     }
 
     /**
      * Updates the authenticated user's settings document. Replaces the top-level keys it is given and leaves the rest untouched.
      */
     public CompletableFuture<UserPreferences> update(UpdatePreferencesRequest request, RequestOptions requestOptions) {
-        return this.rawClient.update(request, requestOptions).thenApply(response -> response.body());
+        CompletableFuture<WhopApiHttpResponse<UserPreferences>> rawFuture =
+                this.rawClient.update(request, requestOptions);
+        CompletableFuture<UserPreferences> future = rawFuture.thenApply(response -> response.body());
+        future.whenComplete((result_, throwable_) -> {
+            if (future.isCancelled()) {
+                rawFuture.cancel(true);
+            }
+        });
+        return future;
     }
 
     public AsyncNotificationsClient notifications() {

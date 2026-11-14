@@ -7,11 +7,11 @@ import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonValue;
 
 public final class LedgerActivityLineType {
-    public static final LedgerActivityLineType DISPUTE_REPRESENTMENT_FEE =
-            new LedgerActivityLineType(Value.DISPUTE_REPRESENTMENT_FEE, "dispute_representment_fee");
+    public static final LedgerActivityLineType ECONOMIC_INTELLIGENCE_PERCENTAGE_FEE = new LedgerActivityLineType(
+            Value.ECONOMIC_INTELLIGENCE_PERCENTAGE_FEE, "economic_intelligence_percentage_fee");
 
-    public static final LedgerActivityLineType PLATFORM_BALANCE_PAYMENT_REFUND =
-            new LedgerActivityLineType(Value.PLATFORM_BALANCE_PAYMENT_REFUND, "platform_balance_payment_refund");
+    public static final LedgerActivityLineType PSP_COMMISSION_FEE =
+            new LedgerActivityLineType(Value.PSP_COMMISSION_FEE, "psp_commission_fee");
 
     public static final LedgerActivityLineType STRIPE_INTERNATIONAL_PROCESSING_FEE = new LedgerActivityLineType(
             Value.STRIPE_INTERNATIONAL_PROCESSING_FEE, "stripe_international_processing_fee");
@@ -22,48 +22,308 @@ public final class LedgerActivityLineType {
     public static final LedgerActivityLineType TREASURY_PAYIN =
             new LedgerActivityLineType(Value.TREASURY_PAYIN, "treasury_payin");
 
+    public static final LedgerActivityLineType PSP_AUTHENTICATION_FEE =
+            new LedgerActivityLineType(Value.PSP_AUTHENTICATION_FEE, "psp_authentication_fee");
+
     public static final LedgerActivityLineType PLATFORM_COVERED_DISPUTE =
             new LedgerActivityLineType(Value.PLATFORM_COVERED_DISPUTE, "platform_covered_dispute");
 
-    public static final LedgerActivityLineType RESOLUTION_CENTER_REFUND =
-            new LedgerActivityLineType(Value.RESOLUTION_CENTER_REFUND, "resolution_center_refund");
+    public static final LedgerActivityLineType REFUND_SETTLEMENT =
+            new LedgerActivityLineType(Value.REFUND_SETTLEMENT, "refund_settlement");
 
-    public static final LedgerActivityLineType AD_PUBLISHER_PAYOUT =
-            new LedgerActivityLineType(Value.AD_PUBLISHER_PAYOUT, "ad_publisher_payout");
+    public static final LedgerActivityLineType PSP_FX_ADJUSTMENT =
+            new LedgerActivityLineType(Value.PSP_FX_ADJUSTMENT, "psp_fx_adjustment");
 
-    public static final LedgerActivityLineType BILLING_PERCENTAGE_FEE =
-            new LedgerActivityLineType(Value.BILLING_PERCENTAGE_FEE, "billing_percentage_fee");
-
-    public static final LedgerActivityLineType PAYMENT_DISPUTE =
-            new LedgerActivityLineType(Value.PAYMENT_DISPUTE, "payment_dispute");
-
-    public static final LedgerActivityLineType PAYMENT_DISPUTE_ADJUSTMENT =
-            new LedgerActivityLineType(Value.PAYMENT_DISPUTE_ADJUSTMENT, "payment_dispute_adjustment");
-
-    public static final LedgerActivityLineType PAYMENT_PROCESSING_PERCENTAGE_FEE =
-            new LedgerActivityLineType(Value.PAYMENT_PROCESSING_PERCENTAGE_FEE, "payment_processing_percentage_fee");
-
-    public static final LedgerActivityLineType THREE_DS_FIXED_FEE =
-            new LedgerActivityLineType(Value.THREE_DS_FIXED_FEE, "three_ds_fixed_fee");
+    public static final LedgerActivityLineType PSP_CLAWBACK_FEE =
+            new LedgerActivityLineType(Value.PSP_CLAWBACK_FEE, "psp_clawback_fee");
 
     public static final LedgerActivityLineType PAYMENT_REVSHARE_REFUND =
             new LedgerActivityLineType(Value.PAYMENT_REVSHARE_REFUND, "payment_revshare_refund");
 
+    public static final LedgerActivityLineType PERPS_BRIDGE_FEE =
+            new LedgerActivityLineType(Value.PERPS_BRIDGE_FEE, "perps_bridge_fee");
+
+    public static final LedgerActivityLineType AD_AFFILIATE_PAYOUT_RECEIVED =
+            new LedgerActivityLineType(Value.AD_AFFILIATE_PAYOUT_RECEIVED, "ad_affiliate_payout_received");
+
+    public static final LedgerActivityLineType WITHDRAWAL_MARKUP_FEE_PAYOUT =
+            new LedgerActivityLineType(Value.WITHDRAWAL_MARKUP_FEE_PAYOUT, "withdrawal_markup_fee_payout");
+
+    public static final LedgerActivityLineType SWAP_SOURCE =
+            new LedgerActivityLineType(Value.SWAP_SOURCE, "swap_source");
+
+    public static final LedgerActivityLineType PSP_VARIABLE_FEE =
+            new LedgerActivityLineType(Value.PSP_VARIABLE_FEE, "psp_variable_fee");
+
+    public static final LedgerActivityLineType PAYOUT_FEE = new LedgerActivityLineType(Value.PAYOUT_FEE, "payout_fee");
+
+    public static final LedgerActivityLineType AD_AFFILIATE_PAYOUT =
+            new LedgerActivityLineType(Value.AD_AFFILIATE_PAYOUT, "ad_affiliate_payout");
+
+    public static final LedgerActivityLineType PAYMENT_UNRECONCILED_REVERSAL =
+            new LedgerActivityLineType(Value.PAYMENT_UNRECONCILED_REVERSAL, "payment_unreconciled_reversal");
+
+    public static final LedgerActivityLineType SETTLEMENT_SHORTFALL_LOSS =
+            new LedgerActivityLineType(Value.SETTLEMENT_SHORTFALL_LOSS, "settlement_shortfall_loss");
+
+    public static final LedgerActivityLineType PAYMENT_REFERRAL_REVERSAL =
+            new LedgerActivityLineType(Value.PAYMENT_REFERRAL_REVERSAL, "payment_referral_reversal");
+
+    public static final LedgerActivityLineType DISPUTE_SETTLEMENT_REVERSAL =
+            new LedgerActivityLineType(Value.DISPUTE_SETTLEMENT_REVERSAL, "dispute_settlement_reversal");
+
+    public static final LedgerActivityLineType AD_BALANCE_FUNDING_RECEIPT =
+            new LedgerActivityLineType(Value.AD_BALANCE_FUNDING_RECEIPT, "ad_balance_funding_receipt");
+
+    public static final LedgerActivityLineType WALLET_TRANSFER_INCOMING =
+            new LedgerActivityLineType(Value.WALLET_TRANSFER_INCOMING, "wallet_transfer_incoming");
+
+    public static final LedgerActivityLineType LEVELS_POINTS_ADS =
+            new LedgerActivityLineType(Value.LEVELS_POINTS_ADS, "levels_points_ads");
+
+    public static final LedgerActivityLineType PLATFORM_BALANCE_TRANSFER_INCOMING =
+            new LedgerActivityLineType(Value.PLATFORM_BALANCE_TRANSFER_INCOMING, "platform_balance_transfer_incoming");
+
+    public static final LedgerActivityLineType INTERNAL_WITHDRAWAL_MARKUP_FEE_REVERSAL = new LedgerActivityLineType(
+            Value.INTERNAL_WITHDRAWAL_MARKUP_FEE_REVERSAL, "internal_withdrawal_markup_fee_reversal");
+
+    public static final LedgerActivityLineType CARD_LOAD_TRANSFER =
+            new LedgerActivityLineType(Value.CARD_LOAD_TRANSFER, "card_load_transfer");
+
+    public static final LedgerActivityLineType INTERNAL_WITHDRAWAL_FEE =
+            new LedgerActivityLineType(Value.INTERNAL_WITHDRAWAL_FEE, "internal_withdrawal_fee");
+
+    public static final LedgerActivityLineType PSP_ADJUSTED_PROCESSING_FEE =
+            new LedgerActivityLineType(Value.PSP_ADJUSTED_PROCESSING_FEE, "psp_adjusted_processing_fee");
+
+    public static final LedgerActivityLineType TAX_FILING_FEE =
+            new LedgerActivityLineType(Value.TAX_FILING_FEE, "tax_filing_fee");
+
+    public static final LedgerActivityLineType FX_MARKUP = new LedgerActivityLineType(Value.FX_MARKUP, "fx_markup");
+
+    public static final LedgerActivityLineType PSP_PROCESSING_FEE =
+            new LedgerActivityLineType(Value.PSP_PROCESSING_FEE, "psp_processing_fee");
+
+    public static final LedgerActivityLineType TOPUP_REVERSAL =
+            new LedgerActivityLineType(Value.TOPUP_REVERSAL, "topup_reversal");
+
+    public static final LedgerActivityLineType DISPUTE_PAYABLE_CLEARING =
+            new LedgerActivityLineType(Value.DISPUTE_PAYABLE_CLEARING, "dispute_payable_clearing");
+
+    public static final LedgerActivityLineType PASSTHROUGH_GMV_OFFSET =
+            new LedgerActivityLineType(Value.PASSTHROUGH_GMV_OFFSET, "passthrough_gmv_offset");
+
+    public static final LedgerActivityLineType ONCHAIN_WITHDRAWAL_OFFSET =
+            new LedgerActivityLineType(Value.ONCHAIN_WITHDRAWAL_OFFSET, "onchain_withdrawal_offset");
+
+    public static final LedgerActivityLineType REFUND_PAYABLE_CLEARING =
+            new LedgerActivityLineType(Value.REFUND_PAYABLE_CLEARING, "refund_payable_clearing");
+
+    public static final LedgerActivityLineType PLATFORM_MARKUP_FEE_PAYOUT =
+            new LedgerActivityLineType(Value.PLATFORM_MARKUP_FEE_PAYOUT, "platform_markup_fee_payout");
+
+    public static final LedgerActivityLineType AD_SPEND_MARGIN =
+            new LedgerActivityLineType(Value.AD_SPEND_MARGIN, "ad_spend_margin");
+
+    public static final LedgerActivityLineType PAYOUT_UNRECONCILED_CLEARING =
+            new LedgerActivityLineType(Value.PAYOUT_UNRECONCILED_CLEARING, "payout_unreconciled_clearing");
+
+    public static final LedgerActivityLineType PAYMENT_REVSHARE_PAYOUT =
+            new LedgerActivityLineType(Value.PAYMENT_REVSHARE_PAYOUT, "payment_revshare_payout");
+
+    public static final LedgerActivityLineType PSP_BANK_PULL_CLEARING =
+            new LedgerActivityLineType(Value.PSP_BANK_PULL_CLEARING, "psp_bank_pull_clearing");
+
+    public static final LedgerActivityLineType PLATFORM_EARNING_UNRECONCILED_CLEARING = new LedgerActivityLineType(
+            Value.PLATFORM_EARNING_UNRECONCILED_CLEARING, "platform_earning_unreconciled_clearing");
+
+    public static final LedgerActivityLineType FRAUD_PREVENTION_FEE =
+            new LedgerActivityLineType(Value.FRAUD_PREVENTION_FEE, "fraud_prevention_fee");
+
+    public static final LedgerActivityLineType INTERNAL_WITHDRAWAL_PAYABLE_REVERSAL = new LedgerActivityLineType(
+            Value.INTERNAL_WITHDRAWAL_PAYABLE_REVERSAL, "internal_withdrawal_payable_reversal");
+
+    public static final LedgerActivityLineType AD_INCOME_RECEIPT =
+            new LedgerActivityLineType(Value.AD_INCOME_RECEIPT, "ad_income_receipt");
+
+    public static final LedgerActivityLineType PSP_PAYOUT_RECEIVABLE =
+            new LedgerActivityLineType(Value.PSP_PAYOUT_RECEIVABLE, "psp_payout_receivable");
+
+    public static final LedgerActivityLineType PSP_POOL_SETTLEMENT =
+            new LedgerActivityLineType(Value.PSP_POOL_SETTLEMENT, "psp_pool_settlement");
+
+    public static final LedgerActivityLineType PSP_PAYOUT_CONSOLIDATION =
+            new LedgerActivityLineType(Value.PSP_PAYOUT_CONSOLIDATION, "psp_payout_consolidation");
+
+    public static final LedgerActivityLineType PAYMENT_REFERRAL_REFUND =
+            new LedgerActivityLineType(Value.PAYMENT_REFERRAL_REFUND, "payment_referral_refund");
+
+    public static final LedgerActivityLineType MISC_REVERSAL =
+            new LedgerActivityLineType(Value.MISC_REVERSAL, "misc_reversal");
+
+    public static final LedgerActivityLineType ACCOUNT_SETTLEMENT =
+            new LedgerActivityLineType(Value.ACCOUNT_SETTLEMENT, "account_settlement");
+
+    public static final LedgerActivityLineType AD_CAMPAIGN_BUDGET =
+            new LedgerActivityLineType(Value.AD_CAMPAIGN_BUDGET, "ad_campaign_budget");
+
+    public static final LedgerActivityLineType PSP_RECEIVABLE_POOLED =
+            new LedgerActivityLineType(Value.PSP_RECEIVABLE_POOLED, "psp_receivable_pooled");
+
+    public static final LedgerActivityLineType ONCHAIN_WITHDRAWAL =
+            new LedgerActivityLineType(Value.ONCHAIN_WITHDRAWAL, "onchain_withdrawal");
+
+    public static final LedgerActivityLineType PSP_CORRECTION =
+            new LedgerActivityLineType(Value.PSP_CORRECTION, "psp_correction");
+
+    public static final LedgerActivityLineType PSP_CURRENCY_CONVERSION_RECEIVABLE =
+            new LedgerActivityLineType(Value.PSP_CURRENCY_CONVERSION_RECEIVABLE, "psp_currency_conversion_receivable");
+
+    public static final LedgerActivityLineType PSP_SERVICE_FEE =
+            new LedgerActivityLineType(Value.PSP_SERVICE_FEE, "psp_service_fee");
+
+    public static final LedgerActivityLineType CARD_SPEND_AUTHORIZATION_VOID =
+            new LedgerActivityLineType(Value.CARD_SPEND_AUTHORIZATION_VOID, "card_spend_authorization_void");
+
+    public static final LedgerActivityLineType EXTERNAL_ACCOUNT_CONNECTION_FEE =
+            new LedgerActivityLineType(Value.EXTERNAL_ACCOUNT_CONNECTION_FEE, "external_account_connection_fee");
+
+    public static final LedgerActivityLineType LEVELS_POINTS_TRADING =
+            new LedgerActivityLineType(Value.LEVELS_POINTS_TRADING, "levels_points_trading");
+
+    public static final LedgerActivityLineType LEGACY_PAYMENT_REFUND =
+            new LedgerActivityLineType(Value.LEGACY_PAYMENT_REFUND, "legacy_payment_refund");
+
+    public static final LedgerActivityLineType INTERNAL_WITHDRAWAL =
+            new LedgerActivityLineType(Value.INTERNAL_WITHDRAWAL, "internal_withdrawal");
+
+    public static final LedgerActivityLineType CARD_UNLOAD_TRANSFER =
+            new LedgerActivityLineType(Value.CARD_UNLOAD_TRANSFER, "card_unload_transfer");
+
+    public static final LedgerActivityLineType REFERRAL_BONUS =
+            new LedgerActivityLineType(Value.REFERRAL_BONUS, "referral_bonus");
+
+    public static final LedgerActivityLineType CLAWBACK_RECEIVABLE =
+            new LedgerActivityLineType(Value.CLAWBACK_RECEIVABLE, "clawback_receivable");
+
+    public static final LedgerActivityLineType INTERNAL_BALANCE_TRANSFER_OUTGOING =
+            new LedgerActivityLineType(Value.INTERNAL_BALANCE_TRANSFER_OUTGOING, "internal_balance_transfer_outgoing");
+
+    public static final LedgerActivityLineType PSP_GATEWAY_FEE =
+            new LedgerActivityLineType(Value.PSP_GATEWAY_FEE, "psp_gateway_fee");
+
+    public static final LedgerActivityLineType BALANCE_RESERVATION_REVERSAL =
+            new LedgerActivityLineType(Value.BALANCE_RESERVATION_REVERSAL, "balance_reservation_reversal");
+
+    public static final LedgerActivityLineType INTERNAL_WITHDRAWAL_PAYABLE =
+            new LedgerActivityLineType(Value.INTERNAL_WITHDRAWAL_PAYABLE, "internal_withdrawal_payable");
+
+    public static final LedgerActivityLineType TRADING_FEE =
+            new LedgerActivityLineType(Value.TRADING_FEE, "trading_fee");
+
+    public static final LedgerActivityLineType PAYMENT_RETURN_FEE =
+            new LedgerActivityLineType(Value.PAYMENT_RETURN_FEE, "payment_return_fee");
+
+    public static final LedgerActivityLineType CONNECTED_ACCOUNT_NEGATIVE_BALANCE =
+            new LedgerActivityLineType(Value.CONNECTED_ACCOUNT_NEGATIVE_BALANCE, "connected_account_negative_balance");
+
+    public static final LedgerActivityLineType RECIPIENT_WALLET_LOAD =
+            new LedgerActivityLineType(Value.RECIPIENT_WALLET_LOAD, "recipient_wallet_load");
+
+    public static final LedgerActivityLineType PSP_CURRENCY_CONVERSION_OUTGOING =
+            new LedgerActivityLineType(Value.PSP_CURRENCY_CONVERSION_OUTGOING, "psp_currency_conversion_outgoing");
+
+    public static final LedgerActivityLineType WITHDRAWAL_TOPUP_ADJUSTMENT =
+            new LedgerActivityLineType(Value.WITHDRAWAL_TOPUP_ADJUSTMENT, "withdrawal_topup_adjustment");
+
+    public static final LedgerActivityLineType PSP_INVOICING_FEE =
+            new LedgerActivityLineType(Value.PSP_INVOICING_FEE, "psp_invoicing_fee");
+
+    public static final LedgerActivityLineType WITHDRAWAL_MARKUP_FEE_PAYOUT_REVERSAL = new LedgerActivityLineType(
+            Value.WITHDRAWAL_MARKUP_FEE_PAYOUT_REVERSAL, "withdrawal_markup_fee_payout_reversal");
+
+    public static final LedgerActivityLineType PSP_DISPUTE_ALERT_FEE =
+            new LedgerActivityLineType(Value.PSP_DISPUTE_ALERT_FEE, "psp_dispute_alert_fee");
+
+    public static final LedgerActivityLineType CARD_SPEND_REFUND =
+            new LedgerActivityLineType(Value.CARD_SPEND_REFUND, "card_spend_refund");
+
+    public static final LedgerActivityLineType CARD_SPEND_CAPTURE =
+            new LedgerActivityLineType(Value.CARD_SPEND_CAPTURE, "card_spend_capture");
+
+    public static final LedgerActivityLineType PARTNER_GRANT_REWARD =
+            new LedgerActivityLineType(Value.PARTNER_GRANT_REWARD, "partner_grant_reward");
+
+    public static final LedgerActivityLineType ONCHAIN_PLATFORM_TRANSFER_INCOMING =
+            new LedgerActivityLineType(Value.ONCHAIN_PLATFORM_TRANSFER_INCOMING, "onchain_platform_transfer_incoming");
+
+    public static final LedgerActivityLineType PSP_EXTERNAL_ACCOUNT_CONNECTION_FEE = new LedgerActivityLineType(
+            Value.PSP_EXTERNAL_ACCOUNT_CONNECTION_FEE, "psp_external_account_connection_fee");
+
+    public static final LedgerActivityLineType CLAWBACK_RECEIVABLE_SETTLEMENT =
+            new LedgerActivityLineType(Value.CLAWBACK_RECEIVABLE_SETTLEMENT, "clawback_receivable_settlement");
+
+    public static final LedgerActivityLineType PAYMENT_REVSHARE =
+            new LedgerActivityLineType(Value.PAYMENT_REVSHARE, "payment_revshare");
+
+    public static final LedgerActivityLineType PSP_WITHHOLDING_TAX =
+            new LedgerActivityLineType(Value.PSP_WITHHOLDING_TAX, "psp_withholding_tax");
+
+    public static final LedgerActivityLineType INTERNAL_WITHDRAWAL_MARKUP_FEE_PAYOUT_REVERSAL =
+            new LedgerActivityLineType(
+                    Value.INTERNAL_WITHDRAWAL_MARKUP_FEE_PAYOUT_REVERSAL,
+                    "internal_withdrawal_markup_fee_payout_reversal");
+
+    public static final LedgerActivityLineType REFUND_PAYABLE_REVERSAL =
+            new LedgerActivityLineType(Value.REFUND_PAYABLE_REVERSAL, "refund_payable_reversal");
+
+    public static final LedgerActivityLineType CAPITAL_REMITTANCE =
+            new LedgerActivityLineType(Value.CAPITAL_REMITTANCE, "capital_remittance");
+
+    public static final LedgerActivityLineType SWAP_TARGET =
+            new LedgerActivityLineType(Value.SWAP_TARGET, "swap_target");
+
+    public static final LedgerActivityLineType WALLET_TRANSFER_OUTGOING =
+            new LedgerActivityLineType(Value.WALLET_TRANSFER_OUTGOING, "wallet_transfer_outgoing");
+
+    public static final LedgerActivityLineType BILLING_PERCENTAGE_FEE =
+            new LedgerActivityLineType(Value.BILLING_PERCENTAGE_FEE, "billing_percentage_fee");
+
+    public static final LedgerActivityLineType PAYMENT_DISPUTE_ADJUSTMENT =
+            new LedgerActivityLineType(Value.PAYMENT_DISPUTE_ADJUSTMENT, "payment_dispute_adjustment");
+
+    public static final LedgerActivityLineType PSP_CLAWBACK_SETTLEMENT_REVERSAL =
+            new LedgerActivityLineType(Value.PSP_CLAWBACK_SETTLEMENT_REVERSAL, "psp_clawback_settlement_reversal");
+
+    public static final LedgerActivityLineType LEVELS_REBATE =
+            new LedgerActivityLineType(Value.LEVELS_REBATE, "levels_rebate");
+
+    public static final LedgerActivityLineType PERPS_VOLUME =
+            new LedgerActivityLineType(Value.PERPS_VOLUME, "perps_volume");
+
+    public static final LedgerActivityLineType PERPS_FEE_OFFSET =
+            new LedgerActivityLineType(Value.PERPS_FEE_OFFSET, "perps_fee_offset");
+
     public static final LedgerActivityLineType DISPUTE_ALERT_FEE =
             new LedgerActivityLineType(Value.DISPUTE_ALERT_FEE, "dispute_alert_fee");
+
+    public static final LedgerActivityLineType PSP_TREASURY_FEE =
+            new LedgerActivityLineType(Value.PSP_TREASURY_FEE, "psp_treasury_fee");
 
     public static final LedgerActivityLineType APPLICATION_FEE =
             new LedgerActivityLineType(Value.APPLICATION_FEE, "application_fee");
 
-    public static final LedgerActivityLineType AIRDROP_LINK_RETURNED =
-            new LedgerActivityLineType(Value.AIRDROP_LINK_RETURNED, "airdrop_link_returned");
+    public static final LedgerActivityLineType PLATFORM_EARNING_SETTLEMENT =
+            new LedgerActivityLineType(Value.PLATFORM_EARNING_SETTLEMENT, "platform_earning_settlement");
 
-    public static final LedgerActivityLineType WITHDRAWAL = new LedgerActivityLineType(Value.WITHDRAWAL, "withdrawal");
+    public static final LedgerActivityLineType CARD_SPEND_AUTHORIZATION_HOLD =
+            new LedgerActivityLineType(Value.CARD_SPEND_AUTHORIZATION_HOLD, "card_spend_authorization_hold");
 
-    public static final LedgerActivityLineType PAYOUT_FEE = new LedgerActivityLineType(Value.PAYOUT_FEE, "payout_fee");
+    public static final LedgerActivityLineType ACCELERATED_SETTLEMENT_FEE =
+            new LedgerActivityLineType(Value.ACCELERATED_SETTLEMENT_FEE, "accelerated_settlement_fee");
 
-    public static final LedgerActivityLineType INSTALLMENT_DEFAULT =
-            new LedgerActivityLineType(Value.INSTALLMENT_DEFAULT, "installment_default");
+    public static final LedgerActivityLineType PAYMENT_UNRECONCILED_CLEARING =
+            new LedgerActivityLineType(Value.PAYMENT_UNRECONCILED_CLEARING, "payment_unreconciled_clearing");
 
     public static final LedgerActivityLineType ONCHAIN_WALLET_TRANSFER_OUTGOING =
             new LedgerActivityLineType(Value.ONCHAIN_WALLET_TRANSFER_OUTGOING, "onchain_wallet_transfer_outgoing");
@@ -71,220 +331,677 @@ public final class LedgerActivityLineType {
     public static final LedgerActivityLineType LICENSE_SALE =
             new LedgerActivityLineType(Value.LICENSE_SALE, "license_sale");
 
+    public static final LedgerActivityLineType PSP_FIXED_FEE =
+            new LedgerActivityLineType(Value.PSP_FIXED_FEE, "psp_fixed_fee");
+
+    public static final LedgerActivityLineType PLATFORM_CREDITS_PAYMENT_REFUND =
+            new LedgerActivityLineType(Value.PLATFORM_CREDITS_PAYMENT_REFUND, "platform_credits_payment_refund");
+
     public static final LedgerActivityLineType APPLICATION_FEE_PAYOUT =
             new LedgerActivityLineType(Value.APPLICATION_FEE_PAYOUT, "application_fee_payout");
 
-    public static final LedgerActivityLineType PLATFORM_BALANCE_PAYMENT =
-            new LedgerActivityLineType(Value.PLATFORM_BALANCE_PAYMENT, "platform_balance_payment");
+    public static final LedgerActivityLineType ONCHAIN_INTERNAL_TRANSFER_INCOMING =
+            new LedgerActivityLineType(Value.ONCHAIN_INTERNAL_TRANSFER_INCOMING, "onchain_internal_transfer_incoming");
 
-    public static final LedgerActivityLineType LEGACY_PAYMENT =
-            new LedgerActivityLineType(Value.LEGACY_PAYMENT, "legacy_payment");
+    public static final LedgerActivityLineType PSP_DISPUTE_MANAGEMENT_FEE =
+            new LedgerActivityLineType(Value.PSP_DISPUTE_MANAGEMENT_FEE, "psp_dispute_management_fee");
 
-    public static final LedgerActivityLineType AD_PUBLISHER_PAYOUT_RECEIVED =
-            new LedgerActivityLineType(Value.AD_PUBLISHER_PAYOUT_RECEIVED, "ad_publisher_payout_received");
+    public static final LedgerActivityLineType PERPS_UNLOAD_TRANSFER =
+            new LedgerActivityLineType(Value.PERPS_UNLOAD_TRANSFER, "perps_unload_transfer");
 
-    public static final LedgerActivityLineType PAYMENT_REFERRAL_REVERSAL =
-            new LedgerActivityLineType(Value.PAYMENT_REFERRAL_REVERSAL, "payment_referral_reversal");
-
-    public static final LedgerActivityLineType LEGACY_CRYPTO_PAYMENT =
-            new LedgerActivityLineType(Value.LEGACY_CRYPTO_PAYMENT, "legacy_crypto_payment");
-
-    public static final LedgerActivityLineType AD_BUDGET_RELEASE =
-            new LedgerActivityLineType(Value.AD_BUDGET_RELEASE, "ad_budget_release");
+    public static final LedgerActivityLineType CLAWBACK_RECEIVABLE_SETTLEMENT_REVERSAL = new LedgerActivityLineType(
+            Value.CLAWBACK_RECEIVABLE_SETTLEMENT_REVERSAL, "clawback_receivable_settlement_reversal");
 
     public static final LedgerActivityLineType AD_SPEND_CHARGE =
             new LedgerActivityLineType(Value.AD_SPEND_CHARGE, "ad_spend_charge");
 
-    public static final LedgerActivityLineType PLATFORM_BALANCE_TRANSFER_INCOMING =
-            new LedgerActivityLineType(Value.PLATFORM_BALANCE_TRANSFER_INCOMING, "platform_balance_transfer_incoming");
-
-    public static final LedgerActivityLineType PAYMENT_REFERRAL =
-            new LedgerActivityLineType(Value.PAYMENT_REFERRAL, "payment_referral");
+    public static final LedgerActivityLineType REFUND_UNRECONCILED_REVERSAL =
+            new LedgerActivityLineType(Value.REFUND_UNRECONCILED_REVERSAL, "refund_unreconciled_reversal");
 
     public static final LedgerActivityLineType PROMO_REVERSAL =
             new LedgerActivityLineType(Value.PROMO_REVERSAL, "promo_reversal");
 
-    public static final LedgerActivityLineType TOPUP_REVERSAL =
-            new LedgerActivityLineType(Value.TOPUP_REVERSAL, "topup_reversal");
+    public static final LedgerActivityLineType TRADING_ACCOUNT_DEPOSIT_OFFSET =
+            new LedgerActivityLineType(Value.TRADING_ACCOUNT_DEPOSIT_OFFSET, "trading_account_deposit_offset");
 
-    public static final LedgerActivityLineType PLATFORM_AFFILIATE_PAYMENT_REVERSAL = new LedgerActivityLineType(
-            Value.PLATFORM_AFFILIATE_PAYMENT_REVERSAL, "platform_affiliate_payment_reversal");
+    public static final LedgerActivityLineType SWAP_FEE = new LedgerActivityLineType(Value.SWAP_FEE, "swap_fee");
+
+    public static final LedgerActivityLineType PAYMENT_REFUND_FEE =
+            new LedgerActivityLineType(Value.PAYMENT_REFUND_FEE, "payment_refund_fee");
 
     public static final LedgerActivityLineType AIRDROP = new LedgerActivityLineType(Value.AIRDROP, "airdrop");
 
-    public static final LedgerActivityLineType WITHDRAWAL_CLAWBACK_REVERSAL =
-            new LedgerActivityLineType(Value.WITHDRAWAL_CLAWBACK_REVERSAL, "withdrawal_clawback_reversal");
+    public static final LedgerActivityLineType CAPITAL_REMITTANCE_REVERSAL =
+            new LedgerActivityLineType(Value.CAPITAL_REMITTANCE_REVERSAL, "capital_remittance_reversal");
 
-    public static final LedgerActivityLineType CARD_SPEND_AUTHORIZATION =
-            new LedgerActivityLineType(Value.CARD_SPEND_AUTHORIZATION, "card_spend_authorization");
+    public static final LedgerActivityLineType PAYMENT_RECEIVABLE_REVERSAL =
+            new LedgerActivityLineType(Value.PAYMENT_RECEIVABLE_REVERSAL, "payment_receivable_reversal");
+
+    public static final LedgerActivityLineType TOPUP = new LedgerActivityLineType(Value.TOPUP, "topup");
 
     public static final LedgerActivityLineType LICENSE_SALE_REVENUE =
             new LedgerActivityLineType(Value.LICENSE_SALE_REVENUE, "license_sale_revenue");
 
-    public static final LedgerActivityLineType TOPUP = new LedgerActivityLineType(Value.TOPUP, "topup");
+    public static final LedgerActivityLineType PAYMENT_REFERRAL_PAYABLE =
+            new LedgerActivityLineType(Value.PAYMENT_REFERRAL_PAYABLE, "payment_referral_payable");
 
     public static final LedgerActivityLineType HIGH_RISK_MERCHANT_FEE =
             new LedgerActivityLineType(Value.HIGH_RISK_MERCHANT_FEE, "high_risk_merchant_fee");
 
-    public static final LedgerActivityLineType PAYMENT_REVSHARE_PAYOUT =
-            new LedgerActivityLineType(Value.PAYMENT_REVSHARE_PAYOUT, "payment_revshare_payout");
+    public static final LedgerActivityLineType PSP_PAYOUT_FEE =
+            new LedgerActivityLineType(Value.PSP_PAYOUT_FEE, "psp_payout_fee");
 
-    public static final LedgerActivityLineType INTERNAL_BALANCE_TRANSFER_INCOMING =
-            new LedgerActivityLineType(Value.INTERNAL_BALANCE_TRANSFER_INCOMING, "internal_balance_transfer_incoming");
+    public static final LedgerActivityLineType INTERNAL_WITHDRAWAL_MARKUP_FEE =
+            new LedgerActivityLineType(Value.INTERNAL_WITHDRAWAL_MARKUP_FEE, "internal_withdrawal_markup_fee");
 
-    public static final LedgerActivityLineType PAYMENT_REFUND_REVERSAL =
-            new LedgerActivityLineType(Value.PAYMENT_REFUND_REVERSAL, "payment_refund_reversal");
+    public static final LedgerActivityLineType TRADING_ACCOUNT_WITHDRAWAL_OFFSET =
+            new LedgerActivityLineType(Value.TRADING_ACCOUNT_WITHDRAWAL_OFFSET, "trading_account_withdrawal_offset");
 
-    public static final LedgerActivityLineType ONCHAIN_DEPOSIT =
-            new LedgerActivityLineType(Value.ONCHAIN_DEPOSIT, "onchain_deposit");
+    public static final LedgerActivityLineType AD_INCOME_EXPENSE =
+            new LedgerActivityLineType(Value.AD_INCOME_EXPENSE, "ad_income_expense");
+
+    public static final LedgerActivityLineType PSP_RISK_FEE =
+            new LedgerActivityLineType(Value.PSP_RISK_FEE, "psp_risk_fee");
+
+    public static final LedgerActivityLineType BALANCE_RESERVATION_RELEASE =
+            new LedgerActivityLineType(Value.BALANCE_RESERVATION_RELEASE, "balance_reservation_release");
+
+    public static final LedgerActivityLineType DEPOSIT = new LedgerActivityLineType(Value.DEPOSIT, "deposit");
 
     public static final LedgerActivityLineType WITHDRAWAL_RECLASSIFICATION =
             new LedgerActivityLineType(Value.WITHDRAWAL_RECLASSIFICATION, "withdrawal_reclassification");
 
-    public static final LedgerActivityLineType FRAUD_PREVENTION_FEE =
-            new LedgerActivityLineType(Value.FRAUD_PREVENTION_FEE, "fraud_prevention_fee");
-
     public static final LedgerActivityLineType STRIPE_DOMESTIC_PROCESSING_FEE =
             new LedgerActivityLineType(Value.STRIPE_DOMESTIC_PROCESSING_FEE, "stripe_domestic_processing_fee");
 
-    public static final LedgerActivityLineType MISC_PURCHASE =
-            new LedgerActivityLineType(Value.MISC_PURCHASE, "misc_purchase");
+    public static final LedgerActivityLineType ONCHAIN_DEPOSIT_OFFSET =
+            new LedgerActivityLineType(Value.ONCHAIN_DEPOSIT_OFFSET, "onchain_deposit_offset");
 
-    public static final LedgerActivityLineType PLATFORM_BALANCE_TRANSFER_OUTGOING =
-            new LedgerActivityLineType(Value.PLATFORM_BALANCE_TRANSFER_OUTGOING, "platform_balance_transfer_outgoing");
+    public static final LedgerActivityLineType CONNECTED_ACCOUNT_CLAWBACK =
+            new LedgerActivityLineType(Value.CONNECTED_ACCOUNT_CLAWBACK, "connected_account_clawback");
 
-    public static final LedgerActivityLineType MISC_REVERSAL =
-            new LedgerActivityLineType(Value.MISC_REVERSAL, "misc_reversal");
+    public static final LedgerActivityLineType PSP_POOL_REFUND_CLEARING =
+            new LedgerActivityLineType(Value.PSP_POOL_REFUND_CLEARING, "psp_pool_refund_clearing");
 
-    public static final LedgerActivityLineType AIRDROP_LINK_REDEEMED =
-            new LedgerActivityLineType(Value.AIRDROP_LINK_REDEEMED, "airdrop_link_redeemed");
-
-    public static final LedgerActivityLineType ONCHAIN_SWAP_TARGET =
-            new LedgerActivityLineType(Value.ONCHAIN_SWAP_TARGET, "onchain_swap_target");
-
-    public static final LedgerActivityLineType AD_CAMPAIGN_BUDGET =
-            new LedgerActivityLineType(Value.AD_CAMPAIGN_BUDGET, "ad_campaign_budget");
+    public static final LedgerActivityLineType ONCHAIN_SWAP_OFFSET =
+            new LedgerActivityLineType(Value.ONCHAIN_SWAP_OFFSET, "onchain_swap_offset");
 
     public static final LedgerActivityLineType SOFTWARE_RENTAL_TRANSACTION =
             new LedgerActivityLineType(Value.SOFTWARE_RENTAL_TRANSACTION, "software_rental_transaction");
 
-    public static final LedgerActivityLineType CURRENCY_CONVERSION_INCOMING =
-            new LedgerActivityLineType(Value.CURRENCY_CONVERSION_INCOMING, "currency_conversion_incoming");
+    public static final LedgerActivityLineType WITHDRAWAL_FEE_REVERSAL =
+            new LedgerActivityLineType(Value.WITHDRAWAL_FEE_REVERSAL, "withdrawal_fee_reversal");
 
-    public static final LedgerActivityLineType AFFILIATE_FEE =
-            new LedgerActivityLineType(Value.AFFILIATE_FEE, "affiliate_fee");
+    public static final LedgerActivityLineType PSP_PAYOUT_SETTLEMENT_REVERSAL =
+            new LedgerActivityLineType(Value.PSP_PAYOUT_SETTLEMENT_REVERSAL, "psp_payout_settlement_reversal");
 
-    public static final LedgerActivityLineType CARD_SPEND_AUTHORIZATION_VOID =
-            new LedgerActivityLineType(Value.CARD_SPEND_AUTHORIZATION_VOID, "card_spend_authorization_void");
-
-    public static final LedgerActivityLineType PAYMENT_GROSS_REVERSAL =
-            new LedgerActivityLineType(Value.PAYMENT_GROSS_REVERSAL, "payment_gross_reversal");
-
-    public static final LedgerActivityLineType LEGACY_PAYMENT_REFUND =
-            new LedgerActivityLineType(Value.LEGACY_PAYMENT_REFUND, "legacy_payment_refund");
+    public static final LedgerActivityLineType PAYOUT_RECEIVABLE =
+            new LedgerActivityLineType(Value.PAYOUT_RECEIVABLE, "payout_receivable");
 
     public static final LedgerActivityLineType PASSTHROUGH_GMV =
             new LedgerActivityLineType(Value.PASSTHROUGH_GMV, "passthrough_gmv");
 
-    public static final LedgerActivityLineType DISPUTE_HOLD_ADJUSTMENT =
-            new LedgerActivityLineType(Value.DISPUTE_HOLD_ADJUSTMENT, "dispute_hold_adjustment");
+    public static final LedgerActivityLineType SALES_TAX_COLLECTED_REVERSAL =
+            new LedgerActivityLineType(Value.SALES_TAX_COLLECTED_REVERSAL, "sales_tax_collected_reversal");
 
-    public static final LedgerActivityLineType INTERNAL_WITHDRAWAL =
-            new LedgerActivityLineType(Value.INTERNAL_WITHDRAWAL, "internal_withdrawal");
+    public static final LedgerActivityLineType PSP_PAYOUT_RECEIVABLE_CLEARING =
+            new LedgerActivityLineType(Value.PSP_PAYOUT_RECEIVABLE_CLEARING, "psp_payout_receivable_clearing");
 
-    public static final LedgerActivityLineType PAYMENT_GROSS =
-            new LedgerActivityLineType(Value.PAYMENT_GROSS, "payment_gross");
+    public static final LedgerActivityLineType AD_NETWORK_SETTLEMENT =
+            new LedgerActivityLineType(Value.AD_NETWORK_SETTLEMENT, "ad_network_settlement");
 
-    public static final LedgerActivityLineType BANK_TRANSFER =
-            new LedgerActivityLineType(Value.BANK_TRANSFER, "bank_transfer");
+    public static final LedgerActivityLineType PERPS_BRIDGE_FEE_OFFSET =
+            new LedgerActivityLineType(Value.PERPS_BRIDGE_FEE_OFFSET, "perps_bridge_fee_offset");
 
-    public static final LedgerActivityLineType REFERRAL_BONUS =
-            new LedgerActivityLineType(Value.REFERRAL_BONUS, "referral_bonus");
+    public static final LedgerActivityLineType MARKETING_EXPENSE =
+            new LedgerActivityLineType(Value.MARKETING_EXPENSE, "marketing_expense");
 
-    public static final LedgerActivityLineType INTERNAL_BALANCE_TRANSFER_OUTGOING =
-            new LedgerActivityLineType(Value.INTERNAL_BALANCE_TRANSFER_OUTGOING, "internal_balance_transfer_outgoing");
+    public static final LedgerActivityLineType CARD_INTERCHANGE =
+            new LedgerActivityLineType(Value.CARD_INTERCHANGE, "card_interchange");
 
-    public static final LedgerActivityLineType SALES_TAX_REMITTANCE_REVERSAL =
-            new LedgerActivityLineType(Value.SALES_TAX_REMITTANCE_REVERSAL, "sales_tax_remittance_reversal");
-
-    public static final LedgerActivityLineType WITHDRAWAL_CLAWBACK =
-            new LedgerActivityLineType(Value.WITHDRAWAL_CLAWBACK, "withdrawal_clawback");
+    public static final LedgerActivityLineType AIRDROP_LINK_CANCELED =
+            new LedgerActivityLineType(Value.AIRDROP_LINK_CANCELED, "airdrop_link_canceled");
 
     public static final LedgerActivityLineType LICENSE_SALE_COMMISSION =
             new LedgerActivityLineType(Value.LICENSE_SALE_COMMISSION, "license_sale_commission");
 
-    public static final LedgerActivityLineType REVSHARE_PERCENTAGE_FEE =
-            new LedgerActivityLineType(Value.REVSHARE_PERCENTAGE_FEE, "revshare_percentage_fee");
-
     public static final LedgerActivityLineType SALES_TAX_FEE =
             new LedgerActivityLineType(Value.SALES_TAX_FEE, "sales_tax_fee");
 
-    public static final LedgerActivityLineType WITHDRAWAL_REVERSAL =
-            new LedgerActivityLineType(Value.WITHDRAWAL_REVERSAL, "withdrawal_reversal");
+    public static final LedgerActivityLineType INTERNAL_WITHDRAWAL_IN_TRANSIT =
+            new LedgerActivityLineType(Value.INTERNAL_WITHDRAWAL_IN_TRANSIT, "internal_withdrawal_in_transit");
 
-    public static final LedgerActivityLineType AIRDROP_REVERSAL =
-            new LedgerActivityLineType(Value.AIRDROP_REVERSAL, "airdrop_reversal");
+    public static final LedgerActivityLineType REFUND_UNRECONCILED_CLEARING =
+            new LedgerActivityLineType(Value.REFUND_UNRECONCILED_CLEARING, "refund_unreconciled_clearing");
 
-    public static final LedgerActivityLineType PAYMENT_REFUND =
-            new LedgerActivityLineType(Value.PAYMENT_REFUND, "payment_refund");
+    public static final LedgerActivityLineType PSP_SCHEME_FEE =
+            new LedgerActivityLineType(Value.PSP_SCHEME_FEE, "psp_scheme_fee");
 
-    public static final LedgerActivityLineType CROSS_BORDER_PERCENTAGE_FEE =
-            new LedgerActivityLineType(Value.CROSS_BORDER_PERCENTAGE_FEE, "cross_border_percentage_fee");
+    public static final LedgerActivityLineType PERPS_VOLUME_OFFSET =
+            new LedgerActivityLineType(Value.PERPS_VOLUME_OFFSET, "perps_volume_offset");
+
+    public static final LedgerActivityLineType PSP_ACCOUNT_UPDATER_FEE =
+            new LedgerActivityLineType(Value.PSP_ACCOUNT_UPDATER_FEE, "psp_account_updater_fee");
 
     public static final LedgerActivityLineType TOPUP_FEE = new LedgerActivityLineType(Value.TOPUP_FEE, "topup_fee");
 
-    public static final LedgerActivityLineType AIRDROP_LINK_CREATED =
-            new LedgerActivityLineType(Value.AIRDROP_LINK_CREATED, "airdrop_link_created");
+    public static final LedgerActivityLineType PAYMENT_RECEIVABLE_SETTLEMENT =
+            new LedgerActivityLineType(Value.PAYMENT_RECEIVABLE_SETTLEMENT, "payment_receivable_settlement");
+
+    public static final LedgerActivityLineType PSP_BANK_PULL_SETTLEMENT =
+            new LedgerActivityLineType(Value.PSP_BANK_PULL_SETTLEMENT, "psp_bank_pull_settlement");
+
+    public static final LedgerActivityLineType CASHBACK = new LedgerActivityLineType(Value.CASHBACK, "cashback");
 
     public static final LedgerActivityLineType FX_PERCENTAGE_FEE =
             new LedgerActivityLineType(Value.FX_PERCENTAGE_FEE, "fx_percentage_fee");
 
-    public static final LedgerActivityLineType CURRENCY_CONVERSION_OUTGOING =
-            new LedgerActivityLineType(Value.CURRENCY_CONVERSION_OUTGOING, "currency_conversion_outgoing");
+    public static final LedgerActivityLineType PAYMENT_RECEIVABLE_CLEARING =
+            new LedgerActivityLineType(Value.PAYMENT_RECEIVABLE_CLEARING, "payment_receivable_clearing");
 
-    public static final LedgerActivityLineType COMPANY_REFERRAL =
-            new LedgerActivityLineType(Value.COMPANY_REFERRAL, "company_referral");
+    public static final LedgerActivityLineType DISPUTE_SETTLEMENT =
+            new LedgerActivityLineType(Value.DISPUTE_SETTLEMENT, "dispute_settlement");
 
-    public static final LedgerActivityLineType ORCHESTRATION_PERCENTAGE_FEE =
-            new LedgerActivityLineType(Value.ORCHESTRATION_PERCENTAGE_FEE, "orchestration_percentage_fee");
+    public static final LedgerActivityLineType PSP_CONNECT_FEE =
+            new LedgerActivityLineType(Value.PSP_CONNECT_FEE, "psp_connect_fee");
 
-    public static final LedgerActivityLineType CARD_SPEND_REFUND =
-            new LedgerActivityLineType(Value.CARD_SPEND_REFUND, "card_spend_refund");
-
-    public static final LedgerActivityLineType PAYMENT_REVSHARE_REVERSAL =
-            new LedgerActivityLineType(Value.PAYMENT_REVSHARE_REVERSAL, "payment_revshare_reversal");
+    public static final LedgerActivityLineType PSP_INTERCHANGE_FEE =
+            new LedgerActivityLineType(Value.PSP_INTERCHANGE_FEE, "psp_interchange_fee");
 
     public static final LedgerActivityLineType PLATFORM_AFFILIATE_PAYMENT =
             new LedgerActivityLineType(Value.PLATFORM_AFFILIATE_PAYMENT, "platform_affiliate_payment");
 
-    public static final LedgerActivityLineType SALES_TAX_REMITTANCE =
-            new LedgerActivityLineType(Value.SALES_TAX_REMITTANCE, "sales_tax_remittance");
+    public static final LedgerActivityLineType INTERNAL_WITHDRAWAL_REVERSAL =
+            new LedgerActivityLineType(Value.INTERNAL_WITHDRAWAL_REVERSAL, "internal_withdrawal_reversal");
+
+    public static final LedgerActivityLineType CARD_SPEND_AUTHORIZATION_VOID_RELEASE = new LedgerActivityLineType(
+            Value.CARD_SPEND_AUTHORIZATION_VOID_RELEASE, "card_spend_authorization_void_release");
+
+    public static final LedgerActivityLineType WITHDRAWAL_PAYABLE_CLEARING_REVERSAL = new LedgerActivityLineType(
+            Value.WITHDRAWAL_PAYABLE_CLEARING_REVERSAL, "withdrawal_payable_clearing_reversal");
+
+    public static final LedgerActivityLineType PSP_INVOICE_TAX_FEE =
+            new LedgerActivityLineType(Value.PSP_INVOICE_TAX_FEE, "psp_invoice_tax_fee");
+
+    public static final LedgerActivityLineType DISPUTE_REPRESENTMENT_FEE =
+            new LedgerActivityLineType(Value.DISPUTE_REPRESENTMENT_FEE, "dispute_representment_fee");
+
+    public static final LedgerActivityLineType PLATFORM_BALANCE_PAYMENT_REFUND =
+            new LedgerActivityLineType(Value.PLATFORM_BALANCE_PAYMENT_REFUND, "platform_balance_payment_refund");
+
+    public static final LedgerActivityLineType PERPS_REALIZED_PNL =
+            new LedgerActivityLineType(Value.PERPS_REALIZED_PNL, "perps_realized_pnl");
+
+    public static final LedgerActivityLineType RESOLUTION_CENTER_REFUND =
+            new LedgerActivityLineType(Value.RESOLUTION_CENTER_REFUND, "resolution_center_refund");
+
+    public static final LedgerActivityLineType PSP_RESERVE_HOLD =
+            new LedgerActivityLineType(Value.PSP_RESERVE_HOLD, "psp_reserve_hold");
+
+    public static final LedgerActivityLineType THREE_DS_FIXED_FEE =
+            new LedgerActivityLineType(Value.THREE_DS_FIXED_FEE, "three_ds_fixed_fee");
+
+    public static final LedgerActivityLineType PSP_POOL_DISPUTE_SETTLEMENT =
+            new LedgerActivityLineType(Value.PSP_POOL_DISPUTE_SETTLEMENT, "psp_pool_dispute_settlement");
+
+    public static final LedgerActivityLineType TRADING_ACCOUNT_DEPOSIT =
+            new LedgerActivityLineType(Value.TRADING_ACCOUNT_DEPOSIT, "trading_account_deposit");
+
+    public static final LedgerActivityLineType PLATFORM_TRADING_COMMISSION =
+            new LedgerActivityLineType(Value.PLATFORM_TRADING_COMMISSION, "platform_trading_commission");
+
+    public static final LedgerActivityLineType ONBOARDING_REWARD =
+            new LedgerActivityLineType(Value.ONBOARDING_REWARD, "onboarding_reward");
+
+    public static final LedgerActivityLineType AIRDROP_LINK_RETURNED =
+            new LedgerActivityLineType(Value.AIRDROP_LINK_RETURNED, "airdrop_link_returned");
+
+    public static final LedgerActivityLineType REFUND_SETTLEMENT_REVERSAL =
+            new LedgerActivityLineType(Value.REFUND_SETTLEMENT_REVERSAL, "refund_settlement_reversal");
+
+    public static final LedgerActivityLineType WITHDRAWAL_MARKUP_FEE =
+            new LedgerActivityLineType(Value.WITHDRAWAL_MARKUP_FEE, "withdrawal_markup_fee");
+
+    public static final LedgerActivityLineType ONCHAIN_PLATFORM_TRANSFER_OUTGOING =
+            new LedgerActivityLineType(Value.ONCHAIN_PLATFORM_TRANSFER_OUTGOING, "onchain_platform_transfer_outgoing");
+
+    public static final LedgerActivityLineType INSTALLMENT_DEFAULT =
+            new LedgerActivityLineType(Value.INSTALLMENT_DEFAULT, "installment_default");
+
+    public static final LedgerActivityLineType PSP_TERMINAL_FEE =
+            new LedgerActivityLineType(Value.PSP_TERMINAL_FEE, "psp_terminal_fee");
+
+    public static final LedgerActivityLineType PLATFORM_BALANCE_PAYMENT =
+            new LedgerActivityLineType(Value.PLATFORM_BALANCE_PAYMENT, "platform_balance_payment");
+
+    public static final LedgerActivityLineType LEVELS_POINTS_ISSUED =
+            new LedgerActivityLineType(Value.LEVELS_POINTS_ISSUED, "levels_points_issued");
+
+    public static final LedgerActivityLineType PSP_REFUND_FEE =
+            new LedgerActivityLineType(Value.PSP_REFUND_FEE, "psp_refund_fee");
+
+    public static final LedgerActivityLineType PERPS_UNLOAD_DEPOSIT =
+            new LedgerActivityLineType(Value.PERPS_UNLOAD_DEPOSIT, "perps_unload_deposit");
+
+    public static final LedgerActivityLineType AD_PUBLISHER_PAYOUT_RECEIVED =
+            new LedgerActivityLineType(Value.AD_PUBLISHER_PAYOUT_RECEIVED, "ad_publisher_payout_received");
+
+    public static final LedgerActivityLineType LEGACY_CRYPTO_PAYMENT =
+            new LedgerActivityLineType(Value.LEGACY_CRYPTO_PAYMENT, "legacy_crypto_payment");
+
+    public static final LedgerActivityLineType CLAWBACK_RECEIVABLE_REVERSAL =
+            new LedgerActivityLineType(Value.CLAWBACK_RECEIVABLE_REVERSAL, "clawback_receivable_reversal");
+
+    public static final LedgerActivityLineType PSP_REFUND_PAYABLE =
+            new LedgerActivityLineType(Value.PSP_REFUND_PAYABLE, "psp_refund_payable");
+
+    public static final LedgerActivityLineType PLATFORM_MARKUP_FEE =
+            new LedgerActivityLineType(Value.PLATFORM_MARKUP_FEE, "platform_markup_fee");
+
+    public static final LedgerActivityLineType PSP_ACCOUNT_DEBIT =
+            new LedgerActivityLineType(Value.PSP_ACCOUNT_DEBIT, "psp_account_debit");
+
+    public static final LedgerActivityLineType PAYMENT_REFERRAL =
+            new LedgerActivityLineType(Value.PAYMENT_REFERRAL, "payment_referral");
+
+    public static final LedgerActivityLineType PERPS_LOAD_DEPOSIT =
+            new LedgerActivityLineType(Value.PERPS_LOAD_DEPOSIT, "perps_load_deposit");
+
+    public static final LedgerActivityLineType WHOP_SWAP_FEE_RECEIVED =
+            new LedgerActivityLineType(Value.WHOP_SWAP_FEE_RECEIVED, "whop_swap_fee_received");
+
+    public static final LedgerActivityLineType WITHDRAWAL_CLAWBACK_REVERSAL =
+            new LedgerActivityLineType(Value.WITHDRAWAL_CLAWBACK_REVERSAL, "withdrawal_clawback_reversal");
+
+    public static final LedgerActivityLineType PSP_MARKUP_FEE =
+            new LedgerActivityLineType(Value.PSP_MARKUP_FEE, "psp_markup_fee");
+
+    public static final LedgerActivityLineType INTERNAL_WITHDRAWAL_MARKUP_FEE_PAYOUT = new LedgerActivityLineType(
+            Value.INTERNAL_WITHDRAWAL_MARKUP_FEE_PAYOUT, "internal_withdrawal_markup_fee_payout");
+
+    public static final LedgerActivityLineType CARD_SPEND_AUTHORIZATION =
+            new LedgerActivityLineType(Value.CARD_SPEND_AUTHORIZATION, "card_spend_authorization");
+
+    public static final LedgerActivityLineType LEVELS_POINTS_PARTNER =
+            new LedgerActivityLineType(Value.LEVELS_POINTS_PARTNER, "levels_points_partner");
+
+    public static final LedgerActivityLineType EXTERNAL_CARD_LOAD_DEPOSIT =
+            new LedgerActivityLineType(Value.EXTERNAL_CARD_LOAD_DEPOSIT, "external_card_load_deposit");
+
+    public static final LedgerActivityLineType SALES_TAX_REMITTED =
+            new LedgerActivityLineType(Value.SALES_TAX_REMITTED, "sales_tax_remitted");
+
+    public static final LedgerActivityLineType PAYMENT_REFUND_REVERSAL =
+            new LedgerActivityLineType(Value.PAYMENT_REFUND_REVERSAL, "payment_refund_reversal");
+
+    public static final LedgerActivityLineType ONCHAIN_INTERNAL_TRANSFER_OUTGOING =
+            new LedgerActivityLineType(Value.ONCHAIN_INTERNAL_TRANSFER_OUTGOING, "onchain_internal_transfer_outgoing");
+
+    public static final LedgerActivityLineType CLAWBACK_FEE =
+            new LedgerActivityLineType(Value.CLAWBACK_FEE, "clawback_fee");
+
+    public static final LedgerActivityLineType WITHDRAWAL_PAYABLE_REVERSAL =
+            new LedgerActivityLineType(Value.WITHDRAWAL_PAYABLE_REVERSAL, "withdrawal_payable_reversal");
+
+    public static final LedgerActivityLineType AIRDROP_EXPENSE =
+            new LedgerActivityLineType(Value.AIRDROP_EXPENSE, "airdrop_expense");
+
+    public static final LedgerActivityLineType AD_NETWORK_COST =
+            new LedgerActivityLineType(Value.AD_NETWORK_COST, "ad_network_cost");
+
+    public static final LedgerActivityLineType FX_SETTLEMENT_GAIN_LOSS =
+            new LedgerActivityLineType(Value.FX_SETTLEMENT_GAIN_LOSS, "fx_settlement_gain_loss");
+
+    public static final LedgerActivityLineType PSP_TAX_SERVICE_FEE =
+            new LedgerActivityLineType(Value.PSP_TAX_SERVICE_FEE, "psp_tax_service_fee");
+
+    public static final LedgerActivityLineType PLATFORM_BALANCE_TRANSFER_OUTGOING =
+            new LedgerActivityLineType(Value.PLATFORM_BALANCE_TRANSFER_OUTGOING, "platform_balance_transfer_outgoing");
+
+    public static final LedgerActivityLineType CASHBACK_FUNDING =
+            new LedgerActivityLineType(Value.CASHBACK_FUNDING, "cashback_funding");
+
+    public static final LedgerActivityLineType PSP_CURRENCY_CONVERSION_INCOMING =
+            new LedgerActivityLineType(Value.PSP_CURRENCY_CONVERSION_INCOMING, "psp_currency_conversion_incoming");
+
+    public static final LedgerActivityLineType ONCHAIN_SWAP_TARGET =
+            new LedgerActivityLineType(Value.ONCHAIN_SWAP_TARGET, "onchain_swap_target");
+
+    public static final LedgerActivityLineType AIRDROP_LINK_REDEEMED =
+            new LedgerActivityLineType(Value.AIRDROP_LINK_REDEEMED, "airdrop_link_redeemed");
+
+    public static final LedgerActivityLineType PSP_CURRENCY_CONVERSION_RECEIVABLE_CLEARING = new LedgerActivityLineType(
+            Value.PSP_CURRENCY_CONVERSION_RECEIVABLE_CLEARING, "psp_currency_conversion_receivable_clearing");
+
+    public static final LedgerActivityLineType CAPITAL_WITHHOLDING_REVERSAL =
+            new LedgerActivityLineType(Value.CAPITAL_WITHHOLDING_REVERSAL, "capital_withholding_reversal");
+
+    public static final LedgerActivityLineType EXTERNAL_CARD_LOAD_OFFSET =
+            new LedgerActivityLineType(Value.EXTERNAL_CARD_LOAD_OFFSET, "external_card_load_offset");
+
+    public static final LedgerActivityLineType AFFILIATE_FEE =
+            new LedgerActivityLineType(Value.AFFILIATE_FEE, "affiliate_fee");
+
+    public static final LedgerActivityLineType ONCHAIN_SWAP_SOURCE =
+            new LedgerActivityLineType(Value.ONCHAIN_SWAP_SOURCE, "onchain_swap_source");
+
+    public static final LedgerActivityLineType PAYMENT_GROSS_REVERSAL =
+            new LedgerActivityLineType(Value.PAYMENT_GROSS_REVERSAL, "payment_gross_reversal");
+
+    public static final LedgerActivityLineType PSP_PAYMENT_RECEIVABLE =
+            new LedgerActivityLineType(Value.PSP_PAYMENT_RECEIVABLE, "psp_payment_receivable");
+
+    public static final LedgerActivityLineType PERPS_FEE = new LedgerActivityLineType(Value.PERPS_FEE, "perps_fee");
+
+    public static final LedgerActivityLineType TREASURY_PAYIN_RECEIVABLE =
+            new LedgerActivityLineType(Value.TREASURY_PAYIN_RECEIVABLE, "treasury_payin_receivable");
+
+    public static final LedgerActivityLineType PSP_IDENTITY_VERIFICATION_FEE =
+            new LedgerActivityLineType(Value.PSP_IDENTITY_VERIFICATION_FEE, "psp_identity_verification_fee");
+
+    public static final LedgerActivityLineType WITHDRAWAL_MARKUP_FEE_REVERSAL =
+            new LedgerActivityLineType(Value.WITHDRAWAL_MARKUP_FEE_REVERSAL, "withdrawal_markup_fee_reversal");
+
+    public static final LedgerActivityLineType AD_FUNDING_DISBURSEMENT =
+            new LedgerActivityLineType(Value.AD_FUNDING_DISBURSEMENT, "ad_funding_disbursement");
+
+    public static final LedgerActivityLineType WITHDRAWAL_CLAWBACK =
+            new LedgerActivityLineType(Value.WITHDRAWAL_CLAWBACK, "withdrawal_clawback");
+
+    public static final LedgerActivityLineType PERPS_REALIZED_PNL_OFFSET =
+            new LedgerActivityLineType(Value.PERPS_REALIZED_PNL_OFFSET, "perps_realized_pnl_offset");
+
+    public static final LedgerActivityLineType PLATFORM_EARNING =
+            new LedgerActivityLineType(Value.PLATFORM_EARNING, "platform_earning");
+
+    public static final LedgerActivityLineType REVSHARE_PERCENTAGE_FEE =
+            new LedgerActivityLineType(Value.REVSHARE_PERCENTAGE_FEE, "revshare_percentage_fee");
+
+    public static final LedgerActivityLineType PAYMENT_REFUND =
+            new LedgerActivityLineType(Value.PAYMENT_REFUND, "payment_refund");
+
+    public static final LedgerActivityLineType AIRDROP_REVERSAL =
+            new LedgerActivityLineType(Value.AIRDROP_REVERSAL, "airdrop_reversal");
+
+    public static final LedgerActivityLineType WITHDRAWAL_FEE =
+            new LedgerActivityLineType(Value.WITHDRAWAL_FEE, "withdrawal_fee");
+
+    public static final LedgerActivityLineType TRADING_ACCOUNT_WITHDRAWAL =
+            new LedgerActivityLineType(Value.TRADING_ACCOUNT_WITHDRAWAL, "trading_account_withdrawal");
+
+    public static final LedgerActivityLineType BAD_DEBT_OFFSET =
+            new LedgerActivityLineType(Value.BAD_DEBT_OFFSET, "bad_debt_offset");
+
+    public static final LedgerActivityLineType BALANCE_RESERVATION_HOLD =
+            new LedgerActivityLineType(Value.BALANCE_RESERVATION_HOLD, "balance_reservation_hold");
+
+    public static final LedgerActivityLineType AIRDROP_LINK_CLAIMED =
+            new LedgerActivityLineType(Value.AIRDROP_LINK_CLAIMED, "airdrop_link_claimed");
+
+    public static final LedgerActivityLineType PSP_DISPUTE_FEE =
+            new LedgerActivityLineType(Value.PSP_DISPUTE_FEE, "psp_dispute_fee");
+
+    public static final LedgerActivityLineType CARD_UNLOAD_DEPOSIT =
+            new LedgerActivityLineType(Value.CARD_UNLOAD_DEPOSIT, "card_unload_deposit");
+
+    public static final LedgerActivityLineType AIRDROP_LINK_CREATED =
+            new LedgerActivityLineType(Value.AIRDROP_LINK_CREATED, "airdrop_link_created");
+
+    public static final LedgerActivityLineType PSP_TRANSFER_SETTLEMENT =
+            new LedgerActivityLineType(Value.PSP_TRANSFER_SETTLEMENT, "psp_transfer_settlement");
+
+    public static final LedgerActivityLineType ORCHESTRATION_PERCENTAGE_FEE =
+            new LedgerActivityLineType(Value.ORCHESTRATION_PERCENTAGE_FEE, "orchestration_percentage_fee");
+
+    public static final LedgerActivityLineType COMPANY_REFERRAL =
+            new LedgerActivityLineType(Value.COMPANY_REFERRAL, "company_referral");
+
+    public static final LedgerActivityLineType CARD_INTERCHANGE_RECEIVABLE =
+            new LedgerActivityLineType(Value.CARD_INTERCHANGE_RECEIVABLE, "card_interchange_receivable");
+
+    public static final LedgerActivityLineType PAYMENT_REVSHARE_REVERSAL =
+            new LedgerActivityLineType(Value.PAYMENT_REVSHARE_REVERSAL, "payment_revshare_reversal");
+
+    public static final LedgerActivityLineType CARD_LOAD_DEPOSIT =
+            new LedgerActivityLineType(Value.CARD_LOAD_DEPOSIT, "card_load_deposit");
 
     public static final LedgerActivityLineType MISC_REFUND =
             new LedgerActivityLineType(Value.MISC_REFUND, "misc_refund");
 
-    public static final LedgerActivityLineType PAYMENT_PROCESSING_FIXED_FEE =
-            new LedgerActivityLineType(Value.PAYMENT_PROCESSING_FIXED_FEE, "payment_processing_fixed_fee");
+    public static final LedgerActivityLineType DISPUTE_PAYABLE_REVERSAL =
+            new LedgerActivityLineType(Value.DISPUTE_PAYABLE_REVERSAL, "dispute_payable_reversal");
 
-    public static final LedgerActivityLineType INTERNAL_WITHDRAWAL_REVERSAL =
-            new LedgerActivityLineType(Value.INTERNAL_WITHDRAWAL_REVERSAL, "internal_withdrawal_reversal");
-
-    public static final LedgerActivityLineType SOFTWARE_RENTAL_REVSHARE =
-            new LedgerActivityLineType(Value.SOFTWARE_RENTAL_REVSHARE, "software_rental_revshare");
-
-    public static final LedgerActivityLineType BUYER_FEE = new LedgerActivityLineType(Value.BUYER_FEE, "buyer_fee");
-
-    public static final LedgerActivityLineType WHOP_PROCESSING_FEE =
-            new LedgerActivityLineType(Value.WHOP_PROCESSING_FEE, "whop_processing_fee");
+    public static final LedgerActivityLineType TREASURY_FEE =
+            new LedgerActivityLineType(Value.TREASURY_FEE, "treasury_fee");
 
     public static final LedgerActivityLineType ONCHAIN_WALLET_TRANSFER_INCOMING =
             new LedgerActivityLineType(Value.ONCHAIN_WALLET_TRANSFER_INCOMING, "onchain_wallet_transfer_incoming");
 
-    public static final LedgerActivityLineType PAYMENT_REVSHARE =
-            new LedgerActivityLineType(Value.PAYMENT_REVSHARE, "payment_revshare");
+    public static final LedgerActivityLineType PSP_TAX_FILING_FEE =
+            new LedgerActivityLineType(Value.PSP_TAX_FILING_FEE, "psp_tax_filing_fee");
 
     public static final LedgerActivityLineType PAYMENT_DISPUTE_FEE =
             new LedgerActivityLineType(Value.PAYMENT_DISPUTE_FEE, "payment_dispute_fee");
+
+    public static final LedgerActivityLineType BAD_DEBT_EXPENSE =
+            new LedgerActivityLineType(Value.BAD_DEBT_EXPENSE, "bad_debt_expense");
+
+    public static final LedgerActivityLineType CAPITAL_HOLD_RELEASE =
+            new LedgerActivityLineType(Value.CAPITAL_HOLD_RELEASE, "capital_hold_release");
+
+    public static final LedgerActivityLineType AIRDROP_EXPENSE_REVERSAL =
+            new LedgerActivityLineType(Value.AIRDROP_EXPENSE_REVERSAL, "airdrop_expense_reversal");
+
+    public static final LedgerActivityLineType PAYMENT_DISPUTE =
+            new LedgerActivityLineType(Value.PAYMENT_DISPUTE, "payment_dispute");
+
+    public static final LedgerActivityLineType AD_PUBLISHER_PAYOUT =
+            new LedgerActivityLineType(Value.AD_PUBLISHER_PAYOUT, "ad_publisher_payout");
+
+    public static final LedgerActivityLineType PAYMENT_PROCESSING_PERCENTAGE_FEE =
+            new LedgerActivityLineType(Value.PAYMENT_PROCESSING_PERCENTAGE_FEE, "payment_processing_percentage_fee");
+
+    public static final LedgerActivityLineType CARD_SPEND_CAPTURE_OFFSET =
+            new LedgerActivityLineType(Value.CARD_SPEND_CAPTURE_OFFSET, "card_spend_capture_offset");
+
+    public static final LedgerActivityLineType PSP_PAYOUT_DEPOSIT =
+            new LedgerActivityLineType(Value.PSP_PAYOUT_DEPOSIT, "psp_payout_deposit");
+
+    public static final LedgerActivityLineType CAPITAL_HOLD =
+            new LedgerActivityLineType(Value.CAPITAL_HOLD, "capital_hold");
+
+    public static final LedgerActivityLineType DISPUTE_MANAGEMENT_FEE =
+            new LedgerActivityLineType(Value.DISPUTE_MANAGEMENT_FEE, "dispute_management_fee");
+
+    public static final LedgerActivityLineType CASHBACK_EXPENSE =
+            new LedgerActivityLineType(Value.CASHBACK_EXPENSE, "cashback_expense");
+
+    public static final LedgerActivityLineType WITHDRAWAL = new LedgerActivityLineType(Value.WITHDRAWAL, "withdrawal");
+
+    public static final LedgerActivityLineType SETTLEMENT_ROUNDING_VARIANCE =
+            new LedgerActivityLineType(Value.SETTLEMENT_ROUNDING_VARIANCE, "settlement_rounding_variance");
+
+    public static final LedgerActivityLineType PSP_NETWORK_TOKEN_FEE =
+            new LedgerActivityLineType(Value.PSP_NETWORK_TOKEN_FEE, "psp_network_token_fee");
+
+    public static final LedgerActivityLineType BALANCE_RESERVATION =
+            new LedgerActivityLineType(Value.BALANCE_RESERVATION, "balance_reservation");
+
+    public static final LedgerActivityLineType AD_SPEND_PURCHASE =
+            new LedgerActivityLineType(Value.AD_SPEND_PURCHASE, "ad_spend_purchase");
+
+    public static final LedgerActivityLineType WITHDRAWAL_PAYABLE =
+            new LedgerActivityLineType(Value.WITHDRAWAL_PAYABLE, "withdrawal_payable");
+
+    public static final LedgerActivityLineType LEGACY_PAYMENT =
+            new LedgerActivityLineType(Value.LEGACY_PAYMENT, "legacy_payment");
+
+    public static final LedgerActivityLineType PSP_RECIPIENT_WALLET_LOAD =
+            new LedgerActivityLineType(Value.PSP_RECIPIENT_WALLET_LOAD, "psp_recipient_wallet_load");
+
+    public static final LedgerActivityLineType AD_BUDGET_RELEASE =
+            new LedgerActivityLineType(Value.AD_BUDGET_RELEASE, "ad_budget_release");
+
+    public static final LedgerActivityLineType PSP_ACCELERATED_SETTLEMENT_FEE =
+            new LedgerActivityLineType(Value.PSP_ACCELERATED_SETTLEMENT_FEE, "psp_accelerated_settlement_fee");
+
+    public static final LedgerActivityLineType LEVELS_POINTS_CARD =
+            new LedgerActivityLineType(Value.LEVELS_POINTS_CARD, "levels_points_card");
+
+    public static final LedgerActivityLineType DISPUTE_UNRECONCILED_REVERSAL =
+            new LedgerActivityLineType(Value.DISPUTE_UNRECONCILED_REVERSAL, "dispute_unreconciled_reversal");
+
+    public static final LedgerActivityLineType PLATFORM_AFFILIATE_PAYMENT_REVERSAL = new LedgerActivityLineType(
+            Value.PLATFORM_AFFILIATE_PAYMENT_REVERSAL, "platform_affiliate_payment_reversal");
+
+    public static final LedgerActivityLineType INTERNAL_WITHDRAWAL_FEE_REVERSAL =
+            new LedgerActivityLineType(Value.INTERNAL_WITHDRAWAL_FEE_REVERSAL, "internal_withdrawal_fee_reversal");
+
+    public static final LedgerActivityLineType FX_GAIN_LOSS =
+            new LedgerActivityLineType(Value.FX_GAIN_LOSS, "fx_gain_loss");
+
+    public static final LedgerActivityLineType PSP_COLLECTION_SETTLEMENT =
+            new LedgerActivityLineType(Value.PSP_COLLECTION_SETTLEMENT, "psp_collection_settlement");
+
+    public static final LedgerActivityLineType INTERNAL_BALANCE_TRANSFER_INCOMING =
+            new LedgerActivityLineType(Value.INTERNAL_BALANCE_TRANSFER_INCOMING, "internal_balance_transfer_incoming");
+
+    public static final LedgerActivityLineType IDENTITY_VERIFICATION_FEE =
+            new LedgerActivityLineType(Value.IDENTITY_VERIFICATION_FEE, "identity_verification_fee");
+
+    public static final LedgerActivityLineType ONCHAIN_DEPOSIT =
+            new LedgerActivityLineType(Value.ONCHAIN_DEPOSIT, "onchain_deposit");
+
+    public static final LedgerActivityLineType PSP_PAYIN_CLEARING =
+            new LedgerActivityLineType(Value.PSP_PAYIN_CLEARING, "psp_payin_clearing");
+
+    public static final LedgerActivityLineType MARKETPLACE_AFFILIATE_FEE =
+            new LedgerActivityLineType(Value.MARKETPLACE_AFFILIATE_FEE, "marketplace_affiliate_fee");
+
+    public static final LedgerActivityLineType CARD_SPEND_REFUND_OFFSET =
+            new LedgerActivityLineType(Value.CARD_SPEND_REFUND_OFFSET, "card_spend_refund_offset");
+
+    public static final LedgerActivityLineType MISC_PURCHASE =
+            new LedgerActivityLineType(Value.MISC_PURCHASE, "misc_purchase");
+
+    public static final LedgerActivityLineType LEVELS_POINTS_BURNED =
+            new LedgerActivityLineType(Value.LEVELS_POINTS_BURNED, "levels_points_burned");
+
+    public static final LedgerActivityLineType PSP_PAYMENT_METHOD_FEE =
+            new LedgerActivityLineType(Value.PSP_PAYMENT_METHOD_FEE, "psp_payment_method_fee");
+
+    public static final LedgerActivityLineType APPLICATION_FEE_PAYABLE =
+            new LedgerActivityLineType(Value.APPLICATION_FEE_PAYABLE, "application_fee_payable");
+
+    public static final LedgerActivityLineType CURRENCY_CONVERSION_INCOMING =
+            new LedgerActivityLineType(Value.CURRENCY_CONVERSION_INCOMING, "currency_conversion_incoming");
+
+    public static final LedgerActivityLineType PSP_PAYOUT_SETTLEMENT =
+            new LedgerActivityLineType(Value.PSP_PAYOUT_SETTLEMENT, "psp_payout_settlement");
+
+    public static final LedgerActivityLineType DISPUTE_HOLD_BLOCKED =
+            new LedgerActivityLineType(Value.DISPUTE_HOLD_BLOCKED, "dispute_hold_blocked");
+
+    public static final LedgerActivityLineType PSP_POOL_REFUND_SETTLEMENT =
+            new LedgerActivityLineType(Value.PSP_POOL_REFUND_SETTLEMENT, "psp_pool_refund_settlement");
+
+    public static final LedgerActivityLineType CAPITAL_WITHHOLDING =
+            new LedgerActivityLineType(Value.CAPITAL_WITHHOLDING, "capital_withholding");
+
+    public static final LedgerActivityLineType PAYMENT_GROSS =
+            new LedgerActivityLineType(Value.PAYMENT_GROSS, "payment_gross");
+
+    public static final LedgerActivityLineType DISPUTE_HOLD_ADJUSTMENT =
+            new LedgerActivityLineType(Value.DISPUTE_HOLD_ADJUSTMENT, "dispute_hold_adjustment");
+
+    public static final LedgerActivityLineType PSP_TRANSFER_SETTLEMENT_REVERSAL =
+            new LedgerActivityLineType(Value.PSP_TRANSFER_SETTLEMENT_REVERSAL, "psp_transfer_settlement_reversal");
+
+    public static final LedgerActivityLineType AGGREGATED_FEE =
+            new LedgerActivityLineType(Value.AGGREGATED_FEE, "aggregated_fee");
+
+    public static final LedgerActivityLineType PSP_RESERVE_RELEASE =
+            new LedgerActivityLineType(Value.PSP_RESERVE_RELEASE, "psp_reserve_release");
+
+    public static final LedgerActivityLineType SALES_TAX_REMITTANCE_REVERSAL =
+            new LedgerActivityLineType(Value.SALES_TAX_REMITTANCE_REVERSAL, "sales_tax_remittance_reversal");
+
+    public static final LedgerActivityLineType ADS_CARD_SPREAD =
+            new LedgerActivityLineType(Value.ADS_CARD_SPREAD, "ads_card_spread");
+
+    public static final LedgerActivityLineType SALES_TAX_COLLECTED =
+            new LedgerActivityLineType(Value.SALES_TAX_COLLECTED, "sales_tax_collected");
+
+    public static final LedgerActivityLineType PERPS_LOAD_TRANSFER =
+            new LedgerActivityLineType(Value.PERPS_LOAD_TRANSFER, "perps_load_transfer");
+
+    public static final LedgerActivityLineType PLATFORM_CREDITS_PAYMENT =
+            new LedgerActivityLineType(Value.PLATFORM_CREDITS_PAYMENT, "platform_credits_payment");
+
+    public static final LedgerActivityLineType WITHDRAWAL_REVERSAL =
+            new LedgerActivityLineType(Value.WITHDRAWAL_REVERSAL, "withdrawal_reversal");
+
+    public static final LedgerActivityLineType DISPUTE_UNRECONCILED_CLEARING =
+            new LedgerActivityLineType(Value.DISPUTE_UNRECONCILED_CLEARING, "dispute_unreconciled_clearing");
+
+    public static final LedgerActivityLineType CROSS_BORDER_PERCENTAGE_FEE =
+            new LedgerActivityLineType(Value.CROSS_BORDER_PERCENTAGE_FEE, "cross_border_percentage_fee");
+
+    public static final LedgerActivityLineType PSP_POOL_CLEARING =
+            new LedgerActivityLineType(Value.PSP_POOL_CLEARING, "psp_pool_clearing");
+
+    public static final LedgerActivityLineType PSP_BILLING_FEE =
+            new LedgerActivityLineType(Value.PSP_BILLING_FEE, "psp_billing_fee");
+
+    public static final LedgerActivityLineType INTERNAL_WITHDRAWAL_COMPLETE =
+            new LedgerActivityLineType(Value.INTERNAL_WITHDRAWAL_COMPLETE, "internal_withdrawal_complete");
+
+    public static final LedgerActivityLineType PSP_OPTIMIZATION_FEE =
+            new LedgerActivityLineType(Value.PSP_OPTIMIZATION_FEE, "psp_optimization_fee");
+
+    public static final LedgerActivityLineType PLATFORM_BALANCE_TRANSFER_FEE =
+            new LedgerActivityLineType(Value.PLATFORM_BALANCE_TRANSFER_FEE, "platform_balance_transfer_fee");
+
+    public static final LedgerActivityLineType INTERNAL_WITHDRAWAL_IN_TRANSIT_REVERSAL = new LedgerActivityLineType(
+            Value.INTERNAL_WITHDRAWAL_IN_TRANSIT_REVERSAL, "internal_withdrawal_in_transit_reversal");
+
+    public static final LedgerActivityLineType PSP_DISPUTE_PAYABLE =
+            new LedgerActivityLineType(Value.PSP_DISPUTE_PAYABLE, "psp_dispute_payable");
+
+    public static final LedgerActivityLineType CURRENCY_CONVERSION_OUTGOING =
+            new LedgerActivityLineType(Value.CURRENCY_CONVERSION_OUTGOING, "currency_conversion_outgoing");
+
+    public static final LedgerActivityLineType PLATFORM_CREDITS_GRANTED =
+            new LedgerActivityLineType(Value.PLATFORM_CREDITS_GRANTED, "platform_credits_granted");
+
+    public static final LedgerActivityLineType PAYOUT_SUBSIDY =
+            new LedgerActivityLineType(Value.PAYOUT_SUBSIDY, "payout_subsidy");
+
+    public static final LedgerActivityLineType PSP_PAYIN_SETTLEMENT =
+            new LedgerActivityLineType(Value.PSP_PAYIN_SETTLEMENT, "psp_payin_settlement");
+
+    public static final LedgerActivityLineType PSP_CLAWBACK_SETTLEMENT =
+            new LedgerActivityLineType(Value.PSP_CLAWBACK_SETTLEMENT, "psp_clawback_settlement");
+
+    public static final LedgerActivityLineType SALES_TAX_REMITTANCE =
+            new LedgerActivityLineType(Value.SALES_TAX_REMITTANCE, "sales_tax_remittance");
+
+    public static final LedgerActivityLineType WITHDRAWAL_PAYABLE_CLEARING =
+            new LedgerActivityLineType(Value.WITHDRAWAL_PAYABLE_CLEARING, "withdrawal_payable_clearing");
+
+    public static final LedgerActivityLineType PAYMENT_PROCESSING_FIXED_FEE =
+            new LedgerActivityLineType(Value.PAYMENT_PROCESSING_FIXED_FEE, "payment_processing_fixed_fee");
+
+    public static final LedgerActivityLineType SOFTWARE_RENTAL_REVSHARE =
+            new LedgerActivityLineType(Value.SOFTWARE_RENTAL_REVSHARE, "software_rental_revshare");
+
+    public static final LedgerActivityLineType WHOP_PROCESSING_FEE =
+            new LedgerActivityLineType(Value.WHOP_PROCESSING_FEE, "whop_processing_fee");
+
+    public static final LedgerActivityLineType BUYER_FEE = new LedgerActivityLineType(Value.BUYER_FEE, "buyer_fee");
+
+    public static final LedgerActivityLineType AIRDROP_LINK_FUNDED =
+            new LedgerActivityLineType(Value.AIRDROP_LINK_FUNDED, "airdrop_link_funded");
 
     private final Value value;
 
@@ -319,196 +1036,676 @@ public final class LedgerActivityLineType {
 
     public <T> T visit(Visitor<T> visitor) {
         switch (value) {
-            case DISPUTE_REPRESENTMENT_FEE:
-                return visitor.visitDisputeRepresentmentFee();
-            case PLATFORM_BALANCE_PAYMENT_REFUND:
-                return visitor.visitPlatformBalancePaymentRefund();
+            case ECONOMIC_INTELLIGENCE_PERCENTAGE_FEE:
+                return visitor.visitEconomicIntelligencePercentageFee();
+            case PSP_COMMISSION_FEE:
+                return visitor.visitPspCommissionFee();
             case STRIPE_INTERNATIONAL_PROCESSING_FEE:
                 return visitor.visitStripeInternationalProcessingFee();
             case PAYMENT_DISPUTE_REVERSAL:
                 return visitor.visitPaymentDisputeReversal();
             case TREASURY_PAYIN:
                 return visitor.visitTreasuryPayin();
+            case PSP_AUTHENTICATION_FEE:
+                return visitor.visitPspAuthenticationFee();
             case PLATFORM_COVERED_DISPUTE:
                 return visitor.visitPlatformCoveredDispute();
-            case RESOLUTION_CENTER_REFUND:
-                return visitor.visitResolutionCenterRefund();
-            case AD_PUBLISHER_PAYOUT:
-                return visitor.visitAdPublisherPayout();
-            case BILLING_PERCENTAGE_FEE:
-                return visitor.visitBillingPercentageFee();
-            case PAYMENT_DISPUTE:
-                return visitor.visitPaymentDispute();
-            case PAYMENT_DISPUTE_ADJUSTMENT:
-                return visitor.visitPaymentDisputeAdjustment();
-            case PAYMENT_PROCESSING_PERCENTAGE_FEE:
-                return visitor.visitPaymentProcessingPercentageFee();
-            case THREE_DS_FIXED_FEE:
-                return visitor.visitThreeDsFixedFee();
+            case REFUND_SETTLEMENT:
+                return visitor.visitRefundSettlement();
+            case PSP_FX_ADJUSTMENT:
+                return visitor.visitPspFxAdjustment();
+            case PSP_CLAWBACK_FEE:
+                return visitor.visitPspClawbackFee();
             case PAYMENT_REVSHARE_REFUND:
                 return visitor.visitPaymentRevshareRefund();
-            case DISPUTE_ALERT_FEE:
-                return visitor.visitDisputeAlertFee();
-            case APPLICATION_FEE:
-                return visitor.visitApplicationFee();
-            case AIRDROP_LINK_RETURNED:
-                return visitor.visitAirdropLinkReturned();
-            case WITHDRAWAL:
-                return visitor.visitWithdrawal();
+            case PERPS_BRIDGE_FEE:
+                return visitor.visitPerpsBridgeFee();
+            case AD_AFFILIATE_PAYOUT_RECEIVED:
+                return visitor.visitAdAffiliatePayoutReceived();
+            case WITHDRAWAL_MARKUP_FEE_PAYOUT:
+                return visitor.visitWithdrawalMarkupFeePayout();
+            case SWAP_SOURCE:
+                return visitor.visitSwapSource();
+            case PSP_VARIABLE_FEE:
+                return visitor.visitPspVariableFee();
             case PAYOUT_FEE:
                 return visitor.visitPayoutFee();
-            case INSTALLMENT_DEFAULT:
-                return visitor.visitInstallmentDefault();
+            case AD_AFFILIATE_PAYOUT:
+                return visitor.visitAdAffiliatePayout();
+            case PAYMENT_UNRECONCILED_REVERSAL:
+                return visitor.visitPaymentUnreconciledReversal();
+            case SETTLEMENT_SHORTFALL_LOSS:
+                return visitor.visitSettlementShortfallLoss();
+            case PAYMENT_REFERRAL_REVERSAL:
+                return visitor.visitPaymentReferralReversal();
+            case DISPUTE_SETTLEMENT_REVERSAL:
+                return visitor.visitDisputeSettlementReversal();
+            case AD_BALANCE_FUNDING_RECEIPT:
+                return visitor.visitAdBalanceFundingReceipt();
+            case WALLET_TRANSFER_INCOMING:
+                return visitor.visitWalletTransferIncoming();
+            case LEVELS_POINTS_ADS:
+                return visitor.visitLevelsPointsAds();
+            case PLATFORM_BALANCE_TRANSFER_INCOMING:
+                return visitor.visitPlatformBalanceTransferIncoming();
+            case INTERNAL_WITHDRAWAL_MARKUP_FEE_REVERSAL:
+                return visitor.visitInternalWithdrawalMarkupFeeReversal();
+            case CARD_LOAD_TRANSFER:
+                return visitor.visitCardLoadTransfer();
+            case INTERNAL_WITHDRAWAL_FEE:
+                return visitor.visitInternalWithdrawalFee();
+            case PSP_ADJUSTED_PROCESSING_FEE:
+                return visitor.visitPspAdjustedProcessingFee();
+            case TAX_FILING_FEE:
+                return visitor.visitTaxFilingFee();
+            case FX_MARKUP:
+                return visitor.visitFxMarkup();
+            case PSP_PROCESSING_FEE:
+                return visitor.visitPspProcessingFee();
+            case TOPUP_REVERSAL:
+                return visitor.visitTopupReversal();
+            case DISPUTE_PAYABLE_CLEARING:
+                return visitor.visitDisputePayableClearing();
+            case PASSTHROUGH_GMV_OFFSET:
+                return visitor.visitPassthroughGmvOffset();
+            case ONCHAIN_WITHDRAWAL_OFFSET:
+                return visitor.visitOnchainWithdrawalOffset();
+            case REFUND_PAYABLE_CLEARING:
+                return visitor.visitRefundPayableClearing();
+            case PLATFORM_MARKUP_FEE_PAYOUT:
+                return visitor.visitPlatformMarkupFeePayout();
+            case AD_SPEND_MARGIN:
+                return visitor.visitAdSpendMargin();
+            case PAYOUT_UNRECONCILED_CLEARING:
+                return visitor.visitPayoutUnreconciledClearing();
+            case PAYMENT_REVSHARE_PAYOUT:
+                return visitor.visitPaymentRevsharePayout();
+            case PSP_BANK_PULL_CLEARING:
+                return visitor.visitPspBankPullClearing();
+            case PLATFORM_EARNING_UNRECONCILED_CLEARING:
+                return visitor.visitPlatformEarningUnreconciledClearing();
+            case FRAUD_PREVENTION_FEE:
+                return visitor.visitFraudPreventionFee();
+            case INTERNAL_WITHDRAWAL_PAYABLE_REVERSAL:
+                return visitor.visitInternalWithdrawalPayableReversal();
+            case AD_INCOME_RECEIPT:
+                return visitor.visitAdIncomeReceipt();
+            case PSP_PAYOUT_RECEIVABLE:
+                return visitor.visitPspPayoutReceivable();
+            case PSP_POOL_SETTLEMENT:
+                return visitor.visitPspPoolSettlement();
+            case PSP_PAYOUT_CONSOLIDATION:
+                return visitor.visitPspPayoutConsolidation();
+            case PAYMENT_REFERRAL_REFUND:
+                return visitor.visitPaymentReferralRefund();
+            case MISC_REVERSAL:
+                return visitor.visitMiscReversal();
+            case ACCOUNT_SETTLEMENT:
+                return visitor.visitAccountSettlement();
+            case AD_CAMPAIGN_BUDGET:
+                return visitor.visitAdCampaignBudget();
+            case PSP_RECEIVABLE_POOLED:
+                return visitor.visitPspReceivablePooled();
+            case ONCHAIN_WITHDRAWAL:
+                return visitor.visitOnchainWithdrawal();
+            case PSP_CORRECTION:
+                return visitor.visitPspCorrection();
+            case PSP_CURRENCY_CONVERSION_RECEIVABLE:
+                return visitor.visitPspCurrencyConversionReceivable();
+            case PSP_SERVICE_FEE:
+                return visitor.visitPspServiceFee();
+            case CARD_SPEND_AUTHORIZATION_VOID:
+                return visitor.visitCardSpendAuthorizationVoid();
+            case EXTERNAL_ACCOUNT_CONNECTION_FEE:
+                return visitor.visitExternalAccountConnectionFee();
+            case LEVELS_POINTS_TRADING:
+                return visitor.visitLevelsPointsTrading();
+            case LEGACY_PAYMENT_REFUND:
+                return visitor.visitLegacyPaymentRefund();
+            case INTERNAL_WITHDRAWAL:
+                return visitor.visitInternalWithdrawal();
+            case CARD_UNLOAD_TRANSFER:
+                return visitor.visitCardUnloadTransfer();
+            case REFERRAL_BONUS:
+                return visitor.visitReferralBonus();
+            case CLAWBACK_RECEIVABLE:
+                return visitor.visitClawbackReceivable();
+            case INTERNAL_BALANCE_TRANSFER_OUTGOING:
+                return visitor.visitInternalBalanceTransferOutgoing();
+            case PSP_GATEWAY_FEE:
+                return visitor.visitPspGatewayFee();
+            case BALANCE_RESERVATION_REVERSAL:
+                return visitor.visitBalanceReservationReversal();
+            case INTERNAL_WITHDRAWAL_PAYABLE:
+                return visitor.visitInternalWithdrawalPayable();
+            case TRADING_FEE:
+                return visitor.visitTradingFee();
+            case PAYMENT_RETURN_FEE:
+                return visitor.visitPaymentReturnFee();
+            case CONNECTED_ACCOUNT_NEGATIVE_BALANCE:
+                return visitor.visitConnectedAccountNegativeBalance();
+            case RECIPIENT_WALLET_LOAD:
+                return visitor.visitRecipientWalletLoad();
+            case PSP_CURRENCY_CONVERSION_OUTGOING:
+                return visitor.visitPspCurrencyConversionOutgoing();
+            case WITHDRAWAL_TOPUP_ADJUSTMENT:
+                return visitor.visitWithdrawalTopupAdjustment();
+            case PSP_INVOICING_FEE:
+                return visitor.visitPspInvoicingFee();
+            case WITHDRAWAL_MARKUP_FEE_PAYOUT_REVERSAL:
+                return visitor.visitWithdrawalMarkupFeePayoutReversal();
+            case PSP_DISPUTE_ALERT_FEE:
+                return visitor.visitPspDisputeAlertFee();
+            case CARD_SPEND_REFUND:
+                return visitor.visitCardSpendRefund();
+            case CARD_SPEND_CAPTURE:
+                return visitor.visitCardSpendCapture();
+            case PARTNER_GRANT_REWARD:
+                return visitor.visitPartnerGrantReward();
+            case ONCHAIN_PLATFORM_TRANSFER_INCOMING:
+                return visitor.visitOnchainPlatformTransferIncoming();
+            case PSP_EXTERNAL_ACCOUNT_CONNECTION_FEE:
+                return visitor.visitPspExternalAccountConnectionFee();
+            case CLAWBACK_RECEIVABLE_SETTLEMENT:
+                return visitor.visitClawbackReceivableSettlement();
+            case PAYMENT_REVSHARE:
+                return visitor.visitPaymentRevshare();
+            case PSP_WITHHOLDING_TAX:
+                return visitor.visitPspWithholdingTax();
+            case INTERNAL_WITHDRAWAL_MARKUP_FEE_PAYOUT_REVERSAL:
+                return visitor.visitInternalWithdrawalMarkupFeePayoutReversal();
+            case REFUND_PAYABLE_REVERSAL:
+                return visitor.visitRefundPayableReversal();
+            case CAPITAL_REMITTANCE:
+                return visitor.visitCapitalRemittance();
+            case SWAP_TARGET:
+                return visitor.visitSwapTarget();
+            case WALLET_TRANSFER_OUTGOING:
+                return visitor.visitWalletTransferOutgoing();
+            case BILLING_PERCENTAGE_FEE:
+                return visitor.visitBillingPercentageFee();
+            case PAYMENT_DISPUTE_ADJUSTMENT:
+                return visitor.visitPaymentDisputeAdjustment();
+            case PSP_CLAWBACK_SETTLEMENT_REVERSAL:
+                return visitor.visitPspClawbackSettlementReversal();
+            case LEVELS_REBATE:
+                return visitor.visitLevelsRebate();
+            case PERPS_VOLUME:
+                return visitor.visitPerpsVolume();
+            case PERPS_FEE_OFFSET:
+                return visitor.visitPerpsFeeOffset();
+            case DISPUTE_ALERT_FEE:
+                return visitor.visitDisputeAlertFee();
+            case PSP_TREASURY_FEE:
+                return visitor.visitPspTreasuryFee();
+            case APPLICATION_FEE:
+                return visitor.visitApplicationFee();
+            case PLATFORM_EARNING_SETTLEMENT:
+                return visitor.visitPlatformEarningSettlement();
+            case CARD_SPEND_AUTHORIZATION_HOLD:
+                return visitor.visitCardSpendAuthorizationHold();
+            case ACCELERATED_SETTLEMENT_FEE:
+                return visitor.visitAcceleratedSettlementFee();
+            case PAYMENT_UNRECONCILED_CLEARING:
+                return visitor.visitPaymentUnreconciledClearing();
             case ONCHAIN_WALLET_TRANSFER_OUTGOING:
                 return visitor.visitOnchainWalletTransferOutgoing();
             case LICENSE_SALE:
                 return visitor.visitLicenseSale();
+            case PSP_FIXED_FEE:
+                return visitor.visitPspFixedFee();
+            case PLATFORM_CREDITS_PAYMENT_REFUND:
+                return visitor.visitPlatformCreditsPaymentRefund();
             case APPLICATION_FEE_PAYOUT:
                 return visitor.visitApplicationFeePayout();
-            case PLATFORM_BALANCE_PAYMENT:
-                return visitor.visitPlatformBalancePayment();
-            case LEGACY_PAYMENT:
-                return visitor.visitLegacyPayment();
-            case AD_PUBLISHER_PAYOUT_RECEIVED:
-                return visitor.visitAdPublisherPayoutReceived();
-            case PAYMENT_REFERRAL_REVERSAL:
-                return visitor.visitPaymentReferralReversal();
-            case LEGACY_CRYPTO_PAYMENT:
-                return visitor.visitLegacyCryptoPayment();
-            case AD_BUDGET_RELEASE:
-                return visitor.visitAdBudgetRelease();
+            case ONCHAIN_INTERNAL_TRANSFER_INCOMING:
+                return visitor.visitOnchainInternalTransferIncoming();
+            case PSP_DISPUTE_MANAGEMENT_FEE:
+                return visitor.visitPspDisputeManagementFee();
+            case PERPS_UNLOAD_TRANSFER:
+                return visitor.visitPerpsUnloadTransfer();
+            case CLAWBACK_RECEIVABLE_SETTLEMENT_REVERSAL:
+                return visitor.visitClawbackReceivableSettlementReversal();
             case AD_SPEND_CHARGE:
                 return visitor.visitAdSpendCharge();
-            case PLATFORM_BALANCE_TRANSFER_INCOMING:
-                return visitor.visitPlatformBalanceTransferIncoming();
-            case PAYMENT_REFERRAL:
-                return visitor.visitPaymentReferral();
+            case REFUND_UNRECONCILED_REVERSAL:
+                return visitor.visitRefundUnreconciledReversal();
             case PROMO_REVERSAL:
                 return visitor.visitPromoReversal();
-            case TOPUP_REVERSAL:
-                return visitor.visitTopupReversal();
-            case PLATFORM_AFFILIATE_PAYMENT_REVERSAL:
-                return visitor.visitPlatformAffiliatePaymentReversal();
+            case TRADING_ACCOUNT_DEPOSIT_OFFSET:
+                return visitor.visitTradingAccountDepositOffset();
+            case SWAP_FEE:
+                return visitor.visitSwapFee();
+            case PAYMENT_REFUND_FEE:
+                return visitor.visitPaymentRefundFee();
             case AIRDROP:
                 return visitor.visitAirdrop();
-            case WITHDRAWAL_CLAWBACK_REVERSAL:
-                return visitor.visitWithdrawalClawbackReversal();
-            case CARD_SPEND_AUTHORIZATION:
-                return visitor.visitCardSpendAuthorization();
-            case LICENSE_SALE_REVENUE:
-                return visitor.visitLicenseSaleRevenue();
+            case CAPITAL_REMITTANCE_REVERSAL:
+                return visitor.visitCapitalRemittanceReversal();
+            case PAYMENT_RECEIVABLE_REVERSAL:
+                return visitor.visitPaymentReceivableReversal();
             case TOPUP:
                 return visitor.visitTopup();
+            case LICENSE_SALE_REVENUE:
+                return visitor.visitLicenseSaleRevenue();
+            case PAYMENT_REFERRAL_PAYABLE:
+                return visitor.visitPaymentReferralPayable();
             case HIGH_RISK_MERCHANT_FEE:
                 return visitor.visitHighRiskMerchantFee();
-            case PAYMENT_REVSHARE_PAYOUT:
-                return visitor.visitPaymentRevsharePayout();
-            case INTERNAL_BALANCE_TRANSFER_INCOMING:
-                return visitor.visitInternalBalanceTransferIncoming();
-            case PAYMENT_REFUND_REVERSAL:
-                return visitor.visitPaymentRefundReversal();
-            case ONCHAIN_DEPOSIT:
-                return visitor.visitOnchainDeposit();
+            case PSP_PAYOUT_FEE:
+                return visitor.visitPspPayoutFee();
+            case INTERNAL_WITHDRAWAL_MARKUP_FEE:
+                return visitor.visitInternalWithdrawalMarkupFee();
+            case TRADING_ACCOUNT_WITHDRAWAL_OFFSET:
+                return visitor.visitTradingAccountWithdrawalOffset();
+            case AD_INCOME_EXPENSE:
+                return visitor.visitAdIncomeExpense();
+            case PSP_RISK_FEE:
+                return visitor.visitPspRiskFee();
+            case BALANCE_RESERVATION_RELEASE:
+                return visitor.visitBalanceReservationRelease();
+            case DEPOSIT:
+                return visitor.visitDeposit();
             case WITHDRAWAL_RECLASSIFICATION:
                 return visitor.visitWithdrawalReclassification();
-            case FRAUD_PREVENTION_FEE:
-                return visitor.visitFraudPreventionFee();
             case STRIPE_DOMESTIC_PROCESSING_FEE:
                 return visitor.visitStripeDomesticProcessingFee();
-            case MISC_PURCHASE:
-                return visitor.visitMiscPurchase();
-            case PLATFORM_BALANCE_TRANSFER_OUTGOING:
-                return visitor.visitPlatformBalanceTransferOutgoing();
-            case MISC_REVERSAL:
-                return visitor.visitMiscReversal();
-            case AIRDROP_LINK_REDEEMED:
-                return visitor.visitAirdropLinkRedeemed();
-            case ONCHAIN_SWAP_TARGET:
-                return visitor.visitOnchainSwapTarget();
-            case AD_CAMPAIGN_BUDGET:
-                return visitor.visitAdCampaignBudget();
+            case ONCHAIN_DEPOSIT_OFFSET:
+                return visitor.visitOnchainDepositOffset();
+            case CONNECTED_ACCOUNT_CLAWBACK:
+                return visitor.visitConnectedAccountClawback();
+            case PSP_POOL_REFUND_CLEARING:
+                return visitor.visitPspPoolRefundClearing();
+            case ONCHAIN_SWAP_OFFSET:
+                return visitor.visitOnchainSwapOffset();
             case SOFTWARE_RENTAL_TRANSACTION:
                 return visitor.visitSoftwareRentalTransaction();
-            case CURRENCY_CONVERSION_INCOMING:
-                return visitor.visitCurrencyConversionIncoming();
-            case AFFILIATE_FEE:
-                return visitor.visitAffiliateFee();
-            case CARD_SPEND_AUTHORIZATION_VOID:
-                return visitor.visitCardSpendAuthorizationVoid();
-            case PAYMENT_GROSS_REVERSAL:
-                return visitor.visitPaymentGrossReversal();
-            case LEGACY_PAYMENT_REFUND:
-                return visitor.visitLegacyPaymentRefund();
+            case WITHDRAWAL_FEE_REVERSAL:
+                return visitor.visitWithdrawalFeeReversal();
+            case PSP_PAYOUT_SETTLEMENT_REVERSAL:
+                return visitor.visitPspPayoutSettlementReversal();
+            case PAYOUT_RECEIVABLE:
+                return visitor.visitPayoutReceivable();
             case PASSTHROUGH_GMV:
                 return visitor.visitPassthroughGmv();
-            case DISPUTE_HOLD_ADJUSTMENT:
-                return visitor.visitDisputeHoldAdjustment();
-            case INTERNAL_WITHDRAWAL:
-                return visitor.visitInternalWithdrawal();
-            case PAYMENT_GROSS:
-                return visitor.visitPaymentGross();
-            case BANK_TRANSFER:
-                return visitor.visitBankTransfer();
-            case REFERRAL_BONUS:
-                return visitor.visitReferralBonus();
-            case INTERNAL_BALANCE_TRANSFER_OUTGOING:
-                return visitor.visitInternalBalanceTransferOutgoing();
-            case SALES_TAX_REMITTANCE_REVERSAL:
-                return visitor.visitSalesTaxRemittanceReversal();
-            case WITHDRAWAL_CLAWBACK:
-                return visitor.visitWithdrawalClawback();
+            case SALES_TAX_COLLECTED_REVERSAL:
+                return visitor.visitSalesTaxCollectedReversal();
+            case PSP_PAYOUT_RECEIVABLE_CLEARING:
+                return visitor.visitPspPayoutReceivableClearing();
+            case AD_NETWORK_SETTLEMENT:
+                return visitor.visitAdNetworkSettlement();
+            case PERPS_BRIDGE_FEE_OFFSET:
+                return visitor.visitPerpsBridgeFeeOffset();
+            case MARKETING_EXPENSE:
+                return visitor.visitMarketingExpense();
+            case CARD_INTERCHANGE:
+                return visitor.visitCardInterchange();
+            case AIRDROP_LINK_CANCELED:
+                return visitor.visitAirdropLinkCanceled();
             case LICENSE_SALE_COMMISSION:
                 return visitor.visitLicenseSaleCommission();
-            case REVSHARE_PERCENTAGE_FEE:
-                return visitor.visitRevsharePercentageFee();
             case SALES_TAX_FEE:
                 return visitor.visitSalesTaxFee();
-            case WITHDRAWAL_REVERSAL:
-                return visitor.visitWithdrawalReversal();
-            case AIRDROP_REVERSAL:
-                return visitor.visitAirdropReversal();
-            case PAYMENT_REFUND:
-                return visitor.visitPaymentRefund();
-            case CROSS_BORDER_PERCENTAGE_FEE:
-                return visitor.visitCrossBorderPercentageFee();
+            case INTERNAL_WITHDRAWAL_IN_TRANSIT:
+                return visitor.visitInternalWithdrawalInTransit();
+            case REFUND_UNRECONCILED_CLEARING:
+                return visitor.visitRefundUnreconciledClearing();
+            case PSP_SCHEME_FEE:
+                return visitor.visitPspSchemeFee();
+            case PERPS_VOLUME_OFFSET:
+                return visitor.visitPerpsVolumeOffset();
+            case PSP_ACCOUNT_UPDATER_FEE:
+                return visitor.visitPspAccountUpdaterFee();
             case TOPUP_FEE:
                 return visitor.visitTopupFee();
-            case AIRDROP_LINK_CREATED:
-                return visitor.visitAirdropLinkCreated();
+            case PAYMENT_RECEIVABLE_SETTLEMENT:
+                return visitor.visitPaymentReceivableSettlement();
+            case PSP_BANK_PULL_SETTLEMENT:
+                return visitor.visitPspBankPullSettlement();
+            case CASHBACK:
+                return visitor.visitCashback();
             case FX_PERCENTAGE_FEE:
                 return visitor.visitFxPercentageFee();
-            case CURRENCY_CONVERSION_OUTGOING:
-                return visitor.visitCurrencyConversionOutgoing();
-            case COMPANY_REFERRAL:
-                return visitor.visitCompanyReferral();
-            case ORCHESTRATION_PERCENTAGE_FEE:
-                return visitor.visitOrchestrationPercentageFee();
-            case CARD_SPEND_REFUND:
-                return visitor.visitCardSpendRefund();
-            case PAYMENT_REVSHARE_REVERSAL:
-                return visitor.visitPaymentRevshareReversal();
+            case PAYMENT_RECEIVABLE_CLEARING:
+                return visitor.visitPaymentReceivableClearing();
+            case DISPUTE_SETTLEMENT:
+                return visitor.visitDisputeSettlement();
+            case PSP_CONNECT_FEE:
+                return visitor.visitPspConnectFee();
+            case PSP_INTERCHANGE_FEE:
+                return visitor.visitPspInterchangeFee();
             case PLATFORM_AFFILIATE_PAYMENT:
                 return visitor.visitPlatformAffiliatePayment();
-            case SALES_TAX_REMITTANCE:
-                return visitor.visitSalesTaxRemittance();
-            case MISC_REFUND:
-                return visitor.visitMiscRefund();
-            case PAYMENT_PROCESSING_FIXED_FEE:
-                return visitor.visitPaymentProcessingFixedFee();
             case INTERNAL_WITHDRAWAL_REVERSAL:
                 return visitor.visitInternalWithdrawalReversal();
-            case SOFTWARE_RENTAL_REVSHARE:
-                return visitor.visitSoftwareRentalRevshare();
-            case BUYER_FEE:
-                return visitor.visitBuyerFee();
-            case WHOP_PROCESSING_FEE:
-                return visitor.visitWhopProcessingFee();
+            case CARD_SPEND_AUTHORIZATION_VOID_RELEASE:
+                return visitor.visitCardSpendAuthorizationVoidRelease();
+            case WITHDRAWAL_PAYABLE_CLEARING_REVERSAL:
+                return visitor.visitWithdrawalPayableClearingReversal();
+            case PSP_INVOICE_TAX_FEE:
+                return visitor.visitPspInvoiceTaxFee();
+            case DISPUTE_REPRESENTMENT_FEE:
+                return visitor.visitDisputeRepresentmentFee();
+            case PLATFORM_BALANCE_PAYMENT_REFUND:
+                return visitor.visitPlatformBalancePaymentRefund();
+            case PERPS_REALIZED_PNL:
+                return visitor.visitPerpsRealizedPnl();
+            case RESOLUTION_CENTER_REFUND:
+                return visitor.visitResolutionCenterRefund();
+            case PSP_RESERVE_HOLD:
+                return visitor.visitPspReserveHold();
+            case THREE_DS_FIXED_FEE:
+                return visitor.visitThreeDsFixedFee();
+            case PSP_POOL_DISPUTE_SETTLEMENT:
+                return visitor.visitPspPoolDisputeSettlement();
+            case TRADING_ACCOUNT_DEPOSIT:
+                return visitor.visitTradingAccountDeposit();
+            case PLATFORM_TRADING_COMMISSION:
+                return visitor.visitPlatformTradingCommission();
+            case ONBOARDING_REWARD:
+                return visitor.visitOnboardingReward();
+            case AIRDROP_LINK_RETURNED:
+                return visitor.visitAirdropLinkReturned();
+            case REFUND_SETTLEMENT_REVERSAL:
+                return visitor.visitRefundSettlementReversal();
+            case WITHDRAWAL_MARKUP_FEE:
+                return visitor.visitWithdrawalMarkupFee();
+            case ONCHAIN_PLATFORM_TRANSFER_OUTGOING:
+                return visitor.visitOnchainPlatformTransferOutgoing();
+            case INSTALLMENT_DEFAULT:
+                return visitor.visitInstallmentDefault();
+            case PSP_TERMINAL_FEE:
+                return visitor.visitPspTerminalFee();
+            case PLATFORM_BALANCE_PAYMENT:
+                return visitor.visitPlatformBalancePayment();
+            case LEVELS_POINTS_ISSUED:
+                return visitor.visitLevelsPointsIssued();
+            case PSP_REFUND_FEE:
+                return visitor.visitPspRefundFee();
+            case PERPS_UNLOAD_DEPOSIT:
+                return visitor.visitPerpsUnloadDeposit();
+            case AD_PUBLISHER_PAYOUT_RECEIVED:
+                return visitor.visitAdPublisherPayoutReceived();
+            case LEGACY_CRYPTO_PAYMENT:
+                return visitor.visitLegacyCryptoPayment();
+            case CLAWBACK_RECEIVABLE_REVERSAL:
+                return visitor.visitClawbackReceivableReversal();
+            case PSP_REFUND_PAYABLE:
+                return visitor.visitPspRefundPayable();
+            case PLATFORM_MARKUP_FEE:
+                return visitor.visitPlatformMarkupFee();
+            case PSP_ACCOUNT_DEBIT:
+                return visitor.visitPspAccountDebit();
+            case PAYMENT_REFERRAL:
+                return visitor.visitPaymentReferral();
+            case PERPS_LOAD_DEPOSIT:
+                return visitor.visitPerpsLoadDeposit();
+            case WHOP_SWAP_FEE_RECEIVED:
+                return visitor.visitWhopSwapFeeReceived();
+            case WITHDRAWAL_CLAWBACK_REVERSAL:
+                return visitor.visitWithdrawalClawbackReversal();
+            case PSP_MARKUP_FEE:
+                return visitor.visitPspMarkupFee();
+            case INTERNAL_WITHDRAWAL_MARKUP_FEE_PAYOUT:
+                return visitor.visitInternalWithdrawalMarkupFeePayout();
+            case CARD_SPEND_AUTHORIZATION:
+                return visitor.visitCardSpendAuthorization();
+            case LEVELS_POINTS_PARTNER:
+                return visitor.visitLevelsPointsPartner();
+            case EXTERNAL_CARD_LOAD_DEPOSIT:
+                return visitor.visitExternalCardLoadDeposit();
+            case SALES_TAX_REMITTED:
+                return visitor.visitSalesTaxRemitted();
+            case PAYMENT_REFUND_REVERSAL:
+                return visitor.visitPaymentRefundReversal();
+            case ONCHAIN_INTERNAL_TRANSFER_OUTGOING:
+                return visitor.visitOnchainInternalTransferOutgoing();
+            case CLAWBACK_FEE:
+                return visitor.visitClawbackFee();
+            case WITHDRAWAL_PAYABLE_REVERSAL:
+                return visitor.visitWithdrawalPayableReversal();
+            case AIRDROP_EXPENSE:
+                return visitor.visitAirdropExpense();
+            case AD_NETWORK_COST:
+                return visitor.visitAdNetworkCost();
+            case FX_SETTLEMENT_GAIN_LOSS:
+                return visitor.visitFxSettlementGainLoss();
+            case PSP_TAX_SERVICE_FEE:
+                return visitor.visitPspTaxServiceFee();
+            case PLATFORM_BALANCE_TRANSFER_OUTGOING:
+                return visitor.visitPlatformBalanceTransferOutgoing();
+            case CASHBACK_FUNDING:
+                return visitor.visitCashbackFunding();
+            case PSP_CURRENCY_CONVERSION_INCOMING:
+                return visitor.visitPspCurrencyConversionIncoming();
+            case ONCHAIN_SWAP_TARGET:
+                return visitor.visitOnchainSwapTarget();
+            case AIRDROP_LINK_REDEEMED:
+                return visitor.visitAirdropLinkRedeemed();
+            case PSP_CURRENCY_CONVERSION_RECEIVABLE_CLEARING:
+                return visitor.visitPspCurrencyConversionReceivableClearing();
+            case CAPITAL_WITHHOLDING_REVERSAL:
+                return visitor.visitCapitalWithholdingReversal();
+            case EXTERNAL_CARD_LOAD_OFFSET:
+                return visitor.visitExternalCardLoadOffset();
+            case AFFILIATE_FEE:
+                return visitor.visitAffiliateFee();
+            case ONCHAIN_SWAP_SOURCE:
+                return visitor.visitOnchainSwapSource();
+            case PAYMENT_GROSS_REVERSAL:
+                return visitor.visitPaymentGrossReversal();
+            case PSP_PAYMENT_RECEIVABLE:
+                return visitor.visitPspPaymentReceivable();
+            case PERPS_FEE:
+                return visitor.visitPerpsFee();
+            case TREASURY_PAYIN_RECEIVABLE:
+                return visitor.visitTreasuryPayinReceivable();
+            case PSP_IDENTITY_VERIFICATION_FEE:
+                return visitor.visitPspIdentityVerificationFee();
+            case WITHDRAWAL_MARKUP_FEE_REVERSAL:
+                return visitor.visitWithdrawalMarkupFeeReversal();
+            case AD_FUNDING_DISBURSEMENT:
+                return visitor.visitAdFundingDisbursement();
+            case WITHDRAWAL_CLAWBACK:
+                return visitor.visitWithdrawalClawback();
+            case PERPS_REALIZED_PNL_OFFSET:
+                return visitor.visitPerpsRealizedPnlOffset();
+            case PLATFORM_EARNING:
+                return visitor.visitPlatformEarning();
+            case REVSHARE_PERCENTAGE_FEE:
+                return visitor.visitRevsharePercentageFee();
+            case PAYMENT_REFUND:
+                return visitor.visitPaymentRefund();
+            case AIRDROP_REVERSAL:
+                return visitor.visitAirdropReversal();
+            case WITHDRAWAL_FEE:
+                return visitor.visitWithdrawalFee();
+            case TRADING_ACCOUNT_WITHDRAWAL:
+                return visitor.visitTradingAccountWithdrawal();
+            case BAD_DEBT_OFFSET:
+                return visitor.visitBadDebtOffset();
+            case BALANCE_RESERVATION_HOLD:
+                return visitor.visitBalanceReservationHold();
+            case AIRDROP_LINK_CLAIMED:
+                return visitor.visitAirdropLinkClaimed();
+            case PSP_DISPUTE_FEE:
+                return visitor.visitPspDisputeFee();
+            case CARD_UNLOAD_DEPOSIT:
+                return visitor.visitCardUnloadDeposit();
+            case AIRDROP_LINK_CREATED:
+                return visitor.visitAirdropLinkCreated();
+            case PSP_TRANSFER_SETTLEMENT:
+                return visitor.visitPspTransferSettlement();
+            case ORCHESTRATION_PERCENTAGE_FEE:
+                return visitor.visitOrchestrationPercentageFee();
+            case COMPANY_REFERRAL:
+                return visitor.visitCompanyReferral();
+            case CARD_INTERCHANGE_RECEIVABLE:
+                return visitor.visitCardInterchangeReceivable();
+            case PAYMENT_REVSHARE_REVERSAL:
+                return visitor.visitPaymentRevshareReversal();
+            case CARD_LOAD_DEPOSIT:
+                return visitor.visitCardLoadDeposit();
+            case MISC_REFUND:
+                return visitor.visitMiscRefund();
+            case DISPUTE_PAYABLE_REVERSAL:
+                return visitor.visitDisputePayableReversal();
+            case TREASURY_FEE:
+                return visitor.visitTreasuryFee();
             case ONCHAIN_WALLET_TRANSFER_INCOMING:
                 return visitor.visitOnchainWalletTransferIncoming();
-            case PAYMENT_REVSHARE:
-                return visitor.visitPaymentRevshare();
+            case PSP_TAX_FILING_FEE:
+                return visitor.visitPspTaxFilingFee();
             case PAYMENT_DISPUTE_FEE:
                 return visitor.visitPaymentDisputeFee();
+            case BAD_DEBT_EXPENSE:
+                return visitor.visitBadDebtExpense();
+            case CAPITAL_HOLD_RELEASE:
+                return visitor.visitCapitalHoldRelease();
+            case AIRDROP_EXPENSE_REVERSAL:
+                return visitor.visitAirdropExpenseReversal();
+            case PAYMENT_DISPUTE:
+                return visitor.visitPaymentDispute();
+            case AD_PUBLISHER_PAYOUT:
+                return visitor.visitAdPublisherPayout();
+            case PAYMENT_PROCESSING_PERCENTAGE_FEE:
+                return visitor.visitPaymentProcessingPercentageFee();
+            case CARD_SPEND_CAPTURE_OFFSET:
+                return visitor.visitCardSpendCaptureOffset();
+            case PSP_PAYOUT_DEPOSIT:
+                return visitor.visitPspPayoutDeposit();
+            case CAPITAL_HOLD:
+                return visitor.visitCapitalHold();
+            case DISPUTE_MANAGEMENT_FEE:
+                return visitor.visitDisputeManagementFee();
+            case CASHBACK_EXPENSE:
+                return visitor.visitCashbackExpense();
+            case WITHDRAWAL:
+                return visitor.visitWithdrawal();
+            case SETTLEMENT_ROUNDING_VARIANCE:
+                return visitor.visitSettlementRoundingVariance();
+            case PSP_NETWORK_TOKEN_FEE:
+                return visitor.visitPspNetworkTokenFee();
+            case BALANCE_RESERVATION:
+                return visitor.visitBalanceReservation();
+            case AD_SPEND_PURCHASE:
+                return visitor.visitAdSpendPurchase();
+            case WITHDRAWAL_PAYABLE:
+                return visitor.visitWithdrawalPayable();
+            case LEGACY_PAYMENT:
+                return visitor.visitLegacyPayment();
+            case PSP_RECIPIENT_WALLET_LOAD:
+                return visitor.visitPspRecipientWalletLoad();
+            case AD_BUDGET_RELEASE:
+                return visitor.visitAdBudgetRelease();
+            case PSP_ACCELERATED_SETTLEMENT_FEE:
+                return visitor.visitPspAcceleratedSettlementFee();
+            case LEVELS_POINTS_CARD:
+                return visitor.visitLevelsPointsCard();
+            case DISPUTE_UNRECONCILED_REVERSAL:
+                return visitor.visitDisputeUnreconciledReversal();
+            case PLATFORM_AFFILIATE_PAYMENT_REVERSAL:
+                return visitor.visitPlatformAffiliatePaymentReversal();
+            case INTERNAL_WITHDRAWAL_FEE_REVERSAL:
+                return visitor.visitInternalWithdrawalFeeReversal();
+            case FX_GAIN_LOSS:
+                return visitor.visitFxGainLoss();
+            case PSP_COLLECTION_SETTLEMENT:
+                return visitor.visitPspCollectionSettlement();
+            case INTERNAL_BALANCE_TRANSFER_INCOMING:
+                return visitor.visitInternalBalanceTransferIncoming();
+            case IDENTITY_VERIFICATION_FEE:
+                return visitor.visitIdentityVerificationFee();
+            case ONCHAIN_DEPOSIT:
+                return visitor.visitOnchainDeposit();
+            case PSP_PAYIN_CLEARING:
+                return visitor.visitPspPayinClearing();
+            case MARKETPLACE_AFFILIATE_FEE:
+                return visitor.visitMarketplaceAffiliateFee();
+            case CARD_SPEND_REFUND_OFFSET:
+                return visitor.visitCardSpendRefundOffset();
+            case MISC_PURCHASE:
+                return visitor.visitMiscPurchase();
+            case LEVELS_POINTS_BURNED:
+                return visitor.visitLevelsPointsBurned();
+            case PSP_PAYMENT_METHOD_FEE:
+                return visitor.visitPspPaymentMethodFee();
+            case APPLICATION_FEE_PAYABLE:
+                return visitor.visitApplicationFeePayable();
+            case CURRENCY_CONVERSION_INCOMING:
+                return visitor.visitCurrencyConversionIncoming();
+            case PSP_PAYOUT_SETTLEMENT:
+                return visitor.visitPspPayoutSettlement();
+            case DISPUTE_HOLD_BLOCKED:
+                return visitor.visitDisputeHoldBlocked();
+            case PSP_POOL_REFUND_SETTLEMENT:
+                return visitor.visitPspPoolRefundSettlement();
+            case CAPITAL_WITHHOLDING:
+                return visitor.visitCapitalWithholding();
+            case PAYMENT_GROSS:
+                return visitor.visitPaymentGross();
+            case DISPUTE_HOLD_ADJUSTMENT:
+                return visitor.visitDisputeHoldAdjustment();
+            case PSP_TRANSFER_SETTLEMENT_REVERSAL:
+                return visitor.visitPspTransferSettlementReversal();
+            case AGGREGATED_FEE:
+                return visitor.visitAggregatedFee();
+            case PSP_RESERVE_RELEASE:
+                return visitor.visitPspReserveRelease();
+            case SALES_TAX_REMITTANCE_REVERSAL:
+                return visitor.visitSalesTaxRemittanceReversal();
+            case ADS_CARD_SPREAD:
+                return visitor.visitAdsCardSpread();
+            case SALES_TAX_COLLECTED:
+                return visitor.visitSalesTaxCollected();
+            case PERPS_LOAD_TRANSFER:
+                return visitor.visitPerpsLoadTransfer();
+            case PLATFORM_CREDITS_PAYMENT:
+                return visitor.visitPlatformCreditsPayment();
+            case WITHDRAWAL_REVERSAL:
+                return visitor.visitWithdrawalReversal();
+            case DISPUTE_UNRECONCILED_CLEARING:
+                return visitor.visitDisputeUnreconciledClearing();
+            case CROSS_BORDER_PERCENTAGE_FEE:
+                return visitor.visitCrossBorderPercentageFee();
+            case PSP_POOL_CLEARING:
+                return visitor.visitPspPoolClearing();
+            case PSP_BILLING_FEE:
+                return visitor.visitPspBillingFee();
+            case INTERNAL_WITHDRAWAL_COMPLETE:
+                return visitor.visitInternalWithdrawalComplete();
+            case PSP_OPTIMIZATION_FEE:
+                return visitor.visitPspOptimizationFee();
+            case PLATFORM_BALANCE_TRANSFER_FEE:
+                return visitor.visitPlatformBalanceTransferFee();
+            case INTERNAL_WITHDRAWAL_IN_TRANSIT_REVERSAL:
+                return visitor.visitInternalWithdrawalInTransitReversal();
+            case PSP_DISPUTE_PAYABLE:
+                return visitor.visitPspDisputePayable();
+            case CURRENCY_CONVERSION_OUTGOING:
+                return visitor.visitCurrencyConversionOutgoing();
+            case PLATFORM_CREDITS_GRANTED:
+                return visitor.visitPlatformCreditsGranted();
+            case PAYOUT_SUBSIDY:
+                return visitor.visitPayoutSubsidy();
+            case PSP_PAYIN_SETTLEMENT:
+                return visitor.visitPspPayinSettlement();
+            case PSP_CLAWBACK_SETTLEMENT:
+                return visitor.visitPspClawbackSettlement();
+            case SALES_TAX_REMITTANCE:
+                return visitor.visitSalesTaxRemittance();
+            case WITHDRAWAL_PAYABLE_CLEARING:
+                return visitor.visitWithdrawalPayableClearing();
+            case PAYMENT_PROCESSING_FIXED_FEE:
+                return visitor.visitPaymentProcessingFixedFee();
+            case SOFTWARE_RENTAL_REVSHARE:
+                return visitor.visitSoftwareRentalRevshare();
+            case WHOP_PROCESSING_FEE:
+                return visitor.visitWhopProcessingFee();
+            case BUYER_FEE:
+                return visitor.visitBuyerFee();
+            case AIRDROP_LINK_FUNDED:
+                return visitor.visitAirdropLinkFunded();
             case UNKNOWN:
             default:
                 return visitor.visitUnknown(string);
@@ -518,269 +1715,1111 @@ public final class LedgerActivityLineType {
     @JsonCreator(mode = JsonCreator.Mode.DELEGATING)
     public static LedgerActivityLineType valueOf(String value) {
         switch (value) {
-            case "dispute_representment_fee":
-                return DISPUTE_REPRESENTMENT_FEE;
-            case "platform_balance_payment_refund":
-                return PLATFORM_BALANCE_PAYMENT_REFUND;
+            case "economic_intelligence_percentage_fee":
+                return ECONOMIC_INTELLIGENCE_PERCENTAGE_FEE;
+            case "psp_commission_fee":
+                return PSP_COMMISSION_FEE;
             case "stripe_international_processing_fee":
                 return STRIPE_INTERNATIONAL_PROCESSING_FEE;
             case "payment_dispute_reversal":
                 return PAYMENT_DISPUTE_REVERSAL;
             case "treasury_payin":
                 return TREASURY_PAYIN;
+            case "psp_authentication_fee":
+                return PSP_AUTHENTICATION_FEE;
             case "platform_covered_dispute":
                 return PLATFORM_COVERED_DISPUTE;
-            case "resolution_center_refund":
-                return RESOLUTION_CENTER_REFUND;
-            case "ad_publisher_payout":
-                return AD_PUBLISHER_PAYOUT;
-            case "billing_percentage_fee":
-                return BILLING_PERCENTAGE_FEE;
-            case "payment_dispute":
-                return PAYMENT_DISPUTE;
-            case "payment_dispute_adjustment":
-                return PAYMENT_DISPUTE_ADJUSTMENT;
-            case "payment_processing_percentage_fee":
-                return PAYMENT_PROCESSING_PERCENTAGE_FEE;
-            case "three_ds_fixed_fee":
-                return THREE_DS_FIXED_FEE;
+            case "refund_settlement":
+                return REFUND_SETTLEMENT;
+            case "psp_fx_adjustment":
+                return PSP_FX_ADJUSTMENT;
+            case "psp_clawback_fee":
+                return PSP_CLAWBACK_FEE;
             case "payment_revshare_refund":
                 return PAYMENT_REVSHARE_REFUND;
-            case "dispute_alert_fee":
-                return DISPUTE_ALERT_FEE;
-            case "application_fee":
-                return APPLICATION_FEE;
-            case "airdrop_link_returned":
-                return AIRDROP_LINK_RETURNED;
-            case "withdrawal":
-                return WITHDRAWAL;
+            case "perps_bridge_fee":
+                return PERPS_BRIDGE_FEE;
+            case "ad_affiliate_payout_received":
+                return AD_AFFILIATE_PAYOUT_RECEIVED;
+            case "withdrawal_markup_fee_payout":
+                return WITHDRAWAL_MARKUP_FEE_PAYOUT;
+            case "swap_source":
+                return SWAP_SOURCE;
+            case "psp_variable_fee":
+                return PSP_VARIABLE_FEE;
             case "payout_fee":
                 return PAYOUT_FEE;
-            case "installment_default":
-                return INSTALLMENT_DEFAULT;
+            case "ad_affiliate_payout":
+                return AD_AFFILIATE_PAYOUT;
+            case "payment_unreconciled_reversal":
+                return PAYMENT_UNRECONCILED_REVERSAL;
+            case "settlement_shortfall_loss":
+                return SETTLEMENT_SHORTFALL_LOSS;
+            case "payment_referral_reversal":
+                return PAYMENT_REFERRAL_REVERSAL;
+            case "dispute_settlement_reversal":
+                return DISPUTE_SETTLEMENT_REVERSAL;
+            case "ad_balance_funding_receipt":
+                return AD_BALANCE_FUNDING_RECEIPT;
+            case "wallet_transfer_incoming":
+                return WALLET_TRANSFER_INCOMING;
+            case "levels_points_ads":
+                return LEVELS_POINTS_ADS;
+            case "platform_balance_transfer_incoming":
+                return PLATFORM_BALANCE_TRANSFER_INCOMING;
+            case "internal_withdrawal_markup_fee_reversal":
+                return INTERNAL_WITHDRAWAL_MARKUP_FEE_REVERSAL;
+            case "card_load_transfer":
+                return CARD_LOAD_TRANSFER;
+            case "internal_withdrawal_fee":
+                return INTERNAL_WITHDRAWAL_FEE;
+            case "psp_adjusted_processing_fee":
+                return PSP_ADJUSTED_PROCESSING_FEE;
+            case "tax_filing_fee":
+                return TAX_FILING_FEE;
+            case "fx_markup":
+                return FX_MARKUP;
+            case "psp_processing_fee":
+                return PSP_PROCESSING_FEE;
+            case "topup_reversal":
+                return TOPUP_REVERSAL;
+            case "dispute_payable_clearing":
+                return DISPUTE_PAYABLE_CLEARING;
+            case "passthrough_gmv_offset":
+                return PASSTHROUGH_GMV_OFFSET;
+            case "onchain_withdrawal_offset":
+                return ONCHAIN_WITHDRAWAL_OFFSET;
+            case "refund_payable_clearing":
+                return REFUND_PAYABLE_CLEARING;
+            case "platform_markup_fee_payout":
+                return PLATFORM_MARKUP_FEE_PAYOUT;
+            case "ad_spend_margin":
+                return AD_SPEND_MARGIN;
+            case "payout_unreconciled_clearing":
+                return PAYOUT_UNRECONCILED_CLEARING;
+            case "payment_revshare_payout":
+                return PAYMENT_REVSHARE_PAYOUT;
+            case "psp_bank_pull_clearing":
+                return PSP_BANK_PULL_CLEARING;
+            case "platform_earning_unreconciled_clearing":
+                return PLATFORM_EARNING_UNRECONCILED_CLEARING;
+            case "fraud_prevention_fee":
+                return FRAUD_PREVENTION_FEE;
+            case "internal_withdrawal_payable_reversal":
+                return INTERNAL_WITHDRAWAL_PAYABLE_REVERSAL;
+            case "ad_income_receipt":
+                return AD_INCOME_RECEIPT;
+            case "psp_payout_receivable":
+                return PSP_PAYOUT_RECEIVABLE;
+            case "psp_pool_settlement":
+                return PSP_POOL_SETTLEMENT;
+            case "psp_payout_consolidation":
+                return PSP_PAYOUT_CONSOLIDATION;
+            case "payment_referral_refund":
+                return PAYMENT_REFERRAL_REFUND;
+            case "misc_reversal":
+                return MISC_REVERSAL;
+            case "account_settlement":
+                return ACCOUNT_SETTLEMENT;
+            case "ad_campaign_budget":
+                return AD_CAMPAIGN_BUDGET;
+            case "psp_receivable_pooled":
+                return PSP_RECEIVABLE_POOLED;
+            case "onchain_withdrawal":
+                return ONCHAIN_WITHDRAWAL;
+            case "psp_correction":
+                return PSP_CORRECTION;
+            case "psp_currency_conversion_receivable":
+                return PSP_CURRENCY_CONVERSION_RECEIVABLE;
+            case "psp_service_fee":
+                return PSP_SERVICE_FEE;
+            case "card_spend_authorization_void":
+                return CARD_SPEND_AUTHORIZATION_VOID;
+            case "external_account_connection_fee":
+                return EXTERNAL_ACCOUNT_CONNECTION_FEE;
+            case "levels_points_trading":
+                return LEVELS_POINTS_TRADING;
+            case "legacy_payment_refund":
+                return LEGACY_PAYMENT_REFUND;
+            case "internal_withdrawal":
+                return INTERNAL_WITHDRAWAL;
+            case "card_unload_transfer":
+                return CARD_UNLOAD_TRANSFER;
+            case "referral_bonus":
+                return REFERRAL_BONUS;
+            case "clawback_receivable":
+                return CLAWBACK_RECEIVABLE;
+            case "internal_balance_transfer_outgoing":
+                return INTERNAL_BALANCE_TRANSFER_OUTGOING;
+            case "psp_gateway_fee":
+                return PSP_GATEWAY_FEE;
+            case "balance_reservation_reversal":
+                return BALANCE_RESERVATION_REVERSAL;
+            case "internal_withdrawal_payable":
+                return INTERNAL_WITHDRAWAL_PAYABLE;
+            case "trading_fee":
+                return TRADING_FEE;
+            case "payment_return_fee":
+                return PAYMENT_RETURN_FEE;
+            case "connected_account_negative_balance":
+                return CONNECTED_ACCOUNT_NEGATIVE_BALANCE;
+            case "recipient_wallet_load":
+                return RECIPIENT_WALLET_LOAD;
+            case "psp_currency_conversion_outgoing":
+                return PSP_CURRENCY_CONVERSION_OUTGOING;
+            case "withdrawal_topup_adjustment":
+                return WITHDRAWAL_TOPUP_ADJUSTMENT;
+            case "psp_invoicing_fee":
+                return PSP_INVOICING_FEE;
+            case "withdrawal_markup_fee_payout_reversal":
+                return WITHDRAWAL_MARKUP_FEE_PAYOUT_REVERSAL;
+            case "psp_dispute_alert_fee":
+                return PSP_DISPUTE_ALERT_FEE;
+            case "card_spend_refund":
+                return CARD_SPEND_REFUND;
+            case "card_spend_capture":
+                return CARD_SPEND_CAPTURE;
+            case "partner_grant_reward":
+                return PARTNER_GRANT_REWARD;
+            case "onchain_platform_transfer_incoming":
+                return ONCHAIN_PLATFORM_TRANSFER_INCOMING;
+            case "psp_external_account_connection_fee":
+                return PSP_EXTERNAL_ACCOUNT_CONNECTION_FEE;
+            case "clawback_receivable_settlement":
+                return CLAWBACK_RECEIVABLE_SETTLEMENT;
+            case "payment_revshare":
+                return PAYMENT_REVSHARE;
+            case "psp_withholding_tax":
+                return PSP_WITHHOLDING_TAX;
+            case "internal_withdrawal_markup_fee_payout_reversal":
+                return INTERNAL_WITHDRAWAL_MARKUP_FEE_PAYOUT_REVERSAL;
+            case "refund_payable_reversal":
+                return REFUND_PAYABLE_REVERSAL;
+            case "capital_remittance":
+                return CAPITAL_REMITTANCE;
+            case "swap_target":
+                return SWAP_TARGET;
+            case "wallet_transfer_outgoing":
+                return WALLET_TRANSFER_OUTGOING;
+            case "billing_percentage_fee":
+                return BILLING_PERCENTAGE_FEE;
+            case "payment_dispute_adjustment":
+                return PAYMENT_DISPUTE_ADJUSTMENT;
+            case "psp_clawback_settlement_reversal":
+                return PSP_CLAWBACK_SETTLEMENT_REVERSAL;
+            case "levels_rebate":
+                return LEVELS_REBATE;
+            case "perps_volume":
+                return PERPS_VOLUME;
+            case "perps_fee_offset":
+                return PERPS_FEE_OFFSET;
+            case "dispute_alert_fee":
+                return DISPUTE_ALERT_FEE;
+            case "psp_treasury_fee":
+                return PSP_TREASURY_FEE;
+            case "application_fee":
+                return APPLICATION_FEE;
+            case "platform_earning_settlement":
+                return PLATFORM_EARNING_SETTLEMENT;
+            case "card_spend_authorization_hold":
+                return CARD_SPEND_AUTHORIZATION_HOLD;
+            case "accelerated_settlement_fee":
+                return ACCELERATED_SETTLEMENT_FEE;
+            case "payment_unreconciled_clearing":
+                return PAYMENT_UNRECONCILED_CLEARING;
             case "onchain_wallet_transfer_outgoing":
                 return ONCHAIN_WALLET_TRANSFER_OUTGOING;
             case "license_sale":
                 return LICENSE_SALE;
+            case "psp_fixed_fee":
+                return PSP_FIXED_FEE;
+            case "platform_credits_payment_refund":
+                return PLATFORM_CREDITS_PAYMENT_REFUND;
             case "application_fee_payout":
                 return APPLICATION_FEE_PAYOUT;
-            case "platform_balance_payment":
-                return PLATFORM_BALANCE_PAYMENT;
-            case "legacy_payment":
-                return LEGACY_PAYMENT;
-            case "ad_publisher_payout_received":
-                return AD_PUBLISHER_PAYOUT_RECEIVED;
-            case "payment_referral_reversal":
-                return PAYMENT_REFERRAL_REVERSAL;
-            case "legacy_crypto_payment":
-                return LEGACY_CRYPTO_PAYMENT;
-            case "ad_budget_release":
-                return AD_BUDGET_RELEASE;
+            case "onchain_internal_transfer_incoming":
+                return ONCHAIN_INTERNAL_TRANSFER_INCOMING;
+            case "psp_dispute_management_fee":
+                return PSP_DISPUTE_MANAGEMENT_FEE;
+            case "perps_unload_transfer":
+                return PERPS_UNLOAD_TRANSFER;
+            case "clawback_receivable_settlement_reversal":
+                return CLAWBACK_RECEIVABLE_SETTLEMENT_REVERSAL;
             case "ad_spend_charge":
                 return AD_SPEND_CHARGE;
-            case "platform_balance_transfer_incoming":
-                return PLATFORM_BALANCE_TRANSFER_INCOMING;
-            case "payment_referral":
-                return PAYMENT_REFERRAL;
+            case "refund_unreconciled_reversal":
+                return REFUND_UNRECONCILED_REVERSAL;
             case "promo_reversal":
                 return PROMO_REVERSAL;
-            case "topup_reversal":
-                return TOPUP_REVERSAL;
-            case "platform_affiliate_payment_reversal":
-                return PLATFORM_AFFILIATE_PAYMENT_REVERSAL;
+            case "trading_account_deposit_offset":
+                return TRADING_ACCOUNT_DEPOSIT_OFFSET;
+            case "swap_fee":
+                return SWAP_FEE;
+            case "payment_refund_fee":
+                return PAYMENT_REFUND_FEE;
             case "airdrop":
                 return AIRDROP;
-            case "withdrawal_clawback_reversal":
-                return WITHDRAWAL_CLAWBACK_REVERSAL;
-            case "card_spend_authorization":
-                return CARD_SPEND_AUTHORIZATION;
-            case "license_sale_revenue":
-                return LICENSE_SALE_REVENUE;
+            case "capital_remittance_reversal":
+                return CAPITAL_REMITTANCE_REVERSAL;
+            case "payment_receivable_reversal":
+                return PAYMENT_RECEIVABLE_REVERSAL;
             case "topup":
                 return TOPUP;
+            case "license_sale_revenue":
+                return LICENSE_SALE_REVENUE;
+            case "payment_referral_payable":
+                return PAYMENT_REFERRAL_PAYABLE;
             case "high_risk_merchant_fee":
                 return HIGH_RISK_MERCHANT_FEE;
-            case "payment_revshare_payout":
-                return PAYMENT_REVSHARE_PAYOUT;
-            case "internal_balance_transfer_incoming":
-                return INTERNAL_BALANCE_TRANSFER_INCOMING;
-            case "payment_refund_reversal":
-                return PAYMENT_REFUND_REVERSAL;
-            case "onchain_deposit":
-                return ONCHAIN_DEPOSIT;
+            case "psp_payout_fee":
+                return PSP_PAYOUT_FEE;
+            case "internal_withdrawal_markup_fee":
+                return INTERNAL_WITHDRAWAL_MARKUP_FEE;
+            case "trading_account_withdrawal_offset":
+                return TRADING_ACCOUNT_WITHDRAWAL_OFFSET;
+            case "ad_income_expense":
+                return AD_INCOME_EXPENSE;
+            case "psp_risk_fee":
+                return PSP_RISK_FEE;
+            case "balance_reservation_release":
+                return BALANCE_RESERVATION_RELEASE;
+            case "deposit":
+                return DEPOSIT;
             case "withdrawal_reclassification":
                 return WITHDRAWAL_RECLASSIFICATION;
-            case "fraud_prevention_fee":
-                return FRAUD_PREVENTION_FEE;
             case "stripe_domestic_processing_fee":
                 return STRIPE_DOMESTIC_PROCESSING_FEE;
-            case "misc_purchase":
-                return MISC_PURCHASE;
-            case "platform_balance_transfer_outgoing":
-                return PLATFORM_BALANCE_TRANSFER_OUTGOING;
-            case "misc_reversal":
-                return MISC_REVERSAL;
-            case "airdrop_link_redeemed":
-                return AIRDROP_LINK_REDEEMED;
-            case "onchain_swap_target":
-                return ONCHAIN_SWAP_TARGET;
-            case "ad_campaign_budget":
-                return AD_CAMPAIGN_BUDGET;
+            case "onchain_deposit_offset":
+                return ONCHAIN_DEPOSIT_OFFSET;
+            case "connected_account_clawback":
+                return CONNECTED_ACCOUNT_CLAWBACK;
+            case "psp_pool_refund_clearing":
+                return PSP_POOL_REFUND_CLEARING;
+            case "onchain_swap_offset":
+                return ONCHAIN_SWAP_OFFSET;
             case "software_rental_transaction":
                 return SOFTWARE_RENTAL_TRANSACTION;
-            case "currency_conversion_incoming":
-                return CURRENCY_CONVERSION_INCOMING;
-            case "affiliate_fee":
-                return AFFILIATE_FEE;
-            case "card_spend_authorization_void":
-                return CARD_SPEND_AUTHORIZATION_VOID;
-            case "payment_gross_reversal":
-                return PAYMENT_GROSS_REVERSAL;
-            case "legacy_payment_refund":
-                return LEGACY_PAYMENT_REFUND;
+            case "withdrawal_fee_reversal":
+                return WITHDRAWAL_FEE_REVERSAL;
+            case "psp_payout_settlement_reversal":
+                return PSP_PAYOUT_SETTLEMENT_REVERSAL;
+            case "payout_receivable":
+                return PAYOUT_RECEIVABLE;
             case "passthrough_gmv":
                 return PASSTHROUGH_GMV;
-            case "dispute_hold_adjustment":
-                return DISPUTE_HOLD_ADJUSTMENT;
-            case "internal_withdrawal":
-                return INTERNAL_WITHDRAWAL;
-            case "payment_gross":
-                return PAYMENT_GROSS;
-            case "bank_transfer":
-                return BANK_TRANSFER;
-            case "referral_bonus":
-                return REFERRAL_BONUS;
-            case "internal_balance_transfer_outgoing":
-                return INTERNAL_BALANCE_TRANSFER_OUTGOING;
-            case "sales_tax_remittance_reversal":
-                return SALES_TAX_REMITTANCE_REVERSAL;
-            case "withdrawal_clawback":
-                return WITHDRAWAL_CLAWBACK;
+            case "sales_tax_collected_reversal":
+                return SALES_TAX_COLLECTED_REVERSAL;
+            case "psp_payout_receivable_clearing":
+                return PSP_PAYOUT_RECEIVABLE_CLEARING;
+            case "ad_network_settlement":
+                return AD_NETWORK_SETTLEMENT;
+            case "perps_bridge_fee_offset":
+                return PERPS_BRIDGE_FEE_OFFSET;
+            case "marketing_expense":
+                return MARKETING_EXPENSE;
+            case "card_interchange":
+                return CARD_INTERCHANGE;
+            case "airdrop_link_canceled":
+                return AIRDROP_LINK_CANCELED;
             case "license_sale_commission":
                 return LICENSE_SALE_COMMISSION;
-            case "revshare_percentage_fee":
-                return REVSHARE_PERCENTAGE_FEE;
             case "sales_tax_fee":
                 return SALES_TAX_FEE;
-            case "withdrawal_reversal":
-                return WITHDRAWAL_REVERSAL;
-            case "airdrop_reversal":
-                return AIRDROP_REVERSAL;
-            case "payment_refund":
-                return PAYMENT_REFUND;
-            case "cross_border_percentage_fee":
-                return CROSS_BORDER_PERCENTAGE_FEE;
+            case "internal_withdrawal_in_transit":
+                return INTERNAL_WITHDRAWAL_IN_TRANSIT;
+            case "refund_unreconciled_clearing":
+                return REFUND_UNRECONCILED_CLEARING;
+            case "psp_scheme_fee":
+                return PSP_SCHEME_FEE;
+            case "perps_volume_offset":
+                return PERPS_VOLUME_OFFSET;
+            case "psp_account_updater_fee":
+                return PSP_ACCOUNT_UPDATER_FEE;
             case "topup_fee":
                 return TOPUP_FEE;
-            case "airdrop_link_created":
-                return AIRDROP_LINK_CREATED;
+            case "payment_receivable_settlement":
+                return PAYMENT_RECEIVABLE_SETTLEMENT;
+            case "psp_bank_pull_settlement":
+                return PSP_BANK_PULL_SETTLEMENT;
+            case "cashback":
+                return CASHBACK;
             case "fx_percentage_fee":
                 return FX_PERCENTAGE_FEE;
-            case "currency_conversion_outgoing":
-                return CURRENCY_CONVERSION_OUTGOING;
-            case "company_referral":
-                return COMPANY_REFERRAL;
-            case "orchestration_percentage_fee":
-                return ORCHESTRATION_PERCENTAGE_FEE;
-            case "card_spend_refund":
-                return CARD_SPEND_REFUND;
-            case "payment_revshare_reversal":
-                return PAYMENT_REVSHARE_REVERSAL;
+            case "payment_receivable_clearing":
+                return PAYMENT_RECEIVABLE_CLEARING;
+            case "dispute_settlement":
+                return DISPUTE_SETTLEMENT;
+            case "psp_connect_fee":
+                return PSP_CONNECT_FEE;
+            case "psp_interchange_fee":
+                return PSP_INTERCHANGE_FEE;
             case "platform_affiliate_payment":
                 return PLATFORM_AFFILIATE_PAYMENT;
-            case "sales_tax_remittance":
-                return SALES_TAX_REMITTANCE;
-            case "misc_refund":
-                return MISC_REFUND;
-            case "payment_processing_fixed_fee":
-                return PAYMENT_PROCESSING_FIXED_FEE;
             case "internal_withdrawal_reversal":
                 return INTERNAL_WITHDRAWAL_REVERSAL;
-            case "software_rental_revshare":
-                return SOFTWARE_RENTAL_REVSHARE;
-            case "buyer_fee":
-                return BUYER_FEE;
-            case "whop_processing_fee":
-                return WHOP_PROCESSING_FEE;
+            case "card_spend_authorization_void_release":
+                return CARD_SPEND_AUTHORIZATION_VOID_RELEASE;
+            case "withdrawal_payable_clearing_reversal":
+                return WITHDRAWAL_PAYABLE_CLEARING_REVERSAL;
+            case "psp_invoice_tax_fee":
+                return PSP_INVOICE_TAX_FEE;
+            case "dispute_representment_fee":
+                return DISPUTE_REPRESENTMENT_FEE;
+            case "platform_balance_payment_refund":
+                return PLATFORM_BALANCE_PAYMENT_REFUND;
+            case "perps_realized_pnl":
+                return PERPS_REALIZED_PNL;
+            case "resolution_center_refund":
+                return RESOLUTION_CENTER_REFUND;
+            case "psp_reserve_hold":
+                return PSP_RESERVE_HOLD;
+            case "three_ds_fixed_fee":
+                return THREE_DS_FIXED_FEE;
+            case "psp_pool_dispute_settlement":
+                return PSP_POOL_DISPUTE_SETTLEMENT;
+            case "trading_account_deposit":
+                return TRADING_ACCOUNT_DEPOSIT;
+            case "platform_trading_commission":
+                return PLATFORM_TRADING_COMMISSION;
+            case "onboarding_reward":
+                return ONBOARDING_REWARD;
+            case "airdrop_link_returned":
+                return AIRDROP_LINK_RETURNED;
+            case "refund_settlement_reversal":
+                return REFUND_SETTLEMENT_REVERSAL;
+            case "withdrawal_markup_fee":
+                return WITHDRAWAL_MARKUP_FEE;
+            case "onchain_platform_transfer_outgoing":
+                return ONCHAIN_PLATFORM_TRANSFER_OUTGOING;
+            case "installment_default":
+                return INSTALLMENT_DEFAULT;
+            case "psp_terminal_fee":
+                return PSP_TERMINAL_FEE;
+            case "platform_balance_payment":
+                return PLATFORM_BALANCE_PAYMENT;
+            case "levels_points_issued":
+                return LEVELS_POINTS_ISSUED;
+            case "psp_refund_fee":
+                return PSP_REFUND_FEE;
+            case "perps_unload_deposit":
+                return PERPS_UNLOAD_DEPOSIT;
+            case "ad_publisher_payout_received":
+                return AD_PUBLISHER_PAYOUT_RECEIVED;
+            case "legacy_crypto_payment":
+                return LEGACY_CRYPTO_PAYMENT;
+            case "clawback_receivable_reversal":
+                return CLAWBACK_RECEIVABLE_REVERSAL;
+            case "psp_refund_payable":
+                return PSP_REFUND_PAYABLE;
+            case "platform_markup_fee":
+                return PLATFORM_MARKUP_FEE;
+            case "psp_account_debit":
+                return PSP_ACCOUNT_DEBIT;
+            case "payment_referral":
+                return PAYMENT_REFERRAL;
+            case "perps_load_deposit":
+                return PERPS_LOAD_DEPOSIT;
+            case "whop_swap_fee_received":
+                return WHOP_SWAP_FEE_RECEIVED;
+            case "withdrawal_clawback_reversal":
+                return WITHDRAWAL_CLAWBACK_REVERSAL;
+            case "psp_markup_fee":
+                return PSP_MARKUP_FEE;
+            case "internal_withdrawal_markup_fee_payout":
+                return INTERNAL_WITHDRAWAL_MARKUP_FEE_PAYOUT;
+            case "card_spend_authorization":
+                return CARD_SPEND_AUTHORIZATION;
+            case "levels_points_partner":
+                return LEVELS_POINTS_PARTNER;
+            case "external_card_load_deposit":
+                return EXTERNAL_CARD_LOAD_DEPOSIT;
+            case "sales_tax_remitted":
+                return SALES_TAX_REMITTED;
+            case "payment_refund_reversal":
+                return PAYMENT_REFUND_REVERSAL;
+            case "onchain_internal_transfer_outgoing":
+                return ONCHAIN_INTERNAL_TRANSFER_OUTGOING;
+            case "clawback_fee":
+                return CLAWBACK_FEE;
+            case "withdrawal_payable_reversal":
+                return WITHDRAWAL_PAYABLE_REVERSAL;
+            case "airdrop_expense":
+                return AIRDROP_EXPENSE;
+            case "ad_network_cost":
+                return AD_NETWORK_COST;
+            case "fx_settlement_gain_loss":
+                return FX_SETTLEMENT_GAIN_LOSS;
+            case "psp_tax_service_fee":
+                return PSP_TAX_SERVICE_FEE;
+            case "platform_balance_transfer_outgoing":
+                return PLATFORM_BALANCE_TRANSFER_OUTGOING;
+            case "cashback_funding":
+                return CASHBACK_FUNDING;
+            case "psp_currency_conversion_incoming":
+                return PSP_CURRENCY_CONVERSION_INCOMING;
+            case "onchain_swap_target":
+                return ONCHAIN_SWAP_TARGET;
+            case "airdrop_link_redeemed":
+                return AIRDROP_LINK_REDEEMED;
+            case "psp_currency_conversion_receivable_clearing":
+                return PSP_CURRENCY_CONVERSION_RECEIVABLE_CLEARING;
+            case "capital_withholding_reversal":
+                return CAPITAL_WITHHOLDING_REVERSAL;
+            case "external_card_load_offset":
+                return EXTERNAL_CARD_LOAD_OFFSET;
+            case "affiliate_fee":
+                return AFFILIATE_FEE;
+            case "onchain_swap_source":
+                return ONCHAIN_SWAP_SOURCE;
+            case "payment_gross_reversal":
+                return PAYMENT_GROSS_REVERSAL;
+            case "psp_payment_receivable":
+                return PSP_PAYMENT_RECEIVABLE;
+            case "perps_fee":
+                return PERPS_FEE;
+            case "treasury_payin_receivable":
+                return TREASURY_PAYIN_RECEIVABLE;
+            case "psp_identity_verification_fee":
+                return PSP_IDENTITY_VERIFICATION_FEE;
+            case "withdrawal_markup_fee_reversal":
+                return WITHDRAWAL_MARKUP_FEE_REVERSAL;
+            case "ad_funding_disbursement":
+                return AD_FUNDING_DISBURSEMENT;
+            case "withdrawal_clawback":
+                return WITHDRAWAL_CLAWBACK;
+            case "perps_realized_pnl_offset":
+                return PERPS_REALIZED_PNL_OFFSET;
+            case "platform_earning":
+                return PLATFORM_EARNING;
+            case "revshare_percentage_fee":
+                return REVSHARE_PERCENTAGE_FEE;
+            case "payment_refund":
+                return PAYMENT_REFUND;
+            case "airdrop_reversal":
+                return AIRDROP_REVERSAL;
+            case "withdrawal_fee":
+                return WITHDRAWAL_FEE;
+            case "trading_account_withdrawal":
+                return TRADING_ACCOUNT_WITHDRAWAL;
+            case "bad_debt_offset":
+                return BAD_DEBT_OFFSET;
+            case "balance_reservation_hold":
+                return BALANCE_RESERVATION_HOLD;
+            case "airdrop_link_claimed":
+                return AIRDROP_LINK_CLAIMED;
+            case "psp_dispute_fee":
+                return PSP_DISPUTE_FEE;
+            case "card_unload_deposit":
+                return CARD_UNLOAD_DEPOSIT;
+            case "airdrop_link_created":
+                return AIRDROP_LINK_CREATED;
+            case "psp_transfer_settlement":
+                return PSP_TRANSFER_SETTLEMENT;
+            case "orchestration_percentage_fee":
+                return ORCHESTRATION_PERCENTAGE_FEE;
+            case "company_referral":
+                return COMPANY_REFERRAL;
+            case "card_interchange_receivable":
+                return CARD_INTERCHANGE_RECEIVABLE;
+            case "payment_revshare_reversal":
+                return PAYMENT_REVSHARE_REVERSAL;
+            case "card_load_deposit":
+                return CARD_LOAD_DEPOSIT;
+            case "misc_refund":
+                return MISC_REFUND;
+            case "dispute_payable_reversal":
+                return DISPUTE_PAYABLE_REVERSAL;
+            case "treasury_fee":
+                return TREASURY_FEE;
             case "onchain_wallet_transfer_incoming":
                 return ONCHAIN_WALLET_TRANSFER_INCOMING;
-            case "payment_revshare":
-                return PAYMENT_REVSHARE;
+            case "psp_tax_filing_fee":
+                return PSP_TAX_FILING_FEE;
             case "payment_dispute_fee":
                 return PAYMENT_DISPUTE_FEE;
+            case "bad_debt_expense":
+                return BAD_DEBT_EXPENSE;
+            case "capital_hold_release":
+                return CAPITAL_HOLD_RELEASE;
+            case "airdrop_expense_reversal":
+                return AIRDROP_EXPENSE_REVERSAL;
+            case "payment_dispute":
+                return PAYMENT_DISPUTE;
+            case "ad_publisher_payout":
+                return AD_PUBLISHER_PAYOUT;
+            case "payment_processing_percentage_fee":
+                return PAYMENT_PROCESSING_PERCENTAGE_FEE;
+            case "card_spend_capture_offset":
+                return CARD_SPEND_CAPTURE_OFFSET;
+            case "psp_payout_deposit":
+                return PSP_PAYOUT_DEPOSIT;
+            case "capital_hold":
+                return CAPITAL_HOLD;
+            case "dispute_management_fee":
+                return DISPUTE_MANAGEMENT_FEE;
+            case "cashback_expense":
+                return CASHBACK_EXPENSE;
+            case "withdrawal":
+                return WITHDRAWAL;
+            case "settlement_rounding_variance":
+                return SETTLEMENT_ROUNDING_VARIANCE;
+            case "psp_network_token_fee":
+                return PSP_NETWORK_TOKEN_FEE;
+            case "balance_reservation":
+                return BALANCE_RESERVATION;
+            case "ad_spend_purchase":
+                return AD_SPEND_PURCHASE;
+            case "withdrawal_payable":
+                return WITHDRAWAL_PAYABLE;
+            case "legacy_payment":
+                return LEGACY_PAYMENT;
+            case "psp_recipient_wallet_load":
+                return PSP_RECIPIENT_WALLET_LOAD;
+            case "ad_budget_release":
+                return AD_BUDGET_RELEASE;
+            case "psp_accelerated_settlement_fee":
+                return PSP_ACCELERATED_SETTLEMENT_FEE;
+            case "levels_points_card":
+                return LEVELS_POINTS_CARD;
+            case "dispute_unreconciled_reversal":
+                return DISPUTE_UNRECONCILED_REVERSAL;
+            case "platform_affiliate_payment_reversal":
+                return PLATFORM_AFFILIATE_PAYMENT_REVERSAL;
+            case "internal_withdrawal_fee_reversal":
+                return INTERNAL_WITHDRAWAL_FEE_REVERSAL;
+            case "fx_gain_loss":
+                return FX_GAIN_LOSS;
+            case "psp_collection_settlement":
+                return PSP_COLLECTION_SETTLEMENT;
+            case "internal_balance_transfer_incoming":
+                return INTERNAL_BALANCE_TRANSFER_INCOMING;
+            case "identity_verification_fee":
+                return IDENTITY_VERIFICATION_FEE;
+            case "onchain_deposit":
+                return ONCHAIN_DEPOSIT;
+            case "psp_payin_clearing":
+                return PSP_PAYIN_CLEARING;
+            case "marketplace_affiliate_fee":
+                return MARKETPLACE_AFFILIATE_FEE;
+            case "card_spend_refund_offset":
+                return CARD_SPEND_REFUND_OFFSET;
+            case "misc_purchase":
+                return MISC_PURCHASE;
+            case "levels_points_burned":
+                return LEVELS_POINTS_BURNED;
+            case "psp_payment_method_fee":
+                return PSP_PAYMENT_METHOD_FEE;
+            case "application_fee_payable":
+                return APPLICATION_FEE_PAYABLE;
+            case "currency_conversion_incoming":
+                return CURRENCY_CONVERSION_INCOMING;
+            case "psp_payout_settlement":
+                return PSP_PAYOUT_SETTLEMENT;
+            case "dispute_hold_blocked":
+                return DISPUTE_HOLD_BLOCKED;
+            case "psp_pool_refund_settlement":
+                return PSP_POOL_REFUND_SETTLEMENT;
+            case "capital_withholding":
+                return CAPITAL_WITHHOLDING;
+            case "payment_gross":
+                return PAYMENT_GROSS;
+            case "dispute_hold_adjustment":
+                return DISPUTE_HOLD_ADJUSTMENT;
+            case "psp_transfer_settlement_reversal":
+                return PSP_TRANSFER_SETTLEMENT_REVERSAL;
+            case "aggregated_fee":
+                return AGGREGATED_FEE;
+            case "psp_reserve_release":
+                return PSP_RESERVE_RELEASE;
+            case "sales_tax_remittance_reversal":
+                return SALES_TAX_REMITTANCE_REVERSAL;
+            case "ads_card_spread":
+                return ADS_CARD_SPREAD;
+            case "sales_tax_collected":
+                return SALES_TAX_COLLECTED;
+            case "perps_load_transfer":
+                return PERPS_LOAD_TRANSFER;
+            case "platform_credits_payment":
+                return PLATFORM_CREDITS_PAYMENT;
+            case "withdrawal_reversal":
+                return WITHDRAWAL_REVERSAL;
+            case "dispute_unreconciled_clearing":
+                return DISPUTE_UNRECONCILED_CLEARING;
+            case "cross_border_percentage_fee":
+                return CROSS_BORDER_PERCENTAGE_FEE;
+            case "psp_pool_clearing":
+                return PSP_POOL_CLEARING;
+            case "psp_billing_fee":
+                return PSP_BILLING_FEE;
+            case "internal_withdrawal_complete":
+                return INTERNAL_WITHDRAWAL_COMPLETE;
+            case "psp_optimization_fee":
+                return PSP_OPTIMIZATION_FEE;
+            case "platform_balance_transfer_fee":
+                return PLATFORM_BALANCE_TRANSFER_FEE;
+            case "internal_withdrawal_in_transit_reversal":
+                return INTERNAL_WITHDRAWAL_IN_TRANSIT_REVERSAL;
+            case "psp_dispute_payable":
+                return PSP_DISPUTE_PAYABLE;
+            case "currency_conversion_outgoing":
+                return CURRENCY_CONVERSION_OUTGOING;
+            case "platform_credits_granted":
+                return PLATFORM_CREDITS_GRANTED;
+            case "payout_subsidy":
+                return PAYOUT_SUBSIDY;
+            case "psp_payin_settlement":
+                return PSP_PAYIN_SETTLEMENT;
+            case "psp_clawback_settlement":
+                return PSP_CLAWBACK_SETTLEMENT;
+            case "sales_tax_remittance":
+                return SALES_TAX_REMITTANCE;
+            case "withdrawal_payable_clearing":
+                return WITHDRAWAL_PAYABLE_CLEARING;
+            case "payment_processing_fixed_fee":
+                return PAYMENT_PROCESSING_FIXED_FEE;
+            case "software_rental_revshare":
+                return SOFTWARE_RENTAL_REVSHARE;
+            case "whop_processing_fee":
+                return WHOP_PROCESSING_FEE;
+            case "buyer_fee":
+                return BUYER_FEE;
+            case "airdrop_link_funded":
+                return AIRDROP_LINK_FUNDED;
             default:
                 return new LedgerActivityLineType(Value.UNKNOWN, value);
         }
     }
 
     public enum Value {
-        AD_BUDGET_RELEASE,
+        PSP_PAYMENT_RECEIVABLE,
 
-        AD_CAMPAIGN_BUDGET,
+        PAYMENT_GROSS,
+
+        TOPUP,
+
+        TOPUP_FEE,
+
+        PAYMENT_GROSS_REVERSAL,
+
+        TOPUP_REVERSAL,
+
+        PAYMENT_REFUND,
+
+        PAYMENT_REFUND_REVERSAL,
+
+        PLATFORM_BALANCE_PAYMENT,
+
+        PLATFORM_BALANCE_PAYMENT_REFUND,
+
+        AD_SPEND_PURCHASE,
+
+        PSP_REFUND_PAYABLE,
+
+        PASSTHROUGH_GMV,
+
+        PASSTHROUGH_GMV_OFFSET,
+
+        INSTALLMENT_DEFAULT,
+
+        AGGREGATED_FEE,
+
+        PAYMENT_PROCESSING_FIXED_FEE,
+
+        PAYMENT_PROCESSING_PERCENTAGE_FEE,
+
+        BILLING_PERCENTAGE_FEE,
+
+        CROSS_BORDER_PERCENTAGE_FEE,
+
+        FX_PERCENTAGE_FEE,
+
+        ORCHESTRATION_PERCENTAGE_FEE,
+
+        REVSHARE_PERCENTAGE_FEE,
+
+        STRIPE_DOMESTIC_PROCESSING_FEE,
+
+        STRIPE_INTERNATIONAL_PROCESSING_FEE,
+
+        THREE_DS_FIXED_FEE,
+
+        WHOP_PROCESSING_FEE,
+
+        ECONOMIC_INTELLIGENCE_PERCENTAGE_FEE,
+
+        HIGH_RISK_MERCHANT_FEE,
+
+        FRAUD_PREVENTION_FEE,
+
+        BUYER_FEE,
+
+        SALES_TAX_FEE,
+
+        PAYOUT_FEE,
+
+        AFFILIATE_FEE,
+
+        MARKETPLACE_AFFILIATE_FEE,
+
+        APPLICATION_FEE,
+
+        PLATFORM_MARKUP_FEE,
+
+        PLATFORM_MARKUP_FEE_PAYOUT,
+
+        SALES_TAX_REMITTANCE,
+
+        SALES_TAX_REMITTANCE_REVERSAL,
+
+        SALES_TAX_COLLECTED,
+
+        SALES_TAX_COLLECTED_REVERSAL,
+
+        SALES_TAX_REMITTED,
+
+        PAYMENT_DISPUTE,
+
+        PAYMENT_DISPUTE_ADJUSTMENT,
+
+        PAYMENT_DISPUTE_FEE,
+
+        PAYMENT_DISPUTE_REVERSAL,
+
+        PLATFORM_COVERED_DISPUTE,
+
+        DISPUTE_ALERT_FEE,
+
+        DISPUTE_REPRESENTMENT_FEE,
+
+        PAYMENT_RETURN_FEE,
+
+        DISPUTE_HOLD_ADJUSTMENT,
+
+        DISPUTE_HOLD_BLOCKED,
+
+        PSP_DISPUTE_PAYABLE,
+
+        WITHDRAWAL,
+
+        WITHDRAWAL_PAYABLE,
+
+        WITHDRAWAL_PAYABLE_REVERSAL,
+
+        WITHDRAWAL_FEE,
+
+        WITHDRAWAL_FEE_REVERSAL,
+
+        WITHDRAWAL_MARKUP_FEE,
+
+        WITHDRAWAL_MARKUP_FEE_REVERSAL,
+
+        WITHDRAWAL_MARKUP_FEE_PAYOUT,
+
+        WITHDRAWAL_MARKUP_FEE_PAYOUT_REVERSAL,
+
+        WITHDRAWAL_REVERSAL,
+
+        WITHDRAWAL_CLAWBACK,
+
+        WITHDRAWAL_CLAWBACK_REVERSAL,
+
+        PAYOUT_RECEIVABLE,
+
+        WITHDRAWAL_RECLASSIFICATION,
+
+        CLAWBACK_RECEIVABLE,
+
+        CLAWBACK_RECEIVABLE_REVERSAL,
+
+        CAPITAL_WITHHOLDING,
+
+        CAPITAL_WITHHOLDING_REVERSAL,
+
+        CAPITAL_HOLD,
+
+        CAPITAL_HOLD_RELEASE,
+
+        CAPITAL_REMITTANCE,
+
+        CAPITAL_REMITTANCE_REVERSAL,
+
+        TREASURY_PAYIN,
+
+        TREASURY_PAYIN_RECEIVABLE,
+
+        ONCHAIN_DEPOSIT,
+
+        ONCHAIN_DEPOSIT_OFFSET,
+
+        ONCHAIN_WITHDRAWAL,
+
+        ONCHAIN_WITHDRAWAL_OFFSET,
+
+        TRADING_ACCOUNT_WITHDRAWAL,
+
+        TRADING_ACCOUNT_WITHDRAWAL_OFFSET,
+
+        TRADING_ACCOUNT_DEPOSIT,
+
+        TRADING_ACCOUNT_DEPOSIT_OFFSET,
+
+        PERPS_LOAD_TRANSFER,
+
+        PERPS_LOAD_DEPOSIT,
+
+        PERPS_UNLOAD_TRANSFER,
+
+        PERPS_UNLOAD_DEPOSIT,
+
+        PERPS_BRIDGE_FEE,
+
+        PERPS_BRIDGE_FEE_OFFSET,
+
+        PERPS_VOLUME,
+
+        PERPS_VOLUME_OFFSET,
+
+        PERPS_FEE,
+
+        PERPS_FEE_OFFSET,
+
+        PLATFORM_TRADING_COMMISSION,
+
+        TRADING_FEE,
+
+        PERPS_REALIZED_PNL,
+
+        PERPS_REALIZED_PNL_OFFSET,
+
+        ONCHAIN_WALLET_TRANSFER_OUTGOING,
+
+        ONCHAIN_WALLET_TRANSFER_INCOMING,
+
+        ONCHAIN_PLATFORM_TRANSFER_OUTGOING,
+
+        ONCHAIN_PLATFORM_TRANSFER_INCOMING,
+
+        ONCHAIN_INTERNAL_TRANSFER_OUTGOING,
+
+        ONCHAIN_INTERNAL_TRANSFER_INCOMING,
+
+        ONCHAIN_SWAP_SOURCE,
+
+        ONCHAIN_SWAP_TARGET,
+
+        ONCHAIN_SWAP_OFFSET,
+
+        WHOP_SWAP_FEE_RECEIVED,
+
+        SWAP_FEE,
+
+        INTERNAL_WITHDRAWAL,
+
+        INTERNAL_WITHDRAWAL_REVERSAL,
+
+        INTERNAL_WITHDRAWAL_PAYABLE,
+
+        INTERNAL_WITHDRAWAL_PAYABLE_REVERSAL,
+
+        INTERNAL_WITHDRAWAL_FEE,
+
+        INTERNAL_WITHDRAWAL_FEE_REVERSAL,
+
+        INTERNAL_WITHDRAWAL_MARKUP_FEE,
+
+        INTERNAL_WITHDRAWAL_MARKUP_FEE_REVERSAL,
+
+        INTERNAL_WITHDRAWAL_MARKUP_FEE_PAYOUT,
+
+        INTERNAL_WITHDRAWAL_MARKUP_FEE_PAYOUT_REVERSAL,
+
+        INTERNAL_WITHDRAWAL_IN_TRANSIT,
+
+        INTERNAL_WITHDRAWAL_COMPLETE,
+
+        INTERNAL_WITHDRAWAL_IN_TRANSIT_REVERSAL,
+
+        CARD_LOAD_TRANSFER,
+
+        CARD_LOAD_DEPOSIT,
+
+        CARD_UNLOAD_TRANSFER,
+
+        CARD_UNLOAD_DEPOSIT,
+
+        EXTERNAL_CARD_LOAD_DEPOSIT,
+
+        EXTERNAL_CARD_LOAD_OFFSET,
+
+        CARD_SPEND_AUTHORIZATION,
+
+        CARD_SPEND_AUTHORIZATION_HOLD,
+
+        CARD_SPEND_CAPTURE,
+
+        CARD_SPEND_CAPTURE_OFFSET,
+
+        CARD_SPEND_AUTHORIZATION_VOID,
+
+        CARD_SPEND_AUTHORIZATION_VOID_RELEASE,
+
+        CARD_SPEND_REFUND,
+
+        CARD_SPEND_REFUND_OFFSET,
+
+        CASHBACK,
+
+        CASHBACK_EXPENSE,
+
+        CASHBACK_FUNDING,
+
+        CARD_INTERCHANGE_RECEIVABLE,
+
+        CARD_INTERCHANGE,
+
+        ACCOUNT_SETTLEMENT,
+
+        CURRENCY_CONVERSION_OUTGOING,
+
+        CURRENCY_CONVERSION_INCOMING,
+
+        BALANCE_RESERVATION,
+
+        BALANCE_RESERVATION_HOLD,
+
+        BALANCE_RESERVATION_REVERSAL,
+
+        BALANCE_RESERVATION_RELEASE,
+
+        BAD_DEBT_OFFSET,
+
+        BAD_DEBT_EXPENSE,
+
+        PLATFORM_CREDITS_PAYMENT,
+
+        PLATFORM_CREDITS_PAYMENT_REFUND,
+
+        PLATFORM_CREDITS_GRANTED,
+
+        LEVELS_POINTS_CARD,
+
+        LEVELS_POINTS_ADS,
+
+        LEVELS_POINTS_TRADING,
+
+        LEVELS_POINTS_PARTNER,
+
+        LEVELS_POINTS_BURNED,
+
+        LEVELS_POINTS_ISSUED,
+
+        LEVELS_REBATE,
+
+        MARKETING_EXPENSE,
+
+        PLATFORM_BALANCE_TRANSFER_OUTGOING,
+
+        PLATFORM_BALANCE_TRANSFER_INCOMING,
+
+        INTERNAL_BALANCE_TRANSFER_OUTGOING,
+
+        INTERNAL_BALANCE_TRANSFER_INCOMING,
+
+        PLATFORM_BALANCE_TRANSFER_FEE,
+
+        CONNECTED_ACCOUNT_CLAWBACK,
+
+        CONNECTED_ACCOUNT_NEGATIVE_BALANCE,
 
         AD_PUBLISHER_PAYOUT,
 
         AD_PUBLISHER_PAYOUT_RECEIVED,
 
-        AD_SPEND_CHARGE,
+        COMPANY_REFERRAL,
 
-        AFFILIATE_FEE,
+        PLATFORM_AFFILIATE_PAYMENT,
 
-        AIRDROP,
+        PLATFORM_AFFILIATE_PAYMENT_REVERSAL,
 
-        AIRDROP_LINK_CREATED,
+        ONBOARDING_REWARD,
 
-        AIRDROP_LINK_REDEEMED,
+        PARTNER_GRANT_REWARD,
 
-        AIRDROP_LINK_RETURNED,
+        PAYMENT_REVSHARE,
 
-        AIRDROP_REVERSAL,
+        PAYMENT_REVSHARE_PAYOUT,
 
-        APPLICATION_FEE,
+        PAYMENT_REVSHARE_REVERSAL,
+
+        PAYMENT_REVSHARE_REFUND,
+
+        PAYMENT_REFERRAL,
+
+        PAYMENT_REFERRAL_PAYABLE,
+
+        PAYMENT_REFERRAL_REVERSAL,
+
+        PAYMENT_REFERRAL_REFUND,
+
+        APPLICATION_FEE_PAYABLE,
 
         APPLICATION_FEE_PAYOUT,
 
-        BANK_TRANSFER,
+        PLATFORM_EARNING,
 
-        BILLING_PERCENTAGE_FEE,
+        AIRDROP,
 
-        BUYER_FEE,
+        AIRDROP_REVERSAL,
 
-        CARD_SPEND_AUTHORIZATION,
+        AIRDROP_EXPENSE,
 
-        CARD_SPEND_AUTHORIZATION_VOID,
+        AIRDROP_EXPENSE_REVERSAL,
 
-        CARD_SPEND_REFUND,
+        AIRDROP_LINK_FUNDED,
 
-        COMPANY_REFERRAL,
+        AIRDROP_LINK_CANCELED,
 
-        CROSS_BORDER_PERCENTAGE_FEE,
+        AIRDROP_LINK_RETURNED,
 
-        CURRENCY_CONVERSION_INCOMING,
+        AIRDROP_LINK_CLAIMED,
 
-        CURRENCY_CONVERSION_OUTGOING,
+        AIRDROP_LINK_REDEEMED,
 
-        DISPUTE_ALERT_FEE,
+        AIRDROP_LINK_CREATED,
 
-        DISPUTE_HOLD_ADJUSTMENT,
+        RESOLUTION_CENTER_REFUND,
 
-        DISPUTE_REPRESENTMENT_FEE,
+        AD_FUNDING_DISBURSEMENT,
 
-        FRAUD_PREVENTION_FEE,
+        AD_CAMPAIGN_BUDGET,
 
-        FX_PERCENTAGE_FEE,
+        ADS_CARD_SPREAD,
 
-        HIGH_RISK_MERCHANT_FEE,
+        AD_SPEND_CHARGE,
 
-        INSTALLMENT_DEFAULT,
+        AD_NETWORK_COST,
 
-        INTERNAL_BALANCE_TRANSFER_INCOMING,
+        AD_SPEND_MARGIN,
 
-        INTERNAL_BALANCE_TRANSFER_OUTGOING,
+        AD_INCOME_EXPENSE,
 
-        INTERNAL_WITHDRAWAL,
+        AD_INCOME_RECEIPT,
 
-        INTERNAL_WITHDRAWAL_REVERSAL,
+        AD_BUDGET_RELEASE,
+
+        AD_NETWORK_SETTLEMENT,
+
+        AD_AFFILIATE_PAYOUT,
+
+        AD_AFFILIATE_PAYOUT_RECEIVED,
+
+        AD_BALANCE_FUNDING_RECEIPT,
+
+        MISC_REVERSAL,
+
+        FX_GAIN_LOSS,
+
+        FX_MARKUP,
 
         LEGACY_CRYPTO_PAYMENT,
 
@@ -794,187 +2833,667 @@ public final class LedgerActivityLineType {
 
         LICENSE_SALE_REVENUE,
 
-        MISC_PURCHASE,
-
-        MISC_REFUND,
-
-        MISC_REVERSAL,
-
-        ONCHAIN_DEPOSIT,
-
-        ONCHAIN_SWAP_TARGET,
-
-        ONCHAIN_WALLET_TRANSFER_INCOMING,
-
-        ONCHAIN_WALLET_TRANSFER_OUTGOING,
-
-        ORCHESTRATION_PERCENTAGE_FEE,
-
-        PASSTHROUGH_GMV,
-
-        PAYMENT_DISPUTE,
-
-        PAYMENT_DISPUTE_ADJUSTMENT,
-
-        PAYMENT_DISPUTE_FEE,
-
-        PAYMENT_DISPUTE_REVERSAL,
-
-        PAYMENT_GROSS,
-
-        PAYMENT_GROSS_REVERSAL,
-
-        PAYMENT_PROCESSING_FIXED_FEE,
-
-        PAYMENT_PROCESSING_PERCENTAGE_FEE,
-
-        PAYMENT_REFERRAL,
-
-        PAYMENT_REFERRAL_REVERSAL,
-
-        PAYMENT_REFUND,
-
-        PAYMENT_REFUND_REVERSAL,
-
-        PAYMENT_REVSHARE,
-
-        PAYMENT_REVSHARE_PAYOUT,
-
-        PAYMENT_REVSHARE_REFUND,
-
-        PAYMENT_REVSHARE_REVERSAL,
-
-        PAYOUT_FEE,
-
-        PLATFORM_AFFILIATE_PAYMENT,
-
-        PLATFORM_AFFILIATE_PAYMENT_REVERSAL,
-
-        PLATFORM_BALANCE_PAYMENT,
-
-        PLATFORM_BALANCE_PAYMENT_REFUND,
-
-        PLATFORM_BALANCE_TRANSFER_INCOMING,
-
-        PLATFORM_BALANCE_TRANSFER_OUTGOING,
-
-        PLATFORM_COVERED_DISPUTE,
-
-        PROMO_REVERSAL,
-
-        REFERRAL_BONUS,
-
-        RESOLUTION_CENTER_REFUND,
-
-        REVSHARE_PERCENTAGE_FEE,
-
-        SALES_TAX_FEE,
-
-        SALES_TAX_REMITTANCE,
-
-        SALES_TAX_REMITTANCE_REVERSAL,
-
         SOFTWARE_RENTAL_REVSHARE,
 
         SOFTWARE_RENTAL_TRANSACTION,
 
-        STRIPE_DOMESTIC_PROCESSING_FEE,
+        MISC_PURCHASE,
 
-        STRIPE_INTERNATIONAL_PROCESSING_FEE,
+        MISC_REFUND,
 
-        THREE_DS_FIXED_FEE,
+        REFERRAL_BONUS,
 
-        TOPUP,
+        PROMO_REVERSAL,
 
-        TOPUP_FEE,
+        PAYMENT_RECEIVABLE_SETTLEMENT,
 
-        TOPUP_REVERSAL,
+        PLATFORM_EARNING_SETTLEMENT,
 
-        TREASURY_PAYIN,
+        PLATFORM_EARNING_UNRECONCILED_CLEARING,
 
-        WHOP_PROCESSING_FEE,
+        PAYMENT_RECEIVABLE_CLEARING,
 
-        WITHDRAWAL,
+        PAYMENT_RECEIVABLE_REVERSAL,
 
-        WITHDRAWAL_CLAWBACK,
+        PAYMENT_UNRECONCILED_CLEARING,
 
-        WITHDRAWAL_CLAWBACK_REVERSAL,
+        PAYMENT_UNRECONCILED_REVERSAL,
 
-        WITHDRAWAL_RECLASSIFICATION,
+        SETTLEMENT_SHORTFALL_LOSS,
 
-        WITHDRAWAL_REVERSAL,
+        FX_SETTLEMENT_GAIN_LOSS,
+
+        SETTLEMENT_ROUNDING_VARIANCE,
+
+        PSP_PAYOUT_SETTLEMENT,
+
+        PSP_PAYOUT_DEPOSIT,
+
+        PSP_PAYOUT_RECEIVABLE,
+
+        PSP_PAYOUT_RECEIVABLE_CLEARING,
+
+        PAYOUT_UNRECONCILED_CLEARING,
+
+        PSP_CURRENCY_CONVERSION_OUTGOING,
+
+        PSP_CURRENCY_CONVERSION_INCOMING,
+
+        PSP_CURRENCY_CONVERSION_RECEIVABLE,
+
+        PSP_CURRENCY_CONVERSION_RECEIVABLE_CLEARING,
+
+        PSP_FX_ADJUSTMENT,
+
+        REFUND_SETTLEMENT,
+
+        REFUND_SETTLEMENT_REVERSAL,
+
+        REFUND_PAYABLE_CLEARING,
+
+        REFUND_PAYABLE_REVERSAL,
+
+        REFUND_UNRECONCILED_CLEARING,
+
+        REFUND_UNRECONCILED_REVERSAL,
+
+        PSP_ACCOUNT_DEBIT,
+
+        PAYMENT_REFUND_FEE,
+
+        DISPUTE_SETTLEMENT,
+
+        DISPUTE_SETTLEMENT_REVERSAL,
+
+        DISPUTE_PAYABLE_CLEARING,
+
+        DISPUTE_PAYABLE_REVERSAL,
+
+        DISPUTE_UNRECONCILED_CLEARING,
+
+        DISPUTE_UNRECONCILED_REVERSAL,
+
+        PSP_RESERVE_HOLD,
+
+        PSP_RESERVE_RELEASE,
+
+        PSP_DISPUTE_FEE,
+
+        PSP_DISPUTE_ALERT_FEE,
+
+        PSP_REFUND_FEE,
+
+        PSP_ACCOUNT_UPDATER_FEE,
+
+        PSP_ADJUSTED_PROCESSING_FEE,
+
+        PSP_AUTHENTICATION_FEE,
+
+        PSP_COMMISSION_FEE,
+
+        PSP_FIXED_FEE,
+
+        PSP_GATEWAY_FEE,
+
+        PSP_INTERCHANGE_FEE,
+
+        PSP_INVOICE_TAX_FEE,
+
+        PSP_MARKUP_FEE,
+
+        PSP_NETWORK_TOKEN_FEE,
+
+        PSP_OPTIMIZATION_FEE,
+
+        PSP_PAYMENT_METHOD_FEE,
+
+        PSP_PAYOUT_FEE,
+
+        PSP_PROCESSING_FEE,
+
+        PSP_RISK_FEE,
+
+        PSP_SCHEME_FEE,
+
+        PSP_VARIABLE_FEE,
+
+        PSP_BILLING_FEE,
+
+        PSP_TAX_SERVICE_FEE,
+
+        PSP_CONNECT_FEE,
+
+        EXTERNAL_ACCOUNT_CONNECTION_FEE,
+
+        PSP_EXTERNAL_ACCOUNT_CONNECTION_FEE,
+
+        PSP_INVOICING_FEE,
+
+        PSP_TERMINAL_FEE,
+
+        TREASURY_FEE,
+
+        PSP_TREASURY_FEE,
+
+        ACCELERATED_SETTLEMENT_FEE,
+
+        PSP_ACCELERATED_SETTLEMENT_FEE,
+
+        PSP_RECEIVABLE_POOLED,
+
+        PSP_POOL_SETTLEMENT,
+
+        PSP_POOL_CLEARING,
+
+        PSP_POOL_REFUND_SETTLEMENT,
+
+        PSP_POOL_REFUND_CLEARING,
+
+        PSP_CORRECTION,
+
+        PSP_PAYIN_SETTLEMENT,
+
+        PSP_PAYIN_CLEARING,
+
+        PSP_BANK_PULL_SETTLEMENT,
+
+        PSP_BANK_PULL_CLEARING,
+
+        PSP_POOL_DISPUTE_SETTLEMENT,
+
+        PSP_PAYOUT_CONSOLIDATION,
+
+        PSP_WITHHOLDING_TAX,
+
+        PSP_PAYOUT_SETTLEMENT_REVERSAL,
+
+        PSP_TRANSFER_SETTLEMENT,
+
+        PSP_TRANSFER_SETTLEMENT_REVERSAL,
+
+        PSP_COLLECTION_SETTLEMENT,
+
+        PAYOUT_SUBSIDY,
+
+        WITHDRAWAL_TOPUP_ADJUSTMENT,
+
+        WITHDRAWAL_PAYABLE_CLEARING,
+
+        WITHDRAWAL_PAYABLE_CLEARING_REVERSAL,
+
+        IDENTITY_VERIFICATION_FEE,
+
+        PSP_IDENTITY_VERIFICATION_FEE,
+
+        TAX_FILING_FEE,
+
+        PSP_TAX_FILING_FEE,
+
+        PSP_SERVICE_FEE,
+
+        RECIPIENT_WALLET_LOAD,
+
+        PSP_RECIPIENT_WALLET_LOAD,
+
+        DISPUTE_MANAGEMENT_FEE,
+
+        PSP_DISPUTE_MANAGEMENT_FEE,
+
+        PSP_CLAWBACK_SETTLEMENT,
+
+        PSP_CLAWBACK_SETTLEMENT_REVERSAL,
+
+        CLAWBACK_RECEIVABLE_SETTLEMENT,
+
+        CLAWBACK_RECEIVABLE_SETTLEMENT_REVERSAL,
+
+        CLAWBACK_FEE,
+
+        PSP_CLAWBACK_FEE,
+
+        DEPOSIT,
+
+        WALLET_TRANSFER_INCOMING,
+
+        WALLET_TRANSFER_OUTGOING,
+
+        SWAP_SOURCE,
+
+        SWAP_TARGET,
 
         UNKNOWN
     }
 
     public interface Visitor<T> {
-        T visitAdBudgetRelease();
+        T visitPspPaymentReceivable();
 
-        T visitAdCampaignBudget();
+        T visitPaymentGross();
+
+        T visitTopup();
+
+        T visitTopupFee();
+
+        T visitPaymentGrossReversal();
+
+        T visitTopupReversal();
+
+        T visitPaymentRefund();
+
+        T visitPaymentRefundReversal();
+
+        T visitPlatformBalancePayment();
+
+        T visitPlatformBalancePaymentRefund();
+
+        T visitAdSpendPurchase();
+
+        T visitPspRefundPayable();
+
+        T visitPassthroughGmv();
+
+        T visitPassthroughGmvOffset();
+
+        T visitInstallmentDefault();
+
+        T visitAggregatedFee();
+
+        T visitPaymentProcessingFixedFee();
+
+        T visitPaymentProcessingPercentageFee();
+
+        T visitBillingPercentageFee();
+
+        T visitCrossBorderPercentageFee();
+
+        T visitFxPercentageFee();
+
+        T visitOrchestrationPercentageFee();
+
+        T visitRevsharePercentageFee();
+
+        T visitStripeDomesticProcessingFee();
+
+        T visitStripeInternationalProcessingFee();
+
+        T visitThreeDsFixedFee();
+
+        T visitWhopProcessingFee();
+
+        T visitEconomicIntelligencePercentageFee();
+
+        T visitHighRiskMerchantFee();
+
+        T visitFraudPreventionFee();
+
+        T visitBuyerFee();
+
+        T visitSalesTaxFee();
+
+        T visitPayoutFee();
+
+        T visitAffiliateFee();
+
+        T visitMarketplaceAffiliateFee();
+
+        T visitApplicationFee();
+
+        T visitPlatformMarkupFee();
+
+        T visitPlatformMarkupFeePayout();
+
+        T visitSalesTaxRemittance();
+
+        T visitSalesTaxRemittanceReversal();
+
+        T visitSalesTaxCollected();
+
+        T visitSalesTaxCollectedReversal();
+
+        T visitSalesTaxRemitted();
+
+        T visitPaymentDispute();
+
+        T visitPaymentDisputeAdjustment();
+
+        T visitPaymentDisputeFee();
+
+        T visitPaymentDisputeReversal();
+
+        T visitPlatformCoveredDispute();
+
+        T visitDisputeAlertFee();
+
+        T visitDisputeRepresentmentFee();
+
+        T visitPaymentReturnFee();
+
+        T visitDisputeHoldAdjustment();
+
+        T visitDisputeHoldBlocked();
+
+        T visitPspDisputePayable();
+
+        T visitWithdrawal();
+
+        T visitWithdrawalPayable();
+
+        T visitWithdrawalPayableReversal();
+
+        T visitWithdrawalFee();
+
+        T visitWithdrawalFeeReversal();
+
+        T visitWithdrawalMarkupFee();
+
+        T visitWithdrawalMarkupFeeReversal();
+
+        T visitWithdrawalMarkupFeePayout();
+
+        T visitWithdrawalMarkupFeePayoutReversal();
+
+        T visitWithdrawalReversal();
+
+        T visitWithdrawalClawback();
+
+        T visitWithdrawalClawbackReversal();
+
+        T visitPayoutReceivable();
+
+        T visitWithdrawalReclassification();
+
+        T visitClawbackReceivable();
+
+        T visitClawbackReceivableReversal();
+
+        T visitCapitalWithholding();
+
+        T visitCapitalWithholdingReversal();
+
+        T visitCapitalHold();
+
+        T visitCapitalHoldRelease();
+
+        T visitCapitalRemittance();
+
+        T visitCapitalRemittanceReversal();
+
+        T visitTreasuryPayin();
+
+        T visitTreasuryPayinReceivable();
+
+        T visitOnchainDeposit();
+
+        T visitOnchainDepositOffset();
+
+        T visitOnchainWithdrawal();
+
+        T visitOnchainWithdrawalOffset();
+
+        T visitTradingAccountWithdrawal();
+
+        T visitTradingAccountWithdrawalOffset();
+
+        T visitTradingAccountDeposit();
+
+        T visitTradingAccountDepositOffset();
+
+        T visitPerpsLoadTransfer();
+
+        T visitPerpsLoadDeposit();
+
+        T visitPerpsUnloadTransfer();
+
+        T visitPerpsUnloadDeposit();
+
+        T visitPerpsBridgeFee();
+
+        T visitPerpsBridgeFeeOffset();
+
+        T visitPerpsVolume();
+
+        T visitPerpsVolumeOffset();
+
+        T visitPerpsFee();
+
+        T visitPerpsFeeOffset();
+
+        T visitPlatformTradingCommission();
+
+        T visitTradingFee();
+
+        T visitPerpsRealizedPnl();
+
+        T visitPerpsRealizedPnlOffset();
+
+        T visitOnchainWalletTransferOutgoing();
+
+        T visitOnchainWalletTransferIncoming();
+
+        T visitOnchainPlatformTransferOutgoing();
+
+        T visitOnchainPlatformTransferIncoming();
+
+        T visitOnchainInternalTransferOutgoing();
+
+        T visitOnchainInternalTransferIncoming();
+
+        T visitOnchainSwapSource();
+
+        T visitOnchainSwapTarget();
+
+        T visitOnchainSwapOffset();
+
+        T visitWhopSwapFeeReceived();
+
+        T visitSwapFee();
+
+        T visitInternalWithdrawal();
+
+        T visitInternalWithdrawalReversal();
+
+        T visitInternalWithdrawalPayable();
+
+        T visitInternalWithdrawalPayableReversal();
+
+        T visitInternalWithdrawalFee();
+
+        T visitInternalWithdrawalFeeReversal();
+
+        T visitInternalWithdrawalMarkupFee();
+
+        T visitInternalWithdrawalMarkupFeeReversal();
+
+        T visitInternalWithdrawalMarkupFeePayout();
+
+        T visitInternalWithdrawalMarkupFeePayoutReversal();
+
+        T visitInternalWithdrawalInTransit();
+
+        T visitInternalWithdrawalComplete();
+
+        T visitInternalWithdrawalInTransitReversal();
+
+        T visitCardLoadTransfer();
+
+        T visitCardLoadDeposit();
+
+        T visitCardUnloadTransfer();
+
+        T visitCardUnloadDeposit();
+
+        T visitExternalCardLoadDeposit();
+
+        T visitExternalCardLoadOffset();
+
+        T visitCardSpendAuthorization();
+
+        T visitCardSpendAuthorizationHold();
+
+        T visitCardSpendCapture();
+
+        T visitCardSpendCaptureOffset();
+
+        T visitCardSpendAuthorizationVoid();
+
+        T visitCardSpendAuthorizationVoidRelease();
+
+        T visitCardSpendRefund();
+
+        T visitCardSpendRefundOffset();
+
+        T visitCashback();
+
+        T visitCashbackExpense();
+
+        T visitCashbackFunding();
+
+        T visitCardInterchangeReceivable();
+
+        T visitCardInterchange();
+
+        T visitAccountSettlement();
+
+        T visitCurrencyConversionOutgoing();
+
+        T visitCurrencyConversionIncoming();
+
+        T visitBalanceReservation();
+
+        T visitBalanceReservationHold();
+
+        T visitBalanceReservationReversal();
+
+        T visitBalanceReservationRelease();
+
+        T visitBadDebtOffset();
+
+        T visitBadDebtExpense();
+
+        T visitPlatformCreditsPayment();
+
+        T visitPlatformCreditsPaymentRefund();
+
+        T visitPlatformCreditsGranted();
+
+        T visitLevelsPointsCard();
+
+        T visitLevelsPointsAds();
+
+        T visitLevelsPointsTrading();
+
+        T visitLevelsPointsPartner();
+
+        T visitLevelsPointsBurned();
+
+        T visitLevelsPointsIssued();
+
+        T visitLevelsRebate();
+
+        T visitMarketingExpense();
+
+        T visitPlatformBalanceTransferOutgoing();
+
+        T visitPlatformBalanceTransferIncoming();
+
+        T visitInternalBalanceTransferOutgoing();
+
+        T visitInternalBalanceTransferIncoming();
+
+        T visitPlatformBalanceTransferFee();
+
+        T visitConnectedAccountClawback();
+
+        T visitConnectedAccountNegativeBalance();
 
         T visitAdPublisherPayout();
 
         T visitAdPublisherPayoutReceived();
 
-        T visitAdSpendCharge();
+        T visitCompanyReferral();
 
-        T visitAffiliateFee();
+        T visitPlatformAffiliatePayment();
 
-        T visitAirdrop();
+        T visitPlatformAffiliatePaymentReversal();
 
-        T visitAirdropLinkCreated();
+        T visitOnboardingReward();
 
-        T visitAirdropLinkRedeemed();
+        T visitPartnerGrantReward();
 
-        T visitAirdropLinkReturned();
+        T visitPaymentRevshare();
 
-        T visitAirdropReversal();
+        T visitPaymentRevsharePayout();
 
-        T visitApplicationFee();
+        T visitPaymentRevshareReversal();
+
+        T visitPaymentRevshareRefund();
+
+        T visitPaymentReferral();
+
+        T visitPaymentReferralPayable();
+
+        T visitPaymentReferralReversal();
+
+        T visitPaymentReferralRefund();
+
+        T visitApplicationFeePayable();
 
         T visitApplicationFeePayout();
 
-        T visitBankTransfer();
+        T visitPlatformEarning();
 
-        T visitBillingPercentageFee();
+        T visitAirdrop();
 
-        T visitBuyerFee();
+        T visitAirdropReversal();
 
-        T visitCardSpendAuthorization();
+        T visitAirdropExpense();
 
-        T visitCardSpendAuthorizationVoid();
+        T visitAirdropExpenseReversal();
 
-        T visitCardSpendRefund();
+        T visitAirdropLinkFunded();
 
-        T visitCompanyReferral();
+        T visitAirdropLinkCanceled();
 
-        T visitCrossBorderPercentageFee();
+        T visitAirdropLinkReturned();
 
-        T visitCurrencyConversionIncoming();
+        T visitAirdropLinkClaimed();
 
-        T visitCurrencyConversionOutgoing();
+        T visitAirdropLinkRedeemed();
 
-        T visitDisputeAlertFee();
+        T visitAirdropLinkCreated();
 
-        T visitDisputeHoldAdjustment();
+        T visitResolutionCenterRefund();
 
-        T visitDisputeRepresentmentFee();
+        T visitAdFundingDisbursement();
 
-        T visitFraudPreventionFee();
+        T visitAdCampaignBudget();
 
-        T visitFxPercentageFee();
+        T visitAdsCardSpread();
 
-        T visitHighRiskMerchantFee();
+        T visitAdSpendCharge();
 
-        T visitInstallmentDefault();
+        T visitAdNetworkCost();
 
-        T visitInternalBalanceTransferIncoming();
+        T visitAdSpendMargin();
 
-        T visitInternalBalanceTransferOutgoing();
+        T visitAdIncomeExpense();
 
-        T visitInternalWithdrawal();
+        T visitAdIncomeReceipt();
 
-        T visitInternalWithdrawalReversal();
+        T visitAdBudgetRelease();
+
+        T visitAdNetworkSettlement();
+
+        T visitAdAffiliatePayout();
+
+        T visitAdAffiliatePayoutReceived();
+
+        T visitAdBalanceFundingReceipt();
+
+        T visitMiscReversal();
+
+        T visitFxGainLoss();
+
+        T visitFxMarkup();
 
         T visitLegacyCryptoPayment();
 
@@ -988,115 +3507,233 @@ public final class LedgerActivityLineType {
 
         T visitLicenseSaleRevenue();
 
-        T visitMiscPurchase();
-
-        T visitMiscRefund();
-
-        T visitMiscReversal();
-
-        T visitOnchainDeposit();
-
-        T visitOnchainSwapTarget();
-
-        T visitOnchainWalletTransferIncoming();
-
-        T visitOnchainWalletTransferOutgoing();
-
-        T visitOrchestrationPercentageFee();
-
-        T visitPassthroughGmv();
-
-        T visitPaymentDispute();
-
-        T visitPaymentDisputeAdjustment();
-
-        T visitPaymentDisputeFee();
-
-        T visitPaymentDisputeReversal();
-
-        T visitPaymentGross();
-
-        T visitPaymentGrossReversal();
-
-        T visitPaymentProcessingFixedFee();
-
-        T visitPaymentProcessingPercentageFee();
-
-        T visitPaymentReferral();
-
-        T visitPaymentReferralReversal();
-
-        T visitPaymentRefund();
-
-        T visitPaymentRefundReversal();
-
-        T visitPaymentRevshare();
-
-        T visitPaymentRevsharePayout();
-
-        T visitPaymentRevshareRefund();
-
-        T visitPaymentRevshareReversal();
-
-        T visitPayoutFee();
-
-        T visitPlatformAffiliatePayment();
-
-        T visitPlatformAffiliatePaymentReversal();
-
-        T visitPlatformBalancePayment();
-
-        T visitPlatformBalancePaymentRefund();
-
-        T visitPlatformBalanceTransferIncoming();
-
-        T visitPlatformBalanceTransferOutgoing();
-
-        T visitPlatformCoveredDispute();
-
-        T visitPromoReversal();
-
-        T visitReferralBonus();
-
-        T visitResolutionCenterRefund();
-
-        T visitRevsharePercentageFee();
-
-        T visitSalesTaxFee();
-
-        T visitSalesTaxRemittance();
-
-        T visitSalesTaxRemittanceReversal();
-
         T visitSoftwareRentalRevshare();
 
         T visitSoftwareRentalTransaction();
 
-        T visitStripeDomesticProcessingFee();
+        T visitMiscPurchase();
 
-        T visitStripeInternationalProcessingFee();
+        T visitMiscRefund();
 
-        T visitThreeDsFixedFee();
+        T visitReferralBonus();
 
-        T visitTopup();
+        T visitPromoReversal();
 
-        T visitTopupFee();
+        T visitPaymentReceivableSettlement();
 
-        T visitTopupReversal();
+        T visitPlatformEarningSettlement();
 
-        T visitTreasuryPayin();
+        T visitPlatformEarningUnreconciledClearing();
 
-        T visitWhopProcessingFee();
+        T visitPaymentReceivableClearing();
 
-        T visitWithdrawal();
+        T visitPaymentReceivableReversal();
 
-        T visitWithdrawalClawback();
+        T visitPaymentUnreconciledClearing();
 
-        T visitWithdrawalClawbackReversal();
+        T visitPaymentUnreconciledReversal();
 
-        T visitWithdrawalReclassification();
+        T visitSettlementShortfallLoss();
 
-        T visitWithdrawalReversal();
+        T visitFxSettlementGainLoss();
+
+        T visitSettlementRoundingVariance();
+
+        T visitPspPayoutSettlement();
+
+        T visitPspPayoutDeposit();
+
+        T visitPspPayoutReceivable();
+
+        T visitPspPayoutReceivableClearing();
+
+        T visitPayoutUnreconciledClearing();
+
+        T visitPspCurrencyConversionOutgoing();
+
+        T visitPspCurrencyConversionIncoming();
+
+        T visitPspCurrencyConversionReceivable();
+
+        T visitPspCurrencyConversionReceivableClearing();
+
+        T visitPspFxAdjustment();
+
+        T visitRefundSettlement();
+
+        T visitRefundSettlementReversal();
+
+        T visitRefundPayableClearing();
+
+        T visitRefundPayableReversal();
+
+        T visitRefundUnreconciledClearing();
+
+        T visitRefundUnreconciledReversal();
+
+        T visitPspAccountDebit();
+
+        T visitPaymentRefundFee();
+
+        T visitDisputeSettlement();
+
+        T visitDisputeSettlementReversal();
+
+        T visitDisputePayableClearing();
+
+        T visitDisputePayableReversal();
+
+        T visitDisputeUnreconciledClearing();
+
+        T visitDisputeUnreconciledReversal();
+
+        T visitPspReserveHold();
+
+        T visitPspReserveRelease();
+
+        T visitPspDisputeFee();
+
+        T visitPspDisputeAlertFee();
+
+        T visitPspRefundFee();
+
+        T visitPspAccountUpdaterFee();
+
+        T visitPspAdjustedProcessingFee();
+
+        T visitPspAuthenticationFee();
+
+        T visitPspCommissionFee();
+
+        T visitPspFixedFee();
+
+        T visitPspGatewayFee();
+
+        T visitPspInterchangeFee();
+
+        T visitPspInvoiceTaxFee();
+
+        T visitPspMarkupFee();
+
+        T visitPspNetworkTokenFee();
+
+        T visitPspOptimizationFee();
+
+        T visitPspPaymentMethodFee();
+
+        T visitPspPayoutFee();
+
+        T visitPspProcessingFee();
+
+        T visitPspRiskFee();
+
+        T visitPspSchemeFee();
+
+        T visitPspVariableFee();
+
+        T visitPspBillingFee();
+
+        T visitPspTaxServiceFee();
+
+        T visitPspConnectFee();
+
+        T visitExternalAccountConnectionFee();
+
+        T visitPspExternalAccountConnectionFee();
+
+        T visitPspInvoicingFee();
+
+        T visitPspTerminalFee();
+
+        T visitTreasuryFee();
+
+        T visitPspTreasuryFee();
+
+        T visitAcceleratedSettlementFee();
+
+        T visitPspAcceleratedSettlementFee();
+
+        T visitPspReceivablePooled();
+
+        T visitPspPoolSettlement();
+
+        T visitPspPoolClearing();
+
+        T visitPspPoolRefundSettlement();
+
+        T visitPspPoolRefundClearing();
+
+        T visitPspCorrection();
+
+        T visitPspPayinSettlement();
+
+        T visitPspPayinClearing();
+
+        T visitPspBankPullSettlement();
+
+        T visitPspBankPullClearing();
+
+        T visitPspPoolDisputeSettlement();
+
+        T visitPspPayoutConsolidation();
+
+        T visitPspWithholdingTax();
+
+        T visitPspPayoutSettlementReversal();
+
+        T visitPspTransferSettlement();
+
+        T visitPspTransferSettlementReversal();
+
+        T visitPspCollectionSettlement();
+
+        T visitPayoutSubsidy();
+
+        T visitWithdrawalTopupAdjustment();
+
+        T visitWithdrawalPayableClearing();
+
+        T visitWithdrawalPayableClearingReversal();
+
+        T visitIdentityVerificationFee();
+
+        T visitPspIdentityVerificationFee();
+
+        T visitTaxFilingFee();
+
+        T visitPspTaxFilingFee();
+
+        T visitPspServiceFee();
+
+        T visitRecipientWalletLoad();
+
+        T visitPspRecipientWalletLoad();
+
+        T visitDisputeManagementFee();
+
+        T visitPspDisputeManagementFee();
+
+        T visitPspClawbackSettlement();
+
+        T visitPspClawbackSettlementReversal();
+
+        T visitClawbackReceivableSettlement();
+
+        T visitClawbackReceivableSettlementReversal();
+
+        T visitClawbackFee();
+
+        T visitPspClawbackFee();
+
+        T visitDeposit();
+
+        T visitWalletTransferIncoming();
+
+        T visitWalletTransferOutgoing();
+
+        T visitSwapSource();
+
+        T visitSwapTarget();
 
         T visitUnknown(String unknownType);
     }

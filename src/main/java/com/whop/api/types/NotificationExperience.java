@@ -157,7 +157,6 @@ public final class NotificationExperience {
 
         private Optional<NotificationExperienceApp> app = Optional.empty();
 
-        @JsonAnySetter
         private Map<String, Object> additionalProperties = new HashMap<>();
 
         private Builder() {}
@@ -171,7 +170,6 @@ public final class NotificationExperience {
         }
 
         /**
-         * <p>Experience ID, prefixed <code>exp_</code>.</p>
          * <p>Experience ID, prefixed <code>exp_</code>.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
@@ -257,6 +255,14 @@ public final class NotificationExperience {
         @java.lang.Override
         public NotificationExperience build() {
             return new NotificationExperience(app, id, name, additionalProperties);
+        }
+
+        @JsonAnySetter
+        private void putAdditionalPropertyFromJson(String key, Object value) {
+            if (key.equalsIgnoreCase("app") || key.equalsIgnoreCase("id") || key.equalsIgnoreCase("name")) {
+                return;
+            }
+            this.additionalProperties.put(key, value);
         }
 
         @java.lang.Override

@@ -22,19 +22,13 @@ import java.util.Optional;
 public final class DuplicateAdGroupsRequest {
     private final Optional<Integer> count;
 
-    private final Optional<Boolean> preserveEngagement;
-
     private final Optional<String> targetAdCampaignId;
 
     private final Map<String, Object> additionalProperties;
 
     private DuplicateAdGroupsRequest(
-            Optional<Integer> count,
-            Optional<Boolean> preserveEngagement,
-            Optional<String> targetAdCampaignId,
-            Map<String, Object> additionalProperties) {
+            Optional<Integer> count, Optional<String> targetAdCampaignId, Map<String, Object> additionalProperties) {
         this.count = count;
-        this.preserveEngagement = preserveEngagement;
         this.targetAdCampaignId = targetAdCampaignId;
         this.additionalProperties = additionalProperties;
     }
@@ -48,15 +42,7 @@ public final class DuplicateAdGroupsRequest {
     }
 
     /**
-     * @return Whether the copied ads keep the original posts' engagement (likes, comments, shares). Defaults to false.
-     */
-    @JsonProperty("preserve_engagement")
-    public Optional<Boolean> getPreserveEngagement() {
-        return preserveEngagement;
-    }
-
-    /**
-     * @return Campaign to duplicate into. Defaults to the ad group's own campaign.
+     * @return Campaign to duplicate into. Must belong to the same account and be compatible with the ad group's targeting and goals. Defaults to the ad group's own campaign.
      */
     @JsonProperty("target_ad_campaign_id")
     public Optional<String> getTargetAdCampaignId() {
@@ -75,14 +61,12 @@ public final class DuplicateAdGroupsRequest {
     }
 
     private boolean equalTo(DuplicateAdGroupsRequest other) {
-        return count.equals(other.count)
-                && preserveEngagement.equals(other.preserveEngagement)
-                && targetAdCampaignId.equals(other.targetAdCampaignId);
+        return count.equals(other.count) && targetAdCampaignId.equals(other.targetAdCampaignId);
     }
 
     @java.lang.Override
     public int hashCode() {
-        return Objects.hash(this.count, this.preserveEngagement, this.targetAdCampaignId);
+        return Objects.hash(this.count, this.targetAdCampaignId);
     }
 
     @java.lang.Override
@@ -98,18 +82,14 @@ public final class DuplicateAdGroupsRequest {
     public static final class Builder {
         private Optional<Integer> count = Optional.empty();
 
-        private Optional<Boolean> preserveEngagement = Optional.empty();
-
         private Optional<String> targetAdCampaignId = Optional.empty();
 
-        @JsonAnySetter
         private Map<String, Object> additionalProperties = new HashMap<>();
 
         private Builder() {}
 
         public Builder from(DuplicateAdGroupsRequest other) {
             count(other.getCount());
-            preserveEngagement(other.getPreserveEngagement());
             targetAdCampaignId(other.getTargetAdCampaignId());
             return this;
         }
@@ -129,21 +109,7 @@ public final class DuplicateAdGroupsRequest {
         }
 
         /**
-         * <p>Whether the copied ads keep the original posts' engagement (likes, comments, shares). Defaults to false.</p>
-         */
-        @JsonSetter(value = "preserve_engagement", nulls = Nulls.SKIP)
-        public Builder preserveEngagement(Optional<Boolean> preserveEngagement) {
-            this.preserveEngagement = preserveEngagement;
-            return this;
-        }
-
-        public Builder preserveEngagement(Boolean preserveEngagement) {
-            this.preserveEngagement = Optional.ofNullable(preserveEngagement);
-            return this;
-        }
-
-        /**
-         * <p>Campaign to duplicate into. Defaults to the ad group's own campaign.</p>
+         * <p>Campaign to duplicate into. Must belong to the same account and be compatible with the ad group's targeting and goals. Defaults to the ad group's own campaign.</p>
          */
         @JsonSetter(value = "target_ad_campaign_id", nulls = Nulls.SKIP)
         public Builder targetAdCampaignId(Optional<String> targetAdCampaignId) {
@@ -157,7 +123,15 @@ public final class DuplicateAdGroupsRequest {
         }
 
         public DuplicateAdGroupsRequest build() {
-            return new DuplicateAdGroupsRequest(count, preserveEngagement, targetAdCampaignId, additionalProperties);
+            return new DuplicateAdGroupsRequest(count, targetAdCampaignId, additionalProperties);
+        }
+
+        @JsonAnySetter
+        private void putAdditionalPropertyFromJson(String key, Object value) {
+            if (key.equalsIgnoreCase("count") || key.equalsIgnoreCase("target_ad_campaign_id")) {
+                return;
+            }
+            this.additionalProperties.put(key, value);
         }
 
         public Builder additionalProperty(String key, Object value) {

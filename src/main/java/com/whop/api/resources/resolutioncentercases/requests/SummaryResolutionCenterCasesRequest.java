@@ -192,7 +192,6 @@ public final class SummaryResolutionCenterCasesRequest {
 
         private Optional<String> createdAfter = Optional.empty();
 
-        @JsonAnySetter
         private Map<String, Object> additionalProperties = new HashMap<>();
 
         private Builder() {}
@@ -352,6 +351,21 @@ public final class SummaryResolutionCenterCasesRequest {
                     createdBefore,
                     createdAfter,
                     additionalProperties);
+        }
+
+        @JsonAnySetter
+        private void putAdditionalPropertyFromJson(String key, Object value) {
+            if (key.equalsIgnoreCase("groups")
+                    || key.equalsIgnoreCase("status")
+                    || key.equalsIgnoreCase("reason")
+                    || key.equalsIgnoreCase("outcome")
+                    || key.equalsIgnoreCase("account_id")
+                    || key.equalsIgnoreCase("user_id")
+                    || key.equalsIgnoreCase("created_before")
+                    || key.equalsIgnoreCase("created_after")) {
+                return;
+            }
+            this.additionalProperties.put(key, value);
         }
 
         public Builder additionalProperty(String key, Object value) {

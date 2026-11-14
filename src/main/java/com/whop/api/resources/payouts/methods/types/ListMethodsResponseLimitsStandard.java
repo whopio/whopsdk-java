@@ -5,26 +5,63 @@ package com.whop.api.resources.payouts.methods.types;
 
 import com.fasterxml.jackson.annotation.JsonAnyGetter;
 import com.fasterxml.jackson.annotation.JsonAnySetter;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonSetter;
+import com.fasterxml.jackson.annotation.Nulls;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
+import com.whop.api.core.Nullable;
+import com.whop.api.core.NullableNonemptyFilter;
 import com.whop.api.core.ObjectMappers;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
+import java.util.Optional;
 
 @JsonInclude(JsonInclude.Include.NON_ABSENT)
 @JsonDeserialize(builder = ListMethodsResponseLimitsStandard.Builder.class)
 public final class ListMethodsResponseLimitsStandard {
+    private final Optional<ListMethodsResponseLimitsStandardErrorCode> errorCode;
+
+    private final Optional<String> errorMessage;
+
     private final float maxAmount;
 
     private final Map<String, Object> additionalProperties;
 
-    private ListMethodsResponseLimitsStandard(float maxAmount, Map<String, Object> additionalProperties) {
+    private ListMethodsResponseLimitsStandard(
+            Optional<ListMethodsResponseLimitsStandardErrorCode> errorCode,
+            Optional<String> errorMessage,
+            float maxAmount,
+            Map<String, Object> additionalProperties) {
+        this.errorCode = errorCode;
+        this.errorMessage = errorMessage;
         this.maxAmount = maxAmount;
         this.additionalProperties = additionalProperties;
+    }
+
+    /**
+     * @return Why a standard payout cannot move funds right now, or null when the cap is above 0.
+     */
+    @JsonIgnore
+    public Optional<ListMethodsResponseLimitsStandardErrorCode> getErrorCode() {
+        if (errorCode == null) {
+            return Optional.empty();
+        }
+        return errorCode;
+    }
+
+    /**
+     * @return Human-readable form of error_code, or null when a standard payout can move funds.
+     */
+    @JsonIgnore
+    public Optional<String> getErrorMessage() {
+        if (errorMessage == null) {
+            return Optional.empty();
+        }
+        return errorMessage;
     }
 
     /**
@@ -33,6 +70,18 @@ public final class ListMethodsResponseLimitsStandard {
     @JsonProperty("max_amount")
     public float getMaxAmount() {
         return maxAmount;
+    }
+
+    @JsonInclude(value = JsonInclude.Include.CUSTOM, valueFilter = NullableNonemptyFilter.class)
+    @JsonProperty("error_code")
+    private Optional<ListMethodsResponseLimitsStandardErrorCode> _getErrorCode() {
+        return errorCode;
+    }
+
+    @JsonInclude(value = JsonInclude.Include.CUSTOM, valueFilter = NullableNonemptyFilter.class)
+    @JsonProperty("error_message")
+    private Optional<String> _getErrorMessage() {
+        return errorMessage;
     }
 
     @java.lang.Override
@@ -47,12 +96,14 @@ public final class ListMethodsResponseLimitsStandard {
     }
 
     private boolean equalTo(ListMethodsResponseLimitsStandard other) {
-        return maxAmount == other.maxAmount;
+        return errorCode.equals(other.errorCode)
+                && errorMessage.equals(other.errorMessage)
+                && maxAmount == other.maxAmount;
     }
 
     @java.lang.Override
     public int hashCode() {
-        return Objects.hash(this.maxAmount);
+        return Objects.hash(this.errorCode, this.errorMessage, this.maxAmount);
     }
 
     @java.lang.Override
@@ -79,25 +130,47 @@ public final class ListMethodsResponseLimitsStandard {
         _FinalStage additionalProperty(String key, Object value);
 
         _FinalStage additionalProperties(Map<String, Object> additionalProperties);
+
+        /**
+         * <p>Why a standard payout cannot move funds right now, or null when the cap is above 0.</p>
+         */
+        _FinalStage errorCode(Optional<ListMethodsResponseLimitsStandardErrorCode> errorCode);
+
+        _FinalStage errorCode(ListMethodsResponseLimitsStandardErrorCode errorCode);
+
+        _FinalStage errorCode(Nullable<ListMethodsResponseLimitsStandardErrorCode> errorCode);
+
+        /**
+         * <p>Human-readable form of error_code, or null when a standard payout can move funds.</p>
+         */
+        _FinalStage errorMessage(Optional<String> errorMessage);
+
+        _FinalStage errorMessage(String errorMessage);
+
+        _FinalStage errorMessage(Nullable<String> errorMessage);
     }
 
     @JsonIgnoreProperties(ignoreUnknown = true)
     public static final class Builder implements MaxAmountStage, _FinalStage {
         private float maxAmount;
 
-        @JsonAnySetter
+        private Optional<String> errorMessage = Optional.empty();
+
+        private Optional<ListMethodsResponseLimitsStandardErrorCode> errorCode = Optional.empty();
+
         private Map<String, Object> additionalProperties = new HashMap<>();
 
         private Builder() {}
 
         @java.lang.Override
         public Builder from(ListMethodsResponseLimitsStandard other) {
+            errorCode(other.getErrorCode());
+            errorMessage(other.getErrorMessage());
             maxAmount(other.getMaxAmount());
             return this;
         }
 
         /**
-         * <p>The maximum amount a standard payout can move right now, in whole currency units.</p>
          * <p>The maximum amount a standard payout can move right now, in whole currency units.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
@@ -108,9 +181,91 @@ public final class ListMethodsResponseLimitsStandard {
             return this;
         }
 
+        /**
+         * <p>Human-readable form of error_code, or null when a standard payout can move funds.</p>
+         * @return Reference to {@code this} so that method calls can be chained together.
+         */
+        @java.lang.Override
+        public _FinalStage errorMessage(Nullable<String> errorMessage) {
+            if (errorMessage.isNull()) {
+                this.errorMessage = null;
+            } else if (errorMessage.isEmpty()) {
+                this.errorMessage = Optional.empty();
+            } else {
+                this.errorMessage = Optional.of(errorMessage.get());
+            }
+            return this;
+        }
+
+        /**
+         * <p>Human-readable form of error_code, or null when a standard payout can move funds.</p>
+         * @return Reference to {@code this} so that method calls can be chained together.
+         */
+        @java.lang.Override
+        public _FinalStage errorMessage(String errorMessage) {
+            this.errorMessage = Optional.ofNullable(errorMessage);
+            return this;
+        }
+
+        /**
+         * <p>Human-readable form of error_code, or null when a standard payout can move funds.</p>
+         */
+        @java.lang.Override
+        @JsonSetter(value = "error_message", nulls = Nulls.SKIP)
+        public _FinalStage errorMessage(Optional<String> errorMessage) {
+            this.errorMessage = errorMessage;
+            return this;
+        }
+
+        /**
+         * <p>Why a standard payout cannot move funds right now, or null when the cap is above 0.</p>
+         * @return Reference to {@code this} so that method calls can be chained together.
+         */
+        @java.lang.Override
+        public _FinalStage errorCode(Nullable<ListMethodsResponseLimitsStandardErrorCode> errorCode) {
+            if (errorCode.isNull()) {
+                this.errorCode = null;
+            } else if (errorCode.isEmpty()) {
+                this.errorCode = Optional.empty();
+            } else {
+                this.errorCode = Optional.of(errorCode.get());
+            }
+            return this;
+        }
+
+        /**
+         * <p>Why a standard payout cannot move funds right now, or null when the cap is above 0.</p>
+         * @return Reference to {@code this} so that method calls can be chained together.
+         */
+        @java.lang.Override
+        public _FinalStage errorCode(ListMethodsResponseLimitsStandardErrorCode errorCode) {
+            this.errorCode = Optional.ofNullable(errorCode);
+            return this;
+        }
+
+        /**
+         * <p>Why a standard payout cannot move funds right now, or null when the cap is above 0.</p>
+         */
+        @java.lang.Override
+        @JsonSetter(value = "error_code", nulls = Nulls.SKIP)
+        public _FinalStage errorCode(Optional<ListMethodsResponseLimitsStandardErrorCode> errorCode) {
+            this.errorCode = errorCode;
+            return this;
+        }
+
         @java.lang.Override
         public ListMethodsResponseLimitsStandard build() {
-            return new ListMethodsResponseLimitsStandard(maxAmount, additionalProperties);
+            return new ListMethodsResponseLimitsStandard(errorCode, errorMessage, maxAmount, additionalProperties);
+        }
+
+        @JsonAnySetter
+        private void putAdditionalPropertyFromJson(String key, Object value) {
+            if (key.equalsIgnoreCase("error_code")
+                    || key.equalsIgnoreCase("error_message")
+                    || key.equalsIgnoreCase("max_amount")) {
+                return;
+            }
+            this.additionalProperties.put(key, value);
         }
 
         @java.lang.Override

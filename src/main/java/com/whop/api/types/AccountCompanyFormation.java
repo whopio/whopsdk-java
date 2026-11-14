@@ -155,7 +155,6 @@ public final class AccountCompanyFormation {
 
         private Optional<AccountCompanyFormationStatus> status = Optional.empty();
 
-        @JsonAnySetter
         private Map<String, Object> additionalProperties = new HashMap<>();
 
         private Builder() {}
@@ -262,6 +261,19 @@ public final class AccountCompanyFormation {
         public AccountCompanyFormation build() {
             return new AccountCompanyFormation(
                     documents, einRegistered, legalName, signatures, stateRegistered, status, additionalProperties);
+        }
+
+        @JsonAnySetter
+        private void putAdditionalPropertyFromJson(String key, Object value) {
+            if (key.equalsIgnoreCase("documents")
+                    || key.equalsIgnoreCase("ein_registered")
+                    || key.equalsIgnoreCase("legal_name")
+                    || key.equalsIgnoreCase("signatures")
+                    || key.equalsIgnoreCase("state_registered")
+                    || key.equalsIgnoreCase("status")) {
+                return;
+            }
+            this.additionalProperties.put(key, value);
         }
 
         public Builder additionalProperty(String key, Object value) {

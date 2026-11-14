@@ -8,6 +8,7 @@ import com.whop.api.core.ClientOptions;
 import com.whop.api.core.ObjectMappers;
 import com.whop.api.core.QueryStringMapper;
 import com.whop.api.core.RequestOptions;
+import com.whop.api.core.RetryInterceptor;
 import com.whop.api.core.WhopApiApiException;
 import com.whop.api.core.WhopApiException;
 import com.whop.api.core.WhopApiHttpResponse;
@@ -37,14 +38,14 @@ public class RawSupportedMethodsClient {
     }
 
     /**
-     * Lists the payout methods an account or user is eligible to add.
+     * Lists the payout methods an account or user is eligible to add. Pass a result's ID as <code>supported_payout_method_id</code> to <code>POST /payouts/methods</code> to save one.
      */
     public WhopApiHttpResponse<SyncPagingIterable<ListSupportedMethodsResponseDataItem>> list() {
         return list(ListSupportedMethodsRequest.builder().build());
     }
 
     /**
-     * Lists the payout methods an account or user is eligible to add.
+     * Lists the payout methods an account or user is eligible to add. Pass a result's ID as <code>supported_payout_method_id</code> to <code>POST /payouts/methods</code> to save one.
      */
     public WhopApiHttpResponse<SyncPagingIterable<ListSupportedMethodsResponseDataItem>> list(
             RequestOptions requestOptions) {
@@ -52,7 +53,7 @@ public class RawSupportedMethodsClient {
     }
 
     /**
-     * Lists the payout methods an account or user is eligible to add.
+     * Lists the payout methods an account or user is eligible to add. Pass a result's ID as <code>supported_payout_method_id</code> to <code>POST /payouts/methods</code> to save one.
      */
     public WhopApiHttpResponse<SyncPagingIterable<ListSupportedMethodsResponseDataItem>> list(
             ListSupportedMethodsRequest request) {
@@ -60,11 +61,11 @@ public class RawSupportedMethodsClient {
     }
 
     /**
-     * Lists the payout methods an account or user is eligible to add.
+     * Lists the payout methods an account or user is eligible to add. Pass a result's ID as <code>supported_payout_method_id</code> to <code>POST /payouts/methods</code> to save one.
      */
     public WhopApiHttpResponse<SyncPagingIterable<ListSupportedMethodsResponseDataItem>> list(
             ListSupportedMethodsRequest request, RequestOptions requestOptions) {
-        HttpUrl.Builder httpUrl = HttpUrl.parse(this.clientOptions.environment().getUrl())
+        HttpUrl.Builder httpUrl = HttpUrl.parse(this.clientOptions.environment().getApiURL())
                 .newBuilder()
                 .addPathSegments("payouts/supported_methods");
         if (request.getAccountId().isPresent()) {
@@ -101,6 +102,17 @@ public class RawSupportedMethodsClient {
                     request.getDestinationCurrency().get(),
                     false);
         }
+        if (request.getPartyType().isPresent()) {
+            QueryStringMapper.addQueryParameter(
+                    httpUrl, "party_type", request.getPartyType().get(), false);
+        }
+        if (request.getIncludeIndividualBanks().isPresent()) {
+            QueryStringMapper.addQueryParameter(
+                    httpUrl,
+                    "include_individual_banks",
+                    request.getIncludeIndividualBanks().get(),
+                    false);
+        }
         if (request.getFirst().isPresent()) {
             QueryStringMapper.addQueryParameter(
                     httpUrl, "first", request.getFirst().get(), false);
@@ -132,6 +144,15 @@ public class RawSupportedMethodsClient {
         if (requestOptions != null && requestOptions.getTimeout().isPresent()) {
             client = clientOptions.httpClientWithTimeout(requestOptions);
         }
+        if (requestOptions != null && requestOptions.getMaxRetries().isPresent()) {
+            okhttpRequest = okhttpRequest
+                    .newBuilder()
+                    .tag(
+                            RetryInterceptor.MaxRetriesOverride.class,
+                            new RetryInterceptor.MaxRetriesOverride(
+                                    requestOptions.getMaxRetries().get()))
+                    .build();
+        }
         try (Response response = client.newCall(okhttpRequest).execute()) {
             ResponseBody responseBody = response.body();
             String responseBodyString = responseBody != null ? responseBody.string() : "{}";
@@ -146,8 +167,11 @@ public class RawSupportedMethodsClient {
                 List<ListSupportedMethodsResponseDataItem> result = parsedResponse.getData();
                 return new WhopApiHttpResponse<>(
                         new SyncPagingIterable<ListSupportedMethodsResponseDataItem>(
-                                startingAfter != null, result, parsedResponse, () -> list(nextRequest, requestOptions)
-                                        .body()),
+                                startingAfter.isPresent()
+                                        && !startingAfter.get().isEmpty(),
+                                result,
+                                parsedResponse,
+                                () -> list(nextRequest, requestOptions).body()),
                         response);
             }
             try {
@@ -171,6 +195,8 @@ public class RawSupportedMethodsClient {
             Object errorBody = ObjectMappers.parseErrorBody(responseBodyString);
             throw new WhopApiApiException(
                     "Error with status code " + response.code(), response.code(), errorBody, response);
+        } catch (JsonProcessingException e) {
+            throw new WhopApiException("Failed to deserialize response: " + e.getMessage(), e);
         } catch (IOException e) {
             throw new WhopApiException("Network error executing HTTP request", e);
         }

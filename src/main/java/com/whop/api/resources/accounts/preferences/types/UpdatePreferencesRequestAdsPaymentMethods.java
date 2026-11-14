@@ -106,7 +106,6 @@ public final class UpdatePreferencesRequestAdsPaymentMethods {
 
         private Optional<UpdatePreferencesRequestAdsPaymentMethodsBackup> backup = Optional.empty();
 
-        @JsonAnySetter
         private Map<String, Object> additionalProperties = new HashMap<>();
 
         private Builder() {}
@@ -148,6 +147,14 @@ public final class UpdatePreferencesRequestAdsPaymentMethods {
         @java.lang.Override
         public UpdatePreferencesRequestAdsPaymentMethods build() {
             return new UpdatePreferencesRequestAdsPaymentMethods(backup, primary, additionalProperties);
+        }
+
+        @JsonAnySetter
+        private void putAdditionalPropertyFromJson(String key, Object value) {
+            if (key.equalsIgnoreCase("backup") || key.equalsIgnoreCase("primary")) {
+                return;
+            }
+            this.additionalProperties.put(key, value);
         }
 
         @java.lang.Override

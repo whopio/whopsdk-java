@@ -127,7 +127,6 @@ public final class AccountWallet {
 
         private AccountWalletNetwork network;
 
-        @JsonAnySetter
         private Map<String, Object> additionalProperties = new HashMap<>();
 
         private Builder() {}
@@ -142,7 +141,6 @@ public final class AccountWallet {
 
         /**
          * <p>The on-chain address of the wallet</p>
-         * <p>The on-chain address of the wallet</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
@@ -154,7 +152,6 @@ public final class AccountWallet {
 
         /**
          * <p>Wallet ID, prefixed <code>wallet_</code>.</p>
-         * <p>Wallet ID, prefixed <code>wallet_</code>.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
@@ -165,7 +162,6 @@ public final class AccountWallet {
         }
 
         /**
-         * <p>The blockchain network the wallet lives on</p>
          * <p>The blockchain network the wallet lives on</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
@@ -179,6 +175,14 @@ public final class AccountWallet {
         @java.lang.Override
         public AccountWallet build() {
             return new AccountWallet(address, id, network, additionalProperties);
+        }
+
+        @JsonAnySetter
+        private void putAdditionalPropertyFromJson(String key, Object value) {
+            if (key.equalsIgnoreCase("address") || key.equalsIgnoreCase("id") || key.equalsIgnoreCase("network")) {
+                return;
+            }
+            this.additionalProperties.put(key, value);
         }
 
         @java.lang.Override

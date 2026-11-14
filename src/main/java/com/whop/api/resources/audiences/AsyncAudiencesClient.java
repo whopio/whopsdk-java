@@ -5,6 +5,7 @@ package com.whop.api.resources.audiences;
 
 import com.whop.api.core.ClientOptions;
 import com.whop.api.core.RequestOptions;
+import com.whop.api.core.WhopApiHttpResponse;
 import com.whop.api.core.pagination.SyncPagingIterable;
 import com.whop.api.resources.audiences.requests.AddPeopleAudiencesRequest;
 import com.whop.api.resources.audiences.requests.CreateAudiencesRequest;
@@ -34,54 +35,106 @@ public class AsyncAudiencesClient {
     }
 
     /**
-     * Lists uploaded customer-list audiences for an account. Pass <code>audience_id</code> to return a specific audience.
+     * Lists an account's custom and lookalike audiences.
      */
     public CompletableFuture<SyncPagingIterable<Audience>> list(ListAudiencesRequest request) {
-        return this.rawClient.list(request).thenApply(response -> response.body());
+        CompletableFuture<WhopApiHttpResponse<SyncPagingIterable<Audience>>> rawFuture = this.rawClient.list(request);
+        CompletableFuture<SyncPagingIterable<Audience>> future = rawFuture.thenApply(response -> response.body());
+        future.whenComplete((result_, throwable_) -> {
+            if (future.isCancelled()) {
+                rawFuture.cancel(true);
+            }
+        });
+        return future;
     }
 
     /**
-     * Lists uploaded customer-list audiences for an account. Pass <code>audience_id</code> to return a specific audience.
+     * Lists an account's custom and lookalike audiences.
      */
     public CompletableFuture<SyncPagingIterable<Audience>> list(
             ListAudiencesRequest request, RequestOptions requestOptions) {
-        return this.rawClient.list(request, requestOptions).thenApply(response -> response.body());
+        CompletableFuture<WhopApiHttpResponse<SyncPagingIterable<Audience>>> rawFuture =
+                this.rawClient.list(request, requestOptions);
+        CompletableFuture<SyncPagingIterable<Audience>> future = rawFuture.thenApply(response -> response.body());
+        future.whenComplete((result_, throwable_) -> {
+            if (future.isCancelled()) {
+                rawFuture.cancel(true);
+            }
+        });
+        return future;
     }
 
     /**
-     * Creates an audience. Default (<code>audience_type</code> omitted or <code>custom</code>): creates one audience from an uploaded customer identity CSV file (<code>name</code>, <code>column_mapping</code>, and <code>file_id</code> required) and starts processing it; responds with the audience object. With <code>filters</code>: creates an audience from saved People filters (<code>name</code> required) — membership is built from the account's People data, and <code>auto_refresh</code> decides whether it keeps tracking the filters or keeps whoever matched at creation. With <code>audience_type: lookalike</code>: creates a ladder of Meta lookalike audiences from an existing ready custom audience (<code>source_audience_id</code>, <code>count</code>, and <code>percentage</code> required) — <code>count</code> equal similarity bands slicing the top <code>percentage</code>% (3 audiences at 6% = 0–2%, 2–4%, 4–6%), each returned as its own audience in a <code>{ data: [...] }</code> envelope.
+     * Creates a custom audience from a customer list or your account's Whop People data, or a lookalike audience that reaches people similar to an existing one. Processing runs asynchronously. A custom audience returns one audience; a lookalike returns the requested similarity bands in <code>data</code>.
      */
     public CompletableFuture<CreateAudiencesResponse> create(CreateAudiencesRequest request) {
-        return this.rawClient.create(request).thenApply(response -> response.body());
+        CompletableFuture<WhopApiHttpResponse<CreateAudiencesResponse>> rawFuture = this.rawClient.create(request);
+        CompletableFuture<CreateAudiencesResponse> future = rawFuture.thenApply(response -> response.body());
+        future.whenComplete((result_, throwable_) -> {
+            if (future.isCancelled()) {
+                rawFuture.cancel(true);
+            }
+        });
+        return future;
     }
 
     /**
-     * Creates an audience. Default (<code>audience_type</code> omitted or <code>custom</code>): creates one audience from an uploaded customer identity CSV file (<code>name</code>, <code>column_mapping</code>, and <code>file_id</code> required) and starts processing it; responds with the audience object. With <code>filters</code>: creates an audience from saved People filters (<code>name</code> required) — membership is built from the account's People data, and <code>auto_refresh</code> decides whether it keeps tracking the filters or keeps whoever matched at creation. With <code>audience_type: lookalike</code>: creates a ladder of Meta lookalike audiences from an existing ready custom audience (<code>source_audience_id</code>, <code>count</code>, and <code>percentage</code> required) — <code>count</code> equal similarity bands slicing the top <code>percentage</code>% (3 audiences at 6% = 0–2%, 2–4%, 4–6%), each returned as its own audience in a <code>{ data: [...] }</code> envelope.
+     * Creates a custom audience from a customer list or your account's Whop People data, or a lookalike audience that reaches people similar to an existing one. Processing runs asynchronously. A custom audience returns one audience; a lookalike returns the requested similarity bands in <code>data</code>.
      */
     public CompletableFuture<CreateAudiencesResponse> create(
             CreateAudiencesRequest request, RequestOptions requestOptions) {
-        return this.rawClient.create(request, requestOptions).thenApply(response -> response.body());
+        CompletableFuture<WhopApiHttpResponse<CreateAudiencesResponse>> rawFuture =
+                this.rawClient.create(request, requestOptions);
+        CompletableFuture<CreateAudiencesResponse> future = rawFuture.thenApply(response -> response.body());
+        future.whenComplete((result_, throwable_) -> {
+            if (future.isCancelled()) {
+                rawFuture.cancel(true);
+            }
+        });
+        return future;
     }
 
     /**
      * Deletes an audience so it is no longer available for targeting.
      */
     public CompletableFuture<DeleteAudiencesResponse> delete(String id) {
-        return this.rawClient.delete(id).thenApply(response -> response.body());
+        CompletableFuture<WhopApiHttpResponse<DeleteAudiencesResponse>> rawFuture = this.rawClient.delete(id);
+        CompletableFuture<DeleteAudiencesResponse> future = rawFuture.thenApply(response -> response.body());
+        future.whenComplete((result_, throwable_) -> {
+            if (future.isCancelled()) {
+                rawFuture.cancel(true);
+            }
+        });
+        return future;
     }
 
     /**
      * Deletes an audience so it is no longer available for targeting.
      */
     public CompletableFuture<DeleteAudiencesResponse> delete(String id, RequestOptions requestOptions) {
-        return this.rawClient.delete(id, requestOptions).thenApply(response -> response.body());
+        CompletableFuture<WhopApiHttpResponse<DeleteAudiencesResponse>> rawFuture =
+                this.rawClient.delete(id, requestOptions);
+        CompletableFuture<DeleteAudiencesResponse> future = rawFuture.thenApply(response -> response.body());
+        future.whenComplete((result_, throwable_) -> {
+            if (future.isCancelled()) {
+                rawFuture.cancel(true);
+            }
+        });
+        return future;
     }
 
     /**
      * Deletes an audience so it is no longer available for targeting.
      */
     public CompletableFuture<DeleteAudiencesResponse> delete(String id, DeleteAudiencesRequest request) {
-        return this.rawClient.delete(id, request).thenApply(response -> response.body());
+        CompletableFuture<WhopApiHttpResponse<DeleteAudiencesResponse>> rawFuture = this.rawClient.delete(id, request);
+        CompletableFuture<DeleteAudiencesResponse> future = rawFuture.thenApply(response -> response.body());
+        future.whenComplete((result_, throwable_) -> {
+            if (future.isCancelled()) {
+                rawFuture.cancel(true);
+            }
+        });
+        return future;
     }
 
     /**
@@ -89,28 +142,57 @@ public class AsyncAudiencesClient {
      */
     public CompletableFuture<DeleteAudiencesResponse> delete(
             String id, DeleteAudiencesRequest request, RequestOptions requestOptions) {
-        return this.rawClient.delete(id, request, requestOptions).thenApply(response -> response.body());
+        CompletableFuture<WhopApiHttpResponse<DeleteAudiencesResponse>> rawFuture =
+                this.rawClient.delete(id, request, requestOptions);
+        CompletableFuture<DeleteAudiencesResponse> future = rawFuture.thenApply(response -> response.body());
+        future.whenComplete((result_, throwable_) -> {
+            if (future.isCancelled()) {
+                rawFuture.cancel(true);
+            }
+        });
+        return future;
     }
 
     /**
      * Renames an audience. For an audience built from People filters that keeps itself up to date, pass <code>filters</code> to replace them, which rebuilds membership immediately. Whether an audience auto refreshes is set when it is created.
      */
     public CompletableFuture<Audience> update(String id) {
-        return this.rawClient.update(id).thenApply(response -> response.body());
+        CompletableFuture<WhopApiHttpResponse<Audience>> rawFuture = this.rawClient.update(id);
+        CompletableFuture<Audience> future = rawFuture.thenApply(response -> response.body());
+        future.whenComplete((result_, throwable_) -> {
+            if (future.isCancelled()) {
+                rawFuture.cancel(true);
+            }
+        });
+        return future;
     }
 
     /**
      * Renames an audience. For an audience built from People filters that keeps itself up to date, pass <code>filters</code> to replace them, which rebuilds membership immediately. Whether an audience auto refreshes is set when it is created.
      */
     public CompletableFuture<Audience> update(String id, RequestOptions requestOptions) {
-        return this.rawClient.update(id, requestOptions).thenApply(response -> response.body());
+        CompletableFuture<WhopApiHttpResponse<Audience>> rawFuture = this.rawClient.update(id, requestOptions);
+        CompletableFuture<Audience> future = rawFuture.thenApply(response -> response.body());
+        future.whenComplete((result_, throwable_) -> {
+            if (future.isCancelled()) {
+                rawFuture.cancel(true);
+            }
+        });
+        return future;
     }
 
     /**
      * Renames an audience. For an audience built from People filters that keeps itself up to date, pass <code>filters</code> to replace them, which rebuilds membership immediately. Whether an audience auto refreshes is set when it is created.
      */
     public CompletableFuture<Audience> update(String id, UpdateAudiencesRequest request) {
-        return this.rawClient.update(id, request).thenApply(response -> response.body());
+        CompletableFuture<WhopApiHttpResponse<Audience>> rawFuture = this.rawClient.update(id, request);
+        CompletableFuture<Audience> future = rawFuture.thenApply(response -> response.body());
+        future.whenComplete((result_, throwable_) -> {
+            if (future.isCancelled()) {
+                rawFuture.cancel(true);
+            }
+        });
+        return future;
     }
 
     /**
@@ -118,14 +200,28 @@ public class AsyncAudiencesClient {
      */
     public CompletableFuture<Audience> update(
             String id, UpdateAudiencesRequest request, RequestOptions requestOptions) {
-        return this.rawClient.update(id, request, requestOptions).thenApply(response -> response.body());
+        CompletableFuture<WhopApiHttpResponse<Audience>> rawFuture = this.rawClient.update(id, request, requestOptions);
+        CompletableFuture<Audience> future = rawFuture.thenApply(response -> response.body());
+        future.whenComplete((result_, throwable_) -> {
+            if (future.isCancelled()) {
+                rawFuture.cancel(true);
+            }
+        });
+        return future;
     }
 
     /**
      * Adds users from a new CSV file to an existing uploaded custom audience. The file uses the audience's saved column mapping, processing happens in the background, and existing audience members remain unchanged.
      */
     public CompletableFuture<Audience> addPeople(String id, AddPeopleAudiencesRequest request) {
-        return this.rawClient.addPeople(id, request).thenApply(response -> response.body());
+        CompletableFuture<WhopApiHttpResponse<Audience>> rawFuture = this.rawClient.addPeople(id, request);
+        CompletableFuture<Audience> future = rawFuture.thenApply(response -> response.body());
+        future.whenComplete((result_, throwable_) -> {
+            if (future.isCancelled()) {
+                rawFuture.cancel(true);
+            }
+        });
+        return future;
     }
 
     /**
@@ -133,6 +229,14 @@ public class AsyncAudiencesClient {
      */
     public CompletableFuture<Audience> addPeople(
             String id, AddPeopleAudiencesRequest request, RequestOptions requestOptions) {
-        return this.rawClient.addPeople(id, request, requestOptions).thenApply(response -> response.body());
+        CompletableFuture<WhopApiHttpResponse<Audience>> rawFuture =
+                this.rawClient.addPeople(id, request, requestOptions);
+        CompletableFuture<Audience> future = rawFuture.thenApply(response -> response.body());
+        future.whenComplete((result_, throwable_) -> {
+            if (future.isCancelled()) {
+                rawFuture.cancel(true);
+            }
+        });
+        return future;
     }
 }

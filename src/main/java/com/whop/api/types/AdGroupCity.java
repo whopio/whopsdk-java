@@ -34,7 +34,7 @@ public final class AdGroupCity {
     }
 
     /**
-     * @return The ad platform's key for the city in its location taxonomy.
+     * @return The city's key in the location taxonomy.
      */
     @JsonProperty("key")
     public String getKey() {
@@ -42,7 +42,7 @@ public final class AdGroupCity {
     }
 
     /**
-     * @return City name, such as <code>Austin</code>. Absent when the platform doesn't return one.
+     * @return City name, such as <code>Austin</code>. Absent when the location taxonomy has none.
      */
     @JsonProperty("name")
     public Optional<String> getName() {
@@ -80,7 +80,7 @@ public final class AdGroupCity {
 
     public interface KeyStage {
         /**
-         * <p>The ad platform's key for the city in its location taxonomy.</p>
+         * <p>The city's key in the location taxonomy.</p>
          */
         _FinalStage key(@NotNull String key);
 
@@ -95,7 +95,7 @@ public final class AdGroupCity {
         _FinalStage additionalProperties(Map<String, Object> additionalProperties);
 
         /**
-         * <p>City name, such as <code>Austin</code>. Absent when the platform doesn't return one.</p>
+         * <p>City name, such as <code>Austin</code>. Absent when the location taxonomy has none.</p>
          */
         _FinalStage name(Optional<String> name);
 
@@ -108,7 +108,6 @@ public final class AdGroupCity {
 
         private Optional<String> name = Optional.empty();
 
-        @JsonAnySetter
         private Map<String, Object> additionalProperties = new HashMap<>();
 
         private Builder() {}
@@ -121,8 +120,7 @@ public final class AdGroupCity {
         }
 
         /**
-         * <p>The ad platform's key for the city in its location taxonomy.</p>
-         * <p>The ad platform's key for the city in its location taxonomy.</p>
+         * <p>The city's key in the location taxonomy.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
@@ -133,7 +131,7 @@ public final class AdGroupCity {
         }
 
         /**
-         * <p>City name, such as <code>Austin</code>. Absent when the platform doesn't return one.</p>
+         * <p>City name, such as <code>Austin</code>. Absent when the location taxonomy has none.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
@@ -143,7 +141,7 @@ public final class AdGroupCity {
         }
 
         /**
-         * <p>City name, such as <code>Austin</code>. Absent when the platform doesn't return one.</p>
+         * <p>City name, such as <code>Austin</code>. Absent when the location taxonomy has none.</p>
          */
         @java.lang.Override
         @JsonSetter(value = "name", nulls = Nulls.SKIP)
@@ -155,6 +153,14 @@ public final class AdGroupCity {
         @java.lang.Override
         public AdGroupCity build() {
             return new AdGroupCity(key, name, additionalProperties);
+        }
+
+        @JsonAnySetter
+        private void putAdditionalPropertyFromJson(String key, Object value) {
+            if (key.equalsIgnoreCase("key") || key.equalsIgnoreCase("name")) {
+                return;
+            }
+            this.additionalProperties.put(key, value);
         }
 
         @java.lang.Override

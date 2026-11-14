@@ -155,7 +155,6 @@ public final class NotificationTopicSummary {
 
         private NotificationTopicSummaryTopicType topicType;
 
-        @JsonAnySetter
         private Map<String, Object> additionalProperties = new HashMap<>();
 
         private Builder() {}
@@ -171,7 +170,6 @@ public final class NotificationTopicSummary {
 
         /**
          * <p>Whether notifications for this topic are enabled by default when the user has not set a preference.</p>
-         * <p>Whether notifications for this topic are enabled by default when the user has not set a preference.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
@@ -182,7 +180,6 @@ public final class NotificationTopicSummary {
         }
 
         /**
-         * <p>Notification topic ID, prefixed <code>topic_</code>.</p>
          * <p>Notification topic ID, prefixed <code>topic_</code>.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
@@ -195,7 +192,6 @@ public final class NotificationTopicSummary {
 
         /**
          * <p>Whether this topic exclusively handles mention-based notifications.</p>
-         * <p>Whether this topic exclusively handles mention-based notifications.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
@@ -206,7 +202,6 @@ public final class NotificationTopicSummary {
         }
 
         /**
-         * <p>Scope of the topic: whether it applies to an account, a user, or an account's team.</p>
          * <p>Scope of the topic: whether it applies to an account, a user, or an account's team.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
@@ -220,6 +215,17 @@ public final class NotificationTopicSummary {
         @java.lang.Override
         public NotificationTopicSummary build() {
             return new NotificationTopicSummary(defaultPreferenceValue, id, isMention, topicType, additionalProperties);
+        }
+
+        @JsonAnySetter
+        private void putAdditionalPropertyFromJson(String key, Object value) {
+            if (key.equalsIgnoreCase("default_preference_value")
+                    || key.equalsIgnoreCase("id")
+                    || key.equalsIgnoreCase("is_mention")
+                    || key.equalsIgnoreCase("topic_type")) {
+                return;
+            }
+            this.additionalProperties.put(key, value);
         }
 
         @java.lang.Override

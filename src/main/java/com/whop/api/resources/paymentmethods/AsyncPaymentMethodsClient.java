@@ -5,6 +5,7 @@ package com.whop.api.resources.paymentmethods;
 
 import com.whop.api.core.ClientOptions;
 import com.whop.api.core.RequestOptions;
+import com.whop.api.core.WhopApiHttpResponse;
 import com.whop.api.core.pagination.SyncPagingIterable;
 import com.whop.api.resources.paymentmethods.requests.DeletePaymentMethodRequest;
 import com.whop.api.resources.paymentmethods.requests.ListPaymentMethodsRequest;
@@ -31,40 +32,67 @@ public class AsyncPaymentMethodsClient {
     }
 
     /**
-     * Returns a paginated list of payment methods for a member or company, or for the authenticated user when neither is given, with optional filtering by creation date. A payment method is a stored representation of how a customer intends to pay, such as a card, bank account, or digital wallet.
+     * Returns a paginated list of saved payment methods for a member or account, or for the authenticated user when you pass neither.
      * <p>Required permissions:</p>
      * <ul>
      * <li><code>member:payment_methods:read</code></li>
      * </ul>
      */
     public CompletableFuture<SyncPagingIterable<PaymentMethodListItem>> list() {
-        return this.rawClient.list().thenApply(response -> response.body());
+        CompletableFuture<WhopApiHttpResponse<SyncPagingIterable<PaymentMethodListItem>>> rawFuture =
+                this.rawClient.list();
+        CompletableFuture<SyncPagingIterable<PaymentMethodListItem>> future =
+                rawFuture.thenApply(response -> response.body());
+        future.whenComplete((result_, throwable_) -> {
+            if (future.isCancelled()) {
+                rawFuture.cancel(true);
+            }
+        });
+        return future;
     }
 
     /**
-     * Returns a paginated list of payment methods for a member or company, or for the authenticated user when neither is given, with optional filtering by creation date. A payment method is a stored representation of how a customer intends to pay, such as a card, bank account, or digital wallet.
+     * Returns a paginated list of saved payment methods for a member or account, or for the authenticated user when you pass neither.
      * <p>Required permissions:</p>
      * <ul>
      * <li><code>member:payment_methods:read</code></li>
      * </ul>
      */
     public CompletableFuture<SyncPagingIterable<PaymentMethodListItem>> list(RequestOptions requestOptions) {
-        return this.rawClient.list(requestOptions).thenApply(response -> response.body());
+        CompletableFuture<WhopApiHttpResponse<SyncPagingIterable<PaymentMethodListItem>>> rawFuture =
+                this.rawClient.list(requestOptions);
+        CompletableFuture<SyncPagingIterable<PaymentMethodListItem>> future =
+                rawFuture.thenApply(response -> response.body());
+        future.whenComplete((result_, throwable_) -> {
+            if (future.isCancelled()) {
+                rawFuture.cancel(true);
+            }
+        });
+        return future;
     }
 
     /**
-     * Returns a paginated list of payment methods for a member or company, or for the authenticated user when neither is given, with optional filtering by creation date. A payment method is a stored representation of how a customer intends to pay, such as a card, bank account, or digital wallet.
+     * Returns a paginated list of saved payment methods for a member or account, or for the authenticated user when you pass neither.
      * <p>Required permissions:</p>
      * <ul>
      * <li><code>member:payment_methods:read</code></li>
      * </ul>
      */
     public CompletableFuture<SyncPagingIterable<PaymentMethodListItem>> list(ListPaymentMethodsRequest request) {
-        return this.rawClient.list(request).thenApply(response -> response.body());
+        CompletableFuture<WhopApiHttpResponse<SyncPagingIterable<PaymentMethodListItem>>> rawFuture =
+                this.rawClient.list(request);
+        CompletableFuture<SyncPagingIterable<PaymentMethodListItem>> future =
+                rawFuture.thenApply(response -> response.body());
+        future.whenComplete((result_, throwable_) -> {
+            if (future.isCancelled()) {
+                rawFuture.cancel(true);
+            }
+        });
+        return future;
     }
 
     /**
-     * Returns a paginated list of payment methods for a member or company, or for the authenticated user when neither is given, with optional filtering by creation date. A payment method is a stored representation of how a customer intends to pay, such as a card, bank account, or digital wallet.
+     * Returns a paginated list of saved payment methods for a member or account, or for the authenticated user when you pass neither.
      * <p>Required permissions:</p>
      * <ul>
      * <li><code>member:payment_methods:read</code></li>
@@ -72,44 +100,74 @@ public class AsyncPaymentMethodsClient {
      */
     public CompletableFuture<SyncPagingIterable<PaymentMethodListItem>> list(
             ListPaymentMethodsRequest request, RequestOptions requestOptions) {
-        return this.rawClient.list(request, requestOptions).thenApply(response -> response.body());
+        CompletableFuture<WhopApiHttpResponse<SyncPagingIterable<PaymentMethodListItem>>> rawFuture =
+                this.rawClient.list(request, requestOptions);
+        CompletableFuture<SyncPagingIterable<PaymentMethodListItem>> future =
+                rawFuture.thenApply(response -> response.body());
+        future.whenComplete((result_, throwable_) -> {
+            if (future.isCancelled()) {
+                rawFuture.cancel(true);
+            }
+        });
+        return future;
     }
 
     /**
-     * Retrieves the details of an existing payment method. Addresses a member's wallet when member_id or company_id is given, otherwise your own.
+     * Retrieves a saved payment method from a member's wallet when you pass <code>member_id</code> or <code>account_id</code>, or from your own otherwise.
      * <p>Required permissions:</p>
      * <ul>
      * <li><code>member:payment_methods:read</code></li>
      * </ul>
      */
     public CompletableFuture<PaymentMethod> retrieve(String id) {
-        return this.rawClient.retrieve(id).thenApply(response -> response.body());
+        CompletableFuture<WhopApiHttpResponse<PaymentMethod>> rawFuture = this.rawClient.retrieve(id);
+        CompletableFuture<PaymentMethod> future = rawFuture.thenApply(response -> response.body());
+        future.whenComplete((result_, throwable_) -> {
+            if (future.isCancelled()) {
+                rawFuture.cancel(true);
+            }
+        });
+        return future;
     }
 
     /**
-     * Retrieves the details of an existing payment method. Addresses a member's wallet when member_id or company_id is given, otherwise your own.
+     * Retrieves a saved payment method from a member's wallet when you pass <code>member_id</code> or <code>account_id</code>, or from your own otherwise.
      * <p>Required permissions:</p>
      * <ul>
      * <li><code>member:payment_methods:read</code></li>
      * </ul>
      */
     public CompletableFuture<PaymentMethod> retrieve(String id, RequestOptions requestOptions) {
-        return this.rawClient.retrieve(id, requestOptions).thenApply(response -> response.body());
+        CompletableFuture<WhopApiHttpResponse<PaymentMethod>> rawFuture = this.rawClient.retrieve(id, requestOptions);
+        CompletableFuture<PaymentMethod> future = rawFuture.thenApply(response -> response.body());
+        future.whenComplete((result_, throwable_) -> {
+            if (future.isCancelled()) {
+                rawFuture.cancel(true);
+            }
+        });
+        return future;
     }
 
     /**
-     * Retrieves the details of an existing payment method. Addresses a member's wallet when member_id or company_id is given, otherwise your own.
+     * Retrieves a saved payment method from a member's wallet when you pass <code>member_id</code> or <code>account_id</code>, or from your own otherwise.
      * <p>Required permissions:</p>
      * <ul>
      * <li><code>member:payment_methods:read</code></li>
      * </ul>
      */
     public CompletableFuture<PaymentMethod> retrieve(String id, RetrievePaymentMethodsRequest request) {
-        return this.rawClient.retrieve(id, request).thenApply(response -> response.body());
+        CompletableFuture<WhopApiHttpResponse<PaymentMethod>> rawFuture = this.rawClient.retrieve(id, request);
+        CompletableFuture<PaymentMethod> future = rawFuture.thenApply(response -> response.body());
+        future.whenComplete((result_, throwable_) -> {
+            if (future.isCancelled()) {
+                rawFuture.cancel(true);
+            }
+        });
+        return future;
     }
 
     /**
-     * Retrieves the details of an existing payment method. Addresses a member's wallet when member_id or company_id is given, otherwise your own.
+     * Retrieves a saved payment method from a member's wallet when you pass <code>member_id</code> or <code>account_id</code>, or from your own otherwise.
      * <p>Required permissions:</p>
      * <ul>
      * <li><code>member:payment_methods:read</code></li>
@@ -117,7 +175,15 @@ public class AsyncPaymentMethodsClient {
      */
     public CompletableFuture<PaymentMethod> retrieve(
             String id, RetrievePaymentMethodsRequest request, RequestOptions requestOptions) {
-        return this.rawClient.retrieve(id, request, requestOptions).thenApply(response -> response.body());
+        CompletableFuture<WhopApiHttpResponse<PaymentMethod>> rawFuture =
+                this.rawClient.retrieve(id, request, requestOptions);
+        CompletableFuture<PaymentMethod> future = rawFuture.thenApply(response -> response.body());
+        future.whenComplete((result_, throwable_) -> {
+            if (future.isCancelled()) {
+                rawFuture.cancel(true);
+            }
+        });
+        return future;
     }
 
     /**
@@ -128,7 +194,14 @@ public class AsyncPaymentMethodsClient {
      * </ul>
      */
     public CompletableFuture<Boolean> deletePaymentMethod(String id) {
-        return this.rawClient.deletePaymentMethod(id).thenApply(response -> response.body());
+        CompletableFuture<WhopApiHttpResponse<Boolean>> rawFuture = this.rawClient.deletePaymentMethod(id);
+        CompletableFuture<Boolean> future = rawFuture.thenApply(response -> response.body());
+        future.whenComplete((result_, throwable_) -> {
+            if (future.isCancelled()) {
+                rawFuture.cancel(true);
+            }
+        });
+        return future;
     }
 
     /**
@@ -139,7 +212,15 @@ public class AsyncPaymentMethodsClient {
      * </ul>
      */
     public CompletableFuture<Boolean> deletePaymentMethod(String id, RequestOptions requestOptions) {
-        return this.rawClient.deletePaymentMethod(id, requestOptions).thenApply(response -> response.body());
+        CompletableFuture<WhopApiHttpResponse<Boolean>> rawFuture =
+                this.rawClient.deletePaymentMethod(id, requestOptions);
+        CompletableFuture<Boolean> future = rawFuture.thenApply(response -> response.body());
+        future.whenComplete((result_, throwable_) -> {
+            if (future.isCancelled()) {
+                rawFuture.cancel(true);
+            }
+        });
+        return future;
     }
 
     /**
@@ -150,7 +231,14 @@ public class AsyncPaymentMethodsClient {
      * </ul>
      */
     public CompletableFuture<Boolean> deletePaymentMethod(String id, DeletePaymentMethodRequest request) {
-        return this.rawClient.deletePaymentMethod(id, request).thenApply(response -> response.body());
+        CompletableFuture<WhopApiHttpResponse<Boolean>> rawFuture = this.rawClient.deletePaymentMethod(id, request);
+        CompletableFuture<Boolean> future = rawFuture.thenApply(response -> response.body());
+        future.whenComplete((result_, throwable_) -> {
+            if (future.isCancelled()) {
+                rawFuture.cancel(true);
+            }
+        });
+        return future;
     }
 
     /**
@@ -162,6 +250,14 @@ public class AsyncPaymentMethodsClient {
      */
     public CompletableFuture<Boolean> deletePaymentMethod(
             String id, DeletePaymentMethodRequest request, RequestOptions requestOptions) {
-        return this.rawClient.deletePaymentMethod(id, request, requestOptions).thenApply(response -> response.body());
+        CompletableFuture<WhopApiHttpResponse<Boolean>> rawFuture =
+                this.rawClient.deletePaymentMethod(id, request, requestOptions);
+        CompletableFuture<Boolean> future = rawFuture.thenApply(response -> response.body());
+        future.whenComplete((result_, throwable_) -> {
+            if (future.isCancelled()) {
+                rawFuture.cancel(true);
+            }
+        });
+        return future;
     }
 }
