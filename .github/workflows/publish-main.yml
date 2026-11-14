@@ -967,7 +967,7 @@ jobs:
 
   tag:
     needs: [decide, build, publish, publish-github-packages]
-    if: always() && needs.decide.outputs.dry == 'false' && needs.decide.outputs.version != ''
+    if: always() && needs.decide.outputs.dry == 'false' && needs.decide.outputs.version != '' && needs.decide.outputs.version != '0.0.0' && github.ref == 'refs/heads/main' && github.event_name != 'pull_request'
     runs-on: ubuntu-latest
     permissions:
       contents: write

@@ -84,5 +84,3 @@ src/test/java/com/whop/api/helpers/
 .fern/replay.lock
 .fern/replay.yml
 .gitattributes
-
-gradle.properties

@@ -44,3 +44,11 @@ Closing a client releases HTTP resources the SDK created. A supplied `OkHttpClie
 ## Version pinning
 
 The generated builder sends the API version matching its models. An explicit `apiVersionDate(...)` still overrides that pin; select an older API date only when your integration also expects its response shapes.
+
+## Installing and releasing the package
+
+This change builds and tests the SDK without publishing it. `gradle.properties` keeps `version=0.0.0`, and the release workflow refuses to publish that placeholder. Generated metadata records the generator's input version; the release workflow stamps the artifact, source headers, and metadata from `gradle.properties` before building them.
+
+After this change is merged, release with a separate pull request that changes only `version=0.0.0` to the approved version in `gradle.properties` (for example, `version=2.8.1`). Merging that version-only change publishes to GitHub Packages by default. Pull request runs always rehearse the release without uploading. Java releases use an explicit version and are outside the shared SDK release train.
+
+GitHub Packages consumers use `com.whop.api:whop-java:<version>` with the repository `https://maven.pkg.github.com/whopio/whopsdk-java` and GitHub package-read credentials. A public Maven Central release additionally needs verified ownership of the `com.whop` namespace and signing/publishing credentials in a main-only `maven-central` GitHub Environment. Select the Maven Central target only after those prerequisites are configured.
