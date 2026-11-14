@@ -172,7 +172,6 @@ public final class ListBusinessesResponseDataItemFirstTierPartner {
 
         private Optional<String> name = Optional.empty();
 
-        @JsonAnySetter
         private Map<String, Object> additionalProperties = new HashMap<>();
 
         private Builder() {}
@@ -188,7 +187,6 @@ public final class ListBusinessesResponseDataItemFirstTierPartner {
 
         /**
          * <p>User ID, prefixed <code>user_</code>.</p>
-         * <p>User ID, prefixed <code>user_</code>.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
@@ -199,7 +197,6 @@ public final class ListBusinessesResponseDataItemFirstTierPartner {
         }
 
         /**
-         * <p>The user's profile picture.</p>
          * <p>The user's profile picture.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
@@ -212,7 +209,6 @@ public final class ListBusinessesResponseDataItemFirstTierPartner {
         }
 
         /**
-         * <p>The user's unique username.</p>
          * <p>The user's unique username.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
@@ -263,6 +259,17 @@ public final class ListBusinessesResponseDataItemFirstTierPartner {
         public ListBusinessesResponseDataItemFirstTierPartner build() {
             return new ListBusinessesResponseDataItemFirstTierPartner(
                     id, name, profilePicture, username, additionalProperties);
+        }
+
+        @JsonAnySetter
+        private void putAdditionalPropertyFromJson(String key, Object value) {
+            if (key.equalsIgnoreCase("id")
+                    || key.equalsIgnoreCase("name")
+                    || key.equalsIgnoreCase("profile_picture")
+                    || key.equalsIgnoreCase("username")) {
+                return;
+            }
+            this.additionalProperties.put(key, value);
         }
 
         @java.lang.Override

@@ -10,6 +10,12 @@ public final class UpdateAccountsRequestThreeDsLevel {
     public static final UpdateAccountsRequestThreeDsLevel MANDATE_CHALLENGE =
             new UpdateAccountsRequestThreeDsLevel(Value.MANDATE_CHALLENGE, "mandate_challenge");
 
+    public static final UpdateAccountsRequestThreeDsLevel MANDATE_IF_REQUIRED =
+            new UpdateAccountsRequestThreeDsLevel(Value.MANDATE_IF_REQUIRED, "mandate_if_required");
+
+    public static final UpdateAccountsRequestThreeDsLevel FRICTIONLESS_IF_REQUIRED =
+            new UpdateAccountsRequestThreeDsLevel(Value.FRICTIONLESS_IF_REQUIRED, "frictionless_if_required");
+
     private final Value value;
 
     private final String string;
@@ -45,6 +51,10 @@ public final class UpdateAccountsRequestThreeDsLevel {
         switch (value) {
             case MANDATE_CHALLENGE:
                 return visitor.visitMandateChallenge();
+            case MANDATE_IF_REQUIRED:
+                return visitor.visitMandateIfRequired();
+            case FRICTIONLESS_IF_REQUIRED:
+                return visitor.visitFrictionlessIfRequired();
             case UNKNOWN:
             default:
                 return visitor.visitUnknown(string);
@@ -56,6 +66,10 @@ public final class UpdateAccountsRequestThreeDsLevel {
         switch (value) {
             case "mandate_challenge":
                 return MANDATE_CHALLENGE;
+            case "mandate_if_required":
+                return MANDATE_IF_REQUIRED;
+            case "frictionless_if_required":
+                return FRICTIONLESS_IF_REQUIRED;
             default:
                 return new UpdateAccountsRequestThreeDsLevel(Value.UNKNOWN, value);
         }
@@ -64,11 +78,19 @@ public final class UpdateAccountsRequestThreeDsLevel {
     public enum Value {
         MANDATE_CHALLENGE,
 
+        MANDATE_IF_REQUIRED,
+
+        FRICTIONLESS_IF_REQUIRED,
+
         UNKNOWN
     }
 
     public interface Visitor<T> {
         T visitMandateChallenge();
+
+        T visitMandateIfRequired();
+
+        T visitFrictionlessIfRequired();
 
         T visitUnknown(String unknownType);
     }

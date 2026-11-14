@@ -10,6 +10,8 @@ public final class ListMembershipsRequestStatus {
     public static final ListMembershipsRequestStatus PAST_DUE =
             new ListMembershipsRequestStatus(Value.PAST_DUE, "past_due");
 
+    public static final ListMembershipsRequestStatus BANNED = new ListMembershipsRequestStatus(Value.BANNED, "banned");
+
     public static final ListMembershipsRequestStatus CANCELED =
             new ListMembershipsRequestStatus(Value.CANCELED, "canceled");
 
@@ -19,7 +21,16 @@ public final class ListMembershipsRequestStatus {
     public static final ListMembershipsRequestStatus EXPIRED =
             new ListMembershipsRequestStatus(Value.EXPIRED, "expired");
 
+    public static final ListMembershipsRequestStatus EXPIRING =
+            new ListMembershipsRequestStatus(Value.EXPIRING, "expiring");
+
+    public static final ListMembershipsRequestStatus UNCLAIMED =
+            new ListMembershipsRequestStatus(Value.UNCLAIMED, "unclaimed");
+
     public static final ListMembershipsRequestStatus PAUSED = new ListMembershipsRequestStatus(Value.PAUSED, "paused");
+
+    public static final ListMembershipsRequestStatus ONE_TIME =
+            new ListMembershipsRequestStatus(Value.ONE_TIME, "one_time");
 
     public static final ListMembershipsRequestStatus CANCELING =
             new ListMembershipsRequestStatus(Value.CANCELING, "canceling");
@@ -64,14 +75,22 @@ public final class ListMembershipsRequestStatus {
         switch (value) {
             case PAST_DUE:
                 return visitor.visitPastDue();
+            case BANNED:
+                return visitor.visitBanned();
             case CANCELED:
                 return visitor.visitCanceled();
             case COMPLETED:
                 return visitor.visitCompleted();
             case EXPIRED:
                 return visitor.visitExpired();
+            case EXPIRING:
+                return visitor.visitExpiring();
+            case UNCLAIMED:
+                return visitor.visitUnclaimed();
             case PAUSED:
                 return visitor.visitPaused();
+            case ONE_TIME:
+                return visitor.visitOneTime();
             case CANCELING:
                 return visitor.visitCanceling();
             case TRIALING:
@@ -89,14 +108,22 @@ public final class ListMembershipsRequestStatus {
         switch (value) {
             case "past_due":
                 return PAST_DUE;
+            case "banned":
+                return BANNED;
             case "canceled":
                 return CANCELED;
             case "completed":
                 return COMPLETED;
             case "expired":
                 return EXPIRED;
+            case "expiring":
+                return EXPIRING;
+            case "unclaimed":
+                return UNCLAIMED;
             case "paused":
                 return PAUSED;
+            case "one_time":
+                return ONE_TIME;
             case "canceling":
                 return CANCELING;
             case "trialing":
@@ -125,6 +152,14 @@ public final class ListMembershipsRequestStatus {
 
         PAUSED,
 
+        EXPIRING,
+
+        ONE_TIME,
+
+        UNCLAIMED,
+
+        BANNED,
+
         UNKNOWN
     }
 
@@ -144,6 +179,14 @@ public final class ListMembershipsRequestStatus {
         T visitCanceling();
 
         T visitPaused();
+
+        T visitExpiring();
+
+        T visitOneTime();
+
+        T visitUnclaimed();
+
+        T visitBanned();
 
         T visitUnknown(String unknownType);
     }

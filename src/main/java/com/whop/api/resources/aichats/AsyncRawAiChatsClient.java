@@ -4,11 +4,14 @@
 package com.whop.api.resources.aichats;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
+import com.whop.api.core.BodyProperties;
 import com.whop.api.core.ClientOptions;
 import com.whop.api.core.MediaTypes;
 import com.whop.api.core.ObjectMappers;
+import com.whop.api.core.PathSegments;
 import com.whop.api.core.QueryStringMapper;
 import com.whop.api.core.RequestOptions;
+import com.whop.api.core.RetryInterceptor;
 import com.whop.api.core.WhopApiApiException;
 import com.whop.api.core.WhopApiException;
 import com.whop.api.core.WhopApiHttpResponse;
@@ -28,6 +31,8 @@ import com.whop.api.resources.aichats.requests.UpdateAiChatsRequest;
 import com.whop.api.resources.aichats.types.ListAiChatsResponse;
 import com.whop.api.types.AiChat;
 import com.whop.api.types.AiChatListItem;
+import com.whop.api.types.InternalServerErrorBody;
+import com.whop.api.types.UnprocessableEntityErrorBody;
 import java.io.IOException;
 import java.util.List;
 import java.util.Optional;
@@ -53,6 +58,10 @@ public class AsyncRawAiChatsClient {
 
     /**
      * Returns a paginated list of AI chat threads for the current authenticated user.
+     * <p>Required permissions:</p>
+     * <ul>
+     * <li><code>ai_chat:read</code></li>
+     * </ul>
      */
     public CompletableFuture<WhopApiHttpResponse<SyncPagingIterable<AiChatListItem>>> list() {
         return list(ListAiChatsRequest.builder().build());
@@ -60,6 +69,10 @@ public class AsyncRawAiChatsClient {
 
     /**
      * Returns a paginated list of AI chat threads for the current authenticated user.
+     * <p>Required permissions:</p>
+     * <ul>
+     * <li><code>ai_chat:read</code></li>
+     * </ul>
      */
     public CompletableFuture<WhopApiHttpResponse<SyncPagingIterable<AiChatListItem>>> list(
             RequestOptions requestOptions) {
@@ -68,6 +81,10 @@ public class AsyncRawAiChatsClient {
 
     /**
      * Returns a paginated list of AI chat threads for the current authenticated user.
+     * <p>Required permissions:</p>
+     * <ul>
+     * <li><code>ai_chat:read</code></li>
+     * </ul>
      */
     public CompletableFuture<WhopApiHttpResponse<SyncPagingIterable<AiChatListItem>>> list(ListAiChatsRequest request) {
         return list(request, null);
@@ -75,10 +92,14 @@ public class AsyncRawAiChatsClient {
 
     /**
      * Returns a paginated list of AI chat threads for the current authenticated user.
+     * <p>Required permissions:</p>
+     * <ul>
+     * <li><code>ai_chat:read</code></li>
+     * </ul>
      */
     public CompletableFuture<WhopApiHttpResponse<SyncPagingIterable<AiChatListItem>>> list(
             ListAiChatsRequest request, RequestOptions requestOptions) {
-        HttpUrl.Builder httpUrl = HttpUrl.parse(this.clientOptions.environment().getUrl())
+        HttpUrl.Builder httpUrl = HttpUrl.parse(this.clientOptions.environment().getApiURL())
                 .newBuilder()
                 .addPathSegments("ai_chats");
         if (request.getAfter().isPresent()) {
@@ -96,6 +117,14 @@ public class AsyncRawAiChatsClient {
         if (request.getLast().isPresent()) {
             QueryStringMapper.addQueryParameter(
                     httpUrl, "last", request.getLast().get(), false);
+        }
+        if (request.getAgentIdentifier().isPresent()) {
+            QueryStringMapper.addQueryParameter(
+                    httpUrl, "agent_identifier", request.getAgentIdentifier().get(), false);
+        }
+        if (request.getAccountId().isPresent()) {
+            QueryStringMapper.addQueryParameter(
+                    httpUrl, "account_id", request.getAccountId().get(), false);
         }
         if (request.getOnlyActiveCrons().isPresent()) {
             QueryStringMapper.addQueryParameter(
@@ -116,8 +145,18 @@ public class AsyncRawAiChatsClient {
         if (requestOptions != null && requestOptions.getTimeout().isPresent()) {
             client = clientOptions.httpClientWithTimeout(requestOptions);
         }
+        if (requestOptions != null && requestOptions.getMaxRetries().isPresent()) {
+            okhttpRequest = okhttpRequest
+                    .newBuilder()
+                    .tag(
+                            RetryInterceptor.MaxRetriesOverride.class,
+                            new RetryInterceptor.MaxRetriesOverride(
+                                    requestOptions.getMaxRetries().get()))
+                    .build();
+        }
         CompletableFuture<WhopApiHttpResponse<SyncPagingIterable<AiChatListItem>>> future = new CompletableFuture<>();
-        client.newCall(okhttpRequest).enqueue(new Callback() {
+        RetryInterceptor.AsyncCall okhttpCall = RetryInterceptor.newAsyncCall(client, okhttpRequest);
+        okhttpCall.enqueue(new Callback() {
             @Override
             public void onResponse(@NotNull Call call, @NotNull Response response) throws IOException {
                 try (ResponseBody responseBody = response.body()) {
@@ -134,7 +173,11 @@ public class AsyncRawAiChatsClient {
                         List<AiChatListItem> result = parsedResponse.getData();
                         future.complete(new WhopApiHttpResponse<>(
                                 new SyncPagingIterable<AiChatListItem>(
-                                        startingAfter != null, result, parsedResponse, () -> {
+                                        startingAfter.isPresent()
+                                                && !startingAfter.get().isEmpty(),
+                                        result,
+                                        parsedResponse,
+                                        () -> {
                                             try {
                                                 return list(nextRequest, requestOptions)
                                                         .get()
@@ -170,7 +213,8 @@ public class AsyncRawAiChatsClient {
                                 return;
                             case 422:
                                 future.completeExceptionally(new UnprocessableEntityError(
-                                        ObjectMappers.JSON_MAPPER.readValue(responseBodyString, Object.class),
+                                        ObjectMappers.JSON_MAPPER.readValue(
+                                                responseBodyString, UnprocessableEntityErrorBody.class),
                                         response));
                                 return;
                             case 429:
@@ -180,7 +224,8 @@ public class AsyncRawAiChatsClient {
                                 return;
                             case 500:
                                 future.completeExceptionally(new InternalServerError(
-                                        ObjectMappers.JSON_MAPPER.readValue(responseBodyString, Object.class),
+                                        ObjectMappers.JSON_MAPPER.readValue(
+                                                responseBodyString, InternalServerErrorBody.class),
                                         response));
                                 return;
                         }
@@ -191,6 +236,9 @@ public class AsyncRawAiChatsClient {
                     future.completeExceptionally(new WhopApiApiException(
                             "Error with status code " + response.code(), response.code(), errorBody, response));
                     return;
+                } catch (JsonProcessingException e) {
+                    future.completeExceptionally(
+                            new WhopApiException("Failed to deserialize response: " + e.getMessage(), e));
                 } catch (IOException e) {
                     future.completeExceptionally(new WhopApiException("Network error executing HTTP request", e));
                 }
@@ -199,6 +247,11 @@ public class AsyncRawAiChatsClient {
             @Override
             public void onFailure(@NotNull Call call, @NotNull IOException e) {
                 future.completeExceptionally(new WhopApiException("Network error executing HTTP request", e));
+            }
+        });
+        future.whenComplete((result_, throwable_) -> {
+            if (future.isCancelled()) {
+                okhttpCall.cancel();
             }
         });
         return future;
@@ -224,7 +277,7 @@ public class AsyncRawAiChatsClient {
      */
     public CompletableFuture<WhopApiHttpResponse<AiChat>> create(
             CreateAiChatsRequest request, RequestOptions requestOptions) {
-        HttpUrl.Builder httpUrl = HttpUrl.parse(this.clientOptions.environment().getUrl())
+        HttpUrl.Builder httpUrl = HttpUrl.parse(this.clientOptions.environment().getApiURL())
                 .newBuilder()
                 .addPathSegments("ai_chats");
         if (requestOptions != null) {
@@ -235,7 +288,9 @@ public class AsyncRawAiChatsClient {
         RequestBody body;
         try {
             body = RequestBody.create(
-                    ObjectMappers.JSON_MAPPER.writeValueAsBytes(request), MediaTypes.APPLICATION_JSON);
+                    ObjectMappers.JSON_MAPPER.writeValueAsBytes(BodyProperties.merge(
+                            request, requestOptions != null ? requestOptions.getBodyProperties() : null)),
+                    MediaTypes.APPLICATION_JSON);
         } catch (JsonProcessingException e) {
             throw new WhopApiException("Failed to serialize request", e);
         }
@@ -250,8 +305,18 @@ public class AsyncRawAiChatsClient {
         if (requestOptions != null && requestOptions.getTimeout().isPresent()) {
             client = clientOptions.httpClientWithTimeout(requestOptions);
         }
+        if (requestOptions != null && requestOptions.getMaxRetries().isPresent()) {
+            okhttpRequest = okhttpRequest
+                    .newBuilder()
+                    .tag(
+                            RetryInterceptor.MaxRetriesOverride.class,
+                            new RetryInterceptor.MaxRetriesOverride(
+                                    requestOptions.getMaxRetries().get()))
+                    .build();
+        }
         CompletableFuture<WhopApiHttpResponse<AiChat>> future = new CompletableFuture<>();
-        client.newCall(okhttpRequest).enqueue(new Callback() {
+        RetryInterceptor.AsyncCall okhttpCall = RetryInterceptor.newAsyncCall(client, okhttpRequest);
+        okhttpCall.enqueue(new Callback() {
             @Override
             public void onResponse(@NotNull Call call, @NotNull Response response) throws IOException {
                 try (ResponseBody responseBody = response.body()) {
@@ -285,7 +350,8 @@ public class AsyncRawAiChatsClient {
                                 return;
                             case 422:
                                 future.completeExceptionally(new UnprocessableEntityError(
-                                        ObjectMappers.JSON_MAPPER.readValue(responseBodyString, Object.class),
+                                        ObjectMappers.JSON_MAPPER.readValue(
+                                                responseBodyString, UnprocessableEntityErrorBody.class),
                                         response));
                                 return;
                             case 429:
@@ -295,7 +361,8 @@ public class AsyncRawAiChatsClient {
                                 return;
                             case 500:
                                 future.completeExceptionally(new InternalServerError(
-                                        ObjectMappers.JSON_MAPPER.readValue(responseBodyString, Object.class),
+                                        ObjectMappers.JSON_MAPPER.readValue(
+                                                responseBodyString, InternalServerErrorBody.class),
                                         response));
                                 return;
                         }
@@ -306,6 +373,9 @@ public class AsyncRawAiChatsClient {
                     future.completeExceptionally(new WhopApiApiException(
                             "Error with status code " + response.code(), response.code(), errorBody, response));
                     return;
+                } catch (JsonProcessingException e) {
+                    future.completeExceptionally(
+                            new WhopApiException("Failed to deserialize response: " + e.getMessage(), e));
                 } catch (IOException e) {
                     future.completeExceptionally(new WhopApiException("Network error executing HTTP request", e));
                 }
@@ -316,11 +386,20 @@ public class AsyncRawAiChatsClient {
                 future.completeExceptionally(new WhopApiException("Network error executing HTTP request", e));
             }
         });
+        future.whenComplete((result_, throwable_) -> {
+            if (future.isCancelled()) {
+                okhttpCall.cancel();
+            }
+        });
         return future;
     }
 
     /**
      * Retrieves the details of an existing AI chat.
+     * <p>Required permissions:</p>
+     * <ul>
+     * <li><code>ai_chat:read</code></li>
+     * </ul>
      */
     public CompletableFuture<WhopApiHttpResponse<AiChat>> retrieve(String id) {
         return retrieve(id, RetrieveAiChatsRequest.builder().build());
@@ -328,6 +407,10 @@ public class AsyncRawAiChatsClient {
 
     /**
      * Retrieves the details of an existing AI chat.
+     * <p>Required permissions:</p>
+     * <ul>
+     * <li><code>ai_chat:read</code></li>
+     * </ul>
      */
     public CompletableFuture<WhopApiHttpResponse<AiChat>> retrieve(String id, RequestOptions requestOptions) {
         return retrieve(id, RetrieveAiChatsRequest.builder().build(), requestOptions);
@@ -335,6 +418,10 @@ public class AsyncRawAiChatsClient {
 
     /**
      * Retrieves the details of an existing AI chat.
+     * <p>Required permissions:</p>
+     * <ul>
+     * <li><code>ai_chat:read</code></li>
+     * </ul>
      */
     public CompletableFuture<WhopApiHttpResponse<AiChat>> retrieve(String id, RetrieveAiChatsRequest request) {
         return retrieve(id, request, null);
@@ -342,13 +429,17 @@ public class AsyncRawAiChatsClient {
 
     /**
      * Retrieves the details of an existing AI chat.
+     * <p>Required permissions:</p>
+     * <ul>
+     * <li><code>ai_chat:read</code></li>
+     * </ul>
      */
     public CompletableFuture<WhopApiHttpResponse<AiChat>> retrieve(
             String id, RetrieveAiChatsRequest request, RequestOptions requestOptions) {
-        HttpUrl.Builder httpUrl = HttpUrl.parse(this.clientOptions.environment().getUrl())
+        HttpUrl.Builder httpUrl = HttpUrl.parse(this.clientOptions.environment().getApiURL())
                 .newBuilder()
                 .addPathSegments("ai_chats")
-                .addPathSegment(id);
+                .addPathSegment(PathSegments.validate(id));
         if (requestOptions != null) {
             requestOptions.getQueryParameters().forEach((_key, _value) -> {
                 httpUrl.addQueryParameter(_key, _value);
@@ -364,8 +455,18 @@ public class AsyncRawAiChatsClient {
         if (requestOptions != null && requestOptions.getTimeout().isPresent()) {
             client = clientOptions.httpClientWithTimeout(requestOptions);
         }
+        if (requestOptions != null && requestOptions.getMaxRetries().isPresent()) {
+            okhttpRequest = okhttpRequest
+                    .newBuilder()
+                    .tag(
+                            RetryInterceptor.MaxRetriesOverride.class,
+                            new RetryInterceptor.MaxRetriesOverride(
+                                    requestOptions.getMaxRetries().get()))
+                    .build();
+        }
         CompletableFuture<WhopApiHttpResponse<AiChat>> future = new CompletableFuture<>();
-        client.newCall(okhttpRequest).enqueue(new Callback() {
+        RetryInterceptor.AsyncCall okhttpCall = RetryInterceptor.newAsyncCall(client, okhttpRequest);
+        okhttpCall.enqueue(new Callback() {
             @Override
             public void onResponse(@NotNull Call call, @NotNull Response response) throws IOException {
                 try (ResponseBody responseBody = response.body()) {
@@ -399,7 +500,8 @@ public class AsyncRawAiChatsClient {
                                 return;
                             case 422:
                                 future.completeExceptionally(new UnprocessableEntityError(
-                                        ObjectMappers.JSON_MAPPER.readValue(responseBodyString, Object.class),
+                                        ObjectMappers.JSON_MAPPER.readValue(
+                                                responseBodyString, UnprocessableEntityErrorBody.class),
                                         response));
                                 return;
                             case 429:
@@ -409,7 +511,8 @@ public class AsyncRawAiChatsClient {
                                 return;
                             case 500:
                                 future.completeExceptionally(new InternalServerError(
-                                        ObjectMappers.JSON_MAPPER.readValue(responseBodyString, Object.class),
+                                        ObjectMappers.JSON_MAPPER.readValue(
+                                                responseBodyString, InternalServerErrorBody.class),
                                         response));
                                 return;
                         }
@@ -420,6 +523,9 @@ public class AsyncRawAiChatsClient {
                     future.completeExceptionally(new WhopApiApiException(
                             "Error with status code " + response.code(), response.code(), errorBody, response));
                     return;
+                } catch (JsonProcessingException e) {
+                    future.completeExceptionally(
+                            new WhopApiException("Failed to deserialize response: " + e.getMessage(), e));
                 } catch (IOException e) {
                     future.completeExceptionally(new WhopApiException("Network error executing HTTP request", e));
                 }
@@ -428,6 +534,11 @@ public class AsyncRawAiChatsClient {
             @Override
             public void onFailure(@NotNull Call call, @NotNull IOException e) {
                 future.completeExceptionally(new WhopApiException("Network error executing HTTP request", e));
+            }
+        });
+        future.whenComplete((result_, throwable_) -> {
+            if (future.isCancelled()) {
+                okhttpCall.cancel();
             }
         });
         return future;
@@ -475,10 +586,10 @@ public class AsyncRawAiChatsClient {
      */
     public CompletableFuture<WhopApiHttpResponse<Boolean>> delete(
             String id, DeleteAiChatsRequest request, RequestOptions requestOptions) {
-        HttpUrl.Builder httpUrl = HttpUrl.parse(this.clientOptions.environment().getUrl())
+        HttpUrl.Builder httpUrl = HttpUrl.parse(this.clientOptions.environment().getApiURL())
                 .newBuilder()
                 .addPathSegments("ai_chats")
-                .addPathSegment(id);
+                .addPathSegment(PathSegments.validate(id));
         if (requestOptions != null) {
             requestOptions.getQueryParameters().forEach((_key, _value) -> {
                 httpUrl.addQueryParameter(_key, _value);
@@ -486,7 +597,10 @@ public class AsyncRawAiChatsClient {
         }
         Request.Builder _requestBuilder = new Request.Builder()
                 .url(httpUrl.build())
-                .method("DELETE", null)
+                .method(
+                        "DELETE",
+                        BodyProperties.toRequestBody(
+                                requestOptions != null ? requestOptions.getBodyProperties() : null, null))
                 .headers(Headers.of(clientOptions.headers(requestOptions)))
                 .addHeader("Accept", "application/json");
         Request okhttpRequest = _requestBuilder.build();
@@ -494,8 +608,18 @@ public class AsyncRawAiChatsClient {
         if (requestOptions != null && requestOptions.getTimeout().isPresent()) {
             client = clientOptions.httpClientWithTimeout(requestOptions);
         }
+        if (requestOptions != null && requestOptions.getMaxRetries().isPresent()) {
+            okhttpRequest = okhttpRequest
+                    .newBuilder()
+                    .tag(
+                            RetryInterceptor.MaxRetriesOverride.class,
+                            new RetryInterceptor.MaxRetriesOverride(
+                                    requestOptions.getMaxRetries().get()))
+                    .build();
+        }
         CompletableFuture<WhopApiHttpResponse<Boolean>> future = new CompletableFuture<>();
-        client.newCall(okhttpRequest).enqueue(new Callback() {
+        RetryInterceptor.AsyncCall okhttpCall = RetryInterceptor.newAsyncCall(client, okhttpRequest);
+        okhttpCall.enqueue(new Callback() {
             @Override
             public void onResponse(@NotNull Call call, @NotNull Response response) throws IOException {
                 try (ResponseBody responseBody = response.body()) {
@@ -529,7 +653,8 @@ public class AsyncRawAiChatsClient {
                                 return;
                             case 422:
                                 future.completeExceptionally(new UnprocessableEntityError(
-                                        ObjectMappers.JSON_MAPPER.readValue(responseBodyString, Object.class),
+                                        ObjectMappers.JSON_MAPPER.readValue(
+                                                responseBodyString, UnprocessableEntityErrorBody.class),
                                         response));
                                 return;
                             case 429:
@@ -539,7 +664,8 @@ public class AsyncRawAiChatsClient {
                                 return;
                             case 500:
                                 future.completeExceptionally(new InternalServerError(
-                                        ObjectMappers.JSON_MAPPER.readValue(responseBodyString, Object.class),
+                                        ObjectMappers.JSON_MAPPER.readValue(
+                                                responseBodyString, InternalServerErrorBody.class),
                                         response));
                                 return;
                         }
@@ -550,6 +676,9 @@ public class AsyncRawAiChatsClient {
                     future.completeExceptionally(new WhopApiApiException(
                             "Error with status code " + response.code(), response.code(), errorBody, response));
                     return;
+                } catch (JsonProcessingException e) {
+                    future.completeExceptionally(
+                            new WhopApiException("Failed to deserialize response: " + e.getMessage(), e));
                 } catch (IOException e) {
                     future.completeExceptionally(new WhopApiException("Network error executing HTTP request", e));
                 }
@@ -560,11 +689,16 @@ public class AsyncRawAiChatsClient {
                 future.completeExceptionally(new WhopApiException("Network error executing HTTP request", e));
             }
         });
+        future.whenComplete((result_, throwable_) -> {
+            if (future.isCancelled()) {
+                okhttpCall.cancel();
+            }
+        });
         return future;
     }
 
     /**
-     * Update an AI chat's title, notification preferences, or associated company context.
+     * Update an AI chat's title, notification preferences, or associated account context.
      * <p>Required permissions:</p>
      * <ul>
      * <li><code>ai_chat:update</code></li>
@@ -575,7 +709,7 @@ public class AsyncRawAiChatsClient {
     }
 
     /**
-     * Update an AI chat's title, notification preferences, or associated company context.
+     * Update an AI chat's title, notification preferences, or associated account context.
      * <p>Required permissions:</p>
      * <ul>
      * <li><code>ai_chat:update</code></li>
@@ -586,7 +720,7 @@ public class AsyncRawAiChatsClient {
     }
 
     /**
-     * Update an AI chat's title, notification preferences, or associated company context.
+     * Update an AI chat's title, notification preferences, or associated account context.
      * <p>Required permissions:</p>
      * <ul>
      * <li><code>ai_chat:update</code></li>
@@ -597,7 +731,7 @@ public class AsyncRawAiChatsClient {
     }
 
     /**
-     * Update an AI chat's title, notification preferences, or associated company context.
+     * Update an AI chat's title, notification preferences, or associated account context.
      * <p>Required permissions:</p>
      * <ul>
      * <li><code>ai_chat:update</code></li>
@@ -605,10 +739,10 @@ public class AsyncRawAiChatsClient {
      */
     public CompletableFuture<WhopApiHttpResponse<AiChat>> update(
             String id, UpdateAiChatsRequest request, RequestOptions requestOptions) {
-        HttpUrl.Builder httpUrl = HttpUrl.parse(this.clientOptions.environment().getUrl())
+        HttpUrl.Builder httpUrl = HttpUrl.parse(this.clientOptions.environment().getApiURL())
                 .newBuilder()
                 .addPathSegments("ai_chats")
-                .addPathSegment(id);
+                .addPathSegment(PathSegments.validate(id));
         if (requestOptions != null) {
             requestOptions.getQueryParameters().forEach((_key, _value) -> {
                 httpUrl.addQueryParameter(_key, _value);
@@ -617,7 +751,9 @@ public class AsyncRawAiChatsClient {
         RequestBody body;
         try {
             body = RequestBody.create(
-                    ObjectMappers.JSON_MAPPER.writeValueAsBytes(request), MediaTypes.APPLICATION_JSON);
+                    ObjectMappers.JSON_MAPPER.writeValueAsBytes(BodyProperties.merge(
+                            request, requestOptions != null ? requestOptions.getBodyProperties() : null)),
+                    MediaTypes.APPLICATION_JSON);
         } catch (JsonProcessingException e) {
             throw new WhopApiException("Failed to serialize request", e);
         }
@@ -632,8 +768,18 @@ public class AsyncRawAiChatsClient {
         if (requestOptions != null && requestOptions.getTimeout().isPresent()) {
             client = clientOptions.httpClientWithTimeout(requestOptions);
         }
+        if (requestOptions != null && requestOptions.getMaxRetries().isPresent()) {
+            okhttpRequest = okhttpRequest
+                    .newBuilder()
+                    .tag(
+                            RetryInterceptor.MaxRetriesOverride.class,
+                            new RetryInterceptor.MaxRetriesOverride(
+                                    requestOptions.getMaxRetries().get()))
+                    .build();
+        }
         CompletableFuture<WhopApiHttpResponse<AiChat>> future = new CompletableFuture<>();
-        client.newCall(okhttpRequest).enqueue(new Callback() {
+        RetryInterceptor.AsyncCall okhttpCall = RetryInterceptor.newAsyncCall(client, okhttpRequest);
+        okhttpCall.enqueue(new Callback() {
             @Override
             public void onResponse(@NotNull Call call, @NotNull Response response) throws IOException {
                 try (ResponseBody responseBody = response.body()) {
@@ -667,7 +813,8 @@ public class AsyncRawAiChatsClient {
                                 return;
                             case 422:
                                 future.completeExceptionally(new UnprocessableEntityError(
-                                        ObjectMappers.JSON_MAPPER.readValue(responseBodyString, Object.class),
+                                        ObjectMappers.JSON_MAPPER.readValue(
+                                                responseBodyString, UnprocessableEntityErrorBody.class),
                                         response));
                                 return;
                             case 429:
@@ -677,7 +824,8 @@ public class AsyncRawAiChatsClient {
                                 return;
                             case 500:
                                 future.completeExceptionally(new InternalServerError(
-                                        ObjectMappers.JSON_MAPPER.readValue(responseBodyString, Object.class),
+                                        ObjectMappers.JSON_MAPPER.readValue(
+                                                responseBodyString, InternalServerErrorBody.class),
                                         response));
                                 return;
                         }
@@ -688,6 +836,9 @@ public class AsyncRawAiChatsClient {
                     future.completeExceptionally(new WhopApiApiException(
                             "Error with status code " + response.code(), response.code(), errorBody, response));
                     return;
+                } catch (JsonProcessingException e) {
+                    future.completeExceptionally(
+                            new WhopApiException("Failed to deserialize response: " + e.getMessage(), e));
                 } catch (IOException e) {
                     future.completeExceptionally(new WhopApiException("Network error executing HTTP request", e));
                 }
@@ -696,6 +847,11 @@ public class AsyncRawAiChatsClient {
             @Override
             public void onFailure(@NotNull Call call, @NotNull IOException e) {
                 future.completeExceptionally(new WhopApiException("Network error executing HTTP request", e));
+            }
+        });
+        future.whenComplete((result_, throwable_) -> {
+            if (future.isCancelled()) {
+                okhttpCall.cancel();
             }
         });
         return future;

@@ -131,7 +131,6 @@ public final class SummaryResolutionCenterCasesResponseGroupsStatus {
 
         private int underReview;
 
-        @JsonAnySetter
         private Map<String, Object> additionalProperties = new HashMap<>();
 
         private Builder() {}
@@ -177,6 +176,17 @@ public final class SummaryResolutionCenterCasesResponseGroupsStatus {
         public SummaryResolutionCenterCasesResponseGroupsStatus build() {
             return new SummaryResolutionCenterCasesResponseGroupsStatus(
                     awaitingCustomer, awaitingMerchant, closed, underReview, additionalProperties);
+        }
+
+        @JsonAnySetter
+        private void putAdditionalPropertyFromJson(String key, Object value) {
+            if (key.equalsIgnoreCase("awaiting_customer")
+                    || key.equalsIgnoreCase("awaiting_merchant")
+                    || key.equalsIgnoreCase("closed")
+                    || key.equalsIgnoreCase("under_review")) {
+                return;
+            }
+            this.additionalProperties.put(key, value);
         }
 
         @java.lang.Override

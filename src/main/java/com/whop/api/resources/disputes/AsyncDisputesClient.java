@@ -5,14 +5,14 @@ package com.whop.api.resources.disputes;
 
 import com.whop.api.core.ClientOptions;
 import com.whop.api.core.RequestOptions;
+import com.whop.api.core.WhopApiHttpResponse;
 import com.whop.api.core.pagination.SyncPagingIterable;
+import com.whop.api.resources.disputes.requests.AcceptDisputesRequest;
 import com.whop.api.resources.disputes.requests.ListDisputesRequest;
 import com.whop.api.resources.disputes.requests.RetrieveDisputesRequest;
 import com.whop.api.resources.disputes.requests.SubmitDisputesRequest;
-import com.whop.api.resources.disputes.requests.SubmitEvidenceDisputeRequest;
 import com.whop.api.resources.disputes.requests.SummaryDisputesRequest;
 import com.whop.api.resources.disputes.requests.UpdateDisputesRequest;
-import com.whop.api.resources.disputes.requests.UpdateEvidenceDisputeRequest;
 import com.whop.api.resources.disputes.requests.UploadEvidenceDisputesRequest;
 import com.whop.api.resources.disputes.types.SummaryDisputesResponse;
 import com.whop.api.types.Dispute;
@@ -39,21 +39,43 @@ public class AsyncDisputesClient {
      * Lists the disputes across the accounts you can read.
      */
     public CompletableFuture<SyncPagingIterable<Dispute>> list() {
-        return this.rawClient.list().thenApply(response -> response.body());
+        CompletableFuture<WhopApiHttpResponse<SyncPagingIterable<Dispute>>> rawFuture = this.rawClient.list();
+        CompletableFuture<SyncPagingIterable<Dispute>> future = rawFuture.thenApply(response -> response.body());
+        future.whenComplete((result_, throwable_) -> {
+            if (future.isCancelled()) {
+                rawFuture.cancel(true);
+            }
+        });
+        return future;
     }
 
     /**
      * Lists the disputes across the accounts you can read.
      */
     public CompletableFuture<SyncPagingIterable<Dispute>> list(RequestOptions requestOptions) {
-        return this.rawClient.list(requestOptions).thenApply(response -> response.body());
+        CompletableFuture<WhopApiHttpResponse<SyncPagingIterable<Dispute>>> rawFuture =
+                this.rawClient.list(requestOptions);
+        CompletableFuture<SyncPagingIterable<Dispute>> future = rawFuture.thenApply(response -> response.body());
+        future.whenComplete((result_, throwable_) -> {
+            if (future.isCancelled()) {
+                rawFuture.cancel(true);
+            }
+        });
+        return future;
     }
 
     /**
      * Lists the disputes across the accounts you can read.
      */
     public CompletableFuture<SyncPagingIterable<Dispute>> list(ListDisputesRequest request) {
-        return this.rawClient.list(request).thenApply(response -> response.body());
+        CompletableFuture<WhopApiHttpResponse<SyncPagingIterable<Dispute>>> rawFuture = this.rawClient.list(request);
+        CompletableFuture<SyncPagingIterable<Dispute>> future = rawFuture.thenApply(response -> response.body());
+        future.whenComplete((result_, throwable_) -> {
+            if (future.isCancelled()) {
+                rawFuture.cancel(true);
+            }
+        });
+        return future;
     }
 
     /**
@@ -61,28 +83,58 @@ public class AsyncDisputesClient {
      */
     public CompletableFuture<SyncPagingIterable<Dispute>> list(
             ListDisputesRequest request, RequestOptions requestOptions) {
-        return this.rawClient.list(request, requestOptions).thenApply(response -> response.body());
+        CompletableFuture<WhopApiHttpResponse<SyncPagingIterable<Dispute>>> rawFuture =
+                this.rawClient.list(request, requestOptions);
+        CompletableFuture<SyncPagingIterable<Dispute>> future = rawFuture.thenApply(response -> response.body());
+        future.whenComplete((result_, throwable_) -> {
+            if (future.isCancelled()) {
+                rawFuture.cancel(true);
+            }
+        });
+        return future;
     }
 
     /**
      * Totals up the same disputes the list returns, so you can build status tabs and totals without paging through them.
      */
     public CompletableFuture<SummaryDisputesResponse> summary() {
-        return this.rawClient.summary().thenApply(response -> response.body());
+        CompletableFuture<WhopApiHttpResponse<SummaryDisputesResponse>> rawFuture = this.rawClient.summary();
+        CompletableFuture<SummaryDisputesResponse> future = rawFuture.thenApply(response -> response.body());
+        future.whenComplete((result_, throwable_) -> {
+            if (future.isCancelled()) {
+                rawFuture.cancel(true);
+            }
+        });
+        return future;
     }
 
     /**
      * Totals up the same disputes the list returns, so you can build status tabs and totals without paging through them.
      */
     public CompletableFuture<SummaryDisputesResponse> summary(RequestOptions requestOptions) {
-        return this.rawClient.summary(requestOptions).thenApply(response -> response.body());
+        CompletableFuture<WhopApiHttpResponse<SummaryDisputesResponse>> rawFuture =
+                this.rawClient.summary(requestOptions);
+        CompletableFuture<SummaryDisputesResponse> future = rawFuture.thenApply(response -> response.body());
+        future.whenComplete((result_, throwable_) -> {
+            if (future.isCancelled()) {
+                rawFuture.cancel(true);
+            }
+        });
+        return future;
     }
 
     /**
      * Totals up the same disputes the list returns, so you can build status tabs and totals without paging through them.
      */
     public CompletableFuture<SummaryDisputesResponse> summary(SummaryDisputesRequest request) {
-        return this.rawClient.summary(request).thenApply(response -> response.body());
+        CompletableFuture<WhopApiHttpResponse<SummaryDisputesResponse>> rawFuture = this.rawClient.summary(request);
+        CompletableFuture<SummaryDisputesResponse> future = rawFuture.thenApply(response -> response.body());
+        future.whenComplete((result_, throwable_) -> {
+            if (future.isCancelled()) {
+                rawFuture.cancel(true);
+            }
+        });
+        return future;
     }
 
     /**
@@ -90,28 +142,57 @@ public class AsyncDisputesClient {
      */
     public CompletableFuture<SummaryDisputesResponse> summary(
             SummaryDisputesRequest request, RequestOptions requestOptions) {
-        return this.rawClient.summary(request, requestOptions).thenApply(response -> response.body());
+        CompletableFuture<WhopApiHttpResponse<SummaryDisputesResponse>> rawFuture =
+                this.rawClient.summary(request, requestOptions);
+        CompletableFuture<SummaryDisputesResponse> future = rawFuture.thenApply(response -> response.body());
+        future.whenComplete((result_, throwable_) -> {
+            if (future.isCancelled()) {
+                rawFuture.cancel(true);
+            }
+        });
+        return future;
     }
 
     /**
      * Retrieves a single dispute.
      */
     public CompletableFuture<Dispute> retrieve(String id) {
-        return this.rawClient.retrieve(id).thenApply(response -> response.body());
+        CompletableFuture<WhopApiHttpResponse<Dispute>> rawFuture = this.rawClient.retrieve(id);
+        CompletableFuture<Dispute> future = rawFuture.thenApply(response -> response.body());
+        future.whenComplete((result_, throwable_) -> {
+            if (future.isCancelled()) {
+                rawFuture.cancel(true);
+            }
+        });
+        return future;
     }
 
     /**
      * Retrieves a single dispute.
      */
     public CompletableFuture<Dispute> retrieve(String id, RequestOptions requestOptions) {
-        return this.rawClient.retrieve(id, requestOptions).thenApply(response -> response.body());
+        CompletableFuture<WhopApiHttpResponse<Dispute>> rawFuture = this.rawClient.retrieve(id, requestOptions);
+        CompletableFuture<Dispute> future = rawFuture.thenApply(response -> response.body());
+        future.whenComplete((result_, throwable_) -> {
+            if (future.isCancelled()) {
+                rawFuture.cancel(true);
+            }
+        });
+        return future;
     }
 
     /**
      * Retrieves a single dispute.
      */
     public CompletableFuture<Dispute> retrieve(String id, RetrieveDisputesRequest request) {
-        return this.rawClient.retrieve(id, request).thenApply(response -> response.body());
+        CompletableFuture<WhopApiHttpResponse<Dispute>> rawFuture = this.rawClient.retrieve(id, request);
+        CompletableFuture<Dispute> future = rawFuture.thenApply(response -> response.body());
+        future.whenComplete((result_, throwable_) -> {
+            if (future.isCancelled()) {
+                rawFuture.cancel(true);
+            }
+        });
+        return future;
     }
 
     /**
@@ -119,223 +200,212 @@ public class AsyncDisputesClient {
      */
     public CompletableFuture<Dispute> retrieve(
             String id, RetrieveDisputesRequest request, RequestOptions requestOptions) {
-        return this.rawClient.retrieve(id, request, requestOptions).thenApply(response -> response.body());
+        CompletableFuture<WhopApiHttpResponse<Dispute>> rawFuture =
+                this.rawClient.retrieve(id, request, requestOptions);
+        CompletableFuture<Dispute> future = rawFuture.thenApply(response -> response.body());
+        future.whenComplete((result_, throwable_) -> {
+            if (future.isCancelled()) {
+                rawFuture.cancel(true);
+            }
+        });
+        return future;
     }
 
     /**
-     * Edits a dispute's evidence, while it is still editable. Sending it is a separate call.
+     * Edits a dispute's evidence while it is still editable. When the evidence is ready, send it to the payment processor with <code>POST /disputes/:id/submit</code>.
      */
     public CompletableFuture<Dispute> update(String id) {
-        return this.rawClient.update(id).thenApply(response -> response.body());
+        CompletableFuture<WhopApiHttpResponse<Dispute>> rawFuture = this.rawClient.update(id);
+        CompletableFuture<Dispute> future = rawFuture.thenApply(response -> response.body());
+        future.whenComplete((result_, throwable_) -> {
+            if (future.isCancelled()) {
+                rawFuture.cancel(true);
+            }
+        });
+        return future;
     }
 
     /**
-     * Edits a dispute's evidence, while it is still editable. Sending it is a separate call.
+     * Edits a dispute's evidence while it is still editable. When the evidence is ready, send it to the payment processor with <code>POST /disputes/:id/submit</code>.
      */
     public CompletableFuture<Dispute> update(String id, RequestOptions requestOptions) {
-        return this.rawClient.update(id, requestOptions).thenApply(response -> response.body());
+        CompletableFuture<WhopApiHttpResponse<Dispute>> rawFuture = this.rawClient.update(id, requestOptions);
+        CompletableFuture<Dispute> future = rawFuture.thenApply(response -> response.body());
+        future.whenComplete((result_, throwable_) -> {
+            if (future.isCancelled()) {
+                rawFuture.cancel(true);
+            }
+        });
+        return future;
     }
 
     /**
-     * Edits a dispute's evidence, while it is still editable. Sending it is a separate call.
+     * Edits a dispute's evidence while it is still editable. When the evidence is ready, send it to the payment processor with <code>POST /disputes/:id/submit</code>.
      */
     public CompletableFuture<Dispute> update(String id, UpdateDisputesRequest request) {
-        return this.rawClient.update(id, request).thenApply(response -> response.body());
+        CompletableFuture<WhopApiHttpResponse<Dispute>> rawFuture = this.rawClient.update(id, request);
+        CompletableFuture<Dispute> future = rawFuture.thenApply(response -> response.body());
+        future.whenComplete((result_, throwable_) -> {
+            if (future.isCancelled()) {
+                rawFuture.cancel(true);
+            }
+        });
+        return future;
     }
 
     /**
-     * Edits a dispute's evidence, while it is still editable. Sending it is a separate call.
+     * Edits a dispute's evidence while it is still editable. When the evidence is ready, send it to the payment processor with <code>POST /disputes/:id/submit</code>.
      */
     public CompletableFuture<Dispute> update(String id, UpdateDisputesRequest request, RequestOptions requestOptions) {
-        return this.rawClient.update(id, request, requestOptions).thenApply(response -> response.body());
+        CompletableFuture<WhopApiHttpResponse<Dispute>> rawFuture = this.rawClient.update(id, request, requestOptions);
+        CompletableFuture<Dispute> future = rawFuture.thenApply(response -> response.body());
+        future.whenComplete((result_, throwable_) -> {
+            if (future.isCancelled()) {
+                rawFuture.cancel(true);
+            }
+        });
+        return future;
     }
 
     /**
-     * Sends a dispute's evidence to the payment processor. This is final — it cannot be edited or sent again.
+     * Accepts a chargeback, conceding it to the customer instead of contesting it. The payment processor closes the dispute as <code>lost</code>. This is final — the dispute cannot be contested afterwards. Only a dispute whose <code>acceptable</code> is true can be accepted.
+     */
+    public CompletableFuture<Dispute> accept(String id) {
+        CompletableFuture<WhopApiHttpResponse<Dispute>> rawFuture = this.rawClient.accept(id);
+        CompletableFuture<Dispute> future = rawFuture.thenApply(response -> response.body());
+        future.whenComplete((result_, throwable_) -> {
+            if (future.isCancelled()) {
+                rawFuture.cancel(true);
+            }
+        });
+        return future;
+    }
+
+    /**
+     * Accepts a chargeback, conceding it to the customer instead of contesting it. The payment processor closes the dispute as <code>lost</code>. This is final — the dispute cannot be contested afterwards. Only a dispute whose <code>acceptable</code> is true can be accepted.
+     */
+    public CompletableFuture<Dispute> accept(String id, RequestOptions requestOptions) {
+        CompletableFuture<WhopApiHttpResponse<Dispute>> rawFuture = this.rawClient.accept(id, requestOptions);
+        CompletableFuture<Dispute> future = rawFuture.thenApply(response -> response.body());
+        future.whenComplete((result_, throwable_) -> {
+            if (future.isCancelled()) {
+                rawFuture.cancel(true);
+            }
+        });
+        return future;
+    }
+
+    /**
+     * Accepts a chargeback, conceding it to the customer instead of contesting it. The payment processor closes the dispute as <code>lost</code>. This is final — the dispute cannot be contested afterwards. Only a dispute whose <code>acceptable</code> is true can be accepted.
+     */
+    public CompletableFuture<Dispute> accept(String id, AcceptDisputesRequest request) {
+        CompletableFuture<WhopApiHttpResponse<Dispute>> rawFuture = this.rawClient.accept(id, request);
+        CompletableFuture<Dispute> future = rawFuture.thenApply(response -> response.body());
+        future.whenComplete((result_, throwable_) -> {
+            if (future.isCancelled()) {
+                rawFuture.cancel(true);
+            }
+        });
+        return future;
+    }
+
+    /**
+     * Accepts a chargeback, conceding it to the customer instead of contesting it. The payment processor closes the dispute as <code>lost</code>. This is final — the dispute cannot be contested afterwards. Only a dispute whose <code>acceptable</code> is true can be accepted.
+     */
+    public CompletableFuture<Dispute> accept(String id, AcceptDisputesRequest request, RequestOptions requestOptions) {
+        CompletableFuture<WhopApiHttpResponse<Dispute>> rawFuture = this.rawClient.accept(id, request, requestOptions);
+        CompletableFuture<Dispute> future = rawFuture.thenApply(response -> response.body());
+        future.whenComplete((result_, throwable_) -> {
+            if (future.isCancelled()) {
+                rawFuture.cancel(true);
+            }
+        });
+        return future;
+    }
+
+    /**
+     * Sends a dispute's evidence to the payment processor. The packet is checked against the processor's limits first, so a file over a cap is refused here with the file and the limit named. Otherwise the dispute is returned as <code>generating_response</code> with its evidence locked and the filing completes in the background: the dispute moves to <code>under_review</code> with <code>evidence_submitted_at</code> set once the processor accepts it, or back to <code>needs_response</code> with <code>submission_failure_reason</code> set when the processor refuses it, so it can be fixed and sent again before <code>evidence_due_at</code>. Either move is sent as <code>dispute.updated</code>.
      */
     public CompletableFuture<Dispute> submit(String id) {
-        return this.rawClient.submit(id).thenApply(response -> response.body());
+        CompletableFuture<WhopApiHttpResponse<Dispute>> rawFuture = this.rawClient.submit(id);
+        CompletableFuture<Dispute> future = rawFuture.thenApply(response -> response.body());
+        future.whenComplete((result_, throwable_) -> {
+            if (future.isCancelled()) {
+                rawFuture.cancel(true);
+            }
+        });
+        return future;
     }
 
     /**
-     * Sends a dispute's evidence to the payment processor. This is final — it cannot be edited or sent again.
+     * Sends a dispute's evidence to the payment processor. The packet is checked against the processor's limits first, so a file over a cap is refused here with the file and the limit named. Otherwise the dispute is returned as <code>generating_response</code> with its evidence locked and the filing completes in the background: the dispute moves to <code>under_review</code> with <code>evidence_submitted_at</code> set once the processor accepts it, or back to <code>needs_response</code> with <code>submission_failure_reason</code> set when the processor refuses it, so it can be fixed and sent again before <code>evidence_due_at</code>. Either move is sent as <code>dispute.updated</code>.
      */
     public CompletableFuture<Dispute> submit(String id, RequestOptions requestOptions) {
-        return this.rawClient.submit(id, requestOptions).thenApply(response -> response.body());
+        CompletableFuture<WhopApiHttpResponse<Dispute>> rawFuture = this.rawClient.submit(id, requestOptions);
+        CompletableFuture<Dispute> future = rawFuture.thenApply(response -> response.body());
+        future.whenComplete((result_, throwable_) -> {
+            if (future.isCancelled()) {
+                rawFuture.cancel(true);
+            }
+        });
+        return future;
     }
 
     /**
-     * Sends a dispute's evidence to the payment processor. This is final — it cannot be edited or sent again.
+     * Sends a dispute's evidence to the payment processor. The packet is checked against the processor's limits first, so a file over a cap is refused here with the file and the limit named. Otherwise the dispute is returned as <code>generating_response</code> with its evidence locked and the filing completes in the background: the dispute moves to <code>under_review</code> with <code>evidence_submitted_at</code> set once the processor accepts it, or back to <code>needs_response</code> with <code>submission_failure_reason</code> set when the processor refuses it, so it can be fixed and sent again before <code>evidence_due_at</code>. Either move is sent as <code>dispute.updated</code>.
      */
     public CompletableFuture<Dispute> submit(String id, SubmitDisputesRequest request) {
-        return this.rawClient.submit(id, request).thenApply(response -> response.body());
+        CompletableFuture<WhopApiHttpResponse<Dispute>> rawFuture = this.rawClient.submit(id, request);
+        CompletableFuture<Dispute> future = rawFuture.thenApply(response -> response.body());
+        future.whenComplete((result_, throwable_) -> {
+            if (future.isCancelled()) {
+                rawFuture.cancel(true);
+            }
+        });
+        return future;
     }
 
     /**
-     * Sends a dispute's evidence to the payment processor. This is final — it cannot be edited or sent again.
+     * Sends a dispute's evidence to the payment processor. The packet is checked against the processor's limits first, so a file over a cap is refused here with the file and the limit named. Otherwise the dispute is returned as <code>generating_response</code> with its evidence locked and the filing completes in the background: the dispute moves to <code>under_review</code> with <code>evidence_submitted_at</code> set once the processor accepts it, or back to <code>needs_response</code> with <code>submission_failure_reason</code> set when the processor refuses it, so it can be fixed and sent again before <code>evidence_due_at</code>. Either move is sent as <code>dispute.updated</code>.
      */
     public CompletableFuture<Dispute> submit(String id, SubmitDisputesRequest request, RequestOptions requestOptions) {
-        return this.rawClient.submit(id, request, requestOptions).thenApply(response -> response.body());
+        CompletableFuture<WhopApiHttpResponse<Dispute>> rawFuture = this.rawClient.submit(id, request, requestOptions);
+        CompletableFuture<Dispute> future = rawFuture.thenApply(response -> response.body());
+        future.whenComplete((result_, throwable_) -> {
+            if (future.isCancelled()) {
+                rawFuture.cancel(true);
+            }
+        });
+        return future;
     }
 
     /**
-     * Submit a payment dispute to the payment processor for review. Once submitted, no further edits can be made.
-     * <p>Required permissions:</p>
-     * <ul>
-     * <li><code>payment:dispute</code></li>
-     * <li><code>plan:basic:read</code></li>
-     * <li><code>access_pass:basic:read</code></li>
-     * <li><code>company:basic:read</code></li>
-     * <li><code>payment:basic:read</code></li>
-     * <li><code>member:email:read</code></li>
-     * <li><code>member:basic:read</code></li>
-     * <li><code>member:phone:read</code></li>
-     * </ul>
-     */
-    public CompletableFuture<Dispute> submitEvidenceDispute(String id) {
-        return this.rawClient.submitEvidenceDispute(id).thenApply(response -> response.body());
-    }
-
-    /**
-     * Submit a payment dispute to the payment processor for review. Once submitted, no further edits can be made.
-     * <p>Required permissions:</p>
-     * <ul>
-     * <li><code>payment:dispute</code></li>
-     * <li><code>plan:basic:read</code></li>
-     * <li><code>access_pass:basic:read</code></li>
-     * <li><code>company:basic:read</code></li>
-     * <li><code>payment:basic:read</code></li>
-     * <li><code>member:email:read</code></li>
-     * <li><code>member:basic:read</code></li>
-     * <li><code>member:phone:read</code></li>
-     * </ul>
-     */
-    public CompletableFuture<Dispute> submitEvidenceDispute(String id, RequestOptions requestOptions) {
-        return this.rawClient.submitEvidenceDispute(id, requestOptions).thenApply(response -> response.body());
-    }
-
-    /**
-     * Submit a payment dispute to the payment processor for review. Once submitted, no further edits can be made.
-     * <p>Required permissions:</p>
-     * <ul>
-     * <li><code>payment:dispute</code></li>
-     * <li><code>plan:basic:read</code></li>
-     * <li><code>access_pass:basic:read</code></li>
-     * <li><code>company:basic:read</code></li>
-     * <li><code>payment:basic:read</code></li>
-     * <li><code>member:email:read</code></li>
-     * <li><code>member:basic:read</code></li>
-     * <li><code>member:phone:read</code></li>
-     * </ul>
-     */
-    public CompletableFuture<Dispute> submitEvidenceDispute(String id, SubmitEvidenceDisputeRequest request) {
-        return this.rawClient.submitEvidenceDispute(id, request).thenApply(response -> response.body());
-    }
-
-    /**
-     * Submit a payment dispute to the payment processor for review. Once submitted, no further edits can be made.
-     * <p>Required permissions:</p>
-     * <ul>
-     * <li><code>payment:dispute</code></li>
-     * <li><code>plan:basic:read</code></li>
-     * <li><code>access_pass:basic:read</code></li>
-     * <li><code>company:basic:read</code></li>
-     * <li><code>payment:basic:read</code></li>
-     * <li><code>member:email:read</code></li>
-     * <li><code>member:basic:read</code></li>
-     * <li><code>member:phone:read</code></li>
-     * </ul>
-     */
-    public CompletableFuture<Dispute> submitEvidenceDispute(
-            String id, SubmitEvidenceDisputeRequest request, RequestOptions requestOptions) {
-        return this.rawClient.submitEvidenceDispute(id, request, requestOptions).thenApply(response -> response.body());
-    }
-
-    /**
-     * Update a dispute with evidence data to attempt to win the dispute.
-     * <p>Required permissions:</p>
-     * <ul>
-     * <li><code>payment:dispute</code></li>
-     * <li><code>plan:basic:read</code></li>
-     * <li><code>access_pass:basic:read</code></li>
-     * <li><code>company:basic:read</code></li>
-     * <li><code>payment:basic:read</code></li>
-     * <li><code>member:email:read</code></li>
-     * <li><code>member:basic:read</code></li>
-     * <li><code>member:phone:read</code></li>
-     * </ul>
-     */
-    public CompletableFuture<Dispute> updateEvidenceDispute(String id) {
-        return this.rawClient.updateEvidenceDispute(id).thenApply(response -> response.body());
-    }
-
-    /**
-     * Update a dispute with evidence data to attempt to win the dispute.
-     * <p>Required permissions:</p>
-     * <ul>
-     * <li><code>payment:dispute</code></li>
-     * <li><code>plan:basic:read</code></li>
-     * <li><code>access_pass:basic:read</code></li>
-     * <li><code>company:basic:read</code></li>
-     * <li><code>payment:basic:read</code></li>
-     * <li><code>member:email:read</code></li>
-     * <li><code>member:basic:read</code></li>
-     * <li><code>member:phone:read</code></li>
-     * </ul>
-     */
-    public CompletableFuture<Dispute> updateEvidenceDispute(String id, RequestOptions requestOptions) {
-        return this.rawClient.updateEvidenceDispute(id, requestOptions).thenApply(response -> response.body());
-    }
-
-    /**
-     * Update a dispute with evidence data to attempt to win the dispute.
-     * <p>Required permissions:</p>
-     * <ul>
-     * <li><code>payment:dispute</code></li>
-     * <li><code>plan:basic:read</code></li>
-     * <li><code>access_pass:basic:read</code></li>
-     * <li><code>company:basic:read</code></li>
-     * <li><code>payment:basic:read</code></li>
-     * <li><code>member:email:read</code></li>
-     * <li><code>member:basic:read</code></li>
-     * <li><code>member:phone:read</code></li>
-     * </ul>
-     */
-    public CompletableFuture<Dispute> updateEvidenceDispute(String id, UpdateEvidenceDisputeRequest request) {
-        return this.rawClient.updateEvidenceDispute(id, request).thenApply(response -> response.body());
-    }
-
-    /**
-     * Update a dispute with evidence data to attempt to win the dispute.
-     * <p>Required permissions:</p>
-     * <ul>
-     * <li><code>payment:dispute</code></li>
-     * <li><code>plan:basic:read</code></li>
-     * <li><code>access_pass:basic:read</code></li>
-     * <li><code>company:basic:read</code></li>
-     * <li><code>payment:basic:read</code></li>
-     * <li><code>member:email:read</code></li>
-     * <li><code>member:basic:read</code></li>
-     * <li><code>member:phone:read</code></li>
-     * </ul>
-     */
-    public CompletableFuture<Dispute> updateEvidenceDispute(
-            String id, UpdateEvidenceDisputeRequest request, RequestOptions requestOptions) {
-        return this.rawClient.updateEvidenceDispute(id, request, requestOptions).thenApply(response -> response.body());
-    }
-
-    /**
-     * Replaces the full set of uploaded evidence documents on a dispute, beyond the four fixed evidence slots. Send the files as multipart file parts to upload and attach in one call, or reference files already stored by <code>id</code>/<code>direct_upload_id</code>. Send every document the packet should carry — up to 10, 10MB each and 25MB in total; an empty list removes them all. Accepted content types: application/pdf, application/json, image/jpeg, image/png, image/webp — any other type is rejected.
+     * Replaces the full set of uploaded evidence documents on a dispute, beyond the four fixed evidence slots. Prefer <code>PATCH /disputes/:id</code> with <code>evidence.documents</code>, which does the same replace alongside every other evidence field in one call.
      */
     public CompletableFuture<Dispute> uploadEvidence(String id, UploadEvidenceDisputesRequest request) {
-        return this.rawClient.uploadEvidence(id, request).thenApply(response -> response.body());
+        CompletableFuture<WhopApiHttpResponse<Dispute>> rawFuture = this.rawClient.uploadEvidence(id, request);
+        CompletableFuture<Dispute> future = rawFuture.thenApply(response -> response.body());
+        future.whenComplete((result_, throwable_) -> {
+            if (future.isCancelled()) {
+                rawFuture.cancel(true);
+            }
+        });
+        return future;
     }
 
     /**
-     * Replaces the full set of uploaded evidence documents on a dispute, beyond the four fixed evidence slots. Send the files as multipart file parts to upload and attach in one call, or reference files already stored by <code>id</code>/<code>direct_upload_id</code>. Send every document the packet should carry — up to 10, 10MB each and 25MB in total; an empty list removes them all. Accepted content types: application/pdf, application/json, image/jpeg, image/png, image/webp — any other type is rejected.
+     * Replaces the full set of uploaded evidence documents on a dispute, beyond the four fixed evidence slots. Prefer <code>PATCH /disputes/:id</code> with <code>evidence.documents</code>, which does the same replace alongside every other evidence field in one call.
      */
     public CompletableFuture<Dispute> uploadEvidence(
             String id, UploadEvidenceDisputesRequest request, RequestOptions requestOptions) {
-        return this.rawClient.uploadEvidence(id, request, requestOptions).thenApply(response -> response.body());
+        CompletableFuture<WhopApiHttpResponse<Dispute>> rawFuture =
+                this.rawClient.uploadEvidence(id, request, requestOptions);
+        CompletableFuture<Dispute> future = rawFuture.thenApply(response -> response.body());
+        future.whenComplete((result_, throwable_) -> {
+            if (future.isCancelled()) {
+                rawFuture.cancel(true);
+            }
+        });
+        return future;
     }
 }

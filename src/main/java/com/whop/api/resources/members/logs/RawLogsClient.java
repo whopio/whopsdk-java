@@ -6,8 +6,10 @@ package com.whop.api.resources.members.logs;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.whop.api.core.ClientOptions;
 import com.whop.api.core.ObjectMappers;
+import com.whop.api.core.PathSegments;
 import com.whop.api.core.QueryStringMapper;
 import com.whop.api.core.RequestOptions;
+import com.whop.api.core.RetryInterceptor;
 import com.whop.api.core.WhopApiApiException;
 import com.whop.api.core.WhopApiException;
 import com.whop.api.core.WhopApiHttpResponse;
@@ -35,14 +37,14 @@ public class RawLogsClient {
     }
 
     /**
-     * Lists activity for a member and all of their non-drafted memberships, most recent first.
+     * Lists activity for a member and all of their memberships that are not <code>drafted</code>, most recent first.
      */
     public WhopApiHttpResponse<SyncPagingIterable<ListLogsResponseDataItem>> list(String id) {
         return list(id, ListLogsRequest.builder().build());
     }
 
     /**
-     * Lists activity for a member and all of their non-drafted memberships, most recent first.
+     * Lists activity for a member and all of their memberships that are not <code>drafted</code>, most recent first.
      */
     public WhopApiHttpResponse<SyncPagingIterable<ListLogsResponseDataItem>> list(
             String id, RequestOptions requestOptions) {
@@ -50,21 +52,21 @@ public class RawLogsClient {
     }
 
     /**
-     * Lists activity for a member and all of their non-drafted memberships, most recent first.
+     * Lists activity for a member and all of their memberships that are not <code>drafted</code>, most recent first.
      */
     public WhopApiHttpResponse<SyncPagingIterable<ListLogsResponseDataItem>> list(String id, ListLogsRequest request) {
         return list(id, request, null);
     }
 
     /**
-     * Lists activity for a member and all of their non-drafted memberships, most recent first.
+     * Lists activity for a member and all of their memberships that are not <code>drafted</code>, most recent first.
      */
     public WhopApiHttpResponse<SyncPagingIterable<ListLogsResponseDataItem>> list(
             String id, ListLogsRequest request, RequestOptions requestOptions) {
-        HttpUrl.Builder httpUrl = HttpUrl.parse(this.clientOptions.environment().getUrl())
+        HttpUrl.Builder httpUrl = HttpUrl.parse(this.clientOptions.environment().getApiURL())
                 .newBuilder()
                 .addPathSegments("members")
-                .addPathSegment(id)
+                .addPathSegment(PathSegments.validate(id))
                 .addPathSegments("logs");
         if (request.getFirst().isPresent()) {
             QueryStringMapper.addQueryParameter(
@@ -97,6 +99,15 @@ public class RawLogsClient {
         if (requestOptions != null && requestOptions.getTimeout().isPresent()) {
             client = clientOptions.httpClientWithTimeout(requestOptions);
         }
+        if (requestOptions != null && requestOptions.getMaxRetries().isPresent()) {
+            okhttpRequest = okhttpRequest
+                    .newBuilder()
+                    .tag(
+                            RetryInterceptor.MaxRetriesOverride.class,
+                            new RetryInterceptor.MaxRetriesOverride(
+                                    requestOptions.getMaxRetries().get()))
+                    .build();
+        }
         try (Response response = client.newCall(okhttpRequest).execute()) {
             ResponseBody responseBody = response.body();
             String responseBodyString = responseBody != null ? responseBody.string() : "{}";
@@ -111,9 +122,11 @@ public class RawLogsClient {
                 List<ListLogsResponseDataItem> result = parsedResponse.getData();
                 return new WhopApiHttpResponse<>(
                         new SyncPagingIterable<ListLogsResponseDataItem>(
-                                startingAfter != null, result, parsedResponse, () -> list(
-                                                id, nextRequest, requestOptions)
-                                        .body()),
+                                startingAfter.isPresent()
+                                        && !startingAfter.get().isEmpty(),
+                                result,
+                                parsedResponse,
+                                () -> list(id, nextRequest, requestOptions).body()),
                         response);
             }
             try {
@@ -131,6 +144,8 @@ public class RawLogsClient {
             Object errorBody = ObjectMappers.parseErrorBody(responseBodyString);
             throw new WhopApiApiException(
                     "Error with status code " + response.code(), response.code(), errorBody, response);
+        } catch (JsonProcessingException e) {
+            throw new WhopApiException("Failed to deserialize response: " + e.getMessage(), e);
         } catch (IOException e) {
             throw new WhopApiException("Network error executing HTTP request", e);
         }

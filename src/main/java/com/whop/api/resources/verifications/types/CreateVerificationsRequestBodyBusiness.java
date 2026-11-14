@@ -13,6 +13,7 @@ import com.fasterxml.jackson.annotation.Nulls;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.whop.api.core.ObjectMappers;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
@@ -34,15 +35,25 @@ public final class CreateVerificationsRequestBodyBusiness {
 
     private final Optional<String> dateOfBirth;
 
+    private final Optional<CreateVerificationsRequestBodyBusinessDocuments> documents;
+
     private final Optional<String> firstName;
+
+    private final Optional<String> incorporationDate;
 
     private final Optional<String> lastName;
 
+    private final Optional<List<CreateVerificationsRequestBodyBusinessOwnersItem>> owners;
+
     private final Optional<String> placeOfIncorporation;
+
+    private final Optional<String> registrationNumber;
 
     private final Optional<String> shareToken;
 
     private final Optional<String> taxIdentificationNumber;
+
+    private final Optional<String> verificationId;
 
     private final Map<String, Object> additionalProperties;
 
@@ -54,11 +65,16 @@ public final class CreateVerificationsRequestBodyBusiness {
             Optional<String> businessWebsite,
             Optional<String> country,
             Optional<String> dateOfBirth,
+            Optional<CreateVerificationsRequestBodyBusinessDocuments> documents,
             Optional<String> firstName,
+            Optional<String> incorporationDate,
             Optional<String> lastName,
+            Optional<List<CreateVerificationsRequestBodyBusinessOwnersItem>> owners,
             Optional<String> placeOfIncorporation,
+            Optional<String> registrationNumber,
             Optional<String> shareToken,
             Optional<String> taxIdentificationNumber,
+            Optional<String> verificationId,
             Map<String, Object> additionalProperties) {
         this.address = address;
         this.businessName = businessName;
@@ -67,11 +83,16 @@ public final class CreateVerificationsRequestBodyBusiness {
         this.businessWebsite = businessWebsite;
         this.country = country;
         this.dateOfBirth = dateOfBirth;
+        this.documents = documents;
         this.firstName = firstName;
+        this.incorporationDate = incorporationDate;
         this.lastName = lastName;
+        this.owners = owners;
         this.placeOfIncorporation = placeOfIncorporation;
+        this.registrationNumber = registrationNumber;
         this.shareToken = shareToken;
         this.taxIdentificationNumber = taxIdentificationNumber;
+        this.verificationId = verificationId;
         this.additionalProperties = additionalProperties;
     }
 
@@ -132,11 +153,27 @@ public final class CreateVerificationsRequestBodyBusiness {
     }
 
     /**
+     * @return Company formation documents, each the ID of a file uploaded with Create File and not yet attached to anything else, prefixed <code>file_</code>. Send the ID once its <code>upload_status</code> is <code>ready</code>. Each file must be a PDF, JPEG, or PNG of up to 10MB. They are filed under the business's country, from <code>country</code>, <code>address</code>, or an earlier request. A document of a kind already on file is kept unless it was rejected, so a retried request does not add a second copy. The hosted session at <code>session_url</code> collects anything still missing.
+     */
+    @JsonProperty("documents")
+    public Optional<CreateVerificationsRequestBodyBusinessDocuments> getDocuments() {
+        return documents;
+    }
+
+    /**
      * @return First name of the business representative, used to prefill the verification session.
      */
     @JsonProperty("first_name")
     public Optional<String> getFirstName() {
         return firstName;
+    }
+
+    /**
+     * @return Date the business was incorporated, formatted as <code>YYYY-MM-DD</code>. Cannot be in the future. Sent to the verification provider and returned in the response; <code>requested_information</code> asks for it while it is still missing.
+     */
+    @JsonProperty("incorporation_date")
+    public Optional<String> getIncorporationDate() {
+        return incorporationDate;
     }
 
     /**
@@ -148,11 +185,27 @@ public final class CreateVerificationsRequestBodyBusiness {
     }
 
     /**
-     * @return State or region where the business is incorporated.
+     * @return Owners of the business, up to 10 per request. Once the company details, the company documents, and the owners are in and every new owner's documents were sent, Create Verification sends the business for review: in the request that completes it, as soon as the last owner's documents finish sending in the background, or when called again after Update Verification. Owners can still be added, changed, or removed while the review waits on them.
+     */
+    @JsonProperty("owners")
+    public Optional<List<CreateVerificationsRequestBodyBusinessOwnersItem>> getOwners() {
+        return owners;
+    }
+
+    /**
+     * @return State or region where the business is incorporated. Sent to the verification provider and returned in the response; <code>requested_information</code> asks for it while it is still missing.
      */
     @JsonProperty("place_of_incorporation")
     public Optional<String> getPlaceOfIncorporation() {
         return placeOfIncorporation;
+    }
+
+    /**
+     * @return Number the business was registered under in its place of incorporation, such as a state file number in the US or a Company Number in the UK. Sent to the verification provider and returned in the response; <code>requested_information</code> asks for it while it is still missing.
+     */
+    @JsonProperty("registration_number")
+    public Optional<String> getRegistrationNumber() {
+        return registrationNumber;
     }
 
     /**
@@ -169,6 +222,14 @@ public final class CreateVerificationsRequestBodyBusiness {
     @JsonProperty("tax_identification_number")
     public Optional<String> getTaxIdentificationNumber() {
         return taxIdentificationNumber;
+    }
+
+    /**
+     * @return ID of an <code>approved</code> verification to reuse on this account instead of verifying the person again, for example <code>idpf_XXXXXXXX</code>. The verification becomes this account's current one for its kind — replacing whichever verification of that kind the account already has, and carrying its payout account across — and the response is that same verification, unchanged. Only the signed-in Whop user who started the original verification can reuse it: API keys, OAuth tokens, and onboarding links are refused. <code>kind</code> is the only other field it accepts, and must match the reused verification. An account whose verification was denied or is still under review cannot reuse one.
+     */
+    @JsonProperty("verification_id")
+    public Optional<String> getVerificationId() {
+        return verificationId;
     }
 
     @java.lang.Override
@@ -191,11 +252,16 @@ public final class CreateVerificationsRequestBodyBusiness {
                 && businessWebsite.equals(other.businessWebsite)
                 && country.equals(other.country)
                 && dateOfBirth.equals(other.dateOfBirth)
+                && documents.equals(other.documents)
                 && firstName.equals(other.firstName)
+                && incorporationDate.equals(other.incorporationDate)
                 && lastName.equals(other.lastName)
+                && owners.equals(other.owners)
                 && placeOfIncorporation.equals(other.placeOfIncorporation)
+                && registrationNumber.equals(other.registrationNumber)
                 && shareToken.equals(other.shareToken)
-                && taxIdentificationNumber.equals(other.taxIdentificationNumber);
+                && taxIdentificationNumber.equals(other.taxIdentificationNumber)
+                && verificationId.equals(other.verificationId);
     }
 
     @java.lang.Override
@@ -208,11 +274,16 @@ public final class CreateVerificationsRequestBodyBusiness {
                 this.businessWebsite,
                 this.country,
                 this.dateOfBirth,
+                this.documents,
                 this.firstName,
+                this.incorporationDate,
                 this.lastName,
+                this.owners,
                 this.placeOfIncorporation,
+                this.registrationNumber,
                 this.shareToken,
-                this.taxIdentificationNumber);
+                this.taxIdentificationNumber,
+                this.verificationId);
     }
 
     @java.lang.Override
@@ -240,17 +311,26 @@ public final class CreateVerificationsRequestBodyBusiness {
 
         private Optional<String> dateOfBirth = Optional.empty();
 
+        private Optional<CreateVerificationsRequestBodyBusinessDocuments> documents = Optional.empty();
+
         private Optional<String> firstName = Optional.empty();
+
+        private Optional<String> incorporationDate = Optional.empty();
 
         private Optional<String> lastName = Optional.empty();
 
+        private Optional<List<CreateVerificationsRequestBodyBusinessOwnersItem>> owners = Optional.empty();
+
         private Optional<String> placeOfIncorporation = Optional.empty();
+
+        private Optional<String> registrationNumber = Optional.empty();
 
         private Optional<String> shareToken = Optional.empty();
 
         private Optional<String> taxIdentificationNumber = Optional.empty();
 
-        @JsonAnySetter
+        private Optional<String> verificationId = Optional.empty();
+
         private Map<String, Object> additionalProperties = new HashMap<>();
 
         private Builder() {}
@@ -263,11 +343,16 @@ public final class CreateVerificationsRequestBodyBusiness {
             businessWebsite(other.getBusinessWebsite());
             country(other.getCountry());
             dateOfBirth(other.getDateOfBirth());
+            documents(other.getDocuments());
             firstName(other.getFirstName());
+            incorporationDate(other.getIncorporationDate());
             lastName(other.getLastName());
+            owners(other.getOwners());
             placeOfIncorporation(other.getPlaceOfIncorporation());
+            registrationNumber(other.getRegistrationNumber());
             shareToken(other.getShareToken());
             taxIdentificationNumber(other.getTaxIdentificationNumber());
+            verificationId(other.getVerificationId());
             return this;
         }
 
@@ -370,6 +455,20 @@ public final class CreateVerificationsRequestBodyBusiness {
         }
 
         /**
+         * <p>Company formation documents, each the ID of a file uploaded with Create File and not yet attached to anything else, prefixed <code>file_</code>. Send the ID once its <code>upload_status</code> is <code>ready</code>. Each file must be a PDF, JPEG, or PNG of up to 10MB. They are filed under the business's country, from <code>country</code>, <code>address</code>, or an earlier request. A document of a kind already on file is kept unless it was rejected, so a retried request does not add a second copy. The hosted session at <code>session_url</code> collects anything still missing.</p>
+         */
+        @JsonSetter(value = "documents", nulls = Nulls.SKIP)
+        public Builder documents(Optional<CreateVerificationsRequestBodyBusinessDocuments> documents) {
+            this.documents = documents;
+            return this;
+        }
+
+        public Builder documents(CreateVerificationsRequestBodyBusinessDocuments documents) {
+            this.documents = Optional.ofNullable(documents);
+            return this;
+        }
+
+        /**
          * <p>First name of the business representative, used to prefill the verification session.</p>
          */
         @JsonSetter(value = "first_name", nulls = Nulls.SKIP)
@@ -380,6 +479,20 @@ public final class CreateVerificationsRequestBodyBusiness {
 
         public Builder firstName(String firstName) {
             this.firstName = Optional.ofNullable(firstName);
+            return this;
+        }
+
+        /**
+         * <p>Date the business was incorporated, formatted as <code>YYYY-MM-DD</code>. Cannot be in the future. Sent to the verification provider and returned in the response; <code>requested_information</code> asks for it while it is still missing.</p>
+         */
+        @JsonSetter(value = "incorporation_date", nulls = Nulls.SKIP)
+        public Builder incorporationDate(Optional<String> incorporationDate) {
+            this.incorporationDate = incorporationDate;
+            return this;
+        }
+
+        public Builder incorporationDate(String incorporationDate) {
+            this.incorporationDate = Optional.ofNullable(incorporationDate);
             return this;
         }
 
@@ -398,7 +511,21 @@ public final class CreateVerificationsRequestBodyBusiness {
         }
 
         /**
-         * <p>State or region where the business is incorporated.</p>
+         * <p>Owners of the business, up to 10 per request. Once the company details, the company documents, and the owners are in and every new owner's documents were sent, Create Verification sends the business for review: in the request that completes it, as soon as the last owner's documents finish sending in the background, or when called again after Update Verification. Owners can still be added, changed, or removed while the review waits on them.</p>
+         */
+        @JsonSetter(value = "owners", nulls = Nulls.SKIP)
+        public Builder owners(Optional<List<CreateVerificationsRequestBodyBusinessOwnersItem>> owners) {
+            this.owners = owners;
+            return this;
+        }
+
+        public Builder owners(List<CreateVerificationsRequestBodyBusinessOwnersItem> owners) {
+            this.owners = Optional.ofNullable(owners);
+            return this;
+        }
+
+        /**
+         * <p>State or region where the business is incorporated. Sent to the verification provider and returned in the response; <code>requested_information</code> asks for it while it is still missing.</p>
          */
         @JsonSetter(value = "place_of_incorporation", nulls = Nulls.SKIP)
         public Builder placeOfIncorporation(Optional<String> placeOfIncorporation) {
@@ -408,6 +535,20 @@ public final class CreateVerificationsRequestBodyBusiness {
 
         public Builder placeOfIncorporation(String placeOfIncorporation) {
             this.placeOfIncorporation = Optional.ofNullable(placeOfIncorporation);
+            return this;
+        }
+
+        /**
+         * <p>Number the business was registered under in its place of incorporation, such as a state file number in the US or a Company Number in the UK. Sent to the verification provider and returned in the response; <code>requested_information</code> asks for it while it is still missing.</p>
+         */
+        @JsonSetter(value = "registration_number", nulls = Nulls.SKIP)
+        public Builder registrationNumber(Optional<String> registrationNumber) {
+            this.registrationNumber = registrationNumber;
+            return this;
+        }
+
+        public Builder registrationNumber(String registrationNumber) {
+            this.registrationNumber = Optional.ofNullable(registrationNumber);
             return this;
         }
 
@@ -439,6 +580,20 @@ public final class CreateVerificationsRequestBodyBusiness {
             return this;
         }
 
+        /**
+         * <p>ID of an <code>approved</code> verification to reuse on this account instead of verifying the person again, for example <code>idpf_XXXXXXXX</code>. The verification becomes this account's current one for its kind — replacing whichever verification of that kind the account already has, and carrying its payout account across — and the response is that same verification, unchanged. Only the signed-in Whop user who started the original verification can reuse it: API keys, OAuth tokens, and onboarding links are refused. <code>kind</code> is the only other field it accepts, and must match the reused verification. An account whose verification was denied or is still under review cannot reuse one.</p>
+         */
+        @JsonSetter(value = "verification_id", nulls = Nulls.SKIP)
+        public Builder verificationId(Optional<String> verificationId) {
+            this.verificationId = verificationId;
+            return this;
+        }
+
+        public Builder verificationId(String verificationId) {
+            this.verificationId = Optional.ofNullable(verificationId);
+            return this;
+        }
+
         public CreateVerificationsRequestBodyBusiness build() {
             return new CreateVerificationsRequestBodyBusiness(
                     address,
@@ -448,12 +603,41 @@ public final class CreateVerificationsRequestBodyBusiness {
                     businessWebsite,
                     country,
                     dateOfBirth,
+                    documents,
                     firstName,
+                    incorporationDate,
                     lastName,
+                    owners,
                     placeOfIncorporation,
+                    registrationNumber,
                     shareToken,
                     taxIdentificationNumber,
+                    verificationId,
                     additionalProperties);
+        }
+
+        @JsonAnySetter
+        private void putAdditionalPropertyFromJson(String key, Object value) {
+            if (key.equalsIgnoreCase("address")
+                    || key.equalsIgnoreCase("business_name")
+                    || key.equalsIgnoreCase("business_structure")
+                    || key.equalsIgnoreCase("business_tax_identification_number")
+                    || key.equalsIgnoreCase("business_website")
+                    || key.equalsIgnoreCase("country")
+                    || key.equalsIgnoreCase("date_of_birth")
+                    || key.equalsIgnoreCase("documents")
+                    || key.equalsIgnoreCase("first_name")
+                    || key.equalsIgnoreCase("incorporation_date")
+                    || key.equalsIgnoreCase("last_name")
+                    || key.equalsIgnoreCase("owners")
+                    || key.equalsIgnoreCase("place_of_incorporation")
+                    || key.equalsIgnoreCase("registration_number")
+                    || key.equalsIgnoreCase("share_token")
+                    || key.equalsIgnoreCase("tax_identification_number")
+                    || key.equalsIgnoreCase("verification_id")) {
+                return;
+            }
+            this.additionalProperties.put(key, value);
         }
 
         public Builder additionalProperty(String key, Object value) {

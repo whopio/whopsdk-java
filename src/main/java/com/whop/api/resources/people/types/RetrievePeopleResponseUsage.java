@@ -155,7 +155,6 @@ public final class RetrievePeopleResponseUsage {
 
         private Optional<List<RetrievePeopleResponseUsageTimezoneItem>> timezone = Optional.empty();
 
-        @JsonAnySetter
         private Map<String, Object> additionalProperties = new HashMap<>();
 
         private Builder() {}
@@ -263,6 +262,21 @@ public final class RetrievePeopleResponseUsage {
         public RetrievePeopleResponseUsage build() {
             return new RetrievePeopleResponseUsage(
                     browser, city, country, device, ip, os, referrer, timezone, additionalProperties);
+        }
+
+        @JsonAnySetter
+        private void putAdditionalPropertyFromJson(String key, Object value) {
+            if (key.equalsIgnoreCase("browser")
+                    || key.equalsIgnoreCase("city")
+                    || key.equalsIgnoreCase("country")
+                    || key.equalsIgnoreCase("device")
+                    || key.equalsIgnoreCase("ip")
+                    || key.equalsIgnoreCase("os")
+                    || key.equalsIgnoreCase("referrer")
+                    || key.equalsIgnoreCase("timezone")) {
+                return;
+            }
+            this.additionalProperties.put(key, value);
         }
 
         public Builder additionalProperty(String key, Object value) {

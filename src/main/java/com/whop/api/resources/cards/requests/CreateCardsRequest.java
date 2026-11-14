@@ -12,6 +12,9 @@ import com.fasterxml.jackson.annotation.JsonSetter;
 import com.fasterxml.jackson.annotation.Nulls;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.whop.api.core.ObjectMappers;
+import com.whop.api.resources.cards.types.CreateCardsRequestBilling;
+import com.whop.api.resources.cards.types.CreateCardsRequestCardholder;
+import com.whop.api.resources.cards.types.CreateCardsRequestKind;
 import com.whop.api.resources.cards.types.CreateCardsRequestSpendLimitFrequency;
 import java.util.HashMap;
 import java.util.Map;
@@ -24,6 +27,12 @@ public final class CreateCardsRequest {
     private final Optional<String> accountId;
 
     private final Optional<String> assignedUserId;
+
+    private final Optional<CreateCardsRequestBilling> billing;
+
+    private final Optional<CreateCardsRequestCardholder> cardholder;
+
+    private final Optional<CreateCardsRequestKind> kind;
 
     private final Optional<String> name;
 
@@ -40,6 +49,9 @@ public final class CreateCardsRequest {
     private CreateCardsRequest(
             Optional<String> accountId,
             Optional<String> assignedUserId,
+            Optional<CreateCardsRequestBilling> billing,
+            Optional<CreateCardsRequestCardholder> cardholder,
+            Optional<CreateCardsRequestKind> kind,
             Optional<String> name,
             Optional<Double> spendLimit,
             Optional<CreateCardsRequestSpendLimitFrequency> spendLimitFrequency,
@@ -48,6 +60,9 @@ public final class CreateCardsRequest {
             Map<String, Object> additionalProperties) {
         this.accountId = accountId;
         this.assignedUserId = assignedUserId;
+        this.billing = billing;
+        this.cardholder = cardholder;
+        this.kind = kind;
         this.name = name;
         this.spendLimit = spendLimit;
         this.spendLimitFrequency = spendLimitFrequency;
@@ -65,11 +80,35 @@ public final class CreateCardsRequest {
     }
 
     /**
-     * @return The account member (a user_ identifier) to assign the card to. Required for business card issuing accounts.
+     * @return The account member (a user_ identifier) to assign the card to. Required for business card issuing accounts. When this call files the card application, the member applies with their identity; a company API key that sends neither this nor kind is refused.
      */
     @JsonProperty("assigned_user_id")
     public Optional<String> getAssignedUserId() {
         return assignedUserId;
+    }
+
+    /**
+     * @return The card's initial billing address. On a company card it also registers the assigned member as a cardholder if they are not one yet. For an individual card, region is also required.
+     */
+    @JsonProperty("billing")
+    public Optional<CreateCardsRequestBilling> getBilling() {
+        return billing;
+    }
+
+    /**
+     * @return Details for a company card's assigned member when they are not registered as a cardholder yet. Send with billing to register them and start provisioning in one call instead of sending them an onboarding invitation. The legal name comes from the member's approved identity verification when they have one, and from these fields when they do not.
+     */
+    @JsonProperty("cardholder")
+    public Optional<CreateCardsRequestCardholder> getCardholder() {
+        return cardholder;
+    }
+
+    /**
+     * @return Who the card application verifies, set only on the call that files it; sending it while the account's application is in progress or approved is a 400. <code>business</code> applies as the account with its approved KYB. <code>individual</code> applies as a person: assigned_user_id when given, otherwise the account owner, using the identity verified on the account. Omit it to apply as the business when its KYB is approved, and as an individual otherwise.
+     */
+    @JsonProperty("kind")
+    public Optional<CreateCardsRequestKind> getKind() {
+        return kind;
     }
 
     /**
@@ -126,6 +165,9 @@ public final class CreateCardsRequest {
     private boolean equalTo(CreateCardsRequest other) {
         return accountId.equals(other.accountId)
                 && assignedUserId.equals(other.assignedUserId)
+                && billing.equals(other.billing)
+                && cardholder.equals(other.cardholder)
+                && kind.equals(other.kind)
                 && name.equals(other.name)
                 && spendLimit.equals(other.spendLimit)
                 && spendLimitFrequency.equals(other.spendLimitFrequency)
@@ -138,6 +180,9 @@ public final class CreateCardsRequest {
         return Objects.hash(
                 this.accountId,
                 this.assignedUserId,
+                this.billing,
+                this.cardholder,
+                this.kind,
                 this.name,
                 this.spendLimit,
                 this.spendLimitFrequency,
@@ -160,6 +205,12 @@ public final class CreateCardsRequest {
 
         private Optional<String> assignedUserId = Optional.empty();
 
+        private Optional<CreateCardsRequestBilling> billing = Optional.empty();
+
+        private Optional<CreateCardsRequestCardholder> cardholder = Optional.empty();
+
+        private Optional<CreateCardsRequestKind> kind = Optional.empty();
+
         private Optional<String> name = Optional.empty();
 
         private Optional<Double> spendLimit = Optional.empty();
@@ -170,7 +221,6 @@ public final class CreateCardsRequest {
 
         private Optional<String> userId = Optional.empty();
 
-        @JsonAnySetter
         private Map<String, Object> additionalProperties = new HashMap<>();
 
         private Builder() {}
@@ -178,6 +228,9 @@ public final class CreateCardsRequest {
         public Builder from(CreateCardsRequest other) {
             accountId(other.getAccountId());
             assignedUserId(other.getAssignedUserId());
+            billing(other.getBilling());
+            cardholder(other.getCardholder());
+            kind(other.getKind());
             name(other.getName());
             spendLimit(other.getSpendLimit());
             spendLimitFrequency(other.getSpendLimitFrequency());
@@ -201,7 +254,7 @@ public final class CreateCardsRequest {
         }
 
         /**
-         * <p>The account member (a user_ identifier) to assign the card to. Required for business card issuing accounts.</p>
+         * <p>The account member (a user_ identifier) to assign the card to. Required for business card issuing accounts. When this call files the card application, the member applies with their identity; a company API key that sends neither this nor kind is refused.</p>
          */
         @JsonSetter(value = "assigned_user_id", nulls = Nulls.SKIP)
         public Builder assignedUserId(Optional<String> assignedUserId) {
@@ -211,6 +264,48 @@ public final class CreateCardsRequest {
 
         public Builder assignedUserId(String assignedUserId) {
             this.assignedUserId = Optional.ofNullable(assignedUserId);
+            return this;
+        }
+
+        /**
+         * <p>The card's initial billing address. On a company card it also registers the assigned member as a cardholder if they are not one yet. For an individual card, region is also required.</p>
+         */
+        @JsonSetter(value = "billing", nulls = Nulls.SKIP)
+        public Builder billing(Optional<CreateCardsRequestBilling> billing) {
+            this.billing = billing;
+            return this;
+        }
+
+        public Builder billing(CreateCardsRequestBilling billing) {
+            this.billing = Optional.ofNullable(billing);
+            return this;
+        }
+
+        /**
+         * <p>Details for a company card's assigned member when they are not registered as a cardholder yet. Send with billing to register them and start provisioning in one call instead of sending them an onboarding invitation. The legal name comes from the member's approved identity verification when they have one, and from these fields when they do not.</p>
+         */
+        @JsonSetter(value = "cardholder", nulls = Nulls.SKIP)
+        public Builder cardholder(Optional<CreateCardsRequestCardholder> cardholder) {
+            this.cardholder = cardholder;
+            return this;
+        }
+
+        public Builder cardholder(CreateCardsRequestCardholder cardholder) {
+            this.cardholder = Optional.ofNullable(cardholder);
+            return this;
+        }
+
+        /**
+         * <p>Who the card application verifies, set only on the call that files it; sending it while the account's application is in progress or approved is a 400. <code>business</code> applies as the account with its approved KYB. <code>individual</code> applies as a person: assigned_user_id when given, otherwise the account owner, using the identity verified on the account. Omit it to apply as the business when its KYB is approved, and as an individual otherwise.</p>
+         */
+        @JsonSetter(value = "kind", nulls = Nulls.SKIP)
+        public Builder kind(Optional<CreateCardsRequestKind> kind) {
+            this.kind = kind;
+            return this;
+        }
+
+        public Builder kind(CreateCardsRequestKind kind) {
+            this.kind = Optional.ofNullable(kind);
             return this;
         }
 
@@ -288,12 +383,32 @@ public final class CreateCardsRequest {
             return new CreateCardsRequest(
                     accountId,
                     assignedUserId,
+                    billing,
+                    cardholder,
+                    kind,
                     name,
                     spendLimit,
                     spendLimitFrequency,
                     transactionLimit,
                     userId,
                     additionalProperties);
+        }
+
+        @JsonAnySetter
+        private void putAdditionalPropertyFromJson(String key, Object value) {
+            if (key.equalsIgnoreCase("account_id")
+                    || key.equalsIgnoreCase("assigned_user_id")
+                    || key.equalsIgnoreCase("billing")
+                    || key.equalsIgnoreCase("cardholder")
+                    || key.equalsIgnoreCase("kind")
+                    || key.equalsIgnoreCase("name")
+                    || key.equalsIgnoreCase("spend_limit")
+                    || key.equalsIgnoreCase("spend_limit_frequency")
+                    || key.equalsIgnoreCase("transaction_limit")
+                    || key.equalsIgnoreCase("user_id")) {
+                return;
+            }
+            this.additionalProperties.put(key, value);
         }
 
         public Builder additionalProperty(String key, Object value) {

@@ -332,7 +332,6 @@ public final class WorkforceBountyListItem {
 
         private int voteThreshold;
 
-        @JsonAnySetter
         private Map<String, Object> additionalProperties = new HashMap<>();
 
         private Builder() {}
@@ -355,7 +354,6 @@ public final class WorkforceBountyListItem {
 
         /**
          * <p>The underlying bounty implementation type.</p>
-         * <p>The underlying bounty implementation type.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
@@ -366,7 +364,6 @@ public final class WorkforceBountyListItem {
         }
 
         /**
-         * <p>The datetime the bounty was created.</p>
          * <p>The datetime the bounty was created.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
@@ -379,7 +376,6 @@ public final class WorkforceBountyListItem {
 
         /**
          * <p>The currency used for the bounty funds.</p>
-         * <p>The currency used for the bounty funds.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
@@ -390,7 +386,6 @@ public final class WorkforceBountyListItem {
         }
 
         /**
-         * <p>The description of the bounty.</p>
          * <p>The description of the bounty.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
@@ -403,7 +398,6 @@ public final class WorkforceBountyListItem {
 
         /**
          * <p>The unique identifier for the bounty.</p>
-         * <p>The unique identifier for the bounty.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
@@ -414,7 +408,6 @@ public final class WorkforceBountyListItem {
         }
 
         /**
-         * <p>The current lifecycle status of the bounty.</p>
          * <p>The current lifecycle status of the bounty.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
@@ -427,7 +420,6 @@ public final class WorkforceBountyListItem {
 
         /**
          * <p>The title of the bounty.</p>
-         * <p>The title of the bounty.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
@@ -438,7 +430,6 @@ public final class WorkforceBountyListItem {
         }
 
         /**
-         * <p>The total amount currently funded in the bounty pool for payout.</p>
          * <p>The total amount currently funded in the bounty pool for payout.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
@@ -451,7 +442,6 @@ public final class WorkforceBountyListItem {
 
         /**
          * <p>The total amount paid out for this bounty.</p>
-         * <p>The total amount paid out for this bounty.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
@@ -463,7 +453,6 @@ public final class WorkforceBountyListItem {
 
         /**
          * <p>The datetime the bounty was last updated.</p>
-         * <p>The datetime the bounty was last updated.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
@@ -474,7 +463,6 @@ public final class WorkforceBountyListItem {
         }
 
         /**
-         * <p>The number of watcher votes required before the submission can resolve.</p>
          * <p>The number of watcher votes required before the submission can resolve.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
@@ -500,6 +488,24 @@ public final class WorkforceBountyListItem {
                     updatedAt,
                     voteThreshold,
                     additionalProperties);
+        }
+
+        @JsonAnySetter
+        private void putAdditionalPropertyFromJson(String key, Object value) {
+            if (key.equalsIgnoreCase("bounty_type")
+                    || key.equalsIgnoreCase("created_at")
+                    || key.equalsIgnoreCase("currency")
+                    || key.equalsIgnoreCase("description")
+                    || key.equalsIgnoreCase("id")
+                    || key.equalsIgnoreCase("status")
+                    || key.equalsIgnoreCase("title")
+                    || key.equalsIgnoreCase("total_available")
+                    || key.equalsIgnoreCase("total_paid")
+                    || key.equalsIgnoreCase("updated_at")
+                    || key.equalsIgnoreCase("vote_threshold")) {
+                return;
+            }
+            this.additionalProperties.put(key, value);
         }
 
         @java.lang.Override

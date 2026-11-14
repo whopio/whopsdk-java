@@ -106,7 +106,6 @@ public final class MediaAssetFile {
 
         private String url;
 
-        @JsonAnySetter
         private Map<String, Object> additionalProperties = new HashMap<>();
 
         private Builder() {}
@@ -120,7 +119,6 @@ public final class MediaAssetFile {
 
         /**
          * <p>File ID, prefixed <code>file_</code>.</p>
-         * <p>File ID, prefixed <code>file_</code>.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
@@ -131,7 +129,6 @@ public final class MediaAssetFile {
         }
 
         /**
-         * <p>CDN URL for downloading the file.</p>
          * <p>CDN URL for downloading the file.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
@@ -145,6 +142,14 @@ public final class MediaAssetFile {
         @java.lang.Override
         public MediaAssetFile build() {
             return new MediaAssetFile(id, url, additionalProperties);
+        }
+
+        @JsonAnySetter
+        private void putAdditionalPropertyFromJson(String key, Object value) {
+            if (key.equalsIgnoreCase("id") || key.equalsIgnoreCase("url")) {
+                return;
+            }
+            this.additionalProperties.put(key, value);
         }
 
         @java.lang.Override

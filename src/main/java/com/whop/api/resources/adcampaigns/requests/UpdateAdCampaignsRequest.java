@@ -5,15 +5,19 @@ package com.whop.api.resources.adcampaigns.requests;
 
 import com.fasterxml.jackson.annotation.JsonAnyGetter;
 import com.fasterxml.jackson.annotation.JsonAnySetter;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonSetter;
 import com.fasterxml.jackson.annotation.Nulls;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
+import com.whop.api.core.Nullable;
+import com.whop.api.core.NullableNonemptyFilter;
 import com.whop.api.core.ObjectMappers;
-import com.whop.api.resources.adcampaigns.types.UpdateAdCampaignsRequestBidType;
 import com.whop.api.resources.adcampaigns.types.UpdateAdCampaignsRequestBudgetOptimization;
+import com.whop.api.resources.adcampaigns.types.UpdateAdCampaignsRequestBudgetType;
+import com.whop.api.resources.adcampaigns.types.UpdateAdCampaignsRequestCampaignType;
 import com.whop.api.resources.adcampaigns.types.UpdateAdCampaignsRequestSpecialAdCategoriesItem;
 import com.whop.api.resources.adcampaigns.types.UpdateAdCampaignsRequestStatus;
 import java.util.HashMap;
@@ -25,11 +29,17 @@ import java.util.Optional;
 @JsonInclude(JsonInclude.Include.NON_ABSENT)
 @JsonDeserialize(builder = UpdateAdCampaignsRequest.Builder.class)
 public final class UpdateAdCampaignsRequest {
-    private final Optional<UpdateAdCampaignsRequestBidType> bidType;
-
     private final Optional<Double> budgetAmount;
 
+    private final Optional<Double> budgetAmountLocal;
+
     private final Optional<UpdateAdCampaignsRequestBudgetOptimization> budgetOptimization;
+
+    private final Optional<UpdateAdCampaignsRequestBudgetType> budgetType;
+
+    private final Optional<UpdateAdCampaignsRequestCampaignType> campaignType;
+
+    private final Optional<Double> desiredCostPerResult;
 
     private final Optional<String> endsAt;
 
@@ -44,18 +54,24 @@ public final class UpdateAdCampaignsRequest {
     private final Map<String, Object> additionalProperties;
 
     private UpdateAdCampaignsRequest(
-            Optional<UpdateAdCampaignsRequestBidType> bidType,
             Optional<Double> budgetAmount,
+            Optional<Double> budgetAmountLocal,
             Optional<UpdateAdCampaignsRequestBudgetOptimization> budgetOptimization,
+            Optional<UpdateAdCampaignsRequestBudgetType> budgetType,
+            Optional<UpdateAdCampaignsRequestCampaignType> campaignType,
+            Optional<Double> desiredCostPerResult,
             Optional<String> endsAt,
             Optional<List<UpdateAdCampaignsRequestSpecialAdCategoriesItem>> specialAdCategories,
             Optional<String> startsAt,
             Optional<UpdateAdCampaignsRequestStatus> status,
             Optional<String> title,
             Map<String, Object> additionalProperties) {
-        this.bidType = bidType;
         this.budgetAmount = budgetAmount;
+        this.budgetAmountLocal = budgetAmountLocal;
         this.budgetOptimization = budgetOptimization;
+        this.budgetType = budgetType;
+        this.campaignType = campaignType;
+        this.desiredCostPerResult = desiredCostPerResult;
         this.endsAt = endsAt;
         this.specialAdCategories = specialAdCategories;
         this.startsAt = startsAt;
@@ -65,15 +81,7 @@ public final class UpdateAdCampaignsRequest {
     }
 
     /**
-     * @return How delivery bids in the ad auction: <code>minimum_cost</code> gets the most results for the budget, <code>average_target</code> holds an average cost per result, <code>maximum_target</code> never bids above a cap. Switching to <code>minimum_cost</code> clears the cap amounts stored on the campaign's ad groups. Only for campaigns that own the budget.
-     */
-    @JsonProperty("bid_type")
-    public Optional<UpdateAdCampaignsRequestBidType> getBidType() {
-        return bidType;
-    }
-
-    /**
-     * @return The campaign budget, in the account's currency. Interpreted as daily or lifetime per the campaign's existing budget type.
+     * @return The campaign budget in USD, which is what it is stored and billed in. Interpreted as daily or lifetime per the campaign's budget type, including a budget_type sent in the same request.
      */
     @JsonProperty("budget_amount")
     public Optional<Double> getBudgetAmount() {
@@ -81,11 +89,46 @@ public final class UpdateAdCampaignsRequest {
     }
 
     /**
-     * @return Which level owns the budget: the whole campaign (<code>ad_campaign</code>) or each ad group individually (<code>ad_group</code>). Only changeable before the campaign is live on the ad network; switching to <code>ad_campaign</code> requires budget_amount in the same request, and switching to <code>ad_group</code> clears the campaign budget.
+     * @return The campaign budget stated in the account's ads reporting currency (<code>budget_currency</code> on the response) instead of USD. Converted to USD at the current exchange rate and stored as budget_amount; an amount equal to the current budget_amount_local keeps the stored USD budget as is. Provide this or budget_amount, not both.
+     */
+    @JsonProperty("budget_amount_local")
+    public Optional<Double> getBudgetAmountLocal() {
+        return budgetAmountLocal;
+    }
+
+    /**
+     * @return Which level owns the budget: the whole campaign (<code>ad_campaign</code>) or each ad group individually (<code>ad_group</code>). Only changeable before the campaign launches; switching to <code>ad_campaign</code> requires budget_amount in the same request, and switching to <code>ad_group</code> clears the campaign budget.
      */
     @JsonProperty("budget_optimization")
     public Optional<UpdateAdCampaignsRequestBudgetOptimization> getBudgetOptimization() {
         return budgetOptimization;
+    }
+
+    /**
+     * @return Whether <code>budget_amount</code> is spent per day (<code>daily</code>) or over the campaign's full run (<code>lifetime</code>). Only changeable while the campaign is a draft; send budget_amount in the same request so the amount lands on the new type.
+     */
+    @JsonProperty("budget_type")
+    public Optional<UpdateAdCampaignsRequestBudgetType> getBudgetType() {
+        return budgetType;
+    }
+
+    /**
+     * @return Accepted only when it matches the campaign's current type, so a read can be sent back unchanged. The type is fixed at creation.
+     */
+    @JsonProperty("campaign_type")
+    public Optional<UpdateAdCampaignsRequestCampaignType> getCampaignType() {
+        return campaignType;
+    }
+
+    /**
+     * @return The cost per result, in USD, you want this campaign to achieve. A target only: it is not a bid, cost cap, or bid cap, and doesn't change how the campaign's ads bid. Ad groups set cost and bid caps with their own <code>desired_cost_per_result</code>. <code>null</code> clears it.
+     */
+    @JsonIgnore
+    public Optional<Double> getDesiredCostPerResult() {
+        if (desiredCostPerResult == null) {
+            return Optional.empty();
+        }
+        return desiredCostPerResult;
     }
 
     /**
@@ -128,6 +171,12 @@ public final class UpdateAdCampaignsRequest {
         return title;
     }
 
+    @JsonInclude(value = JsonInclude.Include.CUSTOM, valueFilter = NullableNonemptyFilter.class)
+    @JsonProperty("desired_cost_per_result")
+    private Optional<Double> _getDesiredCostPerResult() {
+        return desiredCostPerResult;
+    }
+
     @java.lang.Override
     public boolean equals(Object other) {
         if (this == other) return true;
@@ -140,9 +189,12 @@ public final class UpdateAdCampaignsRequest {
     }
 
     private boolean equalTo(UpdateAdCampaignsRequest other) {
-        return bidType.equals(other.bidType)
-                && budgetAmount.equals(other.budgetAmount)
+        return budgetAmount.equals(other.budgetAmount)
+                && budgetAmountLocal.equals(other.budgetAmountLocal)
                 && budgetOptimization.equals(other.budgetOptimization)
+                && budgetType.equals(other.budgetType)
+                && campaignType.equals(other.campaignType)
+                && desiredCostPerResult.equals(other.desiredCostPerResult)
                 && endsAt.equals(other.endsAt)
                 && specialAdCategories.equals(other.specialAdCategories)
                 && startsAt.equals(other.startsAt)
@@ -153,9 +205,12 @@ public final class UpdateAdCampaignsRequest {
     @java.lang.Override
     public int hashCode() {
         return Objects.hash(
-                this.bidType,
                 this.budgetAmount,
+                this.budgetAmountLocal,
                 this.budgetOptimization,
+                this.budgetType,
+                this.campaignType,
+                this.desiredCostPerResult,
                 this.endsAt,
                 this.specialAdCategories,
                 this.startsAt,
@@ -174,11 +229,17 @@ public final class UpdateAdCampaignsRequest {
 
     @JsonIgnoreProperties(ignoreUnknown = true)
     public static final class Builder {
-        private Optional<UpdateAdCampaignsRequestBidType> bidType = Optional.empty();
-
         private Optional<Double> budgetAmount = Optional.empty();
 
+        private Optional<Double> budgetAmountLocal = Optional.empty();
+
         private Optional<UpdateAdCampaignsRequestBudgetOptimization> budgetOptimization = Optional.empty();
+
+        private Optional<UpdateAdCampaignsRequestBudgetType> budgetType = Optional.empty();
+
+        private Optional<UpdateAdCampaignsRequestCampaignType> campaignType = Optional.empty();
+
+        private Optional<Double> desiredCostPerResult = Optional.empty();
 
         private Optional<String> endsAt = Optional.empty();
 
@@ -190,15 +251,17 @@ public final class UpdateAdCampaignsRequest {
 
         private Optional<String> title = Optional.empty();
 
-        @JsonAnySetter
         private Map<String, Object> additionalProperties = new HashMap<>();
 
         private Builder() {}
 
         public Builder from(UpdateAdCampaignsRequest other) {
-            bidType(other.getBidType());
             budgetAmount(other.getBudgetAmount());
+            budgetAmountLocal(other.getBudgetAmountLocal());
             budgetOptimization(other.getBudgetOptimization());
+            budgetType(other.getBudgetType());
+            campaignType(other.getCampaignType());
+            desiredCostPerResult(other.getDesiredCostPerResult());
             endsAt(other.getEndsAt());
             specialAdCategories(other.getSpecialAdCategories());
             startsAt(other.getStartsAt());
@@ -208,21 +271,7 @@ public final class UpdateAdCampaignsRequest {
         }
 
         /**
-         * <p>How delivery bids in the ad auction: <code>minimum_cost</code> gets the most results for the budget, <code>average_target</code> holds an average cost per result, <code>maximum_target</code> never bids above a cap. Switching to <code>minimum_cost</code> clears the cap amounts stored on the campaign's ad groups. Only for campaigns that own the budget.</p>
-         */
-        @JsonSetter(value = "bid_type", nulls = Nulls.SKIP)
-        public Builder bidType(Optional<UpdateAdCampaignsRequestBidType> bidType) {
-            this.bidType = bidType;
-            return this;
-        }
-
-        public Builder bidType(UpdateAdCampaignsRequestBidType bidType) {
-            this.bidType = Optional.ofNullable(bidType);
-            return this;
-        }
-
-        /**
-         * <p>The campaign budget, in the account's currency. Interpreted as daily or lifetime per the campaign's existing budget type.</p>
+         * <p>The campaign budget in USD, which is what it is stored and billed in. Interpreted as daily or lifetime per the campaign's budget type, including a budget_type sent in the same request.</p>
          */
         @JsonSetter(value = "budget_amount", nulls = Nulls.SKIP)
         public Builder budgetAmount(Optional<Double> budgetAmount) {
@@ -236,7 +285,21 @@ public final class UpdateAdCampaignsRequest {
         }
 
         /**
-         * <p>Which level owns the budget: the whole campaign (<code>ad_campaign</code>) or each ad group individually (<code>ad_group</code>). Only changeable before the campaign is live on the ad network; switching to <code>ad_campaign</code> requires budget_amount in the same request, and switching to <code>ad_group</code> clears the campaign budget.</p>
+         * <p>The campaign budget stated in the account's ads reporting currency (<code>budget_currency</code> on the response) instead of USD. Converted to USD at the current exchange rate and stored as budget_amount; an amount equal to the current budget_amount_local keeps the stored USD budget as is. Provide this or budget_amount, not both.</p>
+         */
+        @JsonSetter(value = "budget_amount_local", nulls = Nulls.SKIP)
+        public Builder budgetAmountLocal(Optional<Double> budgetAmountLocal) {
+            this.budgetAmountLocal = budgetAmountLocal;
+            return this;
+        }
+
+        public Builder budgetAmountLocal(Double budgetAmountLocal) {
+            this.budgetAmountLocal = Optional.ofNullable(budgetAmountLocal);
+            return this;
+        }
+
+        /**
+         * <p>Which level owns the budget: the whole campaign (<code>ad_campaign</code>) or each ad group individually (<code>ad_group</code>). Only changeable before the campaign launches; switching to <code>ad_campaign</code> requires budget_amount in the same request, and switching to <code>ad_group</code> clears the campaign budget.</p>
          */
         @JsonSetter(value = "budget_optimization", nulls = Nulls.SKIP)
         public Builder budgetOptimization(Optional<UpdateAdCampaignsRequestBudgetOptimization> budgetOptimization) {
@@ -246,6 +309,59 @@ public final class UpdateAdCampaignsRequest {
 
         public Builder budgetOptimization(UpdateAdCampaignsRequestBudgetOptimization budgetOptimization) {
             this.budgetOptimization = Optional.ofNullable(budgetOptimization);
+            return this;
+        }
+
+        /**
+         * <p>Whether <code>budget_amount</code> is spent per day (<code>daily</code>) or over the campaign's full run (<code>lifetime</code>). Only changeable while the campaign is a draft; send budget_amount in the same request so the amount lands on the new type.</p>
+         */
+        @JsonSetter(value = "budget_type", nulls = Nulls.SKIP)
+        public Builder budgetType(Optional<UpdateAdCampaignsRequestBudgetType> budgetType) {
+            this.budgetType = budgetType;
+            return this;
+        }
+
+        public Builder budgetType(UpdateAdCampaignsRequestBudgetType budgetType) {
+            this.budgetType = Optional.ofNullable(budgetType);
+            return this;
+        }
+
+        /**
+         * <p>Accepted only when it matches the campaign's current type, so a read can be sent back unchanged. The type is fixed at creation.</p>
+         */
+        @JsonSetter(value = "campaign_type", nulls = Nulls.SKIP)
+        public Builder campaignType(Optional<UpdateAdCampaignsRequestCampaignType> campaignType) {
+            this.campaignType = campaignType;
+            return this;
+        }
+
+        public Builder campaignType(UpdateAdCampaignsRequestCampaignType campaignType) {
+            this.campaignType = Optional.ofNullable(campaignType);
+            return this;
+        }
+
+        /**
+         * <p>The cost per result, in USD, you want this campaign to achieve. A target only: it is not a bid, cost cap, or bid cap, and doesn't change how the campaign's ads bid. Ad groups set cost and bid caps with their own <code>desired_cost_per_result</code>. <code>null</code> clears it.</p>
+         */
+        @JsonSetter(value = "desired_cost_per_result", nulls = Nulls.SKIP)
+        public Builder desiredCostPerResult(Optional<Double> desiredCostPerResult) {
+            this.desiredCostPerResult = desiredCostPerResult;
+            return this;
+        }
+
+        public Builder desiredCostPerResult(Double desiredCostPerResult) {
+            this.desiredCostPerResult = Optional.ofNullable(desiredCostPerResult);
+            return this;
+        }
+
+        public Builder desiredCostPerResult(Nullable<Double> desiredCostPerResult) {
+            if (desiredCostPerResult.isNull()) {
+                this.desiredCostPerResult = null;
+            } else if (desiredCostPerResult.isEmpty()) {
+                this.desiredCostPerResult = Optional.empty();
+            } else {
+                this.desiredCostPerResult = Optional.of(desiredCostPerResult.get());
+            }
             return this;
         }
 
@@ -322,15 +438,36 @@ public final class UpdateAdCampaignsRequest {
 
         public UpdateAdCampaignsRequest build() {
             return new UpdateAdCampaignsRequest(
-                    bidType,
                     budgetAmount,
+                    budgetAmountLocal,
                     budgetOptimization,
+                    budgetType,
+                    campaignType,
+                    desiredCostPerResult,
                     endsAt,
                     specialAdCategories,
                     startsAt,
                     status,
                     title,
                     additionalProperties);
+        }
+
+        @JsonAnySetter
+        private void putAdditionalPropertyFromJson(String key, Object value) {
+            if (key.equalsIgnoreCase("budget_amount")
+                    || key.equalsIgnoreCase("budget_amount_local")
+                    || key.equalsIgnoreCase("budget_optimization")
+                    || key.equalsIgnoreCase("budget_type")
+                    || key.equalsIgnoreCase("campaign_type")
+                    || key.equalsIgnoreCase("desired_cost_per_result")
+                    || key.equalsIgnoreCase("ends_at")
+                    || key.equalsIgnoreCase("special_ad_categories")
+                    || key.equalsIgnoreCase("starts_at")
+                    || key.equalsIgnoreCase("status")
+                    || key.equalsIgnoreCase("title")) {
+                return;
+            }
+            this.additionalProperties.put(key, value);
         }
 
         public Builder additionalProperty(String key, Object value) {

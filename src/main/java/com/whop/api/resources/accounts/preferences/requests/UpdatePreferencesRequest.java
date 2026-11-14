@@ -5,16 +5,25 @@ package com.whop.api.resources.accounts.preferences.requests;
 
 import com.fasterxml.jackson.annotation.JsonAnyGetter;
 import com.fasterxml.jackson.annotation.JsonAnySetter;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonSetter;
 import com.fasterxml.jackson.annotation.Nulls;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
+import com.whop.api.core.Nullable;
+import com.whop.api.core.NullableNonemptyFilter;
 import com.whop.api.core.ObjectMappers;
 import com.whop.api.resources.accounts.preferences.types.UpdatePreferencesRequestAdsPaymentMethods;
 import com.whop.api.resources.accounts.preferences.types.UpdatePreferencesRequestAdsTripleWhaleIntegration;
+import com.whop.api.resources.accounts.preferences.types.UpdatePreferencesRequestCustomerTracking;
+import com.whop.api.resources.accounts.preferences.types.UpdatePreferencesRequestEconomicIntelligenceDurationKey;
+import com.whop.api.resources.accounts.preferences.types.UpdatePreferencesRequestFeedbackOptionsItem;
+import com.whop.api.resources.accounts.preferences.types.UpdatePreferencesRequestPreferredSettlementCurrency;
+import com.whop.api.resources.accounts.preferences.types.UpdatePreferencesRequestSubscriptionFailureBehavior;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
@@ -30,9 +39,37 @@ public final class UpdatePreferencesRequest {
 
     private final Optional<UpdatePreferencesRequestAdsTripleWhaleIntegration> adsTripleWhaleIntegration;
 
+    private final Optional<Boolean> cancellationEmails;
+
     private final Optional<Boolean> cardsAutoTopUp;
 
+    private final Optional<Boolean> cardsNotifications;
+
+    private final Optional<Boolean> coversSubaccountNegativeBalances;
+
+    private final Optional<UpdatePreferencesRequestCustomerTracking> customerTracking;
+
     private final Optional<Boolean> disputeFighterEnabled;
+
+    private final Optional<Boolean> economicIntelligenceAutoRenew;
+
+    private final Optional<UpdatePreferencesRequestEconomicIntelligenceDurationKey> economicIntelligenceDurationKey;
+
+    private final Optional<Boolean> failedPaymentEmails;
+
+    private final Optional<List<UpdatePreferencesRequestFeedbackOptionsItem>> feedbackOptions;
+
+    private final Optional<UpdatePreferencesRequestPreferredSettlementCurrency> preferredSettlementCurrency;
+
+    private final Optional<Boolean> renewalReminderEmails;
+
+    private final Optional<Boolean> reviewRequestEmails;
+
+    private final Optional<Boolean> subaccountNotifications;
+
+    private final Optional<Boolean> subaccountTeamViewOnly;
+
+    private final Optional<UpdatePreferencesRequestSubscriptionFailureBehavior> subscriptionFailureBehavior;
 
     private final Map<String, Object> additionalProperties;
 
@@ -41,20 +78,48 @@ public final class UpdatePreferencesRequest {
             Optional<String> adsReportingCurrency,
             Optional<String> adsSchedulingTimezone,
             Optional<UpdatePreferencesRequestAdsTripleWhaleIntegration> adsTripleWhaleIntegration,
+            Optional<Boolean> cancellationEmails,
             Optional<Boolean> cardsAutoTopUp,
+            Optional<Boolean> cardsNotifications,
+            Optional<Boolean> coversSubaccountNegativeBalances,
+            Optional<UpdatePreferencesRequestCustomerTracking> customerTracking,
             Optional<Boolean> disputeFighterEnabled,
+            Optional<Boolean> economicIntelligenceAutoRenew,
+            Optional<UpdatePreferencesRequestEconomicIntelligenceDurationKey> economicIntelligenceDurationKey,
+            Optional<Boolean> failedPaymentEmails,
+            Optional<List<UpdatePreferencesRequestFeedbackOptionsItem>> feedbackOptions,
+            Optional<UpdatePreferencesRequestPreferredSettlementCurrency> preferredSettlementCurrency,
+            Optional<Boolean> renewalReminderEmails,
+            Optional<Boolean> reviewRequestEmails,
+            Optional<Boolean> subaccountNotifications,
+            Optional<Boolean> subaccountTeamViewOnly,
+            Optional<UpdatePreferencesRequestSubscriptionFailureBehavior> subscriptionFailureBehavior,
             Map<String, Object> additionalProperties) {
         this.adsPaymentMethods = adsPaymentMethods;
         this.adsReportingCurrency = adsReportingCurrency;
         this.adsSchedulingTimezone = adsSchedulingTimezone;
         this.adsTripleWhaleIntegration = adsTripleWhaleIntegration;
+        this.cancellationEmails = cancellationEmails;
         this.cardsAutoTopUp = cardsAutoTopUp;
+        this.cardsNotifications = cardsNotifications;
+        this.coversSubaccountNegativeBalances = coversSubaccountNegativeBalances;
+        this.customerTracking = customerTracking;
         this.disputeFighterEnabled = disputeFighterEnabled;
+        this.economicIntelligenceAutoRenew = economicIntelligenceAutoRenew;
+        this.economicIntelligenceDurationKey = economicIntelligenceDurationKey;
+        this.failedPaymentEmails = failedPaymentEmails;
+        this.feedbackOptions = feedbackOptions;
+        this.preferredSettlementCurrency = preferredSettlementCurrency;
+        this.renewalReminderEmails = renewalReminderEmails;
+        this.reviewRequestEmails = reviewRequestEmails;
+        this.subaccountNotifications = subaccountNotifications;
+        this.subaccountTeamViewOnly = subaccountTeamViewOnly;
+        this.subscriptionFailureBehavior = subscriptionFailureBehavior;
         this.additionalProperties = additionalProperties;
     }
 
     /**
-     * @return How the account pays for Whop Ads spend. <code>primary</code> is charged first; <code>backup</code> covers the charge when the primary fails.
+     * @return How the account pays for Whop Ads spend. Requires <code>primary</code>; <code>backup</code> is optional and covers the charge when the primary fails. Requires the <code>ad_campaign:create</code> scope on your API key. Configuring a <code>card</code> requires a user token; account API keys can configure only <code>platform_balance</code> sources.
      */
     @JsonProperty("ads_payment_methods")
     public Optional<UpdatePreferencesRequestAdsPaymentMethods> getAdsPaymentMethods() {
@@ -62,7 +127,7 @@ public final class UpdatePreferencesRequest {
     }
 
     /**
-     * @return Lowercase ISO currency code, such as <code>usd</code> or <code>eur</code>, used to display ad spend and stats. Defaults to <code>usd</code>.
+     * @return Lowercase ISO currency code, such as <code>usd</code> or <code>eur</code>, used to display ad spend and stats. Defaults to <code>usd</code>. Requires the <code>ad_campaign:create</code> scope on your API key.
      */
     @JsonProperty("ads_reporting_currency")
     public Optional<String> getAdsReportingCurrency() {
@@ -70,7 +135,7 @@ public final class UpdatePreferencesRequest {
     }
 
     /**
-     * @return IANA timezone (e.g. <code>America/New_York</code>) used to interpret campaign start/end times and to bucket reports. Cannot be cleared once set — pass a new value to change it.
+     * @return IANA timezone (e.g. <code>America/New_York</code>) used to interpret campaign start/end times and to bucket reports. Cannot be cleared once set — pass a new value to change it. Requires the <code>ad_campaign:create</code> scope on your API key.
      */
     @JsonProperty("ads_scheduling_timezone")
     public Optional<String> getAdsSchedulingTimezone() {
@@ -78,7 +143,7 @@ public final class UpdatePreferencesRequest {
     }
 
     /**
-     * @return Connects or disconnects the Triple Whale integration. Requires a connected Shopify store, since Triple Whale keys spend records by Shopify shop.
+     * @return Connects or disconnects the Triple Whale integration, or changes the shop it reports to. Requires the <code>ad_campaign:create</code> scope on your API key. Connecting requires a <code>shop_domain</code> to report spend against.
      */
     @JsonProperty("ads_triple_whale_integration")
     public Optional<UpdatePreferencesRequestAdsTripleWhaleIntegration> getAdsTripleWhaleIntegration() {
@@ -86,7 +151,15 @@ public final class UpdatePreferencesRequest {
     }
 
     /**
-     * @return Whether incoming funds are automatically moved to the account's cards balance. Requires a cards balance on the account.
+     * @return Whether Whop emails members when their membership is canceled or terminated. Set it to <code>false</code> to stop these emails while keeping the account's other customer emails. Requires the <code>company:update</code> scope on your API key.
+     */
+    @JsonProperty("cancellation_emails")
+    public Optional<Boolean> getCancellationEmails() {
+        return cancellationEmails;
+    }
+
+    /**
+     * @return Whether incoming funds are automatically moved to the account's cards balance. Requires a cards balance on the account and the <code>payout:account:update</code> scope on your API key.
      */
     @JsonProperty("cards_auto_top_up")
     public Optional<Boolean> getCardsAutoTopUp() {
@@ -94,11 +167,133 @@ public final class UpdatePreferencesRequest {
     }
 
     /**
-     * @return Whether Whop assembles and files the evidence response when this account's payments are disputed. Off by default; enabling it also opts the account into the success fee charged only on disputes it wins.
+     * @return Whether Whop Card notifications reach this account's team. Set it to <code>false</code> to stop every card email and push notification for the account — application status, verification and action-required alerts, card-ready alerts, declines, large charges, and cashback summaries. Cardholder onboarding invitations still send, because they carry the only link an invited cardholder can onboard with. Requesting a card is rejected while notifications are off, since the request reaches nobody. Cards on personal accounts are unaffected. Requires a cards balance on the account and the <code>payout:account:update</code> scope on your API key.
+     */
+    @JsonProperty("cards_notifications")
+    public Optional<Boolean> getCardsNotifications() {
+        return cardsNotifications;
+    }
+
+    /**
+     * @return Whether this account covers its subaccounts' negative balances. When a subaccount's balance drops below zero (from refunds, disputes, or fees), this account's available balance in the same currency pays it back, up to what is available. Only accounts with subaccounts can set it. Requires the <code>payout:account:update</code> scope on your API key.
+     */
+    @JsonProperty("covers_subaccount_negative_balances")
+    public Optional<Boolean> getCoversSubaccountNegativeBalances() {
+        return coversSubaccountNegativeBalances;
+    }
+
+    /**
+     * @return Customer tracking settings for the hosted tracking page and Element, replaced as a whole: fields left out are reset to their defaults. Pass null to clear them, which turns tracking off. Requires the <code>company:manage_checkout</code> scope on your API key.
+     */
+    @JsonIgnore
+    public Optional<UpdatePreferencesRequestCustomerTracking> getCustomerTracking() {
+        if (customerTracking == null) {
+            return Optional.empty();
+        }
+        return customerTracking;
+    }
+
+    /**
+     * @return Whether Whop assembles and files the evidence response when this account's payments are disputed. Off by default; enabling it also opts the account into the success fee charged only on disputes it wins. Requires the <code>payment:dispute</code> scope on your API key.
      */
     @JsonProperty("dispute_fighter_enabled")
     public Optional<Boolean> getDisputeFighterEnabled() {
         return disputeFighterEnabled;
+    }
+
+    /**
+     * @return <code>false</code> stops renewing: Economic Intelligence stays on until the end of the current period, and the fee is charged until then. <code>true</code> keeps it renewing again before then, or turns it on like the <code>3_days</code> offer. Can't be combined with <code>economic_intelligence_duration_key</code>. Requires the <code>company:update</code> scope on your API key.
+     */
+    @JsonProperty("economic_intelligence_auto_renew")
+    public Optional<Boolean> getEconomicIntelligenceAutoRenew() {
+        return economicIntelligenceAutoRenew;
+    }
+
+    /**
+     * @return Turns on Economic Intelligence with the offer that has this <code>key</code> in <code>economic_intelligence_offers</code>, at that offer's fee. Only <code>3_days</code>, the auto-renew offer, is accepted. Any other key is rejected. Returns <code>403</code> for an account Economic Intelligence is not offered to. Requires the <code>company:update</code> scope on your API key.
+     */
+    @JsonProperty("economic_intelligence_duration_key")
+    public Optional<UpdatePreferencesRequestEconomicIntelligenceDurationKey> getEconomicIntelligenceDurationKey() {
+        return economicIntelligenceDurationKey;
+    }
+
+    /**
+     * @return Whether Whop emails members when a renewal payment fails or needs them to verify it. Set it to <code>false</code> to stop these emails while keeping the account's other customer emails. Subscriptions billed by invoice still get their invoice emails. Requires the <code>company:update</code> scope on your API key.
+     */
+    @JsonProperty("failed_payment_emails")
+    public Optional<Boolean> getFailedPaymentEmails() {
+        return failedPaymentEmails;
+    }
+
+    /**
+     * @return Replaces the account's own cancel reasons, shown to members in this order when they cancel. Pass an option's <code>id</code> to keep it, for example when renaming it; options without an <code>id</code> are added, and options left out are removed. Pass an empty array to go back to Whop's default reasons. Members who already picked an option keep the label they saw. Requires the <code>company:manage_checkout</code> scope on your API key.
+     */
+    @JsonProperty("feedback_options")
+    public Optional<List<UpdatePreferencesRequestFeedbackOptionsItem>> getFeedbackOptions() {
+        return feedbackOptions;
+    }
+
+    /**
+     * @return Settle every new sale into this currency, regardless of the plan's currency or what the buyer paid in; sales converted this way carry an additional 0.5% FX fee. Pass <code>null</code> to go back to settling each sale in its plan's currency. Changing it never converts money already in your balances, and it can change at most once a day (see <code>preferred_settlement_currency_changeable_at</code>). Requires the <code>payout:account:update</code> scope on your API key.
+     */
+    @JsonIgnore
+    public Optional<UpdatePreferencesRequestPreferredSettlementCurrency> getPreferredSettlementCurrency() {
+        if (preferredSettlementCurrency == null) {
+            return Optional.empty();
+        }
+        return preferredSettlementCurrency;
+    }
+
+    /**
+     * @return Whether Whop emails members the day before their membership renews or their free trial converts. Set it to <code>false</code> to stop that reminder. Members still get the reminders card networks require. Requires the <code>company:update</code> scope on your API key.
+     */
+    @JsonProperty("renewal_reminder_emails")
+    public Optional<Boolean> getRenewalReminderEmails() {
+        return renewalReminderEmails;
+    }
+
+    /**
+     * @return Whether Whop emails customers after a purchase asking them to leave a review. Set it to <code>false</code> to stop these emails, including ones already scheduled. Requires the <code>company:update</code> scope on your API key.
+     */
+    @JsonProperty("review_request_emails")
+    public Optional<Boolean> getReviewRequestEmails() {
+        return reviewRequestEmails;
+    }
+
+    /**
+     * @return Whether Whop emails and notifies the teams of this account's subaccounts. Set it to <code>false</code> to stop Whop's emails, push, and in-app notifications to them. These include payout, verification, dispute, and card alerts about their accounts. Only accounts with subaccounts can set it. Requires the <code>company:update</code> scope on your API key.
+     */
+    @JsonProperty("subaccount_notifications")
+    public Optional<Boolean> getSubaccountNotifications() {
+        return subaccountNotifications;
+    }
+
+    /**
+     * @return Whether this account's subaccounts are view-only for their own team members. Set it to <code>true</code> to refuse every change a subaccount's team tries to make while still letting them see what their role allows. Only accounts with subaccounts can set it. Requires the <code>company:update</code> scope on your API key.
+     */
+    @JsonProperty("subaccount_team_view_only")
+    public Optional<Boolean> getSubaccountTeamViewOnly() {
+        return subaccountTeamViewOnly;
+    }
+
+    /**
+     * @return What happens to a subscription once every retry of a renewal payment has failed. <code>cancel</code> (the default) cancels it. <code>none</code> leaves it past due and keeps billing it each period; access follows the account's past-due access setting. Requires company:manage_checkout permission.
+     */
+    @JsonProperty("subscription_failure_behavior")
+    public Optional<UpdatePreferencesRequestSubscriptionFailureBehavior> getSubscriptionFailureBehavior() {
+        return subscriptionFailureBehavior;
+    }
+
+    @JsonInclude(value = JsonInclude.Include.CUSTOM, valueFilter = NullableNonemptyFilter.class)
+    @JsonProperty("customer_tracking")
+    private Optional<UpdatePreferencesRequestCustomerTracking> _getCustomerTracking() {
+        return customerTracking;
+    }
+
+    @JsonInclude(value = JsonInclude.Include.CUSTOM, valueFilter = NullableNonemptyFilter.class)
+    @JsonProperty("preferred_settlement_currency")
+    private Optional<UpdatePreferencesRequestPreferredSettlementCurrency> _getPreferredSettlementCurrency() {
+        return preferredSettlementCurrency;
     }
 
     @java.lang.Override
@@ -117,8 +312,22 @@ public final class UpdatePreferencesRequest {
                 && adsReportingCurrency.equals(other.adsReportingCurrency)
                 && adsSchedulingTimezone.equals(other.adsSchedulingTimezone)
                 && adsTripleWhaleIntegration.equals(other.adsTripleWhaleIntegration)
+                && cancellationEmails.equals(other.cancellationEmails)
                 && cardsAutoTopUp.equals(other.cardsAutoTopUp)
-                && disputeFighterEnabled.equals(other.disputeFighterEnabled);
+                && cardsNotifications.equals(other.cardsNotifications)
+                && coversSubaccountNegativeBalances.equals(other.coversSubaccountNegativeBalances)
+                && customerTracking.equals(other.customerTracking)
+                && disputeFighterEnabled.equals(other.disputeFighterEnabled)
+                && economicIntelligenceAutoRenew.equals(other.economicIntelligenceAutoRenew)
+                && economicIntelligenceDurationKey.equals(other.economicIntelligenceDurationKey)
+                && failedPaymentEmails.equals(other.failedPaymentEmails)
+                && feedbackOptions.equals(other.feedbackOptions)
+                && preferredSettlementCurrency.equals(other.preferredSettlementCurrency)
+                && renewalReminderEmails.equals(other.renewalReminderEmails)
+                && reviewRequestEmails.equals(other.reviewRequestEmails)
+                && subaccountNotifications.equals(other.subaccountNotifications)
+                && subaccountTeamViewOnly.equals(other.subaccountTeamViewOnly)
+                && subscriptionFailureBehavior.equals(other.subscriptionFailureBehavior);
     }
 
     @java.lang.Override
@@ -128,8 +337,22 @@ public final class UpdatePreferencesRequest {
                 this.adsReportingCurrency,
                 this.adsSchedulingTimezone,
                 this.adsTripleWhaleIntegration,
+                this.cancellationEmails,
                 this.cardsAutoTopUp,
-                this.disputeFighterEnabled);
+                this.cardsNotifications,
+                this.coversSubaccountNegativeBalances,
+                this.customerTracking,
+                this.disputeFighterEnabled,
+                this.economicIntelligenceAutoRenew,
+                this.economicIntelligenceDurationKey,
+                this.failedPaymentEmails,
+                this.feedbackOptions,
+                this.preferredSettlementCurrency,
+                this.renewalReminderEmails,
+                this.reviewRequestEmails,
+                this.subaccountNotifications,
+                this.subaccountTeamViewOnly,
+                this.subscriptionFailureBehavior);
     }
 
     @java.lang.Override
@@ -152,11 +375,41 @@ public final class UpdatePreferencesRequest {
         private Optional<UpdatePreferencesRequestAdsTripleWhaleIntegration> adsTripleWhaleIntegration =
                 Optional.empty();
 
+        private Optional<Boolean> cancellationEmails = Optional.empty();
+
         private Optional<Boolean> cardsAutoTopUp = Optional.empty();
+
+        private Optional<Boolean> cardsNotifications = Optional.empty();
+
+        private Optional<Boolean> coversSubaccountNegativeBalances = Optional.empty();
+
+        private Optional<UpdatePreferencesRequestCustomerTracking> customerTracking = Optional.empty();
 
         private Optional<Boolean> disputeFighterEnabled = Optional.empty();
 
-        @JsonAnySetter
+        private Optional<Boolean> economicIntelligenceAutoRenew = Optional.empty();
+
+        private Optional<UpdatePreferencesRequestEconomicIntelligenceDurationKey> economicIntelligenceDurationKey =
+                Optional.empty();
+
+        private Optional<Boolean> failedPaymentEmails = Optional.empty();
+
+        private Optional<List<UpdatePreferencesRequestFeedbackOptionsItem>> feedbackOptions = Optional.empty();
+
+        private Optional<UpdatePreferencesRequestPreferredSettlementCurrency> preferredSettlementCurrency =
+                Optional.empty();
+
+        private Optional<Boolean> renewalReminderEmails = Optional.empty();
+
+        private Optional<Boolean> reviewRequestEmails = Optional.empty();
+
+        private Optional<Boolean> subaccountNotifications = Optional.empty();
+
+        private Optional<Boolean> subaccountTeamViewOnly = Optional.empty();
+
+        private Optional<UpdatePreferencesRequestSubscriptionFailureBehavior> subscriptionFailureBehavior =
+                Optional.empty();
+
         private Map<String, Object> additionalProperties = new HashMap<>();
 
         private Builder() {}
@@ -166,13 +419,27 @@ public final class UpdatePreferencesRequest {
             adsReportingCurrency(other.getAdsReportingCurrency());
             adsSchedulingTimezone(other.getAdsSchedulingTimezone());
             adsTripleWhaleIntegration(other.getAdsTripleWhaleIntegration());
+            cancellationEmails(other.getCancellationEmails());
             cardsAutoTopUp(other.getCardsAutoTopUp());
+            cardsNotifications(other.getCardsNotifications());
+            coversSubaccountNegativeBalances(other.getCoversSubaccountNegativeBalances());
+            customerTracking(other.getCustomerTracking());
             disputeFighterEnabled(other.getDisputeFighterEnabled());
+            economicIntelligenceAutoRenew(other.getEconomicIntelligenceAutoRenew());
+            economicIntelligenceDurationKey(other.getEconomicIntelligenceDurationKey());
+            failedPaymentEmails(other.getFailedPaymentEmails());
+            feedbackOptions(other.getFeedbackOptions());
+            preferredSettlementCurrency(other.getPreferredSettlementCurrency());
+            renewalReminderEmails(other.getRenewalReminderEmails());
+            reviewRequestEmails(other.getReviewRequestEmails());
+            subaccountNotifications(other.getSubaccountNotifications());
+            subaccountTeamViewOnly(other.getSubaccountTeamViewOnly());
+            subscriptionFailureBehavior(other.getSubscriptionFailureBehavior());
             return this;
         }
 
         /**
-         * <p>How the account pays for Whop Ads spend. <code>primary</code> is charged first; <code>backup</code> covers the charge when the primary fails.</p>
+         * <p>How the account pays for Whop Ads spend. Requires <code>primary</code>; <code>backup</code> is optional and covers the charge when the primary fails. Requires the <code>ad_campaign:create</code> scope on your API key. Configuring a <code>card</code> requires a user token; account API keys can configure only <code>platform_balance</code> sources.</p>
          */
         @JsonSetter(value = "ads_payment_methods", nulls = Nulls.SKIP)
         public Builder adsPaymentMethods(Optional<UpdatePreferencesRequestAdsPaymentMethods> adsPaymentMethods) {
@@ -186,7 +453,7 @@ public final class UpdatePreferencesRequest {
         }
 
         /**
-         * <p>Lowercase ISO currency code, such as <code>usd</code> or <code>eur</code>, used to display ad spend and stats. Defaults to <code>usd</code>.</p>
+         * <p>Lowercase ISO currency code, such as <code>usd</code> or <code>eur</code>, used to display ad spend and stats. Defaults to <code>usd</code>. Requires the <code>ad_campaign:create</code> scope on your API key.</p>
          */
         @JsonSetter(value = "ads_reporting_currency", nulls = Nulls.SKIP)
         public Builder adsReportingCurrency(Optional<String> adsReportingCurrency) {
@@ -200,7 +467,7 @@ public final class UpdatePreferencesRequest {
         }
 
         /**
-         * <p>IANA timezone (e.g. <code>America/New_York</code>) used to interpret campaign start/end times and to bucket reports. Cannot be cleared once set — pass a new value to change it.</p>
+         * <p>IANA timezone (e.g. <code>America/New_York</code>) used to interpret campaign start/end times and to bucket reports. Cannot be cleared once set — pass a new value to change it. Requires the <code>ad_campaign:create</code> scope on your API key.</p>
          */
         @JsonSetter(value = "ads_scheduling_timezone", nulls = Nulls.SKIP)
         public Builder adsSchedulingTimezone(Optional<String> adsSchedulingTimezone) {
@@ -214,7 +481,7 @@ public final class UpdatePreferencesRequest {
         }
 
         /**
-         * <p>Connects or disconnects the Triple Whale integration. Requires a connected Shopify store, since Triple Whale keys spend records by Shopify shop.</p>
+         * <p>Connects or disconnects the Triple Whale integration, or changes the shop it reports to. Requires the <code>ad_campaign:create</code> scope on your API key. Connecting requires a <code>shop_domain</code> to report spend against.</p>
          */
         @JsonSetter(value = "ads_triple_whale_integration", nulls = Nulls.SKIP)
         public Builder adsTripleWhaleIntegration(
@@ -230,7 +497,21 @@ public final class UpdatePreferencesRequest {
         }
 
         /**
-         * <p>Whether incoming funds are automatically moved to the account's cards balance. Requires a cards balance on the account.</p>
+         * <p>Whether Whop emails members when their membership is canceled or terminated. Set it to <code>false</code> to stop these emails while keeping the account's other customer emails. Requires the <code>company:update</code> scope on your API key.</p>
+         */
+        @JsonSetter(value = "cancellation_emails", nulls = Nulls.SKIP)
+        public Builder cancellationEmails(Optional<Boolean> cancellationEmails) {
+            this.cancellationEmails = cancellationEmails;
+            return this;
+        }
+
+        public Builder cancellationEmails(Boolean cancellationEmails) {
+            this.cancellationEmails = Optional.ofNullable(cancellationEmails);
+            return this;
+        }
+
+        /**
+         * <p>Whether incoming funds are automatically moved to the account's cards balance. Requires a cards balance on the account and the <code>payout:account:update</code> scope on your API key.</p>
          */
         @JsonSetter(value = "cards_auto_top_up", nulls = Nulls.SKIP)
         public Builder cardsAutoTopUp(Optional<Boolean> cardsAutoTopUp) {
@@ -244,7 +525,60 @@ public final class UpdatePreferencesRequest {
         }
 
         /**
-         * <p>Whether Whop assembles and files the evidence response when this account's payments are disputed. Off by default; enabling it also opts the account into the success fee charged only on disputes it wins.</p>
+         * <p>Whether Whop Card notifications reach this account's team. Set it to <code>false</code> to stop every card email and push notification for the account — application status, verification and action-required alerts, card-ready alerts, declines, large charges, and cashback summaries. Cardholder onboarding invitations still send, because they carry the only link an invited cardholder can onboard with. Requesting a card is rejected while notifications are off, since the request reaches nobody. Cards on personal accounts are unaffected. Requires a cards balance on the account and the <code>payout:account:update</code> scope on your API key.</p>
+         */
+        @JsonSetter(value = "cards_notifications", nulls = Nulls.SKIP)
+        public Builder cardsNotifications(Optional<Boolean> cardsNotifications) {
+            this.cardsNotifications = cardsNotifications;
+            return this;
+        }
+
+        public Builder cardsNotifications(Boolean cardsNotifications) {
+            this.cardsNotifications = Optional.ofNullable(cardsNotifications);
+            return this;
+        }
+
+        /**
+         * <p>Whether this account covers its subaccounts' negative balances. When a subaccount's balance drops below zero (from refunds, disputes, or fees), this account's available balance in the same currency pays it back, up to what is available. Only accounts with subaccounts can set it. Requires the <code>payout:account:update</code> scope on your API key.</p>
+         */
+        @JsonSetter(value = "covers_subaccount_negative_balances", nulls = Nulls.SKIP)
+        public Builder coversSubaccountNegativeBalances(Optional<Boolean> coversSubaccountNegativeBalances) {
+            this.coversSubaccountNegativeBalances = coversSubaccountNegativeBalances;
+            return this;
+        }
+
+        public Builder coversSubaccountNegativeBalances(Boolean coversSubaccountNegativeBalances) {
+            this.coversSubaccountNegativeBalances = Optional.ofNullable(coversSubaccountNegativeBalances);
+            return this;
+        }
+
+        /**
+         * <p>Customer tracking settings for the hosted tracking page and Element, replaced as a whole: fields left out are reset to their defaults. Pass null to clear them, which turns tracking off. Requires the <code>company:manage_checkout</code> scope on your API key.</p>
+         */
+        @JsonSetter(value = "customer_tracking", nulls = Nulls.SKIP)
+        public Builder customerTracking(Optional<UpdatePreferencesRequestCustomerTracking> customerTracking) {
+            this.customerTracking = customerTracking;
+            return this;
+        }
+
+        public Builder customerTracking(UpdatePreferencesRequestCustomerTracking customerTracking) {
+            this.customerTracking = Optional.ofNullable(customerTracking);
+            return this;
+        }
+
+        public Builder customerTracking(Nullable<UpdatePreferencesRequestCustomerTracking> customerTracking) {
+            if (customerTracking.isNull()) {
+                this.customerTracking = null;
+            } else if (customerTracking.isEmpty()) {
+                this.customerTracking = Optional.empty();
+            } else {
+                this.customerTracking = Optional.of(customerTracking.get());
+            }
+            return this;
+        }
+
+        /**
+         * <p>Whether Whop assembles and files the evidence response when this account's payments are disputed. Off by default; enabling it also opts the account into the success fee charged only on disputes it wins. Requires the <code>payment:dispute</code> scope on your API key.</p>
          */
         @JsonSetter(value = "dispute_fighter_enabled", nulls = Nulls.SKIP)
         public Builder disputeFighterEnabled(Optional<Boolean> disputeFighterEnabled) {
@@ -257,15 +591,214 @@ public final class UpdatePreferencesRequest {
             return this;
         }
 
+        /**
+         * <p><code>false</code> stops renewing: Economic Intelligence stays on until the end of the current period, and the fee is charged until then. <code>true</code> keeps it renewing again before then, or turns it on like the <code>3_days</code> offer. Can't be combined with <code>economic_intelligence_duration_key</code>. Requires the <code>company:update</code> scope on your API key.</p>
+         */
+        @JsonSetter(value = "economic_intelligence_auto_renew", nulls = Nulls.SKIP)
+        public Builder economicIntelligenceAutoRenew(Optional<Boolean> economicIntelligenceAutoRenew) {
+            this.economicIntelligenceAutoRenew = economicIntelligenceAutoRenew;
+            return this;
+        }
+
+        public Builder economicIntelligenceAutoRenew(Boolean economicIntelligenceAutoRenew) {
+            this.economicIntelligenceAutoRenew = Optional.ofNullable(economicIntelligenceAutoRenew);
+            return this;
+        }
+
+        /**
+         * <p>Turns on Economic Intelligence with the offer that has this <code>key</code> in <code>economic_intelligence_offers</code>, at that offer's fee. Only <code>3_days</code>, the auto-renew offer, is accepted. Any other key is rejected. Returns <code>403</code> for an account Economic Intelligence is not offered to. Requires the <code>company:update</code> scope on your API key.</p>
+         */
+        @JsonSetter(value = "economic_intelligence_duration_key", nulls = Nulls.SKIP)
+        public Builder economicIntelligenceDurationKey(
+                Optional<UpdatePreferencesRequestEconomicIntelligenceDurationKey> economicIntelligenceDurationKey) {
+            this.economicIntelligenceDurationKey = economicIntelligenceDurationKey;
+            return this;
+        }
+
+        public Builder economicIntelligenceDurationKey(
+                UpdatePreferencesRequestEconomicIntelligenceDurationKey economicIntelligenceDurationKey) {
+            this.economicIntelligenceDurationKey = Optional.ofNullable(economicIntelligenceDurationKey);
+            return this;
+        }
+
+        /**
+         * <p>Whether Whop emails members when a renewal payment fails or needs them to verify it. Set it to <code>false</code> to stop these emails while keeping the account's other customer emails. Subscriptions billed by invoice still get their invoice emails. Requires the <code>company:update</code> scope on your API key.</p>
+         */
+        @JsonSetter(value = "failed_payment_emails", nulls = Nulls.SKIP)
+        public Builder failedPaymentEmails(Optional<Boolean> failedPaymentEmails) {
+            this.failedPaymentEmails = failedPaymentEmails;
+            return this;
+        }
+
+        public Builder failedPaymentEmails(Boolean failedPaymentEmails) {
+            this.failedPaymentEmails = Optional.ofNullable(failedPaymentEmails);
+            return this;
+        }
+
+        /**
+         * <p>Replaces the account's own cancel reasons, shown to members in this order when they cancel. Pass an option's <code>id</code> to keep it, for example when renaming it; options without an <code>id</code> are added, and options left out are removed. Pass an empty array to go back to Whop's default reasons. Members who already picked an option keep the label they saw. Requires the <code>company:manage_checkout</code> scope on your API key.</p>
+         */
+        @JsonSetter(value = "feedback_options", nulls = Nulls.SKIP)
+        public Builder feedbackOptions(Optional<List<UpdatePreferencesRequestFeedbackOptionsItem>> feedbackOptions) {
+            this.feedbackOptions = feedbackOptions;
+            return this;
+        }
+
+        public Builder feedbackOptions(List<UpdatePreferencesRequestFeedbackOptionsItem> feedbackOptions) {
+            this.feedbackOptions = Optional.ofNullable(feedbackOptions);
+            return this;
+        }
+
+        /**
+         * <p>Settle every new sale into this currency, regardless of the plan's currency or what the buyer paid in; sales converted this way carry an additional 0.5% FX fee. Pass <code>null</code> to go back to settling each sale in its plan's currency. Changing it never converts money already in your balances, and it can change at most once a day (see <code>preferred_settlement_currency_changeable_at</code>). Requires the <code>payout:account:update</code> scope on your API key.</p>
+         */
+        @JsonSetter(value = "preferred_settlement_currency", nulls = Nulls.SKIP)
+        public Builder preferredSettlementCurrency(
+                Optional<UpdatePreferencesRequestPreferredSettlementCurrency> preferredSettlementCurrency) {
+            this.preferredSettlementCurrency = preferredSettlementCurrency;
+            return this;
+        }
+
+        public Builder preferredSettlementCurrency(
+                UpdatePreferencesRequestPreferredSettlementCurrency preferredSettlementCurrency) {
+            this.preferredSettlementCurrency = Optional.ofNullable(preferredSettlementCurrency);
+            return this;
+        }
+
+        public Builder preferredSettlementCurrency(
+                Nullable<UpdatePreferencesRequestPreferredSettlementCurrency> preferredSettlementCurrency) {
+            if (preferredSettlementCurrency.isNull()) {
+                this.preferredSettlementCurrency = null;
+            } else if (preferredSettlementCurrency.isEmpty()) {
+                this.preferredSettlementCurrency = Optional.empty();
+            } else {
+                this.preferredSettlementCurrency = Optional.of(preferredSettlementCurrency.get());
+            }
+            return this;
+        }
+
+        /**
+         * <p>Whether Whop emails members the day before their membership renews or their free trial converts. Set it to <code>false</code> to stop that reminder. Members still get the reminders card networks require. Requires the <code>company:update</code> scope on your API key.</p>
+         */
+        @JsonSetter(value = "renewal_reminder_emails", nulls = Nulls.SKIP)
+        public Builder renewalReminderEmails(Optional<Boolean> renewalReminderEmails) {
+            this.renewalReminderEmails = renewalReminderEmails;
+            return this;
+        }
+
+        public Builder renewalReminderEmails(Boolean renewalReminderEmails) {
+            this.renewalReminderEmails = Optional.ofNullable(renewalReminderEmails);
+            return this;
+        }
+
+        /**
+         * <p>Whether Whop emails customers after a purchase asking them to leave a review. Set it to <code>false</code> to stop these emails, including ones already scheduled. Requires the <code>company:update</code> scope on your API key.</p>
+         */
+        @JsonSetter(value = "review_request_emails", nulls = Nulls.SKIP)
+        public Builder reviewRequestEmails(Optional<Boolean> reviewRequestEmails) {
+            this.reviewRequestEmails = reviewRequestEmails;
+            return this;
+        }
+
+        public Builder reviewRequestEmails(Boolean reviewRequestEmails) {
+            this.reviewRequestEmails = Optional.ofNullable(reviewRequestEmails);
+            return this;
+        }
+
+        /**
+         * <p>Whether Whop emails and notifies the teams of this account's subaccounts. Set it to <code>false</code> to stop Whop's emails, push, and in-app notifications to them. These include payout, verification, dispute, and card alerts about their accounts. Only accounts with subaccounts can set it. Requires the <code>company:update</code> scope on your API key.</p>
+         */
+        @JsonSetter(value = "subaccount_notifications", nulls = Nulls.SKIP)
+        public Builder subaccountNotifications(Optional<Boolean> subaccountNotifications) {
+            this.subaccountNotifications = subaccountNotifications;
+            return this;
+        }
+
+        public Builder subaccountNotifications(Boolean subaccountNotifications) {
+            this.subaccountNotifications = Optional.ofNullable(subaccountNotifications);
+            return this;
+        }
+
+        /**
+         * <p>Whether this account's subaccounts are view-only for their own team members. Set it to <code>true</code> to refuse every change a subaccount's team tries to make while still letting them see what their role allows. Only accounts with subaccounts can set it. Requires the <code>company:update</code> scope on your API key.</p>
+         */
+        @JsonSetter(value = "subaccount_team_view_only", nulls = Nulls.SKIP)
+        public Builder subaccountTeamViewOnly(Optional<Boolean> subaccountTeamViewOnly) {
+            this.subaccountTeamViewOnly = subaccountTeamViewOnly;
+            return this;
+        }
+
+        public Builder subaccountTeamViewOnly(Boolean subaccountTeamViewOnly) {
+            this.subaccountTeamViewOnly = Optional.ofNullable(subaccountTeamViewOnly);
+            return this;
+        }
+
+        /**
+         * <p>What happens to a subscription once every retry of a renewal payment has failed. <code>cancel</code> (the default) cancels it. <code>none</code> leaves it past due and keeps billing it each period; access follows the account's past-due access setting. Requires company:manage_checkout permission.</p>
+         */
+        @JsonSetter(value = "subscription_failure_behavior", nulls = Nulls.SKIP)
+        public Builder subscriptionFailureBehavior(
+                Optional<UpdatePreferencesRequestSubscriptionFailureBehavior> subscriptionFailureBehavior) {
+            this.subscriptionFailureBehavior = subscriptionFailureBehavior;
+            return this;
+        }
+
+        public Builder subscriptionFailureBehavior(
+                UpdatePreferencesRequestSubscriptionFailureBehavior subscriptionFailureBehavior) {
+            this.subscriptionFailureBehavior = Optional.ofNullable(subscriptionFailureBehavior);
+            return this;
+        }
+
         public UpdatePreferencesRequest build() {
             return new UpdatePreferencesRequest(
                     adsPaymentMethods,
                     adsReportingCurrency,
                     adsSchedulingTimezone,
                     adsTripleWhaleIntegration,
+                    cancellationEmails,
                     cardsAutoTopUp,
+                    cardsNotifications,
+                    coversSubaccountNegativeBalances,
+                    customerTracking,
                     disputeFighterEnabled,
+                    economicIntelligenceAutoRenew,
+                    economicIntelligenceDurationKey,
+                    failedPaymentEmails,
+                    feedbackOptions,
+                    preferredSettlementCurrency,
+                    renewalReminderEmails,
+                    reviewRequestEmails,
+                    subaccountNotifications,
+                    subaccountTeamViewOnly,
+                    subscriptionFailureBehavior,
                     additionalProperties);
+        }
+
+        @JsonAnySetter
+        private void putAdditionalPropertyFromJson(String key, Object value) {
+            if (key.equalsIgnoreCase("ads_payment_methods")
+                    || key.equalsIgnoreCase("ads_reporting_currency")
+                    || key.equalsIgnoreCase("ads_scheduling_timezone")
+                    || key.equalsIgnoreCase("ads_triple_whale_integration")
+                    || key.equalsIgnoreCase("cancellation_emails")
+                    || key.equalsIgnoreCase("cards_auto_top_up")
+                    || key.equalsIgnoreCase("cards_notifications")
+                    || key.equalsIgnoreCase("covers_subaccount_negative_balances")
+                    || key.equalsIgnoreCase("customer_tracking")
+                    || key.equalsIgnoreCase("dispute_fighter_enabled")
+                    || key.equalsIgnoreCase("economic_intelligence_auto_renew")
+                    || key.equalsIgnoreCase("economic_intelligence_duration_key")
+                    || key.equalsIgnoreCase("failed_payment_emails")
+                    || key.equalsIgnoreCase("feedback_options")
+                    || key.equalsIgnoreCase("preferred_settlement_currency")
+                    || key.equalsIgnoreCase("renewal_reminder_emails")
+                    || key.equalsIgnoreCase("review_request_emails")
+                    || key.equalsIgnoreCase("subaccount_notifications")
+                    || key.equalsIgnoreCase("subaccount_team_view_only")
+                    || key.equalsIgnoreCase("subscription_failure_behavior")) {
+                return;
+            }
+            this.additionalProperties.put(key, value);
         }
 
         public Builder additionalProperty(String key, Object value) {

@@ -156,7 +156,6 @@ public final class LedgerActivityResourceBankCard {
 
         private Optional<String> last4 = Optional.empty();
 
-        @JsonAnySetter
         private Map<String, Object> additionalProperties = new HashMap<>();
 
         private Builder() {}
@@ -271,6 +270,17 @@ public final class LedgerActivityResourceBankCard {
 
         public LedgerActivityResourceBankCard build() {
             return new LedgerActivityResourceBankCard(brand, expMonth, expYear, last4, additionalProperties);
+        }
+
+        @JsonAnySetter
+        private void putAdditionalPropertyFromJson(String key, Object value) {
+            if (key.equalsIgnoreCase("brand")
+                    || key.equalsIgnoreCase("exp_month")
+                    || key.equalsIgnoreCase("exp_year")
+                    || key.equalsIgnoreCase("last4")) {
+                return;
+            }
+            this.additionalProperties.put(key, value);
         }
 
         public Builder additionalProperty(String key, Object value) {

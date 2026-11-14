@@ -4,11 +4,14 @@
 package com.whop.api.resources.paymentmethoddomains;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
+import com.whop.api.core.BodyProperties;
 import com.whop.api.core.ClientOptions;
 import com.whop.api.core.MediaTypes;
 import com.whop.api.core.ObjectMappers;
+import com.whop.api.core.PathSegments;
 import com.whop.api.core.QueryStringMapper;
 import com.whop.api.core.RequestOptions;
+import com.whop.api.core.RetryInterceptor;
 import com.whop.api.core.WhopApiApiException;
 import com.whop.api.core.WhopApiException;
 import com.whop.api.core.WhopApiHttpResponse;
@@ -26,7 +29,6 @@ import com.whop.api.resources.paymentmethoddomains.requests.VerifyPaymentMethodD
 import com.whop.api.resources.paymentmethoddomains.types.DeletePaymentMethodDomainsResponse;
 import com.whop.api.resources.paymentmethoddomains.types.ListPaymentMethodDomainsResponse;
 import com.whop.api.types.PaymentMethodDomain;
-import com.whop.api.types.V1ErrorResponse;
 import java.io.IOException;
 import java.util.List;
 import java.util.Optional;
@@ -46,32 +48,32 @@ public class RawPaymentMethodDomainsClient {
     }
 
     /**
-     * Lists payment method domains. Without <code>account_id</code>, returns the caller's own domains and those of every connected account.
+     * Lists the payment method domains registered for your account and its subaccounts. Deprecated: list domains with <code>GET /domains</code> and the <code>apple_pay</code> filter instead.
      */
     public WhopApiHttpResponse<SyncPagingIterable<PaymentMethodDomain>> list() {
         return list(ListPaymentMethodDomainsRequest.builder().build());
     }
 
     /**
-     * Lists payment method domains. Without <code>account_id</code>, returns the caller's own domains and those of every connected account.
+     * Lists the payment method domains registered for your account and its subaccounts. Deprecated: list domains with <code>GET /domains</code> and the <code>apple_pay</code> filter instead.
      */
     public WhopApiHttpResponse<SyncPagingIterable<PaymentMethodDomain>> list(RequestOptions requestOptions) {
         return list(ListPaymentMethodDomainsRequest.builder().build(), requestOptions);
     }
 
     /**
-     * Lists payment method domains. Without <code>account_id</code>, returns the caller's own domains and those of every connected account.
+     * Lists the payment method domains registered for your account and its subaccounts. Deprecated: list domains with <code>GET /domains</code> and the <code>apple_pay</code> filter instead.
      */
     public WhopApiHttpResponse<SyncPagingIterable<PaymentMethodDomain>> list(ListPaymentMethodDomainsRequest request) {
         return list(request, null);
     }
 
     /**
-     * Lists payment method domains. Without <code>account_id</code>, returns the caller's own domains and those of every connected account.
+     * Lists the payment method domains registered for your account and its subaccounts. Deprecated: list domains with <code>GET /domains</code> and the <code>apple_pay</code> filter instead.
      */
     public WhopApiHttpResponse<SyncPagingIterable<PaymentMethodDomain>> list(
             ListPaymentMethodDomainsRequest request, RequestOptions requestOptions) {
-        HttpUrl.Builder httpUrl = HttpUrl.parse(this.clientOptions.environment().getUrl())
+        HttpUrl.Builder httpUrl = HttpUrl.parse(this.clientOptions.environment().getApiURL())
                 .newBuilder()
                 .addPathSegments("payment_method_domains");
         if (request.getAccountId().isPresent()) {
@@ -137,6 +139,15 @@ public class RawPaymentMethodDomainsClient {
         if (requestOptions != null && requestOptions.getTimeout().isPresent()) {
             client = clientOptions.httpClientWithTimeout(requestOptions);
         }
+        if (requestOptions != null && requestOptions.getMaxRetries().isPresent()) {
+            okhttpRequest = okhttpRequest
+                    .newBuilder()
+                    .tag(
+                            RetryInterceptor.MaxRetriesOverride.class,
+                            new RetryInterceptor.MaxRetriesOverride(
+                                    requestOptions.getMaxRetries().get()))
+                    .build();
+        }
         try (Response response = client.newCall(okhttpRequest).execute()) {
             ResponseBody responseBody = response.body();
             String responseBodyString = responseBody != null ? responseBody.string() : "{}";
@@ -151,8 +162,11 @@ public class RawPaymentMethodDomainsClient {
                 List<PaymentMethodDomain> result = parsedResponse.getData();
                 return new WhopApiHttpResponse<>(
                         new SyncPagingIterable<PaymentMethodDomain>(
-                                startingAfter != null, result, parsedResponse, () -> list(nextRequest, requestOptions)
-                                        .body()),
+                                startingAfter.isPresent()
+                                        && !startingAfter.get().isEmpty(),
+                                result,
+                                parsedResponse,
+                                () -> list(nextRequest, requestOptions).body()),
                         response);
             }
             try {
@@ -176,24 +190,26 @@ public class RawPaymentMethodDomainsClient {
             Object errorBody = ObjectMappers.parseErrorBody(responseBodyString);
             throw new WhopApiApiException(
                     "Error with status code " + response.code(), response.code(), errorBody, response);
+        } catch (JsonProcessingException e) {
+            throw new WhopApiException("Failed to deserialize response: " + e.getMessage(), e);
         } catch (IOException e) {
             throw new WhopApiException("Network error executing HTTP request", e);
         }
     }
 
     /**
-     * Registers a hostname with the wallet provider and attempts verification inline. Returns <code>verified</code> when the provider fetched the domain-association file (for Apple Pay, <code>/.well-known/apple-developer-merchantid-domain-association</code>), or <code>pending</code> when it could not — host the file, then retry with the verify endpoint.
+     * Registers a hostname with the wallet provider and attempts verification inline. Returns <code>verified</code> when the provider fetched the domain-association file (for Apple Pay, <code>/.well-known/apple-developer-merchantid-domain-association</code>), or <code>pending</code> when it could not: host the file, then retry with <code>POST /payment_method_domains/:id/verify</code>. Deprecated: add Apple Pay with <code>POST /domains</code> and <code>apple_pay: {}</code> instead.
      */
     public WhopApiHttpResponse<PaymentMethodDomain> create(CreatePaymentMethodDomainsRequest request) {
         return create(request, null);
     }
 
     /**
-     * Registers a hostname with the wallet provider and attempts verification inline. Returns <code>verified</code> when the provider fetched the domain-association file (for Apple Pay, <code>/.well-known/apple-developer-merchantid-domain-association</code>), or <code>pending</code> when it could not — host the file, then retry with the verify endpoint.
+     * Registers a hostname with the wallet provider and attempts verification inline. Returns <code>verified</code> when the provider fetched the domain-association file (for Apple Pay, <code>/.well-known/apple-developer-merchantid-domain-association</code>), or <code>pending</code> when it could not: host the file, then retry with <code>POST /payment_method_domains/:id/verify</code>. Deprecated: add Apple Pay with <code>POST /domains</code> and <code>apple_pay: {}</code> instead.
      */
     public WhopApiHttpResponse<PaymentMethodDomain> create(
             CreatePaymentMethodDomainsRequest request, RequestOptions requestOptions) {
-        HttpUrl.Builder httpUrl = HttpUrl.parse(this.clientOptions.environment().getUrl())
+        HttpUrl.Builder httpUrl = HttpUrl.parse(this.clientOptions.environment().getApiURL())
                 .newBuilder()
                 .addPathSegments("payment_method_domains");
         if (requestOptions != null) {
@@ -204,7 +220,9 @@ public class RawPaymentMethodDomainsClient {
         RequestBody body;
         try {
             body = RequestBody.create(
-                    ObjectMappers.JSON_MAPPER.writeValueAsBytes(request), MediaTypes.APPLICATION_JSON);
+                    ObjectMappers.JSON_MAPPER.writeValueAsBytes(BodyProperties.merge(
+                            request, requestOptions != null ? requestOptions.getBodyProperties() : null)),
+                    MediaTypes.APPLICATION_JSON);
         } catch (JsonProcessingException e) {
             throw new WhopApiException("Failed to serialize request", e);
         }
@@ -218,6 +236,15 @@ public class RawPaymentMethodDomainsClient {
         OkHttpClient client = clientOptions.httpClient();
         if (requestOptions != null && requestOptions.getTimeout().isPresent()) {
             client = clientOptions.httpClientWithTimeout(requestOptions);
+        }
+        if (requestOptions != null && requestOptions.getMaxRetries().isPresent()) {
+            okhttpRequest = okhttpRequest
+                    .newBuilder()
+                    .tag(
+                            RetryInterceptor.MaxRetriesOverride.class,
+                            new RetryInterceptor.MaxRetriesOverride(
+                                    requestOptions.getMaxRetries().get()))
+                    .build();
         }
         try (Response response = client.newCall(okhttpRequest).execute()) {
             ResponseBody responseBody = response.body();
@@ -242,8 +269,7 @@ public class RawPaymentMethodDomainsClient {
                                 ObjectMappers.JSON_MAPPER.readValue(responseBodyString, Object.class), response);
                     case 409:
                         throw new ConflictError(
-                                ObjectMappers.JSON_MAPPER.readValue(responseBodyString, V1ErrorResponse.class),
-                                response);
+                                ObjectMappers.JSON_MAPPER.readValue(responseBodyString, Object.class), response);
                 }
             } catch (JsonProcessingException ignored) {
                 // unable to map error response, throwing generic error
@@ -251,41 +277,43 @@ public class RawPaymentMethodDomainsClient {
             Object errorBody = ObjectMappers.parseErrorBody(responseBodyString);
             throw new WhopApiApiException(
                     "Error with status code " + response.code(), response.code(), errorBody, response);
+        } catch (JsonProcessingException e) {
+            throw new WhopApiException("Failed to deserialize response: " + e.getMessage(), e);
         } catch (IOException e) {
             throw new WhopApiException("Network error executing HTTP request", e);
         }
     }
 
     /**
-     * Retrieves a payment method domain to check its verification status.
+     * Retrieves a payment method domain to check its verification status. Deprecated: retrieve the domain with <code>GET /domains/{id}</code> instead, using the same ID.
      */
     public WhopApiHttpResponse<PaymentMethodDomain> retrieve(String id) {
         return retrieve(id, RetrievePaymentMethodDomainsRequest.builder().build());
     }
 
     /**
-     * Retrieves a payment method domain to check its verification status.
+     * Retrieves a payment method domain to check its verification status. Deprecated: retrieve the domain with <code>GET /domains/{id}</code> instead, using the same ID.
      */
     public WhopApiHttpResponse<PaymentMethodDomain> retrieve(String id, RequestOptions requestOptions) {
         return retrieve(id, RetrievePaymentMethodDomainsRequest.builder().build(), requestOptions);
     }
 
     /**
-     * Retrieves a payment method domain to check its verification status.
+     * Retrieves a payment method domain to check its verification status. Deprecated: retrieve the domain with <code>GET /domains/{id}</code> instead, using the same ID.
      */
     public WhopApiHttpResponse<PaymentMethodDomain> retrieve(String id, RetrievePaymentMethodDomainsRequest request) {
         return retrieve(id, request, null);
     }
 
     /**
-     * Retrieves a payment method domain to check its verification status.
+     * Retrieves a payment method domain to check its verification status. Deprecated: retrieve the domain with <code>GET /domains/{id}</code> instead, using the same ID.
      */
     public WhopApiHttpResponse<PaymentMethodDomain> retrieve(
             String id, RetrievePaymentMethodDomainsRequest request, RequestOptions requestOptions) {
-        HttpUrl.Builder httpUrl = HttpUrl.parse(this.clientOptions.environment().getUrl())
+        HttpUrl.Builder httpUrl = HttpUrl.parse(this.clientOptions.environment().getApiURL())
                 .newBuilder()
                 .addPathSegments("payment_method_domains")
-                .addPathSegment(id);
+                .addPathSegment(PathSegments.validate(id));
         if (requestOptions != null) {
             requestOptions.getQueryParameters().forEach((_key, _value) -> {
                 httpUrl.addQueryParameter(_key, _value);
@@ -300,6 +328,15 @@ public class RawPaymentMethodDomainsClient {
         OkHttpClient client = clientOptions.httpClient();
         if (requestOptions != null && requestOptions.getTimeout().isPresent()) {
             client = clientOptions.httpClientWithTimeout(requestOptions);
+        }
+        if (requestOptions != null && requestOptions.getMaxRetries().isPresent()) {
+            okhttpRequest = okhttpRequest
+                    .newBuilder()
+                    .tag(
+                            RetryInterceptor.MaxRetriesOverride.class,
+                            new RetryInterceptor.MaxRetriesOverride(
+                                    requestOptions.getMaxRetries().get()))
+                    .build();
         }
         try (Response response = client.newCall(okhttpRequest).execute()) {
             ResponseBody responseBody = response.body();
@@ -326,27 +363,29 @@ public class RawPaymentMethodDomainsClient {
             Object errorBody = ObjectMappers.parseErrorBody(responseBodyString);
             throw new WhopApiApiException(
                     "Error with status code " + response.code(), response.code(), errorBody, response);
+        } catch (JsonProcessingException e) {
+            throw new WhopApiException("Failed to deserialize response: " + e.getMessage(), e);
         } catch (IOException e) {
             throw new WhopApiException("Network error executing HTTP request", e);
         }
     }
 
     /**
-     * Unregisters a payment method domain so its wallet payment methods stop rendering there.
+     * Unregisters a payment method domain so its wallet payment methods stop rendering there. Deprecated: remove Apple Pay with <code>PATCH /domains/{id}</code> and <code>apple_pay: null</code> instead. <code>DELETE /domains/{id}</code> removes the whole domain, including any website on it.
      */
     public WhopApiHttpResponse<DeletePaymentMethodDomainsResponse> delete(String id) {
         return delete(id, DeletePaymentMethodDomainsRequest.builder().build());
     }
 
     /**
-     * Unregisters a payment method domain so its wallet payment methods stop rendering there.
+     * Unregisters a payment method domain so its wallet payment methods stop rendering there. Deprecated: remove Apple Pay with <code>PATCH /domains/{id}</code> and <code>apple_pay: null</code> instead. <code>DELETE /domains/{id}</code> removes the whole domain, including any website on it.
      */
     public WhopApiHttpResponse<DeletePaymentMethodDomainsResponse> delete(String id, RequestOptions requestOptions) {
         return delete(id, DeletePaymentMethodDomainsRequest.builder().build(), requestOptions);
     }
 
     /**
-     * Unregisters a payment method domain so its wallet payment methods stop rendering there.
+     * Unregisters a payment method domain so its wallet payment methods stop rendering there. Deprecated: remove Apple Pay with <code>PATCH /domains/{id}</code> and <code>apple_pay: null</code> instead. <code>DELETE /domains/{id}</code> removes the whole domain, including any website on it.
      */
     public WhopApiHttpResponse<DeletePaymentMethodDomainsResponse> delete(
             String id, DeletePaymentMethodDomainsRequest request) {
@@ -354,14 +393,14 @@ public class RawPaymentMethodDomainsClient {
     }
 
     /**
-     * Unregisters a payment method domain so its wallet payment methods stop rendering there.
+     * Unregisters a payment method domain so its wallet payment methods stop rendering there. Deprecated: remove Apple Pay with <code>PATCH /domains/{id}</code> and <code>apple_pay: null</code> instead. <code>DELETE /domains/{id}</code> removes the whole domain, including any website on it.
      */
     public WhopApiHttpResponse<DeletePaymentMethodDomainsResponse> delete(
             String id, DeletePaymentMethodDomainsRequest request, RequestOptions requestOptions) {
-        HttpUrl.Builder httpUrl = HttpUrl.parse(this.clientOptions.environment().getUrl())
+        HttpUrl.Builder httpUrl = HttpUrl.parse(this.clientOptions.environment().getApiURL())
                 .newBuilder()
                 .addPathSegments("payment_method_domains")
-                .addPathSegment(id);
+                .addPathSegment(PathSegments.validate(id));
         if (requestOptions != null) {
             requestOptions.getQueryParameters().forEach((_key, _value) -> {
                 httpUrl.addQueryParameter(_key, _value);
@@ -369,13 +408,25 @@ public class RawPaymentMethodDomainsClient {
         }
         Request.Builder _requestBuilder = new Request.Builder()
                 .url(httpUrl.build())
-                .method("DELETE", null)
+                .method(
+                        "DELETE",
+                        BodyProperties.toRequestBody(
+                                requestOptions != null ? requestOptions.getBodyProperties() : null, null))
                 .headers(Headers.of(clientOptions.headers(requestOptions)))
                 .addHeader("Accept", "application/json");
         Request okhttpRequest = _requestBuilder.build();
         OkHttpClient client = clientOptions.httpClient();
         if (requestOptions != null && requestOptions.getTimeout().isPresent()) {
             client = clientOptions.httpClientWithTimeout(requestOptions);
+        }
+        if (requestOptions != null && requestOptions.getMaxRetries().isPresent()) {
+            okhttpRequest = okhttpRequest
+                    .newBuilder()
+                    .tag(
+                            RetryInterceptor.MaxRetriesOverride.class,
+                            new RetryInterceptor.MaxRetriesOverride(
+                                    requestOptions.getMaxRetries().get()))
+                    .build();
         }
         try (Response response = client.newCall(okhttpRequest).execute()) {
             ResponseBody responseBody = response.body();
@@ -404,41 +455,43 @@ public class RawPaymentMethodDomainsClient {
             Object errorBody = ObjectMappers.parseErrorBody(responseBodyString);
             throw new WhopApiApiException(
                     "Error with status code " + response.code(), response.code(), errorBody, response);
+        } catch (JsonProcessingException e) {
+            throw new WhopApiException("Failed to deserialize response: " + e.getMessage(), e);
         } catch (IOException e) {
             throw new WhopApiException("Network error executing HTTP request", e);
         }
     }
 
     /**
-     * Re-attempts provider verification of a pending domain once the association file is hosted. Fails with a <code>bad_request</code> explaining what to fix; verifying an already <code>verified</code> domain is a no-op.
+     * Re-attempts provider verification of a pending domain once the association file is hosted. Fails with a <code>bad_request</code> explaining what to fix; verifying an already <code>verified</code> domain is a no-op. Deprecated: check the domain with <code>POST /domains/{id}/check</code> instead.
      */
     public WhopApiHttpResponse<PaymentMethodDomain> verify(String id) {
         return verify(id, VerifyPaymentMethodDomainsRequest.builder().build());
     }
 
     /**
-     * Re-attempts provider verification of a pending domain once the association file is hosted. Fails with a <code>bad_request</code> explaining what to fix; verifying an already <code>verified</code> domain is a no-op.
+     * Re-attempts provider verification of a pending domain once the association file is hosted. Fails with a <code>bad_request</code> explaining what to fix; verifying an already <code>verified</code> domain is a no-op. Deprecated: check the domain with <code>POST /domains/{id}/check</code> instead.
      */
     public WhopApiHttpResponse<PaymentMethodDomain> verify(String id, RequestOptions requestOptions) {
         return verify(id, VerifyPaymentMethodDomainsRequest.builder().build(), requestOptions);
     }
 
     /**
-     * Re-attempts provider verification of a pending domain once the association file is hosted. Fails with a <code>bad_request</code> explaining what to fix; verifying an already <code>verified</code> domain is a no-op.
+     * Re-attempts provider verification of a pending domain once the association file is hosted. Fails with a <code>bad_request</code> explaining what to fix; verifying an already <code>verified</code> domain is a no-op. Deprecated: check the domain with <code>POST /domains/{id}/check</code> instead.
      */
     public WhopApiHttpResponse<PaymentMethodDomain> verify(String id, VerifyPaymentMethodDomainsRequest request) {
         return verify(id, request, null);
     }
 
     /**
-     * Re-attempts provider verification of a pending domain once the association file is hosted. Fails with a <code>bad_request</code> explaining what to fix; verifying an already <code>verified</code> domain is a no-op.
+     * Re-attempts provider verification of a pending domain once the association file is hosted. Fails with a <code>bad_request</code> explaining what to fix; verifying an already <code>verified</code> domain is a no-op. Deprecated: check the domain with <code>POST /domains/{id}/check</code> instead.
      */
     public WhopApiHttpResponse<PaymentMethodDomain> verify(
             String id, VerifyPaymentMethodDomainsRequest request, RequestOptions requestOptions) {
-        HttpUrl.Builder httpUrl = HttpUrl.parse(this.clientOptions.environment().getUrl())
+        HttpUrl.Builder httpUrl = HttpUrl.parse(this.clientOptions.environment().getApiURL())
                 .newBuilder()
                 .addPathSegments("payment_method_domains")
-                .addPathSegment(id)
+                .addPathSegment(PathSegments.validate(id))
                 .addPathSegments("verify");
         if (requestOptions != null) {
             requestOptions.getQueryParameters().forEach((_key, _value) -> {
@@ -447,13 +500,26 @@ public class RawPaymentMethodDomainsClient {
         }
         Request.Builder _requestBuilder = new Request.Builder()
                 .url(httpUrl.build())
-                .method("POST", RequestBody.create("", null))
+                .method(
+                        "POST",
+                        BodyProperties.toRequestBody(
+                                requestOptions != null ? requestOptions.getBodyProperties() : null,
+                                RequestBody.create("", null)))
                 .headers(Headers.of(clientOptions.headers(requestOptions)))
                 .addHeader("Accept", "application/json");
         Request okhttpRequest = _requestBuilder.build();
         OkHttpClient client = clientOptions.httpClient();
         if (requestOptions != null && requestOptions.getTimeout().isPresent()) {
             client = clientOptions.httpClientWithTimeout(requestOptions);
+        }
+        if (requestOptions != null && requestOptions.getMaxRetries().isPresent()) {
+            okhttpRequest = okhttpRequest
+                    .newBuilder()
+                    .tag(
+                            RetryInterceptor.MaxRetriesOverride.class,
+                            new RetryInterceptor.MaxRetriesOverride(
+                                    requestOptions.getMaxRetries().get()))
+                    .build();
         }
         try (Response response = client.newCall(okhttpRequest).execute()) {
             ResponseBody responseBody = response.body();
@@ -478,8 +544,7 @@ public class RawPaymentMethodDomainsClient {
                                 ObjectMappers.JSON_MAPPER.readValue(responseBodyString, Object.class), response);
                     case 409:
                         throw new ConflictError(
-                                ObjectMappers.JSON_MAPPER.readValue(responseBodyString, V1ErrorResponse.class),
-                                response);
+                                ObjectMappers.JSON_MAPPER.readValue(responseBodyString, Object.class), response);
                 }
             } catch (JsonProcessingException ignored) {
                 // unable to map error response, throwing generic error
@@ -487,6 +552,8 @@ public class RawPaymentMethodDomainsClient {
             Object errorBody = ObjectMappers.parseErrorBody(responseBodyString);
             throw new WhopApiApiException(
                     "Error with status code " + response.code(), response.code(), errorBody, response);
+        } catch (JsonProcessingException e) {
+            throw new WhopApiException("Failed to deserialize response: " + e.getMessage(), e);
         } catch (IOException e) {
             throw new WhopApiException("Network error executing HTTP request", e);
         }

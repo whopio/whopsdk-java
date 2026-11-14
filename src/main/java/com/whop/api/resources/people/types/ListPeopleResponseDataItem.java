@@ -599,7 +599,6 @@ public final class ListPeopleResponseDataItem {
 
         private Optional<Double> aov = Optional.empty();
 
-        @JsonAnySetter
         private Map<String, Object> additionalProperties = new HashMap<>();
 
         private Builder() {}
@@ -1101,6 +1100,34 @@ public final class ListPeopleResponseDataItem {
                     timezone,
                     user,
                     additionalProperties);
+        }
+
+        @JsonAnySetter
+        private void putAdditionalPropertyFromJson(String key, Object value) {
+            if (key.equalsIgnoreCase("account_id")
+                    || key.equalsIgnoreCase("aov")
+                    || key.equalsIgnoreCase("device")
+                    || key.equalsIgnoreCase("email")
+                    || key.equalsIgnoreCase("event_count")
+                    || key.equalsIgnoreCase("first_purchase_at")
+                    || key.equalsIgnoreCase("first_seen_at")
+                    || key.equalsIgnoreCase("first_source")
+                    || key.equalsIgnoreCase("id")
+                    || key.equalsIgnoreCase("last_ip")
+                    || key.equalsIgnoreCase("last_purchase_at")
+                    || key.equalsIgnoreCase("last_seen_at")
+                    || key.equalsIgnoreCase("last_source")
+                    || key.equalsIgnoreCase("location")
+                    || key.equalsIgnoreCase("ltv")
+                    || key.equalsIgnoreCase("member")
+                    || key.equalsIgnoreCase("name")
+                    || key.equalsIgnoreCase("phone")
+                    || key.equalsIgnoreCase("purchase_count")
+                    || key.equalsIgnoreCase("timezone")
+                    || key.equalsIgnoreCase("user")) {
+                return;
+            }
+            this.additionalProperties.put(key, value);
         }
 
         @java.lang.Override

@@ -7,14 +7,27 @@ import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonValue;
 
 public final class AccountRequiredActionAction {
+    public static final AccountRequiredActionAction UPDATE_PAYOUT_METHOD =
+            new AccountRequiredActionAction(Value.UPDATE_PAYOUT_METHOD, "update_payout_method");
+
+    public static final AccountRequiredActionAction UPDATE_AUTOMATIC_WITHDRAWAL_METHOD =
+            new AccountRequiredActionAction(
+                    Value.UPDATE_AUTOMATIC_WITHDRAWAL_METHOD, "update_automatic_withdrawal_method");
+
+    public static final AccountRequiredActionAction ENABLE_TWO_FACTOR_AUTHENTICATION =
+            new AccountRequiredActionAction(Value.ENABLE_TWO_FACTOR_AUTHENTICATION, "enable_two_factor_authentication");
+
+    public static final AccountRequiredActionAction ADD_VAT_REGISTRATION =
+            new AccountRequiredActionAction(Value.ADD_VAT_REGISTRATION, "add_vat_registration");
+
+    public static final AccountRequiredActionAction RESPOND_TO_ABUSE_REPORT =
+            new AccountRequiredActionAction(Value.RESPOND_TO_ABUSE_REPORT, "respond_to_abuse_report");
+
+    public static final AccountRequiredActionAction CARD_USAGE_REVIEW =
+            new AccountRequiredActionAction(Value.CARD_USAGE_REVIEW, "card_usage_review");
+
     public static final AccountRequiredActionAction VERIFY_IDENTITY =
             new AccountRequiredActionAction(Value.VERIFY_IDENTITY, "verify_identity");
-
-    public static final AccountRequiredActionAction CONNECT_FULFILLMENT_TRACKER =
-            new AccountRequiredActionAction(Value.CONNECT_FULFILLMENT_TRACKER, "connect_fulfillment_tracker");
-
-    public static final AccountRequiredActionAction SETUP_APPLE_PAY_DOMAINS =
-            new AccountRequiredActionAction(Value.SETUP_APPLE_PAY_DOMAINS, "setup_apple_pay_domains");
 
     public static final AccountRequiredActionAction UPDATE_PAYOUT_PROFILE =
             new AccountRequiredActionAction(Value.UPDATE_PAYOUT_PROFILE, "update_payout_profile");
@@ -25,8 +38,8 @@ public final class AccountRequiredActionAction {
     public static final AccountRequiredActionAction SUBMIT_INFORMATION_REQUEST =
             new AccountRequiredActionAction(Value.SUBMIT_INFORMATION_REQUEST, "submit_information_request");
 
-    public static final AccountRequiredActionAction ADD_VAT_REGISTRATION =
-            new AccountRequiredActionAction(Value.ADD_VAT_REGISTRATION, "add_vat_registration");
+    public static final AccountRequiredActionAction CONFIRM_TAX_DETAILS =
+            new AccountRequiredActionAction(Value.CONFIRM_TAX_DETAILS, "confirm_tax_details");
 
     public static final AccountRequiredActionAction SIGN_FORMATION_DOCUMENTS =
             new AccountRequiredActionAction(Value.SIGN_FORMATION_DOCUMENTS, "sign_formation_documents");
@@ -37,8 +50,14 @@ public final class AccountRequiredActionAction {
     public static final AccountRequiredActionAction DEPOSIT_FUNDS =
             new AccountRequiredActionAction(Value.DEPOSIT_FUNDS, "deposit_funds");
 
-    public static final AccountRequiredActionAction CARD_USAGE_REVIEW =
-            new AccountRequiredActionAction(Value.CARD_USAGE_REVIEW, "card_usage_review");
+    public static final AccountRequiredActionAction SCALE_ACCOUNT_SETUP =
+            new AccountRequiredActionAction(Value.SCALE_ACCOUNT_SETUP, "scale_account_setup");
+
+    public static final AccountRequiredActionAction ACCEPT_PAYOUT_TERMS =
+            new AccountRequiredActionAction(Value.ACCEPT_PAYOUT_TERMS, "accept_payout_terms");
+
+    public static final AccountRequiredActionAction REVIEW_HELD_PAYMENTS =
+            new AccountRequiredActionAction(Value.REVIEW_HELD_PAYMENTS, "review_held_payments");
 
     private final Value value;
 
@@ -73,28 +92,40 @@ public final class AccountRequiredActionAction {
 
     public <T> T visit(Visitor<T> visitor) {
         switch (value) {
+            case UPDATE_PAYOUT_METHOD:
+                return visitor.visitUpdatePayoutMethod();
+            case UPDATE_AUTOMATIC_WITHDRAWAL_METHOD:
+                return visitor.visitUpdateAutomaticWithdrawalMethod();
+            case ENABLE_TWO_FACTOR_AUTHENTICATION:
+                return visitor.visitEnableTwoFactorAuthentication();
+            case ADD_VAT_REGISTRATION:
+                return visitor.visitAddVatRegistration();
+            case RESPOND_TO_ABUSE_REPORT:
+                return visitor.visitRespondToAbuseReport();
+            case CARD_USAGE_REVIEW:
+                return visitor.visitCardUsageReview();
             case VERIFY_IDENTITY:
                 return visitor.visitVerifyIdentity();
-            case CONNECT_FULFILLMENT_TRACKER:
-                return visitor.visitConnectFulfillmentTracker();
-            case SETUP_APPLE_PAY_DOMAINS:
-                return visitor.visitSetupApplePayDomains();
             case UPDATE_PAYOUT_PROFILE:
                 return visitor.visitUpdatePayoutProfile();
             case REAUTHORIZE_PAYOUT_METHODS:
                 return visitor.visitReauthorizePayoutMethods();
             case SUBMIT_INFORMATION_REQUEST:
                 return visitor.visitSubmitInformationRequest();
-            case ADD_VAT_REGISTRATION:
-                return visitor.visitAddVatRegistration();
+            case CONFIRM_TAX_DETAILS:
+                return visitor.visitConfirmTaxDetails();
             case SIGN_FORMATION_DOCUMENTS:
                 return visitor.visitSignFormationDocuments();
             case CONFIGURE_TAX_REMITTER:
                 return visitor.visitConfigureTaxRemitter();
             case DEPOSIT_FUNDS:
                 return visitor.visitDepositFunds();
-            case CARD_USAGE_REVIEW:
-                return visitor.visitCardUsageReview();
+            case SCALE_ACCOUNT_SETUP:
+                return visitor.visitScaleAccountSetup();
+            case ACCEPT_PAYOUT_TERMS:
+                return visitor.visitAcceptPayoutTerms();
+            case REVIEW_HELD_PAYMENTS:
+                return visitor.visitReviewHeldPayments();
             case UNKNOWN:
             default:
                 return visitor.visitUnknown(string);
@@ -104,28 +135,40 @@ public final class AccountRequiredActionAction {
     @JsonCreator(mode = JsonCreator.Mode.DELEGATING)
     public static AccountRequiredActionAction valueOf(String value) {
         switch (value) {
+            case "update_payout_method":
+                return UPDATE_PAYOUT_METHOD;
+            case "update_automatic_withdrawal_method":
+                return UPDATE_AUTOMATIC_WITHDRAWAL_METHOD;
+            case "enable_two_factor_authentication":
+                return ENABLE_TWO_FACTOR_AUTHENTICATION;
+            case "add_vat_registration":
+                return ADD_VAT_REGISTRATION;
+            case "respond_to_abuse_report":
+                return RESPOND_TO_ABUSE_REPORT;
+            case "card_usage_review":
+                return CARD_USAGE_REVIEW;
             case "verify_identity":
                 return VERIFY_IDENTITY;
-            case "connect_fulfillment_tracker":
-                return CONNECT_FULFILLMENT_TRACKER;
-            case "setup_apple_pay_domains":
-                return SETUP_APPLE_PAY_DOMAINS;
             case "update_payout_profile":
                 return UPDATE_PAYOUT_PROFILE;
             case "reauthorize_payout_methods":
                 return REAUTHORIZE_PAYOUT_METHODS;
             case "submit_information_request":
                 return SUBMIT_INFORMATION_REQUEST;
-            case "add_vat_registration":
-                return ADD_VAT_REGISTRATION;
+            case "confirm_tax_details":
+                return CONFIRM_TAX_DETAILS;
             case "sign_formation_documents":
                 return SIGN_FORMATION_DOCUMENTS;
             case "configure_tax_remitter":
                 return CONFIGURE_TAX_REMITTER;
             case "deposit_funds":
                 return DEPOSIT_FUNDS;
-            case "card_usage_review":
-                return CARD_USAGE_REVIEW;
+            case "scale_account_setup":
+                return SCALE_ACCOUNT_SETUP;
+            case "accept_payout_terms":
+                return ACCEPT_PAYOUT_TERMS;
+            case "review_held_payments":
+                return REVIEW_HELD_PAYMENTS;
             default:
                 return new AccountRequiredActionAction(Value.UNKNOWN, value);
         }
@@ -134,9 +177,15 @@ public final class AccountRequiredActionAction {
     public enum Value {
         DEPOSIT_FUNDS,
 
+        REVIEW_HELD_PAYMENTS,
+
         SUBMIT_INFORMATION_REQUEST,
 
+        UPDATE_AUTOMATIC_WITHDRAWAL_METHOD,
+
         REAUTHORIZE_PAYOUT_METHODS,
+
+        UPDATE_PAYOUT_METHOD,
 
         UPDATE_PAYOUT_PROFILE,
 
@@ -144,15 +193,21 @@ public final class AccountRequiredActionAction {
 
         VERIFY_IDENTITY,
 
+        SCALE_ACCOUNT_SETUP,
+
         SIGN_FORMATION_DOCUMENTS,
-
-        CONNECT_FULFILLMENT_TRACKER,
-
-        SETUP_APPLE_PAY_DOMAINS,
 
         CONFIGURE_TAX_REMITTER,
 
         ADD_VAT_REGISTRATION,
+
+        CONFIRM_TAX_DETAILS,
+
+        ACCEPT_PAYOUT_TERMS,
+
+        ENABLE_TWO_FACTOR_AUTHENTICATION,
+
+        RESPOND_TO_ABUSE_REPORT,
 
         UNKNOWN
     }
@@ -160,9 +215,15 @@ public final class AccountRequiredActionAction {
     public interface Visitor<T> {
         T visitDepositFunds();
 
+        T visitReviewHeldPayments();
+
         T visitSubmitInformationRequest();
 
+        T visitUpdateAutomaticWithdrawalMethod();
+
         T visitReauthorizePayoutMethods();
+
+        T visitUpdatePayoutMethod();
 
         T visitUpdatePayoutProfile();
 
@@ -170,15 +231,21 @@ public final class AccountRequiredActionAction {
 
         T visitVerifyIdentity();
 
+        T visitScaleAccountSetup();
+
         T visitSignFormationDocuments();
-
-        T visitConnectFulfillmentTracker();
-
-        T visitSetupApplePayDomains();
 
         T visitConfigureTaxRemitter();
 
         T visitAddVatRegistration();
+
+        T visitConfirmTaxDetails();
+
+        T visitAcceptPayoutTerms();
+
+        T visitEnableTwoFactorAuthentication();
+
+        T visitRespondToAbuseReport();
 
         T visitUnknown(String unknownType);
     }

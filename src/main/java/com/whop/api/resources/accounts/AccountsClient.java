@@ -7,23 +7,40 @@ import com.whop.api.core.ClientOptions;
 import com.whop.api.core.RequestOptions;
 import com.whop.api.core.Suppliers;
 import com.whop.api.core.pagination.SyncPagingIterable;
+import com.whop.api.resources.accounts.customertracking.CustomerTrackingClient;
+import com.whop.api.resources.accounts.fees.FeesClient;
+import com.whop.api.resources.accounts.financingproviders.FinancingProvidersClient;
 import com.whop.api.resources.accounts.preferences.PreferencesClient;
 import com.whop.api.resources.accounts.requests.CreateAccountsRequest;
+import com.whop.api.resources.accounts.requests.DeleteAccountsRequest;
 import com.whop.api.resources.accounts.requests.FormCompanyAccountsRequest;
 import com.whop.api.resources.accounts.requests.ListAccountsRequest;
+import com.whop.api.resources.accounts.requests.MeAccountsRequest;
 import com.whop.api.resources.accounts.requests.RetrieveAccountsRequest;
+import com.whop.api.resources.accounts.requests.RetryAdsPaymentAccountsRequest;
+import com.whop.api.resources.accounts.requests.SearchAccountsRequest;
+import com.whop.api.resources.accounts.requests.SuspendAccountsRequest;
 import com.whop.api.resources.accounts.requests.TransferOwnershipAccountsRequest;
 import com.whop.api.resources.accounts.requests.UpdateAccountsRequest;
 import com.whop.api.resources.accounts.reserves.ReservesClient;
+import com.whop.api.resources.accounts.types.DeleteAccountsResponse;
 import com.whop.api.resources.accounts.types.FormCompanyAccountsResponse;
+import com.whop.api.resources.accounts.types.RetryAdsPaymentAccountsResponse;
 import com.whop.api.resources.accounts.types.TransferOwnershipAccountsResponse;
 import com.whop.api.types.Account;
+import com.whop.api.types.AccountSearchResult;
 import java.util.function.Supplier;
 
 public class AccountsClient {
     protected final ClientOptions clientOptions;
 
     private final RawAccountsClient rawClient;
+
+    protected final Supplier<CustomerTrackingClient> customerTrackingClient;
+
+    protected final Supplier<FeesClient> feesClient;
+
+    protected final Supplier<FinancingProvidersClient> financingProvidersClient;
 
     protected final Supplier<PreferencesClient> preferencesClient;
 
@@ -32,6 +49,9 @@ public class AccountsClient {
     public AccountsClient(ClientOptions clientOptions) {
         this.clientOptions = clientOptions;
         this.rawClient = new RawAccountsClient(clientOptions);
+        this.customerTrackingClient = Suppliers.memoize(() -> new CustomerTrackingClient(clientOptions));
+        this.feesClient = Suppliers.memoize(() -> new FeesClient(clientOptions));
+        this.financingProvidersClient = Suppliers.memoize(() -> new FinancingProvidersClient(clientOptions));
         this.preferencesClient = Suppliers.memoize(() -> new PreferencesClient(clientOptions));
         this.reservesClient = Suppliers.memoize(() -> new ReservesClient(clientOptions));
     }
@@ -44,56 +64,56 @@ public class AccountsClient {
     }
 
     /**
-     * Lists accounts visible to the credential. User tokens return the user's business accounts; Account API keys return the requesting account and its connected accounts. Pass <code>parent_account_id</code> to return only that parent account's connected accounts.
+     * Lists accounts visible to the credential. User tokens return the user's business accounts; Account API keys return the requesting account and its subaccounts.
      */
     public SyncPagingIterable<Account> list() {
         return this.rawClient.list().body();
     }
 
     /**
-     * Lists accounts visible to the credential. User tokens return the user's business accounts; Account API keys return the requesting account and its connected accounts. Pass <code>parent_account_id</code> to return only that parent account's connected accounts.
+     * Lists accounts visible to the credential. User tokens return the user's business accounts; Account API keys return the requesting account and its subaccounts.
      */
     public SyncPagingIterable<Account> list(RequestOptions requestOptions) {
         return this.rawClient.list(requestOptions).body();
     }
 
     /**
-     * Lists accounts visible to the credential. User tokens return the user's business accounts; Account API keys return the requesting account and its connected accounts. Pass <code>parent_account_id</code> to return only that parent account's connected accounts.
+     * Lists accounts visible to the credential. User tokens return the user's business accounts; Account API keys return the requesting account and its subaccounts.
      */
     public SyncPagingIterable<Account> list(ListAccountsRequest request) {
         return this.rawClient.list(request).body();
     }
 
     /**
-     * Lists accounts visible to the credential. User tokens return the user's business accounts; Account API keys return the requesting account and its connected accounts. Pass <code>parent_account_id</code> to return only that parent account's connected accounts.
+     * Lists accounts visible to the credential. User tokens return the user's business accounts; Account API keys return the requesting account and its subaccounts.
      */
     public SyncPagingIterable<Account> list(ListAccountsRequest request, RequestOptions requestOptions) {
         return this.rawClient.list(request, requestOptions).body();
     }
 
     /**
-     * Creates an account. User tokens create business accounts; Account API keys create connected accounts. Tax fields (<code>tax_remitted_by</code>, <code>tax_type</code>, <code>product_tax_code_id</code>, <code>business_address</code>, <code>tax_identifiers</code>) are configured with Update Account, not at creation.
+     * Creates an account. User tokens create business accounts; Account API keys create subaccounts. Tax fields (<code>tax_remitted_by</code>, <code>tax_type</code>, <code>product_tax_code_id</code>, <code>business_address</code>, <code>tax_identifiers</code>) are configured with Update Account, not at creation.
      */
     public Account create() {
         return this.rawClient.create().body();
     }
 
     /**
-     * Creates an account. User tokens create business accounts; Account API keys create connected accounts. Tax fields (<code>tax_remitted_by</code>, <code>tax_type</code>, <code>product_tax_code_id</code>, <code>business_address</code>, <code>tax_identifiers</code>) are configured with Update Account, not at creation.
+     * Creates an account. User tokens create business accounts; Account API keys create subaccounts. Tax fields (<code>tax_remitted_by</code>, <code>tax_type</code>, <code>product_tax_code_id</code>, <code>business_address</code>, <code>tax_identifiers</code>) are configured with Update Account, not at creation.
      */
     public Account create(RequestOptions requestOptions) {
         return this.rawClient.create(requestOptions).body();
     }
 
     /**
-     * Creates an account. User tokens create business accounts; Account API keys create connected accounts. Tax fields (<code>tax_remitted_by</code>, <code>tax_type</code>, <code>product_tax_code_id</code>, <code>business_address</code>, <code>tax_identifiers</code>) are configured with Update Account, not at creation.
+     * Creates an account. User tokens create business accounts; Account API keys create subaccounts. Tax fields (<code>tax_remitted_by</code>, <code>tax_type</code>, <code>product_tax_code_id</code>, <code>business_address</code>, <code>tax_identifiers</code>) are configured with Update Account, not at creation.
      */
     public Account create(CreateAccountsRequest request) {
         return this.rawClient.create(request).body();
     }
 
     /**
-     * Creates an account. User tokens create business accounts; Account API keys create connected accounts. Tax fields (<code>tax_remitted_by</code>, <code>tax_type</code>, <code>product_tax_code_id</code>, <code>business_address</code>, <code>tax_identifiers</code>) are configured with Update Account, not at creation.
+     * Creates an account. User tokens create business accounts; Account API keys create subaccounts. Tax fields (<code>tax_remitted_by</code>, <code>tax_type</code>, <code>product_tax_code_id</code>, <code>business_address</code>, <code>tax_identifiers</code>) are configured with Update Account, not at creation.
      */
     public Account create(CreateAccountsRequest request, RequestOptions requestOptions) {
         return this.rawClient.create(request, requestOptions).body();
@@ -114,70 +134,127 @@ public class AccountsClient {
     }
 
     /**
-     * Retrieves a single account by ID or public route when it is visible to the credential, including its crypto wallet. The reserved id <code>me</code> retrieves the account associated with the current Account API key; user tokens have no single account, so they must address one by ID or route.
+     * Retrieves the account associated with the current Account API key.
+     */
+    public Account me(MeAccountsRequest request) {
+        return this.rawClient.me(request).body();
+    }
+
+    /**
+     * Retrieves the account associated with the current Account API key.
+     */
+    public Account me(MeAccountsRequest request, RequestOptions requestOptions) {
+        return this.rawClient.me(request, requestOptions).body();
+    }
+
+    /**
+     * Finds accounts by name among the accounts the credential can list. Support searches cover every company and return only the 50 best matches.
+     */
+    public SyncPagingIterable<AccountSearchResult> search(SearchAccountsRequest request) {
+        return this.rawClient.search(request).body();
+    }
+
+    /**
+     * Finds accounts by name among the accounts the credential can list. Support searches cover every company and return only the 50 best matches.
+     */
+    public SyncPagingIterable<AccountSearchResult> search(
+            SearchAccountsRequest request, RequestOptions requestOptions) {
+        return this.rawClient.search(request, requestOptions).body();
+    }
+
+    /**
+     * Retrieves an account visible to the credential by ID or public route, including its crypto wallet.
      */
     public Account retrieve(String id) {
         return this.rawClient.retrieve(id).body();
     }
 
     /**
-     * Retrieves a single account by ID or public route when it is visible to the credential, including its crypto wallet. The reserved id <code>me</code> retrieves the account associated with the current Account API key; user tokens have no single account, so they must address one by ID or route.
+     * Retrieves an account visible to the credential by ID or public route, including its crypto wallet.
      */
     public Account retrieve(String id, RequestOptions requestOptions) {
         return this.rawClient.retrieve(id, requestOptions).body();
     }
 
     /**
-     * Retrieves a single account by ID or public route when it is visible to the credential, including its crypto wallet. The reserved id <code>me</code> retrieves the account associated with the current Account API key; user tokens have no single account, so they must address one by ID or route.
+     * Retrieves an account visible to the credential by ID or public route, including its crypto wallet.
      */
     public Account retrieve(String id, RetrieveAccountsRequest request) {
         return this.rawClient.retrieve(id, request).body();
     }
 
     /**
-     * Retrieves a single account by ID or public route when it is visible to the credential, including its crypto wallet. The reserved id <code>me</code> retrieves the account associated with the current Account API key; user tokens have no single account, so they must address one by ID or route.
+     * Retrieves an account visible to the credential by ID or public route, including its crypto wallet.
      */
     public Account retrieve(String id, RetrieveAccountsRequest request, RequestOptions requestOptions) {
         return this.rawClient.retrieve(id, request, requestOptions).body();
     }
 
     /**
-     * Updates an account. User tokens can update business accounts; Account API keys can update connected accounts. The reserved id <code>me</code> — accepted on Retrieve Account — resolves to the requesting account, which an Account API key cannot edit, so updates must name the connected account by its <code>biz_</code> id.
+     * Deletes a subaccount directly owned by the authenticated platform account. The account must have no settled, pending, or reserved balance in any currency and no active, trialing, or past-due memberships. The account stops resolving immediately, and its products, plans, and team access are removed in the background; payment history is retained. Deletion cannot be undone through the API. This cannot delete the platform account itself or an account owned by another platform.
+     */
+    public DeleteAccountsResponse delete(String id) {
+        return this.rawClient.delete(id).body();
+    }
+
+    /**
+     * Deletes a subaccount directly owned by the authenticated platform account. The account must have no settled, pending, or reserved balance in any currency and no active, trialing, or past-due memberships. The account stops resolving immediately, and its products, plans, and team access are removed in the background; payment history is retained. Deletion cannot be undone through the API. This cannot delete the platform account itself or an account owned by another platform.
+     */
+    public DeleteAccountsResponse delete(String id, RequestOptions requestOptions) {
+        return this.rawClient.delete(id, requestOptions).body();
+    }
+
+    /**
+     * Deletes a subaccount directly owned by the authenticated platform account. The account must have no settled, pending, or reserved balance in any currency and no active, trialing, or past-due memberships. The account stops resolving immediately, and its products, plans, and team access are removed in the background; payment history is retained. Deletion cannot be undone through the API. This cannot delete the platform account itself or an account owned by another platform.
+     */
+    public DeleteAccountsResponse delete(String id, DeleteAccountsRequest request) {
+        return this.rawClient.delete(id, request).body();
+    }
+
+    /**
+     * Deletes a subaccount directly owned by the authenticated platform account. The account must have no settled, pending, or reserved balance in any currency and no active, trialing, or past-due memberships. The account stops resolving immediately, and its products, plans, and team access are removed in the background; payment history is retained. Deletion cannot be undone through the API. This cannot delete the platform account itself or an account owned by another platform.
+     */
+    public DeleteAccountsResponse delete(String id, DeleteAccountsRequest request, RequestOptions requestOptions) {
+        return this.rawClient.delete(id, request, requestOptions).body();
+    }
+
+    /**
+     * Updates an account. User tokens can update business accounts; Account API keys can update subaccounts.
      */
     public Account update(String id) {
         return this.rawClient.update(id).body();
     }
 
     /**
-     * Updates an account. User tokens can update business accounts; Account API keys can update connected accounts. The reserved id <code>me</code> — accepted on Retrieve Account — resolves to the requesting account, which an Account API key cannot edit, so updates must name the connected account by its <code>biz_</code> id.
+     * Updates an account. User tokens can update business accounts; Account API keys can update subaccounts.
      */
     public Account update(String id, RequestOptions requestOptions) {
         return this.rawClient.update(id, requestOptions).body();
     }
 
     /**
-     * Updates an account. User tokens can update business accounts; Account API keys can update connected accounts. The reserved id <code>me</code> — accepted on Retrieve Account — resolves to the requesting account, which an Account API key cannot edit, so updates must name the connected account by its <code>biz_</code> id.
+     * Updates an account. User tokens can update business accounts; Account API keys can update subaccounts.
      */
     public Account update(String id, UpdateAccountsRequest request) {
         return this.rawClient.update(id, request).body();
     }
 
     /**
-     * Updates an account. User tokens can update business accounts; Account API keys can update connected accounts. The reserved id <code>me</code> — accepted on Retrieve Account — resolves to the requesting account, which an Account API key cannot edit, so updates must name the connected account by its <code>biz_</code> id.
+     * Updates an account. User tokens can update business accounts; Account API keys can update subaccounts.
      */
     public Account update(String id, UpdateAccountsRequest request, RequestOptions requestOptions) {
         return this.rawClient.update(id, request, requestOptions).body();
     }
 
     /**
-     * Starts an LLC or C-Corp formation for a business account. Defaults to an LLC; set <code>entity_type</code> to <code>c_corp</code> to form a C-Corp, which additionally requires <code>share_structure</code> and officer <code>roles</code> on every founder. On submission, the application is validated and the response returns a hosted checkout URL. Once paid, the filing is submitted. Track progress through the account's <a href="/api-reference/beta/accounts/retrieve-account"><code>company_formation</code></a> field on Retrieve Account.
+     * Starts an LLC or C-Corp formation for a business account. The application is validated and the response returns a hosted checkout URL; once paid, the filing is submitted. Track progress through the account's <a href="/api-reference/accounts/retrieve-account"><code>company_formation</code></a> field on Retrieve Account.
      */
     public FormCompanyAccountsResponse formCompany(String id, FormCompanyAccountsRequest request) {
         return this.rawClient.formCompany(id, request).body();
     }
 
     /**
-     * Starts an LLC or C-Corp formation for a business account. Defaults to an LLC; set <code>entity_type</code> to <code>c_corp</code> to form a C-Corp, which additionally requires <code>share_structure</code> and officer <code>roles</code> on every founder. On submission, the application is validated and the response returns a hosted checkout URL. Once paid, the filing is submitted. Track progress through the account's <a href="/api-reference/beta/accounts/retrieve-account"><code>company_formation</code></a> field on Retrieve Account.
+     * Starts an LLC or C-Corp formation for a business account. The application is validated and the response returns a hosted checkout URL; once paid, the filing is submitted. Track progress through the account's <a href="/api-reference/accounts/retrieve-account"><code>company_formation</code></a> field on Retrieve Account.
      */
     public FormCompanyAccountsResponse formCompany(
             String id, FormCompanyAccountsRequest request, RequestOptions requestOptions) {
@@ -185,18 +262,87 @@ public class AccountsClient {
     }
 
     /**
-     * Transfers ownership of the account to another user, identified by user ID or email address. If the recipient already holds the owner role, ownership moves immediately; otherwise they get an invite and ownership moves when they accept.
+     * Queues one background retry of the account's failed ads payments across its campaigns, using the account's configured ads payment methods. A queued response does not mean payment succeeded; read each campaign's <code>delivery_status</code> and <code>issues</code> for the outcome. Successful settlement clears the payment block without changing a configured <code>active</code> or <code>paused</code> status; a legacy <code>payment_failed</code> status becomes <code>paused</code>. Returns an error when the account has no failed ads payments, or while a previous retry for the account is queued or running.
+     */
+    public RetryAdsPaymentAccountsResponse retryAdsPayment(String id) {
+        return this.rawClient.retryAdsPayment(id).body();
+    }
+
+    /**
+     * Queues one background retry of the account's failed ads payments across its campaigns, using the account's configured ads payment methods. A queued response does not mean payment succeeded; read each campaign's <code>delivery_status</code> and <code>issues</code> for the outcome. Successful settlement clears the payment block without changing a configured <code>active</code> or <code>paused</code> status; a legacy <code>payment_failed</code> status becomes <code>paused</code>. Returns an error when the account has no failed ads payments, or while a previous retry for the account is queued or running.
+     */
+    public RetryAdsPaymentAccountsResponse retryAdsPayment(String id, RequestOptions requestOptions) {
+        return this.rawClient.retryAdsPayment(id, requestOptions).body();
+    }
+
+    /**
+     * Queues one background retry of the account's failed ads payments across its campaigns, using the account's configured ads payment methods. A queued response does not mean payment succeeded; read each campaign's <code>delivery_status</code> and <code>issues</code> for the outcome. Successful settlement clears the payment block without changing a configured <code>active</code> or <code>paused</code> status; a legacy <code>payment_failed</code> status becomes <code>paused</code>. Returns an error when the account has no failed ads payments, or while a previous retry for the account is queued or running.
+     */
+    public RetryAdsPaymentAccountsResponse retryAdsPayment(String id, RetryAdsPaymentAccountsRequest request) {
+        return this.rawClient.retryAdsPayment(id, request).body();
+    }
+
+    /**
+     * Queues one background retry of the account's failed ads payments across its campaigns, using the account's configured ads payment methods. A queued response does not mean payment succeeded; read each campaign's <code>delivery_status</code> and <code>issues</code> for the outcome. Successful settlement clears the payment block without changing a configured <code>active</code> or <code>paused</code> status; a legacy <code>payment_failed</code> status becomes <code>paused</code>. Returns an error when the account has no failed ads payments, or while a previous retry for the account is queued or running.
+     */
+    public RetryAdsPaymentAccountsResponse retryAdsPayment(
+            String id, RetryAdsPaymentAccountsRequest request, RequestOptions requestOptions) {
+        return this.rawClient.retryAdsPayment(id, request, requestOptions).body();
+    }
+
+    /**
+     * Suspends a subaccount directly owned by the authenticated platform account. This cannot suspend the platform account itself or an account owned by another platform.
+     */
+    public Account suspend(String id) {
+        return this.rawClient.suspend(id).body();
+    }
+
+    /**
+     * Suspends a subaccount directly owned by the authenticated platform account. This cannot suspend the platform account itself or an account owned by another platform.
+     */
+    public Account suspend(String id, RequestOptions requestOptions) {
+        return this.rawClient.suspend(id, requestOptions).body();
+    }
+
+    /**
+     * Suspends a subaccount directly owned by the authenticated platform account. This cannot suspend the platform account itself or an account owned by another platform.
+     */
+    public Account suspend(String id, SuspendAccountsRequest request) {
+        return this.rawClient.suspend(id, request).body();
+    }
+
+    /**
+     * Suspends a subaccount directly owned by the authenticated platform account. This cannot suspend the platform account itself or an account owned by another platform.
+     */
+    public Account suspend(String id, SuspendAccountsRequest request, RequestOptions requestOptions) {
+        return this.rawClient.suspend(id, request, requestOptions).body();
+    }
+
+    /**
+     * Transfers ownership of the account to another user, identified by user ID or email address. If the recipient already holds the owner role, ownership moves immediately; otherwise they get an invite and ownership moves when they accept. The Whop CLI and MCP can hand off a business their user owns as a partner (<code>as_partner: true</code>) with the <code>partner:handoff</code> scope; other OAuth apps cannot transfer ownership.
      */
     public TransferOwnershipAccountsResponse transferOwnership(String id, TransferOwnershipAccountsRequest request) {
         return this.rawClient.transferOwnership(id, request).body();
     }
 
     /**
-     * Transfers ownership of the account to another user, identified by user ID or email address. If the recipient already holds the owner role, ownership moves immediately; otherwise they get an invite and ownership moves when they accept.
+     * Transfers ownership of the account to another user, identified by user ID or email address. If the recipient already holds the owner role, ownership moves immediately; otherwise they get an invite and ownership moves when they accept. The Whop CLI and MCP can hand off a business their user owns as a partner (<code>as_partner: true</code>) with the <code>partner:handoff</code> scope; other OAuth apps cannot transfer ownership.
      */
     public TransferOwnershipAccountsResponse transferOwnership(
             String id, TransferOwnershipAccountsRequest request, RequestOptions requestOptions) {
         return this.rawClient.transferOwnership(id, request, requestOptions).body();
+    }
+
+    public CustomerTrackingClient customerTracking() {
+        return this.customerTrackingClient.get();
+    }
+
+    public FeesClient fees() {
+        return this.feesClient.get();
+    }
+
+    public FinancingProvidersClient financingProviders() {
+        return this.financingProvidersClient.get();
     }
 
     public PreferencesClient preferences() {

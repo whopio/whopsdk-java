@@ -4,11 +4,14 @@
 package com.whop.api.resources.aichats;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
+import com.whop.api.core.BodyProperties;
 import com.whop.api.core.ClientOptions;
 import com.whop.api.core.MediaTypes;
 import com.whop.api.core.ObjectMappers;
+import com.whop.api.core.PathSegments;
 import com.whop.api.core.QueryStringMapper;
 import com.whop.api.core.RequestOptions;
+import com.whop.api.core.RetryInterceptor;
 import com.whop.api.core.WhopApiApiException;
 import com.whop.api.core.WhopApiException;
 import com.whop.api.core.WhopApiHttpResponse;
@@ -28,6 +31,8 @@ import com.whop.api.resources.aichats.requests.UpdateAiChatsRequest;
 import com.whop.api.resources.aichats.types.ListAiChatsResponse;
 import com.whop.api.types.AiChat;
 import com.whop.api.types.AiChatListItem;
+import com.whop.api.types.InternalServerErrorBody;
+import com.whop.api.types.UnprocessableEntityErrorBody;
 import java.io.IOException;
 import java.util.List;
 import java.util.Optional;
@@ -48,6 +53,10 @@ public class RawAiChatsClient {
 
     /**
      * Returns a paginated list of AI chat threads for the current authenticated user.
+     * <p>Required permissions:</p>
+     * <ul>
+     * <li><code>ai_chat:read</code></li>
+     * </ul>
      */
     public WhopApiHttpResponse<SyncPagingIterable<AiChatListItem>> list() {
         return list(ListAiChatsRequest.builder().build());
@@ -55,6 +64,10 @@ public class RawAiChatsClient {
 
     /**
      * Returns a paginated list of AI chat threads for the current authenticated user.
+     * <p>Required permissions:</p>
+     * <ul>
+     * <li><code>ai_chat:read</code></li>
+     * </ul>
      */
     public WhopApiHttpResponse<SyncPagingIterable<AiChatListItem>> list(RequestOptions requestOptions) {
         return list(ListAiChatsRequest.builder().build(), requestOptions);
@@ -62,6 +75,10 @@ public class RawAiChatsClient {
 
     /**
      * Returns a paginated list of AI chat threads for the current authenticated user.
+     * <p>Required permissions:</p>
+     * <ul>
+     * <li><code>ai_chat:read</code></li>
+     * </ul>
      */
     public WhopApiHttpResponse<SyncPagingIterable<AiChatListItem>> list(ListAiChatsRequest request) {
         return list(request, null);
@@ -69,10 +86,14 @@ public class RawAiChatsClient {
 
     /**
      * Returns a paginated list of AI chat threads for the current authenticated user.
+     * <p>Required permissions:</p>
+     * <ul>
+     * <li><code>ai_chat:read</code></li>
+     * </ul>
      */
     public WhopApiHttpResponse<SyncPagingIterable<AiChatListItem>> list(
             ListAiChatsRequest request, RequestOptions requestOptions) {
-        HttpUrl.Builder httpUrl = HttpUrl.parse(this.clientOptions.environment().getUrl())
+        HttpUrl.Builder httpUrl = HttpUrl.parse(this.clientOptions.environment().getApiURL())
                 .newBuilder()
                 .addPathSegments("ai_chats");
         if (request.getAfter().isPresent()) {
@@ -90,6 +111,14 @@ public class RawAiChatsClient {
         if (request.getLast().isPresent()) {
             QueryStringMapper.addQueryParameter(
                     httpUrl, "last", request.getLast().get(), false);
+        }
+        if (request.getAgentIdentifier().isPresent()) {
+            QueryStringMapper.addQueryParameter(
+                    httpUrl, "agent_identifier", request.getAgentIdentifier().get(), false);
+        }
+        if (request.getAccountId().isPresent()) {
+            QueryStringMapper.addQueryParameter(
+                    httpUrl, "account_id", request.getAccountId().get(), false);
         }
         if (request.getOnlyActiveCrons().isPresent()) {
             QueryStringMapper.addQueryParameter(
@@ -110,6 +139,15 @@ public class RawAiChatsClient {
         if (requestOptions != null && requestOptions.getTimeout().isPresent()) {
             client = clientOptions.httpClientWithTimeout(requestOptions);
         }
+        if (requestOptions != null && requestOptions.getMaxRetries().isPresent()) {
+            okhttpRequest = okhttpRequest
+                    .newBuilder()
+                    .tag(
+                            RetryInterceptor.MaxRetriesOverride.class,
+                            new RetryInterceptor.MaxRetriesOverride(
+                                    requestOptions.getMaxRetries().get()))
+                    .build();
+        }
         try (Response response = client.newCall(okhttpRequest).execute()) {
             ResponseBody responseBody = response.body();
             String responseBodyString = responseBody != null ? responseBody.string() : "{}";
@@ -124,8 +162,11 @@ public class RawAiChatsClient {
                 List<AiChatListItem> result = parsedResponse.getData();
                 return new WhopApiHttpResponse<>(
                         new SyncPagingIterable<AiChatListItem>(
-                                startingAfter != null, result, parsedResponse, () -> list(nextRequest, requestOptions)
-                                        .body()),
+                                startingAfter.isPresent()
+                                        && !startingAfter.get().isEmpty(),
+                                result,
+                                parsedResponse,
+                                () -> list(nextRequest, requestOptions).body()),
                         response);
             }
             try {
@@ -144,13 +185,16 @@ public class RawAiChatsClient {
                                 ObjectMappers.JSON_MAPPER.readValue(responseBodyString, Object.class), response);
                     case 422:
                         throw new UnprocessableEntityError(
-                                ObjectMappers.JSON_MAPPER.readValue(responseBodyString, Object.class), response);
+                                ObjectMappers.JSON_MAPPER.readValue(
+                                        responseBodyString, UnprocessableEntityErrorBody.class),
+                                response);
                     case 429:
                         throw new TooManyRequestsError(
                                 ObjectMappers.JSON_MAPPER.readValue(responseBodyString, Object.class), response);
                     case 500:
                         throw new InternalServerError(
-                                ObjectMappers.JSON_MAPPER.readValue(responseBodyString, Object.class), response);
+                                ObjectMappers.JSON_MAPPER.readValue(responseBodyString, InternalServerErrorBody.class),
+                                response);
                 }
             } catch (JsonProcessingException ignored) {
                 // unable to map error response, throwing generic error
@@ -158,6 +202,8 @@ public class RawAiChatsClient {
             Object errorBody = ObjectMappers.parseErrorBody(responseBodyString);
             throw new WhopApiApiException(
                     "Error with status code " + response.code(), response.code(), errorBody, response);
+        } catch (JsonProcessingException e) {
+            throw new WhopApiException("Failed to deserialize response: " + e.getMessage(), e);
         } catch (IOException e) {
             throw new WhopApiException("Network error executing HTTP request", e);
         }
@@ -182,7 +228,7 @@ public class RawAiChatsClient {
      * </ul>
      */
     public WhopApiHttpResponse<AiChat> create(CreateAiChatsRequest request, RequestOptions requestOptions) {
-        HttpUrl.Builder httpUrl = HttpUrl.parse(this.clientOptions.environment().getUrl())
+        HttpUrl.Builder httpUrl = HttpUrl.parse(this.clientOptions.environment().getApiURL())
                 .newBuilder()
                 .addPathSegments("ai_chats");
         if (requestOptions != null) {
@@ -193,7 +239,9 @@ public class RawAiChatsClient {
         RequestBody body;
         try {
             body = RequestBody.create(
-                    ObjectMappers.JSON_MAPPER.writeValueAsBytes(request), MediaTypes.APPLICATION_JSON);
+                    ObjectMappers.JSON_MAPPER.writeValueAsBytes(BodyProperties.merge(
+                            request, requestOptions != null ? requestOptions.getBodyProperties() : null)),
+                    MediaTypes.APPLICATION_JSON);
         } catch (JsonProcessingException e) {
             throw new WhopApiException("Failed to serialize request", e);
         }
@@ -207,6 +255,15 @@ public class RawAiChatsClient {
         OkHttpClient client = clientOptions.httpClient();
         if (requestOptions != null && requestOptions.getTimeout().isPresent()) {
             client = clientOptions.httpClientWithTimeout(requestOptions);
+        }
+        if (requestOptions != null && requestOptions.getMaxRetries().isPresent()) {
+            okhttpRequest = okhttpRequest
+                    .newBuilder()
+                    .tag(
+                            RetryInterceptor.MaxRetriesOverride.class,
+                            new RetryInterceptor.MaxRetriesOverride(
+                                    requestOptions.getMaxRetries().get()))
+                    .build();
         }
         try (Response response = client.newCall(okhttpRequest).execute()) {
             ResponseBody responseBody = response.body();
@@ -231,13 +288,16 @@ public class RawAiChatsClient {
                                 ObjectMappers.JSON_MAPPER.readValue(responseBodyString, Object.class), response);
                     case 422:
                         throw new UnprocessableEntityError(
-                                ObjectMappers.JSON_MAPPER.readValue(responseBodyString, Object.class), response);
+                                ObjectMappers.JSON_MAPPER.readValue(
+                                        responseBodyString, UnprocessableEntityErrorBody.class),
+                                response);
                     case 429:
                         throw new TooManyRequestsError(
                                 ObjectMappers.JSON_MAPPER.readValue(responseBodyString, Object.class), response);
                     case 500:
                         throw new InternalServerError(
-                                ObjectMappers.JSON_MAPPER.readValue(responseBodyString, Object.class), response);
+                                ObjectMappers.JSON_MAPPER.readValue(responseBodyString, InternalServerErrorBody.class),
+                                response);
                 }
             } catch (JsonProcessingException ignored) {
                 // unable to map error response, throwing generic error
@@ -245,6 +305,8 @@ public class RawAiChatsClient {
             Object errorBody = ObjectMappers.parseErrorBody(responseBodyString);
             throw new WhopApiApiException(
                     "Error with status code " + response.code(), response.code(), errorBody, response);
+        } catch (JsonProcessingException e) {
+            throw new WhopApiException("Failed to deserialize response: " + e.getMessage(), e);
         } catch (IOException e) {
             throw new WhopApiException("Network error executing HTTP request", e);
         }
@@ -252,6 +314,10 @@ public class RawAiChatsClient {
 
     /**
      * Retrieves the details of an existing AI chat.
+     * <p>Required permissions:</p>
+     * <ul>
+     * <li><code>ai_chat:read</code></li>
+     * </ul>
      */
     public WhopApiHttpResponse<AiChat> retrieve(String id) {
         return retrieve(id, RetrieveAiChatsRequest.builder().build());
@@ -259,6 +325,10 @@ public class RawAiChatsClient {
 
     /**
      * Retrieves the details of an existing AI chat.
+     * <p>Required permissions:</p>
+     * <ul>
+     * <li><code>ai_chat:read</code></li>
+     * </ul>
      */
     public WhopApiHttpResponse<AiChat> retrieve(String id, RequestOptions requestOptions) {
         return retrieve(id, RetrieveAiChatsRequest.builder().build(), requestOptions);
@@ -266,6 +336,10 @@ public class RawAiChatsClient {
 
     /**
      * Retrieves the details of an existing AI chat.
+     * <p>Required permissions:</p>
+     * <ul>
+     * <li><code>ai_chat:read</code></li>
+     * </ul>
      */
     public WhopApiHttpResponse<AiChat> retrieve(String id, RetrieveAiChatsRequest request) {
         return retrieve(id, request, null);
@@ -273,13 +347,17 @@ public class RawAiChatsClient {
 
     /**
      * Retrieves the details of an existing AI chat.
+     * <p>Required permissions:</p>
+     * <ul>
+     * <li><code>ai_chat:read</code></li>
+     * </ul>
      */
     public WhopApiHttpResponse<AiChat> retrieve(
             String id, RetrieveAiChatsRequest request, RequestOptions requestOptions) {
-        HttpUrl.Builder httpUrl = HttpUrl.parse(this.clientOptions.environment().getUrl())
+        HttpUrl.Builder httpUrl = HttpUrl.parse(this.clientOptions.environment().getApiURL())
                 .newBuilder()
                 .addPathSegments("ai_chats")
-                .addPathSegment(id);
+                .addPathSegment(PathSegments.validate(id));
         if (requestOptions != null) {
             requestOptions.getQueryParameters().forEach((_key, _value) -> {
                 httpUrl.addQueryParameter(_key, _value);
@@ -295,6 +373,15 @@ public class RawAiChatsClient {
         if (requestOptions != null && requestOptions.getTimeout().isPresent()) {
             client = clientOptions.httpClientWithTimeout(requestOptions);
         }
+        if (requestOptions != null && requestOptions.getMaxRetries().isPresent()) {
+            okhttpRequest = okhttpRequest
+                    .newBuilder()
+                    .tag(
+                            RetryInterceptor.MaxRetriesOverride.class,
+                            new RetryInterceptor.MaxRetriesOverride(
+                                    requestOptions.getMaxRetries().get()))
+                    .build();
+        }
         try (Response response = client.newCall(okhttpRequest).execute()) {
             ResponseBody responseBody = response.body();
             String responseBodyString = responseBody != null ? responseBody.string() : "{}";
@@ -318,13 +405,16 @@ public class RawAiChatsClient {
                                 ObjectMappers.JSON_MAPPER.readValue(responseBodyString, Object.class), response);
                     case 422:
                         throw new UnprocessableEntityError(
-                                ObjectMappers.JSON_MAPPER.readValue(responseBodyString, Object.class), response);
+                                ObjectMappers.JSON_MAPPER.readValue(
+                                        responseBodyString, UnprocessableEntityErrorBody.class),
+                                response);
                     case 429:
                         throw new TooManyRequestsError(
                                 ObjectMappers.JSON_MAPPER.readValue(responseBodyString, Object.class), response);
                     case 500:
                         throw new InternalServerError(
-                                ObjectMappers.JSON_MAPPER.readValue(responseBodyString, Object.class), response);
+                                ObjectMappers.JSON_MAPPER.readValue(responseBodyString, InternalServerErrorBody.class),
+                                response);
                 }
             } catch (JsonProcessingException ignored) {
                 // unable to map error response, throwing generic error
@@ -332,6 +422,8 @@ public class RawAiChatsClient {
             Object errorBody = ObjectMappers.parseErrorBody(responseBodyString);
             throw new WhopApiApiException(
                     "Error with status code " + response.code(), response.code(), errorBody, response);
+        } catch (JsonProcessingException e) {
+            throw new WhopApiException("Failed to deserialize response: " + e.getMessage(), e);
         } catch (IOException e) {
             throw new WhopApiException("Network error executing HTTP request", e);
         }
@@ -378,10 +470,10 @@ public class RawAiChatsClient {
      * </ul>
      */
     public WhopApiHttpResponse<Boolean> delete(String id, DeleteAiChatsRequest request, RequestOptions requestOptions) {
-        HttpUrl.Builder httpUrl = HttpUrl.parse(this.clientOptions.environment().getUrl())
+        HttpUrl.Builder httpUrl = HttpUrl.parse(this.clientOptions.environment().getApiURL())
                 .newBuilder()
                 .addPathSegments("ai_chats")
-                .addPathSegment(id);
+                .addPathSegment(PathSegments.validate(id));
         if (requestOptions != null) {
             requestOptions.getQueryParameters().forEach((_key, _value) -> {
                 httpUrl.addQueryParameter(_key, _value);
@@ -389,13 +481,25 @@ public class RawAiChatsClient {
         }
         Request.Builder _requestBuilder = new Request.Builder()
                 .url(httpUrl.build())
-                .method("DELETE", null)
+                .method(
+                        "DELETE",
+                        BodyProperties.toRequestBody(
+                                requestOptions != null ? requestOptions.getBodyProperties() : null, null))
                 .headers(Headers.of(clientOptions.headers(requestOptions)))
                 .addHeader("Accept", "application/json");
         Request okhttpRequest = _requestBuilder.build();
         OkHttpClient client = clientOptions.httpClient();
         if (requestOptions != null && requestOptions.getTimeout().isPresent()) {
             client = clientOptions.httpClientWithTimeout(requestOptions);
+        }
+        if (requestOptions != null && requestOptions.getMaxRetries().isPresent()) {
+            okhttpRequest = okhttpRequest
+                    .newBuilder()
+                    .tag(
+                            RetryInterceptor.MaxRetriesOverride.class,
+                            new RetryInterceptor.MaxRetriesOverride(
+                                    requestOptions.getMaxRetries().get()))
+                    .build();
         }
         try (Response response = client.newCall(okhttpRequest).execute()) {
             ResponseBody responseBody = response.body();
@@ -420,13 +524,16 @@ public class RawAiChatsClient {
                                 ObjectMappers.JSON_MAPPER.readValue(responseBodyString, Object.class), response);
                     case 422:
                         throw new UnprocessableEntityError(
-                                ObjectMappers.JSON_MAPPER.readValue(responseBodyString, Object.class), response);
+                                ObjectMappers.JSON_MAPPER.readValue(
+                                        responseBodyString, UnprocessableEntityErrorBody.class),
+                                response);
                     case 429:
                         throw new TooManyRequestsError(
                                 ObjectMappers.JSON_MAPPER.readValue(responseBodyString, Object.class), response);
                     case 500:
                         throw new InternalServerError(
-                                ObjectMappers.JSON_MAPPER.readValue(responseBodyString, Object.class), response);
+                                ObjectMappers.JSON_MAPPER.readValue(responseBodyString, InternalServerErrorBody.class),
+                                response);
                 }
             } catch (JsonProcessingException ignored) {
                 // unable to map error response, throwing generic error
@@ -434,13 +541,15 @@ public class RawAiChatsClient {
             Object errorBody = ObjectMappers.parseErrorBody(responseBodyString);
             throw new WhopApiApiException(
                     "Error with status code " + response.code(), response.code(), errorBody, response);
+        } catch (JsonProcessingException e) {
+            throw new WhopApiException("Failed to deserialize response: " + e.getMessage(), e);
         } catch (IOException e) {
             throw new WhopApiException("Network error executing HTTP request", e);
         }
     }
 
     /**
-     * Update an AI chat's title, notification preferences, or associated company context.
+     * Update an AI chat's title, notification preferences, or associated account context.
      * <p>Required permissions:</p>
      * <ul>
      * <li><code>ai_chat:update</code></li>
@@ -451,7 +560,7 @@ public class RawAiChatsClient {
     }
 
     /**
-     * Update an AI chat's title, notification preferences, or associated company context.
+     * Update an AI chat's title, notification preferences, or associated account context.
      * <p>Required permissions:</p>
      * <ul>
      * <li><code>ai_chat:update</code></li>
@@ -462,7 +571,7 @@ public class RawAiChatsClient {
     }
 
     /**
-     * Update an AI chat's title, notification preferences, or associated company context.
+     * Update an AI chat's title, notification preferences, or associated account context.
      * <p>Required permissions:</p>
      * <ul>
      * <li><code>ai_chat:update</code></li>
@@ -473,17 +582,17 @@ public class RawAiChatsClient {
     }
 
     /**
-     * Update an AI chat's title, notification preferences, or associated company context.
+     * Update an AI chat's title, notification preferences, or associated account context.
      * <p>Required permissions:</p>
      * <ul>
      * <li><code>ai_chat:update</code></li>
      * </ul>
      */
     public WhopApiHttpResponse<AiChat> update(String id, UpdateAiChatsRequest request, RequestOptions requestOptions) {
-        HttpUrl.Builder httpUrl = HttpUrl.parse(this.clientOptions.environment().getUrl())
+        HttpUrl.Builder httpUrl = HttpUrl.parse(this.clientOptions.environment().getApiURL())
                 .newBuilder()
                 .addPathSegments("ai_chats")
-                .addPathSegment(id);
+                .addPathSegment(PathSegments.validate(id));
         if (requestOptions != null) {
             requestOptions.getQueryParameters().forEach((_key, _value) -> {
                 httpUrl.addQueryParameter(_key, _value);
@@ -492,7 +601,9 @@ public class RawAiChatsClient {
         RequestBody body;
         try {
             body = RequestBody.create(
-                    ObjectMappers.JSON_MAPPER.writeValueAsBytes(request), MediaTypes.APPLICATION_JSON);
+                    ObjectMappers.JSON_MAPPER.writeValueAsBytes(BodyProperties.merge(
+                            request, requestOptions != null ? requestOptions.getBodyProperties() : null)),
+                    MediaTypes.APPLICATION_JSON);
         } catch (JsonProcessingException e) {
             throw new WhopApiException("Failed to serialize request", e);
         }
@@ -506,6 +617,15 @@ public class RawAiChatsClient {
         OkHttpClient client = clientOptions.httpClient();
         if (requestOptions != null && requestOptions.getTimeout().isPresent()) {
             client = clientOptions.httpClientWithTimeout(requestOptions);
+        }
+        if (requestOptions != null && requestOptions.getMaxRetries().isPresent()) {
+            okhttpRequest = okhttpRequest
+                    .newBuilder()
+                    .tag(
+                            RetryInterceptor.MaxRetriesOverride.class,
+                            new RetryInterceptor.MaxRetriesOverride(
+                                    requestOptions.getMaxRetries().get()))
+                    .build();
         }
         try (Response response = client.newCall(okhttpRequest).execute()) {
             ResponseBody responseBody = response.body();
@@ -530,13 +650,16 @@ public class RawAiChatsClient {
                                 ObjectMappers.JSON_MAPPER.readValue(responseBodyString, Object.class), response);
                     case 422:
                         throw new UnprocessableEntityError(
-                                ObjectMappers.JSON_MAPPER.readValue(responseBodyString, Object.class), response);
+                                ObjectMappers.JSON_MAPPER.readValue(
+                                        responseBodyString, UnprocessableEntityErrorBody.class),
+                                response);
                     case 429:
                         throw new TooManyRequestsError(
                                 ObjectMappers.JSON_MAPPER.readValue(responseBodyString, Object.class), response);
                     case 500:
                         throw new InternalServerError(
-                                ObjectMappers.JSON_MAPPER.readValue(responseBodyString, Object.class), response);
+                                ObjectMappers.JSON_MAPPER.readValue(responseBodyString, InternalServerErrorBody.class),
+                                response);
                 }
             } catch (JsonProcessingException ignored) {
                 // unable to map error response, throwing generic error
@@ -544,6 +667,8 @@ public class RawAiChatsClient {
             Object errorBody = ObjectMappers.parseErrorBody(responseBodyString);
             throw new WhopApiApiException(
                     "Error with status code " + response.code(), response.code(), errorBody, response);
+        } catch (JsonProcessingException e) {
+            throw new WhopApiException("Failed to deserialize response: " + e.getMessage(), e);
         } catch (IOException e) {
             throw new WhopApiException("Network error executing HTTP request", e);
         }

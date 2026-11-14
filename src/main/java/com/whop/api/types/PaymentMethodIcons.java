@@ -109,7 +109,6 @@ public final class PaymentMethodIcons {
 
         private PaymentMethodIconVariants square;
 
-        @JsonAnySetter
         private Map<String, Object> additionalProperties = new HashMap<>();
 
         private Builder() {}
@@ -123,7 +122,6 @@ public final class PaymentMethodIcons {
 
         /**
          * <p>The credit-card-proportioned tile (48x30).</p>
-         * <p>The credit-card-proportioned tile (48x30).</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
@@ -134,7 +132,6 @@ public final class PaymentMethodIcons {
         }
 
         /**
-         * <p>The square tile (32x32).</p>
          * <p>The square tile (32x32).</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
@@ -148,6 +145,14 @@ public final class PaymentMethodIcons {
         @java.lang.Override
         public PaymentMethodIcons build() {
             return new PaymentMethodIcons(card, square, additionalProperties);
+        }
+
+        @JsonAnySetter
+        private void putAdditionalPropertyFromJson(String key, Object value) {
+            if (key.equalsIgnoreCase("card") || key.equalsIgnoreCase("square")) {
+                return;
+            }
+            this.additionalProperties.put(key, value);
         }
 
         @java.lang.Override

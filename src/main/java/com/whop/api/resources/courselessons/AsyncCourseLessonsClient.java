@@ -5,6 +5,7 @@ package com.whop.api.resources.courselessons;
 
 import com.whop.api.core.ClientOptions;
 import com.whop.api.core.RequestOptions;
+import com.whop.api.core.WhopApiHttpResponse;
 import com.whop.api.core.pagination.SyncPagingIterable;
 import com.whop.api.resources.courselessons.requests.CreateCourseLessonsRequest;
 import com.whop.api.resources.courselessons.requests.DeleteCourseLessonsRequest;
@@ -44,7 +45,16 @@ public class AsyncCourseLessonsClient {
      * </ul>
      */
     public CompletableFuture<SyncPagingIterable<CourseLessonListItem>> list() {
-        return this.rawClient.list().thenApply(response -> response.body());
+        CompletableFuture<WhopApiHttpResponse<SyncPagingIterable<CourseLessonListItem>>> rawFuture =
+                this.rawClient.list();
+        CompletableFuture<SyncPagingIterable<CourseLessonListItem>> future =
+                rawFuture.thenApply(response -> response.body());
+        future.whenComplete((result_, throwable_) -> {
+            if (future.isCancelled()) {
+                rawFuture.cancel(true);
+            }
+        });
+        return future;
     }
 
     /**
@@ -55,7 +65,16 @@ public class AsyncCourseLessonsClient {
      * </ul>
      */
     public CompletableFuture<SyncPagingIterable<CourseLessonListItem>> list(RequestOptions requestOptions) {
-        return this.rawClient.list(requestOptions).thenApply(response -> response.body());
+        CompletableFuture<WhopApiHttpResponse<SyncPagingIterable<CourseLessonListItem>>> rawFuture =
+                this.rawClient.list(requestOptions);
+        CompletableFuture<SyncPagingIterable<CourseLessonListItem>> future =
+                rawFuture.thenApply(response -> response.body());
+        future.whenComplete((result_, throwable_) -> {
+            if (future.isCancelled()) {
+                rawFuture.cancel(true);
+            }
+        });
+        return future;
     }
 
     /**
@@ -66,7 +85,16 @@ public class AsyncCourseLessonsClient {
      * </ul>
      */
     public CompletableFuture<SyncPagingIterable<CourseLessonListItem>> list(ListCourseLessonsRequest request) {
-        return this.rawClient.list(request).thenApply(response -> response.body());
+        CompletableFuture<WhopApiHttpResponse<SyncPagingIterable<CourseLessonListItem>>> rawFuture =
+                this.rawClient.list(request);
+        CompletableFuture<SyncPagingIterable<CourseLessonListItem>> future =
+                rawFuture.thenApply(response -> response.body());
+        future.whenComplete((result_, throwable_) -> {
+            if (future.isCancelled()) {
+                rawFuture.cancel(true);
+            }
+        });
+        return future;
     }
 
     /**
@@ -78,7 +106,16 @@ public class AsyncCourseLessonsClient {
      */
     public CompletableFuture<SyncPagingIterable<CourseLessonListItem>> list(
             ListCourseLessonsRequest request, RequestOptions requestOptions) {
-        return this.rawClient.list(request, requestOptions).thenApply(response -> response.body());
+        CompletableFuture<WhopApiHttpResponse<SyncPagingIterable<CourseLessonListItem>>> rawFuture =
+                this.rawClient.list(request, requestOptions);
+        CompletableFuture<SyncPagingIterable<CourseLessonListItem>> future =
+                rawFuture.thenApply(response -> response.body());
+        future.whenComplete((result_, throwable_) -> {
+            if (future.isCancelled()) {
+                rawFuture.cancel(true);
+            }
+        });
+        return future;
     }
 
     /**
@@ -89,7 +126,14 @@ public class AsyncCourseLessonsClient {
      * </ul>
      */
     public CompletableFuture<CourseLesson> create(CreateCourseLessonsRequest request) {
-        return this.rawClient.create(request).thenApply(response -> response.body());
+        CompletableFuture<WhopApiHttpResponse<CourseLesson>> rawFuture = this.rawClient.create(request);
+        CompletableFuture<CourseLesson> future = rawFuture.thenApply(response -> response.body());
+        future.whenComplete((result_, throwable_) -> {
+            if (future.isCancelled()) {
+                rawFuture.cancel(true);
+            }
+        });
+        return future;
     }
 
     /**
@@ -100,7 +144,14 @@ public class AsyncCourseLessonsClient {
      * </ul>
      */
     public CompletableFuture<CourseLesson> create(CreateCourseLessonsRequest request, RequestOptions requestOptions) {
-        return this.rawClient.create(request, requestOptions).thenApply(response -> response.body());
+        CompletableFuture<WhopApiHttpResponse<CourseLesson>> rawFuture = this.rawClient.create(request, requestOptions);
+        CompletableFuture<CourseLesson> future = rawFuture.thenApply(response -> response.body());
+        future.whenComplete((result_, throwable_) -> {
+            if (future.isCancelled()) {
+                rawFuture.cancel(true);
+            }
+        });
+        return future;
     }
 
     /**
@@ -111,7 +162,14 @@ public class AsyncCourseLessonsClient {
      * </ul>
      */
     public CompletableFuture<CourseLesson> retrieve(String id) {
-        return this.rawClient.retrieve(id).thenApply(response -> response.body());
+        CompletableFuture<WhopApiHttpResponse<CourseLesson>> rawFuture = this.rawClient.retrieve(id);
+        CompletableFuture<CourseLesson> future = rawFuture.thenApply(response -> response.body());
+        future.whenComplete((result_, throwable_) -> {
+            if (future.isCancelled()) {
+                rawFuture.cancel(true);
+            }
+        });
+        return future;
     }
 
     /**
@@ -122,7 +180,14 @@ public class AsyncCourseLessonsClient {
      * </ul>
      */
     public CompletableFuture<CourseLesson> retrieve(String id, RequestOptions requestOptions) {
-        return this.rawClient.retrieve(id, requestOptions).thenApply(response -> response.body());
+        CompletableFuture<WhopApiHttpResponse<CourseLesson>> rawFuture = this.rawClient.retrieve(id, requestOptions);
+        CompletableFuture<CourseLesson> future = rawFuture.thenApply(response -> response.body());
+        future.whenComplete((result_, throwable_) -> {
+            if (future.isCancelled()) {
+                rawFuture.cancel(true);
+            }
+        });
+        return future;
     }
 
     /**
@@ -133,7 +198,14 @@ public class AsyncCourseLessonsClient {
      * </ul>
      */
     public CompletableFuture<CourseLesson> retrieve(String id, RetrieveCourseLessonsRequest request) {
-        return this.rawClient.retrieve(id, request).thenApply(response -> response.body());
+        CompletableFuture<WhopApiHttpResponse<CourseLesson>> rawFuture = this.rawClient.retrieve(id, request);
+        CompletableFuture<CourseLesson> future = rawFuture.thenApply(response -> response.body());
+        future.whenComplete((result_, throwable_) -> {
+            if (future.isCancelled()) {
+                rawFuture.cancel(true);
+            }
+        });
+        return future;
     }
 
     /**
@@ -145,7 +217,15 @@ public class AsyncCourseLessonsClient {
      */
     public CompletableFuture<CourseLesson> retrieve(
             String id, RetrieveCourseLessonsRequest request, RequestOptions requestOptions) {
-        return this.rawClient.retrieve(id, request, requestOptions).thenApply(response -> response.body());
+        CompletableFuture<WhopApiHttpResponse<CourseLesson>> rawFuture =
+                this.rawClient.retrieve(id, request, requestOptions);
+        CompletableFuture<CourseLesson> future = rawFuture.thenApply(response -> response.body());
+        future.whenComplete((result_, throwable_) -> {
+            if (future.isCancelled()) {
+                rawFuture.cancel(true);
+            }
+        });
+        return future;
     }
 
     /**
@@ -156,7 +236,14 @@ public class AsyncCourseLessonsClient {
      * </ul>
      */
     public CompletableFuture<Boolean> delete(String id) {
-        return this.rawClient.delete(id).thenApply(response -> response.body());
+        CompletableFuture<WhopApiHttpResponse<Boolean>> rawFuture = this.rawClient.delete(id);
+        CompletableFuture<Boolean> future = rawFuture.thenApply(response -> response.body());
+        future.whenComplete((result_, throwable_) -> {
+            if (future.isCancelled()) {
+                rawFuture.cancel(true);
+            }
+        });
+        return future;
     }
 
     /**
@@ -167,7 +254,14 @@ public class AsyncCourseLessonsClient {
      * </ul>
      */
     public CompletableFuture<Boolean> delete(String id, RequestOptions requestOptions) {
-        return this.rawClient.delete(id, requestOptions).thenApply(response -> response.body());
+        CompletableFuture<WhopApiHttpResponse<Boolean>> rawFuture = this.rawClient.delete(id, requestOptions);
+        CompletableFuture<Boolean> future = rawFuture.thenApply(response -> response.body());
+        future.whenComplete((result_, throwable_) -> {
+            if (future.isCancelled()) {
+                rawFuture.cancel(true);
+            }
+        });
+        return future;
     }
 
     /**
@@ -178,7 +272,14 @@ public class AsyncCourseLessonsClient {
      * </ul>
      */
     public CompletableFuture<Boolean> delete(String id, DeleteCourseLessonsRequest request) {
-        return this.rawClient.delete(id, request).thenApply(response -> response.body());
+        CompletableFuture<WhopApiHttpResponse<Boolean>> rawFuture = this.rawClient.delete(id, request);
+        CompletableFuture<Boolean> future = rawFuture.thenApply(response -> response.body());
+        future.whenComplete((result_, throwable_) -> {
+            if (future.isCancelled()) {
+                rawFuture.cancel(true);
+            }
+        });
+        return future;
     }
 
     /**
@@ -190,7 +291,14 @@ public class AsyncCourseLessonsClient {
      */
     public CompletableFuture<Boolean> delete(
             String id, DeleteCourseLessonsRequest request, RequestOptions requestOptions) {
-        return this.rawClient.delete(id, request, requestOptions).thenApply(response -> response.body());
+        CompletableFuture<WhopApiHttpResponse<Boolean>> rawFuture = this.rawClient.delete(id, request, requestOptions);
+        CompletableFuture<Boolean> future = rawFuture.thenApply(response -> response.body());
+        future.whenComplete((result_, throwable_) -> {
+            if (future.isCancelled()) {
+                rawFuture.cancel(true);
+            }
+        });
+        return future;
     }
 
     /**
@@ -201,7 +309,14 @@ public class AsyncCourseLessonsClient {
      * </ul>
      */
     public CompletableFuture<CourseLesson> update(String id) {
-        return this.rawClient.update(id).thenApply(response -> response.body());
+        CompletableFuture<WhopApiHttpResponse<CourseLesson>> rawFuture = this.rawClient.update(id);
+        CompletableFuture<CourseLesson> future = rawFuture.thenApply(response -> response.body());
+        future.whenComplete((result_, throwable_) -> {
+            if (future.isCancelled()) {
+                rawFuture.cancel(true);
+            }
+        });
+        return future;
     }
 
     /**
@@ -212,7 +327,14 @@ public class AsyncCourseLessonsClient {
      * </ul>
      */
     public CompletableFuture<CourseLesson> update(String id, RequestOptions requestOptions) {
-        return this.rawClient.update(id, requestOptions).thenApply(response -> response.body());
+        CompletableFuture<WhopApiHttpResponse<CourseLesson>> rawFuture = this.rawClient.update(id, requestOptions);
+        CompletableFuture<CourseLesson> future = rawFuture.thenApply(response -> response.body());
+        future.whenComplete((result_, throwable_) -> {
+            if (future.isCancelled()) {
+                rawFuture.cancel(true);
+            }
+        });
+        return future;
     }
 
     /**
@@ -223,7 +345,14 @@ public class AsyncCourseLessonsClient {
      * </ul>
      */
     public CompletableFuture<CourseLesson> update(String id, UpdateCourseLessonsRequest request) {
-        return this.rawClient.update(id, request).thenApply(response -> response.body());
+        CompletableFuture<WhopApiHttpResponse<CourseLesson>> rawFuture = this.rawClient.update(id, request);
+        CompletableFuture<CourseLesson> future = rawFuture.thenApply(response -> response.body());
+        future.whenComplete((result_, throwable_) -> {
+            if (future.isCancelled()) {
+                rawFuture.cancel(true);
+            }
+        });
+        return future;
     }
 
     /**
@@ -235,28 +364,58 @@ public class AsyncCourseLessonsClient {
      */
     public CompletableFuture<CourseLesson> update(
             String id, UpdateCourseLessonsRequest request, RequestOptions requestOptions) {
-        return this.rawClient.update(id, request, requestOptions).thenApply(response -> response.body());
+        CompletableFuture<WhopApiHttpResponse<CourseLesson>> rawFuture =
+                this.rawClient.update(id, request, requestOptions);
+        CompletableFuture<CourseLesson> future = rawFuture.thenApply(response -> response.body());
+        future.whenComplete((result_, throwable_) -> {
+            if (future.isCancelled()) {
+                rawFuture.cancel(true);
+            }
+        });
+        return future;
     }
 
     /**
      * Mark a lesson as completed for the current user after they finish the content.
      */
     public CompletableFuture<Boolean> markAsCompleted(String lessonId) {
-        return this.rawClient.markAsCompleted(lessonId).thenApply(response -> response.body());
+        CompletableFuture<WhopApiHttpResponse<Boolean>> rawFuture = this.rawClient.markAsCompleted(lessonId);
+        CompletableFuture<Boolean> future = rawFuture.thenApply(response -> response.body());
+        future.whenComplete((result_, throwable_) -> {
+            if (future.isCancelled()) {
+                rawFuture.cancel(true);
+            }
+        });
+        return future;
     }
 
     /**
      * Mark a lesson as completed for the current user after they finish the content.
      */
     public CompletableFuture<Boolean> markAsCompleted(String lessonId, RequestOptions requestOptions) {
-        return this.rawClient.markAsCompleted(lessonId, requestOptions).thenApply(response -> response.body());
+        CompletableFuture<WhopApiHttpResponse<Boolean>> rawFuture =
+                this.rawClient.markAsCompleted(lessonId, requestOptions);
+        CompletableFuture<Boolean> future = rawFuture.thenApply(response -> response.body());
+        future.whenComplete((result_, throwable_) -> {
+            if (future.isCancelled()) {
+                rawFuture.cancel(true);
+            }
+        });
+        return future;
     }
 
     /**
      * Mark a lesson as completed for the current user after they finish the content.
      */
     public CompletableFuture<Boolean> markAsCompleted(String lessonId, MarkAsCompletedCourseLessonsRequest request) {
-        return this.rawClient.markAsCompleted(lessonId, request).thenApply(response -> response.body());
+        CompletableFuture<WhopApiHttpResponse<Boolean>> rawFuture = this.rawClient.markAsCompleted(lessonId, request);
+        CompletableFuture<Boolean> future = rawFuture.thenApply(response -> response.body());
+        future.whenComplete((result_, throwable_) -> {
+            if (future.isCancelled()) {
+                rawFuture.cancel(true);
+            }
+        });
+        return future;
     }
 
     /**
@@ -264,28 +423,57 @@ public class AsyncCourseLessonsClient {
      */
     public CompletableFuture<Boolean> markAsCompleted(
             String lessonId, MarkAsCompletedCourseLessonsRequest request, RequestOptions requestOptions) {
-        return this.rawClient.markAsCompleted(lessonId, request, requestOptions).thenApply(response -> response.body());
+        CompletableFuture<WhopApiHttpResponse<Boolean>> rawFuture =
+                this.rawClient.markAsCompleted(lessonId, request, requestOptions);
+        CompletableFuture<Boolean> future = rawFuture.thenApply(response -> response.body());
+        future.whenComplete((result_, throwable_) -> {
+            if (future.isCancelled()) {
+                rawFuture.cancel(true);
+            }
+        });
+        return future;
     }
 
     /**
      * Record that the current user has started viewing a lesson, creating progress tracking records.
      */
     public CompletableFuture<Boolean> start(String lessonId) {
-        return this.rawClient.start(lessonId).thenApply(response -> response.body());
+        CompletableFuture<WhopApiHttpResponse<Boolean>> rawFuture = this.rawClient.start(lessonId);
+        CompletableFuture<Boolean> future = rawFuture.thenApply(response -> response.body());
+        future.whenComplete((result_, throwable_) -> {
+            if (future.isCancelled()) {
+                rawFuture.cancel(true);
+            }
+        });
+        return future;
     }
 
     /**
      * Record that the current user has started viewing a lesson, creating progress tracking records.
      */
     public CompletableFuture<Boolean> start(String lessonId, RequestOptions requestOptions) {
-        return this.rawClient.start(lessonId, requestOptions).thenApply(response -> response.body());
+        CompletableFuture<WhopApiHttpResponse<Boolean>> rawFuture = this.rawClient.start(lessonId, requestOptions);
+        CompletableFuture<Boolean> future = rawFuture.thenApply(response -> response.body());
+        future.whenComplete((result_, throwable_) -> {
+            if (future.isCancelled()) {
+                rawFuture.cancel(true);
+            }
+        });
+        return future;
     }
 
     /**
      * Record that the current user has started viewing a lesson, creating progress tracking records.
      */
     public CompletableFuture<Boolean> start(String lessonId, StartCourseLessonsRequest request) {
-        return this.rawClient.start(lessonId, request).thenApply(response -> response.body());
+        CompletableFuture<WhopApiHttpResponse<Boolean>> rawFuture = this.rawClient.start(lessonId, request);
+        CompletableFuture<Boolean> future = rawFuture.thenApply(response -> response.body());
+        future.whenComplete((result_, throwable_) -> {
+            if (future.isCancelled()) {
+                rawFuture.cancel(true);
+            }
+        });
+        return future;
     }
 
     /**
@@ -293,7 +481,15 @@ public class AsyncCourseLessonsClient {
      */
     public CompletableFuture<Boolean> start(
             String lessonId, StartCourseLessonsRequest request, RequestOptions requestOptions) {
-        return this.rawClient.start(lessonId, request, requestOptions).thenApply(response -> response.body());
+        CompletableFuture<WhopApiHttpResponse<Boolean>> rawFuture =
+                this.rawClient.start(lessonId, request, requestOptions);
+        CompletableFuture<Boolean> future = rawFuture.thenApply(response -> response.body());
+        future.whenComplete((result_, throwable_) -> {
+            if (future.isCancelled()) {
+                rawFuture.cancel(true);
+            }
+        });
+        return future;
     }
 
     /**
@@ -301,7 +497,16 @@ public class AsyncCourseLessonsClient {
      */
     public CompletableFuture<SubmitAssessmentCourseLessonsResponse> submitAssessment(
             String lessonId, SubmitAssessmentCourseLessonsRequest request) {
-        return this.rawClient.submitAssessment(lessonId, request).thenApply(response -> response.body());
+        CompletableFuture<WhopApiHttpResponse<SubmitAssessmentCourseLessonsResponse>> rawFuture =
+                this.rawClient.submitAssessment(lessonId, request);
+        CompletableFuture<SubmitAssessmentCourseLessonsResponse> future =
+                rawFuture.thenApply(response -> response.body());
+        future.whenComplete((result_, throwable_) -> {
+            if (future.isCancelled()) {
+                rawFuture.cancel(true);
+            }
+        });
+        return future;
     }
 
     /**
@@ -309,8 +514,15 @@ public class AsyncCourseLessonsClient {
      */
     public CompletableFuture<SubmitAssessmentCourseLessonsResponse> submitAssessment(
             String lessonId, SubmitAssessmentCourseLessonsRequest request, RequestOptions requestOptions) {
-        return this.rawClient
-                .submitAssessment(lessonId, request, requestOptions)
-                .thenApply(response -> response.body());
+        CompletableFuture<WhopApiHttpResponse<SubmitAssessmentCourseLessonsResponse>> rawFuture =
+                this.rawClient.submitAssessment(lessonId, request, requestOptions);
+        CompletableFuture<SubmitAssessmentCourseLessonsResponse> future =
+                rawFuture.thenApply(response -> response.body());
+        future.whenComplete((result_, throwable_) -> {
+            if (future.isCancelled()) {
+                rawFuture.cancel(true);
+            }
+        });
+        return future;
     }
 }

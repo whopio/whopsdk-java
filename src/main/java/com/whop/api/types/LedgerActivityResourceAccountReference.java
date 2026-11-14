@@ -282,7 +282,6 @@ public final class LedgerActivityResourceAccountReference {
 
         private Optional<String> accountReference = Optional.empty();
 
-        @JsonAnySetter
         private Map<String, Object> additionalProperties = new HashMap<>();
 
         private Builder() {}
@@ -300,7 +299,6 @@ public final class LedgerActivityResourceAccountReference {
         }
 
         /**
-         * <p>Payout method ID.</p>
          * <p>Payout method ID.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
@@ -509,6 +507,20 @@ public final class LedgerActivityResourceAccountReference {
                     object,
                     provider,
                     additionalProperties);
+        }
+
+        @JsonAnySetter
+        private void putAdditionalPropertyFromJson(String key, Object value) {
+            if (key.equalsIgnoreCase("account_reference")
+                    || key.equalsIgnoreCase("destination_currency_code")
+                    || key.equalsIgnoreCase("id")
+                    || key.equalsIgnoreCase("institution_name")
+                    || key.equalsIgnoreCase("nickname")
+                    || key.equalsIgnoreCase("object")
+                    || key.equalsIgnoreCase("provider")) {
+                return;
+            }
+            this.additionalProperties.put(key, value);
         }
 
         @java.lang.Override

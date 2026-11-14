@@ -20,6 +20,8 @@ import java.util.Optional;
 @JsonInclude(JsonInclude.Include.NON_ABSENT)
 @JsonDeserialize(builder = AdGroupGeoLocationsBodyCustomLocationsItem.Builder.class)
 public final class AdGroupGeoLocationsBodyCustomLocationsItem {
+    private final Optional<String> countryCode;
+
     private final Optional<AdGroupGeoLocationsBodyCustomLocationsItemDistanceUnit> distanceUnit;
 
     private final double latitude;
@@ -33,18 +35,28 @@ public final class AdGroupGeoLocationsBodyCustomLocationsItem {
     private final Map<String, Object> additionalProperties;
 
     private AdGroupGeoLocationsBodyCustomLocationsItem(
+            Optional<String> countryCode,
             Optional<AdGroupGeoLocationsBodyCustomLocationsItemDistanceUnit> distanceUnit,
             double latitude,
             double longitude,
             Optional<String> name,
             double radius,
             Map<String, Object> additionalProperties) {
+        this.countryCode = countryCode;
         this.distanceUnit = distanceUnit;
         this.latitude = latitude;
         this.longitude = longitude;
         this.name = name;
         this.radius = radius;
         this.additionalProperties = additionalProperties;
+    }
+
+    /**
+     * @return ISO 3166-1 alpha-2 country the point falls in, as <code>DE</code>. Send it under a special ad category: the campaign must declare the countries its ad sets reach, and a coordinate names none.
+     */
+    @JsonProperty("country_code")
+    public Optional<String> getCountryCode() {
+        return countryCode;
     }
 
     /**
@@ -100,7 +112,8 @@ public final class AdGroupGeoLocationsBodyCustomLocationsItem {
     }
 
     private boolean equalTo(AdGroupGeoLocationsBodyCustomLocationsItem other) {
-        return distanceUnit.equals(other.distanceUnit)
+        return countryCode.equals(other.countryCode)
+                && distanceUnit.equals(other.distanceUnit)
                 && latitude == other.latitude
                 && longitude == other.longitude
                 && name.equals(other.name)
@@ -109,7 +122,7 @@ public final class AdGroupGeoLocationsBodyCustomLocationsItem {
 
     @java.lang.Override
     public int hashCode() {
-        return Objects.hash(this.distanceUnit, this.latitude, this.longitude, this.name, this.radius);
+        return Objects.hash(this.countryCode, this.distanceUnit, this.latitude, this.longitude, this.name, this.radius);
     }
 
     @java.lang.Override
@@ -152,6 +165,13 @@ public final class AdGroupGeoLocationsBodyCustomLocationsItem {
         _FinalStage additionalProperties(Map<String, Object> additionalProperties);
 
         /**
+         * <p>ISO 3166-1 alpha-2 country the point falls in, as <code>DE</code>. Send it under a special ad category: the campaign must declare the countries its ad sets reach, and a coordinate names none.</p>
+         */
+        _FinalStage countryCode(Optional<String> countryCode);
+
+        _FinalStage countryCode(String countryCode);
+
+        /**
          * <p>Unit for <code>radius</code>. Defaults to <code>mile</code>.</p>
          */
         _FinalStage distanceUnit(Optional<AdGroupGeoLocationsBodyCustomLocationsItemDistanceUnit> distanceUnit);
@@ -178,13 +198,15 @@ public final class AdGroupGeoLocationsBodyCustomLocationsItem {
 
         private Optional<AdGroupGeoLocationsBodyCustomLocationsItemDistanceUnit> distanceUnit = Optional.empty();
 
-        @JsonAnySetter
+        private Optional<String> countryCode = Optional.empty();
+
         private Map<String, Object> additionalProperties = new HashMap<>();
 
         private Builder() {}
 
         @java.lang.Override
         public Builder from(AdGroupGeoLocationsBodyCustomLocationsItem other) {
+            countryCode(other.getCountryCode());
             distanceUnit(other.getDistanceUnit());
             latitude(other.getLatitude());
             longitude(other.getLongitude());
@@ -194,7 +216,6 @@ public final class AdGroupGeoLocationsBodyCustomLocationsItem {
         }
 
         /**
-         * <p>Latitude of the center point.</p>
          * <p>Latitude of the center point.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
@@ -207,7 +228,6 @@ public final class AdGroupGeoLocationsBodyCustomLocationsItem {
 
         /**
          * <p>Longitude of the center point.</p>
-         * <p>Longitude of the center point.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
@@ -218,7 +238,6 @@ public final class AdGroupGeoLocationsBodyCustomLocationsItem {
         }
 
         /**
-         * <p>Radius around the center point: 1-50 miles or 1-80 kilometers.</p>
          * <p>Radius around the center point: 1-50 miles or 1-80 kilometers.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
@@ -269,10 +288,43 @@ public final class AdGroupGeoLocationsBodyCustomLocationsItem {
             return this;
         }
 
+        /**
+         * <p>ISO 3166-1 alpha-2 country the point falls in, as <code>DE</code>. Send it under a special ad category: the campaign must declare the countries its ad sets reach, and a coordinate names none.</p>
+         * @return Reference to {@code this} so that method calls can be chained together.
+         */
+        @java.lang.Override
+        public _FinalStage countryCode(String countryCode) {
+            this.countryCode = Optional.ofNullable(countryCode);
+            return this;
+        }
+
+        /**
+         * <p>ISO 3166-1 alpha-2 country the point falls in, as <code>DE</code>. Send it under a special ad category: the campaign must declare the countries its ad sets reach, and a coordinate names none.</p>
+         */
+        @java.lang.Override
+        @JsonSetter(value = "country_code", nulls = Nulls.SKIP)
+        public _FinalStage countryCode(Optional<String> countryCode) {
+            this.countryCode = countryCode;
+            return this;
+        }
+
         @java.lang.Override
         public AdGroupGeoLocationsBodyCustomLocationsItem build() {
             return new AdGroupGeoLocationsBodyCustomLocationsItem(
-                    distanceUnit, latitude, longitude, name, radius, additionalProperties);
+                    countryCode, distanceUnit, latitude, longitude, name, radius, additionalProperties);
+        }
+
+        @JsonAnySetter
+        private void putAdditionalPropertyFromJson(String key, Object value) {
+            if (key.equalsIgnoreCase("country_code")
+                    || key.equalsIgnoreCase("distance_unit")
+                    || key.equalsIgnoreCase("latitude")
+                    || key.equalsIgnoreCase("longitude")
+                    || key.equalsIgnoreCase("name")
+                    || key.equalsIgnoreCase("radius")) {
+                return;
+            }
+            this.additionalProperties.put(key, value);
         }
 
         @java.lang.Override

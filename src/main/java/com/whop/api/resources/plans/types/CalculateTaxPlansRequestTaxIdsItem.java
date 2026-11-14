@@ -35,17 +35,11 @@ public final class CalculateTaxPlansRequestTaxIdsItem {
         this.additionalProperties = additionalProperties;
     }
 
-    /**
-     * @return Tax ID type, such as <code>eu_vat</code> for an EU VAT number.
-     */
     @JsonProperty("type")
     public Optional<CalculateTaxPlansRequestTaxIdsItemType> getType() {
         return type;
     }
 
-    /**
-     * @return Tax ID value, for example <code>DE123456789</code>.
-     */
     @JsonProperty("value")
     public Optional<String> getValue() {
         return value;
@@ -87,7 +81,6 @@ public final class CalculateTaxPlansRequestTaxIdsItem {
 
         private Optional<String> value = Optional.empty();
 
-        @JsonAnySetter
         private Map<String, Object> additionalProperties = new HashMap<>();
 
         private Builder() {}
@@ -98,9 +91,6 @@ public final class CalculateTaxPlansRequestTaxIdsItem {
             return this;
         }
 
-        /**
-         * <p>Tax ID type, such as <code>eu_vat</code> for an EU VAT number.</p>
-         */
         @JsonSetter(value = "type", nulls = Nulls.SKIP)
         public Builder type(Optional<CalculateTaxPlansRequestTaxIdsItemType> type) {
             this.type = type;
@@ -112,9 +102,6 @@ public final class CalculateTaxPlansRequestTaxIdsItem {
             return this;
         }
 
-        /**
-         * <p>Tax ID value, for example <code>DE123456789</code>.</p>
-         */
         @JsonSetter(value = "value", nulls = Nulls.SKIP)
         public Builder value(Optional<String> value) {
             this.value = value;
@@ -128,6 +115,14 @@ public final class CalculateTaxPlansRequestTaxIdsItem {
 
         public CalculateTaxPlansRequestTaxIdsItem build() {
             return new CalculateTaxPlansRequestTaxIdsItem(type, value, additionalProperties);
+        }
+
+        @JsonAnySetter
+        private void putAdditionalPropertyFromJson(String key, Object value) {
+            if (key.equalsIgnoreCase("type") || key.equalsIgnoreCase("value")) {
+                return;
+            }
+            this.additionalProperties.put(key, value);
         }
 
         public Builder additionalProperty(String key, Object value) {

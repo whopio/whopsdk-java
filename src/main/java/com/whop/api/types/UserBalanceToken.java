@@ -259,7 +259,6 @@ public final class UserBalanceToken {
 
         private Optional<String> iconUrl = Optional.empty();
 
-        @JsonAnySetter
         private Map<String, Object> additionalProperties = new HashMap<>();
 
         private Builder() {}
@@ -278,7 +277,6 @@ public final class UserBalanceToken {
 
         /**
          * <p>Amount held in native token units, as a decimal string.</p>
-         * <p>Amount held in native token units, as a decimal string.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
@@ -289,7 +287,6 @@ public final class UserBalanceToken {
         }
 
         /**
-         * <p>Balance split into available, pending, in-transit, and reserve amounts, as native-unit decimal strings. Transfers between the user's own wallet and card are reported in <code>in_transit</code> until they arrive.</p>
          * <p>Balance split into available, pending, in-transit, and reserve amounts, as native-unit decimal strings. Transfers between the user's own wallet and card are reported in <code>in_transit</code> until they arrive.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
@@ -302,7 +299,6 @@ public final class UserBalanceToken {
 
         /**
          * <p>Token display symbol, such as <code>USDT</code>, <code>XAUT</code>, or <code>cbBTC</code>.</p>
-         * <p>Token display symbol, such as <code>USDT</code>, <code>XAUT</code>, or <code>cbBTC</code>.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
@@ -313,7 +309,6 @@ public final class UserBalanceToken {
         }
 
         /**
-         * <p>Holding USD value.</p>
          * <p>Holding USD value.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
@@ -436,6 +431,20 @@ public final class UserBalanceToken {
         public UserBalanceToken build() {
             return new UserBalanceToken(
                     balance, breakdown, iconUrl, name, priceUsd, symbol, valueUsd, additionalProperties);
+        }
+
+        @JsonAnySetter
+        private void putAdditionalPropertyFromJson(String key, Object value) {
+            if (key.equalsIgnoreCase("balance")
+                    || key.equalsIgnoreCase("breakdown")
+                    || key.equalsIgnoreCase("icon_url")
+                    || key.equalsIgnoreCase("name")
+                    || key.equalsIgnoreCase("price_usd")
+                    || key.equalsIgnoreCase("symbol")
+                    || key.equalsIgnoreCase("value_usd")) {
+                return;
+            }
+            this.additionalProperties.put(key, value);
         }
 
         @java.lang.Override

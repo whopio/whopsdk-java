@@ -55,7 +55,7 @@ public final class RetrievePreferencesResponseAdsTripleWhaleIntegration {
     }
 
     /**
-     * @return The connected Shopify store domain spend is reported for, such as <code>acme.myshopify.com</code>. <code>null</code> when no store is connected.
+     * @return The shop domain spend is reported for, such as <code>acme.myshopify.com</code> or a custom domain for a non-Shopify store. <code>null</code> when none is set.
      */
     @JsonIgnore
     public Optional<String> getShopDomain() {
@@ -66,7 +66,7 @@ public final class RetrievePreferencesResponseAdsTripleWhaleIntegration {
     }
 
     /**
-     * @return Where the integration stands. <code>requires_shopify_store</code> means no Shopify store is connected — Triple Whale keys records by Shopify shop, so no spend is reported until one is.
+     * @return Where the integration stands. <code>requires_shop_domain</code> means no shop domain is configured — set <code>shop_domain</code> before spend can be reported.
      */
     @JsonProperty("status")
     public RetrievePreferencesResponseAdsTripleWhaleIntegrationStatus getStatus() {
@@ -119,7 +119,7 @@ public final class RetrievePreferencesResponseAdsTripleWhaleIntegration {
 
     public interface StatusStage {
         /**
-         * <p>Where the integration stands. <code>requires_shopify_store</code> means no Shopify store is connected — Triple Whale keys records by Shopify shop, so no spend is reported until one is.</p>
+         * <p>Where the integration stands. <code>requires_shop_domain</code> means no shop domain is configured — set <code>shop_domain</code> before spend can be reported.</p>
          */
         _FinalStage status(@NotNull RetrievePreferencesResponseAdsTripleWhaleIntegrationStatus status);
 
@@ -143,7 +143,7 @@ public final class RetrievePreferencesResponseAdsTripleWhaleIntegration {
         _FinalStage maskedApiKey(Nullable<String> maskedApiKey);
 
         /**
-         * <p>The connected Shopify store domain spend is reported for, such as <code>acme.myshopify.com</code>. <code>null</code> when no store is connected.</p>
+         * <p>The shop domain spend is reported for, such as <code>acme.myshopify.com</code> or a custom domain for a non-Shopify store. <code>null</code> when none is set.</p>
          */
         _FinalStage shopDomain(Optional<String> shopDomain);
 
@@ -160,7 +160,6 @@ public final class RetrievePreferencesResponseAdsTripleWhaleIntegration {
 
         private Optional<String> maskedApiKey = Optional.empty();
 
-        @JsonAnySetter
         private Map<String, Object> additionalProperties = new HashMap<>();
 
         private Builder() {}
@@ -174,8 +173,7 @@ public final class RetrievePreferencesResponseAdsTripleWhaleIntegration {
         }
 
         /**
-         * <p>Where the integration stands. <code>requires_shopify_store</code> means no Shopify store is connected — Triple Whale keys records by Shopify shop, so no spend is reported until one is.</p>
-         * <p>Where the integration stands. <code>requires_shopify_store</code> means no Shopify store is connected — Triple Whale keys records by Shopify shop, so no spend is reported until one is.</p>
+         * <p>Where the integration stands. <code>requires_shop_domain</code> means no shop domain is configured — set <code>shop_domain</code> before spend can be reported.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
@@ -186,7 +184,7 @@ public final class RetrievePreferencesResponseAdsTripleWhaleIntegration {
         }
 
         /**
-         * <p>The connected Shopify store domain spend is reported for, such as <code>acme.myshopify.com</code>. <code>null</code> when no store is connected.</p>
+         * <p>The shop domain spend is reported for, such as <code>acme.myshopify.com</code> or a custom domain for a non-Shopify store. <code>null</code> when none is set.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
@@ -202,7 +200,7 @@ public final class RetrievePreferencesResponseAdsTripleWhaleIntegration {
         }
 
         /**
-         * <p>The connected Shopify store domain spend is reported for, such as <code>acme.myshopify.com</code>. <code>null</code> when no store is connected.</p>
+         * <p>The shop domain spend is reported for, such as <code>acme.myshopify.com</code> or a custom domain for a non-Shopify store. <code>null</code> when none is set.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
@@ -212,7 +210,7 @@ public final class RetrievePreferencesResponseAdsTripleWhaleIntegration {
         }
 
         /**
-         * <p>The connected Shopify store domain spend is reported for, such as <code>acme.myshopify.com</code>. <code>null</code> when no store is connected.</p>
+         * <p>The shop domain spend is reported for, such as <code>acme.myshopify.com</code> or a custom domain for a non-Shopify store. <code>null</code> when none is set.</p>
          */
         @java.lang.Override
         @JsonSetter(value = "shop_domain", nulls = Nulls.SKIP)
@@ -261,6 +259,16 @@ public final class RetrievePreferencesResponseAdsTripleWhaleIntegration {
         public RetrievePreferencesResponseAdsTripleWhaleIntegration build() {
             return new RetrievePreferencesResponseAdsTripleWhaleIntegration(
                     maskedApiKey, shopDomain, status, additionalProperties);
+        }
+
+        @JsonAnySetter
+        private void putAdditionalPropertyFromJson(String key, Object value) {
+            if (key.equalsIgnoreCase("masked_api_key")
+                    || key.equalsIgnoreCase("shop_domain")
+                    || key.equalsIgnoreCase("status")) {
+                return;
+            }
+            this.additionalProperties.put(key, value);
         }
 
         @java.lang.Override

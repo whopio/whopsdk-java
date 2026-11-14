@@ -80,7 +80,6 @@ public final class V1ErrorResponse {
     public static final class Builder implements ErrorStage, _FinalStage {
         private V1ErrorResponseError error;
 
-        @JsonAnySetter
         private Map<String, Object> additionalProperties = new HashMap<>();
 
         private Builder() {}
@@ -101,6 +100,14 @@ public final class V1ErrorResponse {
         @java.lang.Override
         public V1ErrorResponse build() {
             return new V1ErrorResponse(error, additionalProperties);
+        }
+
+        @JsonAnySetter
+        private void putAdditionalPropertyFromJson(String key, Object value) {
+            if (key.equalsIgnoreCase("error")) {
+                return;
+            }
+            this.additionalProperties.put(key, value);
         }
 
         @java.lang.Override

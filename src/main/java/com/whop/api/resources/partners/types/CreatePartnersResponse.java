@@ -108,7 +108,6 @@ public final class CreatePartnersResponse {
 
         private OffsetDateTime whopPartnerEnabledAt;
 
-        @JsonAnySetter
         private Map<String, Object> additionalProperties = new HashMap<>();
 
         private Builder() {}
@@ -122,7 +121,6 @@ public final class CreatePartnersResponse {
 
         /**
          * <p>The caller's referral link — businesses that sign up through it are attributed to the caller.</p>
-         * <p>The caller's referral link — businesses that sign up through it are attributed to the caller.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
@@ -133,7 +131,6 @@ public final class CreatePartnersResponse {
         }
 
         /**
-         * <p>When the caller became a Whop partner.</p>
          * <p>When the caller became a Whop partner.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
@@ -148,6 +145,14 @@ public final class CreatePartnersResponse {
         @java.lang.Override
         public CreatePartnersResponse build() {
             return new CreatePartnersResponse(referralLink, whopPartnerEnabledAt, additionalProperties);
+        }
+
+        @JsonAnySetter
+        private void putAdditionalPropertyFromJson(String key, Object value) {
+            if (key.equalsIgnoreCase("referral_link") || key.equalsIgnoreCase("whop_partner_enabled_at")) {
+                return;
+            }
+            this.additionalProperties.put(key, value);
         }
 
         @java.lang.Override

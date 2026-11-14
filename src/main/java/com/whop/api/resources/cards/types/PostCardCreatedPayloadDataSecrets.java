@@ -181,7 +181,6 @@ public final class PostCardCreatedPayloadDataSecrets {
 
         private Optional<String> nameOnCard = Optional.empty();
 
-        @JsonAnySetter
         private Map<String, Object> additionalProperties = new HashMap<>();
 
         private Builder() {}
@@ -197,7 +196,6 @@ public final class PostCardCreatedPayloadDataSecrets {
 
         /**
          * <p>Full card number.</p>
-         * <p>Full card number.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
@@ -208,7 +206,6 @@ public final class PostCardCreatedPayloadDataSecrets {
         }
 
         /**
-         * <p>Card verification code.</p>
          * <p>Card verification code.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
@@ -294,6 +291,17 @@ public final class PostCardCreatedPayloadDataSecrets {
         @java.lang.Override
         public PostCardCreatedPayloadDataSecrets build() {
             return new PostCardCreatedPayloadDataSecrets(cardNumber, cvc, nameOnCard, pin, additionalProperties);
+        }
+
+        @JsonAnySetter
+        private void putAdditionalPropertyFromJson(String key, Object value) {
+            if (key.equalsIgnoreCase("card_number")
+                    || key.equalsIgnoreCase("cvc")
+                    || key.equalsIgnoreCase("name_on_card")
+                    || key.equalsIgnoreCase("pin")) {
+                return;
+            }
+            this.additionalProperties.put(key, value);
         }
 
         @java.lang.Override

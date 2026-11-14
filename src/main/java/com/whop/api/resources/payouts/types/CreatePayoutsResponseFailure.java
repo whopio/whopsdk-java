@@ -133,7 +133,6 @@ public final class CreatePayoutsResponseFailure {
 
         private Optional<String> message = Optional.empty();
 
-        @JsonAnySetter
         private Map<String, Object> additionalProperties = new HashMap<>();
 
         private Builder() {}
@@ -222,6 +221,16 @@ public final class CreatePayoutsResponseFailure {
 
         public CreatePayoutsResponseFailure build() {
             return new CreatePayoutsResponseFailure(code, fundsReturnedAt, message, additionalProperties);
+        }
+
+        @JsonAnySetter
+        private void putAdditionalPropertyFromJson(String key, Object value) {
+            if (key.equalsIgnoreCase("code")
+                    || key.equalsIgnoreCase("funds_returned_at")
+                    || key.equalsIgnoreCase("message")) {
+                return;
+            }
+            this.additionalProperties.put(key, value);
         }
 
         public Builder additionalProperty(String key, Object value) {

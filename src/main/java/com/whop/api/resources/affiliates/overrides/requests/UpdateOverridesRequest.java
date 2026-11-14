@@ -159,7 +159,6 @@ public final class UpdateOverridesRequest {
 
         private Optional<AffiliateRevenueBases> revenueBasis = Optional.empty();
 
-        @JsonAnySetter
         private Map<String, Object> additionalProperties = new HashMap<>();
 
         private Builder() {}
@@ -275,6 +274,17 @@ public final class UpdateOverridesRequest {
         public UpdateOverridesRequest build() {
             return new UpdateOverridesRequest(
                     appliesToPayments, commissionType, commissionValue, revenueBasis, additionalProperties);
+        }
+
+        @JsonAnySetter
+        private void putAdditionalPropertyFromJson(String key, Object value) {
+            if (key.equalsIgnoreCase("applies_to_payments")
+                    || key.equalsIgnoreCase("commission_type")
+                    || key.equalsIgnoreCase("commission_value")
+                    || key.equalsIgnoreCase("revenue_basis")) {
+                return;
+            }
+            this.additionalProperties.put(key, value);
         }
 
         public Builder additionalProperty(String key, Object value) {

@@ -146,7 +146,6 @@ public final class CourseLessonInteractionCourse {
 
         private Optional<String> title = Optional.empty();
 
-        @JsonAnySetter
         private Map<String, Object> additionalProperties = new HashMap<>();
 
         private Builder() {}
@@ -161,7 +160,6 @@ public final class CourseLessonInteractionCourse {
 
         /**
          * <p>The parent experience that this course belongs to.</p>
-         * <p>The parent experience that this course belongs to.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
@@ -172,7 +170,6 @@ public final class CourseLessonInteractionCourse {
         }
 
         /**
-         * <p>The unique identifier for the course.</p>
          * <p>The unique identifier for the course.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
@@ -222,6 +219,14 @@ public final class CourseLessonInteractionCourse {
         @java.lang.Override
         public CourseLessonInteractionCourse build() {
             return new CourseLessonInteractionCourse(experience, id, title, additionalProperties);
+        }
+
+        @JsonAnySetter
+        private void putAdditionalPropertyFromJson(String key, Object value) {
+            if (key.equalsIgnoreCase("experience") || key.equalsIgnoreCase("id") || key.equalsIgnoreCase("title")) {
+                return;
+            }
+            this.additionalProperties.put(key, value);
         }
 
         @java.lang.Override

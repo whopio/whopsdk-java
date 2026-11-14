@@ -10,6 +10,9 @@ public final class ListBusinessesResponseDataItemMyPartnerTier {
     public static final ListBusinessesResponseDataItemMyPartnerTier SECOND =
             new ListBusinessesResponseDataItemMyPartnerTier(Value.SECOND, "second");
 
+    public static final ListBusinessesResponseDataItemMyPartnerTier BLUEPRINT =
+            new ListBusinessesResponseDataItemMyPartnerTier(Value.BLUEPRINT, "blueprint");
+
     public static final ListBusinessesResponseDataItemMyPartnerTier FIRST =
             new ListBusinessesResponseDataItemMyPartnerTier(Value.FIRST, "first");
 
@@ -48,6 +51,8 @@ public final class ListBusinessesResponseDataItemMyPartnerTier {
         switch (value) {
             case SECOND:
                 return visitor.visitSecond();
+            case BLUEPRINT:
+                return visitor.visitBlueprint();
             case FIRST:
                 return visitor.visitFirst();
             case UNKNOWN:
@@ -61,6 +66,8 @@ public final class ListBusinessesResponseDataItemMyPartnerTier {
         switch (value) {
             case "second":
                 return SECOND;
+            case "blueprint":
+                return BLUEPRINT;
             case "first":
                 return FIRST;
             default:
@@ -73,6 +80,8 @@ public final class ListBusinessesResponseDataItemMyPartnerTier {
 
         SECOND,
 
+        BLUEPRINT,
+
         UNKNOWN
     }
 
@@ -80,6 +89,8 @@ public final class ListBusinessesResponseDataItemMyPartnerTier {
         T visitFirst();
 
         T visitSecond();
+
+        T visitBlueprint();
 
         T visitUnknown(String unknownType);
     }

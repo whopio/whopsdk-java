@@ -4,34 +4,28 @@
 package com.whop.api.resources.socialaccounts;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
+import com.whop.api.core.BodyProperties;
 import com.whop.api.core.ClientOptions;
 import com.whop.api.core.MediaTypes;
 import com.whop.api.core.ObjectMappers;
+import com.whop.api.core.PathSegments;
 import com.whop.api.core.QueryStringMapper;
 import com.whop.api.core.RequestOptions;
+import com.whop.api.core.RetryInterceptor;
 import com.whop.api.core.WhopApiApiException;
 import com.whop.api.core.WhopApiException;
 import com.whop.api.core.WhopApiHttpResponse;
 import com.whop.api.core.pagination.SyncPagingIterable;
-import com.whop.api.errors.BadRequestError;
 import com.whop.api.errors.ConflictError;
-import com.whop.api.errors.ForbiddenError;
-import com.whop.api.errors.NotFoundError;
-import com.whop.api.errors.UnauthorizedError;
 import com.whop.api.resources.socialaccounts.requests.ConnectSocialAccountsRequest;
-import com.whop.api.resources.socialaccounts.requests.CreateSocialAccountsRequest;
 import com.whop.api.resources.socialaccounts.requests.DeleteSocialAccountsRequest;
-import com.whop.api.resources.socialaccounts.requests.LeadFormsSocialAccountsRequest;
 import com.whop.api.resources.socialaccounts.requests.ListSocialAccountsRequest;
-import com.whop.api.resources.socialaccounts.requests.PostsSocialAccountsRequest;
+import com.whop.api.resources.socialaccounts.requests.RefreshSocialAccountsRequest;
 import com.whop.api.resources.socialaccounts.types.ConnectSocialAccountsResponse;
+import com.whop.api.resources.socialaccounts.types.CreateSocialAccountsRequestBody;
 import com.whop.api.resources.socialaccounts.types.DeleteSocialAccountsResponse;
-import com.whop.api.resources.socialaccounts.types.LeadFormsSocialAccountsResponse;
 import com.whop.api.resources.socialaccounts.types.ListSocialAccountsResponse;
-import com.whop.api.resources.socialaccounts.types.PostsSocialAccountsResponse;
 import com.whop.api.types.SocialAccount;
-import com.whop.api.types.SocialAccountPost;
-import com.whop.api.types.V1ErrorResponse;
 import java.io.IOException;
 import java.util.List;
 import java.util.Optional;
@@ -56,14 +50,14 @@ public class AsyncRawSocialAccountsClient {
     }
 
     /**
-     * Lists the social accounts linked to an account or user.
+     * Deprecated compatibility endpoint. List external accounts with <code>GET /external_accounts</code> instead.
      */
     public CompletableFuture<WhopApiHttpResponse<SyncPagingIterable<SocialAccount>>> list() {
         return list(ListSocialAccountsRequest.builder().build());
     }
 
     /**
-     * Lists the social accounts linked to an account or user.
+     * Deprecated compatibility endpoint. List external accounts with <code>GET /external_accounts</code> instead.
      */
     public CompletableFuture<WhopApiHttpResponse<SyncPagingIterable<SocialAccount>>> list(
             RequestOptions requestOptions) {
@@ -71,7 +65,7 @@ public class AsyncRawSocialAccountsClient {
     }
 
     /**
-     * Lists the social accounts linked to an account or user.
+     * Deprecated compatibility endpoint. List external accounts with <code>GET /external_accounts</code> instead.
      */
     public CompletableFuture<WhopApiHttpResponse<SyncPagingIterable<SocialAccount>>> list(
             ListSocialAccountsRequest request) {
@@ -79,11 +73,11 @@ public class AsyncRawSocialAccountsClient {
     }
 
     /**
-     * Lists the social accounts linked to an account or user.
+     * Deprecated compatibility endpoint. List external accounts with <code>GET /external_accounts</code> instead.
      */
     public CompletableFuture<WhopApiHttpResponse<SyncPagingIterable<SocialAccount>>> list(
             ListSocialAccountsRequest request, RequestOptions requestOptions) {
-        HttpUrl.Builder httpUrl = HttpUrl.parse(this.clientOptions.environment().getUrl())
+        HttpUrl.Builder httpUrl = HttpUrl.parse(this.clientOptions.environment().getApiURL())
                 .newBuilder()
                 .addPathSegments("social_accounts");
         if (request.getAccountId().isPresent()) {
@@ -97,6 +91,10 @@ public class AsyncRawSocialAccountsClient {
         if (request.getPlatform().isPresent()) {
             QueryStringMapper.addQueryParameter(
                     httpUrl, "platform", request.getPlatform().get(), false);
+        }
+        if (request.getTrustLevel().isPresent()) {
+            QueryStringMapper.addQueryParameter(
+                    httpUrl, "trust_level", request.getTrustLevel().get(), false);
         }
         if (request.getVerified().isPresent()) {
             QueryStringMapper.addQueryParameter(
@@ -145,8 +143,18 @@ public class AsyncRawSocialAccountsClient {
         if (requestOptions != null && requestOptions.getTimeout().isPresent()) {
             client = clientOptions.httpClientWithTimeout(requestOptions);
         }
+        if (requestOptions != null && requestOptions.getMaxRetries().isPresent()) {
+            okhttpRequest = okhttpRequest
+                    .newBuilder()
+                    .tag(
+                            RetryInterceptor.MaxRetriesOverride.class,
+                            new RetryInterceptor.MaxRetriesOverride(
+                                    requestOptions.getMaxRetries().get()))
+                    .build();
+        }
         CompletableFuture<WhopApiHttpResponse<SyncPagingIterable<SocialAccount>>> future = new CompletableFuture<>();
-        client.newCall(okhttpRequest).enqueue(new Callback() {
+        RetryInterceptor.AsyncCall okhttpCall = RetryInterceptor.newAsyncCall(client, okhttpRequest);
+        okhttpCall.enqueue(new Callback() {
             @Override
             public void onResponse(@NotNull Call call, @NotNull Response response) throws IOException {
                 try (ResponseBody responseBody = response.body()) {
@@ -163,7 +171,11 @@ public class AsyncRawSocialAccountsClient {
                         List<SocialAccount> result = parsedResponse.getData();
                         future.complete(new WhopApiHttpResponse<>(
                                 new SyncPagingIterable<SocialAccount>(
-                                        startingAfter != null, result, parsedResponse, () -> {
+                                        startingAfter.isPresent()
+                                                && !startingAfter.get().isEmpty(),
+                                        result,
+                                        parsedResponse,
+                                        () -> {
                                             try {
                                                 return list(nextRequest, requestOptions)
                                                         .get()
@@ -175,26 +187,13 @@ public class AsyncRawSocialAccountsClient {
                                 response));
                         return;
                     }
-                    try {
-                        switch (response.code()) {
-                            case 400:
-                                future.completeExceptionally(new BadRequestError(
-                                        ObjectMappers.JSON_MAPPER.readValue(responseBodyString, Object.class),
-                                        response));
-                                return;
-                            case 401:
-                                future.completeExceptionally(new UnauthorizedError(
-                                        ObjectMappers.JSON_MAPPER.readValue(responseBodyString, Object.class),
-                                        response));
-                                return;
-                        }
-                    } catch (JsonProcessingException ignored) {
-                        // unable to map error response, throwing generic error
-                    }
                     Object errorBody = ObjectMappers.parseErrorBody(responseBodyString);
                     future.completeExceptionally(new WhopApiApiException(
                             "Error with status code " + response.code(), response.code(), errorBody, response));
                     return;
+                } catch (JsonProcessingException e) {
+                    future.completeExceptionally(
+                            new WhopApiException("Failed to deserialize response: " + e.getMessage(), e));
                 } catch (IOException e) {
                     future.completeExceptionally(new WhopApiException("Network error executing HTTP request", e));
                 }
@@ -205,22 +204,27 @@ public class AsyncRawSocialAccountsClient {
                 future.completeExceptionally(new WhopApiException("Network error executing HTTP request", e));
             }
         });
+        future.whenComplete((result_, throwable_) -> {
+            if (future.isCancelled()) {
+                okhttpCall.cancel();
+            }
+        });
         return future;
     }
 
     /**
-     * Creates or returns a Whop-managed Facebook page for an account.
+     * Deprecated compatibility endpoint. Create external accounts with <code>POST /external_accounts</code> instead.
      */
-    public CompletableFuture<WhopApiHttpResponse<SocialAccount>> create(CreateSocialAccountsRequest request) {
+    public CompletableFuture<WhopApiHttpResponse<SocialAccount>> create(CreateSocialAccountsRequestBody request) {
         return create(request, null);
     }
 
     /**
-     * Creates or returns a Whop-managed Facebook page for an account.
+     * Deprecated compatibility endpoint. Create external accounts with <code>POST /external_accounts</code> instead.
      */
     public CompletableFuture<WhopApiHttpResponse<SocialAccount>> create(
-            CreateSocialAccountsRequest request, RequestOptions requestOptions) {
-        HttpUrl.Builder httpUrl = HttpUrl.parse(this.clientOptions.environment().getUrl())
+            CreateSocialAccountsRequestBody request, RequestOptions requestOptions) {
+        HttpUrl.Builder httpUrl = HttpUrl.parse(this.clientOptions.environment().getApiURL())
                 .newBuilder()
                 .addPathSegments("social_accounts");
         if (requestOptions != null) {
@@ -231,7 +235,9 @@ public class AsyncRawSocialAccountsClient {
         RequestBody body;
         try {
             body = RequestBody.create(
-                    ObjectMappers.JSON_MAPPER.writeValueAsBytes(request), MediaTypes.APPLICATION_JSON);
+                    ObjectMappers.JSON_MAPPER.writeValueAsBytes(BodyProperties.merge(
+                            request, requestOptions != null ? requestOptions.getBodyProperties() : null)),
+                    MediaTypes.APPLICATION_JSON);
         } catch (JsonProcessingException e) {
             throw new WhopApiException("Failed to serialize request", e);
         }
@@ -246,8 +252,18 @@ public class AsyncRawSocialAccountsClient {
         if (requestOptions != null && requestOptions.getTimeout().isPresent()) {
             client = clientOptions.httpClientWithTimeout(requestOptions);
         }
+        if (requestOptions != null && requestOptions.getMaxRetries().isPresent()) {
+            okhttpRequest = okhttpRequest
+                    .newBuilder()
+                    .tag(
+                            RetryInterceptor.MaxRetriesOverride.class,
+                            new RetryInterceptor.MaxRetriesOverride(
+                                    requestOptions.getMaxRetries().get()))
+                    .build();
+        }
         CompletableFuture<WhopApiHttpResponse<SocialAccount>> future = new CompletableFuture<>();
-        client.newCall(okhttpRequest).enqueue(new Callback() {
+        RetryInterceptor.AsyncCall okhttpCall = RetryInterceptor.newAsyncCall(client, okhttpRequest);
+        okhttpCall.enqueue(new Callback() {
             @Override
             public void onResponse(@NotNull Call call, @NotNull Response response) throws IOException {
                 try (ResponseBody responseBody = response.body()) {
@@ -259,22 +275,10 @@ public class AsyncRawSocialAccountsClient {
                         return;
                     }
                     try {
-                        switch (response.code()) {
-                            case 400:
-                                future.completeExceptionally(new BadRequestError(
-                                        ObjectMappers.JSON_MAPPER.readValue(responseBodyString, Object.class),
-                                        response));
-                                return;
-                            case 401:
-                                future.completeExceptionally(new UnauthorizedError(
-                                        ObjectMappers.JSON_MAPPER.readValue(responseBodyString, Object.class),
-                                        response));
-                                return;
-                            case 409:
-                                future.completeExceptionally(new ConflictError(
-                                        ObjectMappers.JSON_MAPPER.readValue(responseBodyString, V1ErrorResponse.class),
-                                        response));
-                                return;
+                        if (response.code() == 409) {
+                            future.completeExceptionally(new ConflictError(
+                                    ObjectMappers.JSON_MAPPER.readValue(responseBodyString, Object.class), response));
+                            return;
                         }
                     } catch (JsonProcessingException ignored) {
                         // unable to map error response, throwing generic error
@@ -283,6 +287,9 @@ public class AsyncRawSocialAccountsClient {
                     future.completeExceptionally(new WhopApiApiException(
                             "Error with status code " + response.code(), response.code(), errorBody, response));
                     return;
+                } catch (JsonProcessingException e) {
+                    future.completeExceptionally(
+                            new WhopApiException("Failed to deserialize response: " + e.getMessage(), e));
                 } catch (IOException e) {
                     future.completeExceptionally(new WhopApiException("Network error executing HTTP request", e));
                 }
@@ -293,11 +300,16 @@ public class AsyncRawSocialAccountsClient {
                 future.completeExceptionally(new WhopApiException("Network error executing HTTP request", e));
             }
         });
+        future.whenComplete((result_, throwable_) -> {
+            if (future.isCancelled()) {
+                okhttpCall.cancel();
+            }
+        });
         return future;
     }
 
     /**
-     * Starts an OAuth connection flow and returns an authorize_url where the user can connect a social account.
+     * Deprecated compatibility endpoint. Connect external accounts with <code>POST /external_accounts/connect</code> instead.
      */
     public CompletableFuture<WhopApiHttpResponse<ConnectSocialAccountsResponse>> connect(
             ConnectSocialAccountsRequest request) {
@@ -305,11 +317,11 @@ public class AsyncRawSocialAccountsClient {
     }
 
     /**
-     * Starts an OAuth connection flow and returns an authorize_url where the user can connect a social account.
+     * Deprecated compatibility endpoint. Connect external accounts with <code>POST /external_accounts/connect</code> instead.
      */
     public CompletableFuture<WhopApiHttpResponse<ConnectSocialAccountsResponse>> connect(
             ConnectSocialAccountsRequest request, RequestOptions requestOptions) {
-        HttpUrl.Builder httpUrl = HttpUrl.parse(this.clientOptions.environment().getUrl())
+        HttpUrl.Builder httpUrl = HttpUrl.parse(this.clientOptions.environment().getApiURL())
                 .newBuilder()
                 .addPathSegments("social_accounts/connect");
         if (requestOptions != null) {
@@ -320,7 +332,9 @@ public class AsyncRawSocialAccountsClient {
         RequestBody body;
         try {
             body = RequestBody.create(
-                    ObjectMappers.JSON_MAPPER.writeValueAsBytes(request), MediaTypes.APPLICATION_JSON);
+                    ObjectMappers.JSON_MAPPER.writeValueAsBytes(BodyProperties.merge(
+                            request, requestOptions != null ? requestOptions.getBodyProperties() : null)),
+                    MediaTypes.APPLICATION_JSON);
         } catch (JsonProcessingException e) {
             throw new WhopApiException("Failed to serialize request", e);
         }
@@ -335,8 +349,18 @@ public class AsyncRawSocialAccountsClient {
         if (requestOptions != null && requestOptions.getTimeout().isPresent()) {
             client = clientOptions.httpClientWithTimeout(requestOptions);
         }
+        if (requestOptions != null && requestOptions.getMaxRetries().isPresent()) {
+            okhttpRequest = okhttpRequest
+                    .newBuilder()
+                    .tag(
+                            RetryInterceptor.MaxRetriesOverride.class,
+                            new RetryInterceptor.MaxRetriesOverride(
+                                    requestOptions.getMaxRetries().get()))
+                    .build();
+        }
         CompletableFuture<WhopApiHttpResponse<ConnectSocialAccountsResponse>> future = new CompletableFuture<>();
-        client.newCall(okhttpRequest).enqueue(new Callback() {
+        RetryInterceptor.AsyncCall okhttpCall = RetryInterceptor.newAsyncCall(client, okhttpRequest);
+        okhttpCall.enqueue(new Callback() {
             @Override
             public void onResponse(@NotNull Call call, @NotNull Response response) throws IOException {
                 try (ResponseBody responseBody = response.body()) {
@@ -349,22 +373,10 @@ public class AsyncRawSocialAccountsClient {
                         return;
                     }
                     try {
-                        switch (response.code()) {
-                            case 400:
-                                future.completeExceptionally(new BadRequestError(
-                                        ObjectMappers.JSON_MAPPER.readValue(responseBodyString, Object.class),
-                                        response));
-                                return;
-                            case 401:
-                                future.completeExceptionally(new UnauthorizedError(
-                                        ObjectMappers.JSON_MAPPER.readValue(responseBodyString, Object.class),
-                                        response));
-                                return;
-                            case 409:
-                                future.completeExceptionally(new ConflictError(
-                                        ObjectMappers.JSON_MAPPER.readValue(responseBodyString, V1ErrorResponse.class),
-                                        response));
-                                return;
+                        if (response.code() == 409) {
+                            future.completeExceptionally(new ConflictError(
+                                    ObjectMappers.JSON_MAPPER.readValue(responseBodyString, Object.class), response));
+                            return;
                         }
                     } catch (JsonProcessingException ignored) {
                         // unable to map error response, throwing generic error
@@ -373,6 +385,9 @@ public class AsyncRawSocialAccountsClient {
                     future.completeExceptionally(new WhopApiApiException(
                             "Error with status code " + response.code(), response.code(), errorBody, response));
                     return;
+                } catch (JsonProcessingException e) {
+                    future.completeExceptionally(
+                            new WhopApiException("Failed to deserialize response: " + e.getMessage(), e));
                 } catch (IOException e) {
                     future.completeExceptionally(new WhopApiException("Network error executing HTTP request", e));
                 }
@@ -383,18 +398,23 @@ public class AsyncRawSocialAccountsClient {
                 future.completeExceptionally(new WhopApiException("Network error executing HTTP request", e));
             }
         });
+        future.whenComplete((result_, throwable_) -> {
+            if (future.isCancelled()) {
+                okhttpCall.cancel();
+            }
+        });
         return future;
     }
 
     /**
-     * Disconnects a social account from an account or user without deleting the underlying platform account.
+     * Deprecated compatibility endpoint. Disconnect external accounts with <code>DELETE /external_accounts/{id}</code> instead.
      */
     public CompletableFuture<WhopApiHttpResponse<DeleteSocialAccountsResponse>> delete(String id) {
         return delete(id, DeleteSocialAccountsRequest.builder().build());
     }
 
     /**
-     * Disconnects a social account from an account or user without deleting the underlying platform account.
+     * Deprecated compatibility endpoint. Disconnect external accounts with <code>DELETE /external_accounts/{id}</code> instead.
      */
     public CompletableFuture<WhopApiHttpResponse<DeleteSocialAccountsResponse>> delete(
             String id, RequestOptions requestOptions) {
@@ -402,7 +422,7 @@ public class AsyncRawSocialAccountsClient {
     }
 
     /**
-     * Disconnects a social account from an account or user without deleting the underlying platform account.
+     * Deprecated compatibility endpoint. Disconnect external accounts with <code>DELETE /external_accounts/{id}</code> instead.
      */
     public CompletableFuture<WhopApiHttpResponse<DeleteSocialAccountsResponse>> delete(
             String id, DeleteSocialAccountsRequest request) {
@@ -410,14 +430,14 @@ public class AsyncRawSocialAccountsClient {
     }
 
     /**
-     * Disconnects a social account from an account or user without deleting the underlying platform account.
+     * Deprecated compatibility endpoint. Disconnect external accounts with <code>DELETE /external_accounts/{id}</code> instead.
      */
     public CompletableFuture<WhopApiHttpResponse<DeleteSocialAccountsResponse>> delete(
             String id, DeleteSocialAccountsRequest request, RequestOptions requestOptions) {
-        HttpUrl.Builder httpUrl = HttpUrl.parse(this.clientOptions.environment().getUrl())
+        HttpUrl.Builder httpUrl = HttpUrl.parse(this.clientOptions.environment().getApiURL())
                 .newBuilder()
                 .addPathSegments("social_accounts")
-                .addPathSegment(id);
+                .addPathSegment(PathSegments.validate(id));
         if (request.getAccountId().isPresent()) {
             QueryStringMapper.addQueryParameter(
                     httpUrl, "account_id", request.getAccountId().get(), false);
@@ -433,7 +453,10 @@ public class AsyncRawSocialAccountsClient {
         }
         Request.Builder _requestBuilder = new Request.Builder()
                 .url(httpUrl.build())
-                .method("DELETE", null)
+                .method(
+                        "DELETE",
+                        BodyProperties.toRequestBody(
+                                requestOptions != null ? requestOptions.getBodyProperties() : null, null))
                 .headers(Headers.of(clientOptions.headers(requestOptions)))
                 .addHeader("Accept", "application/json");
         Request okhttpRequest = _requestBuilder.build();
@@ -441,8 +464,18 @@ public class AsyncRawSocialAccountsClient {
         if (requestOptions != null && requestOptions.getTimeout().isPresent()) {
             client = clientOptions.httpClientWithTimeout(requestOptions);
         }
+        if (requestOptions != null && requestOptions.getMaxRetries().isPresent()) {
+            okhttpRequest = okhttpRequest
+                    .newBuilder()
+                    .tag(
+                            RetryInterceptor.MaxRetriesOverride.class,
+                            new RetryInterceptor.MaxRetriesOverride(
+                                    requestOptions.getMaxRetries().get()))
+                    .build();
+        }
         CompletableFuture<WhopApiHttpResponse<DeleteSocialAccountsResponse>> future = new CompletableFuture<>();
-        client.newCall(okhttpRequest).enqueue(new Callback() {
+        RetryInterceptor.AsyncCall okhttpCall = RetryInterceptor.newAsyncCall(client, okhttpRequest);
+        okhttpCall.enqueue(new Callback() {
             @Override
             public void onResponse(@NotNull Call call, @NotNull Response response) throws IOException {
                 try (ResponseBody responseBody = response.body()) {
@@ -454,41 +487,13 @@ public class AsyncRawSocialAccountsClient {
                                 response));
                         return;
                     }
-                    try {
-                        switch (response.code()) {
-                            case 400:
-                                future.completeExceptionally(new BadRequestError(
-                                        ObjectMappers.JSON_MAPPER.readValue(responseBodyString, Object.class),
-                                        response));
-                                return;
-                            case 401:
-                                future.completeExceptionally(new UnauthorizedError(
-                                        ObjectMappers.JSON_MAPPER.readValue(responseBodyString, Object.class),
-                                        response));
-                                return;
-                            case 403:
-                                future.completeExceptionally(new ForbiddenError(
-                                        ObjectMappers.JSON_MAPPER.readValue(responseBodyString, Object.class),
-                                        response));
-                                return;
-                            case 404:
-                                future.completeExceptionally(new NotFoundError(
-                                        ObjectMappers.JSON_MAPPER.readValue(responseBodyString, Object.class),
-                                        response));
-                                return;
-                            case 409:
-                                future.completeExceptionally(new ConflictError(
-                                        ObjectMappers.JSON_MAPPER.readValue(responseBodyString, V1ErrorResponse.class),
-                                        response));
-                                return;
-                        }
-                    } catch (JsonProcessingException ignored) {
-                        // unable to map error response, throwing generic error
-                    }
                     Object errorBody = ObjectMappers.parseErrorBody(responseBodyString);
                     future.completeExceptionally(new WhopApiApiException(
                             "Error with status code " + response.code(), response.code(), errorBody, response));
                     return;
+                } catch (JsonProcessingException e) {
+                    future.completeExceptionally(
+                            new WhopApiException("Failed to deserialize response: " + e.getMessage(), e));
                 } catch (IOException e) {
                     future.completeExceptionally(new WhopApiException("Network error executing HTTP request", e));
                 }
@@ -499,73 +504,98 @@ public class AsyncRawSocialAccountsClient {
                 future.completeExceptionally(new WhopApiException("Network error executing HTTP request", e));
             }
         });
+        future.whenComplete((result_, throwable_) -> {
+            if (future.isCancelled()) {
+                okhttpCall.cancel();
+            }
+        });
         return future;
     }
 
     /**
-     * Lists the active lead (instant) forms that already exist on a connected Facebook page, so an ad can reuse one as its <code>lead_gen_form_id</code> instead of authoring a new form. Every active form comes back in a single response — the list is not paginated.
+     * Deprecated compatibility endpoint. Refresh external accounts with <code>POST /external_accounts/{id}/refresh</code> instead.
      */
-    public CompletableFuture<WhopApiHttpResponse<LeadFormsSocialAccountsResponse>> leadForms(
-            String id, LeadFormsSocialAccountsRequest request) {
-        return leadForms(id, request, null);
+    public CompletableFuture<WhopApiHttpResponse<SocialAccount>> refresh(String id) {
+        return refresh(id, RefreshSocialAccountsRequest.builder().build());
     }
 
     /**
-     * Lists the active lead (instant) forms that already exist on a connected Facebook page, so an ad can reuse one as its <code>lead_gen_form_id</code> instead of authoring a new form. Every active form comes back in a single response — the list is not paginated.
+     * Deprecated compatibility endpoint. Refresh external accounts with <code>POST /external_accounts/{id}/refresh</code> instead.
      */
-    public CompletableFuture<WhopApiHttpResponse<LeadFormsSocialAccountsResponse>> leadForms(
-            String id, LeadFormsSocialAccountsRequest request, RequestOptions requestOptions) {
-        HttpUrl.Builder httpUrl = HttpUrl.parse(this.clientOptions.environment().getUrl())
+    public CompletableFuture<WhopApiHttpResponse<SocialAccount>> refresh(String id, RequestOptions requestOptions) {
+        return refresh(id, RefreshSocialAccountsRequest.builder().build(), requestOptions);
+    }
+
+    /**
+     * Deprecated compatibility endpoint. Refresh external accounts with <code>POST /external_accounts/{id}/refresh</code> instead.
+     */
+    public CompletableFuture<WhopApiHttpResponse<SocialAccount>> refresh(
+            String id, RefreshSocialAccountsRequest request) {
+        return refresh(id, request, null);
+    }
+
+    /**
+     * Deprecated compatibility endpoint. Refresh external accounts with <code>POST /external_accounts/{id}/refresh</code> instead.
+     */
+    public CompletableFuture<WhopApiHttpResponse<SocialAccount>> refresh(
+            String id, RefreshSocialAccountsRequest request, RequestOptions requestOptions) {
+        HttpUrl.Builder httpUrl = HttpUrl.parse(this.clientOptions.environment().getApiURL())
                 .newBuilder()
                 .addPathSegments("social_accounts")
-                .addPathSegment(id)
-                .addPathSegments("lead_forms");
-        QueryStringMapper.addQueryParameter(httpUrl, "account_id", request.getAccountId(), false);
+                .addPathSegment(PathSegments.validate(id))
+                .addPathSegments("refresh");
         if (requestOptions != null) {
             requestOptions.getQueryParameters().forEach((_key, _value) -> {
                 httpUrl.addQueryParameter(_key, _value);
             });
         }
-        Request.Builder _requestBuilder = new Request.Builder()
+        RequestBody body;
+        try {
+            body = RequestBody.create(
+                    ObjectMappers.JSON_MAPPER.writeValueAsBytes(BodyProperties.merge(
+                            request, requestOptions != null ? requestOptions.getBodyProperties() : null)),
+                    MediaTypes.APPLICATION_JSON);
+        } catch (JsonProcessingException e) {
+            throw new WhopApiException("Failed to serialize request", e);
+        }
+        Request okhttpRequest = new Request.Builder()
                 .url(httpUrl.build())
-                .method("GET", null)
+                .method("POST", body)
                 .headers(Headers.of(clientOptions.headers(requestOptions)))
-                .addHeader("Accept", "application/json");
-        Request okhttpRequest = _requestBuilder.build();
+                .addHeader("Content-Type", "application/json")
+                .addHeader("Accept", "application/json")
+                .build();
         OkHttpClient client = clientOptions.httpClient();
         if (requestOptions != null && requestOptions.getTimeout().isPresent()) {
             client = clientOptions.httpClientWithTimeout(requestOptions);
         }
-        CompletableFuture<WhopApiHttpResponse<LeadFormsSocialAccountsResponse>> future = new CompletableFuture<>();
-        client.newCall(okhttpRequest).enqueue(new Callback() {
+        if (requestOptions != null && requestOptions.getMaxRetries().isPresent()) {
+            okhttpRequest = okhttpRequest
+                    .newBuilder()
+                    .tag(
+                            RetryInterceptor.MaxRetriesOverride.class,
+                            new RetryInterceptor.MaxRetriesOverride(
+                                    requestOptions.getMaxRetries().get()))
+                    .build();
+        }
+        CompletableFuture<WhopApiHttpResponse<SocialAccount>> future = new CompletableFuture<>();
+        RetryInterceptor.AsyncCall okhttpCall = RetryInterceptor.newAsyncCall(client, okhttpRequest);
+        okhttpCall.enqueue(new Callback() {
             @Override
             public void onResponse(@NotNull Call call, @NotNull Response response) throws IOException {
                 try (ResponseBody responseBody = response.body()) {
                     String responseBodyString = responseBody != null ? responseBody.string() : "{}";
                     if (response.isSuccessful()) {
                         future.complete(new WhopApiHttpResponse<>(
-                                ObjectMappers.JSON_MAPPER.readValue(
-                                        responseBodyString, LeadFormsSocialAccountsResponse.class),
+                                ObjectMappers.JSON_MAPPER.readValue(responseBodyString, SocialAccount.class),
                                 response));
                         return;
                     }
                     try {
-                        switch (response.code()) {
-                            case 400:
-                                future.completeExceptionally(new BadRequestError(
-                                        ObjectMappers.JSON_MAPPER.readValue(responseBodyString, Object.class),
-                                        response));
-                                return;
-                            case 401:
-                                future.completeExceptionally(new UnauthorizedError(
-                                        ObjectMappers.JSON_MAPPER.readValue(responseBodyString, Object.class),
-                                        response));
-                                return;
-                            case 404:
-                                future.completeExceptionally(new NotFoundError(
-                                        ObjectMappers.JSON_MAPPER.readValue(responseBodyString, Object.class),
-                                        response));
-                                return;
+                        if (response.code() == 409) {
+                            future.completeExceptionally(new ConflictError(
+                                    ObjectMappers.JSON_MAPPER.readValue(responseBodyString, Object.class), response));
+                            return;
                         }
                     } catch (JsonProcessingException ignored) {
                         // unable to map error response, throwing generic error
@@ -574,6 +604,9 @@ public class AsyncRawSocialAccountsClient {
                     future.completeExceptionally(new WhopApiApiException(
                             "Error with status code " + response.code(), response.code(), errorBody, response));
                     return;
+                } catch (JsonProcessingException e) {
+                    future.completeExceptionally(
+                            new WhopApiException("Failed to deserialize response: " + e.getMessage(), e));
                 } catch (IOException e) {
                     future.completeExceptionally(new WhopApiException("Network error executing HTTP request", e));
                 }
@@ -584,119 +617,9 @@ public class AsyncRawSocialAccountsClient {
                 future.completeExceptionally(new WhopApiException("Network error executing HTTP request", e));
             }
         });
-        return future;
-    }
-
-    /**
-     * Lists the existing posts of a connected Facebook page, Instagram account, or TikTok account.
-     */
-    public CompletableFuture<WhopApiHttpResponse<SyncPagingIterable<SocialAccountPost>>> posts(
-            String id, PostsSocialAccountsRequest request) {
-        return posts(id, request, null);
-    }
-
-    /**
-     * Lists the existing posts of a connected Facebook page, Instagram account, or TikTok account.
-     */
-    public CompletableFuture<WhopApiHttpResponse<SyncPagingIterable<SocialAccountPost>>> posts(
-            String id, PostsSocialAccountsRequest request, RequestOptions requestOptions) {
-        HttpUrl.Builder httpUrl = HttpUrl.parse(this.clientOptions.environment().getUrl())
-                .newBuilder()
-                .addPathSegments("social_accounts")
-                .addPathSegment(id)
-                .addPathSegments("posts");
-        QueryStringMapper.addQueryParameter(httpUrl, "account_id", request.getAccountId(), false);
-        if (request.getPostId().isPresent()) {
-            QueryStringMapper.addQueryParameter(
-                    httpUrl, "post_id", request.getPostId().get(), false);
-        }
-        if (request.getFirst().isPresent()) {
-            QueryStringMapper.addQueryParameter(
-                    httpUrl, "first", request.getFirst().get(), false);
-        }
-        if (request.getAfter().isPresent()) {
-            QueryStringMapper.addQueryParameter(
-                    httpUrl, "after", request.getAfter().get(), false);
-        }
-        if (requestOptions != null) {
-            requestOptions.getQueryParameters().forEach((_key, _value) -> {
-                httpUrl.addQueryParameter(_key, _value);
-            });
-        }
-        Request.Builder _requestBuilder = new Request.Builder()
-                .url(httpUrl.build())
-                .method("GET", null)
-                .headers(Headers.of(clientOptions.headers(requestOptions)))
-                .addHeader("Accept", "application/json");
-        Request okhttpRequest = _requestBuilder.build();
-        OkHttpClient client = clientOptions.httpClient();
-        if (requestOptions != null && requestOptions.getTimeout().isPresent()) {
-            client = clientOptions.httpClientWithTimeout(requestOptions);
-        }
-        CompletableFuture<WhopApiHttpResponse<SyncPagingIterable<SocialAccountPost>>> future =
-                new CompletableFuture<>();
-        client.newCall(okhttpRequest).enqueue(new Callback() {
-            @Override
-            public void onResponse(@NotNull Call call, @NotNull Response response) throws IOException {
-                try (ResponseBody responseBody = response.body()) {
-                    String responseBodyString = responseBody != null ? responseBody.string() : "{}";
-                    if (response.isSuccessful()) {
-                        PostsSocialAccountsResponse parsedResponse = ObjectMappers.JSON_MAPPER.readValue(
-                                responseBodyString, PostsSocialAccountsResponse.class);
-                        Optional<String> startingAfter =
-                                parsedResponse.getPageInfo().getEndCursor();
-                        PostsSocialAccountsRequest nextRequest = PostsSocialAccountsRequest.builder()
-                                .from(request)
-                                .after(startingAfter)
-                                .build();
-                        List<SocialAccountPost> result = parsedResponse.getData();
-                        future.complete(new WhopApiHttpResponse<>(
-                                new SyncPagingIterable<SocialAccountPost>(
-                                        startingAfter != null, result, parsedResponse, () -> {
-                                            try {
-                                                return posts(id, nextRequest, requestOptions)
-                                                        .get()
-                                                        .body();
-                                            } catch (InterruptedException | ExecutionException e) {
-                                                throw new RuntimeException(e);
-                                            }
-                                        }),
-                                response));
-                        return;
-                    }
-                    try {
-                        switch (response.code()) {
-                            case 400:
-                                future.completeExceptionally(new BadRequestError(
-                                        ObjectMappers.JSON_MAPPER.readValue(responseBodyString, Object.class),
-                                        response));
-                                return;
-                            case 401:
-                                future.completeExceptionally(new UnauthorizedError(
-                                        ObjectMappers.JSON_MAPPER.readValue(responseBodyString, Object.class),
-                                        response));
-                                return;
-                            case 404:
-                                future.completeExceptionally(new NotFoundError(
-                                        ObjectMappers.JSON_MAPPER.readValue(responseBodyString, Object.class),
-                                        response));
-                                return;
-                        }
-                    } catch (JsonProcessingException ignored) {
-                        // unable to map error response, throwing generic error
-                    }
-                    Object errorBody = ObjectMappers.parseErrorBody(responseBodyString);
-                    future.completeExceptionally(new WhopApiApiException(
-                            "Error with status code " + response.code(), response.code(), errorBody, response));
-                    return;
-                } catch (IOException e) {
-                    future.completeExceptionally(new WhopApiException("Network error executing HTTP request", e));
-                }
-            }
-
-            @Override
-            public void onFailure(@NotNull Call call, @NotNull IOException e) {
-                future.completeExceptionally(new WhopApiException("Network error executing HTTP request", e));
+        future.whenComplete((result_, throwable_) -> {
+            if (future.isCancelled()) {
+                okhttpCall.cancel();
             }
         });
         return future;

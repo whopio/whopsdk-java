@@ -13,6 +13,7 @@ import com.fasterxml.jackson.annotation.Nulls;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.whop.api.core.ObjectMappers;
 import com.whop.api.resources.adcampaigns.types.ListAdCampaignsRequestAttributionModel;
+import com.whop.api.resources.adcampaigns.types.ListAdCampaignsRequestCampaignType;
 import com.whop.api.resources.adcampaigns.types.ListAdCampaignsRequestDirection;
 import com.whop.api.resources.adcampaigns.types.ListAdCampaignsRequestOrder;
 import com.whop.api.resources.adcampaigns.types.ListAdCampaignsRequestStatus;
@@ -33,6 +34,8 @@ public final class ListAdCampaignsRequest {
     private final Optional<ListAdCampaignsRequestOrder> order;
 
     private final Optional<ListAdCampaignsRequestDirection> direction;
+
+    private final Optional<ListAdCampaignsRequestCampaignType> campaignType;
 
     private final Optional<String> createdBefore;
 
@@ -62,6 +65,7 @@ public final class ListAdCampaignsRequest {
             Optional<String> query,
             Optional<ListAdCampaignsRequestOrder> order,
             Optional<ListAdCampaignsRequestDirection> direction,
+            Optional<ListAdCampaignsRequestCampaignType> campaignType,
             Optional<String> createdBefore,
             Optional<String> createdAfter,
             Optional<String> statsFrom,
@@ -78,6 +82,7 @@ public final class ListAdCampaignsRequest {
         this.query = query;
         this.order = order;
         this.direction = direction;
+        this.campaignType = campaignType;
         this.createdBefore = createdBefore;
         this.createdAfter = createdAfter;
         this.statsFrom = statsFrom;
@@ -116,7 +121,7 @@ public final class ListAdCampaignsRequest {
     }
 
     /**
-     * @return The field to sort by. Defaults to created_at. Stat columns (spend, impressions, …) rank over the stats_from/stats_to window across the whole list, not just the current page. results, cost_per_result and return_on_ad_spend rank by the same Whop pixel-attributed values the response reports.
+     * @return The field to sort by. Defaults to created_at. Stat columns (spend, impressions, …) rank over the stats_from/stats_to window across the whole list, not just the current page. results, cost_per_result and return_on_ad_spend rank by the same Whop pixel-attributed values the response reports, and link_clicks by the same Whop pixel page views.
      */
     @JsonProperty("order")
     public Optional<ListAdCampaignsRequestOrder> getOrder() {
@@ -129,6 +134,14 @@ public final class ListAdCampaignsRequest {
     @JsonProperty("direction")
     public Optional<ListAdCampaignsRequestDirection> getDirection() {
         return direction;
+    }
+
+    /**
+     * @return Only return campaigns of this type.
+     */
+    @JsonProperty("campaign_type")
+    public Optional<ListAdCampaignsRequestCampaignType> getCampaignType() {
+        return campaignType;
     }
 
     /**
@@ -180,7 +193,7 @@ public final class ListAdCampaignsRequest {
     }
 
     /**
-     * @return The number of campaigns to return.
+     * @return Number of results to return from the start of the range.
      */
     @JsonProperty("first")
     public Optional<Integer> getFirst() {
@@ -188,7 +201,7 @@ public final class ListAdCampaignsRequest {
     }
 
     /**
-     * @return Cursor to fetch the page after (from page_info.end_cursor).
+     * @return Return results after this cursor. Use <code>page_info.end_cursor</code> from the previous response to fetch the next page.
      */
     @JsonProperty("after")
     public Optional<String> getAfter() {
@@ -196,7 +209,7 @@ public final class ListAdCampaignsRequest {
     }
 
     /**
-     * @return The number of campaigns to return from the end of the range.
+     * @return Number of results to return from the end of the range.
      */
     @JsonProperty("last")
     public Optional<Integer> getLast() {
@@ -204,7 +217,7 @@ public final class ListAdCampaignsRequest {
     }
 
     /**
-     * @return Cursor to fetch the page before (from page_info.start_cursor).
+     * @return Return results before this cursor. Use <code>page_info.start_cursor</code> from the previous response to fetch the previous page.
      */
     @JsonProperty("before")
     public Optional<String> getBefore() {
@@ -228,6 +241,7 @@ public final class ListAdCampaignsRequest {
                 && query.equals(other.query)
                 && order.equals(other.order)
                 && direction.equals(other.direction)
+                && campaignType.equals(other.campaignType)
                 && createdBefore.equals(other.createdBefore)
                 && createdAfter.equals(other.createdAfter)
                 && statsFrom.equals(other.statsFrom)
@@ -248,6 +262,7 @@ public final class ListAdCampaignsRequest {
                 this.query,
                 this.order,
                 this.direction,
+                this.campaignType,
                 this.createdBefore,
                 this.createdAfter,
                 this.statsFrom,
@@ -281,6 +296,8 @@ public final class ListAdCampaignsRequest {
 
         private Optional<ListAdCampaignsRequestDirection> direction = Optional.empty();
 
+        private Optional<ListAdCampaignsRequestCampaignType> campaignType = Optional.empty();
+
         private Optional<String> createdBefore = Optional.empty();
 
         private Optional<String> createdAfter = Optional.empty();
@@ -301,7 +318,6 @@ public final class ListAdCampaignsRequest {
 
         private Optional<String> before = Optional.empty();
 
-        @JsonAnySetter
         private Map<String, Object> additionalProperties = new HashMap<>();
 
         private Builder() {}
@@ -312,6 +328,7 @@ public final class ListAdCampaignsRequest {
             query(other.getQuery());
             order(other.getOrder());
             direction(other.getDirection());
+            campaignType(other.getCampaignType());
             createdBefore(other.getCreatedBefore());
             createdAfter(other.getCreatedAfter());
             statsFrom(other.getStatsFrom());
@@ -368,7 +385,7 @@ public final class ListAdCampaignsRequest {
         }
 
         /**
-         * <p>The field to sort by. Defaults to created_at. Stat columns (spend, impressions, …) rank over the stats_from/stats_to window across the whole list, not just the current page. results, cost_per_result and return_on_ad_spend rank by the same Whop pixel-attributed values the response reports.</p>
+         * <p>The field to sort by. Defaults to created_at. Stat columns (spend, impressions, …) rank over the stats_from/stats_to window across the whole list, not just the current page. results, cost_per_result and return_on_ad_spend rank by the same Whop pixel-attributed values the response reports, and link_clicks by the same Whop pixel page views.</p>
          */
         @JsonSetter(value = "order", nulls = Nulls.SKIP)
         public Builder order(Optional<ListAdCampaignsRequestOrder> order) {
@@ -392,6 +409,20 @@ public final class ListAdCampaignsRequest {
 
         public Builder direction(ListAdCampaignsRequestDirection direction) {
             this.direction = Optional.ofNullable(direction);
+            return this;
+        }
+
+        /**
+         * <p>Only return campaigns of this type.</p>
+         */
+        @JsonSetter(value = "campaign_type", nulls = Nulls.SKIP)
+        public Builder campaignType(Optional<ListAdCampaignsRequestCampaignType> campaignType) {
+            this.campaignType = campaignType;
+            return this;
+        }
+
+        public Builder campaignType(ListAdCampaignsRequestCampaignType campaignType) {
+            this.campaignType = Optional.ofNullable(campaignType);
             return this;
         }
 
@@ -480,7 +511,7 @@ public final class ListAdCampaignsRequest {
         }
 
         /**
-         * <p>The number of campaigns to return.</p>
+         * <p>Number of results to return from the start of the range.</p>
          */
         @JsonSetter(value = "first", nulls = Nulls.SKIP)
         public Builder first(Optional<Integer> first) {
@@ -494,7 +525,7 @@ public final class ListAdCampaignsRequest {
         }
 
         /**
-         * <p>Cursor to fetch the page after (from page_info.end_cursor).</p>
+         * <p>Return results after this cursor. Use <code>page_info.end_cursor</code> from the previous response to fetch the next page.</p>
          */
         @JsonSetter(value = "after", nulls = Nulls.SKIP)
         public Builder after(Optional<String> after) {
@@ -508,7 +539,7 @@ public final class ListAdCampaignsRequest {
         }
 
         /**
-         * <p>The number of campaigns to return from the end of the range.</p>
+         * <p>Number of results to return from the end of the range.</p>
          */
         @JsonSetter(value = "last", nulls = Nulls.SKIP)
         public Builder last(Optional<Integer> last) {
@@ -522,7 +553,7 @@ public final class ListAdCampaignsRequest {
         }
 
         /**
-         * <p>Cursor to fetch the page before (from page_info.start_cursor).</p>
+         * <p>Return results before this cursor. Use <code>page_info.start_cursor</code> from the previous response to fetch the previous page.</p>
          */
         @JsonSetter(value = "before", nulls = Nulls.SKIP)
         public Builder before(Optional<String> before) {
@@ -542,6 +573,7 @@ public final class ListAdCampaignsRequest {
                     query,
                     order,
                     direction,
+                    campaignType,
                     createdBefore,
                     createdAfter,
                     statsFrom,
@@ -553,6 +585,29 @@ public final class ListAdCampaignsRequest {
                     last,
                     before,
                     additionalProperties);
+        }
+
+        @JsonAnySetter
+        private void putAdditionalPropertyFromJson(String key, Object value) {
+            if (key.equalsIgnoreCase("account_id")
+                    || key.equalsIgnoreCase("status")
+                    || key.equalsIgnoreCase("query")
+                    || key.equalsIgnoreCase("order")
+                    || key.equalsIgnoreCase("direction")
+                    || key.equalsIgnoreCase("campaign_type")
+                    || key.equalsIgnoreCase("created_before")
+                    || key.equalsIgnoreCase("created_after")
+                    || key.equalsIgnoreCase("stats_from")
+                    || key.equalsIgnoreCase("stats_to")
+                    || key.equalsIgnoreCase("time_zone")
+                    || key.equalsIgnoreCase("attribution_model")
+                    || key.equalsIgnoreCase("first")
+                    || key.equalsIgnoreCase("after")
+                    || key.equalsIgnoreCase("last")
+                    || key.equalsIgnoreCase("before")) {
+                return;
+            }
+            this.additionalProperties.put(key, value);
         }
 
         public Builder additionalProperty(String key, Object value) {

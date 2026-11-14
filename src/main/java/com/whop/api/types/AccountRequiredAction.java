@@ -276,7 +276,6 @@ public final class AccountRequiredAction {
 
         private List<String> blockedCapabilities = new ArrayList<>();
 
-        @JsonAnySetter
         private Map<String, Object> additionalProperties = new HashMap<>();
 
         private Builder() {}
@@ -296,7 +295,6 @@ public final class AccountRequiredAction {
 
         /**
          * <p>What the holder must do; new values may be added, so handle unknown actions gracefully</p>
-         * <p>What the holder must do; new values may be added, so handle unknown actions gracefully</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
@@ -307,7 +305,6 @@ public final class AccountRequiredAction {
         }
 
         /**
-         * <p>Button label, or empty when there is no button</p>
          * <p>Button label, or empty when there is no button</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
@@ -320,7 +317,6 @@ public final class AccountRequiredAction {
 
         /**
          * <p>Supporting copy, or empty</p>
-         * <p>Supporting copy, or empty</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
@@ -332,7 +328,6 @@ public final class AccountRequiredAction {
 
         /**
          * <p>required (act now) or pending (under review)</p>
-         * <p>required (act now) or pending (under review)</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
@@ -343,7 +338,6 @@ public final class AccountRequiredAction {
         }
 
         /**
-         * <p>Headline for the action</p>
          * <p>Headline for the action</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
@@ -462,6 +456,21 @@ public final class AccountRequiredAction {
                     status,
                     title,
                     additionalProperties);
+        }
+
+        @JsonAnySetter
+        private void putAdditionalPropertyFromJson(String key, Object value) {
+            if (key.equalsIgnoreCase("action")
+                    || key.equalsIgnoreCase("blocked_capabilities")
+                    || key.equalsIgnoreCase("cta")
+                    || key.equalsIgnoreCase("cta_label")
+                    || key.equalsIgnoreCase("description")
+                    || key.equalsIgnoreCase("icon_url")
+                    || key.equalsIgnoreCase("status")
+                    || key.equalsIgnoreCase("title")) {
+                return;
+            }
+            this.additionalProperties.put(key, value);
         }
 
         @java.lang.Override

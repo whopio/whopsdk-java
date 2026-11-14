@@ -52,7 +52,7 @@ public final class PostPayoutMethodCreatedPayloadDataFeeStructure {
     }
 
     /**
-     * @return Percentage of the withdrawal amount charged as a fee.
+     * @return Percentage of the payout amount charged as a fee.
      */
     @JsonProperty("percentage")
     public float getPercentage() {
@@ -107,7 +107,7 @@ public final class PostPayoutMethodCreatedPayloadDataFeeStructure {
 
     public interface PercentageStage {
         /**
-         * <p>Percentage of the withdrawal amount charged as a fee.</p>
+         * <p>Percentage of the payout amount charged as a fee.</p>
          */
         _FinalStage percentage(float percentage);
     }
@@ -128,7 +128,6 @@ public final class PostPayoutMethodCreatedPayloadDataFeeStructure {
 
         private float percentage;
 
-        @JsonAnySetter
         private Map<String, Object> additionalProperties = new HashMap<>();
 
         private Builder() {}
@@ -143,7 +142,6 @@ public final class PostPayoutMethodCreatedPayloadDataFeeStructure {
 
         /**
          * <p>Currency code of fixed_amount.</p>
-         * <p>Currency code of fixed_amount.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
@@ -155,7 +153,6 @@ public final class PostPayoutMethodCreatedPayloadDataFeeStructure {
 
         /**
          * <p>Fixed fee charged, denominated in <code>currency</code>.</p>
-         * <p>Fixed fee charged, denominated in <code>currency</code>.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
@@ -166,8 +163,7 @@ public final class PostPayoutMethodCreatedPayloadDataFeeStructure {
         }
 
         /**
-         * <p>Percentage of the withdrawal amount charged as a fee.</p>
-         * <p>Percentage of the withdrawal amount charged as a fee.</p>
+         * <p>Percentage of the payout amount charged as a fee.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
@@ -181,6 +177,16 @@ public final class PostPayoutMethodCreatedPayloadDataFeeStructure {
         public PostPayoutMethodCreatedPayloadDataFeeStructure build() {
             return new PostPayoutMethodCreatedPayloadDataFeeStructure(
                     currency, fixedAmount, percentage, additionalProperties);
+        }
+
+        @JsonAnySetter
+        private void putAdditionalPropertyFromJson(String key, Object value) {
+            if (key.equalsIgnoreCase("currency")
+                    || key.equalsIgnoreCase("fixed_amount")
+                    || key.equalsIgnoreCase("percentage")) {
+                return;
+            }
+            this.additionalProperties.put(key, value);
         }
 
         @java.lang.Override

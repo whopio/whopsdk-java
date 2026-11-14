@@ -5,6 +5,7 @@ package com.whop.api.resources.ledgeraccounts;
 
 import com.whop.api.core.ClientOptions;
 import com.whop.api.core.RequestOptions;
+import com.whop.api.core.WhopApiHttpResponse;
 import com.whop.api.resources.ledgeraccounts.requests.RetrieveLedgerAccountsRequest;
 import com.whop.api.types.LedgerAccount;
 import java.util.concurrent.CompletableFuture;
@@ -35,7 +36,14 @@ public class AsyncLedgerAccountsClient {
      * </ul>
      */
     public CompletableFuture<LedgerAccount> retrieve(String id) {
-        return this.rawClient.retrieve(id).thenApply(response -> response.body());
+        CompletableFuture<WhopApiHttpResponse<LedgerAccount>> rawFuture = this.rawClient.retrieve(id);
+        CompletableFuture<LedgerAccount> future = rawFuture.thenApply(response -> response.body());
+        future.whenComplete((result_, throwable_) -> {
+            if (future.isCancelled()) {
+                rawFuture.cancel(true);
+            }
+        });
+        return future;
     }
 
     /**
@@ -47,7 +55,14 @@ public class AsyncLedgerAccountsClient {
      * </ul>
      */
     public CompletableFuture<LedgerAccount> retrieve(String id, RequestOptions requestOptions) {
-        return this.rawClient.retrieve(id, requestOptions).thenApply(response -> response.body());
+        CompletableFuture<WhopApiHttpResponse<LedgerAccount>> rawFuture = this.rawClient.retrieve(id, requestOptions);
+        CompletableFuture<LedgerAccount> future = rawFuture.thenApply(response -> response.body());
+        future.whenComplete((result_, throwable_) -> {
+            if (future.isCancelled()) {
+                rawFuture.cancel(true);
+            }
+        });
+        return future;
     }
 
     /**
@@ -59,7 +74,14 @@ public class AsyncLedgerAccountsClient {
      * </ul>
      */
     public CompletableFuture<LedgerAccount> retrieve(String id, RetrieveLedgerAccountsRequest request) {
-        return this.rawClient.retrieve(id, request).thenApply(response -> response.body());
+        CompletableFuture<WhopApiHttpResponse<LedgerAccount>> rawFuture = this.rawClient.retrieve(id, request);
+        CompletableFuture<LedgerAccount> future = rawFuture.thenApply(response -> response.body());
+        future.whenComplete((result_, throwable_) -> {
+            if (future.isCancelled()) {
+                rawFuture.cancel(true);
+            }
+        });
+        return future;
     }
 
     /**
@@ -72,6 +94,14 @@ public class AsyncLedgerAccountsClient {
      */
     public CompletableFuture<LedgerAccount> retrieve(
             String id, RetrieveLedgerAccountsRequest request, RequestOptions requestOptions) {
-        return this.rawClient.retrieve(id, request, requestOptions).thenApply(response -> response.body());
+        CompletableFuture<WhopApiHttpResponse<LedgerAccount>> rawFuture =
+                this.rawClient.retrieve(id, request, requestOptions);
+        CompletableFuture<LedgerAccount> future = rawFuture.thenApply(response -> response.body());
+        future.whenComplete((result_, throwable_) -> {
+            if (future.isCancelled()) {
+                rawFuture.cancel(true);
+            }
+        });
+        return future;
     }
 }

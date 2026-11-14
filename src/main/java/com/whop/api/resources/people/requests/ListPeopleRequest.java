@@ -38,6 +38,12 @@ public final class ListPeopleRequest {
 
     private final Optional<String> customEvent;
 
+    private final Optional<Integer> eventWithinDays;
+
+    private final Optional<OffsetDateTime> from;
+
+    private final Optional<OffsetDateTime> to;
+
     private final Optional<OffsetDateTime> eventFrom;
 
     private final Optional<OffsetDateTime> eventTo;
@@ -68,6 +74,38 @@ public final class ListPeopleRequest {
 
     private final Optional<OffsetDateTime> lastSeenBefore;
 
+    private final Optional<Double> ltvGt;
+
+    private final Optional<Double> ltvGte;
+
+    private final Optional<Double> ltvLt;
+
+    private final Optional<Double> ltvLte;
+
+    private final Optional<Double> aovGt;
+
+    private final Optional<Double> aovGte;
+
+    private final Optional<Double> aovLt;
+
+    private final Optional<Double> aovLte;
+
+    private final Optional<Double> purchaseCountGt;
+
+    private final Optional<Double> purchaseCountGte;
+
+    private final Optional<Double> purchaseCountLt;
+
+    private final Optional<Double> purchaseCountLte;
+
+    private final Optional<Double> eventCountGt;
+
+    private final Optional<Double> eventCountGte;
+
+    private final Optional<Double> eventCountLt;
+
+    private final Optional<Double> eventCountLte;
+
     private final Optional<Integer> first;
 
     private final Optional<String> after;
@@ -87,6 +125,9 @@ public final class ListPeopleRequest {
             Optional<String> query,
             Optional<ListPeopleRequestAttributionModel> attributionModel,
             Optional<String> customEvent,
+            Optional<Integer> eventWithinDays,
+            Optional<OffsetDateTime> from,
+            Optional<OffsetDateTime> to,
             Optional<OffsetDateTime> eventFrom,
             Optional<OffsetDateTime> eventTo,
             Optional<String> audienceId,
@@ -102,6 +143,22 @@ public final class ListPeopleRequest {
             Optional<OffsetDateTime> firstSeenBefore,
             Optional<OffsetDateTime> lastSeenAfter,
             Optional<OffsetDateTime> lastSeenBefore,
+            Optional<Double> ltvGt,
+            Optional<Double> ltvGte,
+            Optional<Double> ltvLt,
+            Optional<Double> ltvLte,
+            Optional<Double> aovGt,
+            Optional<Double> aovGte,
+            Optional<Double> aovLt,
+            Optional<Double> aovLte,
+            Optional<Double> purchaseCountGt,
+            Optional<Double> purchaseCountGte,
+            Optional<Double> purchaseCountLt,
+            Optional<Double> purchaseCountLte,
+            Optional<Double> eventCountGt,
+            Optional<Double> eventCountGte,
+            Optional<Double> eventCountLt,
+            Optional<Double> eventCountLte,
             Optional<Integer> first,
             Optional<String> after,
             Optional<String> before,
@@ -114,6 +171,9 @@ public final class ListPeopleRequest {
         this.query = query;
         this.attributionModel = attributionModel;
         this.customEvent = customEvent;
+        this.eventWithinDays = eventWithinDays;
+        this.from = from;
+        this.to = to;
         this.eventFrom = eventFrom;
         this.eventTo = eventTo;
         this.audienceId = audienceId;
@@ -129,6 +189,22 @@ public final class ListPeopleRequest {
         this.firstSeenBefore = firstSeenBefore;
         this.lastSeenAfter = lastSeenAfter;
         this.lastSeenBefore = lastSeenBefore;
+        this.ltvGt = ltvGt;
+        this.ltvGte = ltvGte;
+        this.ltvLt = ltvLt;
+        this.ltvLte = ltvLte;
+        this.aovGt = aovGt;
+        this.aovGte = aovGte;
+        this.aovLt = aovLt;
+        this.aovLte = aovLte;
+        this.purchaseCountGt = purchaseCountGt;
+        this.purchaseCountGte = purchaseCountGte;
+        this.purchaseCountLt = purchaseCountLt;
+        this.purchaseCountLte = purchaseCountLte;
+        this.eventCountGt = eventCountGt;
+        this.eventCountGte = eventCountGte;
+        this.eventCountLt = eventCountLt;
+        this.eventCountLte = eventCountLte;
         this.first = first;
         this.after = after;
         this.before = before;
@@ -186,7 +262,31 @@ public final class ListPeopleRequest {
     }
 
     /**
-     * @return With event_to plus an event or source filter, switches to exact-population mode: person ids are resolved and paginated on the events side within this window (the same query the people metric counts), then hydrated per page.
+     * @return Match activity within a rolling number of days. Cannot be combined with event_from/event_to.
+     */
+    @JsonProperty("event_within_days")
+    public Optional<Integer> getEventWithinDays() {
+        return eventWithinDays;
+    }
+
+    /**
+     * @return Inclusive activity-window start. Alias for event_from.
+     */
+    @JsonProperty("from")
+    public Optional<OffsetDateTime> getFrom() {
+        return from;
+    }
+
+    /**
+     * @return Inclusive activity-window end. Alias for event_to.
+     */
+    @JsonProperty("to")
+    public Optional<OffsetDateTime> getTo() {
+        return to;
+    }
+
+    /**
+     * @return The inclusive start of the matching activity window.
      */
     @JsonProperty("event_from")
     public Optional<OffsetDateTime> getEventFrom() {
@@ -194,7 +294,7 @@ public final class ListPeopleRequest {
     }
 
     /**
-     * @return The inclusive end of the event window for exact-population mode.
+     * @return The inclusive end of the matching activity window, for both stats drilldowns and saved audiences.
      */
     @JsonProperty("event_to")
     public Optional<OffsetDateTime> getEventTo() {
@@ -234,7 +334,7 @@ public final class ListPeopleRequest {
     }
 
     /**
-     * @return Only include people whose most recent visit came from this ISO 3166-1 alpha-2 country code.
+     * @return Only include people with activity from this ISO 3166-1 alpha-2 country code.
      */
     @JsonProperty("country")
     public Optional<String> getCountry() {
@@ -306,7 +406,135 @@ public final class ListPeopleRequest {
     }
 
     /**
-     * @return The number of people to return (default 100, max 100).
+     * @return Select people whose lifetime ltv is greater than this value. LTV and AOV are in USD.
+     */
+    @JsonProperty("ltv_gt")
+    public Optional<Double> getLtvGt() {
+        return ltvGt;
+    }
+
+    /**
+     * @return Select people whose lifetime ltv is at least this value. LTV and AOV are in USD.
+     */
+    @JsonProperty("ltv_gte")
+    public Optional<Double> getLtvGte() {
+        return ltvGte;
+    }
+
+    /**
+     * @return Select people whose lifetime ltv is less than this value. LTV and AOV are in USD.
+     */
+    @JsonProperty("ltv_lt")
+    public Optional<Double> getLtvLt() {
+        return ltvLt;
+    }
+
+    /**
+     * @return Select people whose lifetime ltv is at most this value. LTV and AOV are in USD.
+     */
+    @JsonProperty("ltv_lte")
+    public Optional<Double> getLtvLte() {
+        return ltvLte;
+    }
+
+    /**
+     * @return Select people whose lifetime aov is greater than this value. LTV and AOV are in USD.
+     */
+    @JsonProperty("aov_gt")
+    public Optional<Double> getAovGt() {
+        return aovGt;
+    }
+
+    /**
+     * @return Select people whose lifetime aov is at least this value. LTV and AOV are in USD.
+     */
+    @JsonProperty("aov_gte")
+    public Optional<Double> getAovGte() {
+        return aovGte;
+    }
+
+    /**
+     * @return Select people whose lifetime aov is less than this value. LTV and AOV are in USD.
+     */
+    @JsonProperty("aov_lt")
+    public Optional<Double> getAovLt() {
+        return aovLt;
+    }
+
+    /**
+     * @return Select people whose lifetime aov is at most this value. LTV and AOV are in USD.
+     */
+    @JsonProperty("aov_lte")
+    public Optional<Double> getAovLte() {
+        return aovLte;
+    }
+
+    /**
+     * @return Select people whose lifetime purchase_count is greater than this value. LTV and AOV are in USD.
+     */
+    @JsonProperty("purchase_count_gt")
+    public Optional<Double> getPurchaseCountGt() {
+        return purchaseCountGt;
+    }
+
+    /**
+     * @return Select people whose lifetime purchase_count is at least this value. LTV and AOV are in USD.
+     */
+    @JsonProperty("purchase_count_gte")
+    public Optional<Double> getPurchaseCountGte() {
+        return purchaseCountGte;
+    }
+
+    /**
+     * @return Select people whose lifetime purchase_count is less than this value. LTV and AOV are in USD.
+     */
+    @JsonProperty("purchase_count_lt")
+    public Optional<Double> getPurchaseCountLt() {
+        return purchaseCountLt;
+    }
+
+    /**
+     * @return Select people whose lifetime purchase_count is at most this value. LTV and AOV are in USD.
+     */
+    @JsonProperty("purchase_count_lte")
+    public Optional<Double> getPurchaseCountLte() {
+        return purchaseCountLte;
+    }
+
+    /**
+     * @return Select people whose lifetime event_count is greater than this value. LTV and AOV are in USD.
+     */
+    @JsonProperty("event_count_gt")
+    public Optional<Double> getEventCountGt() {
+        return eventCountGt;
+    }
+
+    /**
+     * @return Select people whose lifetime event_count is at least this value. LTV and AOV are in USD.
+     */
+    @JsonProperty("event_count_gte")
+    public Optional<Double> getEventCountGte() {
+        return eventCountGte;
+    }
+
+    /**
+     * @return Select people whose lifetime event_count is less than this value. LTV and AOV are in USD.
+     */
+    @JsonProperty("event_count_lt")
+    public Optional<Double> getEventCountLt() {
+        return eventCountLt;
+    }
+
+    /**
+     * @return Select people whose lifetime event_count is at most this value. LTV and AOV are in USD.
+     */
+    @JsonProperty("event_count_lte")
+    public Optional<Double> getEventCountLte() {
+        return eventCountLte;
+    }
+
+    /**
+     * @return Number of results to return from the start of the range.
      */
     @JsonProperty("first")
     public Optional<Integer> getFirst() {
@@ -314,7 +542,7 @@ public final class ListPeopleRequest {
     }
 
     /**
-     * @return A cursor for fetching people after a previous page.
+     * @return Return results after this cursor. Use <code>page_info.end_cursor</code> from the previous response to fetch the next page.
      */
     @JsonProperty("after")
     public Optional<String> getAfter() {
@@ -322,7 +550,7 @@ public final class ListPeopleRequest {
     }
 
     /**
-     * @return A cursor for fetching people before a later page.
+     * @return Return results before this cursor. Use <code>page_info.start_cursor</code> from the previous response to fetch the previous page.
      */
     @JsonProperty("before")
     public Optional<String> getBefore() {
@@ -363,6 +591,9 @@ public final class ListPeopleRequest {
                 && query.equals(other.query)
                 && attributionModel.equals(other.attributionModel)
                 && customEvent.equals(other.customEvent)
+                && eventWithinDays.equals(other.eventWithinDays)
+                && from.equals(other.from)
+                && to.equals(other.to)
                 && eventFrom.equals(other.eventFrom)
                 && eventTo.equals(other.eventTo)
                 && audienceId.equals(other.audienceId)
@@ -378,6 +609,22 @@ public final class ListPeopleRequest {
                 && firstSeenBefore.equals(other.firstSeenBefore)
                 && lastSeenAfter.equals(other.lastSeenAfter)
                 && lastSeenBefore.equals(other.lastSeenBefore)
+                && ltvGt.equals(other.ltvGt)
+                && ltvGte.equals(other.ltvGte)
+                && ltvLt.equals(other.ltvLt)
+                && ltvLte.equals(other.ltvLte)
+                && aovGt.equals(other.aovGt)
+                && aovGte.equals(other.aovGte)
+                && aovLt.equals(other.aovLt)
+                && aovLte.equals(other.aovLte)
+                && purchaseCountGt.equals(other.purchaseCountGt)
+                && purchaseCountGte.equals(other.purchaseCountGte)
+                && purchaseCountLt.equals(other.purchaseCountLt)
+                && purchaseCountLte.equals(other.purchaseCountLte)
+                && eventCountGt.equals(other.eventCountGt)
+                && eventCountGte.equals(other.eventCountGte)
+                && eventCountLt.equals(other.eventCountLt)
+                && eventCountLte.equals(other.eventCountLte)
                 && first.equals(other.first)
                 && after.equals(other.after)
                 && before.equals(other.before)
@@ -394,6 +641,9 @@ public final class ListPeopleRequest {
                 this.query,
                 this.attributionModel,
                 this.customEvent,
+                this.eventWithinDays,
+                this.from,
+                this.to,
                 this.eventFrom,
                 this.eventTo,
                 this.audienceId,
@@ -409,6 +659,22 @@ public final class ListPeopleRequest {
                 this.firstSeenBefore,
                 this.lastSeenAfter,
                 this.lastSeenBefore,
+                this.ltvGt,
+                this.ltvGte,
+                this.ltvLt,
+                this.ltvLte,
+                this.aovGt,
+                this.aovGte,
+                this.aovLt,
+                this.aovLte,
+                this.purchaseCountGt,
+                this.purchaseCountGte,
+                this.purchaseCountLt,
+                this.purchaseCountLte,
+                this.eventCountGt,
+                this.eventCountGte,
+                this.eventCountLt,
+                this.eventCountLte,
                 this.first,
                 this.after,
                 this.before,
@@ -438,6 +704,12 @@ public final class ListPeopleRequest {
         private Optional<ListPeopleRequestAttributionModel> attributionModel = Optional.empty();
 
         private Optional<String> customEvent = Optional.empty();
+
+        private Optional<Integer> eventWithinDays = Optional.empty();
+
+        private Optional<OffsetDateTime> from = Optional.empty();
+
+        private Optional<OffsetDateTime> to = Optional.empty();
 
         private Optional<OffsetDateTime> eventFrom = Optional.empty();
 
@@ -469,6 +741,38 @@ public final class ListPeopleRequest {
 
         private Optional<OffsetDateTime> lastSeenBefore = Optional.empty();
 
+        private Optional<Double> ltvGt = Optional.empty();
+
+        private Optional<Double> ltvGte = Optional.empty();
+
+        private Optional<Double> ltvLt = Optional.empty();
+
+        private Optional<Double> ltvLte = Optional.empty();
+
+        private Optional<Double> aovGt = Optional.empty();
+
+        private Optional<Double> aovGte = Optional.empty();
+
+        private Optional<Double> aovLt = Optional.empty();
+
+        private Optional<Double> aovLte = Optional.empty();
+
+        private Optional<Double> purchaseCountGt = Optional.empty();
+
+        private Optional<Double> purchaseCountGte = Optional.empty();
+
+        private Optional<Double> purchaseCountLt = Optional.empty();
+
+        private Optional<Double> purchaseCountLte = Optional.empty();
+
+        private Optional<Double> eventCountGt = Optional.empty();
+
+        private Optional<Double> eventCountGte = Optional.empty();
+
+        private Optional<Double> eventCountLt = Optional.empty();
+
+        private Optional<Double> eventCountLte = Optional.empty();
+
         private Optional<Integer> first = Optional.empty();
 
         private Optional<String> after = Optional.empty();
@@ -479,7 +783,6 @@ public final class ListPeopleRequest {
 
         private Optional<ListPeopleRequestDirection> direction = Optional.empty();
 
-        @JsonAnySetter
         private Map<String, Object> additionalProperties = new HashMap<>();
 
         private Builder() {}
@@ -491,6 +794,9 @@ public final class ListPeopleRequest {
             query(other.getQuery());
             attributionModel(other.getAttributionModel());
             customEvent(other.getCustomEvent());
+            eventWithinDays(other.getEventWithinDays());
+            from(other.getFrom());
+            to(other.getTo());
             eventFrom(other.getEventFrom());
             eventTo(other.getEventTo());
             audienceId(other.getAudienceId());
@@ -506,6 +812,22 @@ public final class ListPeopleRequest {
             firstSeenBefore(other.getFirstSeenBefore());
             lastSeenAfter(other.getLastSeenAfter());
             lastSeenBefore(other.getLastSeenBefore());
+            ltvGt(other.getLtvGt());
+            ltvGte(other.getLtvGte());
+            ltvLt(other.getLtvLt());
+            ltvLte(other.getLtvLte());
+            aovGt(other.getAovGt());
+            aovGte(other.getAovGte());
+            aovLt(other.getAovLt());
+            aovLte(other.getAovLte());
+            purchaseCountGt(other.getPurchaseCountGt());
+            purchaseCountGte(other.getPurchaseCountGte());
+            purchaseCountLt(other.getPurchaseCountLt());
+            purchaseCountLte(other.getPurchaseCountLte());
+            eventCountGt(other.getEventCountGt());
+            eventCountGte(other.getEventCountGte());
+            eventCountLt(other.getEventCountLt());
+            eventCountLte(other.getEventCountLte());
             first(other.getFirst());
             after(other.getAfter());
             before(other.getBefore());
@@ -609,7 +931,49 @@ public final class ListPeopleRequest {
         }
 
         /**
-         * <p>With event_to plus an event or source filter, switches to exact-population mode: person ids are resolved and paginated on the events side within this window (the same query the people metric counts), then hydrated per page.</p>
+         * <p>Match activity within a rolling number of days. Cannot be combined with event_from/event_to.</p>
+         */
+        @JsonSetter(value = "event_within_days", nulls = Nulls.SKIP)
+        public Builder eventWithinDays(Optional<Integer> eventWithinDays) {
+            this.eventWithinDays = eventWithinDays;
+            return this;
+        }
+
+        public Builder eventWithinDays(Integer eventWithinDays) {
+            this.eventWithinDays = Optional.ofNullable(eventWithinDays);
+            return this;
+        }
+
+        /**
+         * <p>Inclusive activity-window start. Alias for event_from.</p>
+         */
+        @JsonSetter(value = "from", nulls = Nulls.SKIP)
+        public Builder from(Optional<OffsetDateTime> from) {
+            this.from = from;
+            return this;
+        }
+
+        public Builder from(OffsetDateTime from) {
+            this.from = Optional.ofNullable(from);
+            return this;
+        }
+
+        /**
+         * <p>Inclusive activity-window end. Alias for event_to.</p>
+         */
+        @JsonSetter(value = "to", nulls = Nulls.SKIP)
+        public Builder to(Optional<OffsetDateTime> to) {
+            this.to = to;
+            return this;
+        }
+
+        public Builder to(OffsetDateTime to) {
+            this.to = Optional.ofNullable(to);
+            return this;
+        }
+
+        /**
+         * <p>The inclusive start of the matching activity window.</p>
          */
         @JsonSetter(value = "event_from", nulls = Nulls.SKIP)
         public Builder eventFrom(Optional<OffsetDateTime> eventFrom) {
@@ -623,7 +987,7 @@ public final class ListPeopleRequest {
         }
 
         /**
-         * <p>The inclusive end of the event window for exact-population mode.</p>
+         * <p>The inclusive end of the matching activity window, for both stats drilldowns and saved audiences.</p>
          */
         @JsonSetter(value = "event_to", nulls = Nulls.SKIP)
         public Builder eventTo(Optional<OffsetDateTime> eventTo) {
@@ -693,7 +1057,7 @@ public final class ListPeopleRequest {
         }
 
         /**
-         * <p>Only include people whose most recent visit came from this ISO 3166-1 alpha-2 country code.</p>
+         * <p>Only include people with activity from this ISO 3166-1 alpha-2 country code.</p>
          */
         @JsonSetter(value = "country", nulls = Nulls.SKIP)
         public Builder country(Optional<String> country) {
@@ -819,7 +1183,231 @@ public final class ListPeopleRequest {
         }
 
         /**
-         * <p>The number of people to return (default 100, max 100).</p>
+         * <p>Select people whose lifetime ltv is greater than this value. LTV and AOV are in USD.</p>
+         */
+        @JsonSetter(value = "ltv_gt", nulls = Nulls.SKIP)
+        public Builder ltvGt(Optional<Double> ltvGt) {
+            this.ltvGt = ltvGt;
+            return this;
+        }
+
+        public Builder ltvGt(Double ltvGt) {
+            this.ltvGt = Optional.ofNullable(ltvGt);
+            return this;
+        }
+
+        /**
+         * <p>Select people whose lifetime ltv is at least this value. LTV and AOV are in USD.</p>
+         */
+        @JsonSetter(value = "ltv_gte", nulls = Nulls.SKIP)
+        public Builder ltvGte(Optional<Double> ltvGte) {
+            this.ltvGte = ltvGte;
+            return this;
+        }
+
+        public Builder ltvGte(Double ltvGte) {
+            this.ltvGte = Optional.ofNullable(ltvGte);
+            return this;
+        }
+
+        /**
+         * <p>Select people whose lifetime ltv is less than this value. LTV and AOV are in USD.</p>
+         */
+        @JsonSetter(value = "ltv_lt", nulls = Nulls.SKIP)
+        public Builder ltvLt(Optional<Double> ltvLt) {
+            this.ltvLt = ltvLt;
+            return this;
+        }
+
+        public Builder ltvLt(Double ltvLt) {
+            this.ltvLt = Optional.ofNullable(ltvLt);
+            return this;
+        }
+
+        /**
+         * <p>Select people whose lifetime ltv is at most this value. LTV and AOV are in USD.</p>
+         */
+        @JsonSetter(value = "ltv_lte", nulls = Nulls.SKIP)
+        public Builder ltvLte(Optional<Double> ltvLte) {
+            this.ltvLte = ltvLte;
+            return this;
+        }
+
+        public Builder ltvLte(Double ltvLte) {
+            this.ltvLte = Optional.ofNullable(ltvLte);
+            return this;
+        }
+
+        /**
+         * <p>Select people whose lifetime aov is greater than this value. LTV and AOV are in USD.</p>
+         */
+        @JsonSetter(value = "aov_gt", nulls = Nulls.SKIP)
+        public Builder aovGt(Optional<Double> aovGt) {
+            this.aovGt = aovGt;
+            return this;
+        }
+
+        public Builder aovGt(Double aovGt) {
+            this.aovGt = Optional.ofNullable(aovGt);
+            return this;
+        }
+
+        /**
+         * <p>Select people whose lifetime aov is at least this value. LTV and AOV are in USD.</p>
+         */
+        @JsonSetter(value = "aov_gte", nulls = Nulls.SKIP)
+        public Builder aovGte(Optional<Double> aovGte) {
+            this.aovGte = aovGte;
+            return this;
+        }
+
+        public Builder aovGte(Double aovGte) {
+            this.aovGte = Optional.ofNullable(aovGte);
+            return this;
+        }
+
+        /**
+         * <p>Select people whose lifetime aov is less than this value. LTV and AOV are in USD.</p>
+         */
+        @JsonSetter(value = "aov_lt", nulls = Nulls.SKIP)
+        public Builder aovLt(Optional<Double> aovLt) {
+            this.aovLt = aovLt;
+            return this;
+        }
+
+        public Builder aovLt(Double aovLt) {
+            this.aovLt = Optional.ofNullable(aovLt);
+            return this;
+        }
+
+        /**
+         * <p>Select people whose lifetime aov is at most this value. LTV and AOV are in USD.</p>
+         */
+        @JsonSetter(value = "aov_lte", nulls = Nulls.SKIP)
+        public Builder aovLte(Optional<Double> aovLte) {
+            this.aovLte = aovLte;
+            return this;
+        }
+
+        public Builder aovLte(Double aovLte) {
+            this.aovLte = Optional.ofNullable(aovLte);
+            return this;
+        }
+
+        /**
+         * <p>Select people whose lifetime purchase_count is greater than this value. LTV and AOV are in USD.</p>
+         */
+        @JsonSetter(value = "purchase_count_gt", nulls = Nulls.SKIP)
+        public Builder purchaseCountGt(Optional<Double> purchaseCountGt) {
+            this.purchaseCountGt = purchaseCountGt;
+            return this;
+        }
+
+        public Builder purchaseCountGt(Double purchaseCountGt) {
+            this.purchaseCountGt = Optional.ofNullable(purchaseCountGt);
+            return this;
+        }
+
+        /**
+         * <p>Select people whose lifetime purchase_count is at least this value. LTV and AOV are in USD.</p>
+         */
+        @JsonSetter(value = "purchase_count_gte", nulls = Nulls.SKIP)
+        public Builder purchaseCountGte(Optional<Double> purchaseCountGte) {
+            this.purchaseCountGte = purchaseCountGte;
+            return this;
+        }
+
+        public Builder purchaseCountGte(Double purchaseCountGte) {
+            this.purchaseCountGte = Optional.ofNullable(purchaseCountGte);
+            return this;
+        }
+
+        /**
+         * <p>Select people whose lifetime purchase_count is less than this value. LTV and AOV are in USD.</p>
+         */
+        @JsonSetter(value = "purchase_count_lt", nulls = Nulls.SKIP)
+        public Builder purchaseCountLt(Optional<Double> purchaseCountLt) {
+            this.purchaseCountLt = purchaseCountLt;
+            return this;
+        }
+
+        public Builder purchaseCountLt(Double purchaseCountLt) {
+            this.purchaseCountLt = Optional.ofNullable(purchaseCountLt);
+            return this;
+        }
+
+        /**
+         * <p>Select people whose lifetime purchase_count is at most this value. LTV and AOV are in USD.</p>
+         */
+        @JsonSetter(value = "purchase_count_lte", nulls = Nulls.SKIP)
+        public Builder purchaseCountLte(Optional<Double> purchaseCountLte) {
+            this.purchaseCountLte = purchaseCountLte;
+            return this;
+        }
+
+        public Builder purchaseCountLte(Double purchaseCountLte) {
+            this.purchaseCountLte = Optional.ofNullable(purchaseCountLte);
+            return this;
+        }
+
+        /**
+         * <p>Select people whose lifetime event_count is greater than this value. LTV and AOV are in USD.</p>
+         */
+        @JsonSetter(value = "event_count_gt", nulls = Nulls.SKIP)
+        public Builder eventCountGt(Optional<Double> eventCountGt) {
+            this.eventCountGt = eventCountGt;
+            return this;
+        }
+
+        public Builder eventCountGt(Double eventCountGt) {
+            this.eventCountGt = Optional.ofNullable(eventCountGt);
+            return this;
+        }
+
+        /**
+         * <p>Select people whose lifetime event_count is at least this value. LTV and AOV are in USD.</p>
+         */
+        @JsonSetter(value = "event_count_gte", nulls = Nulls.SKIP)
+        public Builder eventCountGte(Optional<Double> eventCountGte) {
+            this.eventCountGte = eventCountGte;
+            return this;
+        }
+
+        public Builder eventCountGte(Double eventCountGte) {
+            this.eventCountGte = Optional.ofNullable(eventCountGte);
+            return this;
+        }
+
+        /**
+         * <p>Select people whose lifetime event_count is less than this value. LTV and AOV are in USD.</p>
+         */
+        @JsonSetter(value = "event_count_lt", nulls = Nulls.SKIP)
+        public Builder eventCountLt(Optional<Double> eventCountLt) {
+            this.eventCountLt = eventCountLt;
+            return this;
+        }
+
+        public Builder eventCountLt(Double eventCountLt) {
+            this.eventCountLt = Optional.ofNullable(eventCountLt);
+            return this;
+        }
+
+        /**
+         * <p>Select people whose lifetime event_count is at most this value. LTV and AOV are in USD.</p>
+         */
+        @JsonSetter(value = "event_count_lte", nulls = Nulls.SKIP)
+        public Builder eventCountLte(Optional<Double> eventCountLte) {
+            this.eventCountLte = eventCountLte;
+            return this;
+        }
+
+        public Builder eventCountLte(Double eventCountLte) {
+            this.eventCountLte = Optional.ofNullable(eventCountLte);
+            return this;
+        }
+
+        /**
+         * <p>Number of results to return from the start of the range.</p>
          */
         @JsonSetter(value = "first", nulls = Nulls.SKIP)
         public Builder first(Optional<Integer> first) {
@@ -833,7 +1421,7 @@ public final class ListPeopleRequest {
         }
 
         /**
-         * <p>A cursor for fetching people after a previous page.</p>
+         * <p>Return results after this cursor. Use <code>page_info.end_cursor</code> from the previous response to fetch the next page.</p>
          */
         @JsonSetter(value = "after", nulls = Nulls.SKIP)
         public Builder after(Optional<String> after) {
@@ -847,7 +1435,7 @@ public final class ListPeopleRequest {
         }
 
         /**
-         * <p>A cursor for fetching people before a later page.</p>
+         * <p>Return results before this cursor. Use <code>page_info.start_cursor</code> from the previous response to fetch the previous page.</p>
          */
         @JsonSetter(value = "before", nulls = Nulls.SKIP)
         public Builder before(Optional<String> before) {
@@ -896,6 +1484,9 @@ public final class ListPeopleRequest {
                     query,
                     attributionModel,
                     customEvent,
+                    eventWithinDays,
+                    from,
+                    to,
                     eventFrom,
                     eventTo,
                     audienceId,
@@ -911,12 +1502,80 @@ public final class ListPeopleRequest {
                     firstSeenBefore,
                     lastSeenAfter,
                     lastSeenBefore,
+                    ltvGt,
+                    ltvGte,
+                    ltvLt,
+                    ltvLte,
+                    aovGt,
+                    aovGte,
+                    aovLt,
+                    aovLte,
+                    purchaseCountGt,
+                    purchaseCountGte,
+                    purchaseCountLt,
+                    purchaseCountLte,
+                    eventCountGt,
+                    eventCountGte,
+                    eventCountLt,
+                    eventCountLte,
                     first,
                     after,
                     before,
                     order,
                     direction,
                     additionalProperties);
+        }
+
+        @JsonAnySetter
+        private void putAdditionalPropertyFromJson(String key, Object value) {
+            if (key.equalsIgnoreCase("source")
+                    || key.equalsIgnoreCase("event_name")
+                    || key.equalsIgnoreCase("account_id")
+                    || key.equalsIgnoreCase("query")
+                    || key.equalsIgnoreCase("attribution_model")
+                    || key.equalsIgnoreCase("custom_event")
+                    || key.equalsIgnoreCase("event_within_days")
+                    || key.equalsIgnoreCase("from")
+                    || key.equalsIgnoreCase("to")
+                    || key.equalsIgnoreCase("event_from")
+                    || key.equalsIgnoreCase("event_to")
+                    || key.equalsIgnoreCase("audience_id")
+                    || key.equalsIgnoreCase("user_id")
+                    || key.equalsIgnoreCase("email")
+                    || key.equalsIgnoreCase("phone")
+                    || key.equalsIgnoreCase("country")
+                    || key.equalsIgnoreCase("has_purchased")
+                    || key.equalsIgnoreCase("contactable")
+                    || key.equalsIgnoreCase("first_seen_within_days")
+                    || key.equalsIgnoreCase("last_seen_within_days")
+                    || key.equalsIgnoreCase("first_seen_after")
+                    || key.equalsIgnoreCase("first_seen_before")
+                    || key.equalsIgnoreCase("last_seen_after")
+                    || key.equalsIgnoreCase("last_seen_before")
+                    || key.equalsIgnoreCase("ltv_gt")
+                    || key.equalsIgnoreCase("ltv_gte")
+                    || key.equalsIgnoreCase("ltv_lt")
+                    || key.equalsIgnoreCase("ltv_lte")
+                    || key.equalsIgnoreCase("aov_gt")
+                    || key.equalsIgnoreCase("aov_gte")
+                    || key.equalsIgnoreCase("aov_lt")
+                    || key.equalsIgnoreCase("aov_lte")
+                    || key.equalsIgnoreCase("purchase_count_gt")
+                    || key.equalsIgnoreCase("purchase_count_gte")
+                    || key.equalsIgnoreCase("purchase_count_lt")
+                    || key.equalsIgnoreCase("purchase_count_lte")
+                    || key.equalsIgnoreCase("event_count_gt")
+                    || key.equalsIgnoreCase("event_count_gte")
+                    || key.equalsIgnoreCase("event_count_lt")
+                    || key.equalsIgnoreCase("event_count_lte")
+                    || key.equalsIgnoreCase("first")
+                    || key.equalsIgnoreCase("after")
+                    || key.equalsIgnoreCase("before")
+                    || key.equalsIgnoreCase("order")
+                    || key.equalsIgnoreCase("direction")) {
+                return;
+            }
+            this.additionalProperties.put(key, value);
         }
 
         public Builder additionalProperty(String key, Object value) {

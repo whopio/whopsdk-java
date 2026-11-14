@@ -22,14 +22,10 @@ import java.util.Optional;
 public final class DuplicateAdCampaignsRequest {
     private final Optional<Integer> count;
 
-    private final Optional<Boolean> preserveEngagement;
-
     private final Map<String, Object> additionalProperties;
 
-    private DuplicateAdCampaignsRequest(
-            Optional<Integer> count, Optional<Boolean> preserveEngagement, Map<String, Object> additionalProperties) {
+    private DuplicateAdCampaignsRequest(Optional<Integer> count, Map<String, Object> additionalProperties) {
         this.count = count;
-        this.preserveEngagement = preserveEngagement;
         this.additionalProperties = additionalProperties;
     }
 
@@ -39,14 +35,6 @@ public final class DuplicateAdCampaignsRequest {
     @JsonProperty("count")
     public Optional<Integer> getCount() {
         return count;
-    }
-
-    /**
-     * @return Whether the copied ads keep the original posts' engagement (likes, comments, shares). Defaults to false.
-     */
-    @JsonProperty("preserve_engagement")
-    public Optional<Boolean> getPreserveEngagement() {
-        return preserveEngagement;
     }
 
     @java.lang.Override
@@ -61,12 +49,12 @@ public final class DuplicateAdCampaignsRequest {
     }
 
     private boolean equalTo(DuplicateAdCampaignsRequest other) {
-        return count.equals(other.count) && preserveEngagement.equals(other.preserveEngagement);
+        return count.equals(other.count);
     }
 
     @java.lang.Override
     public int hashCode() {
-        return Objects.hash(this.count, this.preserveEngagement);
+        return Objects.hash(this.count);
     }
 
     @java.lang.Override
@@ -82,16 +70,12 @@ public final class DuplicateAdCampaignsRequest {
     public static final class Builder {
         private Optional<Integer> count = Optional.empty();
 
-        private Optional<Boolean> preserveEngagement = Optional.empty();
-
-        @JsonAnySetter
         private Map<String, Object> additionalProperties = new HashMap<>();
 
         private Builder() {}
 
         public Builder from(DuplicateAdCampaignsRequest other) {
             count(other.getCount());
-            preserveEngagement(other.getPreserveEngagement());
             return this;
         }
 
@@ -109,22 +93,16 @@ public final class DuplicateAdCampaignsRequest {
             return this;
         }
 
-        /**
-         * <p>Whether the copied ads keep the original posts' engagement (likes, comments, shares). Defaults to false.</p>
-         */
-        @JsonSetter(value = "preserve_engagement", nulls = Nulls.SKIP)
-        public Builder preserveEngagement(Optional<Boolean> preserveEngagement) {
-            this.preserveEngagement = preserveEngagement;
-            return this;
-        }
-
-        public Builder preserveEngagement(Boolean preserveEngagement) {
-            this.preserveEngagement = Optional.ofNullable(preserveEngagement);
-            return this;
-        }
-
         public DuplicateAdCampaignsRequest build() {
-            return new DuplicateAdCampaignsRequest(count, preserveEngagement, additionalProperties);
+            return new DuplicateAdCampaignsRequest(count, additionalProperties);
+        }
+
+        @JsonAnySetter
+        private void putAdditionalPropertyFromJson(String key, Object value) {
+            if (key.equalsIgnoreCase("count")) {
+                return;
+            }
+            this.additionalProperties.put(key, value);
         }
 
         public Builder additionalProperty(String key, Object value) {

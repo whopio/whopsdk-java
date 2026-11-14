@@ -5,30 +5,37 @@ package com.whop.api.types;
 
 import com.fasterxml.jackson.annotation.JsonAnyGetter;
 import com.fasterxml.jackson.annotation.JsonAnySetter;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonSetter;
+import com.fasterxml.jackson.annotation.Nulls;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
+import com.whop.api.core.Nullable;
+import com.whop.api.core.NullableNonemptyFilter;
 import com.whop.api.core.ObjectMappers;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
-import org.jetbrains.annotations.NotNull;
+import java.util.Optional;
 
 @JsonInclude(JsonInclude.Include.NON_ABSENT)
 @JsonDeserialize(builder = PaymentMethodUsBankAccountPaymentMethodUsBankAccount.Builder.class)
 public final class PaymentMethodUsBankAccountPaymentMethodUsBankAccount {
-    private final String accountType;
+    private final Optional<String> accountType;
 
-    private final String bankName;
+    private final Optional<String> bankName;
 
-    private final String last4;
+    private final Optional<String> last4;
 
     private final Map<String, Object> additionalProperties;
 
     private PaymentMethodUsBankAccountPaymentMethodUsBankAccount(
-            String accountType, String bankName, String last4, Map<String, Object> additionalProperties) {
+            Optional<String> accountType,
+            Optional<String> bankName,
+            Optional<String> last4,
+            Map<String, Object> additionalProperties) {
         this.accountType = accountType;
         this.bankName = bankName;
         this.last4 = last4;
@@ -38,24 +45,51 @@ public final class PaymentMethodUsBankAccountPaymentMethodUsBankAccount {
     /**
      * @return The type of bank account (e.g., checking, savings).
      */
-    @JsonProperty("account_type")
-    public String getAccountType() {
+    @JsonIgnore
+    public Optional<String> getAccountType() {
+        if (accountType == null) {
+            return Optional.empty();
+        }
         return accountType;
     }
 
     /**
      * @return The name of the financial institution holding the account.
      */
-    @JsonProperty("bank_name")
-    public String getBankName() {
+    @JsonIgnore
+    public Optional<String> getBankName() {
+        if (bankName == null) {
+            return Optional.empty();
+        }
         return bankName;
     }
 
     /**
      * @return The last four digits of the bank account number.
      */
+    @JsonIgnore
+    public Optional<String> getLast4() {
+        if (last4 == null) {
+            return Optional.empty();
+        }
+        return last4;
+    }
+
+    @JsonInclude(value = JsonInclude.Include.CUSTOM, valueFilter = NullableNonemptyFilter.class)
+    @JsonProperty("account_type")
+    private Optional<String> _getAccountType() {
+        return accountType;
+    }
+
+    @JsonInclude(value = JsonInclude.Include.CUSTOM, valueFilter = NullableNonemptyFilter.class)
+    @JsonProperty("bank_name")
+    private Optional<String> _getBankName() {
+        return bankName;
+    }
+
+    @JsonInclude(value = JsonInclude.Include.CUSTOM, valueFilter = NullableNonemptyFilter.class)
     @JsonProperty("last4")
-    public String getLast4() {
+    private Optional<String> _getLast4() {
         return last4;
     }
 
@@ -85,55 +119,22 @@ public final class PaymentMethodUsBankAccountPaymentMethodUsBankAccount {
         return ObjectMappers.stringify(this);
     }
 
-    public static AccountTypeStage builder() {
+    public static Builder builder() {
         return new Builder();
     }
 
-    public interface AccountTypeStage {
-        /**
-         * <p>The type of bank account (e.g., checking, savings).</p>
-         */
-        BankNameStage accountType(@NotNull String accountType);
-
-        Builder from(PaymentMethodUsBankAccountPaymentMethodUsBankAccount other);
-    }
-
-    public interface BankNameStage {
-        /**
-         * <p>The name of the financial institution holding the account.</p>
-         */
-        Last4Stage bankName(@NotNull String bankName);
-    }
-
-    public interface Last4Stage {
-        /**
-         * <p>The last four digits of the bank account number.</p>
-         */
-        _FinalStage last4(@NotNull String last4);
-    }
-
-    public interface _FinalStage {
-        PaymentMethodUsBankAccountPaymentMethodUsBankAccount build();
-
-        _FinalStage additionalProperty(String key, Object value);
-
-        _FinalStage additionalProperties(Map<String, Object> additionalProperties);
-    }
-
     @JsonIgnoreProperties(ignoreUnknown = true)
-    public static final class Builder implements AccountTypeStage, BankNameStage, Last4Stage, _FinalStage {
-        private String accountType;
+    public static final class Builder {
+        private Optional<String> accountType = Optional.empty();
 
-        private String bankName;
+        private Optional<String> bankName = Optional.empty();
 
-        private String last4;
+        private Optional<String> last4 = Optional.empty();
 
-        @JsonAnySetter
         private Map<String, Object> additionalProperties = new HashMap<>();
 
         private Builder() {}
 
-        @java.lang.Override
         public Builder from(PaymentMethodUsBankAccountPaymentMethodUsBankAccount other) {
             accountType(other.getAccountType());
             bankName(other.getBankName());
@@ -143,53 +144,99 @@ public final class PaymentMethodUsBankAccountPaymentMethodUsBankAccount {
 
         /**
          * <p>The type of bank account (e.g., checking, savings).</p>
-         * <p>The type of bank account (e.g., checking, savings).</p>
-         * @return Reference to {@code this} so that method calls can be chained together.
          */
-        @java.lang.Override
-        @JsonSetter("account_type")
-        public BankNameStage accountType(@NotNull String accountType) {
-            this.accountType = Objects.requireNonNull(accountType, "accountType must not be null");
+        @JsonSetter(value = "account_type", nulls = Nulls.SKIP)
+        public Builder accountType(Optional<String> accountType) {
+            this.accountType = accountType;
+            return this;
+        }
+
+        public Builder accountType(String accountType) {
+            this.accountType = Optional.ofNullable(accountType);
+            return this;
+        }
+
+        public Builder accountType(Nullable<String> accountType) {
+            if (accountType.isNull()) {
+                this.accountType = null;
+            } else if (accountType.isEmpty()) {
+                this.accountType = Optional.empty();
+            } else {
+                this.accountType = Optional.of(accountType.get());
+            }
             return this;
         }
 
         /**
          * <p>The name of the financial institution holding the account.</p>
-         * <p>The name of the financial institution holding the account.</p>
-         * @return Reference to {@code this} so that method calls can be chained together.
          */
-        @java.lang.Override
-        @JsonSetter("bank_name")
-        public Last4Stage bankName(@NotNull String bankName) {
-            this.bankName = Objects.requireNonNull(bankName, "bankName must not be null");
+        @JsonSetter(value = "bank_name", nulls = Nulls.SKIP)
+        public Builder bankName(Optional<String> bankName) {
+            this.bankName = bankName;
+            return this;
+        }
+
+        public Builder bankName(String bankName) {
+            this.bankName = Optional.ofNullable(bankName);
+            return this;
+        }
+
+        public Builder bankName(Nullable<String> bankName) {
+            if (bankName.isNull()) {
+                this.bankName = null;
+            } else if (bankName.isEmpty()) {
+                this.bankName = Optional.empty();
+            } else {
+                this.bankName = Optional.of(bankName.get());
+            }
             return this;
         }
 
         /**
          * <p>The last four digits of the bank account number.</p>
-         * <p>The last four digits of the bank account number.</p>
-         * @return Reference to {@code this} so that method calls can be chained together.
          */
-        @java.lang.Override
-        @JsonSetter("last4")
-        public _FinalStage last4(@NotNull String last4) {
-            this.last4 = Objects.requireNonNull(last4, "last4 must not be null");
+        @JsonSetter(value = "last4", nulls = Nulls.SKIP)
+        public Builder last4(Optional<String> last4) {
+            this.last4 = last4;
             return this;
         }
 
-        @java.lang.Override
+        public Builder last4(String last4) {
+            this.last4 = Optional.ofNullable(last4);
+            return this;
+        }
+
+        public Builder last4(Nullable<String> last4) {
+            if (last4.isNull()) {
+                this.last4 = null;
+            } else if (last4.isEmpty()) {
+                this.last4 = Optional.empty();
+            } else {
+                this.last4 = Optional.of(last4.get());
+            }
+            return this;
+        }
+
         public PaymentMethodUsBankAccountPaymentMethodUsBankAccount build() {
             return new PaymentMethodUsBankAccountPaymentMethodUsBankAccount(
                     accountType, bankName, last4, additionalProperties);
         }
 
-        @java.lang.Override
+        @JsonAnySetter
+        private void putAdditionalPropertyFromJson(String key, Object value) {
+            if (key.equalsIgnoreCase("account_type")
+                    || key.equalsIgnoreCase("bank_name")
+                    || key.equalsIgnoreCase("last4")) {
+                return;
+            }
+            this.additionalProperties.put(key, value);
+        }
+
         public Builder additionalProperty(String key, Object value) {
             this.additionalProperties.put(key, value);
             return this;
         }
 
-        @java.lang.Override
         public Builder additionalProperties(Map<String, Object> additionalProperties) {
             this.additionalProperties.putAll(additionalProperties);
             return this;

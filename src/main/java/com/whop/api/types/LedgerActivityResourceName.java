@@ -208,7 +208,6 @@ public final class LedgerActivityResourceName {
 
         private Optional<String> name = Optional.empty();
 
-        @JsonAnySetter
         private Map<String, Object> additionalProperties = new HashMap<>();
 
         private Builder() {}
@@ -224,7 +223,6 @@ public final class LedgerActivityResourceName {
         }
 
         /**
-         * <p>User ID.</p>
          * <p>User ID.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
@@ -353,6 +351,18 @@ public final class LedgerActivityResourceName {
         @java.lang.Override
         public LedgerActivityResourceName build() {
             return new LedgerActivityResourceName(id, name, object, profilePictureUrl, username, additionalProperties);
+        }
+
+        @JsonAnySetter
+        private void putAdditionalPropertyFromJson(String key, Object value) {
+            if (key.equalsIgnoreCase("id")
+                    || key.equalsIgnoreCase("name")
+                    || key.equalsIgnoreCase("object")
+                    || key.equalsIgnoreCase("profile_picture_url")
+                    || key.equalsIgnoreCase("username")) {
+                return;
+            }
+            this.additionalProperties.put(key, value);
         }
 
         @java.lang.Override

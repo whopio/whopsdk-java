@@ -7,19 +7,16 @@ import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonValue;
 
 public final class UploadEvidenceDisputesRequestDocumentsItemDocumentType {
+    public static final UploadEvidenceDisputesRequestDocumentsItemDocumentType TERMS_OF_SERVICE =
+            new UploadEvidenceDisputesRequestDocumentsItemDocumentType(Value.TERMS_OF_SERVICE, "terms_of_service");
+
     public static final UploadEvidenceDisputesRequestDocumentsItemDocumentType DIGITAL_FULFILLMENT =
             new UploadEvidenceDisputesRequestDocumentsItemDocumentType(
                     Value.DIGITAL_FULFILLMENT, "digital_fulfillment");
 
-    public static final UploadEvidenceDisputesRequestDocumentsItemDocumentType RETURN_POLICY =
-            new UploadEvidenceDisputesRequestDocumentsItemDocumentType(Value.RETURN_POLICY, "return_policy");
-
-    public static final UploadEvidenceDisputesRequestDocumentsItemDocumentType SHIPPING_POLICY =
-            new UploadEvidenceDisputesRequestDocumentsItemDocumentType(Value.SHIPPING_POLICY, "shipping_policy");
-
-    public static final UploadEvidenceDisputesRequestDocumentsItemDocumentType CUSTOMER_ORDER_HISTORY =
+    public static final UploadEvidenceDisputesRequestDocumentsItemDocumentType CANCELLATION_POLICY =
             new UploadEvidenceDisputesRequestDocumentsItemDocumentType(
-                    Value.CUSTOMER_ORDER_HISTORY, "customer_order_history");
+                    Value.CANCELLATION_POLICY, "cancellation_policy");
 
     public static final UploadEvidenceDisputesRequestDocumentsItemDocumentType SUBSCRIPTION =
             new UploadEvidenceDisputesRequestDocumentsItemDocumentType(Value.SUBSCRIPTION, "subscription");
@@ -31,8 +28,25 @@ public final class UploadEvidenceDisputesRequestDocumentsItemDocumentType {
             new UploadEvidenceDisputesRequestDocumentsItemDocumentType(
                     Value.PHYSICAL_FULFILLMENT, "physical_fulfillment");
 
+    public static final UploadEvidenceDisputesRequestDocumentsItemDocumentType CUSTOMER_COMMUNICATION =
+            new UploadEvidenceDisputesRequestDocumentsItemDocumentType(
+                    Value.CUSTOMER_COMMUNICATION, "customer_communication");
+
     public static final UploadEvidenceDisputesRequestDocumentsItemDocumentType CUSTOMER_SESSION =
             new UploadEvidenceDisputesRequestDocumentsItemDocumentType(Value.CUSTOMER_SESSION, "customer_session");
+
+    public static final UploadEvidenceDisputesRequestDocumentsItemDocumentType RETURN_POLICY =
+            new UploadEvidenceDisputesRequestDocumentsItemDocumentType(Value.RETURN_POLICY, "return_policy");
+
+    public static final UploadEvidenceDisputesRequestDocumentsItemDocumentType SHIPPING_POLICY =
+            new UploadEvidenceDisputesRequestDocumentsItemDocumentType(Value.SHIPPING_POLICY, "shipping_policy");
+
+    public static final UploadEvidenceDisputesRequestDocumentsItemDocumentType CUSTOMER_ORDER_HISTORY =
+            new UploadEvidenceDisputesRequestDocumentsItemDocumentType(
+                    Value.CUSTOMER_ORDER_HISTORY, "customer_order_history");
+
+    public static final UploadEvidenceDisputesRequestDocumentsItemDocumentType COMPLETE_EVIDENCE =
+            new UploadEvidenceDisputesRequestDocumentsItemDocumentType(Value.COMPLETE_EVIDENCE, "complete_evidence");
 
     public static final UploadEvidenceDisputesRequestDocumentsItemDocumentType PRIOR_TRANSACTIONS =
             new UploadEvidenceDisputesRequestDocumentsItemDocumentType(Value.PRIOR_TRANSACTIONS, "prior_transactions");
@@ -70,22 +84,30 @@ public final class UploadEvidenceDisputesRequestDocumentsItemDocumentType {
 
     public <T> T visit(Visitor<T> visitor) {
         switch (value) {
+            case TERMS_OF_SERVICE:
+                return visitor.visitTermsOfService();
             case DIGITAL_FULFILLMENT:
                 return visitor.visitDigitalFulfillment();
-            case RETURN_POLICY:
-                return visitor.visitReturnPolicy();
-            case SHIPPING_POLICY:
-                return visitor.visitShippingPolicy();
-            case CUSTOMER_ORDER_HISTORY:
-                return visitor.visitCustomerOrderHistory();
+            case CANCELLATION_POLICY:
+                return visitor.visitCancellationPolicy();
             case SUBSCRIPTION:
                 return visitor.visitSubscription();
             case PRODUCT_IMAGE:
                 return visitor.visitProductImage();
             case PHYSICAL_FULFILLMENT:
                 return visitor.visitPhysicalFulfillment();
+            case CUSTOMER_COMMUNICATION:
+                return visitor.visitCustomerCommunication();
             case CUSTOMER_SESSION:
                 return visitor.visitCustomerSession();
+            case RETURN_POLICY:
+                return visitor.visitReturnPolicy();
+            case SHIPPING_POLICY:
+                return visitor.visitShippingPolicy();
+            case CUSTOMER_ORDER_HISTORY:
+                return visitor.visitCustomerOrderHistory();
+            case COMPLETE_EVIDENCE:
+                return visitor.visitCompleteEvidence();
             case PRIOR_TRANSACTIONS:
                 return visitor.visitPriorTransactions();
             case UNKNOWN:
@@ -97,22 +119,30 @@ public final class UploadEvidenceDisputesRequestDocumentsItemDocumentType {
     @JsonCreator(mode = JsonCreator.Mode.DELEGATING)
     public static UploadEvidenceDisputesRequestDocumentsItemDocumentType valueOf(String value) {
         switch (value) {
+            case "terms_of_service":
+                return TERMS_OF_SERVICE;
             case "digital_fulfillment":
                 return DIGITAL_FULFILLMENT;
-            case "return_policy":
-                return RETURN_POLICY;
-            case "shipping_policy":
-                return SHIPPING_POLICY;
-            case "customer_order_history":
-                return CUSTOMER_ORDER_HISTORY;
+            case "cancellation_policy":
+                return CANCELLATION_POLICY;
             case "subscription":
                 return SUBSCRIPTION;
             case "product_image":
                 return PRODUCT_IMAGE;
             case "physical_fulfillment":
                 return PHYSICAL_FULFILLMENT;
+            case "customer_communication":
+                return CUSTOMER_COMMUNICATION;
             case "customer_session":
                 return CUSTOMER_SESSION;
+            case "return_policy":
+                return RETURN_POLICY;
+            case "shipping_policy":
+                return SHIPPING_POLICY;
+            case "customer_order_history":
+                return CUSTOMER_ORDER_HISTORY;
+            case "complete_evidence":
+                return COMPLETE_EVIDENCE;
             case "prior_transactions":
                 return PRIOR_TRANSACTIONS;
             default:
@@ -124,6 +154,10 @@ public final class UploadEvidenceDisputesRequestDocumentsItemDocumentType {
         RETURN_POLICY,
 
         SHIPPING_POLICY,
+
+        CANCELLATION_POLICY,
+
+        TERMS_OF_SERVICE,
 
         PHYSICAL_FULFILLMENT,
 
@@ -139,6 +173,10 @@ public final class UploadEvidenceDisputesRequestDocumentsItemDocumentType {
 
         SUBSCRIPTION,
 
+        CUSTOMER_COMMUNICATION,
+
+        COMPLETE_EVIDENCE,
+
         UNKNOWN
     }
 
@@ -146,6 +184,10 @@ public final class UploadEvidenceDisputesRequestDocumentsItemDocumentType {
         T visitReturnPolicy();
 
         T visitShippingPolicy();
+
+        T visitCancellationPolicy();
+
+        T visitTermsOfService();
 
         T visitPhysicalFulfillment();
 
@@ -160,6 +202,10 @@ public final class UploadEvidenceDisputesRequestDocumentsItemDocumentType {
         T visitDigitalFulfillment();
 
         T visitSubscription();
+
+        T visitCustomerCommunication();
+
+        T visitCompleteEvidence();
 
         T visitUnknown(String unknownType);
     }

@@ -225,7 +225,6 @@ public final class CourseChaptersItemLessonsItem {
 
         private Optional<CourseChaptersItemLessonsItemThumbnail> thumbnail = Optional.empty();
 
-        @JsonAnySetter
         private Map<String, Object> additionalProperties = new HashMap<>();
 
         private Builder() {}
@@ -243,7 +242,6 @@ public final class CourseChaptersItemLessonsItem {
 
         /**
          * <p>The unique identifier for the lesson.</p>
-         * <p>The unique identifier for the lesson.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
@@ -254,7 +252,6 @@ public final class CourseChaptersItemLessonsItem {
         }
 
         /**
-         * <p>The content format of this lesson. One of: text, video, pdf, multi, quiz, knowledge_check.</p>
          * <p>The content format of this lesson. One of: text, video, pdf, multi, quiz, knowledge_check.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
@@ -267,7 +264,6 @@ public final class CourseChaptersItemLessonsItem {
 
         /**
          * <p>The sort position of this lesson within its parent chapter, starting from zero.</p>
-         * <p>The sort position of this lesson within its parent chapter, starting from zero.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
@@ -278,7 +274,6 @@ public final class CourseChaptersItemLessonsItem {
         }
 
         /**
-         * <p>The display name of the lesson shown to students. Maximum 120 characters.</p>
          * <p>The display name of the lesson shown to students. Maximum 120 characters.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
@@ -365,6 +360,19 @@ public final class CourseChaptersItemLessonsItem {
         public CourseChaptersItemLessonsItem build() {
             return new CourseChaptersItemLessonsItem(
                     id, lessonType, order, thumbnail, title, videoAsset, additionalProperties);
+        }
+
+        @JsonAnySetter
+        private void putAdditionalPropertyFromJson(String key, Object value) {
+            if (key.equalsIgnoreCase("id")
+                    || key.equalsIgnoreCase("lesson_type")
+                    || key.equalsIgnoreCase("order")
+                    || key.equalsIgnoreCase("thumbnail")
+                    || key.equalsIgnoreCase("title")
+                    || key.equalsIgnoreCase("video_asset")) {
+                return;
+            }
+            this.additionalProperties.put(key, value);
         }
 
         @java.lang.Override

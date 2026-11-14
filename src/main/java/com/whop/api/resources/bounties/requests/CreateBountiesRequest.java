@@ -451,7 +451,6 @@ public final class CreateBountiesRequest {
 
         private Optional<Integer> acceptedSubmissionsLimit = Optional.empty();
 
-        @JsonAnySetter
         private Map<String, Object> additionalProperties = new HashMap<>();
 
         private Builder() {}
@@ -476,7 +475,6 @@ public final class CreateBountiesRequest {
 
         /**
          * <p>Full task instructions shown to workers.</p>
-         * <p>Full task instructions shown to workers.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
@@ -488,7 +486,6 @@ public final class CreateBountiesRequest {
 
         /**
          * <p>Gross bounty-pool amount (USD) escrowed per accepted submission, in whole dollars. Platform fees and affiliate shares are paid from this amount.</p>
-         * <p>Gross bounty-pool amount (USD) escrowed per accepted submission, in whole dollars. Platform fees and affiliate shares are paid from this amount.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
@@ -499,7 +496,6 @@ public final class CreateBountiesRequest {
         }
 
         /**
-         * <p>Short name of the task shown to workers.</p>
          * <p>Short name of the task shown to workers.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
@@ -839,6 +835,26 @@ public final class CreateBountiesRequest {
                     publishAtTimezone,
                     title,
                     additionalProperties);
+        }
+
+        @JsonAnySetter
+        private void putAdditionalPropertyFromJson(String key, Object value) {
+            if (key.equalsIgnoreCase("accepted_submissions_limit")
+                    || key.equalsIgnoreCase("accepted_submissions_per_user_limit")
+                    || key.equalsIgnoreCase("account_id")
+                    || key.equalsIgnoreCase("allowed_country_codes")
+                    || key.equalsIgnoreCase("business_goal_type")
+                    || key.equalsIgnoreCase("capture_spec")
+                    || key.equalsIgnoreCase("description")
+                    || key.equalsIgnoreCase("experience_id")
+                    || key.equalsIgnoreCase("frequency")
+                    || key.equalsIgnoreCase("gross_reward_amount")
+                    || key.equalsIgnoreCase("publish_at")
+                    || key.equalsIgnoreCase("publish_at_timezone")
+                    || key.equalsIgnoreCase("title")) {
+                return;
+            }
+            this.additionalProperties.put(key, value);
         }
 
         @java.lang.Override

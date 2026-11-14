@@ -49,7 +49,7 @@ public final class ListTopicsRequest {
     }
 
     /**
-     * @return The number of topics to return (default 20, max 100).
+     * @return Number of results to return from the start of the range.
      */
     @JsonProperty("first")
     public Optional<Integer> getFirst() {
@@ -57,7 +57,7 @@ public final class ListTopicsRequest {
     }
 
     /**
-     * @return A cursor; returns topics after this position.
+     * @return Return results after this cursor. Use <code>page_info.end_cursor</code> from the previous response to fetch the next page.
      */
     @JsonProperty("after")
     public Optional<String> getAfter() {
@@ -101,7 +101,6 @@ public final class ListTopicsRequest {
 
         private Optional<String> after = Optional.empty();
 
-        @JsonAnySetter
         private Map<String, Object> additionalProperties = new HashMap<>();
 
         private Builder() {}
@@ -128,7 +127,7 @@ public final class ListTopicsRequest {
         }
 
         /**
-         * <p>The number of topics to return (default 20, max 100).</p>
+         * <p>Number of results to return from the start of the range.</p>
          */
         @JsonSetter(value = "first", nulls = Nulls.SKIP)
         public Builder first(Optional<Integer> first) {
@@ -142,7 +141,7 @@ public final class ListTopicsRequest {
         }
 
         /**
-         * <p>A cursor; returns topics after this position.</p>
+         * <p>Return results after this cursor. Use <code>page_info.end_cursor</code> from the previous response to fetch the next page.</p>
          */
         @JsonSetter(value = "after", nulls = Nulls.SKIP)
         public Builder after(Optional<String> after) {
@@ -157,6 +156,14 @@ public final class ListTopicsRequest {
 
         public ListTopicsRequest build() {
             return new ListTopicsRequest(topicType, first, after, additionalProperties);
+        }
+
+        @JsonAnySetter
+        private void putAdditionalPropertyFromJson(String key, Object value) {
+            if (key.equalsIgnoreCase("topic_type") || key.equalsIgnoreCase("first") || key.equalsIgnoreCase("after")) {
+                return;
+            }
+            this.additionalProperties.put(key, value);
         }
 
         public Builder additionalProperty(String key, Object value) {

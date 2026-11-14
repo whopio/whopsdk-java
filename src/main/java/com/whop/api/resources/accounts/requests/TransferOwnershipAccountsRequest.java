@@ -23,14 +23,28 @@ import org.jetbrains.annotations.NotNull;
 public final class TransferOwnershipAccountsRequest {
     private final Optional<Boolean> asPartner;
 
+    private final Optional<String> authorizedUserId;
+
     private final String identifier;
+
+    private final Optional<String> memberId;
+
+    private final Optional<String> message;
 
     private final Map<String, Object> additionalProperties;
 
     private TransferOwnershipAccountsRequest(
-            Optional<Boolean> asPartner, String identifier, Map<String, Object> additionalProperties) {
+            Optional<Boolean> asPartner,
+            Optional<String> authorizedUserId,
+            String identifier,
+            Optional<String> memberId,
+            Optional<String> message,
+            Map<String, Object> additionalProperties) {
         this.asPartner = asPartner;
+        this.authorizedUserId = authorizedUserId;
         this.identifier = identifier;
+        this.memberId = memberId;
+        this.message = message;
         this.additionalProperties = additionalProperties;
     }
 
@@ -43,11 +57,35 @@ public final class TransferOwnershipAccountsRequest {
     }
 
     /**
+     * @return Your team membership on the business this referral is made for, prefixed <code>ausr_</code>. The referral then credits that team instead of you personally. Requires <code>as_partner</code>.
+     */
+    @JsonProperty("authorized_user_id")
+    public Optional<String> getAuthorizedUserId() {
+        return authorizedUserId;
+    }
+
+    /**
      * @return The user to transfer ownership to: a user ID (<code>user_*</code>) or an email address. An email address with no Whop account yet is sent an invite to create one.
      */
     @JsonProperty("identifier")
     public String getIdentifier() {
         return identifier;
+    }
+
+    /**
+     * @return Your member record on the business this referral is made for, prefixed <code>mber_</code>, when your role there is held on your member record. Send this or <code>authorized_user_id</code>, not both. Requires <code>as_partner</code>.
+     */
+    @JsonProperty("member_id")
+    public Optional<String> getMemberId() {
+        return memberId;
+    }
+
+    /**
+     * @return A note from the partner, shown as a quote in the invite email and signed with their name. Requires <code>as_partner</code>; sending it on an ordinary transfer is a 400. Omit it and the email sends without a note.
+     */
+    @JsonProperty("message")
+    public Optional<String> getMessage() {
+        return message;
     }
 
     @java.lang.Override
@@ -62,12 +100,16 @@ public final class TransferOwnershipAccountsRequest {
     }
 
     private boolean equalTo(TransferOwnershipAccountsRequest other) {
-        return asPartner.equals(other.asPartner) && identifier.equals(other.identifier);
+        return asPartner.equals(other.asPartner)
+                && authorizedUserId.equals(other.authorizedUserId)
+                && identifier.equals(other.identifier)
+                && memberId.equals(other.memberId)
+                && message.equals(other.message);
     }
 
     @java.lang.Override
     public int hashCode() {
-        return Objects.hash(this.asPartner, this.identifier);
+        return Objects.hash(this.asPartner, this.authorizedUserId, this.identifier, this.memberId, this.message);
     }
 
     @java.lang.Override
@@ -101,15 +143,41 @@ public final class TransferOwnershipAccountsRequest {
         _FinalStage asPartner(Optional<Boolean> asPartner);
 
         _FinalStage asPartner(Boolean asPartner);
+
+        /**
+         * <p>Your team membership on the business this referral is made for, prefixed <code>ausr_</code>. The referral then credits that team instead of you personally. Requires <code>as_partner</code>.</p>
+         */
+        _FinalStage authorizedUserId(Optional<String> authorizedUserId);
+
+        _FinalStage authorizedUserId(String authorizedUserId);
+
+        /**
+         * <p>Your member record on the business this referral is made for, prefixed <code>mber_</code>, when your role there is held on your member record. Send this or <code>authorized_user_id</code>, not both. Requires <code>as_partner</code>.</p>
+         */
+        _FinalStage memberId(Optional<String> memberId);
+
+        _FinalStage memberId(String memberId);
+
+        /**
+         * <p>A note from the partner, shown as a quote in the invite email and signed with their name. Requires <code>as_partner</code>; sending it on an ordinary transfer is a 400. Omit it and the email sends without a note.</p>
+         */
+        _FinalStage message(Optional<String> message);
+
+        _FinalStage message(String message);
     }
 
     @JsonIgnoreProperties(ignoreUnknown = true)
     public static final class Builder implements IdentifierStage, _FinalStage {
         private String identifier;
 
+        private Optional<String> message = Optional.empty();
+
+        private Optional<String> memberId = Optional.empty();
+
+        private Optional<String> authorizedUserId = Optional.empty();
+
         private Optional<Boolean> asPartner = Optional.empty();
 
-        @JsonAnySetter
         private Map<String, Object> additionalProperties = new HashMap<>();
 
         private Builder() {}
@@ -117,12 +185,14 @@ public final class TransferOwnershipAccountsRequest {
         @java.lang.Override
         public Builder from(TransferOwnershipAccountsRequest other) {
             asPartner(other.getAsPartner());
+            authorizedUserId(other.getAuthorizedUserId());
             identifier(other.getIdentifier());
+            memberId(other.getMemberId());
+            message(other.getMessage());
             return this;
         }
 
         /**
-         * <p>The user to transfer ownership to: a user ID (<code>user_*</code>) or an email address. An email address with no Whop account yet is sent an invite to create one.</p>
          * <p>The user to transfer ownership to: a user ID (<code>user_*</code>) or an email address. An email address with no Whop account yet is sent an invite to create one.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
@@ -130,6 +200,66 @@ public final class TransferOwnershipAccountsRequest {
         @JsonSetter("identifier")
         public _FinalStage identifier(@NotNull String identifier) {
             this.identifier = Objects.requireNonNull(identifier, "identifier must not be null");
+            return this;
+        }
+
+        /**
+         * <p>A note from the partner, shown as a quote in the invite email and signed with their name. Requires <code>as_partner</code>; sending it on an ordinary transfer is a 400. Omit it and the email sends without a note.</p>
+         * @return Reference to {@code this} so that method calls can be chained together.
+         */
+        @java.lang.Override
+        public _FinalStage message(String message) {
+            this.message = Optional.ofNullable(message);
+            return this;
+        }
+
+        /**
+         * <p>A note from the partner, shown as a quote in the invite email and signed with their name. Requires <code>as_partner</code>; sending it on an ordinary transfer is a 400. Omit it and the email sends without a note.</p>
+         */
+        @java.lang.Override
+        @JsonSetter(value = "message", nulls = Nulls.SKIP)
+        public _FinalStage message(Optional<String> message) {
+            this.message = message;
+            return this;
+        }
+
+        /**
+         * <p>Your member record on the business this referral is made for, prefixed <code>mber_</code>, when your role there is held on your member record. Send this or <code>authorized_user_id</code>, not both. Requires <code>as_partner</code>.</p>
+         * @return Reference to {@code this} so that method calls can be chained together.
+         */
+        @java.lang.Override
+        public _FinalStage memberId(String memberId) {
+            this.memberId = Optional.ofNullable(memberId);
+            return this;
+        }
+
+        /**
+         * <p>Your member record on the business this referral is made for, prefixed <code>mber_</code>, when your role there is held on your member record. Send this or <code>authorized_user_id</code>, not both. Requires <code>as_partner</code>.</p>
+         */
+        @java.lang.Override
+        @JsonSetter(value = "member_id", nulls = Nulls.SKIP)
+        public _FinalStage memberId(Optional<String> memberId) {
+            this.memberId = memberId;
+            return this;
+        }
+
+        /**
+         * <p>Your team membership on the business this referral is made for, prefixed <code>ausr_</code>. The referral then credits that team instead of you personally. Requires <code>as_partner</code>.</p>
+         * @return Reference to {@code this} so that method calls can be chained together.
+         */
+        @java.lang.Override
+        public _FinalStage authorizedUserId(String authorizedUserId) {
+            this.authorizedUserId = Optional.ofNullable(authorizedUserId);
+            return this;
+        }
+
+        /**
+         * <p>Your team membership on the business this referral is made for, prefixed <code>ausr_</code>. The referral then credits that team instead of you personally. Requires <code>as_partner</code>.</p>
+         */
+        @java.lang.Override
+        @JsonSetter(value = "authorized_user_id", nulls = Nulls.SKIP)
+        public _FinalStage authorizedUserId(Optional<String> authorizedUserId) {
+            this.authorizedUserId = authorizedUserId;
             return this;
         }
 
@@ -155,7 +285,20 @@ public final class TransferOwnershipAccountsRequest {
 
         @java.lang.Override
         public TransferOwnershipAccountsRequest build() {
-            return new TransferOwnershipAccountsRequest(asPartner, identifier, additionalProperties);
+            return new TransferOwnershipAccountsRequest(
+                    asPartner, authorizedUserId, identifier, memberId, message, additionalProperties);
+        }
+
+        @JsonAnySetter
+        private void putAdditionalPropertyFromJson(String key, Object value) {
+            if (key.equalsIgnoreCase("as_partner")
+                    || key.equalsIgnoreCase("authorized_user_id")
+                    || key.equalsIgnoreCase("identifier")
+                    || key.equalsIgnoreCase("member_id")
+                    || key.equalsIgnoreCase("message")) {
+                return;
+            }
+            this.additionalProperties.put(key, value);
         }
 
         @java.lang.Override

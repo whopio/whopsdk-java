@@ -115,7 +115,7 @@ public final class DisputeEvidence {
     }
 
     /**
-     * @return The cancellation policy document. Falls back to Whop's platform policy when the seller has not uploaded their own.
+     * @return The cancellation policy document. Defaults to the account's cancellation policy, then its terms of service, then its return policy, then Whop's platform policy.
      */
     @JsonIgnore
     public Optional<DisputeAttachment> getCancellationPolicyAttachment() {
@@ -197,7 +197,7 @@ public final class DisputeEvidence {
     }
 
     /**
-     * @return The refund policy document. Falls back to Whop's platform policy when the seller has not uploaded their own.
+     * @return The refund policy document. Defaults to the account's return policy, then its terms of service, then Whop's platform policy.
      */
     @JsonIgnore
     public Optional<DisputeAttachment> getRefundPolicyAttachment() {
@@ -425,7 +425,6 @@ public final class DisputeEvidence {
 
         private Optional<DisputeAttachment> uncategorizedAttachment = Optional.empty();
 
-        @JsonAnySetter
         private Map<String, Object> additionalProperties = new HashMap<>();
 
         private Builder() {}
@@ -500,7 +499,7 @@ public final class DisputeEvidence {
         }
 
         /**
-         * <p>The cancellation policy document. Falls back to Whop's platform policy when the seller has not uploaded their own.</p>
+         * <p>The cancellation policy document. Defaults to the account's cancellation policy, then its terms of service, then its return policy, then Whop's platform policy.</p>
          */
         @JsonSetter(value = "cancellation_policy_attachment", nulls = Nulls.SKIP)
         public Builder cancellationPolicyAttachment(Optional<DisputeAttachment> cancellationPolicyAttachment) {
@@ -696,7 +695,7 @@ public final class DisputeEvidence {
         }
 
         /**
-         * <p>The refund policy document. Falls back to Whop's platform policy when the seller has not uploaded their own.</p>
+         * <p>The refund policy document. Defaults to the account's return policy, then its terms of service, then Whop's platform policy.</p>
          */
         @JsonSetter(value = "refund_policy_attachment", nulls = Nulls.SKIP)
         public Builder refundPolicyAttachment(Optional<DisputeAttachment> refundPolicyAttachment) {
@@ -838,6 +837,28 @@ public final class DisputeEvidence {
                     serviceDate,
                     uncategorizedAttachment,
                     additionalProperties);
+        }
+
+        @JsonAnySetter
+        private void putAdditionalPropertyFromJson(String key, Object value) {
+            if (key.equalsIgnoreCase("access_activity_log")
+                    || key.equalsIgnoreCase("billing_address")
+                    || key.equalsIgnoreCase("cancellation_policy_attachment")
+                    || key.equalsIgnoreCase("cancellation_policy_disclosure")
+                    || key.equalsIgnoreCase("customer_communication_attachment")
+                    || key.equalsIgnoreCase("customer_email_address")
+                    || key.equalsIgnoreCase("customer_name")
+                    || key.equalsIgnoreCase("documents")
+                    || key.equalsIgnoreCase("notes")
+                    || key.equalsIgnoreCase("product_description")
+                    || key.equalsIgnoreCase("refund_policy_attachment")
+                    || key.equalsIgnoreCase("refund_policy_disclosure")
+                    || key.equalsIgnoreCase("refund_refusal_explanation")
+                    || key.equalsIgnoreCase("service_date")
+                    || key.equalsIgnoreCase("uncategorized_attachment")) {
+                return;
+            }
+            this.additionalProperties.put(key, value);
         }
 
         public Builder additionalProperty(String key, Object value) {

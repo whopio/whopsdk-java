@@ -27,6 +27,7 @@ permissions:
 concurrency:
   group: publish-whop-java-${{ github.ref }}
   cancel-in-progress: false
+  queue: max
 
 env:
   RELEASE_TARGET: github-packages
@@ -594,6 +595,38 @@ jobs:
           echo "bundle verified:"
           find "$BUNDLE_DIR" -type f | sort
 
+      - name: Verify an installed Maven consumer
+        env:
+          VERSION: ${{ needs.decide.outputs.version }}
+        run: |
+          set -euo pipefail
+          ./gradlew --no-daemon -p .github/package-smoke run \
+            -PsdkRepository="$PWD/$BUNDLE_DIR" -PsdkVersion="$VERSION" --args="$VERSION"
+
+      - name: Match the POM against the one the build job verified
+        env:
+          VERSION: ${{ needs.decide.outputs.version }}
+        run: |
+          set -euo pipefail
+
+          ./gradlew --no-daemon -I "$INIT_SCRIPT" generatePomFileForMavenPublication
+
+          staged="${BUNDLE_DIR}/${GROUP_PATH}/${ARTIFACT_ID}/${VERSION}/${ARTIFACT_ID}-${VERSION}.pom"
+          if ! diff -u "$staged" build/publications/maven/pom-default.xml; then
+            echo "::error::this job would publish a POM the build job never verified. The build job asserts the coordinate, the Central metadata and every api dependency against the generated build.gradle; a POM that differs here means the two jobs did not see the same tree."
+            exit 1
+          fi
+
+          echo "the POM this job will publish is the one the build job verified"
+
+      - name: Rehearse the upload
+        env:
+          GITHUB_PACKAGES_URL: ${{ env.PACKAGES_BASE }}
+        run: |
+          set -euo pipefail
+          echo "::warning::dry run — resolving the publish task graph without uploading. The HTTP transport to ${PACKAGES_BASE} is the only part of this path a dry run cannot cover."
+          ./gradlew --no-daemon -I "$INIT_SCRIPT" publishMavenPublicationToGitHubPackagesRepository --dry-run
+
       - uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a
         with:
           name: bundle
@@ -822,7 +855,7 @@ jobs:
 
   publish-github-packages:
     needs: [decide, build]
-    if: needs.decide.outputs.packages == 'true'
+    if: needs.decide.outputs.packages == 'true' && needs.decide.outputs.dry == 'false' && github.ref == 'refs/heads/main' && github.event_name != 'pull_request'
     runs-on: ubuntu-latest
     permissions:
       contents: read
@@ -898,15 +931,6 @@ jobs:
 
           echo "the POM this job will publish is the one the build job verified"
 
-      - name: Rehearse the upload
-        if: needs.decide.outputs.dry == 'true'
-        env:
-          GITHUB_PACKAGES_URL: ${{ env.PACKAGES_BASE }}
-        run: |
-          set -euo pipefail
-          echo "::warning::dry run — resolving the publish task graph without uploading. The HTTP transport to ${PACKAGES_BASE} is the only part of this path a dry run cannot cover."
-          ./gradlew --no-daemon -I "$INIT_SCRIPT" publishMavenPublicationToGitHubPackagesRepository --dry-run
-
       - name: Publish to GitHub Packages
         if: needs.decide.outputs.dry == 'false'
         env:
@@ -943,7 +967,7 @@ jobs:
 
   tag:
     needs: [decide, build, publish, publish-github-packages]
-    if: always() && needs.decide.outputs.dry == 'false' && needs.decide.outputs.version != ''
+    if: always() && needs.decide.outputs.dry == 'false' && needs.decide.outputs.version != '' && needs.decide.outputs.version != '0.0.0' && github.ref == 'refs/heads/main' && github.event_name != 'pull_request'
     runs-on: ubuntu-latest
     permissions:
       contents: write

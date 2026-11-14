@@ -86,7 +86,6 @@ public final class AdGroupRegionsBody {
 
         private Optional<AdGroupGeoLocationsBody> include = Optional.empty();
 
-        @JsonAnySetter
         private Map<String, Object> additionalProperties = new HashMap<>();
 
         private Builder() {}
@@ -127,6 +126,14 @@ public final class AdGroupRegionsBody {
 
         public AdGroupRegionsBody build() {
             return new AdGroupRegionsBody(exclude, include, additionalProperties);
+        }
+
+        @JsonAnySetter
+        private void putAdditionalPropertyFromJson(String key, Object value) {
+            if (key.equalsIgnoreCase("exclude") || key.equalsIgnoreCase("include")) {
+                return;
+            }
+            this.additionalProperties.put(key, value);
         }
 
         public Builder additionalProperty(String key, Object value) {

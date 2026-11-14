@@ -127,7 +127,6 @@ public final class CheckoutSessionPaymentMethodConfiguration {
 
         private List<String> disabled = new ArrayList<>();
 
-        @JsonAnySetter
         private Map<String, Object> additionalProperties = new HashMap<>();
 
         private Builder() {}
@@ -141,7 +140,6 @@ public final class CheckoutSessionPaymentMethodConfiguration {
         }
 
         /**
-         * <p>Whether Whop's default set is the starting point. When <code>false</code>, only <code>enabled</code> is offered.</p>
          * <p>Whether Whop's default set is the starting point. When <code>false</code>, only <code>enabled</code> is offered.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
@@ -204,6 +202,16 @@ public final class CheckoutSessionPaymentMethodConfiguration {
         public CheckoutSessionPaymentMethodConfiguration build() {
             return new CheckoutSessionPaymentMethodConfiguration(
                     disabled, enabled, includePlatformDefaults, additionalProperties);
+        }
+
+        @JsonAnySetter
+        private void putAdditionalPropertyFromJson(String key, Object value) {
+            if (key.equalsIgnoreCase("disabled")
+                    || key.equalsIgnoreCase("enabled")
+                    || key.equalsIgnoreCase("include_platform_defaults")) {
+                return;
+            }
+            this.additionalProperties.put(key, value);
         }
 
         @java.lang.Override

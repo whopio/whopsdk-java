@@ -9,27 +9,15 @@ import com.fasterxml.jackson.annotation.JsonValue;
 public final class AdCampaignStatus {
     public static final AdCampaignStatus INACTIVE = new AdCampaignStatus(Value.INACTIVE, "inactive");
 
-    public static final AdCampaignStatus STALE = new AdCampaignStatus(Value.STALE, "stale");
-
     public static final AdCampaignStatus DUPLICATING = new AdCampaignStatus(Value.DUPLICATING, "duplicating");
 
     public static final AdCampaignStatus PAUSED = new AdCampaignStatus(Value.PAUSED, "paused");
-
-    public static final AdCampaignStatus IMPORTED = new AdCampaignStatus(Value.IMPORTED, "imported");
-
-    public static final AdCampaignStatus PENDING_REFUND = new AdCampaignStatus(Value.PENDING_REFUND, "pending_refund");
 
     public static final AdCampaignStatus PAYMENT_FAILED = new AdCampaignStatus(Value.PAYMENT_FAILED, "payment_failed");
 
     public static final AdCampaignStatus DRAFT = new AdCampaignStatus(Value.DRAFT, "draft");
 
-    public static final AdCampaignStatus FLAGGED = new AdCampaignStatus(Value.FLAGGED, "flagged");
-
-    public static final AdCampaignStatus IN_REVIEW = new AdCampaignStatus(Value.IN_REVIEW, "in_review");
-
     public static final AdCampaignStatus ACTIVE = new AdCampaignStatus(Value.ACTIVE, "active");
-
-    public static final AdCampaignStatus IMPORTING = new AdCampaignStatus(Value.IMPORTING, "importing");
 
     private final Value value;
 
@@ -65,28 +53,16 @@ public final class AdCampaignStatus {
         switch (value) {
             case INACTIVE:
                 return visitor.visitInactive();
-            case STALE:
-                return visitor.visitStale();
             case DUPLICATING:
                 return visitor.visitDuplicating();
             case PAUSED:
                 return visitor.visitPaused();
-            case IMPORTED:
-                return visitor.visitImported();
-            case PENDING_REFUND:
-                return visitor.visitPendingRefund();
             case PAYMENT_FAILED:
                 return visitor.visitPaymentFailed();
             case DRAFT:
                 return visitor.visitDraft();
-            case FLAGGED:
-                return visitor.visitFlagged();
-            case IN_REVIEW:
-                return visitor.visitInReview();
             case ACTIVE:
                 return visitor.visitActive();
-            case IMPORTING:
-                return visitor.visitImporting();
             case UNKNOWN:
             default:
                 return visitor.visitUnknown(string);
@@ -98,28 +74,16 @@ public final class AdCampaignStatus {
         switch (value) {
             case "inactive":
                 return INACTIVE;
-            case "stale":
-                return STALE;
             case "duplicating":
                 return DUPLICATING;
             case "paused":
                 return PAUSED;
-            case "imported":
-                return IMPORTED;
-            case "pending_refund":
-                return PENDING_REFUND;
             case "payment_failed":
                 return PAYMENT_FAILED;
             case "draft":
                 return DRAFT;
-            case "flagged":
-                return FLAGGED;
-            case "in_review":
-                return IN_REVIEW;
             case "active":
                 return ACTIVE;
-            case "importing":
-                return IMPORTING;
             default:
                 return new AdCampaignStatus(Value.UNKNOWN, value);
         }
@@ -132,21 +96,9 @@ public final class AdCampaignStatus {
 
         INACTIVE,
 
-        STALE,
-
-        PENDING_REFUND,
-
         PAYMENT_FAILED,
 
         DRAFT,
-
-        IN_REVIEW,
-
-        FLAGGED,
-
-        IMPORTING,
-
-        IMPORTED,
 
         DUPLICATING,
 
@@ -160,21 +112,9 @@ public final class AdCampaignStatus {
 
         T visitInactive();
 
-        T visitStale();
-
-        T visitPendingRefund();
-
         T visitPaymentFailed();
 
         T visitDraft();
-
-        T visitInReview();
-
-        T visitFlagged();
-
-        T visitImporting();
-
-        T visitImported();
 
         T visitDuplicating();
 

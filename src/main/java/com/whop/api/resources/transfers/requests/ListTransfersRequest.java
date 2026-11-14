@@ -70,7 +70,7 @@ public final class ListTransfersRequest {
     }
 
     /**
-     * @return Filter to transfers sent from this account. Provide this or destination_id.
+     * @return Filter to transfers sent from this account.
      */
     @JsonProperty("origin_id")
     public Optional<String> getOriginId() {
@@ -78,7 +78,7 @@ public final class ListTransfersRequest {
     }
 
     /**
-     * @return Filter to transfers received by this account. Provide this or origin_id.
+     * @return Filter to transfers received by this account.
      */
     @JsonProperty("destination_id")
     public Optional<String> getDestinationId() {
@@ -118,7 +118,7 @@ public final class ListTransfersRequest {
     }
 
     /**
-     * @return Number of transfers to return from the start of the window.
+     * @return Number of results to return from the start of the range.
      */
     @JsonProperty("first")
     public Optional<Integer> getFirst() {
@@ -126,7 +126,7 @@ public final class ListTransfersRequest {
     }
 
     /**
-     * @return Cursor to fetch the page after (from page_info.end_cursor).
+     * @return Return results after this cursor. Use <code>page_info.end_cursor</code> from the previous response to fetch the next page.
      */
     @JsonProperty("after")
     public Optional<String> getAfter() {
@@ -134,7 +134,7 @@ public final class ListTransfersRequest {
     }
 
     /**
-     * @return Number of transfers to return from the end of the window.
+     * @return Number of results to return from the end of the range.
      */
     @JsonProperty("last")
     public Optional<Integer> getLast() {
@@ -142,7 +142,7 @@ public final class ListTransfersRequest {
     }
 
     /**
-     * @return Cursor to fetch the page before (from page_info.start_cursor).
+     * @return Return results before this cursor. Use <code>page_info.start_cursor</code> from the previous response to fetch the previous page.
      */
     @JsonProperty("before")
     public Optional<String> getBefore() {
@@ -219,7 +219,6 @@ public final class ListTransfersRequest {
 
         private Optional<String> before = Optional.empty();
 
-        @JsonAnySetter
         private Map<String, Object> additionalProperties = new HashMap<>();
 
         private Builder() {}
@@ -239,7 +238,7 @@ public final class ListTransfersRequest {
         }
 
         /**
-         * <p>Filter to transfers sent from this account. Provide this or destination_id.</p>
+         * <p>Filter to transfers sent from this account.</p>
          */
         @JsonSetter(value = "origin_id", nulls = Nulls.SKIP)
         public Builder originId(Optional<String> originId) {
@@ -253,7 +252,7 @@ public final class ListTransfersRequest {
         }
 
         /**
-         * <p>Filter to transfers received by this account. Provide this or origin_id.</p>
+         * <p>Filter to transfers received by this account.</p>
          */
         @JsonSetter(value = "destination_id", nulls = Nulls.SKIP)
         public Builder destinationId(Optional<String> destinationId) {
@@ -323,7 +322,7 @@ public final class ListTransfersRequest {
         }
 
         /**
-         * <p>Number of transfers to return from the start of the window.</p>
+         * <p>Number of results to return from the start of the range.</p>
          */
         @JsonSetter(value = "first", nulls = Nulls.SKIP)
         public Builder first(Optional<Integer> first) {
@@ -337,7 +336,7 @@ public final class ListTransfersRequest {
         }
 
         /**
-         * <p>Cursor to fetch the page after (from page_info.end_cursor).</p>
+         * <p>Return results after this cursor. Use <code>page_info.end_cursor</code> from the previous response to fetch the next page.</p>
          */
         @JsonSetter(value = "after", nulls = Nulls.SKIP)
         public Builder after(Optional<String> after) {
@@ -351,7 +350,7 @@ public final class ListTransfersRequest {
         }
 
         /**
-         * <p>Number of transfers to return from the end of the window.</p>
+         * <p>Number of results to return from the end of the range.</p>
          */
         @JsonSetter(value = "last", nulls = Nulls.SKIP)
         public Builder last(Optional<Integer> last) {
@@ -365,7 +364,7 @@ public final class ListTransfersRequest {
         }
 
         /**
-         * <p>Cursor to fetch the page before (from page_info.start_cursor).</p>
+         * <p>Return results before this cursor. Use <code>page_info.start_cursor</code> from the previous response to fetch the previous page.</p>
          */
         @JsonSetter(value = "before", nulls = Nulls.SKIP)
         public Builder before(Optional<String> before) {
@@ -391,6 +390,23 @@ public final class ListTransfersRequest {
                     last,
                     before,
                     additionalProperties);
+        }
+
+        @JsonAnySetter
+        private void putAdditionalPropertyFromJson(String key, Object value) {
+            if (key.equalsIgnoreCase("origin_id")
+                    || key.equalsIgnoreCase("destination_id")
+                    || key.equalsIgnoreCase("order")
+                    || key.equalsIgnoreCase("direction")
+                    || key.equalsIgnoreCase("created_before")
+                    || key.equalsIgnoreCase("created_after")
+                    || key.equalsIgnoreCase("first")
+                    || key.equalsIgnoreCase("after")
+                    || key.equalsIgnoreCase("last")
+                    || key.equalsIgnoreCase("before")) {
+                return;
+            }
+            this.additionalProperties.put(key, value);
         }
 
         public Builder additionalProperty(String key, Object value) {

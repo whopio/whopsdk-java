@@ -181,7 +181,6 @@ public final class AppDefaultApiKey {
 
         private Optional<String> name = Optional.empty();
 
-        @JsonAnySetter
         private Map<String, Object> additionalProperties = new HashMap<>();
 
         private Builder() {}
@@ -197,7 +196,6 @@ public final class AppDefaultApiKey {
 
         /**
          * <p>API key ID, prefixed <code>apik_</code>.</p>
-         * <p>API key ID, prefixed <code>apik_</code>.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
@@ -208,7 +206,6 @@ public final class AppDefaultApiKey {
         }
 
         /**
-         * <p>Masked version of the secret key, so the key can be recognized without revealing the full secret.</p>
          * <p>Masked version of the secret key, so the key can be recognized without revealing the full secret.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
@@ -295,6 +292,17 @@ public final class AppDefaultApiKey {
         @java.lang.Override
         public AppDefaultApiKey build() {
             return new AppDefaultApiKey(id, name, obfuscatedSecretKey, secretKey, additionalProperties);
+        }
+
+        @JsonAnySetter
+        private void putAdditionalPropertyFromJson(String key, Object value) {
+            if (key.equalsIgnoreCase("id")
+                    || key.equalsIgnoreCase("name")
+                    || key.equalsIgnoreCase("obfuscated_secret_key")
+                    || key.equalsIgnoreCase("secret_key")) {
+                return;
+            }
+            this.additionalProperties.put(key, value);
         }
 
         @java.lang.Override

@@ -266,7 +266,6 @@ public final class FeeMarkup {
 
         private Optional<Double> fixedFeeUsd = Optional.empty();
 
-        @JsonAnySetter
         private Map<String, Object> additionalProperties = new HashMap<>();
 
         private Builder() {}
@@ -285,7 +284,6 @@ public final class FeeMarkup {
 
         /**
          * <p>The datetime the fee markup was created.</p>
-         * <p>The datetime the fee markup was created.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
@@ -296,7 +294,6 @@ public final class FeeMarkup {
         }
 
         /**
-         * <p>The category of fee this markup applies to.</p>
          * <p>The category of fee this markup applies to.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
@@ -309,7 +306,6 @@ public final class FeeMarkup {
 
         /**
          * <p>The unique identifier for the fee markup.</p>
-         * <p>The unique identifier for the fee markup.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
@@ -320,7 +316,6 @@ public final class FeeMarkup {
         }
 
         /**
-         * <p>The datetime the fee markup was last updated.</p>
          * <p>The datetime the fee markup was last updated.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
@@ -443,6 +438,20 @@ public final class FeeMarkup {
         public FeeMarkup build() {
             return new FeeMarkup(
                     createdAt, feeType, fixedFeeUsd, id, notes, percentageFee, updatedAt, additionalProperties);
+        }
+
+        @JsonAnySetter
+        private void putAdditionalPropertyFromJson(String key, Object value) {
+            if (key.equalsIgnoreCase("created_at")
+                    || key.equalsIgnoreCase("fee_type")
+                    || key.equalsIgnoreCase("fixed_fee_usd")
+                    || key.equalsIgnoreCase("id")
+                    || key.equalsIgnoreCase("notes")
+                    || key.equalsIgnoreCase("percentage_fee")
+                    || key.equalsIgnoreCase("updated_at")) {
+                return;
+            }
+            this.additionalProperties.put(key, value);
         }
 
         @java.lang.Override

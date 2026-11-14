@@ -19,14 +19,14 @@ import org.jetbrains.annotations.NotNull;
 @JsonInclude(JsonInclude.Include.NON_ABSENT)
 @JsonDeserialize(builder = CreateAffiliatesRequest.Builder.class)
 public final class CreateAffiliatesRequest {
-    private final String companyId;
+    private final String accountId;
 
     private final String userIdentifier;
 
     private final Map<String, Object> additionalProperties;
 
-    private CreateAffiliatesRequest(String companyId, String userIdentifier, Map<String, Object> additionalProperties) {
-        this.companyId = companyId;
+    private CreateAffiliatesRequest(String accountId, String userIdentifier, Map<String, Object> additionalProperties) {
+        this.accountId = accountId;
         this.userIdentifier = userIdentifier;
         this.additionalProperties = additionalProperties;
     }
@@ -34,9 +34,9 @@ public final class CreateAffiliatesRequest {
     /**
      * @return The ID of the company to create the affiliate for.
      */
-    @JsonProperty("company_id")
-    public String getCompanyId() {
-        return companyId;
+    @JsonProperty("account_id")
+    public String getAccountId() {
+        return accountId;
     }
 
     /**
@@ -59,12 +59,12 @@ public final class CreateAffiliatesRequest {
     }
 
     private boolean equalTo(CreateAffiliatesRequest other) {
-        return companyId.equals(other.companyId) && userIdentifier.equals(other.userIdentifier);
+        return accountId.equals(other.accountId) && userIdentifier.equals(other.userIdentifier);
     }
 
     @java.lang.Override
     public int hashCode() {
-        return Objects.hash(this.companyId, this.userIdentifier);
+        return Objects.hash(this.accountId, this.userIdentifier);
     }
 
     @java.lang.Override
@@ -72,15 +72,15 @@ public final class CreateAffiliatesRequest {
         return ObjectMappers.stringify(this);
     }
 
-    public static CompanyIdStage builder() {
+    public static AccountIdStage builder() {
         return new Builder();
     }
 
-    public interface CompanyIdStage {
+    public interface AccountIdStage {
         /**
          * <p>The ID of the company to create the affiliate for.</p>
          */
-        UserIdentifierStage companyId(@NotNull String companyId);
+        UserIdentifierStage accountId(@NotNull String accountId);
 
         Builder from(CreateAffiliatesRequest other);
     }
@@ -101,37 +101,34 @@ public final class CreateAffiliatesRequest {
     }
 
     @JsonIgnoreProperties(ignoreUnknown = true)
-    public static final class Builder implements CompanyIdStage, UserIdentifierStage, _FinalStage {
-        private String companyId;
+    public static final class Builder implements AccountIdStage, UserIdentifierStage, _FinalStage {
+        private String accountId;
 
         private String userIdentifier;
 
-        @JsonAnySetter
         private Map<String, Object> additionalProperties = new HashMap<>();
 
         private Builder() {}
 
         @java.lang.Override
         public Builder from(CreateAffiliatesRequest other) {
-            companyId(other.getCompanyId());
+            accountId(other.getAccountId());
             userIdentifier(other.getUserIdentifier());
             return this;
         }
 
         /**
          * <p>The ID of the company to create the affiliate for.</p>
-         * <p>The ID of the company to create the affiliate for.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
-        @JsonSetter("company_id")
-        public UserIdentifierStage companyId(@NotNull String companyId) {
-            this.companyId = Objects.requireNonNull(companyId, "companyId must not be null");
+        @JsonSetter("account_id")
+        public UserIdentifierStage accountId(@NotNull String accountId) {
+            this.accountId = Objects.requireNonNull(accountId, "accountId must not be null");
             return this;
         }
 
         /**
-         * <p>The user identifier (username, email, user ID, or Discord ID).</p>
          * <p>The user identifier (username, email, user ID, or Discord ID).</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
@@ -144,7 +141,15 @@ public final class CreateAffiliatesRequest {
 
         @java.lang.Override
         public CreateAffiliatesRequest build() {
-            return new CreateAffiliatesRequest(companyId, userIdentifier, additionalProperties);
+            return new CreateAffiliatesRequest(accountId, userIdentifier, additionalProperties);
+        }
+
+        @JsonAnySetter
+        private void putAdditionalPropertyFromJson(String key, Object value) {
+            if (key.equalsIgnoreCase("account_id") || key.equalsIgnoreCase("user_identifier")) {
+                return;
+            }
+            this.additionalProperties.put(key, value);
         }
 
         @java.lang.Override

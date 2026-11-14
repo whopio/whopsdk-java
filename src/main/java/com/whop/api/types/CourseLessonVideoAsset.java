@@ -460,7 +460,6 @@ public final class CourseLessonVideoAsset {
 
         private Optional<String> assetId = Optional.empty();
 
-        @JsonAnySetter
         private Map<String, Object> additionalProperties = new HashMap<>();
 
         private Builder() {}
@@ -485,7 +484,6 @@ public final class CourseLessonVideoAsset {
 
         /**
          * <p>Whether this asset contains only audio</p>
-         * <p>Whether this asset contains only audio</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
@@ -496,7 +494,6 @@ public final class CourseLessonVideoAsset {
         }
 
         /**
-         * <p>The datetime the mux asset was created.</p>
          * <p>The datetime the mux asset was created.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
@@ -509,7 +506,6 @@ public final class CourseLessonVideoAsset {
 
         /**
          * <p>The unique identifier for the mux asset.</p>
-         * <p>The unique identifier for the mux asset.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
@@ -521,7 +517,6 @@ public final class CourseLessonVideoAsset {
 
         /**
          * <p>The status of the Mux asset</p>
-         * <p>The status of the Mux asset</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
@@ -532,7 +527,6 @@ public final class CourseLessonVideoAsset {
         }
 
         /**
-         * <p>The datetime the mux asset was last updated.</p>
          * <p>The datetime the mux asset was last updated.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
@@ -848,6 +842,26 @@ public final class CourseLessonVideoAsset {
                     status,
                     updatedAt,
                     additionalProperties);
+        }
+
+        @JsonAnySetter
+        private void putAdditionalPropertyFromJson(String key, Object value) {
+            if (key.equalsIgnoreCase("asset_id")
+                    || key.equalsIgnoreCase("audio_only")
+                    || key.equalsIgnoreCase("created_at")
+                    || key.equalsIgnoreCase("duration_seconds")
+                    || key.equalsIgnoreCase("finished_uploading_at")
+                    || key.equalsIgnoreCase("id")
+                    || key.equalsIgnoreCase("playback_id")
+                    || key.equalsIgnoreCase("signed_playback_id")
+                    || key.equalsIgnoreCase("signed_storyboard_playback_token")
+                    || key.equalsIgnoreCase("signed_thumbnail_playback_token")
+                    || key.equalsIgnoreCase("signed_video_playback_token")
+                    || key.equalsIgnoreCase("status")
+                    || key.equalsIgnoreCase("updated_at")) {
+                return;
+            }
+            this.additionalProperties.put(key, value);
         }
 
         @java.lang.Override

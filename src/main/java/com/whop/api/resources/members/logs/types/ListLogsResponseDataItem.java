@@ -140,7 +140,6 @@ public final class ListLogsResponseDataItem {
 
         private Optional<String> action = Optional.empty();
 
-        @JsonAnySetter
         private Map<String, Object> additionalProperties = new HashMap<>();
 
         private Builder() {}
@@ -213,6 +212,14 @@ public final class ListLogsResponseDataItem {
         @java.lang.Override
         public ListLogsResponseDataItem build() {
             return new ListLogsResponseDataItem(action, actor, createdAt, additionalProperties);
+        }
+
+        @JsonAnySetter
+        private void putAdditionalPropertyFromJson(String key, Object value) {
+            if (key.equalsIgnoreCase("action") || key.equalsIgnoreCase("actor") || key.equalsIgnoreCase("created_at")) {
+                return;
+            }
+            this.additionalProperties.put(key, value);
         }
 
         @java.lang.Override

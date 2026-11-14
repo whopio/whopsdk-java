@@ -5,10 +5,10 @@ package com.whop.api.resources.webhooks;
 
 import com.whop.api.core.ClientOptions;
 import com.whop.api.core.RequestOptions;
+import com.whop.api.core.WhopApiHttpResponse;
 import com.whop.api.core.pagination.SyncPagingIterable;
 import com.whop.api.resources.webhooks.requests.CreateWebhooksRequest;
 import com.whop.api.resources.webhooks.requests.DeleteWebhooksRequest;
-import com.whop.api.resources.webhooks.requests.DeliveriesWebhookRequest;
 import com.whop.api.resources.webhooks.requests.ListDeliveriesWebhooksRequest;
 import com.whop.api.resources.webhooks.requests.ListWebhooksRequest;
 import com.whop.api.resources.webhooks.requests.ReplayDeliveryWebhooksRequest;
@@ -17,7 +17,6 @@ import com.whop.api.resources.webhooks.requests.RetrieveWebhooksRequest;
 import com.whop.api.resources.webhooks.requests.TestWebhooksRequest;
 import com.whop.api.resources.webhooks.requests.UpdateWebhooksRequest;
 import com.whop.api.resources.webhooks.types.DeleteWebhooksResponse;
-import com.whop.api.resources.webhooks.types.DeliveriesWebhookResponseDataItem;
 import com.whop.api.resources.webhooks.types.ReplayDeliveryWebhooksResponse;
 import com.whop.api.resources.webhooks.types.ReplayWebhooksResponse;
 import com.whop.api.resources.webhooks.types.TestWebhooksResponse;
@@ -46,8 +45,48 @@ public class AsyncWebhooksClient {
     /**
      * Returns a paginated list of webhook endpoints configured for an account, ordered by most recently created.
      */
+    public CompletableFuture<SyncPagingIterable<WebhookListItem>> list() {
+        CompletableFuture<WhopApiHttpResponse<SyncPagingIterable<WebhookListItem>>> rawFuture = this.rawClient.list();
+        CompletableFuture<SyncPagingIterable<WebhookListItem>> future =
+                rawFuture.thenApply(response -> response.body());
+        future.whenComplete((result_, throwable_) -> {
+            if (future.isCancelled()) {
+                rawFuture.cancel(true);
+            }
+        });
+        return future;
+    }
+
+    /**
+     * Returns a paginated list of webhook endpoints configured for an account, ordered by most recently created.
+     */
+    public CompletableFuture<SyncPagingIterable<WebhookListItem>> list(RequestOptions requestOptions) {
+        CompletableFuture<WhopApiHttpResponse<SyncPagingIterable<WebhookListItem>>> rawFuture =
+                this.rawClient.list(requestOptions);
+        CompletableFuture<SyncPagingIterable<WebhookListItem>> future =
+                rawFuture.thenApply(response -> response.body());
+        future.whenComplete((result_, throwable_) -> {
+            if (future.isCancelled()) {
+                rawFuture.cancel(true);
+            }
+        });
+        return future;
+    }
+
+    /**
+     * Returns a paginated list of webhook endpoints configured for an account, ordered by most recently created.
+     */
     public CompletableFuture<SyncPagingIterable<WebhookListItem>> list(ListWebhooksRequest request) {
-        return this.rawClient.list(request).thenApply(response -> response.body());
+        CompletableFuture<WhopApiHttpResponse<SyncPagingIterable<WebhookListItem>>> rawFuture =
+                this.rawClient.list(request);
+        CompletableFuture<SyncPagingIterable<WebhookListItem>> future =
+                rawFuture.thenApply(response -> response.body());
+        future.whenComplete((result_, throwable_) -> {
+            if (future.isCancelled()) {
+                rawFuture.cancel(true);
+            }
+        });
+        return future;
     }
 
     /**
@@ -55,42 +94,86 @@ public class AsyncWebhooksClient {
      */
     public CompletableFuture<SyncPagingIterable<WebhookListItem>> list(
             ListWebhooksRequest request, RequestOptions requestOptions) {
-        return this.rawClient.list(request, requestOptions).thenApply(response -> response.body());
+        CompletableFuture<WhopApiHttpResponse<SyncPagingIterable<WebhookListItem>>> rawFuture =
+                this.rawClient.list(request, requestOptions);
+        CompletableFuture<SyncPagingIterable<WebhookListItem>> future =
+                rawFuture.thenApply(response -> response.body());
+        future.whenComplete((result_, throwable_) -> {
+            if (future.isCancelled()) {
+                rawFuture.cancel(true);
+            }
+        });
+        return future;
     }
 
     /**
      * Creates a webhook endpoint that receives event notifications via HTTP POST.
      */
     public CompletableFuture<Webhook> create(CreateWebhooksRequest request) {
-        return this.rawClient.create(request).thenApply(response -> response.body());
+        CompletableFuture<WhopApiHttpResponse<Webhook>> rawFuture = this.rawClient.create(request);
+        CompletableFuture<Webhook> future = rawFuture.thenApply(response -> response.body());
+        future.whenComplete((result_, throwable_) -> {
+            if (future.isCancelled()) {
+                rawFuture.cancel(true);
+            }
+        });
+        return future;
     }
 
     /**
      * Creates a webhook endpoint that receives event notifications via HTTP POST.
      */
     public CompletableFuture<Webhook> create(CreateWebhooksRequest request, RequestOptions requestOptions) {
-        return this.rawClient.create(request, requestOptions).thenApply(response -> response.body());
+        CompletableFuture<WhopApiHttpResponse<Webhook>> rawFuture = this.rawClient.create(request, requestOptions);
+        CompletableFuture<Webhook> future = rawFuture.thenApply(response -> response.body());
+        future.whenComplete((result_, throwable_) -> {
+            if (future.isCancelled()) {
+                rawFuture.cancel(true);
+            }
+        });
+        return future;
     }
 
     /**
      * Retrieves the details of an existing webhook.
      */
     public CompletableFuture<Webhook> retrieve(String id) {
-        return this.rawClient.retrieve(id).thenApply(response -> response.body());
+        CompletableFuture<WhopApiHttpResponse<Webhook>> rawFuture = this.rawClient.retrieve(id);
+        CompletableFuture<Webhook> future = rawFuture.thenApply(response -> response.body());
+        future.whenComplete((result_, throwable_) -> {
+            if (future.isCancelled()) {
+                rawFuture.cancel(true);
+            }
+        });
+        return future;
     }
 
     /**
      * Retrieves the details of an existing webhook.
      */
     public CompletableFuture<Webhook> retrieve(String id, RequestOptions requestOptions) {
-        return this.rawClient.retrieve(id, requestOptions).thenApply(response -> response.body());
+        CompletableFuture<WhopApiHttpResponse<Webhook>> rawFuture = this.rawClient.retrieve(id, requestOptions);
+        CompletableFuture<Webhook> future = rawFuture.thenApply(response -> response.body());
+        future.whenComplete((result_, throwable_) -> {
+            if (future.isCancelled()) {
+                rawFuture.cancel(true);
+            }
+        });
+        return future;
     }
 
     /**
      * Retrieves the details of an existing webhook.
      */
     public CompletableFuture<Webhook> retrieve(String id, RetrieveWebhooksRequest request) {
-        return this.rawClient.retrieve(id, request).thenApply(response -> response.body());
+        CompletableFuture<WhopApiHttpResponse<Webhook>> rawFuture = this.rawClient.retrieve(id, request);
+        CompletableFuture<Webhook> future = rawFuture.thenApply(response -> response.body());
+        future.whenComplete((result_, throwable_) -> {
+            if (future.isCancelled()) {
+                rawFuture.cancel(true);
+            }
+        });
+        return future;
     }
 
     /**
@@ -98,150 +181,304 @@ public class AsyncWebhooksClient {
      */
     public CompletableFuture<Webhook> retrieve(
             String id, RetrieveWebhooksRequest request, RequestOptions requestOptions) {
-        return this.rawClient.retrieve(id, request, requestOptions).thenApply(response -> response.body());
+        CompletableFuture<WhopApiHttpResponse<Webhook>> rawFuture =
+                this.rawClient.retrieve(id, request, requestOptions);
+        CompletableFuture<Webhook> future = rawFuture.thenApply(response -> response.body());
+        future.whenComplete((result_, throwable_) -> {
+            if (future.isCancelled()) {
+                rawFuture.cancel(true);
+            }
+        });
+        return future;
     }
 
     /**
-     * Permanently deletes a webhook endpoint. Returns <code>true</code> on success, matching the legacy proxy response.
+     * Permanently deletes a webhook endpoint. To stop deliveries without deleting it, set <code>enabled</code> to <code>false</code> with <code>PATCH /webhooks/:id</code>.
      */
     public CompletableFuture<DeleteWebhooksResponse> delete(String id) {
-        return this.rawClient.delete(id).thenApply(response -> response.body());
+        CompletableFuture<WhopApiHttpResponse<DeleteWebhooksResponse>> rawFuture = this.rawClient.delete(id);
+        CompletableFuture<DeleteWebhooksResponse> future = rawFuture.thenApply(response -> response.body());
+        future.whenComplete((result_, throwable_) -> {
+            if (future.isCancelled()) {
+                rawFuture.cancel(true);
+            }
+        });
+        return future;
     }
 
     /**
-     * Permanently deletes a webhook endpoint. Returns <code>true</code> on success, matching the legacy proxy response.
+     * Permanently deletes a webhook endpoint. To stop deliveries without deleting it, set <code>enabled</code> to <code>false</code> with <code>PATCH /webhooks/:id</code>.
      */
     public CompletableFuture<DeleteWebhooksResponse> delete(String id, RequestOptions requestOptions) {
-        return this.rawClient.delete(id, requestOptions).thenApply(response -> response.body());
+        CompletableFuture<WhopApiHttpResponse<DeleteWebhooksResponse>> rawFuture =
+                this.rawClient.delete(id, requestOptions);
+        CompletableFuture<DeleteWebhooksResponse> future = rawFuture.thenApply(response -> response.body());
+        future.whenComplete((result_, throwable_) -> {
+            if (future.isCancelled()) {
+                rawFuture.cancel(true);
+            }
+        });
+        return future;
     }
 
     /**
-     * Permanently deletes a webhook endpoint. Returns <code>true</code> on success, matching the legacy proxy response.
+     * Permanently deletes a webhook endpoint. To stop deliveries without deleting it, set <code>enabled</code> to <code>false</code> with <code>PATCH /webhooks/:id</code>.
      */
     public CompletableFuture<DeleteWebhooksResponse> delete(String id, DeleteWebhooksRequest request) {
-        return this.rawClient.delete(id, request).thenApply(response -> response.body());
+        CompletableFuture<WhopApiHttpResponse<DeleteWebhooksResponse>> rawFuture = this.rawClient.delete(id, request);
+        CompletableFuture<DeleteWebhooksResponse> future = rawFuture.thenApply(response -> response.body());
+        future.whenComplete((result_, throwable_) -> {
+            if (future.isCancelled()) {
+                rawFuture.cancel(true);
+            }
+        });
+        return future;
     }
 
     /**
-     * Permanently deletes a webhook endpoint. Returns <code>true</code> on success, matching the legacy proxy response.
+     * Permanently deletes a webhook endpoint. To stop deliveries without deleting it, set <code>enabled</code> to <code>false</code> with <code>PATCH /webhooks/:id</code>.
      */
     public CompletableFuture<DeleteWebhooksResponse> delete(
             String id, DeleteWebhooksRequest request, RequestOptions requestOptions) {
-        return this.rawClient.delete(id, request, requestOptions).thenApply(response -> response.body());
+        CompletableFuture<WhopApiHttpResponse<DeleteWebhooksResponse>> rawFuture =
+                this.rawClient.delete(id, request, requestOptions);
+        CompletableFuture<DeleteWebhooksResponse> future = rawFuture.thenApply(response -> response.body());
+        future.whenComplete((result_, throwable_) -> {
+            if (future.isCancelled()) {
+                rawFuture.cancel(true);
+            }
+        });
+        return future;
     }
 
     /**
      * Updates a webhook endpoint's URL, subscribed events, pinned payload version, or enabled state.
      */
     public CompletableFuture<Webhook> update(String id) {
-        return this.rawClient.update(id).thenApply(response -> response.body());
+        CompletableFuture<WhopApiHttpResponse<Webhook>> rawFuture = this.rawClient.update(id);
+        CompletableFuture<Webhook> future = rawFuture.thenApply(response -> response.body());
+        future.whenComplete((result_, throwable_) -> {
+            if (future.isCancelled()) {
+                rawFuture.cancel(true);
+            }
+        });
+        return future;
     }
 
     /**
      * Updates a webhook endpoint's URL, subscribed events, pinned payload version, or enabled state.
      */
     public CompletableFuture<Webhook> update(String id, RequestOptions requestOptions) {
-        return this.rawClient.update(id, requestOptions).thenApply(response -> response.body());
+        CompletableFuture<WhopApiHttpResponse<Webhook>> rawFuture = this.rawClient.update(id, requestOptions);
+        CompletableFuture<Webhook> future = rawFuture.thenApply(response -> response.body());
+        future.whenComplete((result_, throwable_) -> {
+            if (future.isCancelled()) {
+                rawFuture.cancel(true);
+            }
+        });
+        return future;
     }
 
     /**
      * Updates a webhook endpoint's URL, subscribed events, pinned payload version, or enabled state.
      */
     public CompletableFuture<Webhook> update(String id, UpdateWebhooksRequest request) {
-        return this.rawClient.update(id, request).thenApply(response -> response.body());
+        CompletableFuture<WhopApiHttpResponse<Webhook>> rawFuture = this.rawClient.update(id, request);
+        CompletableFuture<Webhook> future = rawFuture.thenApply(response -> response.body());
+        future.whenComplete((result_, throwable_) -> {
+            if (future.isCancelled()) {
+                rawFuture.cancel(true);
+            }
+        });
+        return future;
     }
 
     /**
      * Updates a webhook endpoint's URL, subscribed events, pinned payload version, or enabled state.
      */
     public CompletableFuture<Webhook> update(String id, UpdateWebhooksRequest request, RequestOptions requestOptions) {
-        return this.rawClient.update(id, request, requestOptions).thenApply(response -> response.body());
+        CompletableFuture<WhopApiHttpResponse<Webhook>> rawFuture = this.rawClient.update(id, request, requestOptions);
+        CompletableFuture<Webhook> future = rawFuture.thenApply(response -> response.body());
+        future.whenComplete((result_, throwable_) -> {
+            if (future.isCancelled()) {
+                rawFuture.cancel(true);
+            }
+        });
+        return future;
     }
 
     /**
-     * Returns a paginated list of delivery attempts for a webhook, ordered by most recent first. Includes the request payload, response body, response code, and timing for each attempt.
+     * Returns a paginated list of delivery attempts for a webhook, ordered by most recent first. Includes the request payload, response body, response code, and timing for each attempt. Filtered queries use a bounded read budget, so a page may be partial or empty. Continue with <code>page_info.end_cursor</code> while <code>page_info.has_next_page</code> is <code>true</code>.
      */
     public CompletableFuture<SyncPagingIterable<WebhookDelivery>> listDeliveries(String id) {
-        return this.rawClient.listDeliveries(id).thenApply(response -> response.body());
+        CompletableFuture<WhopApiHttpResponse<SyncPagingIterable<WebhookDelivery>>> rawFuture =
+                this.rawClient.listDeliveries(id);
+        CompletableFuture<SyncPagingIterable<WebhookDelivery>> future =
+                rawFuture.thenApply(response -> response.body());
+        future.whenComplete((result_, throwable_) -> {
+            if (future.isCancelled()) {
+                rawFuture.cancel(true);
+            }
+        });
+        return future;
     }
 
     /**
-     * Returns a paginated list of delivery attempts for a webhook, ordered by most recent first. Includes the request payload, response body, response code, and timing for each attempt.
+     * Returns a paginated list of delivery attempts for a webhook, ordered by most recent first. Includes the request payload, response body, response code, and timing for each attempt. Filtered queries use a bounded read budget, so a page may be partial or empty. Continue with <code>page_info.end_cursor</code> while <code>page_info.has_next_page</code> is <code>true</code>.
      */
     public CompletableFuture<SyncPagingIterable<WebhookDelivery>> listDeliveries(
             String id, RequestOptions requestOptions) {
-        return this.rawClient.listDeliveries(id, requestOptions).thenApply(response -> response.body());
+        CompletableFuture<WhopApiHttpResponse<SyncPagingIterable<WebhookDelivery>>> rawFuture =
+                this.rawClient.listDeliveries(id, requestOptions);
+        CompletableFuture<SyncPagingIterable<WebhookDelivery>> future =
+                rawFuture.thenApply(response -> response.body());
+        future.whenComplete((result_, throwable_) -> {
+            if (future.isCancelled()) {
+                rawFuture.cancel(true);
+            }
+        });
+        return future;
     }
 
     /**
-     * Returns a paginated list of delivery attempts for a webhook, ordered by most recent first. Includes the request payload, response body, response code, and timing for each attempt.
+     * Returns a paginated list of delivery attempts for a webhook, ordered by most recent first. Includes the request payload, response body, response code, and timing for each attempt. Filtered queries use a bounded read budget, so a page may be partial or empty. Continue with <code>page_info.end_cursor</code> while <code>page_info.has_next_page</code> is <code>true</code>.
      */
     public CompletableFuture<SyncPagingIterable<WebhookDelivery>> listDeliveries(
             String id, ListDeliveriesWebhooksRequest request) {
-        return this.rawClient.listDeliveries(id, request).thenApply(response -> response.body());
+        CompletableFuture<WhopApiHttpResponse<SyncPagingIterable<WebhookDelivery>>> rawFuture =
+                this.rawClient.listDeliveries(id, request);
+        CompletableFuture<SyncPagingIterable<WebhookDelivery>> future =
+                rawFuture.thenApply(response -> response.body());
+        future.whenComplete((result_, throwable_) -> {
+            if (future.isCancelled()) {
+                rawFuture.cancel(true);
+            }
+        });
+        return future;
     }
 
     /**
-     * Returns a paginated list of delivery attempts for a webhook, ordered by most recent first. Includes the request payload, response body, response code, and timing for each attempt.
+     * Returns a paginated list of delivery attempts for a webhook, ordered by most recent first. Includes the request payload, response body, response code, and timing for each attempt. Filtered queries use a bounded read budget, so a page may be partial or empty. Continue with <code>page_info.end_cursor</code> while <code>page_info.has_next_page</code> is <code>true</code>.
      */
     public CompletableFuture<SyncPagingIterable<WebhookDelivery>> listDeliveries(
             String id, ListDeliveriesWebhooksRequest request, RequestOptions requestOptions) {
-        return this.rawClient.listDeliveries(id, request, requestOptions).thenApply(response -> response.body());
+        CompletableFuture<WhopApiHttpResponse<SyncPagingIterable<WebhookDelivery>>> rawFuture =
+                this.rawClient.listDeliveries(id, request, requestOptions);
+        CompletableFuture<SyncPagingIterable<WebhookDelivery>> future =
+                rawFuture.thenApply(response -> response.body());
+        future.whenComplete((result_, throwable_) -> {
+            if (future.isCancelled()) {
+                rawFuture.cancel(true);
+            }
+        });
+        return future;
     }
 
     /**
-     * Re-sends the exact payload of a past delivery to the webhook's current URL and returns the delivery result. By default the replay keeps the original <code>webhook-id</code>, so consumers that deduplicate on it can drop events they already processed. Pass <code>regenerate_id</code> to re-send under a freshly generated <code>webhook-id</code> instead, so a deduplicating consumer processes the replay as a new message. Only available for enabled webhooks on API version v1; deliveries are retained for 30 days.
+     * Re-sends the exact payload of a past delivery to the webhook's current URL and returns the delivery result. The replay keeps the original <code>webhook-id</code> unless you pass <code>regenerate_id</code>, so consumers that deduplicate on it can drop events they already processed. Only available for enabled webhooks on API version <code>v1</code>; deliveries are retained for 30 days.
      */
     public CompletableFuture<ReplayDeliveryWebhooksResponse> replayDelivery(String id, String deliveryId) {
-        return this.rawClient.replayDelivery(id, deliveryId).thenApply(response -> response.body());
+        CompletableFuture<WhopApiHttpResponse<ReplayDeliveryWebhooksResponse>> rawFuture =
+                this.rawClient.replayDelivery(id, deliveryId);
+        CompletableFuture<ReplayDeliveryWebhooksResponse> future = rawFuture.thenApply(response -> response.body());
+        future.whenComplete((result_, throwable_) -> {
+            if (future.isCancelled()) {
+                rawFuture.cancel(true);
+            }
+        });
+        return future;
     }
 
     /**
-     * Re-sends the exact payload of a past delivery to the webhook's current URL and returns the delivery result. By default the replay keeps the original <code>webhook-id</code>, so consumers that deduplicate on it can drop events they already processed. Pass <code>regenerate_id</code> to re-send under a freshly generated <code>webhook-id</code> instead, so a deduplicating consumer processes the replay as a new message. Only available for enabled webhooks on API version v1; deliveries are retained for 30 days.
+     * Re-sends the exact payload of a past delivery to the webhook's current URL and returns the delivery result. The replay keeps the original <code>webhook-id</code> unless you pass <code>regenerate_id</code>, so consumers that deduplicate on it can drop events they already processed. Only available for enabled webhooks on API version <code>v1</code>; deliveries are retained for 30 days.
      */
     public CompletableFuture<ReplayDeliveryWebhooksResponse> replayDelivery(
             String id, String deliveryId, RequestOptions requestOptions) {
-        return this.rawClient.replayDelivery(id, deliveryId, requestOptions).thenApply(response -> response.body());
+        CompletableFuture<WhopApiHttpResponse<ReplayDeliveryWebhooksResponse>> rawFuture =
+                this.rawClient.replayDelivery(id, deliveryId, requestOptions);
+        CompletableFuture<ReplayDeliveryWebhooksResponse> future = rawFuture.thenApply(response -> response.body());
+        future.whenComplete((result_, throwable_) -> {
+            if (future.isCancelled()) {
+                rawFuture.cancel(true);
+            }
+        });
+        return future;
     }
 
     /**
-     * Re-sends the exact payload of a past delivery to the webhook's current URL and returns the delivery result. By default the replay keeps the original <code>webhook-id</code>, so consumers that deduplicate on it can drop events they already processed. Pass <code>regenerate_id</code> to re-send under a freshly generated <code>webhook-id</code> instead, so a deduplicating consumer processes the replay as a new message. Only available for enabled webhooks on API version v1; deliveries are retained for 30 days.
+     * Re-sends the exact payload of a past delivery to the webhook's current URL and returns the delivery result. The replay keeps the original <code>webhook-id</code> unless you pass <code>regenerate_id</code>, so consumers that deduplicate on it can drop events they already processed. Only available for enabled webhooks on API version <code>v1</code>; deliveries are retained for 30 days.
      */
     public CompletableFuture<ReplayDeliveryWebhooksResponse> replayDelivery(
             String id, String deliveryId, ReplayDeliveryWebhooksRequest request) {
-        return this.rawClient.replayDelivery(id, deliveryId, request).thenApply(response -> response.body());
+        CompletableFuture<WhopApiHttpResponse<ReplayDeliveryWebhooksResponse>> rawFuture =
+                this.rawClient.replayDelivery(id, deliveryId, request);
+        CompletableFuture<ReplayDeliveryWebhooksResponse> future = rawFuture.thenApply(response -> response.body());
+        future.whenComplete((result_, throwable_) -> {
+            if (future.isCancelled()) {
+                rawFuture.cancel(true);
+            }
+        });
+        return future;
     }
 
     /**
-     * Re-sends the exact payload of a past delivery to the webhook's current URL and returns the delivery result. By default the replay keeps the original <code>webhook-id</code>, so consumers that deduplicate on it can drop events they already processed. Pass <code>regenerate_id</code> to re-send under a freshly generated <code>webhook-id</code> instead, so a deduplicating consumer processes the replay as a new message. Only available for enabled webhooks on API version v1; deliveries are retained for 30 days.
+     * Re-sends the exact payload of a past delivery to the webhook's current URL and returns the delivery result. The replay keeps the original <code>webhook-id</code> unless you pass <code>regenerate_id</code>, so consumers that deduplicate on it can drop events they already processed. Only available for enabled webhooks on API version <code>v1</code>; deliveries are retained for 30 days.
      */
     public CompletableFuture<ReplayDeliveryWebhooksResponse> replayDelivery(
             String id, String deliveryId, ReplayDeliveryWebhooksRequest request, RequestOptions requestOptions) {
-        return this.rawClient
-                .replayDelivery(id, deliveryId, request, requestOptions)
-                .thenApply(response -> response.body());
+        CompletableFuture<WhopApiHttpResponse<ReplayDeliveryWebhooksResponse>> rawFuture =
+                this.rawClient.replayDelivery(id, deliveryId, request, requestOptions);
+        CompletableFuture<ReplayDeliveryWebhooksResponse> future = rawFuture.thenApply(response -> response.body());
+        future.whenComplete((result_, throwable_) -> {
+            if (future.isCancelled()) {
+                rawFuture.cancel(true);
+            }
+        });
+        return future;
     }
 
     /**
-     * Re-sends the webhook's past deliveries within a time window, optionally limited to specific events or to messages whose most recent delivery attempt failed. Fire and forget: nothing about the replay is stored, and each re-send appears as a new entry in the webhook's delivery log. Each matching message is re-sent once, by default with its original <code>webhook-id</code>, so consumers that deduplicate are unaffected; pass <code>regenerate_ids</code> to re-send under freshly generated ids instead. Only available for enabled webhooks on API version v1; deliveries are retained for 30 days.
+     * Re-sends the webhook's past deliveries within a time window, optionally limited to specific events or to failed deliveries. Use it to recover events your endpoint missed. The replay runs asynchronously and nothing about it is stored: each re-send appears as a new entry in the webhook's delivery log. Each matching message is re-sent once, with its original <code>webhook-id</code> unless you pass <code>regenerate_ids</code>. Only available for enabled webhooks on API version <code>v1</code>; deliveries are retained for 30 days.
      */
     public CompletableFuture<ReplayWebhooksResponse> replay(String id, ReplayWebhooksRequest request) {
-        return this.rawClient.replay(id, request).thenApply(response -> response.body());
+        CompletableFuture<WhopApiHttpResponse<ReplayWebhooksResponse>> rawFuture = this.rawClient.replay(id, request);
+        CompletableFuture<ReplayWebhooksResponse> future = rawFuture.thenApply(response -> response.body());
+        future.whenComplete((result_, throwable_) -> {
+            if (future.isCancelled()) {
+                rawFuture.cancel(true);
+            }
+        });
+        return future;
     }
 
     /**
-     * Re-sends the webhook's past deliveries within a time window, optionally limited to specific events or to messages whose most recent delivery attempt failed. Fire and forget: nothing about the replay is stored, and each re-send appears as a new entry in the webhook's delivery log. Each matching message is re-sent once, by default with its original <code>webhook-id</code>, so consumers that deduplicate are unaffected; pass <code>regenerate_ids</code> to re-send under freshly generated ids instead. Only available for enabled webhooks on API version v1; deliveries are retained for 30 days.
+     * Re-sends the webhook's past deliveries within a time window, optionally limited to specific events or to failed deliveries. Use it to recover events your endpoint missed. The replay runs asynchronously and nothing about it is stored: each re-send appears as a new entry in the webhook's delivery log. Each matching message is re-sent once, with its original <code>webhook-id</code> unless you pass <code>regenerate_ids</code>. Only available for enabled webhooks on API version <code>v1</code>; deliveries are retained for 30 days.
      */
     public CompletableFuture<ReplayWebhooksResponse> replay(
             String id, ReplayWebhooksRequest request, RequestOptions requestOptions) {
-        return this.rawClient.replay(id, request, requestOptions).thenApply(response -> response.body());
+        CompletableFuture<WhopApiHttpResponse<ReplayWebhooksResponse>> rawFuture =
+                this.rawClient.replay(id, request, requestOptions);
+        CompletableFuture<ReplayWebhooksResponse> future = rawFuture.thenApply(response -> response.body());
+        future.whenComplete((result_, throwable_) -> {
+            if (future.isCancelled()) {
+                rawFuture.cancel(true);
+            }
+        });
+        return future;
     }
 
     /**
      * Sends a sample payload for the given event to the webhook's URL and returns the delivery result.
      */
     public CompletableFuture<TestWebhooksResponse> test(String id, TestWebhooksRequest request) {
-        return this.rawClient.test(id, request).thenApply(response -> response.body());
+        CompletableFuture<WhopApiHttpResponse<TestWebhooksResponse>> rawFuture = this.rawClient.test(id, request);
+        CompletableFuture<TestWebhooksResponse> future = rawFuture.thenApply(response -> response.body());
+        future.whenComplete((result_, throwable_) -> {
+            if (future.isCancelled()) {
+                rawFuture.cancel(true);
+            }
+        });
+        return future;
     }
 
     /**
@@ -249,56 +486,14 @@ public class AsyncWebhooksClient {
      */
     public CompletableFuture<TestWebhooksResponse> test(
             String id, TestWebhooksRequest request, RequestOptions requestOptions) {
-        return this.rawClient.test(id, request, requestOptions).thenApply(response -> response.body());
-    }
-
-    /**
-     * Returns a paginated list of delivery attempts for a webhook, ordered by most recent first. Includes the request payload, response body, response code, and timing for each attempt.
-     * <p>Required permissions:</p>
-     * <ul>
-     * <li><code>developer:manage_webhook</code></li>
-     * </ul>
-     */
-    public CompletableFuture<SyncPagingIterable<DeliveriesWebhookResponseDataItem>> deliveriesWebhook(
-            String webhookId) {
-        return this.rawClient.deliveriesWebhook(webhookId).thenApply(response -> response.body());
-    }
-
-    /**
-     * Returns a paginated list of delivery attempts for a webhook, ordered by most recent first. Includes the request payload, response body, response code, and timing for each attempt.
-     * <p>Required permissions:</p>
-     * <ul>
-     * <li><code>developer:manage_webhook</code></li>
-     * </ul>
-     */
-    public CompletableFuture<SyncPagingIterable<DeliveriesWebhookResponseDataItem>> deliveriesWebhook(
-            String webhookId, RequestOptions requestOptions) {
-        return this.rawClient.deliveriesWebhook(webhookId, requestOptions).thenApply(response -> response.body());
-    }
-
-    /**
-     * Returns a paginated list of delivery attempts for a webhook, ordered by most recent first. Includes the request payload, response body, response code, and timing for each attempt.
-     * <p>Required permissions:</p>
-     * <ul>
-     * <li><code>developer:manage_webhook</code></li>
-     * </ul>
-     */
-    public CompletableFuture<SyncPagingIterable<DeliveriesWebhookResponseDataItem>> deliveriesWebhook(
-            String webhookId, DeliveriesWebhookRequest request) {
-        return this.rawClient.deliveriesWebhook(webhookId, request).thenApply(response -> response.body());
-    }
-
-    /**
-     * Returns a paginated list of delivery attempts for a webhook, ordered by most recent first. Includes the request payload, response body, response code, and timing for each attempt.
-     * <p>Required permissions:</p>
-     * <ul>
-     * <li><code>developer:manage_webhook</code></li>
-     * </ul>
-     */
-    public CompletableFuture<SyncPagingIterable<DeliveriesWebhookResponseDataItem>> deliveriesWebhook(
-            String webhookId, DeliveriesWebhookRequest request, RequestOptions requestOptions) {
-        return this.rawClient
-                .deliveriesWebhook(webhookId, request, requestOptions)
-                .thenApply(response -> response.body());
+        CompletableFuture<WhopApiHttpResponse<TestWebhooksResponse>> rawFuture =
+                this.rawClient.test(id, request, requestOptions);
+        CompletableFuture<TestWebhooksResponse> future = rawFuture.thenApply(response -> response.body());
+        future.whenComplete((result_, throwable_) -> {
+            if (future.isCancelled()) {
+                rawFuture.cancel(true);
+            }
+        });
+        return future;
     }
 }

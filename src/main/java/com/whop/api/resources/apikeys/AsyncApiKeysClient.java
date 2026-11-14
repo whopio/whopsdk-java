@@ -5,6 +5,7 @@ package com.whop.api.resources.apikeys;
 
 import com.whop.api.core.ClientOptions;
 import com.whop.api.core.RequestOptions;
+import com.whop.api.core.WhopApiHttpResponse;
 import com.whop.api.core.pagination.SyncPagingIterable;
 import com.whop.api.resources.apikeys.requests.CreateApiKeysRequest;
 import com.whop.api.resources.apikeys.requests.DeleteApiKeysRequest;
@@ -35,67 +36,133 @@ public class AsyncApiKeysClient {
     }
 
     /**
-     * Lists the API keys of an account or app, newest first. Responses never include the full secret — only its obfuscated form.
+     * Lists the API keys of an account, app, or your own user, newest first. Responses never include the full secret — only its obfuscated form.
      */
     public CompletableFuture<SyncPagingIterable<ApiKey>> list(ListApiKeysRequest request) {
-        return this.rawClient.list(request).thenApply(response -> response.body());
+        CompletableFuture<WhopApiHttpResponse<SyncPagingIterable<ApiKey>>> rawFuture = this.rawClient.list(request);
+        CompletableFuture<SyncPagingIterable<ApiKey>> future = rawFuture.thenApply(response -> response.body());
+        future.whenComplete((result_, throwable_) -> {
+            if (future.isCancelled()) {
+                rawFuture.cancel(true);
+            }
+        });
+        return future;
     }
 
     /**
-     * Lists the API keys of an account or app, newest first. Responses never include the full secret — only its obfuscated form.
+     * Lists the API keys of an account, app, or your own user, newest first. Responses never include the full secret — only its obfuscated form.
      */
     public CompletableFuture<SyncPagingIterable<ApiKey>> list(
             ListApiKeysRequest request, RequestOptions requestOptions) {
-        return this.rawClient.list(request, requestOptions).thenApply(response -> response.body());
+        CompletableFuture<WhopApiHttpResponse<SyncPagingIterable<ApiKey>>> rawFuture =
+                this.rawClient.list(request, requestOptions);
+        CompletableFuture<SyncPagingIterable<ApiKey>> future = rawFuture.thenApply(response -> response.body());
+        future.whenComplete((result_, throwable_) -> {
+            if (future.isCancelled()) {
+                rawFuture.cancel(true);
+            }
+        });
+        return future;
     }
 
     /**
-     * Creates an API key for an account or app. The response is the only place the full <code>secret_key</code> is returned — store it immediately. Requires a user session; API keys cannot manage API keys.
+     * Creates an API key for an account, an app, or your own user. A user API key acts as you and can only grant <code>ad_campaign:basic:read</code>, <code>ad_campaign:update</code>, <code>ad_pixel:manage</code>, <code>member:journey:read</code>. The response is the only place the full <code>secret_key</code> is returned — store it immediately. Requires a user session; API keys cannot manage API keys.
      */
     public CompletableFuture<ApiKey> create(CreateApiKeysRequest request) {
-        return this.rawClient.create(request).thenApply(response -> response.body());
+        CompletableFuture<WhopApiHttpResponse<ApiKey>> rawFuture = this.rawClient.create(request);
+        CompletableFuture<ApiKey> future = rawFuture.thenApply(response -> response.body());
+        future.whenComplete((result_, throwable_) -> {
+            if (future.isCancelled()) {
+                rawFuture.cancel(true);
+            }
+        });
+        return future;
     }
 
     /**
-     * Creates an API key for an account or app. The response is the only place the full <code>secret_key</code> is returned — store it immediately. Requires a user session; API keys cannot manage API keys.
+     * Creates an API key for an account, an app, or your own user. A user API key acts as you and can only grant <code>ad_campaign:basic:read</code>, <code>ad_campaign:update</code>, <code>ad_pixel:manage</code>, <code>member:journey:read</code>. The response is the only place the full <code>secret_key</code> is returned — store it immediately. Requires a user session; API keys cannot manage API keys.
      */
     public CompletableFuture<ApiKey> create(CreateApiKeysRequest request, RequestOptions requestOptions) {
-        return this.rawClient.create(request, requestOptions).thenApply(response -> response.body());
+        CompletableFuture<WhopApiHttpResponse<ApiKey>> rawFuture = this.rawClient.create(request, requestOptions);
+        CompletableFuture<ApiKey> future = rawFuture.thenApply(response -> response.body());
+        future.whenComplete((result_, throwable_) -> {
+            if (future.isCancelled()) {
+                rawFuture.cancel(true);
+            }
+        });
+        return future;
     }
 
     /**
-     * Lists the catalog of permission actions that can be granted to users, apps, and API keys — the source for the dashboard's permission pickers. Small and returned in full on one page.
+     * Lists the catalog of permission actions that can be granted to users, apps, and API keys. Use it to choose the <code>permissions</code> for an API key or to build a permission picker. Small and returned in full on one page.
      */
     public CompletableFuture<ListPermissionsApiKeysResponse> listPermissions() {
-        return this.rawClient.listPermissions().thenApply(response -> response.body());
+        CompletableFuture<WhopApiHttpResponse<ListPermissionsApiKeysResponse>> rawFuture =
+                this.rawClient.listPermissions();
+        CompletableFuture<ListPermissionsApiKeysResponse> future = rawFuture.thenApply(response -> response.body());
+        future.whenComplete((result_, throwable_) -> {
+            if (future.isCancelled()) {
+                rawFuture.cancel(true);
+            }
+        });
+        return future;
     }
 
     /**
-     * Lists the catalog of permission actions that can be granted to users, apps, and API keys — the source for the dashboard's permission pickers. Small and returned in full on one page.
+     * Lists the catalog of permission actions that can be granted to users, apps, and API keys. Use it to choose the <code>permissions</code> for an API key or to build a permission picker. Small and returned in full on one page.
      */
     public CompletableFuture<ListPermissionsApiKeysResponse> listPermissions(RequestOptions requestOptions) {
-        return this.rawClient.listPermissions(requestOptions).thenApply(response -> response.body());
+        CompletableFuture<WhopApiHttpResponse<ListPermissionsApiKeysResponse>> rawFuture =
+                this.rawClient.listPermissions(requestOptions);
+        CompletableFuture<ListPermissionsApiKeysResponse> future = rawFuture.thenApply(response -> response.body());
+        future.whenComplete((result_, throwable_) -> {
+            if (future.isCancelled()) {
+                rawFuture.cancel(true);
+            }
+        });
+        return future;
     }
 
     /**
      * Retrieves an API key with its effective permission grants. The full secret is never returned — rotate the key if it was lost.
      */
     public CompletableFuture<ApiKey> retrieve(String id) {
-        return this.rawClient.retrieve(id).thenApply(response -> response.body());
+        CompletableFuture<WhopApiHttpResponse<ApiKey>> rawFuture = this.rawClient.retrieve(id);
+        CompletableFuture<ApiKey> future = rawFuture.thenApply(response -> response.body());
+        future.whenComplete((result_, throwable_) -> {
+            if (future.isCancelled()) {
+                rawFuture.cancel(true);
+            }
+        });
+        return future;
     }
 
     /**
      * Retrieves an API key with its effective permission grants. The full secret is never returned — rotate the key if it was lost.
      */
     public CompletableFuture<ApiKey> retrieve(String id, RequestOptions requestOptions) {
-        return this.rawClient.retrieve(id, requestOptions).thenApply(response -> response.body());
+        CompletableFuture<WhopApiHttpResponse<ApiKey>> rawFuture = this.rawClient.retrieve(id, requestOptions);
+        CompletableFuture<ApiKey> future = rawFuture.thenApply(response -> response.body());
+        future.whenComplete((result_, throwable_) -> {
+            if (future.isCancelled()) {
+                rawFuture.cancel(true);
+            }
+        });
+        return future;
     }
 
     /**
      * Retrieves an API key with its effective permission grants. The full secret is never returned — rotate the key if it was lost.
      */
     public CompletableFuture<ApiKey> retrieve(String id, RetrieveApiKeysRequest request) {
-        return this.rawClient.retrieve(id, request).thenApply(response -> response.body());
+        CompletableFuture<WhopApiHttpResponse<ApiKey>> rawFuture = this.rawClient.retrieve(id, request);
+        CompletableFuture<ApiKey> future = rawFuture.thenApply(response -> response.body());
+        future.whenComplete((result_, throwable_) -> {
+            if (future.isCancelled()) {
+                rawFuture.cancel(true);
+            }
+        });
+        return future;
     }
 
     /**
@@ -103,28 +170,57 @@ public class AsyncApiKeysClient {
      */
     public CompletableFuture<ApiKey> retrieve(
             String id, RetrieveApiKeysRequest request, RequestOptions requestOptions) {
-        return this.rawClient.retrieve(id, request, requestOptions).thenApply(response -> response.body());
+        CompletableFuture<WhopApiHttpResponse<ApiKey>> rawFuture = this.rawClient.retrieve(id, request, requestOptions);
+        CompletableFuture<ApiKey> future = rawFuture.thenApply(response -> response.body());
+        future.whenComplete((result_, throwable_) -> {
+            if (future.isCancelled()) {
+                rawFuture.cancel(true);
+            }
+        });
+        return future;
     }
 
     /**
      * Permanently revokes an API key; requests using its secret stop authenticating immediately. Default and agent-backend keys cannot be deleted.
      */
     public CompletableFuture<DeleteApiKeysResponse> delete(String id) {
-        return this.rawClient.delete(id).thenApply(response -> response.body());
+        CompletableFuture<WhopApiHttpResponse<DeleteApiKeysResponse>> rawFuture = this.rawClient.delete(id);
+        CompletableFuture<DeleteApiKeysResponse> future = rawFuture.thenApply(response -> response.body());
+        future.whenComplete((result_, throwable_) -> {
+            if (future.isCancelled()) {
+                rawFuture.cancel(true);
+            }
+        });
+        return future;
     }
 
     /**
      * Permanently revokes an API key; requests using its secret stop authenticating immediately. Default and agent-backend keys cannot be deleted.
      */
     public CompletableFuture<DeleteApiKeysResponse> delete(String id, RequestOptions requestOptions) {
-        return this.rawClient.delete(id, requestOptions).thenApply(response -> response.body());
+        CompletableFuture<WhopApiHttpResponse<DeleteApiKeysResponse>> rawFuture =
+                this.rawClient.delete(id, requestOptions);
+        CompletableFuture<DeleteApiKeysResponse> future = rawFuture.thenApply(response -> response.body());
+        future.whenComplete((result_, throwable_) -> {
+            if (future.isCancelled()) {
+                rawFuture.cancel(true);
+            }
+        });
+        return future;
     }
 
     /**
      * Permanently revokes an API key; requests using its secret stop authenticating immediately. Default and agent-backend keys cannot be deleted.
      */
     public CompletableFuture<DeleteApiKeysResponse> delete(String id, DeleteApiKeysRequest request) {
-        return this.rawClient.delete(id, request).thenApply(response -> response.body());
+        CompletableFuture<WhopApiHttpResponse<DeleteApiKeysResponse>> rawFuture = this.rawClient.delete(id, request);
+        CompletableFuture<DeleteApiKeysResponse> future = rawFuture.thenApply(response -> response.body());
+        future.whenComplete((result_, throwable_) -> {
+            if (future.isCancelled()) {
+                rawFuture.cancel(true);
+            }
+        });
+        return future;
     }
 
     /**
@@ -132,62 +228,126 @@ public class AsyncApiKeysClient {
      */
     public CompletableFuture<DeleteApiKeysResponse> delete(
             String id, DeleteApiKeysRequest request, RequestOptions requestOptions) {
-        return this.rawClient.delete(id, request, requestOptions).thenApply(response -> response.body());
+        CompletableFuture<WhopApiHttpResponse<DeleteApiKeysResponse>> rawFuture =
+                this.rawClient.delete(id, request, requestOptions);
+        CompletableFuture<DeleteApiKeysResponse> future = rawFuture.thenApply(response -> response.body());
+        future.whenComplete((result_, throwable_) -> {
+            if (future.isCancelled()) {
+                rawFuture.cancel(true);
+            }
+        });
+        return future;
     }
 
     /**
      * Updates an API key's name, permissions, API version, expiration, or IP allowlist. Fields that are omitted keep their current value; default keys cannot be modified.
      */
     public CompletableFuture<ApiKey> update(String id) {
-        return this.rawClient.update(id).thenApply(response -> response.body());
+        CompletableFuture<WhopApiHttpResponse<ApiKey>> rawFuture = this.rawClient.update(id);
+        CompletableFuture<ApiKey> future = rawFuture.thenApply(response -> response.body());
+        future.whenComplete((result_, throwable_) -> {
+            if (future.isCancelled()) {
+                rawFuture.cancel(true);
+            }
+        });
+        return future;
     }
 
     /**
      * Updates an API key's name, permissions, API version, expiration, or IP allowlist. Fields that are omitted keep their current value; default keys cannot be modified.
      */
     public CompletableFuture<ApiKey> update(String id, RequestOptions requestOptions) {
-        return this.rawClient.update(id, requestOptions).thenApply(response -> response.body());
+        CompletableFuture<WhopApiHttpResponse<ApiKey>> rawFuture = this.rawClient.update(id, requestOptions);
+        CompletableFuture<ApiKey> future = rawFuture.thenApply(response -> response.body());
+        future.whenComplete((result_, throwable_) -> {
+            if (future.isCancelled()) {
+                rawFuture.cancel(true);
+            }
+        });
+        return future;
     }
 
     /**
      * Updates an API key's name, permissions, API version, expiration, or IP allowlist. Fields that are omitted keep their current value; default keys cannot be modified.
      */
     public CompletableFuture<ApiKey> update(String id, UpdateApiKeysRequest request) {
-        return this.rawClient.update(id, request).thenApply(response -> response.body());
+        CompletableFuture<WhopApiHttpResponse<ApiKey>> rawFuture = this.rawClient.update(id, request);
+        CompletableFuture<ApiKey> future = rawFuture.thenApply(response -> response.body());
+        future.whenComplete((result_, throwable_) -> {
+            if (future.isCancelled()) {
+                rawFuture.cancel(true);
+            }
+        });
+        return future;
     }
 
     /**
      * Updates an API key's name, permissions, API version, expiration, or IP allowlist. Fields that are omitted keep their current value; default keys cannot be modified.
      */
     public CompletableFuture<ApiKey> update(String id, UpdateApiKeysRequest request, RequestOptions requestOptions) {
-        return this.rawClient.update(id, request, requestOptions).thenApply(response -> response.body());
+        CompletableFuture<WhopApiHttpResponse<ApiKey>> rawFuture = this.rawClient.update(id, request, requestOptions);
+        CompletableFuture<ApiKey> future = rawFuture.thenApply(response -> response.body());
+        future.whenComplete((result_, throwable_) -> {
+            if (future.isCancelled()) {
+                rawFuture.cancel(true);
+            }
+        });
+        return future;
     }
 
     /**
      * Rotates the API key's secret, invalidating the previous secret immediately. The response is the only place the new <code>secret_key</code> is returned.
      */
     public CompletableFuture<ApiKey> rotate(String id) {
-        return this.rawClient.rotate(id).thenApply(response -> response.body());
+        CompletableFuture<WhopApiHttpResponse<ApiKey>> rawFuture = this.rawClient.rotate(id);
+        CompletableFuture<ApiKey> future = rawFuture.thenApply(response -> response.body());
+        future.whenComplete((result_, throwable_) -> {
+            if (future.isCancelled()) {
+                rawFuture.cancel(true);
+            }
+        });
+        return future;
     }
 
     /**
      * Rotates the API key's secret, invalidating the previous secret immediately. The response is the only place the new <code>secret_key</code> is returned.
      */
     public CompletableFuture<ApiKey> rotate(String id, RequestOptions requestOptions) {
-        return this.rawClient.rotate(id, requestOptions).thenApply(response -> response.body());
+        CompletableFuture<WhopApiHttpResponse<ApiKey>> rawFuture = this.rawClient.rotate(id, requestOptions);
+        CompletableFuture<ApiKey> future = rawFuture.thenApply(response -> response.body());
+        future.whenComplete((result_, throwable_) -> {
+            if (future.isCancelled()) {
+                rawFuture.cancel(true);
+            }
+        });
+        return future;
     }
 
     /**
      * Rotates the API key's secret, invalidating the previous secret immediately. The response is the only place the new <code>secret_key</code> is returned.
      */
     public CompletableFuture<ApiKey> rotate(String id, RotateApiKeysRequest request) {
-        return this.rawClient.rotate(id, request).thenApply(response -> response.body());
+        CompletableFuture<WhopApiHttpResponse<ApiKey>> rawFuture = this.rawClient.rotate(id, request);
+        CompletableFuture<ApiKey> future = rawFuture.thenApply(response -> response.body());
+        future.whenComplete((result_, throwable_) -> {
+            if (future.isCancelled()) {
+                rawFuture.cancel(true);
+            }
+        });
+        return future;
     }
 
     /**
      * Rotates the API key's secret, invalidating the previous secret immediately. The response is the only place the new <code>secret_key</code> is returned.
      */
     public CompletableFuture<ApiKey> rotate(String id, RotateApiKeysRequest request, RequestOptions requestOptions) {
-        return this.rawClient.rotate(id, request, requestOptions).thenApply(response -> response.body());
+        CompletableFuture<WhopApiHttpResponse<ApiKey>> rawFuture = this.rawClient.rotate(id, request, requestOptions);
+        CompletableFuture<ApiKey> future = rawFuture.thenApply(response -> response.body());
+        future.whenComplete((result_, throwable_) -> {
+            if (future.isCancelled()) {
+                rawFuture.cancel(true);
+            }
+        });
+        return future;
     }
 }

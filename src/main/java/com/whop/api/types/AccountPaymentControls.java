@@ -36,6 +36,8 @@ public final class AccountPaymentControls {
 
     private final double highRiskProcessingFeePercentage;
 
+    private final List<Map<String, Object>> paymentMethodWarnings;
+
     private final double pendingAutoTopupFeePercentage;
 
     private final int pendingBalanceDelayDays;
@@ -46,6 +48,10 @@ public final class AccountPaymentControls {
 
     private final List<AccountPaymentControlsRestrictedPaymentMethodsItem> restrictedPaymentMethods;
 
+    private final Optional<AccountPaymentControlsUndatedPendingReason> undatedPendingReason;
+
+    private final AccountWithdrawalScheduleControl withdrawalSchedule;
+
     private final Map<String, Object> additionalProperties;
 
     private AccountPaymentControls(
@@ -54,22 +60,28 @@ public final class AccountPaymentControls {
             boolean enforce3Ds,
             boolean financingDisabled,
             double highRiskProcessingFeePercentage,
+            List<Map<String, Object>> paymentMethodWarnings,
             double pendingAutoTopupFeePercentage,
             int pendingBalanceDelayDays,
             AccountReserveControl reserve,
             AccountResolutionCenterAutoRefundControl resolutionCenterAutoRefund,
             List<AccountPaymentControlsRestrictedPaymentMethodsItem> restrictedPaymentMethods,
+            Optional<AccountPaymentControlsUndatedPendingReason> undatedPendingReason,
+            AccountWithdrawalScheduleControl withdrawalSchedule,
             Map<String, Object> additionalProperties) {
         this.disputeAlertAutoRefund = disputeAlertAutoRefund;
         this.disputeAlertFeeUsd = disputeAlertFeeUsd;
         this.enforce3Ds = enforce3Ds;
         this.financingDisabled = financingDisabled;
         this.highRiskProcessingFeePercentage = highRiskProcessingFeePercentage;
+        this.paymentMethodWarnings = paymentMethodWarnings;
         this.pendingAutoTopupFeePercentage = pendingAutoTopupFeePercentage;
         this.pendingBalanceDelayDays = pendingBalanceDelayDays;
         this.reserve = reserve;
         this.resolutionCenterAutoRefund = resolutionCenterAutoRefund;
         this.restrictedPaymentMethods = restrictedPaymentMethods;
+        this.undatedPendingReason = undatedPendingReason;
+        this.withdrawalSchedule = withdrawalSchedule;
         this.additionalProperties = additionalProperties;
     }
 
@@ -116,6 +128,11 @@ public final class AccountPaymentControls {
         return highRiskProcessingFeePercentage;
     }
 
+    @JsonProperty("payment_method_warnings")
+    public List<Map<String, Object>> getPaymentMethodWarnings() {
+        return paymentMethodWarnings;
+    }
+
     /**
      * @return Percentage fee charged when pending, not-yet-settled balance is advanced to fund the account's cards balance, where <code>2</code> means 2%. <code>0</code> when the account is exempt.
      */
@@ -153,10 +170,35 @@ public final class AccountPaymentControls {
         return restrictedPaymentMethods;
     }
 
+    /**
+     * @return Why pending funds without a settlement date aren't moving yet. <code>kyc_incomplete</code>, <code>pending_information_request</code>, and <code>update_payout_profile</code> are things the merchant can act on. <code>compliance_review</code> means a verification the merchant already submitted is being reviewed, so these funds stay pending until it clears. <code>withdrawals_disabled</code> means Whop has blocked withdrawals, so these funds cannot become available. <code>null</code> when there's no reason to show — still clearing, or held for a reason that isn't named here.
+     */
+    @JsonIgnore
+    public Optional<AccountPaymentControlsUndatedPendingReason> getUndatedPendingReason() {
+        if (undatedPendingReason == null) {
+            return Optional.empty();
+        }
+        return undatedPendingReason;
+    }
+
+    /**
+     * @return How the account's balance automatically withdraws.
+     */
+    @JsonProperty("withdrawal_schedule")
+    public AccountWithdrawalScheduleControl getWithdrawalSchedule() {
+        return withdrawalSchedule;
+    }
+
     @JsonInclude(value = JsonInclude.Include.CUSTOM, valueFilter = NullableNonemptyFilter.class)
     @JsonProperty("dispute_alert_fee_usd")
     private Optional<Double> _getDisputeAlertFeeUsd() {
         return disputeAlertFeeUsd;
+    }
+
+    @JsonInclude(value = JsonInclude.Include.CUSTOM, valueFilter = NullableNonemptyFilter.class)
+    @JsonProperty("undated_pending_reason")
+    private Optional<AccountPaymentControlsUndatedPendingReason> _getUndatedPendingReason() {
+        return undatedPendingReason;
     }
 
     @java.lang.Override
@@ -176,11 +218,14 @@ public final class AccountPaymentControls {
                 && enforce3Ds == other.enforce3Ds
                 && financingDisabled == other.financingDisabled
                 && highRiskProcessingFeePercentage == other.highRiskProcessingFeePercentage
+                && paymentMethodWarnings.equals(other.paymentMethodWarnings)
                 && pendingAutoTopupFeePercentage == other.pendingAutoTopupFeePercentage
                 && pendingBalanceDelayDays == other.pendingBalanceDelayDays
                 && reserve.equals(other.reserve)
                 && resolutionCenterAutoRefund.equals(other.resolutionCenterAutoRefund)
-                && restrictedPaymentMethods.equals(other.restrictedPaymentMethods);
+                && restrictedPaymentMethods.equals(other.restrictedPaymentMethods)
+                && undatedPendingReason.equals(other.undatedPendingReason)
+                && withdrawalSchedule.equals(other.withdrawalSchedule);
     }
 
     @java.lang.Override
@@ -191,11 +236,14 @@ public final class AccountPaymentControls {
                 this.enforce3Ds,
                 this.financingDisabled,
                 this.highRiskProcessingFeePercentage,
+                this.paymentMethodWarnings,
                 this.pendingAutoTopupFeePercentage,
                 this.pendingBalanceDelayDays,
                 this.reserve,
                 this.resolutionCenterAutoRefund,
-                this.restrictedPaymentMethods);
+                this.restrictedPaymentMethods,
+                this.undatedPendingReason,
+                this.withdrawalSchedule);
     }
 
     @java.lang.Override
@@ -262,8 +310,15 @@ public final class AccountPaymentControls {
         /**
          * <p>Automatic refund settings for resolution center cases.</p>
          */
-        _FinalStage resolutionCenterAutoRefund(
+        WithdrawalScheduleStage resolutionCenterAutoRefund(
                 @NotNull AccountResolutionCenterAutoRefundControl resolutionCenterAutoRefund);
+    }
+
+    public interface WithdrawalScheduleStage {
+        /**
+         * <p>How the account's balance automatically withdraws.</p>
+         */
+        _FinalStage withdrawalSchedule(@NotNull AccountWithdrawalScheduleControl withdrawalSchedule);
     }
 
     public interface _FinalStage {
@@ -282,6 +337,12 @@ public final class AccountPaymentControls {
 
         _FinalStage disputeAlertFeeUsd(Nullable<Double> disputeAlertFeeUsd);
 
+        _FinalStage paymentMethodWarnings(List<Map<String, Object>> paymentMethodWarnings);
+
+        _FinalStage addPaymentMethodWarnings(Map<String, Object> paymentMethodWarnings);
+
+        _FinalStage addAllPaymentMethodWarnings(List<Map<String, Object>> paymentMethodWarnings);
+
         _FinalStage restrictedPaymentMethods(
                 List<AccountPaymentControlsRestrictedPaymentMethodsItem> restrictedPaymentMethods);
 
@@ -290,6 +351,15 @@ public final class AccountPaymentControls {
 
         _FinalStage addAllRestrictedPaymentMethods(
                 List<AccountPaymentControlsRestrictedPaymentMethodsItem> restrictedPaymentMethods);
+
+        /**
+         * <p>Why pending funds without a settlement date aren't moving yet. <code>kyc_incomplete</code>, <code>pending_information_request</code>, and <code>update_payout_profile</code> are things the merchant can act on. <code>compliance_review</code> means a verification the merchant already submitted is being reviewed, so these funds stay pending until it clears. <code>withdrawals_disabled</code> means Whop has blocked withdrawals, so these funds cannot become available. <code>null</code> when there's no reason to show — still clearing, or held for a reason that isn't named here.</p>
+         */
+        _FinalStage undatedPendingReason(Optional<AccountPaymentControlsUndatedPendingReason> undatedPendingReason);
+
+        _FinalStage undatedPendingReason(AccountPaymentControlsUndatedPendingReason undatedPendingReason);
+
+        _FinalStage undatedPendingReason(Nullable<AccountPaymentControlsUndatedPendingReason> undatedPendingReason);
     }
 
     @JsonIgnoreProperties(ignoreUnknown = true)
@@ -302,6 +372,7 @@ public final class AccountPaymentControls {
                     PendingBalanceDelayDaysStage,
                     ReserveStage,
                     ResolutionCenterAutoRefundStage,
+                    WithdrawalScheduleStage,
                     _FinalStage {
         private AccountDisputeAlertAutoRefundControl disputeAlertAutoRefund;
 
@@ -319,11 +390,16 @@ public final class AccountPaymentControls {
 
         private AccountResolutionCenterAutoRefundControl resolutionCenterAutoRefund;
 
+        private AccountWithdrawalScheduleControl withdrawalSchedule;
+
+        private Optional<AccountPaymentControlsUndatedPendingReason> undatedPendingReason = Optional.empty();
+
         private List<AccountPaymentControlsRestrictedPaymentMethodsItem> restrictedPaymentMethods = new ArrayList<>();
+
+        private List<Map<String, Object>> paymentMethodWarnings = new ArrayList<>();
 
         private Optional<Double> disputeAlertFeeUsd = Optional.empty();
 
-        @JsonAnySetter
         private Map<String, Object> additionalProperties = new HashMap<>();
 
         private Builder() {}
@@ -335,16 +411,18 @@ public final class AccountPaymentControls {
             enforce3Ds(other.getEnforce3Ds());
             financingDisabled(other.getFinancingDisabled());
             highRiskProcessingFeePercentage(other.getHighRiskProcessingFeePercentage());
+            paymentMethodWarnings(other.getPaymentMethodWarnings());
             pendingAutoTopupFeePercentage(other.getPendingAutoTopupFeePercentage());
             pendingBalanceDelayDays(other.getPendingBalanceDelayDays());
             reserve(other.getReserve());
             resolutionCenterAutoRefund(other.getResolutionCenterAutoRefund());
             restrictedPaymentMethods(other.getRestrictedPaymentMethods());
+            undatedPendingReason(other.getUndatedPendingReason());
+            withdrawalSchedule(other.getWithdrawalSchedule());
             return this;
         }
 
         /**
-         * <p>Automatic refund settings for pre-chargeback dispute alerts.</p>
          * <p>Automatic refund settings for pre-chargeback dispute alerts.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
@@ -359,7 +437,6 @@ public final class AccountPaymentControls {
 
         /**
          * <p>Whether 3-D Secure is forced on every card payment at checkout. The account cannot bypass it while set.</p>
-         * <p>Whether 3-D Secure is forced on every card payment at checkout. The account cannot bypass it while set.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
@@ -371,7 +448,6 @@ public final class AccountPaymentControls {
 
         /**
          * <p>Whether payment health controls explicitly disable financing. This is independent of financing approval in <code>capabilities.accept_bnpl_payments</code>.</p>
-         * <p>Whether payment health controls explicitly disable financing. This is independent of financing approval in <code>capabilities.accept_bnpl_payments</code>.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
@@ -382,7 +458,6 @@ public final class AccountPaymentControls {
         }
 
         /**
-         * <p>Additional processing fee percentage for high-risk processing.</p>
          * <p>Additional processing fee percentage for high-risk processing.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
@@ -396,7 +471,6 @@ public final class AccountPaymentControls {
 
         /**
          * <p>Percentage fee charged when pending, not-yet-settled balance is advanced to fund the account's cards balance, where <code>2</code> means 2%. <code>0</code> when the account is exempt.</p>
-         * <p>Percentage fee charged when pending, not-yet-settled balance is advanced to fund the account's cards balance, where <code>2</code> means 2%. <code>0</code> when the account is exempt.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
@@ -407,7 +481,6 @@ public final class AccountPaymentControls {
         }
 
         /**
-         * <p>Additional days payments remain pending before becoming available.</p>
          * <p>Additional days payments remain pending before becoming available.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
@@ -420,7 +493,6 @@ public final class AccountPaymentControls {
 
         /**
          * <p>Reserve currently applied to incoming payment volume.</p>
-         * <p>Reserve currently applied to incoming payment volume.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
@@ -432,15 +504,63 @@ public final class AccountPaymentControls {
 
         /**
          * <p>Automatic refund settings for resolution center cases.</p>
-         * <p>Automatic refund settings for resolution center cases.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
         @JsonSetter("resolution_center_auto_refund")
-        public _FinalStage resolutionCenterAutoRefund(
+        public WithdrawalScheduleStage resolutionCenterAutoRefund(
                 @NotNull AccountResolutionCenterAutoRefundControl resolutionCenterAutoRefund) {
             this.resolutionCenterAutoRefund =
                     Objects.requireNonNull(resolutionCenterAutoRefund, "resolutionCenterAutoRefund must not be null");
+            return this;
+        }
+
+        /**
+         * <p>How the account's balance automatically withdraws.</p>
+         * @return Reference to {@code this} so that method calls can be chained together.
+         */
+        @java.lang.Override
+        @JsonSetter("withdrawal_schedule")
+        public _FinalStage withdrawalSchedule(@NotNull AccountWithdrawalScheduleControl withdrawalSchedule) {
+            this.withdrawalSchedule = Objects.requireNonNull(withdrawalSchedule, "withdrawalSchedule must not be null");
+            return this;
+        }
+
+        /**
+         * <p>Why pending funds without a settlement date aren't moving yet. <code>kyc_incomplete</code>, <code>pending_information_request</code>, and <code>update_payout_profile</code> are things the merchant can act on. <code>compliance_review</code> means a verification the merchant already submitted is being reviewed, so these funds stay pending until it clears. <code>withdrawals_disabled</code> means Whop has blocked withdrawals, so these funds cannot become available. <code>null</code> when there's no reason to show — still clearing, or held for a reason that isn't named here.</p>
+         * @return Reference to {@code this} so that method calls can be chained together.
+         */
+        @java.lang.Override
+        public _FinalStage undatedPendingReason(
+                Nullable<AccountPaymentControlsUndatedPendingReason> undatedPendingReason) {
+            if (undatedPendingReason.isNull()) {
+                this.undatedPendingReason = null;
+            } else if (undatedPendingReason.isEmpty()) {
+                this.undatedPendingReason = Optional.empty();
+            } else {
+                this.undatedPendingReason = Optional.of(undatedPendingReason.get());
+            }
+            return this;
+        }
+
+        /**
+         * <p>Why pending funds without a settlement date aren't moving yet. <code>kyc_incomplete</code>, <code>pending_information_request</code>, and <code>update_payout_profile</code> are things the merchant can act on. <code>compliance_review</code> means a verification the merchant already submitted is being reviewed, so these funds stay pending until it clears. <code>withdrawals_disabled</code> means Whop has blocked withdrawals, so these funds cannot become available. <code>null</code> when there's no reason to show — still clearing, or held for a reason that isn't named here.</p>
+         * @return Reference to {@code this} so that method calls can be chained together.
+         */
+        @java.lang.Override
+        public _FinalStage undatedPendingReason(AccountPaymentControlsUndatedPendingReason undatedPendingReason) {
+            this.undatedPendingReason = Optional.ofNullable(undatedPendingReason);
+            return this;
+        }
+
+        /**
+         * <p>Why pending funds without a settlement date aren't moving yet. <code>kyc_incomplete</code>, <code>pending_information_request</code>, and <code>update_payout_profile</code> are things the merchant can act on. <code>compliance_review</code> means a verification the merchant already submitted is being reviewed, so these funds stay pending until it clears. <code>withdrawals_disabled</code> means Whop has blocked withdrawals, so these funds cannot become available. <code>null</code> when there's no reason to show — still clearing, or held for a reason that isn't named here.</p>
+         */
+        @java.lang.Override
+        @JsonSetter(value = "undated_pending_reason", nulls = Nulls.SKIP)
+        public _FinalStage undatedPendingReason(
+                Optional<AccountPaymentControlsUndatedPendingReason> undatedPendingReason) {
+            this.undatedPendingReason = undatedPendingReason;
             return this;
         }
 
@@ -467,6 +587,30 @@ public final class AccountPaymentControls {
             this.restrictedPaymentMethods.clear();
             if (restrictedPaymentMethods != null) {
                 this.restrictedPaymentMethods.addAll(restrictedPaymentMethods);
+            }
+            return this;
+        }
+
+        @java.lang.Override
+        public _FinalStage addAllPaymentMethodWarnings(List<Map<String, Object>> paymentMethodWarnings) {
+            if (paymentMethodWarnings != null) {
+                this.paymentMethodWarnings.addAll(paymentMethodWarnings);
+            }
+            return this;
+        }
+
+        @java.lang.Override
+        public _FinalStage addPaymentMethodWarnings(Map<String, Object> paymentMethodWarnings) {
+            this.paymentMethodWarnings.add(paymentMethodWarnings);
+            return this;
+        }
+
+        @java.lang.Override
+        @JsonSetter(value = "payment_method_warnings", nulls = Nulls.SKIP)
+        public _FinalStage paymentMethodWarnings(List<Map<String, Object>> paymentMethodWarnings) {
+            this.paymentMethodWarnings.clear();
+            if (paymentMethodWarnings != null) {
+                this.paymentMethodWarnings.addAll(paymentMethodWarnings);
             }
             return this;
         }
@@ -515,12 +659,35 @@ public final class AccountPaymentControls {
                     enforce3Ds,
                     financingDisabled,
                     highRiskProcessingFeePercentage,
+                    paymentMethodWarnings,
                     pendingAutoTopupFeePercentage,
                     pendingBalanceDelayDays,
                     reserve,
                     resolutionCenterAutoRefund,
                     restrictedPaymentMethods,
+                    undatedPendingReason,
+                    withdrawalSchedule,
                     additionalProperties);
+        }
+
+        @JsonAnySetter
+        private void putAdditionalPropertyFromJson(String key, Object value) {
+            if (key.equalsIgnoreCase("dispute_alert_auto_refund")
+                    || key.equalsIgnoreCase("dispute_alert_fee_usd")
+                    || key.equalsIgnoreCase("enforce_3ds")
+                    || key.equalsIgnoreCase("financing_disabled")
+                    || key.equalsIgnoreCase("high_risk_processing_fee_percentage")
+                    || key.equalsIgnoreCase("payment_method_warnings")
+                    || key.equalsIgnoreCase("pending_auto_topup_fee_percentage")
+                    || key.equalsIgnoreCase("pending_balance_delay_days")
+                    || key.equalsIgnoreCase("reserve")
+                    || key.equalsIgnoreCase("resolution_center_auto_refund")
+                    || key.equalsIgnoreCase("restricted_payment_methods")
+                    || key.equalsIgnoreCase("undated_pending_reason")
+                    || key.equalsIgnoreCase("withdrawal_schedule")) {
+                return;
+            }
+            this.additionalProperties.put(key, value);
         }
 
         @java.lang.Override

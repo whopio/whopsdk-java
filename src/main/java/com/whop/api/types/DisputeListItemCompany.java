@@ -106,7 +106,6 @@ public final class DisputeListItemCompany {
 
         private String title;
 
-        @JsonAnySetter
         private Map<String, Object> additionalProperties = new HashMap<>();
 
         private Builder() {}
@@ -120,7 +119,6 @@ public final class DisputeListItemCompany {
 
         /**
          * <p>The unique identifier for the company.</p>
-         * <p>The unique identifier for the company.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
@@ -131,7 +129,6 @@ public final class DisputeListItemCompany {
         }
 
         /**
-         * <p>The written name of the company.</p>
          * <p>The written name of the company.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
@@ -145,6 +142,14 @@ public final class DisputeListItemCompany {
         @java.lang.Override
         public DisputeListItemCompany build() {
             return new DisputeListItemCompany(id, title, additionalProperties);
+        }
+
+        @JsonAnySetter
+        private void putAdditionalPropertyFromJson(String key, Object value) {
+            if (key.equalsIgnoreCase("id") || key.equalsIgnoreCase("title")) {
+                return;
+            }
+            this.additionalProperties.put(key, value);
         }
 
         @java.lang.Override

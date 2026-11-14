@@ -339,7 +339,6 @@ public final class AppBuild {
 
         private Optional<String> fileUrl = Optional.empty();
 
-        @JsonAnySetter
         private Map<String, Object> additionalProperties = new HashMap<>();
 
         private Builder() {}
@@ -361,7 +360,6 @@ public final class AppBuild {
 
         /**
          * <p>Client-generated checksum of the build file, used to verify file integrity.</p>
-         * <p>Client-generated checksum of the build file, used to verify file integrity.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
@@ -372,7 +370,6 @@ public final class AppBuild {
         }
 
         /**
-         * <p>When the build was uploaded, as an ISO 8601 timestamp.</p>
          * <p>When the build was uploaded, as an ISO 8601 timestamp.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
@@ -385,7 +382,6 @@ public final class AppBuild {
 
         /**
          * <p>App build ID, prefixed <code>abld_</code>.</p>
-         * <p>App build ID, prefixed <code>abld_</code>.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
@@ -396,7 +392,6 @@ public final class AppBuild {
         }
 
         /**
-         * <p>Whether this build is the currently active production build for its platform.</p>
          * <p>Whether this build is the currently active production build for its platform.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
@@ -409,7 +404,6 @@ public final class AppBuild {
 
         /**
          * <p>The target platform for this build.</p>
-         * <p>The target platform for this build.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
@@ -420,7 +414,6 @@ public final class AppBuild {
         }
 
         /**
-         * <p>The build's review status.</p>
          * <p>The build's review status.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
@@ -577,6 +570,23 @@ public final class AppBuild {
                     status,
                     supportedAppViewTypes,
                     additionalProperties);
+        }
+
+        @JsonAnySetter
+        private void putAdditionalPropertyFromJson(String key, Object value) {
+            if (key.equalsIgnoreCase("checksum")
+                    || key.equalsIgnoreCase("created_at")
+                    || key.equalsIgnoreCase("file_url")
+                    || key.equalsIgnoreCase("id")
+                    || key.equalsIgnoreCase("is_production")
+                    || key.equalsIgnoreCase("platform")
+                    || key.equalsIgnoreCase("review_message")
+                    || key.equalsIgnoreCase("source_url")
+                    || key.equalsIgnoreCase("status")
+                    || key.equalsIgnoreCase("supported_app_view_types")) {
+                return;
+            }
+            this.additionalProperties.put(key, value);
         }
 
         @java.lang.Override

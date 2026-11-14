@@ -130,7 +130,6 @@ public final class PayoutMethodDestination {
 
         private String name;
 
-        @JsonAnySetter
         private Map<String, Object> additionalProperties = new HashMap<>();
 
         private Builder() {}
@@ -145,7 +144,6 @@ public final class PayoutMethodDestination {
 
         /**
          * <p>The category of the payout destination</p>
-         * <p>The category of the payout destination</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
@@ -157,7 +155,6 @@ public final class PayoutMethodDestination {
 
         /**
          * <p>The country code of the payout destination</p>
-         * <p>The country code of the payout destination</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
@@ -168,7 +165,6 @@ public final class PayoutMethodDestination {
         }
 
         /**
-         * <p>The name of the payer associated with the payout destination</p>
          * <p>The name of the payer associated with the payout destination</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
@@ -182,6 +178,16 @@ public final class PayoutMethodDestination {
         @java.lang.Override
         public PayoutMethodDestination build() {
             return new PayoutMethodDestination(category, countryCode, name, additionalProperties);
+        }
+
+        @JsonAnySetter
+        private void putAdditionalPropertyFromJson(String key, Object value) {
+            if (key.equalsIgnoreCase("category")
+                    || key.equalsIgnoreCase("country_code")
+                    || key.equalsIgnoreCase("name")) {
+                return;
+            }
+            this.additionalProperties.put(key, value);
         }
 
         @java.lang.Override

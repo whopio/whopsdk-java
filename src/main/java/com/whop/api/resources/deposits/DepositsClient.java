@@ -6,7 +6,9 @@ package com.whop.api.resources.deposits;
 import com.whop.api.core.ClientOptions;
 import com.whop.api.core.RequestOptions;
 import com.whop.api.resources.deposits.requests.CreateDepositsRequest;
+import com.whop.api.resources.deposits.requests.ReverseDepositsRequest;
 import com.whop.api.resources.deposits.types.CreateDepositsResponse;
+import com.whop.api.types.LedgerActivity;
 
 public class DepositsClient {
     protected final ClientOptions clientOptions;
@@ -26,16 +28,60 @@ public class DepositsClient {
     }
 
     /**
-     * Retrieve the deposit methods for an account, including crypto and bank transfer.
+     * Returns the deposit methods for an account or user, including crypto addresses, bank transfer instructions, and, for a business, a hosted deposit page. Bitcoin deposits are converted to USDT on Plasma in the destination's wallet. Business destinations require no authentication. Pass <code>payment_method_id</code> to also charge a business's saved payment method for <code>amount</code> in USD and add it to the business's balance; that requires authentication with the <code>payment:charge</code> scope. The charge has no fees or taxes and does not count as revenue.
      */
     public CreateDepositsResponse create(CreateDepositsRequest request) {
         return this.rawClient.create(request).body();
     }
 
     /**
-     * Retrieve the deposit methods for an account, including crypto and bank transfer.
+     * Returns the deposit methods for an account or user, including crypto addresses, bank transfer instructions, and, for a business, a hosted deposit page. Bitcoin deposits are converted to USDT on Plasma in the destination's wallet. Business destinations require no authentication. Pass <code>payment_method_id</code> to also charge a business's saved payment method for <code>amount</code> in USD and add it to the business's balance; that requires authentication with the <code>payment:charge</code> scope. The charge has no fees or taxes and does not count as revenue.
      */
     public CreateDepositsResponse create(CreateDepositsRequest request, RequestOptions requestOptions) {
         return this.rawClient.create(request, requestOptions).body();
+    }
+
+    /**
+     * Sends a deposit back where it came from. If the available balance doesn't cover it, nothing is sent.
+     * <ul>
+     * <li><strong>Bank deposit:</strong> pass its <code>vbt_</code> ID. The deposit fee is returned, so the balance only has to cover the rest. Returns a <code>topup_reversal</code> row.</li>
+     * <li><strong>Card deposit:</strong> pass its <code>pay_</code> ID. It's refunded to the card, and its fees aren't returned. Returns a <code>payment_refund</code> row.</li>
+     * </ul>
+     */
+    public LedgerActivity reverse(String id) {
+        return this.rawClient.reverse(id).body();
+    }
+
+    /**
+     * Sends a deposit back where it came from. If the available balance doesn't cover it, nothing is sent.
+     * <ul>
+     * <li><strong>Bank deposit:</strong> pass its <code>vbt_</code> ID. The deposit fee is returned, so the balance only has to cover the rest. Returns a <code>topup_reversal</code> row.</li>
+     * <li><strong>Card deposit:</strong> pass its <code>pay_</code> ID. It's refunded to the card, and its fees aren't returned. Returns a <code>payment_refund</code> row.</li>
+     * </ul>
+     */
+    public LedgerActivity reverse(String id, RequestOptions requestOptions) {
+        return this.rawClient.reverse(id, requestOptions).body();
+    }
+
+    /**
+     * Sends a deposit back where it came from. If the available balance doesn't cover it, nothing is sent.
+     * <ul>
+     * <li><strong>Bank deposit:</strong> pass its <code>vbt_</code> ID. The deposit fee is returned, so the balance only has to cover the rest. Returns a <code>topup_reversal</code> row.</li>
+     * <li><strong>Card deposit:</strong> pass its <code>pay_</code> ID. It's refunded to the card, and its fees aren't returned. Returns a <code>payment_refund</code> row.</li>
+     * </ul>
+     */
+    public LedgerActivity reverse(String id, ReverseDepositsRequest request) {
+        return this.rawClient.reverse(id, request).body();
+    }
+
+    /**
+     * Sends a deposit back where it came from. If the available balance doesn't cover it, nothing is sent.
+     * <ul>
+     * <li><strong>Bank deposit:</strong> pass its <code>vbt_</code> ID. The deposit fee is returned, so the balance only has to cover the rest. Returns a <code>topup_reversal</code> row.</li>
+     * <li><strong>Card deposit:</strong> pass its <code>pay_</code> ID. It's refunded to the card, and its fees aren't returned. Returns a <code>payment_refund</code> row.</li>
+     * </ul>
+     */
+    public LedgerActivity reverse(String id, ReverseDepositsRequest request, RequestOptions requestOptions) {
+        return this.rawClient.reverse(id, request, requestOptions).body();
     }
 }

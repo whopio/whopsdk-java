@@ -192,7 +192,6 @@ public final class AudienceMatchRate {
 
         private Optional<Double> lowerBound = Optional.empty();
 
-        @JsonAnySetter
         private Map<String, Object> additionalProperties = new HashMap<>();
 
         private Builder() {}
@@ -207,7 +206,6 @@ public final class AudienceMatchRate {
         }
 
         /**
-         * <p>The ad platform that provided the match-rate estimate.</p>
          * <p>The ad platform that provided the match-rate estimate.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
@@ -329,6 +327,17 @@ public final class AudienceMatchRate {
         @java.lang.Override
         public AudienceMatchRate build() {
             return new AudienceMatchRate(lowerBound, platform, status, upperBound, additionalProperties);
+        }
+
+        @JsonAnySetter
+        private void putAdditionalPropertyFromJson(String key, Object value) {
+            if (key.equalsIgnoreCase("lower_bound")
+                    || key.equalsIgnoreCase("platform")
+                    || key.equalsIgnoreCase("status")
+                    || key.equalsIgnoreCase("upper_bound")) {
+                return;
+            }
+            this.additionalProperties.put(key, value);
         }
 
         @java.lang.Override

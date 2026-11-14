@@ -173,7 +173,6 @@ public final class ListExportsRequest {
 
         private Optional<ListExportsRequestDirection> direction = Optional.empty();
 
-        @JsonAnySetter
         private Map<String, Object> additionalProperties = new HashMap<>();
 
         private Builder() {}
@@ -290,6 +289,20 @@ public final class ListExportsRequest {
         public ListExportsRequest build() {
             return new ListExportsRequest(
                     accountId, resource, status, createdAfter, createdBefore, order, direction, additionalProperties);
+        }
+
+        @JsonAnySetter
+        private void putAdditionalPropertyFromJson(String key, Object value) {
+            if (key.equalsIgnoreCase("account_id")
+                    || key.equalsIgnoreCase("resource")
+                    || key.equalsIgnoreCase("status")
+                    || key.equalsIgnoreCase("created_after")
+                    || key.equalsIgnoreCase("created_before")
+                    || key.equalsIgnoreCase("order")
+                    || key.equalsIgnoreCase("direction")) {
+                return;
+            }
+            this.additionalProperties.put(key, value);
         }
 
         public Builder additionalProperty(String key, Object value) {

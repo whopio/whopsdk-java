@@ -5,6 +5,7 @@ package com.whop.api.resources.accesstokens;
 
 import com.whop.api.core.ClientOptions;
 import com.whop.api.core.RequestOptions;
+import com.whop.api.core.WhopApiHttpResponse;
 import com.whop.api.resources.accesstokens.requests.CreateAccessTokensRequest;
 import com.whop.api.types.AccessToken;
 import java.util.concurrent.CompletableFuture;
@@ -27,30 +28,58 @@ public class AsyncAccessTokensClient {
     }
 
     /**
-     * Create a short-lived access token for authenticating API requests. When using API key authentication, provide company_id or user_id. When using OAuth, the user is derived from the token. Use this token with Whop's web and mobile embedded components.
+     * Creates a short-lived access token for Whop's web and mobile embedded components. With API key authentication, pass <code>account_id</code> or <code>user_id</code>; with OAuth, the token is issued for the OAuth user.
      */
     public CompletableFuture<AccessToken> create() {
-        return this.rawClient.create().thenApply(response -> response.body());
+        CompletableFuture<WhopApiHttpResponse<AccessToken>> rawFuture = this.rawClient.create();
+        CompletableFuture<AccessToken> future = rawFuture.thenApply(response -> response.body());
+        future.whenComplete((result_, throwable_) -> {
+            if (future.isCancelled()) {
+                rawFuture.cancel(true);
+            }
+        });
+        return future;
     }
 
     /**
-     * Create a short-lived access token for authenticating API requests. When using API key authentication, provide company_id or user_id. When using OAuth, the user is derived from the token. Use this token with Whop's web and mobile embedded components.
+     * Creates a short-lived access token for Whop's web and mobile embedded components. With API key authentication, pass <code>account_id</code> or <code>user_id</code>; with OAuth, the token is issued for the OAuth user.
      */
     public CompletableFuture<AccessToken> create(RequestOptions requestOptions) {
-        return this.rawClient.create(requestOptions).thenApply(response -> response.body());
+        CompletableFuture<WhopApiHttpResponse<AccessToken>> rawFuture = this.rawClient.create(requestOptions);
+        CompletableFuture<AccessToken> future = rawFuture.thenApply(response -> response.body());
+        future.whenComplete((result_, throwable_) -> {
+            if (future.isCancelled()) {
+                rawFuture.cancel(true);
+            }
+        });
+        return future;
     }
 
     /**
-     * Create a short-lived access token for authenticating API requests. When using API key authentication, provide company_id or user_id. When using OAuth, the user is derived from the token. Use this token with Whop's web and mobile embedded components.
+     * Creates a short-lived access token for Whop's web and mobile embedded components. With API key authentication, pass <code>account_id</code> or <code>user_id</code>; with OAuth, the token is issued for the OAuth user.
      */
     public CompletableFuture<AccessToken> create(CreateAccessTokensRequest request) {
-        return this.rawClient.create(request).thenApply(response -> response.body());
+        CompletableFuture<WhopApiHttpResponse<AccessToken>> rawFuture = this.rawClient.create(request);
+        CompletableFuture<AccessToken> future = rawFuture.thenApply(response -> response.body());
+        future.whenComplete((result_, throwable_) -> {
+            if (future.isCancelled()) {
+                rawFuture.cancel(true);
+            }
+        });
+        return future;
     }
 
     /**
-     * Create a short-lived access token for authenticating API requests. When using API key authentication, provide company_id or user_id. When using OAuth, the user is derived from the token. Use this token with Whop's web and mobile embedded components.
+     * Creates a short-lived access token for Whop's web and mobile embedded components. With API key authentication, pass <code>account_id</code> or <code>user_id</code>; with OAuth, the token is issued for the OAuth user.
      */
     public CompletableFuture<AccessToken> create(CreateAccessTokensRequest request, RequestOptions requestOptions) {
-        return this.rawClient.create(request, requestOptions).thenApply(response -> response.body());
+        CompletableFuture<WhopApiHttpResponse<AccessToken>> rawFuture = this.rawClient.create(request, requestOptions);
+        CompletableFuture<AccessToken> future = rawFuture.thenApply(response -> response.body());
+        future.whenComplete((result_, throwable_) -> {
+            if (future.isCancelled()) {
+                rawFuture.cancel(true);
+            }
+        });
+        return future;
     }
 }

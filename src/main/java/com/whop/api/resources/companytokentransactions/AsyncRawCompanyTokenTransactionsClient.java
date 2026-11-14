@@ -4,11 +4,14 @@
 package com.whop.api.resources.companytokentransactions;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
+import com.whop.api.core.BodyProperties;
 import com.whop.api.core.ClientOptions;
 import com.whop.api.core.MediaTypes;
 import com.whop.api.core.ObjectMappers;
+import com.whop.api.core.PathSegments;
 import com.whop.api.core.QueryStringMapper;
 import com.whop.api.core.RequestOptions;
+import com.whop.api.core.RetryInterceptor;
 import com.whop.api.core.WhopApiApiException;
 import com.whop.api.core.WhopApiException;
 import com.whop.api.core.WhopApiHttpResponse;
@@ -26,6 +29,8 @@ import com.whop.api.resources.companytokentransactions.types.CreateCompanyTokenT
 import com.whop.api.resources.companytokentransactions.types.ListCompanyTokenTransactionsResponse;
 import com.whop.api.types.CompanyTokenTransaction;
 import com.whop.api.types.CompanyTokenTransactionListItem;
+import com.whop.api.types.InternalServerErrorBody;
+import com.whop.api.types.UnprocessableEntityErrorBody;
 import java.io.IOException;
 import java.util.List;
 import java.util.Optional;
@@ -50,7 +55,7 @@ public class AsyncRawCompanyTokenTransactionsClient {
     }
 
     /**
-     * Returns a paginated list of token transactions for a user or company, depending on the authenticated actor, with optional filtering by user and transaction type.
+     * Lists an account's token transactions, newest first.
      * <p>Required permissions:</p>
      * <ul>
      * <li><code>company_token_transaction:read</code></li>
@@ -64,7 +69,7 @@ public class AsyncRawCompanyTokenTransactionsClient {
     }
 
     /**
-     * Returns a paginated list of token transactions for a user or company, depending on the authenticated actor, with optional filtering by user and transaction type.
+     * Lists an account's token transactions, newest first.
      * <p>Required permissions:</p>
      * <ul>
      * <li><code>company_token_transaction:read</code></li>
@@ -74,7 +79,7 @@ public class AsyncRawCompanyTokenTransactionsClient {
      */
     public CompletableFuture<WhopApiHttpResponse<SyncPagingIterable<CompanyTokenTransactionListItem>>> list(
             ListCompanyTokenTransactionsRequest request, RequestOptions requestOptions) {
-        HttpUrl.Builder httpUrl = HttpUrl.parse(this.clientOptions.environment().getUrl())
+        HttpUrl.Builder httpUrl = HttpUrl.parse(this.clientOptions.environment().getApiURL())
                 .newBuilder()
                 .addPathSegments("company_token_transactions");
         if (request.getAfter().isPresent()) {
@@ -93,7 +98,6 @@ public class AsyncRawCompanyTokenTransactionsClient {
             QueryStringMapper.addQueryParameter(
                     httpUrl, "last", request.getLast().get(), false);
         }
-        QueryStringMapper.addQueryParameter(httpUrl, "company_id", request.getCompanyId(), false);
         if (request.getUserId().isPresent()) {
             QueryStringMapper.addQueryParameter(
                     httpUrl, "user_id", request.getUserId().get(), false);
@@ -102,6 +106,7 @@ public class AsyncRawCompanyTokenTransactionsClient {
             QueryStringMapper.addQueryParameter(
                     httpUrl, "transaction_type", request.getTransactionType().get(), false);
         }
+        QueryStringMapper.addQueryParameter(httpUrl, "account_id", request.getAccountId(), false);
         if (requestOptions != null) {
             requestOptions.getQueryParameters().forEach((_key, _value) -> {
                 httpUrl.addQueryParameter(_key, _value);
@@ -117,9 +122,19 @@ public class AsyncRawCompanyTokenTransactionsClient {
         if (requestOptions != null && requestOptions.getTimeout().isPresent()) {
             client = clientOptions.httpClientWithTimeout(requestOptions);
         }
+        if (requestOptions != null && requestOptions.getMaxRetries().isPresent()) {
+            okhttpRequest = okhttpRequest
+                    .newBuilder()
+                    .tag(
+                            RetryInterceptor.MaxRetriesOverride.class,
+                            new RetryInterceptor.MaxRetriesOverride(
+                                    requestOptions.getMaxRetries().get()))
+                    .build();
+        }
         CompletableFuture<WhopApiHttpResponse<SyncPagingIterable<CompanyTokenTransactionListItem>>> future =
                 new CompletableFuture<>();
-        client.newCall(okhttpRequest).enqueue(new Callback() {
+        RetryInterceptor.AsyncCall okhttpCall = RetryInterceptor.newAsyncCall(client, okhttpRequest);
+        okhttpCall.enqueue(new Callback() {
             @Override
             public void onResponse(@NotNull Call call, @NotNull Response response) throws IOException {
                 try (ResponseBody responseBody = response.body()) {
@@ -136,7 +151,11 @@ public class AsyncRawCompanyTokenTransactionsClient {
                         List<CompanyTokenTransactionListItem> result = parsedResponse.getData();
                         future.complete(new WhopApiHttpResponse<>(
                                 new SyncPagingIterable<CompanyTokenTransactionListItem>(
-                                        startingAfter != null, result, parsedResponse, () -> {
+                                        startingAfter.isPresent()
+                                                && !startingAfter.get().isEmpty(),
+                                        result,
+                                        parsedResponse,
+                                        () -> {
                                             try {
                                                 return list(nextRequest, requestOptions)
                                                         .get()
@@ -172,7 +191,8 @@ public class AsyncRawCompanyTokenTransactionsClient {
                                 return;
                             case 422:
                                 future.completeExceptionally(new UnprocessableEntityError(
-                                        ObjectMappers.JSON_MAPPER.readValue(responseBodyString, Object.class),
+                                        ObjectMappers.JSON_MAPPER.readValue(
+                                                responseBodyString, UnprocessableEntityErrorBody.class),
                                         response));
                                 return;
                             case 429:
@@ -182,7 +202,8 @@ public class AsyncRawCompanyTokenTransactionsClient {
                                 return;
                             case 500:
                                 future.completeExceptionally(new InternalServerError(
-                                        ObjectMappers.JSON_MAPPER.readValue(responseBodyString, Object.class),
+                                        ObjectMappers.JSON_MAPPER.readValue(
+                                                responseBodyString, InternalServerErrorBody.class),
                                         response));
                                 return;
                         }
@@ -193,6 +214,9 @@ public class AsyncRawCompanyTokenTransactionsClient {
                     future.completeExceptionally(new WhopApiApiException(
                             "Error with status code " + response.code(), response.code(), errorBody, response));
                     return;
+                } catch (JsonProcessingException e) {
+                    future.completeExceptionally(
+                            new WhopApiException("Failed to deserialize response: " + e.getMessage(), e));
                 } catch (IOException e) {
                     future.completeExceptionally(new WhopApiException("Network error executing HTTP request", e));
                 }
@@ -203,11 +227,16 @@ public class AsyncRawCompanyTokenTransactionsClient {
                 future.completeExceptionally(new WhopApiException("Network error executing HTTP request", e));
             }
         });
+        future.whenComplete((result_, throwable_) -> {
+            if (future.isCancelled()) {
+                okhttpCall.cancel();
+            }
+        });
         return future;
     }
 
     /**
-     * Create a token transaction to add, subtract, or transfer tokens for a member within a company.
+     * Creates a token transaction that adds, subtracts, or transfers tokens for a member of an account.
      * <p>Required permissions:</p>
      * <ul>
      * <li><code>company_token_transaction:create</code></li>
@@ -221,7 +250,7 @@ public class AsyncRawCompanyTokenTransactionsClient {
     }
 
     /**
-     * Create a token transaction to add, subtract, or transfer tokens for a member within a company.
+     * Creates a token transaction that adds, subtracts, or transfers tokens for a member of an account.
      * <p>Required permissions:</p>
      * <ul>
      * <li><code>company_token_transaction:create</code></li>
@@ -231,7 +260,7 @@ public class AsyncRawCompanyTokenTransactionsClient {
      */
     public CompletableFuture<WhopApiHttpResponse<CompanyTokenTransaction>> create(
             CreateCompanyTokenTransactionsRequest request, RequestOptions requestOptions) {
-        HttpUrl.Builder httpUrl = HttpUrl.parse(this.clientOptions.environment().getUrl())
+        HttpUrl.Builder httpUrl = HttpUrl.parse(this.clientOptions.environment().getApiURL())
                 .newBuilder()
                 .addPathSegments("company_token_transactions");
         if (requestOptions != null) {
@@ -242,7 +271,9 @@ public class AsyncRawCompanyTokenTransactionsClient {
         RequestBody body;
         try {
             body = RequestBody.create(
-                    ObjectMappers.JSON_MAPPER.writeValueAsBytes(request), MediaTypes.APPLICATION_JSON);
+                    ObjectMappers.JSON_MAPPER.writeValueAsBytes(BodyProperties.merge(
+                            request, requestOptions != null ? requestOptions.getBodyProperties() : null)),
+                    MediaTypes.APPLICATION_JSON);
         } catch (JsonProcessingException e) {
             throw new WhopApiException("Failed to serialize request", e);
         }
@@ -257,8 +288,18 @@ public class AsyncRawCompanyTokenTransactionsClient {
         if (requestOptions != null && requestOptions.getTimeout().isPresent()) {
             client = clientOptions.httpClientWithTimeout(requestOptions);
         }
+        if (requestOptions != null && requestOptions.getMaxRetries().isPresent()) {
+            okhttpRequest = okhttpRequest
+                    .newBuilder()
+                    .tag(
+                            RetryInterceptor.MaxRetriesOverride.class,
+                            new RetryInterceptor.MaxRetriesOverride(
+                                    requestOptions.getMaxRetries().get()))
+                    .build();
+        }
         CompletableFuture<WhopApiHttpResponse<CompanyTokenTransaction>> future = new CompletableFuture<>();
-        client.newCall(okhttpRequest).enqueue(new Callback() {
+        RetryInterceptor.AsyncCall okhttpCall = RetryInterceptor.newAsyncCall(client, okhttpRequest);
+        okhttpCall.enqueue(new Callback() {
             @Override
             public void onResponse(@NotNull Call call, @NotNull Response response) throws IOException {
                 try (ResponseBody responseBody = response.body()) {
@@ -293,7 +334,8 @@ public class AsyncRawCompanyTokenTransactionsClient {
                                 return;
                             case 422:
                                 future.completeExceptionally(new UnprocessableEntityError(
-                                        ObjectMappers.JSON_MAPPER.readValue(responseBodyString, Object.class),
+                                        ObjectMappers.JSON_MAPPER.readValue(
+                                                responseBodyString, UnprocessableEntityErrorBody.class),
                                         response));
                                 return;
                             case 429:
@@ -303,7 +345,8 @@ public class AsyncRawCompanyTokenTransactionsClient {
                                 return;
                             case 500:
                                 future.completeExceptionally(new InternalServerError(
-                                        ObjectMappers.JSON_MAPPER.readValue(responseBodyString, Object.class),
+                                        ObjectMappers.JSON_MAPPER.readValue(
+                                                responseBodyString, InternalServerErrorBody.class),
                                         response));
                                 return;
                         }
@@ -314,6 +357,9 @@ public class AsyncRawCompanyTokenTransactionsClient {
                     future.completeExceptionally(new WhopApiApiException(
                             "Error with status code " + response.code(), response.code(), errorBody, response));
                     return;
+                } catch (JsonProcessingException e) {
+                    future.completeExceptionally(
+                            new WhopApiException("Failed to deserialize response: " + e.getMessage(), e));
                 } catch (IOException e) {
                     future.completeExceptionally(new WhopApiException("Network error executing HTTP request", e));
                 }
@@ -324,11 +370,16 @@ public class AsyncRawCompanyTokenTransactionsClient {
                 future.completeExceptionally(new WhopApiException("Network error executing HTTP request", e));
             }
         });
+        future.whenComplete((result_, throwable_) -> {
+            if (future.isCancelled()) {
+                okhttpCall.cancel();
+            }
+        });
         return future;
     }
 
     /**
-     * Retrieves the details of an existing company token transaction.
+     * Retrieves a token transaction.
      * <p>Required permissions:</p>
      * <ul>
      * <li><code>company_token_transaction:read</code></li>
@@ -341,7 +392,7 @@ public class AsyncRawCompanyTokenTransactionsClient {
     }
 
     /**
-     * Retrieves the details of an existing company token transaction.
+     * Retrieves a token transaction.
      * <p>Required permissions:</p>
      * <ul>
      * <li><code>company_token_transaction:read</code></li>
@@ -355,7 +406,7 @@ public class AsyncRawCompanyTokenTransactionsClient {
     }
 
     /**
-     * Retrieves the details of an existing company token transaction.
+     * Retrieves a token transaction.
      * <p>Required permissions:</p>
      * <ul>
      * <li><code>company_token_transaction:read</code></li>
@@ -369,7 +420,7 @@ public class AsyncRawCompanyTokenTransactionsClient {
     }
 
     /**
-     * Retrieves the details of an existing company token transaction.
+     * Retrieves a token transaction.
      * <p>Required permissions:</p>
      * <ul>
      * <li><code>company_token_transaction:read</code></li>
@@ -379,10 +430,10 @@ public class AsyncRawCompanyTokenTransactionsClient {
      */
     public CompletableFuture<WhopApiHttpResponse<CompanyTokenTransaction>> retrieve(
             String id, RetrieveCompanyTokenTransactionsRequest request, RequestOptions requestOptions) {
-        HttpUrl.Builder httpUrl = HttpUrl.parse(this.clientOptions.environment().getUrl())
+        HttpUrl.Builder httpUrl = HttpUrl.parse(this.clientOptions.environment().getApiURL())
                 .newBuilder()
                 .addPathSegments("company_token_transactions")
-                .addPathSegment(id);
+                .addPathSegment(PathSegments.validate(id));
         if (requestOptions != null) {
             requestOptions.getQueryParameters().forEach((_key, _value) -> {
                 httpUrl.addQueryParameter(_key, _value);
@@ -398,8 +449,18 @@ public class AsyncRawCompanyTokenTransactionsClient {
         if (requestOptions != null && requestOptions.getTimeout().isPresent()) {
             client = clientOptions.httpClientWithTimeout(requestOptions);
         }
+        if (requestOptions != null && requestOptions.getMaxRetries().isPresent()) {
+            okhttpRequest = okhttpRequest
+                    .newBuilder()
+                    .tag(
+                            RetryInterceptor.MaxRetriesOverride.class,
+                            new RetryInterceptor.MaxRetriesOverride(
+                                    requestOptions.getMaxRetries().get()))
+                    .build();
+        }
         CompletableFuture<WhopApiHttpResponse<CompanyTokenTransaction>> future = new CompletableFuture<>();
-        client.newCall(okhttpRequest).enqueue(new Callback() {
+        RetryInterceptor.AsyncCall okhttpCall = RetryInterceptor.newAsyncCall(client, okhttpRequest);
+        okhttpCall.enqueue(new Callback() {
             @Override
             public void onResponse(@NotNull Call call, @NotNull Response response) throws IOException {
                 try (ResponseBody responseBody = response.body()) {
@@ -434,7 +495,8 @@ public class AsyncRawCompanyTokenTransactionsClient {
                                 return;
                             case 422:
                                 future.completeExceptionally(new UnprocessableEntityError(
-                                        ObjectMappers.JSON_MAPPER.readValue(responseBodyString, Object.class),
+                                        ObjectMappers.JSON_MAPPER.readValue(
+                                                responseBodyString, UnprocessableEntityErrorBody.class),
                                         response));
                                 return;
                             case 429:
@@ -444,7 +506,8 @@ public class AsyncRawCompanyTokenTransactionsClient {
                                 return;
                             case 500:
                                 future.completeExceptionally(new InternalServerError(
-                                        ObjectMappers.JSON_MAPPER.readValue(responseBodyString, Object.class),
+                                        ObjectMappers.JSON_MAPPER.readValue(
+                                                responseBodyString, InternalServerErrorBody.class),
                                         response));
                                 return;
                         }
@@ -455,6 +518,9 @@ public class AsyncRawCompanyTokenTransactionsClient {
                     future.completeExceptionally(new WhopApiApiException(
                             "Error with status code " + response.code(), response.code(), errorBody, response));
                     return;
+                } catch (JsonProcessingException e) {
+                    future.completeExceptionally(
+                            new WhopApiException("Failed to deserialize response: " + e.getMessage(), e));
                 } catch (IOException e) {
                     future.completeExceptionally(new WhopApiException("Network error executing HTTP request", e));
                 }
@@ -463,6 +529,11 @@ public class AsyncRawCompanyTokenTransactionsClient {
             @Override
             public void onFailure(@NotNull Call call, @NotNull IOException e) {
                 future.completeExceptionally(new WhopApiException("Network error executing HTTP request", e));
+            }
+        });
+        future.whenComplete((result_, throwable_) -> {
+            if (future.isCancelled()) {
+                okhttpCall.cancel();
             }
         });
         return future;

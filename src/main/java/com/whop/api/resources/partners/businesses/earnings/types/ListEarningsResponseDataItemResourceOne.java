@@ -132,7 +132,6 @@ public final class ListEarningsResponseDataItemResourceOne {
 
         private ListEarningsResponseDataItemResourceOneObject object;
 
-        @JsonAnySetter
         private Map<String, Object> additionalProperties = new HashMap<>();
 
         private Builder() {}
@@ -177,6 +176,17 @@ public final class ListEarningsResponseDataItemResourceOne {
         @java.lang.Override
         public ListEarningsResponseDataItemResourceOne build() {
             return new ListEarningsResponseDataItemResourceOne(createdAt, currency, id, object, additionalProperties);
+        }
+
+        @JsonAnySetter
+        private void putAdditionalPropertyFromJson(String key, Object value) {
+            if (key.equalsIgnoreCase("created_at")
+                    || key.equalsIgnoreCase("currency")
+                    || key.equalsIgnoreCase("id")
+                    || key.equalsIgnoreCase("object")) {
+                return;
+            }
+            this.additionalProperties.put(key, value);
         }
 
         @java.lang.Override

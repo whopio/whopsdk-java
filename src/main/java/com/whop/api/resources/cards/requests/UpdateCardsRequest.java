@@ -13,6 +13,7 @@ import com.fasterxml.jackson.annotation.Nulls;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.whop.api.core.ObjectMappers;
 import com.whop.api.resources.cards.types.UpdateCardsRequestBilling;
+import com.whop.api.resources.cards.types.UpdateCardsRequestCardholder;
 import com.whop.api.resources.cards.types.UpdateCardsRequestSpendLimitFrequency;
 import java.util.HashMap;
 import java.util.Map;
@@ -27,6 +28,8 @@ public final class UpdateCardsRequest {
     private final Optional<UpdateCardsRequestBilling> billing;
 
     private final Optional<Boolean> canceled;
+
+    private final Optional<UpdateCardsRequestCardholder> cardholder;
 
     private final Optional<Boolean> frozen;
 
@@ -50,6 +53,7 @@ public final class UpdateCardsRequest {
             Optional<String> accountId,
             Optional<UpdateCardsRequestBilling> billing,
             Optional<Boolean> canceled,
+            Optional<UpdateCardsRequestCardholder> cardholder,
             Optional<Boolean> frozen,
             Optional<String> name,
             Optional<String> pin,
@@ -62,6 +66,7 @@ public final class UpdateCardsRequest {
         this.accountId = accountId;
         this.billing = billing;
         this.canceled = canceled;
+        this.cardholder = cardholder;
         this.frozen = frozen;
         this.name = name;
         this.pin = pin;
@@ -82,7 +87,7 @@ public final class UpdateCardsRequest {
     }
 
     /**
-     * @return New billing address. Requires line1, city, region, postal_code, and country_code. On an invited card, passing billing alone (as the invited user) completes onboarding and starts card provisioning.
+     * @return The billing address. On an issued card this replaces the card's billing address and region is also required. On an invited card, sending it as the invited user completes onboarding and starts card provisioning.
      */
     @JsonProperty("billing")
     public Optional<UpdateCardsRequestBilling> getBilling() {
@@ -95,6 +100,14 @@ public final class UpdateCardsRequest {
     @JsonProperty("canceled")
     public Optional<Boolean> getCanceled() {
         return canceled;
+    }
+
+    /**
+     * @return Details for the invited cardholder, accepted only while completing onboarding on an invited card. The legal name comes from an approved identity verification when the invited user has one, and from these fields when they do not.
+     */
+    @JsonProperty("cardholder")
+    public Optional<UpdateCardsRequestCardholder> getCardholder() {
+        return cardholder;
     }
 
     /**
@@ -176,6 +189,7 @@ public final class UpdateCardsRequest {
         return accountId.equals(other.accountId)
                 && billing.equals(other.billing)
                 && canceled.equals(other.canceled)
+                && cardholder.equals(other.cardholder)
                 && frozen.equals(other.frozen)
                 && name.equals(other.name)
                 && pin.equals(other.pin)
@@ -192,6 +206,7 @@ public final class UpdateCardsRequest {
                 this.accountId,
                 this.billing,
                 this.canceled,
+                this.cardholder,
                 this.frozen,
                 this.name,
                 this.pin,
@@ -219,6 +234,8 @@ public final class UpdateCardsRequest {
 
         private Optional<Boolean> canceled = Optional.empty();
 
+        private Optional<UpdateCardsRequestCardholder> cardholder = Optional.empty();
+
         private Optional<Boolean> frozen = Optional.empty();
 
         private Optional<String> name = Optional.empty();
@@ -235,7 +252,6 @@ public final class UpdateCardsRequest {
 
         private Optional<String> userId = Optional.empty();
 
-        @JsonAnySetter
         private Map<String, Object> additionalProperties = new HashMap<>();
 
         private Builder() {}
@@ -244,6 +260,7 @@ public final class UpdateCardsRequest {
             accountId(other.getAccountId());
             billing(other.getBilling());
             canceled(other.getCanceled());
+            cardholder(other.getCardholder());
             frozen(other.getFrozen());
             name(other.getName());
             pin(other.getPin());
@@ -270,7 +287,7 @@ public final class UpdateCardsRequest {
         }
 
         /**
-         * <p>New billing address. Requires line1, city, region, postal_code, and country_code. On an invited card, passing billing alone (as the invited user) completes onboarding and starts card provisioning.</p>
+         * <p>The billing address. On an issued card this replaces the card's billing address and region is also required. On an invited card, sending it as the invited user completes onboarding and starts card provisioning.</p>
          */
         @JsonSetter(value = "billing", nulls = Nulls.SKIP)
         public Builder billing(Optional<UpdateCardsRequestBilling> billing) {
@@ -294,6 +311,20 @@ public final class UpdateCardsRequest {
 
         public Builder canceled(Boolean canceled) {
             this.canceled = Optional.ofNullable(canceled);
+            return this;
+        }
+
+        /**
+         * <p>Details for the invited cardholder, accepted only while completing onboarding on an invited card. The legal name comes from an approved identity verification when the invited user has one, and from these fields when they do not.</p>
+         */
+        @JsonSetter(value = "cardholder", nulls = Nulls.SKIP)
+        public Builder cardholder(Optional<UpdateCardsRequestCardholder> cardholder) {
+            this.cardholder = cardholder;
+            return this;
+        }
+
+        public Builder cardholder(UpdateCardsRequestCardholder cardholder) {
+            this.cardholder = Optional.ofNullable(cardholder);
             return this;
         }
 
@@ -414,6 +445,7 @@ public final class UpdateCardsRequest {
                     accountId,
                     billing,
                     canceled,
+                    cardholder,
                     frozen,
                     name,
                     pin,
@@ -423,6 +455,25 @@ public final class UpdateCardsRequest {
                     transactionLimit,
                     userId,
                     additionalProperties);
+        }
+
+        @JsonAnySetter
+        private void putAdditionalPropertyFromJson(String key, Object value) {
+            if (key.equalsIgnoreCase("account_id")
+                    || key.equalsIgnoreCase("billing")
+                    || key.equalsIgnoreCase("canceled")
+                    || key.equalsIgnoreCase("cardholder")
+                    || key.equalsIgnoreCase("frozen")
+                    || key.equalsIgnoreCase("name")
+                    || key.equalsIgnoreCase("pin")
+                    || key.equalsIgnoreCase("remove_limit")
+                    || key.equalsIgnoreCase("spend_limit")
+                    || key.equalsIgnoreCase("spend_limit_frequency")
+                    || key.equalsIgnoreCase("transaction_limit")
+                    || key.equalsIgnoreCase("user_id")) {
+                return;
+            }
+            this.additionalProperties.put(key, value);
         }
 
         public Builder additionalProperty(String key, Object value) {

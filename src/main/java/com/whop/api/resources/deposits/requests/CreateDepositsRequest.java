@@ -15,8 +15,7 @@ import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.whop.api.core.Nullable;
 import com.whop.api.core.NullableNonemptyFilter;
 import com.whop.api.core.ObjectMappers;
-import com.whop.api.resources.deposits.types.CreateDepositsRequestDestination;
-import com.whop.api.resources.deposits.types.CreateDepositsRequestNetwork;
+import com.whop.api.resources.deposits.types.CreateDepositsRequestMetadataValue;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
@@ -28,29 +27,33 @@ import org.jetbrains.annotations.NotNull;
 public final class CreateDepositsRequest {
     private final Optional<Double> amount;
 
-    private final CreateDepositsRequestDestination destination;
+    private final String destination;
 
-    private final Optional<Map<String, Object>> metadata;
+    private final Optional<Map<String, Optional<CreateDepositsRequestMetadataValue>>> metadata;
 
-    private final Optional<CreateDepositsRequestNetwork> network;
+    private final Optional<String> originBic;
+
+    private final Optional<String> paymentMethodId;
 
     private final Map<String, Object> additionalProperties;
 
     private CreateDepositsRequest(
             Optional<Double> amount,
-            CreateDepositsRequestDestination destination,
-            Optional<Map<String, Object>> metadata,
-            Optional<CreateDepositsRequestNetwork> network,
+            String destination,
+            Optional<Map<String, Optional<CreateDepositsRequestMetadataValue>>> metadata,
+            Optional<String> originBic,
+            Optional<String> paymentMethodId,
             Map<String, Object> additionalProperties) {
         this.amount = amount;
         this.destination = destination;
         this.metadata = metadata;
-        this.network = network;
+        this.originBic = originBic;
+        this.paymentMethodId = paymentMethodId;
         this.additionalProperties = additionalProperties;
     }
 
     /**
-     * @return Amount to prefill on hosted deposit page.
+     * @return Amount to prefill on hosted deposit page. Crypto deposits require a $10 minimum. With <code>payment_method_id</code>, the amount in USD to charge, and required.
      */
     @JsonProperty("amount")
     public Optional<Double> getAmount() {
@@ -58,36 +61,44 @@ public final class CreateDepositsRequest {
     }
 
     /**
-     * @return Destination account ID or wallet address. Object form is supported for compatibility. Any business resolves by its account ID without authentication; a user account resolves only for that same authenticated user.
+     * @return Account ID to fund, <code>biz_</code> or <code>user_</code>. Any business resolves without authentication; a user account resolves only for that same authenticated user.
      */
     @JsonProperty("destination")
-    public CreateDepositsRequestDestination getDestination() {
+    public String getDestination() {
         return destination;
     }
 
     /**
-     * @return Metadata to include with the deposit response.
+     * @return Custom metadata to attach to the payment the charge creates. Ignored unless <code>payment_method_id</code> is provided.
      */
-    @JsonProperty("metadata")
-    public Optional<Map<String, Object>> getMetadata() {
+    @JsonIgnore
+    public Optional<Map<String, Optional<CreateDepositsRequestMetadataValue>>> getMetadata() {
+        if (metadata == null) {
+            return Optional.empty();
+        }
         return metadata;
     }
 
     /**
-     * @return Destination network override. Defaults to the destination wallet's own network.
+     * @return SWIFT/BIC of the bank the funds are sent from, 8 or 11 characters. Fills each bank currency's <code>swift_bic</code> with the intermediary bank to route the wire through.
      */
-    @JsonIgnore
-    public Optional<CreateDepositsRequestNetwork> getNetwork() {
-        if (network == null) {
-            return Optional.empty();
-        }
-        return network;
+    @JsonProperty("origin_bic")
+    public Optional<String> getOriginBic() {
+        return originBic;
+    }
+
+    /**
+     * @return A saved payment method of the business to charge for <code>amount</code>, prefixed <code>payt_</code>. Save one with Create setup intent and <code>owner_id</code> set to the account. Only for a <code>biz_</code> destination, and requires authentication with the <code>payment:charge</code> scope. A declined charge fails the request with 400.
+     */
+    @JsonProperty("payment_method_id")
+    public Optional<String> getPaymentMethodId() {
+        return paymentMethodId;
     }
 
     @JsonInclude(value = JsonInclude.Include.CUSTOM, valueFilter = NullableNonemptyFilter.class)
-    @JsonProperty("network")
-    private Optional<CreateDepositsRequestNetwork> _getNetwork() {
-        return network;
+    @JsonProperty("metadata")
+    private Optional<Map<String, Optional<CreateDepositsRequestMetadataValue>>> _getMetadata() {
+        return metadata;
     }
 
     @java.lang.Override
@@ -105,12 +116,13 @@ public final class CreateDepositsRequest {
         return amount.equals(other.amount)
                 && destination.equals(other.destination)
                 && metadata.equals(other.metadata)
-                && network.equals(other.network);
+                && originBic.equals(other.originBic)
+                && paymentMethodId.equals(other.paymentMethodId);
     }
 
     @java.lang.Override
     public int hashCode() {
-        return Objects.hash(this.amount, this.destination, this.metadata, this.network);
+        return Objects.hash(this.amount, this.destination, this.metadata, this.originBic, this.paymentMethodId);
     }
 
     @java.lang.Override
@@ -124,9 +136,9 @@ public final class CreateDepositsRequest {
 
     public interface DestinationStage {
         /**
-         * <p>Destination account ID or wallet address. Object form is supported for compatibility. Any business resolves by its account ID without authentication; a user account resolves only for that same authenticated user.</p>
+         * <p>Account ID to fund, <code>biz_</code> or <code>user_</code>. Any business resolves without authentication; a user account resolves only for that same authenticated user.</p>
          */
-        _FinalStage destination(@NotNull CreateDepositsRequestDestination destination);
+        _FinalStage destination(@NotNull String destination);
 
         Builder from(CreateDepositsRequest other);
     }
@@ -139,40 +151,48 @@ public final class CreateDepositsRequest {
         _FinalStage additionalProperties(Map<String, Object> additionalProperties);
 
         /**
-         * <p>Amount to prefill on hosted deposit page.</p>
+         * <p>Amount to prefill on hosted deposit page. Crypto deposits require a $10 minimum. With <code>payment_method_id</code>, the amount in USD to charge, and required.</p>
          */
         _FinalStage amount(Optional<Double> amount);
 
         _FinalStage amount(Double amount);
 
         /**
-         * <p>Metadata to include with the deposit response.</p>
+         * <p>Custom metadata to attach to the payment the charge creates. Ignored unless <code>payment_method_id</code> is provided.</p>
          */
-        _FinalStage metadata(Optional<Map<String, Object>> metadata);
+        _FinalStage metadata(Optional<Map<String, Optional<CreateDepositsRequestMetadataValue>>> metadata);
 
-        _FinalStage metadata(Map<String, Object> metadata);
+        _FinalStage metadata(Map<String, Optional<CreateDepositsRequestMetadataValue>> metadata);
+
+        _FinalStage metadata(Nullable<Map<String, Optional<CreateDepositsRequestMetadataValue>>> metadata);
 
         /**
-         * <p>Destination network override. Defaults to the destination wallet's own network.</p>
+         * <p>SWIFT/BIC of the bank the funds are sent from, 8 or 11 characters. Fills each bank currency's <code>swift_bic</code> with the intermediary bank to route the wire through.</p>
          */
-        _FinalStage network(Optional<CreateDepositsRequestNetwork> network);
+        _FinalStage originBic(Optional<String> originBic);
 
-        _FinalStage network(CreateDepositsRequestNetwork network);
+        _FinalStage originBic(String originBic);
 
-        _FinalStage network(Nullable<CreateDepositsRequestNetwork> network);
+        /**
+         * <p>A saved payment method of the business to charge for <code>amount</code>, prefixed <code>payt_</code>. Save one with Create setup intent and <code>owner_id</code> set to the account. Only for a <code>biz_</code> destination, and requires authentication with the <code>payment:charge</code> scope. A declined charge fails the request with 400.</p>
+         */
+        _FinalStage paymentMethodId(Optional<String> paymentMethodId);
+
+        _FinalStage paymentMethodId(String paymentMethodId);
     }
 
     @JsonIgnoreProperties(ignoreUnknown = true)
     public static final class Builder implements DestinationStage, _FinalStage {
-        private CreateDepositsRequestDestination destination;
+        private String destination;
 
-        private Optional<CreateDepositsRequestNetwork> network = Optional.empty();
+        private Optional<String> paymentMethodId = Optional.empty();
 
-        private Optional<Map<String, Object>> metadata = Optional.empty();
+        private Optional<String> originBic = Optional.empty();
+
+        private Optional<Map<String, Optional<CreateDepositsRequestMetadataValue>>> metadata = Optional.empty();
 
         private Optional<Double> amount = Optional.empty();
 
-        @JsonAnySetter
         private Map<String, Object> additionalProperties = new HashMap<>();
 
         private Builder() {}
@@ -182,80 +202,100 @@ public final class CreateDepositsRequest {
             amount(other.getAmount());
             destination(other.getDestination());
             metadata(other.getMetadata());
-            network(other.getNetwork());
+            originBic(other.getOriginBic());
+            paymentMethodId(other.getPaymentMethodId());
             return this;
         }
 
         /**
-         * <p>Destination account ID or wallet address. Object form is supported for compatibility. Any business resolves by its account ID without authentication; a user account resolves only for that same authenticated user.</p>
-         * <p>Destination account ID or wallet address. Object form is supported for compatibility. Any business resolves by its account ID without authentication; a user account resolves only for that same authenticated user.</p>
+         * <p>Account ID to fund, <code>biz_</code> or <code>user_</code>. Any business resolves without authentication; a user account resolves only for that same authenticated user.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
         @JsonSetter("destination")
-        public _FinalStage destination(@NotNull CreateDepositsRequestDestination destination) {
+        public _FinalStage destination(@NotNull String destination) {
             this.destination = Objects.requireNonNull(destination, "destination must not be null");
             return this;
         }
 
         /**
-         * <p>Destination network override. Defaults to the destination wallet's own network.</p>
+         * <p>A saved payment method of the business to charge for <code>amount</code>, prefixed <code>payt_</code>. Save one with Create setup intent and <code>owner_id</code> set to the account. Only for a <code>biz_</code> destination, and requires authentication with the <code>payment:charge</code> scope. A declined charge fails the request with 400.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
-        public _FinalStage network(Nullable<CreateDepositsRequestNetwork> network) {
-            if (network.isNull()) {
-                this.network = null;
-            } else if (network.isEmpty()) {
-                this.network = Optional.empty();
+        public _FinalStage paymentMethodId(String paymentMethodId) {
+            this.paymentMethodId = Optional.ofNullable(paymentMethodId);
+            return this;
+        }
+
+        /**
+         * <p>A saved payment method of the business to charge for <code>amount</code>, prefixed <code>payt_</code>. Save one with Create setup intent and <code>owner_id</code> set to the account. Only for a <code>biz_</code> destination, and requires authentication with the <code>payment:charge</code> scope. A declined charge fails the request with 400.</p>
+         */
+        @java.lang.Override
+        @JsonSetter(value = "payment_method_id", nulls = Nulls.SKIP)
+        public _FinalStage paymentMethodId(Optional<String> paymentMethodId) {
+            this.paymentMethodId = paymentMethodId;
+            return this;
+        }
+
+        /**
+         * <p>SWIFT/BIC of the bank the funds are sent from, 8 or 11 characters. Fills each bank currency's <code>swift_bic</code> with the intermediary bank to route the wire through.</p>
+         * @return Reference to {@code this} so that method calls can be chained together.
+         */
+        @java.lang.Override
+        public _FinalStage originBic(String originBic) {
+            this.originBic = Optional.ofNullable(originBic);
+            return this;
+        }
+
+        /**
+         * <p>SWIFT/BIC of the bank the funds are sent from, 8 or 11 characters. Fills each bank currency's <code>swift_bic</code> with the intermediary bank to route the wire through.</p>
+         */
+        @java.lang.Override
+        @JsonSetter(value = "origin_bic", nulls = Nulls.SKIP)
+        public _FinalStage originBic(Optional<String> originBic) {
+            this.originBic = originBic;
+            return this;
+        }
+
+        /**
+         * <p>Custom metadata to attach to the payment the charge creates. Ignored unless <code>payment_method_id</code> is provided.</p>
+         * @return Reference to {@code this} so that method calls can be chained together.
+         */
+        @java.lang.Override
+        public _FinalStage metadata(Nullable<Map<String, Optional<CreateDepositsRequestMetadataValue>>> metadata) {
+            if (metadata.isNull()) {
+                this.metadata = null;
+            } else if (metadata.isEmpty()) {
+                this.metadata = Optional.empty();
             } else {
-                this.network = Optional.of(network.get());
+                this.metadata = Optional.of(metadata.get());
             }
             return this;
         }
 
         /**
-         * <p>Destination network override. Defaults to the destination wallet's own network.</p>
+         * <p>Custom metadata to attach to the payment the charge creates. Ignored unless <code>payment_method_id</code> is provided.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
-        public _FinalStage network(CreateDepositsRequestNetwork network) {
-            this.network = Optional.ofNullable(network);
-            return this;
-        }
-
-        /**
-         * <p>Destination network override. Defaults to the destination wallet's own network.</p>
-         */
-        @java.lang.Override
-        @JsonSetter(value = "network", nulls = Nulls.SKIP)
-        public _FinalStage network(Optional<CreateDepositsRequestNetwork> network) {
-            this.network = network;
-            return this;
-        }
-
-        /**
-         * <p>Metadata to include with the deposit response.</p>
-         * @return Reference to {@code this} so that method calls can be chained together.
-         */
-        @java.lang.Override
-        public _FinalStage metadata(Map<String, Object> metadata) {
+        public _FinalStage metadata(Map<String, Optional<CreateDepositsRequestMetadataValue>> metadata) {
             this.metadata = Optional.ofNullable(metadata);
             return this;
         }
 
         /**
-         * <p>Metadata to include with the deposit response.</p>
+         * <p>Custom metadata to attach to the payment the charge creates. Ignored unless <code>payment_method_id</code> is provided.</p>
          */
         @java.lang.Override
         @JsonSetter(value = "metadata", nulls = Nulls.SKIP)
-        public _FinalStage metadata(Optional<Map<String, Object>> metadata) {
+        public _FinalStage metadata(Optional<Map<String, Optional<CreateDepositsRequestMetadataValue>>> metadata) {
             this.metadata = metadata;
             return this;
         }
 
         /**
-         * <p>Amount to prefill on hosted deposit page.</p>
+         * <p>Amount to prefill on hosted deposit page. Crypto deposits require a $10 minimum. With <code>payment_method_id</code>, the amount in USD to charge, and required.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
@@ -265,7 +305,7 @@ public final class CreateDepositsRequest {
         }
 
         /**
-         * <p>Amount to prefill on hosted deposit page.</p>
+         * <p>Amount to prefill on hosted deposit page. Crypto deposits require a $10 minimum. With <code>payment_method_id</code>, the amount in USD to charge, and required.</p>
          */
         @java.lang.Override
         @JsonSetter(value = "amount", nulls = Nulls.SKIP)
@@ -276,7 +316,20 @@ public final class CreateDepositsRequest {
 
         @java.lang.Override
         public CreateDepositsRequest build() {
-            return new CreateDepositsRequest(amount, destination, metadata, network, additionalProperties);
+            return new CreateDepositsRequest(
+                    amount, destination, metadata, originBic, paymentMethodId, additionalProperties);
+        }
+
+        @JsonAnySetter
+        private void putAdditionalPropertyFromJson(String key, Object value) {
+            if (key.equalsIgnoreCase("amount")
+                    || key.equalsIgnoreCase("destination")
+                    || key.equalsIgnoreCase("metadata")
+                    || key.equalsIgnoreCase("origin_bic")
+                    || key.equalsIgnoreCase("payment_method_id")) {
+                return;
+            }
+            this.additionalProperties.put(key, value);
         }
 
         @java.lang.Override

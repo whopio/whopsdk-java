@@ -9,23 +9,37 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonSetter;
+import com.fasterxml.jackson.annotation.Nulls;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.whop.api.core.ObjectMappers;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
+import java.util.Optional;
 import org.jetbrains.annotations.NotNull;
 
 @JsonInclude(JsonInclude.Include.NON_ABSENT)
 @JsonDeserialize(builder = UpdateReturnUrlSetupIntentsRequest.Builder.class)
 public final class UpdateReturnUrlSetupIntentsRequest {
+    private final Optional<String> clientSecret;
+
     private final String returnUrl;
 
     private final Map<String, Object> additionalProperties;
 
-    private UpdateReturnUrlSetupIntentsRequest(String returnUrl, Map<String, Object> additionalProperties) {
+    private UpdateReturnUrlSetupIntentsRequest(
+            Optional<String> clientSecret, String returnUrl, Map<String, Object> additionalProperties) {
+        this.clientSecret = clientSecret;
         this.returnUrl = returnUrl;
         this.additionalProperties = additionalProperties;
+    }
+
+    /**
+     * @return The setup's own <code>client_secret</code>, for a caller without a secret key.
+     */
+    @JsonProperty("client_secret")
+    public Optional<String> getClientSecret() {
+        return clientSecret;
     }
 
     /**
@@ -49,12 +63,12 @@ public final class UpdateReturnUrlSetupIntentsRequest {
     }
 
     private boolean equalTo(UpdateReturnUrlSetupIntentsRequest other) {
-        return returnUrl.equals(other.returnUrl);
+        return clientSecret.equals(other.clientSecret) && returnUrl.equals(other.returnUrl);
     }
 
     @java.lang.Override
     public int hashCode() {
-        return Objects.hash(this.returnUrl);
+        return Objects.hash(this.clientSecret, this.returnUrl);
     }
 
     @java.lang.Override
@@ -81,25 +95,33 @@ public final class UpdateReturnUrlSetupIntentsRequest {
         _FinalStage additionalProperty(String key, Object value);
 
         _FinalStage additionalProperties(Map<String, Object> additionalProperties);
+
+        /**
+         * <p>The setup's own <code>client_secret</code>, for a caller without a secret key.</p>
+         */
+        _FinalStage clientSecret(Optional<String> clientSecret);
+
+        _FinalStage clientSecret(String clientSecret);
     }
 
     @JsonIgnoreProperties(ignoreUnknown = true)
     public static final class Builder implements ReturnUrlStage, _FinalStage {
         private String returnUrl;
 
-        @JsonAnySetter
+        private Optional<String> clientSecret = Optional.empty();
+
         private Map<String, Object> additionalProperties = new HashMap<>();
 
         private Builder() {}
 
         @java.lang.Override
         public Builder from(UpdateReturnUrlSetupIntentsRequest other) {
+            clientSecret(other.getClientSecret());
             returnUrl(other.getReturnUrl());
             return this;
         }
 
         /**
-         * <p>Where the buyer continues after completing an off-site step. Must be an absolute https URL without credentials (http is allowed for localhost), at most 2,048 characters.</p>
          * <p>Where the buyer continues after completing an off-site step. Must be an absolute https URL without credentials (http is allowed for localhost), at most 2,048 characters.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
@@ -110,9 +132,37 @@ public final class UpdateReturnUrlSetupIntentsRequest {
             return this;
         }
 
+        /**
+         * <p>The setup's own <code>client_secret</code>, for a caller without a secret key.</p>
+         * @return Reference to {@code this} so that method calls can be chained together.
+         */
+        @java.lang.Override
+        public _FinalStage clientSecret(String clientSecret) {
+            this.clientSecret = Optional.ofNullable(clientSecret);
+            return this;
+        }
+
+        /**
+         * <p>The setup's own <code>client_secret</code>, for a caller without a secret key.</p>
+         */
+        @java.lang.Override
+        @JsonSetter(value = "client_secret", nulls = Nulls.SKIP)
+        public _FinalStage clientSecret(Optional<String> clientSecret) {
+            this.clientSecret = clientSecret;
+            return this;
+        }
+
         @java.lang.Override
         public UpdateReturnUrlSetupIntentsRequest build() {
-            return new UpdateReturnUrlSetupIntentsRequest(returnUrl, additionalProperties);
+            return new UpdateReturnUrlSetupIntentsRequest(clientSecret, returnUrl, additionalProperties);
+        }
+
+        @JsonAnySetter
+        private void putAdditionalPropertyFromJson(String key, Object value) {
+            if (key.equalsIgnoreCase("client_secret") || key.equalsIgnoreCase("return_url")) {
+                return;
+            }
+            this.additionalProperties.put(key, value);
         }
 
         @java.lang.Override

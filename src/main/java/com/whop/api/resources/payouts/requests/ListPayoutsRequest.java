@@ -111,7 +111,7 @@ public final class ListPayoutsRequest {
     }
 
     /**
-     * @return Filter by how the payout was created. Payouts created before source tracking or through internal tooling carry no source and never match.
+     * @return Filter by how the payout was created. A payout with no recorded source never matches.
      */
     @JsonProperty("source")
     public Optional<ListPayoutsRequestSource> getSource() {
@@ -143,7 +143,7 @@ public final class ListPayoutsRequest {
     }
 
     /**
-     * @return Number of payouts to return from the start of the window.
+     * @return Number of results to return from the start of the range.
      */
     @JsonProperty("first")
     public Optional<Integer> getFirst() {
@@ -151,7 +151,7 @@ public final class ListPayoutsRequest {
     }
 
     /**
-     * @return Cursor to fetch the page after (from page_info.end_cursor).
+     * @return Return results after this cursor. Use <code>page_info.end_cursor</code> from the previous response to fetch the next page.
      */
     @JsonProperty("after")
     public Optional<String> getAfter() {
@@ -159,7 +159,7 @@ public final class ListPayoutsRequest {
     }
 
     /**
-     * @return Number of payouts to return from the end of the window.
+     * @return Number of results to return from the end of the range.
      */
     @JsonProperty("last")
     public Optional<Integer> getLast() {
@@ -167,7 +167,7 @@ public final class ListPayoutsRequest {
     }
 
     /**
-     * @return Cursor to fetch the page before (from page_info.start_cursor).
+     * @return Return results before this cursor. Use <code>page_info.start_cursor</code> from the previous response to fetch the previous page.
      */
     @JsonProperty("before")
     public Optional<String> getBefore() {
@@ -252,7 +252,6 @@ public final class ListPayoutsRequest {
 
         private Optional<String> before = Optional.empty();
 
-        @JsonAnySetter
         private Map<String, Object> additionalProperties = new HashMap<>();
 
         private Builder() {}
@@ -330,7 +329,7 @@ public final class ListPayoutsRequest {
         }
 
         /**
-         * <p>Filter by how the payout was created. Payouts created before source tracking or through internal tooling carry no source and never match.</p>
+         * <p>Filter by how the payout was created. A payout with no recorded source never matches.</p>
          */
         @JsonSetter(value = "source", nulls = Nulls.SKIP)
         public Builder source(Optional<ListPayoutsRequestSource> source) {
@@ -386,7 +385,7 @@ public final class ListPayoutsRequest {
         }
 
         /**
-         * <p>Number of payouts to return from the start of the window.</p>
+         * <p>Number of results to return from the start of the range.</p>
          */
         @JsonSetter(value = "first", nulls = Nulls.SKIP)
         public Builder first(Optional<Integer> first) {
@@ -400,7 +399,7 @@ public final class ListPayoutsRequest {
         }
 
         /**
-         * <p>Cursor to fetch the page after (from page_info.end_cursor).</p>
+         * <p>Return results after this cursor. Use <code>page_info.end_cursor</code> from the previous response to fetch the next page.</p>
          */
         @JsonSetter(value = "after", nulls = Nulls.SKIP)
         public Builder after(Optional<String> after) {
@@ -414,7 +413,7 @@ public final class ListPayoutsRequest {
         }
 
         /**
-         * <p>Number of payouts to return from the end of the window.</p>
+         * <p>Number of results to return from the end of the range.</p>
          */
         @JsonSetter(value = "last", nulls = Nulls.SKIP)
         public Builder last(Optional<Integer> last) {
@@ -428,7 +427,7 @@ public final class ListPayoutsRequest {
         }
 
         /**
-         * <p>Cursor to fetch the page before (from page_info.start_cursor).</p>
+         * <p>Return results before this cursor. Use <code>page_info.start_cursor</code> from the previous response to fetch the previous page.</p>
          */
         @JsonSetter(value = "before", nulls = Nulls.SKIP)
         public Builder before(Optional<String> before) {
@@ -456,6 +455,25 @@ public final class ListPayoutsRequest {
                     last,
                     before,
                     additionalProperties);
+        }
+
+        @JsonAnySetter
+        private void putAdditionalPropertyFromJson(String key, Object value) {
+            if (key.equalsIgnoreCase("account_id")
+                    || key.equalsIgnoreCase("user_id")
+                    || key.equalsIgnoreCase("currency")
+                    || key.equalsIgnoreCase("status")
+                    || key.equalsIgnoreCase("source")
+                    || key.equalsIgnoreCase("payout_method_id")
+                    || key.equalsIgnoreCase("created_before")
+                    || key.equalsIgnoreCase("created_after")
+                    || key.equalsIgnoreCase("first")
+                    || key.equalsIgnoreCase("after")
+                    || key.equalsIgnoreCase("last")
+                    || key.equalsIgnoreCase("before")) {
+                return;
+            }
+            this.additionalProperties.put(key, value);
         }
 
         public Builder additionalProperty(String key, Object value) {

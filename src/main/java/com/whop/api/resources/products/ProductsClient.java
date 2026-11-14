@@ -35,14 +35,28 @@ public class ProductsClient {
     }
 
     /**
-     * Returns a paginated list of products belonging to an account.
+     * Lists an account's products, or searches the public marketplace when you omit <code>account_id</code>. Without the <code>access_pass:basic:read</code> permission on the account, including when signed out, the list holds only the products its store page lists.
+     */
+    public SyncPagingIterable<ProductListItem> list() {
+        return this.rawClient.list().body();
+    }
+
+    /**
+     * Lists an account's products, or searches the public marketplace when you omit <code>account_id</code>. Without the <code>access_pass:basic:read</code> permission on the account, including when signed out, the list holds only the products its store page lists.
+     */
+    public SyncPagingIterable<ProductListItem> list(RequestOptions requestOptions) {
+        return this.rawClient.list(requestOptions).body();
+    }
+
+    /**
+     * Lists an account's products, or searches the public marketplace when you omit <code>account_id</code>. Without the <code>access_pass:basic:read</code> permission on the account, including when signed out, the list holds only the products its store page lists.
      */
     public SyncPagingIterable<ProductListItem> list(ListProductsRequest request) {
         return this.rawClient.list(request).body();
     }
 
     /**
-     * Returns a paginated list of products belonging to an account.
+     * Lists an account's products, or searches the public marketplace when you omit <code>account_id</code>. Without the <code>access_pass:basic:read</code> permission on the account, including when signed out, the list holds only the products its store page lists.
      */
     public SyncPagingIterable<ProductListItem> list(ListProductsRequest request, RequestOptions requestOptions) {
         return this.rawClient.list(request, requestOptions).body();
@@ -63,28 +77,28 @@ public class ProductsClient {
     }
 
     /**
-     * Retrieves the details of an existing product. This endpoint is publicly accessible.
+     * Retrieves a product. Requires no authentication.
      */
     public Product retrieve(String id) {
         return this.rawClient.retrieve(id).body();
     }
 
     /**
-     * Retrieves the details of an existing product. This endpoint is publicly accessible.
+     * Retrieves a product. Requires no authentication.
      */
     public Product retrieve(String id, RequestOptions requestOptions) {
         return this.rawClient.retrieve(id, requestOptions).body();
     }
 
     /**
-     * Retrieves the details of an existing product. This endpoint is publicly accessible.
+     * Retrieves a product. Requires no authentication.
      */
     public Product retrieve(String id, RetrieveProductsRequest request) {
         return this.rawClient.retrieve(id, request).body();
     }
 
     /**
-     * Retrieves the details of an existing product. This endpoint is publicly accessible.
+     * Retrieves a product. Requires no authentication.
      */
     public Product retrieve(String id, RetrieveProductsRequest request, RequestOptions requestOptions) {
         return this.rawClient.retrieve(id, request, requestOptions).body();
@@ -147,28 +161,28 @@ public class ProductsClient {
     }
 
     /**
-     * Submits a product to the whop.com marketplace for review. The product moves to <code>pending_review</code>; a Whop reviewer approves it before it goes live.
+     * Submits an App Store app's product for review. The product moves to <code>pending_review</code>; a Whop reviewer approves it before it goes live. Other products can no longer be listed on the whop.com marketplace, so the request fails with <code>discover_listing_discontinued</code>.
      */
     public Product publish(String id) {
         return this.rawClient.publish(id).body();
     }
 
     /**
-     * Submits a product to the whop.com marketplace for review. The product moves to <code>pending_review</code>; a Whop reviewer approves it before it goes live.
+     * Submits an App Store app's product for review. The product moves to <code>pending_review</code>; a Whop reviewer approves it before it goes live. Other products can no longer be listed on the whop.com marketplace, so the request fails with <code>discover_listing_discontinued</code>.
      */
     public Product publish(String id, RequestOptions requestOptions) {
         return this.rawClient.publish(id, requestOptions).body();
     }
 
     /**
-     * Submits a product to the whop.com marketplace for review. The product moves to <code>pending_review</code>; a Whop reviewer approves it before it goes live.
+     * Submits an App Store app's product for review. The product moves to <code>pending_review</code>; a Whop reviewer approves it before it goes live. Other products can no longer be listed on the whop.com marketplace, so the request fails with <code>discover_listing_discontinued</code>.
      */
     public Product publish(String id, PublishProductsRequest request) {
         return this.rawClient.publish(id, request).body();
     }
 
     /**
-     * Submits a product to the whop.com marketplace for review. The product moves to <code>pending_review</code>; a Whop reviewer approves it before it goes live.
+     * Submits an App Store app's product for review. The product moves to <code>pending_review</code>; a Whop reviewer approves it before it goes live. Other products can no longer be listed on the whop.com marketplace, so the request fails with <code>discover_listing_discontinued</code>.
      */
     public Product publish(String id, PublishProductsRequest request, RequestOptions requestOptions) {
         return this.rawClient.publish(id, request, requestOptions).body();

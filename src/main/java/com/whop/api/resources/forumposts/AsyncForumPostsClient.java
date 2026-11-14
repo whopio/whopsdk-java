@@ -5,6 +5,7 @@ package com.whop.api.resources.forumposts;
 
 import com.whop.api.core.ClientOptions;
 import com.whop.api.core.RequestOptions;
+import com.whop.api.core.WhopApiHttpResponse;
 import com.whop.api.core.pagination.SyncPagingIterable;
 import com.whop.api.resources.forumposts.requests.CreateForumPostsRequest;
 import com.whop.api.resources.forumposts.requests.ListForumPostsRequest;
@@ -39,7 +40,16 @@ public class AsyncForumPostsClient {
      * </ul>
      */
     public CompletableFuture<SyncPagingIterable<ForumPostListItem>> list(ListForumPostsRequest request) {
-        return this.rawClient.list(request).thenApply(response -> response.body());
+        CompletableFuture<WhopApiHttpResponse<SyncPagingIterable<ForumPostListItem>>> rawFuture =
+                this.rawClient.list(request);
+        CompletableFuture<SyncPagingIterable<ForumPostListItem>> future =
+                rawFuture.thenApply(response -> response.body());
+        future.whenComplete((result_, throwable_) -> {
+            if (future.isCancelled()) {
+                rawFuture.cancel(true);
+            }
+        });
+        return future;
     }
 
     /**
@@ -51,29 +61,52 @@ public class AsyncForumPostsClient {
      */
     public CompletableFuture<SyncPagingIterable<ForumPostListItem>> list(
             ListForumPostsRequest request, RequestOptions requestOptions) {
-        return this.rawClient.list(request, requestOptions).thenApply(response -> response.body());
+        CompletableFuture<WhopApiHttpResponse<SyncPagingIterable<ForumPostListItem>>> rawFuture =
+                this.rawClient.list(request, requestOptions);
+        CompletableFuture<SyncPagingIterable<ForumPostListItem>> future =
+                rawFuture.thenApply(response -> response.body());
+        future.whenComplete((result_, throwable_) -> {
+            if (future.isCancelled()) {
+                rawFuture.cancel(true);
+            }
+        });
+        return future;
     }
 
     /**
-     * Create a new forum post or comment within an experience. Supports text content, attachments, polls, paywalling, and pinning. Pass experience_id 'public' with a company_id to post to a company's public forum.
+     * Create a new forum post or comment within an experience. Supports text content, attachments, polls, paywalling, and pinning.
      * <p>Required permissions:</p>
      * <ul>
      * <li><code>forum:post:create</code></li>
      * </ul>
      */
     public CompletableFuture<ForumPost> create(CreateForumPostsRequest request) {
-        return this.rawClient.create(request).thenApply(response -> response.body());
+        CompletableFuture<WhopApiHttpResponse<ForumPost>> rawFuture = this.rawClient.create(request);
+        CompletableFuture<ForumPost> future = rawFuture.thenApply(response -> response.body());
+        future.whenComplete((result_, throwable_) -> {
+            if (future.isCancelled()) {
+                rawFuture.cancel(true);
+            }
+        });
+        return future;
     }
 
     /**
-     * Create a new forum post or comment within an experience. Supports text content, attachments, polls, paywalling, and pinning. Pass experience_id 'public' with a company_id to post to a company's public forum.
+     * Create a new forum post or comment within an experience. Supports text content, attachments, polls, paywalling, and pinning.
      * <p>Required permissions:</p>
      * <ul>
      * <li><code>forum:post:create</code></li>
      * </ul>
      */
     public CompletableFuture<ForumPost> create(CreateForumPostsRequest request, RequestOptions requestOptions) {
-        return this.rawClient.create(request, requestOptions).thenApply(response -> response.body());
+        CompletableFuture<WhopApiHttpResponse<ForumPost>> rawFuture = this.rawClient.create(request, requestOptions);
+        CompletableFuture<ForumPost> future = rawFuture.thenApply(response -> response.body());
+        future.whenComplete((result_, throwable_) -> {
+            if (future.isCancelled()) {
+                rawFuture.cancel(true);
+            }
+        });
+        return future;
     }
 
     /**
@@ -84,7 +117,14 @@ public class AsyncForumPostsClient {
      * </ul>
      */
     public CompletableFuture<ForumPost> retrieve(String id) {
-        return this.rawClient.retrieve(id).thenApply(response -> response.body());
+        CompletableFuture<WhopApiHttpResponse<ForumPost>> rawFuture = this.rawClient.retrieve(id);
+        CompletableFuture<ForumPost> future = rawFuture.thenApply(response -> response.body());
+        future.whenComplete((result_, throwable_) -> {
+            if (future.isCancelled()) {
+                rawFuture.cancel(true);
+            }
+        });
+        return future;
     }
 
     /**
@@ -95,7 +135,14 @@ public class AsyncForumPostsClient {
      * </ul>
      */
     public CompletableFuture<ForumPost> retrieve(String id, RequestOptions requestOptions) {
-        return this.rawClient.retrieve(id, requestOptions).thenApply(response -> response.body());
+        CompletableFuture<WhopApiHttpResponse<ForumPost>> rawFuture = this.rawClient.retrieve(id, requestOptions);
+        CompletableFuture<ForumPost> future = rawFuture.thenApply(response -> response.body());
+        future.whenComplete((result_, throwable_) -> {
+            if (future.isCancelled()) {
+                rawFuture.cancel(true);
+            }
+        });
+        return future;
     }
 
     /**
@@ -106,7 +153,14 @@ public class AsyncForumPostsClient {
      * </ul>
      */
     public CompletableFuture<ForumPost> retrieve(String id, RetrieveForumPostsRequest request) {
-        return this.rawClient.retrieve(id, request).thenApply(response -> response.body());
+        CompletableFuture<WhopApiHttpResponse<ForumPost>> rawFuture = this.rawClient.retrieve(id, request);
+        CompletableFuture<ForumPost> future = rawFuture.thenApply(response -> response.body());
+        future.whenComplete((result_, throwable_) -> {
+            if (future.isCancelled()) {
+                rawFuture.cancel(true);
+            }
+        });
+        return future;
     }
 
     /**
@@ -118,28 +172,57 @@ public class AsyncForumPostsClient {
      */
     public CompletableFuture<ForumPost> retrieve(
             String id, RetrieveForumPostsRequest request, RequestOptions requestOptions) {
-        return this.rawClient.retrieve(id, request, requestOptions).thenApply(response -> response.body());
+        CompletableFuture<WhopApiHttpResponse<ForumPost>> rawFuture =
+                this.rawClient.retrieve(id, request, requestOptions);
+        CompletableFuture<ForumPost> future = rawFuture.thenApply(response -> response.body());
+        future.whenComplete((result_, throwable_) -> {
+            if (future.isCancelled()) {
+                rawFuture.cancel(true);
+            }
+        });
+        return future;
     }
 
     /**
      * Edit the content, attachments, pinned status, or visibility of an existing forum post or comment.
      */
     public CompletableFuture<ForumPost> update(String id) {
-        return this.rawClient.update(id).thenApply(response -> response.body());
+        CompletableFuture<WhopApiHttpResponse<ForumPost>> rawFuture = this.rawClient.update(id);
+        CompletableFuture<ForumPost> future = rawFuture.thenApply(response -> response.body());
+        future.whenComplete((result_, throwable_) -> {
+            if (future.isCancelled()) {
+                rawFuture.cancel(true);
+            }
+        });
+        return future;
     }
 
     /**
      * Edit the content, attachments, pinned status, or visibility of an existing forum post or comment.
      */
     public CompletableFuture<ForumPost> update(String id, RequestOptions requestOptions) {
-        return this.rawClient.update(id, requestOptions).thenApply(response -> response.body());
+        CompletableFuture<WhopApiHttpResponse<ForumPost>> rawFuture = this.rawClient.update(id, requestOptions);
+        CompletableFuture<ForumPost> future = rawFuture.thenApply(response -> response.body());
+        future.whenComplete((result_, throwable_) -> {
+            if (future.isCancelled()) {
+                rawFuture.cancel(true);
+            }
+        });
+        return future;
     }
 
     /**
      * Edit the content, attachments, pinned status, or visibility of an existing forum post or comment.
      */
     public CompletableFuture<ForumPost> update(String id, UpdateForumPostsRequest request) {
-        return this.rawClient.update(id, request).thenApply(response -> response.body());
+        CompletableFuture<WhopApiHttpResponse<ForumPost>> rawFuture = this.rawClient.update(id, request);
+        CompletableFuture<ForumPost> future = rawFuture.thenApply(response -> response.body());
+        future.whenComplete((result_, throwable_) -> {
+            if (future.isCancelled()) {
+                rawFuture.cancel(true);
+            }
+        });
+        return future;
     }
 
     /**
@@ -147,6 +230,14 @@ public class AsyncForumPostsClient {
      */
     public CompletableFuture<ForumPost> update(
             String id, UpdateForumPostsRequest request, RequestOptions requestOptions) {
-        return this.rawClient.update(id, request, requestOptions).thenApply(response -> response.body());
+        CompletableFuture<WhopApiHttpResponse<ForumPost>> rawFuture =
+                this.rawClient.update(id, request, requestOptions);
+        CompletableFuture<ForumPost> future = rawFuture.thenApply(response -> response.body());
+        future.whenComplete((result_, throwable_) -> {
+            if (future.isCancelled()) {
+                rawFuture.cancel(true);
+            }
+        });
+        return future;
     }
 }

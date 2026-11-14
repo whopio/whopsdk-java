@@ -6,8 +6,10 @@ package com.whop.api.resources.partners.businesses.earnings;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.whop.api.core.ClientOptions;
 import com.whop.api.core.ObjectMappers;
+import com.whop.api.core.PathSegments;
 import com.whop.api.core.QueryStringMapper;
 import com.whop.api.core.RequestOptions;
+import com.whop.api.core.RetryInterceptor;
 import com.whop.api.core.WhopApiApiException;
 import com.whop.api.core.WhopApiException;
 import com.whop.api.core.WhopApiHttpResponse;
@@ -39,14 +41,14 @@ public class AsyncRawEarningsClient {
     }
 
     /**
-     * Lists the earnings Whop pays out for one referred business's activity, most recent first.
+     * Lists the earnings Whop pays out for one referred business's activity, most recent first. The original referrer or a caller with company:basic:read on the business credited for the referral can read them.
      */
     public CompletableFuture<WhopApiHttpResponse<SyncPagingIterable<ListEarningsResponseDataItem>>> list(String id) {
         return list(id, ListEarningsRequest.builder().build());
     }
 
     /**
-     * Lists the earnings Whop pays out for one referred business's activity, most recent first.
+     * Lists the earnings Whop pays out for one referred business's activity, most recent first. The original referrer or a caller with company:basic:read on the business credited for the referral can read them.
      */
     public CompletableFuture<WhopApiHttpResponse<SyncPagingIterable<ListEarningsResponseDataItem>>> list(
             String id, RequestOptions requestOptions) {
@@ -54,7 +56,7 @@ public class AsyncRawEarningsClient {
     }
 
     /**
-     * Lists the earnings Whop pays out for one referred business's activity, most recent first.
+     * Lists the earnings Whop pays out for one referred business's activity, most recent first. The original referrer or a caller with company:basic:read on the business credited for the referral can read them.
      */
     public CompletableFuture<WhopApiHttpResponse<SyncPagingIterable<ListEarningsResponseDataItem>>> list(
             String id, ListEarningsRequest request) {
@@ -62,14 +64,14 @@ public class AsyncRawEarningsClient {
     }
 
     /**
-     * Lists the earnings Whop pays out for one referred business's activity, most recent first.
+     * Lists the earnings Whop pays out for one referred business's activity, most recent first. The original referrer or a caller with company:basic:read on the business credited for the referral can read them.
      */
     public CompletableFuture<WhopApiHttpResponse<SyncPagingIterable<ListEarningsResponseDataItem>>> list(
             String id, ListEarningsRequest request, RequestOptions requestOptions) {
-        HttpUrl.Builder httpUrl = HttpUrl.parse(this.clientOptions.environment().getUrl())
+        HttpUrl.Builder httpUrl = HttpUrl.parse(this.clientOptions.environment().getApiURL())
                 .newBuilder()
                 .addPathSegments("partners/businesses")
-                .addPathSegment(id)
+                .addPathSegment(PathSegments.validate(id))
                 .addPathSegments("earnings");
         if (request.getStatus().isPresent()) {
             QueryStringMapper.addQueryParameter(
@@ -126,9 +128,19 @@ public class AsyncRawEarningsClient {
         if (requestOptions != null && requestOptions.getTimeout().isPresent()) {
             client = clientOptions.httpClientWithTimeout(requestOptions);
         }
+        if (requestOptions != null && requestOptions.getMaxRetries().isPresent()) {
+            okhttpRequest = okhttpRequest
+                    .newBuilder()
+                    .tag(
+                            RetryInterceptor.MaxRetriesOverride.class,
+                            new RetryInterceptor.MaxRetriesOverride(
+                                    requestOptions.getMaxRetries().get()))
+                    .build();
+        }
         CompletableFuture<WhopApiHttpResponse<SyncPagingIterable<ListEarningsResponseDataItem>>> future =
                 new CompletableFuture<>();
-        client.newCall(okhttpRequest).enqueue(new Callback() {
+        RetryInterceptor.AsyncCall okhttpCall = RetryInterceptor.newAsyncCall(client, okhttpRequest);
+        okhttpCall.enqueue(new Callback() {
             @Override
             public void onResponse(@NotNull Call call, @NotNull Response response) throws IOException {
                 try (ResponseBody responseBody = response.body()) {
@@ -145,7 +157,11 @@ public class AsyncRawEarningsClient {
                         List<ListEarningsResponseDataItem> result = parsedResponse.getData();
                         future.complete(new WhopApiHttpResponse<>(
                                 new SyncPagingIterable<ListEarningsResponseDataItem>(
-                                        startingAfter != null, result, parsedResponse, () -> {
+                                        startingAfter.isPresent()
+                                                && !startingAfter.get().isEmpty(),
+                                        result,
+                                        parsedResponse,
+                                        () -> {
                                             try {
                                                 return list(id, nextRequest, requestOptions)
                                                         .get()
@@ -170,6 +186,9 @@ public class AsyncRawEarningsClient {
                     future.completeExceptionally(new WhopApiApiException(
                             "Error with status code " + response.code(), response.code(), errorBody, response));
                     return;
+                } catch (JsonProcessingException e) {
+                    future.completeExceptionally(
+                            new WhopApiException("Failed to deserialize response: " + e.getMessage(), e));
                 } catch (IOException e) {
                     future.completeExceptionally(new WhopApiException("Network error executing HTTP request", e));
                 }
@@ -178,6 +197,11 @@ public class AsyncRawEarningsClient {
             @Override
             public void onFailure(@NotNull Call call, @NotNull IOException e) {
                 future.completeExceptionally(new WhopApiException("Network error executing HTTP request", e));
+            }
+        });
+        future.whenComplete((result_, throwable_) -> {
+            if (future.isCancelled()) {
+                okhttpCall.cancel();
             }
         });
         return future;

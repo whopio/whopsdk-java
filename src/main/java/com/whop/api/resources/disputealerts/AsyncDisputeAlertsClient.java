@@ -5,6 +5,7 @@ package com.whop.api.resources.disputealerts;
 
 import com.whop.api.core.ClientOptions;
 import com.whop.api.core.RequestOptions;
+import com.whop.api.core.WhopApiHttpResponse;
 import com.whop.api.core.pagination.SyncPagingIterable;
 import com.whop.api.resources.disputealerts.requests.ListDisputeAlertsRequest;
 import com.whop.api.resources.disputealerts.requests.RetrieveDisputeAlertsRequest;
@@ -32,21 +33,44 @@ public class AsyncDisputeAlertsClient {
      * Lists the dispute alerts and early fraud warnings across the accounts you can read.
      */
     public CompletableFuture<SyncPagingIterable<DisputeAlert>> list() {
-        return this.rawClient.list().thenApply(response -> response.body());
+        CompletableFuture<WhopApiHttpResponse<SyncPagingIterable<DisputeAlert>>> rawFuture = this.rawClient.list();
+        CompletableFuture<SyncPagingIterable<DisputeAlert>> future = rawFuture.thenApply(response -> response.body());
+        future.whenComplete((result_, throwable_) -> {
+            if (future.isCancelled()) {
+                rawFuture.cancel(true);
+            }
+        });
+        return future;
     }
 
     /**
      * Lists the dispute alerts and early fraud warnings across the accounts you can read.
      */
     public CompletableFuture<SyncPagingIterable<DisputeAlert>> list(RequestOptions requestOptions) {
-        return this.rawClient.list(requestOptions).thenApply(response -> response.body());
+        CompletableFuture<WhopApiHttpResponse<SyncPagingIterable<DisputeAlert>>> rawFuture =
+                this.rawClient.list(requestOptions);
+        CompletableFuture<SyncPagingIterable<DisputeAlert>> future = rawFuture.thenApply(response -> response.body());
+        future.whenComplete((result_, throwable_) -> {
+            if (future.isCancelled()) {
+                rawFuture.cancel(true);
+            }
+        });
+        return future;
     }
 
     /**
      * Lists the dispute alerts and early fraud warnings across the accounts you can read.
      */
     public CompletableFuture<SyncPagingIterable<DisputeAlert>> list(ListDisputeAlertsRequest request) {
-        return this.rawClient.list(request).thenApply(response -> response.body());
+        CompletableFuture<WhopApiHttpResponse<SyncPagingIterable<DisputeAlert>>> rawFuture =
+                this.rawClient.list(request);
+        CompletableFuture<SyncPagingIterable<DisputeAlert>> future = rawFuture.thenApply(response -> response.body());
+        future.whenComplete((result_, throwable_) -> {
+            if (future.isCancelled()) {
+                rawFuture.cancel(true);
+            }
+        });
+        return future;
     }
 
     /**
@@ -54,28 +78,57 @@ public class AsyncDisputeAlertsClient {
      */
     public CompletableFuture<SyncPagingIterable<DisputeAlert>> list(
             ListDisputeAlertsRequest request, RequestOptions requestOptions) {
-        return this.rawClient.list(request, requestOptions).thenApply(response -> response.body());
+        CompletableFuture<WhopApiHttpResponse<SyncPagingIterable<DisputeAlert>>> rawFuture =
+                this.rawClient.list(request, requestOptions);
+        CompletableFuture<SyncPagingIterable<DisputeAlert>> future = rawFuture.thenApply(response -> response.body());
+        future.whenComplete((result_, throwable_) -> {
+            if (future.isCancelled()) {
+                rawFuture.cancel(true);
+            }
+        });
+        return future;
     }
 
     /**
      * Retrieves a single dispute alert or early fraud warning by ID.
      */
     public CompletableFuture<DisputeAlert> retrieve(String id) {
-        return this.rawClient.retrieve(id).thenApply(response -> response.body());
+        CompletableFuture<WhopApiHttpResponse<DisputeAlert>> rawFuture = this.rawClient.retrieve(id);
+        CompletableFuture<DisputeAlert> future = rawFuture.thenApply(response -> response.body());
+        future.whenComplete((result_, throwable_) -> {
+            if (future.isCancelled()) {
+                rawFuture.cancel(true);
+            }
+        });
+        return future;
     }
 
     /**
      * Retrieves a single dispute alert or early fraud warning by ID.
      */
     public CompletableFuture<DisputeAlert> retrieve(String id, RequestOptions requestOptions) {
-        return this.rawClient.retrieve(id, requestOptions).thenApply(response -> response.body());
+        CompletableFuture<WhopApiHttpResponse<DisputeAlert>> rawFuture = this.rawClient.retrieve(id, requestOptions);
+        CompletableFuture<DisputeAlert> future = rawFuture.thenApply(response -> response.body());
+        future.whenComplete((result_, throwable_) -> {
+            if (future.isCancelled()) {
+                rawFuture.cancel(true);
+            }
+        });
+        return future;
     }
 
     /**
      * Retrieves a single dispute alert or early fraud warning by ID.
      */
     public CompletableFuture<DisputeAlert> retrieve(String id, RetrieveDisputeAlertsRequest request) {
-        return this.rawClient.retrieve(id, request).thenApply(response -> response.body());
+        CompletableFuture<WhopApiHttpResponse<DisputeAlert>> rawFuture = this.rawClient.retrieve(id, request);
+        CompletableFuture<DisputeAlert> future = rawFuture.thenApply(response -> response.body());
+        future.whenComplete((result_, throwable_) -> {
+            if (future.isCancelled()) {
+                rawFuture.cancel(true);
+            }
+        });
+        return future;
     }
 
     /**
@@ -83,6 +136,14 @@ public class AsyncDisputeAlertsClient {
      */
     public CompletableFuture<DisputeAlert> retrieve(
             String id, RetrieveDisputeAlertsRequest request, RequestOptions requestOptions) {
-        return this.rawClient.retrieve(id, request, requestOptions).thenApply(response -> response.body());
+        CompletableFuture<WhopApiHttpResponse<DisputeAlert>> rawFuture =
+                this.rawClient.retrieve(id, request, requestOptions);
+        CompletableFuture<DisputeAlert> future = rawFuture.thenApply(response -> response.body());
+        future.whenComplete((result_, throwable_) -> {
+            if (future.isCancelled()) {
+                rawFuture.cancel(true);
+            }
+        });
+        return future;
     }
 }

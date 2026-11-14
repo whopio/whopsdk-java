@@ -88,7 +88,6 @@ public final class BadgesNotificationsRequest {
 
         private Optional<String> lastFetchedAt = Optional.empty();
 
-        @JsonAnySetter
         private Map<String, Object> additionalProperties = new HashMap<>();
 
         private Builder() {}
@@ -134,6 +133,14 @@ public final class BadgesNotificationsRequest {
 
         public BadgesNotificationsRequest build() {
             return new BadgesNotificationsRequest(experienceIds, lastFetchedAt, additionalProperties);
+        }
+
+        @JsonAnySetter
+        private void putAdditionalPropertyFromJson(String key, Object value) {
+            if (key.equalsIgnoreCase("experience_ids") || key.equalsIgnoreCase("last_fetched_at")) {
+                return;
+            }
+            this.additionalProperties.put(key, value);
         }
 
         public Builder additionalProperty(String key, Object value) {

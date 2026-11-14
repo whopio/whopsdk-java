@@ -15,6 +15,7 @@ import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.whop.api.core.Nullable;
 import com.whop.api.core.NullableNonemptyFilter;
 import com.whop.api.core.ObjectMappers;
+import com.whop.api.types.FunnelStepResult;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -26,6 +27,8 @@ import java.util.Optional;
 public final class RetrieveStatsResponseDataPointsItem {
     private final Optional<List<RetrieveStatsResponseDataPointsItemBreakdownItem>> breakdown;
 
+    private final Optional<List<FunnelStepResult>> steps;
+
     private final int timestamp;
 
     private final Optional<Double> value;
@@ -34,10 +37,12 @@ public final class RetrieveStatsResponseDataPointsItem {
 
     private RetrieveStatsResponseDataPointsItem(
             Optional<List<RetrieveStatsResponseDataPointsItemBreakdownItem>> breakdown,
+            Optional<List<FunnelStepResult>> steps,
             int timestamp,
             Optional<Double> value,
             Map<String, Object> additionalProperties) {
         this.breakdown = breakdown;
+        this.steps = steps;
         this.timestamp = timestamp;
         this.value = value;
         this.additionalProperties = additionalProperties;
@@ -52,6 +57,14 @@ public final class RetrieveStatsResponseDataPointsItem {
     }
 
     /**
+     * @return Present for the funnel metric. People reaching each step in order, starting with the entry step.
+     */
+    @JsonProperty("steps")
+    public Optional<List<FunnelStepResult>> getSteps() {
+        return steps;
+    }
+
+    /**
      * @return Unix timestamp (seconds) of the period start.
      */
     @JsonProperty("timestamp")
@@ -60,7 +73,7 @@ public final class RetrieveStatsResponseDataPointsItem {
     }
 
     /**
-     * @return The metric's value for this period, in the metric's unit.
+     * @return The metric's value for this period, in the metric's unit. For <code>funnel</code>, the final-step conversion percentage.
      */
     @JsonIgnore
     public Optional<Double> getValue() {
@@ -89,12 +102,15 @@ public final class RetrieveStatsResponseDataPointsItem {
     }
 
     private boolean equalTo(RetrieveStatsResponseDataPointsItem other) {
-        return breakdown.equals(other.breakdown) && timestamp == other.timestamp && value.equals(other.value);
+        return breakdown.equals(other.breakdown)
+                && steps.equals(other.steps)
+                && timestamp == other.timestamp
+                && value.equals(other.value);
     }
 
     @java.lang.Override
     public int hashCode() {
-        return Objects.hash(this.breakdown, this.timestamp, this.value);
+        return Objects.hash(this.breakdown, this.steps, this.timestamp, this.value);
     }
 
     @java.lang.Override
@@ -130,7 +146,14 @@ public final class RetrieveStatsResponseDataPointsItem {
         _FinalStage breakdown(List<RetrieveStatsResponseDataPointsItemBreakdownItem> breakdown);
 
         /**
-         * <p>The metric's value for this period, in the metric's unit.</p>
+         * <p>Present for the funnel metric. People reaching each step in order, starting with the entry step.</p>
+         */
+        _FinalStage steps(Optional<List<FunnelStepResult>> steps);
+
+        _FinalStage steps(List<FunnelStepResult> steps);
+
+        /**
+         * <p>The metric's value for this period, in the metric's unit. For <code>funnel</code>, the final-step conversion percentage.</p>
          */
         _FinalStage value(Optional<Double> value);
 
@@ -145,9 +168,10 @@ public final class RetrieveStatsResponseDataPointsItem {
 
         private Optional<Double> value = Optional.empty();
 
+        private Optional<List<FunnelStepResult>> steps = Optional.empty();
+
         private Optional<List<RetrieveStatsResponseDataPointsItemBreakdownItem>> breakdown = Optional.empty();
 
-        @JsonAnySetter
         private Map<String, Object> additionalProperties = new HashMap<>();
 
         private Builder() {}
@@ -155,13 +179,13 @@ public final class RetrieveStatsResponseDataPointsItem {
         @java.lang.Override
         public Builder from(RetrieveStatsResponseDataPointsItem other) {
             breakdown(other.getBreakdown());
+            steps(other.getSteps());
             timestamp(other.getTimestamp());
             value(other.getValue());
             return this;
         }
 
         /**
-         * <p>Unix timestamp (seconds) of the period start.</p>
          * <p>Unix timestamp (seconds) of the period start.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
@@ -173,7 +197,7 @@ public final class RetrieveStatsResponseDataPointsItem {
         }
 
         /**
-         * <p>The metric's value for this period, in the metric's unit.</p>
+         * <p>The metric's value for this period, in the metric's unit. For <code>funnel</code>, the final-step conversion percentage.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
@@ -189,7 +213,7 @@ public final class RetrieveStatsResponseDataPointsItem {
         }
 
         /**
-         * <p>The metric's value for this period, in the metric's unit.</p>
+         * <p>The metric's value for this period, in the metric's unit. For <code>funnel</code>, the final-step conversion percentage.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
@@ -199,12 +223,32 @@ public final class RetrieveStatsResponseDataPointsItem {
         }
 
         /**
-         * <p>The metric's value for this period, in the metric's unit.</p>
+         * <p>The metric's value for this period, in the metric's unit. For <code>funnel</code>, the final-step conversion percentage.</p>
          */
         @java.lang.Override
         @JsonSetter(value = "value", nulls = Nulls.SKIP)
         public _FinalStage value(Optional<Double> value) {
             this.value = value;
+            return this;
+        }
+
+        /**
+         * <p>Present for the funnel metric. People reaching each step in order, starting with the entry step.</p>
+         * @return Reference to {@code this} so that method calls can be chained together.
+         */
+        @java.lang.Override
+        public _FinalStage steps(List<FunnelStepResult> steps) {
+            this.steps = Optional.ofNullable(steps);
+            return this;
+        }
+
+        /**
+         * <p>Present for the funnel metric. People reaching each step in order, starting with the entry step.</p>
+         */
+        @java.lang.Override
+        @JsonSetter(value = "steps", nulls = Nulls.SKIP)
+        public _FinalStage steps(Optional<List<FunnelStepResult>> steps) {
+            this.steps = steps;
             return this;
         }
 
@@ -230,7 +274,18 @@ public final class RetrieveStatsResponseDataPointsItem {
 
         @java.lang.Override
         public RetrieveStatsResponseDataPointsItem build() {
-            return new RetrieveStatsResponseDataPointsItem(breakdown, timestamp, value, additionalProperties);
+            return new RetrieveStatsResponseDataPointsItem(breakdown, steps, timestamp, value, additionalProperties);
+        }
+
+        @JsonAnySetter
+        private void putAdditionalPropertyFromJson(String key, Object value) {
+            if (key.equalsIgnoreCase("breakdown")
+                    || key.equalsIgnoreCase("steps")
+                    || key.equalsIgnoreCase("timestamp")
+                    || key.equalsIgnoreCase("value")) {
+                return;
+            }
+            this.additionalProperties.put(key, value);
         }
 
         @java.lang.Override

@@ -15,7 +15,6 @@ import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.whop.api.core.Nullable;
 import com.whop.api.core.NullableNonemptyFilter;
 import com.whop.api.core.ObjectMappers;
-import java.time.OffsetDateTime;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -27,45 +26,45 @@ import org.jetbrains.annotations.NotNull;
 @JsonInclude(JsonInclude.Include.NON_ABSENT)
 @JsonDeserialize(builder = ReviewListItem.Builder.class)
 public final class ReviewListItem {
-    private final List<ReviewListItemAttachmentsItem> attachments;
+    private final List<ReviewAttachment> attachments;
 
-    private final OffsetDateTime createdAt;
+    private final String createdAt;
 
     private final Optional<String> description;
 
     private final String id;
 
-    private final Optional<OffsetDateTime> joinedAt;
+    private final Optional<String> joinedAt;
 
     private final Optional<Boolean> paidForProduct;
 
-    private final Optional<OffsetDateTime> publishedAt;
+    private final Optional<String> publishedAt;
 
     private final int stars;
 
-    private final ReviewStatus status;
+    private final ReviewListItemStatus status;
 
     private final Optional<String> title;
 
-    private final OffsetDateTime updatedAt;
+    private final String updatedAt;
 
-    private final ReviewListItemUser user;
+    private final ReviewUser user;
 
     private final Map<String, Object> additionalProperties;
 
     private ReviewListItem(
-            List<ReviewListItemAttachmentsItem> attachments,
-            OffsetDateTime createdAt,
+            List<ReviewAttachment> attachments,
+            String createdAt,
             Optional<String> description,
             String id,
-            Optional<OffsetDateTime> joinedAt,
+            Optional<String> joinedAt,
             Optional<Boolean> paidForProduct,
-            Optional<OffsetDateTime> publishedAt,
+            Optional<String> publishedAt,
             int stars,
-            ReviewStatus status,
+            ReviewListItemStatus status,
             Optional<String> title,
-            OffsetDateTime updatedAt,
-            ReviewListItemUser user,
+            String updatedAt,
+            ReviewUser user,
             Map<String, Object> additionalProperties) {
         this.attachments = attachments;
         this.createdAt = createdAt;
@@ -82,19 +81,16 @@ public final class ReviewListItem {
         this.additionalProperties = additionalProperties;
     }
 
-    /**
-     * @return A list of files and media attached to the review.
-     */
     @JsonProperty("attachments")
-    public List<ReviewListItemAttachmentsItem> getAttachments() {
+    public List<ReviewAttachment> getAttachments() {
         return attachments;
     }
 
     /**
-     * @return The datetime the review was created.
+     * @return When the review was created, as an ISO 8601 timestamp.
      */
     @JsonProperty("created_at")
-    public OffsetDateTime getCreatedAt() {
+    public String getCreatedAt() {
         return createdAt;
     }
 
@@ -118,10 +114,10 @@ public final class ReviewListItem {
     }
 
     /**
-     * @return The timestamp of when the reviewer first joined the product. Null if unknown.
+     * @return When the reviewer first joined the product, as an ISO 8601 timestamp. Null if unknown.
      */
     @JsonIgnore
-    public Optional<OffsetDateTime> getJoinedAt() {
+    public Optional<String> getJoinedAt() {
         if (joinedAt == null) {
             return Optional.empty();
         }
@@ -140,10 +136,10 @@ public final class ReviewListItem {
     }
 
     /**
-     * @return The timestamp of when the review was published. Null if the review has not been published yet.
+     * @return When the review was published, as an ISO 8601 timestamp. Null if unknown.
      */
     @JsonIgnore
-    public Optional<OffsetDateTime> getPublishedAt() {
+    public Optional<String> getPublishedAt() {
         if (publishedAt == null) {
             return Optional.empty();
         }
@@ -159,10 +155,10 @@ public final class ReviewListItem {
     }
 
     /**
-     * @return The current moderation status of the review.
+     * @return The moderation status of the review. Only published reviews are returned.
      */
     @JsonProperty("status")
-    public ReviewStatus getStatus() {
+    public ReviewListItemStatus getStatus() {
         return status;
     }
 
@@ -178,10 +174,10 @@ public final class ReviewListItem {
     }
 
     /**
-     * @return The datetime the review was last updated.
+     * @return When the review was last updated, as an ISO 8601 timestamp.
      */
     @JsonProperty("updated_at")
-    public OffsetDateTime getUpdatedAt() {
+    public String getUpdatedAt() {
         return updatedAt;
     }
 
@@ -189,7 +185,7 @@ public final class ReviewListItem {
      * @return The user account of the person who wrote this review.
      */
     @JsonProperty("user")
-    public ReviewListItemUser getUser() {
+    public ReviewUser getUser() {
         return user;
     }
 
@@ -201,7 +197,7 @@ public final class ReviewListItem {
 
     @JsonInclude(value = JsonInclude.Include.CUSTOM, valueFilter = NullableNonemptyFilter.class)
     @JsonProperty("joined_at")
-    private Optional<OffsetDateTime> _getJoinedAt() {
+    private Optional<String> _getJoinedAt() {
         return joinedAt;
     }
 
@@ -213,7 +209,7 @@ public final class ReviewListItem {
 
     @JsonInclude(value = JsonInclude.Include.CUSTOM, valueFilter = NullableNonemptyFilter.class)
     @JsonProperty("published_at")
-    private Optional<OffsetDateTime> _getPublishedAt() {
+    private Optional<String> _getPublishedAt() {
         return publishedAt;
     }
 
@@ -277,9 +273,9 @@ public final class ReviewListItem {
 
     public interface CreatedAtStage {
         /**
-         * <p>The datetime the review was created.</p>
+         * <p>When the review was created, as an ISO 8601 timestamp.</p>
          */
-        IdStage createdAt(@NotNull OffsetDateTime createdAt);
+        IdStage createdAt(@NotNull String createdAt);
 
         Builder from(ReviewListItem other);
     }
@@ -300,23 +296,23 @@ public final class ReviewListItem {
 
     public interface StatusStage {
         /**
-         * <p>The current moderation status of the review.</p>
+         * <p>The moderation status of the review. Only published reviews are returned.</p>
          */
-        UpdatedAtStage status(@NotNull ReviewStatus status);
+        UpdatedAtStage status(@NotNull ReviewListItemStatus status);
     }
 
     public interface UpdatedAtStage {
         /**
-         * <p>The datetime the review was last updated.</p>
+         * <p>When the review was last updated, as an ISO 8601 timestamp.</p>
          */
-        UserStage updatedAt(@NotNull OffsetDateTime updatedAt);
+        UserStage updatedAt(@NotNull String updatedAt);
     }
 
     public interface UserStage {
         /**
          * <p>The user account of the person who wrote this review.</p>
          */
-        _FinalStage user(@NotNull ReviewListItemUser user);
+        _FinalStage user(@NotNull ReviewUser user);
     }
 
     public interface _FinalStage {
@@ -326,14 +322,11 @@ public final class ReviewListItem {
 
         _FinalStage additionalProperties(Map<String, Object> additionalProperties);
 
-        /**
-         * <p>A list of files and media attached to the review.</p>
-         */
-        _FinalStage attachments(List<ReviewListItemAttachmentsItem> attachments);
+        _FinalStage attachments(List<ReviewAttachment> attachments);
 
-        _FinalStage addAttachments(ReviewListItemAttachmentsItem attachments);
+        _FinalStage addAttachments(ReviewAttachment attachments);
 
-        _FinalStage addAllAttachments(List<ReviewListItemAttachmentsItem> attachments);
+        _FinalStage addAllAttachments(List<ReviewAttachment> attachments);
 
         /**
          * <p>The body text of the review containing the user's detailed feedback. Returns an empty string if no description was provided.</p>
@@ -345,13 +338,13 @@ public final class ReviewListItem {
         _FinalStage description(Nullable<String> description);
 
         /**
-         * <p>The timestamp of when the reviewer first joined the product. Null if unknown.</p>
+         * <p>When the reviewer first joined the product, as an ISO 8601 timestamp. Null if unknown.</p>
          */
-        _FinalStage joinedAt(Optional<OffsetDateTime> joinedAt);
+        _FinalStage joinedAt(Optional<String> joinedAt);
 
-        _FinalStage joinedAt(OffsetDateTime joinedAt);
+        _FinalStage joinedAt(String joinedAt);
 
-        _FinalStage joinedAt(Nullable<OffsetDateTime> joinedAt);
+        _FinalStage joinedAt(Nullable<String> joinedAt);
 
         /**
          * <p>Whether the reviewer paid for the product. Null if the payment status is unknown.</p>
@@ -363,13 +356,13 @@ public final class ReviewListItem {
         _FinalStage paidForProduct(Nullable<Boolean> paidForProduct);
 
         /**
-         * <p>The timestamp of when the review was published. Null if the review has not been published yet.</p>
+         * <p>When the review was published, as an ISO 8601 timestamp. Null if unknown.</p>
          */
-        _FinalStage publishedAt(Optional<OffsetDateTime> publishedAt);
+        _FinalStage publishedAt(Optional<String> publishedAt);
 
-        _FinalStage publishedAt(OffsetDateTime publishedAt);
+        _FinalStage publishedAt(String publishedAt);
 
-        _FinalStage publishedAt(Nullable<OffsetDateTime> publishedAt);
+        _FinalStage publishedAt(Nullable<String> publishedAt);
 
         /**
          * <p>A short summary title for the review. Null if the reviewer did not provide one.</p>
@@ -384,31 +377,30 @@ public final class ReviewListItem {
     @JsonIgnoreProperties(ignoreUnknown = true)
     public static final class Builder
             implements CreatedAtStage, IdStage, StarsStage, StatusStage, UpdatedAtStage, UserStage, _FinalStage {
-        private OffsetDateTime createdAt;
+        private String createdAt;
 
         private String id;
 
         private int stars;
 
-        private ReviewStatus status;
+        private ReviewListItemStatus status;
 
-        private OffsetDateTime updatedAt;
+        private String updatedAt;
 
-        private ReviewListItemUser user;
+        private ReviewUser user;
 
         private Optional<String> title = Optional.empty();
 
-        private Optional<OffsetDateTime> publishedAt = Optional.empty();
+        private Optional<String> publishedAt = Optional.empty();
 
         private Optional<Boolean> paidForProduct = Optional.empty();
 
-        private Optional<OffsetDateTime> joinedAt = Optional.empty();
+        private Optional<String> joinedAt = Optional.empty();
 
         private Optional<String> description = Optional.empty();
 
-        private List<ReviewListItemAttachmentsItem> attachments = new ArrayList<>();
+        private List<ReviewAttachment> attachments = new ArrayList<>();
 
-        @JsonAnySetter
         private Map<String, Object> additionalProperties = new HashMap<>();
 
         private Builder() {}
@@ -431,19 +423,17 @@ public final class ReviewListItem {
         }
 
         /**
-         * <p>The datetime the review was created.</p>
-         * <p>The datetime the review was created.</p>
+         * <p>When the review was created, as an ISO 8601 timestamp.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
         @JsonSetter("created_at")
-        public IdStage createdAt(@NotNull OffsetDateTime createdAt) {
+        public IdStage createdAt(@NotNull String createdAt) {
             this.createdAt = Objects.requireNonNull(createdAt, "createdAt must not be null");
             return this;
         }
 
         /**
-         * <p>The unique identifier for the review.</p>
          * <p>The unique identifier for the review.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
@@ -456,7 +446,6 @@ public final class ReviewListItem {
 
         /**
          * <p>The star rating given by the reviewer, from 1 to 5.</p>
-         * <p>The star rating given by the reviewer, from 1 to 5.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
@@ -467,37 +456,34 @@ public final class ReviewListItem {
         }
 
         /**
-         * <p>The current moderation status of the review.</p>
-         * <p>The current moderation status of the review.</p>
+         * <p>The moderation status of the review. Only published reviews are returned.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
         @JsonSetter("status")
-        public UpdatedAtStage status(@NotNull ReviewStatus status) {
+        public UpdatedAtStage status(@NotNull ReviewListItemStatus status) {
             this.status = Objects.requireNonNull(status, "status must not be null");
             return this;
         }
 
         /**
-         * <p>The datetime the review was last updated.</p>
-         * <p>The datetime the review was last updated.</p>
+         * <p>When the review was last updated, as an ISO 8601 timestamp.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
         @JsonSetter("updated_at")
-        public UserStage updatedAt(@NotNull OffsetDateTime updatedAt) {
+        public UserStage updatedAt(@NotNull String updatedAt) {
             this.updatedAt = Objects.requireNonNull(updatedAt, "updatedAt must not be null");
             return this;
         }
 
         /**
          * <p>The user account of the person who wrote this review.</p>
-         * <p>The user account of the person who wrote this review.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
         @JsonSetter("user")
-        public _FinalStage user(@NotNull ReviewListItemUser user) {
+        public _FinalStage user(@NotNull ReviewUser user) {
             this.user = Objects.requireNonNull(user, "user must not be null");
             return this;
         }
@@ -539,11 +525,11 @@ public final class ReviewListItem {
         }
 
         /**
-         * <p>The timestamp of when the review was published. Null if the review has not been published yet.</p>
+         * <p>When the review was published, as an ISO 8601 timestamp. Null if unknown.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
-        public _FinalStage publishedAt(Nullable<OffsetDateTime> publishedAt) {
+        public _FinalStage publishedAt(Nullable<String> publishedAt) {
             if (publishedAt.isNull()) {
                 this.publishedAt = null;
             } else if (publishedAt.isEmpty()) {
@@ -555,21 +541,21 @@ public final class ReviewListItem {
         }
 
         /**
-         * <p>The timestamp of when the review was published. Null if the review has not been published yet.</p>
+         * <p>When the review was published, as an ISO 8601 timestamp. Null if unknown.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
-        public _FinalStage publishedAt(OffsetDateTime publishedAt) {
+        public _FinalStage publishedAt(String publishedAt) {
             this.publishedAt = Optional.ofNullable(publishedAt);
             return this;
         }
 
         /**
-         * <p>The timestamp of when the review was published. Null if the review has not been published yet.</p>
+         * <p>When the review was published, as an ISO 8601 timestamp. Null if unknown.</p>
          */
         @java.lang.Override
         @JsonSetter(value = "published_at", nulls = Nulls.SKIP)
-        public _FinalStage publishedAt(Optional<OffsetDateTime> publishedAt) {
+        public _FinalStage publishedAt(Optional<String> publishedAt) {
             this.publishedAt = publishedAt;
             return this;
         }
@@ -611,11 +597,11 @@ public final class ReviewListItem {
         }
 
         /**
-         * <p>The timestamp of when the reviewer first joined the product. Null if unknown.</p>
+         * <p>When the reviewer first joined the product, as an ISO 8601 timestamp. Null if unknown.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
-        public _FinalStage joinedAt(Nullable<OffsetDateTime> joinedAt) {
+        public _FinalStage joinedAt(Nullable<String> joinedAt) {
             if (joinedAt.isNull()) {
                 this.joinedAt = null;
             } else if (joinedAt.isEmpty()) {
@@ -627,21 +613,21 @@ public final class ReviewListItem {
         }
 
         /**
-         * <p>The timestamp of when the reviewer first joined the product. Null if unknown.</p>
+         * <p>When the reviewer first joined the product, as an ISO 8601 timestamp. Null if unknown.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
-        public _FinalStage joinedAt(OffsetDateTime joinedAt) {
+        public _FinalStage joinedAt(String joinedAt) {
             this.joinedAt = Optional.ofNullable(joinedAt);
             return this;
         }
 
         /**
-         * <p>The timestamp of when the reviewer first joined the product. Null if unknown.</p>
+         * <p>When the reviewer first joined the product, as an ISO 8601 timestamp. Null if unknown.</p>
          */
         @java.lang.Override
         @JsonSetter(value = "joined_at", nulls = Nulls.SKIP)
-        public _FinalStage joinedAt(Optional<OffsetDateTime> joinedAt) {
+        public _FinalStage joinedAt(Optional<String> joinedAt) {
             this.joinedAt = joinedAt;
             return this;
         }
@@ -682,34 +668,23 @@ public final class ReviewListItem {
             return this;
         }
 
-        /**
-         * <p>A list of files and media attached to the review.</p>
-         * @return Reference to {@code this} so that method calls can be chained together.
-         */
         @java.lang.Override
-        public _FinalStage addAllAttachments(List<ReviewListItemAttachmentsItem> attachments) {
+        public _FinalStage addAllAttachments(List<ReviewAttachment> attachments) {
             if (attachments != null) {
                 this.attachments.addAll(attachments);
             }
             return this;
         }
 
-        /**
-         * <p>A list of files and media attached to the review.</p>
-         * @return Reference to {@code this} so that method calls can be chained together.
-         */
         @java.lang.Override
-        public _FinalStage addAttachments(ReviewListItemAttachmentsItem attachments) {
+        public _FinalStage addAttachments(ReviewAttachment attachments) {
             this.attachments.add(attachments);
             return this;
         }
 
-        /**
-         * <p>A list of files and media attached to the review.</p>
-         */
         @java.lang.Override
         @JsonSetter(value = "attachments", nulls = Nulls.SKIP)
-        public _FinalStage attachments(List<ReviewListItemAttachmentsItem> attachments) {
+        public _FinalStage attachments(List<ReviewAttachment> attachments) {
             this.attachments.clear();
             if (attachments != null) {
                 this.attachments.addAll(attachments);
@@ -733,6 +708,25 @@ public final class ReviewListItem {
                     updatedAt,
                     user,
                     additionalProperties);
+        }
+
+        @JsonAnySetter
+        private void putAdditionalPropertyFromJson(String key, Object value) {
+            if (key.equalsIgnoreCase("attachments")
+                    || key.equalsIgnoreCase("created_at")
+                    || key.equalsIgnoreCase("description")
+                    || key.equalsIgnoreCase("id")
+                    || key.equalsIgnoreCase("joined_at")
+                    || key.equalsIgnoreCase("paid_for_product")
+                    || key.equalsIgnoreCase("published_at")
+                    || key.equalsIgnoreCase("stars")
+                    || key.equalsIgnoreCase("status")
+                    || key.equalsIgnoreCase("title")
+                    || key.equalsIgnoreCase("updated_at")
+                    || key.equalsIgnoreCase("user")) {
+                return;
+            }
+            this.additionalProperties.put(key, value);
         }
 
         @java.lang.Override

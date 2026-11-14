@@ -446,7 +446,6 @@ public final class AppDeployment {
 
         private Optional<String> buildId = Optional.empty();
 
-        @JsonAnySetter
         private Map<String, Object> additionalProperties = new HashMap<>();
 
         private Builder() {}
@@ -470,7 +469,6 @@ public final class AppDeployment {
 
         /**
          * <p>The app being deployed, prefixed <code>app_</code>.</p>
-         * <p>The app being deployed, prefixed <code>app_</code>.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
@@ -482,7 +480,6 @@ public final class AppDeployment {
 
         /**
          * <p>Whether the running or last deployment uploaded a build without making it live.</p>
-         * <p>Whether the running or last deployment uploaded a build without making it live.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
@@ -493,7 +490,6 @@ public final class AppDeployment {
         }
 
         /**
-         * <p>Whether the app has anything to publish, and what a publish in flight is doing. <code>unpublished</code> means publishing would ship something new; <code>no_source</code> means the sandbox holds no copy of this app, so there is nothing to publish from.</p>
          * <p>Whether the app has anything to publish, and what a publish in flight is doing. <code>unpublished</code> means publishing would ship something new; <code>no_source</code> means the sandbox holds no copy of this app, so there is nothing to publish from.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
@@ -844,6 +840,25 @@ public final class AppDeployment {
                     status,
                     url,
                     additionalProperties);
+        }
+
+        @JsonAnySetter
+        private void putAdditionalPropertyFromJson(String key, Object value) {
+            if (key.equalsIgnoreCase("app_id")
+                    || key.equalsIgnoreCase("build_id")
+                    || key.equalsIgnoreCase("draft")
+                    || key.equalsIgnoreCase("error")
+                    || key.equalsIgnoreCase("estimated_duration_ms")
+                    || key.equalsIgnoreCase("estimated_remaining_ms")
+                    || key.equalsIgnoreCase("finished_at")
+                    || key.equalsIgnoreCase("phase")
+                    || key.equalsIgnoreCase("progress")
+                    || key.equalsIgnoreCase("started_at")
+                    || key.equalsIgnoreCase("status")
+                    || key.equalsIgnoreCase("url")) {
+                return;
+            }
+            this.additionalProperties.put(key, value);
         }
 
         @java.lang.Override

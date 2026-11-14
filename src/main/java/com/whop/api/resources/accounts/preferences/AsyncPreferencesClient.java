@@ -5,6 +5,7 @@ package com.whop.api.resources.accounts.preferences;
 
 import com.whop.api.core.ClientOptions;
 import com.whop.api.core.RequestOptions;
+import com.whop.api.core.WhopApiHttpResponse;
 import com.whop.api.resources.accounts.preferences.requests.RetrievePreferencesRequest;
 import com.whop.api.resources.accounts.preferences.requests.UpdatePreferencesRequest;
 import com.whop.api.resources.accounts.preferences.types.RetrievePreferencesResponse;
@@ -32,14 +33,30 @@ public class AsyncPreferencesClient {
      * Retrieves the account's preferences: a singleton settings document keyed by preference name.
      */
     public CompletableFuture<RetrievePreferencesResponse> retrieve(String accountId) {
-        return this.rawClient.retrieve(accountId).thenApply(response -> response.body());
+        CompletableFuture<WhopApiHttpResponse<RetrievePreferencesResponse>> rawFuture =
+                this.rawClient.retrieve(accountId);
+        CompletableFuture<RetrievePreferencesResponse> future = rawFuture.thenApply(response -> response.body());
+        future.whenComplete((result_, throwable_) -> {
+            if (future.isCancelled()) {
+                rawFuture.cancel(true);
+            }
+        });
+        return future;
     }
 
     /**
      * Retrieves the account's preferences: a singleton settings document keyed by preference name.
      */
     public CompletableFuture<RetrievePreferencesResponse> retrieve(String accountId, RequestOptions requestOptions) {
-        return this.rawClient.retrieve(accountId, requestOptions).thenApply(response -> response.body());
+        CompletableFuture<WhopApiHttpResponse<RetrievePreferencesResponse>> rawFuture =
+                this.rawClient.retrieve(accountId, requestOptions);
+        CompletableFuture<RetrievePreferencesResponse> future = rawFuture.thenApply(response -> response.body());
+        future.whenComplete((result_, throwable_) -> {
+            if (future.isCancelled()) {
+                rawFuture.cancel(true);
+            }
+        });
+        return future;
     }
 
     /**
@@ -47,7 +64,15 @@ public class AsyncPreferencesClient {
      */
     public CompletableFuture<RetrievePreferencesResponse> retrieve(
             String accountId, RetrievePreferencesRequest request) {
-        return this.rawClient.retrieve(accountId, request).thenApply(response -> response.body());
+        CompletableFuture<WhopApiHttpResponse<RetrievePreferencesResponse>> rawFuture =
+                this.rawClient.retrieve(accountId, request);
+        CompletableFuture<RetrievePreferencesResponse> future = rawFuture.thenApply(response -> response.body());
+        future.whenComplete((result_, throwable_) -> {
+            if (future.isCancelled()) {
+                rawFuture.cancel(true);
+            }
+        });
+        return future;
     }
 
     /**
@@ -55,35 +80,110 @@ public class AsyncPreferencesClient {
      */
     public CompletableFuture<RetrievePreferencesResponse> retrieve(
             String accountId, RetrievePreferencesRequest request, RequestOptions requestOptions) {
-        return this.rawClient.retrieve(accountId, request, requestOptions).thenApply(response -> response.body());
+        CompletableFuture<WhopApiHttpResponse<RetrievePreferencesResponse>> rawFuture =
+                this.rawClient.retrieve(accountId, request, requestOptions);
+        CompletableFuture<RetrievePreferencesResponse> future = rawFuture.thenApply(response -> response.body());
+        future.whenComplete((result_, throwable_) -> {
+            if (future.isCancelled()) {
+                rawFuture.cancel(true);
+            }
+        });
+        return future;
     }
 
     /**
-     * Updates the account's preferences. Each top-level key present in the body is replaced as a whole; omitted keys are left untouched. <code>ads_triple_whale_integration</code> takes the Data-In API key to connect with, or <code>null</code> to disconnect. <code>ads_payment_methods</code> always requires a <code>primary</code> entry. <code>backup</code> is optional and any pairing is allowed — two cards, <code>card</code>+<code>platform_balance</code>, or a single method — so a card-only advertiser can fund ads without a platform balance. The <code>primary</code> and <code>backup</code> must be different sources. A <code>platform_balance</code> entry may omit <code>id</code> to use the account's default Whop balance. Configuring a <code>card</code> requires a user token; account API keys can set up platform-balance billing only.
+     * Updates the account's preferences. Each top-level key in the body replaces its stored value as a whole. Keys left out keep their current values.
+     * <p>The required scope depends on which preferences you update.</p>
+     * <ul>
+     * <li><code>ad_campaign:create</code>: <code>ads_payment_methods</code>, <code>ads_reporting_currency</code>, <code>ads_scheduling_timezone</code>, <code>ads_triple_whale_integration</code>.</li>
+     * <li><code>payout:account:update</code>: <code>cards_auto_top_up</code>, <code>cards_notifications</code>, <code>covers_subaccount_negative_balances</code>.</li>
+     * <li><code>payment:dispute</code>: <code>dispute_fighter_enabled</code>.</li>
+     * <li><code>company:update</code>: <code>economic_intelligence_duration_key</code>, <code>economic_intelligence_auto_renew</code>, <code>review_request_emails</code>, <code>cancellation_emails</code>, <code>renewal_reminder_emails</code>, <code>failed_payment_emails</code>, <code>subaccount_notifications</code>, <code>subaccount_team_view_only</code>.</li>
+     * <li><code>company:manage_checkout</code>: <code>feedback_options</code>, <code>customer_tracking</code>.</li>
+     * </ul>
+     * <p>To update keys under more than one scope, the API key needs all of those scopes.</p>
      */
     public CompletableFuture<UpdatePreferencesResponse> update(String accountId) {
-        return this.rawClient.update(accountId).thenApply(response -> response.body());
+        CompletableFuture<WhopApiHttpResponse<UpdatePreferencesResponse>> rawFuture = this.rawClient.update(accountId);
+        CompletableFuture<UpdatePreferencesResponse> future = rawFuture.thenApply(response -> response.body());
+        future.whenComplete((result_, throwable_) -> {
+            if (future.isCancelled()) {
+                rawFuture.cancel(true);
+            }
+        });
+        return future;
     }
 
     /**
-     * Updates the account's preferences. Each top-level key present in the body is replaced as a whole; omitted keys are left untouched. <code>ads_triple_whale_integration</code> takes the Data-In API key to connect with, or <code>null</code> to disconnect. <code>ads_payment_methods</code> always requires a <code>primary</code> entry. <code>backup</code> is optional and any pairing is allowed — two cards, <code>card</code>+<code>platform_balance</code>, or a single method — so a card-only advertiser can fund ads without a platform balance. The <code>primary</code> and <code>backup</code> must be different sources. A <code>platform_balance</code> entry may omit <code>id</code> to use the account's default Whop balance. Configuring a <code>card</code> requires a user token; account API keys can set up platform-balance billing only.
+     * Updates the account's preferences. Each top-level key in the body replaces its stored value as a whole. Keys left out keep their current values.
+     * <p>The required scope depends on which preferences you update.</p>
+     * <ul>
+     * <li><code>ad_campaign:create</code>: <code>ads_payment_methods</code>, <code>ads_reporting_currency</code>, <code>ads_scheduling_timezone</code>, <code>ads_triple_whale_integration</code>.</li>
+     * <li><code>payout:account:update</code>: <code>cards_auto_top_up</code>, <code>cards_notifications</code>, <code>covers_subaccount_negative_balances</code>.</li>
+     * <li><code>payment:dispute</code>: <code>dispute_fighter_enabled</code>.</li>
+     * <li><code>company:update</code>: <code>economic_intelligence_duration_key</code>, <code>economic_intelligence_auto_renew</code>, <code>review_request_emails</code>, <code>cancellation_emails</code>, <code>renewal_reminder_emails</code>, <code>failed_payment_emails</code>, <code>subaccount_notifications</code>, <code>subaccount_team_view_only</code>.</li>
+     * <li><code>company:manage_checkout</code>: <code>feedback_options</code>, <code>customer_tracking</code>.</li>
+     * </ul>
+     * <p>To update keys under more than one scope, the API key needs all of those scopes.</p>
      */
     public CompletableFuture<UpdatePreferencesResponse> update(String accountId, RequestOptions requestOptions) {
-        return this.rawClient.update(accountId, requestOptions).thenApply(response -> response.body());
+        CompletableFuture<WhopApiHttpResponse<UpdatePreferencesResponse>> rawFuture =
+                this.rawClient.update(accountId, requestOptions);
+        CompletableFuture<UpdatePreferencesResponse> future = rawFuture.thenApply(response -> response.body());
+        future.whenComplete((result_, throwable_) -> {
+            if (future.isCancelled()) {
+                rawFuture.cancel(true);
+            }
+        });
+        return future;
     }
 
     /**
-     * Updates the account's preferences. Each top-level key present in the body is replaced as a whole; omitted keys are left untouched. <code>ads_triple_whale_integration</code> takes the Data-In API key to connect with, or <code>null</code> to disconnect. <code>ads_payment_methods</code> always requires a <code>primary</code> entry. <code>backup</code> is optional and any pairing is allowed — two cards, <code>card</code>+<code>platform_balance</code>, or a single method — so a card-only advertiser can fund ads without a platform balance. The <code>primary</code> and <code>backup</code> must be different sources. A <code>platform_balance</code> entry may omit <code>id</code> to use the account's default Whop balance. Configuring a <code>card</code> requires a user token; account API keys can set up platform-balance billing only.
+     * Updates the account's preferences. Each top-level key in the body replaces its stored value as a whole. Keys left out keep their current values.
+     * <p>The required scope depends on which preferences you update.</p>
+     * <ul>
+     * <li><code>ad_campaign:create</code>: <code>ads_payment_methods</code>, <code>ads_reporting_currency</code>, <code>ads_scheduling_timezone</code>, <code>ads_triple_whale_integration</code>.</li>
+     * <li><code>payout:account:update</code>: <code>cards_auto_top_up</code>, <code>cards_notifications</code>, <code>covers_subaccount_negative_balances</code>.</li>
+     * <li><code>payment:dispute</code>: <code>dispute_fighter_enabled</code>.</li>
+     * <li><code>company:update</code>: <code>economic_intelligence_duration_key</code>, <code>economic_intelligence_auto_renew</code>, <code>review_request_emails</code>, <code>cancellation_emails</code>, <code>renewal_reminder_emails</code>, <code>failed_payment_emails</code>, <code>subaccount_notifications</code>, <code>subaccount_team_view_only</code>.</li>
+     * <li><code>company:manage_checkout</code>: <code>feedback_options</code>, <code>customer_tracking</code>.</li>
+     * </ul>
+     * <p>To update keys under more than one scope, the API key needs all of those scopes.</p>
      */
     public CompletableFuture<UpdatePreferencesResponse> update(String accountId, UpdatePreferencesRequest request) {
-        return this.rawClient.update(accountId, request).thenApply(response -> response.body());
+        CompletableFuture<WhopApiHttpResponse<UpdatePreferencesResponse>> rawFuture =
+                this.rawClient.update(accountId, request);
+        CompletableFuture<UpdatePreferencesResponse> future = rawFuture.thenApply(response -> response.body());
+        future.whenComplete((result_, throwable_) -> {
+            if (future.isCancelled()) {
+                rawFuture.cancel(true);
+            }
+        });
+        return future;
     }
 
     /**
-     * Updates the account's preferences. Each top-level key present in the body is replaced as a whole; omitted keys are left untouched. <code>ads_triple_whale_integration</code> takes the Data-In API key to connect with, or <code>null</code> to disconnect. <code>ads_payment_methods</code> always requires a <code>primary</code> entry. <code>backup</code> is optional and any pairing is allowed — two cards, <code>card</code>+<code>platform_balance</code>, or a single method — so a card-only advertiser can fund ads without a platform balance. The <code>primary</code> and <code>backup</code> must be different sources. A <code>platform_balance</code> entry may omit <code>id</code> to use the account's default Whop balance. Configuring a <code>card</code> requires a user token; account API keys can set up platform-balance billing only.
+     * Updates the account's preferences. Each top-level key in the body replaces its stored value as a whole. Keys left out keep their current values.
+     * <p>The required scope depends on which preferences you update.</p>
+     * <ul>
+     * <li><code>ad_campaign:create</code>: <code>ads_payment_methods</code>, <code>ads_reporting_currency</code>, <code>ads_scheduling_timezone</code>, <code>ads_triple_whale_integration</code>.</li>
+     * <li><code>payout:account:update</code>: <code>cards_auto_top_up</code>, <code>cards_notifications</code>, <code>covers_subaccount_negative_balances</code>.</li>
+     * <li><code>payment:dispute</code>: <code>dispute_fighter_enabled</code>.</li>
+     * <li><code>company:update</code>: <code>economic_intelligence_duration_key</code>, <code>economic_intelligence_auto_renew</code>, <code>review_request_emails</code>, <code>cancellation_emails</code>, <code>renewal_reminder_emails</code>, <code>failed_payment_emails</code>, <code>subaccount_notifications</code>, <code>subaccount_team_view_only</code>.</li>
+     * <li><code>company:manage_checkout</code>: <code>feedback_options</code>, <code>customer_tracking</code>.</li>
+     * </ul>
+     * <p>To update keys under more than one scope, the API key needs all of those scopes.</p>
      */
     public CompletableFuture<UpdatePreferencesResponse> update(
             String accountId, UpdatePreferencesRequest request, RequestOptions requestOptions) {
-        return this.rawClient.update(accountId, request, requestOptions).thenApply(response -> response.body());
+        CompletableFuture<WhopApiHttpResponse<UpdatePreferencesResponse>> rawFuture =
+                this.rawClient.update(accountId, request, requestOptions);
+        CompletableFuture<UpdatePreferencesResponse> future = rawFuture.thenApply(response -> response.body());
+        future.whenComplete((result_, throwable_) -> {
+            if (future.isCancelled()) {
+                rawFuture.cancel(true);
+            }
+        });
+        return future;
     }
 }

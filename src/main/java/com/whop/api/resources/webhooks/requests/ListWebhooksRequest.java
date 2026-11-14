@@ -16,12 +16,11 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
-import org.jetbrains.annotations.NotNull;
 
 @JsonInclude(JsonInclude.Include.NON_ABSENT)
 @JsonDeserialize(builder = ListWebhooksRequest.Builder.class)
 public final class ListWebhooksRequest {
-    private final String accountId;
+    private final Optional<String> accountId;
 
     private final Optional<String> appId;
 
@@ -40,7 +39,7 @@ public final class ListWebhooksRequest {
     private final Map<String, Object> additionalProperties;
 
     private ListWebhooksRequest(
-            String accountId,
+            Optional<String> accountId,
             Optional<String> appId,
             Optional<Boolean> includeAppWebhooks,
             Optional<Boolean> hasFailures,
@@ -64,7 +63,7 @@ public final class ListWebhooksRequest {
      * @return The unique identifier of the account to list webhooks for.
      */
     @JsonProperty("account_id")
-    public String getAccountId() {
+    public Optional<String> getAccountId() {
         return accountId;
     }
 
@@ -93,7 +92,7 @@ public final class ListWebhooksRequest {
     }
 
     /**
-     * @return The number of webhooks to return (default 20, max 100).
+     * @return Number of results to return from the start of the range.
      */
     @JsonProperty("first")
     public Optional<Integer> getFirst() {
@@ -101,7 +100,7 @@ public final class ListWebhooksRequest {
     }
 
     /**
-     * @return A cursor; returns webhooks after this position.
+     * @return Return results after this cursor. Use <code>page_info.end_cursor</code> from the previous response to fetch the next page.
      */
     @JsonProperty("after")
     public Optional<String> getAfter() {
@@ -109,7 +108,7 @@ public final class ListWebhooksRequest {
     }
 
     /**
-     * @return The number of webhooks to return from the end of the range.
+     * @return Number of results to return from the end of the range.
      */
     @JsonProperty("last")
     public Optional<Integer> getLast() {
@@ -117,7 +116,7 @@ public final class ListWebhooksRequest {
     }
 
     /**
-     * @return A cursor; returns webhooks before this position.
+     * @return Return results before this cursor. Use <code>page_info.start_cursor</code> from the previous response to fetch the previous page.
      */
     @JsonProperty("before")
     public Optional<String> getBefore() {
@@ -164,100 +163,32 @@ public final class ListWebhooksRequest {
         return ObjectMappers.stringify(this);
     }
 
-    public static AccountIdStage builder() {
+    public static Builder builder() {
         return new Builder();
     }
 
-    public interface AccountIdStage {
-        /**
-         * <p>The unique identifier of the account to list webhooks for.</p>
-         */
-        _FinalStage accountId(@NotNull String accountId);
-
-        Builder from(ListWebhooksRequest other);
-    }
-
-    public interface _FinalStage {
-        ListWebhooksRequest build();
-
-        _FinalStage additionalProperty(String key, Object value);
-
-        _FinalStage additionalProperties(Map<String, Object> additionalProperties);
-
-        /**
-         * <p>Only return webhooks attached to this app. Omit to list the account's own webhooks.</p>
-         */
-        _FinalStage appId(Optional<String> appId);
-
-        _FinalStage appId(String appId);
-
-        /**
-         * <p>Also return webhooks attached to the account's apps, not just the account's own. Cannot be combined with <code>app_id</code>.</p>
-         */
-        _FinalStage includeAppWebhooks(Optional<Boolean> includeAppWebhooks);
-
-        _FinalStage includeAppWebhooks(Boolean includeAppWebhooks);
-
-        /**
-         * <p>Only return webhooks whose endpoint is currently failing — every delivery since the current failure streak began has been rejected. Clears as soon as a delivery succeeds.</p>
-         */
-        _FinalStage hasFailures(Optional<Boolean> hasFailures);
-
-        _FinalStage hasFailures(Boolean hasFailures);
-
-        /**
-         * <p>The number of webhooks to return (default 20, max 100).</p>
-         */
-        _FinalStage first(Optional<Integer> first);
-
-        _FinalStage first(Integer first);
-
-        /**
-         * <p>A cursor; returns webhooks after this position.</p>
-         */
-        _FinalStage after(Optional<String> after);
-
-        _FinalStage after(String after);
-
-        /**
-         * <p>The number of webhooks to return from the end of the range.</p>
-         */
-        _FinalStage last(Optional<Integer> last);
-
-        _FinalStage last(Integer last);
-
-        /**
-         * <p>A cursor; returns webhooks before this position.</p>
-         */
-        _FinalStage before(Optional<String> before);
-
-        _FinalStage before(String before);
-    }
-
     @JsonIgnoreProperties(ignoreUnknown = true)
-    public static final class Builder implements AccountIdStage, _FinalStage {
-        private String accountId;
-
-        private Optional<String> before = Optional.empty();
-
-        private Optional<Integer> last = Optional.empty();
-
-        private Optional<String> after = Optional.empty();
-
-        private Optional<Integer> first = Optional.empty();
-
-        private Optional<Boolean> hasFailures = Optional.empty();
-
-        private Optional<Boolean> includeAppWebhooks = Optional.empty();
+    public static final class Builder {
+        private Optional<String> accountId = Optional.empty();
 
         private Optional<String> appId = Optional.empty();
 
-        @JsonAnySetter
+        private Optional<Boolean> includeAppWebhooks = Optional.empty();
+
+        private Optional<Boolean> hasFailures = Optional.empty();
+
+        private Optional<Integer> first = Optional.empty();
+
+        private Optional<String> after = Optional.empty();
+
+        private Optional<Integer> last = Optional.empty();
+
+        private Optional<String> before = Optional.empty();
+
         private Map<String, Object> additionalProperties = new HashMap<>();
 
         private Builder() {}
 
-        @java.lang.Override
         public Builder from(ListWebhooksRequest other) {
             accountId(other.getAccountId());
             appId(other.getAppId());
@@ -272,157 +203,116 @@ public final class ListWebhooksRequest {
 
         /**
          * <p>The unique identifier of the account to list webhooks for.</p>
-         * <p>The unique identifier of the account to list webhooks for.</p>
-         * @return Reference to {@code this} so that method calls can be chained together.
          */
-        @java.lang.Override
-        @JsonSetter("account_id")
-        public _FinalStage accountId(@NotNull String accountId) {
-            this.accountId = Objects.requireNonNull(accountId, "accountId must not be null");
+        @JsonSetter(value = "account_id", nulls = Nulls.SKIP)
+        public Builder accountId(Optional<String> accountId) {
+            this.accountId = accountId;
             return this;
         }
 
-        /**
-         * <p>A cursor; returns webhooks before this position.</p>
-         * @return Reference to {@code this} so that method calls can be chained together.
-         */
-        @java.lang.Override
-        public _FinalStage before(String before) {
-            this.before = Optional.ofNullable(before);
-            return this;
-        }
-
-        /**
-         * <p>A cursor; returns webhooks before this position.</p>
-         */
-        @java.lang.Override
-        @JsonSetter(value = "before", nulls = Nulls.SKIP)
-        public _FinalStage before(Optional<String> before) {
-            this.before = before;
-            return this;
-        }
-
-        /**
-         * <p>The number of webhooks to return from the end of the range.</p>
-         * @return Reference to {@code this} so that method calls can be chained together.
-         */
-        @java.lang.Override
-        public _FinalStage last(Integer last) {
-            this.last = Optional.ofNullable(last);
-            return this;
-        }
-
-        /**
-         * <p>The number of webhooks to return from the end of the range.</p>
-         */
-        @java.lang.Override
-        @JsonSetter(value = "last", nulls = Nulls.SKIP)
-        public _FinalStage last(Optional<Integer> last) {
-            this.last = last;
-            return this;
-        }
-
-        /**
-         * <p>A cursor; returns webhooks after this position.</p>
-         * @return Reference to {@code this} so that method calls can be chained together.
-         */
-        @java.lang.Override
-        public _FinalStage after(String after) {
-            this.after = Optional.ofNullable(after);
-            return this;
-        }
-
-        /**
-         * <p>A cursor; returns webhooks after this position.</p>
-         */
-        @java.lang.Override
-        @JsonSetter(value = "after", nulls = Nulls.SKIP)
-        public _FinalStage after(Optional<String> after) {
-            this.after = after;
-            return this;
-        }
-
-        /**
-         * <p>The number of webhooks to return (default 20, max 100).</p>
-         * @return Reference to {@code this} so that method calls can be chained together.
-         */
-        @java.lang.Override
-        public _FinalStage first(Integer first) {
-            this.first = Optional.ofNullable(first);
-            return this;
-        }
-
-        /**
-         * <p>The number of webhooks to return (default 20, max 100).</p>
-         */
-        @java.lang.Override
-        @JsonSetter(value = "first", nulls = Nulls.SKIP)
-        public _FinalStage first(Optional<Integer> first) {
-            this.first = first;
-            return this;
-        }
-
-        /**
-         * <p>Only return webhooks whose endpoint is currently failing — every delivery since the current failure streak began has been rejected. Clears as soon as a delivery succeeds.</p>
-         * @return Reference to {@code this} so that method calls can be chained together.
-         */
-        @java.lang.Override
-        public _FinalStage hasFailures(Boolean hasFailures) {
-            this.hasFailures = Optional.ofNullable(hasFailures);
-            return this;
-        }
-
-        /**
-         * <p>Only return webhooks whose endpoint is currently failing — every delivery since the current failure streak began has been rejected. Clears as soon as a delivery succeeds.</p>
-         */
-        @java.lang.Override
-        @JsonSetter(value = "has_failures", nulls = Nulls.SKIP)
-        public _FinalStage hasFailures(Optional<Boolean> hasFailures) {
-            this.hasFailures = hasFailures;
-            return this;
-        }
-
-        /**
-         * <p>Also return webhooks attached to the account's apps, not just the account's own. Cannot be combined with <code>app_id</code>.</p>
-         * @return Reference to {@code this} so that method calls can be chained together.
-         */
-        @java.lang.Override
-        public _FinalStage includeAppWebhooks(Boolean includeAppWebhooks) {
-            this.includeAppWebhooks = Optional.ofNullable(includeAppWebhooks);
-            return this;
-        }
-
-        /**
-         * <p>Also return webhooks attached to the account's apps, not just the account's own. Cannot be combined with <code>app_id</code>.</p>
-         */
-        @java.lang.Override
-        @JsonSetter(value = "include_app_webhooks", nulls = Nulls.SKIP)
-        public _FinalStage includeAppWebhooks(Optional<Boolean> includeAppWebhooks) {
-            this.includeAppWebhooks = includeAppWebhooks;
+        public Builder accountId(String accountId) {
+            this.accountId = Optional.ofNullable(accountId);
             return this;
         }
 
         /**
          * <p>Only return webhooks attached to this app. Omit to list the account's own webhooks.</p>
-         * @return Reference to {@code this} so that method calls can be chained together.
          */
-        @java.lang.Override
-        public _FinalStage appId(String appId) {
+        @JsonSetter(value = "app_id", nulls = Nulls.SKIP)
+        public Builder appId(Optional<String> appId) {
+            this.appId = appId;
+            return this;
+        }
+
+        public Builder appId(String appId) {
             this.appId = Optional.ofNullable(appId);
             return this;
         }
 
         /**
-         * <p>Only return webhooks attached to this app. Omit to list the account's own webhooks.</p>
+         * <p>Also return webhooks attached to the account's apps, not just the account's own. Cannot be combined with <code>app_id</code>.</p>
          */
-        @java.lang.Override
-        @JsonSetter(value = "app_id", nulls = Nulls.SKIP)
-        public _FinalStage appId(Optional<String> appId) {
-            this.appId = appId;
+        @JsonSetter(value = "include_app_webhooks", nulls = Nulls.SKIP)
+        public Builder includeAppWebhooks(Optional<Boolean> includeAppWebhooks) {
+            this.includeAppWebhooks = includeAppWebhooks;
             return this;
         }
 
-        @java.lang.Override
+        public Builder includeAppWebhooks(Boolean includeAppWebhooks) {
+            this.includeAppWebhooks = Optional.ofNullable(includeAppWebhooks);
+            return this;
+        }
+
+        /**
+         * <p>Only return webhooks whose endpoint is currently failing — every delivery since the current failure streak began has been rejected. Clears as soon as a delivery succeeds.</p>
+         */
+        @JsonSetter(value = "has_failures", nulls = Nulls.SKIP)
+        public Builder hasFailures(Optional<Boolean> hasFailures) {
+            this.hasFailures = hasFailures;
+            return this;
+        }
+
+        public Builder hasFailures(Boolean hasFailures) {
+            this.hasFailures = Optional.ofNullable(hasFailures);
+            return this;
+        }
+
+        /**
+         * <p>Number of results to return from the start of the range.</p>
+         */
+        @JsonSetter(value = "first", nulls = Nulls.SKIP)
+        public Builder first(Optional<Integer> first) {
+            this.first = first;
+            return this;
+        }
+
+        public Builder first(Integer first) {
+            this.first = Optional.ofNullable(first);
+            return this;
+        }
+
+        /**
+         * <p>Return results after this cursor. Use <code>page_info.end_cursor</code> from the previous response to fetch the next page.</p>
+         */
+        @JsonSetter(value = "after", nulls = Nulls.SKIP)
+        public Builder after(Optional<String> after) {
+            this.after = after;
+            return this;
+        }
+
+        public Builder after(String after) {
+            this.after = Optional.ofNullable(after);
+            return this;
+        }
+
+        /**
+         * <p>Number of results to return from the end of the range.</p>
+         */
+        @JsonSetter(value = "last", nulls = Nulls.SKIP)
+        public Builder last(Optional<Integer> last) {
+            this.last = last;
+            return this;
+        }
+
+        public Builder last(Integer last) {
+            this.last = Optional.ofNullable(last);
+            return this;
+        }
+
+        /**
+         * <p>Return results before this cursor. Use <code>page_info.start_cursor</code> from the previous response to fetch the previous page.</p>
+         */
+        @JsonSetter(value = "before", nulls = Nulls.SKIP)
+        public Builder before(Optional<String> before) {
+            this.before = before;
+            return this;
+        }
+
+        public Builder before(String before) {
+            this.before = Optional.ofNullable(before);
+            return this;
+        }
+
         public ListWebhooksRequest build() {
             return new ListWebhooksRequest(
                     accountId,
@@ -436,13 +326,26 @@ public final class ListWebhooksRequest {
                     additionalProperties);
         }
 
-        @java.lang.Override
+        @JsonAnySetter
+        private void putAdditionalPropertyFromJson(String key, Object value) {
+            if (key.equalsIgnoreCase("account_id")
+                    || key.equalsIgnoreCase("app_id")
+                    || key.equalsIgnoreCase("include_app_webhooks")
+                    || key.equalsIgnoreCase("has_failures")
+                    || key.equalsIgnoreCase("first")
+                    || key.equalsIgnoreCase("after")
+                    || key.equalsIgnoreCase("last")
+                    || key.equalsIgnoreCase("before")) {
+                return;
+            }
+            this.additionalProperties.put(key, value);
+        }
+
         public Builder additionalProperty(String key, Object value) {
             this.additionalProperties.put(key, value);
             return this;
         }
 
-        @java.lang.Override
         public Builder additionalProperties(Map<String, Object> additionalProperties) {
             this.additionalProperties.putAll(additionalProperties);
             return this;

@@ -5,6 +5,7 @@ package com.whop.api.resources.payoutmethods;
 
 import com.whop.api.core.ClientOptions;
 import com.whop.api.core.RequestOptions;
+import com.whop.api.core.WhopApiHttpResponse;
 import com.whop.api.core.pagination.SyncPagingIterable;
 import com.whop.api.resources.payoutmethods.requests.ListPayoutMethodRequest;
 import com.whop.api.resources.payoutmethods.requests.RetrievePayoutMethodRequest;
@@ -30,7 +31,7 @@ public class AsyncPayoutMethodsClient {
     }
 
     /**
-     * Returns a list of active payout methods configured for a company, ordered by most recently created.
+     * Lists the active payout methods configured for an account, newest first.
      * <p>Required permissions:</p>
      * <ul>
      * <li><code>payout:destination:read</code></li>
@@ -38,11 +39,20 @@ public class AsyncPayoutMethodsClient {
      */
     public CompletableFuture<SyncPagingIterable<PayoutMethodListItem>> listPayoutMethod(
             ListPayoutMethodRequest request) {
-        return this.rawClient.listPayoutMethod(request).thenApply(response -> response.body());
+        CompletableFuture<WhopApiHttpResponse<SyncPagingIterable<PayoutMethodListItem>>> rawFuture =
+                this.rawClient.listPayoutMethod(request);
+        CompletableFuture<SyncPagingIterable<PayoutMethodListItem>> future =
+                rawFuture.thenApply(response -> response.body());
+        future.whenComplete((result_, throwable_) -> {
+            if (future.isCancelled()) {
+                rawFuture.cancel(true);
+            }
+        });
+        return future;
     }
 
     /**
-     * Returns a list of active payout methods configured for a company, ordered by most recently created.
+     * Lists the active payout methods configured for an account, newest first.
      * <p>Required permissions:</p>
      * <ul>
      * <li><code>payout:destination:read</code></li>
@@ -50,7 +60,16 @@ public class AsyncPayoutMethodsClient {
      */
     public CompletableFuture<SyncPagingIterable<PayoutMethodListItem>> listPayoutMethod(
             ListPayoutMethodRequest request, RequestOptions requestOptions) {
-        return this.rawClient.listPayoutMethod(request, requestOptions).thenApply(response -> response.body());
+        CompletableFuture<WhopApiHttpResponse<SyncPagingIterable<PayoutMethodListItem>>> rawFuture =
+                this.rawClient.listPayoutMethod(request, requestOptions);
+        CompletableFuture<SyncPagingIterable<PayoutMethodListItem>> future =
+                rawFuture.thenApply(response -> response.body());
+        future.whenComplete((result_, throwable_) -> {
+            if (future.isCancelled()) {
+                rawFuture.cancel(true);
+            }
+        });
+        return future;
     }
 
     /**
@@ -61,7 +80,14 @@ public class AsyncPayoutMethodsClient {
      * </ul>
      */
     public CompletableFuture<PayoutMethod> retrievePayoutMethod(String id) {
-        return this.rawClient.retrievePayoutMethod(id).thenApply(response -> response.body());
+        CompletableFuture<WhopApiHttpResponse<PayoutMethod>> rawFuture = this.rawClient.retrievePayoutMethod(id);
+        CompletableFuture<PayoutMethod> future = rawFuture.thenApply(response -> response.body());
+        future.whenComplete((result_, throwable_) -> {
+            if (future.isCancelled()) {
+                rawFuture.cancel(true);
+            }
+        });
+        return future;
     }
 
     /**
@@ -72,7 +98,15 @@ public class AsyncPayoutMethodsClient {
      * </ul>
      */
     public CompletableFuture<PayoutMethod> retrievePayoutMethod(String id, RequestOptions requestOptions) {
-        return this.rawClient.retrievePayoutMethod(id, requestOptions).thenApply(response -> response.body());
+        CompletableFuture<WhopApiHttpResponse<PayoutMethod>> rawFuture =
+                this.rawClient.retrievePayoutMethod(id, requestOptions);
+        CompletableFuture<PayoutMethod> future = rawFuture.thenApply(response -> response.body());
+        future.whenComplete((result_, throwable_) -> {
+            if (future.isCancelled()) {
+                rawFuture.cancel(true);
+            }
+        });
+        return future;
     }
 
     /**
@@ -83,7 +117,15 @@ public class AsyncPayoutMethodsClient {
      * </ul>
      */
     public CompletableFuture<PayoutMethod> retrievePayoutMethod(String id, RetrievePayoutMethodRequest request) {
-        return this.rawClient.retrievePayoutMethod(id, request).thenApply(response -> response.body());
+        CompletableFuture<WhopApiHttpResponse<PayoutMethod>> rawFuture =
+                this.rawClient.retrievePayoutMethod(id, request);
+        CompletableFuture<PayoutMethod> future = rawFuture.thenApply(response -> response.body());
+        future.whenComplete((result_, throwable_) -> {
+            if (future.isCancelled()) {
+                rawFuture.cancel(true);
+            }
+        });
+        return future;
     }
 
     /**
@@ -95,6 +137,14 @@ public class AsyncPayoutMethodsClient {
      */
     public CompletableFuture<PayoutMethod> retrievePayoutMethod(
             String id, RetrievePayoutMethodRequest request, RequestOptions requestOptions) {
-        return this.rawClient.retrievePayoutMethod(id, request, requestOptions).thenApply(response -> response.body());
+        CompletableFuture<WhopApiHttpResponse<PayoutMethod>> rawFuture =
+                this.rawClient.retrievePayoutMethod(id, request, requestOptions);
+        CompletableFuture<PayoutMethod> future = rawFuture.thenApply(response -> response.body());
+        future.whenComplete((result_, throwable_) -> {
+            if (future.isCancelled()) {
+                rawFuture.cancel(true);
+            }
+        });
+        return future;
     }
 }

@@ -27,28 +27,28 @@ public class TopicsClient {
     }
 
     /**
-     * Lists the authenticated user's topic-scoped notification preferences, plus user-agnostic platform defaults. Each filter matches preferences scoped to its value or not narrowed on that dimension. Per-experience levels are listed separately, by <code>GET /users/me/preferences/notifications/experiences</code>.
+     * Lists the authenticated user's topic-scoped notification preferences, plus user-agnostic platform defaults. Per-experience levels are listed separately, by <code>GET /users/me/preferences/notifications/experiences</code>.
      */
     public SyncPagingIterable<UserNotificationPreference> list() {
         return this.rawClient.list().body();
     }
 
     /**
-     * Lists the authenticated user's topic-scoped notification preferences, plus user-agnostic platform defaults. Each filter matches preferences scoped to its value or not narrowed on that dimension. Per-experience levels are listed separately, by <code>GET /users/me/preferences/notifications/experiences</code>.
+     * Lists the authenticated user's topic-scoped notification preferences, plus user-agnostic platform defaults. Per-experience levels are listed separately, by <code>GET /users/me/preferences/notifications/experiences</code>.
      */
     public SyncPagingIterable<UserNotificationPreference> list(RequestOptions requestOptions) {
         return this.rawClient.list(requestOptions).body();
     }
 
     /**
-     * Lists the authenticated user's topic-scoped notification preferences, plus user-agnostic platform defaults. Each filter matches preferences scoped to its value or not narrowed on that dimension. Per-experience levels are listed separately, by <code>GET /users/me/preferences/notifications/experiences</code>.
+     * Lists the authenticated user's topic-scoped notification preferences, plus user-agnostic platform defaults. Per-experience levels are listed separately, by <code>GET /users/me/preferences/notifications/experiences</code>.
      */
     public SyncPagingIterable<UserNotificationPreference> list(ListTopicsRequest request) {
         return this.rawClient.list(request).body();
     }
 
     /**
-     * Lists the authenticated user's topic-scoped notification preferences, plus user-agnostic platform defaults. Each filter matches preferences scoped to its value or not narrowed on that dimension. Per-experience levels are listed separately, by <code>GET /users/me/preferences/notifications/experiences</code>.
+     * Lists the authenticated user's topic-scoped notification preferences, plus user-agnostic platform defaults. Per-experience levels are listed separately, by <code>GET /users/me/preferences/notifications/experiences</code>.
      */
     public SyncPagingIterable<UserNotificationPreference> list(
             ListTopicsRequest request, RequestOptions requestOptions) {

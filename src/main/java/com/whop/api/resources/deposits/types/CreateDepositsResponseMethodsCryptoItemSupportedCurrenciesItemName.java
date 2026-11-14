@@ -19,6 +19,9 @@ public final class CreateDepositsResponseMethodsCryptoItemSupportedCurrenciesIte
     public static final CreateDepositsResponseMethodsCryptoItemSupportedCurrenciesItemName ARB =
             new CreateDepositsResponseMethodsCryptoItemSupportedCurrenciesItemName(Value.ARB, "ARB");
 
+    public static final CreateDepositsResponseMethodsCryptoItemSupportedCurrenciesItemName BTC =
+            new CreateDepositsResponseMethodsCryptoItemSupportedCurrenciesItemName(Value.BTC, "BTC");
+
     public static final CreateDepositsResponseMethodsCryptoItemSupportedCurrenciesItemName W_ETH =
             new CreateDepositsResponseMethodsCryptoItemSupportedCurrenciesItemName(Value.W_ETH, "wETH");
 
@@ -106,6 +109,8 @@ public final class CreateDepositsResponseMethodsCryptoItemSupportedCurrenciesIte
                 return visitor.visitXo();
             case ARB:
                 return visitor.visitArb();
+            case BTC:
+                return visitor.visitBtc();
             case W_ETH:
                 return visitor.visitWEth();
             case BNB:
@@ -153,6 +158,8 @@ public final class CreateDepositsResponseMethodsCryptoItemSupportedCurrenciesIte
                 return XO;
             case "ARB":
                 return ARB;
+            case "BTC":
+                return BTC;
             case "wETH":
                 return W_ETH;
             case "BNB":
@@ -192,6 +199,8 @@ public final class CreateDepositsResponseMethodsCryptoItemSupportedCurrenciesIte
         ARB,
 
         BNB,
+
+        BTC,
 
         ETH,
 
@@ -234,6 +243,8 @@ public final class CreateDepositsResponseMethodsCryptoItemSupportedCurrenciesIte
         T visitArb();
 
         T visitBnb();
+
+        T visitBtc();
 
         T visitEth();
 

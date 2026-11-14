@@ -24,6 +24,8 @@ import org.jetbrains.annotations.NotNull;
 @JsonInclude(JsonInclude.Include.NON_ABSENT)
 @JsonDeserialize(builder = AccountParent.Builder.class)
 public final class AccountParent {
+    private final Optional<Map<String, AccountParentFeesValue>> fees;
+
     private final String id;
 
     private final Optional<String> logoUrl;
@@ -35,12 +37,26 @@ public final class AccountParent {
     private final Map<String, Object> additionalProperties;
 
     private AccountParent(
-            String id, Optional<String> logoUrl, String route, String title, Map<String, Object> additionalProperties) {
+            Optional<Map<String, AccountParentFeesValue>> fees,
+            String id,
+            Optional<String> logoUrl,
+            String route,
+            String title,
+            Map<String, Object> additionalProperties) {
+        this.fees = fees;
         this.id = id;
         this.logoUrl = logoUrl;
         this.route = route;
         this.title = title;
         this.additionalProperties = additionalProperties;
+    }
+
+    /**
+     * @return Markup rates this parent charges the subaccount being read, keyed by fee type (for example <code>crypto_deposit_markup</code>), each with <code>percentage_fee</code> and <code>fixed_fee_usd</code>. Resolved with the subaccount's own overrides winning over the platform default.
+     */
+    @JsonProperty("fees")
+    public Optional<Map<String, AccountParentFeesValue>> getFees() {
+        return fees;
     }
 
     /**
@@ -96,7 +112,8 @@ public final class AccountParent {
     }
 
     private boolean equalTo(AccountParent other) {
-        return id.equals(other.id)
+        return fees.equals(other.fees)
+                && id.equals(other.id)
                 && logoUrl.equals(other.logoUrl)
                 && route.equals(other.route)
                 && title.equals(other.title);
@@ -104,7 +121,7 @@ public final class AccountParent {
 
     @java.lang.Override
     public int hashCode() {
-        return Objects.hash(this.id, this.logoUrl, this.route, this.title);
+        return Objects.hash(this.fees, this.id, this.logoUrl, this.route, this.title);
     }
 
     @java.lang.Override
@@ -147,6 +164,13 @@ public final class AccountParent {
         _FinalStage additionalProperties(Map<String, Object> additionalProperties);
 
         /**
+         * <p>Markup rates this parent charges the subaccount being read, keyed by fee type (for example <code>crypto_deposit_markup</code>), each with <code>percentage_fee</code> and <code>fixed_fee_usd</code>. Resolved with the subaccount's own overrides winning over the platform default.</p>
+         */
+        _FinalStage fees(Optional<Map<String, AccountParentFeesValue>> fees);
+
+        _FinalStage fees(Map<String, AccountParentFeesValue> fees);
+
+        /**
          * <p>Account logo image URL.</p>
          */
         _FinalStage logoUrl(Optional<String> logoUrl);
@@ -166,13 +190,15 @@ public final class AccountParent {
 
         private Optional<String> logoUrl = Optional.empty();
 
-        @JsonAnySetter
+        private Optional<Map<String, AccountParentFeesValue>> fees = Optional.empty();
+
         private Map<String, Object> additionalProperties = new HashMap<>();
 
         private Builder() {}
 
         @java.lang.Override
         public Builder from(AccountParent other) {
+            fees(other.getFees());
             id(other.getId());
             logoUrl(other.getLogoUrl());
             route(other.getRoute());
@@ -181,7 +207,6 @@ public final class AccountParent {
         }
 
         /**
-         * <p>Account ID, prefixed <code>biz_</code>.</p>
          * <p>Account ID, prefixed <code>biz_</code>.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
@@ -194,7 +219,6 @@ public final class AccountParent {
 
         /**
          * <p>Account public route identifier.</p>
-         * <p>Account public route identifier.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
@@ -205,7 +229,6 @@ public final class AccountParent {
         }
 
         /**
-         * <p>Account display name.</p>
          * <p>Account display name.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
@@ -252,9 +275,41 @@ public final class AccountParent {
             return this;
         }
 
+        /**
+         * <p>Markup rates this parent charges the subaccount being read, keyed by fee type (for example <code>crypto_deposit_markup</code>), each with <code>percentage_fee</code> and <code>fixed_fee_usd</code>. Resolved with the subaccount's own overrides winning over the platform default.</p>
+         * @return Reference to {@code this} so that method calls can be chained together.
+         */
+        @java.lang.Override
+        public _FinalStage fees(Map<String, AccountParentFeesValue> fees) {
+            this.fees = Optional.ofNullable(fees);
+            return this;
+        }
+
+        /**
+         * <p>Markup rates this parent charges the subaccount being read, keyed by fee type (for example <code>crypto_deposit_markup</code>), each with <code>percentage_fee</code> and <code>fixed_fee_usd</code>. Resolved with the subaccount's own overrides winning over the platform default.</p>
+         */
+        @java.lang.Override
+        @JsonSetter(value = "fees", nulls = Nulls.SKIP)
+        public _FinalStage fees(Optional<Map<String, AccountParentFeesValue>> fees) {
+            this.fees = fees;
+            return this;
+        }
+
         @java.lang.Override
         public AccountParent build() {
-            return new AccountParent(id, logoUrl, route, title, additionalProperties);
+            return new AccountParent(fees, id, logoUrl, route, title, additionalProperties);
+        }
+
+        @JsonAnySetter
+        private void putAdditionalPropertyFromJson(String key, Object value) {
+            if (key.equalsIgnoreCase("fees")
+                    || key.equalsIgnoreCase("id")
+                    || key.equalsIgnoreCase("logo_url")
+                    || key.equalsIgnoreCase("route")
+                    || key.equalsIgnoreCase("title")) {
+                return;
+            }
+            this.additionalProperties.put(key, value);
         }
 
         @java.lang.Override

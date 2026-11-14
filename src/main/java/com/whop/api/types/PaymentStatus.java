@@ -24,6 +24,12 @@ import org.jetbrains.annotations.NotNull;
 @JsonInclude(JsonInclude.Include.NON_ABSENT)
 @JsonDeserialize(builder = PaymentStatus.Builder.class)
 public final class PaymentStatus {
+    private final Optional<AccountSummary> account;
+
+    private final Optional<String> autoCaptureAt;
+
+    private final Optional<String> captureExpiresAt;
+
     private final String id;
 
     private final Optional<PaymentLastPaymentError> lastPaymentError;
@@ -41,6 +47,9 @@ public final class PaymentStatus {
     private final Map<String, Object> additionalProperties;
 
     private PaymentStatus(
+            Optional<AccountSummary> account,
+            Optional<String> autoCaptureAt,
+            Optional<String> captureExpiresAt,
             String id,
             Optional<PaymentLastPaymentError> lastPaymentError,
             Optional<PaymentNextAction> nextAction,
@@ -49,6 +58,9 @@ public final class PaymentStatus {
             Optional<String> returnUrl,
             PaymentStatusStatus status,
             Map<String, Object> additionalProperties) {
+        this.account = account;
+        this.autoCaptureAt = autoCaptureAt;
+        this.captureExpiresAt = captureExpiresAt;
         this.id = id;
         this.lastPaymentError = lastPaymentError;
         this.nextAction = nextAction;
@@ -57,6 +69,39 @@ public final class PaymentStatus {
         this.returnUrl = returnUrl;
         this.status = status;
         this.additionalProperties = additionalProperties;
+    }
+
+    /**
+     * @return The account receiving this payment, or <code>null</code> when the payment has no associated account.
+     */
+    @JsonIgnore
+    public Optional<AccountSummary> getAccount() {
+        if (account == null) {
+            return Optional.empty();
+        }
+        return account;
+    }
+
+    /**
+     * @return When Whop will capture this authorization automatically, as an ISO 8601 timestamp. <code>null</code> when no automatic capture was requested.
+     */
+    @JsonIgnore
+    public Optional<String> getAutoCaptureAt() {
+        if (autoCaptureAt == null) {
+            return Optional.empty();
+        }
+        return autoCaptureAt;
+    }
+
+    /**
+     * @return When the card authorization must be captured, as an ISO 8601 timestamp. <code>null</code> when this payment was not authorized for later capture.
+     */
+    @JsonIgnore
+    public Optional<String> getCaptureExpiresAt() {
+        if (captureExpiresAt == null) {
+            return Optional.empty();
+        }
+        return captureExpiresAt;
     }
 
     /**
@@ -79,7 +124,7 @@ public final class PaymentStatus {
     }
 
     /**
-     * @return What the buyer must do next while <code>status</code> is <code>requires_action</code>, otherwise <code>null</code>. <code>type</code> picks the shape and each variant carries only its own <code>data</code>, so switching on <code>type</code> gives you exactly that step's payload.
+     * @return What the buyer must do next while <code>status</code> is <code>requires_action</code>, otherwise <code>null</code>. <code>type</code> picks the shape and each variant carries only its own <code>data</code>, so switching on <code>type</code> gives you exactly that step's payload. The <code>collect_card_present</code> step is served only to a credential holding <code>payment:charge</code> on the account; any other reader sees <code>null</code> while the tap is outstanding.
      */
     @JsonIgnore
     public Optional<PaymentNextAction> getNextAction() {
@@ -98,7 +143,7 @@ public final class PaymentStatus {
     }
 
     /**
-     * @return Present while <code>status</code> is <code>processing</code> on a settlement rail, otherwise <code>null</code>.
+     * @return Present while <code>status</code> is <code>processing</code> on a settlement rail, otherwise <code>null</code>. A <code>processing</code> status without it has not been decided yet — keep polling.
      */
     @JsonIgnore
     public Optional<PaymentProcessingDetails> getProcessingDetails() {
@@ -120,11 +165,29 @@ public final class PaymentStatus {
     }
 
     /**
-     * @return How far the payment has got. <code>requires_confirmation</code> — nothing attempted yet, or the last attempt failed and can be retried. <code>requires_action</code> — the buyer has a step outstanding; see <code>next_action</code>. <code>confirming</code> — the buyer has done their part and the processor is deciding. <code>processing</code> — the money is moving; see <code>processing_details</code>. <code>succeeded</code> — collected. <code>canceled</code> — voided or written off.
+     * @return How far the payment has got. <code>requires_confirmation</code> — nothing attempted yet, or the last attempt failed and can be retried. <code>requires_action</code> — the buyer has a step outstanding; see <code>next_action</code>. <code>requires_capture</code> — the card authorization is holding funds and must be captured. <code>confirming</code> — the buyer has done their part and the processor is deciding. <code>processing</code> — with <code>processing_details</code>, the money is moving; without them, the charge is still being decided and the status should be read again. <code>succeeded</code> — collected. <code>canceled</code> — voided or written off.
      */
     @JsonProperty("status")
     public PaymentStatusStatus getStatus() {
         return status;
+    }
+
+    @JsonInclude(value = JsonInclude.Include.CUSTOM, valueFilter = NullableNonemptyFilter.class)
+    @JsonProperty("account")
+    private Optional<AccountSummary> _getAccount() {
+        return account;
+    }
+
+    @JsonInclude(value = JsonInclude.Include.CUSTOM, valueFilter = NullableNonemptyFilter.class)
+    @JsonProperty("auto_capture_at")
+    private Optional<String> _getAutoCaptureAt() {
+        return autoCaptureAt;
+    }
+
+    @JsonInclude(value = JsonInclude.Include.CUSTOM, valueFilter = NullableNonemptyFilter.class)
+    @JsonProperty("capture_expires_at")
+    private Optional<String> _getCaptureExpiresAt() {
+        return captureExpiresAt;
     }
 
     @JsonInclude(value = JsonInclude.Include.CUSTOM, valueFilter = NullableNonemptyFilter.class)
@@ -163,7 +226,10 @@ public final class PaymentStatus {
     }
 
     private boolean equalTo(PaymentStatus other) {
-        return id.equals(other.id)
+        return account.equals(other.account)
+                && autoCaptureAt.equals(other.autoCaptureAt)
+                && captureExpiresAt.equals(other.captureExpiresAt)
+                && id.equals(other.id)
                 && lastPaymentError.equals(other.lastPaymentError)
                 && nextAction.equals(other.nextAction)
                 && object.equals(other.object)
@@ -175,6 +241,9 @@ public final class PaymentStatus {
     @java.lang.Override
     public int hashCode() {
         return Objects.hash(
+                this.account,
+                this.autoCaptureAt,
+                this.captureExpiresAt,
                 this.id,
                 this.lastPaymentError,
                 this.nextAction,
@@ -211,7 +280,7 @@ public final class PaymentStatus {
 
     public interface StatusStage {
         /**
-         * <p>How far the payment has got. <code>requires_confirmation</code> — nothing attempted yet, or the last attempt failed and can be retried. <code>requires_action</code> — the buyer has a step outstanding; see <code>next_action</code>. <code>confirming</code> — the buyer has done their part and the processor is deciding. <code>processing</code> — the money is moving; see <code>processing_details</code>. <code>succeeded</code> — collected. <code>canceled</code> — voided or written off.</p>
+         * <p>How far the payment has got. <code>requires_confirmation</code> — nothing attempted yet, or the last attempt failed and can be retried. <code>requires_action</code> — the buyer has a step outstanding; see <code>next_action</code>. <code>requires_capture</code> — the card authorization is holding funds and must be captured. <code>confirming</code> — the buyer has done their part and the processor is deciding. <code>processing</code> — with <code>processing_details</code>, the money is moving; without them, the charge is still being decided and the status should be read again. <code>succeeded</code> — collected. <code>canceled</code> — voided or written off.</p>
          */
         _FinalStage status(@NotNull PaymentStatusStatus status);
     }
@@ -224,6 +293,33 @@ public final class PaymentStatus {
         _FinalStage additionalProperties(Map<String, Object> additionalProperties);
 
         /**
+         * <p>The account receiving this payment, or <code>null</code> when the payment has no associated account.</p>
+         */
+        _FinalStage account(Optional<AccountSummary> account);
+
+        _FinalStage account(AccountSummary account);
+
+        _FinalStage account(Nullable<AccountSummary> account);
+
+        /**
+         * <p>When Whop will capture this authorization automatically, as an ISO 8601 timestamp. <code>null</code> when no automatic capture was requested.</p>
+         */
+        _FinalStage autoCaptureAt(Optional<String> autoCaptureAt);
+
+        _FinalStage autoCaptureAt(String autoCaptureAt);
+
+        _FinalStage autoCaptureAt(Nullable<String> autoCaptureAt);
+
+        /**
+         * <p>When the card authorization must be captured, as an ISO 8601 timestamp. <code>null</code> when this payment was not authorized for later capture.</p>
+         */
+        _FinalStage captureExpiresAt(Optional<String> captureExpiresAt);
+
+        _FinalStage captureExpiresAt(String captureExpiresAt);
+
+        _FinalStage captureExpiresAt(Nullable<String> captureExpiresAt);
+
+        /**
          * <p>Details of the most recent failed attempt, or <code>null</code> when the payment has not failed.</p>
          */
         _FinalStage lastPaymentError(Optional<PaymentLastPaymentError> lastPaymentError);
@@ -233,7 +329,7 @@ public final class PaymentStatus {
         _FinalStage lastPaymentError(Nullable<PaymentLastPaymentError> lastPaymentError);
 
         /**
-         * <p>What the buyer must do next while <code>status</code> is <code>requires_action</code>, otherwise <code>null</code>. <code>type</code> picks the shape and each variant carries only its own <code>data</code>, so switching on <code>type</code> gives you exactly that step's payload.</p>
+         * <p>What the buyer must do next while <code>status</code> is <code>requires_action</code>, otherwise <code>null</code>. <code>type</code> picks the shape and each variant carries only its own <code>data</code>, so switching on <code>type</code> gives you exactly that step's payload. The <code>collect_card_present</code> step is served only to a credential holding <code>payment:charge</code> on the account; any other reader sees <code>null</code> while the tap is outstanding.</p>
          */
         _FinalStage nextAction(Optional<PaymentNextAction> nextAction);
 
@@ -242,7 +338,7 @@ public final class PaymentStatus {
         _FinalStage nextAction(Nullable<PaymentNextAction> nextAction);
 
         /**
-         * <p>Present while <code>status</code> is <code>processing</code> on a settlement rail, otherwise <code>null</code>.</p>
+         * <p>Present while <code>status</code> is <code>processing</code> on a settlement rail, otherwise <code>null</code>. A <code>processing</code> status without it has not been decided yet — keep polling.</p>
          */
         _FinalStage processingDetails(Optional<PaymentProcessingDetails> processingDetails);
 
@@ -276,13 +372,21 @@ public final class PaymentStatus {
 
         private Optional<PaymentLastPaymentError> lastPaymentError = Optional.empty();
 
-        @JsonAnySetter
+        private Optional<String> captureExpiresAt = Optional.empty();
+
+        private Optional<String> autoCaptureAt = Optional.empty();
+
+        private Optional<AccountSummary> account = Optional.empty();
+
         private Map<String, Object> additionalProperties = new HashMap<>();
 
         private Builder() {}
 
         @java.lang.Override
         public Builder from(PaymentStatus other) {
+            account(other.getAccount());
+            autoCaptureAt(other.getAutoCaptureAt());
+            captureExpiresAt(other.getCaptureExpiresAt());
             id(other.getId());
             lastPaymentError(other.getLastPaymentError());
             nextAction(other.getNextAction());
@@ -295,7 +399,6 @@ public final class PaymentStatus {
 
         /**
          * <p>The payment this status describes, prefixed <code>pay_</code>.</p>
-         * <p>The payment this status describes, prefixed <code>pay_</code>.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
@@ -307,7 +410,6 @@ public final class PaymentStatus {
 
         /**
          * <p>Always <code>payment_status</code>.</p>
-         * <p>Always <code>payment_status</code>.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
@@ -318,8 +420,7 @@ public final class PaymentStatus {
         }
 
         /**
-         * <p>How far the payment has got. <code>requires_confirmation</code> — nothing attempted yet, or the last attempt failed and can be retried. <code>requires_action</code> — the buyer has a step outstanding; see <code>next_action</code>. <code>confirming</code> — the buyer has done their part and the processor is deciding. <code>processing</code> — the money is moving; see <code>processing_details</code>. <code>succeeded</code> — collected. <code>canceled</code> — voided or written off.</p>
-         * <p>How far the payment has got. <code>requires_confirmation</code> — nothing attempted yet, or the last attempt failed and can be retried. <code>requires_action</code> — the buyer has a step outstanding; see <code>next_action</code>. <code>confirming</code> — the buyer has done their part and the processor is deciding. <code>processing</code> — the money is moving; see <code>processing_details</code>. <code>succeeded</code> — collected. <code>canceled</code> — voided or written off.</p>
+         * <p>How far the payment has got. <code>requires_confirmation</code> — nothing attempted yet, or the last attempt failed and can be retried. <code>requires_action</code> — the buyer has a step outstanding; see <code>next_action</code>. <code>requires_capture</code> — the card authorization is holding funds and must be captured. <code>confirming</code> — the buyer has done their part and the processor is deciding. <code>processing</code> — with <code>processing_details</code>, the money is moving; without them, the charge is still being decided and the status should be read again. <code>succeeded</code> — collected. <code>canceled</code> — voided or written off.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
@@ -366,7 +467,7 @@ public final class PaymentStatus {
         }
 
         /**
-         * <p>Present while <code>status</code> is <code>processing</code> on a settlement rail, otherwise <code>null</code>.</p>
+         * <p>Present while <code>status</code> is <code>processing</code> on a settlement rail, otherwise <code>null</code>. A <code>processing</code> status without it has not been decided yet — keep polling.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
@@ -382,7 +483,7 @@ public final class PaymentStatus {
         }
 
         /**
-         * <p>Present while <code>status</code> is <code>processing</code> on a settlement rail, otherwise <code>null</code>.</p>
+         * <p>Present while <code>status</code> is <code>processing</code> on a settlement rail, otherwise <code>null</code>. A <code>processing</code> status without it has not been decided yet — keep polling.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
@@ -392,7 +493,7 @@ public final class PaymentStatus {
         }
 
         /**
-         * <p>Present while <code>status</code> is <code>processing</code> on a settlement rail, otherwise <code>null</code>.</p>
+         * <p>Present while <code>status</code> is <code>processing</code> on a settlement rail, otherwise <code>null</code>. A <code>processing</code> status without it has not been decided yet — keep polling.</p>
          */
         @java.lang.Override
         @JsonSetter(value = "processing_details", nulls = Nulls.SKIP)
@@ -402,7 +503,7 @@ public final class PaymentStatus {
         }
 
         /**
-         * <p>What the buyer must do next while <code>status</code> is <code>requires_action</code>, otherwise <code>null</code>. <code>type</code> picks the shape and each variant carries only its own <code>data</code>, so switching on <code>type</code> gives you exactly that step's payload.</p>
+         * <p>What the buyer must do next while <code>status</code> is <code>requires_action</code>, otherwise <code>null</code>. <code>type</code> picks the shape and each variant carries only its own <code>data</code>, so switching on <code>type</code> gives you exactly that step's payload. The <code>collect_card_present</code> step is served only to a credential holding <code>payment:charge</code> on the account; any other reader sees <code>null</code> while the tap is outstanding.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
@@ -418,7 +519,7 @@ public final class PaymentStatus {
         }
 
         /**
-         * <p>What the buyer must do next while <code>status</code> is <code>requires_action</code>, otherwise <code>null</code>. <code>type</code> picks the shape and each variant carries only its own <code>data</code>, so switching on <code>type</code> gives you exactly that step's payload.</p>
+         * <p>What the buyer must do next while <code>status</code> is <code>requires_action</code>, otherwise <code>null</code>. <code>type</code> picks the shape and each variant carries only its own <code>data</code>, so switching on <code>type</code> gives you exactly that step's payload. The <code>collect_card_present</code> step is served only to a credential holding <code>payment:charge</code> on the account; any other reader sees <code>null</code> while the tap is outstanding.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
@@ -428,7 +529,7 @@ public final class PaymentStatus {
         }
 
         /**
-         * <p>What the buyer must do next while <code>status</code> is <code>requires_action</code>, otherwise <code>null</code>. <code>type</code> picks the shape and each variant carries only its own <code>data</code>, so switching on <code>type</code> gives you exactly that step's payload.</p>
+         * <p>What the buyer must do next while <code>status</code> is <code>requires_action</code>, otherwise <code>null</code>. <code>type</code> picks the shape and each variant carries only its own <code>data</code>, so switching on <code>type</code> gives you exactly that step's payload. The <code>collect_card_present</code> step is served only to a credential holding <code>payment:charge</code> on the account; any other reader sees <code>null</code> while the tap is outstanding.</p>
          */
         @java.lang.Override
         @JsonSetter(value = "next_action", nulls = Nulls.SKIP)
@@ -473,9 +574,120 @@ public final class PaymentStatus {
             return this;
         }
 
+        /**
+         * <p>When the card authorization must be captured, as an ISO 8601 timestamp. <code>null</code> when this payment was not authorized for later capture.</p>
+         * @return Reference to {@code this} so that method calls can be chained together.
+         */
+        @java.lang.Override
+        public _FinalStage captureExpiresAt(Nullable<String> captureExpiresAt) {
+            if (captureExpiresAt.isNull()) {
+                this.captureExpiresAt = null;
+            } else if (captureExpiresAt.isEmpty()) {
+                this.captureExpiresAt = Optional.empty();
+            } else {
+                this.captureExpiresAt = Optional.of(captureExpiresAt.get());
+            }
+            return this;
+        }
+
+        /**
+         * <p>When the card authorization must be captured, as an ISO 8601 timestamp. <code>null</code> when this payment was not authorized for later capture.</p>
+         * @return Reference to {@code this} so that method calls can be chained together.
+         */
+        @java.lang.Override
+        public _FinalStage captureExpiresAt(String captureExpiresAt) {
+            this.captureExpiresAt = Optional.ofNullable(captureExpiresAt);
+            return this;
+        }
+
+        /**
+         * <p>When the card authorization must be captured, as an ISO 8601 timestamp. <code>null</code> when this payment was not authorized for later capture.</p>
+         */
+        @java.lang.Override
+        @JsonSetter(value = "capture_expires_at", nulls = Nulls.SKIP)
+        public _FinalStage captureExpiresAt(Optional<String> captureExpiresAt) {
+            this.captureExpiresAt = captureExpiresAt;
+            return this;
+        }
+
+        /**
+         * <p>When Whop will capture this authorization automatically, as an ISO 8601 timestamp. <code>null</code> when no automatic capture was requested.</p>
+         * @return Reference to {@code this} so that method calls can be chained together.
+         */
+        @java.lang.Override
+        public _FinalStage autoCaptureAt(Nullable<String> autoCaptureAt) {
+            if (autoCaptureAt.isNull()) {
+                this.autoCaptureAt = null;
+            } else if (autoCaptureAt.isEmpty()) {
+                this.autoCaptureAt = Optional.empty();
+            } else {
+                this.autoCaptureAt = Optional.of(autoCaptureAt.get());
+            }
+            return this;
+        }
+
+        /**
+         * <p>When Whop will capture this authorization automatically, as an ISO 8601 timestamp. <code>null</code> when no automatic capture was requested.</p>
+         * @return Reference to {@code this} so that method calls can be chained together.
+         */
+        @java.lang.Override
+        public _FinalStage autoCaptureAt(String autoCaptureAt) {
+            this.autoCaptureAt = Optional.ofNullable(autoCaptureAt);
+            return this;
+        }
+
+        /**
+         * <p>When Whop will capture this authorization automatically, as an ISO 8601 timestamp. <code>null</code> when no automatic capture was requested.</p>
+         */
+        @java.lang.Override
+        @JsonSetter(value = "auto_capture_at", nulls = Nulls.SKIP)
+        public _FinalStage autoCaptureAt(Optional<String> autoCaptureAt) {
+            this.autoCaptureAt = autoCaptureAt;
+            return this;
+        }
+
+        /**
+         * <p>The account receiving this payment, or <code>null</code> when the payment has no associated account.</p>
+         * @return Reference to {@code this} so that method calls can be chained together.
+         */
+        @java.lang.Override
+        public _FinalStage account(Nullable<AccountSummary> account) {
+            if (account.isNull()) {
+                this.account = null;
+            } else if (account.isEmpty()) {
+                this.account = Optional.empty();
+            } else {
+                this.account = Optional.of(account.get());
+            }
+            return this;
+        }
+
+        /**
+         * <p>The account receiving this payment, or <code>null</code> when the payment has no associated account.</p>
+         * @return Reference to {@code this} so that method calls can be chained together.
+         */
+        @java.lang.Override
+        public _FinalStage account(AccountSummary account) {
+            this.account = Optional.ofNullable(account);
+            return this;
+        }
+
+        /**
+         * <p>The account receiving this payment, or <code>null</code> when the payment has no associated account.</p>
+         */
+        @java.lang.Override
+        @JsonSetter(value = "account", nulls = Nulls.SKIP)
+        public _FinalStage account(Optional<AccountSummary> account) {
+            this.account = account;
+            return this;
+        }
+
         @java.lang.Override
         public PaymentStatus build() {
             return new PaymentStatus(
+                    account,
+                    autoCaptureAt,
+                    captureExpiresAt,
                     id,
                     lastPaymentError,
                     nextAction,
@@ -484,6 +696,23 @@ public final class PaymentStatus {
                     returnUrl,
                     status,
                     additionalProperties);
+        }
+
+        @JsonAnySetter
+        private void putAdditionalPropertyFromJson(String key, Object value) {
+            if (key.equalsIgnoreCase("account")
+                    || key.equalsIgnoreCase("auto_capture_at")
+                    || key.equalsIgnoreCase("capture_expires_at")
+                    || key.equalsIgnoreCase("id")
+                    || key.equalsIgnoreCase("last_payment_error")
+                    || key.equalsIgnoreCase("next_action")
+                    || key.equalsIgnoreCase("object")
+                    || key.equalsIgnoreCase("processing_details")
+                    || key.equalsIgnoreCase("return_url")
+                    || key.equalsIgnoreCase("status")) {
+                return;
+            }
+            this.additionalProperties.put(key, value);
         }
 
         @java.lang.Override

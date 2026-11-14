@@ -87,7 +87,7 @@ public final class PaymentMethodDomain {
     }
 
     /**
-     * @return Payment method domain ID, prefixed <code>pmd_</code>.
+     * @return Payment method domain ID: the ID of the account's domain for the hostname, prefixed <code>dom_</code>, or <code>pmd_</code> for some older domains.
      */
     @JsonProperty("id")
     public String getId() {
@@ -178,7 +178,7 @@ public final class PaymentMethodDomain {
 
     public interface IdStage {
         /**
-         * <p>Payment method domain ID, prefixed <code>pmd_</code>.</p>
+         * <p>Payment method domain ID: the ID of the account's domain for the hostname, prefixed <code>dom_</code>, or <code>pmd_</code> for some older domains.</p>
          */
         ProviderStage id(@NotNull String id);
     }
@@ -238,7 +238,6 @@ public final class PaymentMethodDomain {
 
         private Optional<String> accountId = Optional.empty();
 
-        @JsonAnySetter
         private Map<String, Object> additionalProperties = new HashMap<>();
 
         private Builder() {}
@@ -257,7 +256,6 @@ public final class PaymentMethodDomain {
 
         /**
          * <p>When the domain was created, as an ISO 8601 timestamp.</p>
-         * <p>When the domain was created, as an ISO 8601 timestamp.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
@@ -269,7 +267,6 @@ public final class PaymentMethodDomain {
 
         /**
          * <p>Hostname the checkout is served from (e.g. <code>checkout.example.com</code>).</p>
-         * <p>Hostname the checkout is served from (e.g. <code>checkout.example.com</code>).</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
@@ -280,8 +277,7 @@ public final class PaymentMethodDomain {
         }
 
         /**
-         * <p>Payment method domain ID, prefixed <code>pmd_</code>.</p>
-         * <p>Payment method domain ID, prefixed <code>pmd_</code>.</p>
+         * <p>Payment method domain ID: the ID of the account's domain for the hostname, prefixed <code>dom_</code>, or <code>pmd_</code> for some older domains.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
@@ -292,7 +288,6 @@ public final class PaymentMethodDomain {
         }
 
         /**
-         * <p>Wallet provider the domain is registered with.</p>
          * <p>Wallet provider the domain is registered with.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
@@ -305,7 +300,6 @@ public final class PaymentMethodDomain {
 
         /**
          * <p>Verification status. <code>pending</code> means the provider could not fetch the domain-association file yet; only <code>verified</code> domains show wallet payment methods at checkout.</p>
-         * <p>Verification status. <code>pending</code> means the provider could not fetch the domain-association file yet; only <code>verified</code> domains show wallet payment methods at checkout.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
@@ -316,7 +310,6 @@ public final class PaymentMethodDomain {
         }
 
         /**
-         * <p>When the domain was last updated, as an ISO 8601 timestamp.</p>
          * <p>When the domain was last updated, as an ISO 8601 timestamp.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
@@ -367,6 +360,20 @@ public final class PaymentMethodDomain {
         public PaymentMethodDomain build() {
             return new PaymentMethodDomain(
                     accountId, createdAt, hostname, id, provider, status, updatedAt, additionalProperties);
+        }
+
+        @JsonAnySetter
+        private void putAdditionalPropertyFromJson(String key, Object value) {
+            if (key.equalsIgnoreCase("account_id")
+                    || key.equalsIgnoreCase("created_at")
+                    || key.equalsIgnoreCase("hostname")
+                    || key.equalsIgnoreCase("id")
+                    || key.equalsIgnoreCase("provider")
+                    || key.equalsIgnoreCase("status")
+                    || key.equalsIgnoreCase("updated_at")) {
+                return;
+            }
+            this.additionalProperties.put(key, value);
         }
 
         @java.lang.Override

@@ -15,8 +15,10 @@ import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.whop.api.core.Nullable;
 import com.whop.api.core.NullableNonemptyFilter;
 import com.whop.api.core.ObjectMappers;
+import com.whop.api.types.Money;
 import java.time.OffsetDateTime;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
@@ -25,17 +27,11 @@ import org.jetbrains.annotations.NotNull;
 @JsonInclude(JsonInclude.Include.NON_ABSENT)
 @JsonDeserialize(builder = PostTransferCompletedPayloadData.Builder.class)
 public final class PostTransferCompletedPayloadData {
-    private final double amount;
+    private final Optional<Money> amount;
 
     private final OffsetDateTime createdAt;
 
-    private final Optional<PostTransferCompletedPayloadDataCreatedByUser> createdByUser;
-
-    private final String currency;
-
-    private final PostTransferCompletedPayloadDataDestination destination;
-
-    private final String destinationLedgerAccountId;
+    private final Optional<PostTransferCompletedPayloadDataDestination> destination;
 
     private final Optional<OffsetDateTime> failedAt;
 
@@ -43,68 +39,73 @@ public final class PostTransferCompletedPayloadData {
 
     private final Optional<String> failureReason;
 
-    private final Optional<Double> feeAmount;
+    private final Optional<Money> fee;
 
     private final String id;
 
-    private final Optional<Map<String, Object>> metadata;
+    private final Map<String, Object> metadata;
 
     private final Optional<String> notes;
 
     private final PostTransferCompletedPayloadDataObject object;
 
-    private final PostTransferCompletedPayloadDataOrigin origin;
-
-    private final String originLedgerAccountId;
+    private final Optional<PostTransferCompletedPayloadDataOrigin> origin;
 
     private final PostTransferCompletedPayloadDataStatus status;
+
+    private final Optional<OffsetDateTime> statusChangedAt;
+
+    private final Optional<OffsetDateTime> succeededAt;
+
+    private final String trackingUrl;
 
     private final Map<String, Object> additionalProperties;
 
     private PostTransferCompletedPayloadData(
-            double amount,
+            Optional<Money> amount,
             OffsetDateTime createdAt,
-            Optional<PostTransferCompletedPayloadDataCreatedByUser> createdByUser,
-            String currency,
-            PostTransferCompletedPayloadDataDestination destination,
-            String destinationLedgerAccountId,
+            Optional<PostTransferCompletedPayloadDataDestination> destination,
             Optional<OffsetDateTime> failedAt,
             Optional<String> failureCode,
             Optional<String> failureReason,
-            Optional<Double> feeAmount,
+            Optional<Money> fee,
             String id,
-            Optional<Map<String, Object>> metadata,
+            Map<String, Object> metadata,
             Optional<String> notes,
             PostTransferCompletedPayloadDataObject object,
-            PostTransferCompletedPayloadDataOrigin origin,
-            String originLedgerAccountId,
+            Optional<PostTransferCompletedPayloadDataOrigin> origin,
             PostTransferCompletedPayloadDataStatus status,
+            Optional<OffsetDateTime> statusChangedAt,
+            Optional<OffsetDateTime> succeededAt,
+            String trackingUrl,
             Map<String, Object> additionalProperties) {
         this.amount = amount;
         this.createdAt = createdAt;
-        this.createdByUser = createdByUser;
-        this.currency = currency;
         this.destination = destination;
-        this.destinationLedgerAccountId = destinationLedgerAccountId;
         this.failedAt = failedAt;
         this.failureCode = failureCode;
         this.failureReason = failureReason;
-        this.feeAmount = feeAmount;
+        this.fee = fee;
         this.id = id;
         this.metadata = metadata;
         this.notes = notes;
         this.object = object;
         this.origin = origin;
-        this.originLedgerAccountId = originLedgerAccountId;
         this.status = status;
+        this.statusChangedAt = statusChangedAt;
+        this.succeededAt = succeededAt;
+        this.trackingUrl = trackingUrl;
         this.additionalProperties = additionalProperties;
     }
 
     /**
-     * @return Transfer amount.
+     * @return Amount credited to the recipient. Null while the transfer has not succeeded.
      */
-    @JsonProperty("amount")
-    public double getAmount() {
+    @JsonIgnore
+    public Optional<Money> getAmount() {
+        if (amount == null) {
+            return Optional.empty();
+        }
         return amount;
     }
 
@@ -117,42 +118,18 @@ public final class PostTransferCompletedPayloadData {
     }
 
     /**
-     * @return The user who initiated the transfer, such as the team member who sent a manual payout. Null if the creator is unavailable.
+     * @return Business account or user receiving the transfer.
      */
     @JsonIgnore
-    public Optional<PostTransferCompletedPayloadDataCreatedByUser> getCreatedByUser() {
-        if (createdByUser == null) {
+    public Optional<PostTransferCompletedPayloadDataDestination> getDestination() {
+        if (destination == null) {
             return Optional.empty();
         }
-        return createdByUser;
-    }
-
-    /**
-     * @return Transfer currency.
-     */
-    @JsonProperty("currency")
-    public String getCurrency() {
-        return currency;
-    }
-
-    /**
-     * @return Account or user receiving funds.
-     */
-    @JsonProperty("destination")
-    public PostTransferCompletedPayloadDataDestination getDestination() {
         return destination;
     }
 
     /**
-     * @return Destination ledger account ID.
-     */
-    @JsonProperty("destination_ledger_account_id")
-    public String getDestinationLedgerAccountId() {
-        return destinationLedgerAccountId;
-    }
-
-    /**
-     * @return When the transfer failed, as an ISO 8601 timestamp. Null unless the transfer has failed.
+     * @return Recorded failure time. Null unless the transfer has failed.
      */
     @JsonIgnore
     public Optional<OffsetDateTime> getFailedAt() {
@@ -163,7 +140,7 @@ public final class PostTransferCompletedPayloadData {
     }
 
     /**
-     * @return Machine-readable code for why the transfer failed. Null unless the transfer has failed.
+     * @return Machine-readable failure code. Null unless the transfer has failed.
      */
     @JsonIgnore
     public Optional<String> getFailureCode() {
@@ -174,7 +151,7 @@ public final class PostTransferCompletedPayloadData {
     }
 
     /**
-     * @return Human-readable explanation of why the transfer failed. Null unless the transfer has failed.
+     * @return Failure explanation. Null unless the transfer has failed.
      */
     @JsonIgnore
     public Optional<String> getFailureReason() {
@@ -185,14 +162,14 @@ public final class PostTransferCompletedPayloadData {
     }
 
     /**
-     * @return Fee charged for the transfer.
+     * @return All applicable transfer fees, including platform markup. Null when the authoritative total is unavailable.
      */
     @JsonIgnore
-    public Optional<Double> getFeeAmount() {
-        if (feeAmount == null) {
+    public Optional<Money> getFee() {
+        if (fee == null) {
             return Optional.empty();
         }
-        return feeAmount;
+        return fee;
     }
 
     /**
@@ -206,11 +183,8 @@ public final class PostTransferCompletedPayloadData {
     /**
      * @return Custom metadata attached to the transfer.
      */
-    @JsonIgnore
-    public Optional<Map<String, Object>> getMetadata() {
-        if (metadata == null) {
-            return Optional.empty();
-        }
+    @JsonProperty("metadata")
+    public Map<String, Object> getMetadata() {
         return metadata;
     }
 
@@ -226,7 +200,7 @@ public final class PostTransferCompletedPayloadData {
     }
 
     /**
-     * @return The object type. Discriminates the create response from a send or a claim link.
+     * @return The object type.
      */
     @JsonProperty("object")
     public PostTransferCompletedPayloadDataObject getObject() {
@@ -234,33 +208,64 @@ public final class PostTransferCompletedPayloadData {
     }
 
     /**
-     * @return Account or user sending funds.
+     * @return Business account or user sending the transfer.
      */
-    @JsonProperty("origin")
-    public PostTransferCompletedPayloadDataOrigin getOrigin() {
+    @JsonIgnore
+    public Optional<PostTransferCompletedPayloadDataOrigin> getOrigin() {
+        if (origin == null) {
+            return Optional.empty();
+        }
         return origin;
     }
 
     /**
-     * @return Source ledger account ID.
-     */
-    @JsonProperty("origin_ledger_account_id")
-    public String getOriginLedgerAccountId() {
-        return originLedgerAccountId;
-    }
-
-    /**
-     * @return Transfer status. <code>processing</code> means the on-chain leg is still executing — poll the transfer until it resolves to <code>succeeded</code> or <code>failed</code>. A <code>failed</code> transfer may be retried under the same ID and later resolve to <code>succeeded</code>.
+     * @return Current transfer status. A transfer can be created <code>processing</code> and settle a few seconds later; poll Retrieve Transfer or listen for the <code>transfer.completed</code> and <code>transfer.failed</code> webhooks instead of treating the create response as final. <code>succeeded</code> and <code>failed</code> are final.
      */
     @JsonProperty("status")
     public PostTransferCompletedPayloadDataStatus getStatus() {
         return status;
     }
 
+    /**
+     * @return Recorded time of the current transition. Null when the historical transition time is unknown.
+     */
+    @JsonIgnore
+    public Optional<OffsetDateTime> getStatusChangedAt() {
+        if (statusChangedAt == null) {
+            return Optional.empty();
+        }
+        return statusChangedAt;
+    }
+
+    /**
+     * @return Recorded success time. Null when unknown.
+     */
+    @JsonIgnore
+    public Optional<OffsetDateTime> getSucceededAt() {
+        if (succeededAt == null) {
+            return Optional.empty();
+        }
+        return succeededAt;
+    }
+
+    /**
+     * @return Tracking page for the transfer. Viewing it requires sign-in and access to the transfer.
+     */
+    @JsonProperty("tracking_url")
+    public String getTrackingUrl() {
+        return trackingUrl;
+    }
+
     @JsonInclude(value = JsonInclude.Include.CUSTOM, valueFilter = NullableNonemptyFilter.class)
-    @JsonProperty("created_by_user")
-    private Optional<PostTransferCompletedPayloadDataCreatedByUser> _getCreatedByUser() {
-        return createdByUser;
+    @JsonProperty("amount")
+    private Optional<Money> _getAmount() {
+        return amount;
+    }
+
+    @JsonInclude(value = JsonInclude.Include.CUSTOM, valueFilter = NullableNonemptyFilter.class)
+    @JsonProperty("destination")
+    private Optional<PostTransferCompletedPayloadDataDestination> _getDestination() {
+        return destination;
     }
 
     @JsonInclude(value = JsonInclude.Include.CUSTOM, valueFilter = NullableNonemptyFilter.class)
@@ -282,21 +287,33 @@ public final class PostTransferCompletedPayloadData {
     }
 
     @JsonInclude(value = JsonInclude.Include.CUSTOM, valueFilter = NullableNonemptyFilter.class)
-    @JsonProperty("fee_amount")
-    private Optional<Double> _getFeeAmount() {
-        return feeAmount;
-    }
-
-    @JsonInclude(value = JsonInclude.Include.CUSTOM, valueFilter = NullableNonemptyFilter.class)
-    @JsonProperty("metadata")
-    private Optional<Map<String, Object>> _getMetadata() {
-        return metadata;
+    @JsonProperty("fee")
+    private Optional<Money> _getFee() {
+        return fee;
     }
 
     @JsonInclude(value = JsonInclude.Include.CUSTOM, valueFilter = NullableNonemptyFilter.class)
     @JsonProperty("notes")
     private Optional<String> _getNotes() {
         return notes;
+    }
+
+    @JsonInclude(value = JsonInclude.Include.CUSTOM, valueFilter = NullableNonemptyFilter.class)
+    @JsonProperty("origin")
+    private Optional<PostTransferCompletedPayloadDataOrigin> _getOrigin() {
+        return origin;
+    }
+
+    @JsonInclude(value = JsonInclude.Include.CUSTOM, valueFilter = NullableNonemptyFilter.class)
+    @JsonProperty("status_changed_at")
+    private Optional<OffsetDateTime> _getStatusChangedAt() {
+        return statusChangedAt;
+    }
+
+    @JsonInclude(value = JsonInclude.Include.CUSTOM, valueFilter = NullableNonemptyFilter.class)
+    @JsonProperty("succeeded_at")
+    private Optional<OffsetDateTime> _getSucceededAt() {
+        return succeededAt;
     }
 
     @java.lang.Override
@@ -311,23 +328,22 @@ public final class PostTransferCompletedPayloadData {
     }
 
     private boolean equalTo(PostTransferCompletedPayloadData other) {
-        return amount == other.amount
+        return amount.equals(other.amount)
                 && createdAt.equals(other.createdAt)
-                && createdByUser.equals(other.createdByUser)
-                && currency.equals(other.currency)
                 && destination.equals(other.destination)
-                && destinationLedgerAccountId.equals(other.destinationLedgerAccountId)
                 && failedAt.equals(other.failedAt)
                 && failureCode.equals(other.failureCode)
                 && failureReason.equals(other.failureReason)
-                && feeAmount.equals(other.feeAmount)
+                && fee.equals(other.fee)
                 && id.equals(other.id)
                 && metadata.equals(other.metadata)
                 && notes.equals(other.notes)
                 && object.equals(other.object)
                 && origin.equals(other.origin)
-                && originLedgerAccountId.equals(other.originLedgerAccountId)
-                && status.equals(other.status);
+                && status.equals(other.status)
+                && statusChangedAt.equals(other.statusChangedAt)
+                && succeededAt.equals(other.succeededAt)
+                && trackingUrl.equals(other.trackingUrl);
     }
 
     @java.lang.Override
@@ -335,21 +351,20 @@ public final class PostTransferCompletedPayloadData {
         return Objects.hash(
                 this.amount,
                 this.createdAt,
-                this.createdByUser,
-                this.currency,
                 this.destination,
-                this.destinationLedgerAccountId,
                 this.failedAt,
                 this.failureCode,
                 this.failureReason,
-                this.feeAmount,
+                this.fee,
                 this.id,
                 this.metadata,
                 this.notes,
                 this.object,
                 this.origin,
-                this.originLedgerAccountId,
-                this.status);
+                this.status,
+                this.statusChangedAt,
+                this.succeededAt,
+                this.trackingUrl);
     }
 
     @java.lang.Override
@@ -357,45 +372,17 @@ public final class PostTransferCompletedPayloadData {
         return ObjectMappers.stringify(this);
     }
 
-    public static AmountStage builder() {
+    public static CreatedAtStage builder() {
         return new Builder();
-    }
-
-    public interface AmountStage {
-        /**
-         * <p>Transfer amount.</p>
-         */
-        CreatedAtStage amount(double amount);
-
-        Builder from(PostTransferCompletedPayloadData other);
     }
 
     public interface CreatedAtStage {
         /**
          * <p>When the transfer was created.</p>
          */
-        CurrencyStage createdAt(@NotNull OffsetDateTime createdAt);
-    }
+        IdStage createdAt(@NotNull OffsetDateTime createdAt);
 
-    public interface CurrencyStage {
-        /**
-         * <p>Transfer currency.</p>
-         */
-        DestinationStage currency(@NotNull String currency);
-    }
-
-    public interface DestinationStage {
-        /**
-         * <p>Account or user receiving funds.</p>
-         */
-        DestinationLedgerAccountIdStage destination(@NotNull PostTransferCompletedPayloadDataDestination destination);
-    }
-
-    public interface DestinationLedgerAccountIdStage {
-        /**
-         * <p>Destination ledger account ID.</p>
-         */
-        IdStage destinationLedgerAccountId(@NotNull String destinationLedgerAccountId);
+        Builder from(PostTransferCompletedPayloadData other);
     }
 
     public interface IdStage {
@@ -407,30 +394,23 @@ public final class PostTransferCompletedPayloadData {
 
     public interface ObjectStage {
         /**
-         * <p>The object type. Discriminates the create response from a send or a claim link.</p>
+         * <p>The object type.</p>
          */
-        OriginStage object(@NotNull PostTransferCompletedPayloadDataObject object);
-    }
-
-    public interface OriginStage {
-        /**
-         * <p>Account or user sending funds.</p>
-         */
-        OriginLedgerAccountIdStage origin(@NotNull PostTransferCompletedPayloadDataOrigin origin);
-    }
-
-    public interface OriginLedgerAccountIdStage {
-        /**
-         * <p>Source ledger account ID.</p>
-         */
-        StatusStage originLedgerAccountId(@NotNull String originLedgerAccountId);
+        StatusStage object(@NotNull PostTransferCompletedPayloadDataObject object);
     }
 
     public interface StatusStage {
         /**
-         * <p>Transfer status. <code>processing</code> means the on-chain leg is still executing — poll the transfer until it resolves to <code>succeeded</code> or <code>failed</code>. A <code>failed</code> transfer may be retried under the same ID and later resolve to <code>succeeded</code>.</p>
+         * <p>Current transfer status. A transfer can be created <code>processing</code> and settle a few seconds later; poll Retrieve Transfer or listen for the <code>transfer.completed</code> and <code>transfer.failed</code> webhooks instead of treating the create response as final. <code>succeeded</code> and <code>failed</code> are final.</p>
          */
-        _FinalStage status(@NotNull PostTransferCompletedPayloadDataStatus status);
+        TrackingUrlStage status(@NotNull PostTransferCompletedPayloadDataStatus status);
+    }
+
+    public interface TrackingUrlStage {
+        /**
+         * <p>Tracking page for the transfer. Viewing it requires sign-in and access to the transfer.</p>
+         */
+        _FinalStage trackingUrl(@NotNull String trackingUrl);
     }
 
     public interface _FinalStage {
@@ -441,16 +421,25 @@ public final class PostTransferCompletedPayloadData {
         _FinalStage additionalProperties(Map<String, Object> additionalProperties);
 
         /**
-         * <p>The user who initiated the transfer, such as the team member who sent a manual payout. Null if the creator is unavailable.</p>
+         * <p>Amount credited to the recipient. Null while the transfer has not succeeded.</p>
          */
-        _FinalStage createdByUser(Optional<PostTransferCompletedPayloadDataCreatedByUser> createdByUser);
+        _FinalStage amount(Optional<Money> amount);
 
-        _FinalStage createdByUser(PostTransferCompletedPayloadDataCreatedByUser createdByUser);
+        _FinalStage amount(Money amount);
 
-        _FinalStage createdByUser(Nullable<PostTransferCompletedPayloadDataCreatedByUser> createdByUser);
+        _FinalStage amount(Nullable<Money> amount);
 
         /**
-         * <p>When the transfer failed, as an ISO 8601 timestamp. Null unless the transfer has failed.</p>
+         * <p>Business account or user receiving the transfer.</p>
+         */
+        _FinalStage destination(Optional<PostTransferCompletedPayloadDataDestination> destination);
+
+        _FinalStage destination(PostTransferCompletedPayloadDataDestination destination);
+
+        _FinalStage destination(Nullable<PostTransferCompletedPayloadDataDestination> destination);
+
+        /**
+         * <p>Recorded failure time. Null unless the transfer has failed.</p>
          */
         _FinalStage failedAt(Optional<OffsetDateTime> failedAt);
 
@@ -459,7 +448,7 @@ public final class PostTransferCompletedPayloadData {
         _FinalStage failedAt(Nullable<OffsetDateTime> failedAt);
 
         /**
-         * <p>Machine-readable code for why the transfer failed. Null unless the transfer has failed.</p>
+         * <p>Machine-readable failure code. Null unless the transfer has failed.</p>
          */
         _FinalStage failureCode(Optional<String> failureCode);
 
@@ -468,7 +457,7 @@ public final class PostTransferCompletedPayloadData {
         _FinalStage failureCode(Nullable<String> failureCode);
 
         /**
-         * <p>Human-readable explanation of why the transfer failed. Null unless the transfer has failed.</p>
+         * <p>Failure explanation. Null unless the transfer has failed.</p>
          */
         _FinalStage failureReason(Optional<String> failureReason);
 
@@ -477,22 +466,22 @@ public final class PostTransferCompletedPayloadData {
         _FinalStage failureReason(Nullable<String> failureReason);
 
         /**
-         * <p>Fee charged for the transfer.</p>
+         * <p>All applicable transfer fees, including platform markup. Null when the authoritative total is unavailable.</p>
          */
-        _FinalStage feeAmount(Optional<Double> feeAmount);
+        _FinalStage fee(Optional<Money> fee);
 
-        _FinalStage feeAmount(Double feeAmount);
+        _FinalStage fee(Money fee);
 
-        _FinalStage feeAmount(Nullable<Double> feeAmount);
+        _FinalStage fee(Nullable<Money> fee);
 
         /**
          * <p>Custom metadata attached to the transfer.</p>
          */
-        _FinalStage metadata(Optional<Map<String, Object>> metadata);
-
         _FinalStage metadata(Map<String, Object> metadata);
 
-        _FinalStage metadata(Nullable<Map<String, Object>> metadata);
+        _FinalStage putAllMetadata(Map<String, Object> metadata);
+
+        _FinalStage metadata(String key, Object value);
 
         /**
          * <p>Transfer note.</p>
@@ -502,46 +491,59 @@ public final class PostTransferCompletedPayloadData {
         _FinalStage notes(String notes);
 
         _FinalStage notes(Nullable<String> notes);
+
+        /**
+         * <p>Business account or user sending the transfer.</p>
+         */
+        _FinalStage origin(Optional<PostTransferCompletedPayloadDataOrigin> origin);
+
+        _FinalStage origin(PostTransferCompletedPayloadDataOrigin origin);
+
+        _FinalStage origin(Nullable<PostTransferCompletedPayloadDataOrigin> origin);
+
+        /**
+         * <p>Recorded time of the current transition. Null when the historical transition time is unknown.</p>
+         */
+        _FinalStage statusChangedAt(Optional<OffsetDateTime> statusChangedAt);
+
+        _FinalStage statusChangedAt(OffsetDateTime statusChangedAt);
+
+        _FinalStage statusChangedAt(Nullable<OffsetDateTime> statusChangedAt);
+
+        /**
+         * <p>Recorded success time. Null when unknown.</p>
+         */
+        _FinalStage succeededAt(Optional<OffsetDateTime> succeededAt);
+
+        _FinalStage succeededAt(OffsetDateTime succeededAt);
+
+        _FinalStage succeededAt(Nullable<OffsetDateTime> succeededAt);
     }
 
     @JsonIgnoreProperties(ignoreUnknown = true)
     public static final class Builder
-            implements AmountStage,
-                    CreatedAtStage,
-                    CurrencyStage,
-                    DestinationStage,
-                    DestinationLedgerAccountIdStage,
-                    IdStage,
-                    ObjectStage,
-                    OriginStage,
-                    OriginLedgerAccountIdStage,
-                    StatusStage,
-                    _FinalStage {
-        private double amount;
-
+            implements CreatedAtStage, IdStage, ObjectStage, StatusStage, TrackingUrlStage, _FinalStage {
         private OffsetDateTime createdAt;
-
-        private String currency;
-
-        private PostTransferCompletedPayloadDataDestination destination;
-
-        private String destinationLedgerAccountId;
 
         private String id;
 
         private PostTransferCompletedPayloadDataObject object;
 
-        private PostTransferCompletedPayloadDataOrigin origin;
-
-        private String originLedgerAccountId;
-
         private PostTransferCompletedPayloadDataStatus status;
+
+        private String trackingUrl;
+
+        private Optional<OffsetDateTime> succeededAt = Optional.empty();
+
+        private Optional<OffsetDateTime> statusChangedAt = Optional.empty();
+
+        private Optional<PostTransferCompletedPayloadDataOrigin> origin = Optional.empty();
 
         private Optional<String> notes = Optional.empty();
 
-        private Optional<Map<String, Object>> metadata = Optional.empty();
+        private Map<String, Object> metadata = new LinkedHashMap<>();
 
-        private Optional<Double> feeAmount = Optional.empty();
+        private Optional<Money> fee = Optional.empty();
 
         private Optional<String> failureReason = Optional.empty();
 
@@ -549,9 +551,10 @@ public final class PostTransferCompletedPayloadData {
 
         private Optional<OffsetDateTime> failedAt = Optional.empty();
 
-        private Optional<PostTransferCompletedPayloadDataCreatedByUser> createdByUser = Optional.empty();
+        private Optional<PostTransferCompletedPayloadDataDestination> destination = Optional.empty();
 
-        @JsonAnySetter
+        private Optional<Money> amount = Optional.empty();
+
         private Map<String, Object> additionalProperties = new HashMap<>();
 
         private Builder() {}
@@ -560,88 +563,35 @@ public final class PostTransferCompletedPayloadData {
         public Builder from(PostTransferCompletedPayloadData other) {
             amount(other.getAmount());
             createdAt(other.getCreatedAt());
-            createdByUser(other.getCreatedByUser());
-            currency(other.getCurrency());
             destination(other.getDestination());
-            destinationLedgerAccountId(other.getDestinationLedgerAccountId());
             failedAt(other.getFailedAt());
             failureCode(other.getFailureCode());
             failureReason(other.getFailureReason());
-            feeAmount(other.getFeeAmount());
+            fee(other.getFee());
             id(other.getId());
             metadata(other.getMetadata());
             notes(other.getNotes());
             object(other.getObject());
             origin(other.getOrigin());
-            originLedgerAccountId(other.getOriginLedgerAccountId());
             status(other.getStatus());
+            statusChangedAt(other.getStatusChangedAt());
+            succeededAt(other.getSucceededAt());
+            trackingUrl(other.getTrackingUrl());
             return this;
         }
 
         /**
-         * <p>Transfer amount.</p>
-         * <p>Transfer amount.</p>
-         * @return Reference to {@code this} so that method calls can be chained together.
-         */
-        @java.lang.Override
-        @JsonSetter("amount")
-        public CreatedAtStage amount(double amount) {
-            this.amount = amount;
-            return this;
-        }
-
-        /**
-         * <p>When the transfer was created.</p>
          * <p>When the transfer was created.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
         @JsonSetter("created_at")
-        public CurrencyStage createdAt(@NotNull OffsetDateTime createdAt) {
+        public IdStage createdAt(@NotNull OffsetDateTime createdAt) {
             this.createdAt = Objects.requireNonNull(createdAt, "createdAt must not be null");
             return this;
         }
 
         /**
-         * <p>Transfer currency.</p>
-         * <p>Transfer currency.</p>
-         * @return Reference to {@code this} so that method calls can be chained together.
-         */
-        @java.lang.Override
-        @JsonSetter("currency")
-        public DestinationStage currency(@NotNull String currency) {
-            this.currency = Objects.requireNonNull(currency, "currency must not be null");
-            return this;
-        }
-
-        /**
-         * <p>Account or user receiving funds.</p>
-         * <p>Account or user receiving funds.</p>
-         * @return Reference to {@code this} so that method calls can be chained together.
-         */
-        @java.lang.Override
-        @JsonSetter("destination")
-        public DestinationLedgerAccountIdStage destination(
-                @NotNull PostTransferCompletedPayloadDataDestination destination) {
-            this.destination = Objects.requireNonNull(destination, "destination must not be null");
-            return this;
-        }
-
-        /**
-         * <p>Destination ledger account ID.</p>
-         * <p>Destination ledger account ID.</p>
-         * @return Reference to {@code this} so that method calls can be chained together.
-         */
-        @java.lang.Override
-        @JsonSetter("destination_ledger_account_id")
-        public IdStage destinationLedgerAccountId(@NotNull String destinationLedgerAccountId) {
-            this.destinationLedgerAccountId =
-                    Objects.requireNonNull(destinationLedgerAccountId, "destinationLedgerAccountId must not be null");
-            return this;
-        }
-
-        /**
-         * <p>Transfer ID.</p>
          * <p>Transfer ID.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
@@ -653,51 +603,143 @@ public final class PostTransferCompletedPayloadData {
         }
 
         /**
-         * <p>The object type. Discriminates the create response from a send or a claim link.</p>
-         * <p>The object type. Discriminates the create response from a send or a claim link.</p>
+         * <p>The object type.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
         @JsonSetter("object")
-        public OriginStage object(@NotNull PostTransferCompletedPayloadDataObject object) {
+        public StatusStage object(@NotNull PostTransferCompletedPayloadDataObject object) {
             this.object = Objects.requireNonNull(object, "object must not be null");
             return this;
         }
 
         /**
-         * <p>Account or user sending funds.</p>
-         * <p>Account or user sending funds.</p>
-         * @return Reference to {@code this} so that method calls can be chained together.
-         */
-        @java.lang.Override
-        @JsonSetter("origin")
-        public OriginLedgerAccountIdStage origin(@NotNull PostTransferCompletedPayloadDataOrigin origin) {
-            this.origin = Objects.requireNonNull(origin, "origin must not be null");
-            return this;
-        }
-
-        /**
-         * <p>Source ledger account ID.</p>
-         * <p>Source ledger account ID.</p>
-         * @return Reference to {@code this} so that method calls can be chained together.
-         */
-        @java.lang.Override
-        @JsonSetter("origin_ledger_account_id")
-        public StatusStage originLedgerAccountId(@NotNull String originLedgerAccountId) {
-            this.originLedgerAccountId =
-                    Objects.requireNonNull(originLedgerAccountId, "originLedgerAccountId must not be null");
-            return this;
-        }
-
-        /**
-         * <p>Transfer status. <code>processing</code> means the on-chain leg is still executing — poll the transfer until it resolves to <code>succeeded</code> or <code>failed</code>. A <code>failed</code> transfer may be retried under the same ID and later resolve to <code>succeeded</code>.</p>
-         * <p>Transfer status. <code>processing</code> means the on-chain leg is still executing — poll the transfer until it resolves to <code>succeeded</code> or <code>failed</code>. A <code>failed</code> transfer may be retried under the same ID and later resolve to <code>succeeded</code>.</p>
+         * <p>Current transfer status. A transfer can be created <code>processing</code> and settle a few seconds later; poll Retrieve Transfer or listen for the <code>transfer.completed</code> and <code>transfer.failed</code> webhooks instead of treating the create response as final. <code>succeeded</code> and <code>failed</code> are final.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
         @JsonSetter("status")
-        public _FinalStage status(@NotNull PostTransferCompletedPayloadDataStatus status) {
+        public TrackingUrlStage status(@NotNull PostTransferCompletedPayloadDataStatus status) {
             this.status = Objects.requireNonNull(status, "status must not be null");
+            return this;
+        }
+
+        /**
+         * <p>Tracking page for the transfer. Viewing it requires sign-in and access to the transfer.</p>
+         * @return Reference to {@code this} so that method calls can be chained together.
+         */
+        @java.lang.Override
+        @JsonSetter("tracking_url")
+        public _FinalStage trackingUrl(@NotNull String trackingUrl) {
+            this.trackingUrl = Objects.requireNonNull(trackingUrl, "trackingUrl must not be null");
+            return this;
+        }
+
+        /**
+         * <p>Recorded success time. Null when unknown.</p>
+         * @return Reference to {@code this} so that method calls can be chained together.
+         */
+        @java.lang.Override
+        public _FinalStage succeededAt(Nullable<OffsetDateTime> succeededAt) {
+            if (succeededAt.isNull()) {
+                this.succeededAt = null;
+            } else if (succeededAt.isEmpty()) {
+                this.succeededAt = Optional.empty();
+            } else {
+                this.succeededAt = Optional.of(succeededAt.get());
+            }
+            return this;
+        }
+
+        /**
+         * <p>Recorded success time. Null when unknown.</p>
+         * @return Reference to {@code this} so that method calls can be chained together.
+         */
+        @java.lang.Override
+        public _FinalStage succeededAt(OffsetDateTime succeededAt) {
+            this.succeededAt = Optional.ofNullable(succeededAt);
+            return this;
+        }
+
+        /**
+         * <p>Recorded success time. Null when unknown.</p>
+         */
+        @java.lang.Override
+        @JsonSetter(value = "succeeded_at", nulls = Nulls.SKIP)
+        public _FinalStage succeededAt(Optional<OffsetDateTime> succeededAt) {
+            this.succeededAt = succeededAt;
+            return this;
+        }
+
+        /**
+         * <p>Recorded time of the current transition. Null when the historical transition time is unknown.</p>
+         * @return Reference to {@code this} so that method calls can be chained together.
+         */
+        @java.lang.Override
+        public _FinalStage statusChangedAt(Nullable<OffsetDateTime> statusChangedAt) {
+            if (statusChangedAt.isNull()) {
+                this.statusChangedAt = null;
+            } else if (statusChangedAt.isEmpty()) {
+                this.statusChangedAt = Optional.empty();
+            } else {
+                this.statusChangedAt = Optional.of(statusChangedAt.get());
+            }
+            return this;
+        }
+
+        /**
+         * <p>Recorded time of the current transition. Null when the historical transition time is unknown.</p>
+         * @return Reference to {@code this} so that method calls can be chained together.
+         */
+        @java.lang.Override
+        public _FinalStage statusChangedAt(OffsetDateTime statusChangedAt) {
+            this.statusChangedAt = Optional.ofNullable(statusChangedAt);
+            return this;
+        }
+
+        /**
+         * <p>Recorded time of the current transition. Null when the historical transition time is unknown.</p>
+         */
+        @java.lang.Override
+        @JsonSetter(value = "status_changed_at", nulls = Nulls.SKIP)
+        public _FinalStage statusChangedAt(Optional<OffsetDateTime> statusChangedAt) {
+            this.statusChangedAt = statusChangedAt;
+            return this;
+        }
+
+        /**
+         * <p>Business account or user sending the transfer.</p>
+         * @return Reference to {@code this} so that method calls can be chained together.
+         */
+        @java.lang.Override
+        public _FinalStage origin(Nullable<PostTransferCompletedPayloadDataOrigin> origin) {
+            if (origin.isNull()) {
+                this.origin = null;
+            } else if (origin.isEmpty()) {
+                this.origin = Optional.empty();
+            } else {
+                this.origin = Optional.of(origin.get());
+            }
+            return this;
+        }
+
+        /**
+         * <p>Business account or user sending the transfer.</p>
+         * @return Reference to {@code this} so that method calls can be chained together.
+         */
+        @java.lang.Override
+        public _FinalStage origin(PostTransferCompletedPayloadDataOrigin origin) {
+            this.origin = Optional.ofNullable(origin);
+            return this;
+        }
+
+        /**
+         * <p>Business account or user sending the transfer.</p>
+         */
+        @java.lang.Override
+        @JsonSetter(value = "origin", nulls = Nulls.SKIP)
+        public _FinalStage origin(Optional<PostTransferCompletedPayloadDataOrigin> origin) {
+            this.origin = origin;
             return this;
         }
 
@@ -742,14 +784,8 @@ public final class PostTransferCompletedPayloadData {
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
-        public _FinalStage metadata(Nullable<Map<String, Object>> metadata) {
-            if (metadata.isNull()) {
-                this.metadata = null;
-            } else if (metadata.isEmpty()) {
-                this.metadata = Optional.empty();
-            } else {
-                this.metadata = Optional.of(metadata.get());
-            }
+        public _FinalStage metadata(String key, Object value) {
+            this.metadata.put(key, value);
             return this;
         }
 
@@ -758,8 +794,10 @@ public final class PostTransferCompletedPayloadData {
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
-        public _FinalStage metadata(Map<String, Object> metadata) {
-            this.metadata = Optional.ofNullable(metadata);
+        public _FinalStage putAllMetadata(Map<String, Object> metadata) {
+            if (metadata != null) {
+                this.metadata.putAll(metadata);
+            }
             return this;
         }
 
@@ -768,49 +806,52 @@ public final class PostTransferCompletedPayloadData {
          */
         @java.lang.Override
         @JsonSetter(value = "metadata", nulls = Nulls.SKIP)
-        public _FinalStage metadata(Optional<Map<String, Object>> metadata) {
-            this.metadata = metadata;
-            return this;
-        }
-
-        /**
-         * <p>Fee charged for the transfer.</p>
-         * @return Reference to {@code this} so that method calls can be chained together.
-         */
-        @java.lang.Override
-        public _FinalStage feeAmount(Nullable<Double> feeAmount) {
-            if (feeAmount.isNull()) {
-                this.feeAmount = null;
-            } else if (feeAmount.isEmpty()) {
-                this.feeAmount = Optional.empty();
-            } else {
-                this.feeAmount = Optional.of(feeAmount.get());
+        public _FinalStage metadata(Map<String, Object> metadata) {
+            this.metadata.clear();
+            if (metadata != null) {
+                this.metadata.putAll(metadata);
             }
             return this;
         }
 
         /**
-         * <p>Fee charged for the transfer.</p>
+         * <p>All applicable transfer fees, including platform markup. Null when the authoritative total is unavailable.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
-        public _FinalStage feeAmount(Double feeAmount) {
-            this.feeAmount = Optional.ofNullable(feeAmount);
+        public _FinalStage fee(Nullable<Money> fee) {
+            if (fee.isNull()) {
+                this.fee = null;
+            } else if (fee.isEmpty()) {
+                this.fee = Optional.empty();
+            } else {
+                this.fee = Optional.of(fee.get());
+            }
             return this;
         }
 
         /**
-         * <p>Fee charged for the transfer.</p>
+         * <p>All applicable transfer fees, including platform markup. Null when the authoritative total is unavailable.</p>
+         * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
-        @JsonSetter(value = "fee_amount", nulls = Nulls.SKIP)
-        public _FinalStage feeAmount(Optional<Double> feeAmount) {
-            this.feeAmount = feeAmount;
+        public _FinalStage fee(Money fee) {
+            this.fee = Optional.ofNullable(fee);
             return this;
         }
 
         /**
-         * <p>Human-readable explanation of why the transfer failed. Null unless the transfer has failed.</p>
+         * <p>All applicable transfer fees, including platform markup. Null when the authoritative total is unavailable.</p>
+         */
+        @java.lang.Override
+        @JsonSetter(value = "fee", nulls = Nulls.SKIP)
+        public _FinalStage fee(Optional<Money> fee) {
+            this.fee = fee;
+            return this;
+        }
+
+        /**
+         * <p>Failure explanation. Null unless the transfer has failed.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
@@ -826,7 +867,7 @@ public final class PostTransferCompletedPayloadData {
         }
 
         /**
-         * <p>Human-readable explanation of why the transfer failed. Null unless the transfer has failed.</p>
+         * <p>Failure explanation. Null unless the transfer has failed.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
@@ -836,7 +877,7 @@ public final class PostTransferCompletedPayloadData {
         }
 
         /**
-         * <p>Human-readable explanation of why the transfer failed. Null unless the transfer has failed.</p>
+         * <p>Failure explanation. Null unless the transfer has failed.</p>
          */
         @java.lang.Override
         @JsonSetter(value = "failure_reason", nulls = Nulls.SKIP)
@@ -846,7 +887,7 @@ public final class PostTransferCompletedPayloadData {
         }
 
         /**
-         * <p>Machine-readable code for why the transfer failed. Null unless the transfer has failed.</p>
+         * <p>Machine-readable failure code. Null unless the transfer has failed.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
@@ -862,7 +903,7 @@ public final class PostTransferCompletedPayloadData {
         }
 
         /**
-         * <p>Machine-readable code for why the transfer failed. Null unless the transfer has failed.</p>
+         * <p>Machine-readable failure code. Null unless the transfer has failed.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
@@ -872,7 +913,7 @@ public final class PostTransferCompletedPayloadData {
         }
 
         /**
-         * <p>Machine-readable code for why the transfer failed. Null unless the transfer has failed.</p>
+         * <p>Machine-readable failure code. Null unless the transfer has failed.</p>
          */
         @java.lang.Override
         @JsonSetter(value = "failure_code", nulls = Nulls.SKIP)
@@ -882,7 +923,7 @@ public final class PostTransferCompletedPayloadData {
         }
 
         /**
-         * <p>When the transfer failed, as an ISO 8601 timestamp. Null unless the transfer has failed.</p>
+         * <p>Recorded failure time. Null unless the transfer has failed.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
@@ -898,7 +939,7 @@ public final class PostTransferCompletedPayloadData {
         }
 
         /**
-         * <p>When the transfer failed, as an ISO 8601 timestamp. Null unless the transfer has failed.</p>
+         * <p>Recorded failure time. Null unless the transfer has failed.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
@@ -908,7 +949,7 @@ public final class PostTransferCompletedPayloadData {
         }
 
         /**
-         * <p>When the transfer failed, as an ISO 8601 timestamp. Null unless the transfer has failed.</p>
+         * <p>Recorded failure time. Null unless the transfer has failed.</p>
          */
         @java.lang.Override
         @JsonSetter(value = "failed_at", nulls = Nulls.SKIP)
@@ -918,38 +959,74 @@ public final class PostTransferCompletedPayloadData {
         }
 
         /**
-         * <p>The user who initiated the transfer, such as the team member who sent a manual payout. Null if the creator is unavailable.</p>
+         * <p>Business account or user receiving the transfer.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
-        public _FinalStage createdByUser(Nullable<PostTransferCompletedPayloadDataCreatedByUser> createdByUser) {
-            if (createdByUser.isNull()) {
-                this.createdByUser = null;
-            } else if (createdByUser.isEmpty()) {
-                this.createdByUser = Optional.empty();
+        public _FinalStage destination(Nullable<PostTransferCompletedPayloadDataDestination> destination) {
+            if (destination.isNull()) {
+                this.destination = null;
+            } else if (destination.isEmpty()) {
+                this.destination = Optional.empty();
             } else {
-                this.createdByUser = Optional.of(createdByUser.get());
+                this.destination = Optional.of(destination.get());
             }
             return this;
         }
 
         /**
-         * <p>The user who initiated the transfer, such as the team member who sent a manual payout. Null if the creator is unavailable.</p>
+         * <p>Business account or user receiving the transfer.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
-        public _FinalStage createdByUser(PostTransferCompletedPayloadDataCreatedByUser createdByUser) {
-            this.createdByUser = Optional.ofNullable(createdByUser);
+        public _FinalStage destination(PostTransferCompletedPayloadDataDestination destination) {
+            this.destination = Optional.ofNullable(destination);
             return this;
         }
 
         /**
-         * <p>The user who initiated the transfer, such as the team member who sent a manual payout. Null if the creator is unavailable.</p>
+         * <p>Business account or user receiving the transfer.</p>
          */
         @java.lang.Override
-        @JsonSetter(value = "created_by_user", nulls = Nulls.SKIP)
-        public _FinalStage createdByUser(Optional<PostTransferCompletedPayloadDataCreatedByUser> createdByUser) {
-            this.createdByUser = createdByUser;
+        @JsonSetter(value = "destination", nulls = Nulls.SKIP)
+        public _FinalStage destination(Optional<PostTransferCompletedPayloadDataDestination> destination) {
+            this.destination = destination;
+            return this;
+        }
+
+        /**
+         * <p>Amount credited to the recipient. Null while the transfer has not succeeded.</p>
+         * @return Reference to {@code this} so that method calls can be chained together.
+         */
+        @java.lang.Override
+        public _FinalStage amount(Nullable<Money> amount) {
+            if (amount.isNull()) {
+                this.amount = null;
+            } else if (amount.isEmpty()) {
+                this.amount = Optional.empty();
+            } else {
+                this.amount = Optional.of(amount.get());
+            }
+            return this;
+        }
+
+        /**
+         * <p>Amount credited to the recipient. Null while the transfer has not succeeded.</p>
+         * @return Reference to {@code this} so that method calls can be chained together.
+         */
+        @java.lang.Override
+        public _FinalStage amount(Money amount) {
+            this.amount = Optional.ofNullable(amount);
+            return this;
+        }
+
+        /**
+         * <p>Amount credited to the recipient. Null while the transfer has not succeeded.</p>
+         */
+        @java.lang.Override
+        @JsonSetter(value = "amount", nulls = Nulls.SKIP)
+        public _FinalStage amount(Optional<Money> amount) {
+            this.amount = amount;
             return this;
         }
 
@@ -958,22 +1035,44 @@ public final class PostTransferCompletedPayloadData {
             return new PostTransferCompletedPayloadData(
                     amount,
                     createdAt,
-                    createdByUser,
-                    currency,
                     destination,
-                    destinationLedgerAccountId,
                     failedAt,
                     failureCode,
                     failureReason,
-                    feeAmount,
+                    fee,
                     id,
                     metadata,
                     notes,
                     object,
                     origin,
-                    originLedgerAccountId,
                     status,
+                    statusChangedAt,
+                    succeededAt,
+                    trackingUrl,
                     additionalProperties);
+        }
+
+        @JsonAnySetter
+        private void putAdditionalPropertyFromJson(String key, Object value) {
+            if (key.equalsIgnoreCase("amount")
+                    || key.equalsIgnoreCase("created_at")
+                    || key.equalsIgnoreCase("destination")
+                    || key.equalsIgnoreCase("failed_at")
+                    || key.equalsIgnoreCase("failure_code")
+                    || key.equalsIgnoreCase("failure_reason")
+                    || key.equalsIgnoreCase("fee")
+                    || key.equalsIgnoreCase("id")
+                    || key.equalsIgnoreCase("metadata")
+                    || key.equalsIgnoreCase("notes")
+                    || key.equalsIgnoreCase("object")
+                    || key.equalsIgnoreCase("origin")
+                    || key.equalsIgnoreCase("status")
+                    || key.equalsIgnoreCase("status_changed_at")
+                    || key.equalsIgnoreCase("succeeded_at")
+                    || key.equalsIgnoreCase("tracking_url")) {
+                return;
+            }
+            this.additionalProperties.put(key, value);
         }
 
         @java.lang.Override

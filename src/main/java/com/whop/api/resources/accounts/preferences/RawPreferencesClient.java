@@ -4,10 +4,13 @@
 package com.whop.api.resources.accounts.preferences;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
+import com.whop.api.core.BodyProperties;
 import com.whop.api.core.ClientOptions;
 import com.whop.api.core.MediaTypes;
 import com.whop.api.core.ObjectMappers;
+import com.whop.api.core.PathSegments;
 import com.whop.api.core.RequestOptions;
+import com.whop.api.core.RetryInterceptor;
 import com.whop.api.core.WhopApiApiException;
 import com.whop.api.core.WhopApiException;
 import com.whop.api.core.WhopApiHttpResponse;
@@ -62,10 +65,10 @@ public class RawPreferencesClient {
      */
     public WhopApiHttpResponse<RetrievePreferencesResponse> retrieve(
             String accountId, RetrievePreferencesRequest request, RequestOptions requestOptions) {
-        HttpUrl.Builder httpUrl = HttpUrl.parse(this.clientOptions.environment().getUrl())
+        HttpUrl.Builder httpUrl = HttpUrl.parse(this.clientOptions.environment().getApiURL())
                 .newBuilder()
                 .addPathSegments("accounts")
-                .addPathSegment(accountId)
+                .addPathSegment(PathSegments.validate(accountId))
                 .addPathSegments("preferences");
         if (requestOptions != null) {
             requestOptions.getQueryParameters().forEach((_key, _value) -> {
@@ -81,6 +84,15 @@ public class RawPreferencesClient {
         OkHttpClient client = clientOptions.httpClient();
         if (requestOptions != null && requestOptions.getTimeout().isPresent()) {
             client = clientOptions.httpClientWithTimeout(requestOptions);
+        }
+        if (requestOptions != null && requestOptions.getMaxRetries().isPresent()) {
+            okhttpRequest = okhttpRequest
+                    .newBuilder()
+                    .tag(
+                            RetryInterceptor.MaxRetriesOverride.class,
+                            new RetryInterceptor.MaxRetriesOverride(
+                                    requestOptions.getMaxRetries().get()))
+                    .build();
         }
         try (Response response = client.newCall(okhttpRequest).execute()) {
             ResponseBody responseBody = response.body();
@@ -105,41 +117,79 @@ public class RawPreferencesClient {
             Object errorBody = ObjectMappers.parseErrorBody(responseBodyString);
             throw new WhopApiApiException(
                     "Error with status code " + response.code(), response.code(), errorBody, response);
+        } catch (JsonProcessingException e) {
+            throw new WhopApiException("Failed to deserialize response: " + e.getMessage(), e);
         } catch (IOException e) {
             throw new WhopApiException("Network error executing HTTP request", e);
         }
     }
 
     /**
-     * Updates the account's preferences. Each top-level key present in the body is replaced as a whole; omitted keys are left untouched. <code>ads_triple_whale_integration</code> takes the Data-In API key to connect with, or <code>null</code> to disconnect. <code>ads_payment_methods</code> always requires a <code>primary</code> entry. <code>backup</code> is optional and any pairing is allowed — two cards, <code>card</code>+<code>platform_balance</code>, or a single method — so a card-only advertiser can fund ads without a platform balance. The <code>primary</code> and <code>backup</code> must be different sources. A <code>platform_balance</code> entry may omit <code>id</code> to use the account's default Whop balance. Configuring a <code>card</code> requires a user token; account API keys can set up platform-balance billing only.
+     * Updates the account's preferences. Each top-level key in the body replaces its stored value as a whole. Keys left out keep their current values.
+     * <p>The required scope depends on which preferences you update.</p>
+     * <ul>
+     * <li><code>ad_campaign:create</code>: <code>ads_payment_methods</code>, <code>ads_reporting_currency</code>, <code>ads_scheduling_timezone</code>, <code>ads_triple_whale_integration</code>.</li>
+     * <li><code>payout:account:update</code>: <code>cards_auto_top_up</code>, <code>cards_notifications</code>, <code>covers_subaccount_negative_balances</code>.</li>
+     * <li><code>payment:dispute</code>: <code>dispute_fighter_enabled</code>.</li>
+     * <li><code>company:update</code>: <code>economic_intelligence_duration_key</code>, <code>economic_intelligence_auto_renew</code>, <code>review_request_emails</code>, <code>cancellation_emails</code>, <code>renewal_reminder_emails</code>, <code>failed_payment_emails</code>, <code>subaccount_notifications</code>, <code>subaccount_team_view_only</code>.</li>
+     * <li><code>company:manage_checkout</code>: <code>feedback_options</code>, <code>customer_tracking</code>.</li>
+     * </ul>
+     * <p>To update keys under more than one scope, the API key needs all of those scopes.</p>
      */
     public WhopApiHttpResponse<UpdatePreferencesResponse> update(String accountId) {
         return update(accountId, UpdatePreferencesRequest.builder().build());
     }
 
     /**
-     * Updates the account's preferences. Each top-level key present in the body is replaced as a whole; omitted keys are left untouched. <code>ads_triple_whale_integration</code> takes the Data-In API key to connect with, or <code>null</code> to disconnect. <code>ads_payment_methods</code> always requires a <code>primary</code> entry. <code>backup</code> is optional and any pairing is allowed — two cards, <code>card</code>+<code>platform_balance</code>, or a single method — so a card-only advertiser can fund ads without a platform balance. The <code>primary</code> and <code>backup</code> must be different sources. A <code>platform_balance</code> entry may omit <code>id</code> to use the account's default Whop balance. Configuring a <code>card</code> requires a user token; account API keys can set up platform-balance billing only.
+     * Updates the account's preferences. Each top-level key in the body replaces its stored value as a whole. Keys left out keep their current values.
+     * <p>The required scope depends on which preferences you update.</p>
+     * <ul>
+     * <li><code>ad_campaign:create</code>: <code>ads_payment_methods</code>, <code>ads_reporting_currency</code>, <code>ads_scheduling_timezone</code>, <code>ads_triple_whale_integration</code>.</li>
+     * <li><code>payout:account:update</code>: <code>cards_auto_top_up</code>, <code>cards_notifications</code>, <code>covers_subaccount_negative_balances</code>.</li>
+     * <li><code>payment:dispute</code>: <code>dispute_fighter_enabled</code>.</li>
+     * <li><code>company:update</code>: <code>economic_intelligence_duration_key</code>, <code>economic_intelligence_auto_renew</code>, <code>review_request_emails</code>, <code>cancellation_emails</code>, <code>renewal_reminder_emails</code>, <code>failed_payment_emails</code>, <code>subaccount_notifications</code>, <code>subaccount_team_view_only</code>.</li>
+     * <li><code>company:manage_checkout</code>: <code>feedback_options</code>, <code>customer_tracking</code>.</li>
+     * </ul>
+     * <p>To update keys under more than one scope, the API key needs all of those scopes.</p>
      */
     public WhopApiHttpResponse<UpdatePreferencesResponse> update(String accountId, RequestOptions requestOptions) {
         return update(accountId, UpdatePreferencesRequest.builder().build(), requestOptions);
     }
 
     /**
-     * Updates the account's preferences. Each top-level key present in the body is replaced as a whole; omitted keys are left untouched. <code>ads_triple_whale_integration</code> takes the Data-In API key to connect with, or <code>null</code> to disconnect. <code>ads_payment_methods</code> always requires a <code>primary</code> entry. <code>backup</code> is optional and any pairing is allowed — two cards, <code>card</code>+<code>platform_balance</code>, or a single method — so a card-only advertiser can fund ads without a platform balance. The <code>primary</code> and <code>backup</code> must be different sources. A <code>platform_balance</code> entry may omit <code>id</code> to use the account's default Whop balance. Configuring a <code>card</code> requires a user token; account API keys can set up platform-balance billing only.
+     * Updates the account's preferences. Each top-level key in the body replaces its stored value as a whole. Keys left out keep their current values.
+     * <p>The required scope depends on which preferences you update.</p>
+     * <ul>
+     * <li><code>ad_campaign:create</code>: <code>ads_payment_methods</code>, <code>ads_reporting_currency</code>, <code>ads_scheduling_timezone</code>, <code>ads_triple_whale_integration</code>.</li>
+     * <li><code>payout:account:update</code>: <code>cards_auto_top_up</code>, <code>cards_notifications</code>, <code>covers_subaccount_negative_balances</code>.</li>
+     * <li><code>payment:dispute</code>: <code>dispute_fighter_enabled</code>.</li>
+     * <li><code>company:update</code>: <code>economic_intelligence_duration_key</code>, <code>economic_intelligence_auto_renew</code>, <code>review_request_emails</code>, <code>cancellation_emails</code>, <code>renewal_reminder_emails</code>, <code>failed_payment_emails</code>, <code>subaccount_notifications</code>, <code>subaccount_team_view_only</code>.</li>
+     * <li><code>company:manage_checkout</code>: <code>feedback_options</code>, <code>customer_tracking</code>.</li>
+     * </ul>
+     * <p>To update keys under more than one scope, the API key needs all of those scopes.</p>
      */
     public WhopApiHttpResponse<UpdatePreferencesResponse> update(String accountId, UpdatePreferencesRequest request) {
         return update(accountId, request, null);
     }
 
     /**
-     * Updates the account's preferences. Each top-level key present in the body is replaced as a whole; omitted keys are left untouched. <code>ads_triple_whale_integration</code> takes the Data-In API key to connect with, or <code>null</code> to disconnect. <code>ads_payment_methods</code> always requires a <code>primary</code> entry. <code>backup</code> is optional and any pairing is allowed — two cards, <code>card</code>+<code>platform_balance</code>, or a single method — so a card-only advertiser can fund ads without a platform balance. The <code>primary</code> and <code>backup</code> must be different sources. A <code>platform_balance</code> entry may omit <code>id</code> to use the account's default Whop balance. Configuring a <code>card</code> requires a user token; account API keys can set up platform-balance billing only.
+     * Updates the account's preferences. Each top-level key in the body replaces its stored value as a whole. Keys left out keep their current values.
+     * <p>The required scope depends on which preferences you update.</p>
+     * <ul>
+     * <li><code>ad_campaign:create</code>: <code>ads_payment_methods</code>, <code>ads_reporting_currency</code>, <code>ads_scheduling_timezone</code>, <code>ads_triple_whale_integration</code>.</li>
+     * <li><code>payout:account:update</code>: <code>cards_auto_top_up</code>, <code>cards_notifications</code>, <code>covers_subaccount_negative_balances</code>.</li>
+     * <li><code>payment:dispute</code>: <code>dispute_fighter_enabled</code>.</li>
+     * <li><code>company:update</code>: <code>economic_intelligence_duration_key</code>, <code>economic_intelligence_auto_renew</code>, <code>review_request_emails</code>, <code>cancellation_emails</code>, <code>renewal_reminder_emails</code>, <code>failed_payment_emails</code>, <code>subaccount_notifications</code>, <code>subaccount_team_view_only</code>.</li>
+     * <li><code>company:manage_checkout</code>: <code>feedback_options</code>, <code>customer_tracking</code>.</li>
+     * </ul>
+     * <p>To update keys under more than one scope, the API key needs all of those scopes.</p>
      */
     public WhopApiHttpResponse<UpdatePreferencesResponse> update(
             String accountId, UpdatePreferencesRequest request, RequestOptions requestOptions) {
-        HttpUrl.Builder httpUrl = HttpUrl.parse(this.clientOptions.environment().getUrl())
+        HttpUrl.Builder httpUrl = HttpUrl.parse(this.clientOptions.environment().getApiURL())
                 .newBuilder()
                 .addPathSegments("accounts")
-                .addPathSegment(accountId)
+                .addPathSegment(PathSegments.validate(accountId))
                 .addPathSegments("preferences");
         if (requestOptions != null) {
             requestOptions.getQueryParameters().forEach((_key, _value) -> {
@@ -149,7 +199,9 @@ public class RawPreferencesClient {
         RequestBody body;
         try {
             body = RequestBody.create(
-                    ObjectMappers.JSON_MAPPER.writeValueAsBytes(request), MediaTypes.APPLICATION_JSON);
+                    ObjectMappers.JSON_MAPPER.writeValueAsBytes(BodyProperties.merge(
+                            request, requestOptions != null ? requestOptions.getBodyProperties() : null)),
+                    MediaTypes.APPLICATION_JSON);
         } catch (JsonProcessingException e) {
             throw new WhopApiException("Failed to serialize request", e);
         }
@@ -163,6 +215,15 @@ public class RawPreferencesClient {
         OkHttpClient client = clientOptions.httpClient();
         if (requestOptions != null && requestOptions.getTimeout().isPresent()) {
             client = clientOptions.httpClientWithTimeout(requestOptions);
+        }
+        if (requestOptions != null && requestOptions.getMaxRetries().isPresent()) {
+            okhttpRequest = okhttpRequest
+                    .newBuilder()
+                    .tag(
+                            RetryInterceptor.MaxRetriesOverride.class,
+                            new RetryInterceptor.MaxRetriesOverride(
+                                    requestOptions.getMaxRetries().get()))
+                    .build();
         }
         try (Response response = client.newCall(okhttpRequest).execute()) {
             ResponseBody responseBody = response.body();
@@ -193,6 +254,8 @@ public class RawPreferencesClient {
             Object errorBody = ObjectMappers.parseErrorBody(responseBodyString);
             throw new WhopApiApiException(
                     "Error with status code " + response.code(), response.code(), errorBody, response);
+        } catch (JsonProcessingException e) {
+            throw new WhopApiException("Failed to deserialize response: " + e.getMessage(), e);
         } catch (IOException e) {
             throw new WhopApiException("Network error executing HTTP request", e);
         }

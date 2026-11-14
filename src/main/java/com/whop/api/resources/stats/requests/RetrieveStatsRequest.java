@@ -12,9 +12,12 @@ import com.fasterxml.jackson.annotation.JsonSetter;
 import com.fasterxml.jackson.annotation.Nulls;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.whop.api.core.ObjectMappers;
+import com.whop.api.resources.stats.types.RetrieveStatsRequestActivity;
 import com.whop.api.resources.stats.types.RetrieveStatsRequestEventType;
 import com.whop.api.resources.stats.types.RetrieveStatsRequestInterval;
 import com.whop.api.resources.stats.types.RetrieveStatsRequestSnapshotWindow;
+import com.whop.api.types.RetrieveStatsRequestSteps;
+import java.time.OffsetDateTime;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
@@ -94,6 +97,90 @@ public final class RetrieveStatsRequest {
 
     private final Optional<String> event;
 
+    private final Optional<String> businessType;
+
+    private final Optional<String> industryType;
+
+    private final Optional<String> productCategory;
+
+    private final Optional<String> accountCountry;
+
+    private final Optional<String> issuer;
+
+    private final Optional<String> webhookId;
+
+    private final Optional<String> conversionWindow;
+
+    private final Optional<Boolean> matureOnly;
+
+    private final Optional<RetrieveStatsRequestSteps> steps;
+
+    private final Optional<String> compareTo;
+
+    private final Optional<Double> confidenceLevel;
+
+    private final Optional<Boolean> contactable;
+
+    private final Optional<Boolean> hasPurchased;
+
+    private final Optional<OffsetDateTime> firstSeenAfter;
+
+    private final Optional<OffsetDateTime> firstSeenBefore;
+
+    private final Optional<OffsetDateTime> lastSeenAfter;
+
+    private final Optional<OffsetDateTime> lastSeenBefore;
+
+    private final Optional<Integer> firstSeenWithinDays;
+
+    private final Optional<Integer> lastSeenWithinDays;
+
+    private final Optional<Boolean> known;
+
+    private final Optional<Boolean> hasEmail;
+
+    private final Optional<Boolean> hasPhone;
+
+    private final Optional<Double> ltvGt;
+
+    private final Optional<Double> ltvGte;
+
+    private final Optional<Double> ltvLt;
+
+    private final Optional<Double> ltvLte;
+
+    private final Optional<Double> aovGt;
+
+    private final Optional<Double> aovGte;
+
+    private final Optional<Double> aovLt;
+
+    private final Optional<Double> aovLte;
+
+    private final Optional<Double> purchaseCountGt;
+
+    private final Optional<Double> purchaseCountGte;
+
+    private final Optional<Double> purchaseCountLt;
+
+    private final Optional<Double> purchaseCountLte;
+
+    private final Optional<Double> eventCountGt;
+
+    private final Optional<Double> eventCountGte;
+
+    private final Optional<Double> eventCountLt;
+
+    private final Optional<Double> eventCountLte;
+
+    private final Optional<String> referringAccountId;
+
+    private final Optional<String> teamLeadId;
+
+    private final Optional<RetrieveStatsRequestActivity> activity;
+
+    private final Optional<Integer> breakdownLimit;
+
     private final Map<String, Object> additionalProperties;
 
     private RetrieveStatsRequest(
@@ -131,6 +218,48 @@ public final class RetrieveStatsRequest {
             Optional<String> referredUserId,
             Optional<RetrieveStatsRequestSnapshotWindow> snapshotWindow,
             Optional<String> event,
+            Optional<String> businessType,
+            Optional<String> industryType,
+            Optional<String> productCategory,
+            Optional<String> accountCountry,
+            Optional<String> issuer,
+            Optional<String> webhookId,
+            Optional<String> conversionWindow,
+            Optional<Boolean> matureOnly,
+            Optional<RetrieveStatsRequestSteps> steps,
+            Optional<String> compareTo,
+            Optional<Double> confidenceLevel,
+            Optional<Boolean> contactable,
+            Optional<Boolean> hasPurchased,
+            Optional<OffsetDateTime> firstSeenAfter,
+            Optional<OffsetDateTime> firstSeenBefore,
+            Optional<OffsetDateTime> lastSeenAfter,
+            Optional<OffsetDateTime> lastSeenBefore,
+            Optional<Integer> firstSeenWithinDays,
+            Optional<Integer> lastSeenWithinDays,
+            Optional<Boolean> known,
+            Optional<Boolean> hasEmail,
+            Optional<Boolean> hasPhone,
+            Optional<Double> ltvGt,
+            Optional<Double> ltvGte,
+            Optional<Double> ltvLt,
+            Optional<Double> ltvLte,
+            Optional<Double> aovGt,
+            Optional<Double> aovGte,
+            Optional<Double> aovLt,
+            Optional<Double> aovLte,
+            Optional<Double> purchaseCountGt,
+            Optional<Double> purchaseCountGte,
+            Optional<Double> purchaseCountLt,
+            Optional<Double> purchaseCountLte,
+            Optional<Double> eventCountGt,
+            Optional<Double> eventCountGte,
+            Optional<Double> eventCountLt,
+            Optional<Double> eventCountLte,
+            Optional<String> referringAccountId,
+            Optional<String> teamLeadId,
+            Optional<RetrieveStatsRequestActivity> activity,
+            Optional<Integer> breakdownLimit,
             Map<String, Object> additionalProperties) {
         this.adCampaignIds = adCampaignIds;
         this.adGroupIds = adGroupIds;
@@ -166,6 +295,48 @@ public final class RetrieveStatsRequest {
         this.referredUserId = referredUserId;
         this.snapshotWindow = snapshotWindow;
         this.event = event;
+        this.businessType = businessType;
+        this.industryType = industryType;
+        this.productCategory = productCategory;
+        this.accountCountry = accountCountry;
+        this.issuer = issuer;
+        this.webhookId = webhookId;
+        this.conversionWindow = conversionWindow;
+        this.matureOnly = matureOnly;
+        this.steps = steps;
+        this.compareTo = compareTo;
+        this.confidenceLevel = confidenceLevel;
+        this.contactable = contactable;
+        this.hasPurchased = hasPurchased;
+        this.firstSeenAfter = firstSeenAfter;
+        this.firstSeenBefore = firstSeenBefore;
+        this.lastSeenAfter = lastSeenAfter;
+        this.lastSeenBefore = lastSeenBefore;
+        this.firstSeenWithinDays = firstSeenWithinDays;
+        this.lastSeenWithinDays = lastSeenWithinDays;
+        this.known = known;
+        this.hasEmail = hasEmail;
+        this.hasPhone = hasPhone;
+        this.ltvGt = ltvGt;
+        this.ltvGte = ltvGte;
+        this.ltvLt = ltvLt;
+        this.ltvLte = ltvLte;
+        this.aovGt = aovGt;
+        this.aovGte = aovGte;
+        this.aovLt = aovLt;
+        this.aovLte = aovLte;
+        this.purchaseCountGt = purchaseCountGt;
+        this.purchaseCountGte = purchaseCountGte;
+        this.purchaseCountLt = purchaseCountLt;
+        this.purchaseCountLte = purchaseCountLte;
+        this.eventCountGt = eventCountGt;
+        this.eventCountGte = eventCountGte;
+        this.eventCountLt = eventCountLt;
+        this.eventCountLte = eventCountLte;
+        this.referringAccountId = referringAccountId;
+        this.teamLeadId = teamLeadId;
+        this.activity = activity;
+        this.breakdownLimit = breakdownLimit;
         this.additionalProperties = additionalProperties;
     }
 
@@ -194,7 +365,7 @@ public final class RetrieveStatsRequest {
     }
 
     /**
-     * @return The account this query concerns, for example biz_AbC123.
+     * @return Account this query concerns, prefixed <code>biz_</code>, or <code>platform</code> for all of Whop.
      */
     @JsonProperty("account_id")
     public Optional<String> getAccountId() {
@@ -218,7 +389,7 @@ public final class RetrieveStatsRequest {
     }
 
     /**
-     * @return End of the range — a date (YYYY-MM-DD), expanded to the end of that day, or an ISO 8601 timestamp (for example 2026-07-17T16:37:00Z), used exactly.
+     * @return End of the range — a date (YYYY-MM-DD), expanded to the end of that day, or an ISO 8601 timestamp (for example 2026-07-17T16:37:00Z), used exactly. Funnel entry ranges cannot exceed 90 days.
      */
     @JsonProperty("to")
     public String getTo() {
@@ -226,7 +397,7 @@ public final class RetrieveStatsRequest {
     }
 
     /**
-     * @return How wide each point is. Defaults to day. Snapshot metrics are day-only.
+     * @return How wide each point is. Defaults to day. Snapshot metrics are day-only. Funnels support at most 2,000 first-entry cohort buckets.
      */
     @JsonProperty("interval")
     public Optional<RetrieveStatsRequestInterval> getInterval() {
@@ -234,7 +405,7 @@ public final class RetrieveStatsRequest {
     }
 
     /**
-     * @return Split the metric out by one of its properties — each point gets a breakdown array. For example breakdown_by=currency returns an entry for usd, an entry for eur, and so on.
+     * @return Split the metric out by one of its properties — each point gets a breakdown array. For example breakdown_by=currency returns an entry for usd, an entry for eur, and so on. Funnels use a property of the first matched event, with at most 300 groups. experiment_id and variant require an exposure as step 1. For funnel source breakdowns, steps[1][source]=whop:* groups by campaign, whop:&lt;campaign&gt;:* by ad group, and whop:&lt;campaign&gt;:&lt;group&gt;:* by ad. See the metric catalog for supported breakdowns.
      */
     @JsonProperty("breakdown_by")
     public Optional<String> getBreakdownBy() {
@@ -298,7 +469,7 @@ public final class RetrieveStatsRequest {
     }
 
     /**
-     * @return Filter traffic metrics to one website hostname, for example shop.example.com. Pair with breakdown_by=hostname to split by website.
+     * @return Filter traffic metrics to one website hostname, for example shop.example.com. On the events and people metrics, comma-separated hostnames match any listed hostname. Pair with breakdown_by=hostname to split by website.
      */
     @JsonProperty("hostname")
     public Optional<String> getHostname() {
@@ -426,7 +597,7 @@ public final class RetrieveStatsRequest {
     }
 
     /**
-     * @return Window used by a snapshot metric. Ordinary snapshots accept 30d as their trailing activity window. Cohorted dispute metrics accept 7d or 28d as the sales-transaction pool; their attribution window is fixed in the metric name. Each metric lists its accepted values in the catalog.
+     * @return Window used by a snapshot metric. Ordinary snapshots accept 30d as their trailing activity window. Cohorted dispute metrics accept 7d or 28d as the sales-transaction pool; their attribution window is fixed in the metric name. Card network program metrics accept 7d, 14d, 28d, or 56d. Each metric lists its accepted values in the catalog.
      */
     @JsonProperty("snapshot_window")
     public Optional<RetrieveStatsRequestSnapshotWindow> getSnapshotWindow() {
@@ -434,11 +605,347 @@ public final class RetrieveStatsRequest {
     }
 
     /**
-     * @return Filter the events metric to one or more full event names, for example payment.completed or pixel.lead. Comma-separate several to break the metric down by each event. Available on metrics that list event.
+     * @return Filter the events metric to one or more full event names, for example payment.completed or pixel.lead. Comma-separated names match any listed event. Use group_by=event for separate groups. Available on metrics that list event.
      */
     @JsonProperty("event")
     public Optional<String> getEvent() {
         return event;
+    }
+
+    /**
+     * @return Filter to one business type, for example <code>education</code>. Pair with <code>breakdown_by=business_type</code> to split by business type. Available on metrics that list <code>business_type</code>.
+     */
+    @JsonProperty("business_type")
+    public Optional<String> getBusinessType() {
+        return businessType;
+    }
+
+    /**
+     * @return Filter to one industry type, for example <code>options_trading</code>. Pair with <code>breakdown_by=industry_type</code> to split by industry type. Available on metrics that list <code>industry_type</code>.
+     */
+    @JsonProperty("industry_type")
+    public Optional<String> getIndustryType() {
+        return industryType;
+    }
+
+    /**
+     * @return Filter to one product category, for example <code>algo_trading_course</code>. Pair with <code>breakdown_by=product_category</code> to split by product category. Available on metrics that list <code>product_category</code>.
+     */
+    @JsonProperty("product_category")
+    public Optional<String> getProductCategory() {
+        return productCategory;
+    }
+
+    /**
+     * @return Filter to accounts located in one country, as an ISO 3166-1 alpha-2 code such as <code>US</code>. Pair with <code>breakdown_by=account_country</code> to split by account country. Available on metrics that list <code>account_country</code>.
+     */
+    @JsonProperty("account_country")
+    public Optional<String> getAccountCountry() {
+        return accountCountry;
+    }
+
+    /**
+     * @return Filter to one card-issuing bank, named as the processor reports it, for example JPMORGAN CHASE BANK N A, or unknown for payments with no reported bank. Available on metrics that list issuer.
+     */
+    @JsonProperty("issuer")
+    public Optional<String> getIssuer() {
+        return issuer;
+    }
+
+    /**
+     * @return The webhook to count deliveries for, for example hook_AbC123. Required by webhook_deliveries, and must belong to account_id or one of its apps.
+     */
+    @JsonProperty("webhook_id")
+    public Optional<String> getWebhookId() {
+        return webhookId;
+    }
+
+    /**
+     * @return Funnel only. Time allowed from the first event to the final event: integer minutes, hours, or days, up to 30d.
+     */
+    @JsonProperty("conversion_window")
+    public Optional<String> getConversionWindow() {
+        return conversionWindow;
+    }
+
+    /**
+     * @return Funnel only. Include only entrants whose full conversion window has elapsed. Required for confidence intervals and comparisons.
+     */
+    @JsonProperty("mature_only")
+    public Optional<Boolean> getMatureOnly() {
+        return matureOnly;
+    }
+
+    /**
+     * @return Funnel only. Required when metric=funnel. 2 to 10 ordered events per person, as consecutive one-based bracket parameters such as <code>steps[1][event]=pixel.page&amp;steps[1][page]=/pricing*&amp;steps[2][event]=payment.completed</code>. Values are scalar strings, never JSON. A person's first step 1 match inside <code>from</code>/<code>to</code> anchors their cohort, breakdown, and conversion window; later matches do not restart it. Other events may occur between steps, and conversions may land after <code>to</code>. For an experiment funnel, make <code>experiment.exposure</code> step 1 and pass <code>breakdown_by=variant</code>.
+     */
+    @JsonProperty("steps")
+    public Optional<RetrieveStatsRequestSteps> getSteps() {
+        return steps;
+    }
+
+    /**
+     * @return Funnel only. The breakdown value to use as baseline for whole-window final conversion. Requires breakdown_by and mature_only=true; defaults confidence_level to 0.95.
+     */
+    @JsonProperty("compare_to")
+    public Optional<String> getCompareTo() {
+        return compareTo;
+    }
+
+    /**
+     * @return Funnel only. Confidence level for whole-window final conversion intervals, for example 0.95. Requires mature_only=true. Exposure steps must each filter one user- or visitor-randomized experiment.
+     */
+    @JsonProperty("confidence_level")
+    public Optional<Double> getConfidenceLevel() {
+        return confidenceLevel;
+    }
+
+    /**
+     * @return People metric only: contactable equals this value. Applies to the current person profile for every time bucket. LTV and AOV are in USD. Not accepted by the Events metric.
+     */
+    @JsonProperty("contactable")
+    public Optional<Boolean> getContactable() {
+        return contactable;
+    }
+
+    /**
+     * @return People metric only: has_purchased equals this value. Applies to the current person profile for every time bucket. LTV and AOV are in USD. Not accepted by the Events metric.
+     */
+    @JsonProperty("has_purchased")
+    public Optional<Boolean> getHasPurchased() {
+        return hasPurchased;
+    }
+
+    /**
+     * @return People metric only: first_seen_at greater than or equal this value. Applies to the current person profile for every time bucket. LTV and AOV are in USD. Not accepted by the Events metric.
+     */
+    @JsonProperty("first_seen_after")
+    public Optional<OffsetDateTime> getFirstSeenAfter() {
+        return firstSeenAfter;
+    }
+
+    /**
+     * @return People metric only: first_seen_at less than this value. Applies to the current person profile for every time bucket. LTV and AOV are in USD. Not accepted by the Events metric.
+     */
+    @JsonProperty("first_seen_before")
+    public Optional<OffsetDateTime> getFirstSeenBefore() {
+        return firstSeenBefore;
+    }
+
+    /**
+     * @return People metric only: last_seen_at greater than or equal this value. Applies to the current person profile for every time bucket. LTV and AOV are in USD. Not accepted by the Events metric.
+     */
+    @JsonProperty("last_seen_after")
+    public Optional<OffsetDateTime> getLastSeenAfter() {
+        return lastSeenAfter;
+    }
+
+    /**
+     * @return People metric only: last_seen_at less than this value. Applies to the current person profile for every time bucket. LTV and AOV are in USD. Not accepted by the Events metric.
+     */
+    @JsonProperty("last_seen_before")
+    public Optional<OffsetDateTime> getLastSeenBefore() {
+        return lastSeenBefore;
+    }
+
+    /**
+     * @return People metric only: first_seen_at within this many days of now. Applies to the current person profile for every time bucket. LTV and AOV are in USD. Not accepted by the Events metric.
+     */
+    @JsonProperty("first_seen_within_days")
+    public Optional<Integer> getFirstSeenWithinDays() {
+        return firstSeenWithinDays;
+    }
+
+    /**
+     * @return People metric only: last_seen_at within this many days of now. Applies to the current person profile for every time bucket. LTV and AOV are in USD. Not accepted by the Events metric.
+     */
+    @JsonProperty("last_seen_within_days")
+    public Optional<Integer> getLastSeenWithinDays() {
+        return lastSeenWithinDays;
+    }
+
+    /**
+     * @return People metric only: known equals this value. Applies to the current person profile for every time bucket. LTV and AOV are in USD. Not accepted by the Events metric.
+     */
+    @JsonProperty("known")
+    public Optional<Boolean> getKnown() {
+        return known;
+    }
+
+    /**
+     * @return People metric only: has_email equals this value. Applies to the current person profile for every time bucket. LTV and AOV are in USD. Not accepted by the Events metric.
+     */
+    @JsonProperty("has_email")
+    public Optional<Boolean> getHasEmail() {
+        return hasEmail;
+    }
+
+    /**
+     * @return People metric only: has_phone equals this value. Applies to the current person profile for every time bucket. LTV and AOV are in USD. Not accepted by the Events metric.
+     */
+    @JsonProperty("has_phone")
+    public Optional<Boolean> getHasPhone() {
+        return hasPhone;
+    }
+
+    /**
+     * @return People metric only: ltv greater than this value. Applies to the current person profile for every time bucket. LTV and AOV are in USD. Not accepted by the Events metric.
+     */
+    @JsonProperty("ltv_gt")
+    public Optional<Double> getLtvGt() {
+        return ltvGt;
+    }
+
+    /**
+     * @return People metric only: ltv greater than or equal this value. Applies to the current person profile for every time bucket. LTV and AOV are in USD. Not accepted by the Events metric.
+     */
+    @JsonProperty("ltv_gte")
+    public Optional<Double> getLtvGte() {
+        return ltvGte;
+    }
+
+    /**
+     * @return People metric only: ltv less than this value. Applies to the current person profile for every time bucket. LTV and AOV are in USD. Not accepted by the Events metric.
+     */
+    @JsonProperty("ltv_lt")
+    public Optional<Double> getLtvLt() {
+        return ltvLt;
+    }
+
+    /**
+     * @return People metric only: ltv less than or equal this value. Applies to the current person profile for every time bucket. LTV and AOV are in USD. Not accepted by the Events metric.
+     */
+    @JsonProperty("ltv_lte")
+    public Optional<Double> getLtvLte() {
+        return ltvLte;
+    }
+
+    /**
+     * @return People metric only: aov greater than this value. Applies to the current person profile for every time bucket. LTV and AOV are in USD. Not accepted by the Events metric.
+     */
+    @JsonProperty("aov_gt")
+    public Optional<Double> getAovGt() {
+        return aovGt;
+    }
+
+    /**
+     * @return People metric only: aov greater than or equal this value. Applies to the current person profile for every time bucket. LTV and AOV are in USD. Not accepted by the Events metric.
+     */
+    @JsonProperty("aov_gte")
+    public Optional<Double> getAovGte() {
+        return aovGte;
+    }
+
+    /**
+     * @return People metric only: aov less than this value. Applies to the current person profile for every time bucket. LTV and AOV are in USD. Not accepted by the Events metric.
+     */
+    @JsonProperty("aov_lt")
+    public Optional<Double> getAovLt() {
+        return aovLt;
+    }
+
+    /**
+     * @return People metric only: aov less than or equal this value. Applies to the current person profile for every time bucket. LTV and AOV are in USD. Not accepted by the Events metric.
+     */
+    @JsonProperty("aov_lte")
+    public Optional<Double> getAovLte() {
+        return aovLte;
+    }
+
+    /**
+     * @return People metric only: purchase_count greater than this value. Applies to the current person profile for every time bucket. LTV and AOV are in USD. Not accepted by the Events metric.
+     */
+    @JsonProperty("purchase_count_gt")
+    public Optional<Double> getPurchaseCountGt() {
+        return purchaseCountGt;
+    }
+
+    /**
+     * @return People metric only: purchase_count greater than or equal this value. Applies to the current person profile for every time bucket. LTV and AOV are in USD. Not accepted by the Events metric.
+     */
+    @JsonProperty("purchase_count_gte")
+    public Optional<Double> getPurchaseCountGte() {
+        return purchaseCountGte;
+    }
+
+    /**
+     * @return People metric only: purchase_count less than this value. Applies to the current person profile for every time bucket. LTV and AOV are in USD. Not accepted by the Events metric.
+     */
+    @JsonProperty("purchase_count_lt")
+    public Optional<Double> getPurchaseCountLt() {
+        return purchaseCountLt;
+    }
+
+    /**
+     * @return People metric only: purchase_count less than or equal this value. Applies to the current person profile for every time bucket. LTV and AOV are in USD. Not accepted by the Events metric.
+     */
+    @JsonProperty("purchase_count_lte")
+    public Optional<Double> getPurchaseCountLte() {
+        return purchaseCountLte;
+    }
+
+    /**
+     * @return People metric only: event_count greater than this value. Applies to the current person profile for every time bucket. LTV and AOV are in USD. Not accepted by the Events metric.
+     */
+    @JsonProperty("event_count_gt")
+    public Optional<Double> getEventCountGt() {
+        return eventCountGt;
+    }
+
+    /**
+     * @return People metric only: event_count greater than or equal this value. Applies to the current person profile for every time bucket. LTV and AOV are in USD. Not accepted by the Events metric.
+     */
+    @JsonProperty("event_count_gte")
+    public Optional<Double> getEventCountGte() {
+        return eventCountGte;
+    }
+
+    /**
+     * @return People metric only: event_count less than this value. Applies to the current person profile for every time bucket. LTV and AOV are in USD. Not accepted by the Events metric.
+     */
+    @JsonProperty("event_count_lt")
+    public Optional<Double> getEventCountLt() {
+        return eventCountLt;
+    }
+
+    /**
+     * @return People metric only: event_count less than or equal this value. Applies to the current person profile for every time bucket. LTV and AOV are in USD. Not accepted by the Events metric.
+     */
+    @JsonProperty("event_count_lte")
+    public Optional<Double> getEventCountLte() {
+        return eventCountLte;
+    }
+
+    /**
+     * @return Read a referral metric for a business instead of the caller: the referrals its team members made, past members included, for example biz_AbC123. Requires company:basic:read on that business and cannot be combined with user_id. Available on metrics that list referring_account_id.
+     */
+    @JsonProperty("referring_account_id")
+    public Optional<String> getReferringAccountId() {
+        return referringAccountId;
+    }
+
+    /**
+     * @return Read a partner metric for one team lead and everyone under them in today's org chart, for example user_AbC123. Needs referring_account_id or a global query. As breakdown_by=team_lead_id, figures sit under the highest lead above the partner who earned them, so each group matches that lead's team_lead_id filter and the groups add up to the total. With team_lead_id set, or for a caller who reads only their own team, the groups are the leads under that person, who keeps the rest. Anyone with no lead is in a null group. Available on metrics that list team_lead_id.
+     */
+    @JsonProperty("team_lead_id")
+    public Optional<String> getTeamLeadId() {
+        return teamLeadId;
+    }
+
+    /**
+     * @return On partner_reps, all counts the period's roster, earning counts those who earned in the period, and not_earning counts the roster minus them. On the other partner metrics, earning keeps the figures of the people partner_reps counts as earning over the whole range and not_earning keeps the figures of everyone else; those need referring_account_id or a global query. Defaults to all. Available on metrics that list activity.
+     */
+    @JsonProperty("activity")
+    public Optional<RetrieveStatsRequestActivity> getActivity() {
+        return activity;
+    }
+
+    /**
+     * @return With a single breakdown_by, keep the groups with the highest whole-range values, up to this many, and fold every other group into one entry named other. A rate or an average ranks its groups by the deals it divides by. The other entry is measured from the underlying rows, so a distinct count or a rate stays exact rather than being added up from groups. Available on partner metrics only.
+     */
+    @JsonProperty("breakdown_limit")
+    public Optional<Integer> getBreakdownLimit() {
+        return breakdownLimit;
     }
 
     @java.lang.Override
@@ -486,7 +993,49 @@ public final class RetrieveStatsRequest {
                 && mostRecentAction.equals(other.mostRecentAction)
                 && referredUserId.equals(other.referredUserId)
                 && snapshotWindow.equals(other.snapshotWindow)
-                && event.equals(other.event);
+                && event.equals(other.event)
+                && businessType.equals(other.businessType)
+                && industryType.equals(other.industryType)
+                && productCategory.equals(other.productCategory)
+                && accountCountry.equals(other.accountCountry)
+                && issuer.equals(other.issuer)
+                && webhookId.equals(other.webhookId)
+                && conversionWindow.equals(other.conversionWindow)
+                && matureOnly.equals(other.matureOnly)
+                && steps.equals(other.steps)
+                && compareTo.equals(other.compareTo)
+                && confidenceLevel.equals(other.confidenceLevel)
+                && contactable.equals(other.contactable)
+                && hasPurchased.equals(other.hasPurchased)
+                && firstSeenAfter.equals(other.firstSeenAfter)
+                && firstSeenBefore.equals(other.firstSeenBefore)
+                && lastSeenAfter.equals(other.lastSeenAfter)
+                && lastSeenBefore.equals(other.lastSeenBefore)
+                && firstSeenWithinDays.equals(other.firstSeenWithinDays)
+                && lastSeenWithinDays.equals(other.lastSeenWithinDays)
+                && known.equals(other.known)
+                && hasEmail.equals(other.hasEmail)
+                && hasPhone.equals(other.hasPhone)
+                && ltvGt.equals(other.ltvGt)
+                && ltvGte.equals(other.ltvGte)
+                && ltvLt.equals(other.ltvLt)
+                && ltvLte.equals(other.ltvLte)
+                && aovGt.equals(other.aovGt)
+                && aovGte.equals(other.aovGte)
+                && aovLt.equals(other.aovLt)
+                && aovLte.equals(other.aovLte)
+                && purchaseCountGt.equals(other.purchaseCountGt)
+                && purchaseCountGte.equals(other.purchaseCountGte)
+                && purchaseCountLt.equals(other.purchaseCountLt)
+                && purchaseCountLte.equals(other.purchaseCountLte)
+                && eventCountGt.equals(other.eventCountGt)
+                && eventCountGte.equals(other.eventCountGte)
+                && eventCountLt.equals(other.eventCountLt)
+                && eventCountLte.equals(other.eventCountLte)
+                && referringAccountId.equals(other.referringAccountId)
+                && teamLeadId.equals(other.teamLeadId)
+                && activity.equals(other.activity)
+                && breakdownLimit.equals(other.breakdownLimit);
     }
 
     @java.lang.Override
@@ -525,7 +1074,49 @@ public final class RetrieveStatsRequest {
                 this.mostRecentAction,
                 this.referredUserId,
                 this.snapshotWindow,
-                this.event);
+                this.event,
+                this.businessType,
+                this.industryType,
+                this.productCategory,
+                this.accountCountry,
+                this.issuer,
+                this.webhookId,
+                this.conversionWindow,
+                this.matureOnly,
+                this.steps,
+                this.compareTo,
+                this.confidenceLevel,
+                this.contactable,
+                this.hasPurchased,
+                this.firstSeenAfter,
+                this.firstSeenBefore,
+                this.lastSeenAfter,
+                this.lastSeenBefore,
+                this.firstSeenWithinDays,
+                this.lastSeenWithinDays,
+                this.known,
+                this.hasEmail,
+                this.hasPhone,
+                this.ltvGt,
+                this.ltvGte,
+                this.ltvLt,
+                this.ltvLte,
+                this.aovGt,
+                this.aovGte,
+                this.aovLt,
+                this.aovLte,
+                this.purchaseCountGt,
+                this.purchaseCountGte,
+                this.purchaseCountLt,
+                this.purchaseCountLte,
+                this.eventCountGt,
+                this.eventCountGte,
+                this.eventCountLt,
+                this.eventCountLte,
+                this.referringAccountId,
+                this.teamLeadId,
+                this.activity,
+                this.breakdownLimit);
     }
 
     @java.lang.Override
@@ -548,7 +1139,7 @@ public final class RetrieveStatsRequest {
 
     public interface ToStage {
         /**
-         * <p>End of the range — a date (YYYY-MM-DD), expanded to the end of that day, or an ISO 8601 timestamp (for example 2026-07-17T16:37:00Z), used exactly.</p>
+         * <p>End of the range — a date (YYYY-MM-DD), expanded to the end of that day, or an ISO 8601 timestamp (for example 2026-07-17T16:37:00Z), used exactly. Funnel entry ranges cannot exceed 90 days.</p>
          */
         _FinalStage to(@NotNull String to);
     }
@@ -588,7 +1179,7 @@ public final class RetrieveStatsRequest {
         _FinalStage adIds(String adIds);
 
         /**
-         * <p>The account this query concerns, for example biz_AbC123.</p>
+         * <p>Account this query concerns, prefixed <code>biz_</code>, or <code>platform</code> for all of Whop.</p>
          */
         _FinalStage accountId(Optional<String> accountId);
 
@@ -602,14 +1193,14 @@ public final class RetrieveStatsRequest {
         _FinalStage userId(String userId);
 
         /**
-         * <p>How wide each point is. Defaults to day. Snapshot metrics are day-only.</p>
+         * <p>How wide each point is. Defaults to day. Snapshot metrics are day-only. Funnels support at most 2,000 first-entry cohort buckets.</p>
          */
         _FinalStage interval(Optional<RetrieveStatsRequestInterval> interval);
 
         _FinalStage interval(RetrieveStatsRequestInterval interval);
 
         /**
-         * <p>Split the metric out by one of its properties — each point gets a breakdown array. For example breakdown_by=currency returns an entry for usd, an entry for eur, and so on.</p>
+         * <p>Split the metric out by one of its properties — each point gets a breakdown array. For example breakdown_by=currency returns an entry for usd, an entry for eur, and so on. Funnels use a property of the first matched event, with at most 300 groups. experiment_id and variant require an exposure as step 1. For funnel source breakdowns, steps[1][source]=whop:* groups by campaign, whop:&lt;campaign&gt;:* by ad group, and whop:&lt;campaign&gt;:&lt;group&gt;:* by ad. See the metric catalog for supported breakdowns.</p>
          */
         _FinalStage breakdownBy(Optional<String> breakdownBy);
 
@@ -665,7 +1256,7 @@ public final class RetrieveStatsRequest {
         _FinalStage source(String source);
 
         /**
-         * <p>Filter traffic metrics to one website hostname, for example shop.example.com. Pair with breakdown_by=hostname to split by website.</p>
+         * <p>Filter traffic metrics to one website hostname, for example shop.example.com. On the events and people metrics, comma-separated hostnames match any listed hostname. Pair with breakdown_by=hostname to split by website.</p>
          */
         _FinalStage hostname(Optional<String> hostname);
 
@@ -777,18 +1368,312 @@ public final class RetrieveStatsRequest {
         _FinalStage referredUserId(String referredUserId);
 
         /**
-         * <p>Window used by a snapshot metric. Ordinary snapshots accept 30d as their trailing activity window. Cohorted dispute metrics accept 7d or 28d as the sales-transaction pool; their attribution window is fixed in the metric name. Each metric lists its accepted values in the catalog.</p>
+         * <p>Window used by a snapshot metric. Ordinary snapshots accept 30d as their trailing activity window. Cohorted dispute metrics accept 7d or 28d as the sales-transaction pool; their attribution window is fixed in the metric name. Card network program metrics accept 7d, 14d, 28d, or 56d. Each metric lists its accepted values in the catalog.</p>
          */
         _FinalStage snapshotWindow(Optional<RetrieveStatsRequestSnapshotWindow> snapshotWindow);
 
         _FinalStage snapshotWindow(RetrieveStatsRequestSnapshotWindow snapshotWindow);
 
         /**
-         * <p>Filter the events metric to one or more full event names, for example payment.completed or pixel.lead. Comma-separate several to break the metric down by each event. Available on metrics that list event.</p>
+         * <p>Filter the events metric to one or more full event names, for example payment.completed or pixel.lead. Comma-separated names match any listed event. Use group_by=event for separate groups. Available on metrics that list event.</p>
          */
         _FinalStage event(Optional<String> event);
 
         _FinalStage event(String event);
+
+        /**
+         * <p>Filter to one business type, for example <code>education</code>. Pair with <code>breakdown_by=business_type</code> to split by business type. Available on metrics that list <code>business_type</code>.</p>
+         */
+        _FinalStage businessType(Optional<String> businessType);
+
+        _FinalStage businessType(String businessType);
+
+        /**
+         * <p>Filter to one industry type, for example <code>options_trading</code>. Pair with <code>breakdown_by=industry_type</code> to split by industry type. Available on metrics that list <code>industry_type</code>.</p>
+         */
+        _FinalStage industryType(Optional<String> industryType);
+
+        _FinalStage industryType(String industryType);
+
+        /**
+         * <p>Filter to one product category, for example <code>algo_trading_course</code>. Pair with <code>breakdown_by=product_category</code> to split by product category. Available on metrics that list <code>product_category</code>.</p>
+         */
+        _FinalStage productCategory(Optional<String> productCategory);
+
+        _FinalStage productCategory(String productCategory);
+
+        /**
+         * <p>Filter to accounts located in one country, as an ISO 3166-1 alpha-2 code such as <code>US</code>. Pair with <code>breakdown_by=account_country</code> to split by account country. Available on metrics that list <code>account_country</code>.</p>
+         */
+        _FinalStage accountCountry(Optional<String> accountCountry);
+
+        _FinalStage accountCountry(String accountCountry);
+
+        /**
+         * <p>Filter to one card-issuing bank, named as the processor reports it, for example JPMORGAN CHASE BANK N A, or unknown for payments with no reported bank. Available on metrics that list issuer.</p>
+         */
+        _FinalStage issuer(Optional<String> issuer);
+
+        _FinalStage issuer(String issuer);
+
+        /**
+         * <p>The webhook to count deliveries for, for example hook_AbC123. Required by webhook_deliveries, and must belong to account_id or one of its apps.</p>
+         */
+        _FinalStage webhookId(Optional<String> webhookId);
+
+        _FinalStage webhookId(String webhookId);
+
+        /**
+         * <p>Funnel only. Time allowed from the first event to the final event: integer minutes, hours, or days, up to 30d.</p>
+         */
+        _FinalStage conversionWindow(Optional<String> conversionWindow);
+
+        _FinalStage conversionWindow(String conversionWindow);
+
+        /**
+         * <p>Funnel only. Include only entrants whose full conversion window has elapsed. Required for confidence intervals and comparisons.</p>
+         */
+        _FinalStage matureOnly(Optional<Boolean> matureOnly);
+
+        _FinalStage matureOnly(Boolean matureOnly);
+
+        /**
+         * <p>Funnel only. Required when metric=funnel. 2 to 10 ordered events per person, as consecutive one-based bracket parameters such as <code>steps[1][event]=pixel.page&amp;steps[1][page]=/pricing*&amp;steps[2][event]=payment.completed</code>. Values are scalar strings, never JSON. A person's first step 1 match inside <code>from</code>/<code>to</code> anchors their cohort, breakdown, and conversion window; later matches do not restart it. Other events may occur between steps, and conversions may land after <code>to</code>. For an experiment funnel, make <code>experiment.exposure</code> step 1 and pass <code>breakdown_by=variant</code>.</p>
+         */
+        _FinalStage steps(Optional<RetrieveStatsRequestSteps> steps);
+
+        _FinalStage steps(RetrieveStatsRequestSteps steps);
+
+        /**
+         * <p>Funnel only. The breakdown value to use as baseline for whole-window final conversion. Requires breakdown_by and mature_only=true; defaults confidence_level to 0.95.</p>
+         */
+        _FinalStage compareTo(Optional<String> compareTo);
+
+        _FinalStage compareTo(String compareTo);
+
+        /**
+         * <p>Funnel only. Confidence level for whole-window final conversion intervals, for example 0.95. Requires mature_only=true. Exposure steps must each filter one user- or visitor-randomized experiment.</p>
+         */
+        _FinalStage confidenceLevel(Optional<Double> confidenceLevel);
+
+        _FinalStage confidenceLevel(Double confidenceLevel);
+
+        /**
+         * <p>People metric only: contactable equals this value. Applies to the current person profile for every time bucket. LTV and AOV are in USD. Not accepted by the Events metric.</p>
+         */
+        _FinalStage contactable(Optional<Boolean> contactable);
+
+        _FinalStage contactable(Boolean contactable);
+
+        /**
+         * <p>People metric only: has_purchased equals this value. Applies to the current person profile for every time bucket. LTV and AOV are in USD. Not accepted by the Events metric.</p>
+         */
+        _FinalStage hasPurchased(Optional<Boolean> hasPurchased);
+
+        _FinalStage hasPurchased(Boolean hasPurchased);
+
+        /**
+         * <p>People metric only: first_seen_at greater than or equal this value. Applies to the current person profile for every time bucket. LTV and AOV are in USD. Not accepted by the Events metric.</p>
+         */
+        _FinalStage firstSeenAfter(Optional<OffsetDateTime> firstSeenAfter);
+
+        _FinalStage firstSeenAfter(OffsetDateTime firstSeenAfter);
+
+        /**
+         * <p>People metric only: first_seen_at less than this value. Applies to the current person profile for every time bucket. LTV and AOV are in USD. Not accepted by the Events metric.</p>
+         */
+        _FinalStage firstSeenBefore(Optional<OffsetDateTime> firstSeenBefore);
+
+        _FinalStage firstSeenBefore(OffsetDateTime firstSeenBefore);
+
+        /**
+         * <p>People metric only: last_seen_at greater than or equal this value. Applies to the current person profile for every time bucket. LTV and AOV are in USD. Not accepted by the Events metric.</p>
+         */
+        _FinalStage lastSeenAfter(Optional<OffsetDateTime> lastSeenAfter);
+
+        _FinalStage lastSeenAfter(OffsetDateTime lastSeenAfter);
+
+        /**
+         * <p>People metric only: last_seen_at less than this value. Applies to the current person profile for every time bucket. LTV and AOV are in USD. Not accepted by the Events metric.</p>
+         */
+        _FinalStage lastSeenBefore(Optional<OffsetDateTime> lastSeenBefore);
+
+        _FinalStage lastSeenBefore(OffsetDateTime lastSeenBefore);
+
+        /**
+         * <p>People metric only: first_seen_at within this many days of now. Applies to the current person profile for every time bucket. LTV and AOV are in USD. Not accepted by the Events metric.</p>
+         */
+        _FinalStage firstSeenWithinDays(Optional<Integer> firstSeenWithinDays);
+
+        _FinalStage firstSeenWithinDays(Integer firstSeenWithinDays);
+
+        /**
+         * <p>People metric only: last_seen_at within this many days of now. Applies to the current person profile for every time bucket. LTV and AOV are in USD. Not accepted by the Events metric.</p>
+         */
+        _FinalStage lastSeenWithinDays(Optional<Integer> lastSeenWithinDays);
+
+        _FinalStage lastSeenWithinDays(Integer lastSeenWithinDays);
+
+        /**
+         * <p>People metric only: known equals this value. Applies to the current person profile for every time bucket. LTV and AOV are in USD. Not accepted by the Events metric.</p>
+         */
+        _FinalStage known(Optional<Boolean> known);
+
+        _FinalStage known(Boolean known);
+
+        /**
+         * <p>People metric only: has_email equals this value. Applies to the current person profile for every time bucket. LTV and AOV are in USD. Not accepted by the Events metric.</p>
+         */
+        _FinalStage hasEmail(Optional<Boolean> hasEmail);
+
+        _FinalStage hasEmail(Boolean hasEmail);
+
+        /**
+         * <p>People metric only: has_phone equals this value. Applies to the current person profile for every time bucket. LTV and AOV are in USD. Not accepted by the Events metric.</p>
+         */
+        _FinalStage hasPhone(Optional<Boolean> hasPhone);
+
+        _FinalStage hasPhone(Boolean hasPhone);
+
+        /**
+         * <p>People metric only: ltv greater than this value. Applies to the current person profile for every time bucket. LTV and AOV are in USD. Not accepted by the Events metric.</p>
+         */
+        _FinalStage ltvGt(Optional<Double> ltvGt);
+
+        _FinalStage ltvGt(Double ltvGt);
+
+        /**
+         * <p>People metric only: ltv greater than or equal this value. Applies to the current person profile for every time bucket. LTV and AOV are in USD. Not accepted by the Events metric.</p>
+         */
+        _FinalStage ltvGte(Optional<Double> ltvGte);
+
+        _FinalStage ltvGte(Double ltvGte);
+
+        /**
+         * <p>People metric only: ltv less than this value. Applies to the current person profile for every time bucket. LTV and AOV are in USD. Not accepted by the Events metric.</p>
+         */
+        _FinalStage ltvLt(Optional<Double> ltvLt);
+
+        _FinalStage ltvLt(Double ltvLt);
+
+        /**
+         * <p>People metric only: ltv less than or equal this value. Applies to the current person profile for every time bucket. LTV and AOV are in USD. Not accepted by the Events metric.</p>
+         */
+        _FinalStage ltvLte(Optional<Double> ltvLte);
+
+        _FinalStage ltvLte(Double ltvLte);
+
+        /**
+         * <p>People metric only: aov greater than this value. Applies to the current person profile for every time bucket. LTV and AOV are in USD. Not accepted by the Events metric.</p>
+         */
+        _FinalStage aovGt(Optional<Double> aovGt);
+
+        _FinalStage aovGt(Double aovGt);
+
+        /**
+         * <p>People metric only: aov greater than or equal this value. Applies to the current person profile for every time bucket. LTV and AOV are in USD. Not accepted by the Events metric.</p>
+         */
+        _FinalStage aovGte(Optional<Double> aovGte);
+
+        _FinalStage aovGte(Double aovGte);
+
+        /**
+         * <p>People metric only: aov less than this value. Applies to the current person profile for every time bucket. LTV and AOV are in USD. Not accepted by the Events metric.</p>
+         */
+        _FinalStage aovLt(Optional<Double> aovLt);
+
+        _FinalStage aovLt(Double aovLt);
+
+        /**
+         * <p>People metric only: aov less than or equal this value. Applies to the current person profile for every time bucket. LTV and AOV are in USD. Not accepted by the Events metric.</p>
+         */
+        _FinalStage aovLte(Optional<Double> aovLte);
+
+        _FinalStage aovLte(Double aovLte);
+
+        /**
+         * <p>People metric only: purchase_count greater than this value. Applies to the current person profile for every time bucket. LTV and AOV are in USD. Not accepted by the Events metric.</p>
+         */
+        _FinalStage purchaseCountGt(Optional<Double> purchaseCountGt);
+
+        _FinalStage purchaseCountGt(Double purchaseCountGt);
+
+        /**
+         * <p>People metric only: purchase_count greater than or equal this value. Applies to the current person profile for every time bucket. LTV and AOV are in USD. Not accepted by the Events metric.</p>
+         */
+        _FinalStage purchaseCountGte(Optional<Double> purchaseCountGte);
+
+        _FinalStage purchaseCountGte(Double purchaseCountGte);
+
+        /**
+         * <p>People metric only: purchase_count less than this value. Applies to the current person profile for every time bucket. LTV and AOV are in USD. Not accepted by the Events metric.</p>
+         */
+        _FinalStage purchaseCountLt(Optional<Double> purchaseCountLt);
+
+        _FinalStage purchaseCountLt(Double purchaseCountLt);
+
+        /**
+         * <p>People metric only: purchase_count less than or equal this value. Applies to the current person profile for every time bucket. LTV and AOV are in USD. Not accepted by the Events metric.</p>
+         */
+        _FinalStage purchaseCountLte(Optional<Double> purchaseCountLte);
+
+        _FinalStage purchaseCountLte(Double purchaseCountLte);
+
+        /**
+         * <p>People metric only: event_count greater than this value. Applies to the current person profile for every time bucket. LTV and AOV are in USD. Not accepted by the Events metric.</p>
+         */
+        _FinalStage eventCountGt(Optional<Double> eventCountGt);
+
+        _FinalStage eventCountGt(Double eventCountGt);
+
+        /**
+         * <p>People metric only: event_count greater than or equal this value. Applies to the current person profile for every time bucket. LTV and AOV are in USD. Not accepted by the Events metric.</p>
+         */
+        _FinalStage eventCountGte(Optional<Double> eventCountGte);
+
+        _FinalStage eventCountGte(Double eventCountGte);
+
+        /**
+         * <p>People metric only: event_count less than this value. Applies to the current person profile for every time bucket. LTV and AOV are in USD. Not accepted by the Events metric.</p>
+         */
+        _FinalStage eventCountLt(Optional<Double> eventCountLt);
+
+        _FinalStage eventCountLt(Double eventCountLt);
+
+        /**
+         * <p>People metric only: event_count less than or equal this value. Applies to the current person profile for every time bucket. LTV and AOV are in USD. Not accepted by the Events metric.</p>
+         */
+        _FinalStage eventCountLte(Optional<Double> eventCountLte);
+
+        _FinalStage eventCountLte(Double eventCountLte);
+
+        /**
+         * <p>Read a referral metric for a business instead of the caller: the referrals its team members made, past members included, for example biz_AbC123. Requires company:basic:read on that business and cannot be combined with user_id. Available on metrics that list referring_account_id.</p>
+         */
+        _FinalStage referringAccountId(Optional<String> referringAccountId);
+
+        _FinalStage referringAccountId(String referringAccountId);
+
+        /**
+         * <p>Read a partner metric for one team lead and everyone under them in today's org chart, for example user_AbC123. Needs referring_account_id or a global query. As breakdown_by=team_lead_id, figures sit under the highest lead above the partner who earned them, so each group matches that lead's team_lead_id filter and the groups add up to the total. With team_lead_id set, or for a caller who reads only their own team, the groups are the leads under that person, who keeps the rest. Anyone with no lead is in a null group. Available on metrics that list team_lead_id.</p>
+         */
+        _FinalStage teamLeadId(Optional<String> teamLeadId);
+
+        _FinalStage teamLeadId(String teamLeadId);
+
+        /**
+         * <p>On partner_reps, all counts the period's roster, earning counts those who earned in the period, and not_earning counts the roster minus them. On the other partner metrics, earning keeps the figures of the people partner_reps counts as earning over the whole range and not_earning keeps the figures of everyone else; those need referring_account_id or a global query. Defaults to all. Available on metrics that list activity.</p>
+         */
+        _FinalStage activity(Optional<RetrieveStatsRequestActivity> activity);
+
+        _FinalStage activity(RetrieveStatsRequestActivity activity);
+
+        /**
+         * <p>With a single breakdown_by, keep the groups with the highest whole-range values, up to this many, and fold every other group into one entry named other. A rate or an average ranks its groups by the deals it divides by. The other entry is measured from the underlying rows, so a distinct count or a rate stays exact rather than being added up from groups. Available on partner metrics only.</p>
+         */
+        _FinalStage breakdownLimit(Optional<Integer> breakdownLimit);
+
+        _FinalStage breakdownLimit(Integer breakdownLimit);
     }
 
     @JsonIgnoreProperties(ignoreUnknown = true)
@@ -796,6 +1681,90 @@ public final class RetrieveStatsRequest {
         private String from;
 
         private String to;
+
+        private Optional<Integer> breakdownLimit = Optional.empty();
+
+        private Optional<RetrieveStatsRequestActivity> activity = Optional.empty();
+
+        private Optional<String> teamLeadId = Optional.empty();
+
+        private Optional<String> referringAccountId = Optional.empty();
+
+        private Optional<Double> eventCountLte = Optional.empty();
+
+        private Optional<Double> eventCountLt = Optional.empty();
+
+        private Optional<Double> eventCountGte = Optional.empty();
+
+        private Optional<Double> eventCountGt = Optional.empty();
+
+        private Optional<Double> purchaseCountLte = Optional.empty();
+
+        private Optional<Double> purchaseCountLt = Optional.empty();
+
+        private Optional<Double> purchaseCountGte = Optional.empty();
+
+        private Optional<Double> purchaseCountGt = Optional.empty();
+
+        private Optional<Double> aovLte = Optional.empty();
+
+        private Optional<Double> aovLt = Optional.empty();
+
+        private Optional<Double> aovGte = Optional.empty();
+
+        private Optional<Double> aovGt = Optional.empty();
+
+        private Optional<Double> ltvLte = Optional.empty();
+
+        private Optional<Double> ltvLt = Optional.empty();
+
+        private Optional<Double> ltvGte = Optional.empty();
+
+        private Optional<Double> ltvGt = Optional.empty();
+
+        private Optional<Boolean> hasPhone = Optional.empty();
+
+        private Optional<Boolean> hasEmail = Optional.empty();
+
+        private Optional<Boolean> known = Optional.empty();
+
+        private Optional<Integer> lastSeenWithinDays = Optional.empty();
+
+        private Optional<Integer> firstSeenWithinDays = Optional.empty();
+
+        private Optional<OffsetDateTime> lastSeenBefore = Optional.empty();
+
+        private Optional<OffsetDateTime> lastSeenAfter = Optional.empty();
+
+        private Optional<OffsetDateTime> firstSeenBefore = Optional.empty();
+
+        private Optional<OffsetDateTime> firstSeenAfter = Optional.empty();
+
+        private Optional<Boolean> hasPurchased = Optional.empty();
+
+        private Optional<Boolean> contactable = Optional.empty();
+
+        private Optional<Double> confidenceLevel = Optional.empty();
+
+        private Optional<String> compareTo = Optional.empty();
+
+        private Optional<RetrieveStatsRequestSteps> steps = Optional.empty();
+
+        private Optional<Boolean> matureOnly = Optional.empty();
+
+        private Optional<String> conversionWindow = Optional.empty();
+
+        private Optional<String> webhookId = Optional.empty();
+
+        private Optional<String> issuer = Optional.empty();
+
+        private Optional<String> accountCountry = Optional.empty();
+
+        private Optional<String> productCategory = Optional.empty();
+
+        private Optional<String> industryType = Optional.empty();
+
+        private Optional<String> businessType = Optional.empty();
 
         private Optional<String> event = Optional.empty();
 
@@ -861,7 +1830,6 @@ public final class RetrieveStatsRequest {
 
         private Optional<List<String>> adCampaignIds = Optional.empty();
 
-        @JsonAnySetter
         private Map<String, Object> additionalProperties = new HashMap<>();
 
         private Builder() {}
@@ -902,11 +1870,52 @@ public final class RetrieveStatsRequest {
             referredUserId(other.getReferredUserId());
             snapshotWindow(other.getSnapshotWindow());
             event(other.getEvent());
+            businessType(other.getBusinessType());
+            industryType(other.getIndustryType());
+            productCategory(other.getProductCategory());
+            accountCountry(other.getAccountCountry());
+            issuer(other.getIssuer());
+            webhookId(other.getWebhookId());
+            conversionWindow(other.getConversionWindow());
+            matureOnly(other.getMatureOnly());
+            steps(other.getSteps());
+            compareTo(other.getCompareTo());
+            confidenceLevel(other.getConfidenceLevel());
+            contactable(other.getContactable());
+            hasPurchased(other.getHasPurchased());
+            firstSeenAfter(other.getFirstSeenAfter());
+            firstSeenBefore(other.getFirstSeenBefore());
+            lastSeenAfter(other.getLastSeenAfter());
+            lastSeenBefore(other.getLastSeenBefore());
+            firstSeenWithinDays(other.getFirstSeenWithinDays());
+            lastSeenWithinDays(other.getLastSeenWithinDays());
+            known(other.getKnown());
+            hasEmail(other.getHasEmail());
+            hasPhone(other.getHasPhone());
+            ltvGt(other.getLtvGt());
+            ltvGte(other.getLtvGte());
+            ltvLt(other.getLtvLt());
+            ltvLte(other.getLtvLte());
+            aovGt(other.getAovGt());
+            aovGte(other.getAovGte());
+            aovLt(other.getAovLt());
+            aovLte(other.getAovLte());
+            purchaseCountGt(other.getPurchaseCountGt());
+            purchaseCountGte(other.getPurchaseCountGte());
+            purchaseCountLt(other.getPurchaseCountLt());
+            purchaseCountLte(other.getPurchaseCountLte());
+            eventCountGt(other.getEventCountGt());
+            eventCountGte(other.getEventCountGte());
+            eventCountLt(other.getEventCountLt());
+            eventCountLte(other.getEventCountLte());
+            referringAccountId(other.getReferringAccountId());
+            teamLeadId(other.getTeamLeadId());
+            activity(other.getActivity());
+            breakdownLimit(other.getBreakdownLimit());
             return this;
         }
 
         /**
-         * <p>Start of the range — a date (YYYY-MM-DD), expanded to the start of that day, or an ISO 8601 timestamp (for example 2026-07-16T16:37:00Z), used exactly.</p>
          * <p>Start of the range — a date (YYYY-MM-DD), expanded to the start of that day, or an ISO 8601 timestamp (for example 2026-07-16T16:37:00Z), used exactly.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
@@ -918,8 +1927,7 @@ public final class RetrieveStatsRequest {
         }
 
         /**
-         * <p>End of the range — a date (YYYY-MM-DD), expanded to the end of that day, or an ISO 8601 timestamp (for example 2026-07-17T16:37:00Z), used exactly.</p>
-         * <p>End of the range — a date (YYYY-MM-DD), expanded to the end of that day, or an ISO 8601 timestamp (for example 2026-07-17T16:37:00Z), used exactly.</p>
+         * <p>End of the range — a date (YYYY-MM-DD), expanded to the end of that day, or an ISO 8601 timestamp (for example 2026-07-17T16:37:00Z), used exactly. Funnel entry ranges cannot exceed 90 days.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
@@ -930,7 +1938,847 @@ public final class RetrieveStatsRequest {
         }
 
         /**
-         * <p>Filter the events metric to one or more full event names, for example payment.completed or pixel.lead. Comma-separate several to break the metric down by each event. Available on metrics that list event.</p>
+         * <p>With a single breakdown_by, keep the groups with the highest whole-range values, up to this many, and fold every other group into one entry named other. A rate or an average ranks its groups by the deals it divides by. The other entry is measured from the underlying rows, so a distinct count or a rate stays exact rather than being added up from groups. Available on partner metrics only.</p>
+         * @return Reference to {@code this} so that method calls can be chained together.
+         */
+        @java.lang.Override
+        public _FinalStage breakdownLimit(Integer breakdownLimit) {
+            this.breakdownLimit = Optional.ofNullable(breakdownLimit);
+            return this;
+        }
+
+        /**
+         * <p>With a single breakdown_by, keep the groups with the highest whole-range values, up to this many, and fold every other group into one entry named other. A rate or an average ranks its groups by the deals it divides by. The other entry is measured from the underlying rows, so a distinct count or a rate stays exact rather than being added up from groups. Available on partner metrics only.</p>
+         */
+        @java.lang.Override
+        @JsonSetter(value = "breakdown_limit", nulls = Nulls.SKIP)
+        public _FinalStage breakdownLimit(Optional<Integer> breakdownLimit) {
+            this.breakdownLimit = breakdownLimit;
+            return this;
+        }
+
+        /**
+         * <p>On partner_reps, all counts the period's roster, earning counts those who earned in the period, and not_earning counts the roster minus them. On the other partner metrics, earning keeps the figures of the people partner_reps counts as earning over the whole range and not_earning keeps the figures of everyone else; those need referring_account_id or a global query. Defaults to all. Available on metrics that list activity.</p>
+         * @return Reference to {@code this} so that method calls can be chained together.
+         */
+        @java.lang.Override
+        public _FinalStage activity(RetrieveStatsRequestActivity activity) {
+            this.activity = Optional.ofNullable(activity);
+            return this;
+        }
+
+        /**
+         * <p>On partner_reps, all counts the period's roster, earning counts those who earned in the period, and not_earning counts the roster minus them. On the other partner metrics, earning keeps the figures of the people partner_reps counts as earning over the whole range and not_earning keeps the figures of everyone else; those need referring_account_id or a global query. Defaults to all. Available on metrics that list activity.</p>
+         */
+        @java.lang.Override
+        @JsonSetter(value = "activity", nulls = Nulls.SKIP)
+        public _FinalStage activity(Optional<RetrieveStatsRequestActivity> activity) {
+            this.activity = activity;
+            return this;
+        }
+
+        /**
+         * <p>Read a partner metric for one team lead and everyone under them in today's org chart, for example user_AbC123. Needs referring_account_id or a global query. As breakdown_by=team_lead_id, figures sit under the highest lead above the partner who earned them, so each group matches that lead's team_lead_id filter and the groups add up to the total. With team_lead_id set, or for a caller who reads only their own team, the groups are the leads under that person, who keeps the rest. Anyone with no lead is in a null group. Available on metrics that list team_lead_id.</p>
+         * @return Reference to {@code this} so that method calls can be chained together.
+         */
+        @java.lang.Override
+        public _FinalStage teamLeadId(String teamLeadId) {
+            this.teamLeadId = Optional.ofNullable(teamLeadId);
+            return this;
+        }
+
+        /**
+         * <p>Read a partner metric for one team lead and everyone under them in today's org chart, for example user_AbC123. Needs referring_account_id or a global query. As breakdown_by=team_lead_id, figures sit under the highest lead above the partner who earned them, so each group matches that lead's team_lead_id filter and the groups add up to the total. With team_lead_id set, or for a caller who reads only their own team, the groups are the leads under that person, who keeps the rest. Anyone with no lead is in a null group. Available on metrics that list team_lead_id.</p>
+         */
+        @java.lang.Override
+        @JsonSetter(value = "team_lead_id", nulls = Nulls.SKIP)
+        public _FinalStage teamLeadId(Optional<String> teamLeadId) {
+            this.teamLeadId = teamLeadId;
+            return this;
+        }
+
+        /**
+         * <p>Read a referral metric for a business instead of the caller: the referrals its team members made, past members included, for example biz_AbC123. Requires company:basic:read on that business and cannot be combined with user_id. Available on metrics that list referring_account_id.</p>
+         * @return Reference to {@code this} so that method calls can be chained together.
+         */
+        @java.lang.Override
+        public _FinalStage referringAccountId(String referringAccountId) {
+            this.referringAccountId = Optional.ofNullable(referringAccountId);
+            return this;
+        }
+
+        /**
+         * <p>Read a referral metric for a business instead of the caller: the referrals its team members made, past members included, for example biz_AbC123. Requires company:basic:read on that business and cannot be combined with user_id. Available on metrics that list referring_account_id.</p>
+         */
+        @java.lang.Override
+        @JsonSetter(value = "referring_account_id", nulls = Nulls.SKIP)
+        public _FinalStage referringAccountId(Optional<String> referringAccountId) {
+            this.referringAccountId = referringAccountId;
+            return this;
+        }
+
+        /**
+         * <p>People metric only: event_count less than or equal this value. Applies to the current person profile for every time bucket. LTV and AOV are in USD. Not accepted by the Events metric.</p>
+         * @return Reference to {@code this} so that method calls can be chained together.
+         */
+        @java.lang.Override
+        public _FinalStage eventCountLte(Double eventCountLte) {
+            this.eventCountLte = Optional.ofNullable(eventCountLte);
+            return this;
+        }
+
+        /**
+         * <p>People metric only: event_count less than or equal this value. Applies to the current person profile for every time bucket. LTV and AOV are in USD. Not accepted by the Events metric.</p>
+         */
+        @java.lang.Override
+        @JsonSetter(value = "event_count_lte", nulls = Nulls.SKIP)
+        public _FinalStage eventCountLte(Optional<Double> eventCountLte) {
+            this.eventCountLte = eventCountLte;
+            return this;
+        }
+
+        /**
+         * <p>People metric only: event_count less than this value. Applies to the current person profile for every time bucket. LTV and AOV are in USD. Not accepted by the Events metric.</p>
+         * @return Reference to {@code this} so that method calls can be chained together.
+         */
+        @java.lang.Override
+        public _FinalStage eventCountLt(Double eventCountLt) {
+            this.eventCountLt = Optional.ofNullable(eventCountLt);
+            return this;
+        }
+
+        /**
+         * <p>People metric only: event_count less than this value. Applies to the current person profile for every time bucket. LTV and AOV are in USD. Not accepted by the Events metric.</p>
+         */
+        @java.lang.Override
+        @JsonSetter(value = "event_count_lt", nulls = Nulls.SKIP)
+        public _FinalStage eventCountLt(Optional<Double> eventCountLt) {
+            this.eventCountLt = eventCountLt;
+            return this;
+        }
+
+        /**
+         * <p>People metric only: event_count greater than or equal this value. Applies to the current person profile for every time bucket. LTV and AOV are in USD. Not accepted by the Events metric.</p>
+         * @return Reference to {@code this} so that method calls can be chained together.
+         */
+        @java.lang.Override
+        public _FinalStage eventCountGte(Double eventCountGte) {
+            this.eventCountGte = Optional.ofNullable(eventCountGte);
+            return this;
+        }
+
+        /**
+         * <p>People metric only: event_count greater than or equal this value. Applies to the current person profile for every time bucket. LTV and AOV are in USD. Not accepted by the Events metric.</p>
+         */
+        @java.lang.Override
+        @JsonSetter(value = "event_count_gte", nulls = Nulls.SKIP)
+        public _FinalStage eventCountGte(Optional<Double> eventCountGte) {
+            this.eventCountGte = eventCountGte;
+            return this;
+        }
+
+        /**
+         * <p>People metric only: event_count greater than this value. Applies to the current person profile for every time bucket. LTV and AOV are in USD. Not accepted by the Events metric.</p>
+         * @return Reference to {@code this} so that method calls can be chained together.
+         */
+        @java.lang.Override
+        public _FinalStage eventCountGt(Double eventCountGt) {
+            this.eventCountGt = Optional.ofNullable(eventCountGt);
+            return this;
+        }
+
+        /**
+         * <p>People metric only: event_count greater than this value. Applies to the current person profile for every time bucket. LTV and AOV are in USD. Not accepted by the Events metric.</p>
+         */
+        @java.lang.Override
+        @JsonSetter(value = "event_count_gt", nulls = Nulls.SKIP)
+        public _FinalStage eventCountGt(Optional<Double> eventCountGt) {
+            this.eventCountGt = eventCountGt;
+            return this;
+        }
+
+        /**
+         * <p>People metric only: purchase_count less than or equal this value. Applies to the current person profile for every time bucket. LTV and AOV are in USD. Not accepted by the Events metric.</p>
+         * @return Reference to {@code this} so that method calls can be chained together.
+         */
+        @java.lang.Override
+        public _FinalStage purchaseCountLte(Double purchaseCountLte) {
+            this.purchaseCountLte = Optional.ofNullable(purchaseCountLte);
+            return this;
+        }
+
+        /**
+         * <p>People metric only: purchase_count less than or equal this value. Applies to the current person profile for every time bucket. LTV and AOV are in USD. Not accepted by the Events metric.</p>
+         */
+        @java.lang.Override
+        @JsonSetter(value = "purchase_count_lte", nulls = Nulls.SKIP)
+        public _FinalStage purchaseCountLte(Optional<Double> purchaseCountLte) {
+            this.purchaseCountLte = purchaseCountLte;
+            return this;
+        }
+
+        /**
+         * <p>People metric only: purchase_count less than this value. Applies to the current person profile for every time bucket. LTV and AOV are in USD. Not accepted by the Events metric.</p>
+         * @return Reference to {@code this} so that method calls can be chained together.
+         */
+        @java.lang.Override
+        public _FinalStage purchaseCountLt(Double purchaseCountLt) {
+            this.purchaseCountLt = Optional.ofNullable(purchaseCountLt);
+            return this;
+        }
+
+        /**
+         * <p>People metric only: purchase_count less than this value. Applies to the current person profile for every time bucket. LTV and AOV are in USD. Not accepted by the Events metric.</p>
+         */
+        @java.lang.Override
+        @JsonSetter(value = "purchase_count_lt", nulls = Nulls.SKIP)
+        public _FinalStage purchaseCountLt(Optional<Double> purchaseCountLt) {
+            this.purchaseCountLt = purchaseCountLt;
+            return this;
+        }
+
+        /**
+         * <p>People metric only: purchase_count greater than or equal this value. Applies to the current person profile for every time bucket. LTV and AOV are in USD. Not accepted by the Events metric.</p>
+         * @return Reference to {@code this} so that method calls can be chained together.
+         */
+        @java.lang.Override
+        public _FinalStage purchaseCountGte(Double purchaseCountGte) {
+            this.purchaseCountGte = Optional.ofNullable(purchaseCountGte);
+            return this;
+        }
+
+        /**
+         * <p>People metric only: purchase_count greater than or equal this value. Applies to the current person profile for every time bucket. LTV and AOV are in USD. Not accepted by the Events metric.</p>
+         */
+        @java.lang.Override
+        @JsonSetter(value = "purchase_count_gte", nulls = Nulls.SKIP)
+        public _FinalStage purchaseCountGte(Optional<Double> purchaseCountGte) {
+            this.purchaseCountGte = purchaseCountGte;
+            return this;
+        }
+
+        /**
+         * <p>People metric only: purchase_count greater than this value. Applies to the current person profile for every time bucket. LTV and AOV are in USD. Not accepted by the Events metric.</p>
+         * @return Reference to {@code this} so that method calls can be chained together.
+         */
+        @java.lang.Override
+        public _FinalStage purchaseCountGt(Double purchaseCountGt) {
+            this.purchaseCountGt = Optional.ofNullable(purchaseCountGt);
+            return this;
+        }
+
+        /**
+         * <p>People metric only: purchase_count greater than this value. Applies to the current person profile for every time bucket. LTV and AOV are in USD. Not accepted by the Events metric.</p>
+         */
+        @java.lang.Override
+        @JsonSetter(value = "purchase_count_gt", nulls = Nulls.SKIP)
+        public _FinalStage purchaseCountGt(Optional<Double> purchaseCountGt) {
+            this.purchaseCountGt = purchaseCountGt;
+            return this;
+        }
+
+        /**
+         * <p>People metric only: aov less than or equal this value. Applies to the current person profile for every time bucket. LTV and AOV are in USD. Not accepted by the Events metric.</p>
+         * @return Reference to {@code this} so that method calls can be chained together.
+         */
+        @java.lang.Override
+        public _FinalStage aovLte(Double aovLte) {
+            this.aovLte = Optional.ofNullable(aovLte);
+            return this;
+        }
+
+        /**
+         * <p>People metric only: aov less than or equal this value. Applies to the current person profile for every time bucket. LTV and AOV are in USD. Not accepted by the Events metric.</p>
+         */
+        @java.lang.Override
+        @JsonSetter(value = "aov_lte", nulls = Nulls.SKIP)
+        public _FinalStage aovLte(Optional<Double> aovLte) {
+            this.aovLte = aovLte;
+            return this;
+        }
+
+        /**
+         * <p>People metric only: aov less than this value. Applies to the current person profile for every time bucket. LTV and AOV are in USD. Not accepted by the Events metric.</p>
+         * @return Reference to {@code this} so that method calls can be chained together.
+         */
+        @java.lang.Override
+        public _FinalStage aovLt(Double aovLt) {
+            this.aovLt = Optional.ofNullable(aovLt);
+            return this;
+        }
+
+        /**
+         * <p>People metric only: aov less than this value. Applies to the current person profile for every time bucket. LTV and AOV are in USD. Not accepted by the Events metric.</p>
+         */
+        @java.lang.Override
+        @JsonSetter(value = "aov_lt", nulls = Nulls.SKIP)
+        public _FinalStage aovLt(Optional<Double> aovLt) {
+            this.aovLt = aovLt;
+            return this;
+        }
+
+        /**
+         * <p>People metric only: aov greater than or equal this value. Applies to the current person profile for every time bucket. LTV and AOV are in USD. Not accepted by the Events metric.</p>
+         * @return Reference to {@code this} so that method calls can be chained together.
+         */
+        @java.lang.Override
+        public _FinalStage aovGte(Double aovGte) {
+            this.aovGte = Optional.ofNullable(aovGte);
+            return this;
+        }
+
+        /**
+         * <p>People metric only: aov greater than or equal this value. Applies to the current person profile for every time bucket. LTV and AOV are in USD. Not accepted by the Events metric.</p>
+         */
+        @java.lang.Override
+        @JsonSetter(value = "aov_gte", nulls = Nulls.SKIP)
+        public _FinalStage aovGte(Optional<Double> aovGte) {
+            this.aovGte = aovGte;
+            return this;
+        }
+
+        /**
+         * <p>People metric only: aov greater than this value. Applies to the current person profile for every time bucket. LTV and AOV are in USD. Not accepted by the Events metric.</p>
+         * @return Reference to {@code this} so that method calls can be chained together.
+         */
+        @java.lang.Override
+        public _FinalStage aovGt(Double aovGt) {
+            this.aovGt = Optional.ofNullable(aovGt);
+            return this;
+        }
+
+        /**
+         * <p>People metric only: aov greater than this value. Applies to the current person profile for every time bucket. LTV and AOV are in USD. Not accepted by the Events metric.</p>
+         */
+        @java.lang.Override
+        @JsonSetter(value = "aov_gt", nulls = Nulls.SKIP)
+        public _FinalStage aovGt(Optional<Double> aovGt) {
+            this.aovGt = aovGt;
+            return this;
+        }
+
+        /**
+         * <p>People metric only: ltv less than or equal this value. Applies to the current person profile for every time bucket. LTV and AOV are in USD. Not accepted by the Events metric.</p>
+         * @return Reference to {@code this} so that method calls can be chained together.
+         */
+        @java.lang.Override
+        public _FinalStage ltvLte(Double ltvLte) {
+            this.ltvLte = Optional.ofNullable(ltvLte);
+            return this;
+        }
+
+        /**
+         * <p>People metric only: ltv less than or equal this value. Applies to the current person profile for every time bucket. LTV and AOV are in USD. Not accepted by the Events metric.</p>
+         */
+        @java.lang.Override
+        @JsonSetter(value = "ltv_lte", nulls = Nulls.SKIP)
+        public _FinalStage ltvLte(Optional<Double> ltvLte) {
+            this.ltvLte = ltvLte;
+            return this;
+        }
+
+        /**
+         * <p>People metric only: ltv less than this value. Applies to the current person profile for every time bucket. LTV and AOV are in USD. Not accepted by the Events metric.</p>
+         * @return Reference to {@code this} so that method calls can be chained together.
+         */
+        @java.lang.Override
+        public _FinalStage ltvLt(Double ltvLt) {
+            this.ltvLt = Optional.ofNullable(ltvLt);
+            return this;
+        }
+
+        /**
+         * <p>People metric only: ltv less than this value. Applies to the current person profile for every time bucket. LTV and AOV are in USD. Not accepted by the Events metric.</p>
+         */
+        @java.lang.Override
+        @JsonSetter(value = "ltv_lt", nulls = Nulls.SKIP)
+        public _FinalStage ltvLt(Optional<Double> ltvLt) {
+            this.ltvLt = ltvLt;
+            return this;
+        }
+
+        /**
+         * <p>People metric only: ltv greater than or equal this value. Applies to the current person profile for every time bucket. LTV and AOV are in USD. Not accepted by the Events metric.</p>
+         * @return Reference to {@code this} so that method calls can be chained together.
+         */
+        @java.lang.Override
+        public _FinalStage ltvGte(Double ltvGte) {
+            this.ltvGte = Optional.ofNullable(ltvGte);
+            return this;
+        }
+
+        /**
+         * <p>People metric only: ltv greater than or equal this value. Applies to the current person profile for every time bucket. LTV and AOV are in USD. Not accepted by the Events metric.</p>
+         */
+        @java.lang.Override
+        @JsonSetter(value = "ltv_gte", nulls = Nulls.SKIP)
+        public _FinalStage ltvGte(Optional<Double> ltvGte) {
+            this.ltvGte = ltvGte;
+            return this;
+        }
+
+        /**
+         * <p>People metric only: ltv greater than this value. Applies to the current person profile for every time bucket. LTV and AOV are in USD. Not accepted by the Events metric.</p>
+         * @return Reference to {@code this} so that method calls can be chained together.
+         */
+        @java.lang.Override
+        public _FinalStage ltvGt(Double ltvGt) {
+            this.ltvGt = Optional.ofNullable(ltvGt);
+            return this;
+        }
+
+        /**
+         * <p>People metric only: ltv greater than this value. Applies to the current person profile for every time bucket. LTV and AOV are in USD. Not accepted by the Events metric.</p>
+         */
+        @java.lang.Override
+        @JsonSetter(value = "ltv_gt", nulls = Nulls.SKIP)
+        public _FinalStage ltvGt(Optional<Double> ltvGt) {
+            this.ltvGt = ltvGt;
+            return this;
+        }
+
+        /**
+         * <p>People metric only: has_phone equals this value. Applies to the current person profile for every time bucket. LTV and AOV are in USD. Not accepted by the Events metric.</p>
+         * @return Reference to {@code this} so that method calls can be chained together.
+         */
+        @java.lang.Override
+        public _FinalStage hasPhone(Boolean hasPhone) {
+            this.hasPhone = Optional.ofNullable(hasPhone);
+            return this;
+        }
+
+        /**
+         * <p>People metric only: has_phone equals this value. Applies to the current person profile for every time bucket. LTV and AOV are in USD. Not accepted by the Events metric.</p>
+         */
+        @java.lang.Override
+        @JsonSetter(value = "has_phone", nulls = Nulls.SKIP)
+        public _FinalStage hasPhone(Optional<Boolean> hasPhone) {
+            this.hasPhone = hasPhone;
+            return this;
+        }
+
+        /**
+         * <p>People metric only: has_email equals this value. Applies to the current person profile for every time bucket. LTV and AOV are in USD. Not accepted by the Events metric.</p>
+         * @return Reference to {@code this} so that method calls can be chained together.
+         */
+        @java.lang.Override
+        public _FinalStage hasEmail(Boolean hasEmail) {
+            this.hasEmail = Optional.ofNullable(hasEmail);
+            return this;
+        }
+
+        /**
+         * <p>People metric only: has_email equals this value. Applies to the current person profile for every time bucket. LTV and AOV are in USD. Not accepted by the Events metric.</p>
+         */
+        @java.lang.Override
+        @JsonSetter(value = "has_email", nulls = Nulls.SKIP)
+        public _FinalStage hasEmail(Optional<Boolean> hasEmail) {
+            this.hasEmail = hasEmail;
+            return this;
+        }
+
+        /**
+         * <p>People metric only: known equals this value. Applies to the current person profile for every time bucket. LTV and AOV are in USD. Not accepted by the Events metric.</p>
+         * @return Reference to {@code this} so that method calls can be chained together.
+         */
+        @java.lang.Override
+        public _FinalStage known(Boolean known) {
+            this.known = Optional.ofNullable(known);
+            return this;
+        }
+
+        /**
+         * <p>People metric only: known equals this value. Applies to the current person profile for every time bucket. LTV and AOV are in USD. Not accepted by the Events metric.</p>
+         */
+        @java.lang.Override
+        @JsonSetter(value = "known", nulls = Nulls.SKIP)
+        public _FinalStage known(Optional<Boolean> known) {
+            this.known = known;
+            return this;
+        }
+
+        /**
+         * <p>People metric only: last_seen_at within this many days of now. Applies to the current person profile for every time bucket. LTV and AOV are in USD. Not accepted by the Events metric.</p>
+         * @return Reference to {@code this} so that method calls can be chained together.
+         */
+        @java.lang.Override
+        public _FinalStage lastSeenWithinDays(Integer lastSeenWithinDays) {
+            this.lastSeenWithinDays = Optional.ofNullable(lastSeenWithinDays);
+            return this;
+        }
+
+        /**
+         * <p>People metric only: last_seen_at within this many days of now. Applies to the current person profile for every time bucket. LTV and AOV are in USD. Not accepted by the Events metric.</p>
+         */
+        @java.lang.Override
+        @JsonSetter(value = "last_seen_within_days", nulls = Nulls.SKIP)
+        public _FinalStage lastSeenWithinDays(Optional<Integer> lastSeenWithinDays) {
+            this.lastSeenWithinDays = lastSeenWithinDays;
+            return this;
+        }
+
+        /**
+         * <p>People metric only: first_seen_at within this many days of now. Applies to the current person profile for every time bucket. LTV and AOV are in USD. Not accepted by the Events metric.</p>
+         * @return Reference to {@code this} so that method calls can be chained together.
+         */
+        @java.lang.Override
+        public _FinalStage firstSeenWithinDays(Integer firstSeenWithinDays) {
+            this.firstSeenWithinDays = Optional.ofNullable(firstSeenWithinDays);
+            return this;
+        }
+
+        /**
+         * <p>People metric only: first_seen_at within this many days of now. Applies to the current person profile for every time bucket. LTV and AOV are in USD. Not accepted by the Events metric.</p>
+         */
+        @java.lang.Override
+        @JsonSetter(value = "first_seen_within_days", nulls = Nulls.SKIP)
+        public _FinalStage firstSeenWithinDays(Optional<Integer> firstSeenWithinDays) {
+            this.firstSeenWithinDays = firstSeenWithinDays;
+            return this;
+        }
+
+        /**
+         * <p>People metric only: last_seen_at less than this value. Applies to the current person profile for every time bucket. LTV and AOV are in USD. Not accepted by the Events metric.</p>
+         * @return Reference to {@code this} so that method calls can be chained together.
+         */
+        @java.lang.Override
+        public _FinalStage lastSeenBefore(OffsetDateTime lastSeenBefore) {
+            this.lastSeenBefore = Optional.ofNullable(lastSeenBefore);
+            return this;
+        }
+
+        /**
+         * <p>People metric only: last_seen_at less than this value. Applies to the current person profile for every time bucket. LTV and AOV are in USD. Not accepted by the Events metric.</p>
+         */
+        @java.lang.Override
+        @JsonSetter(value = "last_seen_before", nulls = Nulls.SKIP)
+        public _FinalStage lastSeenBefore(Optional<OffsetDateTime> lastSeenBefore) {
+            this.lastSeenBefore = lastSeenBefore;
+            return this;
+        }
+
+        /**
+         * <p>People metric only: last_seen_at greater than or equal this value. Applies to the current person profile for every time bucket. LTV and AOV are in USD. Not accepted by the Events metric.</p>
+         * @return Reference to {@code this} so that method calls can be chained together.
+         */
+        @java.lang.Override
+        public _FinalStage lastSeenAfter(OffsetDateTime lastSeenAfter) {
+            this.lastSeenAfter = Optional.ofNullable(lastSeenAfter);
+            return this;
+        }
+
+        /**
+         * <p>People metric only: last_seen_at greater than or equal this value. Applies to the current person profile for every time bucket. LTV and AOV are in USD. Not accepted by the Events metric.</p>
+         */
+        @java.lang.Override
+        @JsonSetter(value = "last_seen_after", nulls = Nulls.SKIP)
+        public _FinalStage lastSeenAfter(Optional<OffsetDateTime> lastSeenAfter) {
+            this.lastSeenAfter = lastSeenAfter;
+            return this;
+        }
+
+        /**
+         * <p>People metric only: first_seen_at less than this value. Applies to the current person profile for every time bucket. LTV and AOV are in USD. Not accepted by the Events metric.</p>
+         * @return Reference to {@code this} so that method calls can be chained together.
+         */
+        @java.lang.Override
+        public _FinalStage firstSeenBefore(OffsetDateTime firstSeenBefore) {
+            this.firstSeenBefore = Optional.ofNullable(firstSeenBefore);
+            return this;
+        }
+
+        /**
+         * <p>People metric only: first_seen_at less than this value. Applies to the current person profile for every time bucket. LTV and AOV are in USD. Not accepted by the Events metric.</p>
+         */
+        @java.lang.Override
+        @JsonSetter(value = "first_seen_before", nulls = Nulls.SKIP)
+        public _FinalStage firstSeenBefore(Optional<OffsetDateTime> firstSeenBefore) {
+            this.firstSeenBefore = firstSeenBefore;
+            return this;
+        }
+
+        /**
+         * <p>People metric only: first_seen_at greater than or equal this value. Applies to the current person profile for every time bucket. LTV and AOV are in USD. Not accepted by the Events metric.</p>
+         * @return Reference to {@code this} so that method calls can be chained together.
+         */
+        @java.lang.Override
+        public _FinalStage firstSeenAfter(OffsetDateTime firstSeenAfter) {
+            this.firstSeenAfter = Optional.ofNullable(firstSeenAfter);
+            return this;
+        }
+
+        /**
+         * <p>People metric only: first_seen_at greater than or equal this value. Applies to the current person profile for every time bucket. LTV and AOV are in USD. Not accepted by the Events metric.</p>
+         */
+        @java.lang.Override
+        @JsonSetter(value = "first_seen_after", nulls = Nulls.SKIP)
+        public _FinalStage firstSeenAfter(Optional<OffsetDateTime> firstSeenAfter) {
+            this.firstSeenAfter = firstSeenAfter;
+            return this;
+        }
+
+        /**
+         * <p>People metric only: has_purchased equals this value. Applies to the current person profile for every time bucket. LTV and AOV are in USD. Not accepted by the Events metric.</p>
+         * @return Reference to {@code this} so that method calls can be chained together.
+         */
+        @java.lang.Override
+        public _FinalStage hasPurchased(Boolean hasPurchased) {
+            this.hasPurchased = Optional.ofNullable(hasPurchased);
+            return this;
+        }
+
+        /**
+         * <p>People metric only: has_purchased equals this value. Applies to the current person profile for every time bucket. LTV and AOV are in USD. Not accepted by the Events metric.</p>
+         */
+        @java.lang.Override
+        @JsonSetter(value = "has_purchased", nulls = Nulls.SKIP)
+        public _FinalStage hasPurchased(Optional<Boolean> hasPurchased) {
+            this.hasPurchased = hasPurchased;
+            return this;
+        }
+
+        /**
+         * <p>People metric only: contactable equals this value. Applies to the current person profile for every time bucket. LTV and AOV are in USD. Not accepted by the Events metric.</p>
+         * @return Reference to {@code this} so that method calls can be chained together.
+         */
+        @java.lang.Override
+        public _FinalStage contactable(Boolean contactable) {
+            this.contactable = Optional.ofNullable(contactable);
+            return this;
+        }
+
+        /**
+         * <p>People metric only: contactable equals this value. Applies to the current person profile for every time bucket. LTV and AOV are in USD. Not accepted by the Events metric.</p>
+         */
+        @java.lang.Override
+        @JsonSetter(value = "contactable", nulls = Nulls.SKIP)
+        public _FinalStage contactable(Optional<Boolean> contactable) {
+            this.contactable = contactable;
+            return this;
+        }
+
+        /**
+         * <p>Funnel only. Confidence level for whole-window final conversion intervals, for example 0.95. Requires mature_only=true. Exposure steps must each filter one user- or visitor-randomized experiment.</p>
+         * @return Reference to {@code this} so that method calls can be chained together.
+         */
+        @java.lang.Override
+        public _FinalStage confidenceLevel(Double confidenceLevel) {
+            this.confidenceLevel = Optional.ofNullable(confidenceLevel);
+            return this;
+        }
+
+        /**
+         * <p>Funnel only. Confidence level for whole-window final conversion intervals, for example 0.95. Requires mature_only=true. Exposure steps must each filter one user- or visitor-randomized experiment.</p>
+         */
+        @java.lang.Override
+        @JsonSetter(value = "confidence_level", nulls = Nulls.SKIP)
+        public _FinalStage confidenceLevel(Optional<Double> confidenceLevel) {
+            this.confidenceLevel = confidenceLevel;
+            return this;
+        }
+
+        /**
+         * <p>Funnel only. The breakdown value to use as baseline for whole-window final conversion. Requires breakdown_by and mature_only=true; defaults confidence_level to 0.95.</p>
+         * @return Reference to {@code this} so that method calls can be chained together.
+         */
+        @java.lang.Override
+        public _FinalStage compareTo(String compareTo) {
+            this.compareTo = Optional.ofNullable(compareTo);
+            return this;
+        }
+
+        /**
+         * <p>Funnel only. The breakdown value to use as baseline for whole-window final conversion. Requires breakdown_by and mature_only=true; defaults confidence_level to 0.95.</p>
+         */
+        @java.lang.Override
+        @JsonSetter(value = "compare_to", nulls = Nulls.SKIP)
+        public _FinalStage compareTo(Optional<String> compareTo) {
+            this.compareTo = compareTo;
+            return this;
+        }
+
+        /**
+         * <p>Funnel only. Required when metric=funnel. 2 to 10 ordered events per person, as consecutive one-based bracket parameters such as <code>steps[1][event]=pixel.page&amp;steps[1][page]=/pricing*&amp;steps[2][event]=payment.completed</code>. Values are scalar strings, never JSON. A person's first step 1 match inside <code>from</code>/<code>to</code> anchors their cohort, breakdown, and conversion window; later matches do not restart it. Other events may occur between steps, and conversions may land after <code>to</code>. For an experiment funnel, make <code>experiment.exposure</code> step 1 and pass <code>breakdown_by=variant</code>.</p>
+         * @return Reference to {@code this} so that method calls can be chained together.
+         */
+        @java.lang.Override
+        public _FinalStage steps(RetrieveStatsRequestSteps steps) {
+            this.steps = Optional.ofNullable(steps);
+            return this;
+        }
+
+        /**
+         * <p>Funnel only. Required when metric=funnel. 2 to 10 ordered events per person, as consecutive one-based bracket parameters such as <code>steps[1][event]=pixel.page&amp;steps[1][page]=/pricing*&amp;steps[2][event]=payment.completed</code>. Values are scalar strings, never JSON. A person's first step 1 match inside <code>from</code>/<code>to</code> anchors their cohort, breakdown, and conversion window; later matches do not restart it. Other events may occur between steps, and conversions may land after <code>to</code>. For an experiment funnel, make <code>experiment.exposure</code> step 1 and pass <code>breakdown_by=variant</code>.</p>
+         */
+        @java.lang.Override
+        @JsonSetter(value = "steps", nulls = Nulls.SKIP)
+        public _FinalStage steps(Optional<RetrieveStatsRequestSteps> steps) {
+            this.steps = steps;
+            return this;
+        }
+
+        /**
+         * <p>Funnel only. Include only entrants whose full conversion window has elapsed. Required for confidence intervals and comparisons.</p>
+         * @return Reference to {@code this} so that method calls can be chained together.
+         */
+        @java.lang.Override
+        public _FinalStage matureOnly(Boolean matureOnly) {
+            this.matureOnly = Optional.ofNullable(matureOnly);
+            return this;
+        }
+
+        /**
+         * <p>Funnel only. Include only entrants whose full conversion window has elapsed. Required for confidence intervals and comparisons.</p>
+         */
+        @java.lang.Override
+        @JsonSetter(value = "mature_only", nulls = Nulls.SKIP)
+        public _FinalStage matureOnly(Optional<Boolean> matureOnly) {
+            this.matureOnly = matureOnly;
+            return this;
+        }
+
+        /**
+         * <p>Funnel only. Time allowed from the first event to the final event: integer minutes, hours, or days, up to 30d.</p>
+         * @return Reference to {@code this} so that method calls can be chained together.
+         */
+        @java.lang.Override
+        public _FinalStage conversionWindow(String conversionWindow) {
+            this.conversionWindow = Optional.ofNullable(conversionWindow);
+            return this;
+        }
+
+        /**
+         * <p>Funnel only. Time allowed from the first event to the final event: integer minutes, hours, or days, up to 30d.</p>
+         */
+        @java.lang.Override
+        @JsonSetter(value = "conversion_window", nulls = Nulls.SKIP)
+        public _FinalStage conversionWindow(Optional<String> conversionWindow) {
+            this.conversionWindow = conversionWindow;
+            return this;
+        }
+
+        /**
+         * <p>The webhook to count deliveries for, for example hook_AbC123. Required by webhook_deliveries, and must belong to account_id or one of its apps.</p>
+         * @return Reference to {@code this} so that method calls can be chained together.
+         */
+        @java.lang.Override
+        public _FinalStage webhookId(String webhookId) {
+            this.webhookId = Optional.ofNullable(webhookId);
+            return this;
+        }
+
+        /**
+         * <p>The webhook to count deliveries for, for example hook_AbC123. Required by webhook_deliveries, and must belong to account_id or one of its apps.</p>
+         */
+        @java.lang.Override
+        @JsonSetter(value = "webhook_id", nulls = Nulls.SKIP)
+        public _FinalStage webhookId(Optional<String> webhookId) {
+            this.webhookId = webhookId;
+            return this;
+        }
+
+        /**
+         * <p>Filter to one card-issuing bank, named as the processor reports it, for example JPMORGAN CHASE BANK N A, or unknown for payments with no reported bank. Available on metrics that list issuer.</p>
+         * @return Reference to {@code this} so that method calls can be chained together.
+         */
+        @java.lang.Override
+        public _FinalStage issuer(String issuer) {
+            this.issuer = Optional.ofNullable(issuer);
+            return this;
+        }
+
+        /**
+         * <p>Filter to one card-issuing bank, named as the processor reports it, for example JPMORGAN CHASE BANK N A, or unknown for payments with no reported bank. Available on metrics that list issuer.</p>
+         */
+        @java.lang.Override
+        @JsonSetter(value = "issuer", nulls = Nulls.SKIP)
+        public _FinalStage issuer(Optional<String> issuer) {
+            this.issuer = issuer;
+            return this;
+        }
+
+        /**
+         * <p>Filter to accounts located in one country, as an ISO 3166-1 alpha-2 code such as <code>US</code>. Pair with <code>breakdown_by=account_country</code> to split by account country. Available on metrics that list <code>account_country</code>.</p>
+         * @return Reference to {@code this} so that method calls can be chained together.
+         */
+        @java.lang.Override
+        public _FinalStage accountCountry(String accountCountry) {
+            this.accountCountry = Optional.ofNullable(accountCountry);
+            return this;
+        }
+
+        /**
+         * <p>Filter to accounts located in one country, as an ISO 3166-1 alpha-2 code such as <code>US</code>. Pair with <code>breakdown_by=account_country</code> to split by account country. Available on metrics that list <code>account_country</code>.</p>
+         */
+        @java.lang.Override
+        @JsonSetter(value = "account_country", nulls = Nulls.SKIP)
+        public _FinalStage accountCountry(Optional<String> accountCountry) {
+            this.accountCountry = accountCountry;
+            return this;
+        }
+
+        /**
+         * <p>Filter to one product category, for example <code>algo_trading_course</code>. Pair with <code>breakdown_by=product_category</code> to split by product category. Available on metrics that list <code>product_category</code>.</p>
+         * @return Reference to {@code this} so that method calls can be chained together.
+         */
+        @java.lang.Override
+        public _FinalStage productCategory(String productCategory) {
+            this.productCategory = Optional.ofNullable(productCategory);
+            return this;
+        }
+
+        /**
+         * <p>Filter to one product category, for example <code>algo_trading_course</code>. Pair with <code>breakdown_by=product_category</code> to split by product category. Available on metrics that list <code>product_category</code>.</p>
+         */
+        @java.lang.Override
+        @JsonSetter(value = "product_category", nulls = Nulls.SKIP)
+        public _FinalStage productCategory(Optional<String> productCategory) {
+            this.productCategory = productCategory;
+            return this;
+        }
+
+        /**
+         * <p>Filter to one industry type, for example <code>options_trading</code>. Pair with <code>breakdown_by=industry_type</code> to split by industry type. Available on metrics that list <code>industry_type</code>.</p>
+         * @return Reference to {@code this} so that method calls can be chained together.
+         */
+        @java.lang.Override
+        public _FinalStage industryType(String industryType) {
+            this.industryType = Optional.ofNullable(industryType);
+            return this;
+        }
+
+        /**
+         * <p>Filter to one industry type, for example <code>options_trading</code>. Pair with <code>breakdown_by=industry_type</code> to split by industry type. Available on metrics that list <code>industry_type</code>.</p>
+         */
+        @java.lang.Override
+        @JsonSetter(value = "industry_type", nulls = Nulls.SKIP)
+        public _FinalStage industryType(Optional<String> industryType) {
+            this.industryType = industryType;
+            return this;
+        }
+
+        /**
+         * <p>Filter to one business type, for example <code>education</code>. Pair with <code>breakdown_by=business_type</code> to split by business type. Available on metrics that list <code>business_type</code>.</p>
+         * @return Reference to {@code this} so that method calls can be chained together.
+         */
+        @java.lang.Override
+        public _FinalStage businessType(String businessType) {
+            this.businessType = Optional.ofNullable(businessType);
+            return this;
+        }
+
+        /**
+         * <p>Filter to one business type, for example <code>education</code>. Pair with <code>breakdown_by=business_type</code> to split by business type. Available on metrics that list <code>business_type</code>.</p>
+         */
+        @java.lang.Override
+        @JsonSetter(value = "business_type", nulls = Nulls.SKIP)
+        public _FinalStage businessType(Optional<String> businessType) {
+            this.businessType = businessType;
+            return this;
+        }
+
+        /**
+         * <p>Filter the events metric to one or more full event names, for example payment.completed or pixel.lead. Comma-separated names match any listed event. Use group_by=event for separate groups. Available on metrics that list event.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
@@ -940,7 +2788,7 @@ public final class RetrieveStatsRequest {
         }
 
         /**
-         * <p>Filter the events metric to one or more full event names, for example payment.completed or pixel.lead. Comma-separate several to break the metric down by each event. Available on metrics that list event.</p>
+         * <p>Filter the events metric to one or more full event names, for example payment.completed or pixel.lead. Comma-separated names match any listed event. Use group_by=event for separate groups. Available on metrics that list event.</p>
          */
         @java.lang.Override
         @JsonSetter(value = "event", nulls = Nulls.SKIP)
@@ -950,7 +2798,7 @@ public final class RetrieveStatsRequest {
         }
 
         /**
-         * <p>Window used by a snapshot metric. Ordinary snapshots accept 30d as their trailing activity window. Cohorted dispute metrics accept 7d or 28d as the sales-transaction pool; their attribution window is fixed in the metric name. Each metric lists its accepted values in the catalog.</p>
+         * <p>Window used by a snapshot metric. Ordinary snapshots accept 30d as their trailing activity window. Cohorted dispute metrics accept 7d or 28d as the sales-transaction pool; their attribution window is fixed in the metric name. Card network program metrics accept 7d, 14d, 28d, or 56d. Each metric lists its accepted values in the catalog.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
@@ -960,7 +2808,7 @@ public final class RetrieveStatsRequest {
         }
 
         /**
-         * <p>Window used by a snapshot metric. Ordinary snapshots accept 30d as their trailing activity window. Cohorted dispute metrics accept 7d or 28d as the sales-transaction pool; their attribution window is fixed in the metric name. Each metric lists its accepted values in the catalog.</p>
+         * <p>Window used by a snapshot metric. Ordinary snapshots accept 30d as their trailing activity window. Cohorted dispute metrics accept 7d or 28d as the sales-transaction pool; their attribution window is fixed in the metric name. Card network program metrics accept 7d, 14d, 28d, or 56d. Each metric lists its accepted values in the catalog.</p>
          */
         @java.lang.Override
         @JsonSetter(value = "snapshot_window", nulls = Nulls.SKIP)
@@ -1270,7 +3118,7 @@ public final class RetrieveStatsRequest {
         }
 
         /**
-         * <p>Filter traffic metrics to one website hostname, for example shop.example.com. Pair with breakdown_by=hostname to split by website.</p>
+         * <p>Filter traffic metrics to one website hostname, for example shop.example.com. On the events and people metrics, comma-separated hostnames match any listed hostname. Pair with breakdown_by=hostname to split by website.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
@@ -1280,7 +3128,7 @@ public final class RetrieveStatsRequest {
         }
 
         /**
-         * <p>Filter traffic metrics to one website hostname, for example shop.example.com. Pair with breakdown_by=hostname to split by website.</p>
+         * <p>Filter traffic metrics to one website hostname, for example shop.example.com. On the events and people metrics, comma-separated hostnames match any listed hostname. Pair with breakdown_by=hostname to split by website.</p>
          */
         @java.lang.Override
         @JsonSetter(value = "hostname", nulls = Nulls.SKIP)
@@ -1430,7 +3278,7 @@ public final class RetrieveStatsRequest {
         }
 
         /**
-         * <p>Split the metric out by one of its properties — each point gets a breakdown array. For example breakdown_by=currency returns an entry for usd, an entry for eur, and so on.</p>
+         * <p>Split the metric out by one of its properties — each point gets a breakdown array. For example breakdown_by=currency returns an entry for usd, an entry for eur, and so on. Funnels use a property of the first matched event, with at most 300 groups. experiment_id and variant require an exposure as step 1. For funnel source breakdowns, steps[1][source]=whop:* groups by campaign, whop:&lt;campaign&gt;:* by ad group, and whop:&lt;campaign&gt;:&lt;group&gt;:* by ad. See the metric catalog for supported breakdowns.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
@@ -1440,7 +3288,7 @@ public final class RetrieveStatsRequest {
         }
 
         /**
-         * <p>Split the metric out by one of its properties — each point gets a breakdown array. For example breakdown_by=currency returns an entry for usd, an entry for eur, and so on.</p>
+         * <p>Split the metric out by one of its properties — each point gets a breakdown array. For example breakdown_by=currency returns an entry for usd, an entry for eur, and so on. Funnels use a property of the first matched event, with at most 300 groups. experiment_id and variant require an exposure as step 1. For funnel source breakdowns, steps[1][source]=whop:* groups by campaign, whop:&lt;campaign&gt;:* by ad group, and whop:&lt;campaign&gt;:&lt;group&gt;:* by ad. See the metric catalog for supported breakdowns.</p>
          */
         @java.lang.Override
         @JsonSetter(value = "breakdown_by", nulls = Nulls.SKIP)
@@ -1450,7 +3298,7 @@ public final class RetrieveStatsRequest {
         }
 
         /**
-         * <p>How wide each point is. Defaults to day. Snapshot metrics are day-only.</p>
+         * <p>How wide each point is. Defaults to day. Snapshot metrics are day-only. Funnels support at most 2,000 first-entry cohort buckets.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
@@ -1460,7 +3308,7 @@ public final class RetrieveStatsRequest {
         }
 
         /**
-         * <p>How wide each point is. Defaults to day. Snapshot metrics are day-only.</p>
+         * <p>How wide each point is. Defaults to day. Snapshot metrics are day-only. Funnels support at most 2,000 first-entry cohort buckets.</p>
          */
         @java.lang.Override
         @JsonSetter(value = "interval", nulls = Nulls.SKIP)
@@ -1490,7 +3338,7 @@ public final class RetrieveStatsRequest {
         }
 
         /**
-         * <p>The account this query concerns, for example biz_AbC123.</p>
+         * <p>Account this query concerns, prefixed <code>biz_</code>, or <code>platform</code> for all of Whop.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
@@ -1500,7 +3348,7 @@ public final class RetrieveStatsRequest {
         }
 
         /**
-         * <p>The account this query concerns, for example biz_AbC123.</p>
+         * <p>Account this query concerns, prefixed <code>biz_</code>, or <code>platform</code> for all of Whop.</p>
          */
         @java.lang.Override
         @JsonSetter(value = "account_id", nulls = Nulls.SKIP)
@@ -1624,7 +3472,132 @@ public final class RetrieveStatsRequest {
                     referredUserId,
                     snapshotWindow,
                     event,
+                    businessType,
+                    industryType,
+                    productCategory,
+                    accountCountry,
+                    issuer,
+                    webhookId,
+                    conversionWindow,
+                    matureOnly,
+                    steps,
+                    compareTo,
+                    confidenceLevel,
+                    contactable,
+                    hasPurchased,
+                    firstSeenAfter,
+                    firstSeenBefore,
+                    lastSeenAfter,
+                    lastSeenBefore,
+                    firstSeenWithinDays,
+                    lastSeenWithinDays,
+                    known,
+                    hasEmail,
+                    hasPhone,
+                    ltvGt,
+                    ltvGte,
+                    ltvLt,
+                    ltvLte,
+                    aovGt,
+                    aovGte,
+                    aovLt,
+                    aovLte,
+                    purchaseCountGt,
+                    purchaseCountGte,
+                    purchaseCountLt,
+                    purchaseCountLte,
+                    eventCountGt,
+                    eventCountGte,
+                    eventCountLt,
+                    eventCountLte,
+                    referringAccountId,
+                    teamLeadId,
+                    activity,
+                    breakdownLimit,
                     additionalProperties);
+        }
+
+        @JsonAnySetter
+        private void putAdditionalPropertyFromJson(String key, Object value) {
+            if (key.equalsIgnoreCase("ad_campaign_ids")
+                    || key.equalsIgnoreCase("ad_group_ids")
+                    || key.equalsIgnoreCase("ad_ids")
+                    || key.equalsIgnoreCase("account_id")
+                    || key.equalsIgnoreCase("user_id")
+                    || key.equalsIgnoreCase("from")
+                    || key.equalsIgnoreCase("to")
+                    || key.equalsIgnoreCase("interval")
+                    || key.equalsIgnoreCase("breakdown_by")
+                    || key.equalsIgnoreCase("convert_to")
+                    || key.equalsIgnoreCase("currency")
+                    || key.equalsIgnoreCase("time_zone")
+                    || key.equalsIgnoreCase("payment_method")
+                    || key.equalsIgnoreCase("card_network")
+                    || key.equalsIgnoreCase("dispute_reason")
+                    || key.equalsIgnoreCase("source")
+                    || key.equalsIgnoreCase("hostname")
+                    || key.equalsIgnoreCase("page")
+                    || key.equalsIgnoreCase("device_type")
+                    || key.equalsIgnoreCase("country_code")
+                    || key.equalsIgnoreCase("event_name")
+                    || key.equalsIgnoreCase("event_type")
+                    || key.equalsIgnoreCase("custom_name")
+                    || key.equalsIgnoreCase("segment")
+                    || key.equalsIgnoreCase("category")
+                    || key.equalsIgnoreCase("merchant")
+                    || key.equalsIgnoreCase("fee_type")
+                    || key.equalsIgnoreCase("product")
+                    || key.equalsIgnoreCase("status")
+                    || key.equalsIgnoreCase("access_level")
+                    || key.equalsIgnoreCase("most_recent_action")
+                    || key.equalsIgnoreCase("referred_user_id")
+                    || key.equalsIgnoreCase("snapshot_window")
+                    || key.equalsIgnoreCase("event")
+                    || key.equalsIgnoreCase("business_type")
+                    || key.equalsIgnoreCase("industry_type")
+                    || key.equalsIgnoreCase("product_category")
+                    || key.equalsIgnoreCase("account_country")
+                    || key.equalsIgnoreCase("issuer")
+                    || key.equalsIgnoreCase("webhook_id")
+                    || key.equalsIgnoreCase("conversion_window")
+                    || key.equalsIgnoreCase("mature_only")
+                    || key.equalsIgnoreCase("steps")
+                    || key.equalsIgnoreCase("compare_to")
+                    || key.equalsIgnoreCase("confidence_level")
+                    || key.equalsIgnoreCase("contactable")
+                    || key.equalsIgnoreCase("has_purchased")
+                    || key.equalsIgnoreCase("first_seen_after")
+                    || key.equalsIgnoreCase("first_seen_before")
+                    || key.equalsIgnoreCase("last_seen_after")
+                    || key.equalsIgnoreCase("last_seen_before")
+                    || key.equalsIgnoreCase("first_seen_within_days")
+                    || key.equalsIgnoreCase("last_seen_within_days")
+                    || key.equalsIgnoreCase("known")
+                    || key.equalsIgnoreCase("has_email")
+                    || key.equalsIgnoreCase("has_phone")
+                    || key.equalsIgnoreCase("ltv_gt")
+                    || key.equalsIgnoreCase("ltv_gte")
+                    || key.equalsIgnoreCase("ltv_lt")
+                    || key.equalsIgnoreCase("ltv_lte")
+                    || key.equalsIgnoreCase("aov_gt")
+                    || key.equalsIgnoreCase("aov_gte")
+                    || key.equalsIgnoreCase("aov_lt")
+                    || key.equalsIgnoreCase("aov_lte")
+                    || key.equalsIgnoreCase("purchase_count_gt")
+                    || key.equalsIgnoreCase("purchase_count_gte")
+                    || key.equalsIgnoreCase("purchase_count_lt")
+                    || key.equalsIgnoreCase("purchase_count_lte")
+                    || key.equalsIgnoreCase("event_count_gt")
+                    || key.equalsIgnoreCase("event_count_gte")
+                    || key.equalsIgnoreCase("event_count_lt")
+                    || key.equalsIgnoreCase("event_count_lte")
+                    || key.equalsIgnoreCase("referring_account_id")
+                    || key.equalsIgnoreCase("team_lead_id")
+                    || key.equalsIgnoreCase("activity")
+                    || key.equalsIgnoreCase("breakdown_limit")) {
+                return;
+            }
+            this.additionalProperties.put(key, value);
         }
 
         @java.lang.Override

@@ -109,7 +109,6 @@ public final class PaymentNextActionAwaitConfirmation {
 
         private List<PaymentNextActionAwaitConfirmationRenderItem> render = new ArrayList<>();
 
-        @JsonAnySetter
         private Map<String, Object> additionalProperties = new HashMap<>();
 
         private Builder() {}
@@ -122,7 +121,6 @@ public final class PaymentNextActionAwaitConfirmation {
         }
 
         /**
-         * <p>How long the wait can last.</p>
          * <p>How long the wait can last.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
@@ -160,6 +158,14 @@ public final class PaymentNextActionAwaitConfirmation {
         @java.lang.Override
         public PaymentNextActionAwaitConfirmation build() {
             return new PaymentNextActionAwaitConfirmation(data, render, additionalProperties);
+        }
+
+        @JsonAnySetter
+        private void putAdditionalPropertyFromJson(String key, Object value) {
+            if (key.equalsIgnoreCase("data") || key.equalsIgnoreCase("render")) {
+                return;
+            }
+            this.additionalProperties.put(key, value);
         }
 
         @java.lang.Override

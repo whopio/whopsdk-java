@@ -33,6 +33,10 @@ public class AiChatsClient {
 
     /**
      * Returns a paginated list of AI chat threads for the current authenticated user.
+     * <p>Required permissions:</p>
+     * <ul>
+     * <li><code>ai_chat:read</code></li>
+     * </ul>
      */
     public SyncPagingIterable<AiChatListItem> list() {
         return this.rawClient.list().body();
@@ -40,6 +44,10 @@ public class AiChatsClient {
 
     /**
      * Returns a paginated list of AI chat threads for the current authenticated user.
+     * <p>Required permissions:</p>
+     * <ul>
+     * <li><code>ai_chat:read</code></li>
+     * </ul>
      */
     public SyncPagingIterable<AiChatListItem> list(RequestOptions requestOptions) {
         return this.rawClient.list(requestOptions).body();
@@ -47,6 +55,10 @@ public class AiChatsClient {
 
     /**
      * Returns a paginated list of AI chat threads for the current authenticated user.
+     * <p>Required permissions:</p>
+     * <ul>
+     * <li><code>ai_chat:read</code></li>
+     * </ul>
      */
     public SyncPagingIterable<AiChatListItem> list(ListAiChatsRequest request) {
         return this.rawClient.list(request).body();
@@ -54,6 +66,10 @@ public class AiChatsClient {
 
     /**
      * Returns a paginated list of AI chat threads for the current authenticated user.
+     * <p>Required permissions:</p>
+     * <ul>
+     * <li><code>ai_chat:read</code></li>
+     * </ul>
      */
     public SyncPagingIterable<AiChatListItem> list(ListAiChatsRequest request, RequestOptions requestOptions) {
         return this.rawClient.list(request, requestOptions).body();
@@ -83,6 +99,10 @@ public class AiChatsClient {
 
     /**
      * Retrieves the details of an existing AI chat.
+     * <p>Required permissions:</p>
+     * <ul>
+     * <li><code>ai_chat:read</code></li>
+     * </ul>
      */
     public AiChat retrieve(String id) {
         return this.rawClient.retrieve(id).body();
@@ -90,6 +110,10 @@ public class AiChatsClient {
 
     /**
      * Retrieves the details of an existing AI chat.
+     * <p>Required permissions:</p>
+     * <ul>
+     * <li><code>ai_chat:read</code></li>
+     * </ul>
      */
     public AiChat retrieve(String id, RequestOptions requestOptions) {
         return this.rawClient.retrieve(id, requestOptions).body();
@@ -97,6 +121,10 @@ public class AiChatsClient {
 
     /**
      * Retrieves the details of an existing AI chat.
+     * <p>Required permissions:</p>
+     * <ul>
+     * <li><code>ai_chat:read</code></li>
+     * </ul>
      */
     public AiChat retrieve(String id, RetrieveAiChatsRequest request) {
         return this.rawClient.retrieve(id, request).body();
@@ -104,6 +132,10 @@ public class AiChatsClient {
 
     /**
      * Retrieves the details of an existing AI chat.
+     * <p>Required permissions:</p>
+     * <ul>
+     * <li><code>ai_chat:read</code></li>
+     * </ul>
      */
     public AiChat retrieve(String id, RetrieveAiChatsRequest request, RequestOptions requestOptions) {
         return this.rawClient.retrieve(id, request, requestOptions).body();
@@ -154,7 +186,7 @@ public class AiChatsClient {
     }
 
     /**
-     * Update an AI chat's title, notification preferences, or associated company context.
+     * Update an AI chat's title, notification preferences, or associated account context.
      * <p>Required permissions:</p>
      * <ul>
      * <li><code>ai_chat:update</code></li>
@@ -165,7 +197,7 @@ public class AiChatsClient {
     }
 
     /**
-     * Update an AI chat's title, notification preferences, or associated company context.
+     * Update an AI chat's title, notification preferences, or associated account context.
      * <p>Required permissions:</p>
      * <ul>
      * <li><code>ai_chat:update</code></li>
@@ -176,7 +208,7 @@ public class AiChatsClient {
     }
 
     /**
-     * Update an AI chat's title, notification preferences, or associated company context.
+     * Update an AI chat's title, notification preferences, or associated account context.
      * <p>Required permissions:</p>
      * <ul>
      * <li><code>ai_chat:update</code></li>
@@ -187,7 +219,7 @@ public class AiChatsClient {
     }
 
     /**
-     * Update an AI chat's title, notification preferences, or associated company context.
+     * Update an AI chat's title, notification preferences, or associated account context.
      * <p>Required permissions:</p>
      * <ul>
      * <li><code>ai_chat:update</code></li>

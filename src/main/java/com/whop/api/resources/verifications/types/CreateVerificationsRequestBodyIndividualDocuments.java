@@ -60,7 +60,7 @@ public final class CreateVerificationsRequestBodyIndividualDocuments {
     }
 
     /**
-     * @return Back of the driver's license, base64-encoded. Required when <code>document_type</code> is <code>DRIVERS</code>.
+     * @return Back of the driver's license, base64-encoded. Required when <code>document_type</code> is <code>drivers</code>.
      */
     @JsonProperty("drivers_back")
     public Optional<String> getDriversBack() {
@@ -68,7 +68,7 @@ public final class CreateVerificationsRequestBodyIndividualDocuments {
     }
 
     /**
-     * @return Front of the driver's license, base64-encoded. Required when <code>document_type</code> is <code>DRIVERS</code>.
+     * @return Front of the driver's license, base64-encoded. Required when <code>document_type</code> is <code>drivers</code>.
      */
     @JsonProperty("drivers_front")
     public Optional<String> getDriversFront() {
@@ -76,7 +76,7 @@ public final class CreateVerificationsRequestBodyIndividualDocuments {
     }
 
     /**
-     * @return Back of the ID card, base64-encoded. Required when <code>document_type</code> is <code>ID_CARD</code>.
+     * @return Back of the ID card, base64-encoded. Required when <code>document_type</code> is <code>id_card</code>.
      */
     @JsonProperty("id_card_back")
     public Optional<String> getIdCardBack() {
@@ -84,7 +84,7 @@ public final class CreateVerificationsRequestBodyIndividualDocuments {
     }
 
     /**
-     * @return Front of the ID card, base64-encoded. Required when <code>document_type</code> is <code>ID_CARD</code>.
+     * @return Front of the ID card, base64-encoded. Required when <code>document_type</code> is <code>id_card</code>.
      */
     @JsonProperty("id_card_front")
     public Optional<String> getIdCardFront() {
@@ -92,7 +92,7 @@ public final class CreateVerificationsRequestBodyIndividualDocuments {
     }
 
     /**
-     * @return Photo page of the passport, base64-encoded. Required when <code>document_type</code> is <code>PASSPORT</code>.
+     * @return Photo page of the passport, base64-encoded. Required when <code>document_type</code> is <code>passport</code>.
      */
     @JsonProperty("passport_front")
     public Optional<String> getPassportFront() {
@@ -100,7 +100,7 @@ public final class CreateVerificationsRequestBodyIndividualDocuments {
     }
 
     /**
-     * @return Back of the residence permit, base64-encoded. Required when <code>document_type</code> is <code>RESIDENCE_PERMIT</code>.
+     * @return Back of the residence permit, base64-encoded. Required when <code>document_type</code> is <code>residence_permit</code>.
      */
     @JsonProperty("residence_permit_back")
     public Optional<String> getResidencePermitBack() {
@@ -108,7 +108,7 @@ public final class CreateVerificationsRequestBodyIndividualDocuments {
     }
 
     /**
-     * @return Front of the residence permit, base64-encoded. Required when <code>document_type</code> is <code>RESIDENCE_PERMIT</code>.
+     * @return Front of the residence permit, base64-encoded. Required when <code>document_type</code> is <code>residence_permit</code>.
      */
     @JsonProperty("residence_permit_front")
     public Optional<String> getResidencePermitFront() {
@@ -186,7 +186,6 @@ public final class CreateVerificationsRequestBodyIndividualDocuments {
 
         private Optional<String> selfie = Optional.empty();
 
-        @JsonAnySetter
         private Map<String, Object> additionalProperties = new HashMap<>();
 
         private Builder() {}
@@ -204,7 +203,7 @@ public final class CreateVerificationsRequestBodyIndividualDocuments {
         }
 
         /**
-         * <p>Back of the driver's license, base64-encoded. Required when <code>document_type</code> is <code>DRIVERS</code>.</p>
+         * <p>Back of the driver's license, base64-encoded. Required when <code>document_type</code> is <code>drivers</code>.</p>
          */
         @JsonSetter(value = "drivers_back", nulls = Nulls.SKIP)
         public Builder driversBack(Optional<String> driversBack) {
@@ -218,7 +217,7 @@ public final class CreateVerificationsRequestBodyIndividualDocuments {
         }
 
         /**
-         * <p>Front of the driver's license, base64-encoded. Required when <code>document_type</code> is <code>DRIVERS</code>.</p>
+         * <p>Front of the driver's license, base64-encoded. Required when <code>document_type</code> is <code>drivers</code>.</p>
          */
         @JsonSetter(value = "drivers_front", nulls = Nulls.SKIP)
         public Builder driversFront(Optional<String> driversFront) {
@@ -232,7 +231,7 @@ public final class CreateVerificationsRequestBodyIndividualDocuments {
         }
 
         /**
-         * <p>Back of the ID card, base64-encoded. Required when <code>document_type</code> is <code>ID_CARD</code>.</p>
+         * <p>Back of the ID card, base64-encoded. Required when <code>document_type</code> is <code>id_card</code>.</p>
          */
         @JsonSetter(value = "id_card_back", nulls = Nulls.SKIP)
         public Builder idCardBack(Optional<String> idCardBack) {
@@ -246,7 +245,7 @@ public final class CreateVerificationsRequestBodyIndividualDocuments {
         }
 
         /**
-         * <p>Front of the ID card, base64-encoded. Required when <code>document_type</code> is <code>ID_CARD</code>.</p>
+         * <p>Front of the ID card, base64-encoded. Required when <code>document_type</code> is <code>id_card</code>.</p>
          */
         @JsonSetter(value = "id_card_front", nulls = Nulls.SKIP)
         public Builder idCardFront(Optional<String> idCardFront) {
@@ -260,7 +259,7 @@ public final class CreateVerificationsRequestBodyIndividualDocuments {
         }
 
         /**
-         * <p>Photo page of the passport, base64-encoded. Required when <code>document_type</code> is <code>PASSPORT</code>.</p>
+         * <p>Photo page of the passport, base64-encoded. Required when <code>document_type</code> is <code>passport</code>.</p>
          */
         @JsonSetter(value = "passport_front", nulls = Nulls.SKIP)
         public Builder passportFront(Optional<String> passportFront) {
@@ -274,7 +273,7 @@ public final class CreateVerificationsRequestBodyIndividualDocuments {
         }
 
         /**
-         * <p>Back of the residence permit, base64-encoded. Required when <code>document_type</code> is <code>RESIDENCE_PERMIT</code>.</p>
+         * <p>Back of the residence permit, base64-encoded. Required when <code>document_type</code> is <code>residence_permit</code>.</p>
          */
         @JsonSetter(value = "residence_permit_back", nulls = Nulls.SKIP)
         public Builder residencePermitBack(Optional<String> residencePermitBack) {
@@ -288,7 +287,7 @@ public final class CreateVerificationsRequestBodyIndividualDocuments {
         }
 
         /**
-         * <p>Front of the residence permit, base64-encoded. Required when <code>document_type</code> is <code>RESIDENCE_PERMIT</code>.</p>
+         * <p>Front of the residence permit, base64-encoded. Required when <code>document_type</code> is <code>residence_permit</code>.</p>
          */
         @JsonSetter(value = "residence_permit_front", nulls = Nulls.SKIP)
         public Builder residencePermitFront(Optional<String> residencePermitFront) {
@@ -326,6 +325,21 @@ public final class CreateVerificationsRequestBodyIndividualDocuments {
                     residencePermitFront,
                     selfie,
                     additionalProperties);
+        }
+
+        @JsonAnySetter
+        private void putAdditionalPropertyFromJson(String key, Object value) {
+            if (key.equalsIgnoreCase("drivers_back")
+                    || key.equalsIgnoreCase("drivers_front")
+                    || key.equalsIgnoreCase("id_card_back")
+                    || key.equalsIgnoreCase("id_card_front")
+                    || key.equalsIgnoreCase("passport_front")
+                    || key.equalsIgnoreCase("residence_permit_back")
+                    || key.equalsIgnoreCase("residence_permit_front")
+                    || key.equalsIgnoreCase("selfie")) {
+                return;
+            }
+            this.additionalProperties.put(key, value);
         }
 
         public Builder additionalProperty(String key, Object value) {

@@ -6,13 +6,19 @@ package com.whop.api.resources.payouts;
 import com.whop.api.core.ClientOptions;
 import com.whop.api.core.RequestOptions;
 import com.whop.api.core.Suppliers;
+import com.whop.api.core.WhopApiHttpResponse;
 import com.whop.api.core.pagination.SyncPagingIterable;
 import com.whop.api.resources.payouts.methods.AsyncMethodsClient;
+import com.whop.api.resources.payouts.paypallinksessions.AsyncPaypalLinkSessionsClient;
+import com.whop.api.resources.payouts.requests.CancelPayoutsRequest;
+import com.whop.api.resources.payouts.requests.CreatePayoutsRequest;
+import com.whop.api.resources.payouts.requests.CreateQuotePayoutsRequest;
 import com.whop.api.resources.payouts.requests.ListPayoutsRequest;
 import com.whop.api.resources.payouts.requests.RetrievePayoutsRequest;
 import com.whop.api.resources.payouts.supportedmethods.AsyncSupportedMethodsClient;
-import com.whop.api.resources.payouts.types.CreatePayoutsRequestBody;
+import com.whop.api.resources.payouts.types.CancelPayoutsResponse;
 import com.whop.api.resources.payouts.types.CreatePayoutsResponse;
+import com.whop.api.resources.payouts.types.CreateQuotePayoutsResponse;
 import com.whop.api.resources.payouts.types.ListPayoutsResponseDataItem;
 import com.whop.api.resources.payouts.types.RetrievePayoutsResponse;
 import java.util.concurrent.CompletableFuture;
@@ -25,12 +31,15 @@ public class AsyncPayoutsClient {
 
     protected final Supplier<AsyncMethodsClient> methodsClient;
 
+    protected final Supplier<AsyncPaypalLinkSessionsClient> paypalLinkSessionsClient;
+
     protected final Supplier<AsyncSupportedMethodsClient> supportedMethodsClient;
 
     public AsyncPayoutsClient(ClientOptions clientOptions) {
         this.clientOptions = clientOptions;
         this.rawClient = new AsyncRawPayoutsClient(clientOptions);
         this.methodsClient = Suppliers.memoize(() -> new AsyncMethodsClient(clientOptions));
+        this.paypalLinkSessionsClient = Suppliers.memoize(() -> new AsyncPaypalLinkSessionsClient(clientOptions));
         this.supportedMethodsClient = Suppliers.memoize(() -> new AsyncSupportedMethodsClient(clientOptions));
     }
 
@@ -45,21 +54,48 @@ public class AsyncPayoutsClient {
      * Lists an account's or user's payouts, newest first.
      */
     public CompletableFuture<SyncPagingIterable<ListPayoutsResponseDataItem>> list() {
-        return this.rawClient.list().thenApply(response -> response.body());
+        CompletableFuture<WhopApiHttpResponse<SyncPagingIterable<ListPayoutsResponseDataItem>>> rawFuture =
+                this.rawClient.list();
+        CompletableFuture<SyncPagingIterable<ListPayoutsResponseDataItem>> future =
+                rawFuture.thenApply(response -> response.body());
+        future.whenComplete((result_, throwable_) -> {
+            if (future.isCancelled()) {
+                rawFuture.cancel(true);
+            }
+        });
+        return future;
     }
 
     /**
      * Lists an account's or user's payouts, newest first.
      */
     public CompletableFuture<SyncPagingIterable<ListPayoutsResponseDataItem>> list(RequestOptions requestOptions) {
-        return this.rawClient.list(requestOptions).thenApply(response -> response.body());
+        CompletableFuture<WhopApiHttpResponse<SyncPagingIterable<ListPayoutsResponseDataItem>>> rawFuture =
+                this.rawClient.list(requestOptions);
+        CompletableFuture<SyncPagingIterable<ListPayoutsResponseDataItem>> future =
+                rawFuture.thenApply(response -> response.body());
+        future.whenComplete((result_, throwable_) -> {
+            if (future.isCancelled()) {
+                rawFuture.cancel(true);
+            }
+        });
+        return future;
     }
 
     /**
      * Lists an account's or user's payouts, newest first.
      */
     public CompletableFuture<SyncPagingIterable<ListPayoutsResponseDataItem>> list(ListPayoutsRequest request) {
-        return this.rawClient.list(request).thenApply(response -> response.body());
+        CompletableFuture<WhopApiHttpResponse<SyncPagingIterable<ListPayoutsResponseDataItem>>> rawFuture =
+                this.rawClient.list(request);
+        CompletableFuture<SyncPagingIterable<ListPayoutsResponseDataItem>> future =
+                rawFuture.thenApply(response -> response.body());
+        future.whenComplete((result_, throwable_) -> {
+            if (future.isCancelled()) {
+                rawFuture.cancel(true);
+            }
+        });
+        return future;
     }
 
     /**
@@ -67,55 +103,204 @@ public class AsyncPayoutsClient {
      */
     public CompletableFuture<SyncPagingIterable<ListPayoutsResponseDataItem>> list(
             ListPayoutsRequest request, RequestOptions requestOptions) {
-        return this.rawClient.list(request, requestOptions).thenApply(response -> response.body());
+        CompletableFuture<WhopApiHttpResponse<SyncPagingIterable<ListPayoutsResponseDataItem>>> rawFuture =
+                this.rawClient.list(request, requestOptions);
+        CompletableFuture<SyncPagingIterable<ListPayoutsResponseDataItem>> future =
+                rawFuture.thenApply(response -> response.body());
+        future.whenComplete((result_, throwable_) -> {
+            if (future.isCancelled()) {
+                rawFuture.cancel(true);
+            }
+        });
+        return future;
     }
 
     /**
-     * Sends money from an account or user balance to a saved payout method for that owner.
+     * Sends money from an account or user balance to a saved payout method for that owner. First create a quote with POST /payouts/quotes, then submit its quote_token with the same payout details before it expires.
      */
-    public CompletableFuture<CreatePayoutsResponse> create(CreatePayoutsRequestBody request) {
-        return this.rawClient.create(request).thenApply(response -> response.body());
+    public CompletableFuture<CreatePayoutsResponse> create(CreatePayoutsRequest request) {
+        CompletableFuture<WhopApiHttpResponse<CreatePayoutsResponse>> rawFuture = this.rawClient.create(request);
+        CompletableFuture<CreatePayoutsResponse> future = rawFuture.thenApply(response -> response.body());
+        future.whenComplete((result_, throwable_) -> {
+            if (future.isCancelled()) {
+                rawFuture.cancel(true);
+            }
+        });
+        return future;
     }
 
     /**
-     * Sends money from an account or user balance to a saved payout method for that owner.
+     * Sends money from an account or user balance to a saved payout method for that owner. First create a quote with POST /payouts/quotes, then submit its quote_token with the same payout details before it expires.
      */
     public CompletableFuture<CreatePayoutsResponse> create(
-            CreatePayoutsRequestBody request, RequestOptions requestOptions) {
-        return this.rawClient.create(request, requestOptions).thenApply(response -> response.body());
+            CreatePayoutsRequest request, RequestOptions requestOptions) {
+        CompletableFuture<WhopApiHttpResponse<CreatePayoutsResponse>> rawFuture =
+                this.rawClient.create(request, requestOptions);
+        CompletableFuture<CreatePayoutsResponse> future = rawFuture.thenApply(response -> response.body());
+        future.whenComplete((result_, throwable_) -> {
+            if (future.isCancelled()) {
+                rawFuture.cancel(true);
+            }
+        });
+        return future;
     }
 
     /**
-     * Fetches one payout by its <code>wdrl_</code> ID, or by the <code>cofr_</code> conversion request ID a stablecoin payout carries as <code>payout_request_id</code> — both ids answer with the same payout object.
+     * Creates a short-lived, provider-backed quote of a payout's fee, exchange rate, and destination amount. No funds move until you submit the returned <code>quote_token</code> to <code>POST /payouts</code>.
+     */
+    public CompletableFuture<CreateQuotePayoutsResponse> createQuote(CreateQuotePayoutsRequest request) {
+        CompletableFuture<WhopApiHttpResponse<CreateQuotePayoutsResponse>> rawFuture =
+                this.rawClient.createQuote(request);
+        CompletableFuture<CreateQuotePayoutsResponse> future = rawFuture.thenApply(response -> response.body());
+        future.whenComplete((result_, throwable_) -> {
+            if (future.isCancelled()) {
+                rawFuture.cancel(true);
+            }
+        });
+        return future;
+    }
+
+    /**
+     * Creates a short-lived, provider-backed quote of a payout's fee, exchange rate, and destination amount. No funds move until you submit the returned <code>quote_token</code> to <code>POST /payouts</code>.
+     */
+    public CompletableFuture<CreateQuotePayoutsResponse> createQuote(
+            CreateQuotePayoutsRequest request, RequestOptions requestOptions) {
+        CompletableFuture<WhopApiHttpResponse<CreateQuotePayoutsResponse>> rawFuture =
+                this.rawClient.createQuote(request, requestOptions);
+        CompletableFuture<CreateQuotePayoutsResponse> future = rawFuture.thenApply(response -> response.body());
+        future.whenComplete((result_, throwable_) -> {
+            if (future.isCancelled()) {
+                rawFuture.cancel(true);
+            }
+        });
+        return future;
+    }
+
+    /**
+     * Retrieves a payout by its <code>wdrl_</code> ID, or by the <code>cofr_</code> conversion request ID a payout carries as <code>payout_request_id</code>. Authentication is optional: anyone with the ID can view tracking details, including notes, trace code, exchange rate, and payout request ID, while accounting fields require <code>payout:withdrawal:read</code> on the account or user that owns the payout. A supplied invalid credential returns 401.
      */
     public CompletableFuture<RetrievePayoutsResponse> retrieve(String id) {
-        return this.rawClient.retrieve(id).thenApply(response -> response.body());
+        CompletableFuture<WhopApiHttpResponse<RetrievePayoutsResponse>> rawFuture = this.rawClient.retrieve(id);
+        CompletableFuture<RetrievePayoutsResponse> future = rawFuture.thenApply(response -> response.body());
+        future.whenComplete((result_, throwable_) -> {
+            if (future.isCancelled()) {
+                rawFuture.cancel(true);
+            }
+        });
+        return future;
     }
 
     /**
-     * Fetches one payout by its <code>wdrl_</code> ID, or by the <code>cofr_</code> conversion request ID a stablecoin payout carries as <code>payout_request_id</code> — both ids answer with the same payout object.
+     * Retrieves a payout by its <code>wdrl_</code> ID, or by the <code>cofr_</code> conversion request ID a payout carries as <code>payout_request_id</code>. Authentication is optional: anyone with the ID can view tracking details, including notes, trace code, exchange rate, and payout request ID, while accounting fields require <code>payout:withdrawal:read</code> on the account or user that owns the payout. A supplied invalid credential returns 401.
      */
     public CompletableFuture<RetrievePayoutsResponse> retrieve(String id, RequestOptions requestOptions) {
-        return this.rawClient.retrieve(id, requestOptions).thenApply(response -> response.body());
+        CompletableFuture<WhopApiHttpResponse<RetrievePayoutsResponse>> rawFuture =
+                this.rawClient.retrieve(id, requestOptions);
+        CompletableFuture<RetrievePayoutsResponse> future = rawFuture.thenApply(response -> response.body());
+        future.whenComplete((result_, throwable_) -> {
+            if (future.isCancelled()) {
+                rawFuture.cancel(true);
+            }
+        });
+        return future;
     }
 
     /**
-     * Fetches one payout by its <code>wdrl_</code> ID, or by the <code>cofr_</code> conversion request ID a stablecoin payout carries as <code>payout_request_id</code> — both ids answer with the same payout object.
+     * Retrieves a payout by its <code>wdrl_</code> ID, or by the <code>cofr_</code> conversion request ID a payout carries as <code>payout_request_id</code>. Authentication is optional: anyone with the ID can view tracking details, including notes, trace code, exchange rate, and payout request ID, while accounting fields require <code>payout:withdrawal:read</code> on the account or user that owns the payout. A supplied invalid credential returns 401.
      */
     public CompletableFuture<RetrievePayoutsResponse> retrieve(String id, RetrievePayoutsRequest request) {
-        return this.rawClient.retrieve(id, request).thenApply(response -> response.body());
+        CompletableFuture<WhopApiHttpResponse<RetrievePayoutsResponse>> rawFuture =
+                this.rawClient.retrieve(id, request);
+        CompletableFuture<RetrievePayoutsResponse> future = rawFuture.thenApply(response -> response.body());
+        future.whenComplete((result_, throwable_) -> {
+            if (future.isCancelled()) {
+                rawFuture.cancel(true);
+            }
+        });
+        return future;
     }
 
     /**
-     * Fetches one payout by its <code>wdrl_</code> ID, or by the <code>cofr_</code> conversion request ID a stablecoin payout carries as <code>payout_request_id</code> — both ids answer with the same payout object.
+     * Retrieves a payout by its <code>wdrl_</code> ID, or by the <code>cofr_</code> conversion request ID a payout carries as <code>payout_request_id</code>. Authentication is optional: anyone with the ID can view tracking details, including notes, trace code, exchange rate, and payout request ID, while accounting fields require <code>payout:withdrawal:read</code> on the account or user that owns the payout. A supplied invalid credential returns 401.
      */
     public CompletableFuture<RetrievePayoutsResponse> retrieve(
             String id, RetrievePayoutsRequest request, RequestOptions requestOptions) {
-        return this.rawClient.retrieve(id, request, requestOptions).thenApply(response -> response.body());
+        CompletableFuture<WhopApiHttpResponse<RetrievePayoutsResponse>> rawFuture =
+                this.rawClient.retrieve(id, request, requestOptions);
+        CompletableFuture<RetrievePayoutsResponse> future = rawFuture.thenApply(response -> response.body());
+        future.whenComplete((result_, throwable_) -> {
+            if (future.isCancelled()) {
+                rawFuture.cancel(true);
+            }
+        });
+        return future;
+    }
+
+    /**
+     * Cancels a payout before it is sent to the payout provider, or asks the provider to stop one already sent. While the payout is <code>in_review</code>, or <code>processing</code> with nothing sent yet (see <code>cancelable</code>), it is canceled and the funds, fees included, return to the balance. Once sent, the response is 202 with a <code>cancellation</code> object, and the payout reads <code>canceled</code> only if the provider confirms it stopped. A <code>requested</code> payout returns 409 until it reaches review, a payout the provider can no longer stop returns 409 with error type <code>not_cancelable</code>, and canceling an already-canceled payout returns it unchanged.
+     */
+    public CompletableFuture<CancelPayoutsResponse> cancel(String id) {
+        CompletableFuture<WhopApiHttpResponse<CancelPayoutsResponse>> rawFuture = this.rawClient.cancel(id);
+        CompletableFuture<CancelPayoutsResponse> future = rawFuture.thenApply(response -> response.body());
+        future.whenComplete((result_, throwable_) -> {
+            if (future.isCancelled()) {
+                rawFuture.cancel(true);
+            }
+        });
+        return future;
+    }
+
+    /**
+     * Cancels a payout before it is sent to the payout provider, or asks the provider to stop one already sent. While the payout is <code>in_review</code>, or <code>processing</code> with nothing sent yet (see <code>cancelable</code>), it is canceled and the funds, fees included, return to the balance. Once sent, the response is 202 with a <code>cancellation</code> object, and the payout reads <code>canceled</code> only if the provider confirms it stopped. A <code>requested</code> payout returns 409 until it reaches review, a payout the provider can no longer stop returns 409 with error type <code>not_cancelable</code>, and canceling an already-canceled payout returns it unchanged.
+     */
+    public CompletableFuture<CancelPayoutsResponse> cancel(String id, RequestOptions requestOptions) {
+        CompletableFuture<WhopApiHttpResponse<CancelPayoutsResponse>> rawFuture =
+                this.rawClient.cancel(id, requestOptions);
+        CompletableFuture<CancelPayoutsResponse> future = rawFuture.thenApply(response -> response.body());
+        future.whenComplete((result_, throwable_) -> {
+            if (future.isCancelled()) {
+                rawFuture.cancel(true);
+            }
+        });
+        return future;
+    }
+
+    /**
+     * Cancels a payout before it is sent to the payout provider, or asks the provider to stop one already sent. While the payout is <code>in_review</code>, or <code>processing</code> with nothing sent yet (see <code>cancelable</code>), it is canceled and the funds, fees included, return to the balance. Once sent, the response is 202 with a <code>cancellation</code> object, and the payout reads <code>canceled</code> only if the provider confirms it stopped. A <code>requested</code> payout returns 409 until it reaches review, a payout the provider can no longer stop returns 409 with error type <code>not_cancelable</code>, and canceling an already-canceled payout returns it unchanged.
+     */
+    public CompletableFuture<CancelPayoutsResponse> cancel(String id, CancelPayoutsRequest request) {
+        CompletableFuture<WhopApiHttpResponse<CancelPayoutsResponse>> rawFuture = this.rawClient.cancel(id, request);
+        CompletableFuture<CancelPayoutsResponse> future = rawFuture.thenApply(response -> response.body());
+        future.whenComplete((result_, throwable_) -> {
+            if (future.isCancelled()) {
+                rawFuture.cancel(true);
+            }
+        });
+        return future;
+    }
+
+    /**
+     * Cancels a payout before it is sent to the payout provider, or asks the provider to stop one already sent. While the payout is <code>in_review</code>, or <code>processing</code> with nothing sent yet (see <code>cancelable</code>), it is canceled and the funds, fees included, return to the balance. Once sent, the response is 202 with a <code>cancellation</code> object, and the payout reads <code>canceled</code> only if the provider confirms it stopped. A <code>requested</code> payout returns 409 until it reaches review, a payout the provider can no longer stop returns 409 with error type <code>not_cancelable</code>, and canceling an already-canceled payout returns it unchanged.
+     */
+    public CompletableFuture<CancelPayoutsResponse> cancel(
+            String id, CancelPayoutsRequest request, RequestOptions requestOptions) {
+        CompletableFuture<WhopApiHttpResponse<CancelPayoutsResponse>> rawFuture =
+                this.rawClient.cancel(id, request, requestOptions);
+        CompletableFuture<CancelPayoutsResponse> future = rawFuture.thenApply(response -> response.body());
+        future.whenComplete((result_, throwable_) -> {
+            if (future.isCancelled()) {
+                rawFuture.cancel(true);
+            }
+        });
+        return future;
     }
 
     public AsyncMethodsClient methods() {
         return this.methodsClient.get();
+    }
+
+    public AsyncPaypalLinkSessionsClient paypalLinkSessions() {
+        return this.paypalLinkSessionsClient.get();
     }
 
     public AsyncSupportedMethodsClient supportedMethods() {

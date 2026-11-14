@@ -51,7 +51,7 @@ public final class AuthorizedUserListItem {
     }
 
     /**
-     * @return The unique identifier for the authorized user.
+     * @return The team member's ID. It may start with <code>ausr_</code> or <code>mber_</code>; treat it as opaque.
      */
     @JsonProperty("id")
     public String getId() {
@@ -117,7 +117,7 @@ public final class AuthorizedUserListItem {
 
     public interface IdStage {
         /**
-         * <p>The unique identifier for the authorized user.</p>
+         * <p>The team member's ID. It may start with <code>ausr_</code> or <code>mber_</code>; treat it as opaque.</p>
          */
         RoleStage id(@NotNull String id);
     }
@@ -154,7 +154,6 @@ public final class AuthorizedUserListItem {
 
         private AuthorizedUserListItemUser user;
 
-        @JsonAnySetter
         private Map<String, Object> additionalProperties = new HashMap<>();
 
         private Builder() {}
@@ -170,7 +169,6 @@ public final class AuthorizedUserListItem {
 
         /**
          * <p>The company this authorized user has access to.</p>
-         * <p>The company this authorized user has access to.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
@@ -181,8 +179,7 @@ public final class AuthorizedUserListItem {
         }
 
         /**
-         * <p>The unique identifier for the authorized user.</p>
-         * <p>The unique identifier for the authorized user.</p>
+         * <p>The team member's ID. It may start with <code>ausr_</code> or <code>mber_</code>; treat it as opaque.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
@@ -194,7 +191,6 @@ public final class AuthorizedUserListItem {
 
         /**
          * <p>The permission role assigned to this authorized user within the company.</p>
-         * <p>The permission role assigned to this authorized user within the company.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
@@ -205,7 +201,6 @@ public final class AuthorizedUserListItem {
         }
 
         /**
-         * <p>The user account linked to this authorized user record.</p>
          * <p>The user account linked to this authorized user record.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
@@ -219,6 +214,17 @@ public final class AuthorizedUserListItem {
         @java.lang.Override
         public AuthorizedUserListItem build() {
             return new AuthorizedUserListItem(company, id, role, user, additionalProperties);
+        }
+
+        @JsonAnySetter
+        private void putAdditionalPropertyFromJson(String key, Object value) {
+            if (key.equalsIgnoreCase("company")
+                    || key.equalsIgnoreCase("id")
+                    || key.equalsIgnoreCase("role")
+                    || key.equalsIgnoreCase("user")) {
+                return;
+            }
+            this.additionalProperties.put(key, value);
         }
 
         @java.lang.Override

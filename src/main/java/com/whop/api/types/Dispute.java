@@ -26,11 +26,13 @@ import org.jetbrains.annotations.NotNull;
 @JsonInclude(JsonInclude.Include.NON_ABSENT)
 @JsonDeserialize(builder = Dispute.Builder.class)
 public final class Dispute {
+    private final boolean acceptable;
+
     private final Optional<String> accountId;
 
     private final double amount;
 
-    private final Optional<DisputeBuyer> buyer;
+    private final DisputeBuyer buyer;
 
     private final String createdAt;
 
@@ -46,7 +48,9 @@ public final class Dispute {
 
     private final Optional<String> evidenceSubmittedAt;
 
-    private final Optional<DisputeAttachment> generatedResponseAttachment;
+    private final Optional<Money> fee;
+
+    private final boolean feeCharged;
 
     private final String id;
 
@@ -54,13 +58,11 @@ public final class Dispute {
 
     private final List<DisputeIssuerComment> issuerComments;
 
-    private final Optional<DisputePayment> payment;
+    private final List<ReceiptLineItem> lineItems;
 
-    private final Optional<String> planId;
+    private final DisputePayment payment;
 
     private final Optional<String> productId;
-
-    private final boolean rapidDisputeResolution;
 
     private final DisputeReason reason;
 
@@ -68,14 +70,19 @@ public final class Dispute {
 
     private final DisputeStatus status;
 
+    private final Optional<String> submissionFailureReason;
+
     private final String updatedAt;
+
+    private final Optional<String> variantId;
 
     private final Map<String, Object> additionalProperties;
 
     private Dispute(
+            boolean acceptable,
             Optional<String> accountId,
             double amount,
-            Optional<DisputeBuyer> buyer,
+            DisputeBuyer buyer,
             String createdAt,
             String currency,
             DisputeEvidence evidence,
@@ -83,19 +90,22 @@ public final class Dispute {
             boolean evidenceEditable,
             Optional<DisputeEvidenceLockedReason> evidenceLockedReason,
             Optional<String> evidenceSubmittedAt,
-            Optional<DisputeAttachment> generatedResponseAttachment,
+            Optional<Money> fee,
+            boolean feeCharged,
             String id,
             boolean inquiry,
             List<DisputeIssuerComment> issuerComments,
-            Optional<DisputePayment> payment,
-            Optional<String> planId,
+            List<ReceiptLineItem> lineItems,
+            DisputePayment payment,
             Optional<String> productId,
-            boolean rapidDisputeResolution,
             DisputeReason reason,
             Optional<String> reasonCode,
             DisputeStatus status,
+            Optional<String> submissionFailureReason,
             String updatedAt,
+            Optional<String> variantId,
             Map<String, Object> additionalProperties) {
+        this.acceptable = acceptable;
         this.accountId = accountId;
         this.amount = amount;
         this.buyer = buyer;
@@ -106,19 +116,29 @@ public final class Dispute {
         this.evidenceEditable = evidenceEditable;
         this.evidenceLockedReason = evidenceLockedReason;
         this.evidenceSubmittedAt = evidenceSubmittedAt;
-        this.generatedResponseAttachment = generatedResponseAttachment;
+        this.fee = fee;
+        this.feeCharged = feeCharged;
         this.id = id;
         this.inquiry = inquiry;
         this.issuerComments = issuerComments;
+        this.lineItems = lineItems;
         this.payment = payment;
-        this.planId = planId;
         this.productId = productId;
-        this.rapidDisputeResolution = rapidDisputeResolution;
         this.reason = reason;
         this.reasonCode = reasonCode;
         this.status = status;
+        this.submissionFailureReason = submissionFailureReason;
         this.updatedAt = updatedAt;
+        this.variantId = variantId;
         this.additionalProperties = additionalProperties;
+    }
+
+    /**
+     * @return Whether the dispute can be conceded to the customer with <code>POST /disputes/{id}/accept</code>. True only for a chargeback still awaiting a response, before <code>evidence_due_at</code>, whose payment processor supports accepting disputes. Inquiries are never acceptable.
+     */
+    @JsonProperty("acceptable")
+    public boolean getAcceptable() {
+        return acceptable;
     }
 
     /**
@@ -143,11 +163,8 @@ public final class Dispute {
     /**
      * @return The customer who filed the dispute.
      */
-    @JsonIgnore
-    public Optional<DisputeBuyer> getBuyer() {
-        if (buyer == null) {
-            return Optional.empty();
-        }
+    @JsonProperty("buyer")
+    public DisputeBuyer getBuyer() {
         return buyer;
     }
 
@@ -176,7 +193,7 @@ public final class Dispute {
     }
 
     /**
-     * @return The deadline to submit evidence, as an ISO 8601 timestamp. Whop reserves the last 24 hours before the processor's own cutoff to forward the submission.
+     * @return The deadline to submit evidence, as an ISO 8601 timestamp. <code>null</code> when the network already auto-resolved the dispute (Visa RDR) with no evidence round, or when the processor hasn't reported a deadline for this dispute.
      */
     @JsonIgnore
     public Optional<String> getEvidenceDueAt() {
@@ -217,14 +234,22 @@ public final class Dispute {
     }
 
     /**
-     * @return The AI-generated representment document filed with the processor on the seller's behalf, once ready. Null until generation completes, and for disputes not using Whop Dispute Fighter.
+     * @return The dispute fee charged to the account, in the currency it was collected in. <code>null</code> when <code>fee_charged</code> is false.
      */
     @JsonIgnore
-    public Optional<DisputeAttachment> getGeneratedResponseAttachment() {
-        if (generatedResponseAttachment == null) {
+    public Optional<Money> getFee() {
+        if (fee == null) {
             return Optional.empty();
         }
-        return generatedResponseAttachment;
+        return fee;
+    }
+
+    /**
+     * @return Whether Whop charged the account a dispute fee for this one. <code>false</code> when the payment was fully refunded before the dispute was opened, for a Visa RDR resolution, and for an inquiry.
+     */
+    @JsonProperty("fee_charged")
+    public boolean getFeeCharged() {
+        return feeCharged;
     }
 
     /**
@@ -248,26 +273,17 @@ public final class Dispute {
         return issuerComments;
     }
 
-    /**
-     * @return The payment being disputed.
-     */
-    @JsonIgnore
-    public Optional<DisputePayment> getPayment() {
-        if (payment == null) {
-            return Optional.empty();
-        }
-        return payment;
+    @JsonProperty("line_items")
+    public List<ReceiptLineItem> getLineItems() {
+        return lineItems;
     }
 
     /**
-     * @return The plan the disputed payment was made on, prefixed <code>plan_</code>.
+     * @return The payment being disputed.
      */
-    @JsonIgnore
-    public Optional<String> getPlanId() {
-        if (planId == null) {
-            return Optional.empty();
-        }
-        return planId;
+    @JsonProperty("payment")
+    public DisputePayment getPayment() {
+        return payment;
     }
 
     /**
@@ -282,15 +298,7 @@ public final class Dispute {
     }
 
     /**
-     * @return Whether Visa Rapid Dispute Resolution settled this automatically. These refund the customer without an evidence round.
-     */
-    @JsonProperty("rapid_dispute_resolution")
-    public boolean getRapidDisputeResolution() {
-        return rapidDisputeResolution;
-    }
-
-    /**
-     * @return Why the customer says they are disputing, normalized across card networks. <code>other</code> covers a code Whop has not categorized yet — read <code>reason_code</code> for the raw value.
+     * @return Why the customer says they are disputing, normalized across processors and card networks. <code>other</code> covers a processor reason Whop has not categorized yet.
      */
     @JsonProperty("reason")
     public DisputeReason getReason() {
@@ -298,7 +306,7 @@ public final class Dispute {
     }
 
     /**
-     * @return The raw card-network or processor reason code, such as <code>10.4</code>.
+     * @return The raw card-network or processor reason code, such as <code>10.4</code>. Informational only — <code>reason</code> is not derived from it.
      */
     @JsonIgnore
     public Optional<String> getReasonCode() {
@@ -309,11 +317,22 @@ public final class Dispute {
     }
 
     /**
-     * @return Where the dispute stands. <code>needs_response</code> is awaiting evidence, <code>under_review</code> is with the processor, <code>won</code> returned the funds to the seller, <code>lost</code> returned them to the customer, and <code>closed</code> ended without a ruling. A dispute past its <code>evidence_due_at</code> reports <code>under_review</code> — the window to respond has closed.
+     * @return <code>needs_response</code> awaits evidence (after a processor refused a filing, <code>submission_failure_reason</code> says why); <code>generating_response</code> has evidence with the processor, not yet accepted; <code>under_review</code> is with the processor; <code>won</code>/<code>lost</code> are the rulings; <code>prevented</code> settles like <code>lost</code>. <code>warning_</code> statuses are the inquiry tiers. Past <code>evidence_due_at</code> an open one reports <code>under_review</code>.
      */
     @JsonProperty("status")
     public DisputeStatus getStatus() {
         return status;
+    }
+
+    /**
+     * @return Why the payment processor refused the last filing, in plain English, while the dispute is back in <code>needs_response</code>. Fix what it names and submit again. Only on retrieve: <code>dispute.updated</code> reports the move back to <code>needs_response</code>, then read this here.
+     */
+    @JsonIgnore
+    public Optional<String> getSubmissionFailureReason() {
+        if (submissionFailureReason == null) {
+            return Optional.empty();
+        }
+        return submissionFailureReason;
     }
 
     /**
@@ -324,16 +343,21 @@ public final class Dispute {
         return updatedAt;
     }
 
+    /**
+     * @return The variant the disputed payment was made on, prefixed <code>plan_</code>.
+     */
+    @JsonIgnore
+    public Optional<String> getVariantId() {
+        if (variantId == null) {
+            return Optional.empty();
+        }
+        return variantId;
+    }
+
     @JsonInclude(value = JsonInclude.Include.CUSTOM, valueFilter = NullableNonemptyFilter.class)
     @JsonProperty("account_id")
     private Optional<String> _getAccountId() {
         return accountId;
-    }
-
-    @JsonInclude(value = JsonInclude.Include.CUSTOM, valueFilter = NullableNonemptyFilter.class)
-    @JsonProperty("buyer")
-    private Optional<DisputeBuyer> _getBuyer() {
-        return buyer;
     }
 
     @JsonInclude(value = JsonInclude.Include.CUSTOM, valueFilter = NullableNonemptyFilter.class)
@@ -355,21 +379,9 @@ public final class Dispute {
     }
 
     @JsonInclude(value = JsonInclude.Include.CUSTOM, valueFilter = NullableNonemptyFilter.class)
-    @JsonProperty("generated_response_attachment")
-    private Optional<DisputeAttachment> _getGeneratedResponseAttachment() {
-        return generatedResponseAttachment;
-    }
-
-    @JsonInclude(value = JsonInclude.Include.CUSTOM, valueFilter = NullableNonemptyFilter.class)
-    @JsonProperty("payment")
-    private Optional<DisputePayment> _getPayment() {
-        return payment;
-    }
-
-    @JsonInclude(value = JsonInclude.Include.CUSTOM, valueFilter = NullableNonemptyFilter.class)
-    @JsonProperty("plan_id")
-    private Optional<String> _getPlanId() {
-        return planId;
+    @JsonProperty("fee")
+    private Optional<Money> _getFee() {
+        return fee;
     }
 
     @JsonInclude(value = JsonInclude.Include.CUSTOM, valueFilter = NullableNonemptyFilter.class)
@@ -384,6 +396,18 @@ public final class Dispute {
         return reasonCode;
     }
 
+    @JsonInclude(value = JsonInclude.Include.CUSTOM, valueFilter = NullableNonemptyFilter.class)
+    @JsonProperty("submission_failure_reason")
+    private Optional<String> _getSubmissionFailureReason() {
+        return submissionFailureReason;
+    }
+
+    @JsonInclude(value = JsonInclude.Include.CUSTOM, valueFilter = NullableNonemptyFilter.class)
+    @JsonProperty("variant_id")
+    private Optional<String> _getVariantId() {
+        return variantId;
+    }
+
     @java.lang.Override
     public boolean equals(Object other) {
         if (this == other) return true;
@@ -396,7 +420,8 @@ public final class Dispute {
     }
 
     private boolean equalTo(Dispute other) {
-        return accountId.equals(other.accountId)
+        return acceptable == other.acceptable
+                && accountId.equals(other.accountId)
                 && amount == other.amount
                 && buyer.equals(other.buyer)
                 && createdAt.equals(other.createdAt)
@@ -406,23 +431,26 @@ public final class Dispute {
                 && evidenceEditable == other.evidenceEditable
                 && evidenceLockedReason.equals(other.evidenceLockedReason)
                 && evidenceSubmittedAt.equals(other.evidenceSubmittedAt)
-                && generatedResponseAttachment.equals(other.generatedResponseAttachment)
+                && fee.equals(other.fee)
+                && feeCharged == other.feeCharged
                 && id.equals(other.id)
                 && inquiry == other.inquiry
                 && issuerComments.equals(other.issuerComments)
+                && lineItems.equals(other.lineItems)
                 && payment.equals(other.payment)
-                && planId.equals(other.planId)
                 && productId.equals(other.productId)
-                && rapidDisputeResolution == other.rapidDisputeResolution
                 && reason.equals(other.reason)
                 && reasonCode.equals(other.reasonCode)
                 && status.equals(other.status)
-                && updatedAt.equals(other.updatedAt);
+                && submissionFailureReason.equals(other.submissionFailureReason)
+                && updatedAt.equals(other.updatedAt)
+                && variantId.equals(other.variantId);
     }
 
     @java.lang.Override
     public int hashCode() {
         return Objects.hash(
+                this.acceptable,
                 this.accountId,
                 this.amount,
                 this.buyer,
@@ -433,18 +461,20 @@ public final class Dispute {
                 this.evidenceEditable,
                 this.evidenceLockedReason,
                 this.evidenceSubmittedAt,
-                this.generatedResponseAttachment,
+                this.fee,
+                this.feeCharged,
                 this.id,
                 this.inquiry,
                 this.issuerComments,
+                this.lineItems,
                 this.payment,
-                this.planId,
                 this.productId,
-                this.rapidDisputeResolution,
                 this.reason,
                 this.reasonCode,
                 this.status,
-                this.updatedAt);
+                this.submissionFailureReason,
+                this.updatedAt,
+                this.variantId);
     }
 
     @java.lang.Override
@@ -452,17 +482,31 @@ public final class Dispute {
         return ObjectMappers.stringify(this);
     }
 
-    public static AmountStage builder() {
+    public static AcceptableStage builder() {
         return new Builder();
+    }
+
+    public interface AcceptableStage {
+        /**
+         * <p>Whether the dispute can be conceded to the customer with <code>POST /disputes/{id}/accept</code>. True only for a chargeback still awaiting a response, before <code>evidence_due_at</code>, whose payment processor supports accepting disputes. Inquiries are never acceptable.</p>
+         */
+        AmountStage acceptable(boolean acceptable);
+
+        Builder from(Dispute other);
     }
 
     public interface AmountStage {
         /**
          * <p>The disputed amount, in whole units of <code>currency</code>.</p>
          */
-        CreatedAtStage amount(double amount);
+        BuyerStage amount(double amount);
+    }
 
-        Builder from(Dispute other);
+    public interface BuyerStage {
+        /**
+         * <p>The customer who filed the dispute.</p>
+         */
+        CreatedAtStage buyer(@NotNull DisputeBuyer buyer);
     }
 
     public interface CreatedAtStage {
@@ -490,7 +534,14 @@ public final class Dispute {
         /**
          * <p>Whether <code>evidence</code> can still be changed and submitted.</p>
          */
-        IdStage evidenceEditable(boolean evidenceEditable);
+        FeeChargedStage evidenceEditable(boolean evidenceEditable);
+    }
+
+    public interface FeeChargedStage {
+        /**
+         * <p>Whether Whop charged the account a dispute fee for this one. <code>false</code> when the payment was fully refunded before the dispute was opened, for a Visa RDR resolution, and for an inquiry.</p>
+         */
+        IdStage feeCharged(boolean feeCharged);
     }
 
     public interface IdStage {
@@ -504,26 +555,26 @@ public final class Dispute {
         /**
          * <p>Whether this is a pre-dispute inquiry rather than a formal chargeback. Inquiries follow the same lifecycle but move no funds unless one escalates.</p>
          */
-        RapidDisputeResolutionStage inquiry(boolean inquiry);
+        PaymentStage inquiry(boolean inquiry);
     }
 
-    public interface RapidDisputeResolutionStage {
+    public interface PaymentStage {
         /**
-         * <p>Whether Visa Rapid Dispute Resolution settled this automatically. These refund the customer without an evidence round.</p>
+         * <p>The payment being disputed.</p>
          */
-        ReasonStage rapidDisputeResolution(boolean rapidDisputeResolution);
+        ReasonStage payment(@NotNull DisputePayment payment);
     }
 
     public interface ReasonStage {
         /**
-         * <p>Why the customer says they are disputing, normalized across card networks. <code>other</code> covers a code Whop has not categorized yet — read <code>reason_code</code> for the raw value.</p>
+         * <p>Why the customer says they are disputing, normalized across processors and card networks. <code>other</code> covers a processor reason Whop has not categorized yet.</p>
          */
         StatusStage reason(@NotNull DisputeReason reason);
     }
 
     public interface StatusStage {
         /**
-         * <p>Where the dispute stands. <code>needs_response</code> is awaiting evidence, <code>under_review</code> is with the processor, <code>won</code> returned the funds to the seller, <code>lost</code> returned them to the customer, and <code>closed</code> ended without a ruling. A dispute past its <code>evidence_due_at</code> reports <code>under_review</code> — the window to respond has closed.</p>
+         * <p><code>needs_response</code> awaits evidence (after a processor refused a filing, <code>submission_failure_reason</code> says why); <code>generating_response</code> has evidence with the processor, not yet accepted; <code>under_review</code> is with the processor; <code>won</code>/<code>lost</code> are the rulings; <code>prevented</code> settles like <code>lost</code>. <code>warning_</code> statuses are the inquiry tiers. Past <code>evidence_due_at</code> an open one reports <code>under_review</code>.</p>
          */
         UpdatedAtStage status(@NotNull DisputeStatus status);
     }
@@ -552,16 +603,7 @@ public final class Dispute {
         _FinalStage accountId(Nullable<String> accountId);
 
         /**
-         * <p>The customer who filed the dispute.</p>
-         */
-        _FinalStage buyer(Optional<DisputeBuyer> buyer);
-
-        _FinalStage buyer(DisputeBuyer buyer);
-
-        _FinalStage buyer(Nullable<DisputeBuyer> buyer);
-
-        /**
-         * <p>The deadline to submit evidence, as an ISO 8601 timestamp. Whop reserves the last 24 hours before the processor's own cutoff to forward the submission.</p>
+         * <p>The deadline to submit evidence, as an ISO 8601 timestamp. <code>null</code> when the network already auto-resolved the dispute (Visa RDR) with no evidence round, or when the processor hasn't reported a deadline for this dispute.</p>
          */
         _FinalStage evidenceDueAt(Optional<String> evidenceDueAt);
 
@@ -588,13 +630,13 @@ public final class Dispute {
         _FinalStage evidenceSubmittedAt(Nullable<String> evidenceSubmittedAt);
 
         /**
-         * <p>The AI-generated representment document filed with the processor on the seller's behalf, once ready. Null until generation completes, and for disputes not using Whop Dispute Fighter.</p>
+         * <p>The dispute fee charged to the account, in the currency it was collected in. <code>null</code> when <code>fee_charged</code> is false.</p>
          */
-        _FinalStage generatedResponseAttachment(Optional<DisputeAttachment> generatedResponseAttachment);
+        _FinalStage fee(Optional<Money> fee);
 
-        _FinalStage generatedResponseAttachment(DisputeAttachment generatedResponseAttachment);
+        _FinalStage fee(Money fee);
 
-        _FinalStage generatedResponseAttachment(Nullable<DisputeAttachment> generatedResponseAttachment);
+        _FinalStage fee(Nullable<Money> fee);
 
         _FinalStage issuerComments(List<DisputeIssuerComment> issuerComments);
 
@@ -602,23 +644,11 @@ public final class Dispute {
 
         _FinalStage addAllIssuerComments(List<DisputeIssuerComment> issuerComments);
 
-        /**
-         * <p>The payment being disputed.</p>
-         */
-        _FinalStage payment(Optional<DisputePayment> payment);
+        _FinalStage lineItems(List<ReceiptLineItem> lineItems);
 
-        _FinalStage payment(DisputePayment payment);
+        _FinalStage addLineItems(ReceiptLineItem lineItems);
 
-        _FinalStage payment(Nullable<DisputePayment> payment);
-
-        /**
-         * <p>The plan the disputed payment was made on, prefixed <code>plan_</code>.</p>
-         */
-        _FinalStage planId(Optional<String> planId);
-
-        _FinalStage planId(String planId);
-
-        _FinalStage planId(Nullable<String> planId);
+        _FinalStage addAllLineItems(List<ReceiptLineItem> lineItems);
 
         /**
          * <p>The product the disputed payment was for, prefixed <code>prod_</code>.</p>
@@ -630,30 +660,55 @@ public final class Dispute {
         _FinalStage productId(Nullable<String> productId);
 
         /**
-         * <p>The raw card-network or processor reason code, such as <code>10.4</code>.</p>
+         * <p>The raw card-network or processor reason code, such as <code>10.4</code>. Informational only — <code>reason</code> is not derived from it.</p>
          */
         _FinalStage reasonCode(Optional<String> reasonCode);
 
         _FinalStage reasonCode(String reasonCode);
 
         _FinalStage reasonCode(Nullable<String> reasonCode);
+
+        /**
+         * <p>Why the payment processor refused the last filing, in plain English, while the dispute is back in <code>needs_response</code>. Fix what it names and submit again. Only on retrieve: <code>dispute.updated</code> reports the move back to <code>needs_response</code>, then read this here.</p>
+         */
+        _FinalStage submissionFailureReason(Optional<String> submissionFailureReason);
+
+        _FinalStage submissionFailureReason(String submissionFailureReason);
+
+        _FinalStage submissionFailureReason(Nullable<String> submissionFailureReason);
+
+        /**
+         * <p>The variant the disputed payment was made on, prefixed <code>plan_</code>.</p>
+         */
+        _FinalStage variantId(Optional<String> variantId);
+
+        _FinalStage variantId(String variantId);
+
+        _FinalStage variantId(Nullable<String> variantId);
     }
 
     @JsonIgnoreProperties(ignoreUnknown = true)
     public static final class Builder
-            implements AmountStage,
+            implements AcceptableStage,
+                    AmountStage,
+                    BuyerStage,
                     CreatedAtStage,
                     CurrencyStage,
                     EvidenceStage,
                     EvidenceEditableStage,
+                    FeeChargedStage,
                     IdStage,
                     InquiryStage,
-                    RapidDisputeResolutionStage,
+                    PaymentStage,
                     ReasonStage,
                     StatusStage,
                     UpdatedAtStage,
                     _FinalStage {
+        private boolean acceptable;
+
         private double amount;
+
+        private DisputeBuyer buyer;
 
         private String createdAt;
 
@@ -663,11 +718,13 @@ public final class Dispute {
 
         private boolean evidenceEditable;
 
+        private boolean feeCharged;
+
         private String id;
 
         private boolean inquiry;
 
-        private boolean rapidDisputeResolution;
+        private DisputePayment payment;
 
         private DisputeReason reason;
 
@@ -675,17 +732,19 @@ public final class Dispute {
 
         private String updatedAt;
 
+        private Optional<String> variantId = Optional.empty();
+
+        private Optional<String> submissionFailureReason = Optional.empty();
+
         private Optional<String> reasonCode = Optional.empty();
 
         private Optional<String> productId = Optional.empty();
 
-        private Optional<String> planId = Optional.empty();
-
-        private Optional<DisputePayment> payment = Optional.empty();
+        private List<ReceiptLineItem> lineItems = new ArrayList<>();
 
         private List<DisputeIssuerComment> issuerComments = new ArrayList<>();
 
-        private Optional<DisputeAttachment> generatedResponseAttachment = Optional.empty();
+        private Optional<Money> fee = Optional.empty();
 
         private Optional<String> evidenceSubmittedAt = Optional.empty();
 
@@ -693,17 +752,15 @@ public final class Dispute {
 
         private Optional<String> evidenceDueAt = Optional.empty();
 
-        private Optional<DisputeBuyer> buyer = Optional.empty();
-
         private Optional<String> accountId = Optional.empty();
 
-        @JsonAnySetter
         private Map<String, Object> additionalProperties = new HashMap<>();
 
         private Builder() {}
 
         @java.lang.Override
         public Builder from(Dispute other) {
+            acceptable(other.getAcceptable());
             accountId(other.getAccountId());
             amount(other.getAmount());
             buyer(other.getBuyer());
@@ -714,35 +771,57 @@ public final class Dispute {
             evidenceEditable(other.getEvidenceEditable());
             evidenceLockedReason(other.getEvidenceLockedReason());
             evidenceSubmittedAt(other.getEvidenceSubmittedAt());
-            generatedResponseAttachment(other.getGeneratedResponseAttachment());
+            fee(other.getFee());
+            feeCharged(other.getFeeCharged());
             id(other.getId());
             inquiry(other.getInquiry());
             issuerComments(other.getIssuerComments());
+            lineItems(other.getLineItems());
             payment(other.getPayment());
-            planId(other.getPlanId());
             productId(other.getProductId());
-            rapidDisputeResolution(other.getRapidDisputeResolution());
             reason(other.getReason());
             reasonCode(other.getReasonCode());
             status(other.getStatus());
+            submissionFailureReason(other.getSubmissionFailureReason());
             updatedAt(other.getUpdatedAt());
+            variantId(other.getVariantId());
             return this;
         }
 
         /**
-         * <p>The disputed amount, in whole units of <code>currency</code>.</p>
+         * <p>Whether the dispute can be conceded to the customer with <code>POST /disputes/{id}/accept</code>. True only for a chargeback still awaiting a response, before <code>evidence_due_at</code>, whose payment processor supports accepting disputes. Inquiries are never acceptable.</p>
+         * @return Reference to {@code this} so that method calls can be chained together.
+         */
+        @java.lang.Override
+        @JsonSetter("acceptable")
+        public AmountStage acceptable(boolean acceptable) {
+            this.acceptable = acceptable;
+            return this;
+        }
+
+        /**
          * <p>The disputed amount, in whole units of <code>currency</code>.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
         @JsonSetter("amount")
-        public CreatedAtStage amount(double amount) {
+        public BuyerStage amount(double amount) {
             this.amount = amount;
             return this;
         }
 
         /**
-         * <p>When the dispute was opened, as an ISO 8601 timestamp.</p>
+         * <p>The customer who filed the dispute.</p>
+         * @return Reference to {@code this} so that method calls can be chained together.
+         */
+        @java.lang.Override
+        @JsonSetter("buyer")
+        public CreatedAtStage buyer(@NotNull DisputeBuyer buyer) {
+            this.buyer = Objects.requireNonNull(buyer, "buyer must not be null");
+            return this;
+        }
+
+        /**
          * <p>When the dispute was opened, as an ISO 8601 timestamp.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
@@ -755,7 +834,6 @@ public final class Dispute {
 
         /**
          * <p>Three-letter ISO currency code of the disputed amount.</p>
-         * <p>Three-letter ISO currency code of the disputed amount.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
@@ -766,7 +844,6 @@ public final class Dispute {
         }
 
         /**
-         * <p>The evidence packet sent to the processor to contest the dispute.</p>
          * <p>The evidence packet sent to the processor to contest the dispute.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
@@ -779,18 +856,27 @@ public final class Dispute {
 
         /**
          * <p>Whether <code>evidence</code> can still be changed and submitted.</p>
-         * <p>Whether <code>evidence</code> can still be changed and submitted.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
         @JsonSetter("evidence_editable")
-        public IdStage evidenceEditable(boolean evidenceEditable) {
+        public FeeChargedStage evidenceEditable(boolean evidenceEditable) {
             this.evidenceEditable = evidenceEditable;
             return this;
         }
 
         /**
-         * <p>Dispute ID, prefixed <code>dspt_</code>.</p>
+         * <p>Whether Whop charged the account a dispute fee for this one. <code>false</code> when the payment was fully refunded before the dispute was opened, for a Visa RDR resolution, and for an inquiry.</p>
+         * @return Reference to {@code this} so that method calls can be chained together.
+         */
+        @java.lang.Override
+        @JsonSetter("fee_charged")
+        public IdStage feeCharged(boolean feeCharged) {
+            this.feeCharged = feeCharged;
+            return this;
+        }
+
+        /**
          * <p>Dispute ID, prefixed <code>dspt_</code>.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
@@ -803,31 +889,28 @@ public final class Dispute {
 
         /**
          * <p>Whether this is a pre-dispute inquiry rather than a formal chargeback. Inquiries follow the same lifecycle but move no funds unless one escalates.</p>
-         * <p>Whether this is a pre-dispute inquiry rather than a formal chargeback. Inquiries follow the same lifecycle but move no funds unless one escalates.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
         @JsonSetter("inquiry")
-        public RapidDisputeResolutionStage inquiry(boolean inquiry) {
+        public PaymentStage inquiry(boolean inquiry) {
             this.inquiry = inquiry;
             return this;
         }
 
         /**
-         * <p>Whether Visa Rapid Dispute Resolution settled this automatically. These refund the customer without an evidence round.</p>
-         * <p>Whether Visa Rapid Dispute Resolution settled this automatically. These refund the customer without an evidence round.</p>
+         * <p>The payment being disputed.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
-        @JsonSetter("rapid_dispute_resolution")
-        public ReasonStage rapidDisputeResolution(boolean rapidDisputeResolution) {
-            this.rapidDisputeResolution = rapidDisputeResolution;
+        @JsonSetter("payment")
+        public ReasonStage payment(@NotNull DisputePayment payment) {
+            this.payment = Objects.requireNonNull(payment, "payment must not be null");
             return this;
         }
 
         /**
-         * <p>Why the customer says they are disputing, normalized across card networks. <code>other</code> covers a code Whop has not categorized yet — read <code>reason_code</code> for the raw value.</p>
-         * <p>Why the customer says they are disputing, normalized across card networks. <code>other</code> covers a code Whop has not categorized yet — read <code>reason_code</code> for the raw value.</p>
+         * <p>Why the customer says they are disputing, normalized across processors and card networks. <code>other</code> covers a processor reason Whop has not categorized yet.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
@@ -838,8 +921,7 @@ public final class Dispute {
         }
 
         /**
-         * <p>Where the dispute stands. <code>needs_response</code> is awaiting evidence, <code>under_review</code> is with the processor, <code>won</code> returned the funds to the seller, <code>lost</code> returned them to the customer, and <code>closed</code> ended without a ruling. A dispute past its <code>evidence_due_at</code> reports <code>under_review</code> — the window to respond has closed.</p>
-         * <p>Where the dispute stands. <code>needs_response</code> is awaiting evidence, <code>under_review</code> is with the processor, <code>won</code> returned the funds to the seller, <code>lost</code> returned them to the customer, and <code>closed</code> ended without a ruling. A dispute past its <code>evidence_due_at</code> reports <code>under_review</code> — the window to respond has closed.</p>
+         * <p><code>needs_response</code> awaits evidence (after a processor refused a filing, <code>submission_failure_reason</code> says why); <code>generating_response</code> has evidence with the processor, not yet accepted; <code>under_review</code> is with the processor; <code>won</code>/<code>lost</code> are the rulings; <code>prevented</code> settles like <code>lost</code>. <code>warning_</code> statuses are the inquiry tiers. Past <code>evidence_due_at</code> an open one reports <code>under_review</code>.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
@@ -851,7 +933,6 @@ public final class Dispute {
 
         /**
          * <p>When the dispute was last changed, as an ISO 8601 timestamp.</p>
-         * <p>When the dispute was last changed, as an ISO 8601 timestamp.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
@@ -862,7 +943,79 @@ public final class Dispute {
         }
 
         /**
-         * <p>The raw card-network or processor reason code, such as <code>10.4</code>.</p>
+         * <p>The variant the disputed payment was made on, prefixed <code>plan_</code>.</p>
+         * @return Reference to {@code this} so that method calls can be chained together.
+         */
+        @java.lang.Override
+        public _FinalStage variantId(Nullable<String> variantId) {
+            if (variantId.isNull()) {
+                this.variantId = null;
+            } else if (variantId.isEmpty()) {
+                this.variantId = Optional.empty();
+            } else {
+                this.variantId = Optional.of(variantId.get());
+            }
+            return this;
+        }
+
+        /**
+         * <p>The variant the disputed payment was made on, prefixed <code>plan_</code>.</p>
+         * @return Reference to {@code this} so that method calls can be chained together.
+         */
+        @java.lang.Override
+        public _FinalStage variantId(String variantId) {
+            this.variantId = Optional.ofNullable(variantId);
+            return this;
+        }
+
+        /**
+         * <p>The variant the disputed payment was made on, prefixed <code>plan_</code>.</p>
+         */
+        @java.lang.Override
+        @JsonSetter(value = "variant_id", nulls = Nulls.SKIP)
+        public _FinalStage variantId(Optional<String> variantId) {
+            this.variantId = variantId;
+            return this;
+        }
+
+        /**
+         * <p>Why the payment processor refused the last filing, in plain English, while the dispute is back in <code>needs_response</code>. Fix what it names and submit again. Only on retrieve: <code>dispute.updated</code> reports the move back to <code>needs_response</code>, then read this here.</p>
+         * @return Reference to {@code this} so that method calls can be chained together.
+         */
+        @java.lang.Override
+        public _FinalStage submissionFailureReason(Nullable<String> submissionFailureReason) {
+            if (submissionFailureReason.isNull()) {
+                this.submissionFailureReason = null;
+            } else if (submissionFailureReason.isEmpty()) {
+                this.submissionFailureReason = Optional.empty();
+            } else {
+                this.submissionFailureReason = Optional.of(submissionFailureReason.get());
+            }
+            return this;
+        }
+
+        /**
+         * <p>Why the payment processor refused the last filing, in plain English, while the dispute is back in <code>needs_response</code>. Fix what it names and submit again. Only on retrieve: <code>dispute.updated</code> reports the move back to <code>needs_response</code>, then read this here.</p>
+         * @return Reference to {@code this} so that method calls can be chained together.
+         */
+        @java.lang.Override
+        public _FinalStage submissionFailureReason(String submissionFailureReason) {
+            this.submissionFailureReason = Optional.ofNullable(submissionFailureReason);
+            return this;
+        }
+
+        /**
+         * <p>Why the payment processor refused the last filing, in plain English, while the dispute is back in <code>needs_response</code>. Fix what it names and submit again. Only on retrieve: <code>dispute.updated</code> reports the move back to <code>needs_response</code>, then read this here.</p>
+         */
+        @java.lang.Override
+        @JsonSetter(value = "submission_failure_reason", nulls = Nulls.SKIP)
+        public _FinalStage submissionFailureReason(Optional<String> submissionFailureReason) {
+            this.submissionFailureReason = submissionFailureReason;
+            return this;
+        }
+
+        /**
+         * <p>The raw card-network or processor reason code, such as <code>10.4</code>. Informational only — <code>reason</code> is not derived from it.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
@@ -878,7 +1031,7 @@ public final class Dispute {
         }
 
         /**
-         * <p>The raw card-network or processor reason code, such as <code>10.4</code>.</p>
+         * <p>The raw card-network or processor reason code, such as <code>10.4</code>. Informational only — <code>reason</code> is not derived from it.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
@@ -888,7 +1041,7 @@ public final class Dispute {
         }
 
         /**
-         * <p>The raw card-network or processor reason code, such as <code>10.4</code>.</p>
+         * <p>The raw card-network or processor reason code, such as <code>10.4</code>. Informational only — <code>reason</code> is not derived from it.</p>
          */
         @java.lang.Override
         @JsonSetter(value = "reason_code", nulls = Nulls.SKIP)
@@ -933,75 +1086,27 @@ public final class Dispute {
             return this;
         }
 
-        /**
-         * <p>The plan the disputed payment was made on, prefixed <code>plan_</code>.</p>
-         * @return Reference to {@code this} so that method calls can be chained together.
-         */
         @java.lang.Override
-        public _FinalStage planId(Nullable<String> planId) {
-            if (planId.isNull()) {
-                this.planId = null;
-            } else if (planId.isEmpty()) {
-                this.planId = Optional.empty();
-            } else {
-                this.planId = Optional.of(planId.get());
+        public _FinalStage addAllLineItems(List<ReceiptLineItem> lineItems) {
+            if (lineItems != null) {
+                this.lineItems.addAll(lineItems);
             }
             return this;
         }
 
-        /**
-         * <p>The plan the disputed payment was made on, prefixed <code>plan_</code>.</p>
-         * @return Reference to {@code this} so that method calls can be chained together.
-         */
         @java.lang.Override
-        public _FinalStage planId(String planId) {
-            this.planId = Optional.ofNullable(planId);
+        public _FinalStage addLineItems(ReceiptLineItem lineItems) {
+            this.lineItems.add(lineItems);
             return this;
         }
 
-        /**
-         * <p>The plan the disputed payment was made on, prefixed <code>plan_</code>.</p>
-         */
         @java.lang.Override
-        @JsonSetter(value = "plan_id", nulls = Nulls.SKIP)
-        public _FinalStage planId(Optional<String> planId) {
-            this.planId = planId;
-            return this;
-        }
-
-        /**
-         * <p>The payment being disputed.</p>
-         * @return Reference to {@code this} so that method calls can be chained together.
-         */
-        @java.lang.Override
-        public _FinalStage payment(Nullable<DisputePayment> payment) {
-            if (payment.isNull()) {
-                this.payment = null;
-            } else if (payment.isEmpty()) {
-                this.payment = Optional.empty();
-            } else {
-                this.payment = Optional.of(payment.get());
+        @JsonSetter(value = "line_items", nulls = Nulls.SKIP)
+        public _FinalStage lineItems(List<ReceiptLineItem> lineItems) {
+            this.lineItems.clear();
+            if (lineItems != null) {
+                this.lineItems.addAll(lineItems);
             }
-            return this;
-        }
-
-        /**
-         * <p>The payment being disputed.</p>
-         * @return Reference to {@code this} so that method calls can be chained together.
-         */
-        @java.lang.Override
-        public _FinalStage payment(DisputePayment payment) {
-            this.payment = Optional.ofNullable(payment);
-            return this;
-        }
-
-        /**
-         * <p>The payment being disputed.</p>
-         */
-        @java.lang.Override
-        @JsonSetter(value = "payment", nulls = Nulls.SKIP)
-        public _FinalStage payment(Optional<DisputePayment> payment) {
-            this.payment = payment;
             return this;
         }
 
@@ -1030,38 +1135,38 @@ public final class Dispute {
         }
 
         /**
-         * <p>The AI-generated representment document filed with the processor on the seller's behalf, once ready. Null until generation completes, and for disputes not using Whop Dispute Fighter.</p>
+         * <p>The dispute fee charged to the account, in the currency it was collected in. <code>null</code> when <code>fee_charged</code> is false.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
-        public _FinalStage generatedResponseAttachment(Nullable<DisputeAttachment> generatedResponseAttachment) {
-            if (generatedResponseAttachment.isNull()) {
-                this.generatedResponseAttachment = null;
-            } else if (generatedResponseAttachment.isEmpty()) {
-                this.generatedResponseAttachment = Optional.empty();
+        public _FinalStage fee(Nullable<Money> fee) {
+            if (fee.isNull()) {
+                this.fee = null;
+            } else if (fee.isEmpty()) {
+                this.fee = Optional.empty();
             } else {
-                this.generatedResponseAttachment = Optional.of(generatedResponseAttachment.get());
+                this.fee = Optional.of(fee.get());
             }
             return this;
         }
 
         /**
-         * <p>The AI-generated representment document filed with the processor on the seller's behalf, once ready. Null until generation completes, and for disputes not using Whop Dispute Fighter.</p>
+         * <p>The dispute fee charged to the account, in the currency it was collected in. <code>null</code> when <code>fee_charged</code> is false.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
-        public _FinalStage generatedResponseAttachment(DisputeAttachment generatedResponseAttachment) {
-            this.generatedResponseAttachment = Optional.ofNullable(generatedResponseAttachment);
+        public _FinalStage fee(Money fee) {
+            this.fee = Optional.ofNullable(fee);
             return this;
         }
 
         /**
-         * <p>The AI-generated representment document filed with the processor on the seller's behalf, once ready. Null until generation completes, and for disputes not using Whop Dispute Fighter.</p>
+         * <p>The dispute fee charged to the account, in the currency it was collected in. <code>null</code> when <code>fee_charged</code> is false.</p>
          */
         @java.lang.Override
-        @JsonSetter(value = "generated_response_attachment", nulls = Nulls.SKIP)
-        public _FinalStage generatedResponseAttachment(Optional<DisputeAttachment> generatedResponseAttachment) {
-            this.generatedResponseAttachment = generatedResponseAttachment;
+        @JsonSetter(value = "fee", nulls = Nulls.SKIP)
+        public _FinalStage fee(Optional<Money> fee) {
+            this.fee = fee;
             return this;
         }
 
@@ -1138,7 +1243,7 @@ public final class Dispute {
         }
 
         /**
-         * <p>The deadline to submit evidence, as an ISO 8601 timestamp. Whop reserves the last 24 hours before the processor's own cutoff to forward the submission.</p>
+         * <p>The deadline to submit evidence, as an ISO 8601 timestamp. <code>null</code> when the network already auto-resolved the dispute (Visa RDR) with no evidence round, or when the processor hasn't reported a deadline for this dispute.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
@@ -1154,7 +1259,7 @@ public final class Dispute {
         }
 
         /**
-         * <p>The deadline to submit evidence, as an ISO 8601 timestamp. Whop reserves the last 24 hours before the processor's own cutoff to forward the submission.</p>
+         * <p>The deadline to submit evidence, as an ISO 8601 timestamp. <code>null</code> when the network already auto-resolved the dispute (Visa RDR) with no evidence round, or when the processor hasn't reported a deadline for this dispute.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
@@ -1164,48 +1269,12 @@ public final class Dispute {
         }
 
         /**
-         * <p>The deadline to submit evidence, as an ISO 8601 timestamp. Whop reserves the last 24 hours before the processor's own cutoff to forward the submission.</p>
+         * <p>The deadline to submit evidence, as an ISO 8601 timestamp. <code>null</code> when the network already auto-resolved the dispute (Visa RDR) with no evidence round, or when the processor hasn't reported a deadline for this dispute.</p>
          */
         @java.lang.Override
         @JsonSetter(value = "evidence_due_at", nulls = Nulls.SKIP)
         public _FinalStage evidenceDueAt(Optional<String> evidenceDueAt) {
             this.evidenceDueAt = evidenceDueAt;
-            return this;
-        }
-
-        /**
-         * <p>The customer who filed the dispute.</p>
-         * @return Reference to {@code this} so that method calls can be chained together.
-         */
-        @java.lang.Override
-        public _FinalStage buyer(Nullable<DisputeBuyer> buyer) {
-            if (buyer.isNull()) {
-                this.buyer = null;
-            } else if (buyer.isEmpty()) {
-                this.buyer = Optional.empty();
-            } else {
-                this.buyer = Optional.of(buyer.get());
-            }
-            return this;
-        }
-
-        /**
-         * <p>The customer who filed the dispute.</p>
-         * @return Reference to {@code this} so that method calls can be chained together.
-         */
-        @java.lang.Override
-        public _FinalStage buyer(DisputeBuyer buyer) {
-            this.buyer = Optional.ofNullable(buyer);
-            return this;
-        }
-
-        /**
-         * <p>The customer who filed the dispute.</p>
-         */
-        @java.lang.Override
-        @JsonSetter(value = "buyer", nulls = Nulls.SKIP)
-        public _FinalStage buyer(Optional<DisputeBuyer> buyer) {
-            this.buyer = buyer;
             return this;
         }
 
@@ -1248,6 +1317,7 @@ public final class Dispute {
         @java.lang.Override
         public Dispute build() {
             return new Dispute(
+                    acceptable,
                     accountId,
                     amount,
                     buyer,
@@ -1258,19 +1328,53 @@ public final class Dispute {
                     evidenceEditable,
                     evidenceLockedReason,
                     evidenceSubmittedAt,
-                    generatedResponseAttachment,
+                    fee,
+                    feeCharged,
                     id,
                     inquiry,
                     issuerComments,
+                    lineItems,
                     payment,
-                    planId,
                     productId,
-                    rapidDisputeResolution,
                     reason,
                     reasonCode,
                     status,
+                    submissionFailureReason,
                     updatedAt,
+                    variantId,
                     additionalProperties);
+        }
+
+        @JsonAnySetter
+        private void putAdditionalPropertyFromJson(String key, Object value) {
+            if (key.equalsIgnoreCase("acceptable")
+                    || key.equalsIgnoreCase("account_id")
+                    || key.equalsIgnoreCase("amount")
+                    || key.equalsIgnoreCase("buyer")
+                    || key.equalsIgnoreCase("created_at")
+                    || key.equalsIgnoreCase("currency")
+                    || key.equalsIgnoreCase("evidence")
+                    || key.equalsIgnoreCase("evidence_due_at")
+                    || key.equalsIgnoreCase("evidence_editable")
+                    || key.equalsIgnoreCase("evidence_locked_reason")
+                    || key.equalsIgnoreCase("evidence_submitted_at")
+                    || key.equalsIgnoreCase("fee")
+                    || key.equalsIgnoreCase("fee_charged")
+                    || key.equalsIgnoreCase("id")
+                    || key.equalsIgnoreCase("inquiry")
+                    || key.equalsIgnoreCase("issuer_comments")
+                    || key.equalsIgnoreCase("line_items")
+                    || key.equalsIgnoreCase("payment")
+                    || key.equalsIgnoreCase("product_id")
+                    || key.equalsIgnoreCase("reason")
+                    || key.equalsIgnoreCase("reason_code")
+                    || key.equalsIgnoreCase("status")
+                    || key.equalsIgnoreCase("submission_failure_reason")
+                    || key.equalsIgnoreCase("updated_at")
+                    || key.equalsIgnoreCase("variant_id")) {
+                return;
+            }
+            this.additionalProperties.put(key, value);
         }
 
         @java.lang.Override

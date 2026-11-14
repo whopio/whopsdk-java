@@ -27,13 +27,23 @@ import org.jetbrains.annotations.NotNull;
 public final class LedgerActivitySource {
     private final Optional<Double> amountFloat;
 
+    private final Optional<String> cardBrand;
+
     private final Optional<String> chain;
 
     private final Optional<String> claimUrl;
 
     private final Optional<OffsetDateTime> createdAt;
 
+    private final Optional<UserSummary> createdByUser;
+
     private final Optional<OffsetDateTime> estimatedArrival;
+
+    private final Optional<Money> feeAmount;
+
+    private final Optional<LedgerActivitySourceFeeKind> feeKind;
+
+    private final Optional<LedgerActivitySourceFeeType> feeType;
 
     private final Optional<String> fromAmount;
 
@@ -41,15 +51,27 @@ public final class LedgerActivitySource {
 
     private final String id;
 
+    private final Optional<String> notes;
+
     private final String object;
 
     private final Optional<String> payerName;
+
+    private final Optional<Money> paymentAmount;
+
+    private final Optional<String> paymentMethodType;
+
+    private final Optional<String> paymentProcessor;
+
+    private final Optional<Money> payoutAmount;
 
     private final Optional<LedgerActivitySourcePayoutDestination> payoutDestination;
 
     private final Optional<String> payoutTokenNickname;
 
     private final Optional<String> reason;
+
+    private final Optional<Boolean> riskReviewHold;
 
     private final Optional<String> senderAddress;
 
@@ -59,53 +81,79 @@ public final class LedgerActivitySource {
 
     private final Optional<String> toCurrency;
 
+    private final Optional<String> traceCode;
+
     private final Optional<String> txHash;
 
     private final Map<String, Object> additionalProperties;
 
     private LedgerActivitySource(
             Optional<Double> amountFloat,
+            Optional<String> cardBrand,
             Optional<String> chain,
             Optional<String> claimUrl,
             Optional<OffsetDateTime> createdAt,
+            Optional<UserSummary> createdByUser,
             Optional<OffsetDateTime> estimatedArrival,
+            Optional<Money> feeAmount,
+            Optional<LedgerActivitySourceFeeKind> feeKind,
+            Optional<LedgerActivitySourceFeeType> feeType,
             Optional<String> fromAmount,
             Optional<String> fromCurrency,
             String id,
+            Optional<String> notes,
             String object,
             Optional<String> payerName,
+            Optional<Money> paymentAmount,
+            Optional<String> paymentMethodType,
+            Optional<String> paymentProcessor,
+            Optional<Money> payoutAmount,
             Optional<LedgerActivitySourcePayoutDestination> payoutDestination,
             Optional<String> payoutTokenNickname,
             Optional<String> reason,
+            Optional<Boolean> riskReviewHold,
             Optional<String> senderAddress,
             Optional<String> status,
             Optional<String> toAmount,
             Optional<String> toCurrency,
+            Optional<String> traceCode,
             Optional<String> txHash,
             Map<String, Object> additionalProperties) {
         this.amountFloat = amountFloat;
+        this.cardBrand = cardBrand;
         this.chain = chain;
         this.claimUrl = claimUrl;
         this.createdAt = createdAt;
+        this.createdByUser = createdByUser;
         this.estimatedArrival = estimatedArrival;
+        this.feeAmount = feeAmount;
+        this.feeKind = feeKind;
+        this.feeType = feeType;
         this.fromAmount = fromAmount;
         this.fromCurrency = fromCurrency;
         this.id = id;
+        this.notes = notes;
         this.object = object;
         this.payerName = payerName;
+        this.paymentAmount = paymentAmount;
+        this.paymentMethodType = paymentMethodType;
+        this.paymentProcessor = paymentProcessor;
+        this.payoutAmount = payoutAmount;
         this.payoutDestination = payoutDestination;
         this.payoutTokenNickname = payoutTokenNickname;
         this.reason = reason;
+        this.riskReviewHold = riskReviewHold;
         this.senderAddress = senderAddress;
         this.status = status;
         this.toAmount = toAmount;
         this.toCurrency = toCurrency;
+        this.traceCode = traceCode;
         this.txHash = txHash;
         this.additionalProperties = additionalProperties;
     }
 
     /**
-     * @return Withdrawal amount as a decimal number in the destination currency (withdrawal sources only; requires payout:withdrawal:read).
+     * @return Payout amount as a decimal number in the destination currency (payout sources only; requires payout:withdrawal:read).
      */
     @JsonIgnore
     public Optional<Double> getAmountFloat() {
@@ -113,6 +161,17 @@ public final class LedgerActivitySource {
             return Optional.empty();
         }
         return amountFloat;
+    }
+
+    /**
+     * @return Card brand used by the payment source.
+     */
+    @JsonIgnore
+    public Optional<String> getCardBrand() {
+        if (cardBrand == null) {
+            return Optional.empty();
+        }
+        return cardBrand;
     }
 
     /**
@@ -127,7 +186,7 @@ public final class LedgerActivitySource {
     }
 
     /**
-     * @return Public claim URL for the airdrop link (airdrop_link sources only).
+     * @return The airdrop's claim URL. Null unless the caller can manage claim links on the funding company or withdraw from the funding personal balance.
      */
     @JsonIgnore
     public Optional<String> getClaimUrl() {
@@ -138,7 +197,7 @@ public final class LedgerActivitySource {
     }
 
     /**
-     * @return Withdrawal creation time as an ISO 8601 timestamp (withdrawal sources only; requires payout:withdrawal:read).
+     * @return Payout creation time as an ISO 8601 timestamp (payout sources only; requires payout:withdrawal:read).
      */
     @JsonIgnore
     public Optional<OffsetDateTime> getCreatedAt() {
@@ -149,7 +208,18 @@ public final class LedgerActivitySource {
     }
 
     /**
-     * @return Estimated arrival as an ISO 8601 timestamp (withdrawal sources only; requires payout:withdrawal:read).
+     * @return User who requested the withdrawal. Null for system-generated withdrawals or without payout:withdrawal:read.
+     */
+    @JsonIgnore
+    public Optional<UserSummary> getCreatedByUser() {
+        if (createdByUser == null) {
+            return Optional.empty();
+        }
+        return createdByUser;
+    }
+
+    /**
+     * @return Estimated arrival as an ISO 8601 timestamp (payout sources only; requires payout:withdrawal:read).
      */
     @JsonIgnore
     public Optional<OffsetDateTime> getEstimatedArrival() {
@@ -157,6 +227,39 @@ public final class LedgerActivitySource {
             return Optional.empty();
         }
         return estimatedArrival;
+    }
+
+    /**
+     * @return Total withdrawal fees, including markup fees. Requires payout:withdrawal:read.
+     */
+    @JsonIgnore
+    public Optional<Money> getFeeAmount() {
+        if (feeAmount == null) {
+            return Optional.empty();
+        }
+        return feeAmount;
+    }
+
+    /**
+     * @return Action that generated a platform markup fee: deposit, swap, transfer, card_spend, or payout. Present for platform_markup_fee and platform_markup_fee_payout, including when include_resource is false. Null when the originating action is unavailable; omitted on other source types.
+     */
+    @JsonIgnore
+    public Optional<LedgerActivitySourceFeeKind> getFeeKind() {
+        if (feeKind == null) {
+            return Optional.empty();
+        }
+        return feeKind;
+    }
+
+    /**
+     * @return Whether withdrawal fees are inclusive or exclusive. Requires payout:withdrawal:read.
+     */
+    @JsonIgnore
+    public Optional<LedgerActivitySourceFeeType> getFeeType() {
+        if (feeType == null) {
+            return Optional.empty();
+        }
+        return feeType;
     }
 
     /**
@@ -186,13 +289,24 @@ public final class LedgerActivitySource {
         return id;
     }
 
+    /**
+     * @return Memo attached to the transfer, payout, or bank_deposit source, or null when none was provided (on payout sources requires payout:withdrawal:read).
+     */
+    @JsonIgnore
+    public Optional<String> getNotes() {
+        if (notes == null) {
+            return Optional.empty();
+        }
+        return notes;
+    }
+
     @JsonProperty("object")
     public String getObject() {
         return object;
     }
 
     /**
-     * @return Name of the entity processing the payout (withdrawal sources only; requires payout:withdrawal:read).
+     * @return On payout sources, the name of the entity processing the payout (requires payout:withdrawal:read). On bank_deposit sources, the name of the account that sent the deposit.
      */
     @JsonIgnore
     public Optional<String> getPayerName() {
@@ -203,7 +317,51 @@ public final class LedgerActivitySource {
     }
 
     /**
-     * @return Payout destination display info (withdrawal sources only).
+     * @return Total charged by the payment source.
+     */
+    @JsonIgnore
+    public Optional<Money> getPaymentAmount() {
+        if (paymentAmount == null) {
+            return Optional.empty();
+        }
+        return paymentAmount;
+    }
+
+    /**
+     * @return Payment method used by the payment source. On bank_deposit sources, the transfer rail: <code>wire</code>, <code>ach</code>, or <code>rtp</code>.
+     */
+    @JsonIgnore
+    public Optional<String> getPaymentMethodType() {
+        if (paymentMethodType == null) {
+            return Optional.empty();
+        }
+        return paymentMethodType;
+    }
+
+    /**
+     * @return Processor used by the payment source.
+     */
+    @JsonIgnore
+    public Optional<String> getPaymentProcessor() {
+        if (paymentProcessor == null) {
+            return Optional.empty();
+        }
+        return paymentProcessor;
+    }
+
+    /**
+     * @return Withdrawal principal sent to the destination, excluding fees, in the withdrawal currency. Requires payout:withdrawal:read.
+     */
+    @JsonIgnore
+    public Optional<Money> getPayoutAmount() {
+        if (payoutAmount == null) {
+            return Optional.empty();
+        }
+        return payoutAmount;
+    }
+
+    /**
+     * @return Payout destination display info (payout sources only).
      */
     @JsonIgnore
     public Optional<LedgerActivitySourcePayoutDestination> getPayoutDestination() {
@@ -214,7 +372,7 @@ public final class LedgerActivitySource {
     }
 
     /**
-     * @return Saved payout destination nickname (withdrawal sources only).
+     * @return Saved payout destination nickname (payout sources only).
      */
     @JsonIgnore
     public Optional<String> getPayoutTokenNickname() {
@@ -225,7 +383,7 @@ public final class LedgerActivitySource {
     }
 
     /**
-     * @return Why the activity happened. On transfer sources this is the transfer reason, for example pool_top_up or bounty_return. On withdrawal sources it explains why the withdrawal was canceled, denied, or failed (requires payout:withdrawal:read); null while the withdrawal is progressing normally.
+     * @return Why the activity happened. On transfer sources this is the transfer reason, for example pool_top_up or bounty_return. On payout sources it explains why the payout was canceled, denied, or failed (requires payout:withdrawal:read); null while the payout is progressing normally.
      */
     @JsonIgnore
     public Optional<String> getReason() {
@@ -236,7 +394,18 @@ public final class LedgerActivitySource {
     }
 
     /**
-     * @return Sender wallet address or onramp provider identifier (onchain_transaction sources only).
+     * @return Whether this payout is currently held for manual risk review (payout sources only; requires payout:withdrawal:read).
+     */
+    @JsonIgnore
+    public Optional<Boolean> getRiskReviewHold() {
+        if (riskReviewHold == null) {
+            return Optional.empty();
+        }
+        return riskReviewHold;
+    }
+
+    /**
+     * @return On onchain_transaction sources, the sender wallet address or onramp provider identifier. On bank_deposit sources, the last four digits of the sending bank account, such as <code>••••1547</code>.
      */
     @JsonIgnore
     public Optional<String> getSenderAddress() {
@@ -247,7 +416,7 @@ public final class LedgerActivitySource {
     }
 
     /**
-     * @return Lifecycle status. On withdrawal sources this is the withdrawal status (requires payout:withdrawal:read); on airdrop_link sources it is the claim-link status (ungated); on payment and top-up sources it is the friendly payment status such as succeeded/pending/failed (ungated).
+     * @return Lifecycle status. On payout sources this is the payout status (requires payout:withdrawal:read); on airdrop_link sources it is the claim-link status (ungated); on payment and top-up sources it is the friendly payment status such as succeeded/pending/failed (ungated); on bank_deposit sources it is succeeded, reversal_in_progress or reversed (ungated).
      */
     @JsonIgnore
     public Optional<String> getStatus() {
@@ -280,6 +449,17 @@ public final class LedgerActivitySource {
     }
 
     /**
+     * @return Bank trace reference for the withdrawal. Requires payout:withdrawal:read.
+     */
+    @JsonIgnore
+    public Optional<String> getTraceCode() {
+        if (traceCode == null) {
+            return Optional.empty();
+        }
+        return traceCode;
+    }
+
+    /**
      * @return On-chain transaction hash (onchain_transaction and swap sources only).
      */
     @JsonIgnore
@@ -294,6 +474,12 @@ public final class LedgerActivitySource {
     @JsonProperty("amount_float")
     private Optional<Double> _getAmountFloat() {
         return amountFloat;
+    }
+
+    @JsonInclude(value = JsonInclude.Include.CUSTOM, valueFilter = NullableNonemptyFilter.class)
+    @JsonProperty("card_brand")
+    private Optional<String> _getCardBrand() {
+        return cardBrand;
     }
 
     @JsonInclude(value = JsonInclude.Include.CUSTOM, valueFilter = NullableNonemptyFilter.class)
@@ -315,9 +501,33 @@ public final class LedgerActivitySource {
     }
 
     @JsonInclude(value = JsonInclude.Include.CUSTOM, valueFilter = NullableNonemptyFilter.class)
+    @JsonProperty("created_by_user")
+    private Optional<UserSummary> _getCreatedByUser() {
+        return createdByUser;
+    }
+
+    @JsonInclude(value = JsonInclude.Include.CUSTOM, valueFilter = NullableNonemptyFilter.class)
     @JsonProperty("estimated_arrival")
     private Optional<OffsetDateTime> _getEstimatedArrival() {
         return estimatedArrival;
+    }
+
+    @JsonInclude(value = JsonInclude.Include.CUSTOM, valueFilter = NullableNonemptyFilter.class)
+    @JsonProperty("fee_amount")
+    private Optional<Money> _getFeeAmount() {
+        return feeAmount;
+    }
+
+    @JsonInclude(value = JsonInclude.Include.CUSTOM, valueFilter = NullableNonemptyFilter.class)
+    @JsonProperty("fee_kind")
+    private Optional<LedgerActivitySourceFeeKind> _getFeeKind() {
+        return feeKind;
+    }
+
+    @JsonInclude(value = JsonInclude.Include.CUSTOM, valueFilter = NullableNonemptyFilter.class)
+    @JsonProperty("fee_type")
+    private Optional<LedgerActivitySourceFeeType> _getFeeType() {
+        return feeType;
     }
 
     @JsonInclude(value = JsonInclude.Include.CUSTOM, valueFilter = NullableNonemptyFilter.class)
@@ -333,9 +543,39 @@ public final class LedgerActivitySource {
     }
 
     @JsonInclude(value = JsonInclude.Include.CUSTOM, valueFilter = NullableNonemptyFilter.class)
+    @JsonProperty("notes")
+    private Optional<String> _getNotes() {
+        return notes;
+    }
+
+    @JsonInclude(value = JsonInclude.Include.CUSTOM, valueFilter = NullableNonemptyFilter.class)
     @JsonProperty("payer_name")
     private Optional<String> _getPayerName() {
         return payerName;
+    }
+
+    @JsonInclude(value = JsonInclude.Include.CUSTOM, valueFilter = NullableNonemptyFilter.class)
+    @JsonProperty("payment_amount")
+    private Optional<Money> _getPaymentAmount() {
+        return paymentAmount;
+    }
+
+    @JsonInclude(value = JsonInclude.Include.CUSTOM, valueFilter = NullableNonemptyFilter.class)
+    @JsonProperty("payment_method_type")
+    private Optional<String> _getPaymentMethodType() {
+        return paymentMethodType;
+    }
+
+    @JsonInclude(value = JsonInclude.Include.CUSTOM, valueFilter = NullableNonemptyFilter.class)
+    @JsonProperty("payment_processor")
+    private Optional<String> _getPaymentProcessor() {
+        return paymentProcessor;
+    }
+
+    @JsonInclude(value = JsonInclude.Include.CUSTOM, valueFilter = NullableNonemptyFilter.class)
+    @JsonProperty("payout_amount")
+    private Optional<Money> _getPayoutAmount() {
+        return payoutAmount;
     }
 
     @JsonInclude(value = JsonInclude.Include.CUSTOM, valueFilter = NullableNonemptyFilter.class)
@@ -354,6 +594,12 @@ public final class LedgerActivitySource {
     @JsonProperty("reason")
     private Optional<String> _getReason() {
         return reason;
+    }
+
+    @JsonInclude(value = JsonInclude.Include.CUSTOM, valueFilter = NullableNonemptyFilter.class)
+    @JsonProperty("risk_review_hold")
+    private Optional<Boolean> _getRiskReviewHold() {
+        return riskReviewHold;
     }
 
     @JsonInclude(value = JsonInclude.Include.CUSTOM, valueFilter = NullableNonemptyFilter.class)
@@ -381,6 +627,12 @@ public final class LedgerActivitySource {
     }
 
     @JsonInclude(value = JsonInclude.Include.CUSTOM, valueFilter = NullableNonemptyFilter.class)
+    @JsonProperty("trace_code")
+    private Optional<String> _getTraceCode() {
+        return traceCode;
+    }
+
+    @JsonInclude(value = JsonInclude.Include.CUSTOM, valueFilter = NullableNonemptyFilter.class)
     @JsonProperty("tx_hash")
     private Optional<String> _getTxHash() {
         return txHash;
@@ -399,22 +651,34 @@ public final class LedgerActivitySource {
 
     private boolean equalTo(LedgerActivitySource other) {
         return amountFloat.equals(other.amountFloat)
+                && cardBrand.equals(other.cardBrand)
                 && chain.equals(other.chain)
                 && claimUrl.equals(other.claimUrl)
                 && createdAt.equals(other.createdAt)
+                && createdByUser.equals(other.createdByUser)
                 && estimatedArrival.equals(other.estimatedArrival)
+                && feeAmount.equals(other.feeAmount)
+                && feeKind.equals(other.feeKind)
+                && feeType.equals(other.feeType)
                 && fromAmount.equals(other.fromAmount)
                 && fromCurrency.equals(other.fromCurrency)
                 && id.equals(other.id)
+                && notes.equals(other.notes)
                 && object.equals(other.object)
                 && payerName.equals(other.payerName)
+                && paymentAmount.equals(other.paymentAmount)
+                && paymentMethodType.equals(other.paymentMethodType)
+                && paymentProcessor.equals(other.paymentProcessor)
+                && payoutAmount.equals(other.payoutAmount)
                 && payoutDestination.equals(other.payoutDestination)
                 && payoutTokenNickname.equals(other.payoutTokenNickname)
                 && reason.equals(other.reason)
+                && riskReviewHold.equals(other.riskReviewHold)
                 && senderAddress.equals(other.senderAddress)
                 && status.equals(other.status)
                 && toAmount.equals(other.toAmount)
                 && toCurrency.equals(other.toCurrency)
+                && traceCode.equals(other.traceCode)
                 && txHash.equals(other.txHash);
     }
 
@@ -422,22 +686,34 @@ public final class LedgerActivitySource {
     public int hashCode() {
         return Objects.hash(
                 this.amountFloat,
+                this.cardBrand,
                 this.chain,
                 this.claimUrl,
                 this.createdAt,
+                this.createdByUser,
                 this.estimatedArrival,
+                this.feeAmount,
+                this.feeKind,
+                this.feeType,
                 this.fromAmount,
                 this.fromCurrency,
                 this.id,
+                this.notes,
                 this.object,
                 this.payerName,
+                this.paymentAmount,
+                this.paymentMethodType,
+                this.paymentProcessor,
+                this.payoutAmount,
                 this.payoutDestination,
                 this.payoutTokenNickname,
                 this.reason,
+                this.riskReviewHold,
                 this.senderAddress,
                 this.status,
                 this.toAmount,
                 this.toCurrency,
+                this.traceCode,
                 this.txHash);
     }
 
@@ -468,13 +744,22 @@ public final class LedgerActivitySource {
         _FinalStage additionalProperties(Map<String, Object> additionalProperties);
 
         /**
-         * <p>Withdrawal amount as a decimal number in the destination currency (withdrawal sources only; requires payout:withdrawal:read).</p>
+         * <p>Payout amount as a decimal number in the destination currency (payout sources only; requires payout:withdrawal:read).</p>
          */
         _FinalStage amountFloat(Optional<Double> amountFloat);
 
         _FinalStage amountFloat(Double amountFloat);
 
         _FinalStage amountFloat(Nullable<Double> amountFloat);
+
+        /**
+         * <p>Card brand used by the payment source.</p>
+         */
+        _FinalStage cardBrand(Optional<String> cardBrand);
+
+        _FinalStage cardBrand(String cardBrand);
+
+        _FinalStage cardBrand(Nullable<String> cardBrand);
 
         /**
          * <p>Chain the deposit landed on, for example plasma (onchain_transaction sources only).</p>
@@ -486,7 +771,7 @@ public final class LedgerActivitySource {
         _FinalStage chain(Nullable<String> chain);
 
         /**
-         * <p>Public claim URL for the airdrop link (airdrop_link sources only).</p>
+         * <p>The airdrop's claim URL. Null unless the caller can manage claim links on the funding company or withdraw from the funding personal balance.</p>
          */
         _FinalStage claimUrl(Optional<String> claimUrl);
 
@@ -495,7 +780,7 @@ public final class LedgerActivitySource {
         _FinalStage claimUrl(Nullable<String> claimUrl);
 
         /**
-         * <p>Withdrawal creation time as an ISO 8601 timestamp (withdrawal sources only; requires payout:withdrawal:read).</p>
+         * <p>Payout creation time as an ISO 8601 timestamp (payout sources only; requires payout:withdrawal:read).</p>
          */
         _FinalStage createdAt(Optional<OffsetDateTime> createdAt);
 
@@ -504,13 +789,49 @@ public final class LedgerActivitySource {
         _FinalStage createdAt(Nullable<OffsetDateTime> createdAt);
 
         /**
-         * <p>Estimated arrival as an ISO 8601 timestamp (withdrawal sources only; requires payout:withdrawal:read).</p>
+         * <p>User who requested the withdrawal. Null for system-generated withdrawals or without payout:withdrawal:read.</p>
+         */
+        _FinalStage createdByUser(Optional<UserSummary> createdByUser);
+
+        _FinalStage createdByUser(UserSummary createdByUser);
+
+        _FinalStage createdByUser(Nullable<UserSummary> createdByUser);
+
+        /**
+         * <p>Estimated arrival as an ISO 8601 timestamp (payout sources only; requires payout:withdrawal:read).</p>
          */
         _FinalStage estimatedArrival(Optional<OffsetDateTime> estimatedArrival);
 
         _FinalStage estimatedArrival(OffsetDateTime estimatedArrival);
 
         _FinalStage estimatedArrival(Nullable<OffsetDateTime> estimatedArrival);
+
+        /**
+         * <p>Total withdrawal fees, including markup fees. Requires payout:withdrawal:read.</p>
+         */
+        _FinalStage feeAmount(Optional<Money> feeAmount);
+
+        _FinalStage feeAmount(Money feeAmount);
+
+        _FinalStage feeAmount(Nullable<Money> feeAmount);
+
+        /**
+         * <p>Action that generated a platform markup fee: deposit, swap, transfer, card_spend, or payout. Present for platform_markup_fee and platform_markup_fee_payout, including when include_resource is false. Null when the originating action is unavailable; omitted on other source types.</p>
+         */
+        _FinalStage feeKind(Optional<LedgerActivitySourceFeeKind> feeKind);
+
+        _FinalStage feeKind(LedgerActivitySourceFeeKind feeKind);
+
+        _FinalStage feeKind(Nullable<LedgerActivitySourceFeeKind> feeKind);
+
+        /**
+         * <p>Whether withdrawal fees are inclusive or exclusive. Requires payout:withdrawal:read.</p>
+         */
+        _FinalStage feeType(Optional<LedgerActivitySourceFeeType> feeType);
+
+        _FinalStage feeType(LedgerActivitySourceFeeType feeType);
+
+        _FinalStage feeType(Nullable<LedgerActivitySourceFeeType> feeType);
 
         /**
          * <p>Amount converted out of from_currency as a decimal string (swap sources only).</p>
@@ -531,7 +852,16 @@ public final class LedgerActivitySource {
         _FinalStage fromCurrency(Nullable<String> fromCurrency);
 
         /**
-         * <p>Name of the entity processing the payout (withdrawal sources only; requires payout:withdrawal:read).</p>
+         * <p>Memo attached to the transfer, payout, or bank_deposit source, or null when none was provided (on payout sources requires payout:withdrawal:read).</p>
+         */
+        _FinalStage notes(Optional<String> notes);
+
+        _FinalStage notes(String notes);
+
+        _FinalStage notes(Nullable<String> notes);
+
+        /**
+         * <p>On payout sources, the name of the entity processing the payout (requires payout:withdrawal:read). On bank_deposit sources, the name of the account that sent the deposit.</p>
          */
         _FinalStage payerName(Optional<String> payerName);
 
@@ -540,7 +870,43 @@ public final class LedgerActivitySource {
         _FinalStage payerName(Nullable<String> payerName);
 
         /**
-         * <p>Payout destination display info (withdrawal sources only).</p>
+         * <p>Total charged by the payment source.</p>
+         */
+        _FinalStage paymentAmount(Optional<Money> paymentAmount);
+
+        _FinalStage paymentAmount(Money paymentAmount);
+
+        _FinalStage paymentAmount(Nullable<Money> paymentAmount);
+
+        /**
+         * <p>Payment method used by the payment source. On bank_deposit sources, the transfer rail: <code>wire</code>, <code>ach</code>, or <code>rtp</code>.</p>
+         */
+        _FinalStage paymentMethodType(Optional<String> paymentMethodType);
+
+        _FinalStage paymentMethodType(String paymentMethodType);
+
+        _FinalStage paymentMethodType(Nullable<String> paymentMethodType);
+
+        /**
+         * <p>Processor used by the payment source.</p>
+         */
+        _FinalStage paymentProcessor(Optional<String> paymentProcessor);
+
+        _FinalStage paymentProcessor(String paymentProcessor);
+
+        _FinalStage paymentProcessor(Nullable<String> paymentProcessor);
+
+        /**
+         * <p>Withdrawal principal sent to the destination, excluding fees, in the withdrawal currency. Requires payout:withdrawal:read.</p>
+         */
+        _FinalStage payoutAmount(Optional<Money> payoutAmount);
+
+        _FinalStage payoutAmount(Money payoutAmount);
+
+        _FinalStage payoutAmount(Nullable<Money> payoutAmount);
+
+        /**
+         * <p>Payout destination display info (payout sources only).</p>
          */
         _FinalStage payoutDestination(Optional<LedgerActivitySourcePayoutDestination> payoutDestination);
 
@@ -549,7 +915,7 @@ public final class LedgerActivitySource {
         _FinalStage payoutDestination(Nullable<LedgerActivitySourcePayoutDestination> payoutDestination);
 
         /**
-         * <p>Saved payout destination nickname (withdrawal sources only).</p>
+         * <p>Saved payout destination nickname (payout sources only).</p>
          */
         _FinalStage payoutTokenNickname(Optional<String> payoutTokenNickname);
 
@@ -558,7 +924,7 @@ public final class LedgerActivitySource {
         _FinalStage payoutTokenNickname(Nullable<String> payoutTokenNickname);
 
         /**
-         * <p>Why the activity happened. On transfer sources this is the transfer reason, for example pool_top_up or bounty_return. On withdrawal sources it explains why the withdrawal was canceled, denied, or failed (requires payout:withdrawal:read); null while the withdrawal is progressing normally.</p>
+         * <p>Why the activity happened. On transfer sources this is the transfer reason, for example pool_top_up or bounty_return. On payout sources it explains why the payout was canceled, denied, or failed (requires payout:withdrawal:read); null while the payout is progressing normally.</p>
          */
         _FinalStage reason(Optional<String> reason);
 
@@ -567,7 +933,16 @@ public final class LedgerActivitySource {
         _FinalStage reason(Nullable<String> reason);
 
         /**
-         * <p>Sender wallet address or onramp provider identifier (onchain_transaction sources only).</p>
+         * <p>Whether this payout is currently held for manual risk review (payout sources only; requires payout:withdrawal:read).</p>
+         */
+        _FinalStage riskReviewHold(Optional<Boolean> riskReviewHold);
+
+        _FinalStage riskReviewHold(Boolean riskReviewHold);
+
+        _FinalStage riskReviewHold(Nullable<Boolean> riskReviewHold);
+
+        /**
+         * <p>On onchain_transaction sources, the sender wallet address or onramp provider identifier. On bank_deposit sources, the last four digits of the sending bank account, such as <code>••••1547</code>.</p>
          */
         _FinalStage senderAddress(Optional<String> senderAddress);
 
@@ -576,7 +951,7 @@ public final class LedgerActivitySource {
         _FinalStage senderAddress(Nullable<String> senderAddress);
 
         /**
-         * <p>Lifecycle status. On withdrawal sources this is the withdrawal status (requires payout:withdrawal:read); on airdrop_link sources it is the claim-link status (ungated); on payment and top-up sources it is the friendly payment status such as succeeded/pending/failed (ungated).</p>
+         * <p>Lifecycle status. On payout sources this is the payout status (requires payout:withdrawal:read); on airdrop_link sources it is the claim-link status (ungated); on payment and top-up sources it is the friendly payment status such as succeeded/pending/failed (ungated); on bank_deposit sources it is succeeded, reversal_in_progress or reversed (ungated).</p>
          */
         _FinalStage status(Optional<String> status);
 
@@ -603,6 +978,15 @@ public final class LedgerActivitySource {
         _FinalStage toCurrency(Nullable<String> toCurrency);
 
         /**
+         * <p>Bank trace reference for the withdrawal. Requires payout:withdrawal:read.</p>
+         */
+        _FinalStage traceCode(Optional<String> traceCode);
+
+        _FinalStage traceCode(String traceCode);
+
+        _FinalStage traceCode(Nullable<String> traceCode);
+
+        /**
          * <p>On-chain transaction hash (onchain_transaction and swap sources only).</p>
          */
         _FinalStage txHash(Optional<String> txHash);
@@ -620,6 +1004,8 @@ public final class LedgerActivitySource {
 
         private Optional<String> txHash = Optional.empty();
 
+        private Optional<String> traceCode = Optional.empty();
+
         private Optional<String> toCurrency = Optional.empty();
 
         private Optional<String> toAmount = Optional.empty();
@@ -628,19 +1014,39 @@ public final class LedgerActivitySource {
 
         private Optional<String> senderAddress = Optional.empty();
 
+        private Optional<Boolean> riskReviewHold = Optional.empty();
+
         private Optional<String> reason = Optional.empty();
 
         private Optional<String> payoutTokenNickname = Optional.empty();
 
         private Optional<LedgerActivitySourcePayoutDestination> payoutDestination = Optional.empty();
 
+        private Optional<Money> payoutAmount = Optional.empty();
+
+        private Optional<String> paymentProcessor = Optional.empty();
+
+        private Optional<String> paymentMethodType = Optional.empty();
+
+        private Optional<Money> paymentAmount = Optional.empty();
+
         private Optional<String> payerName = Optional.empty();
+
+        private Optional<String> notes = Optional.empty();
 
         private Optional<String> fromCurrency = Optional.empty();
 
         private Optional<String> fromAmount = Optional.empty();
 
+        private Optional<LedgerActivitySourceFeeType> feeType = Optional.empty();
+
+        private Optional<LedgerActivitySourceFeeKind> feeKind = Optional.empty();
+
+        private Optional<Money> feeAmount = Optional.empty();
+
         private Optional<OffsetDateTime> estimatedArrival = Optional.empty();
+
+        private Optional<UserSummary> createdByUser = Optional.empty();
 
         private Optional<OffsetDateTime> createdAt = Optional.empty();
 
@@ -648,9 +1054,10 @@ public final class LedgerActivitySource {
 
         private Optional<String> chain = Optional.empty();
 
+        private Optional<String> cardBrand = Optional.empty();
+
         private Optional<Double> amountFloat = Optional.empty();
 
-        @JsonAnySetter
         private Map<String, Object> additionalProperties = new HashMap<>();
 
         private Builder() {}
@@ -658,22 +1065,34 @@ public final class LedgerActivitySource {
         @java.lang.Override
         public Builder from(LedgerActivitySource other) {
             amountFloat(other.getAmountFloat());
+            cardBrand(other.getCardBrand());
             chain(other.getChain());
             claimUrl(other.getClaimUrl());
             createdAt(other.getCreatedAt());
+            createdByUser(other.getCreatedByUser());
             estimatedArrival(other.getEstimatedArrival());
+            feeAmount(other.getFeeAmount());
+            feeKind(other.getFeeKind());
+            feeType(other.getFeeType());
             fromAmount(other.getFromAmount());
             fromCurrency(other.getFromCurrency());
             id(other.getId());
+            notes(other.getNotes());
             object(other.getObject());
             payerName(other.getPayerName());
+            paymentAmount(other.getPaymentAmount());
+            paymentMethodType(other.getPaymentMethodType());
+            paymentProcessor(other.getPaymentProcessor());
+            payoutAmount(other.getPayoutAmount());
             payoutDestination(other.getPayoutDestination());
             payoutTokenNickname(other.getPayoutTokenNickname());
             reason(other.getReason());
+            riskReviewHold(other.getRiskReviewHold());
             senderAddress(other.getSenderAddress());
             status(other.getStatus());
             toAmount(other.getToAmount());
             toCurrency(other.getToCurrency());
+            traceCode(other.getTraceCode());
             txHash(other.getTxHash());
             return this;
         }
@@ -725,6 +1144,42 @@ public final class LedgerActivitySource {
         @JsonSetter(value = "tx_hash", nulls = Nulls.SKIP)
         public _FinalStage txHash(Optional<String> txHash) {
             this.txHash = txHash;
+            return this;
+        }
+
+        /**
+         * <p>Bank trace reference for the withdrawal. Requires payout:withdrawal:read.</p>
+         * @return Reference to {@code this} so that method calls can be chained together.
+         */
+        @java.lang.Override
+        public _FinalStage traceCode(Nullable<String> traceCode) {
+            if (traceCode.isNull()) {
+                this.traceCode = null;
+            } else if (traceCode.isEmpty()) {
+                this.traceCode = Optional.empty();
+            } else {
+                this.traceCode = Optional.of(traceCode.get());
+            }
+            return this;
+        }
+
+        /**
+         * <p>Bank trace reference for the withdrawal. Requires payout:withdrawal:read.</p>
+         * @return Reference to {@code this} so that method calls can be chained together.
+         */
+        @java.lang.Override
+        public _FinalStage traceCode(String traceCode) {
+            this.traceCode = Optional.ofNullable(traceCode);
+            return this;
+        }
+
+        /**
+         * <p>Bank trace reference for the withdrawal. Requires payout:withdrawal:read.</p>
+         */
+        @java.lang.Override
+        @JsonSetter(value = "trace_code", nulls = Nulls.SKIP)
+        public _FinalStage traceCode(Optional<String> traceCode) {
+            this.traceCode = traceCode;
             return this;
         }
 
@@ -801,7 +1256,7 @@ public final class LedgerActivitySource {
         }
 
         /**
-         * <p>Lifecycle status. On withdrawal sources this is the withdrawal status (requires payout:withdrawal:read); on airdrop_link sources it is the claim-link status (ungated); on payment and top-up sources it is the friendly payment status such as succeeded/pending/failed (ungated).</p>
+         * <p>Lifecycle status. On payout sources this is the payout status (requires payout:withdrawal:read); on airdrop_link sources it is the claim-link status (ungated); on payment and top-up sources it is the friendly payment status such as succeeded/pending/failed (ungated); on bank_deposit sources it is succeeded, reversal_in_progress or reversed (ungated).</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
@@ -817,7 +1272,7 @@ public final class LedgerActivitySource {
         }
 
         /**
-         * <p>Lifecycle status. On withdrawal sources this is the withdrawal status (requires payout:withdrawal:read); on airdrop_link sources it is the claim-link status (ungated); on payment and top-up sources it is the friendly payment status such as succeeded/pending/failed (ungated).</p>
+         * <p>Lifecycle status. On payout sources this is the payout status (requires payout:withdrawal:read); on airdrop_link sources it is the claim-link status (ungated); on payment and top-up sources it is the friendly payment status such as succeeded/pending/failed (ungated); on bank_deposit sources it is succeeded, reversal_in_progress or reversed (ungated).</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
@@ -827,7 +1282,7 @@ public final class LedgerActivitySource {
         }
 
         /**
-         * <p>Lifecycle status. On withdrawal sources this is the withdrawal status (requires payout:withdrawal:read); on airdrop_link sources it is the claim-link status (ungated); on payment and top-up sources it is the friendly payment status such as succeeded/pending/failed (ungated).</p>
+         * <p>Lifecycle status. On payout sources this is the payout status (requires payout:withdrawal:read); on airdrop_link sources it is the claim-link status (ungated); on payment and top-up sources it is the friendly payment status such as succeeded/pending/failed (ungated); on bank_deposit sources it is succeeded, reversal_in_progress or reversed (ungated).</p>
          */
         @java.lang.Override
         @JsonSetter(value = "status", nulls = Nulls.SKIP)
@@ -837,7 +1292,7 @@ public final class LedgerActivitySource {
         }
 
         /**
-         * <p>Sender wallet address or onramp provider identifier (onchain_transaction sources only).</p>
+         * <p>On onchain_transaction sources, the sender wallet address or onramp provider identifier. On bank_deposit sources, the last four digits of the sending bank account, such as <code>••••1547</code>.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
@@ -853,7 +1308,7 @@ public final class LedgerActivitySource {
         }
 
         /**
-         * <p>Sender wallet address or onramp provider identifier (onchain_transaction sources only).</p>
+         * <p>On onchain_transaction sources, the sender wallet address or onramp provider identifier. On bank_deposit sources, the last four digits of the sending bank account, such as <code>••••1547</code>.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
@@ -863,7 +1318,7 @@ public final class LedgerActivitySource {
         }
 
         /**
-         * <p>Sender wallet address or onramp provider identifier (onchain_transaction sources only).</p>
+         * <p>On onchain_transaction sources, the sender wallet address or onramp provider identifier. On bank_deposit sources, the last four digits of the sending bank account, such as <code>••••1547</code>.</p>
          */
         @java.lang.Override
         @JsonSetter(value = "sender_address", nulls = Nulls.SKIP)
@@ -873,7 +1328,43 @@ public final class LedgerActivitySource {
         }
 
         /**
-         * <p>Why the activity happened. On transfer sources this is the transfer reason, for example pool_top_up or bounty_return. On withdrawal sources it explains why the withdrawal was canceled, denied, or failed (requires payout:withdrawal:read); null while the withdrawal is progressing normally.</p>
+         * <p>Whether this payout is currently held for manual risk review (payout sources only; requires payout:withdrawal:read).</p>
+         * @return Reference to {@code this} so that method calls can be chained together.
+         */
+        @java.lang.Override
+        public _FinalStage riskReviewHold(Nullable<Boolean> riskReviewHold) {
+            if (riskReviewHold.isNull()) {
+                this.riskReviewHold = null;
+            } else if (riskReviewHold.isEmpty()) {
+                this.riskReviewHold = Optional.empty();
+            } else {
+                this.riskReviewHold = Optional.of(riskReviewHold.get());
+            }
+            return this;
+        }
+
+        /**
+         * <p>Whether this payout is currently held for manual risk review (payout sources only; requires payout:withdrawal:read).</p>
+         * @return Reference to {@code this} so that method calls can be chained together.
+         */
+        @java.lang.Override
+        public _FinalStage riskReviewHold(Boolean riskReviewHold) {
+            this.riskReviewHold = Optional.ofNullable(riskReviewHold);
+            return this;
+        }
+
+        /**
+         * <p>Whether this payout is currently held for manual risk review (payout sources only; requires payout:withdrawal:read).</p>
+         */
+        @java.lang.Override
+        @JsonSetter(value = "risk_review_hold", nulls = Nulls.SKIP)
+        public _FinalStage riskReviewHold(Optional<Boolean> riskReviewHold) {
+            this.riskReviewHold = riskReviewHold;
+            return this;
+        }
+
+        /**
+         * <p>Why the activity happened. On transfer sources this is the transfer reason, for example pool_top_up or bounty_return. On payout sources it explains why the payout was canceled, denied, or failed (requires payout:withdrawal:read); null while the payout is progressing normally.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
@@ -889,7 +1380,7 @@ public final class LedgerActivitySource {
         }
 
         /**
-         * <p>Why the activity happened. On transfer sources this is the transfer reason, for example pool_top_up or bounty_return. On withdrawal sources it explains why the withdrawal was canceled, denied, or failed (requires payout:withdrawal:read); null while the withdrawal is progressing normally.</p>
+         * <p>Why the activity happened. On transfer sources this is the transfer reason, for example pool_top_up or bounty_return. On payout sources it explains why the payout was canceled, denied, or failed (requires payout:withdrawal:read); null while the payout is progressing normally.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
@@ -899,7 +1390,7 @@ public final class LedgerActivitySource {
         }
 
         /**
-         * <p>Why the activity happened. On transfer sources this is the transfer reason, for example pool_top_up or bounty_return. On withdrawal sources it explains why the withdrawal was canceled, denied, or failed (requires payout:withdrawal:read); null while the withdrawal is progressing normally.</p>
+         * <p>Why the activity happened. On transfer sources this is the transfer reason, for example pool_top_up or bounty_return. On payout sources it explains why the payout was canceled, denied, or failed (requires payout:withdrawal:read); null while the payout is progressing normally.</p>
          */
         @java.lang.Override
         @JsonSetter(value = "reason", nulls = Nulls.SKIP)
@@ -909,7 +1400,7 @@ public final class LedgerActivitySource {
         }
 
         /**
-         * <p>Saved payout destination nickname (withdrawal sources only).</p>
+         * <p>Saved payout destination nickname (payout sources only).</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
@@ -925,7 +1416,7 @@ public final class LedgerActivitySource {
         }
 
         /**
-         * <p>Saved payout destination nickname (withdrawal sources only).</p>
+         * <p>Saved payout destination nickname (payout sources only).</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
@@ -935,7 +1426,7 @@ public final class LedgerActivitySource {
         }
 
         /**
-         * <p>Saved payout destination nickname (withdrawal sources only).</p>
+         * <p>Saved payout destination nickname (payout sources only).</p>
          */
         @java.lang.Override
         @JsonSetter(value = "payout_token_nickname", nulls = Nulls.SKIP)
@@ -945,7 +1436,7 @@ public final class LedgerActivitySource {
         }
 
         /**
-         * <p>Payout destination display info (withdrawal sources only).</p>
+         * <p>Payout destination display info (payout sources only).</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
@@ -961,7 +1452,7 @@ public final class LedgerActivitySource {
         }
 
         /**
-         * <p>Payout destination display info (withdrawal sources only).</p>
+         * <p>Payout destination display info (payout sources only).</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
@@ -971,7 +1462,7 @@ public final class LedgerActivitySource {
         }
 
         /**
-         * <p>Payout destination display info (withdrawal sources only).</p>
+         * <p>Payout destination display info (payout sources only).</p>
          */
         @java.lang.Override
         @JsonSetter(value = "payout_destination", nulls = Nulls.SKIP)
@@ -981,7 +1472,151 @@ public final class LedgerActivitySource {
         }
 
         /**
-         * <p>Name of the entity processing the payout (withdrawal sources only; requires payout:withdrawal:read).</p>
+         * <p>Withdrawal principal sent to the destination, excluding fees, in the withdrawal currency. Requires payout:withdrawal:read.</p>
+         * @return Reference to {@code this} so that method calls can be chained together.
+         */
+        @java.lang.Override
+        public _FinalStage payoutAmount(Nullable<Money> payoutAmount) {
+            if (payoutAmount.isNull()) {
+                this.payoutAmount = null;
+            } else if (payoutAmount.isEmpty()) {
+                this.payoutAmount = Optional.empty();
+            } else {
+                this.payoutAmount = Optional.of(payoutAmount.get());
+            }
+            return this;
+        }
+
+        /**
+         * <p>Withdrawal principal sent to the destination, excluding fees, in the withdrawal currency. Requires payout:withdrawal:read.</p>
+         * @return Reference to {@code this} so that method calls can be chained together.
+         */
+        @java.lang.Override
+        public _FinalStage payoutAmount(Money payoutAmount) {
+            this.payoutAmount = Optional.ofNullable(payoutAmount);
+            return this;
+        }
+
+        /**
+         * <p>Withdrawal principal sent to the destination, excluding fees, in the withdrawal currency. Requires payout:withdrawal:read.</p>
+         */
+        @java.lang.Override
+        @JsonSetter(value = "payout_amount", nulls = Nulls.SKIP)
+        public _FinalStage payoutAmount(Optional<Money> payoutAmount) {
+            this.payoutAmount = payoutAmount;
+            return this;
+        }
+
+        /**
+         * <p>Processor used by the payment source.</p>
+         * @return Reference to {@code this} so that method calls can be chained together.
+         */
+        @java.lang.Override
+        public _FinalStage paymentProcessor(Nullable<String> paymentProcessor) {
+            if (paymentProcessor.isNull()) {
+                this.paymentProcessor = null;
+            } else if (paymentProcessor.isEmpty()) {
+                this.paymentProcessor = Optional.empty();
+            } else {
+                this.paymentProcessor = Optional.of(paymentProcessor.get());
+            }
+            return this;
+        }
+
+        /**
+         * <p>Processor used by the payment source.</p>
+         * @return Reference to {@code this} so that method calls can be chained together.
+         */
+        @java.lang.Override
+        public _FinalStage paymentProcessor(String paymentProcessor) {
+            this.paymentProcessor = Optional.ofNullable(paymentProcessor);
+            return this;
+        }
+
+        /**
+         * <p>Processor used by the payment source.</p>
+         */
+        @java.lang.Override
+        @JsonSetter(value = "payment_processor", nulls = Nulls.SKIP)
+        public _FinalStage paymentProcessor(Optional<String> paymentProcessor) {
+            this.paymentProcessor = paymentProcessor;
+            return this;
+        }
+
+        /**
+         * <p>Payment method used by the payment source. On bank_deposit sources, the transfer rail: <code>wire</code>, <code>ach</code>, or <code>rtp</code>.</p>
+         * @return Reference to {@code this} so that method calls can be chained together.
+         */
+        @java.lang.Override
+        public _FinalStage paymentMethodType(Nullable<String> paymentMethodType) {
+            if (paymentMethodType.isNull()) {
+                this.paymentMethodType = null;
+            } else if (paymentMethodType.isEmpty()) {
+                this.paymentMethodType = Optional.empty();
+            } else {
+                this.paymentMethodType = Optional.of(paymentMethodType.get());
+            }
+            return this;
+        }
+
+        /**
+         * <p>Payment method used by the payment source. On bank_deposit sources, the transfer rail: <code>wire</code>, <code>ach</code>, or <code>rtp</code>.</p>
+         * @return Reference to {@code this} so that method calls can be chained together.
+         */
+        @java.lang.Override
+        public _FinalStage paymentMethodType(String paymentMethodType) {
+            this.paymentMethodType = Optional.ofNullable(paymentMethodType);
+            return this;
+        }
+
+        /**
+         * <p>Payment method used by the payment source. On bank_deposit sources, the transfer rail: <code>wire</code>, <code>ach</code>, or <code>rtp</code>.</p>
+         */
+        @java.lang.Override
+        @JsonSetter(value = "payment_method_type", nulls = Nulls.SKIP)
+        public _FinalStage paymentMethodType(Optional<String> paymentMethodType) {
+            this.paymentMethodType = paymentMethodType;
+            return this;
+        }
+
+        /**
+         * <p>Total charged by the payment source.</p>
+         * @return Reference to {@code this} so that method calls can be chained together.
+         */
+        @java.lang.Override
+        public _FinalStage paymentAmount(Nullable<Money> paymentAmount) {
+            if (paymentAmount.isNull()) {
+                this.paymentAmount = null;
+            } else if (paymentAmount.isEmpty()) {
+                this.paymentAmount = Optional.empty();
+            } else {
+                this.paymentAmount = Optional.of(paymentAmount.get());
+            }
+            return this;
+        }
+
+        /**
+         * <p>Total charged by the payment source.</p>
+         * @return Reference to {@code this} so that method calls can be chained together.
+         */
+        @java.lang.Override
+        public _FinalStage paymentAmount(Money paymentAmount) {
+            this.paymentAmount = Optional.ofNullable(paymentAmount);
+            return this;
+        }
+
+        /**
+         * <p>Total charged by the payment source.</p>
+         */
+        @java.lang.Override
+        @JsonSetter(value = "payment_amount", nulls = Nulls.SKIP)
+        public _FinalStage paymentAmount(Optional<Money> paymentAmount) {
+            this.paymentAmount = paymentAmount;
+            return this;
+        }
+
+        /**
+         * <p>On payout sources, the name of the entity processing the payout (requires payout:withdrawal:read). On bank_deposit sources, the name of the account that sent the deposit.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
@@ -997,7 +1632,7 @@ public final class LedgerActivitySource {
         }
 
         /**
-         * <p>Name of the entity processing the payout (withdrawal sources only; requires payout:withdrawal:read).</p>
+         * <p>On payout sources, the name of the entity processing the payout (requires payout:withdrawal:read). On bank_deposit sources, the name of the account that sent the deposit.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
@@ -1007,12 +1642,48 @@ public final class LedgerActivitySource {
         }
 
         /**
-         * <p>Name of the entity processing the payout (withdrawal sources only; requires payout:withdrawal:read).</p>
+         * <p>On payout sources, the name of the entity processing the payout (requires payout:withdrawal:read). On bank_deposit sources, the name of the account that sent the deposit.</p>
          */
         @java.lang.Override
         @JsonSetter(value = "payer_name", nulls = Nulls.SKIP)
         public _FinalStage payerName(Optional<String> payerName) {
             this.payerName = payerName;
+            return this;
+        }
+
+        /**
+         * <p>Memo attached to the transfer, payout, or bank_deposit source, or null when none was provided (on payout sources requires payout:withdrawal:read).</p>
+         * @return Reference to {@code this} so that method calls can be chained together.
+         */
+        @java.lang.Override
+        public _FinalStage notes(Nullable<String> notes) {
+            if (notes.isNull()) {
+                this.notes = null;
+            } else if (notes.isEmpty()) {
+                this.notes = Optional.empty();
+            } else {
+                this.notes = Optional.of(notes.get());
+            }
+            return this;
+        }
+
+        /**
+         * <p>Memo attached to the transfer, payout, or bank_deposit source, or null when none was provided (on payout sources requires payout:withdrawal:read).</p>
+         * @return Reference to {@code this} so that method calls can be chained together.
+         */
+        @java.lang.Override
+        public _FinalStage notes(String notes) {
+            this.notes = Optional.ofNullable(notes);
+            return this;
+        }
+
+        /**
+         * <p>Memo attached to the transfer, payout, or bank_deposit source, or null when none was provided (on payout sources requires payout:withdrawal:read).</p>
+         */
+        @java.lang.Override
+        @JsonSetter(value = "notes", nulls = Nulls.SKIP)
+        public _FinalStage notes(Optional<String> notes) {
+            this.notes = notes;
             return this;
         }
 
@@ -1089,7 +1760,115 @@ public final class LedgerActivitySource {
         }
 
         /**
-         * <p>Estimated arrival as an ISO 8601 timestamp (withdrawal sources only; requires payout:withdrawal:read).</p>
+         * <p>Whether withdrawal fees are inclusive or exclusive. Requires payout:withdrawal:read.</p>
+         * @return Reference to {@code this} so that method calls can be chained together.
+         */
+        @java.lang.Override
+        public _FinalStage feeType(Nullable<LedgerActivitySourceFeeType> feeType) {
+            if (feeType.isNull()) {
+                this.feeType = null;
+            } else if (feeType.isEmpty()) {
+                this.feeType = Optional.empty();
+            } else {
+                this.feeType = Optional.of(feeType.get());
+            }
+            return this;
+        }
+
+        /**
+         * <p>Whether withdrawal fees are inclusive or exclusive. Requires payout:withdrawal:read.</p>
+         * @return Reference to {@code this} so that method calls can be chained together.
+         */
+        @java.lang.Override
+        public _FinalStage feeType(LedgerActivitySourceFeeType feeType) {
+            this.feeType = Optional.ofNullable(feeType);
+            return this;
+        }
+
+        /**
+         * <p>Whether withdrawal fees are inclusive or exclusive. Requires payout:withdrawal:read.</p>
+         */
+        @java.lang.Override
+        @JsonSetter(value = "fee_type", nulls = Nulls.SKIP)
+        public _FinalStage feeType(Optional<LedgerActivitySourceFeeType> feeType) {
+            this.feeType = feeType;
+            return this;
+        }
+
+        /**
+         * <p>Action that generated a platform markup fee: deposit, swap, transfer, card_spend, or payout. Present for platform_markup_fee and platform_markup_fee_payout, including when include_resource is false. Null when the originating action is unavailable; omitted on other source types.</p>
+         * @return Reference to {@code this} so that method calls can be chained together.
+         */
+        @java.lang.Override
+        public _FinalStage feeKind(Nullable<LedgerActivitySourceFeeKind> feeKind) {
+            if (feeKind.isNull()) {
+                this.feeKind = null;
+            } else if (feeKind.isEmpty()) {
+                this.feeKind = Optional.empty();
+            } else {
+                this.feeKind = Optional.of(feeKind.get());
+            }
+            return this;
+        }
+
+        /**
+         * <p>Action that generated a platform markup fee: deposit, swap, transfer, card_spend, or payout. Present for platform_markup_fee and platform_markup_fee_payout, including when include_resource is false. Null when the originating action is unavailable; omitted on other source types.</p>
+         * @return Reference to {@code this} so that method calls can be chained together.
+         */
+        @java.lang.Override
+        public _FinalStage feeKind(LedgerActivitySourceFeeKind feeKind) {
+            this.feeKind = Optional.ofNullable(feeKind);
+            return this;
+        }
+
+        /**
+         * <p>Action that generated a platform markup fee: deposit, swap, transfer, card_spend, or payout. Present for platform_markup_fee and platform_markup_fee_payout, including when include_resource is false. Null when the originating action is unavailable; omitted on other source types.</p>
+         */
+        @java.lang.Override
+        @JsonSetter(value = "fee_kind", nulls = Nulls.SKIP)
+        public _FinalStage feeKind(Optional<LedgerActivitySourceFeeKind> feeKind) {
+            this.feeKind = feeKind;
+            return this;
+        }
+
+        /**
+         * <p>Total withdrawal fees, including markup fees. Requires payout:withdrawal:read.</p>
+         * @return Reference to {@code this} so that method calls can be chained together.
+         */
+        @java.lang.Override
+        public _FinalStage feeAmount(Nullable<Money> feeAmount) {
+            if (feeAmount.isNull()) {
+                this.feeAmount = null;
+            } else if (feeAmount.isEmpty()) {
+                this.feeAmount = Optional.empty();
+            } else {
+                this.feeAmount = Optional.of(feeAmount.get());
+            }
+            return this;
+        }
+
+        /**
+         * <p>Total withdrawal fees, including markup fees. Requires payout:withdrawal:read.</p>
+         * @return Reference to {@code this} so that method calls can be chained together.
+         */
+        @java.lang.Override
+        public _FinalStage feeAmount(Money feeAmount) {
+            this.feeAmount = Optional.ofNullable(feeAmount);
+            return this;
+        }
+
+        /**
+         * <p>Total withdrawal fees, including markup fees. Requires payout:withdrawal:read.</p>
+         */
+        @java.lang.Override
+        @JsonSetter(value = "fee_amount", nulls = Nulls.SKIP)
+        public _FinalStage feeAmount(Optional<Money> feeAmount) {
+            this.feeAmount = feeAmount;
+            return this;
+        }
+
+        /**
+         * <p>Estimated arrival as an ISO 8601 timestamp (payout sources only; requires payout:withdrawal:read).</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
@@ -1105,7 +1884,7 @@ public final class LedgerActivitySource {
         }
 
         /**
-         * <p>Estimated arrival as an ISO 8601 timestamp (withdrawal sources only; requires payout:withdrawal:read).</p>
+         * <p>Estimated arrival as an ISO 8601 timestamp (payout sources only; requires payout:withdrawal:read).</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
@@ -1115,7 +1894,7 @@ public final class LedgerActivitySource {
         }
 
         /**
-         * <p>Estimated arrival as an ISO 8601 timestamp (withdrawal sources only; requires payout:withdrawal:read).</p>
+         * <p>Estimated arrival as an ISO 8601 timestamp (payout sources only; requires payout:withdrawal:read).</p>
          */
         @java.lang.Override
         @JsonSetter(value = "estimated_arrival", nulls = Nulls.SKIP)
@@ -1125,7 +1904,43 @@ public final class LedgerActivitySource {
         }
 
         /**
-         * <p>Withdrawal creation time as an ISO 8601 timestamp (withdrawal sources only; requires payout:withdrawal:read).</p>
+         * <p>User who requested the withdrawal. Null for system-generated withdrawals or without payout:withdrawal:read.</p>
+         * @return Reference to {@code this} so that method calls can be chained together.
+         */
+        @java.lang.Override
+        public _FinalStage createdByUser(Nullable<UserSummary> createdByUser) {
+            if (createdByUser.isNull()) {
+                this.createdByUser = null;
+            } else if (createdByUser.isEmpty()) {
+                this.createdByUser = Optional.empty();
+            } else {
+                this.createdByUser = Optional.of(createdByUser.get());
+            }
+            return this;
+        }
+
+        /**
+         * <p>User who requested the withdrawal. Null for system-generated withdrawals or without payout:withdrawal:read.</p>
+         * @return Reference to {@code this} so that method calls can be chained together.
+         */
+        @java.lang.Override
+        public _FinalStage createdByUser(UserSummary createdByUser) {
+            this.createdByUser = Optional.ofNullable(createdByUser);
+            return this;
+        }
+
+        /**
+         * <p>User who requested the withdrawal. Null for system-generated withdrawals or without payout:withdrawal:read.</p>
+         */
+        @java.lang.Override
+        @JsonSetter(value = "created_by_user", nulls = Nulls.SKIP)
+        public _FinalStage createdByUser(Optional<UserSummary> createdByUser) {
+            this.createdByUser = createdByUser;
+            return this;
+        }
+
+        /**
+         * <p>Payout creation time as an ISO 8601 timestamp (payout sources only; requires payout:withdrawal:read).</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
@@ -1141,7 +1956,7 @@ public final class LedgerActivitySource {
         }
 
         /**
-         * <p>Withdrawal creation time as an ISO 8601 timestamp (withdrawal sources only; requires payout:withdrawal:read).</p>
+         * <p>Payout creation time as an ISO 8601 timestamp (payout sources only; requires payout:withdrawal:read).</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
@@ -1151,7 +1966,7 @@ public final class LedgerActivitySource {
         }
 
         /**
-         * <p>Withdrawal creation time as an ISO 8601 timestamp (withdrawal sources only; requires payout:withdrawal:read).</p>
+         * <p>Payout creation time as an ISO 8601 timestamp (payout sources only; requires payout:withdrawal:read).</p>
          */
         @java.lang.Override
         @JsonSetter(value = "created_at", nulls = Nulls.SKIP)
@@ -1161,7 +1976,7 @@ public final class LedgerActivitySource {
         }
 
         /**
-         * <p>Public claim URL for the airdrop link (airdrop_link sources only).</p>
+         * <p>The airdrop's claim URL. Null unless the caller can manage claim links on the funding company or withdraw from the funding personal balance.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
@@ -1177,7 +1992,7 @@ public final class LedgerActivitySource {
         }
 
         /**
-         * <p>Public claim URL for the airdrop link (airdrop_link sources only).</p>
+         * <p>The airdrop's claim URL. Null unless the caller can manage claim links on the funding company or withdraw from the funding personal balance.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
@@ -1187,7 +2002,7 @@ public final class LedgerActivitySource {
         }
 
         /**
-         * <p>Public claim URL for the airdrop link (airdrop_link sources only).</p>
+         * <p>The airdrop's claim URL. Null unless the caller can manage claim links on the funding company or withdraw from the funding personal balance.</p>
          */
         @java.lang.Override
         @JsonSetter(value = "claim_url", nulls = Nulls.SKIP)
@@ -1233,7 +2048,43 @@ public final class LedgerActivitySource {
         }
 
         /**
-         * <p>Withdrawal amount as a decimal number in the destination currency (withdrawal sources only; requires payout:withdrawal:read).</p>
+         * <p>Card brand used by the payment source.</p>
+         * @return Reference to {@code this} so that method calls can be chained together.
+         */
+        @java.lang.Override
+        public _FinalStage cardBrand(Nullable<String> cardBrand) {
+            if (cardBrand.isNull()) {
+                this.cardBrand = null;
+            } else if (cardBrand.isEmpty()) {
+                this.cardBrand = Optional.empty();
+            } else {
+                this.cardBrand = Optional.of(cardBrand.get());
+            }
+            return this;
+        }
+
+        /**
+         * <p>Card brand used by the payment source.</p>
+         * @return Reference to {@code this} so that method calls can be chained together.
+         */
+        @java.lang.Override
+        public _FinalStage cardBrand(String cardBrand) {
+            this.cardBrand = Optional.ofNullable(cardBrand);
+            return this;
+        }
+
+        /**
+         * <p>Card brand used by the payment source.</p>
+         */
+        @java.lang.Override
+        @JsonSetter(value = "card_brand", nulls = Nulls.SKIP)
+        public _FinalStage cardBrand(Optional<String> cardBrand) {
+            this.cardBrand = cardBrand;
+            return this;
+        }
+
+        /**
+         * <p>Payout amount as a decimal number in the destination currency (payout sources only; requires payout:withdrawal:read).</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
@@ -1249,7 +2100,7 @@ public final class LedgerActivitySource {
         }
 
         /**
-         * <p>Withdrawal amount as a decimal number in the destination currency (withdrawal sources only; requires payout:withdrawal:read).</p>
+         * <p>Payout amount as a decimal number in the destination currency (payout sources only; requires payout:withdrawal:read).</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
@@ -1259,7 +2110,7 @@ public final class LedgerActivitySource {
         }
 
         /**
-         * <p>Withdrawal amount as a decimal number in the destination currency (withdrawal sources only; requires payout:withdrawal:read).</p>
+         * <p>Payout amount as a decimal number in the destination currency (payout sources only; requires payout:withdrawal:read).</p>
          */
         @java.lang.Override
         @JsonSetter(value = "amount_float", nulls = Nulls.SKIP)
@@ -1272,24 +2123,73 @@ public final class LedgerActivitySource {
         public LedgerActivitySource build() {
             return new LedgerActivitySource(
                     amountFloat,
+                    cardBrand,
                     chain,
                     claimUrl,
                     createdAt,
+                    createdByUser,
                     estimatedArrival,
+                    feeAmount,
+                    feeKind,
+                    feeType,
                     fromAmount,
                     fromCurrency,
                     id,
+                    notes,
                     object,
                     payerName,
+                    paymentAmount,
+                    paymentMethodType,
+                    paymentProcessor,
+                    payoutAmount,
                     payoutDestination,
                     payoutTokenNickname,
                     reason,
+                    riskReviewHold,
                     senderAddress,
                     status,
                     toAmount,
                     toCurrency,
+                    traceCode,
                     txHash,
                     additionalProperties);
+        }
+
+        @JsonAnySetter
+        private void putAdditionalPropertyFromJson(String key, Object value) {
+            if (key.equalsIgnoreCase("amount_float")
+                    || key.equalsIgnoreCase("card_brand")
+                    || key.equalsIgnoreCase("chain")
+                    || key.equalsIgnoreCase("claim_url")
+                    || key.equalsIgnoreCase("created_at")
+                    || key.equalsIgnoreCase("created_by_user")
+                    || key.equalsIgnoreCase("estimated_arrival")
+                    || key.equalsIgnoreCase("fee_amount")
+                    || key.equalsIgnoreCase("fee_kind")
+                    || key.equalsIgnoreCase("fee_type")
+                    || key.equalsIgnoreCase("from_amount")
+                    || key.equalsIgnoreCase("from_currency")
+                    || key.equalsIgnoreCase("id")
+                    || key.equalsIgnoreCase("notes")
+                    || key.equalsIgnoreCase("object")
+                    || key.equalsIgnoreCase("payer_name")
+                    || key.equalsIgnoreCase("payment_amount")
+                    || key.equalsIgnoreCase("payment_method_type")
+                    || key.equalsIgnoreCase("payment_processor")
+                    || key.equalsIgnoreCase("payout_amount")
+                    || key.equalsIgnoreCase("payout_destination")
+                    || key.equalsIgnoreCase("payout_token_nickname")
+                    || key.equalsIgnoreCase("reason")
+                    || key.equalsIgnoreCase("risk_review_hold")
+                    || key.equalsIgnoreCase("sender_address")
+                    || key.equalsIgnoreCase("status")
+                    || key.equalsIgnoreCase("to_amount")
+                    || key.equalsIgnoreCase("to_currency")
+                    || key.equalsIgnoreCase("trace_code")
+                    || key.equalsIgnoreCase("tx_hash")) {
+                return;
+            }
+            this.additionalProperties.put(key, value);
         }
 
         @java.lang.Override

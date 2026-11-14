@@ -52,6 +52,8 @@ public final class WebhookListItem {
 
     private final String resourceId;
 
+    private final Optional<String> title;
+
     private final String url;
 
     private final Optional<String> webhookSecret;
@@ -72,6 +74,7 @@ public final class WebhookListItem {
             String id,
             Optional<String> lastFailureAt,
             String resourceId,
+            Optional<String> title,
             String url,
             Optional<String> webhookSecret,
             Map<String, Object> additionalProperties) {
@@ -88,6 +91,7 @@ public final class WebhookListItem {
         this.id = id;
         this.lastFailureAt = lastFailureAt;
         this.resourceId = resourceId;
+        this.title = title;
         this.url = url;
         this.webhookSecret = webhookSecret;
         this.additionalProperties = additionalProperties;
@@ -113,7 +117,7 @@ public final class WebhookListItem {
     }
 
     /**
-     * @return Whether events are sent for child resources. For example, if the webhook is on an account, enabling this sends events only from its connected accounts.
+     * @return Whether events are sent for child resources. For example, if the webhook is on an account, enabling this sends events only from its subaccounts.
      */
     @JsonProperty("child_resource_events")
     public boolean getChildResourceEvents() {
@@ -210,6 +214,17 @@ public final class WebhookListItem {
     }
 
     /**
+     * @return A label for this webhook endpoint, such as <code>Production</code>, shown in the dashboard. <code>null</code> if no title was set.
+     */
+    @JsonIgnore
+    public Optional<String> getTitle() {
+        if (title == null) {
+            return Optional.empty();
+        }
+        return title;
+    }
+
+    /**
      * @return Destination URL where webhook payloads are delivered via HTTP POST.
      */
     @JsonProperty("url")
@@ -218,7 +233,7 @@ public final class WebhookListItem {
     }
 
     /**
-     * @return Secret key used to sign webhook payloads for verification. Include this in your HMAC validation logic. Returned on the create response and to interactive dashboard sessions; <code>null</code> for API-key and OAuth callers on later reads.
+     * @return Secret key used to sign webhook payloads. Use it to verify the HMAC signature of each delivery. Returned in the create response. <code>null</code> on later reads by API keys and OAuth apps.
      */
     @JsonIgnore
     public Optional<String> getWebhookSecret() {
@@ -259,6 +274,12 @@ public final class WebhookListItem {
     }
 
     @JsonInclude(value = JsonInclude.Include.CUSTOM, valueFilter = NullableNonemptyFilter.class)
+    @JsonProperty("title")
+    private Optional<String> _getTitle() {
+        return title;
+    }
+
+    @JsonInclude(value = JsonInclude.Include.CUSTOM, valueFilter = NullableNonemptyFilter.class)
     @JsonProperty("webhook_secret")
     private Optional<String> _getWebhookSecret() {
         return webhookSecret;
@@ -289,6 +310,7 @@ public final class WebhookListItem {
                 && id.equals(other.id)
                 && lastFailureAt.equals(other.lastFailureAt)
                 && resourceId.equals(other.resourceId)
+                && title.equals(other.title)
                 && url.equals(other.url)
                 && webhookSecret.equals(other.webhookSecret);
     }
@@ -309,6 +331,7 @@ public final class WebhookListItem {
                 this.id,
                 this.lastFailureAt,
                 this.resourceId,
+                this.title,
                 this.url,
                 this.webhookSecret);
     }
@@ -333,7 +356,7 @@ public final class WebhookListItem {
 
     public interface ChildResourceEventsStage {
         /**
-         * <p>Whether events are sent for child resources. For example, if the webhook is on an account, enabling this sends events only from its connected accounts.</p>
+         * <p>Whether events are sent for child resources. For example, if the webhook is on an account, enabling this sends events only from its subaccounts.</p>
          */
         ConsecutiveFailuresStage childResourceEvents(boolean childResourceEvents);
     }
@@ -439,7 +462,16 @@ public final class WebhookListItem {
         _FinalStage lastFailureAt(Nullable<String> lastFailureAt);
 
         /**
-         * <p>Secret key used to sign webhook payloads for verification. Include this in your HMAC validation logic. Returned on the create response and to interactive dashboard sessions; <code>null</code> for API-key and OAuth callers on later reads.</p>
+         * <p>A label for this webhook endpoint, such as <code>Production</code>, shown in the dashboard. <code>null</code> if no title was set.</p>
+         */
+        _FinalStage title(Optional<String> title);
+
+        _FinalStage title(String title);
+
+        _FinalStage title(Nullable<String> title);
+
+        /**
+         * <p>Secret key used to sign webhook payloads. Use it to verify the HMAC signature of each delivery. Returned in the create response. <code>null</code> on later reads by API keys and OAuth apps.</p>
          */
         _FinalStage webhookSecret(Optional<String> webhookSecret);
 
@@ -477,6 +509,8 @@ public final class WebhookListItem {
 
         private Optional<String> webhookSecret = Optional.empty();
 
+        private Optional<String> title = Optional.empty();
+
         private Optional<String> lastFailureAt = Optional.empty();
 
         private Optional<String> failingSince = Optional.empty();
@@ -489,7 +523,6 @@ public final class WebhookListItem {
 
         private Optional<String> apiVersionDate = Optional.empty();
 
-        @JsonAnySetter
         private Map<String, Object> additionalProperties = new HashMap<>();
 
         private Builder() {}
@@ -509,13 +542,13 @@ public final class WebhookListItem {
             id(other.getId());
             lastFailureAt(other.getLastFailureAt());
             resourceId(other.getResourceId());
+            title(other.getTitle());
             url(other.getUrl());
             webhookSecret(other.getWebhookSecret());
             return this;
         }
 
         /**
-         * <p>The API version used to format payloads sent to this webhook endpoint.</p>
          * <p>The API version used to format payloads sent to this webhook endpoint.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
@@ -527,8 +560,7 @@ public final class WebhookListItem {
         }
 
         /**
-         * <p>Whether events are sent for child resources. For example, if the webhook is on an account, enabling this sends events only from its connected accounts.</p>
-         * <p>Whether events are sent for child resources. For example, if the webhook is on an account, enabling this sends events only from its connected accounts.</p>
+         * <p>Whether events are sent for child resources. For example, if the webhook is on an account, enabling this sends events only from its subaccounts.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
@@ -539,7 +571,6 @@ public final class WebhookListItem {
         }
 
         /**
-         * <p>Number of consecutive deliveries whose first attempt to this endpoint failed since it last accepted one. Later retries of the same delivery do not increment it. Resets to <code>0</code> when a delivery succeeds or the webhook is re-enabled.</p>
          * <p>Number of consecutive deliveries whose first attempt to this endpoint failed since it last accepted one. Later retries of the same delivery do not increment it. Resets to <code>0</code> when a delivery succeeds or the webhook is re-enabled.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
@@ -552,7 +583,6 @@ public final class WebhookListItem {
 
         /**
          * <p>When the webhook was created, as an ISO 8601 timestamp.</p>
-         * <p>When the webhook was created, as an ISO 8601 timestamp.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
@@ -563,7 +593,6 @@ public final class WebhookListItem {
         }
 
         /**
-         * <p>Whether this webhook endpoint is currently active and receiving events.</p>
          * <p>Whether this webhook endpoint is currently active and receiving events.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
@@ -576,7 +605,6 @@ public final class WebhookListItem {
 
         /**
          * <p>Webhook ID, prefixed <code>hook_</code>.</p>
-         * <p>Webhook ID, prefixed <code>hook_</code>.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
@@ -587,7 +615,6 @@ public final class WebhookListItem {
         }
 
         /**
-         * <p>ID of the resource (account or app) this webhook is attached to.</p>
          * <p>ID of the resource (account or app) this webhook is attached to.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
@@ -600,7 +627,6 @@ public final class WebhookListItem {
 
         /**
          * <p>Destination URL where webhook payloads are delivered via HTTP POST.</p>
-         * <p>Destination URL where webhook payloads are delivered via HTTP POST.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
@@ -611,7 +637,7 @@ public final class WebhookListItem {
         }
 
         /**
-         * <p>Secret key used to sign webhook payloads for verification. Include this in your HMAC validation logic. Returned on the create response and to interactive dashboard sessions; <code>null</code> for API-key and OAuth callers on later reads.</p>
+         * <p>Secret key used to sign webhook payloads. Use it to verify the HMAC signature of each delivery. Returned in the create response. <code>null</code> on later reads by API keys and OAuth apps.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
@@ -627,7 +653,7 @@ public final class WebhookListItem {
         }
 
         /**
-         * <p>Secret key used to sign webhook payloads for verification. Include this in your HMAC validation logic. Returned on the create response and to interactive dashboard sessions; <code>null</code> for API-key and OAuth callers on later reads.</p>
+         * <p>Secret key used to sign webhook payloads. Use it to verify the HMAC signature of each delivery. Returned in the create response. <code>null</code> on later reads by API keys and OAuth apps.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
@@ -637,12 +663,48 @@ public final class WebhookListItem {
         }
 
         /**
-         * <p>Secret key used to sign webhook payloads for verification. Include this in your HMAC validation logic. Returned on the create response and to interactive dashboard sessions; <code>null</code> for API-key and OAuth callers on later reads.</p>
+         * <p>Secret key used to sign webhook payloads. Use it to verify the HMAC signature of each delivery. Returned in the create response. <code>null</code> on later reads by API keys and OAuth apps.</p>
          */
         @java.lang.Override
         @JsonSetter(value = "webhook_secret", nulls = Nulls.SKIP)
         public _FinalStage webhookSecret(Optional<String> webhookSecret) {
             this.webhookSecret = webhookSecret;
+            return this;
+        }
+
+        /**
+         * <p>A label for this webhook endpoint, such as <code>Production</code>, shown in the dashboard. <code>null</code> if no title was set.</p>
+         * @return Reference to {@code this} so that method calls can be chained together.
+         */
+        @java.lang.Override
+        public _FinalStage title(Nullable<String> title) {
+            if (title.isNull()) {
+                this.title = null;
+            } else if (title.isEmpty()) {
+                this.title = Optional.empty();
+            } else {
+                this.title = Optional.of(title.get());
+            }
+            return this;
+        }
+
+        /**
+         * <p>A label for this webhook endpoint, such as <code>Production</code>, shown in the dashboard. <code>null</code> if no title was set.</p>
+         * @return Reference to {@code this} so that method calls can be chained together.
+         */
+        @java.lang.Override
+        public _FinalStage title(String title) {
+            this.title = Optional.ofNullable(title);
+            return this;
+        }
+
+        /**
+         * <p>A label for this webhook endpoint, such as <code>Production</code>, shown in the dashboard. <code>null</code> if no title was set.</p>
+         */
+        @java.lang.Override
+        @JsonSetter(value = "title", nulls = Nulls.SKIP)
+        public _FinalStage title(Optional<String> title) {
+            this.title = title;
             return this;
         }
 
@@ -866,9 +928,33 @@ public final class WebhookListItem {
                     id,
                     lastFailureAt,
                     resourceId,
+                    title,
                     url,
                     webhookSecret,
                     additionalProperties);
+        }
+
+        @JsonAnySetter
+        private void putAdditionalPropertyFromJson(String key, Object value) {
+            if (key.equalsIgnoreCase("api_version")
+                    || key.equalsIgnoreCase("api_version_date")
+                    || key.equalsIgnoreCase("child_resource_events")
+                    || key.equalsIgnoreCase("consecutive_failures")
+                    || key.equalsIgnoreCase("created_at")
+                    || key.equalsIgnoreCase("disabled_at")
+                    || key.equalsIgnoreCase("disabled_reason")
+                    || key.equalsIgnoreCase("enabled")
+                    || key.equalsIgnoreCase("events")
+                    || key.equalsIgnoreCase("failing_since")
+                    || key.equalsIgnoreCase("id")
+                    || key.equalsIgnoreCase("last_failure_at")
+                    || key.equalsIgnoreCase("resource_id")
+                    || key.equalsIgnoreCase("title")
+                    || key.equalsIgnoreCase("url")
+                    || key.equalsIgnoreCase("webhook_secret")) {
+                return;
+            }
+            this.additionalProperties.put(key, value);
         }
 
         @java.lang.Override

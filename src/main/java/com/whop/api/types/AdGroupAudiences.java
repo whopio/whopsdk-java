@@ -78,7 +78,6 @@ public final class AdGroupAudiences {
 
         private List<String> include = new ArrayList<>();
 
-        @JsonAnySetter
         private Map<String, Object> additionalProperties = new HashMap<>();
 
         private Builder() {}
@@ -133,6 +132,14 @@ public final class AdGroupAudiences {
 
         public AdGroupAudiences build() {
             return new AdGroupAudiences(exclude, include, additionalProperties);
+        }
+
+        @JsonAnySetter
+        private void putAdditionalPropertyFromJson(String key, Object value) {
+            if (key.equalsIgnoreCase("exclude") || key.equalsIgnoreCase("include")) {
+                return;
+            }
+            this.additionalProperties.put(key, value);
         }
 
         public Builder additionalProperty(String key, Object value) {

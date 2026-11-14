@@ -32,56 +32,70 @@ public class TeamMembersClient {
     }
 
     /**
-     * Lists an account's team members, including pending invites (<code>status: &quot;pending&quot;</code>, <code>ausri_</code> ids; <code>user</code> is <code>null</code> for invites sent to an email with no Whop account yet). For accepted members, <code>email</code> requires the <code>company:authorized_user:email:read</code> scope and is <code>null</code> otherwise. Listing <code>role=workforce</code> is also allowed with the <code>bounty:create</code> scope.
+     * Lists team members, including pending invites. Pass <code>account_id</code> to list one account's team. Without it, a signed-in user can pass <code>user_id=me</code> to list their own joined memberships across accounts. The list has one for each account they can read. An API key without <code>account_id</code> lists the team of its own account. With <code>company:basic:read</code>, a user can list their own joined membership on one account. To do this, pass <code>status=joined</code> and their own <code>user_id</code> with the account ID. The <code>bounty:create</code> scope also allows listing <code>role=workforce</code> members. A signed-in Partner without <code>company:authorized_user:read</code> lists only their own joined membership and the members who report up to them. A member others report to gets the same list. Neither of them sees pending invites. Members with the view-only Partner role are listed after all other members.
+     */
+    public SyncPagingIterable<TeamMember> list() {
+        return this.rawClient.list().body();
+    }
+
+    /**
+     * Lists team members, including pending invites. Pass <code>account_id</code> to list one account's team. Without it, a signed-in user can pass <code>user_id=me</code> to list their own joined memberships across accounts. The list has one for each account they can read. An API key without <code>account_id</code> lists the team of its own account. With <code>company:basic:read</code>, a user can list their own joined membership on one account. To do this, pass <code>status=joined</code> and their own <code>user_id</code> with the account ID. The <code>bounty:create</code> scope also allows listing <code>role=workforce</code> members. A signed-in Partner without <code>company:authorized_user:read</code> lists only their own joined membership and the members who report up to them. A member others report to gets the same list. Neither of them sees pending invites. Members with the view-only Partner role are listed after all other members.
+     */
+    public SyncPagingIterable<TeamMember> list(RequestOptions requestOptions) {
+        return this.rawClient.list(requestOptions).body();
+    }
+
+    /**
+     * Lists team members, including pending invites. Pass <code>account_id</code> to list one account's team. Without it, a signed-in user can pass <code>user_id=me</code> to list their own joined memberships across accounts. The list has one for each account they can read. An API key without <code>account_id</code> lists the team of its own account. With <code>company:basic:read</code>, a user can list their own joined membership on one account. To do this, pass <code>status=joined</code> and their own <code>user_id</code> with the account ID. The <code>bounty:create</code> scope also allows listing <code>role=workforce</code> members. A signed-in Partner without <code>company:authorized_user:read</code> lists only their own joined membership and the members who report up to them. A member others report to gets the same list. Neither of them sees pending invites. Members with the view-only Partner role are listed after all other members.
      */
     public SyncPagingIterable<TeamMember> list(ListTeamMembersRequest request) {
         return this.rawClient.list(request).body();
     }
 
     /**
-     * Lists an account's team members, including pending invites (<code>status: &quot;pending&quot;</code>, <code>ausri_</code> ids; <code>user</code> is <code>null</code> for invites sent to an email with no Whop account yet). For accepted members, <code>email</code> requires the <code>company:authorized_user:email:read</code> scope and is <code>null</code> otherwise. Listing <code>role=workforce</code> is also allowed with the <code>bounty:create</code> scope.
+     * Lists team members, including pending invites. Pass <code>account_id</code> to list one account's team. Without it, a signed-in user can pass <code>user_id=me</code> to list their own joined memberships across accounts. The list has one for each account they can read. An API key without <code>account_id</code> lists the team of its own account. With <code>company:basic:read</code>, a user can list their own joined membership on one account. To do this, pass <code>status=joined</code> and their own <code>user_id</code> with the account ID. The <code>bounty:create</code> scope also allows listing <code>role=workforce</code> members. A signed-in Partner without <code>company:authorized_user:read</code> lists only their own joined membership and the members who report up to them. A member others report to gets the same list. Neither of them sees pending invites. Members with the view-only Partner role are listed after all other members.
      */
     public SyncPagingIterable<TeamMember> list(ListTeamMembersRequest request, RequestOptions requestOptions) {
         return this.rawClient.list(request, requestOptions).body();
     }
 
     /**
-     * Adds a member to an account's team with a system role. Identify them by exactly one of <code>user_id</code> or <code>email</code>. If the person has not yet accepted — or the email does not belong to a Whop account yet — an invitation is sent instead and the response is <code>202</code> with <code>{ &quot;object&quot;: &quot;team_member_invite&quot;, &quot;invitation_sent&quot;: true }</code>. If they already have a pending invite, the request fails with a <code>400</code>. Custom roles cannot be granted via the API. Granting the <code>workforce</code> role is also allowed with the <code>bounty:create</code> scope.
+     * Adds a member to an account's team with a system role. Identify them by exactly one of <code>user_id</code> or <code>email</code>. If the person has not yet accepted, or the email does not belong to a Whop account yet, an invitation is sent instead and the response is <code>202</code> with the pending team member, whose <code>status</code> is <code>pending</code> and whose id is prefixed <code>ausri_</code>. If they already have a pending invite, the request fails with a <code>400</code>. Granting the <code>workforce</code> role is also allowed with the <code>bounty:create</code> scope.
      */
     public TeamMember create(CreateTeamMembersRequest request) {
         return this.rawClient.create(request).body();
     }
 
     /**
-     * Adds a member to an account's team with a system role. Identify them by exactly one of <code>user_id</code> or <code>email</code>. If the person has not yet accepted — or the email does not belong to a Whop account yet — an invitation is sent instead and the response is <code>202</code> with <code>{ &quot;object&quot;: &quot;team_member_invite&quot;, &quot;invitation_sent&quot;: true }</code>. If they already have a pending invite, the request fails with a <code>400</code>. Custom roles cannot be granted via the API. Granting the <code>workforce</code> role is also allowed with the <code>bounty:create</code> scope.
+     * Adds a member to an account's team with a system role. Identify them by exactly one of <code>user_id</code> or <code>email</code>. If the person has not yet accepted, or the email does not belong to a Whop account yet, an invitation is sent instead and the response is <code>202</code> with the pending team member, whose <code>status</code> is <code>pending</code> and whose id is prefixed <code>ausri_</code>. If they already have a pending invite, the request fails with a <code>400</code>. Granting the <code>workforce</code> role is also allowed with the <code>bounty:create</code> scope.
      */
     public TeamMember create(CreateTeamMembersRequest request, RequestOptions requestOptions) {
         return this.rawClient.create(request, requestOptions).body();
     }
 
     /**
-     * Retrieves a team member by ID. <code>email</code> requires the <code>company:authorized_user:email:read</code> scope and is <code>null</code> otherwise.
+     * Retrieves a team member or pending invite by ID.
      */
     public TeamMember retrieve(String id) {
         return this.rawClient.retrieve(id).body();
     }
 
     /**
-     * Retrieves a team member by ID. <code>email</code> requires the <code>company:authorized_user:email:read</code> scope and is <code>null</code> otherwise.
+     * Retrieves a team member or pending invite by ID.
      */
     public TeamMember retrieve(String id, RequestOptions requestOptions) {
         return this.rawClient.retrieve(id, requestOptions).body();
     }
 
     /**
-     * Retrieves a team member by ID. <code>email</code> requires the <code>company:authorized_user:email:read</code> scope and is <code>null</code> otherwise.
+     * Retrieves a team member or pending invite by ID.
      */
     public TeamMember retrieve(String id, RetrieveTeamMembersRequest request) {
         return this.rawClient.retrieve(id, request).body();
     }
 
     /**
-     * Retrieves a team member by ID. <code>email</code> requires the <code>company:authorized_user:email:read</code> scope and is <code>null</code> otherwise.
+     * Retrieves a team member or pending invite by ID.
      */
     public TeamMember retrieve(String id, RetrieveTeamMembersRequest request, RequestOptions requestOptions) {
         return this.rawClient.retrieve(id, request, requestOptions).body();
@@ -114,6 +128,20 @@ public class TeamMembersClient {
     public DeleteTeamMembersResponse delete(
             String id, DeleteTeamMembersRequest request, RequestOptions requestOptions) {
         return this.rawClient.delete(id, request, requestOptions).body();
+    }
+
+    /**
+     * Changes a team member's system role. Requires a user session — account API keys cannot change member roles. The account owner's role cannot be changed, and you cannot change your own role.
+     */
+    public TeamMember update(String id) {
+        return this.rawClient.update(id).body();
+    }
+
+    /**
+     * Changes a team member's system role. Requires a user session — account API keys cannot change member roles. The account owner's role cannot be changed, and you cannot change your own role.
+     */
+    public TeamMember update(String id, RequestOptions requestOptions) {
+        return this.rawClient.update(id, requestOptions).body();
     }
 
     /**

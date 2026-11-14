@@ -126,7 +126,6 @@ public final class AppApiKey {
 
         private String id;
 
-        @JsonAnySetter
         private Map<String, Object> additionalProperties = new HashMap<>();
 
         private Builder() {}
@@ -141,7 +140,6 @@ public final class AppApiKey {
 
         /**
          * <p>When the key was created, as an ISO 8601 timestamp.</p>
-         * <p>When the key was created, as an ISO 8601 timestamp.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
@@ -153,7 +151,6 @@ public final class AppApiKey {
 
         /**
          * <p>The key's secret token, sent as a bearer token to authenticate requests on the app's behalf.</p>
-         * <p>The key's secret token, sent as a bearer token to authenticate requests on the app's behalf.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
@@ -164,7 +161,6 @@ public final class AppApiKey {
         }
 
         /**
-         * <p>The unique identifier for the private api key.</p>
          * <p>The unique identifier for the private api key.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
@@ -178,6 +174,14 @@ public final class AppApiKey {
         @java.lang.Override
         public AppApiKey build() {
             return new AppApiKey(createdAt, token, id, additionalProperties);
+        }
+
+        @JsonAnySetter
+        private void putAdditionalPropertyFromJson(String key, Object value) {
+            if (key.equalsIgnoreCase("created_at") || key.equalsIgnoreCase("token") || key.equalsIgnoreCase("id")) {
+                return;
+            }
+            this.additionalProperties.put(key, value);
         }
 
         @java.lang.Override

@@ -20,7 +20,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
-import org.jetbrains.annotations.NotNull;
 
 @JsonInclude(JsonInclude.Include.NON_ABSENT)
 @JsonDeserialize(builder = ListPlansRequest.Builder.class)
@@ -29,11 +28,11 @@ public final class ListPlansRequest {
 
     private final Optional<List<String>> visibilities;
 
-    private final Optional<List<String>> planTypes;
+    private final Optional<List<String>> billingTypes;
 
     private final Optional<List<String>> productIds;
 
-    private final String accountId;
+    private final Optional<String> accountId;
 
     private final Optional<ListPlansRequestDirection> direction;
 
@@ -56,9 +55,9 @@ public final class ListPlansRequest {
     private ListPlansRequest(
             Optional<List<String>> releaseMethods,
             Optional<List<String>> visibilities,
-            Optional<List<String>> planTypes,
+            Optional<List<String>> billingTypes,
             Optional<List<String>> productIds,
-            String accountId,
+            Optional<String> accountId,
             Optional<ListPlansRequestDirection> direction,
             Optional<ListPlansRequestOrder> order,
             Optional<String> createdBefore,
@@ -70,7 +69,7 @@ public final class ListPlansRequest {
             Map<String, Object> additionalProperties) {
         this.releaseMethods = releaseMethods;
         this.visibilities = visibilities;
-        this.planTypes = planTypes;
+        this.billingTypes = billingTypes;
         this.productIds = productIds;
         this.accountId = accountId;
         this.direction = direction;
@@ -84,80 +83,53 @@ public final class ListPlansRequest {
         this.additionalProperties = additionalProperties;
     }
 
-    /**
-     * @return Filter to only plans matching these release methods.
-     */
     @JsonProperty("release_methods")
     public Optional<List<String>> getReleaseMethods() {
         return releaseMethods;
     }
 
-    /**
-     * @return Filter to only plans matching these visibility states.
-     */
     @JsonProperty("visibilities")
     public Optional<List<String>> getVisibilities() {
         return visibilities;
     }
 
-    /**
-     * @return Filter to only plans matching these billing types.
-     */
-    @JsonProperty("plan_types")
-    public Optional<List<String>> getPlanTypes() {
-        return planTypes;
+    @JsonProperty("billing_types")
+    public Optional<List<String>> getBillingTypes() {
+        return billingTypes;
     }
 
-    /**
-     * @return Filter to only plans belonging to these product identifiers.
-     */
     @JsonProperty("product_ids")
     public Optional<List<String>> getProductIds() {
         return productIds;
     }
 
-    /**
-     * @return The unique identifier of the account to list plans for.
-     */
     @JsonProperty("account_id")
-    public String getAccountId() {
+    public Optional<String> getAccountId() {
         return accountId;
     }
 
-    /**
-     * @return The sort direction for results. Defaults to descending.
-     */
     @JsonProperty("direction")
     public Optional<ListPlansRequestDirection> getDirection() {
         return direction;
     }
 
-    /**
-     * @return The field to sort results by. Defaults to created_at.
-     */
     @JsonProperty("order")
     public Optional<ListPlansRequestOrder> getOrder() {
         return order;
     }
 
-    /**
-     * @return Only return plans created before this timestamp.
-     */
     @JsonProperty("created_before")
     public Optional<String> getCreatedBefore() {
         return createdBefore;
     }
 
-    /**
-     * @return Only return plans created after this timestamp.
-     */
     @JsonProperty("created_after")
     public Optional<String> getCreatedAfter() {
         return createdAfter;
     }
 
     /**
-     * @return The number of plans to return (default and max 100).
+     * @return Number of results to return from the start of the range.
      */
     @JsonProperty("first")
     public Optional<Integer> getFirst() {
@@ -165,7 +137,7 @@ public final class ListPlansRequest {
     }
 
     /**
-     * @return A cursor; returns plans after this position.
+     * @return Return results after this cursor. Use <code>page_info.end_cursor</code> from the previous response to fetch the next page.
      */
     @JsonProperty("after")
     public Optional<String> getAfter() {
@@ -173,7 +145,7 @@ public final class ListPlansRequest {
     }
 
     /**
-     * @return The number of plans to return from the end of the range.
+     * @return Number of results to return from the end of the range.
      */
     @JsonProperty("last")
     public Optional<Integer> getLast() {
@@ -181,7 +153,7 @@ public final class ListPlansRequest {
     }
 
     /**
-     * @return A cursor; returns plans before this position.
+     * @return Return results before this cursor. Use <code>page_info.start_cursor</code> from the previous response to fetch the previous page.
      */
     @JsonProperty("before")
     public Optional<String> getBefore() {
@@ -202,7 +174,7 @@ public final class ListPlansRequest {
     private boolean equalTo(ListPlansRequest other) {
         return releaseMethods.equals(other.releaseMethods)
                 && visibilities.equals(other.visibilities)
-                && planTypes.equals(other.planTypes)
+                && billingTypes.equals(other.billingTypes)
                 && productIds.equals(other.productIds)
                 && accountId.equals(other.accountId)
                 && direction.equals(other.direction)
@@ -220,7 +192,7 @@ public final class ListPlansRequest {
         return Objects.hash(
                 this.releaseMethods,
                 this.visibilities,
-                this.planTypes,
+                this.billingTypes,
                 this.productIds,
                 this.accountId,
                 this.direction,
@@ -238,157 +210,46 @@ public final class ListPlansRequest {
         return ObjectMappers.stringify(this);
     }
 
-    public static AccountIdStage builder() {
+    public static Builder builder() {
         return new Builder();
     }
 
-    public interface AccountIdStage {
-        /**
-         * <p>The unique identifier of the account to list plans for.</p>
-         */
-        _FinalStage accountId(@NotNull String accountId);
-
-        Builder from(ListPlansRequest other);
-    }
-
-    public interface _FinalStage {
-        ListPlansRequest build();
-
-        _FinalStage additionalProperty(String key, Object value);
-
-        _FinalStage additionalProperties(Map<String, Object> additionalProperties);
-
-        /**
-         * <p>Filter to only plans matching these release methods.</p>
-         */
-        _FinalStage releaseMethods(Optional<List<String>> releaseMethods);
-
-        _FinalStage releaseMethods(List<String> releaseMethods);
-
-        _FinalStage releaseMethods(String releaseMethods);
-
-        /**
-         * <p>Filter to only plans matching these visibility states.</p>
-         */
-        _FinalStage visibilities(Optional<List<String>> visibilities);
-
-        _FinalStage visibilities(List<String> visibilities);
-
-        _FinalStage visibilities(String visibilities);
-
-        /**
-         * <p>Filter to only plans matching these billing types.</p>
-         */
-        _FinalStage planTypes(Optional<List<String>> planTypes);
-
-        _FinalStage planTypes(List<String> planTypes);
-
-        _FinalStage planTypes(String planTypes);
-
-        /**
-         * <p>Filter to only plans belonging to these product identifiers.</p>
-         */
-        _FinalStage productIds(Optional<List<String>> productIds);
-
-        _FinalStage productIds(List<String> productIds);
-
-        _FinalStage productIds(String productIds);
-
-        /**
-         * <p>The sort direction for results. Defaults to descending.</p>
-         */
-        _FinalStage direction(Optional<ListPlansRequestDirection> direction);
-
-        _FinalStage direction(ListPlansRequestDirection direction);
-
-        /**
-         * <p>The field to sort results by. Defaults to created_at.</p>
-         */
-        _FinalStage order(Optional<ListPlansRequestOrder> order);
-
-        _FinalStage order(ListPlansRequestOrder order);
-
-        /**
-         * <p>Only return plans created before this timestamp.</p>
-         */
-        _FinalStage createdBefore(Optional<String> createdBefore);
-
-        _FinalStage createdBefore(String createdBefore);
-
-        /**
-         * <p>Only return plans created after this timestamp.</p>
-         */
-        _FinalStage createdAfter(Optional<String> createdAfter);
-
-        _FinalStage createdAfter(String createdAfter);
-
-        /**
-         * <p>The number of plans to return (default and max 100).</p>
-         */
-        _FinalStage first(Optional<Integer> first);
-
-        _FinalStage first(Integer first);
-
-        /**
-         * <p>A cursor; returns plans after this position.</p>
-         */
-        _FinalStage after(Optional<String> after);
-
-        _FinalStage after(String after);
-
-        /**
-         * <p>The number of plans to return from the end of the range.</p>
-         */
-        _FinalStage last(Optional<Integer> last);
-
-        _FinalStage last(Integer last);
-
-        /**
-         * <p>A cursor; returns plans before this position.</p>
-         */
-        _FinalStage before(Optional<String> before);
-
-        _FinalStage before(String before);
-    }
-
     @JsonIgnoreProperties(ignoreUnknown = true)
-    public static final class Builder implements AccountIdStage, _FinalStage {
-        private String accountId;
-
-        private Optional<String> before = Optional.empty();
-
-        private Optional<Integer> last = Optional.empty();
-
-        private Optional<String> after = Optional.empty();
-
-        private Optional<Integer> first = Optional.empty();
-
-        private Optional<String> createdAfter = Optional.empty();
-
-        private Optional<String> createdBefore = Optional.empty();
-
-        private Optional<ListPlansRequestOrder> order = Optional.empty();
-
-        private Optional<ListPlansRequestDirection> direction = Optional.empty();
-
-        private Optional<List<String>> productIds = Optional.empty();
-
-        private Optional<List<String>> planTypes = Optional.empty();
+    public static final class Builder {
+        private Optional<List<String>> releaseMethods = Optional.empty();
 
         private Optional<List<String>> visibilities = Optional.empty();
 
-        private Optional<List<String>> releaseMethods = Optional.empty();
+        private Optional<List<String>> billingTypes = Optional.empty();
 
-        @JsonAnySetter
+        private Optional<List<String>> productIds = Optional.empty();
+
+        private Optional<String> accountId = Optional.empty();
+
+        private Optional<ListPlansRequestDirection> direction = Optional.empty();
+
+        private Optional<ListPlansRequestOrder> order = Optional.empty();
+
+        private Optional<String> createdBefore = Optional.empty();
+
+        private Optional<String> createdAfter = Optional.empty();
+
+        private Optional<Integer> first = Optional.empty();
+
+        private Optional<String> after = Optional.empty();
+
+        private Optional<Integer> last = Optional.empty();
+
+        private Optional<String> before = Optional.empty();
+
         private Map<String, Object> additionalProperties = new HashMap<>();
 
         private Builder() {}
 
-        @java.lang.Override
         public Builder from(ListPlansRequest other) {
             releaseMethods(other.getReleaseMethods());
             visibilities(other.getVisibilities());
-            planTypes(other.getPlanTypes());
+            billingTypes(other.getBillingTypes());
             productIds(other.getProductIds());
             accountId(other.getAccountId());
             direction(other.getDirection());
@@ -402,288 +263,186 @@ public final class ListPlansRequest {
             return this;
         }
 
-        /**
-         * <p>The unique identifier of the account to list plans for.</p>
-         * <p>The unique identifier of the account to list plans for.</p>
-         * @return Reference to {@code this} so that method calls can be chained together.
-         */
-        @java.lang.Override
-        @JsonSetter("account_id")
-        public _FinalStage accountId(@NotNull String accountId) {
-            this.accountId = Objects.requireNonNull(accountId, "accountId must not be null");
+        @JsonSetter(value = "release_methods", nulls = Nulls.SKIP)
+        public Builder releaseMethods(Optional<List<String>> releaseMethods) {
+            this.releaseMethods = releaseMethods;
             return this;
         }
 
-        /**
-         * <p>A cursor; returns plans before this position.</p>
-         * @return Reference to {@code this} so that method calls can be chained together.
-         */
-        @java.lang.Override
-        public _FinalStage before(String before) {
-            this.before = Optional.ofNullable(before);
+        public Builder releaseMethods(List<String> releaseMethods) {
+            this.releaseMethods = Optional.ofNullable(releaseMethods);
             return this;
         }
 
-        /**
-         * <p>A cursor; returns plans before this position.</p>
-         */
-        @java.lang.Override
-        @JsonSetter(value = "before", nulls = Nulls.SKIP)
-        public _FinalStage before(Optional<String> before) {
-            this.before = before;
+        public Builder releaseMethods(String releaseMethods) {
+            this.releaseMethods = Optional.of(Collections.singletonList(releaseMethods));
             return this;
         }
 
-        /**
-         * <p>The number of plans to return from the end of the range.</p>
-         * @return Reference to {@code this} so that method calls can be chained together.
-         */
-        @java.lang.Override
-        public _FinalStage last(Integer last) {
-            this.last = Optional.ofNullable(last);
+        @JsonSetter(value = "visibilities", nulls = Nulls.SKIP)
+        public Builder visibilities(Optional<List<String>> visibilities) {
+            this.visibilities = visibilities;
             return this;
         }
 
-        /**
-         * <p>The number of plans to return from the end of the range.</p>
-         */
-        @java.lang.Override
-        @JsonSetter(value = "last", nulls = Nulls.SKIP)
-        public _FinalStage last(Optional<Integer> last) {
-            this.last = last;
+        public Builder visibilities(List<String> visibilities) {
+            this.visibilities = Optional.ofNullable(visibilities);
             return this;
         }
 
-        /**
-         * <p>A cursor; returns plans after this position.</p>
-         * @return Reference to {@code this} so that method calls can be chained together.
-         */
-        @java.lang.Override
-        public _FinalStage after(String after) {
-            this.after = Optional.ofNullable(after);
+        public Builder visibilities(String visibilities) {
+            this.visibilities = Optional.of(Collections.singletonList(visibilities));
             return this;
         }
 
-        /**
-         * <p>A cursor; returns plans after this position.</p>
-         */
-        @java.lang.Override
-        @JsonSetter(value = "after", nulls = Nulls.SKIP)
-        public _FinalStage after(Optional<String> after) {
-            this.after = after;
+        @JsonSetter(value = "billing_types", nulls = Nulls.SKIP)
+        public Builder billingTypes(Optional<List<String>> billingTypes) {
+            this.billingTypes = billingTypes;
             return this;
         }
 
-        /**
-         * <p>The number of plans to return (default and max 100).</p>
-         * @return Reference to {@code this} so that method calls can be chained together.
-         */
-        @java.lang.Override
-        public _FinalStage first(Integer first) {
-            this.first = Optional.ofNullable(first);
+        public Builder billingTypes(List<String> billingTypes) {
+            this.billingTypes = Optional.ofNullable(billingTypes);
             return this;
         }
 
-        /**
-         * <p>The number of plans to return (default and max 100).</p>
-         */
-        @java.lang.Override
-        @JsonSetter(value = "first", nulls = Nulls.SKIP)
-        public _FinalStage first(Optional<Integer> first) {
-            this.first = first;
+        public Builder billingTypes(String billingTypes) {
+            this.billingTypes = Optional.of(Collections.singletonList(billingTypes));
             return this;
         }
 
-        /**
-         * <p>Only return plans created after this timestamp.</p>
-         * @return Reference to {@code this} so that method calls can be chained together.
-         */
-        @java.lang.Override
-        public _FinalStage createdAfter(String createdAfter) {
+        @JsonSetter(value = "product_ids", nulls = Nulls.SKIP)
+        public Builder productIds(Optional<List<String>> productIds) {
+            this.productIds = productIds;
+            return this;
+        }
+
+        public Builder productIds(List<String> productIds) {
+            this.productIds = Optional.ofNullable(productIds);
+            return this;
+        }
+
+        public Builder productIds(String productIds) {
+            this.productIds = Optional.of(Collections.singletonList(productIds));
+            return this;
+        }
+
+        @JsonSetter(value = "account_id", nulls = Nulls.SKIP)
+        public Builder accountId(Optional<String> accountId) {
+            this.accountId = accountId;
+            return this;
+        }
+
+        public Builder accountId(String accountId) {
+            this.accountId = Optional.ofNullable(accountId);
+            return this;
+        }
+
+        @JsonSetter(value = "direction", nulls = Nulls.SKIP)
+        public Builder direction(Optional<ListPlansRequestDirection> direction) {
+            this.direction = direction;
+            return this;
+        }
+
+        public Builder direction(ListPlansRequestDirection direction) {
+            this.direction = Optional.ofNullable(direction);
+            return this;
+        }
+
+        @JsonSetter(value = "order", nulls = Nulls.SKIP)
+        public Builder order(Optional<ListPlansRequestOrder> order) {
+            this.order = order;
+            return this;
+        }
+
+        public Builder order(ListPlansRequestOrder order) {
+            this.order = Optional.ofNullable(order);
+            return this;
+        }
+
+        @JsonSetter(value = "created_before", nulls = Nulls.SKIP)
+        public Builder createdBefore(Optional<String> createdBefore) {
+            this.createdBefore = createdBefore;
+            return this;
+        }
+
+        public Builder createdBefore(String createdBefore) {
+            this.createdBefore = Optional.ofNullable(createdBefore);
+            return this;
+        }
+
+        @JsonSetter(value = "created_after", nulls = Nulls.SKIP)
+        public Builder createdAfter(Optional<String> createdAfter) {
+            this.createdAfter = createdAfter;
+            return this;
+        }
+
+        public Builder createdAfter(String createdAfter) {
             this.createdAfter = Optional.ofNullable(createdAfter);
             return this;
         }
 
         /**
-         * <p>Only return plans created after this timestamp.</p>
+         * <p>Number of results to return from the start of the range.</p>
          */
-        @java.lang.Override
-        @JsonSetter(value = "created_after", nulls = Nulls.SKIP)
-        public _FinalStage createdAfter(Optional<String> createdAfter) {
-            this.createdAfter = createdAfter;
+        @JsonSetter(value = "first", nulls = Nulls.SKIP)
+        public Builder first(Optional<Integer> first) {
+            this.first = first;
+            return this;
+        }
+
+        public Builder first(Integer first) {
+            this.first = Optional.ofNullable(first);
             return this;
         }
 
         /**
-         * <p>Only return plans created before this timestamp.</p>
-         * @return Reference to {@code this} so that method calls can be chained together.
+         * <p>Return results after this cursor. Use <code>page_info.end_cursor</code> from the previous response to fetch the next page.</p>
          */
-        @java.lang.Override
-        public _FinalStage createdBefore(String createdBefore) {
-            this.createdBefore = Optional.ofNullable(createdBefore);
+        @JsonSetter(value = "after", nulls = Nulls.SKIP)
+        public Builder after(Optional<String> after) {
+            this.after = after;
+            return this;
+        }
+
+        public Builder after(String after) {
+            this.after = Optional.ofNullable(after);
             return this;
         }
 
         /**
-         * <p>Only return plans created before this timestamp.</p>
+         * <p>Number of results to return from the end of the range.</p>
          */
-        @java.lang.Override
-        @JsonSetter(value = "created_before", nulls = Nulls.SKIP)
-        public _FinalStage createdBefore(Optional<String> createdBefore) {
-            this.createdBefore = createdBefore;
+        @JsonSetter(value = "last", nulls = Nulls.SKIP)
+        public Builder last(Optional<Integer> last) {
+            this.last = last;
+            return this;
+        }
+
+        public Builder last(Integer last) {
+            this.last = Optional.ofNullable(last);
             return this;
         }
 
         /**
-         * <p>The field to sort results by. Defaults to created_at.</p>
-         * @return Reference to {@code this} so that method calls can be chained together.
+         * <p>Return results before this cursor. Use <code>page_info.start_cursor</code> from the previous response to fetch the previous page.</p>
          */
-        @java.lang.Override
-        public _FinalStage order(ListPlansRequestOrder order) {
-            this.order = Optional.ofNullable(order);
+        @JsonSetter(value = "before", nulls = Nulls.SKIP)
+        public Builder before(Optional<String> before) {
+            this.before = before;
             return this;
         }
 
-        /**
-         * <p>The field to sort results by. Defaults to created_at.</p>
-         */
-        @java.lang.Override
-        @JsonSetter(value = "order", nulls = Nulls.SKIP)
-        public _FinalStage order(Optional<ListPlansRequestOrder> order) {
-            this.order = order;
+        public Builder before(String before) {
+            this.before = Optional.ofNullable(before);
             return this;
         }
 
-        /**
-         * <p>The sort direction for results. Defaults to descending.</p>
-         * @return Reference to {@code this} so that method calls can be chained together.
-         */
-        @java.lang.Override
-        public _FinalStage direction(ListPlansRequestDirection direction) {
-            this.direction = Optional.ofNullable(direction);
-            return this;
-        }
-
-        /**
-         * <p>The sort direction for results. Defaults to descending.</p>
-         */
-        @java.lang.Override
-        @JsonSetter(value = "direction", nulls = Nulls.SKIP)
-        public _FinalStage direction(Optional<ListPlansRequestDirection> direction) {
-            this.direction = direction;
-            return this;
-        }
-
-        @java.lang.Override
-        public _FinalStage productIds(String productIds) {
-            this.productIds = Optional.of(Collections.singletonList(productIds));
-            return this;
-        }
-
-        /**
-         * <p>Filter to only plans belonging to these product identifiers.</p>
-         * @return Reference to {@code this} so that method calls can be chained together.
-         */
-        @java.lang.Override
-        public _FinalStage productIds(List<String> productIds) {
-            this.productIds = Optional.ofNullable(productIds);
-            return this;
-        }
-
-        /**
-         * <p>Filter to only plans belonging to these product identifiers.</p>
-         */
-        @java.lang.Override
-        @JsonSetter(value = "product_ids", nulls = Nulls.SKIP)
-        public _FinalStage productIds(Optional<List<String>> productIds) {
-            this.productIds = productIds;
-            return this;
-        }
-
-        @java.lang.Override
-        public _FinalStage planTypes(String planTypes) {
-            this.planTypes = Optional.of(Collections.singletonList(planTypes));
-            return this;
-        }
-
-        /**
-         * <p>Filter to only plans matching these billing types.</p>
-         * @return Reference to {@code this} so that method calls can be chained together.
-         */
-        @java.lang.Override
-        public _FinalStage planTypes(List<String> planTypes) {
-            this.planTypes = Optional.ofNullable(planTypes);
-            return this;
-        }
-
-        /**
-         * <p>Filter to only plans matching these billing types.</p>
-         */
-        @java.lang.Override
-        @JsonSetter(value = "plan_types", nulls = Nulls.SKIP)
-        public _FinalStage planTypes(Optional<List<String>> planTypes) {
-            this.planTypes = planTypes;
-            return this;
-        }
-
-        @java.lang.Override
-        public _FinalStage visibilities(String visibilities) {
-            this.visibilities = Optional.of(Collections.singletonList(visibilities));
-            return this;
-        }
-
-        /**
-         * <p>Filter to only plans matching these visibility states.</p>
-         * @return Reference to {@code this} so that method calls can be chained together.
-         */
-        @java.lang.Override
-        public _FinalStage visibilities(List<String> visibilities) {
-            this.visibilities = Optional.ofNullable(visibilities);
-            return this;
-        }
-
-        /**
-         * <p>Filter to only plans matching these visibility states.</p>
-         */
-        @java.lang.Override
-        @JsonSetter(value = "visibilities", nulls = Nulls.SKIP)
-        public _FinalStage visibilities(Optional<List<String>> visibilities) {
-            this.visibilities = visibilities;
-            return this;
-        }
-
-        @java.lang.Override
-        public _FinalStage releaseMethods(String releaseMethods) {
-            this.releaseMethods = Optional.of(Collections.singletonList(releaseMethods));
-            return this;
-        }
-
-        /**
-         * <p>Filter to only plans matching these release methods.</p>
-         * @return Reference to {@code this} so that method calls can be chained together.
-         */
-        @java.lang.Override
-        public _FinalStage releaseMethods(List<String> releaseMethods) {
-            this.releaseMethods = Optional.ofNullable(releaseMethods);
-            return this;
-        }
-
-        /**
-         * <p>Filter to only plans matching these release methods.</p>
-         */
-        @java.lang.Override
-        @JsonSetter(value = "release_methods", nulls = Nulls.SKIP)
-        public _FinalStage releaseMethods(Optional<List<String>> releaseMethods) {
-            this.releaseMethods = releaseMethods;
-            return this;
-        }
-
-        @java.lang.Override
         public ListPlansRequest build() {
             return new ListPlansRequest(
                     releaseMethods,
                     visibilities,
-                    planTypes,
+                    billingTypes,
                     productIds,
                     accountId,
                     direction,
@@ -697,13 +456,31 @@ public final class ListPlansRequest {
                     additionalProperties);
         }
 
-        @java.lang.Override
+        @JsonAnySetter
+        private void putAdditionalPropertyFromJson(String key, Object value) {
+            if (key.equalsIgnoreCase("release_methods")
+                    || key.equalsIgnoreCase("visibilities")
+                    || key.equalsIgnoreCase("billing_types")
+                    || key.equalsIgnoreCase("product_ids")
+                    || key.equalsIgnoreCase("account_id")
+                    || key.equalsIgnoreCase("direction")
+                    || key.equalsIgnoreCase("order")
+                    || key.equalsIgnoreCase("created_before")
+                    || key.equalsIgnoreCase("created_after")
+                    || key.equalsIgnoreCase("first")
+                    || key.equalsIgnoreCase("after")
+                    || key.equalsIgnoreCase("last")
+                    || key.equalsIgnoreCase("before")) {
+                return;
+            }
+            this.additionalProperties.put(key, value);
+        }
+
         public Builder additionalProperty(String key, Object value) {
             this.additionalProperties.put(key, value);
             return this;
         }
 
-        @java.lang.Override
         public Builder additionalProperties(Map<String, Object> additionalProperties) {
             this.additionalProperties.putAll(additionalProperties);
             return this;

@@ -156,7 +156,6 @@ public final class AppUsageStats {
 
         private Optional<Integer> wau = Optional.empty();
 
-        @JsonAnySetter
         private Map<String, Object> additionalProperties = new HashMap<>();
 
         private Builder() {}
@@ -271,6 +270,17 @@ public final class AppUsageStats {
 
         public AppUsageStats build() {
             return new AppUsageStats(dau, mau, timeSpentLast24Hours, wau, additionalProperties);
+        }
+
+        @JsonAnySetter
+        private void putAdditionalPropertyFromJson(String key, Object value) {
+            if (key.equalsIgnoreCase("dau")
+                    || key.equalsIgnoreCase("mau")
+                    || key.equalsIgnoreCase("time_spent_last24_hours")
+                    || key.equalsIgnoreCase("wau")) {
+                return;
+            }
+            this.additionalProperties.put(key, value);
         }
 
         public Builder additionalProperty(String key, Object value) {

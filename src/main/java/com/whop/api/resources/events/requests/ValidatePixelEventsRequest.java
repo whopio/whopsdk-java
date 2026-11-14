@@ -42,7 +42,7 @@ public final class ValidatePixelEventsRequest {
     }
 
     /**
-     * @return A page to read for the pixel, e.g. an ad destination. Omit it to check the account from its events alone.
+     * @return A page to check for the pixel, such as an ad destination. Events from that page settle the answer; if it hasn't sent any lately, it is fetched and its source read for the pixel and the conversion events wired on it. Omit it to check the account from its events alone.
      */
     @JsonProperty("url")
     public Optional<String> getUrl() {
@@ -84,7 +84,6 @@ public final class ValidatePixelEventsRequest {
 
         private Optional<String> url = Optional.empty();
 
-        @JsonAnySetter
         private Map<String, Object> additionalProperties = new HashMap<>();
 
         private Builder() {}
@@ -110,7 +109,7 @@ public final class ValidatePixelEventsRequest {
         }
 
         /**
-         * <p>A page to read for the pixel, e.g. an ad destination. Omit it to check the account from its events alone.</p>
+         * <p>A page to check for the pixel, such as an ad destination. Events from that page settle the answer; if it hasn't sent any lately, it is fetched and its source read for the pixel and the conversion events wired on it. Omit it to check the account from its events alone.</p>
          */
         @JsonSetter(value = "url", nulls = Nulls.SKIP)
         public Builder url(Optional<String> url) {
@@ -125,6 +124,14 @@ public final class ValidatePixelEventsRequest {
 
         public ValidatePixelEventsRequest build() {
             return new ValidatePixelEventsRequest(accountId, url, additionalProperties);
+        }
+
+        @JsonAnySetter
+        private void putAdditionalPropertyFromJson(String key, Object value) {
+            if (key.equalsIgnoreCase("account_id") || key.equalsIgnoreCase("url")) {
+                return;
+            }
+            this.additionalProperties.put(key, value);
         }
 
         public Builder additionalProperty(String key, Object value) {

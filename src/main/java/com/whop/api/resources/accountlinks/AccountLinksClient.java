@@ -26,14 +26,14 @@ public class AccountLinksClient {
     }
 
     /**
-     * Generate a URL that directs a sub-merchant to their account portal, such as the hosted payouts dashboard or the KYC onboarding flow.
+     * Generates a URL that sends a sub-merchant to a hosted Whop page, such as the payouts dashboard or the KYC onboarding flow. Requires an API key.
      */
     public AccountLink create(CreateAccountLinksRequest request) {
         return this.rawClient.create(request).body();
     }
 
     /**
-     * Generate a URL that directs a sub-merchant to their account portal, such as the hosted payouts dashboard or the KYC onboarding flow.
+     * Generates a URL that sends a sub-merchant to a hosted Whop page, such as the payouts dashboard or the KYC onboarding flow. Requires an API key.
      */
     public AccountLink create(CreateAccountLinksRequest request, RequestOptions requestOptions) {
         return this.rawClient.create(request, requestOptions).body();

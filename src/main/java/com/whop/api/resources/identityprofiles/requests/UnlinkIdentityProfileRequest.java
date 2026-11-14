@@ -86,7 +86,6 @@ public final class UnlinkIdentityProfileRequest {
     public static final class Builder implements LedgerAccountIdStage, _FinalStage {
         private String ledgerAccountId;
 
-        @JsonAnySetter
         private Map<String, Object> additionalProperties = new HashMap<>();
 
         private Builder() {}
@@ -98,7 +97,6 @@ public final class UnlinkIdentityProfileRequest {
         }
 
         /**
-         * <p>The ID of the LedgerAccount to unlink the identity profile from.</p>
          * <p>The ID of the LedgerAccount to unlink the identity profile from.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
@@ -112,6 +110,14 @@ public final class UnlinkIdentityProfileRequest {
         @java.lang.Override
         public UnlinkIdentityProfileRequest build() {
             return new UnlinkIdentityProfileRequest(ledgerAccountId, additionalProperties);
+        }
+
+        @JsonAnySetter
+        private void putAdditionalPropertyFromJson(String key, Object value) {
+            if (key.equalsIgnoreCase("ledger_account_id")) {
+                return;
+            }
+            this.additionalProperties.put(key, value);
         }
 
         @java.lang.Override

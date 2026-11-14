@@ -6,12 +6,19 @@ package com.whop.api.resources.partners.businesses;
 import com.whop.api.core.ClientOptions;
 import com.whop.api.core.RequestOptions;
 import com.whop.api.core.Suppliers;
+import com.whop.api.core.WhopApiHttpResponse;
 import com.whop.api.core.pagination.SyncPagingIterable;
 import com.whop.api.resources.partners.businesses.earnings.AsyncEarningsClient;
+import com.whop.api.resources.partners.businesses.requests.AcceptCommissionAdvanceBusinessesRequest;
 import com.whop.api.resources.partners.businesses.requests.ListBusinessesRequest;
+import com.whop.api.resources.partners.businesses.requests.ResendInviteBusinessesRequest;
 import com.whop.api.resources.partners.businesses.requests.RetrieveBusinessesRequest;
+import com.whop.api.resources.partners.businesses.requests.UpdateBusinessesRequest;
+import com.whop.api.resources.partners.businesses.types.AcceptCommissionAdvanceBusinessesResponse;
 import com.whop.api.resources.partners.businesses.types.ListBusinessesResponseDataItem;
+import com.whop.api.resources.partners.businesses.types.ResendInviteBusinessesResponse;
 import com.whop.api.resources.partners.businesses.types.RetrieveBusinessesResponse;
+import com.whop.api.resources.partners.businesses.types.UpdateBusinessesResponse;
 import java.util.concurrent.CompletableFuture;
 import java.util.function.Supplier;
 
@@ -39,21 +46,48 @@ public class AsyncBusinessesClient {
      * Lists the businesses the authenticated user referred onto Whop, most recent first.
      */
     public CompletableFuture<SyncPagingIterable<ListBusinessesResponseDataItem>> list() {
-        return this.rawClient.list().thenApply(response -> response.body());
+        CompletableFuture<WhopApiHttpResponse<SyncPagingIterable<ListBusinessesResponseDataItem>>> rawFuture =
+                this.rawClient.list();
+        CompletableFuture<SyncPagingIterable<ListBusinessesResponseDataItem>> future =
+                rawFuture.thenApply(response -> response.body());
+        future.whenComplete((result_, throwable_) -> {
+            if (future.isCancelled()) {
+                rawFuture.cancel(true);
+            }
+        });
+        return future;
     }
 
     /**
      * Lists the businesses the authenticated user referred onto Whop, most recent first.
      */
     public CompletableFuture<SyncPagingIterable<ListBusinessesResponseDataItem>> list(RequestOptions requestOptions) {
-        return this.rawClient.list(requestOptions).thenApply(response -> response.body());
+        CompletableFuture<WhopApiHttpResponse<SyncPagingIterable<ListBusinessesResponseDataItem>>> rawFuture =
+                this.rawClient.list(requestOptions);
+        CompletableFuture<SyncPagingIterable<ListBusinessesResponseDataItem>> future =
+                rawFuture.thenApply(response -> response.body());
+        future.whenComplete((result_, throwable_) -> {
+            if (future.isCancelled()) {
+                rawFuture.cancel(true);
+            }
+        });
+        return future;
     }
 
     /**
      * Lists the businesses the authenticated user referred onto Whop, most recent first.
      */
     public CompletableFuture<SyncPagingIterable<ListBusinessesResponseDataItem>> list(ListBusinessesRequest request) {
-        return this.rawClient.list(request).thenApply(response -> response.body());
+        CompletableFuture<WhopApiHttpResponse<SyncPagingIterable<ListBusinessesResponseDataItem>>> rawFuture =
+                this.rawClient.list(request);
+        CompletableFuture<SyncPagingIterable<ListBusinessesResponseDataItem>> future =
+                rawFuture.thenApply(response -> response.body());
+        future.whenComplete((result_, throwable_) -> {
+            if (future.isCancelled()) {
+                rawFuture.cancel(true);
+            }
+        });
+        return future;
     }
 
     /**
@@ -61,36 +95,201 @@ public class AsyncBusinessesClient {
      */
     public CompletableFuture<SyncPagingIterable<ListBusinessesResponseDataItem>> list(
             ListBusinessesRequest request, RequestOptions requestOptions) {
-        return this.rawClient.list(request, requestOptions).thenApply(response -> response.body());
+        CompletableFuture<WhopApiHttpResponse<SyncPagingIterable<ListBusinessesResponseDataItem>>> rawFuture =
+                this.rawClient.list(request, requestOptions);
+        CompletableFuture<SyncPagingIterable<ListBusinessesResponseDataItem>> future =
+                rawFuture.thenApply(response -> response.body());
+        future.whenComplete((result_, throwable_) -> {
+            if (future.isCancelled()) {
+                rawFuture.cancel(true);
+            }
+        });
+        return future;
     }
 
     /**
-     * Retrieves a single referred business and its referral terms.
+     * Retrieves a single referred business and its referral terms. The original referrer or a caller with company:basic:read on the business credited for the referral can read it.
      */
     public CompletableFuture<RetrieveBusinessesResponse> retrieve(String id) {
-        return this.rawClient.retrieve(id).thenApply(response -> response.body());
+        CompletableFuture<WhopApiHttpResponse<RetrieveBusinessesResponse>> rawFuture = this.rawClient.retrieve(id);
+        CompletableFuture<RetrieveBusinessesResponse> future = rawFuture.thenApply(response -> response.body());
+        future.whenComplete((result_, throwable_) -> {
+            if (future.isCancelled()) {
+                rawFuture.cancel(true);
+            }
+        });
+        return future;
     }
 
     /**
-     * Retrieves a single referred business and its referral terms.
+     * Retrieves a single referred business and its referral terms. The original referrer or a caller with company:basic:read on the business credited for the referral can read it.
      */
     public CompletableFuture<RetrieveBusinessesResponse> retrieve(String id, RequestOptions requestOptions) {
-        return this.rawClient.retrieve(id, requestOptions).thenApply(response -> response.body());
+        CompletableFuture<WhopApiHttpResponse<RetrieveBusinessesResponse>> rawFuture =
+                this.rawClient.retrieve(id, requestOptions);
+        CompletableFuture<RetrieveBusinessesResponse> future = rawFuture.thenApply(response -> response.body());
+        future.whenComplete((result_, throwable_) -> {
+            if (future.isCancelled()) {
+                rawFuture.cancel(true);
+            }
+        });
+        return future;
     }
 
     /**
-     * Retrieves a single referred business and its referral terms.
+     * Retrieves a single referred business and its referral terms. The original referrer or a caller with company:basic:read on the business credited for the referral can read it.
      */
     public CompletableFuture<RetrieveBusinessesResponse> retrieve(String id, RetrieveBusinessesRequest request) {
-        return this.rawClient.retrieve(id, request).thenApply(response -> response.body());
+        CompletableFuture<WhopApiHttpResponse<RetrieveBusinessesResponse>> rawFuture =
+                this.rawClient.retrieve(id, request);
+        CompletableFuture<RetrieveBusinessesResponse> future = rawFuture.thenApply(response -> response.body());
+        future.whenComplete((result_, throwable_) -> {
+            if (future.isCancelled()) {
+                rawFuture.cancel(true);
+            }
+        });
+        return future;
     }
 
     /**
-     * Retrieves a single referred business and its referral terms.
+     * Retrieves a single referred business and its referral terms. The original referrer or a caller with company:basic:read on the business credited for the referral can read it.
      */
     public CompletableFuture<RetrieveBusinessesResponse> retrieve(
             String id, RetrieveBusinessesRequest request, RequestOptions requestOptions) {
-        return this.rawClient.retrieve(id, request, requestOptions).thenApply(response -> response.body());
+        CompletableFuture<WhopApiHttpResponse<RetrieveBusinessesResponse>> rawFuture =
+                this.rawClient.retrieve(id, request, requestOptions);
+        CompletableFuture<RetrieveBusinessesResponse> future = rawFuture.thenApply(response -> response.body());
+        future.whenComplete((result_, throwable_) -> {
+            if (future.isCancelled()) {
+                rawFuture.cancel(true);
+            }
+        });
+        return future;
+    }
+
+    /**
+     * Save annual payment projections for a business referred by the authenticated partner. Unaccepted projections can be replaced with updated annual card and BNPL payment volume. To qualify, payment volume over the last 30 days must reach 5% of the annual payment projection. Ads are excluded from CPA; ordinary ad commissions continue. Pass withdraw_projections: true without projection amounts to remove unaccepted projections. Accepted projections are immutable. Public API access requires a partner OAuth token; business API keys are not supported.
+     */
+    public CompletableFuture<UpdateBusinessesResponse> update(String id) {
+        CompletableFuture<WhopApiHttpResponse<UpdateBusinessesResponse>> rawFuture = this.rawClient.update(id);
+        CompletableFuture<UpdateBusinessesResponse> future = rawFuture.thenApply(response -> response.body());
+        future.whenComplete((result_, throwable_) -> {
+            if (future.isCancelled()) {
+                rawFuture.cancel(true);
+            }
+        });
+        return future;
+    }
+
+    /**
+     * Save annual payment projections for a business referred by the authenticated partner. Unaccepted projections can be replaced with updated annual card and BNPL payment volume. To qualify, payment volume over the last 30 days must reach 5% of the annual payment projection. Ads are excluded from CPA; ordinary ad commissions continue. Pass withdraw_projections: true without projection amounts to remove unaccepted projections. Accepted projections are immutable. Public API access requires a partner OAuth token; business API keys are not supported.
+     */
+    public CompletableFuture<UpdateBusinessesResponse> update(String id, RequestOptions requestOptions) {
+        CompletableFuture<WhopApiHttpResponse<UpdateBusinessesResponse>> rawFuture =
+                this.rawClient.update(id, requestOptions);
+        CompletableFuture<UpdateBusinessesResponse> future = rawFuture.thenApply(response -> response.body());
+        future.whenComplete((result_, throwable_) -> {
+            if (future.isCancelled()) {
+                rawFuture.cancel(true);
+            }
+        });
+        return future;
+    }
+
+    /**
+     * Save annual payment projections for a business referred by the authenticated partner. Unaccepted projections can be replaced with updated annual card and BNPL payment volume. To qualify, payment volume over the last 30 days must reach 5% of the annual payment projection. Ads are excluded from CPA; ordinary ad commissions continue. Pass withdraw_projections: true without projection amounts to remove unaccepted projections. Accepted projections are immutable. Public API access requires a partner OAuth token; business API keys are not supported.
+     */
+    public CompletableFuture<UpdateBusinessesResponse> update(String id, UpdateBusinessesRequest request) {
+        CompletableFuture<WhopApiHttpResponse<UpdateBusinessesResponse>> rawFuture = this.rawClient.update(id, request);
+        CompletableFuture<UpdateBusinessesResponse> future = rawFuture.thenApply(response -> response.body());
+        future.whenComplete((result_, throwable_) -> {
+            if (future.isCancelled()) {
+                rawFuture.cancel(true);
+            }
+        });
+        return future;
+    }
+
+    /**
+     * Save annual payment projections for a business referred by the authenticated partner. Unaccepted projections can be replaced with updated annual card and BNPL payment volume. To qualify, payment volume over the last 30 days must reach 5% of the annual payment projection. Ads are excluded from CPA; ordinary ad commissions continue. Pass withdraw_projections: true without projection amounts to remove unaccepted projections. Accepted projections are immutable. Public API access requires a partner OAuth token; business API keys are not supported.
+     */
+    public CompletableFuture<UpdateBusinessesResponse> update(
+            String id, UpdateBusinessesRequest request, RequestOptions requestOptions) {
+        CompletableFuture<WhopApiHttpResponse<UpdateBusinessesResponse>> rawFuture =
+                this.rawClient.update(id, request, requestOptions);
+        CompletableFuture<UpdateBusinessesResponse> future = rawFuture.thenApply(response -> response.body());
+        future.whenComplete((result_, throwable_) -> {
+            if (future.isCancelled()) {
+                rawFuture.cancel(true);
+            }
+        });
+        return future;
+    }
+
+    /**
+     * Accept the authenticated partner's CPA offer with the reviewed terms and signed offer token. Public API access requires a partner OAuth token; business API keys are not supported.
+     */
+    public CompletableFuture<AcceptCommissionAdvanceBusinessesResponse> acceptCommissionAdvance(
+            String id, AcceptCommissionAdvanceBusinessesRequest request) {
+        CompletableFuture<WhopApiHttpResponse<AcceptCommissionAdvanceBusinessesResponse>> rawFuture =
+                this.rawClient.acceptCommissionAdvance(id, request);
+        CompletableFuture<AcceptCommissionAdvanceBusinessesResponse> future =
+                rawFuture.thenApply(response -> response.body());
+        future.whenComplete((result_, throwable_) -> {
+            if (future.isCancelled()) {
+                rawFuture.cancel(true);
+            }
+        });
+        return future;
+    }
+
+    /**
+     * Accept the authenticated partner's CPA offer with the reviewed terms and signed offer token. Public API access requires a partner OAuth token; business API keys are not supported.
+     */
+    public CompletableFuture<AcceptCommissionAdvanceBusinessesResponse> acceptCommissionAdvance(
+            String id, AcceptCommissionAdvanceBusinessesRequest request, RequestOptions requestOptions) {
+        CompletableFuture<WhopApiHttpResponse<AcceptCommissionAdvanceBusinessesResponse>> rawFuture =
+                this.rawClient.acceptCommissionAdvance(id, request, requestOptions);
+        CompletableFuture<AcceptCommissionAdvanceBusinessesResponse> future =
+                rawFuture.thenApply(response -> response.body());
+        future.whenComplete((result_, throwable_) -> {
+            if (future.isCancelled()) {
+                rawFuture.cancel(true);
+            }
+        });
+        return future;
+    }
+
+    /**
+     * Re-emails an outstanding invite to claim ownership of a referred business. Find the invite in the business's <code>pending_owner_invites</code>. Only the first-tier partner can resend, from a whop.com session or the Whop CLI or MCP with <code>partner:handoff</code>. Rate limited to one resend per invite every five minutes.
+     */
+    public CompletableFuture<ResendInviteBusinessesResponse> resendInvite(
+            String id, ResendInviteBusinessesRequest request) {
+        CompletableFuture<WhopApiHttpResponse<ResendInviteBusinessesResponse>> rawFuture =
+                this.rawClient.resendInvite(id, request);
+        CompletableFuture<ResendInviteBusinessesResponse> future = rawFuture.thenApply(response -> response.body());
+        future.whenComplete((result_, throwable_) -> {
+            if (future.isCancelled()) {
+                rawFuture.cancel(true);
+            }
+        });
+        return future;
+    }
+
+    /**
+     * Re-emails an outstanding invite to claim ownership of a referred business. Find the invite in the business's <code>pending_owner_invites</code>. Only the first-tier partner can resend, from a whop.com session or the Whop CLI or MCP with <code>partner:handoff</code>. Rate limited to one resend per invite every five minutes.
+     */
+    public CompletableFuture<ResendInviteBusinessesResponse> resendInvite(
+            String id, ResendInviteBusinessesRequest request, RequestOptions requestOptions) {
+        CompletableFuture<WhopApiHttpResponse<ResendInviteBusinessesResponse>> rawFuture =
+                this.rawClient.resendInvite(id, request, requestOptions);
+        CompletableFuture<ResendInviteBusinessesResponse> future = rawFuture.thenApply(response -> response.body());
+        future.whenComplete((result_, throwable_) -> {
+            if (future.isCancelled()) {
+                rawFuture.cancel(true);
+            }
+        });
+        return future;
     }
 
     public AsyncEarningsClient earnings() {

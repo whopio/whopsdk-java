@@ -30,7 +30,7 @@ public final class ListCoursesRequest {
 
     private final Optional<String> experienceId;
 
-    private final Optional<String> companyId;
+    private final Optional<String> accountId;
 
     private final Map<String, Object> additionalProperties;
 
@@ -40,14 +40,14 @@ public final class ListCoursesRequest {
             Optional<Integer> first,
             Optional<Integer> last,
             Optional<String> experienceId,
-            Optional<String> companyId,
+            Optional<String> accountId,
             Map<String, Object> additionalProperties) {
         this.after = after;
         this.before = before;
         this.first = first;
         this.last = last;
         this.experienceId = experienceId;
-        this.companyId = companyId;
+        this.accountId = accountId;
         this.additionalProperties = additionalProperties;
     }
 
@@ -94,9 +94,9 @@ public final class ListCoursesRequest {
     /**
      * @return The unique identifier of the company to list courses for.
      */
-    @JsonProperty("company_id")
-    public Optional<String> getCompanyId() {
-        return companyId;
+    @JsonProperty("account_id")
+    public Optional<String> getAccountId() {
+        return accountId;
     }
 
     @java.lang.Override
@@ -116,12 +116,12 @@ public final class ListCoursesRequest {
                 && first.equals(other.first)
                 && last.equals(other.last)
                 && experienceId.equals(other.experienceId)
-                && companyId.equals(other.companyId);
+                && accountId.equals(other.accountId);
     }
 
     @java.lang.Override
     public int hashCode() {
-        return Objects.hash(this.after, this.before, this.first, this.last, this.experienceId, this.companyId);
+        return Objects.hash(this.after, this.before, this.first, this.last, this.experienceId, this.accountId);
     }
 
     @java.lang.Override
@@ -145,9 +145,8 @@ public final class ListCoursesRequest {
 
         private Optional<String> experienceId = Optional.empty();
 
-        private Optional<String> companyId = Optional.empty();
+        private Optional<String> accountId = Optional.empty();
 
-        @JsonAnySetter
         private Map<String, Object> additionalProperties = new HashMap<>();
 
         private Builder() {}
@@ -158,7 +157,7 @@ public final class ListCoursesRequest {
             first(other.getFirst());
             last(other.getLast());
             experienceId(other.getExperienceId());
-            companyId(other.getCompanyId());
+            accountId(other.getAccountId());
             return this;
         }
 
@@ -235,19 +234,32 @@ public final class ListCoursesRequest {
         /**
          * <p>The unique identifier of the company to list courses for.</p>
          */
-        @JsonSetter(value = "company_id", nulls = Nulls.SKIP)
-        public Builder companyId(Optional<String> companyId) {
-            this.companyId = companyId;
+        @JsonSetter(value = "account_id", nulls = Nulls.SKIP)
+        public Builder accountId(Optional<String> accountId) {
+            this.accountId = accountId;
             return this;
         }
 
-        public Builder companyId(String companyId) {
-            this.companyId = Optional.ofNullable(companyId);
+        public Builder accountId(String accountId) {
+            this.accountId = Optional.ofNullable(accountId);
             return this;
         }
 
         public ListCoursesRequest build() {
-            return new ListCoursesRequest(after, before, first, last, experienceId, companyId, additionalProperties);
+            return new ListCoursesRequest(after, before, first, last, experienceId, accountId, additionalProperties);
+        }
+
+        @JsonAnySetter
+        private void putAdditionalPropertyFromJson(String key, Object value) {
+            if (key.equalsIgnoreCase("after")
+                    || key.equalsIgnoreCase("before")
+                    || key.equalsIgnoreCase("first")
+                    || key.equalsIgnoreCase("last")
+                    || key.equalsIgnoreCase("experience_id")
+                    || key.equalsIgnoreCase("account_id")) {
+                return;
+            }
+            this.additionalProperties.put(key, value);
         }
 
         public Builder additionalProperty(String key, Object value) {

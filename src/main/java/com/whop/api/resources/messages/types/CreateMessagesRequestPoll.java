@@ -31,9 +31,6 @@ public final class CreateMessagesRequestPoll {
         this.additionalProperties = additionalProperties;
     }
 
-    /**
-     * @return The options for the poll. Must have sequential IDs starting from 1
-     */
     @JsonProperty("options")
     public List<CreateMessagesRequestPollOptionsItem> getOptions() {
         return options;
@@ -72,7 +69,6 @@ public final class CreateMessagesRequestPoll {
     public static final class Builder {
         private List<CreateMessagesRequestPollOptionsItem> options = new ArrayList<>();
 
-        @JsonAnySetter
         private Map<String, Object> additionalProperties = new HashMap<>();
 
         private Builder() {}
@@ -82,9 +78,6 @@ public final class CreateMessagesRequestPoll {
             return this;
         }
 
-        /**
-         * <p>The options for the poll. Must have sequential IDs starting from 1</p>
-         */
         @JsonSetter(value = "options", nulls = Nulls.SKIP)
         public Builder options(List<CreateMessagesRequestPollOptionsItem> options) {
             this.options.clear();
@@ -108,6 +101,14 @@ public final class CreateMessagesRequestPoll {
 
         public CreateMessagesRequestPoll build() {
             return new CreateMessagesRequestPoll(options, additionalProperties);
+        }
+
+        @JsonAnySetter
+        private void putAdditionalPropertyFromJson(String key, Object value) {
+            if (key.equalsIgnoreCase("options")) {
+                return;
+            }
+            this.additionalProperties.put(key, value);
         }
 
         public Builder additionalProperty(String key, Object value) {

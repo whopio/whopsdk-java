@@ -285,7 +285,6 @@ public final class RetrievePeopleResponseSourcesItem {
 
         private Optional<RetrievePeopleResponseSourcesItemAd> ad = Optional.empty();
 
-        @JsonAnySetter
         private Map<String, Object> additionalProperties = new HashMap<>();
 
         private Builder() {}
@@ -489,6 +488,21 @@ public final class RetrievePeopleResponseSourcesItem {
         public RetrievePeopleResponseSourcesItem build() {
             return new RetrievePeopleResponseSourcesItem(
                     ad, adGroup, campaign, domain, occurredAt, platform, type, utmSource, additionalProperties);
+        }
+
+        @JsonAnySetter
+        private void putAdditionalPropertyFromJson(String key, Object value) {
+            if (key.equalsIgnoreCase("ad")
+                    || key.equalsIgnoreCase("ad_group")
+                    || key.equalsIgnoreCase("campaign")
+                    || key.equalsIgnoreCase("domain")
+                    || key.equalsIgnoreCase("occurred_at")
+                    || key.equalsIgnoreCase("platform")
+                    || key.equalsIgnoreCase("type")
+                    || key.equalsIgnoreCase("utm_source")) {
+                return;
+            }
+            this.additionalProperties.put(key, value);
         }
 
         @java.lang.Override

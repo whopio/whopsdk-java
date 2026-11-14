@@ -138,7 +138,7 @@ public final class PayoutAccount {
     }
 
     /**
-     * @return The granular calculated status of the payout account reflecting its current KYC and withdrawal readiness state.
+     * @return The granular calculated status of the payout account reflecting its current KYC and payout readiness state.
      */
     @JsonIgnore
     public Optional<PayoutAccountCalculatedStatuses> getStatus() {
@@ -305,7 +305,7 @@ public final class PayoutAccount {
         _FinalStage phone(Nullable<String> phone);
 
         /**
-         * <p>The granular calculated status of the payout account reflecting its current KYC and withdrawal readiness state.</p>
+         * <p>The granular calculated status of the payout account reflecting its current KYC and payout readiness state.</p>
          */
         _FinalStage status(Optional<PayoutAccountCalculatedStatuses> status);
 
@@ -332,7 +332,6 @@ public final class PayoutAccount {
 
         private Optional<PayoutAccountAddress> address = Optional.empty();
 
-        @JsonAnySetter
         private Map<String, Object> additionalProperties = new HashMap<>();
 
         private Builder() {}
@@ -352,7 +351,6 @@ public final class PayoutAccount {
 
         /**
          * <p>The unique identifier for the payout account.</p>
-         * <p>The unique identifier for the payout account.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
@@ -363,7 +361,7 @@ public final class PayoutAccount {
         }
 
         /**
-         * <p>The granular calculated status of the payout account reflecting its current KYC and withdrawal readiness state.</p>
+         * <p>The granular calculated status of the payout account reflecting its current KYC and payout readiness state.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
@@ -379,7 +377,7 @@ public final class PayoutAccount {
         }
 
         /**
-         * <p>The granular calculated status of the payout account reflecting its current KYC and withdrawal readiness state.</p>
+         * <p>The granular calculated status of the payout account reflecting its current KYC and payout readiness state.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
@@ -389,7 +387,7 @@ public final class PayoutAccount {
         }
 
         /**
-         * <p>The granular calculated status of the payout account reflecting its current KYC and withdrawal readiness state.</p>
+         * <p>The granular calculated status of the payout account reflecting its current KYC and payout readiness state.</p>
          */
         @java.lang.Override
         @JsonSetter(value = "status", nulls = Nulls.SKIP)
@@ -628,6 +626,21 @@ public final class PayoutAccount {
                     phone,
                     status,
                     additionalProperties);
+        }
+
+        @JsonAnySetter
+        private void putAdditionalPropertyFromJson(String key, Object value) {
+            if (key.equalsIgnoreCase("address")
+                    || key.equalsIgnoreCase("business_name")
+                    || key.equalsIgnoreCase("business_representative")
+                    || key.equalsIgnoreCase("email")
+                    || key.equalsIgnoreCase("id")
+                    || key.equalsIgnoreCase("latest_verification")
+                    || key.equalsIgnoreCase("phone")
+                    || key.equalsIgnoreCase("status")) {
+                return;
+            }
+            this.additionalProperties.put(key, value);
         }
 
         @java.lang.Override

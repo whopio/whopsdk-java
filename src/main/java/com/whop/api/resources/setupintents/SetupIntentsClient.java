@@ -5,25 +5,29 @@ package com.whop.api.resources.setupintents;
 
 import com.whop.api.core.ClientOptions;
 import com.whop.api.core.RequestOptions;
+import com.whop.api.core.Suppliers;
 import com.whop.api.core.pagination.SyncPagingIterable;
+import com.whop.api.resources.setupintents.direct.DirectClient;
+import com.whop.api.resources.setupintents.requests.CreateSetupIntentsRequest;
 import com.whop.api.resources.setupintents.requests.ListSetupIntentsRequest;
 import com.whop.api.resources.setupintents.requests.RetrieveSetupIntentsRequest;
 import com.whop.api.resources.setupintents.requests.RetrieveStatusSetupIntentsRequest;
 import com.whop.api.resources.setupintents.requests.UpdateReturnUrlSetupIntentsRequest;
-import com.whop.api.resources.setupintents.types.CreateSetupIntentsRequest;
-import com.whop.api.resources.setupintents.types.CreateSetupIntentsResponse;
 import com.whop.api.types.SetupIntent;
-import com.whop.api.types.SetupIntentListItem;
 import com.whop.api.types.SetupStatus;
+import java.util.function.Supplier;
 
 public class SetupIntentsClient {
     protected final ClientOptions clientOptions;
 
     private final RawSetupIntentsClient rawClient;
 
+    protected final Supplier<DirectClient> directClient;
+
     public SetupIntentsClient(ClientOptions clientOptions) {
         this.clientOptions = clientOptions;
         this.rawClient = new RawSetupIntentsClient(clientOptions);
+        this.directClient = Suppliers.memoize(() -> new DirectClient(clientOptions));
     }
 
     /**
@@ -34,119 +38,84 @@ public class SetupIntentsClient {
     }
 
     /**
-     * Returns a paginated list of setup intents for a company, with optional filtering by creation date. A setup intent securely collects and stores a member's payment method for future use without charging them immediately.
-     * <p>Required permissions:</p>
-     * <ul>
-     * <li><code>payment:setup_intent:read</code></li>
-     * <li><code>member:basic:read</code></li>
-     * <li><code>member:email:read</code></li>
-     * </ul>
+     * Lists setup intents newest first. An account API key lists its own account; a user token lists every account it can read, or one account with <code>account_id</code>.
      */
-    public SyncPagingIterable<SetupIntentListItem> list(ListSetupIntentsRequest request) {
+    public SyncPagingIterable<SetupIntent> list() {
+        return this.rawClient.list().body();
+    }
+
+    /**
+     * Lists setup intents newest first. An account API key lists its own account; a user token lists every account it can read, or one account with <code>account_id</code>.
+     */
+    public SyncPagingIterable<SetupIntent> list(RequestOptions requestOptions) {
+        return this.rawClient.list(requestOptions).body();
+    }
+
+    /**
+     * Lists setup intents newest first. An account API key lists its own account; a user token lists every account it can read, or one account with <code>account_id</code>.
+     */
+    public SyncPagingIterable<SetupIntent> list(ListSetupIntentsRequest request) {
         return this.rawClient.list(request).body();
     }
 
     /**
-     * Returns a paginated list of setup intents for a company, with optional filtering by creation date. A setup intent securely collects and stores a member's payment method for future use without charging them immediately.
-     * <p>Required permissions:</p>
-     * <ul>
-     * <li><code>payment:setup_intent:read</code></li>
-     * <li><code>member:basic:read</code></li>
-     * <li><code>member:email:read</code></li>
-     * </ul>
+     * Lists setup intents newest first. An account API key lists its own account; a user token lists every account it can read, or one account with <code>account_id</code>.
      */
-    public SyncPagingIterable<SetupIntentListItem> list(
-            ListSetupIntentsRequest request, RequestOptions requestOptions) {
+    public SyncPagingIterable<SetupIntent> list(ListSetupIntentsRequest request, RequestOptions requestOptions) {
         return this.rawClient.list(request, requestOptions).body();
     }
 
     /**
-     * Save a buyer's payment method for later without charging it. Provide a confirmation token for a method the buyer just supplied, or an existing payment method to re-verify. The buyer may still have a step to complete — 3D Secure, a hosted enrollment, linking a bank account — so poll the setup intent's status endpoint for what to do next.
-     * <p>Required permissions:</p>
-     * <ul>
-     * <li><code>payment:charge</code></li>
-     * <li><code>member:basic:read</code></li>
-     * <li><code>member:email:read</code></li>
-     * </ul>
+     * Saves a buyer's payment method for later without charging it — one the buyer just supplied through the payment elements in setup mode, or one already on file to re-verify. The setup completes in the background, so the response is the setup intent as created, not its outcome: hand <code>client_secret</code> to the elements' <code>handleNextAction</code>, or poll Retrieve setup status. A buyer's own token holding <code>member:payment_methods:use</code> may create a setup intent for itself from a confirmation token.
      */
-    public CreateSetupIntentsResponse create(CreateSetupIntentsRequest request) {
+    public SetupIntent create(CreateSetupIntentsRequest request) {
         return this.rawClient.create(request).body();
     }
 
     /**
-     * Save a buyer's payment method for later without charging it. Provide a confirmation token for a method the buyer just supplied, or an existing payment method to re-verify. The buyer may still have a step to complete — 3D Secure, a hosted enrollment, linking a bank account — so poll the setup intent's status endpoint for what to do next.
-     * <p>Required permissions:</p>
-     * <ul>
-     * <li><code>payment:charge</code></li>
-     * <li><code>member:basic:read</code></li>
-     * <li><code>member:email:read</code></li>
-     * </ul>
+     * Saves a buyer's payment method for later without charging it — one the buyer just supplied through the payment elements in setup mode, or one already on file to re-verify. The setup completes in the background, so the response is the setup intent as created, not its outcome: hand <code>client_secret</code> to the elements' <code>handleNextAction</code>, or poll Retrieve setup status. A buyer's own token holding <code>member:payment_methods:use</code> may create a setup intent for itself from a confirmation token.
      */
-    public CreateSetupIntentsResponse create(CreateSetupIntentsRequest request, RequestOptions requestOptions) {
+    public SetupIntent create(CreateSetupIntentsRequest request, RequestOptions requestOptions) {
         return this.rawClient.create(request, requestOptions).body();
     }
 
     /**
-     * Retrieves the details of an existing setup intent.
-     * <p>Required permissions:</p>
-     * <ul>
-     * <li><code>payment:setup_intent:read</code></li>
-     * <li><code>member:basic:read</code></li>
-     * <li><code>member:email:read</code></li>
-     * </ul>
+     * Retrieves a setup intent. Once its <code>status</code> is <code>succeeded</code>, charge the saved method by its <code>payment_method_id</code>. The buyer's own token may retrieve a setup intent that belongs to it.
      */
     public SetupIntent retrieve(String id) {
         return this.rawClient.retrieve(id).body();
     }
 
     /**
-     * Retrieves the details of an existing setup intent.
-     * <p>Required permissions:</p>
-     * <ul>
-     * <li><code>payment:setup_intent:read</code></li>
-     * <li><code>member:basic:read</code></li>
-     * <li><code>member:email:read</code></li>
-     * </ul>
+     * Retrieves a setup intent. Once its <code>status</code> is <code>succeeded</code>, charge the saved method by its <code>payment_method_id</code>. The buyer's own token may retrieve a setup intent that belongs to it.
      */
     public SetupIntent retrieve(String id, RequestOptions requestOptions) {
         return this.rawClient.retrieve(id, requestOptions).body();
     }
 
     /**
-     * Retrieves the details of an existing setup intent.
-     * <p>Required permissions:</p>
-     * <ul>
-     * <li><code>payment:setup_intent:read</code></li>
-     * <li><code>member:basic:read</code></li>
-     * <li><code>member:email:read</code></li>
-     * </ul>
+     * Retrieves a setup intent. Once its <code>status</code> is <code>succeeded</code>, charge the saved method by its <code>payment_method_id</code>. The buyer's own token may retrieve a setup intent that belongs to it.
      */
     public SetupIntent retrieve(String id, RetrieveSetupIntentsRequest request) {
         return this.rawClient.retrieve(id, request).body();
     }
 
     /**
-     * Retrieves the details of an existing setup intent.
-     * <p>Required permissions:</p>
-     * <ul>
-     * <li><code>payment:setup_intent:read</code></li>
-     * <li><code>member:basic:read</code></li>
-     * <li><code>member:email:read</code></li>
-     * </ul>
+     * Retrieves a setup intent. Once its <code>status</code> is <code>succeeded</code>, charge the saved method by its <code>payment_method_id</code>. The buyer's own token may retrieve a setup intent that belongs to it.
      */
     public SetupIntent retrieve(String id, RetrieveSetupIntentsRequest request, RequestOptions requestOptions) {
         return this.rawClient.retrieve(id, request, requestOptions).body();
     }
 
     /**
-     * Changes where the buyer lands after completing an off-site step, up until they return. Accepts either a secret key or the setup's own <code>client_secret</code>, so the surface that knows the final destination can set it.
+     * Changes where the buyer lands after completing an off-site step, up until they return. Accepts either a secret key or the setup's own <code>client_secret</code> in the body, so the surface that knows the final destination can set it.
      */
     public SetupStatus updateReturnUrl(String setupIntentId, UpdateReturnUrlSetupIntentsRequest request) {
         return this.rawClient.updateReturnUrl(setupIntentId, request).body();
     }
 
     /**
-     * Changes where the buyer lands after completing an off-site step, up until they return. Accepts either a secret key or the setup's own <code>client_secret</code>, so the surface that knows the final destination can set it.
+     * Changes where the buyer lands after completing an off-site step, up until they return. Accepts either a secret key or the setup's own <code>client_secret</code> in the body, so the surface that knows the final destination can set it.
      */
     public SetupStatus updateReturnUrl(
             String setupIntentId, UpdateReturnUrlSetupIntentsRequest request, RequestOptions requestOptions) {
@@ -156,33 +125,37 @@ public class SetupIntentsClient {
     }
 
     /**
-     * Retrieves how far a setup has got and what the buyer must do next, if anything. Collection runs in the background, so poll this rather than reading the create response. Accepts either a secret key or the setup's own <code>client_secret</code>, so the surface collecting the payment method can poll it directly.
+     * Retrieves how far a setup has got and what the buyer must do next, if anything. Collection runs in the background, so poll this rather than reading the create response. Accepts either a secret key or the setup's own <code>client_secret</code> as a query parameter, so the surface collecting the payment method can poll it directly.
      */
     public SetupStatus retrieveStatus(String setupIntentId) {
         return this.rawClient.retrieveStatus(setupIntentId).body();
     }
 
     /**
-     * Retrieves how far a setup has got and what the buyer must do next, if anything. Collection runs in the background, so poll this rather than reading the create response. Accepts either a secret key or the setup's own <code>client_secret</code>, so the surface collecting the payment method can poll it directly.
+     * Retrieves how far a setup has got and what the buyer must do next, if anything. Collection runs in the background, so poll this rather than reading the create response. Accepts either a secret key or the setup's own <code>client_secret</code> as a query parameter, so the surface collecting the payment method can poll it directly.
      */
     public SetupStatus retrieveStatus(String setupIntentId, RequestOptions requestOptions) {
         return this.rawClient.retrieveStatus(setupIntentId, requestOptions).body();
     }
 
     /**
-     * Retrieves how far a setup has got and what the buyer must do next, if anything. Collection runs in the background, so poll this rather than reading the create response. Accepts either a secret key or the setup's own <code>client_secret</code>, so the surface collecting the payment method can poll it directly.
+     * Retrieves how far a setup has got and what the buyer must do next, if anything. Collection runs in the background, so poll this rather than reading the create response. Accepts either a secret key or the setup's own <code>client_secret</code> as a query parameter, so the surface collecting the payment method can poll it directly.
      */
     public SetupStatus retrieveStatus(String setupIntentId, RetrieveStatusSetupIntentsRequest request) {
         return this.rawClient.retrieveStatus(setupIntentId, request).body();
     }
 
     /**
-     * Retrieves how far a setup has got and what the buyer must do next, if anything. Collection runs in the background, so poll this rather than reading the create response. Accepts either a secret key or the setup's own <code>client_secret</code>, so the surface collecting the payment method can poll it directly.
+     * Retrieves how far a setup has got and what the buyer must do next, if anything. Collection runs in the background, so poll this rather than reading the create response. Accepts either a secret key or the setup's own <code>client_secret</code> as a query parameter, so the surface collecting the payment method can poll it directly.
      */
     public SetupStatus retrieveStatus(
             String setupIntentId, RetrieveStatusSetupIntentsRequest request, RequestOptions requestOptions) {
         return this.rawClient
                 .retrieveStatus(setupIntentId, request, requestOptions)
                 .body();
+    }
+
+    public DirectClient direct() {
+        return this.directClient.get();
     }
 }

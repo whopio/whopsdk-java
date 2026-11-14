@@ -193,7 +193,6 @@ public final class PaymentListItemShipment {
 
         private Optional<String> carrier = Optional.empty();
 
-        @JsonAnySetter
         private Map<String, Object> additionalProperties = new HashMap<>();
 
         private Builder() {}
@@ -210,7 +209,6 @@ public final class PaymentListItemShipment {
 
         /**
          * <p>The unique identifier for the shipment.</p>
-         * <p>The unique identifier for the shipment.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
@@ -221,7 +219,6 @@ public final class PaymentListItemShipment {
         }
 
         /**
-         * <p>The current delivery status of this shipment.</p>
          * <p>The current delivery status of this shipment.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
@@ -234,7 +231,6 @@ public final class PaymentListItemShipment {
 
         /**
          * <p>The carrier-assigned tracking number used to look up shipment progress.</p>
-         * <p>The carrier-assigned tracking number used to look up shipment progress.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
@@ -245,7 +241,6 @@ public final class PaymentListItemShipment {
         }
 
         /**
-         * <p>A customer-facing URL to track this shipment's progress.</p>
          * <p>A customer-facing URL to track this shipment's progress.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
@@ -295,6 +290,18 @@ public final class PaymentListItemShipment {
         @java.lang.Override
         public PaymentListItemShipment build() {
             return new PaymentListItemShipment(carrier, id, status, trackingNumber, trackingUrl, additionalProperties);
+        }
+
+        @JsonAnySetter
+        private void putAdditionalPropertyFromJson(String key, Object value) {
+            if (key.equalsIgnoreCase("carrier")
+                    || key.equalsIgnoreCase("id")
+                    || key.equalsIgnoreCase("status")
+                    || key.equalsIgnoreCase("tracking_number")
+                    || key.equalsIgnoreCase("tracking_url")) {
+                return;
+            }
+            this.additionalProperties.put(key, value);
         }
 
         @java.lang.Override

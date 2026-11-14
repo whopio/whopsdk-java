@@ -17,8 +17,6 @@ public final class AudienceStatus {
 
     public static final AudienceStatus READY = new AudienceStatus(Value.READY, "ready");
 
-    public static final AudienceStatus SYNCING = new AudienceStatus(Value.SYNCING, "syncing");
-
     private final Value value;
 
     private final String string;
@@ -61,8 +59,6 @@ public final class AudienceStatus {
                 return visitor.visitProcessing();
             case READY:
                 return visitor.visitReady();
-            case SYNCING:
-                return visitor.visitSyncing();
             case UNKNOWN:
             default:
                 return visitor.visitUnknown(string);
@@ -82,8 +78,6 @@ public final class AudienceStatus {
                 return PROCESSING;
             case "ready":
                 return READY;
-            case "syncing":
-                return SYNCING;
             default:
                 return new AudienceStatus(Value.UNKNOWN, value);
         }
@@ -93,8 +87,6 @@ public final class AudienceStatus {
         PENDING,
 
         PROCESSING,
-
-        SYNCING,
 
         READY,
 
@@ -109,8 +101,6 @@ public final class AudienceStatus {
         T visitPending();
 
         T visitProcessing();
-
-        T visitSyncing();
 
         T visitReady();
 

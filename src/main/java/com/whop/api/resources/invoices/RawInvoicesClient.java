@@ -4,34 +4,39 @@
 package com.whop.api.resources.invoices;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
+import com.whop.api.core.BodyProperties;
 import com.whop.api.core.ClientOptions;
 import com.whop.api.core.MediaTypes;
 import com.whop.api.core.ObjectMappers;
+import com.whop.api.core.PathSegments;
 import com.whop.api.core.QueryStringMapper;
 import com.whop.api.core.RequestOptions;
+import com.whop.api.core.RetryInterceptor;
 import com.whop.api.core.WhopApiApiException;
 import com.whop.api.core.WhopApiException;
 import com.whop.api.core.WhopApiHttpResponse;
 import com.whop.api.core.pagination.SyncPagingIterable;
 import com.whop.api.errors.BadRequestError;
+import com.whop.api.errors.ConflictError;
 import com.whop.api.errors.ForbiddenError;
-import com.whop.api.errors.InternalServerError;
 import com.whop.api.errors.NotFoundError;
-import com.whop.api.errors.TooManyRequestsError;
 import com.whop.api.errors.UnauthorizedError;
-import com.whop.api.errors.UnprocessableEntityError;
+import com.whop.api.resources.invoices.requests.ChargeInvoicesRequest;
+import com.whop.api.resources.invoices.requests.CreateInvoicesRequest;
 import com.whop.api.resources.invoices.requests.DeleteInvoicesRequest;
+import com.whop.api.resources.invoices.requests.GeneratePdfInvoicesRequest;
+import com.whop.api.resources.invoices.requests.IssueInvoicesRequest;
 import com.whop.api.resources.invoices.requests.ListInvoicesRequest;
-import com.whop.api.resources.invoices.requests.MarkPaidInvoicesRequest;
 import com.whop.api.resources.invoices.requests.MarkUncollectibleInvoicesRequest;
-import com.whop.api.resources.invoices.requests.ResendInvoicesRequest;
 import com.whop.api.resources.invoices.requests.RetrieveInvoicesRequest;
+import com.whop.api.resources.invoices.requests.SendInvoicesRequest;
+import com.whop.api.resources.invoices.requests.UnscheduleInvoicesRequest;
 import com.whop.api.resources.invoices.requests.UpdateInvoicesRequest;
 import com.whop.api.resources.invoices.requests.VoidInvoicesRequest;
-import com.whop.api.resources.invoices.types.CreateInvoicesRequest;
+import com.whop.api.resources.invoices.types.DeleteInvoicesResponse;
 import com.whop.api.resources.invoices.types.ListInvoicesResponse;
 import com.whop.api.types.Invoice;
-import com.whop.api.types.InvoiceListItem;
+import com.whop.api.types.InvoicePdf;
 import java.io.IOException;
 import java.util.List;
 import java.util.Optional;
@@ -51,100 +56,96 @@ public class RawInvoicesClient {
     }
 
     /**
-     * Returns a paginated list of invoices for a company, with optional filtering by product, status, collection method, and creation date.
-     * <p>Required permissions:</p>
-     * <ul>
-     * <li><code>invoice:basic:read</code></li>
-     * </ul>
+     * Lists receipt-backed invoices for accounts the caller can read. Legacy invoices are excluded.
      */
-    public WhopApiHttpResponse<SyncPagingIterable<InvoiceListItem>> list() {
+    public WhopApiHttpResponse<SyncPagingIterable<Invoice>> list() {
         return list(ListInvoicesRequest.builder().build());
     }
 
     /**
-     * Returns a paginated list of invoices for a company, with optional filtering by product, status, collection method, and creation date.
-     * <p>Required permissions:</p>
-     * <ul>
-     * <li><code>invoice:basic:read</code></li>
-     * </ul>
+     * Lists receipt-backed invoices for accounts the caller can read. Legacy invoices are excluded.
      */
-    public WhopApiHttpResponse<SyncPagingIterable<InvoiceListItem>> list(RequestOptions requestOptions) {
+    public WhopApiHttpResponse<SyncPagingIterable<Invoice>> list(RequestOptions requestOptions) {
         return list(ListInvoicesRequest.builder().build(), requestOptions);
     }
 
     /**
-     * Returns a paginated list of invoices for a company, with optional filtering by product, status, collection method, and creation date.
-     * <p>Required permissions:</p>
-     * <ul>
-     * <li><code>invoice:basic:read</code></li>
-     * </ul>
+     * Lists receipt-backed invoices for accounts the caller can read. Legacy invoices are excluded.
      */
-    public WhopApiHttpResponse<SyncPagingIterable<InvoiceListItem>> list(ListInvoicesRequest request) {
+    public WhopApiHttpResponse<SyncPagingIterable<Invoice>> list(ListInvoicesRequest request) {
         return list(request, null);
     }
 
     /**
-     * Returns a paginated list of invoices for a company, with optional filtering by product, status, collection method, and creation date.
-     * <p>Required permissions:</p>
-     * <ul>
-     * <li><code>invoice:basic:read</code></li>
-     * </ul>
+     * Lists receipt-backed invoices for accounts the caller can read. Legacy invoices are excluded.
      */
-    public WhopApiHttpResponse<SyncPagingIterable<InvoiceListItem>> list(
+    public WhopApiHttpResponse<SyncPagingIterable<Invoice>> list(
             ListInvoicesRequest request, RequestOptions requestOptions) {
-        HttpUrl.Builder httpUrl = HttpUrl.parse(this.clientOptions.environment().getUrl())
+        HttpUrl.Builder httpUrl = HttpUrl.parse(this.clientOptions.environment().getApiURL())
                 .newBuilder()
                 .addPathSegments("invoices");
-        if (request.getAfter().isPresent()) {
+        if (request.getAccountId().isPresent()) {
             QueryStringMapper.addQueryParameter(
-                    httpUrl, "after", request.getAfter().get(), false);
+                    httpUrl, "account_id", request.getAccountId().get(), false);
         }
-        if (request.getBefore().isPresent()) {
+        if (request.getStatus().isPresent()) {
             QueryStringMapper.addQueryParameter(
-                    httpUrl, "before", request.getBefore().get(), false);
+                    httpUrl, "status", request.getStatus().get(), false);
         }
-        if (request.getFirst().isPresent()) {
+        if (request.getOverdue().isPresent()) {
             QueryStringMapper.addQueryParameter(
-                    httpUrl, "first", request.getFirst().get(), false);
+                    httpUrl, "overdue", request.getOverdue().get(), false);
         }
-        if (request.getLast().isPresent()) {
+        if (request.getScheduled().isPresent()) {
             QueryStringMapper.addQueryParameter(
-                    httpUrl, "last", request.getLast().get(), false);
+                    httpUrl, "scheduled", request.getScheduled().get(), false);
         }
-        if (request.getCompanyId().isPresent()) {
+        if (request.getMemberId().isPresent()) {
             QueryStringMapper.addQueryParameter(
-                    httpUrl, "company_id", request.getCompanyId().get(), false);
+                    httpUrl, "member_id", request.getMemberId().get(), false);
         }
-        if (request.getDirection().isPresent()) {
+        if (request.getProductId().isPresent()) {
             QueryStringMapper.addQueryParameter(
-                    httpUrl, "direction", request.getDirection().get(), false);
-        }
-        if (request.getOrder().isPresent()) {
-            QueryStringMapper.addQueryParameter(
-                    httpUrl, "order", request.getOrder().get(), false);
-        }
-        if (request.getCreatedBefore().isPresent()) {
-            QueryStringMapper.addQueryParameter(
-                    httpUrl, "created_before", request.getCreatedBefore().get(), false);
+                    httpUrl, "product_id", request.getProductId().get(), false);
         }
         if (request.getCreatedAfter().isPresent()) {
             QueryStringMapper.addQueryParameter(
                     httpUrl, "created_after", request.getCreatedAfter().get(), false);
         }
-        if (request.getProductIds().isPresent()) {
+        if (request.getCreatedBefore().isPresent()) {
             QueryStringMapper.addQueryParameter(
-                    httpUrl, "product_ids", request.getProductIds().get(), true);
+                    httpUrl, "created_before", request.getCreatedBefore().get(), false);
         }
-        if (request.getCollectionMethods().isPresent()) {
+        if (request.getOrder().isPresent()) {
+            QueryStringMapper.addQueryParameter(
+                    httpUrl, "order", request.getOrder().get(), false);
+        }
+        if (request.getDirection().isPresent()) {
+            QueryStringMapper.addQueryParameter(
+                    httpUrl, "direction", request.getDirection().get(), false);
+        }
+        if (request.getFirst().isPresent()) {
+            QueryStringMapper.addQueryParameter(
+                    httpUrl, "first", request.getFirst().get(), false);
+        }
+        if (request.getAfter().isPresent()) {
+            QueryStringMapper.addQueryParameter(
+                    httpUrl, "after", request.getAfter().get(), false);
+        }
+        if (request.getLast().isPresent()) {
+            QueryStringMapper.addQueryParameter(
+                    httpUrl, "last", request.getLast().get(), false);
+        }
+        if (request.getBefore().isPresent()) {
+            QueryStringMapper.addQueryParameter(
+                    httpUrl, "before", request.getBefore().get(), false);
+        }
+        if (request.getIncludeTotalCount().isPresent()) {
             QueryStringMapper.addQueryParameter(
                     httpUrl,
-                    "collection_methods",
-                    request.getCollectionMethods().get(),
-                    true);
-        }
-        if (request.getStatuses().isPresent()) {
-            QueryStringMapper.addQueryParameter(
-                    httpUrl, "statuses", request.getStatuses().get(), true);
+                    "include_total_count",
+                    request.getIncludeTotalCount().get(),
+                    false);
         }
         if (requestOptions != null) {
             requestOptions.getQueryParameters().forEach((_key, _value) -> {
@@ -161,6 +162,15 @@ public class RawInvoicesClient {
         if (requestOptions != null && requestOptions.getTimeout().isPresent()) {
             client = clientOptions.httpClientWithTimeout(requestOptions);
         }
+        if (requestOptions != null && requestOptions.getMaxRetries().isPresent()) {
+            okhttpRequest = okhttpRequest
+                    .newBuilder()
+                    .tag(
+                            RetryInterceptor.MaxRetriesOverride.class,
+                            new RetryInterceptor.MaxRetriesOverride(
+                                    requestOptions.getMaxRetries().get()))
+                    .build();
+        }
         try (Response response = client.newCall(okhttpRequest).execute()) {
             ResponseBody responseBody = response.body();
             String responseBodyString = responseBody != null ? responseBody.string() : "{}";
@@ -172,11 +182,14 @@ public class RawInvoicesClient {
                         .from(request)
                         .after(startingAfter)
                         .build();
-                List<InvoiceListItem> result = parsedResponse.getData();
+                List<Invoice> result = parsedResponse.getData();
                 return new WhopApiHttpResponse<>(
-                        new SyncPagingIterable<InvoiceListItem>(
-                                startingAfter != null, result, parsedResponse, () -> list(nextRequest, requestOptions)
-                                        .body()),
+                        new SyncPagingIterable<Invoice>(
+                                startingAfter.isPresent()
+                                        && !startingAfter.get().isEmpty(),
+                                result,
+                                parsedResponse,
+                                () -> list(nextRequest, requestOptions).body()),
                         response);
             }
             try {
@@ -193,15 +206,6 @@ public class RawInvoicesClient {
                     case 404:
                         throw new NotFoundError(
                                 ObjectMappers.JSON_MAPPER.readValue(responseBodyString, Object.class), response);
-                    case 422:
-                        throw new UnprocessableEntityError(
-                                ObjectMappers.JSON_MAPPER.readValue(responseBodyString, Object.class), response);
-                    case 429:
-                        throw new TooManyRequestsError(
-                                ObjectMappers.JSON_MAPPER.readValue(responseBodyString, Object.class), response);
-                    case 500:
-                        throw new InternalServerError(
-                                ObjectMappers.JSON_MAPPER.readValue(responseBodyString, Object.class), response);
                 }
             } catch (JsonProcessingException ignored) {
                 // unable to map error response, throwing generic error
@@ -209,37 +213,25 @@ public class RawInvoicesClient {
             Object errorBody = ObjectMappers.parseErrorBody(responseBodyString);
             throw new WhopApiApiException(
                     "Error with status code " + response.code(), response.code(), errorBody, response);
+        } catch (JsonProcessingException e) {
+            throw new WhopApiException("Failed to deserialize response: " + e.getMessage(), e);
         } catch (IOException e) {
             throw new WhopApiException("Network error executing HTTP request", e);
         }
     }
 
     /**
-     * Create an invoice for a customer. The invoice can be charged automatically using a stored payment method, or sent to the customer for manual payment.
-     * <p>Required permissions:</p>
-     * <ul>
-     * <li><code>invoice:create</code></li>
-     * <li><code>member:email:read</code></li>
-     * <li><code>member:basic:read</code></li>
-     * <li><code>payment:basic:read</code></li>
-     * </ul>
+     * Creates a draft invoice backed by a receipt, with saved items, quantities, prices, and recipients. Issue the draft to resolve final tax and open the invoice. The pay_ ID stays the same when paid. Needs <code>invoice:create</code> or <code>payment:charge</code>; a <code>payment_method_id</code> needs <code>payment:charge</code>.
      */
     public WhopApiHttpResponse<Invoice> create(CreateInvoicesRequest request) {
         return create(request, null);
     }
 
     /**
-     * Create an invoice for a customer. The invoice can be charged automatically using a stored payment method, or sent to the customer for manual payment.
-     * <p>Required permissions:</p>
-     * <ul>
-     * <li><code>invoice:create</code></li>
-     * <li><code>member:email:read</code></li>
-     * <li><code>member:basic:read</code></li>
-     * <li><code>payment:basic:read</code></li>
-     * </ul>
+     * Creates a draft invoice backed by a receipt, with saved items, quantities, prices, and recipients. Issue the draft to resolve final tax and open the invoice. The pay_ ID stays the same when paid. Needs <code>invoice:create</code> or <code>payment:charge</code>; a <code>payment_method_id</code> needs <code>payment:charge</code>.
      */
     public WhopApiHttpResponse<Invoice> create(CreateInvoicesRequest request, RequestOptions requestOptions) {
-        HttpUrl.Builder httpUrl = HttpUrl.parse(this.clientOptions.environment().getUrl())
+        HttpUrl.Builder httpUrl = HttpUrl.parse(this.clientOptions.environment().getApiURL())
                 .newBuilder()
                 .addPathSegments("invoices");
         if (requestOptions != null) {
@@ -250,7 +242,9 @@ public class RawInvoicesClient {
         RequestBody body;
         try {
             body = RequestBody.create(
-                    ObjectMappers.JSON_MAPPER.writeValueAsBytes(request), MediaTypes.APPLICATION_JSON);
+                    ObjectMappers.JSON_MAPPER.writeValueAsBytes(BodyProperties.merge(
+                            request, requestOptions != null ? requestOptions.getBodyProperties() : null)),
+                    MediaTypes.APPLICATION_JSON);
         } catch (JsonProcessingException e) {
             throw new WhopApiException("Failed to serialize request", e);
         }
@@ -264,6 +258,15 @@ public class RawInvoicesClient {
         OkHttpClient client = clientOptions.httpClient();
         if (requestOptions != null && requestOptions.getTimeout().isPresent()) {
             client = clientOptions.httpClientWithTimeout(requestOptions);
+        }
+        if (requestOptions != null && requestOptions.getMaxRetries().isPresent()) {
+            okhttpRequest = okhttpRequest
+                    .newBuilder()
+                    .tag(
+                            RetryInterceptor.MaxRetriesOverride.class,
+                            new RetryInterceptor.MaxRetriesOverride(
+                                    requestOptions.getMaxRetries().get()))
+                    .build();
         }
         try (Response response = client.newCall(okhttpRequest).execute()) {
             ResponseBody responseBody = response.body();
@@ -283,17 +286,8 @@ public class RawInvoicesClient {
                     case 403:
                         throw new ForbiddenError(
                                 ObjectMappers.JSON_MAPPER.readValue(responseBodyString, Object.class), response);
-                    case 404:
-                        throw new NotFoundError(
-                                ObjectMappers.JSON_MAPPER.readValue(responseBodyString, Object.class), response);
-                    case 422:
-                        throw new UnprocessableEntityError(
-                                ObjectMappers.JSON_MAPPER.readValue(responseBodyString, Object.class), response);
-                    case 429:
-                        throw new TooManyRequestsError(
-                                ObjectMappers.JSON_MAPPER.readValue(responseBodyString, Object.class), response);
-                    case 500:
-                        throw new InternalServerError(
+                    case 409:
+                        throw new ConflictError(
                                 ObjectMappers.JSON_MAPPER.readValue(responseBodyString, Object.class), response);
                 }
             } catch (JsonProcessingException ignored) {
@@ -302,69 +296,43 @@ public class RawInvoicesClient {
             Object errorBody = ObjectMappers.parseErrorBody(responseBodyString);
             throw new WhopApiApiException(
                     "Error with status code " + response.code(), response.code(), errorBody, response);
+        } catch (JsonProcessingException e) {
+            throw new WhopApiException("Failed to deserialize response: " + e.getMessage(), e);
         } catch (IOException e) {
             throw new WhopApiException("Network error executing HTTP request", e);
         }
     }
 
     /**
-     * Retrieves the details of an existing invoice.
-     * <p>Required permissions:</p>
-     * <ul>
-     * <li><code>invoice:basic:read</code></li>
-     * <li><code>member:email:read</code></li>
-     * <li><code>member:basic:read</code></li>
-     * <li><code>payment:basic:read</code></li>
-     * </ul>
+     * Retrieves a receipt-backed invoice by its pay_ ID.
      */
     public WhopApiHttpResponse<Invoice> retrieve(String id) {
         return retrieve(id, RetrieveInvoicesRequest.builder().build());
     }
 
     /**
-     * Retrieves the details of an existing invoice.
-     * <p>Required permissions:</p>
-     * <ul>
-     * <li><code>invoice:basic:read</code></li>
-     * <li><code>member:email:read</code></li>
-     * <li><code>member:basic:read</code></li>
-     * <li><code>payment:basic:read</code></li>
-     * </ul>
+     * Retrieves a receipt-backed invoice by its pay_ ID.
      */
     public WhopApiHttpResponse<Invoice> retrieve(String id, RequestOptions requestOptions) {
         return retrieve(id, RetrieveInvoicesRequest.builder().build(), requestOptions);
     }
 
     /**
-     * Retrieves the details of an existing invoice.
-     * <p>Required permissions:</p>
-     * <ul>
-     * <li><code>invoice:basic:read</code></li>
-     * <li><code>member:email:read</code></li>
-     * <li><code>member:basic:read</code></li>
-     * <li><code>payment:basic:read</code></li>
-     * </ul>
+     * Retrieves a receipt-backed invoice by its pay_ ID.
      */
     public WhopApiHttpResponse<Invoice> retrieve(String id, RetrieveInvoicesRequest request) {
         return retrieve(id, request, null);
     }
 
     /**
-     * Retrieves the details of an existing invoice.
-     * <p>Required permissions:</p>
-     * <ul>
-     * <li><code>invoice:basic:read</code></li>
-     * <li><code>member:email:read</code></li>
-     * <li><code>member:basic:read</code></li>
-     * <li><code>payment:basic:read</code></li>
-     * </ul>
+     * Retrieves a receipt-backed invoice by its pay_ ID.
      */
     public WhopApiHttpResponse<Invoice> retrieve(
             String id, RetrieveInvoicesRequest request, RequestOptions requestOptions) {
-        HttpUrl.Builder httpUrl = HttpUrl.parse(this.clientOptions.environment().getUrl())
+        HttpUrl.Builder httpUrl = HttpUrl.parse(this.clientOptions.environment().getApiURL())
                 .newBuilder()
                 .addPathSegments("invoices")
-                .addPathSegment(id);
+                .addPathSegment(PathSegments.validate(id));
         if (requestOptions != null) {
             requestOptions.getQueryParameters().forEach((_key, _value) -> {
                 httpUrl.addQueryParameter(_key, _value);
@@ -380,6 +348,15 @@ public class RawInvoicesClient {
         if (requestOptions != null && requestOptions.getTimeout().isPresent()) {
             client = clientOptions.httpClientWithTimeout(requestOptions);
         }
+        if (requestOptions != null && requestOptions.getMaxRetries().isPresent()) {
+            okhttpRequest = okhttpRequest
+                    .newBuilder()
+                    .tag(
+                            RetryInterceptor.MaxRetriesOverride.class,
+                            new RetryInterceptor.MaxRetriesOverride(
+                                    requestOptions.getMaxRetries().get()))
+                    .build();
+        }
         try (Response response = client.newCall(okhttpRequest).execute()) {
             ResponseBody responseBody = response.body();
             String responseBodyString = responseBody != null ? responseBody.string() : "{}";
@@ -389,9 +366,6 @@ public class RawInvoicesClient {
             }
             try {
                 switch (response.code()) {
-                    case 400:
-                        throw new BadRequestError(
-                                ObjectMappers.JSON_MAPPER.readValue(responseBodyString, Object.class), response);
                     case 401:
                         throw new UnauthorizedError(
                                 ObjectMappers.JSON_MAPPER.readValue(responseBodyString, Object.class), response);
@@ -401,15 +375,6 @@ public class RawInvoicesClient {
                     case 404:
                         throw new NotFoundError(
                                 ObjectMappers.JSON_MAPPER.readValue(responseBodyString, Object.class), response);
-                    case 422:
-                        throw new UnprocessableEntityError(
-                                ObjectMappers.JSON_MAPPER.readValue(responseBodyString, Object.class), response);
-                    case 429:
-                        throw new TooManyRequestsError(
-                                ObjectMappers.JSON_MAPPER.readValue(responseBodyString, Object.class), response);
-                    case 500:
-                        throw new InternalServerError(
-                                ObjectMappers.JSON_MAPPER.readValue(responseBodyString, Object.class), response);
                 }
             } catch (JsonProcessingException ignored) {
                 // unable to map error response, throwing generic error
@@ -417,57 +382,43 @@ public class RawInvoicesClient {
             Object errorBody = ObjectMappers.parseErrorBody(responseBodyString);
             throw new WhopApiApiException(
                     "Error with status code " + response.code(), response.code(), errorBody, response);
+        } catch (JsonProcessingException e) {
+            throw new WhopApiException("Failed to deserialize response: " + e.getMessage(), e);
         } catch (IOException e) {
             throw new WhopApiException("Network error executing HTTP request", e);
         }
     }
 
     /**
-     * Delete a draft invoice.
-     * <p>Required permissions:</p>
-     * <ul>
-     * <li><code>invoice:update</code></li>
-     * </ul>
+     * Deletes a draft or void invoice. A deleted invoice no longer appears in invoice or payment lists, and its ID returns a <code>404</code>. Deleting can't be undone. Void an open invoice before you delete it. A draft with a scheduled send or charge must be unscheduled first. A draft renewal invoice can't be deleted, and neither can a void invoice that collected money or still awaits a bank wire. The invoice's <code>deletable</code> field is <code>true</code> when this call can delete it.
      */
-    public WhopApiHttpResponse<Boolean> delete(String id) {
+    public WhopApiHttpResponse<DeleteInvoicesResponse> delete(String id) {
         return delete(id, DeleteInvoicesRequest.builder().build());
     }
 
     /**
-     * Delete a draft invoice.
-     * <p>Required permissions:</p>
-     * <ul>
-     * <li><code>invoice:update</code></li>
-     * </ul>
+     * Deletes a draft or void invoice. A deleted invoice no longer appears in invoice or payment lists, and its ID returns a <code>404</code>. Deleting can't be undone. Void an open invoice before you delete it. A draft with a scheduled send or charge must be unscheduled first. A draft renewal invoice can't be deleted, and neither can a void invoice that collected money or still awaits a bank wire. The invoice's <code>deletable</code> field is <code>true</code> when this call can delete it.
      */
-    public WhopApiHttpResponse<Boolean> delete(String id, RequestOptions requestOptions) {
+    public WhopApiHttpResponse<DeleteInvoicesResponse> delete(String id, RequestOptions requestOptions) {
         return delete(id, DeleteInvoicesRequest.builder().build(), requestOptions);
     }
 
     /**
-     * Delete a draft invoice.
-     * <p>Required permissions:</p>
-     * <ul>
-     * <li><code>invoice:update</code></li>
-     * </ul>
+     * Deletes a draft or void invoice. A deleted invoice no longer appears in invoice or payment lists, and its ID returns a <code>404</code>. Deleting can't be undone. Void an open invoice before you delete it. A draft with a scheduled send or charge must be unscheduled first. A draft renewal invoice can't be deleted, and neither can a void invoice that collected money or still awaits a bank wire. The invoice's <code>deletable</code> field is <code>true</code> when this call can delete it.
      */
-    public WhopApiHttpResponse<Boolean> delete(String id, DeleteInvoicesRequest request) {
+    public WhopApiHttpResponse<DeleteInvoicesResponse> delete(String id, DeleteInvoicesRequest request) {
         return delete(id, request, null);
     }
 
     /**
-     * Delete a draft invoice.
-     * <p>Required permissions:</p>
-     * <ul>
-     * <li><code>invoice:update</code></li>
-     * </ul>
+     * Deletes a draft or void invoice. A deleted invoice no longer appears in invoice or payment lists, and its ID returns a <code>404</code>. Deleting can't be undone. Void an open invoice before you delete it. A draft with a scheduled send or charge must be unscheduled first. A draft renewal invoice can't be deleted, and neither can a void invoice that collected money or still awaits a bank wire. The invoice's <code>deletable</code> field is <code>true</code> when this call can delete it.
      */
-    public WhopApiHttpResponse<Boolean> delete(
+    public WhopApiHttpResponse<DeleteInvoicesResponse> delete(
             String id, DeleteInvoicesRequest request, RequestOptions requestOptions) {
-        HttpUrl.Builder httpUrl = HttpUrl.parse(this.clientOptions.environment().getUrl())
+        HttpUrl.Builder httpUrl = HttpUrl.parse(this.clientOptions.environment().getApiURL())
                 .newBuilder()
                 .addPathSegments("invoices")
-                .addPathSegment(id);
+                .addPathSegment(PathSegments.validate(id));
         if (requestOptions != null) {
             requestOptions.getQueryParameters().forEach((_key, _value) -> {
                 httpUrl.addQueryParameter(_key, _value);
@@ -475,7 +426,10 @@ public class RawInvoicesClient {
         }
         Request.Builder _requestBuilder = new Request.Builder()
                 .url(httpUrl.build())
-                .method("DELETE", null)
+                .method(
+                        "DELETE",
+                        BodyProperties.toRequestBody(
+                                requestOptions != null ? requestOptions.getBodyProperties() : null, null))
                 .headers(Headers.of(clientOptions.headers(requestOptions)))
                 .addHeader("Accept", "application/json");
         Request okhttpRequest = _requestBuilder.build();
@@ -483,12 +437,22 @@ public class RawInvoicesClient {
         if (requestOptions != null && requestOptions.getTimeout().isPresent()) {
             client = clientOptions.httpClientWithTimeout(requestOptions);
         }
+        if (requestOptions != null && requestOptions.getMaxRetries().isPresent()) {
+            okhttpRequest = okhttpRequest
+                    .newBuilder()
+                    .tag(
+                            RetryInterceptor.MaxRetriesOverride.class,
+                            new RetryInterceptor.MaxRetriesOverride(
+                                    requestOptions.getMaxRetries().get()))
+                    .build();
+        }
         try (Response response = client.newCall(okhttpRequest).execute()) {
             ResponseBody responseBody = response.body();
             String responseBodyString = responseBody != null ? responseBody.string() : "{}";
             if (response.isSuccessful()) {
                 return new WhopApiHttpResponse<>(
-                        ObjectMappers.JSON_MAPPER.readValue(responseBodyString, boolean.class), response);
+                        ObjectMappers.JSON_MAPPER.readValue(responseBodyString, DeleteInvoicesResponse.class),
+                        response);
             }
             try {
                 switch (response.code()) {
@@ -504,15 +468,6 @@ public class RawInvoicesClient {
                     case 404:
                         throw new NotFoundError(
                                 ObjectMappers.JSON_MAPPER.readValue(responseBodyString, Object.class), response);
-                    case 422:
-                        throw new UnprocessableEntityError(
-                                ObjectMappers.JSON_MAPPER.readValue(responseBodyString, Object.class), response);
-                    case 429:
-                        throw new TooManyRequestsError(
-                                ObjectMappers.JSON_MAPPER.readValue(responseBodyString, Object.class), response);
-                    case 500:
-                        throw new InternalServerError(
-                                ObjectMappers.JSON_MAPPER.readValue(responseBodyString, Object.class), response);
                 }
             } catch (JsonProcessingException ignored) {
                 // unable to map error response, throwing generic error
@@ -520,69 +475,43 @@ public class RawInvoicesClient {
             Object errorBody = ObjectMappers.parseErrorBody(responseBodyString);
             throw new WhopApiApiException(
                     "Error with status code " + response.code(), response.code(), errorBody, response);
+        } catch (JsonProcessingException e) {
+            throw new WhopApiException("Failed to deserialize response: " + e.getMessage(), e);
         } catch (IOException e) {
             throw new WhopApiException("Network error executing HTTP request", e);
         }
     }
 
     /**
-     * Update a draft invoice's details.
-     * <p>Required permissions:</p>
-     * <ul>
-     * <li><code>invoice:update</code></li>
-     * <li><code>member:email:read</code></li>
-     * <li><code>member:basic:read</code></li>
-     * <li><code>payment:basic:read</code></li>
-     * </ul>
+     * Updates draft invoice items and billing fields. Updates of only <code>recipient_emails</code> and <code>memo</code> are also allowed on unpaid invoices. The customer is set when the draft is created and can't change. To bill someone else, first void the draft. Then create a new invoice. Edit customer contact details through the member API. A draft with no saved payment method and no scheduled send needs <code>invoice:update</code>, <code>invoice:create</code>, or <code>payment:charge</code>; every other update, and setting <code>payment_method_id</code>, needs <code>payment:charge</code>.
      */
     public WhopApiHttpResponse<Invoice> update(String id) {
         return update(id, UpdateInvoicesRequest.builder().build());
     }
 
     /**
-     * Update a draft invoice's details.
-     * <p>Required permissions:</p>
-     * <ul>
-     * <li><code>invoice:update</code></li>
-     * <li><code>member:email:read</code></li>
-     * <li><code>member:basic:read</code></li>
-     * <li><code>payment:basic:read</code></li>
-     * </ul>
+     * Updates draft invoice items and billing fields. Updates of only <code>recipient_emails</code> and <code>memo</code> are also allowed on unpaid invoices. The customer is set when the draft is created and can't change. To bill someone else, first void the draft. Then create a new invoice. Edit customer contact details through the member API. A draft with no saved payment method and no scheduled send needs <code>invoice:update</code>, <code>invoice:create</code>, or <code>payment:charge</code>; every other update, and setting <code>payment_method_id</code>, needs <code>payment:charge</code>.
      */
     public WhopApiHttpResponse<Invoice> update(String id, RequestOptions requestOptions) {
         return update(id, UpdateInvoicesRequest.builder().build(), requestOptions);
     }
 
     /**
-     * Update a draft invoice's details.
-     * <p>Required permissions:</p>
-     * <ul>
-     * <li><code>invoice:update</code></li>
-     * <li><code>member:email:read</code></li>
-     * <li><code>member:basic:read</code></li>
-     * <li><code>payment:basic:read</code></li>
-     * </ul>
+     * Updates draft invoice items and billing fields. Updates of only <code>recipient_emails</code> and <code>memo</code> are also allowed on unpaid invoices. The customer is set when the draft is created and can't change. To bill someone else, first void the draft. Then create a new invoice. Edit customer contact details through the member API. A draft with no saved payment method and no scheduled send needs <code>invoice:update</code>, <code>invoice:create</code>, or <code>payment:charge</code>; every other update, and setting <code>payment_method_id</code>, needs <code>payment:charge</code>.
      */
     public WhopApiHttpResponse<Invoice> update(String id, UpdateInvoicesRequest request) {
         return update(id, request, null);
     }
 
     /**
-     * Update a draft invoice's details.
-     * <p>Required permissions:</p>
-     * <ul>
-     * <li><code>invoice:update</code></li>
-     * <li><code>member:email:read</code></li>
-     * <li><code>member:basic:read</code></li>
-     * <li><code>payment:basic:read</code></li>
-     * </ul>
+     * Updates draft invoice items and billing fields. Updates of only <code>recipient_emails</code> and <code>memo</code> are also allowed on unpaid invoices. The customer is set when the draft is created and can't change. To bill someone else, first void the draft. Then create a new invoice. Edit customer contact details through the member API. A draft with no saved payment method and no scheduled send needs <code>invoice:update</code>, <code>invoice:create</code>, or <code>payment:charge</code>; every other update, and setting <code>payment_method_id</code>, needs <code>payment:charge</code>.
      */
     public WhopApiHttpResponse<Invoice> update(
             String id, UpdateInvoicesRequest request, RequestOptions requestOptions) {
-        HttpUrl.Builder httpUrl = HttpUrl.parse(this.clientOptions.environment().getUrl())
+        HttpUrl.Builder httpUrl = HttpUrl.parse(this.clientOptions.environment().getApiURL())
                 .newBuilder()
                 .addPathSegments("invoices")
-                .addPathSegment(id);
+                .addPathSegment(PathSegments.validate(id));
         if (requestOptions != null) {
             requestOptions.getQueryParameters().forEach((_key, _value) -> {
                 httpUrl.addQueryParameter(_key, _value);
@@ -591,7 +520,9 @@ public class RawInvoicesClient {
         RequestBody body;
         try {
             body = RequestBody.create(
-                    ObjectMappers.JSON_MAPPER.writeValueAsBytes(request), MediaTypes.APPLICATION_JSON);
+                    ObjectMappers.JSON_MAPPER.writeValueAsBytes(BodyProperties.merge(
+                            request, requestOptions != null ? requestOptions.getBodyProperties() : null)),
+                    MediaTypes.APPLICATION_JSON);
         } catch (JsonProcessingException e) {
             throw new WhopApiException("Failed to serialize request", e);
         }
@@ -606,6 +537,112 @@ public class RawInvoicesClient {
         if (requestOptions != null && requestOptions.getTimeout().isPresent()) {
             client = clientOptions.httpClientWithTimeout(requestOptions);
         }
+        if (requestOptions != null && requestOptions.getMaxRetries().isPresent()) {
+            okhttpRequest = okhttpRequest
+                    .newBuilder()
+                    .tag(
+                            RetryInterceptor.MaxRetriesOverride.class,
+                            new RetryInterceptor.MaxRetriesOverride(
+                                    requestOptions.getMaxRetries().get()))
+                    .build();
+        }
+        try (Response response = client.newCall(okhttpRequest).execute()) {
+            ResponseBody responseBody = response.body();
+            String responseBodyString = responseBody != null ? responseBody.string() : "{}";
+            if (response.isSuccessful()) {
+                return new WhopApiHttpResponse<>(
+                        ObjectMappers.JSON_MAPPER.readValue(responseBodyString, Invoice.class), response);
+            }
+            try {
+                switch (response.code()) {
+                    case 400:
+                        throw new BadRequestError(
+                                ObjectMappers.JSON_MAPPER.readValue(responseBodyString, Object.class), response);
+                    case 401:
+                        throw new UnauthorizedError(
+                                ObjectMappers.JSON_MAPPER.readValue(responseBodyString, Object.class), response);
+                    case 403:
+                        throw new ForbiddenError(
+                                ObjectMappers.JSON_MAPPER.readValue(responseBodyString, Object.class), response);
+                }
+            } catch (JsonProcessingException ignored) {
+                // unable to map error response, throwing generic error
+            }
+            Object errorBody = ObjectMappers.parseErrorBody(responseBodyString);
+            throw new WhopApiApiException(
+                    "Error with status code " + response.code(), response.code(), errorBody, response);
+        } catch (JsonProcessingException e) {
+            throw new WhopApiException("Failed to deserialize response: " + e.getMessage(), e);
+        } catch (IOException e) {
+            throw new WhopApiException("Network error executing HTTP request", e);
+        }
+    }
+
+    /**
+     * Charges an open invoice now to one of its customer's saved payment methods, canceling any charge scheduled for later. The charge completes asynchronously: the invoice becomes <code>paid</code>, or, if declined, stays <code>open</code> and its recipients are emailed the <code>checkout_link</code>. Refused for drafts and while another payment is in progress.
+     */
+    public WhopApiHttpResponse<Invoice> charge(String id) {
+        return charge(id, ChargeInvoicesRequest.builder().build());
+    }
+
+    /**
+     * Charges an open invoice now to one of its customer's saved payment methods, canceling any charge scheduled for later. The charge completes asynchronously: the invoice becomes <code>paid</code>, or, if declined, stays <code>open</code> and its recipients are emailed the <code>checkout_link</code>. Refused for drafts and while another payment is in progress.
+     */
+    public WhopApiHttpResponse<Invoice> charge(String id, RequestOptions requestOptions) {
+        return charge(id, ChargeInvoicesRequest.builder().build(), requestOptions);
+    }
+
+    /**
+     * Charges an open invoice now to one of its customer's saved payment methods, canceling any charge scheduled for later. The charge completes asynchronously: the invoice becomes <code>paid</code>, or, if declined, stays <code>open</code> and its recipients are emailed the <code>checkout_link</code>. Refused for drafts and while another payment is in progress.
+     */
+    public WhopApiHttpResponse<Invoice> charge(String id, ChargeInvoicesRequest request) {
+        return charge(id, request, null);
+    }
+
+    /**
+     * Charges an open invoice now to one of its customer's saved payment methods, canceling any charge scheduled for later. The charge completes asynchronously: the invoice becomes <code>paid</code>, or, if declined, stays <code>open</code> and its recipients are emailed the <code>checkout_link</code>. Refused for drafts and while another payment is in progress.
+     */
+    public WhopApiHttpResponse<Invoice> charge(
+            String id, ChargeInvoicesRequest request, RequestOptions requestOptions) {
+        HttpUrl.Builder httpUrl = HttpUrl.parse(this.clientOptions.environment().getApiURL())
+                .newBuilder()
+                .addPathSegments("invoices")
+                .addPathSegment(PathSegments.validate(id))
+                .addPathSegments("charge");
+        if (requestOptions != null) {
+            requestOptions.getQueryParameters().forEach((_key, _value) -> {
+                httpUrl.addQueryParameter(_key, _value);
+            });
+        }
+        RequestBody body;
+        try {
+            body = RequestBody.create(
+                    ObjectMappers.JSON_MAPPER.writeValueAsBytes(BodyProperties.merge(
+                            request, requestOptions != null ? requestOptions.getBodyProperties() : null)),
+                    MediaTypes.APPLICATION_JSON);
+        } catch (JsonProcessingException e) {
+            throw new WhopApiException("Failed to serialize request", e);
+        }
+        Request okhttpRequest = new Request.Builder()
+                .url(httpUrl.build())
+                .method("POST", body)
+                .headers(Headers.of(clientOptions.headers(requestOptions)))
+                .addHeader("Content-Type", "application/json")
+                .addHeader("Accept", "application/json")
+                .build();
+        OkHttpClient client = clientOptions.httpClient();
+        if (requestOptions != null && requestOptions.getTimeout().isPresent()) {
+            client = clientOptions.httpClientWithTimeout(requestOptions);
+        }
+        if (requestOptions != null && requestOptions.getMaxRetries().isPresent()) {
+            okhttpRequest = okhttpRequest
+                    .newBuilder()
+                    .tag(
+                            RetryInterceptor.MaxRetriesOverride.class,
+                            new RetryInterceptor.MaxRetriesOverride(
+                                    requestOptions.getMaxRetries().get()))
+                    .build();
+        }
         try (Response response = client.newCall(okhttpRequest).execute()) {
             ResponseBody responseBody = response.body();
             String responseBodyString = responseBody != null ? responseBody.string() : "{}";
@@ -627,14 +664,8 @@ public class RawInvoicesClient {
                     case 404:
                         throw new NotFoundError(
                                 ObjectMappers.JSON_MAPPER.readValue(responseBodyString, Object.class), response);
-                    case 422:
-                        throw new UnprocessableEntityError(
-                                ObjectMappers.JSON_MAPPER.readValue(responseBodyString, Object.class), response);
-                    case 429:
-                        throw new TooManyRequestsError(
-                                ObjectMappers.JSON_MAPPER.readValue(responseBodyString, Object.class), response);
-                    case 500:
-                        throw new InternalServerError(
+                    case 409:
+                        throw new ConflictError(
                                 ObjectMappers.JSON_MAPPER.readValue(responseBodyString, Object.class), response);
                 }
             } catch (JsonProcessingException ignored) {
@@ -643,79 +674,183 @@ public class RawInvoicesClient {
             Object errorBody = ObjectMappers.parseErrorBody(responseBodyString);
             throw new WhopApiApiException(
                     "Error with status code " + response.code(), response.code(), errorBody, response);
+        } catch (JsonProcessingException e) {
+            throw new WhopApiException("Failed to deserialize response: " + e.getMessage(), e);
         } catch (IOException e) {
             throw new WhopApiException("Network error executing HTTP request", e);
         }
     }
 
     /**
-     * Mark an open invoice as paid when payment was collected outside of Whop.
-     * <p>Required permissions:</p>
-     * <ul>
-     * <li><code>invoice:update</code></li>
-     * </ul>
+     * Generates the invoice as a PDF and returns a short-lived link to download it. A draft shows its estimated totals. The buyer's name and email need <code>member:basic:read</code> and <code>member:email:read</code>, and the Pay now link on an open invoice needs <code>payment:charge</code>, or <code>invoice:create</code> or <code>invoice:update</code> when it has no <code>payment_method_id</code>. Each call generates a new file and link, so this endpoint does not replay <code>Idempotency-Key</code> responses.
      */
-    public WhopApiHttpResponse<Boolean> markPaid(String id) {
-        return markPaid(id, MarkPaidInvoicesRequest.builder().build());
+    public WhopApiHttpResponse<InvoicePdf> generatePdf(String id) {
+        return generatePdf(id, GeneratePdfInvoicesRequest.builder().build());
     }
 
     /**
-     * Mark an open invoice as paid when payment was collected outside of Whop.
-     * <p>Required permissions:</p>
-     * <ul>
-     * <li><code>invoice:update</code></li>
-     * </ul>
+     * Generates the invoice as a PDF and returns a short-lived link to download it. A draft shows its estimated totals. The buyer's name and email need <code>member:basic:read</code> and <code>member:email:read</code>, and the Pay now link on an open invoice needs <code>payment:charge</code>, or <code>invoice:create</code> or <code>invoice:update</code> when it has no <code>payment_method_id</code>. Each call generates a new file and link, so this endpoint does not replay <code>Idempotency-Key</code> responses.
      */
-    public WhopApiHttpResponse<Boolean> markPaid(String id, RequestOptions requestOptions) {
-        return markPaid(id, MarkPaidInvoicesRequest.builder().build(), requestOptions);
+    public WhopApiHttpResponse<InvoicePdf> generatePdf(String id, RequestOptions requestOptions) {
+        return generatePdf(id, GeneratePdfInvoicesRequest.builder().build(), requestOptions);
     }
 
     /**
-     * Mark an open invoice as paid when payment was collected outside of Whop.
-     * <p>Required permissions:</p>
-     * <ul>
-     * <li><code>invoice:update</code></li>
-     * </ul>
+     * Generates the invoice as a PDF and returns a short-lived link to download it. A draft shows its estimated totals. The buyer's name and email need <code>member:basic:read</code> and <code>member:email:read</code>, and the Pay now link on an open invoice needs <code>payment:charge</code>, or <code>invoice:create</code> or <code>invoice:update</code> when it has no <code>payment_method_id</code>. Each call generates a new file and link, so this endpoint does not replay <code>Idempotency-Key</code> responses.
      */
-    public WhopApiHttpResponse<Boolean> markPaid(String id, MarkPaidInvoicesRequest request) {
-        return markPaid(id, request, null);
+    public WhopApiHttpResponse<InvoicePdf> generatePdf(String id, GeneratePdfInvoicesRequest request) {
+        return generatePdf(id, request, null);
     }
 
     /**
-     * Mark an open invoice as paid when payment was collected outside of Whop.
-     * <p>Required permissions:</p>
-     * <ul>
-     * <li><code>invoice:update</code></li>
-     * </ul>
+     * Generates the invoice as a PDF and returns a short-lived link to download it. A draft shows its estimated totals. The buyer's name and email need <code>member:basic:read</code> and <code>member:email:read</code>, and the Pay now link on an open invoice needs <code>payment:charge</code>, or <code>invoice:create</code> or <code>invoice:update</code> when it has no <code>payment_method_id</code>. Each call generates a new file and link, so this endpoint does not replay <code>Idempotency-Key</code> responses.
      */
-    public WhopApiHttpResponse<Boolean> markPaid(
-            String id, MarkPaidInvoicesRequest request, RequestOptions requestOptions) {
-        HttpUrl.Builder httpUrl = HttpUrl.parse(this.clientOptions.environment().getUrl())
+    public WhopApiHttpResponse<InvoicePdf> generatePdf(
+            String id, GeneratePdfInvoicesRequest request, RequestOptions requestOptions) {
+        HttpUrl.Builder httpUrl = HttpUrl.parse(this.clientOptions.environment().getApiURL())
                 .newBuilder()
                 .addPathSegments("invoices")
-                .addPathSegment(id)
-                .addPathSegments("mark_paid");
+                .addPathSegment(PathSegments.validate(id))
+                .addPathSegments("generate_pdf");
         if (requestOptions != null) {
             requestOptions.getQueryParameters().forEach((_key, _value) -> {
                 httpUrl.addQueryParameter(_key, _value);
             });
         }
-        Request.Builder _requestBuilder = new Request.Builder()
+        RequestBody body;
+        try {
+            body = RequestBody.create(
+                    ObjectMappers.JSON_MAPPER.writeValueAsBytes(BodyProperties.merge(
+                            request, requestOptions != null ? requestOptions.getBodyProperties() : null)),
+                    MediaTypes.APPLICATION_JSON);
+        } catch (JsonProcessingException e) {
+            throw new WhopApiException("Failed to serialize request", e);
+        }
+        Request okhttpRequest = new Request.Builder()
                 .url(httpUrl.build())
-                .method("POST", RequestBody.create("", null))
+                .method("POST", body)
                 .headers(Headers.of(clientOptions.headers(requestOptions)))
-                .addHeader("Accept", "application/json");
-        Request okhttpRequest = _requestBuilder.build();
+                .addHeader("Content-Type", "application/json")
+                .addHeader("Accept", "application/json")
+                .build();
         OkHttpClient client = clientOptions.httpClient();
         if (requestOptions != null && requestOptions.getTimeout().isPresent()) {
             client = clientOptions.httpClientWithTimeout(requestOptions);
+        }
+        if (requestOptions != null && requestOptions.getMaxRetries().isPresent()) {
+            okhttpRequest = okhttpRequest
+                    .newBuilder()
+                    .tag(
+                            RetryInterceptor.MaxRetriesOverride.class,
+                            new RetryInterceptor.MaxRetriesOverride(
+                                    requestOptions.getMaxRetries().get()))
+                    .build();
         }
         try (Response response = client.newCall(okhttpRequest).execute()) {
             ResponseBody responseBody = response.body();
             String responseBodyString = responseBody != null ? responseBody.string() : "{}";
             if (response.isSuccessful()) {
                 return new WhopApiHttpResponse<>(
-                        ObjectMappers.JSON_MAPPER.readValue(responseBodyString, boolean.class), response);
+                        ObjectMappers.JSON_MAPPER.readValue(responseBodyString, InvoicePdf.class), response);
+            }
+            try {
+                switch (response.code()) {
+                    case 401:
+                        throw new UnauthorizedError(
+                                ObjectMappers.JSON_MAPPER.readValue(responseBodyString, Object.class), response);
+                    case 403:
+                        throw new ForbiddenError(
+                                ObjectMappers.JSON_MAPPER.readValue(responseBodyString, Object.class), response);
+                    case 404:
+                        throw new NotFoundError(
+                                ObjectMappers.JSON_MAPPER.readValue(responseBodyString, Object.class), response);
+                    case 409:
+                        throw new ConflictError(
+                                ObjectMappers.JSON_MAPPER.readValue(responseBodyString, Object.class), response);
+                }
+            } catch (JsonProcessingException ignored) {
+                // unable to map error response, throwing generic error
+            }
+            Object errorBody = ObjectMappers.parseErrorBody(responseBodyString);
+            throw new WhopApiApiException(
+                    "Error with status code " + response.code(), response.code(), errorBody, response);
+        } catch (JsonProcessingException e) {
+            throw new WhopApiException("Failed to deserialize response: " + e.getMessage(), e);
+        } catch (IOException e) {
+            throw new WhopApiException("Network error executing HTTP request", e);
+        }
+    }
+
+    /**
+     * Resolves final tax and opens a draft invoice without emailing it. An invoice with a <code>payment_method_id</code> is charged to it off-session, as <code>POST /payments</code> charges a saved payment method: at <code>charge_at</code> if given, otherwise on <code>due_at</code> while it is still ahead, otherwise right away (see <code>scheduled_charge_at</code>). With a future <code>due_at</code> and no <code>charge_at</code>, the customer is charged on the due date without being emailed first. Issuing an open invoice again retains its totals and charges nothing.
+     */
+    public WhopApiHttpResponse<Invoice> issue(String id) {
+        return issue(id, IssueInvoicesRequest.builder().build());
+    }
+
+    /**
+     * Resolves final tax and opens a draft invoice without emailing it. An invoice with a <code>payment_method_id</code> is charged to it off-session, as <code>POST /payments</code> charges a saved payment method: at <code>charge_at</code> if given, otherwise on <code>due_at</code> while it is still ahead, otherwise right away (see <code>scheduled_charge_at</code>). With a future <code>due_at</code> and no <code>charge_at</code>, the customer is charged on the due date without being emailed first. Issuing an open invoice again retains its totals and charges nothing.
+     */
+    public WhopApiHttpResponse<Invoice> issue(String id, RequestOptions requestOptions) {
+        return issue(id, IssueInvoicesRequest.builder().build(), requestOptions);
+    }
+
+    /**
+     * Resolves final tax and opens a draft invoice without emailing it. An invoice with a <code>payment_method_id</code> is charged to it off-session, as <code>POST /payments</code> charges a saved payment method: at <code>charge_at</code> if given, otherwise on <code>due_at</code> while it is still ahead, otherwise right away (see <code>scheduled_charge_at</code>). With a future <code>due_at</code> and no <code>charge_at</code>, the customer is charged on the due date without being emailed first. Issuing an open invoice again retains its totals and charges nothing.
+     */
+    public WhopApiHttpResponse<Invoice> issue(String id, IssueInvoicesRequest request) {
+        return issue(id, request, null);
+    }
+
+    /**
+     * Resolves final tax and opens a draft invoice without emailing it. An invoice with a <code>payment_method_id</code> is charged to it off-session, as <code>POST /payments</code> charges a saved payment method: at <code>charge_at</code> if given, otherwise on <code>due_at</code> while it is still ahead, otherwise right away (see <code>scheduled_charge_at</code>). With a future <code>due_at</code> and no <code>charge_at</code>, the customer is charged on the due date without being emailed first. Issuing an open invoice again retains its totals and charges nothing.
+     */
+    public WhopApiHttpResponse<Invoice> issue(String id, IssueInvoicesRequest request, RequestOptions requestOptions) {
+        HttpUrl.Builder httpUrl = HttpUrl.parse(this.clientOptions.environment().getApiURL())
+                .newBuilder()
+                .addPathSegments("invoices")
+                .addPathSegment(PathSegments.validate(id))
+                .addPathSegments("issue");
+        if (requestOptions != null) {
+            requestOptions.getQueryParameters().forEach((_key, _value) -> {
+                httpUrl.addQueryParameter(_key, _value);
+            });
+        }
+        RequestBody body;
+        try {
+            body = RequestBody.create(
+                    ObjectMappers.JSON_MAPPER.writeValueAsBytes(BodyProperties.merge(
+                            request, requestOptions != null ? requestOptions.getBodyProperties() : null)),
+                    MediaTypes.APPLICATION_JSON);
+        } catch (JsonProcessingException e) {
+            throw new WhopApiException("Failed to serialize request", e);
+        }
+        Request okhttpRequest = new Request.Builder()
+                .url(httpUrl.build())
+                .method("POST", body)
+                .headers(Headers.of(clientOptions.headers(requestOptions)))
+                .addHeader("Content-Type", "application/json")
+                .addHeader("Accept", "application/json")
+                .build();
+        OkHttpClient client = clientOptions.httpClient();
+        if (requestOptions != null && requestOptions.getTimeout().isPresent()) {
+            client = clientOptions.httpClientWithTimeout(requestOptions);
+        }
+        if (requestOptions != null && requestOptions.getMaxRetries().isPresent()) {
+            okhttpRequest = okhttpRequest
+                    .newBuilder()
+                    .tag(
+                            RetryInterceptor.MaxRetriesOverride.class,
+                            new RetryInterceptor.MaxRetriesOverride(
+                                    requestOptions.getMaxRetries().get()))
+                    .build();
+        }
+        try (Response response = client.newCall(okhttpRequest).execute()) {
+            ResponseBody responseBody = response.body();
+            String responseBodyString = responseBody != null ? responseBody.string() : "{}";
+            if (response.isSuccessful()) {
+                return new WhopApiHttpResponse<>(
+                        ObjectMappers.JSON_MAPPER.readValue(responseBodyString, Invoice.class), response);
             }
             try {
                 switch (response.code()) {
@@ -731,14 +866,8 @@ public class RawInvoicesClient {
                     case 404:
                         throw new NotFoundError(
                                 ObjectMappers.JSON_MAPPER.readValue(responseBodyString, Object.class), response);
-                    case 422:
-                        throw new UnprocessableEntityError(
-                                ObjectMappers.JSON_MAPPER.readValue(responseBodyString, Object.class), response);
-                    case 429:
-                        throw new TooManyRequestsError(
-                                ObjectMappers.JSON_MAPPER.readValue(responseBodyString, Object.class), response);
-                    case 500:
-                        throw new InternalServerError(
+                    case 409:
+                        throw new ConflictError(
                                 ObjectMappers.JSON_MAPPER.readValue(responseBodyString, Object.class), response);
                 }
             } catch (JsonProcessingException ignored) {
@@ -747,57 +876,43 @@ public class RawInvoicesClient {
             Object errorBody = ObjectMappers.parseErrorBody(responseBodyString);
             throw new WhopApiApiException(
                     "Error with status code " + response.code(), response.code(), errorBody, response);
+        } catch (JsonProcessingException e) {
+            throw new WhopApiException("Failed to deserialize response: " + e.getMessage(), e);
         } catch (IOException e) {
             throw new WhopApiException("Network error executing HTTP request", e);
         }
     }
 
     /**
-     * Mark an open invoice as uncollectible when payment is not expected.
-     * <p>Required permissions:</p>
-     * <ul>
-     * <li><code>invoice:update</code></li>
-     * </ul>
+     * Marks an open invoice as uncollectible. Its checkout link stops working.
      */
-    public WhopApiHttpResponse<Boolean> markUncollectible(String id) {
+    public WhopApiHttpResponse<Invoice> markUncollectible(String id) {
         return markUncollectible(id, MarkUncollectibleInvoicesRequest.builder().build());
     }
 
     /**
-     * Mark an open invoice as uncollectible when payment is not expected.
-     * <p>Required permissions:</p>
-     * <ul>
-     * <li><code>invoice:update</code></li>
-     * </ul>
+     * Marks an open invoice as uncollectible. Its checkout link stops working.
      */
-    public WhopApiHttpResponse<Boolean> markUncollectible(String id, RequestOptions requestOptions) {
+    public WhopApiHttpResponse<Invoice> markUncollectible(String id, RequestOptions requestOptions) {
         return markUncollectible(id, MarkUncollectibleInvoicesRequest.builder().build(), requestOptions);
     }
 
     /**
-     * Mark an open invoice as uncollectible when payment is not expected.
-     * <p>Required permissions:</p>
-     * <ul>
-     * <li><code>invoice:update</code></li>
-     * </ul>
+     * Marks an open invoice as uncollectible. Its checkout link stops working.
      */
-    public WhopApiHttpResponse<Boolean> markUncollectible(String id, MarkUncollectibleInvoicesRequest request) {
+    public WhopApiHttpResponse<Invoice> markUncollectible(String id, MarkUncollectibleInvoicesRequest request) {
         return markUncollectible(id, request, null);
     }
 
     /**
-     * Mark an open invoice as uncollectible when payment is not expected.
-     * <p>Required permissions:</p>
-     * <ul>
-     * <li><code>invoice:update</code></li>
-     * </ul>
+     * Marks an open invoice as uncollectible. Its checkout link stops working.
      */
-    public WhopApiHttpResponse<Boolean> markUncollectible(
+    public WhopApiHttpResponse<Invoice> markUncollectible(
             String id, MarkUncollectibleInvoicesRequest request, RequestOptions requestOptions) {
-        HttpUrl.Builder httpUrl = HttpUrl.parse(this.clientOptions.environment().getUrl())
+        HttpUrl.Builder httpUrl = HttpUrl.parse(this.clientOptions.environment().getApiURL())
                 .newBuilder()
                 .addPathSegments("invoices")
-                .addPathSegment(id)
+                .addPathSegment(PathSegments.validate(id))
                 .addPathSegments("mark_uncollectible");
         if (requestOptions != null) {
             requestOptions.getQueryParameters().forEach((_key, _value) -> {
@@ -806,7 +921,11 @@ public class RawInvoicesClient {
         }
         Request.Builder _requestBuilder = new Request.Builder()
                 .url(httpUrl.build())
-                .method("POST", RequestBody.create("", null))
+                .method(
+                        "POST",
+                        BodyProperties.toRequestBody(
+                                requestOptions != null ? requestOptions.getBodyProperties() : null,
+                                RequestBody.create("", null)))
                 .headers(Headers.of(clientOptions.headers(requestOptions)))
                 .addHeader("Accept", "application/json");
         Request okhttpRequest = _requestBuilder.build();
@@ -814,12 +933,21 @@ public class RawInvoicesClient {
         if (requestOptions != null && requestOptions.getTimeout().isPresent()) {
             client = clientOptions.httpClientWithTimeout(requestOptions);
         }
+        if (requestOptions != null && requestOptions.getMaxRetries().isPresent()) {
+            okhttpRequest = okhttpRequest
+                    .newBuilder()
+                    .tag(
+                            RetryInterceptor.MaxRetriesOverride.class,
+                            new RetryInterceptor.MaxRetriesOverride(
+                                    requestOptions.getMaxRetries().get()))
+                    .build();
+        }
         try (Response response = client.newCall(okhttpRequest).execute()) {
             ResponseBody responseBody = response.body();
             String responseBodyString = responseBody != null ? responseBody.string() : "{}";
             if (response.isSuccessful()) {
                 return new WhopApiHttpResponse<>(
-                        ObjectMappers.JSON_MAPPER.readValue(responseBodyString, boolean.class), response);
+                        ObjectMappers.JSON_MAPPER.readValue(responseBodyString, Invoice.class), response);
             }
             try {
                 switch (response.code()) {
@@ -832,17 +960,8 @@ public class RawInvoicesClient {
                     case 403:
                         throw new ForbiddenError(
                                 ObjectMappers.JSON_MAPPER.readValue(responseBodyString, Object.class), response);
-                    case 404:
-                        throw new NotFoundError(
-                                ObjectMappers.JSON_MAPPER.readValue(responseBodyString, Object.class), response);
-                    case 422:
-                        throw new UnprocessableEntityError(
-                                ObjectMappers.JSON_MAPPER.readValue(responseBodyString, Object.class), response);
-                    case 429:
-                        throw new TooManyRequestsError(
-                                ObjectMappers.JSON_MAPPER.readValue(responseBodyString, Object.class), response);
-                    case 500:
-                        throw new InternalServerError(
+                    case 409:
+                        throw new ConflictError(
                                 ObjectMappers.JSON_MAPPER.readValue(responseBodyString, Object.class), response);
                 }
             } catch (JsonProcessingException ignored) {
@@ -851,58 +970,140 @@ public class RawInvoicesClient {
             Object errorBody = ObjectMappers.parseErrorBody(responseBodyString);
             throw new WhopApiApiException(
                     "Error with status code " + response.code(), response.code(), errorBody, response);
+        } catch (JsonProcessingException e) {
+            throw new WhopApiException("Failed to deserialize response: " + e.getMessage(), e);
         } catch (IOException e) {
             throw new WhopApiException("Network error executing HTTP request", e);
         }
     }
 
     /**
-     * Resend the notification email for an existing invoice to the customer.
-     * <p>Required permissions:</p>
-     * <ul>
-     * <li><code>invoice:update</code></li>
-     * </ul>
+     * Issues a draft and emails it to its recipients, with reminders after the due date. A draft with no <code>payment_method_id</code> needs <code>invoice:update</code>, <code>invoice:create</code>, or <code>payment:charge</code>, and is never charged. A draft with a <code>payment_method_id</code> needs <code>payment:charge</code>: with a <code>charge_at</code>, or when its <code>due_at</code> is still ahead, it is emailed now and charged to that method at that time (see <code>scheduled_charge_at</code>); otherwise it is charged right away instead of emailed. Voiding the invoice, marking it uncollectible, or paying it first cancels the scheduled charge, and its recipients get the payment link if a charge fails. Sending an open invoice needs <code>payment:charge</code> and emails it again, up to three emails a day including the first send. With <code>send_at</code>, the draft is sent at that time instead, and cannot be edited, except its recipients, until it is sent or unscheduled. Each email, reminders included, is sent separately to the customer email shown on the invoice and to each address in <code>recipient_emails</code>, so recipients never see each other's addresses.
      */
-    public WhopApiHttpResponse<Boolean> resend(String id) {
-        return resend(id, ResendInvoicesRequest.builder().build());
+    public WhopApiHttpResponse<Invoice> send(String id) {
+        return send(id, SendInvoicesRequest.builder().build());
     }
 
     /**
-     * Resend the notification email for an existing invoice to the customer.
-     * <p>Required permissions:</p>
-     * <ul>
-     * <li><code>invoice:update</code></li>
-     * </ul>
+     * Issues a draft and emails it to its recipients, with reminders after the due date. A draft with no <code>payment_method_id</code> needs <code>invoice:update</code>, <code>invoice:create</code>, or <code>payment:charge</code>, and is never charged. A draft with a <code>payment_method_id</code> needs <code>payment:charge</code>: with a <code>charge_at</code>, or when its <code>due_at</code> is still ahead, it is emailed now and charged to that method at that time (see <code>scheduled_charge_at</code>); otherwise it is charged right away instead of emailed. Voiding the invoice, marking it uncollectible, or paying it first cancels the scheduled charge, and its recipients get the payment link if a charge fails. Sending an open invoice needs <code>payment:charge</code> and emails it again, up to three emails a day including the first send. With <code>send_at</code>, the draft is sent at that time instead, and cannot be edited, except its recipients, until it is sent or unscheduled. Each email, reminders included, is sent separately to the customer email shown on the invoice and to each address in <code>recipient_emails</code>, so recipients never see each other's addresses.
      */
-    public WhopApiHttpResponse<Boolean> resend(String id, RequestOptions requestOptions) {
-        return resend(id, ResendInvoicesRequest.builder().build(), requestOptions);
+    public WhopApiHttpResponse<Invoice> send(String id, RequestOptions requestOptions) {
+        return send(id, SendInvoicesRequest.builder().build(), requestOptions);
     }
 
     /**
-     * Resend the notification email for an existing invoice to the customer.
-     * <p>Required permissions:</p>
-     * <ul>
-     * <li><code>invoice:update</code></li>
-     * </ul>
+     * Issues a draft and emails it to its recipients, with reminders after the due date. A draft with no <code>payment_method_id</code> needs <code>invoice:update</code>, <code>invoice:create</code>, or <code>payment:charge</code>, and is never charged. A draft with a <code>payment_method_id</code> needs <code>payment:charge</code>: with a <code>charge_at</code>, or when its <code>due_at</code> is still ahead, it is emailed now and charged to that method at that time (see <code>scheduled_charge_at</code>); otherwise it is charged right away instead of emailed. Voiding the invoice, marking it uncollectible, or paying it first cancels the scheduled charge, and its recipients get the payment link if a charge fails. Sending an open invoice needs <code>payment:charge</code> and emails it again, up to three emails a day including the first send. With <code>send_at</code>, the draft is sent at that time instead, and cannot be edited, except its recipients, until it is sent or unscheduled. Each email, reminders included, is sent separately to the customer email shown on the invoice and to each address in <code>recipient_emails</code>, so recipients never see each other's addresses.
      */
-    public WhopApiHttpResponse<Boolean> resend(String id, ResendInvoicesRequest request) {
-        return resend(id, request, null);
+    public WhopApiHttpResponse<Invoice> send(String id, SendInvoicesRequest request) {
+        return send(id, request, null);
     }
 
     /**
-     * Resend the notification email for an existing invoice to the customer.
-     * <p>Required permissions:</p>
-     * <ul>
-     * <li><code>invoice:update</code></li>
-     * </ul>
+     * Issues a draft and emails it to its recipients, with reminders after the due date. A draft with no <code>payment_method_id</code> needs <code>invoice:update</code>, <code>invoice:create</code>, or <code>payment:charge</code>, and is never charged. A draft with a <code>payment_method_id</code> needs <code>payment:charge</code>: with a <code>charge_at</code>, or when its <code>due_at</code> is still ahead, it is emailed now and charged to that method at that time (see <code>scheduled_charge_at</code>); otherwise it is charged right away instead of emailed. Voiding the invoice, marking it uncollectible, or paying it first cancels the scheduled charge, and its recipients get the payment link if a charge fails. Sending an open invoice needs <code>payment:charge</code> and emails it again, up to three emails a day including the first send. With <code>send_at</code>, the draft is sent at that time instead, and cannot be edited, except its recipients, until it is sent or unscheduled. Each email, reminders included, is sent separately to the customer email shown on the invoice and to each address in <code>recipient_emails</code>, so recipients never see each other's addresses.
      */
-    public WhopApiHttpResponse<Boolean> resend(
-            String id, ResendInvoicesRequest request, RequestOptions requestOptions) {
-        HttpUrl.Builder httpUrl = HttpUrl.parse(this.clientOptions.environment().getUrl())
+    public WhopApiHttpResponse<Invoice> send(String id, SendInvoicesRequest request, RequestOptions requestOptions) {
+        HttpUrl.Builder httpUrl = HttpUrl.parse(this.clientOptions.environment().getApiURL())
                 .newBuilder()
                 .addPathSegments("invoices")
-                .addPathSegment(id)
-                .addPathSegments("resend");
+                .addPathSegment(PathSegments.validate(id))
+                .addPathSegments("send");
+        if (requestOptions != null) {
+            requestOptions.getQueryParameters().forEach((_key, _value) -> {
+                httpUrl.addQueryParameter(_key, _value);
+            });
+        }
+        RequestBody body;
+        try {
+            body = RequestBody.create(
+                    ObjectMappers.JSON_MAPPER.writeValueAsBytes(BodyProperties.merge(
+                            request, requestOptions != null ? requestOptions.getBodyProperties() : null)),
+                    MediaTypes.APPLICATION_JSON);
+        } catch (JsonProcessingException e) {
+            throw new WhopApiException("Failed to serialize request", e);
+        }
+        Request okhttpRequest = new Request.Builder()
+                .url(httpUrl.build())
+                .method("POST", body)
+                .headers(Headers.of(clientOptions.headers(requestOptions)))
+                .addHeader("Content-Type", "application/json")
+                .addHeader("Accept", "application/json")
+                .build();
+        OkHttpClient client = clientOptions.httpClient();
+        if (requestOptions != null && requestOptions.getTimeout().isPresent()) {
+            client = clientOptions.httpClientWithTimeout(requestOptions);
+        }
+        if (requestOptions != null && requestOptions.getMaxRetries().isPresent()) {
+            okhttpRequest = okhttpRequest
+                    .newBuilder()
+                    .tag(
+                            RetryInterceptor.MaxRetriesOverride.class,
+                            new RetryInterceptor.MaxRetriesOverride(
+                                    requestOptions.getMaxRetries().get()))
+                    .build();
+        }
+        try (Response response = client.newCall(okhttpRequest).execute()) {
+            ResponseBody responseBody = response.body();
+            String responseBodyString = responseBody != null ? responseBody.string() : "{}";
+            if (response.isSuccessful()) {
+                return new WhopApiHttpResponse<>(
+                        ObjectMappers.JSON_MAPPER.readValue(responseBodyString, Invoice.class), response);
+            }
+            try {
+                switch (response.code()) {
+                    case 400:
+                        throw new BadRequestError(
+                                ObjectMappers.JSON_MAPPER.readValue(responseBodyString, Object.class), response);
+                    case 403:
+                        throw new ForbiddenError(
+                                ObjectMappers.JSON_MAPPER.readValue(responseBodyString, Object.class), response);
+                    case 409:
+                        throw new ConflictError(
+                                ObjectMappers.JSON_MAPPER.readValue(responseBodyString, Object.class), response);
+                }
+            } catch (JsonProcessingException ignored) {
+                // unable to map error response, throwing generic error
+            }
+            Object errorBody = ObjectMappers.parseErrorBody(responseBodyString);
+            throw new WhopApiApiException(
+                    "Error with status code " + response.code(), response.code(), errorBody, response);
+        } catch (JsonProcessingException e) {
+            throw new WhopApiException("Failed to deserialize response: " + e.getMessage(), e);
+        } catch (IOException e) {
+            throw new WhopApiException("Network error executing HTTP request", e);
+        }
+    }
+
+    /**
+     * Cancels a draft's scheduled send, so it can be edited again. An invoice with no scheduled send is returned unchanged. A draft with no <code>payment_method_id</code> needs <code>invoice:update</code>, <code>invoice:create</code>, or <code>payment:charge</code>; any other invoice needs <code>payment:charge</code>.
+     */
+    public WhopApiHttpResponse<Invoice> unschedule(String id) {
+        return unschedule(id, UnscheduleInvoicesRequest.builder().build());
+    }
+
+    /**
+     * Cancels a draft's scheduled send, so it can be edited again. An invoice with no scheduled send is returned unchanged. A draft with no <code>payment_method_id</code> needs <code>invoice:update</code>, <code>invoice:create</code>, or <code>payment:charge</code>; any other invoice needs <code>payment:charge</code>.
+     */
+    public WhopApiHttpResponse<Invoice> unschedule(String id, RequestOptions requestOptions) {
+        return unschedule(id, UnscheduleInvoicesRequest.builder().build(), requestOptions);
+    }
+
+    /**
+     * Cancels a draft's scheduled send, so it can be edited again. An invoice with no scheduled send is returned unchanged. A draft with no <code>payment_method_id</code> needs <code>invoice:update</code>, <code>invoice:create</code>, or <code>payment:charge</code>; any other invoice needs <code>payment:charge</code>.
+     */
+    public WhopApiHttpResponse<Invoice> unschedule(String id, UnscheduleInvoicesRequest request) {
+        return unschedule(id, request, null);
+    }
+
+    /**
+     * Cancels a draft's scheduled send, so it can be edited again. An invoice with no scheduled send is returned unchanged. A draft with no <code>payment_method_id</code> needs <code>invoice:update</code>, <code>invoice:create</code>, or <code>payment:charge</code>; any other invoice needs <code>payment:charge</code>.
+     */
+    public WhopApiHttpResponse<Invoice> unschedule(
+            String id, UnscheduleInvoicesRequest request, RequestOptions requestOptions) {
+        HttpUrl.Builder httpUrl = HttpUrl.parse(this.clientOptions.environment().getApiURL())
+                .newBuilder()
+                .addPathSegments("invoices")
+                .addPathSegment(PathSegments.validate(id))
+                .addPathSegments("unschedule");
         if (requestOptions != null) {
             requestOptions.getQueryParameters().forEach((_key, _value) -> {
                 httpUrl.addQueryParameter(_key, _value);
@@ -910,7 +1111,11 @@ public class RawInvoicesClient {
         }
         Request.Builder _requestBuilder = new Request.Builder()
                 .url(httpUrl.build())
-                .method("POST", RequestBody.create("", null))
+                .method(
+                        "POST",
+                        BodyProperties.toRequestBody(
+                                requestOptions != null ? requestOptions.getBodyProperties() : null,
+                                RequestBody.create("", null)))
                 .headers(Headers.of(clientOptions.headers(requestOptions)))
                 .addHeader("Accept", "application/json");
         Request okhttpRequest = _requestBuilder.build();
@@ -918,35 +1123,29 @@ public class RawInvoicesClient {
         if (requestOptions != null && requestOptions.getTimeout().isPresent()) {
             client = clientOptions.httpClientWithTimeout(requestOptions);
         }
+        if (requestOptions != null && requestOptions.getMaxRetries().isPresent()) {
+            okhttpRequest = okhttpRequest
+                    .newBuilder()
+                    .tag(
+                            RetryInterceptor.MaxRetriesOverride.class,
+                            new RetryInterceptor.MaxRetriesOverride(
+                                    requestOptions.getMaxRetries().get()))
+                    .build();
+        }
         try (Response response = client.newCall(okhttpRequest).execute()) {
             ResponseBody responseBody = response.body();
             String responseBodyString = responseBody != null ? responseBody.string() : "{}";
             if (response.isSuccessful()) {
                 return new WhopApiHttpResponse<>(
-                        ObjectMappers.JSON_MAPPER.readValue(responseBodyString, boolean.class), response);
+                        ObjectMappers.JSON_MAPPER.readValue(responseBodyString, Invoice.class), response);
             }
             try {
                 switch (response.code()) {
-                    case 400:
-                        throw new BadRequestError(
-                                ObjectMappers.JSON_MAPPER.readValue(responseBodyString, Object.class), response);
-                    case 401:
-                        throw new UnauthorizedError(
-                                ObjectMappers.JSON_MAPPER.readValue(responseBodyString, Object.class), response);
                     case 403:
                         throw new ForbiddenError(
                                 ObjectMappers.JSON_MAPPER.readValue(responseBodyString, Object.class), response);
-                    case 404:
-                        throw new NotFoundError(
-                                ObjectMappers.JSON_MAPPER.readValue(responseBodyString, Object.class), response);
-                    case 422:
-                        throw new UnprocessableEntityError(
-                                ObjectMappers.JSON_MAPPER.readValue(responseBodyString, Object.class), response);
-                    case 429:
-                        throw new TooManyRequestsError(
-                                ObjectMappers.JSON_MAPPER.readValue(responseBodyString, Object.class), response);
-                    case 500:
-                        throw new InternalServerError(
+                    case 409:
+                        throw new ConflictError(
                                 ObjectMappers.JSON_MAPPER.readValue(responseBodyString, Object.class), response);
                 }
             } catch (JsonProcessingException ignored) {
@@ -955,56 +1154,42 @@ public class RawInvoicesClient {
             Object errorBody = ObjectMappers.parseErrorBody(responseBodyString);
             throw new WhopApiApiException(
                     "Error with status code " + response.code(), response.code(), errorBody, response);
+        } catch (JsonProcessingException e) {
+            throw new WhopApiException("Failed to deserialize response: " + e.getMessage(), e);
         } catch (IOException e) {
             throw new WhopApiException("Network error executing HTTP request", e);
         }
     }
 
     /**
-     * Void an open invoice so it can no longer be paid. Voiding is permanent and cannot be undone.
-     * <p>Required permissions:</p>
-     * <ul>
-     * <li><code>invoice:update</code></li>
-     * </ul>
+     * Voids a draft or unpaid invoice.
      */
-    public WhopApiHttpResponse<Boolean> void_(String id) {
+    public WhopApiHttpResponse<Invoice> void_(String id) {
         return void_(id, VoidInvoicesRequest.builder().build());
     }
 
     /**
-     * Void an open invoice so it can no longer be paid. Voiding is permanent and cannot be undone.
-     * <p>Required permissions:</p>
-     * <ul>
-     * <li><code>invoice:update</code></li>
-     * </ul>
+     * Voids a draft or unpaid invoice.
      */
-    public WhopApiHttpResponse<Boolean> void_(String id, RequestOptions requestOptions) {
+    public WhopApiHttpResponse<Invoice> void_(String id, RequestOptions requestOptions) {
         return void_(id, VoidInvoicesRequest.builder().build(), requestOptions);
     }
 
     /**
-     * Void an open invoice so it can no longer be paid. Voiding is permanent and cannot be undone.
-     * <p>Required permissions:</p>
-     * <ul>
-     * <li><code>invoice:update</code></li>
-     * </ul>
+     * Voids a draft or unpaid invoice.
      */
-    public WhopApiHttpResponse<Boolean> void_(String id, VoidInvoicesRequest request) {
+    public WhopApiHttpResponse<Invoice> void_(String id, VoidInvoicesRequest request) {
         return void_(id, request, null);
     }
 
     /**
-     * Void an open invoice so it can no longer be paid. Voiding is permanent and cannot be undone.
-     * <p>Required permissions:</p>
-     * <ul>
-     * <li><code>invoice:update</code></li>
-     * </ul>
+     * Voids a draft or unpaid invoice.
      */
-    public WhopApiHttpResponse<Boolean> void_(String id, VoidInvoicesRequest request, RequestOptions requestOptions) {
-        HttpUrl.Builder httpUrl = HttpUrl.parse(this.clientOptions.environment().getUrl())
+    public WhopApiHttpResponse<Invoice> void_(String id, VoidInvoicesRequest request, RequestOptions requestOptions) {
+        HttpUrl.Builder httpUrl = HttpUrl.parse(this.clientOptions.environment().getApiURL())
                 .newBuilder()
                 .addPathSegments("invoices")
-                .addPathSegment(id)
+                .addPathSegment(PathSegments.validate(id))
                 .addPathSegments("void");
         if (requestOptions != null) {
             requestOptions.getQueryParameters().forEach((_key, _value) -> {
@@ -1013,7 +1198,11 @@ public class RawInvoicesClient {
         }
         Request.Builder _requestBuilder = new Request.Builder()
                 .url(httpUrl.build())
-                .method("POST", RequestBody.create("", null))
+                .method(
+                        "POST",
+                        BodyProperties.toRequestBody(
+                                requestOptions != null ? requestOptions.getBodyProperties() : null,
+                                RequestBody.create("", null)))
                 .headers(Headers.of(clientOptions.headers(requestOptions)))
                 .addHeader("Accept", "application/json");
         Request okhttpRequest = _requestBuilder.build();
@@ -1021,12 +1210,21 @@ public class RawInvoicesClient {
         if (requestOptions != null && requestOptions.getTimeout().isPresent()) {
             client = clientOptions.httpClientWithTimeout(requestOptions);
         }
+        if (requestOptions != null && requestOptions.getMaxRetries().isPresent()) {
+            okhttpRequest = okhttpRequest
+                    .newBuilder()
+                    .tag(
+                            RetryInterceptor.MaxRetriesOverride.class,
+                            new RetryInterceptor.MaxRetriesOverride(
+                                    requestOptions.getMaxRetries().get()))
+                    .build();
+        }
         try (Response response = client.newCall(okhttpRequest).execute()) {
             ResponseBody responseBody = response.body();
             String responseBodyString = responseBody != null ? responseBody.string() : "{}";
             if (response.isSuccessful()) {
                 return new WhopApiHttpResponse<>(
-                        ObjectMappers.JSON_MAPPER.readValue(responseBodyString, boolean.class), response);
+                        ObjectMappers.JSON_MAPPER.readValue(responseBodyString, Invoice.class), response);
             }
             try {
                 switch (response.code()) {
@@ -1039,17 +1237,8 @@ public class RawInvoicesClient {
                     case 403:
                         throw new ForbiddenError(
                                 ObjectMappers.JSON_MAPPER.readValue(responseBodyString, Object.class), response);
-                    case 404:
-                        throw new NotFoundError(
-                                ObjectMappers.JSON_MAPPER.readValue(responseBodyString, Object.class), response);
-                    case 422:
-                        throw new UnprocessableEntityError(
-                                ObjectMappers.JSON_MAPPER.readValue(responseBodyString, Object.class), response);
-                    case 429:
-                        throw new TooManyRequestsError(
-                                ObjectMappers.JSON_MAPPER.readValue(responseBodyString, Object.class), response);
-                    case 500:
-                        throw new InternalServerError(
+                    case 409:
+                        throw new ConflictError(
                                 ObjectMappers.JSON_MAPPER.readValue(responseBodyString, Object.class), response);
                 }
             } catch (JsonProcessingException ignored) {
@@ -1058,6 +1247,8 @@ public class RawInvoicesClient {
             Object errorBody = ObjectMappers.parseErrorBody(responseBodyString);
             throw new WhopApiApiException(
                     "Error with status code " + response.code(), response.code(), errorBody, response);
+        } catch (JsonProcessingException e) {
+            throw new WhopApiException("Failed to deserialize response: " + e.getMessage(), e);
         } catch (IOException e) {
             throw new WhopApiException("Network error executing HTTP request", e);
         }

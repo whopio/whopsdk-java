@@ -34,28 +34,28 @@ public class PromoCodesClient {
     }
 
     /**
-     * Lists promo codes for an account with cursor pagination, filters, and sorting.
+     * Lists an account's promo codes.
      */
     public SyncPagingIterable<PromoCodeListItem> list(ListPromoCodesRequest request) {
         return this.rawClient.list(request).body();
     }
 
     /**
-     * Lists promo codes for an account with cursor pagination, filters, and sorting.
+     * Lists an account's promo codes.
      */
     public SyncPagingIterable<PromoCodeListItem> list(ListPromoCodesRequest request, RequestOptions requestOptions) {
         return this.rawClient.list(request, requestOptions).body();
     }
 
     /**
-     * Creates a promo code for an account. First-party sessions may attach an affiliate.
+     * Creates a promo code for an account.
      */
     public PromoCode create(CreatePromoCodesRequest request) {
         return this.rawClient.create(request).body();
     }
 
     /**
-     * Creates a promo code for an account. First-party sessions may attach an affiliate.
+     * Creates a promo code for an account.
      */
     public PromoCode create(CreatePromoCodesRequest request, RequestOptions requestOptions) {
         return this.rawClient.create(request, requestOptions).body();

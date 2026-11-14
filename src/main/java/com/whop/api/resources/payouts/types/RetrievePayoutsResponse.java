@@ -17,7 +17,7 @@ import com.whop.api.core.NullableNonemptyFilter;
 import com.whop.api.core.ObjectMappers;
 import java.time.OffsetDateTime;
 import java.util.HashMap;
-import java.util.LinkedHashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
@@ -26,11 +26,17 @@ import org.jetbrains.annotations.NotNull;
 @JsonInclude(JsonInclude.Include.NON_ABSENT)
 @JsonDeserialize(builder = RetrievePayoutsResponse.Builder.class)
 public final class RetrievePayoutsResponse {
-    private final String amount;
+    private final Optional<String> amount;
+
+    private final Optional<Boolean> cancelable;
+
+    private final Optional<RetrievePayoutsResponseConversion> conversion;
 
     private final OffsetDateTime createdAt;
 
     private final String currency;
+
+    private final Optional<Boolean> delayed;
 
     private final Optional<String> destinationAmount;
 
@@ -38,19 +44,21 @@ public final class RetrievePayoutsResponse {
 
     private final Optional<OffsetDateTime> estimatedArrival;
 
+    private final Optional<OffsetDateTime> estimatedArrivalEnd;
+
     private final Optional<Float> exchangeRate;
 
     private final Optional<RetrievePayoutsResponseFailure> failure;
 
-    private final String feeAmount;
+    private final Optional<String> feeAmount;
 
-    private final RetrievePayoutsResponseFeePaidBy feePaidBy;
+    private final Optional<RetrievePayoutsResponseFeePaidBy> feePaidBy;
 
     private final String id;
 
-    private final String markupFee;
+    private final Optional<String> markupFee;
 
-    private final Map<String, String> metadata;
+    private final Optional<Map<String, String>> metadata;
 
     private final String netAmount;
 
@@ -64,50 +72,70 @@ public final class RetrievePayoutsResponse {
 
     private final Optional<String> payoutRequestId;
 
+    private final Optional<String> recipientName;
+
+    private final Optional<String> senderName;
+
     private final Optional<RetrievePayoutsResponseSource> source;
 
     private final RetrievePayoutsResponseSpeed speed;
 
+    private final Optional<String> statementDescriptor;
+
     private final RetrievePayoutsResponseStatus status;
 
     private final String statusDetail;
+
+    private final Optional<List<RetrievePayoutsResponseTimelineItem>> timeline;
 
     private final Optional<String> traceCode;
 
     private final Map<String, Object> additionalProperties;
 
     private RetrievePayoutsResponse(
-            String amount,
+            Optional<String> amount,
+            Optional<Boolean> cancelable,
+            Optional<RetrievePayoutsResponseConversion> conversion,
             OffsetDateTime createdAt,
             String currency,
+            Optional<Boolean> delayed,
             Optional<String> destinationAmount,
             Optional<String> destinationCurrency,
             Optional<OffsetDateTime> estimatedArrival,
+            Optional<OffsetDateTime> estimatedArrivalEnd,
             Optional<Float> exchangeRate,
             Optional<RetrievePayoutsResponseFailure> failure,
-            String feeAmount,
-            RetrievePayoutsResponseFeePaidBy feePaidBy,
+            Optional<String> feeAmount,
+            Optional<RetrievePayoutsResponseFeePaidBy> feePaidBy,
             String id,
-            String markupFee,
-            Map<String, String> metadata,
+            Optional<String> markupFee,
+            Optional<Map<String, String>> metadata,
             String netAmount,
             Optional<String> notes,
             RetrievePayoutsResponseObject object,
             Optional<String> payerName,
             Optional<RetrievePayoutsResponsePayoutMethod> payoutMethod,
             Optional<String> payoutRequestId,
+            Optional<String> recipientName,
+            Optional<String> senderName,
             Optional<RetrievePayoutsResponseSource> source,
             RetrievePayoutsResponseSpeed speed,
+            Optional<String> statementDescriptor,
             RetrievePayoutsResponseStatus status,
             String statusDetail,
+            Optional<List<RetrievePayoutsResponseTimelineItem>> timeline,
             Optional<String> traceCode,
             Map<String, Object> additionalProperties) {
         this.amount = amount;
+        this.cancelable = cancelable;
+        this.conversion = conversion;
         this.createdAt = createdAt;
         this.currency = currency;
+        this.delayed = delayed;
         this.destinationAmount = destinationAmount;
         this.destinationCurrency = destinationCurrency;
         this.estimatedArrival = estimatedArrival;
+        this.estimatedArrivalEnd = estimatedArrivalEnd;
         this.exchangeRate = exchangeRate;
         this.failure = failure;
         this.feeAmount = feeAmount;
@@ -121,20 +149,43 @@ public final class RetrievePayoutsResponse {
         this.payerName = payerName;
         this.payoutMethod = payoutMethod;
         this.payoutRequestId = payoutRequestId;
+        this.recipientName = recipientName;
+        this.senderName = senderName;
         this.source = source;
         this.speed = speed;
+        this.statementDescriptor = statementDescriptor;
         this.status = status;
         this.statusDetail = statusDetail;
+        this.timeline = timeline;
         this.traceCode = traceCode;
         this.additionalProperties = additionalProperties;
     }
 
     /**
-     * @return The payout amount in whole currency units, as a decimal string.
+     * @return The payout amount in whole currency units, as a decimal string. Only returned to callers with payout:withdrawal:read on the owning ledger.
      */
     @JsonProperty("amount")
-    public String getAmount() {
+    public Optional<String> getAmount() {
         return amount;
+    }
+
+    /**
+     * @return Whether <code>POST /payouts/{id}/cancel</code> would act on this payout right now: <code>true</code> while it is <code>in_review</code>, while it is <code>processing</code> with nothing yet submitted to the payout provider, or while a submitted payout can still be asked to cancel at the provider. <code>false</code> once the money has arrived or the payout has already ended. Only returned to callers with payout:withdrawal:read on the owning ledger.
+     */
+    @JsonProperty("cancelable")
+    public Optional<Boolean> getCancelable() {
+        return cancelable;
+    }
+
+    /**
+     * @return How the balance was converted into the payout currency before the payout was sent. <code>null</code> when the payout was sent from a balance in its own currency. Only returned to callers with payout:withdrawal:read on the owning ledger.
+     */
+    @JsonIgnore
+    public Optional<RetrievePayoutsResponseConversion> getConversion() {
+        if (conversion == null) {
+            return Optional.empty();
+        }
+        return conversion;
     }
 
     /**
@@ -154,6 +205,14 @@ public final class RetrievePayoutsResponse {
     }
 
     /**
+     * @return Whether an in-transit withdrawal is past its settlement window.
+     */
+    @JsonProperty("delayed")
+    public Optional<Boolean> getDelayed() {
+        return delayed;
+    }
+
+    /**
      * @return The amount delivered in the destination currency, as a decimal string. Assigned when the payout is processed, so it is <code>null</code> before then and on payouts without a recorded conversion.
      */
     @JsonIgnore
@@ -165,7 +224,7 @@ public final class RetrievePayoutsResponse {
     }
 
     /**
-     * @return Currency the funds are delivered in, taken from the payout method when the payout is created. On a stablecoin payout it follows the settlement payout minted alongside it — the <code>GET /payouts</code> row carrying this payout's id as <code>payout_request_id</code> — and is <code>null</code> only when no settlement payout exists.
+     * @return Currency the funds are delivered in, taken from the payout method when the payout is created. On a payout funded by a conversion request it follows the settlement payout minted alongside it — the <code>GET /payouts</code> row carrying this payout's id as <code>payout_request_id</code> — and is <code>null</code> only when no settlement payout exists.
      */
     @JsonIgnore
     public Optional<String> getDestinationCurrency() {
@@ -184,6 +243,17 @@ public final class RetrievePayoutsResponse {
             return Optional.empty();
         }
         return estimatedArrival;
+    }
+
+    /**
+     * @return End of the expected bank settlement window.
+     */
+    @JsonIgnore
+    public Optional<OffsetDateTime> getEstimatedArrivalEnd() {
+        if (estimatedArrivalEnd == null) {
+            return Optional.empty();
+        }
+        return estimatedArrivalEnd;
     }
 
     /**
@@ -209,23 +279,23 @@ public final class RetrievePayoutsResponse {
     }
 
     /**
-     * @return The fee charged for the payout, in the payout currency, as a decimal string.
+     * @return The fee charged for the payout, in the payout currency, as a decimal string. Only returned to callers with payout:withdrawal:read on the owning ledger.
      */
     @JsonProperty("fee_amount")
-    public String getFeeAmount() {
+    public Optional<String> getFeeAmount() {
         return feeAmount;
     }
 
     /**
-     * @return Who bore the payout fee: the account itself, or its parent platform.
+     * @return Who bore the payout fee: the account itself, or its parent platform. Only returned to callers with payout:withdrawal:read on the owning ledger.
      */
     @JsonProperty("fee_paid_by")
-    public RetrievePayoutsResponseFeePaidBy getFeePaidBy() {
+    public Optional<RetrievePayoutsResponseFeePaidBy> getFeePaidBy() {
         return feePaidBy;
     }
 
     /**
-     * @return Payout ID, prefixed <code>wdrl_</code> for a payout returned by <code>GET /payouts</code> or <code>cofr_</code> for a payout request returned by <code>POST /payouts</code>.
+     * @return Payout ID, prefixed <code>wdrl_</code> for a payout returned by <code>GET /payouts</code>, <code>cofr_</code> for a payout request returned by <code>POST /payouts</code>, or <code>pay_</code> for a payout funded by a card payment that has not been submitted yet.
      */
     @JsonProperty("id")
     public String getId() {
@@ -233,23 +303,23 @@ public final class RetrievePayoutsResponse {
     }
 
     /**
-     * @return Whop's markup on the provider fee, in the payout currency, as a decimal string. <code>&quot;0.0&quot;</code> when none applies.
+     * @return Whop's markup on the provider fee, in the payout currency, as a decimal string. <code>&quot;0.0&quot;</code> when none applies. Only returned to callers with payout:withdrawal:read on the owning ledger.
      */
     @JsonProperty("markup_fee")
-    public String getMarkupFee() {
+    public Optional<String> getMarkupFee() {
         return markupFee;
     }
 
     /**
-     * @return Key-value data attached at creation and echoed on every read. At most 50 keys, key names up to 40 characters, string values up to 500 characters.
+     * @return Key-value data attached at creation and echoed on every read. At most 50 keys, key names up to 40 characters, string values up to 500 characters. Only returned to callers with payout:withdrawal:read on the owning ledger.
      */
     @JsonProperty("metadata")
-    public Map<String, String> getMetadata() {
+    public Optional<Map<String, String>> getMetadata() {
         return metadata;
     }
 
     /**
-     * @return The planned net for the destination, in the payout currency: amount minus fee_amount minus markup_fee when fee_paid_by is <code>self</code>; equal to amount when the platform covers the fees. A payout that ends denied, canceled, or failed delivered nothing — most keep the planned figure and <code>failure</code> says where the funds are, but a canceled stablecoin payout can report the settled outcome instead: <code>amount</code> carries what stayed in the balance, fees are zero because none were charged, and <code>net_amount</code> is 0 because nothing was delivered.
+     * @return The planned net for the destination, in the payout currency: amount minus fee_amount minus markup_fee when fee_paid_by is <code>self</code>; equal to amount when the platform covers the fees. A payout that ends denied, canceled, or failed delivered nothing — most keep the planned figure and <code>failure</code> says where the funds are, but a canceled payout funded by a conversion request can report the settled outcome instead: <code>amount</code> carries what stayed in the balance, fees are zero because none were charged, and <code>net_amount</code> is 0 because nothing was delivered.
      */
     @JsonProperty("net_amount")
     public String getNetAmount() {
@@ -284,7 +354,7 @@ public final class RetrievePayoutsResponse {
     }
 
     /**
-     * @return The saved payout method used. Requires payout:destination:read; null without it.
+     * @return Payout method display details. The nickname requires payout:destination:read on the owning ledger; otherwise it is null.
      */
     @JsonIgnore
     public Optional<RetrievePayoutsResponsePayoutMethod> getPayoutMethod() {
@@ -306,7 +376,29 @@ public final class RetrievePayoutsResponse {
     }
 
     /**
-     * @return How the payout was created. <code>automatic</code> means a scheduled auto-payout; <code>null</code> on payouts created before source tracking or through internal tooling.
+     * @return The recipient's first name and last initial, or null when no recipient name is available.
+     */
+    @JsonIgnore
+    public Optional<String> getRecipientName() {
+        if (recipientName == null) {
+            return Optional.empty();
+        }
+        return recipientName;
+    }
+
+    /**
+     * @return The sending business's display name, or a personal sender's first name and last initial.
+     */
+    @JsonIgnore
+    public Optional<String> getSenderName() {
+        if (senderName == null) {
+            return Optional.empty();
+        }
+        return senderName;
+    }
+
+    /**
+     * @return How the payout was created. <code>automatic</code> means a scheduled auto-payout. <code>null</code> when the payout has no recorded source. Only returned to callers with payout:withdrawal:read on the owning ledger.
      */
     @JsonIgnore
     public Optional<RetrievePayoutsResponseSource> getSource() {
@@ -325,6 +417,17 @@ public final class RetrievePayoutsResponse {
     }
 
     /**
+     * @return The payment description sent with the payout, or <code>null</code> if no descriptor was set. When set, 5-80 printable ASCII characters. Only returned to callers with payout:withdrawal:read on the owning ledger.
+     */
+    @JsonIgnore
+    public Optional<String> getStatementDescriptor() {
+        if (statementDescriptor == null) {
+            return Optional.empty();
+        }
+        return statementDescriptor;
+    }
+
+    /**
      * @return Current payout status.
      */
     @JsonProperty("status")
@@ -333,7 +436,7 @@ public final class RetrievePayoutsResponse {
     }
 
     /**
-     * @return The finest machine phase under <code>status</code> — for example <code>awaiting_provider_acceptance</code> vs <code>in_transit</code> under <code>processing</code>, or the stablecoin conversion phase under <code>requested</code>. Informational vocabulary: values can be added without a version bump; <code>status</code> is the versioned contract.
+     * @return The finest machine phase under <code>status</code> — for example <code>awaiting_provider_acceptance</code> vs <code>in_transit</code> under <code>processing</code>, or the conversion phase under <code>requested</code>. Informational vocabulary: values can be added without a version bump; <code>status</code> is the versioned contract.
      */
     @JsonProperty("status_detail")
     public String getStatusDetail() {
@@ -341,7 +444,15 @@ public final class RetrievePayoutsResponse {
     }
 
     /**
-     * @return ACH trace number the recipient's bank can use to locate this payout. Assigned when the payout is submitted to the bank, so it is <code>null</code> before then and on payouts not sent over ACH.
+     * @return Completed lifecycle events in chronological order. Present once the payout has a withdrawal record.
+     */
+    @JsonProperty("timeline")
+    public Optional<List<RetrievePayoutsResponseTimelineItem>> getTimeline() {
+        return timeline;
+    }
+
+    /**
+     * @return Payment network reference for this payout, such as an ACH trace number, an RTP or FedNow end-to-end ID, a wire IMAD, or a SWIFT UETR. <code>null</code> until the reference is available, and on payouts that have none.
      */
     @JsonIgnore
     public Optional<String> getTraceCode() {
@@ -349,6 +460,12 @@ public final class RetrievePayoutsResponse {
             return Optional.empty();
         }
         return traceCode;
+    }
+
+    @JsonInclude(value = JsonInclude.Include.CUSTOM, valueFilter = NullableNonemptyFilter.class)
+    @JsonProperty("conversion")
+    private Optional<RetrievePayoutsResponseConversion> _getConversion() {
+        return conversion;
     }
 
     @JsonInclude(value = JsonInclude.Include.CUSTOM, valueFilter = NullableNonemptyFilter.class)
@@ -367,6 +484,12 @@ public final class RetrievePayoutsResponse {
     @JsonProperty("estimated_arrival")
     private Optional<OffsetDateTime> _getEstimatedArrival() {
         return estimatedArrival;
+    }
+
+    @JsonInclude(value = JsonInclude.Include.CUSTOM, valueFilter = NullableNonemptyFilter.class)
+    @JsonProperty("estimated_arrival_end")
+    private Optional<OffsetDateTime> _getEstimatedArrivalEnd() {
+        return estimatedArrivalEnd;
     }
 
     @JsonInclude(value = JsonInclude.Include.CUSTOM, valueFilter = NullableNonemptyFilter.class)
@@ -406,9 +529,27 @@ public final class RetrievePayoutsResponse {
     }
 
     @JsonInclude(value = JsonInclude.Include.CUSTOM, valueFilter = NullableNonemptyFilter.class)
+    @JsonProperty("recipient_name")
+    private Optional<String> _getRecipientName() {
+        return recipientName;
+    }
+
+    @JsonInclude(value = JsonInclude.Include.CUSTOM, valueFilter = NullableNonemptyFilter.class)
+    @JsonProperty("sender_name")
+    private Optional<String> _getSenderName() {
+        return senderName;
+    }
+
+    @JsonInclude(value = JsonInclude.Include.CUSTOM, valueFilter = NullableNonemptyFilter.class)
     @JsonProperty("source")
     private Optional<RetrievePayoutsResponseSource> _getSource() {
         return source;
+    }
+
+    @JsonInclude(value = JsonInclude.Include.CUSTOM, valueFilter = NullableNonemptyFilter.class)
+    @JsonProperty("statement_descriptor")
+    private Optional<String> _getStatementDescriptor() {
+        return statementDescriptor;
     }
 
     @JsonInclude(value = JsonInclude.Include.CUSTOM, valueFilter = NullableNonemptyFilter.class)
@@ -430,11 +571,15 @@ public final class RetrievePayoutsResponse {
 
     private boolean equalTo(RetrievePayoutsResponse other) {
         return amount.equals(other.amount)
+                && cancelable.equals(other.cancelable)
+                && conversion.equals(other.conversion)
                 && createdAt.equals(other.createdAt)
                 && currency.equals(other.currency)
+                && delayed.equals(other.delayed)
                 && destinationAmount.equals(other.destinationAmount)
                 && destinationCurrency.equals(other.destinationCurrency)
                 && estimatedArrival.equals(other.estimatedArrival)
+                && estimatedArrivalEnd.equals(other.estimatedArrivalEnd)
                 && exchangeRate.equals(other.exchangeRate)
                 && failure.equals(other.failure)
                 && feeAmount.equals(other.feeAmount)
@@ -448,10 +593,14 @@ public final class RetrievePayoutsResponse {
                 && payerName.equals(other.payerName)
                 && payoutMethod.equals(other.payoutMethod)
                 && payoutRequestId.equals(other.payoutRequestId)
+                && recipientName.equals(other.recipientName)
+                && senderName.equals(other.senderName)
                 && source.equals(other.source)
                 && speed.equals(other.speed)
+                && statementDescriptor.equals(other.statementDescriptor)
                 && status.equals(other.status)
                 && statusDetail.equals(other.statusDetail)
+                && timeline.equals(other.timeline)
                 && traceCode.equals(other.traceCode);
     }
 
@@ -459,11 +608,15 @@ public final class RetrievePayoutsResponse {
     public int hashCode() {
         return Objects.hash(
                 this.amount,
+                this.cancelable,
+                this.conversion,
                 this.createdAt,
                 this.currency,
+                this.delayed,
                 this.destinationAmount,
                 this.destinationCurrency,
                 this.estimatedArrival,
+                this.estimatedArrivalEnd,
                 this.exchangeRate,
                 this.failure,
                 this.feeAmount,
@@ -477,10 +630,14 @@ public final class RetrievePayoutsResponse {
                 this.payerName,
                 this.payoutMethod,
                 this.payoutRequestId,
+                this.recipientName,
+                this.senderName,
                 this.source,
                 this.speed,
+                this.statementDescriptor,
                 this.status,
                 this.statusDetail,
+                this.timeline,
                 this.traceCode);
     }
 
@@ -489,17 +646,8 @@ public final class RetrievePayoutsResponse {
         return ObjectMappers.stringify(this);
     }
 
-    public static AmountStage builder() {
+    public static CreatedAtStage builder() {
         return new Builder();
-    }
-
-    public interface AmountStage {
-        /**
-         * <p>The payout amount in whole currency units, as a decimal string.</p>
-         */
-        CreatedAtStage amount(@NotNull String amount);
-
-        Builder from(RetrievePayoutsResponse other);
     }
 
     public interface CreatedAtStage {
@@ -507,46 +655,27 @@ public final class RetrievePayoutsResponse {
          * <p>When the payout was created.</p>
          */
         CurrencyStage createdAt(@NotNull OffsetDateTime createdAt);
+
+        Builder from(RetrievePayoutsResponse other);
     }
 
     public interface CurrencyStage {
         /**
          * <p>Payout currency.</p>
          */
-        FeeAmountStage currency(@NotNull String currency);
-    }
-
-    public interface FeeAmountStage {
-        /**
-         * <p>The fee charged for the payout, in the payout currency, as a decimal string.</p>
-         */
-        FeePaidByStage feeAmount(@NotNull String feeAmount);
-    }
-
-    public interface FeePaidByStage {
-        /**
-         * <p>Who bore the payout fee: the account itself, or its parent platform.</p>
-         */
-        IdStage feePaidBy(@NotNull RetrievePayoutsResponseFeePaidBy feePaidBy);
+        IdStage currency(@NotNull String currency);
     }
 
     public interface IdStage {
         /**
-         * <p>Payout ID, prefixed <code>wdrl_</code> for a payout returned by <code>GET /payouts</code> or <code>cofr_</code> for a payout request returned by <code>POST /payouts</code>.</p>
+         * <p>Payout ID, prefixed <code>wdrl_</code> for a payout returned by <code>GET /payouts</code>, <code>cofr_</code> for a payout request returned by <code>POST /payouts</code>, or <code>pay_</code> for a payout funded by a card payment that has not been submitted yet.</p>
          */
-        MarkupFeeStage id(@NotNull String id);
-    }
-
-    public interface MarkupFeeStage {
-        /**
-         * <p>Whop's markup on the provider fee, in the payout currency, as a decimal string. <code>&quot;0.0&quot;</code> when none applies.</p>
-         */
-        NetAmountStage markupFee(@NotNull String markupFee);
+        NetAmountStage id(@NotNull String id);
     }
 
     public interface NetAmountStage {
         /**
-         * <p>The planned net for the destination, in the payout currency: amount minus fee_amount minus markup_fee when fee_paid_by is <code>self</code>; equal to amount when the platform covers the fees. A payout that ends denied, canceled, or failed delivered nothing — most keep the planned figure and <code>failure</code> says where the funds are, but a canceled stablecoin payout can report the settled outcome instead: <code>amount</code> carries what stayed in the balance, fees are zero because none were charged, and <code>net_amount</code> is 0 because nothing was delivered.</p>
+         * <p>The planned net for the destination, in the payout currency: amount minus fee_amount minus markup_fee when fee_paid_by is <code>self</code>; equal to amount when the platform covers the fees. A payout that ends denied, canceled, or failed delivered nothing — most keep the planned figure and <code>failure</code> says where the funds are, but a canceled payout funded by a conversion request can report the settled outcome instead: <code>amount</code> carries what stayed in the balance, fees are zero because none were charged, and <code>net_amount</code> is 0 because nothing was delivered.</p>
          */
         ObjectStage netAmount(@NotNull String netAmount);
     }
@@ -571,7 +700,7 @@ public final class RetrievePayoutsResponse {
 
     public interface StatusDetailStage {
         /**
-         * <p>The finest machine phase under <code>status</code> — for example <code>awaiting_provider_acceptance</code> vs <code>in_transit</code> under <code>processing</code>, or the stablecoin conversion phase under <code>requested</code>. Informational vocabulary: values can be added without a version bump; <code>status</code> is the versioned contract.</p>
+         * <p>The finest machine phase under <code>status</code> — for example <code>awaiting_provider_acceptance</code> vs <code>in_transit</code> under <code>processing</code>, or the conversion phase under <code>requested</code>. Informational vocabulary: values can be added without a version bump; <code>status</code> is the versioned contract.</p>
          */
         _FinalStage statusDetail(@NotNull String statusDetail);
     }
@@ -584,6 +713,36 @@ public final class RetrievePayoutsResponse {
         _FinalStage additionalProperties(Map<String, Object> additionalProperties);
 
         /**
+         * <p>The payout amount in whole currency units, as a decimal string. Only returned to callers with payout:withdrawal:read on the owning ledger.</p>
+         */
+        _FinalStage amount(Optional<String> amount);
+
+        _FinalStage amount(String amount);
+
+        /**
+         * <p>Whether <code>POST /payouts/{id}/cancel</code> would act on this payout right now: <code>true</code> while it is <code>in_review</code>, while it is <code>processing</code> with nothing yet submitted to the payout provider, or while a submitted payout can still be asked to cancel at the provider. <code>false</code> once the money has arrived or the payout has already ended. Only returned to callers with payout:withdrawal:read on the owning ledger.</p>
+         */
+        _FinalStage cancelable(Optional<Boolean> cancelable);
+
+        _FinalStage cancelable(Boolean cancelable);
+
+        /**
+         * <p>How the balance was converted into the payout currency before the payout was sent. <code>null</code> when the payout was sent from a balance in its own currency. Only returned to callers with payout:withdrawal:read on the owning ledger.</p>
+         */
+        _FinalStage conversion(Optional<RetrievePayoutsResponseConversion> conversion);
+
+        _FinalStage conversion(RetrievePayoutsResponseConversion conversion);
+
+        _FinalStage conversion(Nullable<RetrievePayoutsResponseConversion> conversion);
+
+        /**
+         * <p>Whether an in-transit withdrawal is past its settlement window.</p>
+         */
+        _FinalStage delayed(Optional<Boolean> delayed);
+
+        _FinalStage delayed(Boolean delayed);
+
+        /**
          * <p>The amount delivered in the destination currency, as a decimal string. Assigned when the payout is processed, so it is <code>null</code> before then and on payouts without a recorded conversion.</p>
          */
         _FinalStage destinationAmount(Optional<String> destinationAmount);
@@ -593,7 +752,7 @@ public final class RetrievePayoutsResponse {
         _FinalStage destinationAmount(Nullable<String> destinationAmount);
 
         /**
-         * <p>Currency the funds are delivered in, taken from the payout method when the payout is created. On a stablecoin payout it follows the settlement payout minted alongside it — the <code>GET /payouts</code> row carrying this payout's id as <code>payout_request_id</code> — and is <code>null</code> only when no settlement payout exists.</p>
+         * <p>Currency the funds are delivered in, taken from the payout method when the payout is created. On a payout funded by a conversion request it follows the settlement payout minted alongside it — the <code>GET /payouts</code> row carrying this payout's id as <code>payout_request_id</code> — and is <code>null</code> only when no settlement payout exists.</p>
          */
         _FinalStage destinationCurrency(Optional<String> destinationCurrency);
 
@@ -609,6 +768,15 @@ public final class RetrievePayoutsResponse {
         _FinalStage estimatedArrival(OffsetDateTime estimatedArrival);
 
         _FinalStage estimatedArrival(Nullable<OffsetDateTime> estimatedArrival);
+
+        /**
+         * <p>End of the expected bank settlement window.</p>
+         */
+        _FinalStage estimatedArrivalEnd(Optional<OffsetDateTime> estimatedArrivalEnd);
+
+        _FinalStage estimatedArrivalEnd(OffsetDateTime estimatedArrivalEnd);
+
+        _FinalStage estimatedArrivalEnd(Nullable<OffsetDateTime> estimatedArrivalEnd);
 
         /**
          * <p>Exchange rate from the payout currency to the destination currency. Assigned when the payout is processed, so it is <code>null</code> before then and on payouts without a recorded rate.</p>
@@ -629,13 +797,32 @@ public final class RetrievePayoutsResponse {
         _FinalStage failure(Nullable<RetrievePayoutsResponseFailure> failure);
 
         /**
-         * <p>Key-value data attached at creation and echoed on every read. At most 50 keys, key names up to 40 characters, string values up to 500 characters.</p>
+         * <p>The fee charged for the payout, in the payout currency, as a decimal string. Only returned to callers with payout:withdrawal:read on the owning ledger.</p>
          */
+        _FinalStage feeAmount(Optional<String> feeAmount);
+
+        _FinalStage feeAmount(String feeAmount);
+
+        /**
+         * <p>Who bore the payout fee: the account itself, or its parent platform. Only returned to callers with payout:withdrawal:read on the owning ledger.</p>
+         */
+        _FinalStage feePaidBy(Optional<RetrievePayoutsResponseFeePaidBy> feePaidBy);
+
+        _FinalStage feePaidBy(RetrievePayoutsResponseFeePaidBy feePaidBy);
+
+        /**
+         * <p>Whop's markup on the provider fee, in the payout currency, as a decimal string. <code>&quot;0.0&quot;</code> when none applies. Only returned to callers with payout:withdrawal:read on the owning ledger.</p>
+         */
+        _FinalStage markupFee(Optional<String> markupFee);
+
+        _FinalStage markupFee(String markupFee);
+
+        /**
+         * <p>Key-value data attached at creation and echoed on every read. At most 50 keys, key names up to 40 characters, string values up to 500 characters. Only returned to callers with payout:withdrawal:read on the owning ledger.</p>
+         */
+        _FinalStage metadata(Optional<Map<String, String>> metadata);
+
         _FinalStage metadata(Map<String, String> metadata);
-
-        _FinalStage putAllMetadata(Map<String, String> metadata);
-
-        _FinalStage metadata(String key, String value);
 
         /**
          * <p>Free-form notes attached by the payout creator, or <code>null</code> when none were provided. Maximum 255 characters.</p>
@@ -656,7 +843,7 @@ public final class RetrievePayoutsResponse {
         _FinalStage payerName(Nullable<String> payerName);
 
         /**
-         * <p>The saved payout method used. Requires payout:destination:read; null without it.</p>
+         * <p>Payout method display details. The nickname requires payout:destination:read on the owning ledger; otherwise it is null.</p>
          */
         _FinalStage payoutMethod(Optional<RetrievePayoutsResponsePayoutMethod> payoutMethod);
 
@@ -674,7 +861,25 @@ public final class RetrievePayoutsResponse {
         _FinalStage payoutRequestId(Nullable<String> payoutRequestId);
 
         /**
-         * <p>How the payout was created. <code>automatic</code> means a scheduled auto-payout; <code>null</code> on payouts created before source tracking or through internal tooling.</p>
+         * <p>The recipient's first name and last initial, or null when no recipient name is available.</p>
+         */
+        _FinalStage recipientName(Optional<String> recipientName);
+
+        _FinalStage recipientName(String recipientName);
+
+        _FinalStage recipientName(Nullable<String> recipientName);
+
+        /**
+         * <p>The sending business's display name, or a personal sender's first name and last initial.</p>
+         */
+        _FinalStage senderName(Optional<String> senderName);
+
+        _FinalStage senderName(String senderName);
+
+        _FinalStage senderName(Nullable<String> senderName);
+
+        /**
+         * <p>How the payout was created. <code>automatic</code> means a scheduled auto-payout. <code>null</code> when the payout has no recorded source. Only returned to callers with payout:withdrawal:read on the owning ledger.</p>
          */
         _FinalStage source(Optional<RetrievePayoutsResponseSource> source);
 
@@ -683,7 +888,23 @@ public final class RetrievePayoutsResponse {
         _FinalStage source(Nullable<RetrievePayoutsResponseSource> source);
 
         /**
-         * <p>ACH trace number the recipient's bank can use to locate this payout. Assigned when the payout is submitted to the bank, so it is <code>null</code> before then and on payouts not sent over ACH.</p>
+         * <p>The payment description sent with the payout, or <code>null</code> if no descriptor was set. When set, 5-80 printable ASCII characters. Only returned to callers with payout:withdrawal:read on the owning ledger.</p>
+         */
+        _FinalStage statementDescriptor(Optional<String> statementDescriptor);
+
+        _FinalStage statementDescriptor(String statementDescriptor);
+
+        _FinalStage statementDescriptor(Nullable<String> statementDescriptor);
+
+        /**
+         * <p>Completed lifecycle events in chronological order. Present once the payout has a withdrawal record.</p>
+         */
+        _FinalStage timeline(Optional<List<RetrievePayoutsResponseTimelineItem>> timeline);
+
+        _FinalStage timeline(List<RetrievePayoutsResponseTimelineItem> timeline);
+
+        /**
+         * <p>Payment network reference for this payout, such as an ACH trace number, an RTP or FedNow end-to-end ID, a wire IMAD, or a SWIFT UETR. <code>null</code> until the reference is available, and on payouts that have none.</p>
          */
         _FinalStage traceCode(Optional<String> traceCode);
 
@@ -694,32 +915,20 @@ public final class RetrievePayoutsResponse {
 
     @JsonIgnoreProperties(ignoreUnknown = true)
     public static final class Builder
-            implements AmountStage,
-                    CreatedAtStage,
+            implements CreatedAtStage,
                     CurrencyStage,
-                    FeeAmountStage,
-                    FeePaidByStage,
                     IdStage,
-                    MarkupFeeStage,
                     NetAmountStage,
                     ObjectStage,
                     SpeedStage,
                     StatusStage,
                     StatusDetailStage,
                     _FinalStage {
-        private String amount;
-
         private OffsetDateTime createdAt;
 
         private String currency;
 
-        private String feeAmount;
-
-        private RetrievePayoutsResponseFeePaidBy feePaidBy;
-
         private String id;
-
-        private String markupFee;
 
         private String netAmount;
 
@@ -733,7 +942,15 @@ public final class RetrievePayoutsResponse {
 
         private Optional<String> traceCode = Optional.empty();
 
+        private Optional<List<RetrievePayoutsResponseTimelineItem>> timeline = Optional.empty();
+
+        private Optional<String> statementDescriptor = Optional.empty();
+
         private Optional<RetrievePayoutsResponseSource> source = Optional.empty();
+
+        private Optional<String> senderName = Optional.empty();
+
+        private Optional<String> recipientName = Optional.empty();
 
         private Optional<String> payoutRequestId = Optional.empty();
 
@@ -743,11 +960,19 @@ public final class RetrievePayoutsResponse {
 
         private Optional<String> notes = Optional.empty();
 
-        private Map<String, String> metadata = new LinkedHashMap<>();
+        private Optional<Map<String, String>> metadata = Optional.empty();
+
+        private Optional<String> markupFee = Optional.empty();
+
+        private Optional<RetrievePayoutsResponseFeePaidBy> feePaidBy = Optional.empty();
+
+        private Optional<String> feeAmount = Optional.empty();
 
         private Optional<RetrievePayoutsResponseFailure> failure = Optional.empty();
 
         private Optional<Float> exchangeRate = Optional.empty();
+
+        private Optional<OffsetDateTime> estimatedArrivalEnd = Optional.empty();
 
         private Optional<OffsetDateTime> estimatedArrival = Optional.empty();
 
@@ -755,7 +980,14 @@ public final class RetrievePayoutsResponse {
 
         private Optional<String> destinationAmount = Optional.empty();
 
-        @JsonAnySetter
+        private Optional<Boolean> delayed = Optional.empty();
+
+        private Optional<RetrievePayoutsResponseConversion> conversion = Optional.empty();
+
+        private Optional<Boolean> cancelable = Optional.empty();
+
+        private Optional<String> amount = Optional.empty();
+
         private Map<String, Object> additionalProperties = new HashMap<>();
 
         private Builder() {}
@@ -763,11 +995,15 @@ public final class RetrievePayoutsResponse {
         @java.lang.Override
         public Builder from(RetrievePayoutsResponse other) {
             amount(other.getAmount());
+            cancelable(other.getCancelable());
+            conversion(other.getConversion());
             createdAt(other.getCreatedAt());
             currency(other.getCurrency());
+            delayed(other.getDelayed());
             destinationAmount(other.getDestinationAmount());
             destinationCurrency(other.getDestinationCurrency());
             estimatedArrival(other.getEstimatedArrival());
+            estimatedArrivalEnd(other.getEstimatedArrivalEnd());
             exchangeRate(other.getExchangeRate());
             failure(other.getFailure());
             feeAmount(other.getFeeAmount());
@@ -781,28 +1017,19 @@ public final class RetrievePayoutsResponse {
             payerName(other.getPayerName());
             payoutMethod(other.getPayoutMethod());
             payoutRequestId(other.getPayoutRequestId());
+            recipientName(other.getRecipientName());
+            senderName(other.getSenderName());
             source(other.getSource());
             speed(other.getSpeed());
+            statementDescriptor(other.getStatementDescriptor());
             status(other.getStatus());
             statusDetail(other.getStatusDetail());
+            timeline(other.getTimeline());
             traceCode(other.getTraceCode());
             return this;
         }
 
         /**
-         * <p>The payout amount in whole currency units, as a decimal string.</p>
-         * <p>The payout amount in whole currency units, as a decimal string.</p>
-         * @return Reference to {@code this} so that method calls can be chained together.
-         */
-        @java.lang.Override
-        @JsonSetter("amount")
-        public CreatedAtStage amount(@NotNull String amount) {
-            this.amount = Objects.requireNonNull(amount, "amount must not be null");
-            return this;
-        }
-
-        /**
-         * <p>When the payout was created.</p>
          * <p>When the payout was created.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
@@ -815,67 +1042,28 @@ public final class RetrievePayoutsResponse {
 
         /**
          * <p>Payout currency.</p>
-         * <p>Payout currency.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
         @JsonSetter("currency")
-        public FeeAmountStage currency(@NotNull String currency) {
+        public IdStage currency(@NotNull String currency) {
             this.currency = Objects.requireNonNull(currency, "currency must not be null");
             return this;
         }
 
         /**
-         * <p>The fee charged for the payout, in the payout currency, as a decimal string.</p>
-         * <p>The fee charged for the payout, in the payout currency, as a decimal string.</p>
-         * @return Reference to {@code this} so that method calls can be chained together.
-         */
-        @java.lang.Override
-        @JsonSetter("fee_amount")
-        public FeePaidByStage feeAmount(@NotNull String feeAmount) {
-            this.feeAmount = Objects.requireNonNull(feeAmount, "feeAmount must not be null");
-            return this;
-        }
-
-        /**
-         * <p>Who bore the payout fee: the account itself, or its parent platform.</p>
-         * <p>Who bore the payout fee: the account itself, or its parent platform.</p>
-         * @return Reference to {@code this} so that method calls can be chained together.
-         */
-        @java.lang.Override
-        @JsonSetter("fee_paid_by")
-        public IdStage feePaidBy(@NotNull RetrievePayoutsResponseFeePaidBy feePaidBy) {
-            this.feePaidBy = Objects.requireNonNull(feePaidBy, "feePaidBy must not be null");
-            return this;
-        }
-
-        /**
-         * <p>Payout ID, prefixed <code>wdrl_</code> for a payout returned by <code>GET /payouts</code> or <code>cofr_</code> for a payout request returned by <code>POST /payouts</code>.</p>
-         * <p>Payout ID, prefixed <code>wdrl_</code> for a payout returned by <code>GET /payouts</code> or <code>cofr_</code> for a payout request returned by <code>POST /payouts</code>.</p>
+         * <p>Payout ID, prefixed <code>wdrl_</code> for a payout returned by <code>GET /payouts</code>, <code>cofr_</code> for a payout request returned by <code>POST /payouts</code>, or <code>pay_</code> for a payout funded by a card payment that has not been submitted yet.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
         @JsonSetter("id")
-        public MarkupFeeStage id(@NotNull String id) {
+        public NetAmountStage id(@NotNull String id) {
             this.id = Objects.requireNonNull(id, "id must not be null");
             return this;
         }
 
         /**
-         * <p>Whop's markup on the provider fee, in the payout currency, as a decimal string. <code>&quot;0.0&quot;</code> when none applies.</p>
-         * <p>Whop's markup on the provider fee, in the payout currency, as a decimal string. <code>&quot;0.0&quot;</code> when none applies.</p>
-         * @return Reference to {@code this} so that method calls can be chained together.
-         */
-        @java.lang.Override
-        @JsonSetter("markup_fee")
-        public NetAmountStage markupFee(@NotNull String markupFee) {
-            this.markupFee = Objects.requireNonNull(markupFee, "markupFee must not be null");
-            return this;
-        }
-
-        /**
-         * <p>The planned net for the destination, in the payout currency: amount minus fee_amount minus markup_fee when fee_paid_by is <code>self</code>; equal to amount when the platform covers the fees. A payout that ends denied, canceled, or failed delivered nothing — most keep the planned figure and <code>failure</code> says where the funds are, but a canceled stablecoin payout can report the settled outcome instead: <code>amount</code> carries what stayed in the balance, fees are zero because none were charged, and <code>net_amount</code> is 0 because nothing was delivered.</p>
-         * <p>The planned net for the destination, in the payout currency: amount minus fee_amount minus markup_fee when fee_paid_by is <code>self</code>; equal to amount when the platform covers the fees. A payout that ends denied, canceled, or failed delivered nothing — most keep the planned figure and <code>failure</code> says where the funds are, but a canceled stablecoin payout can report the settled outcome instead: <code>amount</code> carries what stayed in the balance, fees are zero because none were charged, and <code>net_amount</code> is 0 because nothing was delivered.</p>
+         * <p>The planned net for the destination, in the payout currency: amount minus fee_amount minus markup_fee when fee_paid_by is <code>self</code>; equal to amount when the platform covers the fees. A payout that ends denied, canceled, or failed delivered nothing — most keep the planned figure and <code>failure</code> says where the funds are, but a canceled payout funded by a conversion request can report the settled outcome instead: <code>amount</code> carries what stayed in the balance, fees are zero because none were charged, and <code>net_amount</code> is 0 because nothing was delivered.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
@@ -894,7 +1082,6 @@ public final class RetrievePayoutsResponse {
 
         /**
          * <p>Payout delivery speed.</p>
-         * <p>Payout delivery speed.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
@@ -906,7 +1093,6 @@ public final class RetrievePayoutsResponse {
 
         /**
          * <p>Current payout status.</p>
-         * <p>Current payout status.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
@@ -917,8 +1103,7 @@ public final class RetrievePayoutsResponse {
         }
 
         /**
-         * <p>The finest machine phase under <code>status</code> — for example <code>awaiting_provider_acceptance</code> vs <code>in_transit</code> under <code>processing</code>, or the stablecoin conversion phase under <code>requested</code>. Informational vocabulary: values can be added without a version bump; <code>status</code> is the versioned contract.</p>
-         * <p>The finest machine phase under <code>status</code> — for example <code>awaiting_provider_acceptance</code> vs <code>in_transit</code> under <code>processing</code>, or the stablecoin conversion phase under <code>requested</code>. Informational vocabulary: values can be added without a version bump; <code>status</code> is the versioned contract.</p>
+         * <p>The finest machine phase under <code>status</code> — for example <code>awaiting_provider_acceptance</code> vs <code>in_transit</code> under <code>processing</code>, or the conversion phase under <code>requested</code>. Informational vocabulary: values can be added without a version bump; <code>status</code> is the versioned contract.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
@@ -929,7 +1114,7 @@ public final class RetrievePayoutsResponse {
         }
 
         /**
-         * <p>ACH trace number the recipient's bank can use to locate this payout. Assigned when the payout is submitted to the bank, so it is <code>null</code> before then and on payouts not sent over ACH.</p>
+         * <p>Payment network reference for this payout, such as an ACH trace number, an RTP or FedNow end-to-end ID, a wire IMAD, or a SWIFT UETR. <code>null</code> until the reference is available, and on payouts that have none.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
@@ -945,7 +1130,7 @@ public final class RetrievePayoutsResponse {
         }
 
         /**
-         * <p>ACH trace number the recipient's bank can use to locate this payout. Assigned when the payout is submitted to the bank, so it is <code>null</code> before then and on payouts not sent over ACH.</p>
+         * <p>Payment network reference for this payout, such as an ACH trace number, an RTP or FedNow end-to-end ID, a wire IMAD, or a SWIFT UETR. <code>null</code> until the reference is available, and on payouts that have none.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
@@ -955,7 +1140,7 @@ public final class RetrievePayoutsResponse {
         }
 
         /**
-         * <p>ACH trace number the recipient's bank can use to locate this payout. Assigned when the payout is submitted to the bank, so it is <code>null</code> before then and on payouts not sent over ACH.</p>
+         * <p>Payment network reference for this payout, such as an ACH trace number, an RTP or FedNow end-to-end ID, a wire IMAD, or a SWIFT UETR. <code>null</code> until the reference is available, and on payouts that have none.</p>
          */
         @java.lang.Override
         @JsonSetter(value = "trace_code", nulls = Nulls.SKIP)
@@ -965,7 +1150,63 @@ public final class RetrievePayoutsResponse {
         }
 
         /**
-         * <p>How the payout was created. <code>automatic</code> means a scheduled auto-payout; <code>null</code> on payouts created before source tracking or through internal tooling.</p>
+         * <p>Completed lifecycle events in chronological order. Present once the payout has a withdrawal record.</p>
+         * @return Reference to {@code this} so that method calls can be chained together.
+         */
+        @java.lang.Override
+        public _FinalStage timeline(List<RetrievePayoutsResponseTimelineItem> timeline) {
+            this.timeline = Optional.ofNullable(timeline);
+            return this;
+        }
+
+        /**
+         * <p>Completed lifecycle events in chronological order. Present once the payout has a withdrawal record.</p>
+         */
+        @java.lang.Override
+        @JsonSetter(value = "timeline", nulls = Nulls.SKIP)
+        public _FinalStage timeline(Optional<List<RetrievePayoutsResponseTimelineItem>> timeline) {
+            this.timeline = timeline;
+            return this;
+        }
+
+        /**
+         * <p>The payment description sent with the payout, or <code>null</code> if no descriptor was set. When set, 5-80 printable ASCII characters. Only returned to callers with payout:withdrawal:read on the owning ledger.</p>
+         * @return Reference to {@code this} so that method calls can be chained together.
+         */
+        @java.lang.Override
+        public _FinalStage statementDescriptor(Nullable<String> statementDescriptor) {
+            if (statementDescriptor.isNull()) {
+                this.statementDescriptor = null;
+            } else if (statementDescriptor.isEmpty()) {
+                this.statementDescriptor = Optional.empty();
+            } else {
+                this.statementDescriptor = Optional.of(statementDescriptor.get());
+            }
+            return this;
+        }
+
+        /**
+         * <p>The payment description sent with the payout, or <code>null</code> if no descriptor was set. When set, 5-80 printable ASCII characters. Only returned to callers with payout:withdrawal:read on the owning ledger.</p>
+         * @return Reference to {@code this} so that method calls can be chained together.
+         */
+        @java.lang.Override
+        public _FinalStage statementDescriptor(String statementDescriptor) {
+            this.statementDescriptor = Optional.ofNullable(statementDescriptor);
+            return this;
+        }
+
+        /**
+         * <p>The payment description sent with the payout, or <code>null</code> if no descriptor was set. When set, 5-80 printable ASCII characters. Only returned to callers with payout:withdrawal:read on the owning ledger.</p>
+         */
+        @java.lang.Override
+        @JsonSetter(value = "statement_descriptor", nulls = Nulls.SKIP)
+        public _FinalStage statementDescriptor(Optional<String> statementDescriptor) {
+            this.statementDescriptor = statementDescriptor;
+            return this;
+        }
+
+        /**
+         * <p>How the payout was created. <code>automatic</code> means a scheduled auto-payout. <code>null</code> when the payout has no recorded source. Only returned to callers with payout:withdrawal:read on the owning ledger.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
@@ -981,7 +1222,7 @@ public final class RetrievePayoutsResponse {
         }
 
         /**
-         * <p>How the payout was created. <code>automatic</code> means a scheduled auto-payout; <code>null</code> on payouts created before source tracking or through internal tooling.</p>
+         * <p>How the payout was created. <code>automatic</code> means a scheduled auto-payout. <code>null</code> when the payout has no recorded source. Only returned to callers with payout:withdrawal:read on the owning ledger.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
@@ -991,12 +1232,84 @@ public final class RetrievePayoutsResponse {
         }
 
         /**
-         * <p>How the payout was created. <code>automatic</code> means a scheduled auto-payout; <code>null</code> on payouts created before source tracking or through internal tooling.</p>
+         * <p>How the payout was created. <code>automatic</code> means a scheduled auto-payout. <code>null</code> when the payout has no recorded source. Only returned to callers with payout:withdrawal:read on the owning ledger.</p>
          */
         @java.lang.Override
         @JsonSetter(value = "source", nulls = Nulls.SKIP)
         public _FinalStage source(Optional<RetrievePayoutsResponseSource> source) {
             this.source = source;
+            return this;
+        }
+
+        /**
+         * <p>The sending business's display name, or a personal sender's first name and last initial.</p>
+         * @return Reference to {@code this} so that method calls can be chained together.
+         */
+        @java.lang.Override
+        public _FinalStage senderName(Nullable<String> senderName) {
+            if (senderName.isNull()) {
+                this.senderName = null;
+            } else if (senderName.isEmpty()) {
+                this.senderName = Optional.empty();
+            } else {
+                this.senderName = Optional.of(senderName.get());
+            }
+            return this;
+        }
+
+        /**
+         * <p>The sending business's display name, or a personal sender's first name and last initial.</p>
+         * @return Reference to {@code this} so that method calls can be chained together.
+         */
+        @java.lang.Override
+        public _FinalStage senderName(String senderName) {
+            this.senderName = Optional.ofNullable(senderName);
+            return this;
+        }
+
+        /**
+         * <p>The sending business's display name, or a personal sender's first name and last initial.</p>
+         */
+        @java.lang.Override
+        @JsonSetter(value = "sender_name", nulls = Nulls.SKIP)
+        public _FinalStage senderName(Optional<String> senderName) {
+            this.senderName = senderName;
+            return this;
+        }
+
+        /**
+         * <p>The recipient's first name and last initial, or null when no recipient name is available.</p>
+         * @return Reference to {@code this} so that method calls can be chained together.
+         */
+        @java.lang.Override
+        public _FinalStage recipientName(Nullable<String> recipientName) {
+            if (recipientName.isNull()) {
+                this.recipientName = null;
+            } else if (recipientName.isEmpty()) {
+                this.recipientName = Optional.empty();
+            } else {
+                this.recipientName = Optional.of(recipientName.get());
+            }
+            return this;
+        }
+
+        /**
+         * <p>The recipient's first name and last initial, or null when no recipient name is available.</p>
+         * @return Reference to {@code this} so that method calls can be chained together.
+         */
+        @java.lang.Override
+        public _FinalStage recipientName(String recipientName) {
+            this.recipientName = Optional.ofNullable(recipientName);
+            return this;
+        }
+
+        /**
+         * <p>The recipient's first name and last initial, or null when no recipient name is available.</p>
+         */
+        @java.lang.Override
+        @JsonSetter(value = "recipient_name", nulls = Nulls.SKIP)
+        public _FinalStage recipientName(Optional<String> recipientName) {
+            this.recipientName = recipientName;
             return this;
         }
 
@@ -1037,7 +1350,7 @@ public final class RetrievePayoutsResponse {
         }
 
         /**
-         * <p>The saved payout method used. Requires payout:destination:read; null without it.</p>
+         * <p>Payout method display details. The nickname requires payout:destination:read on the owning ledger; otherwise it is null.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
@@ -1053,7 +1366,7 @@ public final class RetrievePayoutsResponse {
         }
 
         /**
-         * <p>The saved payout method used. Requires payout:destination:read; null without it.</p>
+         * <p>Payout method display details. The nickname requires payout:destination:read on the owning ledger; otherwise it is null.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
@@ -1063,7 +1376,7 @@ public final class RetrievePayoutsResponse {
         }
 
         /**
-         * <p>The saved payout method used. Requires payout:destination:read; null without it.</p>
+         * <p>Payout method display details. The nickname requires payout:destination:read on the owning ledger; otherwise it is null.</p>
          */
         @java.lang.Override
         @JsonSetter(value = "payout_method", nulls = Nulls.SKIP)
@@ -1145,37 +1458,82 @@ public final class RetrievePayoutsResponse {
         }
 
         /**
-         * <p>Key-value data attached at creation and echoed on every read. At most 50 keys, key names up to 40 characters, string values up to 500 characters.</p>
+         * <p>Key-value data attached at creation and echoed on every read. At most 50 keys, key names up to 40 characters, string values up to 500 characters. Only returned to callers with payout:withdrawal:read on the owning ledger.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
-        public _FinalStage metadata(String key, String value) {
-            this.metadata.put(key, value);
+        public _FinalStage metadata(Map<String, String> metadata) {
+            this.metadata = Optional.ofNullable(metadata);
             return this;
         }
 
         /**
-         * <p>Key-value data attached at creation and echoed on every read. At most 50 keys, key names up to 40 characters, string values up to 500 characters.</p>
-         * @return Reference to {@code this} so that method calls can be chained together.
-         */
-        @java.lang.Override
-        public _FinalStage putAllMetadata(Map<String, String> metadata) {
-            if (metadata != null) {
-                this.metadata.putAll(metadata);
-            }
-            return this;
-        }
-
-        /**
-         * <p>Key-value data attached at creation and echoed on every read. At most 50 keys, key names up to 40 characters, string values up to 500 characters.</p>
+         * <p>Key-value data attached at creation and echoed on every read. At most 50 keys, key names up to 40 characters, string values up to 500 characters. Only returned to callers with payout:withdrawal:read on the owning ledger.</p>
          */
         @java.lang.Override
         @JsonSetter(value = "metadata", nulls = Nulls.SKIP)
-        public _FinalStage metadata(Map<String, String> metadata) {
-            this.metadata.clear();
-            if (metadata != null) {
-                this.metadata.putAll(metadata);
-            }
+        public _FinalStage metadata(Optional<Map<String, String>> metadata) {
+            this.metadata = metadata;
+            return this;
+        }
+
+        /**
+         * <p>Whop's markup on the provider fee, in the payout currency, as a decimal string. <code>&quot;0.0&quot;</code> when none applies. Only returned to callers with payout:withdrawal:read on the owning ledger.</p>
+         * @return Reference to {@code this} so that method calls can be chained together.
+         */
+        @java.lang.Override
+        public _FinalStage markupFee(String markupFee) {
+            this.markupFee = Optional.ofNullable(markupFee);
+            return this;
+        }
+
+        /**
+         * <p>Whop's markup on the provider fee, in the payout currency, as a decimal string. <code>&quot;0.0&quot;</code> when none applies. Only returned to callers with payout:withdrawal:read on the owning ledger.</p>
+         */
+        @java.lang.Override
+        @JsonSetter(value = "markup_fee", nulls = Nulls.SKIP)
+        public _FinalStage markupFee(Optional<String> markupFee) {
+            this.markupFee = markupFee;
+            return this;
+        }
+
+        /**
+         * <p>Who bore the payout fee: the account itself, or its parent platform. Only returned to callers with payout:withdrawal:read on the owning ledger.</p>
+         * @return Reference to {@code this} so that method calls can be chained together.
+         */
+        @java.lang.Override
+        public _FinalStage feePaidBy(RetrievePayoutsResponseFeePaidBy feePaidBy) {
+            this.feePaidBy = Optional.ofNullable(feePaidBy);
+            return this;
+        }
+
+        /**
+         * <p>Who bore the payout fee: the account itself, or its parent platform. Only returned to callers with payout:withdrawal:read on the owning ledger.</p>
+         */
+        @java.lang.Override
+        @JsonSetter(value = "fee_paid_by", nulls = Nulls.SKIP)
+        public _FinalStage feePaidBy(Optional<RetrievePayoutsResponseFeePaidBy> feePaidBy) {
+            this.feePaidBy = feePaidBy;
+            return this;
+        }
+
+        /**
+         * <p>The fee charged for the payout, in the payout currency, as a decimal string. Only returned to callers with payout:withdrawal:read on the owning ledger.</p>
+         * @return Reference to {@code this} so that method calls can be chained together.
+         */
+        @java.lang.Override
+        public _FinalStage feeAmount(String feeAmount) {
+            this.feeAmount = Optional.ofNullable(feeAmount);
+            return this;
+        }
+
+        /**
+         * <p>The fee charged for the payout, in the payout currency, as a decimal string. Only returned to callers with payout:withdrawal:read on the owning ledger.</p>
+         */
+        @java.lang.Override
+        @JsonSetter(value = "fee_amount", nulls = Nulls.SKIP)
+        public _FinalStage feeAmount(Optional<String> feeAmount) {
+            this.feeAmount = feeAmount;
             return this;
         }
 
@@ -1252,6 +1610,42 @@ public final class RetrievePayoutsResponse {
         }
 
         /**
+         * <p>End of the expected bank settlement window.</p>
+         * @return Reference to {@code this} so that method calls can be chained together.
+         */
+        @java.lang.Override
+        public _FinalStage estimatedArrivalEnd(Nullable<OffsetDateTime> estimatedArrivalEnd) {
+            if (estimatedArrivalEnd.isNull()) {
+                this.estimatedArrivalEnd = null;
+            } else if (estimatedArrivalEnd.isEmpty()) {
+                this.estimatedArrivalEnd = Optional.empty();
+            } else {
+                this.estimatedArrivalEnd = Optional.of(estimatedArrivalEnd.get());
+            }
+            return this;
+        }
+
+        /**
+         * <p>End of the expected bank settlement window.</p>
+         * @return Reference to {@code this} so that method calls can be chained together.
+         */
+        @java.lang.Override
+        public _FinalStage estimatedArrivalEnd(OffsetDateTime estimatedArrivalEnd) {
+            this.estimatedArrivalEnd = Optional.ofNullable(estimatedArrivalEnd);
+            return this;
+        }
+
+        /**
+         * <p>End of the expected bank settlement window.</p>
+         */
+        @java.lang.Override
+        @JsonSetter(value = "estimated_arrival_end", nulls = Nulls.SKIP)
+        public _FinalStage estimatedArrivalEnd(Optional<OffsetDateTime> estimatedArrivalEnd) {
+            this.estimatedArrivalEnd = estimatedArrivalEnd;
+            return this;
+        }
+
+        /**
          * <p>Estimated time the funds become available in the destination account.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
@@ -1288,7 +1682,7 @@ public final class RetrievePayoutsResponse {
         }
 
         /**
-         * <p>Currency the funds are delivered in, taken from the payout method when the payout is created. On a stablecoin payout it follows the settlement payout minted alongside it — the <code>GET /payouts</code> row carrying this payout's id as <code>payout_request_id</code> — and is <code>null</code> only when no settlement payout exists.</p>
+         * <p>Currency the funds are delivered in, taken from the payout method when the payout is created. On a payout funded by a conversion request it follows the settlement payout minted alongside it — the <code>GET /payouts</code> row carrying this payout's id as <code>payout_request_id</code> — and is <code>null</code> only when no settlement payout exists.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
@@ -1304,7 +1698,7 @@ public final class RetrievePayoutsResponse {
         }
 
         /**
-         * <p>Currency the funds are delivered in, taken from the payout method when the payout is created. On a stablecoin payout it follows the settlement payout minted alongside it — the <code>GET /payouts</code> row carrying this payout's id as <code>payout_request_id</code> — and is <code>null</code> only when no settlement payout exists.</p>
+         * <p>Currency the funds are delivered in, taken from the payout method when the payout is created. On a payout funded by a conversion request it follows the settlement payout minted alongside it — the <code>GET /payouts</code> row carrying this payout's id as <code>payout_request_id</code> — and is <code>null</code> only when no settlement payout exists.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
@@ -1314,7 +1708,7 @@ public final class RetrievePayoutsResponse {
         }
 
         /**
-         * <p>Currency the funds are delivered in, taken from the payout method when the payout is created. On a stablecoin payout it follows the settlement payout minted alongside it — the <code>GET /payouts</code> row carrying this payout's id as <code>payout_request_id</code> — and is <code>null</code> only when no settlement payout exists.</p>
+         * <p>Currency the funds are delivered in, taken from the payout method when the payout is created. On a payout funded by a conversion request it follows the settlement payout minted alongside it — the <code>GET /payouts</code> row carrying this payout's id as <code>payout_request_id</code> — and is <code>null</code> only when no settlement payout exists.</p>
          */
         @java.lang.Override
         @JsonSetter(value = "destination_currency", nulls = Nulls.SKIP)
@@ -1359,15 +1753,115 @@ public final class RetrievePayoutsResponse {
             return this;
         }
 
+        /**
+         * <p>Whether an in-transit withdrawal is past its settlement window.</p>
+         * @return Reference to {@code this} so that method calls can be chained together.
+         */
+        @java.lang.Override
+        public _FinalStage delayed(Boolean delayed) {
+            this.delayed = Optional.ofNullable(delayed);
+            return this;
+        }
+
+        /**
+         * <p>Whether an in-transit withdrawal is past its settlement window.</p>
+         */
+        @java.lang.Override
+        @JsonSetter(value = "delayed", nulls = Nulls.SKIP)
+        public _FinalStage delayed(Optional<Boolean> delayed) {
+            this.delayed = delayed;
+            return this;
+        }
+
+        /**
+         * <p>How the balance was converted into the payout currency before the payout was sent. <code>null</code> when the payout was sent from a balance in its own currency. Only returned to callers with payout:withdrawal:read on the owning ledger.</p>
+         * @return Reference to {@code this} so that method calls can be chained together.
+         */
+        @java.lang.Override
+        public _FinalStage conversion(Nullable<RetrievePayoutsResponseConversion> conversion) {
+            if (conversion.isNull()) {
+                this.conversion = null;
+            } else if (conversion.isEmpty()) {
+                this.conversion = Optional.empty();
+            } else {
+                this.conversion = Optional.of(conversion.get());
+            }
+            return this;
+        }
+
+        /**
+         * <p>How the balance was converted into the payout currency before the payout was sent. <code>null</code> when the payout was sent from a balance in its own currency. Only returned to callers with payout:withdrawal:read on the owning ledger.</p>
+         * @return Reference to {@code this} so that method calls can be chained together.
+         */
+        @java.lang.Override
+        public _FinalStage conversion(RetrievePayoutsResponseConversion conversion) {
+            this.conversion = Optional.ofNullable(conversion);
+            return this;
+        }
+
+        /**
+         * <p>How the balance was converted into the payout currency before the payout was sent. <code>null</code> when the payout was sent from a balance in its own currency. Only returned to callers with payout:withdrawal:read on the owning ledger.</p>
+         */
+        @java.lang.Override
+        @JsonSetter(value = "conversion", nulls = Nulls.SKIP)
+        public _FinalStage conversion(Optional<RetrievePayoutsResponseConversion> conversion) {
+            this.conversion = conversion;
+            return this;
+        }
+
+        /**
+         * <p>Whether <code>POST /payouts/{id}/cancel</code> would act on this payout right now: <code>true</code> while it is <code>in_review</code>, while it is <code>processing</code> with nothing yet submitted to the payout provider, or while a submitted payout can still be asked to cancel at the provider. <code>false</code> once the money has arrived or the payout has already ended. Only returned to callers with payout:withdrawal:read on the owning ledger.</p>
+         * @return Reference to {@code this} so that method calls can be chained together.
+         */
+        @java.lang.Override
+        public _FinalStage cancelable(Boolean cancelable) {
+            this.cancelable = Optional.ofNullable(cancelable);
+            return this;
+        }
+
+        /**
+         * <p>Whether <code>POST /payouts/{id}/cancel</code> would act on this payout right now: <code>true</code> while it is <code>in_review</code>, while it is <code>processing</code> with nothing yet submitted to the payout provider, or while a submitted payout can still be asked to cancel at the provider. <code>false</code> once the money has arrived or the payout has already ended. Only returned to callers with payout:withdrawal:read on the owning ledger.</p>
+         */
+        @java.lang.Override
+        @JsonSetter(value = "cancelable", nulls = Nulls.SKIP)
+        public _FinalStage cancelable(Optional<Boolean> cancelable) {
+            this.cancelable = cancelable;
+            return this;
+        }
+
+        /**
+         * <p>The payout amount in whole currency units, as a decimal string. Only returned to callers with payout:withdrawal:read on the owning ledger.</p>
+         * @return Reference to {@code this} so that method calls can be chained together.
+         */
+        @java.lang.Override
+        public _FinalStage amount(String amount) {
+            this.amount = Optional.ofNullable(amount);
+            return this;
+        }
+
+        /**
+         * <p>The payout amount in whole currency units, as a decimal string. Only returned to callers with payout:withdrawal:read on the owning ledger.</p>
+         */
+        @java.lang.Override
+        @JsonSetter(value = "amount", nulls = Nulls.SKIP)
+        public _FinalStage amount(Optional<String> amount) {
+            this.amount = amount;
+            return this;
+        }
+
         @java.lang.Override
         public RetrievePayoutsResponse build() {
             return new RetrievePayoutsResponse(
                     amount,
+                    cancelable,
+                    conversion,
                     createdAt,
                     currency,
+                    delayed,
                     destinationAmount,
                     destinationCurrency,
                     estimatedArrival,
+                    estimatedArrivalEnd,
                     exchangeRate,
                     failure,
                     feeAmount,
@@ -1381,12 +1875,55 @@ public final class RetrievePayoutsResponse {
                     payerName,
                     payoutMethod,
                     payoutRequestId,
+                    recipientName,
+                    senderName,
                     source,
                     speed,
+                    statementDescriptor,
                     status,
                     statusDetail,
+                    timeline,
                     traceCode,
                     additionalProperties);
+        }
+
+        @JsonAnySetter
+        private void putAdditionalPropertyFromJson(String key, Object value) {
+            if (key.equalsIgnoreCase("amount")
+                    || key.equalsIgnoreCase("cancelable")
+                    || key.equalsIgnoreCase("conversion")
+                    || key.equalsIgnoreCase("created_at")
+                    || key.equalsIgnoreCase("currency")
+                    || key.equalsIgnoreCase("delayed")
+                    || key.equalsIgnoreCase("destination_amount")
+                    || key.equalsIgnoreCase("destination_currency")
+                    || key.equalsIgnoreCase("estimated_arrival")
+                    || key.equalsIgnoreCase("estimated_arrival_end")
+                    || key.equalsIgnoreCase("exchange_rate")
+                    || key.equalsIgnoreCase("failure")
+                    || key.equalsIgnoreCase("fee_amount")
+                    || key.equalsIgnoreCase("fee_paid_by")
+                    || key.equalsIgnoreCase("id")
+                    || key.equalsIgnoreCase("markup_fee")
+                    || key.equalsIgnoreCase("metadata")
+                    || key.equalsIgnoreCase("net_amount")
+                    || key.equalsIgnoreCase("notes")
+                    || key.equalsIgnoreCase("object")
+                    || key.equalsIgnoreCase("payer_name")
+                    || key.equalsIgnoreCase("payout_method")
+                    || key.equalsIgnoreCase("payout_request_id")
+                    || key.equalsIgnoreCase("recipient_name")
+                    || key.equalsIgnoreCase("sender_name")
+                    || key.equalsIgnoreCase("source")
+                    || key.equalsIgnoreCase("speed")
+                    || key.equalsIgnoreCase("statement_descriptor")
+                    || key.equalsIgnoreCase("status")
+                    || key.equalsIgnoreCase("status_detail")
+                    || key.equalsIgnoreCase("timeline")
+                    || key.equalsIgnoreCase("trace_code")) {
+                return;
+            }
+            this.additionalProperties.put(key, value);
         }
 
         @java.lang.Override

@@ -113,7 +113,6 @@ public final class ReplyResolutionCenterCasesRequest {
 
         private Optional<List<ReplyResolutionCenterCasesRequestAttachmentsItem>> attachments = Optional.empty();
 
-        @JsonAnySetter
         private Map<String, Object> additionalProperties = new HashMap<>();
 
         private Builder() {}
@@ -126,7 +125,6 @@ public final class ReplyResolutionCenterCasesRequest {
         }
 
         /**
-         * <p>The reply to add to the case.</p>
          * <p>The reply to add to the case.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
@@ -160,6 +158,14 @@ public final class ReplyResolutionCenterCasesRequest {
         @java.lang.Override
         public ReplyResolutionCenterCasesRequest build() {
             return new ReplyResolutionCenterCasesRequest(attachments, message, additionalProperties);
+        }
+
+        @JsonAnySetter
+        private void putAdditionalPropertyFromJson(String key, Object value) {
+            if (key.equalsIgnoreCase("attachments") || key.equalsIgnoreCase("message")) {
+                return;
+            }
+            this.additionalProperties.put(key, value);
         }
 
         @java.lang.Override

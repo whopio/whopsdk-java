@@ -32,7 +32,7 @@ public final class PostPayoutMethodCreatedPayloadDataQuoteInstant {
     }
 
     /**
-     * @return Total fee charged, in the withdrawal currency.
+     * @return Total fee charged, in the payout currency.
      */
     @JsonProperty("fee")
     public float getFee() {
@@ -40,7 +40,7 @@ public final class PostPayoutMethodCreatedPayloadDataQuoteInstant {
     }
 
     /**
-     * @return Amount delivered after fees, in the withdrawal currency.
+     * @return Amount remaining after fees, in the payout currency.
      */
     @JsonProperty("total_received")
     public float getTotalReceived() {
@@ -79,7 +79,7 @@ public final class PostPayoutMethodCreatedPayloadDataQuoteInstant {
 
     public interface FeeStage {
         /**
-         * <p>Total fee charged, in the withdrawal currency.</p>
+         * <p>Total fee charged, in the payout currency.</p>
          */
         TotalReceivedStage fee(float fee);
 
@@ -88,7 +88,7 @@ public final class PostPayoutMethodCreatedPayloadDataQuoteInstant {
 
     public interface TotalReceivedStage {
         /**
-         * <p>Amount delivered after fees, in the withdrawal currency.</p>
+         * <p>Amount remaining after fees, in the payout currency.</p>
          */
         _FinalStage totalReceived(float totalReceived);
     }
@@ -107,7 +107,6 @@ public final class PostPayoutMethodCreatedPayloadDataQuoteInstant {
 
         private float totalReceived;
 
-        @JsonAnySetter
         private Map<String, Object> additionalProperties = new HashMap<>();
 
         private Builder() {}
@@ -120,8 +119,7 @@ public final class PostPayoutMethodCreatedPayloadDataQuoteInstant {
         }
 
         /**
-         * <p>Total fee charged, in the withdrawal currency.</p>
-         * <p>Total fee charged, in the withdrawal currency.</p>
+         * <p>Total fee charged, in the payout currency.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
@@ -132,8 +130,7 @@ public final class PostPayoutMethodCreatedPayloadDataQuoteInstant {
         }
 
         /**
-         * <p>Amount delivered after fees, in the withdrawal currency.</p>
-         * <p>Amount delivered after fees, in the withdrawal currency.</p>
+         * <p>Amount remaining after fees, in the payout currency.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
@@ -146,6 +143,14 @@ public final class PostPayoutMethodCreatedPayloadDataQuoteInstant {
         @java.lang.Override
         public PostPayoutMethodCreatedPayloadDataQuoteInstant build() {
             return new PostPayoutMethodCreatedPayloadDataQuoteInstant(fee, totalReceived, additionalProperties);
+        }
+
+        @JsonAnySetter
+        private void putAdditionalPropertyFromJson(String key, Object value) {
+            if (key.equalsIgnoreCase("fee") || key.equalsIgnoreCase("total_received")) {
+                return;
+            }
+            this.additionalProperties.put(key, value);
         }
 
         @java.lang.Override

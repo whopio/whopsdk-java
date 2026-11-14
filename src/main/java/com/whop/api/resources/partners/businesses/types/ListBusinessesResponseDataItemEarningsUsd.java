@@ -128,7 +128,6 @@ public final class ListBusinessesResponseDataItemEarningsUsd {
 
         private String total;
 
-        @JsonAnySetter
         private Map<String, Object> additionalProperties = new HashMap<>();
 
         private Builder() {}
@@ -143,7 +142,6 @@ public final class ListBusinessesResponseDataItemEarningsUsd {
 
         /**
          * <p>Commission already paid out, in USD.</p>
-         * <p>Commission already paid out, in USD.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
@@ -155,7 +153,6 @@ public final class ListBusinessesResponseDataItemEarningsUsd {
 
         /**
          * <p>Commission scheduled but not yet paid, in USD.</p>
-         * <p>Commission scheduled but not yet paid, in USD.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
@@ -166,7 +163,6 @@ public final class ListBusinessesResponseDataItemEarningsUsd {
         }
 
         /**
-         * <p>Pending + completed commission, in USD.</p>
          * <p>Pending + completed commission, in USD.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
@@ -180,6 +176,14 @@ public final class ListBusinessesResponseDataItemEarningsUsd {
         @java.lang.Override
         public ListBusinessesResponseDataItemEarningsUsd build() {
             return new ListBusinessesResponseDataItemEarningsUsd(completed, pending, total, additionalProperties);
+        }
+
+        @JsonAnySetter
+        private void putAdditionalPropertyFromJson(String key, Object value) {
+            if (key.equalsIgnoreCase("completed") || key.equalsIgnoreCase("pending") || key.equalsIgnoreCase("total")) {
+                return;
+            }
+            this.additionalProperties.put(key, value);
         }
 
         @java.lang.Override

@@ -127,7 +127,6 @@ public final class ReplayDeliveryWebhooksResponse {
 
         private boolean success;
 
-        @JsonAnySetter
         private Map<String, Object> additionalProperties = new HashMap<>();
 
         private Builder() {}
@@ -142,7 +141,6 @@ public final class ReplayDeliveryWebhooksResponse {
 
         /**
          * <p>The body your endpoint returned for the replayed request, as raw text. Empty when the endpoint could not be reached.</p>
-         * <p>The body your endpoint returned for the replayed request, as raw text. Empty when the endpoint could not be reached.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
@@ -154,7 +152,6 @@ public final class ReplayDeliveryWebhooksResponse {
 
         /**
          * <p>The HTTP response code your endpoint returned for the replayed request, or 0 when it could not be reached (timeout, DNS, or connection failure).</p>
-         * <p>The HTTP response code your endpoint returned for the replayed request, or 0 when it could not be reached (timeout, DNS, or connection failure).</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
@@ -165,7 +162,6 @@ public final class ReplayDeliveryWebhooksResponse {
         }
 
         /**
-         * <p>Whether your endpoint acknowledged the replay with a 2xx response.</p>
          * <p>Whether your endpoint acknowledged the replay with a 2xx response.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
@@ -179,6 +175,14 @@ public final class ReplayDeliveryWebhooksResponse {
         @java.lang.Override
         public ReplayDeliveryWebhooksResponse build() {
             return new ReplayDeliveryWebhooksResponse(body, status, success, additionalProperties);
+        }
+
+        @JsonAnySetter
+        private void putAdditionalPropertyFromJson(String key, Object value) {
+            if (key.equalsIgnoreCase("body") || key.equalsIgnoreCase("status") || key.equalsIgnoreCase("success")) {
+                return;
+            }
+            this.additionalProperties.put(key, value);
         }
 
         @java.lang.Override

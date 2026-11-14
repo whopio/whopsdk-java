@@ -5,14 +5,15 @@ package com.whop.api.resources.users.passkeys;
 
 import com.whop.api.core.ClientOptions;
 import com.whop.api.core.RequestOptions;
+import com.whop.api.core.WhopApiHttpResponse;
 import com.whop.api.core.pagination.SyncPagingIterable;
 import com.whop.api.resources.users.passkeys.requests.ChallengePasskeysRequest;
 import com.whop.api.resources.users.passkeys.requests.CreatePasskeysRequest;
 import com.whop.api.resources.users.passkeys.requests.DeletePasskeysRequest;
 import com.whop.api.resources.users.passkeys.requests.ListPasskeysRequest;
-import com.whop.api.resources.users.passkeys.types.ChallengePasskeysResponse;
 import com.whop.api.resources.users.passkeys.types.DeletePasskeysResponse;
 import com.whop.api.types.Passkey;
+import com.whop.api.types.PasskeyChallenge;
 import java.util.concurrent.CompletableFuture;
 
 public class AsyncPasskeysClient {
@@ -33,68 +34,134 @@ public class AsyncPasskeysClient {
     }
 
     /**
-     * Lists the authenticated user's own passkeys, newest first. The list is always the caller's own; there is no parameter for reading another user's passkeys. Requires a user session: an API key or an OAuth token is refused, because a passkey confirms the account holder before a sensitive action and no app may enumerate one.
+     * Lists the authenticated user's own passkeys, newest first. You cannot read another user's passkeys. Requires a user session: an API key or an OAuth token is refused, because a passkey confirms the account holder before a sensitive action and no app may enumerate one.
      */
     public CompletableFuture<SyncPagingIterable<Passkey>> list() {
-        return this.rawClient.list().thenApply(response -> response.body());
+        CompletableFuture<WhopApiHttpResponse<SyncPagingIterable<Passkey>>> rawFuture = this.rawClient.list();
+        CompletableFuture<SyncPagingIterable<Passkey>> future = rawFuture.thenApply(response -> response.body());
+        future.whenComplete((result_, throwable_) -> {
+            if (future.isCancelled()) {
+                rawFuture.cancel(true);
+            }
+        });
+        return future;
     }
 
     /**
-     * Lists the authenticated user's own passkeys, newest first. The list is always the caller's own; there is no parameter for reading another user's passkeys. Requires a user session: an API key or an OAuth token is refused, because a passkey confirms the account holder before a sensitive action and no app may enumerate one.
+     * Lists the authenticated user's own passkeys, newest first. You cannot read another user's passkeys. Requires a user session: an API key or an OAuth token is refused, because a passkey confirms the account holder before a sensitive action and no app may enumerate one.
      */
     public CompletableFuture<SyncPagingIterable<Passkey>> list(RequestOptions requestOptions) {
-        return this.rawClient.list(requestOptions).thenApply(response -> response.body());
+        CompletableFuture<WhopApiHttpResponse<SyncPagingIterable<Passkey>>> rawFuture =
+                this.rawClient.list(requestOptions);
+        CompletableFuture<SyncPagingIterable<Passkey>> future = rawFuture.thenApply(response -> response.body());
+        future.whenComplete((result_, throwable_) -> {
+            if (future.isCancelled()) {
+                rawFuture.cancel(true);
+            }
+        });
+        return future;
     }
 
     /**
-     * Lists the authenticated user's own passkeys, newest first. The list is always the caller's own; there is no parameter for reading another user's passkeys. Requires a user session: an API key or an OAuth token is refused, because a passkey confirms the account holder before a sensitive action and no app may enumerate one.
+     * Lists the authenticated user's own passkeys, newest first. You cannot read another user's passkeys. Requires a user session: an API key or an OAuth token is refused, because a passkey confirms the account holder before a sensitive action and no app may enumerate one.
      */
     public CompletableFuture<SyncPagingIterable<Passkey>> list(ListPasskeysRequest request) {
-        return this.rawClient.list(request).thenApply(response -> response.body());
+        CompletableFuture<WhopApiHttpResponse<SyncPagingIterable<Passkey>>> rawFuture = this.rawClient.list(request);
+        CompletableFuture<SyncPagingIterable<Passkey>> future = rawFuture.thenApply(response -> response.body());
+        future.whenComplete((result_, throwable_) -> {
+            if (future.isCancelled()) {
+                rawFuture.cancel(true);
+            }
+        });
+        return future;
     }
 
     /**
-     * Lists the authenticated user's own passkeys, newest first. The list is always the caller's own; there is no parameter for reading another user's passkeys. Requires a user session: an API key or an OAuth token is refused, because a passkey confirms the account holder before a sensitive action and no app may enumerate one.
+     * Lists the authenticated user's own passkeys, newest first. You cannot read another user's passkeys. Requires a user session: an API key or an OAuth token is refused, because a passkey confirms the account holder before a sensitive action and no app may enumerate one.
      */
     public CompletableFuture<SyncPagingIterable<Passkey>> list(
             ListPasskeysRequest request, RequestOptions requestOptions) {
-        return this.rawClient.list(request, requestOptions).thenApply(response -> response.body());
+        CompletableFuture<WhopApiHttpResponse<SyncPagingIterable<Passkey>>> rawFuture =
+                this.rawClient.list(request, requestOptions);
+        CompletableFuture<SyncPagingIterable<Passkey>> future = rawFuture.thenApply(response -> response.body());
+        future.whenComplete((result_, throwable_) -> {
+            if (future.isCancelled()) {
+                rawFuture.cancel(true);
+            }
+        });
+        return future;
     }
 
     /**
-     * Registers a passkey for the authenticated user from the attestation a browser produced for a <code>registration</code> challenge. Mint that challenge first with <code>POST /users/me/passkeys/challenge</code>; it is single-use and expires 5 minutes after it is issued. Requires a user session.
+     * Registers a passkey for the authenticated user from the attestation a browser produced for a <code>registration</code> challenge. Mint that challenge first with <code>POST /users/me/passkeys/challenge</code> and run the ceremony with its <code>creation_options</code>; it is single-use and expires 5 minutes after it is issued. Send back the <code>user_handle</code> the options carried; a registration without it is refused. Registering replaces the account's passkeys made before Whop issued options, which can only be deleted. Requires a user session that has completed step-up verification.
      */
     public CompletableFuture<Passkey> create(CreatePasskeysRequest request) {
-        return this.rawClient.create(request).thenApply(response -> response.body());
+        CompletableFuture<WhopApiHttpResponse<Passkey>> rawFuture = this.rawClient.create(request);
+        CompletableFuture<Passkey> future = rawFuture.thenApply(response -> response.body());
+        future.whenComplete((result_, throwable_) -> {
+            if (future.isCancelled()) {
+                rawFuture.cancel(true);
+            }
+        });
+        return future;
     }
 
     /**
-     * Registers a passkey for the authenticated user from the attestation a browser produced for a <code>registration</code> challenge. Mint that challenge first with <code>POST /users/me/passkeys/challenge</code>; it is single-use and expires 5 minutes after it is issued. Requires a user session.
+     * Registers a passkey for the authenticated user from the attestation a browser produced for a <code>registration</code> challenge. Mint that challenge first with <code>POST /users/me/passkeys/challenge</code> and run the ceremony with its <code>creation_options</code>; it is single-use and expires 5 minutes after it is issued. Send back the <code>user_handle</code> the options carried; a registration without it is refused. Registering replaces the account's passkeys made before Whop issued options, which can only be deleted. Requires a user session that has completed step-up verification.
      */
     public CompletableFuture<Passkey> create(CreatePasskeysRequest request, RequestOptions requestOptions) {
-        return this.rawClient.create(request, requestOptions).thenApply(response -> response.body());
+        CompletableFuture<WhopApiHttpResponse<Passkey>> rawFuture = this.rawClient.create(request, requestOptions);
+        CompletableFuture<Passkey> future = rawFuture.thenApply(response -> response.body());
+        future.whenComplete((result_, throwable_) -> {
+            if (future.isCancelled()) {
+                rawFuture.cancel(true);
+            }
+        });
+        return future;
     }
 
     /**
-     * Mints the challenge a browser needs to run a WebAuthn ceremony against the authenticated user's own passkeys. A <code>registration</code> challenge enrolls a new passkey; a <code>deletion</code> challenge is bound to the one passkey named by <code>passkey_id</code> and proves the user still holds it. Challenges are single-use and expire 5 minutes after they are issued, so send a fresh <code>Idempotency-Key</code> per ceremony — a replayed key returns the original challenge, which may already have expired. Requires a user session.
+     * Mints the challenge and WebAuthn options a browser needs to run a ceremony against the authenticated user's own passkeys. A <code>registration</code> challenge enrolls a new passkey; a <code>deletion</code> challenge is bound to the one passkey named by <code>passkey_id</code> and proves the user still holds it. The options are in wire snake_case: convert the keys to camelCase before passing them to the browser. Challenges are single-use and expire 5 minutes after they are issued, so send a fresh <code>Idempotency-Key</code> per ceremony — a replayed key returns the original challenge, which may already have expired. Requires a user session. A <code>registration</code> challenge also requires step-up verification, so the user completes it before the browser ceremony.
      */
-    public CompletableFuture<ChallengePasskeysResponse> challenge(ChallengePasskeysRequest request) {
-        return this.rawClient.challenge(request).thenApply(response -> response.body());
+    public CompletableFuture<PasskeyChallenge> challenge(ChallengePasskeysRequest request) {
+        CompletableFuture<WhopApiHttpResponse<PasskeyChallenge>> rawFuture = this.rawClient.challenge(request);
+        CompletableFuture<PasskeyChallenge> future = rawFuture.thenApply(response -> response.body());
+        future.whenComplete((result_, throwable_) -> {
+            if (future.isCancelled()) {
+                rawFuture.cancel(true);
+            }
+        });
+        return future;
     }
 
     /**
-     * Mints the challenge a browser needs to run a WebAuthn ceremony against the authenticated user's own passkeys. A <code>registration</code> challenge enrolls a new passkey; a <code>deletion</code> challenge is bound to the one passkey named by <code>passkey_id</code> and proves the user still holds it. Challenges are single-use and expire 5 minutes after they are issued, so send a fresh <code>Idempotency-Key</code> per ceremony — a replayed key returns the original challenge, which may already have expired. Requires a user session.
+     * Mints the challenge and WebAuthn options a browser needs to run a ceremony against the authenticated user's own passkeys. A <code>registration</code> challenge enrolls a new passkey; a <code>deletion</code> challenge is bound to the one passkey named by <code>passkey_id</code> and proves the user still holds it. The options are in wire snake_case: convert the keys to camelCase before passing them to the browser. Challenges are single-use and expire 5 minutes after they are issued, so send a fresh <code>Idempotency-Key</code> per ceremony — a replayed key returns the original challenge, which may already have expired. Requires a user session. A <code>registration</code> challenge also requires step-up verification, so the user completes it before the browser ceremony.
      */
-    public CompletableFuture<ChallengePasskeysResponse> challenge(
+    public CompletableFuture<PasskeyChallenge> challenge(
             ChallengePasskeysRequest request, RequestOptions requestOptions) {
-        return this.rawClient.challenge(request, requestOptions).thenApply(response -> response.body());
+        CompletableFuture<WhopApiHttpResponse<PasskeyChallenge>> rawFuture =
+                this.rawClient.challenge(request, requestOptions);
+        CompletableFuture<PasskeyChallenge> future = rawFuture.thenApply(response -> response.body());
+        future.whenComplete((result_, throwable_) -> {
+            if (future.isCancelled()) {
+                rawFuture.cancel(true);
+            }
+        });
+        return future;
     }
 
     /**
      * Deletes one of the authenticated user's own passkeys. The request body carries a WebAuthn assertion from the passkey being deleted, so possession of the credential is proven before it is removed: mint a <code>deletion</code> challenge for it first, run the ceremony with that passkey, and send the result here. Deleting the user's last passkey is allowed — their other step-up factors remain. Requires a user session.
      */
     public CompletableFuture<DeletePasskeysResponse> delete(String id, DeletePasskeysRequest request) {
-        return this.rawClient.delete(id, request).thenApply(response -> response.body());
+        CompletableFuture<WhopApiHttpResponse<DeletePasskeysResponse>> rawFuture = this.rawClient.delete(id, request);
+        CompletableFuture<DeletePasskeysResponse> future = rawFuture.thenApply(response -> response.body());
+        future.whenComplete((result_, throwable_) -> {
+            if (future.isCancelled()) {
+                rawFuture.cancel(true);
+            }
+        });
+        return future;
     }
 
     /**
@@ -102,6 +169,14 @@ public class AsyncPasskeysClient {
      */
     public CompletableFuture<DeletePasskeysResponse> delete(
             String id, DeletePasskeysRequest request, RequestOptions requestOptions) {
-        return this.rawClient.delete(id, request, requestOptions).thenApply(response -> response.body());
+        CompletableFuture<WhopApiHttpResponse<DeletePasskeysResponse>> rawFuture =
+                this.rawClient.delete(id, request, requestOptions);
+        CompletableFuture<DeletePasskeysResponse> future = rawFuture.thenApply(response -> response.body());
+        future.whenComplete((result_, throwable_) -> {
+            if (future.isCancelled()) {
+                rawFuture.cancel(true);
+            }
+        });
+        return future;
     }
 }

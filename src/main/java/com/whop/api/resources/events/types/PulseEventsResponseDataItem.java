@@ -193,7 +193,6 @@ public final class PulseEventsResponseDataItem {
 
         private Optional<Double> totalUsdAmount = Optional.empty();
 
-        @JsonAnySetter
         private Map<String, Object> additionalProperties = new HashMap<>();
 
         private Builder() {}
@@ -210,7 +209,6 @@ public final class PulseEventsResponseDataItem {
 
         /**
          * <p>The underlying event recorded. Every movement on this feed is a ledger line, so switch on <code>type</code> rather than this.</p>
-         * <p>The underlying event recorded. Every movement on this feed is a ledger line, so switch on <code>type</code> rather than this.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
@@ -222,7 +220,6 @@ public final class PulseEventsResponseDataItem {
 
         /**
          * <p>When the event happened, coarsened to the start of the minute.</p>
-         * <p>When the event happened, coarsened to the start of the minute.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
@@ -233,7 +230,6 @@ public final class PulseEventsResponseDataItem {
         }
 
         /**
-         * <p>What moved: a purchase, an affiliate commission, Whop card spend, ad spend, app revenue, an off-platform sale, a wallet deposit, a card load, a claimed drop, a transfer between accounts, or a referral bonus.</p>
          * <p>What moved: a purchase, an affiliate commission, Whop card spend, ad spend, app revenue, an off-platform sale, a wallet deposit, a card load, a claimed drop, a transfer between accounts, or a referral bonus.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
@@ -304,6 +300,18 @@ public final class PulseEventsResponseDataItem {
         public PulseEventsResponseDataItem build() {
             return new PulseEventsResponseDataItem(
                     eventName, eventTime, totalUsdAmount, type, user, additionalProperties);
+        }
+
+        @JsonAnySetter
+        private void putAdditionalPropertyFromJson(String key, Object value) {
+            if (key.equalsIgnoreCase("event_name")
+                    || key.equalsIgnoreCase("event_time")
+                    || key.equalsIgnoreCase("total_usd_amount")
+                    || key.equalsIgnoreCase("type")
+                    || key.equalsIgnoreCase("user")) {
+                return;
+            }
+            this.additionalProperties.put(key, value);
         }
 
         @java.lang.Override

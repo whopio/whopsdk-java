@@ -18,36 +18,52 @@ import java.util.Objects;
 @JsonInclude(JsonInclude.Include.NON_ABSENT)
 @JsonDeserialize(builder = SummaryDisputesResponseGroupsStatus.Builder.class)
 public final class SummaryDisputesResponseGroupsStatus {
-    private final int closed;
+    private final int generatingResponse;
 
     private final int lost;
 
     private final int needsResponse;
 
+    private final int prevented;
+
     private final int underReview;
+
+    private final int warningClosed;
+
+    private final int warningNeedsResponse;
+
+    private final int warningUnderReview;
 
     private final int won;
 
     private final Map<String, Object> additionalProperties;
 
     private SummaryDisputesResponseGroupsStatus(
-            int closed,
+            int generatingResponse,
             int lost,
             int needsResponse,
+            int prevented,
             int underReview,
+            int warningClosed,
+            int warningNeedsResponse,
+            int warningUnderReview,
             int won,
             Map<String, Object> additionalProperties) {
-        this.closed = closed;
+        this.generatingResponse = generatingResponse;
         this.lost = lost;
         this.needsResponse = needsResponse;
+        this.prevented = prevented;
         this.underReview = underReview;
+        this.warningClosed = warningClosed;
+        this.warningNeedsResponse = warningNeedsResponse;
+        this.warningUnderReview = warningUnderReview;
         this.won = won;
         this.additionalProperties = additionalProperties;
     }
 
-    @JsonProperty("closed")
-    public int getClosed() {
-        return closed;
+    @JsonProperty("generating_response")
+    public int getGeneratingResponse() {
+        return generatingResponse;
     }
 
     @JsonProperty("lost")
@@ -60,9 +76,29 @@ public final class SummaryDisputesResponseGroupsStatus {
         return needsResponse;
     }
 
+    @JsonProperty("prevented")
+    public int getPrevented() {
+        return prevented;
+    }
+
     @JsonProperty("under_review")
     public int getUnderReview() {
         return underReview;
+    }
+
+    @JsonProperty("warning_closed")
+    public int getWarningClosed() {
+        return warningClosed;
+    }
+
+    @JsonProperty("warning_needs_response")
+    public int getWarningNeedsResponse() {
+        return warningNeedsResponse;
+    }
+
+    @JsonProperty("warning_under_review")
+    public int getWarningUnderReview() {
+        return warningUnderReview;
     }
 
     @JsonProperty("won")
@@ -83,16 +119,29 @@ public final class SummaryDisputesResponseGroupsStatus {
     }
 
     private boolean equalTo(SummaryDisputesResponseGroupsStatus other) {
-        return closed == other.closed
+        return generatingResponse == other.generatingResponse
                 && lost == other.lost
                 && needsResponse == other.needsResponse
+                && prevented == other.prevented
                 && underReview == other.underReview
+                && warningClosed == other.warningClosed
+                && warningNeedsResponse == other.warningNeedsResponse
+                && warningUnderReview == other.warningUnderReview
                 && won == other.won;
     }
 
     @java.lang.Override
     public int hashCode() {
-        return Objects.hash(this.closed, this.lost, this.needsResponse, this.underReview, this.won);
+        return Objects.hash(
+                this.generatingResponse,
+                this.lost,
+                this.needsResponse,
+                this.prevented,
+                this.underReview,
+                this.warningClosed,
+                this.warningNeedsResponse,
+                this.warningUnderReview,
+                this.won);
     }
 
     @java.lang.Override
@@ -100,12 +149,12 @@ public final class SummaryDisputesResponseGroupsStatus {
         return ObjectMappers.stringify(this);
     }
 
-    public static ClosedStage builder() {
+    public static GeneratingResponseStage builder() {
         return new Builder();
     }
 
-    public interface ClosedStage {
-        LostStage closed(int closed);
+    public interface GeneratingResponseStage {
+        LostStage generatingResponse(int generatingResponse);
 
         Builder from(SummaryDisputesResponseGroupsStatus other);
     }
@@ -115,11 +164,27 @@ public final class SummaryDisputesResponseGroupsStatus {
     }
 
     public interface NeedsResponseStage {
-        UnderReviewStage needsResponse(int needsResponse);
+        PreventedStage needsResponse(int needsResponse);
+    }
+
+    public interface PreventedStage {
+        UnderReviewStage prevented(int prevented);
     }
 
     public interface UnderReviewStage {
-        WonStage underReview(int underReview);
+        WarningClosedStage underReview(int underReview);
+    }
+
+    public interface WarningClosedStage {
+        WarningNeedsResponseStage warningClosed(int warningClosed);
+    }
+
+    public interface WarningNeedsResponseStage {
+        WarningUnderReviewStage warningNeedsResponse(int warningNeedsResponse);
+    }
+
+    public interface WarningUnderReviewStage {
+        WonStage warningUnderReview(int warningUnderReview);
     }
 
     public interface WonStage {
@@ -136,36 +201,56 @@ public final class SummaryDisputesResponseGroupsStatus {
 
     @JsonIgnoreProperties(ignoreUnknown = true)
     public static final class Builder
-            implements ClosedStage, LostStage, NeedsResponseStage, UnderReviewStage, WonStage, _FinalStage {
-        private int closed;
+            implements GeneratingResponseStage,
+                    LostStage,
+                    NeedsResponseStage,
+                    PreventedStage,
+                    UnderReviewStage,
+                    WarningClosedStage,
+                    WarningNeedsResponseStage,
+                    WarningUnderReviewStage,
+                    WonStage,
+                    _FinalStage {
+        private int generatingResponse;
 
         private int lost;
 
         private int needsResponse;
 
+        private int prevented;
+
         private int underReview;
+
+        private int warningClosed;
+
+        private int warningNeedsResponse;
+
+        private int warningUnderReview;
 
         private int won;
 
-        @JsonAnySetter
         private Map<String, Object> additionalProperties = new HashMap<>();
 
         private Builder() {}
 
         @java.lang.Override
         public Builder from(SummaryDisputesResponseGroupsStatus other) {
-            closed(other.getClosed());
+            generatingResponse(other.getGeneratingResponse());
             lost(other.getLost());
             needsResponse(other.getNeedsResponse());
+            prevented(other.getPrevented());
             underReview(other.getUnderReview());
+            warningClosed(other.getWarningClosed());
+            warningNeedsResponse(other.getWarningNeedsResponse());
+            warningUnderReview(other.getWarningUnderReview());
             won(other.getWon());
             return this;
         }
 
         @java.lang.Override
-        @JsonSetter("closed")
-        public LostStage closed(int closed) {
-            this.closed = closed;
+        @JsonSetter("generating_response")
+        public LostStage generatingResponse(int generatingResponse) {
+            this.generatingResponse = generatingResponse;
             return this;
         }
 
@@ -178,15 +263,43 @@ public final class SummaryDisputesResponseGroupsStatus {
 
         @java.lang.Override
         @JsonSetter("needs_response")
-        public UnderReviewStage needsResponse(int needsResponse) {
+        public PreventedStage needsResponse(int needsResponse) {
             this.needsResponse = needsResponse;
             return this;
         }
 
         @java.lang.Override
+        @JsonSetter("prevented")
+        public UnderReviewStage prevented(int prevented) {
+            this.prevented = prevented;
+            return this;
+        }
+
+        @java.lang.Override
         @JsonSetter("under_review")
-        public WonStage underReview(int underReview) {
+        public WarningClosedStage underReview(int underReview) {
             this.underReview = underReview;
+            return this;
+        }
+
+        @java.lang.Override
+        @JsonSetter("warning_closed")
+        public WarningNeedsResponseStage warningClosed(int warningClosed) {
+            this.warningClosed = warningClosed;
+            return this;
+        }
+
+        @java.lang.Override
+        @JsonSetter("warning_needs_response")
+        public WarningUnderReviewStage warningNeedsResponse(int warningNeedsResponse) {
+            this.warningNeedsResponse = warningNeedsResponse;
+            return this;
+        }
+
+        @java.lang.Override
+        @JsonSetter("warning_under_review")
+        public WonStage warningUnderReview(int warningUnderReview) {
+            this.warningUnderReview = warningUnderReview;
             return this;
         }
 
@@ -200,7 +313,32 @@ public final class SummaryDisputesResponseGroupsStatus {
         @java.lang.Override
         public SummaryDisputesResponseGroupsStatus build() {
             return new SummaryDisputesResponseGroupsStatus(
-                    closed, lost, needsResponse, underReview, won, additionalProperties);
+                    generatingResponse,
+                    lost,
+                    needsResponse,
+                    prevented,
+                    underReview,
+                    warningClosed,
+                    warningNeedsResponse,
+                    warningUnderReview,
+                    won,
+                    additionalProperties);
+        }
+
+        @JsonAnySetter
+        private void putAdditionalPropertyFromJson(String key, Object value) {
+            if (key.equalsIgnoreCase("generating_response")
+                    || key.equalsIgnoreCase("lost")
+                    || key.equalsIgnoreCase("needs_response")
+                    || key.equalsIgnoreCase("prevented")
+                    || key.equalsIgnoreCase("under_review")
+                    || key.equalsIgnoreCase("warning_closed")
+                    || key.equalsIgnoreCase("warning_needs_response")
+                    || key.equalsIgnoreCase("warning_under_review")
+                    || key.equalsIgnoreCase("won")) {
+                return;
+            }
+            this.additionalProperties.put(key, value);
         }
 
         @java.lang.Override

@@ -5,26 +5,31 @@ package com.whop.api.resources.setupintents;
 
 import com.whop.api.core.ClientOptions;
 import com.whop.api.core.RequestOptions;
+import com.whop.api.core.Suppliers;
+import com.whop.api.core.WhopApiHttpResponse;
 import com.whop.api.core.pagination.SyncPagingIterable;
+import com.whop.api.resources.setupintents.direct.AsyncDirectClient;
+import com.whop.api.resources.setupintents.requests.CreateSetupIntentsRequest;
 import com.whop.api.resources.setupintents.requests.ListSetupIntentsRequest;
 import com.whop.api.resources.setupintents.requests.RetrieveSetupIntentsRequest;
 import com.whop.api.resources.setupintents.requests.RetrieveStatusSetupIntentsRequest;
 import com.whop.api.resources.setupintents.requests.UpdateReturnUrlSetupIntentsRequest;
-import com.whop.api.resources.setupintents.types.CreateSetupIntentsRequest;
-import com.whop.api.resources.setupintents.types.CreateSetupIntentsResponse;
 import com.whop.api.types.SetupIntent;
-import com.whop.api.types.SetupIntentListItem;
 import com.whop.api.types.SetupStatus;
 import java.util.concurrent.CompletableFuture;
+import java.util.function.Supplier;
 
 public class AsyncSetupIntentsClient {
     protected final ClientOptions clientOptions;
 
     private final AsyncRawSetupIntentsClient rawClient;
 
+    protected final Supplier<AsyncDirectClient> directClient;
+
     public AsyncSetupIntentsClient(ClientOptions clientOptions) {
         this.clientOptions = clientOptions;
         this.rawClient = new AsyncRawSetupIntentsClient(clientOptions);
+        this.directClient = Suppliers.memoize(() -> new AsyncDirectClient(clientOptions));
     }
 
     /**
@@ -35,159 +40,245 @@ public class AsyncSetupIntentsClient {
     }
 
     /**
-     * Returns a paginated list of setup intents for a company, with optional filtering by creation date. A setup intent securely collects and stores a member's payment method for future use without charging them immediately.
-     * <p>Required permissions:</p>
-     * <ul>
-     * <li><code>payment:setup_intent:read</code></li>
-     * <li><code>member:basic:read</code></li>
-     * <li><code>member:email:read</code></li>
-     * </ul>
+     * Lists setup intents newest first. An account API key lists its own account; a user token lists every account it can read, or one account with <code>account_id</code>.
      */
-    public CompletableFuture<SyncPagingIterable<SetupIntentListItem>> list(ListSetupIntentsRequest request) {
-        return this.rawClient.list(request).thenApply(response -> response.body());
+    public CompletableFuture<SyncPagingIterable<SetupIntent>> list() {
+        CompletableFuture<WhopApiHttpResponse<SyncPagingIterable<SetupIntent>>> rawFuture = this.rawClient.list();
+        CompletableFuture<SyncPagingIterable<SetupIntent>> future = rawFuture.thenApply(response -> response.body());
+        future.whenComplete((result_, throwable_) -> {
+            if (future.isCancelled()) {
+                rawFuture.cancel(true);
+            }
+        });
+        return future;
     }
 
     /**
-     * Returns a paginated list of setup intents for a company, with optional filtering by creation date. A setup intent securely collects and stores a member's payment method for future use without charging them immediately.
-     * <p>Required permissions:</p>
-     * <ul>
-     * <li><code>payment:setup_intent:read</code></li>
-     * <li><code>member:basic:read</code></li>
-     * <li><code>member:email:read</code></li>
-     * </ul>
+     * Lists setup intents newest first. An account API key lists its own account; a user token lists every account it can read, or one account with <code>account_id</code>.
      */
-    public CompletableFuture<SyncPagingIterable<SetupIntentListItem>> list(
+    public CompletableFuture<SyncPagingIterable<SetupIntent>> list(RequestOptions requestOptions) {
+        CompletableFuture<WhopApiHttpResponse<SyncPagingIterable<SetupIntent>>> rawFuture =
+                this.rawClient.list(requestOptions);
+        CompletableFuture<SyncPagingIterable<SetupIntent>> future = rawFuture.thenApply(response -> response.body());
+        future.whenComplete((result_, throwable_) -> {
+            if (future.isCancelled()) {
+                rawFuture.cancel(true);
+            }
+        });
+        return future;
+    }
+
+    /**
+     * Lists setup intents newest first. An account API key lists its own account; a user token lists every account it can read, or one account with <code>account_id</code>.
+     */
+    public CompletableFuture<SyncPagingIterable<SetupIntent>> list(ListSetupIntentsRequest request) {
+        CompletableFuture<WhopApiHttpResponse<SyncPagingIterable<SetupIntent>>> rawFuture =
+                this.rawClient.list(request);
+        CompletableFuture<SyncPagingIterable<SetupIntent>> future = rawFuture.thenApply(response -> response.body());
+        future.whenComplete((result_, throwable_) -> {
+            if (future.isCancelled()) {
+                rawFuture.cancel(true);
+            }
+        });
+        return future;
+    }
+
+    /**
+     * Lists setup intents newest first. An account API key lists its own account; a user token lists every account it can read, or one account with <code>account_id</code>.
+     */
+    public CompletableFuture<SyncPagingIterable<SetupIntent>> list(
             ListSetupIntentsRequest request, RequestOptions requestOptions) {
-        return this.rawClient.list(request, requestOptions).thenApply(response -> response.body());
+        CompletableFuture<WhopApiHttpResponse<SyncPagingIterable<SetupIntent>>> rawFuture =
+                this.rawClient.list(request, requestOptions);
+        CompletableFuture<SyncPagingIterable<SetupIntent>> future = rawFuture.thenApply(response -> response.body());
+        future.whenComplete((result_, throwable_) -> {
+            if (future.isCancelled()) {
+                rawFuture.cancel(true);
+            }
+        });
+        return future;
     }
 
     /**
-     * Save a buyer's payment method for later without charging it. Provide a confirmation token for a method the buyer just supplied, or an existing payment method to re-verify. The buyer may still have a step to complete — 3D Secure, a hosted enrollment, linking a bank account — so poll the setup intent's status endpoint for what to do next.
-     * <p>Required permissions:</p>
-     * <ul>
-     * <li><code>payment:charge</code></li>
-     * <li><code>member:basic:read</code></li>
-     * <li><code>member:email:read</code></li>
-     * </ul>
+     * Saves a buyer's payment method for later without charging it — one the buyer just supplied through the payment elements in setup mode, or one already on file to re-verify. The setup completes in the background, so the response is the setup intent as created, not its outcome: hand <code>client_secret</code> to the elements' <code>handleNextAction</code>, or poll Retrieve setup status. A buyer's own token holding <code>member:payment_methods:use</code> may create a setup intent for itself from a confirmation token.
      */
-    public CompletableFuture<CreateSetupIntentsResponse> create(CreateSetupIntentsRequest request) {
-        return this.rawClient.create(request).thenApply(response -> response.body());
+    public CompletableFuture<SetupIntent> create(CreateSetupIntentsRequest request) {
+        CompletableFuture<WhopApiHttpResponse<SetupIntent>> rawFuture = this.rawClient.create(request);
+        CompletableFuture<SetupIntent> future = rawFuture.thenApply(response -> response.body());
+        future.whenComplete((result_, throwable_) -> {
+            if (future.isCancelled()) {
+                rawFuture.cancel(true);
+            }
+        });
+        return future;
     }
 
     /**
-     * Save a buyer's payment method for later without charging it. Provide a confirmation token for a method the buyer just supplied, or an existing payment method to re-verify. The buyer may still have a step to complete — 3D Secure, a hosted enrollment, linking a bank account — so poll the setup intent's status endpoint for what to do next.
-     * <p>Required permissions:</p>
-     * <ul>
-     * <li><code>payment:charge</code></li>
-     * <li><code>member:basic:read</code></li>
-     * <li><code>member:email:read</code></li>
-     * </ul>
+     * Saves a buyer's payment method for later without charging it — one the buyer just supplied through the payment elements in setup mode, or one already on file to re-verify. The setup completes in the background, so the response is the setup intent as created, not its outcome: hand <code>client_secret</code> to the elements' <code>handleNextAction</code>, or poll Retrieve setup status. A buyer's own token holding <code>member:payment_methods:use</code> may create a setup intent for itself from a confirmation token.
      */
-    public CompletableFuture<CreateSetupIntentsResponse> create(
-            CreateSetupIntentsRequest request, RequestOptions requestOptions) {
-        return this.rawClient.create(request, requestOptions).thenApply(response -> response.body());
+    public CompletableFuture<SetupIntent> create(CreateSetupIntentsRequest request, RequestOptions requestOptions) {
+        CompletableFuture<WhopApiHttpResponse<SetupIntent>> rawFuture = this.rawClient.create(request, requestOptions);
+        CompletableFuture<SetupIntent> future = rawFuture.thenApply(response -> response.body());
+        future.whenComplete((result_, throwable_) -> {
+            if (future.isCancelled()) {
+                rawFuture.cancel(true);
+            }
+        });
+        return future;
     }
 
     /**
-     * Retrieves the details of an existing setup intent.
-     * <p>Required permissions:</p>
-     * <ul>
-     * <li><code>payment:setup_intent:read</code></li>
-     * <li><code>member:basic:read</code></li>
-     * <li><code>member:email:read</code></li>
-     * </ul>
+     * Retrieves a setup intent. Once its <code>status</code> is <code>succeeded</code>, charge the saved method by its <code>payment_method_id</code>. The buyer's own token may retrieve a setup intent that belongs to it.
      */
     public CompletableFuture<SetupIntent> retrieve(String id) {
-        return this.rawClient.retrieve(id).thenApply(response -> response.body());
+        CompletableFuture<WhopApiHttpResponse<SetupIntent>> rawFuture = this.rawClient.retrieve(id);
+        CompletableFuture<SetupIntent> future = rawFuture.thenApply(response -> response.body());
+        future.whenComplete((result_, throwable_) -> {
+            if (future.isCancelled()) {
+                rawFuture.cancel(true);
+            }
+        });
+        return future;
     }
 
     /**
-     * Retrieves the details of an existing setup intent.
-     * <p>Required permissions:</p>
-     * <ul>
-     * <li><code>payment:setup_intent:read</code></li>
-     * <li><code>member:basic:read</code></li>
-     * <li><code>member:email:read</code></li>
-     * </ul>
+     * Retrieves a setup intent. Once its <code>status</code> is <code>succeeded</code>, charge the saved method by its <code>payment_method_id</code>. The buyer's own token may retrieve a setup intent that belongs to it.
      */
     public CompletableFuture<SetupIntent> retrieve(String id, RequestOptions requestOptions) {
-        return this.rawClient.retrieve(id, requestOptions).thenApply(response -> response.body());
+        CompletableFuture<WhopApiHttpResponse<SetupIntent>> rawFuture = this.rawClient.retrieve(id, requestOptions);
+        CompletableFuture<SetupIntent> future = rawFuture.thenApply(response -> response.body());
+        future.whenComplete((result_, throwable_) -> {
+            if (future.isCancelled()) {
+                rawFuture.cancel(true);
+            }
+        });
+        return future;
     }
 
     /**
-     * Retrieves the details of an existing setup intent.
-     * <p>Required permissions:</p>
-     * <ul>
-     * <li><code>payment:setup_intent:read</code></li>
-     * <li><code>member:basic:read</code></li>
-     * <li><code>member:email:read</code></li>
-     * </ul>
+     * Retrieves a setup intent. Once its <code>status</code> is <code>succeeded</code>, charge the saved method by its <code>payment_method_id</code>. The buyer's own token may retrieve a setup intent that belongs to it.
      */
     public CompletableFuture<SetupIntent> retrieve(String id, RetrieveSetupIntentsRequest request) {
-        return this.rawClient.retrieve(id, request).thenApply(response -> response.body());
+        CompletableFuture<WhopApiHttpResponse<SetupIntent>> rawFuture = this.rawClient.retrieve(id, request);
+        CompletableFuture<SetupIntent> future = rawFuture.thenApply(response -> response.body());
+        future.whenComplete((result_, throwable_) -> {
+            if (future.isCancelled()) {
+                rawFuture.cancel(true);
+            }
+        });
+        return future;
     }
 
     /**
-     * Retrieves the details of an existing setup intent.
-     * <p>Required permissions:</p>
-     * <ul>
-     * <li><code>payment:setup_intent:read</code></li>
-     * <li><code>member:basic:read</code></li>
-     * <li><code>member:email:read</code></li>
-     * </ul>
+     * Retrieves a setup intent. Once its <code>status</code> is <code>succeeded</code>, charge the saved method by its <code>payment_method_id</code>. The buyer's own token may retrieve a setup intent that belongs to it.
      */
     public CompletableFuture<SetupIntent> retrieve(
             String id, RetrieveSetupIntentsRequest request, RequestOptions requestOptions) {
-        return this.rawClient.retrieve(id, request, requestOptions).thenApply(response -> response.body());
+        CompletableFuture<WhopApiHttpResponse<SetupIntent>> rawFuture =
+                this.rawClient.retrieve(id, request, requestOptions);
+        CompletableFuture<SetupIntent> future = rawFuture.thenApply(response -> response.body());
+        future.whenComplete((result_, throwable_) -> {
+            if (future.isCancelled()) {
+                rawFuture.cancel(true);
+            }
+        });
+        return future;
     }
 
     /**
-     * Changes where the buyer lands after completing an off-site step, up until they return. Accepts either a secret key or the setup's own <code>client_secret</code>, so the surface that knows the final destination can set it.
+     * Changes where the buyer lands after completing an off-site step, up until they return. Accepts either a secret key or the setup's own <code>client_secret</code> in the body, so the surface that knows the final destination can set it.
      */
     public CompletableFuture<SetupStatus> updateReturnUrl(
             String setupIntentId, UpdateReturnUrlSetupIntentsRequest request) {
-        return this.rawClient.updateReturnUrl(setupIntentId, request).thenApply(response -> response.body());
+        CompletableFuture<WhopApiHttpResponse<SetupStatus>> rawFuture =
+                this.rawClient.updateReturnUrl(setupIntentId, request);
+        CompletableFuture<SetupStatus> future = rawFuture.thenApply(response -> response.body());
+        future.whenComplete((result_, throwable_) -> {
+            if (future.isCancelled()) {
+                rawFuture.cancel(true);
+            }
+        });
+        return future;
     }
 
     /**
-     * Changes where the buyer lands after completing an off-site step, up until they return. Accepts either a secret key or the setup's own <code>client_secret</code>, so the surface that knows the final destination can set it.
+     * Changes where the buyer lands after completing an off-site step, up until they return. Accepts either a secret key or the setup's own <code>client_secret</code> in the body, so the surface that knows the final destination can set it.
      */
     public CompletableFuture<SetupStatus> updateReturnUrl(
             String setupIntentId, UpdateReturnUrlSetupIntentsRequest request, RequestOptions requestOptions) {
-        return this.rawClient
-                .updateReturnUrl(setupIntentId, request, requestOptions)
-                .thenApply(response -> response.body());
+        CompletableFuture<WhopApiHttpResponse<SetupStatus>> rawFuture =
+                this.rawClient.updateReturnUrl(setupIntentId, request, requestOptions);
+        CompletableFuture<SetupStatus> future = rawFuture.thenApply(response -> response.body());
+        future.whenComplete((result_, throwable_) -> {
+            if (future.isCancelled()) {
+                rawFuture.cancel(true);
+            }
+        });
+        return future;
     }
 
     /**
-     * Retrieves how far a setup has got and what the buyer must do next, if anything. Collection runs in the background, so poll this rather than reading the create response. Accepts either a secret key or the setup's own <code>client_secret</code>, so the surface collecting the payment method can poll it directly.
+     * Retrieves how far a setup has got and what the buyer must do next, if anything. Collection runs in the background, so poll this rather than reading the create response. Accepts either a secret key or the setup's own <code>client_secret</code> as a query parameter, so the surface collecting the payment method can poll it directly.
      */
     public CompletableFuture<SetupStatus> retrieveStatus(String setupIntentId) {
-        return this.rawClient.retrieveStatus(setupIntentId).thenApply(response -> response.body());
+        CompletableFuture<WhopApiHttpResponse<SetupStatus>> rawFuture = this.rawClient.retrieveStatus(setupIntentId);
+        CompletableFuture<SetupStatus> future = rawFuture.thenApply(response -> response.body());
+        future.whenComplete((result_, throwable_) -> {
+            if (future.isCancelled()) {
+                rawFuture.cancel(true);
+            }
+        });
+        return future;
     }
 
     /**
-     * Retrieves how far a setup has got and what the buyer must do next, if anything. Collection runs in the background, so poll this rather than reading the create response. Accepts either a secret key or the setup's own <code>client_secret</code>, so the surface collecting the payment method can poll it directly.
+     * Retrieves how far a setup has got and what the buyer must do next, if anything. Collection runs in the background, so poll this rather than reading the create response. Accepts either a secret key or the setup's own <code>client_secret</code> as a query parameter, so the surface collecting the payment method can poll it directly.
      */
     public CompletableFuture<SetupStatus> retrieveStatus(String setupIntentId, RequestOptions requestOptions) {
-        return this.rawClient.retrieveStatus(setupIntentId, requestOptions).thenApply(response -> response.body());
+        CompletableFuture<WhopApiHttpResponse<SetupStatus>> rawFuture =
+                this.rawClient.retrieveStatus(setupIntentId, requestOptions);
+        CompletableFuture<SetupStatus> future = rawFuture.thenApply(response -> response.body());
+        future.whenComplete((result_, throwable_) -> {
+            if (future.isCancelled()) {
+                rawFuture.cancel(true);
+            }
+        });
+        return future;
     }
 
     /**
-     * Retrieves how far a setup has got and what the buyer must do next, if anything. Collection runs in the background, so poll this rather than reading the create response. Accepts either a secret key or the setup's own <code>client_secret</code>, so the surface collecting the payment method can poll it directly.
+     * Retrieves how far a setup has got and what the buyer must do next, if anything. Collection runs in the background, so poll this rather than reading the create response. Accepts either a secret key or the setup's own <code>client_secret</code> as a query parameter, so the surface collecting the payment method can poll it directly.
      */
     public CompletableFuture<SetupStatus> retrieveStatus(
             String setupIntentId, RetrieveStatusSetupIntentsRequest request) {
-        return this.rawClient.retrieveStatus(setupIntentId, request).thenApply(response -> response.body());
+        CompletableFuture<WhopApiHttpResponse<SetupStatus>> rawFuture =
+                this.rawClient.retrieveStatus(setupIntentId, request);
+        CompletableFuture<SetupStatus> future = rawFuture.thenApply(response -> response.body());
+        future.whenComplete((result_, throwable_) -> {
+            if (future.isCancelled()) {
+                rawFuture.cancel(true);
+            }
+        });
+        return future;
     }
 
     /**
-     * Retrieves how far a setup has got and what the buyer must do next, if anything. Collection runs in the background, so poll this rather than reading the create response. Accepts either a secret key or the setup's own <code>client_secret</code>, so the surface collecting the payment method can poll it directly.
+     * Retrieves how far a setup has got and what the buyer must do next, if anything. Collection runs in the background, so poll this rather than reading the create response. Accepts either a secret key or the setup's own <code>client_secret</code> as a query parameter, so the surface collecting the payment method can poll it directly.
      */
     public CompletableFuture<SetupStatus> retrieveStatus(
             String setupIntentId, RetrieveStatusSetupIntentsRequest request, RequestOptions requestOptions) {
-        return this.rawClient
-                .retrieveStatus(setupIntentId, request, requestOptions)
-                .thenApply(response -> response.body());
+        CompletableFuture<WhopApiHttpResponse<SetupStatus>> rawFuture =
+                this.rawClient.retrieveStatus(setupIntentId, request, requestOptions);
+        CompletableFuture<SetupStatus> future = rawFuture.thenApply(response -> response.body());
+        future.whenComplete((result_, throwable_) -> {
+            if (future.isCancelled()) {
+                rawFuture.cancel(true);
+            }
+        });
+        return future;
+    }
+
+    public AsyncDirectClient direct() {
+        return this.directClient.get();
     }
 }

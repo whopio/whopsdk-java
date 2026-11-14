@@ -44,11 +44,15 @@ public final class ListAccountsRequest {
 
     private final Optional<OffsetDateTime> createdBefore;
 
+    private final Optional<String> externalId;
+
     private final Optional<Double> volumeMin;
 
     private final Optional<Double> volumeMax;
 
     private final Optional<String> parentAccountId;
+
+    private final Optional<String> ownerId;
 
     private final Map<String, Object> additionalProperties;
 
@@ -63,9 +67,11 @@ public final class ListAccountsRequest {
             Optional<String> query,
             Optional<OffsetDateTime> createdAfter,
             Optional<OffsetDateTime> createdBefore,
+            Optional<String> externalId,
             Optional<Double> volumeMin,
             Optional<Double> volumeMax,
             Optional<String> parentAccountId,
+            Optional<String> ownerId,
             Map<String, Object> additionalProperties) {
         this.first = first;
         this.after = after;
@@ -77,14 +83,16 @@ public final class ListAccountsRequest {
         this.query = query;
         this.createdAfter = createdAfter;
         this.createdBefore = createdBefore;
+        this.externalId = externalId;
         this.volumeMin = volumeMin;
         this.volumeMax = volumeMax;
         this.parentAccountId = parentAccountId;
+        this.ownerId = ownerId;
         this.additionalProperties = additionalProperties;
     }
 
     /**
-     * @return The number of accounts to return (default 10, max 50).
+     * @return Number of results to return from the start of the range.
      */
     @JsonProperty("first")
     public Optional<Integer> getFirst() {
@@ -92,7 +100,7 @@ public final class ListAccountsRequest {
     }
 
     /**
-     * @return A cursor; returns accounts after this position.
+     * @return Return results after this cursor. Use <code>page_info.end_cursor</code> from the previous response to fetch the next page.
      */
     @JsonProperty("after")
     public Optional<String> getAfter() {
@@ -100,7 +108,7 @@ public final class ListAccountsRequest {
     }
 
     /**
-     * @return The number of accounts to return from the end of the range.
+     * @return Number of results to return from the end of the range.
      */
     @JsonProperty("last")
     public Optional<Integer> getLast() {
@@ -108,7 +116,7 @@ public final class ListAccountsRequest {
     }
 
     /**
-     * @return A cursor; returns accounts before this position.
+     * @return Return results before this cursor. Use <code>page_info.start_cursor</code> from the previous response to fetch the previous page.
      */
     @JsonProperty("before")
     public Optional<String> getBefore() {
@@ -164,6 +172,14 @@ public final class ListAccountsRequest {
     }
 
     /**
+     * @return Return only the subaccount with this <code>external_id</code>, matched exactly and case-sensitively. End it with <code>%</code> to return every subaccount whose <code>external_id</code> starts with the text before it, such as <code>shopline:%</code>. <code>%</code> is accepted only at the end, because anywhere else it would scan all your subaccounts. <code>_</code> always matches literally.
+     */
+    @JsonProperty("external_id")
+    public Optional<String> getExternalId() {
+        return externalId;
+    }
+
+    /**
      * @return Return only accounts whose lifetime USD volume is at least this value. Requires <code>stats:read</code> on the parent account.
      */
     @JsonProperty("volume_min")
@@ -180,11 +196,19 @@ public final class ListAccountsRequest {
     }
 
     /**
-     * @return For platforms: the parent account ID whose direct connected accounts to return. Requires <code>payout:account:read</code> on the parent account.
+     * @return For platforms: the parent account ID whose direct subaccounts to return. Requires <code>payout:account:read</code> on the parent account.
      */
     @JsonProperty("parent_account_id")
     public Optional<String> getParentAccountId() {
         return parentAccountId;
+    }
+
+    /**
+     * @return Return only accounts owned by this user (<code>user_...</code>), the account's <code>owner</code>. Cannot be combined with <code>parent_account_id</code>.
+     */
+    @JsonProperty("owner_id")
+    public Optional<String> getOwnerId() {
+        return ownerId;
     }
 
     @java.lang.Override
@@ -209,9 +233,11 @@ public final class ListAccountsRequest {
                 && query.equals(other.query)
                 && createdAfter.equals(other.createdAfter)
                 && createdBefore.equals(other.createdBefore)
+                && externalId.equals(other.externalId)
                 && volumeMin.equals(other.volumeMin)
                 && volumeMax.equals(other.volumeMax)
-                && parentAccountId.equals(other.parentAccountId);
+                && parentAccountId.equals(other.parentAccountId)
+                && ownerId.equals(other.ownerId);
     }
 
     @java.lang.Override
@@ -227,9 +253,11 @@ public final class ListAccountsRequest {
                 this.query,
                 this.createdAfter,
                 this.createdBefore,
+                this.externalId,
                 this.volumeMin,
                 this.volumeMax,
-                this.parentAccountId);
+                this.parentAccountId,
+                this.ownerId);
     }
 
     @java.lang.Override
@@ -263,13 +291,16 @@ public final class ListAccountsRequest {
 
         private Optional<OffsetDateTime> createdBefore = Optional.empty();
 
+        private Optional<String> externalId = Optional.empty();
+
         private Optional<Double> volumeMin = Optional.empty();
 
         private Optional<Double> volumeMax = Optional.empty();
 
         private Optional<String> parentAccountId = Optional.empty();
 
-        @JsonAnySetter
+        private Optional<String> ownerId = Optional.empty();
+
         private Map<String, Object> additionalProperties = new HashMap<>();
 
         private Builder() {}
@@ -285,14 +316,16 @@ public final class ListAccountsRequest {
             query(other.getQuery());
             createdAfter(other.getCreatedAfter());
             createdBefore(other.getCreatedBefore());
+            externalId(other.getExternalId());
             volumeMin(other.getVolumeMin());
             volumeMax(other.getVolumeMax());
             parentAccountId(other.getParentAccountId());
+            ownerId(other.getOwnerId());
             return this;
         }
 
         /**
-         * <p>The number of accounts to return (default 10, max 50).</p>
+         * <p>Number of results to return from the start of the range.</p>
          */
         @JsonSetter(value = "first", nulls = Nulls.SKIP)
         public Builder first(Optional<Integer> first) {
@@ -306,7 +339,7 @@ public final class ListAccountsRequest {
         }
 
         /**
-         * <p>A cursor; returns accounts after this position.</p>
+         * <p>Return results after this cursor. Use <code>page_info.end_cursor</code> from the previous response to fetch the next page.</p>
          */
         @JsonSetter(value = "after", nulls = Nulls.SKIP)
         public Builder after(Optional<String> after) {
@@ -320,7 +353,7 @@ public final class ListAccountsRequest {
         }
 
         /**
-         * <p>The number of accounts to return from the end of the range.</p>
+         * <p>Number of results to return from the end of the range.</p>
          */
         @JsonSetter(value = "last", nulls = Nulls.SKIP)
         public Builder last(Optional<Integer> last) {
@@ -334,7 +367,7 @@ public final class ListAccountsRequest {
         }
 
         /**
-         * <p>A cursor; returns accounts before this position.</p>
+         * <p>Return results before this cursor. Use <code>page_info.start_cursor</code> from the previous response to fetch the previous page.</p>
          */
         @JsonSetter(value = "before", nulls = Nulls.SKIP)
         public Builder before(Optional<String> before) {
@@ -432,6 +465,20 @@ public final class ListAccountsRequest {
         }
 
         /**
+         * <p>Return only the subaccount with this <code>external_id</code>, matched exactly and case-sensitively. End it with <code>%</code> to return every subaccount whose <code>external_id</code> starts with the text before it, such as <code>shopline:%</code>. <code>%</code> is accepted only at the end, because anywhere else it would scan all your subaccounts. <code>_</code> always matches literally.</p>
+         */
+        @JsonSetter(value = "external_id", nulls = Nulls.SKIP)
+        public Builder externalId(Optional<String> externalId) {
+            this.externalId = externalId;
+            return this;
+        }
+
+        public Builder externalId(String externalId) {
+            this.externalId = Optional.ofNullable(externalId);
+            return this;
+        }
+
+        /**
          * <p>Return only accounts whose lifetime USD volume is at least this value. Requires <code>stats:read</code> on the parent account.</p>
          */
         @JsonSetter(value = "volume_min", nulls = Nulls.SKIP)
@@ -460,7 +507,7 @@ public final class ListAccountsRequest {
         }
 
         /**
-         * <p>For platforms: the parent account ID whose direct connected accounts to return. Requires <code>payout:account:read</code> on the parent account.</p>
+         * <p>For platforms: the parent account ID whose direct subaccounts to return. Requires <code>payout:account:read</code> on the parent account.</p>
          */
         @JsonSetter(value = "parent_account_id", nulls = Nulls.SKIP)
         public Builder parentAccountId(Optional<String> parentAccountId) {
@@ -470,6 +517,20 @@ public final class ListAccountsRequest {
 
         public Builder parentAccountId(String parentAccountId) {
             this.parentAccountId = Optional.ofNullable(parentAccountId);
+            return this;
+        }
+
+        /**
+         * <p>Return only accounts owned by this user (<code>user_...</code>), the account's <code>owner</code>. Cannot be combined with <code>parent_account_id</code>.</p>
+         */
+        @JsonSetter(value = "owner_id", nulls = Nulls.SKIP)
+        public Builder ownerId(Optional<String> ownerId) {
+            this.ownerId = ownerId;
+            return this;
+        }
+
+        public Builder ownerId(String ownerId) {
+            this.ownerId = Optional.ofNullable(ownerId);
             return this;
         }
 
@@ -485,10 +546,34 @@ public final class ListAccountsRequest {
                     query,
                     createdAfter,
                     createdBefore,
+                    externalId,
                     volumeMin,
                     volumeMax,
                     parentAccountId,
+                    ownerId,
                     additionalProperties);
+        }
+
+        @JsonAnySetter
+        private void putAdditionalPropertyFromJson(String key, Object value) {
+            if (key.equalsIgnoreCase("first")
+                    || key.equalsIgnoreCase("after")
+                    || key.equalsIgnoreCase("last")
+                    || key.equalsIgnoreCase("before")
+                    || key.equalsIgnoreCase("order")
+                    || key.equalsIgnoreCase("direction")
+                    || key.equalsIgnoreCase("status")
+                    || key.equalsIgnoreCase("query")
+                    || key.equalsIgnoreCase("created_after")
+                    || key.equalsIgnoreCase("created_before")
+                    || key.equalsIgnoreCase("external_id")
+                    || key.equalsIgnoreCase("volume_min")
+                    || key.equalsIgnoreCase("volume_max")
+                    || key.equalsIgnoreCase("parent_account_id")
+                    || key.equalsIgnoreCase("owner_id")) {
+                return;
+            }
+            this.additionalProperties.put(key, value);
         }
 
         public Builder additionalProperty(String key, Object value) {

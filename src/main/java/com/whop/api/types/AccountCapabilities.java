@@ -147,7 +147,7 @@ public final class AccountCapabilities {
     }
 
     /**
-     * @return Launching ad campaigns through Whop Ads. <code>inactive</code> while a requested ads services agreement is awaiting the account's signature.
+     * @return Launching ad campaigns through Whop Ads. <code>inactive</code> until the account's identity or business is verified, while a requested ads services agreement is awaiting the account's signature, and while the account is suspended from Whop Ads.
      */
     @JsonProperty("run_ads")
     public AccountCapabilitiesRunAds getRunAds() {
@@ -289,7 +289,7 @@ public final class AccountCapabilities {
 
     public interface RunAdsStage {
         /**
-         * <p>Launching ad campaigns through Whop Ads. <code>inactive</code> while a requested ads services agreement is awaiting the account's signature.</p>
+         * <p>Launching ad campaigns through Whop Ads. <code>inactive</code> until the account's identity or business is verified, while a requested ads services agreement is awaiting the account's signature, and while the account is suspended from Whop Ads.</p>
          */
         StandardPayoutStage runAds(@NotNull AccountCapabilitiesRunAds runAds);
     }
@@ -355,7 +355,6 @@ public final class AccountCapabilities {
 
         private AccountCapabilitiesTransfer transfer;
 
-        @JsonAnySetter
         private Map<String, Object> additionalProperties = new HashMap<>();
 
         private Builder() {}
@@ -379,7 +378,6 @@ public final class AccountCapabilities {
 
         /**
          * <p>Bank payins: debits, transfers, and local bank rails</p>
-         * <p>Bank payins: debits, transfers, and local bank rails</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
@@ -391,7 +389,6 @@ public final class AccountCapabilities {
         }
 
         /**
-         * <p>Buy-now-pay-later payins; requires approval</p>
          * <p>Buy-now-pay-later payins; requires approval</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
@@ -405,7 +402,6 @@ public final class AccountCapabilities {
 
         /**
          * <p>Card payins, including Apple Pay and Google Pay</p>
-         * <p>Card payins, including Apple Pay and Google Pay</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
@@ -416,7 +412,6 @@ public final class AccountCapabilities {
         }
 
         /**
-         * <p>Deposits by bank wire or ACH to the account's virtual bank account</p>
          * <p>Deposits by bank wire or ACH to the account's virtual bank account</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
@@ -429,7 +424,6 @@ public final class AccountCapabilities {
 
         /**
          * <p>Balance top-ups by charging a stored payment method</p>
-         * <p>Balance top-ups by charging a stored payment method</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
@@ -440,7 +434,6 @@ public final class AccountCapabilities {
         }
 
         /**
-         * <p>Issuing Whop cards; requires card application approval</p>
          * <p>Issuing Whop cards; requires card application approval</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
@@ -453,7 +446,6 @@ public final class AccountCapabilities {
 
         /**
          * <p>On-chain deposits to the account's crypto wallet</p>
-         * <p>On-chain deposits to the account's crypto wallet</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
@@ -464,7 +456,6 @@ public final class AccountCapabilities {
         }
 
         /**
-         * <p>On-chain payouts to a crypto wallet</p>
          * <p>On-chain payouts to a crypto wallet</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
@@ -477,7 +468,6 @@ public final class AccountCapabilities {
 
         /**
          * <p>Instant payouts to an eligible payout destination</p>
-         * <p>Instant payouts to an eligible payout destination</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
@@ -488,8 +478,7 @@ public final class AccountCapabilities {
         }
 
         /**
-         * <p>Launching ad campaigns through Whop Ads. <code>inactive</code> while a requested ads services agreement is awaiting the account's signature.</p>
-         * <p>Launching ad campaigns through Whop Ads. <code>inactive</code> while a requested ads services agreement is awaiting the account's signature.</p>
+         * <p>Launching ad campaigns through Whop Ads. <code>inactive</code> until the account's identity or business is verified, while a requested ads services agreement is awaiting the account's signature, and while the account is suspended from Whop Ads.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
@@ -501,7 +490,6 @@ public final class AccountCapabilities {
 
         /**
          * <p>Standard payouts to an external payout destination</p>
-         * <p>Standard payouts to an external payout destination</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
@@ -512,7 +500,6 @@ public final class AccountCapabilities {
         }
 
         /**
-         * <p>Transfers to other accounts</p>
          * <p>Transfers to other accounts</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
@@ -539,6 +526,25 @@ public final class AccountCapabilities {
                     standardPayout,
                     transfer,
                     additionalProperties);
+        }
+
+        @JsonAnySetter
+        private void putAdditionalPropertyFromJson(String key, Object value) {
+            if (key.equalsIgnoreCase("accept_bank_payments")
+                    || key.equalsIgnoreCase("accept_bnpl_payments")
+                    || key.equalsIgnoreCase("accept_card_payments")
+                    || key.equalsIgnoreCase("bank_deposit")
+                    || key.equalsIgnoreCase("card_deposit")
+                    || key.equalsIgnoreCase("card_issuing")
+                    || key.equalsIgnoreCase("crypto_deposit")
+                    || key.equalsIgnoreCase("crypto_payout")
+                    || key.equalsIgnoreCase("instant_payout")
+                    || key.equalsIgnoreCase("run_ads")
+                    || key.equalsIgnoreCase("standard_payout")
+                    || key.equalsIgnoreCase("transfer")) {
+                return;
+            }
+            this.additionalProperties.put(key, value);
         }
 
         @java.lang.Override

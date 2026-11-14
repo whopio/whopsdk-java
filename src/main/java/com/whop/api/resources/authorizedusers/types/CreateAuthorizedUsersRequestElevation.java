@@ -59,7 +59,7 @@ public final class CreateAuthorizedUsersRequestElevation {
     }
 
     /**
-     * @return The WebAuthn authenticator data (base64).
+     * @return Ignored. Kept so existing API clients that send a passkey assertion keep working.
      */
     @JsonIgnore
     public Optional<String> getAuthenticatorData() {
@@ -70,7 +70,7 @@ public final class CreateAuthorizedUsersRequestElevation {
     }
 
     /**
-     * @return The WebAuthn client data JSON (base64).
+     * @return Ignored. Kept so existing API clients that send a passkey assertion keep working.
      */
     @JsonIgnore
     public Optional<String> getClientDataJson() {
@@ -81,7 +81,7 @@ public final class CreateAuthorizedUsersRequestElevation {
     }
 
     /**
-     * @return The WebAuthn credential ID (base64).
+     * @return Ignored. Kept so existing API clients that send a passkey assertion keep working.
      */
     @JsonIgnore
     public Optional<String> getCredentialId() {
@@ -103,7 +103,7 @@ public final class CreateAuthorizedUsersRequestElevation {
     }
 
     /**
-     * @return The WebAuthn signature (base64).
+     * @return Ignored. Kept so existing API clients that send a passkey assertion keep working.
      */
     @JsonIgnore
     public Optional<String> getSignature() {
@@ -125,7 +125,7 @@ public final class CreateAuthorizedUsersRequestElevation {
     }
 
     /**
-     * @return Reuse an existing elevated session (for SMS/email 2FA users).
+     * @return Ignored. Kept so existing API clients that send it keep working.
      */
     @JsonIgnore
     public Optional<Boolean> getUseFinanceSession() {
@@ -236,7 +236,6 @@ public final class CreateAuthorizedUsersRequestElevation {
 
         private Optional<Boolean> useFinanceSession = Optional.empty();
 
-        @JsonAnySetter
         private Map<String, Object> additionalProperties = new HashMap<>();
 
         private Builder() {}
@@ -253,7 +252,7 @@ public final class CreateAuthorizedUsersRequestElevation {
         }
 
         /**
-         * <p>The WebAuthn authenticator data (base64).</p>
+         * <p>Ignored. Kept so existing API clients that send a passkey assertion keep working.</p>
          */
         @JsonSetter(value = "authenticator_data", nulls = Nulls.SKIP)
         public Builder authenticatorData(Optional<String> authenticatorData) {
@@ -278,7 +277,7 @@ public final class CreateAuthorizedUsersRequestElevation {
         }
 
         /**
-         * <p>The WebAuthn client data JSON (base64).</p>
+         * <p>Ignored. Kept so existing API clients that send a passkey assertion keep working.</p>
          */
         @JsonSetter(value = "client_data_json", nulls = Nulls.SKIP)
         public Builder clientDataJson(Optional<String> clientDataJson) {
@@ -303,7 +302,7 @@ public final class CreateAuthorizedUsersRequestElevation {
         }
 
         /**
-         * <p>The WebAuthn credential ID (base64).</p>
+         * <p>Ignored. Kept so existing API clients that send a passkey assertion keep working.</p>
          */
         @JsonSetter(value = "credential_id", nulls = Nulls.SKIP)
         public Builder credentialId(Optional<String> credentialId) {
@@ -353,7 +352,7 @@ public final class CreateAuthorizedUsersRequestElevation {
         }
 
         /**
-         * <p>The WebAuthn signature (base64).</p>
+         * <p>Ignored. Kept so existing API clients that send a passkey assertion keep working.</p>
          */
         @JsonSetter(value = "signature", nulls = Nulls.SKIP)
         public Builder signature(Optional<String> signature) {
@@ -403,7 +402,7 @@ public final class CreateAuthorizedUsersRequestElevation {
         }
 
         /**
-         * <p>Reuse an existing elevated session (for SMS/email 2FA users).</p>
+         * <p>Ignored. Kept so existing API clients that send it keep working.</p>
          */
         @JsonSetter(value = "use_finance_session", nulls = Nulls.SKIP)
         public Builder useFinanceSession(Optional<Boolean> useFinanceSession) {
@@ -437,6 +436,20 @@ public final class CreateAuthorizedUsersRequestElevation {
                     totpCode,
                     useFinanceSession,
                     additionalProperties);
+        }
+
+        @JsonAnySetter
+        private void putAdditionalPropertyFromJson(String key, Object value) {
+            if (key.equalsIgnoreCase("authenticator_data")
+                    || key.equalsIgnoreCase("client_data_json")
+                    || key.equalsIgnoreCase("credential_id")
+                    || key.equalsIgnoreCase("email_code")
+                    || key.equalsIgnoreCase("signature")
+                    || key.equalsIgnoreCase("totp_code")
+                    || key.equalsIgnoreCase("use_finance_session")) {
+                return;
+            }
+            this.additionalProperties.put(key, value);
         }
 
         public Builder additionalProperty(String key, Object value) {

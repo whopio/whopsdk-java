@@ -127,7 +127,6 @@ public final class EntryCustomFieldResponsesItem {
 
         private String question;
 
-        @JsonAnySetter
         private Map<String, Object> additionalProperties = new HashMap<>();
 
         private Builder() {}
@@ -142,7 +141,6 @@ public final class EntryCustomFieldResponsesItem {
 
         /**
          * <p>The response a user gave to the specific question or field.</p>
-         * <p>The response a user gave to the specific question or field.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
@@ -154,7 +152,6 @@ public final class EntryCustomFieldResponsesItem {
 
         /**
          * <p>The unique identifier for the custom field response.</p>
-         * <p>The unique identifier for the custom field response.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
@@ -165,7 +162,6 @@ public final class EntryCustomFieldResponsesItem {
         }
 
         /**
-         * <p>The question asked by the custom field</p>
          * <p>The question asked by the custom field</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
@@ -179,6 +175,14 @@ public final class EntryCustomFieldResponsesItem {
         @java.lang.Override
         public EntryCustomFieldResponsesItem build() {
             return new EntryCustomFieldResponsesItem(answer, id, question, additionalProperties);
+        }
+
+        @JsonAnySetter
+        private void putAdditionalPropertyFromJson(String key, Object value) {
+            if (key.equalsIgnoreCase("answer") || key.equalsIgnoreCase("id") || key.equalsIgnoreCase("question")) {
+                return;
+            }
+            this.additionalProperties.put(key, value);
         }
 
         @java.lang.Override

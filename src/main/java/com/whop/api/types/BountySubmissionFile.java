@@ -225,7 +225,6 @@ public final class BountySubmissionFile {
 
         private Optional<BountySubmissionFileAttachmentType> attachmentType = Optional.empty();
 
-        @JsonAnySetter
         private Map<String, Object> additionalProperties = new HashMap<>();
 
         private Builder() {}
@@ -241,7 +240,6 @@ public final class BountySubmissionFile {
         }
 
         /**
-         * <p>File ID, prefixed <code>file_</code>.</p>
          * <p>File ID, prefixed <code>file_</code>.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
@@ -399,6 +397,18 @@ public final class BountySubmissionFile {
         @java.lang.Override
         public BountySubmissionFile build() {
             return new BountySubmissionFile(attachmentType, contentType, filename, id, url, additionalProperties);
+        }
+
+        @JsonAnySetter
+        private void putAdditionalPropertyFromJson(String key, Object value) {
+            if (key.equalsIgnoreCase("attachment_type")
+                    || key.equalsIgnoreCase("content_type")
+                    || key.equalsIgnoreCase("filename")
+                    || key.equalsIgnoreCase("id")
+                    || key.equalsIgnoreCase("url")) {
+                return;
+            }
+            this.additionalProperties.put(key, value);
         }
 
         @java.lang.Override

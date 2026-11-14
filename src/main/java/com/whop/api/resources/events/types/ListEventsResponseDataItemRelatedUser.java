@@ -136,7 +136,6 @@ public final class ListEventsResponseDataItemRelatedUser {
 
         private Optional<String> username = Optional.empty();
 
-        @JsonAnySetter
         private Map<String, Object> additionalProperties = new HashMap<>();
 
         private Builder() {}
@@ -228,6 +227,17 @@ public final class ListEventsResponseDataItemRelatedUser {
 
         public ListEventsResponseDataItemRelatedUser build() {
             return new ListEventsResponseDataItemRelatedUser(avatarUrl, id, name, username, additionalProperties);
+        }
+
+        @JsonAnySetter
+        private void putAdditionalPropertyFromJson(String key, Object value) {
+            if (key.equalsIgnoreCase("avatar_url")
+                    || key.equalsIgnoreCase("id")
+                    || key.equalsIgnoreCase("name")
+                    || key.equalsIgnoreCase("username")) {
+                return;
+            }
+            this.additionalProperties.put(key, value);
         }
 
         public Builder additionalProperty(String key, Object value) {

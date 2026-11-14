@@ -137,7 +137,6 @@ public final class RetrievePeopleResponseFirstSourceCampaign {
 
         private Optional<String> name = Optional.empty();
 
-        @JsonAnySetter
         private Map<String, Object> additionalProperties = new HashMap<>();
 
         private Builder() {}
@@ -210,6 +209,14 @@ public final class RetrievePeopleResponseFirstSourceCampaign {
         @java.lang.Override
         public RetrievePeopleResponseFirstSourceCampaign build() {
             return new RetrievePeopleResponseFirstSourceCampaign(id, name, thumbnailUrl, additionalProperties);
+        }
+
+        @JsonAnySetter
+        private void putAdditionalPropertyFromJson(String key, Object value) {
+            if (key.equalsIgnoreCase("id") || key.equalsIgnoreCase("name") || key.equalsIgnoreCase("thumbnail_url")) {
+                return;
+            }
+            this.additionalProperties.put(key, value);
         }
 
         @java.lang.Override

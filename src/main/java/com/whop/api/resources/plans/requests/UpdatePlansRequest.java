@@ -30,6 +30,10 @@ import java.util.Optional;
 public final class UpdatePlansRequest {
     private final Optional<Boolean> adaptivePricingEnabled;
 
+    private final Optional<Boolean> allowMultipleQuantity;
+
+    private final Optional<Map<String, Object>> attributes;
+
     private final Optional<Integer> billingPeriod;
 
     private final Optional<Integer> cancelDiscountIntervals;
@@ -64,6 +68,10 @@ public final class UpdatePlansRequest {
 
     private final Optional<Double> renewalPrice;
 
+    private final Optional<String> sku;
+
+    private final Optional<Integer> splitPayRequiredPayments;
+
     private final Optional<Integer> stock;
 
     private final Optional<Double> strikeThroughInitialPrice;
@@ -84,6 +92,8 @@ public final class UpdatePlansRequest {
 
     private UpdatePlansRequest(
             Optional<Boolean> adaptivePricingEnabled,
+            Optional<Boolean> allowMultipleQuantity,
+            Optional<Map<String, Object>> attributes,
             Optional<Integer> billingPeriod,
             Optional<Integer> cancelDiscountIntervals,
             Optional<Integer> cancelDiscountPercentage,
@@ -101,6 +111,8 @@ public final class UpdatePlansRequest {
             Optional<UpdatePlansRequestPaymentMethodConfiguration> paymentMethodConfiguration,
             Optional<String> releaseMethod,
             Optional<Double> renewalPrice,
+            Optional<String> sku,
+            Optional<Integer> splitPayRequiredPayments,
             Optional<Integer> stock,
             Optional<Double> strikeThroughInitialPrice,
             Optional<Double> strikeThroughRenewalPrice,
@@ -111,6 +123,8 @@ public final class UpdatePlansRequest {
             Optional<String> visibility,
             Map<String, Object> additionalProperties) {
         this.adaptivePricingEnabled = adaptivePricingEnabled;
+        this.allowMultipleQuantity = allowMultipleQuantity;
+        this.attributes = attributes;
         this.billingPeriod = billingPeriod;
         this.cancelDiscountIntervals = cancelDiscountIntervals;
         this.cancelDiscountPercentage = cancelDiscountPercentage;
@@ -128,6 +142,8 @@ public final class UpdatePlansRequest {
         this.paymentMethodConfiguration = paymentMethodConfiguration;
         this.releaseMethod = releaseMethod;
         this.renewalPrice = renewalPrice;
+        this.sku = sku;
+        this.splitPayRequiredPayments = splitPayRequiredPayments;
         this.stock = stock;
         this.strikeThroughInitialPrice = strikeThroughInitialPrice;
         this.strikeThroughRenewalPrice = strikeThroughRenewalPrice;
@@ -139,9 +155,6 @@ public final class UpdatePlansRequest {
         this.additionalProperties = additionalProperties;
     }
 
-    /**
-     * @return Whether this plan accepts local currency payments via adaptive pricing.
-     */
     @JsonIgnore
     public Optional<Boolean> getAdaptivePricingEnabled() {
         if (adaptivePricingEnabled == null) {
@@ -150,9 +163,19 @@ public final class UpdatePlansRequest {
         return adaptivePricingEnabled;
     }
 
-    /**
-     * @return Recurring billing interval in days, such as 30 for monthly or 365 for annual.
-     */
+    @JsonProperty("allow_multiple_quantity")
+    public Optional<Boolean> getAllowMultipleQuantity() {
+        return allowMultipleQuantity;
+    }
+
+    @JsonIgnore
+    public Optional<Map<String, Object>> getAttributes() {
+        if (attributes == null) {
+            return Optional.empty();
+        }
+        return attributes;
+    }
+
     @JsonIgnore
     public Optional<Integer> getBillingPeriod() {
         if (billingPeriod == null) {
@@ -161,9 +184,6 @@ public final class UpdatePlansRequest {
         return billingPeriod;
     }
 
-    /**
-     * @return How many renewals the retention discount applies to. Required when <code>offer_cancel_discount</code> is true.
-     */
     @JsonIgnore
     public Optional<Integer> getCancelDiscountIntervals() {
         if (cancelDiscountIntervals == null) {
@@ -172,9 +192,6 @@ public final class UpdatePlansRequest {
         return cancelDiscountIntervals;
     }
 
-    /**
-     * @return Percentage taken off each discounted renewal. Required when <code>offer_cancel_discount</code> is true.
-     */
     @JsonIgnore
     public Optional<Integer> getCancelDiscountPercentage() {
         if (cancelDiscountPercentage == null) {
@@ -183,9 +200,6 @@ public final class UpdatePlansRequest {
         return cancelDiscountPercentage;
     }
 
-    /**
-     * @return Checkout styling overrides for this plan.
-     */
     @JsonIgnore
     public Optional<Map<String, Object>> getCheckoutStyling() {
         if (checkoutStyling == null) {
@@ -194,17 +208,11 @@ public final class UpdatePlansRequest {
         return checkoutStyling;
     }
 
-    /**
-     * @return The three-letter ISO currency code for the plan's pricing. Defaults to USD.
-     */
     @JsonProperty("currency")
     public Optional<String> getCurrency() {
         return currency;
     }
 
-    /**
-     * @return An array of custom field definitions to collect from customers at checkout. Omitting this field clears existing custom fields.
-     */
     @JsonIgnore
     public Optional<List<UpdatePlansRequestCustomFieldsItem>> getCustomFields() {
         if (customFields == null) {
@@ -213,9 +221,6 @@ public final class UpdatePlansRequest {
         return customFields;
     }
 
-    /**
-     * @return A text description of the plan displayed to customers on the product page.
-     */
     @JsonIgnore
     public Optional<String> getDescription() {
         if (description == null) {
@@ -224,9 +229,6 @@ public final class UpdatePlansRequest {
         return description;
     }
 
-    /**
-     * @return Access duration in days before the membership expires.
-     */
     @JsonIgnore
     public Optional<Integer> getExpirationDays() {
         if (expirationDays == null) {
@@ -235,9 +237,6 @@ public final class UpdatePlansRequest {
         return expirationDays;
     }
 
-    /**
-     * @return An image displayed on the product page to represent this plan.
-     */
     @JsonIgnore
     public Optional<UpdatePlansRequestImage> getImage() {
         if (image == null) {
@@ -246,9 +245,6 @@ public final class UpdatePlansRequest {
         return image;
     }
 
-    /**
-     * @return Initial amount charged in the plan's currency, e.g. 10.43 for $10.43.
-     */
     @JsonIgnore
     public Optional<Double> getInitialPrice() {
         if (initialPrice == null) {
@@ -257,9 +253,6 @@ public final class UpdatePlansRequest {
         return initialPrice;
     }
 
-    /**
-     * @return Private notes visible only to the account owner. Not shown to customers.
-     */
     @JsonIgnore
     public Optional<String> getInternalNotes() {
         if (internalNotes == null) {
@@ -268,9 +261,6 @@ public final class UpdatePlansRequest {
         return internalNotes;
     }
 
-    /**
-     * @return Custom key-value pairs to store on the plan. Included in webhook payloads for payment and membership events. Max 50 keys, 100 chars per key, 500 chars per string value. The reserved keys <code>custom_cta</code> (a checkout call-to-action button label — one of the product custom CTA values, e.g. <code>subscribe</code>, <code>get_offer</code>) and <code>custom_cta_url</code> (a URL the button links to; web or <code>tel:</code>) override the product's call to action for this plan and are validated on save.
-     */
     @JsonIgnore
     public Optional<Map<String, Object>> getMetadata() {
         if (metadata == null) {
@@ -279,9 +269,6 @@ public final class UpdatePlansRequest {
         return metadata;
     }
 
-    /**
-     * @return Whether to offer a retention discount when a customer attempts to cancel.
-     */
     @JsonIgnore
     public Optional<Boolean> getOfferCancelDiscount() {
         if (offerCancelDiscount == null) {
@@ -290,17 +277,11 @@ public final class UpdatePlansRequest {
         return offerCancelDiscount;
     }
 
-    /**
-     * @return Override the default tax classification for this specific plan.
-     */
     @JsonProperty("override_tax_type")
     public Optional<String> getOverrideTaxType() {
         return overrideTaxType;
     }
 
-    /**
-     * @return Explicit payment method configuration for the plan. When not provided, the account's defaults apply.
-     */
     @JsonIgnore
     public Optional<UpdatePlansRequestPaymentMethodConfiguration> getPaymentMethodConfiguration() {
         if (paymentMethodConfiguration == null) {
@@ -309,17 +290,11 @@ public final class UpdatePlansRequest {
         return paymentMethodConfiguration;
     }
 
-    /**
-     * @return Sales method for this plan.
-     */
     @JsonProperty("release_method")
     public Optional<String> getReleaseMethod() {
         return releaseMethod;
     }
 
-    /**
-     * @return The amount charged each billing period for recurring plans, in the plan's currency.
-     */
     @JsonIgnore
     public Optional<Double> getRenewalPrice() {
         if (renewalPrice == null) {
@@ -328,9 +303,22 @@ public final class UpdatePlansRequest {
         return renewalPrice;
     }
 
-    /**
-     * @return The maximum number of units available for purchase. Ignored when unlimited_stock is true.
-     */
+    @JsonIgnore
+    public Optional<String> getSku() {
+        if (sku == null) {
+            return Optional.empty();
+        }
+        return sku;
+    }
+
+    @JsonIgnore
+    public Optional<Integer> getSplitPayRequiredPayments() {
+        if (splitPayRequiredPayments == null) {
+            return Optional.empty();
+        }
+        return splitPayRequiredPayments;
+    }
+
     @JsonIgnore
     public Optional<Integer> getStock() {
         if (stock == null) {
@@ -339,9 +327,6 @@ public final class UpdatePlansRequest {
         return stock;
     }
 
-    /**
-     * @return A comparison price displayed with a strikethrough for the initial price.
-     */
     @JsonIgnore
     public Optional<Double> getStrikeThroughInitialPrice() {
         if (strikeThroughInitialPrice == null) {
@@ -350,9 +335,6 @@ public final class UpdatePlansRequest {
         return strikeThroughInitialPrice;
     }
 
-    /**
-     * @return A comparison price displayed with a strikethrough for the renewal price.
-     */
     @JsonIgnore
     public Optional<Double> getStrikeThroughRenewalPrice() {
         if (strikeThroughRenewalPrice == null) {
@@ -361,9 +343,6 @@ public final class UpdatePlansRequest {
         return strikeThroughRenewalPrice;
     }
 
-    /**
-     * @return 3D Secure behavior for this plan. Send <code>null</code> to inherit the account default.
-     */
     @JsonIgnore
     public Optional<UpdatePlansRequestThreeDsLevel> getThreeDsLevel() {
         if (threeDsLevel == null) {
@@ -372,9 +351,6 @@ public final class UpdatePlansRequest {
         return threeDsLevel;
     }
 
-    /**
-     * @return The display name of the plan shown to customers on the product page.
-     */
     @JsonIgnore
     public Optional<String> getTitle() {
         if (title == null) {
@@ -383,9 +359,6 @@ public final class UpdatePlansRequest {
         return title;
     }
 
-    /**
-     * @return Free trial duration before the first recurring charge.
-     */
     @JsonIgnore
     public Optional<Integer> getTrialPeriodDays() {
         if (trialPeriodDays == null) {
@@ -394,9 +367,6 @@ public final class UpdatePlansRequest {
         return trialPeriodDays;
     }
 
-    /**
-     * @return Whether the plan has unlimited stock. When true, the stock field is ignored.
-     */
     @JsonIgnore
     public Optional<Boolean> getUnlimitedStock() {
         if (unlimitedStock == null) {
@@ -405,9 +375,6 @@ public final class UpdatePlansRequest {
         return unlimitedStock;
     }
 
-    /**
-     * @return Whether the plan is visible to customers or hidden from public view.
-     */
     @JsonProperty("visibility")
     public Optional<String> getVisibility() {
         return visibility;
@@ -417,6 +384,12 @@ public final class UpdatePlansRequest {
     @JsonProperty("adaptive_pricing_enabled")
     private Optional<Boolean> _getAdaptivePricingEnabled() {
         return adaptivePricingEnabled;
+    }
+
+    @JsonInclude(value = JsonInclude.Include.CUSTOM, valueFilter = NullableNonemptyFilter.class)
+    @JsonProperty("attributes")
+    private Optional<Map<String, Object>> _getAttributes() {
+        return attributes;
     }
 
     @JsonInclude(value = JsonInclude.Include.CUSTOM, valueFilter = NullableNonemptyFilter.class)
@@ -504,6 +477,18 @@ public final class UpdatePlansRequest {
     }
 
     @JsonInclude(value = JsonInclude.Include.CUSTOM, valueFilter = NullableNonemptyFilter.class)
+    @JsonProperty("sku")
+    private Optional<String> _getSku() {
+        return sku;
+    }
+
+    @JsonInclude(value = JsonInclude.Include.CUSTOM, valueFilter = NullableNonemptyFilter.class)
+    @JsonProperty("split_pay_required_payments")
+    private Optional<Integer> _getSplitPayRequiredPayments() {
+        return splitPayRequiredPayments;
+    }
+
+    @JsonInclude(value = JsonInclude.Include.CUSTOM, valueFilter = NullableNonemptyFilter.class)
     @JsonProperty("stock")
     private Optional<Integer> _getStock() {
         return stock;
@@ -558,6 +543,8 @@ public final class UpdatePlansRequest {
 
     private boolean equalTo(UpdatePlansRequest other) {
         return adaptivePricingEnabled.equals(other.adaptivePricingEnabled)
+                && allowMultipleQuantity.equals(other.allowMultipleQuantity)
+                && attributes.equals(other.attributes)
                 && billingPeriod.equals(other.billingPeriod)
                 && cancelDiscountIntervals.equals(other.cancelDiscountIntervals)
                 && cancelDiscountPercentage.equals(other.cancelDiscountPercentage)
@@ -575,6 +562,8 @@ public final class UpdatePlansRequest {
                 && paymentMethodConfiguration.equals(other.paymentMethodConfiguration)
                 && releaseMethod.equals(other.releaseMethod)
                 && renewalPrice.equals(other.renewalPrice)
+                && sku.equals(other.sku)
+                && splitPayRequiredPayments.equals(other.splitPayRequiredPayments)
                 && stock.equals(other.stock)
                 && strikeThroughInitialPrice.equals(other.strikeThroughInitialPrice)
                 && strikeThroughRenewalPrice.equals(other.strikeThroughRenewalPrice)
@@ -589,6 +578,8 @@ public final class UpdatePlansRequest {
     public int hashCode() {
         return Objects.hash(
                 this.adaptivePricingEnabled,
+                this.allowMultipleQuantity,
+                this.attributes,
                 this.billingPeriod,
                 this.cancelDiscountIntervals,
                 this.cancelDiscountPercentage,
@@ -606,6 +597,8 @@ public final class UpdatePlansRequest {
                 this.paymentMethodConfiguration,
                 this.releaseMethod,
                 this.renewalPrice,
+                this.sku,
+                this.splitPayRequiredPayments,
                 this.stock,
                 this.strikeThroughInitialPrice,
                 this.strikeThroughRenewalPrice,
@@ -628,6 +621,10 @@ public final class UpdatePlansRequest {
     @JsonIgnoreProperties(ignoreUnknown = true)
     public static final class Builder {
         private Optional<Boolean> adaptivePricingEnabled = Optional.empty();
+
+        private Optional<Boolean> allowMultipleQuantity = Optional.empty();
+
+        private Optional<Map<String, Object>> attributes = Optional.empty();
 
         private Optional<Integer> billingPeriod = Optional.empty();
 
@@ -663,6 +660,10 @@ public final class UpdatePlansRequest {
 
         private Optional<Double> renewalPrice = Optional.empty();
 
+        private Optional<String> sku = Optional.empty();
+
+        private Optional<Integer> splitPayRequiredPayments = Optional.empty();
+
         private Optional<Integer> stock = Optional.empty();
 
         private Optional<Double> strikeThroughInitialPrice = Optional.empty();
@@ -679,13 +680,14 @@ public final class UpdatePlansRequest {
 
         private Optional<String> visibility = Optional.empty();
 
-        @JsonAnySetter
         private Map<String, Object> additionalProperties = new HashMap<>();
 
         private Builder() {}
 
         public Builder from(UpdatePlansRequest other) {
             adaptivePricingEnabled(other.getAdaptivePricingEnabled());
+            allowMultipleQuantity(other.getAllowMultipleQuantity());
+            attributes(other.getAttributes());
             billingPeriod(other.getBillingPeriod());
             cancelDiscountIntervals(other.getCancelDiscountIntervals());
             cancelDiscountPercentage(other.getCancelDiscountPercentage());
@@ -703,6 +705,8 @@ public final class UpdatePlansRequest {
             paymentMethodConfiguration(other.getPaymentMethodConfiguration());
             releaseMethod(other.getReleaseMethod());
             renewalPrice(other.getRenewalPrice());
+            sku(other.getSku());
+            splitPayRequiredPayments(other.getSplitPayRequiredPayments());
             stock(other.getStock());
             strikeThroughInitialPrice(other.getStrikeThroughInitialPrice());
             strikeThroughRenewalPrice(other.getStrikeThroughRenewalPrice());
@@ -714,9 +718,6 @@ public final class UpdatePlansRequest {
             return this;
         }
 
-        /**
-         * <p>Whether this plan accepts local currency payments via adaptive pricing.</p>
-         */
         @JsonSetter(value = "adaptive_pricing_enabled", nulls = Nulls.SKIP)
         public Builder adaptivePricingEnabled(Optional<Boolean> adaptivePricingEnabled) {
             this.adaptivePricingEnabled = adaptivePricingEnabled;
@@ -739,9 +740,39 @@ public final class UpdatePlansRequest {
             return this;
         }
 
-        /**
-         * <p>Recurring billing interval in days, such as 30 for monthly or 365 for annual.</p>
-         */
+        @JsonSetter(value = "allow_multiple_quantity", nulls = Nulls.SKIP)
+        public Builder allowMultipleQuantity(Optional<Boolean> allowMultipleQuantity) {
+            this.allowMultipleQuantity = allowMultipleQuantity;
+            return this;
+        }
+
+        public Builder allowMultipleQuantity(Boolean allowMultipleQuantity) {
+            this.allowMultipleQuantity = Optional.ofNullable(allowMultipleQuantity);
+            return this;
+        }
+
+        @JsonSetter(value = "attributes", nulls = Nulls.SKIP)
+        public Builder attributes(Optional<Map<String, Object>> attributes) {
+            this.attributes = attributes;
+            return this;
+        }
+
+        public Builder attributes(Map<String, Object> attributes) {
+            this.attributes = Optional.ofNullable(attributes);
+            return this;
+        }
+
+        public Builder attributes(Nullable<Map<String, Object>> attributes) {
+            if (attributes.isNull()) {
+                this.attributes = null;
+            } else if (attributes.isEmpty()) {
+                this.attributes = Optional.empty();
+            } else {
+                this.attributes = Optional.of(attributes.get());
+            }
+            return this;
+        }
+
         @JsonSetter(value = "billing_period", nulls = Nulls.SKIP)
         public Builder billingPeriod(Optional<Integer> billingPeriod) {
             this.billingPeriod = billingPeriod;
@@ -764,9 +795,6 @@ public final class UpdatePlansRequest {
             return this;
         }
 
-        /**
-         * <p>How many renewals the retention discount applies to. Required when <code>offer_cancel_discount</code> is true.</p>
-         */
         @JsonSetter(value = "cancel_discount_intervals", nulls = Nulls.SKIP)
         public Builder cancelDiscountIntervals(Optional<Integer> cancelDiscountIntervals) {
             this.cancelDiscountIntervals = cancelDiscountIntervals;
@@ -789,9 +817,6 @@ public final class UpdatePlansRequest {
             return this;
         }
 
-        /**
-         * <p>Percentage taken off each discounted renewal. Required when <code>offer_cancel_discount</code> is true.</p>
-         */
         @JsonSetter(value = "cancel_discount_percentage", nulls = Nulls.SKIP)
         public Builder cancelDiscountPercentage(Optional<Integer> cancelDiscountPercentage) {
             this.cancelDiscountPercentage = cancelDiscountPercentage;
@@ -814,9 +839,6 @@ public final class UpdatePlansRequest {
             return this;
         }
 
-        /**
-         * <p>Checkout styling overrides for this plan.</p>
-         */
         @JsonSetter(value = "checkout_styling", nulls = Nulls.SKIP)
         public Builder checkoutStyling(Optional<Map<String, Object>> checkoutStyling) {
             this.checkoutStyling = checkoutStyling;
@@ -839,9 +861,6 @@ public final class UpdatePlansRequest {
             return this;
         }
 
-        /**
-         * <p>The three-letter ISO currency code for the plan's pricing. Defaults to USD.</p>
-         */
         @JsonSetter(value = "currency", nulls = Nulls.SKIP)
         public Builder currency(Optional<String> currency) {
             this.currency = currency;
@@ -853,9 +872,6 @@ public final class UpdatePlansRequest {
             return this;
         }
 
-        /**
-         * <p>An array of custom field definitions to collect from customers at checkout. Omitting this field clears existing custom fields.</p>
-         */
         @JsonSetter(value = "custom_fields", nulls = Nulls.SKIP)
         public Builder customFields(Optional<List<UpdatePlansRequestCustomFieldsItem>> customFields) {
             this.customFields = customFields;
@@ -878,9 +894,6 @@ public final class UpdatePlansRequest {
             return this;
         }
 
-        /**
-         * <p>A text description of the plan displayed to customers on the product page.</p>
-         */
         @JsonSetter(value = "description", nulls = Nulls.SKIP)
         public Builder description(Optional<String> description) {
             this.description = description;
@@ -903,9 +916,6 @@ public final class UpdatePlansRequest {
             return this;
         }
 
-        /**
-         * <p>Access duration in days before the membership expires.</p>
-         */
         @JsonSetter(value = "expiration_days", nulls = Nulls.SKIP)
         public Builder expirationDays(Optional<Integer> expirationDays) {
             this.expirationDays = expirationDays;
@@ -928,9 +938,6 @@ public final class UpdatePlansRequest {
             return this;
         }
 
-        /**
-         * <p>An image displayed on the product page to represent this plan.</p>
-         */
         @JsonSetter(value = "image", nulls = Nulls.SKIP)
         public Builder image(Optional<UpdatePlansRequestImage> image) {
             this.image = image;
@@ -953,9 +960,6 @@ public final class UpdatePlansRequest {
             return this;
         }
 
-        /**
-         * <p>Initial amount charged in the plan's currency, e.g. 10.43 for $10.43.</p>
-         */
         @JsonSetter(value = "initial_price", nulls = Nulls.SKIP)
         public Builder initialPrice(Optional<Double> initialPrice) {
             this.initialPrice = initialPrice;
@@ -978,9 +982,6 @@ public final class UpdatePlansRequest {
             return this;
         }
 
-        /**
-         * <p>Private notes visible only to the account owner. Not shown to customers.</p>
-         */
         @JsonSetter(value = "internal_notes", nulls = Nulls.SKIP)
         public Builder internalNotes(Optional<String> internalNotes) {
             this.internalNotes = internalNotes;
@@ -1003,9 +1004,6 @@ public final class UpdatePlansRequest {
             return this;
         }
 
-        /**
-         * <p>Custom key-value pairs to store on the plan. Included in webhook payloads for payment and membership events. Max 50 keys, 100 chars per key, 500 chars per string value. The reserved keys <code>custom_cta</code> (a checkout call-to-action button label — one of the product custom CTA values, e.g. <code>subscribe</code>, <code>get_offer</code>) and <code>custom_cta_url</code> (a URL the button links to; web or <code>tel:</code>) override the product's call to action for this plan and are validated on save.</p>
-         */
         @JsonSetter(value = "metadata", nulls = Nulls.SKIP)
         public Builder metadata(Optional<Map<String, Object>> metadata) {
             this.metadata = metadata;
@@ -1028,9 +1026,6 @@ public final class UpdatePlansRequest {
             return this;
         }
 
-        /**
-         * <p>Whether to offer a retention discount when a customer attempts to cancel.</p>
-         */
         @JsonSetter(value = "offer_cancel_discount", nulls = Nulls.SKIP)
         public Builder offerCancelDiscount(Optional<Boolean> offerCancelDiscount) {
             this.offerCancelDiscount = offerCancelDiscount;
@@ -1053,9 +1048,6 @@ public final class UpdatePlansRequest {
             return this;
         }
 
-        /**
-         * <p>Override the default tax classification for this specific plan.</p>
-         */
         @JsonSetter(value = "override_tax_type", nulls = Nulls.SKIP)
         public Builder overrideTaxType(Optional<String> overrideTaxType) {
             this.overrideTaxType = overrideTaxType;
@@ -1067,9 +1059,6 @@ public final class UpdatePlansRequest {
             return this;
         }
 
-        /**
-         * <p>Explicit payment method configuration for the plan. When not provided, the account's defaults apply.</p>
-         */
         @JsonSetter(value = "payment_method_configuration", nulls = Nulls.SKIP)
         public Builder paymentMethodConfiguration(
                 Optional<UpdatePlansRequestPaymentMethodConfiguration> paymentMethodConfiguration) {
@@ -1095,9 +1084,6 @@ public final class UpdatePlansRequest {
             return this;
         }
 
-        /**
-         * <p>Sales method for this plan.</p>
-         */
         @JsonSetter(value = "release_method", nulls = Nulls.SKIP)
         public Builder releaseMethod(Optional<String> releaseMethod) {
             this.releaseMethod = releaseMethod;
@@ -1109,9 +1095,6 @@ public final class UpdatePlansRequest {
             return this;
         }
 
-        /**
-         * <p>The amount charged each billing period for recurring plans, in the plan's currency.</p>
-         */
         @JsonSetter(value = "renewal_price", nulls = Nulls.SKIP)
         public Builder renewalPrice(Optional<Double> renewalPrice) {
             this.renewalPrice = renewalPrice;
@@ -1134,9 +1117,50 @@ public final class UpdatePlansRequest {
             return this;
         }
 
-        /**
-         * <p>The maximum number of units available for purchase. Ignored when unlimited_stock is true.</p>
-         */
+        @JsonSetter(value = "sku", nulls = Nulls.SKIP)
+        public Builder sku(Optional<String> sku) {
+            this.sku = sku;
+            return this;
+        }
+
+        public Builder sku(String sku) {
+            this.sku = Optional.ofNullable(sku);
+            return this;
+        }
+
+        public Builder sku(Nullable<String> sku) {
+            if (sku.isNull()) {
+                this.sku = null;
+            } else if (sku.isEmpty()) {
+                this.sku = Optional.empty();
+            } else {
+                this.sku = Optional.of(sku.get());
+            }
+            return this;
+        }
+
+        @JsonSetter(value = "split_pay_required_payments", nulls = Nulls.SKIP)
+        public Builder splitPayRequiredPayments(Optional<Integer> splitPayRequiredPayments) {
+            this.splitPayRequiredPayments = splitPayRequiredPayments;
+            return this;
+        }
+
+        public Builder splitPayRequiredPayments(Integer splitPayRequiredPayments) {
+            this.splitPayRequiredPayments = Optional.ofNullable(splitPayRequiredPayments);
+            return this;
+        }
+
+        public Builder splitPayRequiredPayments(Nullable<Integer> splitPayRequiredPayments) {
+            if (splitPayRequiredPayments.isNull()) {
+                this.splitPayRequiredPayments = null;
+            } else if (splitPayRequiredPayments.isEmpty()) {
+                this.splitPayRequiredPayments = Optional.empty();
+            } else {
+                this.splitPayRequiredPayments = Optional.of(splitPayRequiredPayments.get());
+            }
+            return this;
+        }
+
         @JsonSetter(value = "stock", nulls = Nulls.SKIP)
         public Builder stock(Optional<Integer> stock) {
             this.stock = stock;
@@ -1159,9 +1183,6 @@ public final class UpdatePlansRequest {
             return this;
         }
 
-        /**
-         * <p>A comparison price displayed with a strikethrough for the initial price.</p>
-         */
         @JsonSetter(value = "strike_through_initial_price", nulls = Nulls.SKIP)
         public Builder strikeThroughInitialPrice(Optional<Double> strikeThroughInitialPrice) {
             this.strikeThroughInitialPrice = strikeThroughInitialPrice;
@@ -1184,9 +1205,6 @@ public final class UpdatePlansRequest {
             return this;
         }
 
-        /**
-         * <p>A comparison price displayed with a strikethrough for the renewal price.</p>
-         */
         @JsonSetter(value = "strike_through_renewal_price", nulls = Nulls.SKIP)
         public Builder strikeThroughRenewalPrice(Optional<Double> strikeThroughRenewalPrice) {
             this.strikeThroughRenewalPrice = strikeThroughRenewalPrice;
@@ -1209,9 +1227,6 @@ public final class UpdatePlansRequest {
             return this;
         }
 
-        /**
-         * <p>3D Secure behavior for this plan. Send <code>null</code> to inherit the account default.</p>
-         */
         @JsonSetter(value = "three_ds_level", nulls = Nulls.SKIP)
         public Builder threeDsLevel(Optional<UpdatePlansRequestThreeDsLevel> threeDsLevel) {
             this.threeDsLevel = threeDsLevel;
@@ -1234,9 +1249,6 @@ public final class UpdatePlansRequest {
             return this;
         }
 
-        /**
-         * <p>The display name of the plan shown to customers on the product page.</p>
-         */
         @JsonSetter(value = "title", nulls = Nulls.SKIP)
         public Builder title(Optional<String> title) {
             this.title = title;
@@ -1259,9 +1271,6 @@ public final class UpdatePlansRequest {
             return this;
         }
 
-        /**
-         * <p>Free trial duration before the first recurring charge.</p>
-         */
         @JsonSetter(value = "trial_period_days", nulls = Nulls.SKIP)
         public Builder trialPeriodDays(Optional<Integer> trialPeriodDays) {
             this.trialPeriodDays = trialPeriodDays;
@@ -1284,9 +1293,6 @@ public final class UpdatePlansRequest {
             return this;
         }
 
-        /**
-         * <p>Whether the plan has unlimited stock. When true, the stock field is ignored.</p>
-         */
         @JsonSetter(value = "unlimited_stock", nulls = Nulls.SKIP)
         public Builder unlimitedStock(Optional<Boolean> unlimitedStock) {
             this.unlimitedStock = unlimitedStock;
@@ -1309,9 +1315,6 @@ public final class UpdatePlansRequest {
             return this;
         }
 
-        /**
-         * <p>Whether the plan is visible to customers or hidden from public view.</p>
-         */
         @JsonSetter(value = "visibility", nulls = Nulls.SKIP)
         public Builder visibility(Optional<String> visibility) {
             this.visibility = visibility;
@@ -1326,6 +1329,8 @@ public final class UpdatePlansRequest {
         public UpdatePlansRequest build() {
             return new UpdatePlansRequest(
                     adaptivePricingEnabled,
+                    allowMultipleQuantity,
+                    attributes,
                     billingPeriod,
                     cancelDiscountIntervals,
                     cancelDiscountPercentage,
@@ -1343,6 +1348,8 @@ public final class UpdatePlansRequest {
                     paymentMethodConfiguration,
                     releaseMethod,
                     renewalPrice,
+                    sku,
+                    splitPayRequiredPayments,
                     stock,
                     strikeThroughInitialPrice,
                     strikeThroughRenewalPrice,
@@ -1352,6 +1359,43 @@ public final class UpdatePlansRequest {
                     unlimitedStock,
                     visibility,
                     additionalProperties);
+        }
+
+        @JsonAnySetter
+        private void putAdditionalPropertyFromJson(String key, Object value) {
+            if (key.equalsIgnoreCase("adaptive_pricing_enabled")
+                    || key.equalsIgnoreCase("allow_multiple_quantity")
+                    || key.equalsIgnoreCase("attributes")
+                    || key.equalsIgnoreCase("billing_period")
+                    || key.equalsIgnoreCase("cancel_discount_intervals")
+                    || key.equalsIgnoreCase("cancel_discount_percentage")
+                    || key.equalsIgnoreCase("checkout_styling")
+                    || key.equalsIgnoreCase("currency")
+                    || key.equalsIgnoreCase("custom_fields")
+                    || key.equalsIgnoreCase("description")
+                    || key.equalsIgnoreCase("expiration_days")
+                    || key.equalsIgnoreCase("image")
+                    || key.equalsIgnoreCase("initial_price")
+                    || key.equalsIgnoreCase("internal_notes")
+                    || key.equalsIgnoreCase("metadata")
+                    || key.equalsIgnoreCase("offer_cancel_discount")
+                    || key.equalsIgnoreCase("override_tax_type")
+                    || key.equalsIgnoreCase("payment_method_configuration")
+                    || key.equalsIgnoreCase("release_method")
+                    || key.equalsIgnoreCase("renewal_price")
+                    || key.equalsIgnoreCase("sku")
+                    || key.equalsIgnoreCase("split_pay_required_payments")
+                    || key.equalsIgnoreCase("stock")
+                    || key.equalsIgnoreCase("strike_through_initial_price")
+                    || key.equalsIgnoreCase("strike_through_renewal_price")
+                    || key.equalsIgnoreCase("three_ds_level")
+                    || key.equalsIgnoreCase("title")
+                    || key.equalsIgnoreCase("trial_period_days")
+                    || key.equalsIgnoreCase("unlimited_stock")
+                    || key.equalsIgnoreCase("visibility")) {
+                return;
+            }
+            this.additionalProperties.put(key, value);
         }
 
         public Builder additionalProperty(String key, Object value) {

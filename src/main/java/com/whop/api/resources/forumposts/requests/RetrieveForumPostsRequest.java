@@ -43,7 +43,6 @@ public final class RetrieveForumPostsRequest {
 
     @JsonIgnoreProperties(ignoreUnknown = true)
     public static final class Builder {
-        @JsonAnySetter
         private Map<String, Object> additionalProperties = new HashMap<>();
 
         private Builder() {}
@@ -54,6 +53,11 @@ public final class RetrieveForumPostsRequest {
 
         public RetrieveForumPostsRequest build() {
             return new RetrieveForumPostsRequest(additionalProperties);
+        }
+
+        @JsonAnySetter
+        private void putAdditionalPropertyFromJson(String key, Object value) {
+            this.additionalProperties.put(key, value);
         }
 
         public Builder additionalProperty(String key, Object value) {

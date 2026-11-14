@@ -4,11 +4,14 @@
 package com.whop.api.resources.dmchannels;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
+import com.whop.api.core.BodyProperties;
 import com.whop.api.core.ClientOptions;
 import com.whop.api.core.MediaTypes;
 import com.whop.api.core.ObjectMappers;
+import com.whop.api.core.PathSegments;
 import com.whop.api.core.QueryStringMapper;
 import com.whop.api.core.RequestOptions;
+import com.whop.api.core.RetryInterceptor;
 import com.whop.api.core.WhopApiApiException;
 import com.whop.api.core.WhopApiException;
 import com.whop.api.core.WhopApiHttpResponse;
@@ -28,6 +31,8 @@ import com.whop.api.resources.dmchannels.requests.UpdateDmChannelsRequest;
 import com.whop.api.resources.dmchannels.types.ListDmChannelsResponse;
 import com.whop.api.types.DmChannel;
 import com.whop.api.types.DmChannelListItem;
+import com.whop.api.types.InternalServerErrorBody;
+import com.whop.api.types.UnprocessableEntityErrorBody;
 import java.io.IOException;
 import java.util.List;
 import java.util.Optional;
@@ -47,7 +52,7 @@ public class RawDmChannelsClient {
     }
 
     /**
-     * Returns a paginated list of DM channels for the currently authenticated user, sorted by most recently active.
+     * Lists the authenticated user's DM channels, most recently active first.
      * <p>Required permissions:</p>
      * <ul>
      * <li><code>dms:read</code></li>
@@ -58,7 +63,7 @@ public class RawDmChannelsClient {
     }
 
     /**
-     * Returns a paginated list of DM channels for the currently authenticated user, sorted by most recently active.
+     * Lists the authenticated user's DM channels, most recently active first.
      * <p>Required permissions:</p>
      * <ul>
      * <li><code>dms:read</code></li>
@@ -69,7 +74,7 @@ public class RawDmChannelsClient {
     }
 
     /**
-     * Returns a paginated list of DM channels for the currently authenticated user, sorted by most recently active.
+     * Lists the authenticated user's DM channels, most recently active first.
      * <p>Required permissions:</p>
      * <ul>
      * <li><code>dms:read</code></li>
@@ -80,7 +85,7 @@ public class RawDmChannelsClient {
     }
 
     /**
-     * Returns a paginated list of DM channels for the currently authenticated user, sorted by most recently active.
+     * Lists the authenticated user's DM channels, most recently active first.
      * <p>Required permissions:</p>
      * <ul>
      * <li><code>dms:read</code></li>
@@ -88,7 +93,7 @@ public class RawDmChannelsClient {
      */
     public WhopApiHttpResponse<SyncPagingIterable<DmChannelListItem>> list(
             ListDmChannelsRequest request, RequestOptions requestOptions) {
-        HttpUrl.Builder httpUrl = HttpUrl.parse(this.clientOptions.environment().getUrl())
+        HttpUrl.Builder httpUrl = HttpUrl.parse(this.clientOptions.environment().getApiURL())
                 .newBuilder()
                 .addPathSegments("dm_channels");
         if (request.getAfter().isPresent()) {
@@ -107,9 +112,9 @@ public class RawDmChannelsClient {
             QueryStringMapper.addQueryParameter(
                     httpUrl, "last", request.getLast().get(), false);
         }
-        if (request.getCompanyId().isPresent()) {
+        if (request.getAccountId().isPresent()) {
             QueryStringMapper.addQueryParameter(
-                    httpUrl, "company_id", request.getCompanyId().get(), false);
+                    httpUrl, "account_id", request.getAccountId().get(), false);
         }
         if (requestOptions != null) {
             requestOptions.getQueryParameters().forEach((_key, _value) -> {
@@ -126,6 +131,15 @@ public class RawDmChannelsClient {
         if (requestOptions != null && requestOptions.getTimeout().isPresent()) {
             client = clientOptions.httpClientWithTimeout(requestOptions);
         }
+        if (requestOptions != null && requestOptions.getMaxRetries().isPresent()) {
+            okhttpRequest = okhttpRequest
+                    .newBuilder()
+                    .tag(
+                            RetryInterceptor.MaxRetriesOverride.class,
+                            new RetryInterceptor.MaxRetriesOverride(
+                                    requestOptions.getMaxRetries().get()))
+                    .build();
+        }
         try (Response response = client.newCall(okhttpRequest).execute()) {
             ResponseBody responseBody = response.body();
             String responseBodyString = responseBody != null ? responseBody.string() : "{}";
@@ -140,8 +154,11 @@ public class RawDmChannelsClient {
                 List<DmChannelListItem> result = parsedResponse.getData();
                 return new WhopApiHttpResponse<>(
                         new SyncPagingIterable<DmChannelListItem>(
-                                startingAfter != null, result, parsedResponse, () -> list(nextRequest, requestOptions)
-                                        .body()),
+                                startingAfter.isPresent()
+                                        && !startingAfter.get().isEmpty(),
+                                result,
+                                parsedResponse,
+                                () -> list(nextRequest, requestOptions).body()),
                         response);
             }
             try {
@@ -160,13 +177,16 @@ public class RawDmChannelsClient {
                                 ObjectMappers.JSON_MAPPER.readValue(responseBodyString, Object.class), response);
                     case 422:
                         throw new UnprocessableEntityError(
-                                ObjectMappers.JSON_MAPPER.readValue(responseBodyString, Object.class), response);
+                                ObjectMappers.JSON_MAPPER.readValue(
+                                        responseBodyString, UnprocessableEntityErrorBody.class),
+                                response);
                     case 429:
                         throw new TooManyRequestsError(
                                 ObjectMappers.JSON_MAPPER.readValue(responseBodyString, Object.class), response);
                     case 500:
                         throw new InternalServerError(
-                                ObjectMappers.JSON_MAPPER.readValue(responseBodyString, Object.class), response);
+                                ObjectMappers.JSON_MAPPER.readValue(responseBodyString, InternalServerErrorBody.class),
+                                response);
                 }
             } catch (JsonProcessingException ignored) {
                 // unable to map error response, throwing generic error
@@ -174,13 +194,15 @@ public class RawDmChannelsClient {
             Object errorBody = ObjectMappers.parseErrorBody(responseBodyString);
             throw new WhopApiApiException(
                     "Error with status code " + response.code(), response.code(), errorBody, response);
+        } catch (JsonProcessingException e) {
+            throw new WhopApiException("Failed to deserialize response: " + e.getMessage(), e);
         } catch (IOException e) {
             throw new WhopApiException("Network error executing HTTP request", e);
         }
     }
 
     /**
-     * Create a new DM channel between two or more users, optionally scoped to a specific company. Returns the existing channel if one already exists.
+     * Creates a DM channel between two or more users, optionally scoped to an account. Returns the existing channel if one already exists.
      * <p>Required permissions:</p>
      * <ul>
      * <li><code>dms:channel:manage</code></li>
@@ -191,14 +213,14 @@ public class RawDmChannelsClient {
     }
 
     /**
-     * Create a new DM channel between two or more users, optionally scoped to a specific company. Returns the existing channel if one already exists.
+     * Creates a DM channel between two or more users, optionally scoped to an account. Returns the existing channel if one already exists.
      * <p>Required permissions:</p>
      * <ul>
      * <li><code>dms:channel:manage</code></li>
      * </ul>
      */
     public WhopApiHttpResponse<DmChannel> create(CreateDmChannelsRequest request, RequestOptions requestOptions) {
-        HttpUrl.Builder httpUrl = HttpUrl.parse(this.clientOptions.environment().getUrl())
+        HttpUrl.Builder httpUrl = HttpUrl.parse(this.clientOptions.environment().getApiURL())
                 .newBuilder()
                 .addPathSegments("dm_channels");
         if (requestOptions != null) {
@@ -209,7 +231,9 @@ public class RawDmChannelsClient {
         RequestBody body;
         try {
             body = RequestBody.create(
-                    ObjectMappers.JSON_MAPPER.writeValueAsBytes(request), MediaTypes.APPLICATION_JSON);
+                    ObjectMappers.JSON_MAPPER.writeValueAsBytes(BodyProperties.merge(
+                            request, requestOptions != null ? requestOptions.getBodyProperties() : null)),
+                    MediaTypes.APPLICATION_JSON);
         } catch (JsonProcessingException e) {
             throw new WhopApiException("Failed to serialize request", e);
         }
@@ -223,6 +247,15 @@ public class RawDmChannelsClient {
         OkHttpClient client = clientOptions.httpClient();
         if (requestOptions != null && requestOptions.getTimeout().isPresent()) {
             client = clientOptions.httpClientWithTimeout(requestOptions);
+        }
+        if (requestOptions != null && requestOptions.getMaxRetries().isPresent()) {
+            okhttpRequest = okhttpRequest
+                    .newBuilder()
+                    .tag(
+                            RetryInterceptor.MaxRetriesOverride.class,
+                            new RetryInterceptor.MaxRetriesOverride(
+                                    requestOptions.getMaxRetries().get()))
+                    .build();
         }
         try (Response response = client.newCall(okhttpRequest).execute()) {
             ResponseBody responseBody = response.body();
@@ -247,13 +280,16 @@ public class RawDmChannelsClient {
                                 ObjectMappers.JSON_MAPPER.readValue(responseBodyString, Object.class), response);
                     case 422:
                         throw new UnprocessableEntityError(
-                                ObjectMappers.JSON_MAPPER.readValue(responseBodyString, Object.class), response);
+                                ObjectMappers.JSON_MAPPER.readValue(
+                                        responseBodyString, UnprocessableEntityErrorBody.class),
+                                response);
                     case 429:
                         throw new TooManyRequestsError(
                                 ObjectMappers.JSON_MAPPER.readValue(responseBodyString, Object.class), response);
                     case 500:
                         throw new InternalServerError(
-                                ObjectMappers.JSON_MAPPER.readValue(responseBodyString, Object.class), response);
+                                ObjectMappers.JSON_MAPPER.readValue(responseBodyString, InternalServerErrorBody.class),
+                                response);
                 }
             } catch (JsonProcessingException ignored) {
                 // unable to map error response, throwing generic error
@@ -261,6 +297,8 @@ public class RawDmChannelsClient {
             Object errorBody = ObjectMappers.parseErrorBody(responseBodyString);
             throw new WhopApiApiException(
                     "Error with status code " + response.code(), response.code(), errorBody, response);
+        } catch (JsonProcessingException e) {
+            throw new WhopApiException("Failed to deserialize response: " + e.getMessage(), e);
         } catch (IOException e) {
             throw new WhopApiException("Network error executing HTTP request", e);
         }
@@ -312,10 +350,10 @@ public class RawDmChannelsClient {
      */
     public WhopApiHttpResponse<DmChannel> retrieve(
             String id, RetrieveDmChannelsRequest request, RequestOptions requestOptions) {
-        HttpUrl.Builder httpUrl = HttpUrl.parse(this.clientOptions.environment().getUrl())
+        HttpUrl.Builder httpUrl = HttpUrl.parse(this.clientOptions.environment().getApiURL())
                 .newBuilder()
                 .addPathSegments("dm_channels")
-                .addPathSegment(id);
+                .addPathSegment(PathSegments.validate(id));
         if (requestOptions != null) {
             requestOptions.getQueryParameters().forEach((_key, _value) -> {
                 httpUrl.addQueryParameter(_key, _value);
@@ -330,6 +368,15 @@ public class RawDmChannelsClient {
         OkHttpClient client = clientOptions.httpClient();
         if (requestOptions != null && requestOptions.getTimeout().isPresent()) {
             client = clientOptions.httpClientWithTimeout(requestOptions);
+        }
+        if (requestOptions != null && requestOptions.getMaxRetries().isPresent()) {
+            okhttpRequest = okhttpRequest
+                    .newBuilder()
+                    .tag(
+                            RetryInterceptor.MaxRetriesOverride.class,
+                            new RetryInterceptor.MaxRetriesOverride(
+                                    requestOptions.getMaxRetries().get()))
+                    .build();
         }
         try (Response response = client.newCall(okhttpRequest).execute()) {
             ResponseBody responseBody = response.body();
@@ -354,13 +401,16 @@ public class RawDmChannelsClient {
                                 ObjectMappers.JSON_MAPPER.readValue(responseBodyString, Object.class), response);
                     case 422:
                         throw new UnprocessableEntityError(
-                                ObjectMappers.JSON_MAPPER.readValue(responseBodyString, Object.class), response);
+                                ObjectMappers.JSON_MAPPER.readValue(
+                                        responseBodyString, UnprocessableEntityErrorBody.class),
+                                response);
                     case 429:
                         throw new TooManyRequestsError(
                                 ObjectMappers.JSON_MAPPER.readValue(responseBodyString, Object.class), response);
                     case 500:
                         throw new InternalServerError(
-                                ObjectMappers.JSON_MAPPER.readValue(responseBodyString, Object.class), response);
+                                ObjectMappers.JSON_MAPPER.readValue(responseBodyString, InternalServerErrorBody.class),
+                                response);
                 }
             } catch (JsonProcessingException ignored) {
                 // unable to map error response, throwing generic error
@@ -368,13 +418,15 @@ public class RawDmChannelsClient {
             Object errorBody = ObjectMappers.parseErrorBody(responseBodyString);
             throw new WhopApiApiException(
                     "Error with status code " + response.code(), response.code(), errorBody, response);
+        } catch (JsonProcessingException e) {
+            throw new WhopApiException("Failed to deserialize response: " + e.getMessage(), e);
         } catch (IOException e) {
             throw new WhopApiException("Network error executing HTTP request", e);
         }
     }
 
     /**
-     * Permanently delete a DM channel and all of its messages. Only an admin of the channel can perform this action.
+     * Permanently deletes a DM channel and all of its messages. Only a channel admin can delete it.
      * <p>Required permissions (one of):</p>
      * <ul>
      * <li><code>dms:channel:manage</code></li>
@@ -386,7 +438,7 @@ public class RawDmChannelsClient {
     }
 
     /**
-     * Permanently delete a DM channel and all of its messages. Only an admin of the channel can perform this action.
+     * Permanently deletes a DM channel and all of its messages. Only a channel admin can delete it.
      * <p>Required permissions (one of):</p>
      * <ul>
      * <li><code>dms:channel:manage</code></li>
@@ -398,7 +450,7 @@ public class RawDmChannelsClient {
     }
 
     /**
-     * Permanently delete a DM channel and all of its messages. Only an admin of the channel can perform this action.
+     * Permanently deletes a DM channel and all of its messages. Only a channel admin can delete it.
      * <p>Required permissions (one of):</p>
      * <ul>
      * <li><code>dms:channel:manage</code></li>
@@ -410,7 +462,7 @@ public class RawDmChannelsClient {
     }
 
     /**
-     * Permanently delete a DM channel and all of its messages. Only an admin of the channel can perform this action.
+     * Permanently deletes a DM channel and all of its messages. Only a channel admin can delete it.
      * <p>Required permissions (one of):</p>
      * <ul>
      * <li><code>dms:channel:manage</code></li>
@@ -419,10 +471,10 @@ public class RawDmChannelsClient {
      */
     public WhopApiHttpResponse<Boolean> delete(
             String id, DeleteDmChannelsRequest request, RequestOptions requestOptions) {
-        HttpUrl.Builder httpUrl = HttpUrl.parse(this.clientOptions.environment().getUrl())
+        HttpUrl.Builder httpUrl = HttpUrl.parse(this.clientOptions.environment().getApiURL())
                 .newBuilder()
                 .addPathSegments("dm_channels")
-                .addPathSegment(id);
+                .addPathSegment(PathSegments.validate(id));
         if (requestOptions != null) {
             requestOptions.getQueryParameters().forEach((_key, _value) -> {
                 httpUrl.addQueryParameter(_key, _value);
@@ -430,13 +482,25 @@ public class RawDmChannelsClient {
         }
         Request.Builder _requestBuilder = new Request.Builder()
                 .url(httpUrl.build())
-                .method("DELETE", null)
+                .method(
+                        "DELETE",
+                        BodyProperties.toRequestBody(
+                                requestOptions != null ? requestOptions.getBodyProperties() : null, null))
                 .headers(Headers.of(clientOptions.headers(requestOptions)))
                 .addHeader("Accept", "application/json");
         Request okhttpRequest = _requestBuilder.build();
         OkHttpClient client = clientOptions.httpClient();
         if (requestOptions != null && requestOptions.getTimeout().isPresent()) {
             client = clientOptions.httpClientWithTimeout(requestOptions);
+        }
+        if (requestOptions != null && requestOptions.getMaxRetries().isPresent()) {
+            okhttpRequest = okhttpRequest
+                    .newBuilder()
+                    .tag(
+                            RetryInterceptor.MaxRetriesOverride.class,
+                            new RetryInterceptor.MaxRetriesOverride(
+                                    requestOptions.getMaxRetries().get()))
+                    .build();
         }
         try (Response response = client.newCall(okhttpRequest).execute()) {
             ResponseBody responseBody = response.body();
@@ -461,13 +525,16 @@ public class RawDmChannelsClient {
                                 ObjectMappers.JSON_MAPPER.readValue(responseBodyString, Object.class), response);
                     case 422:
                         throw new UnprocessableEntityError(
-                                ObjectMappers.JSON_MAPPER.readValue(responseBodyString, Object.class), response);
+                                ObjectMappers.JSON_MAPPER.readValue(
+                                        responseBodyString, UnprocessableEntityErrorBody.class),
+                                response);
                     case 429:
                         throw new TooManyRequestsError(
                                 ObjectMappers.JSON_MAPPER.readValue(responseBodyString, Object.class), response);
                     case 500:
                         throw new InternalServerError(
-                                ObjectMappers.JSON_MAPPER.readValue(responseBodyString, Object.class), response);
+                                ObjectMappers.JSON_MAPPER.readValue(responseBodyString, InternalServerErrorBody.class),
+                                response);
                 }
             } catch (JsonProcessingException ignored) {
                 // unable to map error response, throwing generic error
@@ -475,13 +542,15 @@ public class RawDmChannelsClient {
             Object errorBody = ObjectMappers.parseErrorBody(responseBodyString);
             throw new WhopApiApiException(
                     "Error with status code " + response.code(), response.code(), errorBody, response);
+        } catch (JsonProcessingException e) {
+            throw new WhopApiException("Failed to deserialize response: " + e.getMessage(), e);
         } catch (IOException e) {
             throw new WhopApiException("Network error executing HTTP request", e);
         }
     }
 
     /**
-     * Update the settings of an existing DM channel, such as its display name. Only an admin of the channel can perform this action.
+     * Updates a DM channel's settings, such as its display name. Only a channel admin can update it.
      * <p>Required permissions (one of):</p>
      * <ul>
      * <li><code>dms:channel:manage</code></li>
@@ -493,7 +562,7 @@ public class RawDmChannelsClient {
     }
 
     /**
-     * Update the settings of an existing DM channel, such as its display name. Only an admin of the channel can perform this action.
+     * Updates a DM channel's settings, such as its display name. Only a channel admin can update it.
      * <p>Required permissions (one of):</p>
      * <ul>
      * <li><code>dms:channel:manage</code></li>
@@ -505,7 +574,7 @@ public class RawDmChannelsClient {
     }
 
     /**
-     * Update the settings of an existing DM channel, such as its display name. Only an admin of the channel can perform this action.
+     * Updates a DM channel's settings, such as its display name. Only a channel admin can update it.
      * <p>Required permissions (one of):</p>
      * <ul>
      * <li><code>dms:channel:manage</code></li>
@@ -517,7 +586,7 @@ public class RawDmChannelsClient {
     }
 
     /**
-     * Update the settings of an existing DM channel, such as its display name. Only an admin of the channel can perform this action.
+     * Updates a DM channel's settings, such as its display name. Only a channel admin can update it.
      * <p>Required permissions (one of):</p>
      * <ul>
      * <li><code>dms:channel:manage</code></li>
@@ -526,10 +595,10 @@ public class RawDmChannelsClient {
      */
     public WhopApiHttpResponse<DmChannel> update(
             String id, UpdateDmChannelsRequest request, RequestOptions requestOptions) {
-        HttpUrl.Builder httpUrl = HttpUrl.parse(this.clientOptions.environment().getUrl())
+        HttpUrl.Builder httpUrl = HttpUrl.parse(this.clientOptions.environment().getApiURL())
                 .newBuilder()
                 .addPathSegments("dm_channels")
-                .addPathSegment(id);
+                .addPathSegment(PathSegments.validate(id));
         if (requestOptions != null) {
             requestOptions.getQueryParameters().forEach((_key, _value) -> {
                 httpUrl.addQueryParameter(_key, _value);
@@ -538,7 +607,9 @@ public class RawDmChannelsClient {
         RequestBody body;
         try {
             body = RequestBody.create(
-                    ObjectMappers.JSON_MAPPER.writeValueAsBytes(request), MediaTypes.APPLICATION_JSON);
+                    ObjectMappers.JSON_MAPPER.writeValueAsBytes(BodyProperties.merge(
+                            request, requestOptions != null ? requestOptions.getBodyProperties() : null)),
+                    MediaTypes.APPLICATION_JSON);
         } catch (JsonProcessingException e) {
             throw new WhopApiException("Failed to serialize request", e);
         }
@@ -552,6 +623,15 @@ public class RawDmChannelsClient {
         OkHttpClient client = clientOptions.httpClient();
         if (requestOptions != null && requestOptions.getTimeout().isPresent()) {
             client = clientOptions.httpClientWithTimeout(requestOptions);
+        }
+        if (requestOptions != null && requestOptions.getMaxRetries().isPresent()) {
+            okhttpRequest = okhttpRequest
+                    .newBuilder()
+                    .tag(
+                            RetryInterceptor.MaxRetriesOverride.class,
+                            new RetryInterceptor.MaxRetriesOverride(
+                                    requestOptions.getMaxRetries().get()))
+                    .build();
         }
         try (Response response = client.newCall(okhttpRequest).execute()) {
             ResponseBody responseBody = response.body();
@@ -576,13 +656,16 @@ public class RawDmChannelsClient {
                                 ObjectMappers.JSON_MAPPER.readValue(responseBodyString, Object.class), response);
                     case 422:
                         throw new UnprocessableEntityError(
-                                ObjectMappers.JSON_MAPPER.readValue(responseBodyString, Object.class), response);
+                                ObjectMappers.JSON_MAPPER.readValue(
+                                        responseBodyString, UnprocessableEntityErrorBody.class),
+                                response);
                     case 429:
                         throw new TooManyRequestsError(
                                 ObjectMappers.JSON_MAPPER.readValue(responseBodyString, Object.class), response);
                     case 500:
                         throw new InternalServerError(
-                                ObjectMappers.JSON_MAPPER.readValue(responseBodyString, Object.class), response);
+                                ObjectMappers.JSON_MAPPER.readValue(responseBodyString, InternalServerErrorBody.class),
+                                response);
                 }
             } catch (JsonProcessingException ignored) {
                 // unable to map error response, throwing generic error
@@ -590,6 +673,8 @@ public class RawDmChannelsClient {
             Object errorBody = ObjectMappers.parseErrorBody(responseBodyString);
             throw new WhopApiApiException(
                     "Error with status code " + response.code(), response.code(), errorBody, response);
+        } catch (JsonProcessingException e) {
+            throw new WhopApiException("Failed to deserialize response: " + e.getMessage(), e);
         } catch (IOException e) {
             throw new WhopApiException("Network error executing HTTP request", e);
         }

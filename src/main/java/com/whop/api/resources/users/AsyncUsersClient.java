@@ -6,7 +6,9 @@ package com.whop.api.resources.users;
 import com.whop.api.core.ClientOptions;
 import com.whop.api.core.RequestOptions;
 import com.whop.api.core.Suppliers;
+import com.whop.api.core.WhopApiHttpResponse;
 import com.whop.api.core.pagination.SyncPagingIterable;
+import com.whop.api.resources.users.fees.AsyncFeesClient;
 import com.whop.api.resources.users.oauthgrants.AsyncOauthGrantsClient;
 import com.whop.api.resources.users.passkeys.AsyncPasskeysClient;
 import com.whop.api.resources.users.preferences.AsyncPreferencesClient;
@@ -34,12 +36,15 @@ public class AsyncUsersClient {
 
     protected final Supplier<AsyncPreferencesClient> preferencesClient;
 
+    protected final Supplier<AsyncFeesClient> feesClient;
+
     public AsyncUsersClient(ClientOptions clientOptions) {
         this.clientOptions = clientOptions;
         this.rawClient = new AsyncRawUsersClient(clientOptions);
         this.oauthGrantsClient = Suppliers.memoize(() -> new AsyncOauthGrantsClient(clientOptions));
         this.passkeysClient = Suppliers.memoize(() -> new AsyncPasskeysClient(clientOptions));
         this.preferencesClient = Suppliers.memoize(() -> new AsyncPreferencesClient(clientOptions));
+        this.feesClient = Suppliers.memoize(() -> new AsyncFeesClient(clientOptions));
     }
 
     /**
@@ -50,150 +55,300 @@ public class AsyncUsersClient {
     }
 
     /**
-     * Search for users by name or username, ranked by social proximity to the authenticated user. Returns the user's most recently followed users when no query is given.
+     * Searches for users by name or username, ranked by social proximity to the authenticated user. Without a <code>query</code>, returns the user's most recently followed users.
      */
     public CompletableFuture<SyncPagingIterable<User>> list() {
-        return this.rawClient.list().thenApply(response -> response.body());
+        CompletableFuture<WhopApiHttpResponse<SyncPagingIterable<User>>> rawFuture = this.rawClient.list();
+        CompletableFuture<SyncPagingIterable<User>> future = rawFuture.thenApply(response -> response.body());
+        future.whenComplete((result_, throwable_) -> {
+            if (future.isCancelled()) {
+                rawFuture.cancel(true);
+            }
+        });
+        return future;
     }
 
     /**
-     * Search for users by name or username, ranked by social proximity to the authenticated user. Returns the user's most recently followed users when no query is given.
+     * Searches for users by name or username, ranked by social proximity to the authenticated user. Without a <code>query</code>, returns the user's most recently followed users.
      */
     public CompletableFuture<SyncPagingIterable<User>> list(RequestOptions requestOptions) {
-        return this.rawClient.list(requestOptions).thenApply(response -> response.body());
+        CompletableFuture<WhopApiHttpResponse<SyncPagingIterable<User>>> rawFuture =
+                this.rawClient.list(requestOptions);
+        CompletableFuture<SyncPagingIterable<User>> future = rawFuture.thenApply(response -> response.body());
+        future.whenComplete((result_, throwable_) -> {
+            if (future.isCancelled()) {
+                rawFuture.cancel(true);
+            }
+        });
+        return future;
     }
 
     /**
-     * Search for users by name or username, ranked by social proximity to the authenticated user. Returns the user's most recently followed users when no query is given.
+     * Searches for users by name or username, ranked by social proximity to the authenticated user. Without a <code>query</code>, returns the user's most recently followed users.
      */
     public CompletableFuture<SyncPagingIterable<User>> list(ListUsersRequest request) {
-        return this.rawClient.list(request).thenApply(response -> response.body());
+        CompletableFuture<WhopApiHttpResponse<SyncPagingIterable<User>>> rawFuture = this.rawClient.list(request);
+        CompletableFuture<SyncPagingIterable<User>> future = rawFuture.thenApply(response -> response.body());
+        future.whenComplete((result_, throwable_) -> {
+            if (future.isCancelled()) {
+                rawFuture.cancel(true);
+            }
+        });
+        return future;
     }
 
     /**
-     * Search for users by name or username, ranked by social proximity to the authenticated user. Returns the user's most recently followed users when no query is given.
+     * Searches for users by name or username, ranked by social proximity to the authenticated user. Without a <code>query</code>, returns the user's most recently followed users.
      */
     public CompletableFuture<SyncPagingIterable<User>> list(ListUsersRequest request, RequestOptions requestOptions) {
-        return this.rawClient.list(request, requestOptions).thenApply(response -> response.body());
+        CompletableFuture<WhopApiHttpResponse<SyncPagingIterable<User>>> rawFuture =
+                this.rawClient.list(request, requestOptions);
+        CompletableFuture<SyncPagingIterable<User>> future = rawFuture.thenApply(response -> response.body());
+        future.whenComplete((result_, throwable_) -> {
+            if (future.isCancelled()) {
+                rawFuture.cancel(true);
+            }
+        });
+        return future;
     }
 
     /**
-     * Retrieves the authenticated user — the self view of the user object. Same shape as <code>GET /users/{id}</code>, with the self-only fields populated: <code>email</code> (email-read scope), <code>staff</code> (Whop staff only, staff-read scope), <code>balance</code> and <code>earnings_usd</code> (balance-read scope), the opt-in <code>balance_history</code>, and every linked social account.
+     * Retrieves the authenticated user. Same as <code>GET /users/:id</code> with the reserved id <code>me</code>: the self view, where self-only fields such as <code>email</code>, <code>balance</code>, and <code>cards</code> can be populated.
      */
     public CompletableFuture<User> me() {
-        return this.rawClient.me().thenApply(response -> response.body());
+        CompletableFuture<WhopApiHttpResponse<User>> rawFuture = this.rawClient.me();
+        CompletableFuture<User> future = rawFuture.thenApply(response -> response.body());
+        future.whenComplete((result_, throwable_) -> {
+            if (future.isCancelled()) {
+                rawFuture.cancel(true);
+            }
+        });
+        return future;
     }
 
     /**
-     * Retrieves the authenticated user — the self view of the user object. Same shape as <code>GET /users/{id}</code>, with the self-only fields populated: <code>email</code> (email-read scope), <code>staff</code> (Whop staff only, staff-read scope), <code>balance</code> and <code>earnings_usd</code> (balance-read scope), the opt-in <code>balance_history</code>, and every linked social account.
+     * Retrieves the authenticated user. Same as <code>GET /users/:id</code> with the reserved id <code>me</code>: the self view, where self-only fields such as <code>email</code>, <code>balance</code>, and <code>cards</code> can be populated.
      */
     public CompletableFuture<User> me(RequestOptions requestOptions) {
-        return this.rawClient.me(requestOptions).thenApply(response -> response.body());
+        CompletableFuture<WhopApiHttpResponse<User>> rawFuture = this.rawClient.me(requestOptions);
+        CompletableFuture<User> future = rawFuture.thenApply(response -> response.body());
+        future.whenComplete((result_, throwable_) -> {
+            if (future.isCancelled()) {
+                rawFuture.cancel(true);
+            }
+        });
+        return future;
     }
 
     /**
-     * Retrieves the authenticated user — the self view of the user object. Same shape as <code>GET /users/{id}</code>, with the self-only fields populated: <code>email</code> (email-read scope), <code>staff</code> (Whop staff only, staff-read scope), <code>balance</code> and <code>earnings_usd</code> (balance-read scope), the opt-in <code>balance_history</code>, and every linked social account.
+     * Retrieves the authenticated user. Same as <code>GET /users/:id</code> with the reserved id <code>me</code>: the self view, where self-only fields such as <code>email</code>, <code>balance</code>, and <code>cards</code> can be populated.
      */
     public CompletableFuture<User> me(MeUsersRequest request) {
-        return this.rawClient.me(request).thenApply(response -> response.body());
+        CompletableFuture<WhopApiHttpResponse<User>> rawFuture = this.rawClient.me(request);
+        CompletableFuture<User> future = rawFuture.thenApply(response -> response.body());
+        future.whenComplete((result_, throwable_) -> {
+            if (future.isCancelled()) {
+                rawFuture.cancel(true);
+            }
+        });
+        return future;
     }
 
     /**
-     * Retrieves the authenticated user — the self view of the user object. Same shape as <code>GET /users/{id}</code>, with the self-only fields populated: <code>email</code> (email-read scope), <code>staff</code> (Whop staff only, staff-read scope), <code>balance</code> and <code>earnings_usd</code> (balance-read scope), the opt-in <code>balance_history</code>, and every linked social account.
+     * Retrieves the authenticated user. Same as <code>GET /users/:id</code> with the reserved id <code>me</code>: the self view, where self-only fields such as <code>email</code>, <code>balance</code>, and <code>cards</code> can be populated.
      */
     public CompletableFuture<User> me(MeUsersRequest request, RequestOptions requestOptions) {
-        return this.rawClient.me(request, requestOptions).thenApply(response -> response.body());
+        CompletableFuture<WhopApiHttpResponse<User>> rawFuture = this.rawClient.me(request, requestOptions);
+        CompletableFuture<User> future = rawFuture.thenApply(response -> response.body());
+        future.whenComplete((result_, throwable_) -> {
+            if (future.isCancelled()) {
+                rawFuture.cancel(true);
+            }
+        });
+        return future;
     }
 
     /**
-     * Updates the authenticated user's global profile, or their profile override for an account when account_id is given. Not available to API keys.
+     * Updates the authenticated user's global profile, or their profile override for an account when <code>account_id</code> is given. Not available to API keys.
      */
     public CompletableFuture<User> updateMe() {
-        return this.rawClient.updateMe().thenApply(response -> response.body());
+        CompletableFuture<WhopApiHttpResponse<User>> rawFuture = this.rawClient.updateMe();
+        CompletableFuture<User> future = rawFuture.thenApply(response -> response.body());
+        future.whenComplete((result_, throwable_) -> {
+            if (future.isCancelled()) {
+                rawFuture.cancel(true);
+            }
+        });
+        return future;
     }
 
     /**
-     * Updates the authenticated user's global profile, or their profile override for an account when account_id is given. Not available to API keys.
+     * Updates the authenticated user's global profile, or their profile override for an account when <code>account_id</code> is given. Not available to API keys.
      */
     public CompletableFuture<User> updateMe(RequestOptions requestOptions) {
-        return this.rawClient.updateMe(requestOptions).thenApply(response -> response.body());
+        CompletableFuture<WhopApiHttpResponse<User>> rawFuture = this.rawClient.updateMe(requestOptions);
+        CompletableFuture<User> future = rawFuture.thenApply(response -> response.body());
+        future.whenComplete((result_, throwable_) -> {
+            if (future.isCancelled()) {
+                rawFuture.cancel(true);
+            }
+        });
+        return future;
     }
 
     /**
-     * Updates the authenticated user's global profile, or their profile override for an account when account_id is given. Not available to API keys.
+     * Updates the authenticated user's global profile, or their profile override for an account when <code>account_id</code> is given. Not available to API keys.
      */
     public CompletableFuture<User> updateMe(UpdateMeUsersRequest request) {
-        return this.rawClient.updateMe(request).thenApply(response -> response.body());
+        CompletableFuture<WhopApiHttpResponse<User>> rawFuture = this.rawClient.updateMe(request);
+        CompletableFuture<User> future = rawFuture.thenApply(response -> response.body());
+        future.whenComplete((result_, throwable_) -> {
+            if (future.isCancelled()) {
+                rawFuture.cancel(true);
+            }
+        });
+        return future;
     }
 
     /**
-     * Updates the authenticated user's global profile, or their profile override for an account when account_id is given. Not available to API keys.
+     * Updates the authenticated user's global profile, or their profile override for an account when <code>account_id</code> is given. Not available to API keys.
      */
     public CompletableFuture<User> updateMe(UpdateMeUsersRequest request, RequestOptions requestOptions) {
-        return this.rawClient.updateMe(request, requestOptions).thenApply(response -> response.body());
+        CompletableFuture<WhopApiHttpResponse<User>> rawFuture = this.rawClient.updateMe(request, requestOptions);
+        CompletableFuture<User> future = rawFuture.thenApply(response -> response.body());
+        future.whenComplete((result_, throwable_) -> {
+            if (future.isCancelled()) {
+                rawFuture.cancel(true);
+            }
+        });
+        return future;
     }
 
     /**
-     * Retrieves a user by <code>user_</code> tag or username, or the authenticated user with the reserved id <code>me</code>. Profiles include linked social accounts — reading your own profile returns every linked account, other profiles only what is public on Whop (the primary Discord and the X account). The self-only fields are populated only when the id is <code>me</code>: <code>email</code> (email-read scope), <code>staff</code> (Whop staff only, staff-read scope), <code>balance</code> and <code>earnings_usd</code> (balance-read scope), and the opt-in <code>balance_history</code>. They are always <code>null</code> when addressing a user by tag or username.
+     * Retrieves a user by <code>user_</code> tag or username, or the authenticated user with the reserved id <code>me</code>. Self-only fields such as <code>email</code>, <code>balance</code>, and <code>earnings_usd</code> are populated only when the id is <code>me</code>, and are always <code>null</code> when addressing a user by tag or username.
      */
     public CompletableFuture<User> retrieve(String id) {
-        return this.rawClient.retrieve(id).thenApply(response -> response.body());
+        CompletableFuture<WhopApiHttpResponse<User>> rawFuture = this.rawClient.retrieve(id);
+        CompletableFuture<User> future = rawFuture.thenApply(response -> response.body());
+        future.whenComplete((result_, throwable_) -> {
+            if (future.isCancelled()) {
+                rawFuture.cancel(true);
+            }
+        });
+        return future;
     }
 
     /**
-     * Retrieves a user by <code>user_</code> tag or username, or the authenticated user with the reserved id <code>me</code>. Profiles include linked social accounts — reading your own profile returns every linked account, other profiles only what is public on Whop (the primary Discord and the X account). The self-only fields are populated only when the id is <code>me</code>: <code>email</code> (email-read scope), <code>staff</code> (Whop staff only, staff-read scope), <code>balance</code> and <code>earnings_usd</code> (balance-read scope), and the opt-in <code>balance_history</code>. They are always <code>null</code> when addressing a user by tag or username.
+     * Retrieves a user by <code>user_</code> tag or username, or the authenticated user with the reserved id <code>me</code>. Self-only fields such as <code>email</code>, <code>balance</code>, and <code>earnings_usd</code> are populated only when the id is <code>me</code>, and are always <code>null</code> when addressing a user by tag or username.
      */
     public CompletableFuture<User> retrieve(String id, RequestOptions requestOptions) {
-        return this.rawClient.retrieve(id, requestOptions).thenApply(response -> response.body());
+        CompletableFuture<WhopApiHttpResponse<User>> rawFuture = this.rawClient.retrieve(id, requestOptions);
+        CompletableFuture<User> future = rawFuture.thenApply(response -> response.body());
+        future.whenComplete((result_, throwable_) -> {
+            if (future.isCancelled()) {
+                rawFuture.cancel(true);
+            }
+        });
+        return future;
     }
 
     /**
-     * Retrieves a user by <code>user_</code> tag or username, or the authenticated user with the reserved id <code>me</code>. Profiles include linked social accounts — reading your own profile returns every linked account, other profiles only what is public on Whop (the primary Discord and the X account). The self-only fields are populated only when the id is <code>me</code>: <code>email</code> (email-read scope), <code>staff</code> (Whop staff only, staff-read scope), <code>balance</code> and <code>earnings_usd</code> (balance-read scope), and the opt-in <code>balance_history</code>. They are always <code>null</code> when addressing a user by tag or username.
+     * Retrieves a user by <code>user_</code> tag or username, or the authenticated user with the reserved id <code>me</code>. Self-only fields such as <code>email</code>, <code>balance</code>, and <code>earnings_usd</code> are populated only when the id is <code>me</code>, and are always <code>null</code> when addressing a user by tag or username.
      */
     public CompletableFuture<User> retrieve(String id, RetrieveUsersRequest request) {
-        return this.rawClient.retrieve(id, request).thenApply(response -> response.body());
+        CompletableFuture<WhopApiHttpResponse<User>> rawFuture = this.rawClient.retrieve(id, request);
+        CompletableFuture<User> future = rawFuture.thenApply(response -> response.body());
+        future.whenComplete((result_, throwable_) -> {
+            if (future.isCancelled()) {
+                rawFuture.cancel(true);
+            }
+        });
+        return future;
     }
 
     /**
-     * Retrieves a user by <code>user_</code> tag or username, or the authenticated user with the reserved id <code>me</code>. Profiles include linked social accounts — reading your own profile returns every linked account, other profiles only what is public on Whop (the primary Discord and the X account). The self-only fields are populated only when the id is <code>me</code>: <code>email</code> (email-read scope), <code>staff</code> (Whop staff only, staff-read scope), <code>balance</code> and <code>earnings_usd</code> (balance-read scope), and the opt-in <code>balance_history</code>. They are always <code>null</code> when addressing a user by tag or username.
+     * Retrieves a user by <code>user_</code> tag or username, or the authenticated user with the reserved id <code>me</code>. Self-only fields such as <code>email</code>, <code>balance</code>, and <code>earnings_usd</code> are populated only when the id is <code>me</code>, and are always <code>null</code> when addressing a user by tag or username.
      */
     public CompletableFuture<User> retrieve(String id, RetrieveUsersRequest request, RequestOptions requestOptions) {
-        return this.rawClient.retrieve(id, request, requestOptions).thenApply(response -> response.body());
+        CompletableFuture<WhopApiHttpResponse<User>> rawFuture = this.rawClient.retrieve(id, request, requestOptions);
+        CompletableFuture<User> future = rawFuture.thenApply(response -> response.body());
+        future.whenComplete((result_, throwable_) -> {
+            if (future.isCancelled()) {
+                rawFuture.cancel(true);
+            }
+        });
+        return future;
     }
 
     /**
-     * Updates a user, addressed by <code>user_</code> tag, username, or the reserved id <code>me</code> for the authenticated user. A user token updates their own global profile; an API key updates the user's account-specific profile override (account_id required).
+     * Updates a user, addressed by <code>user_</code> tag, username, or the reserved id <code>me</code> for the authenticated user. A user token updates their own global profile; an API key updates the user's profile override for the account in <code>account_id</code>.
      */
     public CompletableFuture<User> update(String id) {
-        return this.rawClient.update(id).thenApply(response -> response.body());
+        CompletableFuture<WhopApiHttpResponse<User>> rawFuture = this.rawClient.update(id);
+        CompletableFuture<User> future = rawFuture.thenApply(response -> response.body());
+        future.whenComplete((result_, throwable_) -> {
+            if (future.isCancelled()) {
+                rawFuture.cancel(true);
+            }
+        });
+        return future;
     }
 
     /**
-     * Updates a user, addressed by <code>user_</code> tag, username, or the reserved id <code>me</code> for the authenticated user. A user token updates their own global profile; an API key updates the user's account-specific profile override (account_id required).
+     * Updates a user, addressed by <code>user_</code> tag, username, or the reserved id <code>me</code> for the authenticated user. A user token updates their own global profile; an API key updates the user's profile override for the account in <code>account_id</code>.
      */
     public CompletableFuture<User> update(String id, RequestOptions requestOptions) {
-        return this.rawClient.update(id, requestOptions).thenApply(response -> response.body());
+        CompletableFuture<WhopApiHttpResponse<User>> rawFuture = this.rawClient.update(id, requestOptions);
+        CompletableFuture<User> future = rawFuture.thenApply(response -> response.body());
+        future.whenComplete((result_, throwable_) -> {
+            if (future.isCancelled()) {
+                rawFuture.cancel(true);
+            }
+        });
+        return future;
     }
 
     /**
-     * Updates a user, addressed by <code>user_</code> tag, username, or the reserved id <code>me</code> for the authenticated user. A user token updates their own global profile; an API key updates the user's account-specific profile override (account_id required).
+     * Updates a user, addressed by <code>user_</code> tag, username, or the reserved id <code>me</code> for the authenticated user. A user token updates their own global profile; an API key updates the user's profile override for the account in <code>account_id</code>.
      */
     public CompletableFuture<User> update(String id, UpdateUsersRequest request) {
-        return this.rawClient.update(id, request).thenApply(response -> response.body());
+        CompletableFuture<WhopApiHttpResponse<User>> rawFuture = this.rawClient.update(id, request);
+        CompletableFuture<User> future = rawFuture.thenApply(response -> response.body());
+        future.whenComplete((result_, throwable_) -> {
+            if (future.isCancelled()) {
+                rawFuture.cancel(true);
+            }
+        });
+        return future;
     }
 
     /**
-     * Updates a user, addressed by <code>user_</code> tag, username, or the reserved id <code>me</code> for the authenticated user. A user token updates their own global profile; an API key updates the user's account-specific profile override (account_id required).
+     * Updates a user, addressed by <code>user_</code> tag, username, or the reserved id <code>me</code> for the authenticated user. A user token updates their own global profile; an API key updates the user's profile override for the account in <code>account_id</code>.
      */
     public CompletableFuture<User> update(String id, UpdateUsersRequest request, RequestOptions requestOptions) {
-        return this.rawClient.update(id, request, requestOptions).thenApply(response -> response.body());
+        CompletableFuture<WhopApiHttpResponse<User>> rawFuture = this.rawClient.update(id, request, requestOptions);
+        CompletableFuture<User> future = rawFuture.thenApply(response -> response.body());
+        future.whenComplete((result_, throwable_) -> {
+            if (future.isCancelled()) {
+                rawFuture.cancel(true);
+            }
+        });
+        return future;
     }
 
     /**
      * Checks whether a user has access to an account, product, or experience the caller can reach.
      */
     public CompletableFuture<CheckAccessUsersResponse> checkAccess(String id, String resourceId) {
-        return this.rawClient.checkAccess(id, resourceId).thenApply(response -> response.body());
+        CompletableFuture<WhopApiHttpResponse<CheckAccessUsersResponse>> rawFuture =
+                this.rawClient.checkAccess(id, resourceId);
+        CompletableFuture<CheckAccessUsersResponse> future = rawFuture.thenApply(response -> response.body());
+        future.whenComplete((result_, throwable_) -> {
+            if (future.isCancelled()) {
+                rawFuture.cancel(true);
+            }
+        });
+        return future;
     }
 
     /**
@@ -201,7 +356,15 @@ public class AsyncUsersClient {
      */
     public CompletableFuture<CheckAccessUsersResponse> checkAccess(
             String id, String resourceId, RequestOptions requestOptions) {
-        return this.rawClient.checkAccess(id, resourceId, requestOptions).thenApply(response -> response.body());
+        CompletableFuture<WhopApiHttpResponse<CheckAccessUsersResponse>> rawFuture =
+                this.rawClient.checkAccess(id, resourceId, requestOptions);
+        CompletableFuture<CheckAccessUsersResponse> future = rawFuture.thenApply(response -> response.body());
+        future.whenComplete((result_, throwable_) -> {
+            if (future.isCancelled()) {
+                rawFuture.cancel(true);
+            }
+        });
+        return future;
     }
 
     /**
@@ -209,7 +372,15 @@ public class AsyncUsersClient {
      */
     public CompletableFuture<CheckAccessUsersResponse> checkAccess(
             String id, String resourceId, CheckAccessUsersRequest request) {
-        return this.rawClient.checkAccess(id, resourceId, request).thenApply(response -> response.body());
+        CompletableFuture<WhopApiHttpResponse<CheckAccessUsersResponse>> rawFuture =
+                this.rawClient.checkAccess(id, resourceId, request);
+        CompletableFuture<CheckAccessUsersResponse> future = rawFuture.thenApply(response -> response.body());
+        future.whenComplete((result_, throwable_) -> {
+            if (future.isCancelled()) {
+                rawFuture.cancel(true);
+            }
+        });
+        return future;
     }
 
     /**
@@ -217,39 +388,77 @@ public class AsyncUsersClient {
      */
     public CompletableFuture<CheckAccessUsersResponse> checkAccess(
             String id, String resourceId, CheckAccessUsersRequest request, RequestOptions requestOptions) {
-        return this.rawClient
-                .checkAccess(id, resourceId, request, requestOptions)
-                .thenApply(response -> response.body());
+        CompletableFuture<WhopApiHttpResponse<CheckAccessUsersResponse>> rawFuture =
+                this.rawClient.checkAccess(id, resourceId, request, requestOptions);
+        CompletableFuture<CheckAccessUsersResponse> future = rawFuture.thenApply(response -> response.body());
+        future.whenComplete((result_, throwable_) -> {
+            if (future.isCancelled()) {
+                rawFuture.cancel(true);
+            }
+        });
+        return future;
     }
 
     /**
-     * Lists the recommended actions computed for the user: personal suggestions (e.g. start a business or become an affiliate) pooled with the highest-impact actions across the accounts the user owns. Business actions are tagged with their <code>account_id</code>/<code>account_name</code>; personal actions leave those <code>null</code>. Self-only: <code>id</code> must be <code>me</code> or the authenticated user's own tag/username.
+     * Lists the recommended actions computed for the authenticated user, such as starting a business. You can only list your own recommended actions.
      */
     public CompletableFuture<RecommendActionsUsersResponse> recommendActions(String id) {
-        return this.rawClient.recommendActions(id).thenApply(response -> response.body());
+        CompletableFuture<WhopApiHttpResponse<RecommendActionsUsersResponse>> rawFuture =
+                this.rawClient.recommendActions(id);
+        CompletableFuture<RecommendActionsUsersResponse> future = rawFuture.thenApply(response -> response.body());
+        future.whenComplete((result_, throwable_) -> {
+            if (future.isCancelled()) {
+                rawFuture.cancel(true);
+            }
+        });
+        return future;
     }
 
     /**
-     * Lists the recommended actions computed for the user: personal suggestions (e.g. start a business or become an affiliate) pooled with the highest-impact actions across the accounts the user owns. Business actions are tagged with their <code>account_id</code>/<code>account_name</code>; personal actions leave those <code>null</code>. Self-only: <code>id</code> must be <code>me</code> or the authenticated user's own tag/username.
+     * Lists the recommended actions computed for the authenticated user, such as starting a business. You can only list your own recommended actions.
      */
     public CompletableFuture<RecommendActionsUsersResponse> recommendActions(String id, RequestOptions requestOptions) {
-        return this.rawClient.recommendActions(id, requestOptions).thenApply(response -> response.body());
+        CompletableFuture<WhopApiHttpResponse<RecommendActionsUsersResponse>> rawFuture =
+                this.rawClient.recommendActions(id, requestOptions);
+        CompletableFuture<RecommendActionsUsersResponse> future = rawFuture.thenApply(response -> response.body());
+        future.whenComplete((result_, throwable_) -> {
+            if (future.isCancelled()) {
+                rawFuture.cancel(true);
+            }
+        });
+        return future;
     }
 
     /**
-     * Lists the recommended actions computed for the user: personal suggestions (e.g. start a business or become an affiliate) pooled with the highest-impact actions across the accounts the user owns. Business actions are tagged with their <code>account_id</code>/<code>account_name</code>; personal actions leave those <code>null</code>. Self-only: <code>id</code> must be <code>me</code> or the authenticated user's own tag/username.
+     * Lists the recommended actions computed for the authenticated user, such as starting a business. You can only list your own recommended actions.
      */
     public CompletableFuture<RecommendActionsUsersResponse> recommendActions(
             String id, RecommendActionsUsersRequest request) {
-        return this.rawClient.recommendActions(id, request).thenApply(response -> response.body());
+        CompletableFuture<WhopApiHttpResponse<RecommendActionsUsersResponse>> rawFuture =
+                this.rawClient.recommendActions(id, request);
+        CompletableFuture<RecommendActionsUsersResponse> future = rawFuture.thenApply(response -> response.body());
+        future.whenComplete((result_, throwable_) -> {
+            if (future.isCancelled()) {
+                rawFuture.cancel(true);
+            }
+        });
+        return future;
     }
 
     /**
-     * Lists the recommended actions computed for the user: personal suggestions (e.g. start a business or become an affiliate) pooled with the highest-impact actions across the accounts the user owns. Business actions are tagged with their <code>account_id</code>/<code>account_name</code>; personal actions leave those <code>null</code>. Self-only: <code>id</code> must be <code>me</code> or the authenticated user's own tag/username.
+     * Lists the recommended actions computed for the authenticated user, such as starting a business. You can only list your own recommended actions.
      */
     public CompletableFuture<RecommendActionsUsersResponse> recommendActions(
             String id, RecommendActionsUsersRequest request, RequestOptions requestOptions) {
-        return this.rawClient.recommendActions(id, request, requestOptions).thenApply(response -> response.body());
+        CompletableFuture<WhopApiHttpResponse<RecommendActionsUsersResponse>> rawFuture =
+                this.rawClient.recommendActions(id, request, requestOptions);
+        CompletableFuture<RecommendActionsUsersResponse> future = rawFuture.thenApply(response -> response.body());
+        future.whenComplete((result_, throwable_) -> {
+            if (future.isCancelled()) {
+                rawFuture.cancel(true);
+            }
+        });
+        return future;
     }
 
     public AsyncOauthGrantsClient oauthGrants() {
@@ -262,5 +471,9 @@ public class AsyncUsersClient {
 
     public AsyncPreferencesClient preferences() {
         return this.preferencesClient.get();
+    }
+
+    public AsyncFeesClient fees() {
+        return this.feesClient.get();
     }
 }

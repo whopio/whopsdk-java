@@ -143,7 +143,6 @@ public final class ExperienceApp {
 
         private Optional<ExperienceAppIcon> icon = Optional.empty();
 
-        @JsonAnySetter
         private Map<String, Object> additionalProperties = new HashMap<>();
 
         private Builder() {}
@@ -158,7 +157,6 @@ public final class ExperienceApp {
 
         /**
          * <p>The unique identifier for the app.</p>
-         * <p>The unique identifier for the app.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
@@ -169,7 +167,6 @@ public final class ExperienceApp {
         }
 
         /**
-         * <p>The display name of this app shown on the app store and in experience navigation. Maximum 30 characters.</p>
          * <p>The display name of this app shown on the app store and in experience navigation. Maximum 30 characters.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
@@ -219,6 +216,14 @@ public final class ExperienceApp {
         @java.lang.Override
         public ExperienceApp build() {
             return new ExperienceApp(icon, id, name, additionalProperties);
+        }
+
+        @JsonAnySetter
+        private void putAdditionalPropertyFromJson(String key, Object value) {
+            if (key.equalsIgnoreCase("icon") || key.equalsIgnoreCase("id") || key.equalsIgnoreCase("name")) {
+                return;
+            }
+            this.additionalProperties.put(key, value);
         }
 
         @java.lang.Override

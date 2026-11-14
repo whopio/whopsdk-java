@@ -148,7 +148,6 @@ public final class LedgerActivityResourceTwo {
 
         private String title;
 
-        @JsonAnySetter
         private Map<String, Object> additionalProperties = new HashMap<>();
 
         private Builder() {}
@@ -163,7 +162,6 @@ public final class LedgerActivityResourceTwo {
         }
 
         /**
-         * <p>Bounty ID.</p>
          * <p>Bounty ID.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
@@ -183,7 +181,6 @@ public final class LedgerActivityResourceTwo {
 
         /**
          * <p>Bounty lifecycle status.</p>
-         * <p>Bounty lifecycle status.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
@@ -194,7 +191,6 @@ public final class LedgerActivityResourceTwo {
         }
 
         /**
-         * <p>Bounty title.</p>
          * <p>Bounty title.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
@@ -208,6 +204,17 @@ public final class LedgerActivityResourceTwo {
         @java.lang.Override
         public LedgerActivityResourceTwo build() {
             return new LedgerActivityResourceTwo(id, object, status, title, additionalProperties);
+        }
+
+        @JsonAnySetter
+        private void putAdditionalPropertyFromJson(String key, Object value) {
+            if (key.equalsIgnoreCase("id")
+                    || key.equalsIgnoreCase("object")
+                    || key.equalsIgnoreCase("status")
+                    || key.equalsIgnoreCase("title")) {
+                return;
+            }
+            this.additionalProperties.put(key, value);
         }
 
         @java.lang.Override

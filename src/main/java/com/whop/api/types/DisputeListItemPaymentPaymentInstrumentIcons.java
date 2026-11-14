@@ -88,7 +88,6 @@ public final class DisputeListItemPaymentPaymentInstrumentIcons {
     public static final class Builder implements SquareStage, _FinalStage {
         private DisputeListItemPaymentPaymentInstrumentIconsSquare square;
 
-        @JsonAnySetter
         private Map<String, Object> additionalProperties = new HashMap<>();
 
         private Builder() {}
@@ -100,7 +99,6 @@ public final class DisputeListItemPaymentPaymentInstrumentIcons {
         }
 
         /**
-         * <p>The square tile (32x32).</p>
          * <p>The square tile (32x32).</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
@@ -114,6 +112,14 @@ public final class DisputeListItemPaymentPaymentInstrumentIcons {
         @java.lang.Override
         public DisputeListItemPaymentPaymentInstrumentIcons build() {
             return new DisputeListItemPaymentPaymentInstrumentIcons(square, additionalProperties);
+        }
+
+        @JsonAnySetter
+        private void putAdditionalPropertyFromJson(String key, Object value) {
+            if (key.equalsIgnoreCase("square")) {
+                return;
+            }
+            this.additionalProperties.put(key, value);
         }
 
         @java.lang.Override

@@ -6,10 +6,15 @@ package com.whop.api.resources.members;
 import com.whop.api.core.ClientOptions;
 import com.whop.api.core.RequestOptions;
 import com.whop.api.core.Suppliers;
+import com.whop.api.core.WhopApiHttpResponse;
 import com.whop.api.core.pagination.SyncPagingIterable;
 import com.whop.api.resources.members.logs.AsyncLogsClient;
+import com.whop.api.resources.members.notes.AsyncNotesClient;
+import com.whop.api.resources.members.requests.CreateMembersRequest;
 import com.whop.api.resources.members.requests.ListMembersRequest;
 import com.whop.api.resources.members.requests.RetrieveMembersRequest;
+import com.whop.api.resources.members.requests.UnsubscribeMembersRequest;
+import com.whop.api.resources.members.requests.UpdateMembersRequest;
 import com.whop.api.types.Member;
 import java.util.concurrent.CompletableFuture;
 import java.util.function.Supplier;
@@ -21,10 +26,13 @@ public class AsyncMembersClient {
 
     protected final Supplier<AsyncLogsClient> logsClient;
 
+    protected final Supplier<AsyncNotesClient> notesClient;
+
     public AsyncMembersClient(ClientOptions clientOptions) {
         this.clientOptions = clientOptions;
         this.rawClient = new AsyncRawMembersClient(clientOptions);
         this.logsClient = Suppliers.memoize(() -> new AsyncLogsClient(clientOptions));
+        this.notesClient = Suppliers.memoize(() -> new AsyncNotesClient(clientOptions));
     }
 
     /**
@@ -38,21 +46,43 @@ public class AsyncMembersClient {
      * Lists the members of an account. A member is one buyer's relationship with the account, regardless of how many memberships they hold.
      */
     public CompletableFuture<SyncPagingIterable<Member>> list() {
-        return this.rawClient.list().thenApply(response -> response.body());
+        CompletableFuture<WhopApiHttpResponse<SyncPagingIterable<Member>>> rawFuture = this.rawClient.list();
+        CompletableFuture<SyncPagingIterable<Member>> future = rawFuture.thenApply(response -> response.body());
+        future.whenComplete((result_, throwable_) -> {
+            if (future.isCancelled()) {
+                rawFuture.cancel(true);
+            }
+        });
+        return future;
     }
 
     /**
      * Lists the members of an account. A member is one buyer's relationship with the account, regardless of how many memberships they hold.
      */
     public CompletableFuture<SyncPagingIterable<Member>> list(RequestOptions requestOptions) {
-        return this.rawClient.list(requestOptions).thenApply(response -> response.body());
+        CompletableFuture<WhopApiHttpResponse<SyncPagingIterable<Member>>> rawFuture =
+                this.rawClient.list(requestOptions);
+        CompletableFuture<SyncPagingIterable<Member>> future = rawFuture.thenApply(response -> response.body());
+        future.whenComplete((result_, throwable_) -> {
+            if (future.isCancelled()) {
+                rawFuture.cancel(true);
+            }
+        });
+        return future;
     }
 
     /**
      * Lists the members of an account. A member is one buyer's relationship with the account, regardless of how many memberships they hold.
      */
     public CompletableFuture<SyncPagingIterable<Member>> list(ListMembersRequest request) {
-        return this.rawClient.list(request).thenApply(response -> response.body());
+        CompletableFuture<WhopApiHttpResponse<SyncPagingIterable<Member>>> rawFuture = this.rawClient.list(request);
+        CompletableFuture<SyncPagingIterable<Member>> future = rawFuture.thenApply(response -> response.body());
+        future.whenComplete((result_, throwable_) -> {
+            if (future.isCancelled()) {
+                rawFuture.cancel(true);
+            }
+        });
+        return future;
     }
 
     /**
@@ -60,28 +90,85 @@ public class AsyncMembersClient {
      */
     public CompletableFuture<SyncPagingIterable<Member>> list(
             ListMembersRequest request, RequestOptions requestOptions) {
-        return this.rawClient.list(request, requestOptions).thenApply(response -> response.body());
+        CompletableFuture<WhopApiHttpResponse<SyncPagingIterable<Member>>> rawFuture =
+                this.rawClient.list(request, requestOptions);
+        CompletableFuture<SyncPagingIterable<Member>> future = rawFuture.thenApply(response -> response.body());
+        future.whenComplete((result_, throwable_) -> {
+            if (future.isCancelled()) {
+                rawFuture.cancel(true);
+            }
+        });
+        return future;
+    }
+
+    /**
+     * Adds a person to an account as a member. If the person is already a member of the account, that member is returned unchanged.
+     */
+    public CompletableFuture<Member> create(CreateMembersRequest request) {
+        CompletableFuture<WhopApiHttpResponse<Member>> rawFuture = this.rawClient.create(request);
+        CompletableFuture<Member> future = rawFuture.thenApply(response -> response.body());
+        future.whenComplete((result_, throwable_) -> {
+            if (future.isCancelled()) {
+                rawFuture.cancel(true);
+            }
+        });
+        return future;
+    }
+
+    /**
+     * Adds a person to an account as a member. If the person is already a member of the account, that member is returned unchanged.
+     */
+    public CompletableFuture<Member> create(CreateMembersRequest request, RequestOptions requestOptions) {
+        CompletableFuture<WhopApiHttpResponse<Member>> rawFuture = this.rawClient.create(request, requestOptions);
+        CompletableFuture<Member> future = rawFuture.thenApply(response -> response.body());
+        future.whenComplete((result_, throwable_) -> {
+            if (future.isCancelled()) {
+                rawFuture.cancel(true);
+            }
+        });
+        return future;
     }
 
     /**
      * Retrieves a member by ID. Accessible to the account and to the member's own user.
      */
     public CompletableFuture<Member> retrieve(String id) {
-        return this.rawClient.retrieve(id).thenApply(response -> response.body());
+        CompletableFuture<WhopApiHttpResponse<Member>> rawFuture = this.rawClient.retrieve(id);
+        CompletableFuture<Member> future = rawFuture.thenApply(response -> response.body());
+        future.whenComplete((result_, throwable_) -> {
+            if (future.isCancelled()) {
+                rawFuture.cancel(true);
+            }
+        });
+        return future;
     }
 
     /**
      * Retrieves a member by ID. Accessible to the account and to the member's own user.
      */
     public CompletableFuture<Member> retrieve(String id, RequestOptions requestOptions) {
-        return this.rawClient.retrieve(id, requestOptions).thenApply(response -> response.body());
+        CompletableFuture<WhopApiHttpResponse<Member>> rawFuture = this.rawClient.retrieve(id, requestOptions);
+        CompletableFuture<Member> future = rawFuture.thenApply(response -> response.body());
+        future.whenComplete((result_, throwable_) -> {
+            if (future.isCancelled()) {
+                rawFuture.cancel(true);
+            }
+        });
+        return future;
     }
 
     /**
      * Retrieves a member by ID. Accessible to the account and to the member's own user.
      */
     public CompletableFuture<Member> retrieve(String id, RetrieveMembersRequest request) {
-        return this.rawClient.retrieve(id, request).thenApply(response -> response.body());
+        CompletableFuture<WhopApiHttpResponse<Member>> rawFuture = this.rawClient.retrieve(id, request);
+        CompletableFuture<Member> future = rawFuture.thenApply(response -> response.body());
+        future.whenComplete((result_, throwable_) -> {
+            if (future.isCancelled()) {
+                rawFuture.cancel(true);
+            }
+        });
+        return future;
     }
 
     /**
@@ -89,10 +176,107 @@ public class AsyncMembersClient {
      */
     public CompletableFuture<Member> retrieve(
             String id, RetrieveMembersRequest request, RequestOptions requestOptions) {
-        return this.rawClient.retrieve(id, request, requestOptions).thenApply(response -> response.body());
+        CompletableFuture<WhopApiHttpResponse<Member>> rawFuture = this.rawClient.retrieve(id, request, requestOptions);
+        CompletableFuture<Member> future = rawFuture.thenApply(response -> response.body());
+        future.whenComplete((result_, throwable_) -> {
+            if (future.isCancelled()) {
+                rawFuture.cancel(true);
+            }
+        });
+        return future;
+    }
+
+    /**
+     * Updates a member.
+     */
+    public CompletableFuture<Member> update(String id) {
+        CompletableFuture<WhopApiHttpResponse<Member>> rawFuture = this.rawClient.update(id);
+        CompletableFuture<Member> future = rawFuture.thenApply(response -> response.body());
+        future.whenComplete((result_, throwable_) -> {
+            if (future.isCancelled()) {
+                rawFuture.cancel(true);
+            }
+        });
+        return future;
+    }
+
+    /**
+     * Updates a member.
+     */
+    public CompletableFuture<Member> update(String id, RequestOptions requestOptions) {
+        CompletableFuture<WhopApiHttpResponse<Member>> rawFuture = this.rawClient.update(id, requestOptions);
+        CompletableFuture<Member> future = rawFuture.thenApply(response -> response.body());
+        future.whenComplete((result_, throwable_) -> {
+            if (future.isCancelled()) {
+                rawFuture.cancel(true);
+            }
+        });
+        return future;
+    }
+
+    /**
+     * Updates a member.
+     */
+    public CompletableFuture<Member> update(String id, UpdateMembersRequest request) {
+        CompletableFuture<WhopApiHttpResponse<Member>> rawFuture = this.rawClient.update(id, request);
+        CompletableFuture<Member> future = rawFuture.thenApply(response -> response.body());
+        future.whenComplete((result_, throwable_) -> {
+            if (future.isCancelled()) {
+                rawFuture.cancel(true);
+            }
+        });
+        return future;
+    }
+
+    /**
+     * Updates a member.
+     */
+    public CompletableFuture<Member> update(String id, UpdateMembersRequest request, RequestOptions requestOptions) {
+        CompletableFuture<WhopApiHttpResponse<Member>> rawFuture = this.rawClient.update(id, request, requestOptions);
+        CompletableFuture<Member> future = rawFuture.thenApply(response -> response.body());
+        future.whenComplete((result_, throwable_) -> {
+            if (future.isCancelled()) {
+                rawFuture.cancel(true);
+            }
+        });
+        return future;
+    }
+
+    /**
+     * Unsubscribes a member from the account's marketing communications with the token from their unsubscribe link. Inboxes post here directly for one-click unsubscribe (RFC 8058).
+     */
+    public CompletableFuture<Void> unsubscribe(String id, UnsubscribeMembersRequest request) {
+        CompletableFuture<WhopApiHttpResponse<Void>> rawFuture = this.rawClient.unsubscribe(id, request);
+        CompletableFuture<Void> future = rawFuture.thenApply(response -> response.body());
+        future.whenComplete((result_, throwable_) -> {
+            if (future.isCancelled()) {
+                rawFuture.cancel(true);
+            }
+        });
+        return future;
+    }
+
+    /**
+     * Unsubscribes a member from the account's marketing communications with the token from their unsubscribe link. Inboxes post here directly for one-click unsubscribe (RFC 8058).
+     */
+    public CompletableFuture<Void> unsubscribe(
+            String id, UnsubscribeMembersRequest request, RequestOptions requestOptions) {
+        CompletableFuture<WhopApiHttpResponse<Void>> rawFuture =
+                this.rawClient.unsubscribe(id, request, requestOptions);
+        CompletableFuture<Void> future = rawFuture.thenApply(response -> response.body());
+        future.whenComplete((result_, throwable_) -> {
+            if (future.isCancelled()) {
+                rawFuture.cancel(true);
+            }
+        });
+        return future;
     }
 
     public AsyncLogsClient logs() {
         return this.logsClient.get();
+    }
+
+    public AsyncNotesClient notes() {
+        return this.notesClient.get();
     }
 }

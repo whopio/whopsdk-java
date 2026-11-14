@@ -343,7 +343,6 @@ public final class CompanyTokenTransactionListItem {
 
         private Optional<String> description = Optional.empty();
 
-        @JsonAnySetter
         private Map<String, Object> additionalProperties = new HashMap<>();
 
         private Builder() {}
@@ -365,7 +364,6 @@ public final class CompanyTokenTransactionListItem {
 
         /**
          * <p>The token amount for this transaction. Always a positive value regardless of transaction type.</p>
-         * <p>The token amount for this transaction. Always a positive value regardless of transaction type.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
@@ -376,7 +374,6 @@ public final class CompanyTokenTransactionListItem {
         }
 
         /**
-         * <p>The company whose token balance this transaction affects.</p>
          * <p>The company whose token balance this transaction affects.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
@@ -389,7 +386,6 @@ public final class CompanyTokenTransactionListItem {
 
         /**
          * <p>The datetime the company token transaction was created.</p>
-         * <p>The datetime the company token transaction was created.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
@@ -400,7 +396,6 @@ public final class CompanyTokenTransactionListItem {
         }
 
         /**
-         * <p>The unique identifier for the company token transaction.</p>
          * <p>The unique identifier for the company token transaction.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
@@ -413,7 +408,6 @@ public final class CompanyTokenTransactionListItem {
 
         /**
          * <p>The member whose token balance was affected by this transaction.</p>
-         * <p>The member whose token balance was affected by this transaction.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
@@ -425,7 +419,6 @@ public final class CompanyTokenTransactionListItem {
 
         /**
          * <p>The direction of this token transaction (add, subtract, or transfer).</p>
-         * <p>The direction of this token transaction (add, subtract, or transfer).</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
@@ -436,7 +429,6 @@ public final class CompanyTokenTransactionListItem {
         }
 
         /**
-         * <p>The user whose token balance was affected by this transaction.</p>
          * <p>The user whose token balance was affected by this transaction.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
@@ -569,6 +561,23 @@ public final class CompanyTokenTransactionListItem {
                     transactionType,
                     user,
                     additionalProperties);
+        }
+
+        @JsonAnySetter
+        private void putAdditionalPropertyFromJson(String key, Object value) {
+            if (key.equalsIgnoreCase("amount")
+                    || key.equalsIgnoreCase("company")
+                    || key.equalsIgnoreCase("created_at")
+                    || key.equalsIgnoreCase("description")
+                    || key.equalsIgnoreCase("id")
+                    || key.equalsIgnoreCase("idempotency_key")
+                    || key.equalsIgnoreCase("linked_transaction_id")
+                    || key.equalsIgnoreCase("member")
+                    || key.equalsIgnoreCase("transaction_type")
+                    || key.equalsIgnoreCase("user")) {
+                return;
+            }
+            this.additionalProperties.put(key, value);
         }
 
         @java.lang.Override

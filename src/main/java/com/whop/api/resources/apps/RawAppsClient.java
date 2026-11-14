@@ -4,11 +4,14 @@
 package com.whop.api.resources.apps;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
+import com.whop.api.core.BodyProperties;
 import com.whop.api.core.ClientOptions;
 import com.whop.api.core.MediaTypes;
 import com.whop.api.core.ObjectMappers;
+import com.whop.api.core.PathSegments;
 import com.whop.api.core.QueryStringMapper;
 import com.whop.api.core.RequestOptions;
+import com.whop.api.core.RetryInterceptor;
 import com.whop.api.core.WhopApiApiException;
 import com.whop.api.core.WhopApiException;
 import com.whop.api.core.WhopApiHttpResponse;
@@ -16,11 +19,8 @@ import com.whop.api.core.pagination.SyncPagingIterable;
 import com.whop.api.errors.BadRequestError;
 import com.whop.api.errors.ConflictError;
 import com.whop.api.errors.ForbiddenError;
-import com.whop.api.errors.InternalServerError;
 import com.whop.api.errors.NotFoundError;
-import com.whop.api.errors.TooManyRequestsError;
 import com.whop.api.errors.UnauthorizedError;
-import com.whop.api.errors.UnprocessableEntityError;
 import com.whop.api.resources.apps.requests.CreateAppsRequest;
 import com.whop.api.resources.apps.requests.DeleteAppsRequest;
 import com.whop.api.resources.apps.requests.DeployAppsRequest;
@@ -28,7 +28,6 @@ import com.whop.api.resources.apps.requests.ListAppsRequest;
 import com.whop.api.resources.apps.requests.LogsAppsRequest;
 import com.whop.api.resources.apps.requests.RetrieveAppsRequest;
 import com.whop.api.resources.apps.requests.UpdateAppsRequest;
-import com.whop.api.resources.apps.requests.UpdatePermissionsAppRequest;
 import com.whop.api.resources.apps.requests.UpdatePermissionsAppsRequest;
 import com.whop.api.resources.apps.types.DeleteAppsResponse;
 import com.whop.api.resources.apps.types.ListAppsResponse;
@@ -37,7 +36,6 @@ import com.whop.api.resources.apps.types.LogsAppsResponseDataItem;
 import com.whop.api.types.App;
 import com.whop.api.types.AppDeployment;
 import com.whop.api.types.AppListItem;
-import com.whop.api.types.V1ErrorResponse;
 import java.io.IOException;
 import java.util.List;
 import java.util.Optional;
@@ -57,32 +55,32 @@ public class RawAppsClient {
     }
 
     /**
-     * Lists apps on the Whop platform: the app store's live apps, or — with <code>account_id</code> and developer access to that account — every app the account owns. Requires authentication, except for the publicly readable lists: <code>verified_apps_only=true</code>, and <code>app_type=website</code> with no <code>account_id</code>, which returns every live deployed website that Whop has not verified — verified templates are the curated <code>verified_apps_only=true</code> list instead.
+     * Lists published apps approved for the app store without authentication. With <code>account_id</code> and developer access, also includes unpublished apps that the account owns. Public website discovery includes built official blueprints and built, live community blueprints that Whop recommends.
      */
     public WhopApiHttpResponse<SyncPagingIterable<AppListItem>> list() {
         return list(ListAppsRequest.builder().build());
     }
 
     /**
-     * Lists apps on the Whop platform: the app store's live apps, or — with <code>account_id</code> and developer access to that account — every app the account owns. Requires authentication, except for the publicly readable lists: <code>verified_apps_only=true</code>, and <code>app_type=website</code> with no <code>account_id</code>, which returns every live deployed website that Whop has not verified — verified templates are the curated <code>verified_apps_only=true</code> list instead.
+     * Lists published apps approved for the app store without authentication. With <code>account_id</code> and developer access, also includes unpublished apps that the account owns. Public website discovery includes built official blueprints and built, live community blueprints that Whop recommends.
      */
     public WhopApiHttpResponse<SyncPagingIterable<AppListItem>> list(RequestOptions requestOptions) {
         return list(ListAppsRequest.builder().build(), requestOptions);
     }
 
     /**
-     * Lists apps on the Whop platform: the app store's live apps, or — with <code>account_id</code> and developer access to that account — every app the account owns. Requires authentication, except for the publicly readable lists: <code>verified_apps_only=true</code>, and <code>app_type=website</code> with no <code>account_id</code>, which returns every live deployed website that Whop has not verified — verified templates are the curated <code>verified_apps_only=true</code> list instead.
+     * Lists published apps approved for the app store without authentication. With <code>account_id</code> and developer access, also includes unpublished apps that the account owns. Public website discovery includes built official blueprints and built, live community blueprints that Whop recommends.
      */
     public WhopApiHttpResponse<SyncPagingIterable<AppListItem>> list(ListAppsRequest request) {
         return list(request, null);
     }
 
     /**
-     * Lists apps on the Whop platform: the app store's live apps, or — with <code>account_id</code> and developer access to that account — every app the account owns. Requires authentication, except for the publicly readable lists: <code>verified_apps_only=true</code>, and <code>app_type=website</code> with no <code>account_id</code>, which returns every live deployed website that Whop has not verified — verified templates are the curated <code>verified_apps_only=true</code> list instead.
+     * Lists published apps approved for the app store without authentication. With <code>account_id</code> and developer access, also includes unpublished apps that the account owns. Public website discovery includes built official blueprints and built, live community blueprints that Whop recommends.
      */
     public WhopApiHttpResponse<SyncPagingIterable<AppListItem>> list(
             ListAppsRequest request, RequestOptions requestOptions) {
-        HttpUrl.Builder httpUrl = HttpUrl.parse(this.clientOptions.environment().getUrl())
+        HttpUrl.Builder httpUrl = HttpUrl.parse(this.clientOptions.environment().getApiURL())
                 .newBuilder()
                 .addPathSegments("apps");
         if (request.getAccountId().isPresent()) {
@@ -97,13 +95,40 @@ public class RawAppsClient {
             QueryStringMapper.addQueryParameter(
                     httpUrl, "view_type", request.getViewType().get(), false);
         }
+        if (request.getVerified().isPresent()) {
+            QueryStringMapper.addQueryParameter(
+                    httpUrl, "verified", request.getVerified().get(), false);
+        }
         if (request.getVerifiedAppsOnly().isPresent()) {
             QueryStringMapper.addQueryParameter(
                     httpUrl, "verified_apps_only", request.getVerifiedAppsOnly().get(), false);
         }
+        if (request.getRecommended().isPresent()) {
+            QueryStringMapper.addQueryParameter(
+                    httpUrl, "recommended", request.getRecommended().get(), false);
+        }
         if (request.getQuery().isPresent()) {
             QueryStringMapper.addQueryParameter(
                     httpUrl, "query", request.getQuery().get(), false);
+        }
+        if (request.getProductCategory().isPresent()) {
+            QueryStringMapper.addQueryParameter(
+                    httpUrl, "product_category", request.getProductCategory().get(), false);
+        }
+        if (request.getBusinessType().isPresent()) {
+            QueryStringMapper.addQueryParameter(
+                    httpUrl, "business_type", request.getBusinessType().get(), false);
+        }
+        if (request.getIndustryType().isPresent()) {
+            QueryStringMapper.addQueryParameter(
+                    httpUrl, "industry_type", request.getIndustryType().get(), false);
+        }
+        if (request.getMarketplaceCategoryRoute().isPresent()) {
+            QueryStringMapper.addQueryParameter(
+                    httpUrl,
+                    "marketplace_category_route",
+                    request.getMarketplaceCategoryRoute().get(),
+                    false);
         }
         if (request.getOrder().isPresent()) {
             QueryStringMapper.addQueryParameter(
@@ -129,6 +154,13 @@ public class RawAppsClient {
             QueryStringMapper.addQueryParameter(
                     httpUrl, "before", request.getBefore().get(), false);
         }
+        if (request.getIncludeTotalCount().isPresent()) {
+            QueryStringMapper.addQueryParameter(
+                    httpUrl,
+                    "include_total_count",
+                    request.getIncludeTotalCount().get(),
+                    false);
+        }
         if (requestOptions != null) {
             requestOptions.getQueryParameters().forEach((_key, _value) -> {
                 httpUrl.addQueryParameter(_key, _value);
@@ -144,6 +176,15 @@ public class RawAppsClient {
         if (requestOptions != null && requestOptions.getTimeout().isPresent()) {
             client = clientOptions.httpClientWithTimeout(requestOptions);
         }
+        if (requestOptions != null && requestOptions.getMaxRetries().isPresent()) {
+            okhttpRequest = okhttpRequest
+                    .newBuilder()
+                    .tag(
+                            RetryInterceptor.MaxRetriesOverride.class,
+                            new RetryInterceptor.MaxRetriesOverride(
+                                    requestOptions.getMaxRetries().get()))
+                    .build();
+        }
         try (Response response = client.newCall(okhttpRequest).execute()) {
             ResponseBody responseBody = response.body();
             String responseBodyString = responseBody != null ? responseBody.string() : "{}";
@@ -158,8 +199,11 @@ public class RawAppsClient {
                 List<AppListItem> result = parsedResponse.getData();
                 return new WhopApiHttpResponse<>(
                         new SyncPagingIterable<AppListItem>(
-                                startingAfter != null, result, parsedResponse, () -> list(nextRequest, requestOptions)
-                                        .body()),
+                                startingAfter.isPresent()
+                                        && !startingAfter.get().isEmpty(),
+                                result,
+                                parsedResponse,
+                                () -> list(nextRequest, requestOptions).body()),
                         response);
             }
             try {
@@ -177,6 +221,8 @@ public class RawAppsClient {
             Object errorBody = ObjectMappers.parseErrorBody(responseBodyString);
             throw new WhopApiApiException(
                     "Error with status code " + response.code(), response.code(), errorBody, response);
+        } catch (JsonProcessingException e) {
+            throw new WhopApiException("Failed to deserialize response: " + e.getMessage(), e);
         } catch (IOException e) {
             throw new WhopApiException("Network error executing HTTP request", e);
         }
@@ -193,7 +239,7 @@ public class RawAppsClient {
      * Registers a new app on the Whop developer platform. Apps provide custom experiences that can be added to products.
      */
     public WhopApiHttpResponse<App> create(CreateAppsRequest request, RequestOptions requestOptions) {
-        HttpUrl.Builder httpUrl = HttpUrl.parse(this.clientOptions.environment().getUrl())
+        HttpUrl.Builder httpUrl = HttpUrl.parse(this.clientOptions.environment().getApiURL())
                 .newBuilder()
                 .addPathSegments("apps");
         if (requestOptions != null) {
@@ -204,7 +250,9 @@ public class RawAppsClient {
         RequestBody body;
         try {
             body = RequestBody.create(
-                    ObjectMappers.JSON_MAPPER.writeValueAsBytes(request), MediaTypes.APPLICATION_JSON);
+                    ObjectMappers.JSON_MAPPER.writeValueAsBytes(BodyProperties.merge(
+                            request, requestOptions != null ? requestOptions.getBodyProperties() : null)),
+                    MediaTypes.APPLICATION_JSON);
         } catch (JsonProcessingException e) {
             throw new WhopApiException("Failed to serialize request", e);
         }
@@ -218,6 +266,15 @@ public class RawAppsClient {
         OkHttpClient client = clientOptions.httpClient();
         if (requestOptions != null && requestOptions.getTimeout().isPresent()) {
             client = clientOptions.httpClientWithTimeout(requestOptions);
+        }
+        if (requestOptions != null && requestOptions.getMaxRetries().isPresent()) {
+            okhttpRequest = okhttpRequest
+                    .newBuilder()
+                    .tag(
+                            RetryInterceptor.MaxRetriesOverride.class,
+                            new RetryInterceptor.MaxRetriesOverride(
+                                    requestOptions.getMaxRetries().get()))
+                    .build();
         }
         try (Response response = client.newCall(okhttpRequest).execute()) {
             ResponseBody responseBody = response.body();
@@ -242,8 +299,7 @@ public class RawAppsClient {
                                 ObjectMappers.JSON_MAPPER.readValue(responseBodyString, Object.class), response);
                     case 409:
                         throw new ConflictError(
-                                ObjectMappers.JSON_MAPPER.readValue(responseBodyString, V1ErrorResponse.class),
-                                response);
+                                ObjectMappers.JSON_MAPPER.readValue(responseBodyString, Object.class), response);
                 }
             } catch (JsonProcessingException ignored) {
                 // unable to map error response, throwing generic error
@@ -251,130 +307,42 @@ public class RawAppsClient {
             Object errorBody = ObjectMappers.parseErrorBody(responseBodyString);
             throw new WhopApiApiException(
                     "Error with status code " + response.code(), response.code(), errorBody, response);
-        } catch (IOException e) {
-            throw new WhopApiException("Network error executing HTTP request", e);
-        }
-    }
-
-    /**
-     * Updates the permission requirements for an app
-     * <p>Required permissions:</p>
-     * <ul>
-     * <li><code>developer:update_app_authorization</code></li>
-     * </ul>
-     */
-    public WhopApiHttpResponse<Boolean> updatePermissionsApp(String appId, UpdatePermissionsAppRequest request) {
-        return updatePermissionsApp(appId, request, null);
-    }
-
-    /**
-     * Updates the permission requirements for an app
-     * <p>Required permissions:</p>
-     * <ul>
-     * <li><code>developer:update_app_authorization</code></li>
-     * </ul>
-     */
-    public WhopApiHttpResponse<Boolean> updatePermissionsApp(
-            String appId, UpdatePermissionsAppRequest request, RequestOptions requestOptions) {
-        HttpUrl.Builder httpUrl = HttpUrl.parse(this.clientOptions.environment().getUrl())
-                .newBuilder()
-                .addPathSegments("apps")
-                .addPathSegment(appId)
-                .addPathSegments("permissions");
-        if (requestOptions != null) {
-            requestOptions.getQueryParameters().forEach((_key, _value) -> {
-                httpUrl.addQueryParameter(_key, _value);
-            });
-        }
-        RequestBody body;
-        try {
-            body = RequestBody.create(
-                    ObjectMappers.JSON_MAPPER.writeValueAsBytes(request), MediaTypes.APPLICATION_JSON);
         } catch (JsonProcessingException e) {
-            throw new WhopApiException("Failed to serialize request", e);
-        }
-        Request okhttpRequest = new Request.Builder()
-                .url(httpUrl.build())
-                .method("PATCH", body)
-                .headers(Headers.of(clientOptions.headers(requestOptions)))
-                .addHeader("Content-Type", "application/json")
-                .addHeader("Accept", "application/json")
-                .build();
-        OkHttpClient client = clientOptions.httpClient();
-        if (requestOptions != null && requestOptions.getTimeout().isPresent()) {
-            client = clientOptions.httpClientWithTimeout(requestOptions);
-        }
-        try (Response response = client.newCall(okhttpRequest).execute()) {
-            ResponseBody responseBody = response.body();
-            String responseBodyString = responseBody != null ? responseBody.string() : "{}";
-            if (response.isSuccessful()) {
-                return new WhopApiHttpResponse<>(
-                        ObjectMappers.JSON_MAPPER.readValue(responseBodyString, boolean.class), response);
-            }
-            try {
-                switch (response.code()) {
-                    case 400:
-                        throw new BadRequestError(
-                                ObjectMappers.JSON_MAPPER.readValue(responseBodyString, Object.class), response);
-                    case 401:
-                        throw new UnauthorizedError(
-                                ObjectMappers.JSON_MAPPER.readValue(responseBodyString, Object.class), response);
-                    case 403:
-                        throw new ForbiddenError(
-                                ObjectMappers.JSON_MAPPER.readValue(responseBodyString, Object.class), response);
-                    case 404:
-                        throw new NotFoundError(
-                                ObjectMappers.JSON_MAPPER.readValue(responseBodyString, Object.class), response);
-                    case 422:
-                        throw new UnprocessableEntityError(
-                                ObjectMappers.JSON_MAPPER.readValue(responseBodyString, Object.class), response);
-                    case 429:
-                        throw new TooManyRequestsError(
-                                ObjectMappers.JSON_MAPPER.readValue(responseBodyString, Object.class), response);
-                    case 500:
-                        throw new InternalServerError(
-                                ObjectMappers.JSON_MAPPER.readValue(responseBodyString, Object.class), response);
-                }
-            } catch (JsonProcessingException ignored) {
-                // unable to map error response, throwing generic error
-            }
-            Object errorBody = ObjectMappers.parseErrorBody(responseBodyString);
-            throw new WhopApiApiException(
-                    "Error with status code " + response.code(), response.code(), errorBody, response);
+            throw new WhopApiException("Failed to deserialize response: " + e.getMessage(), e);
         } catch (IOException e) {
             throw new WhopApiException("Network error executing HTTP request", e);
         }
     }
 
     /**
-     * Retrieves an app by ID, claimed route, or proxy domain id. Credential fields (api_key, default_api_key, secrets) render <code>null</code> unless the caller has the corresponding developer permission on the owning account.
+     * Retrieves an app by ID, claimed route, active verified custom hostname, or proxy domain id. Authentication is optional; credential fields stay <code>null</code> unless you have the matching developer permission on the owning account.
      */
     public WhopApiHttpResponse<App> retrieve(String id) {
         return retrieve(id, RetrieveAppsRequest.builder().build());
     }
 
     /**
-     * Retrieves an app by ID, claimed route, or proxy domain id. Credential fields (api_key, default_api_key, secrets) render <code>null</code> unless the caller has the corresponding developer permission on the owning account.
+     * Retrieves an app by ID, claimed route, active verified custom hostname, or proxy domain id. Authentication is optional; credential fields stay <code>null</code> unless you have the matching developer permission on the owning account.
      */
     public WhopApiHttpResponse<App> retrieve(String id, RequestOptions requestOptions) {
         return retrieve(id, RetrieveAppsRequest.builder().build(), requestOptions);
     }
 
     /**
-     * Retrieves an app by ID, claimed route, or proxy domain id. Credential fields (api_key, default_api_key, secrets) render <code>null</code> unless the caller has the corresponding developer permission on the owning account.
+     * Retrieves an app by ID, claimed route, active verified custom hostname, or proxy domain id. Authentication is optional; credential fields stay <code>null</code> unless you have the matching developer permission on the owning account.
      */
     public WhopApiHttpResponse<App> retrieve(String id, RetrieveAppsRequest request) {
         return retrieve(id, request, null);
     }
 
     /**
-     * Retrieves an app by ID, claimed route, or proxy domain id. Credential fields (api_key, default_api_key, secrets) render <code>null</code> unless the caller has the corresponding developer permission on the owning account.
+     * Retrieves an app by ID, claimed route, active verified custom hostname, or proxy domain id. Authentication is optional; credential fields stay <code>null</code> unless you have the matching developer permission on the owning account.
      */
     public WhopApiHttpResponse<App> retrieve(String id, RetrieveAppsRequest request, RequestOptions requestOptions) {
-        HttpUrl.Builder httpUrl = HttpUrl.parse(this.clientOptions.environment().getUrl())
+        HttpUrl.Builder httpUrl = HttpUrl.parse(this.clientOptions.environment().getApiURL())
                 .newBuilder()
                 .addPathSegments("apps")
-                .addPathSegment(id);
+                .addPathSegment(PathSegments.validate(id));
         if (requestOptions != null) {
             requestOptions.getQueryParameters().forEach((_key, _value) -> {
                 httpUrl.addQueryParameter(_key, _value);
@@ -389,6 +357,15 @@ public class RawAppsClient {
         OkHttpClient client = clientOptions.httpClient();
         if (requestOptions != null && requestOptions.getTimeout().isPresent()) {
             client = clientOptions.httpClientWithTimeout(requestOptions);
+        }
+        if (requestOptions != null && requestOptions.getMaxRetries().isPresent()) {
+            okhttpRequest = okhttpRequest
+                    .newBuilder()
+                    .tag(
+                            RetryInterceptor.MaxRetriesOverride.class,
+                            new RetryInterceptor.MaxRetriesOverride(
+                                    requestOptions.getMaxRetries().get()))
+                    .build();
         }
         try (Response response = client.newCall(okhttpRequest).execute()) {
             ResponseBody responseBody = response.body();
@@ -408,6 +385,8 @@ public class RawAppsClient {
             Object errorBody = ObjectMappers.parseErrorBody(responseBodyString);
             throw new WhopApiApiException(
                     "Error with status code " + response.code(), response.code(), errorBody, response);
+        } catch (JsonProcessingException e) {
+            throw new WhopApiException("Failed to deserialize response: " + e.getMessage(), e);
         } catch (IOException e) {
             throw new WhopApiException("Network error executing HTTP request", e);
         }
@@ -439,10 +418,10 @@ public class RawAppsClient {
      */
     public WhopApiHttpResponse<DeleteAppsResponse> delete(
             String id, DeleteAppsRequest request, RequestOptions requestOptions) {
-        HttpUrl.Builder httpUrl = HttpUrl.parse(this.clientOptions.environment().getUrl())
+        HttpUrl.Builder httpUrl = HttpUrl.parse(this.clientOptions.environment().getApiURL())
                 .newBuilder()
                 .addPathSegments("apps")
-                .addPathSegment(id);
+                .addPathSegment(PathSegments.validate(id));
         if (requestOptions != null) {
             requestOptions.getQueryParameters().forEach((_key, _value) -> {
                 httpUrl.addQueryParameter(_key, _value);
@@ -450,13 +429,25 @@ public class RawAppsClient {
         }
         Request.Builder _requestBuilder = new Request.Builder()
                 .url(httpUrl.build())
-                .method("DELETE", null)
+                .method(
+                        "DELETE",
+                        BodyProperties.toRequestBody(
+                                requestOptions != null ? requestOptions.getBodyProperties() : null, null))
                 .headers(Headers.of(clientOptions.headers(requestOptions)))
                 .addHeader("Accept", "application/json");
         Request okhttpRequest = _requestBuilder.build();
         OkHttpClient client = clientOptions.httpClient();
         if (requestOptions != null && requestOptions.getTimeout().isPresent()) {
             client = clientOptions.httpClientWithTimeout(requestOptions);
+        }
+        if (requestOptions != null && requestOptions.getMaxRetries().isPresent()) {
+            okhttpRequest = okhttpRequest
+                    .newBuilder()
+                    .tag(
+                            RetryInterceptor.MaxRetriesOverride.class,
+                            new RetryInterceptor.MaxRetriesOverride(
+                                    requestOptions.getMaxRetries().get()))
+                    .build();
         }
         try (Response response = client.newCall(okhttpRequest).execute()) {
             ResponseBody responseBody = response.body();
@@ -483,6 +474,8 @@ public class RawAppsClient {
             Object errorBody = ObjectMappers.parseErrorBody(responseBodyString);
             throw new WhopApiApiException(
                     "Error with status code " + response.code(), response.code(), errorBody, response);
+        } catch (JsonProcessingException e) {
+            throw new WhopApiException("Failed to deserialize response: " + e.getMessage(), e);
         } catch (IOException e) {
             throw new WhopApiException("Network error executing HTTP request", e);
         }
@@ -513,10 +506,10 @@ public class RawAppsClient {
      * Updates the settings, metadata, or status of an app. Fields that are omitted keep their current value.
      */
     public WhopApiHttpResponse<App> update(String id, UpdateAppsRequest request, RequestOptions requestOptions) {
-        HttpUrl.Builder httpUrl = HttpUrl.parse(this.clientOptions.environment().getUrl())
+        HttpUrl.Builder httpUrl = HttpUrl.parse(this.clientOptions.environment().getApiURL())
                 .newBuilder()
                 .addPathSegments("apps")
-                .addPathSegment(id);
+                .addPathSegment(PathSegments.validate(id));
         if (requestOptions != null) {
             requestOptions.getQueryParameters().forEach((_key, _value) -> {
                 httpUrl.addQueryParameter(_key, _value);
@@ -525,7 +518,9 @@ public class RawAppsClient {
         RequestBody body;
         try {
             body = RequestBody.create(
-                    ObjectMappers.JSON_MAPPER.writeValueAsBytes(request), MediaTypes.APPLICATION_JSON);
+                    ObjectMappers.JSON_MAPPER.writeValueAsBytes(BodyProperties.merge(
+                            request, requestOptions != null ? requestOptions.getBodyProperties() : null)),
+                    MediaTypes.APPLICATION_JSON);
         } catch (JsonProcessingException e) {
             throw new WhopApiException("Failed to serialize request", e);
         }
@@ -539,6 +534,15 @@ public class RawAppsClient {
         OkHttpClient client = clientOptions.httpClient();
         if (requestOptions != null && requestOptions.getTimeout().isPresent()) {
             client = clientOptions.httpClientWithTimeout(requestOptions);
+        }
+        if (requestOptions != null && requestOptions.getMaxRetries().isPresent()) {
+            okhttpRequest = okhttpRequest
+                    .newBuilder()
+                    .tag(
+                            RetryInterceptor.MaxRetriesOverride.class,
+                            new RetryInterceptor.MaxRetriesOverride(
+                                    requestOptions.getMaxRetries().get()))
+                    .build();
         }
         try (Response response = client.newCall(okhttpRequest).execute()) {
             ResponseBody responseBody = response.body();
@@ -568,6 +572,8 @@ public class RawAppsClient {
             Object errorBody = ObjectMappers.parseErrorBody(responseBodyString);
             throw new WhopApiApiException(
                     "Error with status code " + response.code(), response.code(), errorBody, response);
+        } catch (JsonProcessingException e) {
+            throw new WhopApiException("Failed to deserialize response: " + e.getMessage(), e);
         } catch (IOException e) {
             throw new WhopApiException("Network error executing HTTP request", e);
         }
@@ -599,10 +605,10 @@ public class RawAppsClient {
      */
     public WhopApiHttpResponse<AppDeployment> deploy(
             String id, DeployAppsRequest request, RequestOptions requestOptions) {
-        HttpUrl.Builder httpUrl = HttpUrl.parse(this.clientOptions.environment().getUrl())
+        HttpUrl.Builder httpUrl = HttpUrl.parse(this.clientOptions.environment().getApiURL())
                 .newBuilder()
                 .addPathSegments("apps")
-                .addPathSegment(id)
+                .addPathSegment(PathSegments.validate(id))
                 .addPathSegments("deploy");
         if (requestOptions != null) {
             requestOptions.getQueryParameters().forEach((_key, _value) -> {
@@ -612,7 +618,9 @@ public class RawAppsClient {
         RequestBody body;
         try {
             body = RequestBody.create(
-                    ObjectMappers.JSON_MAPPER.writeValueAsBytes(request), MediaTypes.APPLICATION_JSON);
+                    ObjectMappers.JSON_MAPPER.writeValueAsBytes(BodyProperties.merge(
+                            request, requestOptions != null ? requestOptions.getBodyProperties() : null)),
+                    MediaTypes.APPLICATION_JSON);
         } catch (JsonProcessingException e) {
             throw new WhopApiException("Failed to serialize request", e);
         }
@@ -626,6 +634,15 @@ public class RawAppsClient {
         OkHttpClient client = clientOptions.httpClient();
         if (requestOptions != null && requestOptions.getTimeout().isPresent()) {
             client = clientOptions.httpClientWithTimeout(requestOptions);
+        }
+        if (requestOptions != null && requestOptions.getMaxRetries().isPresent()) {
+            okhttpRequest = okhttpRequest
+                    .newBuilder()
+                    .tag(
+                            RetryInterceptor.MaxRetriesOverride.class,
+                            new RetryInterceptor.MaxRetriesOverride(
+                                    requestOptions.getMaxRetries().get()))
+                    .build();
         }
         try (Response response = client.newCall(okhttpRequest).execute()) {
             ResponseBody responseBody = response.body();
@@ -641,8 +658,7 @@ public class RawAppsClient {
                                 ObjectMappers.JSON_MAPPER.readValue(responseBodyString, Object.class), response);
                     case 409:
                         throw new ConflictError(
-                                ObjectMappers.JSON_MAPPER.readValue(responseBodyString, V1ErrorResponse.class),
-                                response);
+                                ObjectMappers.JSON_MAPPER.readValue(responseBodyString, Object.class), response);
                 }
             } catch (JsonProcessingException ignored) {
                 // unable to map error response, throwing generic error
@@ -650,20 +666,22 @@ public class RawAppsClient {
             Object errorBody = ObjectMappers.parseErrorBody(responseBodyString);
             throw new WhopApiApiException(
                     "Error with status code " + response.code(), response.code(), errorBody, response);
+        } catch (JsonProcessingException e) {
+            throw new WhopApiException("Failed to deserialize response: " + e.getMessage(), e);
         } catch (IOException e) {
             throw new WhopApiException("Network error executing HTTP request", e);
         }
     }
 
     /**
-     * Lists a hosted app's server runtime logs, most recent first: console output, uncaught exceptions, and failed-request summaries captured on whop.app hosting. Logs are retained for 7 days.
+     * Lists a hosted app's server runtime logs, most recent first: console output, uncaught exceptions, and failed-request summaries captured on whop.site hosting. Logs are retained for 7 days.
      */
     public WhopApiHttpResponse<SyncPagingIterable<LogsAppsResponseDataItem>> logs(String id) {
         return logs(id, LogsAppsRequest.builder().build());
     }
 
     /**
-     * Lists a hosted app's server runtime logs, most recent first: console output, uncaught exceptions, and failed-request summaries captured on whop.app hosting. Logs are retained for 7 days.
+     * Lists a hosted app's server runtime logs, most recent first: console output, uncaught exceptions, and failed-request summaries captured on whop.site hosting. Logs are retained for 7 days.
      */
     public WhopApiHttpResponse<SyncPagingIterable<LogsAppsResponseDataItem>> logs(
             String id, RequestOptions requestOptions) {
@@ -671,21 +689,21 @@ public class RawAppsClient {
     }
 
     /**
-     * Lists a hosted app's server runtime logs, most recent first: console output, uncaught exceptions, and failed-request summaries captured on whop.app hosting. Logs are retained for 7 days.
+     * Lists a hosted app's server runtime logs, most recent first: console output, uncaught exceptions, and failed-request summaries captured on whop.site hosting. Logs are retained for 7 days.
      */
     public WhopApiHttpResponse<SyncPagingIterable<LogsAppsResponseDataItem>> logs(String id, LogsAppsRequest request) {
         return logs(id, request, null);
     }
 
     /**
-     * Lists a hosted app's server runtime logs, most recent first: console output, uncaught exceptions, and failed-request summaries captured on whop.app hosting. Logs are retained for 7 days.
+     * Lists a hosted app's server runtime logs, most recent first: console output, uncaught exceptions, and failed-request summaries captured on whop.site hosting. Logs are retained for 7 days.
      */
     public WhopApiHttpResponse<SyncPagingIterable<LogsAppsResponseDataItem>> logs(
             String id, LogsAppsRequest request, RequestOptions requestOptions) {
-        HttpUrl.Builder httpUrl = HttpUrl.parse(this.clientOptions.environment().getUrl())
+        HttpUrl.Builder httpUrl = HttpUrl.parse(this.clientOptions.environment().getApiURL())
                 .newBuilder()
                 .addPathSegments("apps")
-                .addPathSegment(id)
+                .addPathSegment(PathSegments.validate(id))
                 .addPathSegments("logs");
         if (request.getAppBuildId().isPresent()) {
             QueryStringMapper.addQueryParameter(
@@ -734,6 +752,15 @@ public class RawAppsClient {
         if (requestOptions != null && requestOptions.getTimeout().isPresent()) {
             client = clientOptions.httpClientWithTimeout(requestOptions);
         }
+        if (requestOptions != null && requestOptions.getMaxRetries().isPresent()) {
+            okhttpRequest = okhttpRequest
+                    .newBuilder()
+                    .tag(
+                            RetryInterceptor.MaxRetriesOverride.class,
+                            new RetryInterceptor.MaxRetriesOverride(
+                                    requestOptions.getMaxRetries().get()))
+                    .build();
+        }
         try (Response response = client.newCall(okhttpRequest).execute()) {
             ResponseBody responseBody = response.body();
             String responseBodyString = responseBody != null ? responseBody.string() : "{}";
@@ -772,6 +799,8 @@ public class RawAppsClient {
             Object errorBody = ObjectMappers.parseErrorBody(responseBodyString);
             throw new WhopApiApiException(
                     "Error with status code " + response.code(), response.code(), errorBody, response);
+        } catch (JsonProcessingException e) {
+            throw new WhopApiException("Failed to deserialize response: " + e.getMessage(), e);
         } catch (IOException e) {
             throw new WhopApiException("Network error executing HTTP request", e);
         }
@@ -789,10 +818,10 @@ public class RawAppsClient {
      */
     public WhopApiHttpResponse<App> updatePermissions(
             String id, UpdatePermissionsAppsRequest request, RequestOptions requestOptions) {
-        HttpUrl.Builder httpUrl = HttpUrl.parse(this.clientOptions.environment().getUrl())
+        HttpUrl.Builder httpUrl = HttpUrl.parse(this.clientOptions.environment().getApiURL())
                 .newBuilder()
                 .addPathSegments("apps")
-                .addPathSegment(id)
+                .addPathSegment(PathSegments.validate(id))
                 .addPathSegments("permissions");
         if (requestOptions != null) {
             requestOptions.getQueryParameters().forEach((_key, _value) -> {
@@ -802,7 +831,9 @@ public class RawAppsClient {
         RequestBody body;
         try {
             body = RequestBody.create(
-                    ObjectMappers.JSON_MAPPER.writeValueAsBytes(request), MediaTypes.APPLICATION_JSON);
+                    ObjectMappers.JSON_MAPPER.writeValueAsBytes(BodyProperties.merge(
+                            request, requestOptions != null ? requestOptions.getBodyProperties() : null)),
+                    MediaTypes.APPLICATION_JSON);
         } catch (JsonProcessingException e) {
             throw new WhopApiException("Failed to serialize request", e);
         }
@@ -816,6 +847,15 @@ public class RawAppsClient {
         OkHttpClient client = clientOptions.httpClient();
         if (requestOptions != null && requestOptions.getTimeout().isPresent()) {
             client = clientOptions.httpClientWithTimeout(requestOptions);
+        }
+        if (requestOptions != null && requestOptions.getMaxRetries().isPresent()) {
+            okhttpRequest = okhttpRequest
+                    .newBuilder()
+                    .tag(
+                            RetryInterceptor.MaxRetriesOverride.class,
+                            new RetryInterceptor.MaxRetriesOverride(
+                                    requestOptions.getMaxRetries().get()))
+                    .build();
         }
         try (Response response = client.newCall(okhttpRequest).execute()) {
             ResponseBody responseBody = response.body();
@@ -845,6 +885,8 @@ public class RawAppsClient {
             Object errorBody = ObjectMappers.parseErrorBody(responseBodyString);
             throw new WhopApiApiException(
                     "Error with status code " + response.code(), response.code(), errorBody, response);
+        } catch (JsonProcessingException e) {
+            throw new WhopApiException("Failed to deserialize response: " + e.getMessage(), e);
         } catch (IOException e) {
             throw new WhopApiException("Network error executing HTTP request", e);
         }

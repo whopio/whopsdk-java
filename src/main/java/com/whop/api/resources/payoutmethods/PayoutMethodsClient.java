@@ -29,7 +29,7 @@ public class PayoutMethodsClient {
     }
 
     /**
-     * Returns a list of active payout methods configured for a company, ordered by most recently created.
+     * Lists the active payout methods configured for an account, newest first.
      * <p>Required permissions:</p>
      * <ul>
      * <li><code>payout:destination:read</code></li>
@@ -40,7 +40,7 @@ public class PayoutMethodsClient {
     }
 
     /**
-     * Returns a list of active payout methods configured for a company, ordered by most recently created.
+     * Lists the active payout methods configured for an account, newest first.
      * <p>Required permissions:</p>
      * <ul>
      * <li><code>payout:destination:read</code></li>

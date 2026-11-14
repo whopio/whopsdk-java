@@ -7,6 +7,12 @@ import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonValue;
 
 public final class RetrieveStatsRequestSnapshotWindow {
+    public static final RetrieveStatsRequestSnapshotWindow FIFTY_SIX_D =
+            new RetrieveStatsRequestSnapshotWindow(Value.FIFTY_SIX_D, "56d");
+
+    public static final RetrieveStatsRequestSnapshotWindow FOURTEEN_D =
+            new RetrieveStatsRequestSnapshotWindow(Value.FOURTEEN_D, "14d");
+
     public static final RetrieveStatsRequestSnapshotWindow SEVEN_D =
             new RetrieveStatsRequestSnapshotWindow(Value.SEVEN_D, "7d");
 
@@ -49,6 +55,10 @@ public final class RetrieveStatsRequestSnapshotWindow {
 
     public <T> T visit(Visitor<T> visitor) {
         switch (value) {
+            case FIFTY_SIX_D:
+                return visitor.visitFiftySixD();
+            case FOURTEEN_D:
+                return visitor.visitFourteenD();
             case SEVEN_D:
                 return visitor.visitSevenD();
             case TWENTY_EIGHT_D:
@@ -64,6 +74,10 @@ public final class RetrieveStatsRequestSnapshotWindow {
     @JsonCreator(mode = JsonCreator.Mode.DELEGATING)
     public static RetrieveStatsRequestSnapshotWindow valueOf(String value) {
         switch (value) {
+            case "56d":
+                return FIFTY_SIX_D;
+            case "14d":
+                return FOURTEEN_D;
             case "7d":
                 return SEVEN_D;
             case "28d":
@@ -78,9 +92,13 @@ public final class RetrieveStatsRequestSnapshotWindow {
     public enum Value {
         SEVEN_D,
 
+        FOURTEEN_D,
+
         TWENTY_EIGHT_D,
 
         THIRTY_D,
+
+        FIFTY_SIX_D,
 
         UNKNOWN
     }
@@ -88,9 +106,13 @@ public final class RetrieveStatsRequestSnapshotWindow {
     public interface Visitor<T> {
         T visitSevenD();
 
+        T visitFourteenD();
+
         T visitTwentyEightD();
 
         T visitThirtyD();
+
+        T visitFiftySixD();
 
         T visitUnknown(String unknownType);
     }

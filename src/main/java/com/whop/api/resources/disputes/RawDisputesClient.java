@@ -4,11 +4,14 @@
 package com.whop.api.resources.disputes;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
+import com.whop.api.core.BodyProperties;
 import com.whop.api.core.ClientOptions;
 import com.whop.api.core.MediaTypes;
 import com.whop.api.core.ObjectMappers;
+import com.whop.api.core.PathSegments;
 import com.whop.api.core.QueryStringMapper;
 import com.whop.api.core.RequestOptions;
+import com.whop.api.core.RetryInterceptor;
 import com.whop.api.core.WhopApiApiException;
 import com.whop.api.core.WhopApiException;
 import com.whop.api.core.WhopApiHttpResponse;
@@ -16,23 +19,18 @@ import com.whop.api.core.pagination.SyncPagingIterable;
 import com.whop.api.errors.BadRequestError;
 import com.whop.api.errors.ConflictError;
 import com.whop.api.errors.ForbiddenError;
-import com.whop.api.errors.InternalServerError;
 import com.whop.api.errors.NotFoundError;
-import com.whop.api.errors.TooManyRequestsError;
 import com.whop.api.errors.UnauthorizedError;
-import com.whop.api.errors.UnprocessableEntityError;
+import com.whop.api.resources.disputes.requests.AcceptDisputesRequest;
 import com.whop.api.resources.disputes.requests.ListDisputesRequest;
 import com.whop.api.resources.disputes.requests.RetrieveDisputesRequest;
 import com.whop.api.resources.disputes.requests.SubmitDisputesRequest;
-import com.whop.api.resources.disputes.requests.SubmitEvidenceDisputeRequest;
 import com.whop.api.resources.disputes.requests.SummaryDisputesRequest;
 import com.whop.api.resources.disputes.requests.UpdateDisputesRequest;
-import com.whop.api.resources.disputes.requests.UpdateEvidenceDisputeRequest;
 import com.whop.api.resources.disputes.requests.UploadEvidenceDisputesRequest;
 import com.whop.api.resources.disputes.types.ListDisputesResponse;
 import com.whop.api.resources.disputes.types.SummaryDisputesResponse;
 import com.whop.api.types.Dispute;
-import com.whop.api.types.V1ErrorResponse;
 import java.io.IOException;
 import java.util.List;
 import java.util.Optional;
@@ -77,7 +75,7 @@ public class RawDisputesClient {
      */
     public WhopApiHttpResponse<SyncPagingIterable<Dispute>> list(
             ListDisputesRequest request, RequestOptions requestOptions) {
-        HttpUrl.Builder httpUrl = HttpUrl.parse(this.clientOptions.environment().getUrl())
+        HttpUrl.Builder httpUrl = HttpUrl.parse(this.clientOptions.environment().getApiURL())
                 .newBuilder()
                 .addPathSegments("disputes");
         if (request.getAccountId().isPresent()) {
@@ -120,6 +118,17 @@ public class RawDisputesClient {
             QueryStringMapper.addQueryParameter(
                     httpUrl, "created_after", request.getCreatedAfter().get(), false);
         }
+        if (request.getQuery().isPresent()) {
+            QueryStringMapper.addQueryParameter(
+                    httpUrl, "query", request.getQuery().get(), false);
+        }
+        if (request.getIncludeSubaccounts().isPresent()) {
+            QueryStringMapper.addQueryParameter(
+                    httpUrl,
+                    "include_subaccounts",
+                    request.getIncludeSubaccounts().get(),
+                    false);
+        }
         if (request.getStatus().isPresent()) {
             QueryStringMapper.addQueryParameter(
                     httpUrl, "status", request.getStatus().get(), true);
@@ -139,6 +148,15 @@ public class RawDisputesClient {
         if (requestOptions != null && requestOptions.getTimeout().isPresent()) {
             client = clientOptions.httpClientWithTimeout(requestOptions);
         }
+        if (requestOptions != null && requestOptions.getMaxRetries().isPresent()) {
+            okhttpRequest = okhttpRequest
+                    .newBuilder()
+                    .tag(
+                            RetryInterceptor.MaxRetriesOverride.class,
+                            new RetryInterceptor.MaxRetriesOverride(
+                                    requestOptions.getMaxRetries().get()))
+                    .build();
+        }
         try (Response response = client.newCall(okhttpRequest).execute()) {
             ResponseBody responseBody = response.body();
             String responseBodyString = responseBody != null ? responseBody.string() : "{}";
@@ -153,8 +171,11 @@ public class RawDisputesClient {
                 List<Dispute> result = parsedResponse.getData();
                 return new WhopApiHttpResponse<>(
                         new SyncPagingIterable<Dispute>(
-                                startingAfter != null, result, parsedResponse, () -> list(nextRequest, requestOptions)
-                                        .body()),
+                                startingAfter.isPresent()
+                                        && !startingAfter.get().isEmpty(),
+                                result,
+                                parsedResponse,
+                                () -> list(nextRequest, requestOptions).body()),
                         response);
             }
             try {
@@ -175,6 +196,8 @@ public class RawDisputesClient {
             Object errorBody = ObjectMappers.parseErrorBody(responseBodyString);
             throw new WhopApiApiException(
                     "Error with status code " + response.code(), response.code(), errorBody, response);
+        } catch (JsonProcessingException e) {
+            throw new WhopApiException("Failed to deserialize response: " + e.getMessage(), e);
         } catch (IOException e) {
             throw new WhopApiException("Network error executing HTTP request", e);
         }
@@ -206,7 +229,7 @@ public class RawDisputesClient {
      */
     public WhopApiHttpResponse<SummaryDisputesResponse> summary(
             SummaryDisputesRequest request, RequestOptions requestOptions) {
-        HttpUrl.Builder httpUrl = HttpUrl.parse(this.clientOptions.environment().getUrl())
+        HttpUrl.Builder httpUrl = HttpUrl.parse(this.clientOptions.environment().getApiURL())
                 .newBuilder()
                 .addPathSegments("disputes/summary");
         if (request.getAccountId().isPresent()) {
@@ -224,6 +247,17 @@ public class RawDisputesClient {
         if (request.getCreatedAfter().isPresent()) {
             QueryStringMapper.addQueryParameter(
                     httpUrl, "created_after", request.getCreatedAfter().get(), false);
+        }
+        if (request.getQuery().isPresent()) {
+            QueryStringMapper.addQueryParameter(
+                    httpUrl, "query", request.getQuery().get(), false);
+        }
+        if (request.getIncludeSubaccounts().isPresent()) {
+            QueryStringMapper.addQueryParameter(
+                    httpUrl,
+                    "include_subaccounts",
+                    request.getIncludeSubaccounts().get(),
+                    false);
         }
         if (request.getGroups().isPresent()) {
             QueryStringMapper.addQueryParameter(
@@ -248,6 +282,15 @@ public class RawDisputesClient {
         if (requestOptions != null && requestOptions.getTimeout().isPresent()) {
             client = clientOptions.httpClientWithTimeout(requestOptions);
         }
+        if (requestOptions != null && requestOptions.getMaxRetries().isPresent()) {
+            okhttpRequest = okhttpRequest
+                    .newBuilder()
+                    .tag(
+                            RetryInterceptor.MaxRetriesOverride.class,
+                            new RetryInterceptor.MaxRetriesOverride(
+                                    requestOptions.getMaxRetries().get()))
+                    .build();
+        }
         try (Response response = client.newCall(okhttpRequest).execute()) {
             ResponseBody responseBody = response.body();
             String responseBodyString = responseBody != null ? responseBody.string() : "{}";
@@ -271,6 +314,8 @@ public class RawDisputesClient {
             Object errorBody = ObjectMappers.parseErrorBody(responseBodyString);
             throw new WhopApiApiException(
                     "Error with status code " + response.code(), response.code(), errorBody, response);
+        } catch (JsonProcessingException e) {
+            throw new WhopApiException("Failed to deserialize response: " + e.getMessage(), e);
         } catch (IOException e) {
             throw new WhopApiException("Network error executing HTTP request", e);
         }
@@ -302,10 +347,10 @@ public class RawDisputesClient {
      */
     public WhopApiHttpResponse<Dispute> retrieve(
             String id, RetrieveDisputesRequest request, RequestOptions requestOptions) {
-        HttpUrl.Builder httpUrl = HttpUrl.parse(this.clientOptions.environment().getUrl())
+        HttpUrl.Builder httpUrl = HttpUrl.parse(this.clientOptions.environment().getApiURL())
                 .newBuilder()
                 .addPathSegments("disputes")
-                .addPathSegment(id);
+                .addPathSegment(PathSegments.validate(id));
         if (requestOptions != null) {
             requestOptions.getQueryParameters().forEach((_key, _value) -> {
                 httpUrl.addQueryParameter(_key, _value);
@@ -321,6 +366,15 @@ public class RawDisputesClient {
         if (requestOptions != null && requestOptions.getTimeout().isPresent()) {
             client = clientOptions.httpClientWithTimeout(requestOptions);
         }
+        if (requestOptions != null && requestOptions.getMaxRetries().isPresent()) {
+            okhttpRequest = okhttpRequest
+                    .newBuilder()
+                    .tag(
+                            RetryInterceptor.MaxRetriesOverride.class,
+                            new RetryInterceptor.MaxRetriesOverride(
+                                    requestOptions.getMaxRetries().get()))
+                    .build();
+        }
         try (Response response = client.newCall(okhttpRequest).execute()) {
             ResponseBody responseBody = response.body();
             String responseBodyString = responseBody != null ? responseBody.string() : "{}";
@@ -343,41 +397,43 @@ public class RawDisputesClient {
             Object errorBody = ObjectMappers.parseErrorBody(responseBodyString);
             throw new WhopApiApiException(
                     "Error with status code " + response.code(), response.code(), errorBody, response);
+        } catch (JsonProcessingException e) {
+            throw new WhopApiException("Failed to deserialize response: " + e.getMessage(), e);
         } catch (IOException e) {
             throw new WhopApiException("Network error executing HTTP request", e);
         }
     }
 
     /**
-     * Edits a dispute's evidence, while it is still editable. Sending it is a separate call.
+     * Edits a dispute's evidence while it is still editable. When the evidence is ready, send it to the payment processor with <code>POST /disputes/:id/submit</code>.
      */
     public WhopApiHttpResponse<Dispute> update(String id) {
         return update(id, UpdateDisputesRequest.builder().build());
     }
 
     /**
-     * Edits a dispute's evidence, while it is still editable. Sending it is a separate call.
+     * Edits a dispute's evidence while it is still editable. When the evidence is ready, send it to the payment processor with <code>POST /disputes/:id/submit</code>.
      */
     public WhopApiHttpResponse<Dispute> update(String id, RequestOptions requestOptions) {
         return update(id, UpdateDisputesRequest.builder().build(), requestOptions);
     }
 
     /**
-     * Edits a dispute's evidence, while it is still editable. Sending it is a separate call.
+     * Edits a dispute's evidence while it is still editable. When the evidence is ready, send it to the payment processor with <code>POST /disputes/:id/submit</code>.
      */
     public WhopApiHttpResponse<Dispute> update(String id, UpdateDisputesRequest request) {
         return update(id, request, null);
     }
 
     /**
-     * Edits a dispute's evidence, while it is still editable. Sending it is a separate call.
+     * Edits a dispute's evidence while it is still editable. When the evidence is ready, send it to the payment processor with <code>POST /disputes/:id/submit</code>.
      */
     public WhopApiHttpResponse<Dispute> update(
             String id, UpdateDisputesRequest request, RequestOptions requestOptions) {
-        HttpUrl.Builder httpUrl = HttpUrl.parse(this.clientOptions.environment().getUrl())
+        HttpUrl.Builder httpUrl = HttpUrl.parse(this.clientOptions.environment().getApiURL())
                 .newBuilder()
                 .addPathSegments("disputes")
-                .addPathSegment(id);
+                .addPathSegment(PathSegments.validate(id));
         if (requestOptions != null) {
             requestOptions.getQueryParameters().forEach((_key, _value) -> {
                 httpUrl.addQueryParameter(_key, _value);
@@ -386,7 +442,9 @@ public class RawDisputesClient {
         RequestBody body;
         try {
             body = RequestBody.create(
-                    ObjectMappers.JSON_MAPPER.writeValueAsBytes(request), MediaTypes.APPLICATION_JSON);
+                    ObjectMappers.JSON_MAPPER.writeValueAsBytes(BodyProperties.merge(
+                            request, requestOptions != null ? requestOptions.getBodyProperties() : null)),
+                    MediaTypes.APPLICATION_JSON);
         } catch (JsonProcessingException e) {
             throw new WhopApiException("Failed to serialize request", e);
         }
@@ -401,6 +459,15 @@ public class RawDisputesClient {
         if (requestOptions != null && requestOptions.getTimeout().isPresent()) {
             client = clientOptions.httpClientWithTimeout(requestOptions);
         }
+        if (requestOptions != null && requestOptions.getMaxRetries().isPresent()) {
+            okhttpRequest = okhttpRequest
+                    .newBuilder()
+                    .tag(
+                            RetryInterceptor.MaxRetriesOverride.class,
+                            new RetryInterceptor.MaxRetriesOverride(
+                                    requestOptions.getMaxRetries().get()))
+                    .build();
+        }
         try (Response response = client.newCall(okhttpRequest).execute()) {
             ResponseBody responseBody = response.body();
             String responseBodyString = responseBody != null ? responseBody.string() : "{}";
@@ -426,41 +493,140 @@ public class RawDisputesClient {
             Object errorBody = ObjectMappers.parseErrorBody(responseBodyString);
             throw new WhopApiApiException(
                     "Error with status code " + response.code(), response.code(), errorBody, response);
+        } catch (JsonProcessingException e) {
+            throw new WhopApiException("Failed to deserialize response: " + e.getMessage(), e);
         } catch (IOException e) {
             throw new WhopApiException("Network error executing HTTP request", e);
         }
     }
 
     /**
-     * Sends a dispute's evidence to the payment processor. This is final — it cannot be edited or sent again.
+     * Accepts a chargeback, conceding it to the customer instead of contesting it. The payment processor closes the dispute as <code>lost</code>. This is final — the dispute cannot be contested afterwards. Only a dispute whose <code>acceptable</code> is true can be accepted.
+     */
+    public WhopApiHttpResponse<Dispute> accept(String id) {
+        return accept(id, AcceptDisputesRequest.builder().build());
+    }
+
+    /**
+     * Accepts a chargeback, conceding it to the customer instead of contesting it. The payment processor closes the dispute as <code>lost</code>. This is final — the dispute cannot be contested afterwards. Only a dispute whose <code>acceptable</code> is true can be accepted.
+     */
+    public WhopApiHttpResponse<Dispute> accept(String id, RequestOptions requestOptions) {
+        return accept(id, AcceptDisputesRequest.builder().build(), requestOptions);
+    }
+
+    /**
+     * Accepts a chargeback, conceding it to the customer instead of contesting it. The payment processor closes the dispute as <code>lost</code>. This is final — the dispute cannot be contested afterwards. Only a dispute whose <code>acceptable</code> is true can be accepted.
+     */
+    public WhopApiHttpResponse<Dispute> accept(String id, AcceptDisputesRequest request) {
+        return accept(id, request, null);
+    }
+
+    /**
+     * Accepts a chargeback, conceding it to the customer instead of contesting it. The payment processor closes the dispute as <code>lost</code>. This is final — the dispute cannot be contested afterwards. Only a dispute whose <code>acceptable</code> is true can be accepted.
+     */
+    public WhopApiHttpResponse<Dispute> accept(
+            String id, AcceptDisputesRequest request, RequestOptions requestOptions) {
+        HttpUrl.Builder httpUrl = HttpUrl.parse(this.clientOptions.environment().getApiURL())
+                .newBuilder()
+                .addPathSegments("disputes")
+                .addPathSegment(PathSegments.validate(id))
+                .addPathSegments("accept");
+        if (requestOptions != null) {
+            requestOptions.getQueryParameters().forEach((_key, _value) -> {
+                httpUrl.addQueryParameter(_key, _value);
+            });
+        }
+        Request.Builder _requestBuilder = new Request.Builder()
+                .url(httpUrl.build())
+                .method(
+                        "POST",
+                        BodyProperties.toRequestBody(
+                                requestOptions != null ? requestOptions.getBodyProperties() : null,
+                                RequestBody.create("", null)))
+                .headers(Headers.of(clientOptions.headers(requestOptions)))
+                .addHeader("Accept", "application/json");
+        Request okhttpRequest = _requestBuilder.build();
+        OkHttpClient client = clientOptions.httpClient();
+        if (requestOptions != null && requestOptions.getTimeout().isPresent()) {
+            client = clientOptions.httpClientWithTimeout(requestOptions);
+        }
+        if (requestOptions != null && requestOptions.getMaxRetries().isPresent()) {
+            okhttpRequest = okhttpRequest
+                    .newBuilder()
+                    .tag(
+                            RetryInterceptor.MaxRetriesOverride.class,
+                            new RetryInterceptor.MaxRetriesOverride(
+                                    requestOptions.getMaxRetries().get()))
+                    .build();
+        }
+        try (Response response = client.newCall(okhttpRequest).execute()) {
+            ResponseBody responseBody = response.body();
+            String responseBodyString = responseBody != null ? responseBody.string() : "{}";
+            if (response.isSuccessful()) {
+                return new WhopApiHttpResponse<>(
+                        ObjectMappers.JSON_MAPPER.readValue(responseBodyString, Dispute.class), response);
+            }
+            try {
+                switch (response.code()) {
+                    case 400:
+                        throw new BadRequestError(
+                                ObjectMappers.JSON_MAPPER.readValue(responseBodyString, Object.class), response);
+                    case 401:
+                        throw new UnauthorizedError(
+                                ObjectMappers.JSON_MAPPER.readValue(responseBodyString, Object.class), response);
+                    case 403:
+                        throw new ForbiddenError(
+                                ObjectMappers.JSON_MAPPER.readValue(responseBodyString, Object.class), response);
+                    case 404:
+                        throw new NotFoundError(
+                                ObjectMappers.JSON_MAPPER.readValue(responseBodyString, Object.class), response);
+                    case 409:
+                        throw new ConflictError(
+                                ObjectMappers.JSON_MAPPER.readValue(responseBodyString, Object.class), response);
+                }
+            } catch (JsonProcessingException ignored) {
+                // unable to map error response, throwing generic error
+            }
+            Object errorBody = ObjectMappers.parseErrorBody(responseBodyString);
+            throw new WhopApiApiException(
+                    "Error with status code " + response.code(), response.code(), errorBody, response);
+        } catch (JsonProcessingException e) {
+            throw new WhopApiException("Failed to deserialize response: " + e.getMessage(), e);
+        } catch (IOException e) {
+            throw new WhopApiException("Network error executing HTTP request", e);
+        }
+    }
+
+    /**
+     * Sends a dispute's evidence to the payment processor. The packet is checked against the processor's limits first, so a file over a cap is refused here with the file and the limit named. Otherwise the dispute is returned as <code>generating_response</code> with its evidence locked and the filing completes in the background: the dispute moves to <code>under_review</code> with <code>evidence_submitted_at</code> set once the processor accepts it, or back to <code>needs_response</code> with <code>submission_failure_reason</code> set when the processor refuses it, so it can be fixed and sent again before <code>evidence_due_at</code>. Either move is sent as <code>dispute.updated</code>.
      */
     public WhopApiHttpResponse<Dispute> submit(String id) {
         return submit(id, SubmitDisputesRequest.builder().build());
     }
 
     /**
-     * Sends a dispute's evidence to the payment processor. This is final — it cannot be edited or sent again.
+     * Sends a dispute's evidence to the payment processor. The packet is checked against the processor's limits first, so a file over a cap is refused here with the file and the limit named. Otherwise the dispute is returned as <code>generating_response</code> with its evidence locked and the filing completes in the background: the dispute moves to <code>under_review</code> with <code>evidence_submitted_at</code> set once the processor accepts it, or back to <code>needs_response</code> with <code>submission_failure_reason</code> set when the processor refuses it, so it can be fixed and sent again before <code>evidence_due_at</code>. Either move is sent as <code>dispute.updated</code>.
      */
     public WhopApiHttpResponse<Dispute> submit(String id, RequestOptions requestOptions) {
         return submit(id, SubmitDisputesRequest.builder().build(), requestOptions);
     }
 
     /**
-     * Sends a dispute's evidence to the payment processor. This is final — it cannot be edited or sent again.
+     * Sends a dispute's evidence to the payment processor. The packet is checked against the processor's limits first, so a file over a cap is refused here with the file and the limit named. Otherwise the dispute is returned as <code>generating_response</code> with its evidence locked and the filing completes in the background: the dispute moves to <code>under_review</code> with <code>evidence_submitted_at</code> set once the processor accepts it, or back to <code>needs_response</code> with <code>submission_failure_reason</code> set when the processor refuses it, so it can be fixed and sent again before <code>evidence_due_at</code>. Either move is sent as <code>dispute.updated</code>.
      */
     public WhopApiHttpResponse<Dispute> submit(String id, SubmitDisputesRequest request) {
         return submit(id, request, null);
     }
 
     /**
-     * Sends a dispute's evidence to the payment processor. This is final — it cannot be edited or sent again.
+     * Sends a dispute's evidence to the payment processor. The packet is checked against the processor's limits first, so a file over a cap is refused here with the file and the limit named. Otherwise the dispute is returned as <code>generating_response</code> with its evidence locked and the filing completes in the background: the dispute moves to <code>under_review</code> with <code>evidence_submitted_at</code> set once the processor accepts it, or back to <code>needs_response</code> with <code>submission_failure_reason</code> set when the processor refuses it, so it can be fixed and sent again before <code>evidence_due_at</code>. Either move is sent as <code>dispute.updated</code>.
      */
     public WhopApiHttpResponse<Dispute> submit(
             String id, SubmitDisputesRequest request, RequestOptions requestOptions) {
-        HttpUrl.Builder httpUrl = HttpUrl.parse(this.clientOptions.environment().getUrl())
+        HttpUrl.Builder httpUrl = HttpUrl.parse(this.clientOptions.environment().getApiURL())
                 .newBuilder()
                 .addPathSegments("disputes")
-                .addPathSegment(id)
+                .addPathSegment(PathSegments.validate(id))
                 .addPathSegments("submit");
         if (requestOptions != null) {
             requestOptions.getQueryParameters().forEach((_key, _value) -> {
@@ -469,13 +635,26 @@ public class RawDisputesClient {
         }
         Request.Builder _requestBuilder = new Request.Builder()
                 .url(httpUrl.build())
-                .method("POST", RequestBody.create("", null))
+                .method(
+                        "POST",
+                        BodyProperties.toRequestBody(
+                                requestOptions != null ? requestOptions.getBodyProperties() : null,
+                                RequestBody.create("", null)))
                 .headers(Headers.of(clientOptions.headers(requestOptions)))
                 .addHeader("Accept", "application/json");
         Request okhttpRequest = _requestBuilder.build();
         OkHttpClient client = clientOptions.httpClient();
         if (requestOptions != null && requestOptions.getTimeout().isPresent()) {
             client = clientOptions.httpClientWithTimeout(requestOptions);
+        }
+        if (requestOptions != null && requestOptions.getMaxRetries().isPresent()) {
+            okhttpRequest = okhttpRequest
+                    .newBuilder()
+                    .tag(
+                            RetryInterceptor.MaxRetriesOverride.class,
+                            new RetryInterceptor.MaxRetriesOverride(
+                                    requestOptions.getMaxRetries().get()))
+                    .build();
         }
         try (Response response = client.newCall(okhttpRequest).execute()) {
             ResponseBody responseBody = response.body();
@@ -497,139 +676,6 @@ public class RawDisputesClient {
                                 ObjectMappers.JSON_MAPPER.readValue(responseBodyString, Object.class), response);
                     case 409:
                         throw new ConflictError(
-                                ObjectMappers.JSON_MAPPER.readValue(responseBodyString, V1ErrorResponse.class),
-                                response);
-                }
-            } catch (JsonProcessingException ignored) {
-                // unable to map error response, throwing generic error
-            }
-            Object errorBody = ObjectMappers.parseErrorBody(responseBodyString);
-            throw new WhopApiApiException(
-                    "Error with status code " + response.code(), response.code(), errorBody, response);
-        } catch (IOException e) {
-            throw new WhopApiException("Network error executing HTTP request", e);
-        }
-    }
-
-    /**
-     * Submit a payment dispute to the payment processor for review. Once submitted, no further edits can be made.
-     * <p>Required permissions:</p>
-     * <ul>
-     * <li><code>payment:dispute</code></li>
-     * <li><code>plan:basic:read</code></li>
-     * <li><code>access_pass:basic:read</code></li>
-     * <li><code>company:basic:read</code></li>
-     * <li><code>payment:basic:read</code></li>
-     * <li><code>member:email:read</code></li>
-     * <li><code>member:basic:read</code></li>
-     * <li><code>member:phone:read</code></li>
-     * </ul>
-     */
-    public WhopApiHttpResponse<Dispute> submitEvidenceDispute(String id) {
-        return submitEvidenceDispute(id, SubmitEvidenceDisputeRequest.builder().build());
-    }
-
-    /**
-     * Submit a payment dispute to the payment processor for review. Once submitted, no further edits can be made.
-     * <p>Required permissions:</p>
-     * <ul>
-     * <li><code>payment:dispute</code></li>
-     * <li><code>plan:basic:read</code></li>
-     * <li><code>access_pass:basic:read</code></li>
-     * <li><code>company:basic:read</code></li>
-     * <li><code>payment:basic:read</code></li>
-     * <li><code>member:email:read</code></li>
-     * <li><code>member:basic:read</code></li>
-     * <li><code>member:phone:read</code></li>
-     * </ul>
-     */
-    public WhopApiHttpResponse<Dispute> submitEvidenceDispute(String id, RequestOptions requestOptions) {
-        return submitEvidenceDispute(id, SubmitEvidenceDisputeRequest.builder().build(), requestOptions);
-    }
-
-    /**
-     * Submit a payment dispute to the payment processor for review. Once submitted, no further edits can be made.
-     * <p>Required permissions:</p>
-     * <ul>
-     * <li><code>payment:dispute</code></li>
-     * <li><code>plan:basic:read</code></li>
-     * <li><code>access_pass:basic:read</code></li>
-     * <li><code>company:basic:read</code></li>
-     * <li><code>payment:basic:read</code></li>
-     * <li><code>member:email:read</code></li>
-     * <li><code>member:basic:read</code></li>
-     * <li><code>member:phone:read</code></li>
-     * </ul>
-     */
-    public WhopApiHttpResponse<Dispute> submitEvidenceDispute(String id, SubmitEvidenceDisputeRequest request) {
-        return submitEvidenceDispute(id, request, null);
-    }
-
-    /**
-     * Submit a payment dispute to the payment processor for review. Once submitted, no further edits can be made.
-     * <p>Required permissions:</p>
-     * <ul>
-     * <li><code>payment:dispute</code></li>
-     * <li><code>plan:basic:read</code></li>
-     * <li><code>access_pass:basic:read</code></li>
-     * <li><code>company:basic:read</code></li>
-     * <li><code>payment:basic:read</code></li>
-     * <li><code>member:email:read</code></li>
-     * <li><code>member:basic:read</code></li>
-     * <li><code>member:phone:read</code></li>
-     * </ul>
-     */
-    public WhopApiHttpResponse<Dispute> submitEvidenceDispute(
-            String id, SubmitEvidenceDisputeRequest request, RequestOptions requestOptions) {
-        HttpUrl.Builder httpUrl = HttpUrl.parse(this.clientOptions.environment().getUrl())
-                .newBuilder()
-                .addPathSegments("disputes")
-                .addPathSegment(id)
-                .addPathSegments("submit_evidence");
-        if (requestOptions != null) {
-            requestOptions.getQueryParameters().forEach((_key, _value) -> {
-                httpUrl.addQueryParameter(_key, _value);
-            });
-        }
-        Request.Builder _requestBuilder = new Request.Builder()
-                .url(httpUrl.build())
-                .method("POST", RequestBody.create("", null))
-                .headers(Headers.of(clientOptions.headers(requestOptions)))
-                .addHeader("Accept", "application/json");
-        Request okhttpRequest = _requestBuilder.build();
-        OkHttpClient client = clientOptions.httpClient();
-        if (requestOptions != null && requestOptions.getTimeout().isPresent()) {
-            client = clientOptions.httpClientWithTimeout(requestOptions);
-        }
-        try (Response response = client.newCall(okhttpRequest).execute()) {
-            ResponseBody responseBody = response.body();
-            String responseBodyString = responseBody != null ? responseBody.string() : "{}";
-            if (response.isSuccessful()) {
-                return new WhopApiHttpResponse<>(
-                        ObjectMappers.JSON_MAPPER.readValue(responseBodyString, Dispute.class), response);
-            }
-            try {
-                switch (response.code()) {
-                    case 400:
-                        throw new BadRequestError(
-                                ObjectMappers.JSON_MAPPER.readValue(responseBodyString, Object.class), response);
-                    case 401:
-                        throw new UnauthorizedError(
-                                ObjectMappers.JSON_MAPPER.readValue(responseBodyString, Object.class), response);
-                    case 403:
-                        throw new ForbiddenError(
-                                ObjectMappers.JSON_MAPPER.readValue(responseBodyString, Object.class), response);
-                    case 404:
-                        throw new NotFoundError(
-                                ObjectMappers.JSON_MAPPER.readValue(responseBodyString, Object.class), response);
-                    case 422:
-                        throw new UnprocessableEntityError(
-                                ObjectMappers.JSON_MAPPER.readValue(responseBodyString, Object.class), response);
-                    case 429:
-                        throw new TooManyRequestsError(
-                                ObjectMappers.JSON_MAPPER.readValue(responseBodyString, Object.class), response);
-                    case 500:
-                        throw new InternalServerError(
                                 ObjectMappers.JSON_MAPPER.readValue(responseBodyString, Object.class), response);
                 }
             } catch (JsonProcessingException ignored) {
@@ -638,167 +684,29 @@ public class RawDisputesClient {
             Object errorBody = ObjectMappers.parseErrorBody(responseBodyString);
             throw new WhopApiApiException(
                     "Error with status code " + response.code(), response.code(), errorBody, response);
-        } catch (IOException e) {
-            throw new WhopApiException("Network error executing HTTP request", e);
-        }
-    }
-
-    /**
-     * Update a dispute with evidence data to attempt to win the dispute.
-     * <p>Required permissions:</p>
-     * <ul>
-     * <li><code>payment:dispute</code></li>
-     * <li><code>plan:basic:read</code></li>
-     * <li><code>access_pass:basic:read</code></li>
-     * <li><code>company:basic:read</code></li>
-     * <li><code>payment:basic:read</code></li>
-     * <li><code>member:email:read</code></li>
-     * <li><code>member:basic:read</code></li>
-     * <li><code>member:phone:read</code></li>
-     * </ul>
-     */
-    public WhopApiHttpResponse<Dispute> updateEvidenceDispute(String id) {
-        return updateEvidenceDispute(id, UpdateEvidenceDisputeRequest.builder().build());
-    }
-
-    /**
-     * Update a dispute with evidence data to attempt to win the dispute.
-     * <p>Required permissions:</p>
-     * <ul>
-     * <li><code>payment:dispute</code></li>
-     * <li><code>plan:basic:read</code></li>
-     * <li><code>access_pass:basic:read</code></li>
-     * <li><code>company:basic:read</code></li>
-     * <li><code>payment:basic:read</code></li>
-     * <li><code>member:email:read</code></li>
-     * <li><code>member:basic:read</code></li>
-     * <li><code>member:phone:read</code></li>
-     * </ul>
-     */
-    public WhopApiHttpResponse<Dispute> updateEvidenceDispute(String id, RequestOptions requestOptions) {
-        return updateEvidenceDispute(id, UpdateEvidenceDisputeRequest.builder().build(), requestOptions);
-    }
-
-    /**
-     * Update a dispute with evidence data to attempt to win the dispute.
-     * <p>Required permissions:</p>
-     * <ul>
-     * <li><code>payment:dispute</code></li>
-     * <li><code>plan:basic:read</code></li>
-     * <li><code>access_pass:basic:read</code></li>
-     * <li><code>company:basic:read</code></li>
-     * <li><code>payment:basic:read</code></li>
-     * <li><code>member:email:read</code></li>
-     * <li><code>member:basic:read</code></li>
-     * <li><code>member:phone:read</code></li>
-     * </ul>
-     */
-    public WhopApiHttpResponse<Dispute> updateEvidenceDispute(String id, UpdateEvidenceDisputeRequest request) {
-        return updateEvidenceDispute(id, request, null);
-    }
-
-    /**
-     * Update a dispute with evidence data to attempt to win the dispute.
-     * <p>Required permissions:</p>
-     * <ul>
-     * <li><code>payment:dispute</code></li>
-     * <li><code>plan:basic:read</code></li>
-     * <li><code>access_pass:basic:read</code></li>
-     * <li><code>company:basic:read</code></li>
-     * <li><code>payment:basic:read</code></li>
-     * <li><code>member:email:read</code></li>
-     * <li><code>member:basic:read</code></li>
-     * <li><code>member:phone:read</code></li>
-     * </ul>
-     */
-    public WhopApiHttpResponse<Dispute> updateEvidenceDispute(
-            String id, UpdateEvidenceDisputeRequest request, RequestOptions requestOptions) {
-        HttpUrl.Builder httpUrl = HttpUrl.parse(this.clientOptions.environment().getUrl())
-                .newBuilder()
-                .addPathSegments("disputes")
-                .addPathSegment(id)
-                .addPathSegments("update_evidence");
-        if (requestOptions != null) {
-            requestOptions.getQueryParameters().forEach((_key, _value) -> {
-                httpUrl.addQueryParameter(_key, _value);
-            });
-        }
-        RequestBody body;
-        try {
-            body = RequestBody.create(
-                    ObjectMappers.JSON_MAPPER.writeValueAsBytes(request), MediaTypes.APPLICATION_JSON);
         } catch (JsonProcessingException e) {
-            throw new WhopApiException("Failed to serialize request", e);
-        }
-        Request okhttpRequest = new Request.Builder()
-                .url(httpUrl.build())
-                .method("POST", body)
-                .headers(Headers.of(clientOptions.headers(requestOptions)))
-                .addHeader("Content-Type", "application/json")
-                .addHeader("Accept", "application/json")
-                .build();
-        OkHttpClient client = clientOptions.httpClient();
-        if (requestOptions != null && requestOptions.getTimeout().isPresent()) {
-            client = clientOptions.httpClientWithTimeout(requestOptions);
-        }
-        try (Response response = client.newCall(okhttpRequest).execute()) {
-            ResponseBody responseBody = response.body();
-            String responseBodyString = responseBody != null ? responseBody.string() : "{}";
-            if (response.isSuccessful()) {
-                return new WhopApiHttpResponse<>(
-                        ObjectMappers.JSON_MAPPER.readValue(responseBodyString, Dispute.class), response);
-            }
-            try {
-                switch (response.code()) {
-                    case 400:
-                        throw new BadRequestError(
-                                ObjectMappers.JSON_MAPPER.readValue(responseBodyString, Object.class), response);
-                    case 401:
-                        throw new UnauthorizedError(
-                                ObjectMappers.JSON_MAPPER.readValue(responseBodyString, Object.class), response);
-                    case 403:
-                        throw new ForbiddenError(
-                                ObjectMappers.JSON_MAPPER.readValue(responseBodyString, Object.class), response);
-                    case 404:
-                        throw new NotFoundError(
-                                ObjectMappers.JSON_MAPPER.readValue(responseBodyString, Object.class), response);
-                    case 422:
-                        throw new UnprocessableEntityError(
-                                ObjectMappers.JSON_MAPPER.readValue(responseBodyString, Object.class), response);
-                    case 429:
-                        throw new TooManyRequestsError(
-                                ObjectMappers.JSON_MAPPER.readValue(responseBodyString, Object.class), response);
-                    case 500:
-                        throw new InternalServerError(
-                                ObjectMappers.JSON_MAPPER.readValue(responseBodyString, Object.class), response);
-                }
-            } catch (JsonProcessingException ignored) {
-                // unable to map error response, throwing generic error
-            }
-            Object errorBody = ObjectMappers.parseErrorBody(responseBodyString);
-            throw new WhopApiApiException(
-                    "Error with status code " + response.code(), response.code(), errorBody, response);
+            throw new WhopApiException("Failed to deserialize response: " + e.getMessage(), e);
         } catch (IOException e) {
             throw new WhopApiException("Network error executing HTTP request", e);
         }
     }
 
     /**
-     * Replaces the full set of uploaded evidence documents on a dispute, beyond the four fixed evidence slots. Send the files as multipart file parts to upload and attach in one call, or reference files already stored by <code>id</code>/<code>direct_upload_id</code>. Send every document the packet should carry — up to 10, 10MB each and 25MB in total; an empty list removes them all. Accepted content types: application/pdf, application/json, image/jpeg, image/png, image/webp — any other type is rejected.
+     * Replaces the full set of uploaded evidence documents on a dispute, beyond the four fixed evidence slots. Prefer <code>PATCH /disputes/:id</code> with <code>evidence.documents</code>, which does the same replace alongside every other evidence field in one call.
      */
     public WhopApiHttpResponse<Dispute> uploadEvidence(String id, UploadEvidenceDisputesRequest request) {
         return uploadEvidence(id, request, null);
     }
 
     /**
-     * Replaces the full set of uploaded evidence documents on a dispute, beyond the four fixed evidence slots. Send the files as multipart file parts to upload and attach in one call, or reference files already stored by <code>id</code>/<code>direct_upload_id</code>. Send every document the packet should carry — up to 10, 10MB each and 25MB in total; an empty list removes them all. Accepted content types: application/pdf, application/json, image/jpeg, image/png, image/webp — any other type is rejected.
+     * Replaces the full set of uploaded evidence documents on a dispute, beyond the four fixed evidence slots. Prefer <code>PATCH /disputes/:id</code> with <code>evidence.documents</code>, which does the same replace alongside every other evidence field in one call.
      */
     public WhopApiHttpResponse<Dispute> uploadEvidence(
             String id, UploadEvidenceDisputesRequest request, RequestOptions requestOptions) {
-        HttpUrl.Builder httpUrl = HttpUrl.parse(this.clientOptions.environment().getUrl())
+        HttpUrl.Builder httpUrl = HttpUrl.parse(this.clientOptions.environment().getApiURL())
                 .newBuilder()
                 .addPathSegments("disputes")
-                .addPathSegment(id)
+                .addPathSegment(PathSegments.validate(id))
                 .addPathSegments("upload_evidence");
         if (requestOptions != null) {
             requestOptions.getQueryParameters().forEach((_key, _value) -> {
@@ -808,7 +716,9 @@ public class RawDisputesClient {
         RequestBody body;
         try {
             body = RequestBody.create(
-                    ObjectMappers.JSON_MAPPER.writeValueAsBytes(request), MediaTypes.APPLICATION_JSON);
+                    ObjectMappers.JSON_MAPPER.writeValueAsBytes(BodyProperties.merge(
+                            request, requestOptions != null ? requestOptions.getBodyProperties() : null)),
+                    MediaTypes.APPLICATION_JSON);
         } catch (JsonProcessingException e) {
             throw new WhopApiException("Failed to serialize request", e);
         }
@@ -822,6 +732,15 @@ public class RawDisputesClient {
         OkHttpClient client = clientOptions.httpClient();
         if (requestOptions != null && requestOptions.getTimeout().isPresent()) {
             client = clientOptions.httpClientWithTimeout(requestOptions);
+        }
+        if (requestOptions != null && requestOptions.getMaxRetries().isPresent()) {
+            okhttpRequest = okhttpRequest
+                    .newBuilder()
+                    .tag(
+                            RetryInterceptor.MaxRetriesOverride.class,
+                            new RetryInterceptor.MaxRetriesOverride(
+                                    requestOptions.getMaxRetries().get()))
+                    .build();
         }
         try (Response response = client.newCall(okhttpRequest).execute()) {
             ResponseBody responseBody = response.body();
@@ -843,8 +762,7 @@ public class RawDisputesClient {
                                 ObjectMappers.JSON_MAPPER.readValue(responseBodyString, Object.class), response);
                     case 409:
                         throw new ConflictError(
-                                ObjectMappers.JSON_MAPPER.readValue(responseBodyString, V1ErrorResponse.class),
-                                response);
+                                ObjectMappers.JSON_MAPPER.readValue(responseBodyString, Object.class), response);
                 }
             } catch (JsonProcessingException ignored) {
                 // unable to map error response, throwing generic error
@@ -852,6 +770,8 @@ public class RawDisputesClient {
             Object errorBody = ObjectMappers.parseErrorBody(responseBodyString);
             throw new WhopApiApiException(
                     "Error with status code " + response.code(), response.code(), errorBody, response);
+        } catch (JsonProcessingException e) {
+            throw new WhopApiException("Failed to deserialize response: " + e.getMessage(), e);
         } catch (IOException e) {
             throw new WhopApiException("Network error executing HTTP request", e);
         }

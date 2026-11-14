@@ -4,23 +4,25 @@
 package com.whop.api.resources.reviews;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
+import com.whop.api.core.BodyProperties;
 import com.whop.api.core.ClientOptions;
 import com.whop.api.core.ObjectMappers;
+import com.whop.api.core.PathSegments;
 import com.whop.api.core.QueryStringMapper;
 import com.whop.api.core.RequestOptions;
+import com.whop.api.core.RetryInterceptor;
 import com.whop.api.core.WhopApiApiException;
 import com.whop.api.core.WhopApiException;
 import com.whop.api.core.WhopApiHttpResponse;
 import com.whop.api.core.pagination.SyncPagingIterable;
 import com.whop.api.errors.BadRequestError;
 import com.whop.api.errors.ForbiddenError;
-import com.whop.api.errors.InternalServerError;
 import com.whop.api.errors.NotFoundError;
-import com.whop.api.errors.TooManyRequestsError;
 import com.whop.api.errors.UnauthorizedError;
-import com.whop.api.errors.UnprocessableEntityError;
+import com.whop.api.resources.reviews.requests.DeleteReviewsRequest;
 import com.whop.api.resources.reviews.requests.ListReviewsRequest;
 import com.whop.api.resources.reviews.requests.RetrieveReviewsRequest;
+import com.whop.api.resources.reviews.types.DeleteReviewsResponse;
 import com.whop.api.resources.reviews.types.ListReviewsResponse;
 import com.whop.api.types.Review;
 import com.whop.api.types.ReviewListItem;
@@ -42,37 +44,42 @@ public class RawReviewsClient {
     }
 
     /**
-     * Returns a paginated list of customer reviews for a specific product, with optional filtering by star rating and creation date.
+     * Lists the published reviews for a product or account. Without <code>account_id</code> or <code>product_id</code>, a user lists the reviews they wrote, an account or app API key lists its account's reviews, and a request without credentials returns 400.
+     */
+    public WhopApiHttpResponse<SyncPagingIterable<ReviewListItem>> list() {
+        return list(ListReviewsRequest.builder().build());
+    }
+
+    /**
+     * Lists the published reviews for a product or account. Without <code>account_id</code> or <code>product_id</code>, a user lists the reviews they wrote, an account or app API key lists its account's reviews, and a request without credentials returns 400.
+     */
+    public WhopApiHttpResponse<SyncPagingIterable<ReviewListItem>> list(RequestOptions requestOptions) {
+        return list(ListReviewsRequest.builder().build(), requestOptions);
+    }
+
+    /**
+     * Lists the published reviews for a product or account. Without <code>account_id</code> or <code>product_id</code>, a user lists the reviews they wrote, an account or app API key lists its account's reviews, and a request without credentials returns 400.
      */
     public WhopApiHttpResponse<SyncPagingIterable<ReviewListItem>> list(ListReviewsRequest request) {
         return list(request, null);
     }
 
     /**
-     * Returns a paginated list of customer reviews for a specific product, with optional filtering by star rating and creation date.
+     * Lists the published reviews for a product or account. Without <code>account_id</code> or <code>product_id</code>, a user lists the reviews they wrote, an account or app API key lists its account's reviews, and a request without credentials returns 400.
      */
     public WhopApiHttpResponse<SyncPagingIterable<ReviewListItem>> list(
             ListReviewsRequest request, RequestOptions requestOptions) {
-        HttpUrl.Builder httpUrl = HttpUrl.parse(this.clientOptions.environment().getUrl())
+        HttpUrl.Builder httpUrl = HttpUrl.parse(this.clientOptions.environment().getApiURL())
                 .newBuilder()
                 .addPathSegments("reviews");
-        if (request.getAfter().isPresent()) {
+        if (request.getAccountId().isPresent()) {
             QueryStringMapper.addQueryParameter(
-                    httpUrl, "after", request.getAfter().get(), false);
+                    httpUrl, "account_id", request.getAccountId().get(), false);
         }
-        if (request.getBefore().isPresent()) {
+        if (request.getProductId().isPresent()) {
             QueryStringMapper.addQueryParameter(
-                    httpUrl, "before", request.getBefore().get(), false);
+                    httpUrl, "product_id", request.getProductId().get(), false);
         }
-        if (request.getFirst().isPresent()) {
-            QueryStringMapper.addQueryParameter(
-                    httpUrl, "first", request.getFirst().get(), false);
-        }
-        if (request.getLast().isPresent()) {
-            QueryStringMapper.addQueryParameter(
-                    httpUrl, "last", request.getLast().get(), false);
-        }
-        QueryStringMapper.addQueryParameter(httpUrl, "product_id", request.getProductId(), false);
         if (request.getMinStars().isPresent()) {
             QueryStringMapper.addQueryParameter(
                     httpUrl, "min_stars", request.getMinStars().get(), false);
@@ -89,6 +96,37 @@ public class RawReviewsClient {
             QueryStringMapper.addQueryParameter(
                     httpUrl, "created_after", request.getCreatedAfter().get(), false);
         }
+        if (request.getOrder().isPresent()) {
+            QueryStringMapper.addQueryParameter(
+                    httpUrl, "order", request.getOrder().get(), false);
+        }
+        if (request.getDirection().isPresent()) {
+            QueryStringMapper.addQueryParameter(
+                    httpUrl, "direction", request.getDirection().get(), false);
+        }
+        if (request.getFirst().isPresent()) {
+            QueryStringMapper.addQueryParameter(
+                    httpUrl, "first", request.getFirst().get(), false);
+        }
+        if (request.getAfter().isPresent()) {
+            QueryStringMapper.addQueryParameter(
+                    httpUrl, "after", request.getAfter().get(), false);
+        }
+        if (request.getLast().isPresent()) {
+            QueryStringMapper.addQueryParameter(
+                    httpUrl, "last", request.getLast().get(), false);
+        }
+        if (request.getBefore().isPresent()) {
+            QueryStringMapper.addQueryParameter(
+                    httpUrl, "before", request.getBefore().get(), false);
+        }
+        if (request.getIncludeTotalCount().isPresent()) {
+            QueryStringMapper.addQueryParameter(
+                    httpUrl,
+                    "include_total_count",
+                    request.getIncludeTotalCount().get(),
+                    false);
+        }
         if (requestOptions != null) {
             requestOptions.getQueryParameters().forEach((_key, _value) -> {
                 httpUrl.addQueryParameter(_key, _value);
@@ -103,6 +141,15 @@ public class RawReviewsClient {
         OkHttpClient client = clientOptions.httpClient();
         if (requestOptions != null && requestOptions.getTimeout().isPresent()) {
             client = clientOptions.httpClientWithTimeout(requestOptions);
+        }
+        if (requestOptions != null && requestOptions.getMaxRetries().isPresent()) {
+            okhttpRequest = okhttpRequest
+                    .newBuilder()
+                    .tag(
+                            RetryInterceptor.MaxRetriesOverride.class,
+                            new RetryInterceptor.MaxRetriesOverride(
+                                    requestOptions.getMaxRetries().get()))
+                    .build();
         }
         try (Response response = client.newCall(okhttpRequest).execute()) {
             ResponseBody responseBody = response.body();
@@ -118,8 +165,11 @@ public class RawReviewsClient {
                 List<ReviewListItem> result = parsedResponse.getData();
                 return new WhopApiHttpResponse<>(
                         new SyncPagingIterable<ReviewListItem>(
-                                startingAfter != null, result, parsedResponse, () -> list(nextRequest, requestOptions)
-                                        .body()),
+                                startingAfter.isPresent()
+                                        && !startingAfter.get().isEmpty(),
+                                result,
+                                parsedResponse,
+                                () -> list(nextRequest, requestOptions).body()),
                         response);
             }
             try {
@@ -127,23 +177,8 @@ public class RawReviewsClient {
                     case 400:
                         throw new BadRequestError(
                                 ObjectMappers.JSON_MAPPER.readValue(responseBodyString, Object.class), response);
-                    case 401:
-                        throw new UnauthorizedError(
-                                ObjectMappers.JSON_MAPPER.readValue(responseBodyString, Object.class), response);
-                    case 403:
-                        throw new ForbiddenError(
-                                ObjectMappers.JSON_MAPPER.readValue(responseBodyString, Object.class), response);
                     case 404:
                         throw new NotFoundError(
-                                ObjectMappers.JSON_MAPPER.readValue(responseBodyString, Object.class), response);
-                    case 422:
-                        throw new UnprocessableEntityError(
-                                ObjectMappers.JSON_MAPPER.readValue(responseBodyString, Object.class), response);
-                    case 429:
-                        throw new TooManyRequestsError(
-                                ObjectMappers.JSON_MAPPER.readValue(responseBodyString, Object.class), response);
-                    case 500:
-                        throw new InternalServerError(
                                 ObjectMappers.JSON_MAPPER.readValue(responseBodyString, Object.class), response);
                 }
             } catch (JsonProcessingException ignored) {
@@ -152,41 +187,43 @@ public class RawReviewsClient {
             Object errorBody = ObjectMappers.parseErrorBody(responseBodyString);
             throw new WhopApiApiException(
                     "Error with status code " + response.code(), response.code(), errorBody, response);
+        } catch (JsonProcessingException e) {
+            throw new WhopApiException("Failed to deserialize response: " + e.getMessage(), e);
         } catch (IOException e) {
             throw new WhopApiException("Network error executing HTTP request", e);
         }
     }
 
     /**
-     * Retrieves the details of an existing review.
+     * Retrieves a published review. Reviews that are not published return 404.
      */
     public WhopApiHttpResponse<Review> retrieve(String id) {
         return retrieve(id, RetrieveReviewsRequest.builder().build());
     }
 
     /**
-     * Retrieves the details of an existing review.
+     * Retrieves a published review. Reviews that are not published return 404.
      */
     public WhopApiHttpResponse<Review> retrieve(String id, RequestOptions requestOptions) {
         return retrieve(id, RetrieveReviewsRequest.builder().build(), requestOptions);
     }
 
     /**
-     * Retrieves the details of an existing review.
+     * Retrieves a published review. Reviews that are not published return 404.
      */
     public WhopApiHttpResponse<Review> retrieve(String id, RetrieveReviewsRequest request) {
         return retrieve(id, request, null);
     }
 
     /**
-     * Retrieves the details of an existing review.
+     * Retrieves a published review. Reviews that are not published return 404.
      */
     public WhopApiHttpResponse<Review> retrieve(
             String id, RetrieveReviewsRequest request, RequestOptions requestOptions) {
-        HttpUrl.Builder httpUrl = HttpUrl.parse(this.clientOptions.environment().getUrl())
+        HttpUrl.Builder httpUrl = HttpUrl.parse(this.clientOptions.environment().getApiURL())
                 .newBuilder()
                 .addPathSegments("reviews")
-                .addPathSegment(id);
+                .addPathSegment(PathSegments.validate(id));
         if (requestOptions != null) {
             requestOptions.getQueryParameters().forEach((_key, _value) -> {
                 httpUrl.addQueryParameter(_key, _value);
@@ -202,6 +239,15 @@ public class RawReviewsClient {
         if (requestOptions != null && requestOptions.getTimeout().isPresent()) {
             client = clientOptions.httpClientWithTimeout(requestOptions);
         }
+        if (requestOptions != null && requestOptions.getMaxRetries().isPresent()) {
+            okhttpRequest = okhttpRequest
+                    .newBuilder()
+                    .tag(
+                            RetryInterceptor.MaxRetriesOverride.class,
+                            new RetryInterceptor.MaxRetriesOverride(
+                                    requestOptions.getMaxRetries().get()))
+                    .build();
+        }
         try (Response response = client.newCall(okhttpRequest).execute()) {
             ResponseBody responseBody = response.body();
             String responseBodyString = responseBody != null ? responseBody.string() : "{}";
@@ -210,10 +256,89 @@ public class RawReviewsClient {
                         ObjectMappers.JSON_MAPPER.readValue(responseBodyString, Review.class), response);
             }
             try {
+                if (response.code() == 404) {
+                    throw new NotFoundError(
+                            ObjectMappers.JSON_MAPPER.readValue(responseBodyString, Object.class), response);
+                }
+            } catch (JsonProcessingException ignored) {
+                // unable to map error response, throwing generic error
+            }
+            Object errorBody = ObjectMappers.parseErrorBody(responseBodyString);
+            throw new WhopApiApiException(
+                    "Error with status code " + response.code(), response.code(), errorBody, response);
+        } catch (JsonProcessingException e) {
+            throw new WhopApiException("Failed to deserialize response: " + e.getMessage(), e);
+        } catch (IOException e) {
+            throw new WhopApiException("Network error executing HTTP request", e);
+        }
+    }
+
+    /**
+     * Deletes a review the signed-in user wrote. Requires the <code>review:delete</code> scope, and returns 404 for a review another user wrote.
+     */
+    public WhopApiHttpResponse<DeleteReviewsResponse> delete(String id) {
+        return delete(id, DeleteReviewsRequest.builder().build());
+    }
+
+    /**
+     * Deletes a review the signed-in user wrote. Requires the <code>review:delete</code> scope, and returns 404 for a review another user wrote.
+     */
+    public WhopApiHttpResponse<DeleteReviewsResponse> delete(String id, RequestOptions requestOptions) {
+        return delete(id, DeleteReviewsRequest.builder().build(), requestOptions);
+    }
+
+    /**
+     * Deletes a review the signed-in user wrote. Requires the <code>review:delete</code> scope, and returns 404 for a review another user wrote.
+     */
+    public WhopApiHttpResponse<DeleteReviewsResponse> delete(String id, DeleteReviewsRequest request) {
+        return delete(id, request, null);
+    }
+
+    /**
+     * Deletes a review the signed-in user wrote. Requires the <code>review:delete</code> scope, and returns 404 for a review another user wrote.
+     */
+    public WhopApiHttpResponse<DeleteReviewsResponse> delete(
+            String id, DeleteReviewsRequest request, RequestOptions requestOptions) {
+        HttpUrl.Builder httpUrl = HttpUrl.parse(this.clientOptions.environment().getApiURL())
+                .newBuilder()
+                .addPathSegments("reviews")
+                .addPathSegment(PathSegments.validate(id));
+        if (requestOptions != null) {
+            requestOptions.getQueryParameters().forEach((_key, _value) -> {
+                httpUrl.addQueryParameter(_key, _value);
+            });
+        }
+        Request.Builder _requestBuilder = new Request.Builder()
+                .url(httpUrl.build())
+                .method(
+                        "DELETE",
+                        BodyProperties.toRequestBody(
+                                requestOptions != null ? requestOptions.getBodyProperties() : null, null))
+                .headers(Headers.of(clientOptions.headers(requestOptions)))
+                .addHeader("Accept", "application/json");
+        Request okhttpRequest = _requestBuilder.build();
+        OkHttpClient client = clientOptions.httpClient();
+        if (requestOptions != null && requestOptions.getTimeout().isPresent()) {
+            client = clientOptions.httpClientWithTimeout(requestOptions);
+        }
+        if (requestOptions != null && requestOptions.getMaxRetries().isPresent()) {
+            okhttpRequest = okhttpRequest
+                    .newBuilder()
+                    .tag(
+                            RetryInterceptor.MaxRetriesOverride.class,
+                            new RetryInterceptor.MaxRetriesOverride(
+                                    requestOptions.getMaxRetries().get()))
+                    .build();
+        }
+        try (Response response = client.newCall(okhttpRequest).execute()) {
+            ResponseBody responseBody = response.body();
+            String responseBodyString = responseBody != null ? responseBody.string() : "{}";
+            if (response.isSuccessful()) {
+                return new WhopApiHttpResponse<>(
+                        ObjectMappers.JSON_MAPPER.readValue(responseBodyString, DeleteReviewsResponse.class), response);
+            }
+            try {
                 switch (response.code()) {
-                    case 400:
-                        throw new BadRequestError(
-                                ObjectMappers.JSON_MAPPER.readValue(responseBodyString, Object.class), response);
                     case 401:
                         throw new UnauthorizedError(
                                 ObjectMappers.JSON_MAPPER.readValue(responseBodyString, Object.class), response);
@@ -223,15 +348,6 @@ public class RawReviewsClient {
                     case 404:
                         throw new NotFoundError(
                                 ObjectMappers.JSON_MAPPER.readValue(responseBodyString, Object.class), response);
-                    case 422:
-                        throw new UnprocessableEntityError(
-                                ObjectMappers.JSON_MAPPER.readValue(responseBodyString, Object.class), response);
-                    case 429:
-                        throw new TooManyRequestsError(
-                                ObjectMappers.JSON_MAPPER.readValue(responseBodyString, Object.class), response);
-                    case 500:
-                        throw new InternalServerError(
-                                ObjectMappers.JSON_MAPPER.readValue(responseBodyString, Object.class), response);
                 }
             } catch (JsonProcessingException ignored) {
                 // unable to map error response, throwing generic error
@@ -239,6 +355,8 @@ public class RawReviewsClient {
             Object errorBody = ObjectMappers.parseErrorBody(responseBodyString);
             throw new WhopApiApiException(
                     "Error with status code " + response.code(), response.code(), errorBody, response);
+        } catch (JsonProcessingException e) {
+            throw new WhopApiException("Failed to deserialize response: " + e.getMessage(), e);
         } catch (IOException e) {
             throw new WhopApiException("Network error executing HTTP request", e);
         }

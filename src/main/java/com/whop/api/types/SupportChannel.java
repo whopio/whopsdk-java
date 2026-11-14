@@ -25,6 +25,8 @@ import org.jetbrains.annotations.NotNull;
 @JsonInclude(JsonInclude.Include.NON_ABSENT)
 @JsonDeserialize(builder = SupportChannel.Builder.class)
 public final class SupportChannel {
+    private final Optional<String> accountId;
+
     private final Optional<String> companyId;
 
     private final Optional<String> customName;
@@ -33,31 +35,60 @@ public final class SupportChannel {
 
     private final String id;
 
+    private final Optional<SupportChannelLastMessage> lastMessage;
+
     private final Optional<OffsetDateTime> lastMessageAt;
 
+    private final Optional<Boolean> needsReply;
+
+    private final Optional<Boolean> participated;
+
     private final Optional<OffsetDateTime> resolvedAt;
+
+    private final Optional<Boolean> unread;
 
     private final Map<String, Object> additionalProperties;
 
     private SupportChannel(
+            Optional<String> accountId,
             Optional<String> companyId,
             Optional<String> customName,
             Optional<SupportChannelCustomerUser> customerUser,
             String id,
+            Optional<SupportChannelLastMessage> lastMessage,
             Optional<OffsetDateTime> lastMessageAt,
+            Optional<Boolean> needsReply,
+            Optional<Boolean> participated,
             Optional<OffsetDateTime> resolvedAt,
+            Optional<Boolean> unread,
             Map<String, Object> additionalProperties) {
+        this.accountId = accountId;
         this.companyId = companyId;
         this.customName = customName;
         this.customerUser = customerUser;
         this.id = id;
+        this.lastMessage = lastMessage;
         this.lastMessageAt = lastMessageAt;
+        this.needsReply = needsReply;
+        this.participated = participated;
         this.resolvedAt = resolvedAt;
+        this.unread = unread;
         this.additionalProperties = additionalProperties;
     }
 
     /**
-     * @return The unique identifier of the company associated with this channel. Null if this is not a support or company-scoped conversation.
+     * @return The unique identifier of the account associated with this channel. Null if this is not a support or account-scoped conversation.
+     */
+    @JsonIgnore
+    public Optional<String> getAccountId() {
+        if (accountId == null) {
+            return Optional.empty();
+        }
+        return accountId;
+    }
+
+    /**
+     * @return The unique identifier of the account associated with this channel. Null if this is not a support or account-scoped conversation.
      */
     @JsonIgnore
     public Optional<String> getCompanyId() {
@@ -98,6 +129,17 @@ public final class SupportChannel {
     }
 
     /**
+     * @return The most recent message in this channel. Null if no messages have been sent, or when listing support channels without <code>include_last_message</code>.
+     */
+    @JsonIgnore
+    public Optional<SupportChannelLastMessage> getLastMessage() {
+        if (lastMessage == null) {
+            return Optional.empty();
+        }
+        return lastMessage;
+    }
+
+    /**
      * @return The timestamp when the most recent message was sent in this channel. Null if no messages have been sent.
      */
     @JsonIgnore
@@ -109,6 +151,28 @@ public final class SupportChannel {
     }
 
     /**
+     * @return Whether the customer sent the latest message and the linked support ticket is unresolved. Null if not a support chat.
+     */
+    @JsonIgnore
+    public Optional<Boolean> getNeedsReply() {
+        if (needsReply == null) {
+            return Optional.empty();
+        }
+        return needsReply;
+    }
+
+    /**
+     * @return Whether the authenticated user has joined this channel as a participant. Null when the caller is not a user, or when listing support channels without <code>include_participated</code>.
+     */
+    @JsonIgnore
+    public Optional<Boolean> getParticipated() {
+        if (participated == null) {
+            return Optional.empty();
+        }
+        return participated;
+    }
+
+    /**
      * @return The timestamp when the linked support ticket was marked as resolved. Null if unresolved or not a support chat.
      */
     @JsonIgnore
@@ -117,6 +181,23 @@ public final class SupportChannel {
             return Optional.empty();
         }
         return resolvedAt;
+    }
+
+    /**
+     * @return Whether this channel has a message from someone else that the authenticated user has not viewed yet. Null when the caller is not a user, or when listing support channels without <code>include_last_message</code>.
+     */
+    @JsonIgnore
+    public Optional<Boolean> getUnread() {
+        if (unread == null) {
+            return Optional.empty();
+        }
+        return unread;
+    }
+
+    @JsonInclude(value = JsonInclude.Include.CUSTOM, valueFilter = NullableNonemptyFilter.class)
+    @JsonProperty("account_id")
+    private Optional<String> _getAccountId() {
+        return accountId;
     }
 
     @JsonInclude(value = JsonInclude.Include.CUSTOM, valueFilter = NullableNonemptyFilter.class)
@@ -138,15 +219,39 @@ public final class SupportChannel {
     }
 
     @JsonInclude(value = JsonInclude.Include.CUSTOM, valueFilter = NullableNonemptyFilter.class)
+    @JsonProperty("last_message")
+    private Optional<SupportChannelLastMessage> _getLastMessage() {
+        return lastMessage;
+    }
+
+    @JsonInclude(value = JsonInclude.Include.CUSTOM, valueFilter = NullableNonemptyFilter.class)
     @JsonProperty("last_message_at")
     private Optional<OffsetDateTime> _getLastMessageAt() {
         return lastMessageAt;
     }
 
     @JsonInclude(value = JsonInclude.Include.CUSTOM, valueFilter = NullableNonemptyFilter.class)
+    @JsonProperty("needs_reply")
+    private Optional<Boolean> _getNeedsReply() {
+        return needsReply;
+    }
+
+    @JsonInclude(value = JsonInclude.Include.CUSTOM, valueFilter = NullableNonemptyFilter.class)
+    @JsonProperty("participated")
+    private Optional<Boolean> _getParticipated() {
+        return participated;
+    }
+
+    @JsonInclude(value = JsonInclude.Include.CUSTOM, valueFilter = NullableNonemptyFilter.class)
     @JsonProperty("resolved_at")
     private Optional<OffsetDateTime> _getResolvedAt() {
         return resolvedAt;
+    }
+
+    @JsonInclude(value = JsonInclude.Include.CUSTOM, valueFilter = NullableNonemptyFilter.class)
+    @JsonProperty("unread")
+    private Optional<Boolean> _getUnread() {
+        return unread;
     }
 
     @java.lang.Override
@@ -161,18 +266,33 @@ public final class SupportChannel {
     }
 
     private boolean equalTo(SupportChannel other) {
-        return companyId.equals(other.companyId)
+        return accountId.equals(other.accountId)
+                && companyId.equals(other.companyId)
                 && customName.equals(other.customName)
                 && customerUser.equals(other.customerUser)
                 && id.equals(other.id)
+                && lastMessage.equals(other.lastMessage)
                 && lastMessageAt.equals(other.lastMessageAt)
-                && resolvedAt.equals(other.resolvedAt);
+                && needsReply.equals(other.needsReply)
+                && participated.equals(other.participated)
+                && resolvedAt.equals(other.resolvedAt)
+                && unread.equals(other.unread);
     }
 
     @java.lang.Override
     public int hashCode() {
         return Objects.hash(
-                this.companyId, this.customName, this.customerUser, this.id, this.lastMessageAt, this.resolvedAt);
+                this.accountId,
+                this.companyId,
+                this.customName,
+                this.customerUser,
+                this.id,
+                this.lastMessage,
+                this.lastMessageAt,
+                this.needsReply,
+                this.participated,
+                this.resolvedAt,
+                this.unread);
     }
 
     @java.lang.Override
@@ -201,7 +321,16 @@ public final class SupportChannel {
         _FinalStage additionalProperties(Map<String, Object> additionalProperties);
 
         /**
-         * <p>The unique identifier of the company associated with this channel. Null if this is not a support or company-scoped conversation.</p>
+         * <p>The unique identifier of the account associated with this channel. Null if this is not a support or account-scoped conversation.</p>
+         */
+        _FinalStage accountId(Optional<String> accountId);
+
+        _FinalStage accountId(String accountId);
+
+        _FinalStage accountId(Nullable<String> accountId);
+
+        /**
+         * <p>The unique identifier of the account associated with this channel. Null if this is not a support or account-scoped conversation.</p>
          */
         _FinalStage companyId(Optional<String> companyId);
 
@@ -228,6 +357,15 @@ public final class SupportChannel {
         _FinalStage customerUser(Nullable<SupportChannelCustomerUser> customerUser);
 
         /**
+         * <p>The most recent message in this channel. Null if no messages have been sent, or when listing support channels without <code>include_last_message</code>.</p>
+         */
+        _FinalStage lastMessage(Optional<SupportChannelLastMessage> lastMessage);
+
+        _FinalStage lastMessage(SupportChannelLastMessage lastMessage);
+
+        _FinalStage lastMessage(Nullable<SupportChannelLastMessage> lastMessage);
+
+        /**
          * <p>The timestamp when the most recent message was sent in this channel. Null if no messages have been sent.</p>
          */
         _FinalStage lastMessageAt(Optional<OffsetDateTime> lastMessageAt);
@@ -237,6 +375,24 @@ public final class SupportChannel {
         _FinalStage lastMessageAt(Nullable<OffsetDateTime> lastMessageAt);
 
         /**
+         * <p>Whether the customer sent the latest message and the linked support ticket is unresolved. Null if not a support chat.</p>
+         */
+        _FinalStage needsReply(Optional<Boolean> needsReply);
+
+        _FinalStage needsReply(Boolean needsReply);
+
+        _FinalStage needsReply(Nullable<Boolean> needsReply);
+
+        /**
+         * <p>Whether the authenticated user has joined this channel as a participant. Null when the caller is not a user, or when listing support channels without <code>include_participated</code>.</p>
+         */
+        _FinalStage participated(Optional<Boolean> participated);
+
+        _FinalStage participated(Boolean participated);
+
+        _FinalStage participated(Nullable<Boolean> participated);
+
+        /**
          * <p>The timestamp when the linked support ticket was marked as resolved. Null if unresolved or not a support chat.</p>
          */
         _FinalStage resolvedAt(Optional<OffsetDateTime> resolvedAt);
@@ -244,15 +400,32 @@ public final class SupportChannel {
         _FinalStage resolvedAt(OffsetDateTime resolvedAt);
 
         _FinalStage resolvedAt(Nullable<OffsetDateTime> resolvedAt);
+
+        /**
+         * <p>Whether this channel has a message from someone else that the authenticated user has not viewed yet. Null when the caller is not a user, or when listing support channels without <code>include_last_message</code>.</p>
+         */
+        _FinalStage unread(Optional<Boolean> unread);
+
+        _FinalStage unread(Boolean unread);
+
+        _FinalStage unread(Nullable<Boolean> unread);
     }
 
     @JsonIgnoreProperties(ignoreUnknown = true)
     public static final class Builder implements IdStage, _FinalStage {
         private String id;
 
+        private Optional<Boolean> unread = Optional.empty();
+
         private Optional<OffsetDateTime> resolvedAt = Optional.empty();
 
+        private Optional<Boolean> participated = Optional.empty();
+
+        private Optional<Boolean> needsReply = Optional.empty();
+
         private Optional<OffsetDateTime> lastMessageAt = Optional.empty();
+
+        private Optional<SupportChannelLastMessage> lastMessage = Optional.empty();
 
         private Optional<SupportChannelCustomerUser> customerUser = Optional.empty();
 
@@ -260,24 +433,29 @@ public final class SupportChannel {
 
         private Optional<String> companyId = Optional.empty();
 
-        @JsonAnySetter
+        private Optional<String> accountId = Optional.empty();
+
         private Map<String, Object> additionalProperties = new HashMap<>();
 
         private Builder() {}
 
         @java.lang.Override
         public Builder from(SupportChannel other) {
+            accountId(other.getAccountId());
             companyId(other.getCompanyId());
             customName(other.getCustomName());
             customerUser(other.getCustomerUser());
             id(other.getId());
+            lastMessage(other.getLastMessage());
             lastMessageAt(other.getLastMessageAt());
+            needsReply(other.getNeedsReply());
+            participated(other.getParticipated());
             resolvedAt(other.getResolvedAt());
+            unread(other.getUnread());
             return this;
         }
 
         /**
-         * <p>The unique identifier for the entity</p>
          * <p>The unique identifier for the entity</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
@@ -285,6 +463,42 @@ public final class SupportChannel {
         @JsonSetter("id")
         public _FinalStage id(@NotNull String id) {
             this.id = Objects.requireNonNull(id, "id must not be null");
+            return this;
+        }
+
+        /**
+         * <p>Whether this channel has a message from someone else that the authenticated user has not viewed yet. Null when the caller is not a user, or when listing support channels without <code>include_last_message</code>.</p>
+         * @return Reference to {@code this} so that method calls can be chained together.
+         */
+        @java.lang.Override
+        public _FinalStage unread(Nullable<Boolean> unread) {
+            if (unread.isNull()) {
+                this.unread = null;
+            } else if (unread.isEmpty()) {
+                this.unread = Optional.empty();
+            } else {
+                this.unread = Optional.of(unread.get());
+            }
+            return this;
+        }
+
+        /**
+         * <p>Whether this channel has a message from someone else that the authenticated user has not viewed yet. Null when the caller is not a user, or when listing support channels without <code>include_last_message</code>.</p>
+         * @return Reference to {@code this} so that method calls can be chained together.
+         */
+        @java.lang.Override
+        public _FinalStage unread(Boolean unread) {
+            this.unread = Optional.ofNullable(unread);
+            return this;
+        }
+
+        /**
+         * <p>Whether this channel has a message from someone else that the authenticated user has not viewed yet. Null when the caller is not a user, or when listing support channels without <code>include_last_message</code>.</p>
+         */
+        @java.lang.Override
+        @JsonSetter(value = "unread", nulls = Nulls.SKIP)
+        public _FinalStage unread(Optional<Boolean> unread) {
+            this.unread = unread;
             return this;
         }
 
@@ -325,6 +539,78 @@ public final class SupportChannel {
         }
 
         /**
+         * <p>Whether the authenticated user has joined this channel as a participant. Null when the caller is not a user, or when listing support channels without <code>include_participated</code>.</p>
+         * @return Reference to {@code this} so that method calls can be chained together.
+         */
+        @java.lang.Override
+        public _FinalStage participated(Nullable<Boolean> participated) {
+            if (participated.isNull()) {
+                this.participated = null;
+            } else if (participated.isEmpty()) {
+                this.participated = Optional.empty();
+            } else {
+                this.participated = Optional.of(participated.get());
+            }
+            return this;
+        }
+
+        /**
+         * <p>Whether the authenticated user has joined this channel as a participant. Null when the caller is not a user, or when listing support channels without <code>include_participated</code>.</p>
+         * @return Reference to {@code this} so that method calls can be chained together.
+         */
+        @java.lang.Override
+        public _FinalStage participated(Boolean participated) {
+            this.participated = Optional.ofNullable(participated);
+            return this;
+        }
+
+        /**
+         * <p>Whether the authenticated user has joined this channel as a participant. Null when the caller is not a user, or when listing support channels without <code>include_participated</code>.</p>
+         */
+        @java.lang.Override
+        @JsonSetter(value = "participated", nulls = Nulls.SKIP)
+        public _FinalStage participated(Optional<Boolean> participated) {
+            this.participated = participated;
+            return this;
+        }
+
+        /**
+         * <p>Whether the customer sent the latest message and the linked support ticket is unresolved. Null if not a support chat.</p>
+         * @return Reference to {@code this} so that method calls can be chained together.
+         */
+        @java.lang.Override
+        public _FinalStage needsReply(Nullable<Boolean> needsReply) {
+            if (needsReply.isNull()) {
+                this.needsReply = null;
+            } else if (needsReply.isEmpty()) {
+                this.needsReply = Optional.empty();
+            } else {
+                this.needsReply = Optional.of(needsReply.get());
+            }
+            return this;
+        }
+
+        /**
+         * <p>Whether the customer sent the latest message and the linked support ticket is unresolved. Null if not a support chat.</p>
+         * @return Reference to {@code this} so that method calls can be chained together.
+         */
+        @java.lang.Override
+        public _FinalStage needsReply(Boolean needsReply) {
+            this.needsReply = Optional.ofNullable(needsReply);
+            return this;
+        }
+
+        /**
+         * <p>Whether the customer sent the latest message and the linked support ticket is unresolved. Null if not a support chat.</p>
+         */
+        @java.lang.Override
+        @JsonSetter(value = "needs_reply", nulls = Nulls.SKIP)
+        public _FinalStage needsReply(Optional<Boolean> needsReply) {
+            this.needsReply = needsReply;
+            return this;
+        }
+
+        /**
          * <p>The timestamp when the most recent message was sent in this channel. Null if no messages have been sent.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
@@ -357,6 +643,42 @@ public final class SupportChannel {
         @JsonSetter(value = "last_message_at", nulls = Nulls.SKIP)
         public _FinalStage lastMessageAt(Optional<OffsetDateTime> lastMessageAt) {
             this.lastMessageAt = lastMessageAt;
+            return this;
+        }
+
+        /**
+         * <p>The most recent message in this channel. Null if no messages have been sent, or when listing support channels without <code>include_last_message</code>.</p>
+         * @return Reference to {@code this} so that method calls can be chained together.
+         */
+        @java.lang.Override
+        public _FinalStage lastMessage(Nullable<SupportChannelLastMessage> lastMessage) {
+            if (lastMessage.isNull()) {
+                this.lastMessage = null;
+            } else if (lastMessage.isEmpty()) {
+                this.lastMessage = Optional.empty();
+            } else {
+                this.lastMessage = Optional.of(lastMessage.get());
+            }
+            return this;
+        }
+
+        /**
+         * <p>The most recent message in this channel. Null if no messages have been sent, or when listing support channels without <code>include_last_message</code>.</p>
+         * @return Reference to {@code this} so that method calls can be chained together.
+         */
+        @java.lang.Override
+        public _FinalStage lastMessage(SupportChannelLastMessage lastMessage) {
+            this.lastMessage = Optional.ofNullable(lastMessage);
+            return this;
+        }
+
+        /**
+         * <p>The most recent message in this channel. Null if no messages have been sent, or when listing support channels without <code>include_last_message</code>.</p>
+         */
+        @java.lang.Override
+        @JsonSetter(value = "last_message", nulls = Nulls.SKIP)
+        public _FinalStage lastMessage(Optional<SupportChannelLastMessage> lastMessage) {
+            this.lastMessage = lastMessage;
             return this;
         }
 
@@ -433,7 +755,7 @@ public final class SupportChannel {
         }
 
         /**
-         * <p>The unique identifier of the company associated with this channel. Null if this is not a support or company-scoped conversation.</p>
+         * <p>The unique identifier of the account associated with this channel. Null if this is not a support or account-scoped conversation.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
@@ -449,7 +771,7 @@ public final class SupportChannel {
         }
 
         /**
-         * <p>The unique identifier of the company associated with this channel. Null if this is not a support or company-scoped conversation.</p>
+         * <p>The unique identifier of the account associated with this channel. Null if this is not a support or account-scoped conversation.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
@@ -459,7 +781,7 @@ public final class SupportChannel {
         }
 
         /**
-         * <p>The unique identifier of the company associated with this channel. Null if this is not a support or company-scoped conversation.</p>
+         * <p>The unique identifier of the account associated with this channel. Null if this is not a support or account-scoped conversation.</p>
          */
         @java.lang.Override
         @JsonSetter(value = "company_id", nulls = Nulls.SKIP)
@@ -468,10 +790,75 @@ public final class SupportChannel {
             return this;
         }
 
+        /**
+         * <p>The unique identifier of the account associated with this channel. Null if this is not a support or account-scoped conversation.</p>
+         * @return Reference to {@code this} so that method calls can be chained together.
+         */
+        @java.lang.Override
+        public _FinalStage accountId(Nullable<String> accountId) {
+            if (accountId.isNull()) {
+                this.accountId = null;
+            } else if (accountId.isEmpty()) {
+                this.accountId = Optional.empty();
+            } else {
+                this.accountId = Optional.of(accountId.get());
+            }
+            return this;
+        }
+
+        /**
+         * <p>The unique identifier of the account associated with this channel. Null if this is not a support or account-scoped conversation.</p>
+         * @return Reference to {@code this} so that method calls can be chained together.
+         */
+        @java.lang.Override
+        public _FinalStage accountId(String accountId) {
+            this.accountId = Optional.ofNullable(accountId);
+            return this;
+        }
+
+        /**
+         * <p>The unique identifier of the account associated with this channel. Null if this is not a support or account-scoped conversation.</p>
+         */
+        @java.lang.Override
+        @JsonSetter(value = "account_id", nulls = Nulls.SKIP)
+        public _FinalStage accountId(Optional<String> accountId) {
+            this.accountId = accountId;
+            return this;
+        }
+
         @java.lang.Override
         public SupportChannel build() {
             return new SupportChannel(
-                    companyId, customName, customerUser, id, lastMessageAt, resolvedAt, additionalProperties);
+                    accountId,
+                    companyId,
+                    customName,
+                    customerUser,
+                    id,
+                    lastMessage,
+                    lastMessageAt,
+                    needsReply,
+                    participated,
+                    resolvedAt,
+                    unread,
+                    additionalProperties);
+        }
+
+        @JsonAnySetter
+        private void putAdditionalPropertyFromJson(String key, Object value) {
+            if (key.equalsIgnoreCase("account_id")
+                    || key.equalsIgnoreCase("company_id")
+                    || key.equalsIgnoreCase("custom_name")
+                    || key.equalsIgnoreCase("customer_user")
+                    || key.equalsIgnoreCase("id")
+                    || key.equalsIgnoreCase("last_message")
+                    || key.equalsIgnoreCase("last_message_at")
+                    || key.equalsIgnoreCase("needs_reply")
+                    || key.equalsIgnoreCase("participated")
+                    || key.equalsIgnoreCase("resolved_at")
+                    || key.equalsIgnoreCase("unread")) {
+                return;
+            }
+            this.additionalProperties.put(key, value);
         }
 
         @java.lang.Override

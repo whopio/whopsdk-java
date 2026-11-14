@@ -27,28 +27,28 @@ public class SupportedMethodsClient {
     }
 
     /**
-     * Lists the payout methods an account or user is eligible to add.
+     * Lists the payout methods an account or user is eligible to add. Pass a result's ID as <code>supported_payout_method_id</code> to <code>POST /payouts/methods</code> to save one.
      */
     public SyncPagingIterable<ListSupportedMethodsResponseDataItem> list() {
         return this.rawClient.list().body();
     }
 
     /**
-     * Lists the payout methods an account or user is eligible to add.
+     * Lists the payout methods an account or user is eligible to add. Pass a result's ID as <code>supported_payout_method_id</code> to <code>POST /payouts/methods</code> to save one.
      */
     public SyncPagingIterable<ListSupportedMethodsResponseDataItem> list(RequestOptions requestOptions) {
         return this.rawClient.list(requestOptions).body();
     }
 
     /**
-     * Lists the payout methods an account or user is eligible to add.
+     * Lists the payout methods an account or user is eligible to add. Pass a result's ID as <code>supported_payout_method_id</code> to <code>POST /payouts/methods</code> to save one.
      */
     public SyncPagingIterable<ListSupportedMethodsResponseDataItem> list(ListSupportedMethodsRequest request) {
         return this.rawClient.list(request).body();
     }
 
     /**
-     * Lists the payout methods an account or user is eligible to add.
+     * Lists the payout methods an account or user is eligible to add. Pass a result's ID as <code>supported_payout_method_id</code> to <code>POST /payouts/methods</code> to save one.
      */
     public SyncPagingIterable<ListSupportedMethodsResponseDataItem> list(
             ListSupportedMethodsRequest request, RequestOptions requestOptions) {

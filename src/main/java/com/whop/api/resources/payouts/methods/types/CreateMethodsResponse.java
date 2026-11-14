@@ -59,11 +59,15 @@ public final class CreateMethodsResponse {
 
     private final Optional<Map<String, Object>> quote;
 
+    private final Optional<CreateMethodsResponseRecipient> recipient;
+
     private final CreateMethodsResponseStatus status;
 
     private final Optional<String> statusReason;
 
     private final Optional<CreateMethodsResponseSupportedPayoutMethod> supportedPayoutMethod;
+
+    private final Optional<CreateMethodsResponseType> type;
 
     private final Optional<CreateMethodsResponseUnavailableReason> unavailableReason;
 
@@ -87,9 +91,11 @@ public final class CreateMethodsResponse {
             CreateMethodsResponseObject object,
             Optional<String> payerName,
             Optional<Map<String, Object>> quote,
+            Optional<CreateMethodsResponseRecipient> recipient,
             CreateMethodsResponseStatus status,
             Optional<String> statusReason,
             Optional<CreateMethodsResponseSupportedPayoutMethod> supportedPayoutMethod,
+            Optional<CreateMethodsResponseType> type,
             Optional<CreateMethodsResponseUnavailableReason> unavailableReason,
             Map<String, Object> additionalProperties) {
         this.accountReference = accountReference;
@@ -109,9 +115,11 @@ public final class CreateMethodsResponse {
         this.object = object;
         this.payerName = payerName;
         this.quote = quote;
+        this.recipient = recipient;
         this.status = status;
         this.statusReason = statusReason;
         this.supportedPayoutMethod = supportedPayoutMethod;
+        this.type = type;
         this.unavailableReason = unavailableReason;
         this.additionalProperties = additionalProperties;
     }
@@ -262,6 +270,14 @@ public final class CreateMethodsResponse {
     }
 
     /**
+     * @return The recipient of a third-party payout method. Present only for recipient payout methods.
+     */
+    @JsonProperty("recipient")
+    public Optional<CreateMethodsResponseRecipient> getRecipient() {
+        return recipient;
+    }
+
+    /**
      * @return Always <code>created</code> on create — no payout has used the method yet.
      */
     @JsonProperty("status")
@@ -286,6 +302,14 @@ public final class CreateMethodsResponse {
             return Optional.empty();
         }
         return supportedPayoutMethod;
+    }
+
+    /**
+     * @return The kind of payout method. <code>external</code> sends funds out of Whop. <code>whop_card</code> moves funds onto the account's own Whop Card. A <code>whop_card</code> method takes standard-speed payouts only, and cannot be updated, reconnected, or deleted.
+     */
+    @JsonProperty("type")
+    public Optional<CreateMethodsResponseType> getType() {
+        return type;
     }
 
     /**
@@ -400,9 +424,11 @@ public final class CreateMethodsResponse {
                 && object.equals(other.object)
                 && payerName.equals(other.payerName)
                 && quote.equals(other.quote)
+                && recipient.equals(other.recipient)
                 && status.equals(other.status)
                 && statusReason.equals(other.statusReason)
                 && supportedPayoutMethod.equals(other.supportedPayoutMethod)
+                && type.equals(other.type)
                 && unavailableReason.equals(other.unavailableReason);
     }
 
@@ -426,9 +452,11 @@ public final class CreateMethodsResponse {
                 this.object,
                 this.payerName,
                 this.quote,
+                this.recipient,
                 this.status,
                 this.statusReason,
                 this.supportedPayoutMethod,
+                this.type,
                 this.unavailableReason);
     }
 
@@ -577,6 +605,13 @@ public final class CreateMethodsResponse {
         _FinalStage quote(Nullable<Map<String, Object>> quote);
 
         /**
+         * <p>The recipient of a third-party payout method. Present only for recipient payout methods.</p>
+         */
+        _FinalStage recipient(Optional<CreateMethodsResponseRecipient> recipient);
+
+        _FinalStage recipient(CreateMethodsResponseRecipient recipient);
+
+        /**
          * <p>Always <code>null</code> on create.</p>
          */
         _FinalStage statusReason(Optional<String> statusReason);
@@ -590,6 +625,13 @@ public final class CreateMethodsResponse {
         _FinalStage supportedPayoutMethod(CreateMethodsResponseSupportedPayoutMethod supportedPayoutMethod);
 
         _FinalStage supportedPayoutMethod(Nullable<CreateMethodsResponseSupportedPayoutMethod> supportedPayoutMethod);
+
+        /**
+         * <p>The kind of payout method. <code>external</code> sends funds out of Whop. <code>whop_card</code> moves funds onto the account's own Whop Card. A <code>whop_card</code> method takes standard-speed payouts only, and cannot be updated, reconnected, or deleted.</p>
+         */
+        _FinalStage type(Optional<CreateMethodsResponseType> type);
+
+        _FinalStage type(CreateMethodsResponseType type);
 
         /**
          * <p>Why this method is unavailable: <code>destination_retired</code> means the payout provider stopped offering the destination. Whop may automatically remap an eligible method that was not linked through Plaid to a compatible replacement; otherwise, the account owner must re-add it. <code>null</code> means no unavailability reason is known.</p>
@@ -624,9 +666,13 @@ public final class CreateMethodsResponse {
 
         private Optional<CreateMethodsResponseUnavailableReason> unavailableReason = Optional.empty();
 
+        private Optional<CreateMethodsResponseType> type = Optional.empty();
+
         private Optional<CreateMethodsResponseSupportedPayoutMethod> supportedPayoutMethod = Optional.empty();
 
         private Optional<String> statusReason = Optional.empty();
+
+        private Optional<CreateMethodsResponseRecipient> recipient = Optional.empty();
 
         private Optional<Map<String, Object>> quote = Optional.empty();
 
@@ -652,7 +698,6 @@ public final class CreateMethodsResponse {
 
         private Optional<String> accountReference = Optional.empty();
 
-        @JsonAnySetter
         private Map<String, Object> additionalProperties = new HashMap<>();
 
         private Builder() {}
@@ -676,9 +721,11 @@ public final class CreateMethodsResponse {
             object(other.getObject());
             payerName(other.getPayerName());
             quote(other.getQuote());
+            recipient(other.getRecipient());
             status(other.getStatus());
             statusReason(other.getStatusReason());
             supportedPayoutMethod(other.getSupportedPayoutMethod());
+            type(other.getType());
             unavailableReason(other.getUnavailableReason());
             return this;
         }
@@ -699,7 +746,6 @@ public final class CreateMethodsResponse {
         }
 
         /**
-         * <p>Payout method ID, usable as payout_method_id on POST /payouts.</p>
          * <p>Payout method ID, usable as payout_method_id on POST /payouts.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
@@ -725,7 +771,6 @@ public final class CreateMethodsResponse {
         }
 
         /**
-         * <p>Always <code>created</code> on create — no payout has used the method yet.</p>
          * <p>Always <code>created</code> on create — no payout has used the method yet.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
@@ -769,6 +814,26 @@ public final class CreateMethodsResponse {
         @JsonSetter(value = "unavailable_reason", nulls = Nulls.SKIP)
         public _FinalStage unavailableReason(Optional<CreateMethodsResponseUnavailableReason> unavailableReason) {
             this.unavailableReason = unavailableReason;
+            return this;
+        }
+
+        /**
+         * <p>The kind of payout method. <code>external</code> sends funds out of Whop. <code>whop_card</code> moves funds onto the account's own Whop Card. A <code>whop_card</code> method takes standard-speed payouts only, and cannot be updated, reconnected, or deleted.</p>
+         * @return Reference to {@code this} so that method calls can be chained together.
+         */
+        @java.lang.Override
+        public _FinalStage type(CreateMethodsResponseType type) {
+            this.type = Optional.ofNullable(type);
+            return this;
+        }
+
+        /**
+         * <p>The kind of payout method. <code>external</code> sends funds out of Whop. <code>whop_card</code> moves funds onto the account's own Whop Card. A <code>whop_card</code> method takes standard-speed payouts only, and cannot be updated, reconnected, or deleted.</p>
+         */
+        @java.lang.Override
+        @JsonSetter(value = "type", nulls = Nulls.SKIP)
+        public _FinalStage type(Optional<CreateMethodsResponseType> type) {
+            this.type = type;
             return this;
         }
 
@@ -832,6 +897,26 @@ public final class CreateMethodsResponse {
         @JsonSetter(value = "status_reason", nulls = Nulls.SKIP)
         public _FinalStage statusReason(Optional<String> statusReason) {
             this.statusReason = statusReason;
+            return this;
+        }
+
+        /**
+         * <p>The recipient of a third-party payout method. Present only for recipient payout methods.</p>
+         * @return Reference to {@code this} so that method calls can be chained together.
+         */
+        @java.lang.Override
+        public _FinalStage recipient(CreateMethodsResponseRecipient recipient) {
+            this.recipient = Optional.ofNullable(recipient);
+            return this;
+        }
+
+        /**
+         * <p>The recipient of a third-party payout method. Present only for recipient payout methods.</p>
+         */
+        @java.lang.Override
+        @JsonSetter(value = "recipient", nulls = Nulls.SKIP)
+        public _FinalStage recipient(Optional<CreateMethodsResponseRecipient> recipient) {
+            this.recipient = recipient;
             return this;
         }
 
@@ -1219,11 +1304,43 @@ public final class CreateMethodsResponse {
                     object,
                     payerName,
                     quote,
+                    recipient,
                     status,
                     statusReason,
                     supportedPayoutMethod,
+                    type,
                     unavailableReason,
                     additionalProperties);
+        }
+
+        @JsonAnySetter
+        private void putAdditionalPropertyFromJson(String key, Object value) {
+            if (key.equalsIgnoreCase("account_reference")
+                    || key.equalsIgnoreCase("bank_verification_state")
+                    || key.equalsIgnoreCase("created_at")
+                    || key.equalsIgnoreCase("destination_currency")
+                    || key.equalsIgnoreCase("estimated_arrival")
+                    || key.equalsIgnoreCase("fee_structure")
+                    || key.equalsIgnoreCase("id")
+                    || key.equalsIgnoreCase("institution_name")
+                    || key.equalsIgnoreCase("is_clone")
+                    || key.equalsIgnoreCase("is_default")
+                    || key.equalsIgnoreCase("last_paid_out_at")
+                    || key.equalsIgnoreCase("linked_via_plaid")
+                    || key.equalsIgnoreCase("needs_plaid_reconnect")
+                    || key.equalsIgnoreCase("nickname")
+                    || key.equalsIgnoreCase("object")
+                    || key.equalsIgnoreCase("payer_name")
+                    || key.equalsIgnoreCase("quote")
+                    || key.equalsIgnoreCase("recipient")
+                    || key.equalsIgnoreCase("status")
+                    || key.equalsIgnoreCase("status_reason")
+                    || key.equalsIgnoreCase("supported_payout_method")
+                    || key.equalsIgnoreCase("type")
+                    || key.equalsIgnoreCase("unavailable_reason")) {
+                return;
+            }
+            this.additionalProperties.put(key, value);
         }
 
         @java.lang.Override

@@ -30,11 +30,11 @@ public final class ListIdentityProfileRequest {
 
     private final Optional<Integer> last;
 
-    private final Optional<String> companyId;
-
     private final Optional<IdentityProfileKinds> profileType;
 
     private final Optional<IdentityProfileStatuses> status;
+
+    private final Optional<String> accountId;
 
     private final Map<String, Object> additionalProperties;
 
@@ -43,17 +43,17 @@ public final class ListIdentityProfileRequest {
             Optional<String> before,
             Optional<Integer> first,
             Optional<Integer> last,
-            Optional<String> companyId,
             Optional<IdentityProfileKinds> profileType,
             Optional<IdentityProfileStatuses> status,
+            Optional<String> accountId,
             Map<String, Object> additionalProperties) {
         this.after = after;
         this.before = before;
         this.first = first;
         this.last = last;
-        this.companyId = companyId;
         this.profileType = profileType;
         this.status = status;
+        this.accountId = accountId;
         this.additionalProperties = additionalProperties;
     }
 
@@ -89,14 +89,6 @@ public final class ListIdentityProfileRequest {
         return last;
     }
 
-    /**
-     * @return The unique identifier of the company to filter to. When omitted, returns IPs across all ledgers the actor can read.
-     */
-    @JsonProperty("company_id")
-    public Optional<String> getCompanyId() {
-        return companyId;
-    }
-
     @JsonProperty("profile_type")
     public Optional<IdentityProfileKinds> getProfileType() {
         return profileType;
@@ -105,6 +97,14 @@ public final class ListIdentityProfileRequest {
     @JsonProperty("status")
     public Optional<IdentityProfileStatuses> getStatus() {
         return status;
+    }
+
+    /**
+     * @return Account to list identity profiles for, prefixed <code>biz_</code>. Omit to list profiles across every account you can read, including child accounts under a parent and, with a user credential, your own user.
+     */
+    @JsonProperty("account_id")
+    public Optional<String> getAccountId() {
+        return accountId;
     }
 
     @java.lang.Override
@@ -123,15 +123,15 @@ public final class ListIdentityProfileRequest {
                 && before.equals(other.before)
                 && first.equals(other.first)
                 && last.equals(other.last)
-                && companyId.equals(other.companyId)
                 && profileType.equals(other.profileType)
-                && status.equals(other.status);
+                && status.equals(other.status)
+                && accountId.equals(other.accountId);
     }
 
     @java.lang.Override
     public int hashCode() {
         return Objects.hash(
-                this.after, this.before, this.first, this.last, this.companyId, this.profileType, this.status);
+                this.after, this.before, this.first, this.last, this.profileType, this.status, this.accountId);
     }
 
     @java.lang.Override
@@ -153,13 +153,12 @@ public final class ListIdentityProfileRequest {
 
         private Optional<Integer> last = Optional.empty();
 
-        private Optional<String> companyId = Optional.empty();
-
         private Optional<IdentityProfileKinds> profileType = Optional.empty();
 
         private Optional<IdentityProfileStatuses> status = Optional.empty();
 
-        @JsonAnySetter
+        private Optional<String> accountId = Optional.empty();
+
         private Map<String, Object> additionalProperties = new HashMap<>();
 
         private Builder() {}
@@ -169,9 +168,9 @@ public final class ListIdentityProfileRequest {
             before(other.getBefore());
             first(other.getFirst());
             last(other.getLast());
-            companyId(other.getCompanyId());
             profileType(other.getProfileType());
             status(other.getStatus());
+            accountId(other.getAccountId());
             return this;
         }
 
@@ -231,20 +230,6 @@ public final class ListIdentityProfileRequest {
             return this;
         }
 
-        /**
-         * <p>The unique identifier of the company to filter to. When omitted, returns IPs across all ledgers the actor can read.</p>
-         */
-        @JsonSetter(value = "company_id", nulls = Nulls.SKIP)
-        public Builder companyId(Optional<String> companyId) {
-            this.companyId = companyId;
-            return this;
-        }
-
-        public Builder companyId(String companyId) {
-            this.companyId = Optional.ofNullable(companyId);
-            return this;
-        }
-
         @JsonSetter(value = "profile_type", nulls = Nulls.SKIP)
         public Builder profileType(Optional<IdentityProfileKinds> profileType) {
             this.profileType = profileType;
@@ -267,9 +252,37 @@ public final class ListIdentityProfileRequest {
             return this;
         }
 
+        /**
+         * <p>Account to list identity profiles for, prefixed <code>biz_</code>. Omit to list profiles across every account you can read, including child accounts under a parent and, with a user credential, your own user.</p>
+         */
+        @JsonSetter(value = "account_id", nulls = Nulls.SKIP)
+        public Builder accountId(Optional<String> accountId) {
+            this.accountId = accountId;
+            return this;
+        }
+
+        public Builder accountId(String accountId) {
+            this.accountId = Optional.ofNullable(accountId);
+            return this;
+        }
+
         public ListIdentityProfileRequest build() {
             return new ListIdentityProfileRequest(
-                    after, before, first, last, companyId, profileType, status, additionalProperties);
+                    after, before, first, last, profileType, status, accountId, additionalProperties);
+        }
+
+        @JsonAnySetter
+        private void putAdditionalPropertyFromJson(String key, Object value) {
+            if (key.equalsIgnoreCase("after")
+                    || key.equalsIgnoreCase("before")
+                    || key.equalsIgnoreCase("first")
+                    || key.equalsIgnoreCase("last")
+                    || key.equalsIgnoreCase("profile_type")
+                    || key.equalsIgnoreCase("status")
+                    || key.equalsIgnoreCase("account_id")) {
+                return;
+            }
+            this.additionalProperties.put(key, value);
         }
 
         public Builder additionalProperty(String key, Object value) {

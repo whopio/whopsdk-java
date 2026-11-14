@@ -72,7 +72,6 @@ public final class LeaderboardPartnersRequest {
     public static final class Builder {
         private Optional<LeaderboardPartnersRequestPeriod> period = Optional.empty();
 
-        @JsonAnySetter
         private Map<String, Object> additionalProperties = new HashMap<>();
 
         private Builder() {}
@@ -98,6 +97,14 @@ public final class LeaderboardPartnersRequest {
 
         public LeaderboardPartnersRequest build() {
             return new LeaderboardPartnersRequest(period, additionalProperties);
+        }
+
+        @JsonAnySetter
+        private void putAdditionalPropertyFromJson(String key, Object value) {
+            if (key.equalsIgnoreCase("period")) {
+                return;
+            }
+            this.additionalProperties.put(key, value);
         }
 
         public Builder additionalProperty(String key, Object value) {

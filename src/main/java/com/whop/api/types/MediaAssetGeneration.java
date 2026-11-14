@@ -179,7 +179,6 @@ public final class MediaAssetGeneration {
 
         private Optional<Double> durationSeconds = Optional.empty();
 
-        @JsonAnySetter
         private Map<String, Object> additionalProperties = new HashMap<>();
 
         private Builder() {}
@@ -194,7 +193,6 @@ public final class MediaAssetGeneration {
         }
 
         /**
-         * <p>What the asset was generated from.</p>
          * <p>What the asset was generated from.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
@@ -304,6 +302,17 @@ public final class MediaAssetGeneration {
         @java.lang.Override
         public MediaAssetGeneration build() {
             return new MediaAssetGeneration(durationSeconds, prompt, referenceMedia, resolution, additionalProperties);
+        }
+
+        @JsonAnySetter
+        private void putAdditionalPropertyFromJson(String key, Object value) {
+            if (key.equalsIgnoreCase("duration_seconds")
+                    || key.equalsIgnoreCase("prompt")
+                    || key.equalsIgnoreCase("reference_media")
+                    || key.equalsIgnoreCase("resolution")) {
+                return;
+            }
+            this.additionalProperties.put(key, value);
         }
 
         @java.lang.Override

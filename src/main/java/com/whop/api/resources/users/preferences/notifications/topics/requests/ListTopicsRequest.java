@@ -65,7 +65,7 @@ public final class ListTopicsRequest {
     }
 
     /**
-     * @return Only return preferences scoped to this account's member notifications (<code>biz_</code> tag).
+     * @return Only return preferences scoped to this account's member notifications (<code>biz_</code> tag), or not narrowed to an account.
      */
     @JsonProperty("account_id")
     public Optional<String> getAccountId() {
@@ -73,7 +73,7 @@ public final class ListTopicsRequest {
     }
 
     /**
-     * @return Only return preferences scoped to this account's team notifications (<code>biz_</code> tag).
+     * @return Only return preferences scoped to this account's team notifications (<code>biz_</code> tag), or not narrowed to a team account.
      */
     @JsonProperty("team_account_id")
     public Optional<String> getTeamAccountId() {
@@ -81,7 +81,7 @@ public final class ListTopicsRequest {
     }
 
     /**
-     * @return Only return preferences scoped to this experience (<code>exp_</code> tag).
+     * @return Only return preferences scoped to this experience (<code>exp_</code> tag), or not narrowed to an experience.
      */
     @JsonProperty("experience_id")
     public Optional<String> getExperienceId() {
@@ -89,7 +89,7 @@ public final class ListTopicsRequest {
     }
 
     /**
-     * @return Only return preferences scoped to this notification topic (<code>topic_</code> tag).
+     * @return Only return preferences scoped to this notification topic (<code>topic_</code> tag), or not narrowed to a topic.
      */
     @JsonProperty("topic_id")
     public Optional<String> getTopicId() {
@@ -97,7 +97,7 @@ public final class ListTopicsRequest {
     }
 
     /**
-     * @return The number of preferences to return.
+     * @return Number of results to return from the start of the range.
      */
     @JsonProperty("first")
     public Optional<Integer> getFirst() {
@@ -105,7 +105,7 @@ public final class ListTopicsRequest {
     }
 
     /**
-     * @return A cursor; returns preferences after this position.
+     * @return Return results after this cursor. Use <code>page_info.end_cursor</code> from the previous response to fetch the next page.
      */
     @JsonProperty("after")
     public Optional<String> getAfter() {
@@ -170,7 +170,6 @@ public final class ListTopicsRequest {
 
         private Optional<String> after = Optional.empty();
 
-        @JsonAnySetter
         private Map<String, Object> additionalProperties = new HashMap<>();
 
         private Builder() {}
@@ -201,7 +200,7 @@ public final class ListTopicsRequest {
         }
 
         /**
-         * <p>Only return preferences scoped to this account's member notifications (<code>biz_</code> tag).</p>
+         * <p>Only return preferences scoped to this account's member notifications (<code>biz_</code> tag), or not narrowed to an account.</p>
          */
         @JsonSetter(value = "account_id", nulls = Nulls.SKIP)
         public Builder accountId(Optional<String> accountId) {
@@ -215,7 +214,7 @@ public final class ListTopicsRequest {
         }
 
         /**
-         * <p>Only return preferences scoped to this account's team notifications (<code>biz_</code> tag).</p>
+         * <p>Only return preferences scoped to this account's team notifications (<code>biz_</code> tag), or not narrowed to a team account.</p>
          */
         @JsonSetter(value = "team_account_id", nulls = Nulls.SKIP)
         public Builder teamAccountId(Optional<String> teamAccountId) {
@@ -229,7 +228,7 @@ public final class ListTopicsRequest {
         }
 
         /**
-         * <p>Only return preferences scoped to this experience (<code>exp_</code> tag).</p>
+         * <p>Only return preferences scoped to this experience (<code>exp_</code> tag), or not narrowed to an experience.</p>
          */
         @JsonSetter(value = "experience_id", nulls = Nulls.SKIP)
         public Builder experienceId(Optional<String> experienceId) {
@@ -243,7 +242,7 @@ public final class ListTopicsRequest {
         }
 
         /**
-         * <p>Only return preferences scoped to this notification topic (<code>topic_</code> tag).</p>
+         * <p>Only return preferences scoped to this notification topic (<code>topic_</code> tag), or not narrowed to a topic.</p>
          */
         @JsonSetter(value = "topic_id", nulls = Nulls.SKIP)
         public Builder topicId(Optional<String> topicId) {
@@ -257,7 +256,7 @@ public final class ListTopicsRequest {
         }
 
         /**
-         * <p>The number of preferences to return.</p>
+         * <p>Number of results to return from the start of the range.</p>
          */
         @JsonSetter(value = "first", nulls = Nulls.SKIP)
         public Builder first(Optional<Integer> first) {
@@ -271,7 +270,7 @@ public final class ListTopicsRequest {
         }
 
         /**
-         * <p>A cursor; returns preferences after this position.</p>
+         * <p>Return results after this cursor. Use <code>page_info.end_cursor</code> from the previous response to fetch the next page.</p>
          */
         @JsonSetter(value = "after", nulls = Nulls.SKIP)
         public Builder after(Optional<String> after) {
@@ -287,6 +286,20 @@ public final class ListTopicsRequest {
         public ListTopicsRequest build() {
             return new ListTopicsRequest(
                     channel, accountId, teamAccountId, experienceId, topicId, first, after, additionalProperties);
+        }
+
+        @JsonAnySetter
+        private void putAdditionalPropertyFromJson(String key, Object value) {
+            if (key.equalsIgnoreCase("channel")
+                    || key.equalsIgnoreCase("account_id")
+                    || key.equalsIgnoreCase("team_account_id")
+                    || key.equalsIgnoreCase("experience_id")
+                    || key.equalsIgnoreCase("topic_id")
+                    || key.equalsIgnoreCase("first")
+                    || key.equalsIgnoreCase("after")) {
+                return;
+            }
+            this.additionalProperties.put(key, value);
         }
 
         public Builder additionalProperty(String key, Object value) {

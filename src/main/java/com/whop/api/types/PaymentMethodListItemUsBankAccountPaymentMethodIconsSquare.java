@@ -110,7 +110,6 @@ public final class PaymentMethodListItemUsBankAccountPaymentMethodIconsSquare {
 
         private PaymentMethodListItemUsBankAccountPaymentMethodIconsSquareLight light;
 
-        @JsonAnySetter
         private Map<String, Object> additionalProperties = new HashMap<>();
 
         private Builder() {}
@@ -124,7 +123,6 @@ public final class PaymentMethodListItemUsBankAccountPaymentMethodIconsSquare {
 
         /**
          * <p>The colorway for dark surfaces.</p>
-         * <p>The colorway for dark surfaces.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
@@ -135,7 +133,6 @@ public final class PaymentMethodListItemUsBankAccountPaymentMethodIconsSquare {
         }
 
         /**
-         * <p>The colorway for light surfaces.</p>
          * <p>The colorway for light surfaces.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
@@ -149,6 +146,14 @@ public final class PaymentMethodListItemUsBankAccountPaymentMethodIconsSquare {
         @java.lang.Override
         public PaymentMethodListItemUsBankAccountPaymentMethodIconsSquare build() {
             return new PaymentMethodListItemUsBankAccountPaymentMethodIconsSquare(dark, light, additionalProperties);
+        }
+
+        @JsonAnySetter
+        private void putAdditionalPropertyFromJson(String key, Object value) {
+            if (key.equalsIgnoreCase("dark") || key.equalsIgnoreCase("light")) {
+                return;
+            }
+            this.additionalProperties.put(key, value);
         }
 
         @java.lang.Override

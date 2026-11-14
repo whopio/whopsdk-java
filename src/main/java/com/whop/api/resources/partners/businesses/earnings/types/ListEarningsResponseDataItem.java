@@ -15,6 +15,7 @@ import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.whop.api.core.Nullable;
 import com.whop.api.core.NullableNonemptyFilter;
 import com.whop.api.core.ObjectMappers;
+import com.whop.api.types.Money;
 import java.time.OffsetDateTime;
 import java.util.HashMap;
 import java.util.List;
@@ -32,6 +33,8 @@ public final class ListEarningsResponseDataItem {
 
     private final Optional<String> commissionAmountUsd;
 
+    private final boolean coveredByCommissionAdvance;
+
     private final OffsetDateTime createdAt;
 
     private final Optional<List<ListEarningsResponseDataItemFinancialActivityItem>> financialActivity;
@@ -48,6 +51,8 @@ public final class ListEarningsResponseDataItem {
 
     private final Optional<ListEarningsResponseDataItemProduct> product;
 
+    private final Optional<Money> projectedCommissionAmountUsd;
+
     private final Optional<ListEarningsResponseDataItemResource> resource;
 
     private final boolean secondTier;
@@ -62,6 +67,7 @@ public final class ListEarningsResponseDataItem {
             Optional<ListEarningsResponseDataItemAccount> account,
             Optional<String> cancelationReason,
             Optional<String> commissionAmountUsd,
+            boolean coveredByCommissionAdvance,
             OffsetDateTime createdAt,
             Optional<List<ListEarningsResponseDataItemFinancialActivityItem>> financialActivity,
             Optional<String> id,
@@ -70,6 +76,7 @@ public final class ListEarningsResponseDataItem {
             Optional<OffsetDateTime> payoutAt,
             Optional<Float> payoutPercentage,
             Optional<ListEarningsResponseDataItemProduct> product,
+            Optional<Money> projectedCommissionAmountUsd,
             Optional<ListEarningsResponseDataItemResource> resource,
             boolean secondTier,
             ListEarningsResponseDataItemStatus status,
@@ -78,6 +85,7 @@ public final class ListEarningsResponseDataItem {
         this.account = account;
         this.cancelationReason = cancelationReason;
         this.commissionAmountUsd = commissionAmountUsd;
+        this.coveredByCommissionAdvance = coveredByCommissionAdvance;
         this.createdAt = createdAt;
         this.financialActivity = financialActivity;
         this.id = id;
@@ -86,6 +94,7 @@ public final class ListEarningsResponseDataItem {
         this.payoutAt = payoutAt;
         this.payoutPercentage = payoutPercentage;
         this.product = product;
+        this.projectedCommissionAmountUsd = projectedCommissionAmountUsd;
         this.resource = resource;
         this.secondTier = secondTier;
         this.status = status;
@@ -126,6 +135,14 @@ public final class ListEarningsResponseDataItem {
         return commissionAmountUsd;
     }
 
+    /**
+     * @return Whether an upfront commission advance replaces this commission, including covered earnings that are still awaiting settlement.
+     */
+    @JsonProperty("covered_by_commission_advance")
+    public boolean getCoveredByCommissionAdvance() {
+        return coveredByCommissionAdvance;
+    }
+
     @JsonProperty("created_at")
     public OffsetDateTime getCreatedAt() {
         return createdAt;
@@ -151,7 +168,7 @@ public final class ListEarningsResponseDataItem {
     }
 
     /**
-     * @return Which income source the commission is on: product-sales gross profit, Whop Ads spend billed to the business, platform balance transfer fees, or Whop Card interchange.
+     * @return Which income source the commission is on: product-sales gross profit, Whop Ads spend billed to the business, platform balance transfer fees, Whop Card interchange, withdrawal gross profit, or a fixed onboarding or referral link reward paid to the partner when a referred business qualifies.
      */
     @JsonProperty("income_source")
     public ListEarningsResponseDataItemIncomeSource getIncomeSource() {
@@ -191,7 +208,18 @@ public final class ListEarningsResponseDataItem {
     }
 
     /**
-     * @return The resource that generated the earning: the customer payment receipt for sales and ad spend earnings, the balance transfer for transfer earnings, or the card transaction for card interchange earnings.
+     * @return Estimated commission while awaiting settlement. Zero when a funded commission advance covers the earning. Null when no estimate is available or the earning has settled.
+     */
+    @JsonIgnore
+    public Optional<Money> getProjectedCommissionAmountUsd() {
+        if (projectedCommissionAmountUsd == null) {
+            return Optional.empty();
+        }
+        return projectedCommissionAmountUsd;
+    }
+
+    /**
+     * @return The resource that generated the earning. For sales and ad spend earnings, it is the customer payment receipt. For transfer earnings, it is the balance transfer. For withdrawal earnings, it is the withdrawal. For card interchange earnings, it is the card transaction. For fixed reward earnings, it is the qualifying reward. For business referral earnings, it is the referred partner business's own commission.
      */
     @JsonIgnore
     public Optional<ListEarningsResponseDataItemResource> getResource() {
@@ -274,6 +302,12 @@ public final class ListEarningsResponseDataItem {
     }
 
     @JsonInclude(value = JsonInclude.Include.CUSTOM, valueFilter = NullableNonemptyFilter.class)
+    @JsonProperty("projected_commission_amount_usd")
+    private Optional<Money> _getProjectedCommissionAmountUsd() {
+        return projectedCommissionAmountUsd;
+    }
+
+    @JsonInclude(value = JsonInclude.Include.CUSTOM, valueFilter = NullableNonemptyFilter.class)
     @JsonProperty("resource")
     private Optional<ListEarningsResponseDataItemResource> _getResource() {
         return resource;
@@ -294,6 +328,7 @@ public final class ListEarningsResponseDataItem {
         return account.equals(other.account)
                 && cancelationReason.equals(other.cancelationReason)
                 && commissionAmountUsd.equals(other.commissionAmountUsd)
+                && coveredByCommissionAdvance == other.coveredByCommissionAdvance
                 && createdAt.equals(other.createdAt)
                 && financialActivity.equals(other.financialActivity)
                 && id.equals(other.id)
@@ -302,6 +337,7 @@ public final class ListEarningsResponseDataItem {
                 && payoutAt.equals(other.payoutAt)
                 && payoutPercentage.equals(other.payoutPercentage)
                 && product.equals(other.product)
+                && projectedCommissionAmountUsd.equals(other.projectedCommissionAmountUsd)
                 && resource.equals(other.resource)
                 && secondTier == other.secondTier
                 && status.equals(other.status)
@@ -314,6 +350,7 @@ public final class ListEarningsResponseDataItem {
                 this.account,
                 this.cancelationReason,
                 this.commissionAmountUsd,
+                this.coveredByCommissionAdvance,
                 this.createdAt,
                 this.financialActivity,
                 this.id,
@@ -322,6 +359,7 @@ public final class ListEarningsResponseDataItem {
                 this.payoutAt,
                 this.payoutPercentage,
                 this.product,
+                this.projectedCommissionAmountUsd,
                 this.resource,
                 this.secondTier,
                 this.status,
@@ -333,19 +371,26 @@ public final class ListEarningsResponseDataItem {
         return ObjectMappers.stringify(this);
     }
 
-    public static CreatedAtStage builder() {
+    public static CoveredByCommissionAdvanceStage builder() {
         return new Builder();
     }
 
-    public interface CreatedAtStage {
-        IncomeSourceStage createdAt(@NotNull OffsetDateTime createdAt);
+    public interface CoveredByCommissionAdvanceStage {
+        /**
+         * <p>Whether an upfront commission advance replaces this commission, including covered earnings that are still awaiting settlement.</p>
+         */
+        CreatedAtStage coveredByCommissionAdvance(boolean coveredByCommissionAdvance);
 
         Builder from(ListEarningsResponseDataItem other);
     }
 
+    public interface CreatedAtStage {
+        IncomeSourceStage createdAt(@NotNull OffsetDateTime createdAt);
+    }
+
     public interface IncomeSourceStage {
         /**
-         * <p>Which income source the commission is on: product-sales gross profit, Whop Ads spend billed to the business, platform balance transfer fees, or Whop Card interchange.</p>
+         * <p>Which income source the commission is on: product-sales gross profit, Whop Ads spend billed to the business, platform balance transfer fees, Whop Card interchange, withdrawal gross profit, or a fixed onboarding or referral link reward paid to the partner when a referred business qualifies.</p>
          */
         ObjectStage incomeSource(@NotNull ListEarningsResponseDataItemIncomeSource incomeSource);
     }
@@ -448,7 +493,16 @@ public final class ListEarningsResponseDataItem {
         _FinalStage product(Nullable<ListEarningsResponseDataItemProduct> product);
 
         /**
-         * <p>The resource that generated the earning: the customer payment receipt for sales and ad spend earnings, the balance transfer for transfer earnings, or the card transaction for card interchange earnings.</p>
+         * <p>Estimated commission while awaiting settlement. Zero when a funded commission advance covers the earning. Null when no estimate is available or the earning has settled.</p>
+         */
+        _FinalStage projectedCommissionAmountUsd(Optional<Money> projectedCommissionAmountUsd);
+
+        _FinalStage projectedCommissionAmountUsd(Money projectedCommissionAmountUsd);
+
+        _FinalStage projectedCommissionAmountUsd(Nullable<Money> projectedCommissionAmountUsd);
+
+        /**
+         * <p>The resource that generated the earning. For sales and ad spend earnings, it is the customer payment receipt. For transfer earnings, it is the balance transfer. For withdrawal earnings, it is the withdrawal. For card interchange earnings, it is the card transaction. For fixed reward earnings, it is the qualifying reward. For business referral earnings, it is the referred partner business's own commission.</p>
          */
         _FinalStage resource(Optional<ListEarningsResponseDataItemResource> resource);
 
@@ -459,13 +513,16 @@ public final class ListEarningsResponseDataItem {
 
     @JsonIgnoreProperties(ignoreUnknown = true)
     public static final class Builder
-            implements CreatedAtStage,
+            implements CoveredByCommissionAdvanceStage,
+                    CreatedAtStage,
                     IncomeSourceStage,
                     ObjectStage,
                     SecondTierStage,
                     StatusStage,
                     TransactionAmountUsdStage,
                     _FinalStage {
+        private boolean coveredByCommissionAdvance;
+
         private OffsetDateTime createdAt;
 
         private ListEarningsResponseDataItemIncomeSource incomeSource;
@@ -479,6 +536,8 @@ public final class ListEarningsResponseDataItem {
         private String transactionAmountUsd;
 
         private Optional<ListEarningsResponseDataItemResource> resource = Optional.empty();
+
+        private Optional<Money> projectedCommissionAmountUsd = Optional.empty();
 
         private Optional<ListEarningsResponseDataItemProduct> product = Optional.empty();
 
@@ -496,7 +555,6 @@ public final class ListEarningsResponseDataItem {
 
         private Optional<ListEarningsResponseDataItemAccount> account = Optional.empty();
 
-        @JsonAnySetter
         private Map<String, Object> additionalProperties = new HashMap<>();
 
         private Builder() {}
@@ -506,6 +564,7 @@ public final class ListEarningsResponseDataItem {
             account(other.getAccount());
             cancelationReason(other.getCancelationReason());
             commissionAmountUsd(other.getCommissionAmountUsd());
+            coveredByCommissionAdvance(other.getCoveredByCommissionAdvance());
             createdAt(other.getCreatedAt());
             financialActivity(other.getFinancialActivity());
             id(other.getId());
@@ -514,10 +573,22 @@ public final class ListEarningsResponseDataItem {
             payoutAt(other.getPayoutAt());
             payoutPercentage(other.getPayoutPercentage());
             product(other.getProduct());
+            projectedCommissionAmountUsd(other.getProjectedCommissionAmountUsd());
             resource(other.getResource());
             secondTier(other.getSecondTier());
             status(other.getStatus());
             transactionAmountUsd(other.getTransactionAmountUsd());
+            return this;
+        }
+
+        /**
+         * <p>Whether an upfront commission advance replaces this commission, including covered earnings that are still awaiting settlement.</p>
+         * @return Reference to {@code this} so that method calls can be chained together.
+         */
+        @java.lang.Override
+        @JsonSetter("covered_by_commission_advance")
+        public CreatedAtStage coveredByCommissionAdvance(boolean coveredByCommissionAdvance) {
+            this.coveredByCommissionAdvance = coveredByCommissionAdvance;
             return this;
         }
 
@@ -529,8 +600,7 @@ public final class ListEarningsResponseDataItem {
         }
 
         /**
-         * <p>Which income source the commission is on: product-sales gross profit, Whop Ads spend billed to the business, platform balance transfer fees, or Whop Card interchange.</p>
-         * <p>Which income source the commission is on: product-sales gross profit, Whop Ads spend billed to the business, platform balance transfer fees, or Whop Card interchange.</p>
+         * <p>Which income source the commission is on: product-sales gross profit, Whop Ads spend billed to the business, platform balance transfer fees, Whop Card interchange, withdrawal gross profit, or a fixed onboarding or referral link reward paid to the partner when a referred business qualifies.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
@@ -549,7 +619,6 @@ public final class ListEarningsResponseDataItem {
 
         /**
          * <p>Whether this earning is a second-tier (grandparent) commission.</p>
-         * <p>Whether this earning is a second-tier (grandparent) commission.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
@@ -560,7 +629,6 @@ public final class ListEarningsResponseDataItem {
         }
 
         /**
-         * <p>Current status of the earning.</p>
          * <p>Current status of the earning.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
@@ -573,7 +641,6 @@ public final class ListEarningsResponseDataItem {
 
         /**
          * <p>The underlying transaction amount the commission's income comes from, in USD.</p>
-         * <p>The underlying transaction amount the commission's income comes from, in USD.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
@@ -585,7 +652,7 @@ public final class ListEarningsResponseDataItem {
         }
 
         /**
-         * <p>The resource that generated the earning: the customer payment receipt for sales and ad spend earnings, the balance transfer for transfer earnings, or the card transaction for card interchange earnings.</p>
+         * <p>The resource that generated the earning. For sales and ad spend earnings, it is the customer payment receipt. For transfer earnings, it is the balance transfer. For withdrawal earnings, it is the withdrawal. For card interchange earnings, it is the card transaction. For fixed reward earnings, it is the qualifying reward. For business referral earnings, it is the referred partner business's own commission.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
@@ -601,7 +668,7 @@ public final class ListEarningsResponseDataItem {
         }
 
         /**
-         * <p>The resource that generated the earning: the customer payment receipt for sales and ad spend earnings, the balance transfer for transfer earnings, or the card transaction for card interchange earnings.</p>
+         * <p>The resource that generated the earning. For sales and ad spend earnings, it is the customer payment receipt. For transfer earnings, it is the balance transfer. For withdrawal earnings, it is the withdrawal. For card interchange earnings, it is the card transaction. For fixed reward earnings, it is the qualifying reward. For business referral earnings, it is the referred partner business's own commission.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
@@ -611,12 +678,48 @@ public final class ListEarningsResponseDataItem {
         }
 
         /**
-         * <p>The resource that generated the earning: the customer payment receipt for sales and ad spend earnings, the balance transfer for transfer earnings, or the card transaction for card interchange earnings.</p>
+         * <p>The resource that generated the earning. For sales and ad spend earnings, it is the customer payment receipt. For transfer earnings, it is the balance transfer. For withdrawal earnings, it is the withdrawal. For card interchange earnings, it is the card transaction. For fixed reward earnings, it is the qualifying reward. For business referral earnings, it is the referred partner business's own commission.</p>
          */
         @java.lang.Override
         @JsonSetter(value = "resource", nulls = Nulls.SKIP)
         public _FinalStage resource(Optional<ListEarningsResponseDataItemResource> resource) {
             this.resource = resource;
+            return this;
+        }
+
+        /**
+         * <p>Estimated commission while awaiting settlement. Zero when a funded commission advance covers the earning. Null when no estimate is available or the earning has settled.</p>
+         * @return Reference to {@code this} so that method calls can be chained together.
+         */
+        @java.lang.Override
+        public _FinalStage projectedCommissionAmountUsd(Nullable<Money> projectedCommissionAmountUsd) {
+            if (projectedCommissionAmountUsd.isNull()) {
+                this.projectedCommissionAmountUsd = null;
+            } else if (projectedCommissionAmountUsd.isEmpty()) {
+                this.projectedCommissionAmountUsd = Optional.empty();
+            } else {
+                this.projectedCommissionAmountUsd = Optional.of(projectedCommissionAmountUsd.get());
+            }
+            return this;
+        }
+
+        /**
+         * <p>Estimated commission while awaiting settlement. Zero when a funded commission advance covers the earning. Null when no estimate is available or the earning has settled.</p>
+         * @return Reference to {@code this} so that method calls can be chained together.
+         */
+        @java.lang.Override
+        public _FinalStage projectedCommissionAmountUsd(Money projectedCommissionAmountUsd) {
+            this.projectedCommissionAmountUsd = Optional.ofNullable(projectedCommissionAmountUsd);
+            return this;
+        }
+
+        /**
+         * <p>Estimated commission while awaiting settlement. Zero when a funded commission advance covers the earning. Null when no estimate is available or the earning has settled.</p>
+         */
+        @java.lang.Override
+        @JsonSetter(value = "projected_commission_amount_usd", nulls = Nulls.SKIP)
+        public _FinalStage projectedCommissionAmountUsd(Optional<Money> projectedCommissionAmountUsd) {
+            this.projectedCommissionAmountUsd = projectedCommissionAmountUsd;
             return this;
         }
 
@@ -884,6 +987,7 @@ public final class ListEarningsResponseDataItem {
                     account,
                     cancelationReason,
                     commissionAmountUsd,
+                    coveredByCommissionAdvance,
                     createdAt,
                     financialActivity,
                     id,
@@ -892,11 +996,36 @@ public final class ListEarningsResponseDataItem {
                     payoutAt,
                     payoutPercentage,
                     product,
+                    projectedCommissionAmountUsd,
                     resource,
                     secondTier,
                     status,
                     transactionAmountUsd,
                     additionalProperties);
+        }
+
+        @JsonAnySetter
+        private void putAdditionalPropertyFromJson(String key, Object value) {
+            if (key.equalsIgnoreCase("account")
+                    || key.equalsIgnoreCase("cancelation_reason")
+                    || key.equalsIgnoreCase("commission_amount_usd")
+                    || key.equalsIgnoreCase("covered_by_commission_advance")
+                    || key.equalsIgnoreCase("created_at")
+                    || key.equalsIgnoreCase("financial_activity")
+                    || key.equalsIgnoreCase("id")
+                    || key.equalsIgnoreCase("income_source")
+                    || key.equalsIgnoreCase("object")
+                    || key.equalsIgnoreCase("payout_at")
+                    || key.equalsIgnoreCase("payout_percentage")
+                    || key.equalsIgnoreCase("product")
+                    || key.equalsIgnoreCase("projected_commission_amount_usd")
+                    || key.equalsIgnoreCase("resource")
+                    || key.equalsIgnoreCase("second_tier")
+                    || key.equalsIgnoreCase("status")
+                    || key.equalsIgnoreCase("transaction_amount_usd")) {
+                return;
+            }
+            this.additionalProperties.put(key, value);
         }
 
         @java.lang.Override

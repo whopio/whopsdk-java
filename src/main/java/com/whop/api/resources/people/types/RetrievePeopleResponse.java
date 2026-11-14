@@ -823,7 +823,6 @@ public final class RetrievePeopleResponse {
 
         private Optional<Double> aov = Optional.empty();
 
-        @JsonAnySetter
         private Map<String, Object> additionalProperties = new HashMap<>();
 
         private Builder() {}
@@ -1532,6 +1531,45 @@ public final class RetrievePeopleResponse {
                     user,
                     userIds,
                     additionalProperties);
+        }
+
+        @JsonAnySetter
+        private void putAdditionalPropertyFromJson(String key, Object value) {
+            if (key.equalsIgnoreCase("account_id")
+                    || key.equalsIgnoreCase("aov")
+                    || key.equalsIgnoreCase("audience_ids")
+                    || key.equalsIgnoreCase("custom_event_names")
+                    || key.equalsIgnoreCase("device")
+                    || key.equalsIgnoreCase("email")
+                    || key.equalsIgnoreCase("emails")
+                    || key.equalsIgnoreCase("event_count")
+                    || key.equalsIgnoreCase("event_names")
+                    || key.equalsIgnoreCase("first_purchase_at")
+                    || key.equalsIgnoreCase("first_seen_at")
+                    || key.equalsIgnoreCase("first_source")
+                    || key.equalsIgnoreCase("id")
+                    || key.equalsIgnoreCase("last_ip")
+                    || key.equalsIgnoreCase("last_purchase_at")
+                    || key.equalsIgnoreCase("last_seen_at")
+                    || key.equalsIgnoreCase("last_source")
+                    || key.equalsIgnoreCase("location")
+                    || key.equalsIgnoreCase("ltv")
+                    || key.equalsIgnoreCase("member")
+                    || key.equalsIgnoreCase("name")
+                    || key.equalsIgnoreCase("names")
+                    || key.equalsIgnoreCase("phone")
+                    || key.equalsIgnoreCase("phones")
+                    || key.equalsIgnoreCase("purchase_count")
+                    || key.equalsIgnoreCase("purchases")
+                    || key.equalsIgnoreCase("roles")
+                    || key.equalsIgnoreCase("sources")
+                    || key.equalsIgnoreCase("timezone")
+                    || key.equalsIgnoreCase("usage")
+                    || key.equalsIgnoreCase("user")
+                    || key.equalsIgnoreCase("user_ids")) {
+                return;
+            }
+            this.additionalProperties.put(key, value);
         }
 
         @java.lang.Override

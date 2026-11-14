@@ -178,7 +178,6 @@ public final class ListCourseChaptersRequest {
 
         private Optional<String> after = Optional.empty();
 
-        @JsonAnySetter
         private Map<String, Object> additionalProperties = new HashMap<>();
 
         private Builder() {}
@@ -194,7 +193,6 @@ public final class ListCourseChaptersRequest {
         }
 
         /**
-         * <p>The unique identifier of the course to list chapters for.</p>
          * <p>The unique identifier of the course to list chapters for.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
@@ -288,6 +286,18 @@ public final class ListCourseChaptersRequest {
         @java.lang.Override
         public ListCourseChaptersRequest build() {
             return new ListCourseChaptersRequest(after, before, first, last, courseId, additionalProperties);
+        }
+
+        @JsonAnySetter
+        private void putAdditionalPropertyFromJson(String key, Object value) {
+            if (key.equalsIgnoreCase("after")
+                    || key.equalsIgnoreCase("before")
+                    || key.equalsIgnoreCase("first")
+                    || key.equalsIgnoreCase("last")
+                    || key.equalsIgnoreCase("course_id")) {
+                return;
+            }
+            this.additionalProperties.put(key, value);
         }
 
         @java.lang.Override

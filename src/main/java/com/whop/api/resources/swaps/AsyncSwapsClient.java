@@ -5,6 +5,7 @@ package com.whop.api.resources.swaps;
 
 import com.whop.api.core.ClientOptions;
 import com.whop.api.core.RequestOptions;
+import com.whop.api.core.WhopApiHttpResponse;
 import com.whop.api.resources.swaps.requests.CreateQuoteSwapsRequest;
 import com.whop.api.resources.swaps.requests.CreateSwapsRequest;
 import com.whop.api.resources.swaps.requests.ListSwapsRequest;
@@ -33,74 +34,178 @@ public class AsyncSwapsClient {
     }
 
     /**
-     * Retrieve the account's completed or pending swaps — currently just the latest one.
+     * Lists the completed or pending swaps for an account or user — currently only the most recent one.
+     */
+    public CompletableFuture<ListSwapsResponse> list() {
+        CompletableFuture<WhopApiHttpResponse<ListSwapsResponse>> rawFuture = this.rawClient.list();
+        CompletableFuture<ListSwapsResponse> future = rawFuture.thenApply(response -> response.body());
+        future.whenComplete((result_, throwable_) -> {
+            if (future.isCancelled()) {
+                rawFuture.cancel(true);
+            }
+        });
+        return future;
+    }
+
+    /**
+     * Lists the completed or pending swaps for an account or user — currently only the most recent one.
+     */
+    public CompletableFuture<ListSwapsResponse> list(RequestOptions requestOptions) {
+        CompletableFuture<WhopApiHttpResponse<ListSwapsResponse>> rawFuture = this.rawClient.list(requestOptions);
+        CompletableFuture<ListSwapsResponse> future = rawFuture.thenApply(response -> response.body());
+        future.whenComplete((result_, throwable_) -> {
+            if (future.isCancelled()) {
+                rawFuture.cancel(true);
+            }
+        });
+        return future;
+    }
+
+    /**
+     * Lists the completed or pending swaps for an account or user — currently only the most recent one.
      */
     public CompletableFuture<ListSwapsResponse> list(ListSwapsRequest request) {
-        return this.rawClient.list(request).thenApply(response -> response.body());
+        CompletableFuture<WhopApiHttpResponse<ListSwapsResponse>> rawFuture = this.rawClient.list(request);
+        CompletableFuture<ListSwapsResponse> future = rawFuture.thenApply(response -> response.body());
+        future.whenComplete((result_, throwable_) -> {
+            if (future.isCancelled()) {
+                rawFuture.cancel(true);
+            }
+        });
+        return future;
     }
 
     /**
-     * Retrieve the account's completed or pending swaps — currently just the latest one.
+     * Lists the completed or pending swaps for an account or user — currently only the most recent one.
      */
     public CompletableFuture<ListSwapsResponse> list(ListSwapsRequest request, RequestOptions requestOptions) {
-        return this.rawClient.list(request, requestOptions).thenApply(response -> response.body());
+        CompletableFuture<WhopApiHttpResponse<ListSwapsResponse>> rawFuture =
+                this.rawClient.list(request, requestOptions);
+        CompletableFuture<ListSwapsResponse> future = rawFuture.thenApply(response -> response.body());
+        future.whenComplete((result_, throwable_) -> {
+            if (future.isCancelled()) {
+                rawFuture.cancel(true);
+            }
+        });
+        return future;
     }
 
     /**
-     * Swaps one token for another from the account's wallet, or converts between fiat currencies in the account's ledger at the mid-market rate. Crypto swaps finish in the background — check the swap for its status.
+     * Swaps one token for another in an account or user's wallet, or converts between their fiat balances. Crypto swaps finish in the background — retrieve the swap to follow its status.
      */
     public CompletableFuture<CreateSwapsResponse> create(CreateSwapsRequest request) {
-        return this.rawClient.create(request).thenApply(response -> response.body());
+        CompletableFuture<WhopApiHttpResponse<CreateSwapsResponse>> rawFuture = this.rawClient.create(request);
+        CompletableFuture<CreateSwapsResponse> future = rawFuture.thenApply(response -> response.body());
+        future.whenComplete((result_, throwable_) -> {
+            if (future.isCancelled()) {
+                rawFuture.cancel(true);
+            }
+        });
+        return future;
     }
 
     /**
-     * Swaps one token for another from the account's wallet, or converts between fiat currencies in the account's ledger at the mid-market rate. Crypto swaps finish in the background — check the swap for its status.
+     * Swaps one token for another in an account or user's wallet, or converts between their fiat balances. Crypto swaps finish in the background — retrieve the swap to follow its status.
      */
     public CompletableFuture<CreateSwapsResponse> create(CreateSwapsRequest request, RequestOptions requestOptions) {
-        return this.rawClient.create(request, requestOptions).thenApply(response -> response.body());
+        CompletableFuture<WhopApiHttpResponse<CreateSwapsResponse>> rawFuture =
+                this.rawClient.create(request, requestOptions);
+        CompletableFuture<CreateSwapsResponse> future = rawFuture.thenApply(response -> response.body());
+        future.whenComplete((result_, throwable_) -> {
+            if (future.isCancelled()) {
+                rawFuture.cancel(true);
+            }
+        });
+        return future;
     }
 
     /**
-     * Previews the price of a swap. Fiat pairs quote the in-ledger mid-market conversion — the same rate creating the swap fills at. No funds move and nothing is saved.
+     * Previews the price of a swap before you create it. A fiat pair quotes the same rate creating the swap fills at; name the account with <code>account_id</code> or <code>user_id</code> to quote the rate for that account. No funds move, nothing is saved, and no authentication is required unless you name an account.
      */
     public CompletableFuture<CreateQuoteSwapsResponse> createQuote(CreateQuoteSwapsRequest request) {
-        return this.rawClient.createQuote(request).thenApply(response -> response.body());
+        CompletableFuture<WhopApiHttpResponse<CreateQuoteSwapsResponse>> rawFuture =
+                this.rawClient.createQuote(request);
+        CompletableFuture<CreateQuoteSwapsResponse> future = rawFuture.thenApply(response -> response.body());
+        future.whenComplete((result_, throwable_) -> {
+            if (future.isCancelled()) {
+                rawFuture.cancel(true);
+            }
+        });
+        return future;
     }
 
     /**
-     * Previews the price of a swap. Fiat pairs quote the in-ledger mid-market conversion — the same rate creating the swap fills at. No funds move and nothing is saved.
+     * Previews the price of a swap before you create it. A fiat pair quotes the same rate creating the swap fills at; name the account with <code>account_id</code> or <code>user_id</code> to quote the rate for that account. No funds move, nothing is saved, and no authentication is required unless you name an account.
      */
     public CompletableFuture<CreateQuoteSwapsResponse> createQuote(
             CreateQuoteSwapsRequest request, RequestOptions requestOptions) {
-        return this.rawClient.createQuote(request, requestOptions).thenApply(response -> response.body());
+        CompletableFuture<WhopApiHttpResponse<CreateQuoteSwapsResponse>> rawFuture =
+                this.rawClient.createQuote(request, requestOptions);
+        CompletableFuture<CreateQuoteSwapsResponse> future = rawFuture.thenApply(response -> response.body());
+        future.whenComplete((result_, throwable_) -> {
+            if (future.isCancelled()) {
+                rawFuture.cancel(true);
+            }
+        });
+        return future;
     }
 
     /**
-     * Retrieves a single swap and its status.
+     * Retrieves a swap and its status. Poll it after creating a crypto swap, which finishes in the background.
      */
     public CompletableFuture<RetrieveSwapsResponse> retrieve(String id) {
-        return this.rawClient.retrieve(id).thenApply(response -> response.body());
+        CompletableFuture<WhopApiHttpResponse<RetrieveSwapsResponse>> rawFuture = this.rawClient.retrieve(id);
+        CompletableFuture<RetrieveSwapsResponse> future = rawFuture.thenApply(response -> response.body());
+        future.whenComplete((result_, throwable_) -> {
+            if (future.isCancelled()) {
+                rawFuture.cancel(true);
+            }
+        });
+        return future;
     }
 
     /**
-     * Retrieves a single swap and its status.
+     * Retrieves a swap and its status. Poll it after creating a crypto swap, which finishes in the background.
      */
     public CompletableFuture<RetrieveSwapsResponse> retrieve(String id, RequestOptions requestOptions) {
-        return this.rawClient.retrieve(id, requestOptions).thenApply(response -> response.body());
+        CompletableFuture<WhopApiHttpResponse<RetrieveSwapsResponse>> rawFuture =
+                this.rawClient.retrieve(id, requestOptions);
+        CompletableFuture<RetrieveSwapsResponse> future = rawFuture.thenApply(response -> response.body());
+        future.whenComplete((result_, throwable_) -> {
+            if (future.isCancelled()) {
+                rawFuture.cancel(true);
+            }
+        });
+        return future;
     }
 
     /**
-     * Retrieves a single swap and its status.
+     * Retrieves a swap and its status. Poll it after creating a crypto swap, which finishes in the background.
      */
     public CompletableFuture<RetrieveSwapsResponse> retrieve(String id, RetrieveSwapsRequest request) {
-        return this.rawClient.retrieve(id, request).thenApply(response -> response.body());
+        CompletableFuture<WhopApiHttpResponse<RetrieveSwapsResponse>> rawFuture = this.rawClient.retrieve(id, request);
+        CompletableFuture<RetrieveSwapsResponse> future = rawFuture.thenApply(response -> response.body());
+        future.whenComplete((result_, throwable_) -> {
+            if (future.isCancelled()) {
+                rawFuture.cancel(true);
+            }
+        });
+        return future;
     }
 
     /**
-     * Retrieves a single swap and its status.
+     * Retrieves a swap and its status. Poll it after creating a crypto swap, which finishes in the background.
      */
     public CompletableFuture<RetrieveSwapsResponse> retrieve(
             String id, RetrieveSwapsRequest request, RequestOptions requestOptions) {
-        return this.rawClient.retrieve(id, request, requestOptions).thenApply(response -> response.body());
+        CompletableFuture<WhopApiHttpResponse<RetrieveSwapsResponse>> rawFuture =
+                this.rawClient.retrieve(id, request, requestOptions);
+        CompletableFuture<RetrieveSwapsResponse> future = rawFuture.thenApply(response -> response.body());
+        future.whenComplete((result_, throwable_) -> {
+            if (future.isCancelled()) {
+                rawFuture.cancel(true);
+            }
+        });
+        return future;
     }
 }

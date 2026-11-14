@@ -39,6 +39,10 @@ public final class AdGroup {
 
     private final Optional<Double> budgetAmount;
 
+    private final Optional<Double> budgetAmountLocal;
+
+    private final String budgetCurrency;
+
     private final Optional<AdGroupBudgetType> budgetType;
 
     private final double clickThroughRate;
@@ -54,8 +58,6 @@ public final class AdGroup {
     private final double contacts;
 
     private final Optional<ConversionEvent> conversionEvent;
-
-    private final Optional<AdGroupConversionLocation> conversionLocation;
 
     private final Optional<Double> costPerAddedToCart;
 
@@ -89,23 +91,19 @@ public final class AdGroup {
 
     private final Map<String, Object> customEventValues;
 
+    private final Optional<AdGroupDeliverySchedule> deliverySchedule;
+
     private final AdGroupDeliveryStatus deliveryStatus;
 
     private final AdGroupDemographics demographics;
 
     private final Optional<Double> desiredCostPerResult;
 
-    private final AdGroupDetailedTargeting detailedTargeting;
-
     private final AdGroupDevices devices;
-
-    private final Optional<Boolean> dynamicCreative;
 
     private final Optional<String> endsAt;
 
     private final Optional<Double> frequency;
-
-    private final Optional<AdGroupFrequencyCap> frequencyCap;
 
     private final String id;
 
@@ -113,19 +111,17 @@ public final class AdGroup {
 
     private final List<AdPlatformIssue> issues;
 
+    private final Optional<List<AdGroupKeyword>> keywords;
+
     private final List<String> languages;
 
     private final double leadValue;
 
     private final double leads;
 
-    private final Optional<List<AdGroupMessageAppsItem>> messageApps;
+    private final Optional<AdGroupLearningProgress> learningProgress;
 
-    private final Optional<Double> minimumDailySpend;
-
-    private final Optional<AdGroupOptimizationGoal> optimizationGoal;
-
-    private final List<AdGroupPlacement> placements;
+    private final double linkClicks;
 
     private final double purchaseValue;
 
@@ -180,6 +176,8 @@ public final class AdGroup {
             AdGroupAudiences audiences,
             Optional<AdGroupBidType> bidType,
             Optional<Double> budgetAmount,
+            Optional<Double> budgetAmountLocal,
+            String budgetCurrency,
             Optional<AdGroupBudgetType> budgetType,
             double clickThroughRate,
             double clicks,
@@ -188,7 +186,6 @@ public final class AdGroup {
             double contactValue,
             double contacts,
             Optional<ConversionEvent> conversionEvent,
-            Optional<AdGroupConversionLocation> conversionLocation,
             Optional<Double> costPerAddedToCart,
             double costPerClick,
             Optional<Double> costPerCompletedRegistration,
@@ -205,25 +202,22 @@ public final class AdGroup {
             double customConversions,
             Map<String, Object> customEventCounts,
             Map<String, Object> customEventValues,
+            Optional<AdGroupDeliverySchedule> deliverySchedule,
             AdGroupDeliveryStatus deliveryStatus,
             AdGroupDemographics demographics,
             Optional<Double> desiredCostPerResult,
-            AdGroupDetailedTargeting detailedTargeting,
             AdGroupDevices devices,
-            Optional<Boolean> dynamicCreative,
             Optional<String> endsAt,
             Optional<Double> frequency,
-            Optional<AdGroupFrequencyCap> frequencyCap,
             String id,
             double impressions,
             List<AdPlatformIssue> issues,
+            Optional<List<AdGroupKeyword>> keywords,
             List<String> languages,
             double leadValue,
             double leads,
-            Optional<List<AdGroupMessageAppsItem>> messageApps,
-            Optional<Double> minimumDailySpend,
-            Optional<AdGroupOptimizationGoal> optimizationGoal,
-            List<AdGroupPlacement> placements,
+            Optional<AdGroupLearningProgress> learningProgress,
+            double linkClicks,
             double purchaseValue,
             double purchases,
             double reach,
@@ -253,6 +247,8 @@ public final class AdGroup {
         this.audiences = audiences;
         this.bidType = bidType;
         this.budgetAmount = budgetAmount;
+        this.budgetAmountLocal = budgetAmountLocal;
+        this.budgetCurrency = budgetCurrency;
         this.budgetType = budgetType;
         this.clickThroughRate = clickThroughRate;
         this.clicks = clicks;
@@ -261,7 +257,6 @@ public final class AdGroup {
         this.contactValue = contactValue;
         this.contacts = contacts;
         this.conversionEvent = conversionEvent;
-        this.conversionLocation = conversionLocation;
         this.costPerAddedToCart = costPerAddedToCart;
         this.costPerClick = costPerClick;
         this.costPerCompletedRegistration = costPerCompletedRegistration;
@@ -278,25 +273,22 @@ public final class AdGroup {
         this.customConversions = customConversions;
         this.customEventCounts = customEventCounts;
         this.customEventValues = customEventValues;
+        this.deliverySchedule = deliverySchedule;
         this.deliveryStatus = deliveryStatus;
         this.demographics = demographics;
         this.desiredCostPerResult = desiredCostPerResult;
-        this.detailedTargeting = detailedTargeting;
         this.devices = devices;
-        this.dynamicCreative = dynamicCreative;
         this.endsAt = endsAt;
         this.frequency = frequency;
-        this.frequencyCap = frequencyCap;
         this.id = id;
         this.impressions = impressions;
         this.issues = issues;
+        this.keywords = keywords;
         this.languages = languages;
         this.leadValue = leadValue;
         this.leads = leads;
-        this.messageApps = messageApps;
-        this.minimumDailySpend = minimumDailySpend;
-        this.optimizationGoal = optimizationGoal;
-        this.placements = placements;
+        this.learningProgress = learningProgress;
+        this.linkClicks = linkClicks;
         this.purchaseValue = purchaseValue;
         this.purchases = purchases;
         this.reach = reach;
@@ -366,7 +358,7 @@ public final class AdGroup {
     }
 
     /**
-     * @return This ad group's budget, in the ad account's currency. <code>null</code> when the budget is set on the campaign instead.
+     * @return This ad group's budget in USD, which is what it is stored and billed in. <code>null</code> when the budget is set on the campaign instead.
      */
     @JsonIgnore
     public Optional<Double> getBudgetAmount() {
@@ -377,7 +369,26 @@ public final class AdGroup {
     }
 
     /**
-     * @return Whether <code>budget_amount</code> is spent per day (<code>daily</code>) or over the ad group's full run (<code>lifetime</code>).
+     * @return The same budget stated in <code>budget_currency</code> at today's exchange rate, for display in the account's ads reporting currency. <code>null</code> when <code>budget_amount</code> is.
+     */
+    @JsonIgnore
+    public Optional<Double> getBudgetAmountLocal() {
+        if (budgetAmountLocal == null) {
+            return Optional.empty();
+        }
+        return budgetAmountLocal;
+    }
+
+    /**
+     * @return The ISO 4217 code <code>budget_amount_local</code> is in: the account's <code>ads_reporting_currency</code> preference. <code>usd</code> unless the account changed it.
+     */
+    @JsonProperty("budget_currency")
+    public String getBudgetCurrency() {
+        return budgetCurrency;
+    }
+
+    /**
+     * @return Whether <code>budget_amount</code> is spent per day (<code>daily</code>) or over the ad group's full run (<code>lifetime</code>). A <code>lifetime</code> ad group also needs <code>ends_at</code>, at least 24 hours after it starts.
      */
     @JsonIgnore
     public Optional<AdGroupBudgetType> getBudgetType() {
@@ -441,17 +452,6 @@ public final class AdGroup {
             return Optional.empty();
         }
         return conversionEvent;
-    }
-
-    /**
-     * @return Where the outcome being optimized for occurs, such as a website visit, social-profile visit, messaging conversation, ad interaction, or lead-form submission.
-     */
-    @JsonIgnore
-    public Optional<AdGroupConversionLocation> getConversionLocation() {
-        if (conversionLocation == null) {
-            return Optional.empty();
-        }
-        return conversionLocation;
     }
 
     /**
@@ -613,6 +613,17 @@ public final class AdGroup {
     }
 
     /**
+     * @return Hours the ad group delivers in each week, keyed by day. Days it doesn't deliver are omitted. <code>null</code> when it delivers at every hour. Some platforms need a lifetime <code>budget_type</code> for a schedule, on the ad group or on its campaign when the campaign holds the budget.
+     */
+    @JsonIgnore
+    public Optional<AdGroupDeliverySchedule> getDeliverySchedule() {
+        if (deliverySchedule == null) {
+            return Optional.empty();
+        }
+        return deliverySchedule;
+    }
+
+    /**
      * @return Whether ads in this ad group are delivering right now, and if not, why. When several states apply at once, the highest-precedence one is returned.
      */
     @JsonProperty("delivery_status")
@@ -640,27 +651,11 @@ public final class AdGroup {
     }
 
     /**
-     * @return Interest, behavior, and demographic targeting, using categories from the ad platform's targeting taxonomy. Entries across interests, behaviors, and demographics are OR'd together (anyone matching any entry is reached), matching Ads Manager's detailed-targeting box. Can't be combined with automatic audience targeting, and unavailable to campaigns with special_ad_categories.
-     */
-    @JsonProperty("detailed_targeting")
-    public AdGroupDetailedTargeting getDetailedTargeting() {
-        return detailedTargeting;
-    }
-
-    /**
      * @return Device platforms and operating systems targeted.
      */
     @JsonProperty("devices")
     public AdGroupDevices getDevices() {
         return devices;
-    }
-
-    /**
-     * @return Whether the ad platform automatically mixes and matches this ad group's creatives and copy to find the best-performing combinations.
-     */
-    @JsonProperty("dynamic_creative")
-    public Optional<Boolean> getDynamicCreative() {
-        return dynamicCreative;
     }
 
     /**
@@ -675,7 +670,7 @@ public final class AdGroup {
     }
 
     /**
-     * @return Platform-reported impressions divided by reach.
+     * @return Impressions divided by reach.
      */
     @JsonIgnore
     public Optional<Double> getFrequency() {
@@ -683,17 +678,6 @@ public final class AdGroup {
             return Optional.empty();
         }
         return frequency;
-    }
-
-    /**
-     * @return Cap on how often one person sees ads from this ad group. Only available on campaigns with the <code>awareness</code> objective; <code>null</code> when uncapped.
-     */
-    @JsonIgnore
-    public Optional<AdGroupFrequencyCap> getFrequencyCap() {
-        if (frequencyCap == null) {
-            return Optional.empty();
-        }
-        return frequencyCap;
     }
 
     /**
@@ -717,6 +701,11 @@ public final class AdGroup {
         return issues;
     }
 
+    @JsonProperty("keywords")
+    public Optional<List<AdGroupKeyword>> getKeywords() {
+        return keywords;
+    }
+
     @JsonProperty("languages")
     public List<String> getLanguages() {
         return languages;
@@ -738,36 +727,23 @@ public final class AdGroup {
         return leads;
     }
 
-    @JsonProperty("message_apps")
-    public Optional<List<AdGroupMessageAppsItem>> getMessageApps() {
-        return messageApps;
+    /**
+     * @return Progress toward the conversions this ad group's learning phase needs. Null unless it is learning or learning limited and valid counts are available. Reaching the threshold does not determine delivery status.
+     */
+    @JsonIgnore
+    public Optional<AdGroupLearningProgress> getLearningProgress() {
+        if (learningProgress == null) {
+            return Optional.empty();
+        }
+        return learningProgress;
     }
 
     /**
-     * @return Minimum the ad group tries to spend each day. <code>null</code> when no floor is set.
+     * @return Page views on your destination from people who clicked the ad, recorded by the Whop pixel. Counted the same way on every ad platform.
      */
-    @JsonIgnore
-    public Optional<Double> getMinimumDailySpend() {
-        if (minimumDailySpend == null) {
-            return Optional.empty();
-        }
-        return minimumDailySpend;
-    }
-
-    /**
-     * @return The result the ad group's delivery is optimized to get the most of.
-     */
-    @JsonIgnore
-    public Optional<AdGroupOptimizationGoal> getOptimizationGoal() {
-        if (optimizationGoal == null) {
-            return Optional.empty();
-        }
-        return optimizationGoal;
-    }
-
-    @JsonProperty("placements")
-    public List<AdGroupPlacement> getPlacements() {
-        return placements;
+    @JsonProperty("link_clicks")
+    public double getLinkClicks() {
+        return linkClicks;
     }
 
     /**
@@ -980,6 +956,12 @@ public final class AdGroup {
     }
 
     @JsonInclude(value = JsonInclude.Include.CUSTOM, valueFilter = NullableNonemptyFilter.class)
+    @JsonProperty("budget_amount_local")
+    private Optional<Double> _getBudgetAmountLocal() {
+        return budgetAmountLocal;
+    }
+
+    @JsonInclude(value = JsonInclude.Include.CUSTOM, valueFilter = NullableNonemptyFilter.class)
     @JsonProperty("budget_type")
     private Optional<AdGroupBudgetType> _getBudgetType() {
         return budgetType;
@@ -989,12 +971,6 @@ public final class AdGroup {
     @JsonProperty("conversion_event")
     private Optional<ConversionEvent> _getConversionEvent() {
         return conversionEvent;
-    }
-
-    @JsonInclude(value = JsonInclude.Include.CUSTOM, valueFilter = NullableNonemptyFilter.class)
-    @JsonProperty("conversion_location")
-    private Optional<AdGroupConversionLocation> _getConversionLocation() {
-        return conversionLocation;
     }
 
     @JsonInclude(value = JsonInclude.Include.CUSTOM, valueFilter = NullableNonemptyFilter.class)
@@ -1058,6 +1034,12 @@ public final class AdGroup {
     }
 
     @JsonInclude(value = JsonInclude.Include.CUSTOM, valueFilter = NullableNonemptyFilter.class)
+    @JsonProperty("delivery_schedule")
+    private Optional<AdGroupDeliverySchedule> _getDeliverySchedule() {
+        return deliverySchedule;
+    }
+
+    @JsonInclude(value = JsonInclude.Include.CUSTOM, valueFilter = NullableNonemptyFilter.class)
     @JsonProperty("desired_cost_per_result")
     private Optional<Double> _getDesiredCostPerResult() {
         return desiredCostPerResult;
@@ -1076,21 +1058,9 @@ public final class AdGroup {
     }
 
     @JsonInclude(value = JsonInclude.Include.CUSTOM, valueFilter = NullableNonemptyFilter.class)
-    @JsonProperty("frequency_cap")
-    private Optional<AdGroupFrequencyCap> _getFrequencyCap() {
-        return frequencyCap;
-    }
-
-    @JsonInclude(value = JsonInclude.Include.CUSTOM, valueFilter = NullableNonemptyFilter.class)
-    @JsonProperty("minimum_daily_spend")
-    private Optional<Double> _getMinimumDailySpend() {
-        return minimumDailySpend;
-    }
-
-    @JsonInclude(value = JsonInclude.Include.CUSTOM, valueFilter = NullableNonemptyFilter.class)
-    @JsonProperty("optimization_goal")
-    private Optional<AdGroupOptimizationGoal> _getOptimizationGoal() {
-        return optimizationGoal;
+    @JsonProperty("learning_progress")
+    private Optional<AdGroupLearningProgress> _getLearningProgress() {
+        return learningProgress;
     }
 
     @JsonInclude(value = JsonInclude.Include.CUSTOM, valueFilter = NullableNonemptyFilter.class)
@@ -1153,6 +1123,8 @@ public final class AdGroup {
                 && audiences.equals(other.audiences)
                 && bidType.equals(other.bidType)
                 && budgetAmount.equals(other.budgetAmount)
+                && budgetAmountLocal.equals(other.budgetAmountLocal)
+                && budgetCurrency.equals(other.budgetCurrency)
                 && budgetType.equals(other.budgetType)
                 && clickThroughRate == other.clickThroughRate
                 && clicks == other.clicks
@@ -1161,7 +1133,6 @@ public final class AdGroup {
                 && contactValue == other.contactValue
                 && contacts == other.contacts
                 && conversionEvent.equals(other.conversionEvent)
-                && conversionLocation.equals(other.conversionLocation)
                 && costPerAddedToCart.equals(other.costPerAddedToCart)
                 && costPerClick == other.costPerClick
                 && costPerCompletedRegistration.equals(other.costPerCompletedRegistration)
@@ -1178,25 +1149,22 @@ public final class AdGroup {
                 && customConversions == other.customConversions
                 && customEventCounts.equals(other.customEventCounts)
                 && customEventValues.equals(other.customEventValues)
+                && deliverySchedule.equals(other.deliverySchedule)
                 && deliveryStatus.equals(other.deliveryStatus)
                 && demographics.equals(other.demographics)
                 && desiredCostPerResult.equals(other.desiredCostPerResult)
-                && detailedTargeting.equals(other.detailedTargeting)
                 && devices.equals(other.devices)
-                && dynamicCreative.equals(other.dynamicCreative)
                 && endsAt.equals(other.endsAt)
                 && frequency.equals(other.frequency)
-                && frequencyCap.equals(other.frequencyCap)
                 && id.equals(other.id)
                 && impressions == other.impressions
                 && issues.equals(other.issues)
+                && keywords.equals(other.keywords)
                 && languages.equals(other.languages)
                 && leadValue == other.leadValue
                 && leads == other.leads
-                && messageApps.equals(other.messageApps)
-                && minimumDailySpend.equals(other.minimumDailySpend)
-                && optimizationGoal.equals(other.optimizationGoal)
-                && placements.equals(other.placements)
+                && learningProgress.equals(other.learningProgress)
+                && linkClicks == other.linkClicks
                 && purchaseValue == other.purchaseValue
                 && purchases == other.purchases
                 && reach == other.reach
@@ -1230,6 +1198,8 @@ public final class AdGroup {
                 this.audiences,
                 this.bidType,
                 this.budgetAmount,
+                this.budgetAmountLocal,
+                this.budgetCurrency,
                 this.budgetType,
                 this.clickThroughRate,
                 this.clicks,
@@ -1238,7 +1208,6 @@ public final class AdGroup {
                 this.contactValue,
                 this.contacts,
                 this.conversionEvent,
-                this.conversionLocation,
                 this.costPerAddedToCart,
                 this.costPerClick,
                 this.costPerCompletedRegistration,
@@ -1255,25 +1224,22 @@ public final class AdGroup {
                 this.customConversions,
                 this.customEventCounts,
                 this.customEventValues,
+                this.deliverySchedule,
                 this.deliveryStatus,
                 this.demographics,
                 this.desiredCostPerResult,
-                this.detailedTargeting,
                 this.devices,
-                this.dynamicCreative,
                 this.endsAt,
                 this.frequency,
-                this.frequencyCap,
                 this.id,
                 this.impressions,
                 this.issues,
+                this.keywords,
                 this.languages,
                 this.leadValue,
                 this.leads,
-                this.messageApps,
-                this.minimumDailySpend,
-                this.optimizationGoal,
-                this.placements,
+                this.learningProgress,
+                this.linkClicks,
                 this.purchaseValue,
                 this.purchases,
                 this.reach,
@@ -1334,7 +1300,14 @@ public final class AdGroup {
         /**
          * <p>Saved audiences this ad group delivers to or excludes.</p>
          */
-        ClickThroughRateStage audiences(@NotNull AdGroupAudiences audiences);
+        BudgetCurrencyStage audiences(@NotNull AdGroupAudiences audiences);
+    }
+
+    public interface BudgetCurrencyStage {
+        /**
+         * <p>The ISO 4217 code <code>budget_amount_local</code> is in: the account's <code>ads_reporting_currency</code> preference. <code>usd</code> unless the account changed it.</p>
+         */
+        ClickThroughRateStage budgetCurrency(@NotNull String budgetCurrency);
     }
 
     public interface ClickThroughRateStage {
@@ -1418,14 +1391,7 @@ public final class AdGroup {
         /**
          * <p>Age, gender, and automatic-audience targeting.</p>
          */
-        DetailedTargetingStage demographics(@NotNull AdGroupDemographics demographics);
-    }
-
-    public interface DetailedTargetingStage {
-        /**
-         * <p>Interest, behavior, and demographic targeting, using categories from the ad platform's targeting taxonomy. Entries across interests, behaviors, and demographics are OR'd together (anyone matching any entry is reached), matching Ads Manager's detailed-targeting box. Can't be combined with automatic audience targeting, and unavailable to campaigns with special_ad_categories.</p>
-         */
-        DevicesStage detailedTargeting(@NotNull AdGroupDetailedTargeting detailedTargeting);
+        DevicesStage demographics(@NotNull AdGroupDemographics demographics);
     }
 
     public interface DevicesStage {
@@ -1460,7 +1426,14 @@ public final class AdGroup {
         /**
          * <p>Whop pixel-attributed leads, last-click.</p>
          */
-        PurchaseValueStage leads(double leads);
+        LinkClicksStage leads(double leads);
+    }
+
+    public interface LinkClicksStage {
+        /**
+         * <p>Page views on your destination from people who clicked the ad, recorded by the Whop pixel. Counted the same way on every ad platform.</p>
+         */
+        PurchaseValueStage linkClicks(double linkClicks);
     }
 
     public interface PurchaseValueStage {
@@ -1585,7 +1558,7 @@ public final class AdGroup {
         _FinalStage bidType(Nullable<AdGroupBidType> bidType);
 
         /**
-         * <p>This ad group's budget, in the ad account's currency. <code>null</code> when the budget is set on the campaign instead.</p>
+         * <p>This ad group's budget in USD, which is what it is stored and billed in. <code>null</code> when the budget is set on the campaign instead.</p>
          */
         _FinalStage budgetAmount(Optional<Double> budgetAmount);
 
@@ -1594,7 +1567,16 @@ public final class AdGroup {
         _FinalStage budgetAmount(Nullable<Double> budgetAmount);
 
         /**
-         * <p>Whether <code>budget_amount</code> is spent per day (<code>daily</code>) or over the ad group's full run (<code>lifetime</code>).</p>
+         * <p>The same budget stated in <code>budget_currency</code> at today's exchange rate, for display in the account's ads reporting currency. <code>null</code> when <code>budget_amount</code> is.</p>
+         */
+        _FinalStage budgetAmountLocal(Optional<Double> budgetAmountLocal);
+
+        _FinalStage budgetAmountLocal(Double budgetAmountLocal);
+
+        _FinalStage budgetAmountLocal(Nullable<Double> budgetAmountLocal);
+
+        /**
+         * <p>Whether <code>budget_amount</code> is spent per day (<code>daily</code>) or over the ad group's full run (<code>lifetime</code>). A <code>lifetime</code> ad group also needs <code>ends_at</code>, at least 24 hours after it starts.</p>
          */
         _FinalStage budgetType(Optional<AdGroupBudgetType> budgetType);
 
@@ -1607,15 +1589,6 @@ public final class AdGroup {
         _FinalStage conversionEvent(ConversionEvent conversionEvent);
 
         _FinalStage conversionEvent(Nullable<ConversionEvent> conversionEvent);
-
-        /**
-         * <p>Where the outcome being optimized for occurs, such as a website visit, social-profile visit, messaging conversation, ad interaction, or lead-form submission.</p>
-         */
-        _FinalStage conversionLocation(Optional<AdGroupConversionLocation> conversionLocation);
-
-        _FinalStage conversionLocation(AdGroupConversionLocation conversionLocation);
-
-        _FinalStage conversionLocation(Nullable<AdGroupConversionLocation> conversionLocation);
 
         /**
          * <p>Spend divided by attributed add-to-cart events; null when they are not the goal and none are attributed.</p>
@@ -1726,6 +1699,15 @@ public final class AdGroup {
         _FinalStage customEventValues(String key, Object value);
 
         /**
+         * <p>Hours the ad group delivers in each week, keyed by day. Days it doesn't deliver are omitted. <code>null</code> when it delivers at every hour. Some platforms need a lifetime <code>budget_type</code> for a schedule, on the ad group or on its campaign when the campaign holds the budget.</p>
+         */
+        _FinalStage deliverySchedule(Optional<AdGroupDeliverySchedule> deliverySchedule);
+
+        _FinalStage deliverySchedule(AdGroupDeliverySchedule deliverySchedule);
+
+        _FinalStage deliverySchedule(Nullable<AdGroupDeliverySchedule> deliverySchedule);
+
+        /**
          * <p>Cost per result to aim for (<code>average_target</code>) or never exceed (<code>maximum_target</code>). <code>null</code> for <code>minimum_cost</code> bidding.</p>
          */
         _FinalStage desiredCostPerResult(Optional<Double> desiredCostPerResult);
@@ -1733,13 +1715,6 @@ public final class AdGroup {
         _FinalStage desiredCostPerResult(Double desiredCostPerResult);
 
         _FinalStage desiredCostPerResult(Nullable<Double> desiredCostPerResult);
-
-        /**
-         * <p>Whether the ad platform automatically mixes and matches this ad group's creatives and copy to find the best-performing combinations.</p>
-         */
-        _FinalStage dynamicCreative(Optional<Boolean> dynamicCreative);
-
-        _FinalStage dynamicCreative(Boolean dynamicCreative);
 
         /**
          * <p>When the ad group stops delivering, as an ISO 8601 timestamp. <code>null</code> when it runs until paused.</p>
@@ -1751,7 +1726,7 @@ public final class AdGroup {
         _FinalStage endsAt(Nullable<String> endsAt);
 
         /**
-         * <p>Platform-reported impressions divided by reach.</p>
+         * <p>Impressions divided by reach.</p>
          */
         _FinalStage frequency(Optional<Double> frequency);
 
@@ -1759,20 +1734,15 @@ public final class AdGroup {
 
         _FinalStage frequency(Nullable<Double> frequency);
 
-        /**
-         * <p>Cap on how often one person sees ads from this ad group. Only available on campaigns with the <code>awareness</code> objective; <code>null</code> when uncapped.</p>
-         */
-        _FinalStage frequencyCap(Optional<AdGroupFrequencyCap> frequencyCap);
-
-        _FinalStage frequencyCap(AdGroupFrequencyCap frequencyCap);
-
-        _FinalStage frequencyCap(Nullable<AdGroupFrequencyCap> frequencyCap);
-
         _FinalStage issues(List<AdPlatformIssue> issues);
 
         _FinalStage addIssues(AdPlatformIssue issues);
 
         _FinalStage addAllIssues(List<AdPlatformIssue> issues);
+
+        _FinalStage keywords(Optional<List<AdGroupKeyword>> keywords);
+
+        _FinalStage keywords(List<AdGroupKeyword> keywords);
 
         _FinalStage languages(List<String> languages);
 
@@ -1780,33 +1750,14 @@ public final class AdGroup {
 
         _FinalStage addAllLanguages(List<String> languages);
 
-        _FinalStage messageApps(Optional<List<AdGroupMessageAppsItem>> messageApps);
-
-        _FinalStage messageApps(List<AdGroupMessageAppsItem> messageApps);
-
         /**
-         * <p>Minimum the ad group tries to spend each day. <code>null</code> when no floor is set.</p>
+         * <p>Progress toward the conversions this ad group's learning phase needs. Null unless it is learning or learning limited and valid counts are available. Reaching the threshold does not determine delivery status.</p>
          */
-        _FinalStage minimumDailySpend(Optional<Double> minimumDailySpend);
+        _FinalStage learningProgress(Optional<AdGroupLearningProgress> learningProgress);
 
-        _FinalStage minimumDailySpend(Double minimumDailySpend);
+        _FinalStage learningProgress(AdGroupLearningProgress learningProgress);
 
-        _FinalStage minimumDailySpend(Nullable<Double> minimumDailySpend);
-
-        /**
-         * <p>The result the ad group's delivery is optimized to get the most of.</p>
-         */
-        _FinalStage optimizationGoal(Optional<AdGroupOptimizationGoal> optimizationGoal);
-
-        _FinalStage optimizationGoal(AdGroupOptimizationGoal optimizationGoal);
-
-        _FinalStage optimizationGoal(Nullable<AdGroupOptimizationGoal> optimizationGoal);
-
-        _FinalStage placements(List<AdGroupPlacement> placements);
-
-        _FinalStage addPlacements(AdGroupPlacement placements);
-
-        _FinalStage addAllPlacements(List<AdGroupPlacement> placements);
+        _FinalStage learningProgress(Nullable<AdGroupLearningProgress> learningProgress);
 
         /**
          * <p>The Whop pixel conversion event whose attributed count represents results — the optimization goal, or the highest-volume attributed event for campaigns that budget per ad group. Null when the goal isn't a Whop-attributed event.</p>
@@ -1878,6 +1829,7 @@ public final class AdGroup {
                     AddedToCartValueStage,
                     AddedToCartsStage,
                     AudiencesStage,
+                    BudgetCurrencyStage,
                     ClickThroughRateStage,
                     ClicksStage,
                     CompletedRegistrationValueStage,
@@ -1890,12 +1842,12 @@ public final class AdGroup {
                     CustomConversionsStage,
                     DeliveryStatusStage,
                     DemographicsStage,
-                    DetailedTargetingStage,
                     DevicesStage,
                     IdStage,
                     ImpressionsStage,
                     LeadValueStage,
                     LeadsStage,
+                    LinkClicksStage,
                     PurchaseValueStage,
                     PurchasesStage,
                     ReachStage,
@@ -1919,6 +1871,8 @@ public final class AdGroup {
         private double addedToCarts;
 
         private AdGroupAudiences audiences;
+
+        private String budgetCurrency;
 
         private double clickThroughRate;
 
@@ -1944,8 +1898,6 @@ public final class AdGroup {
 
         private AdGroupDemographics demographics;
 
-        private AdGroupDetailedTargeting detailedTargeting;
-
         private AdGroupDevices devices;
 
         private String id;
@@ -1955,6 +1907,8 @@ public final class AdGroup {
         private double leadValue;
 
         private double leads;
+
+        private double linkClicks;
 
         private double purchaseValue;
 
@@ -2000,27 +1954,21 @@ public final class AdGroup {
 
         private Optional<AdGroupResultEvent> resultEvent = Optional.empty();
 
-        private List<AdGroupPlacement> placements = new ArrayList<>();
-
-        private Optional<AdGroupOptimizationGoal> optimizationGoal = Optional.empty();
-
-        private Optional<Double> minimumDailySpend = Optional.empty();
-
-        private Optional<List<AdGroupMessageAppsItem>> messageApps = Optional.empty();
+        private Optional<AdGroupLearningProgress> learningProgress = Optional.empty();
 
         private List<String> languages = new ArrayList<>();
 
-        private List<AdPlatformIssue> issues = new ArrayList<>();
+        private Optional<List<AdGroupKeyword>> keywords = Optional.empty();
 
-        private Optional<AdGroupFrequencyCap> frequencyCap = Optional.empty();
+        private List<AdPlatformIssue> issues = new ArrayList<>();
 
         private Optional<Double> frequency = Optional.empty();
 
         private Optional<String> endsAt = Optional.empty();
 
-        private Optional<Boolean> dynamicCreative = Optional.empty();
-
         private Optional<Double> desiredCostPerResult = Optional.empty();
+
+        private Optional<AdGroupDeliverySchedule> deliverySchedule = Optional.empty();
 
         private Map<String, Object> customEventValues = new LinkedHashMap<>();
 
@@ -2046,17 +1994,16 @@ public final class AdGroup {
 
         private Optional<Double> costPerAddedToCart = Optional.empty();
 
-        private Optional<AdGroupConversionLocation> conversionLocation = Optional.empty();
-
         private Optional<ConversionEvent> conversionEvent = Optional.empty();
 
         private Optional<AdGroupBudgetType> budgetType = Optional.empty();
+
+        private Optional<Double> budgetAmountLocal = Optional.empty();
 
         private Optional<Double> budgetAmount = Optional.empty();
 
         private Optional<AdGroupBidType> bidType = Optional.empty();
 
-        @JsonAnySetter
         private Map<String, Object> additionalProperties = new HashMap<>();
 
         private Builder() {}
@@ -2069,6 +2016,8 @@ public final class AdGroup {
             audiences(other.getAudiences());
             bidType(other.getBidType());
             budgetAmount(other.getBudgetAmount());
+            budgetAmountLocal(other.getBudgetAmountLocal());
+            budgetCurrency(other.getBudgetCurrency());
             budgetType(other.getBudgetType());
             clickThroughRate(other.getClickThroughRate());
             clicks(other.getClicks());
@@ -2077,7 +2026,6 @@ public final class AdGroup {
             contactValue(other.getContactValue());
             contacts(other.getContacts());
             conversionEvent(other.getConversionEvent());
-            conversionLocation(other.getConversionLocation());
             costPerAddedToCart(other.getCostPerAddedToCart());
             costPerClick(other.getCostPerClick());
             costPerCompletedRegistration(other.getCostPerCompletedRegistration());
@@ -2094,25 +2042,22 @@ public final class AdGroup {
             customConversions(other.getCustomConversions());
             customEventCounts(other.getCustomEventCounts());
             customEventValues(other.getCustomEventValues());
+            deliverySchedule(other.getDeliverySchedule());
             deliveryStatus(other.getDeliveryStatus());
             demographics(other.getDemographics());
             desiredCostPerResult(other.getDesiredCostPerResult());
-            detailedTargeting(other.getDetailedTargeting());
             devices(other.getDevices());
-            dynamicCreative(other.getDynamicCreative());
             endsAt(other.getEndsAt());
             frequency(other.getFrequency());
-            frequencyCap(other.getFrequencyCap());
             id(other.getId());
             impressions(other.getImpressions());
             issues(other.getIssues());
+            keywords(other.getKeywords());
             languages(other.getLanguages());
             leadValue(other.getLeadValue());
             leads(other.getLeads());
-            messageApps(other.getMessageApps());
-            minimumDailySpend(other.getMinimumDailySpend());
-            optimizationGoal(other.getOptimizationGoal());
-            placements(other.getPlacements());
+            learningProgress(other.getLearningProgress());
+            linkClicks(other.getLinkClicks());
             purchaseValue(other.getPurchaseValue());
             purchases(other.getPurchases());
             reach(other.getReach());
@@ -2140,7 +2085,6 @@ public final class AdGroup {
 
         /**
          * <p>The ad campaign this ad group belongs to.</p>
-         * <p>The ad campaign this ad group belongs to.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
@@ -2151,7 +2095,6 @@ public final class AdGroup {
         }
 
         /**
-         * <p>USD value attributed to add-to-cart events. Sums the value sent with each event, normalized to USD; events without a value contribute 0.</p>
          * <p>USD value attributed to add-to-cart events. Sums the value sent with each event, normalized to USD; events without a value contribute 0.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
@@ -2164,7 +2107,6 @@ public final class AdGroup {
 
         /**
          * <p>Whop pixel-attributed add-to-cart events, last-click.</p>
-         * <p>Whop pixel-attributed add-to-cart events, last-click.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
@@ -2176,18 +2118,27 @@ public final class AdGroup {
 
         /**
          * <p>Saved audiences this ad group delivers to or excludes.</p>
-         * <p>Saved audiences this ad group delivers to or excludes.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
         @JsonSetter("audiences")
-        public ClickThroughRateStage audiences(@NotNull AdGroupAudiences audiences) {
+        public BudgetCurrencyStage audiences(@NotNull AdGroupAudiences audiences) {
             this.audiences = Objects.requireNonNull(audiences, "audiences must not be null");
             return this;
         }
 
         /**
-         * <p>Clicks divided by impressions, between 0 and 1.</p>
+         * <p>The ISO 4217 code <code>budget_amount_local</code> is in: the account's <code>ads_reporting_currency</code> preference. <code>usd</code> unless the account changed it.</p>
+         * @return Reference to {@code this} so that method calls can be chained together.
+         */
+        @java.lang.Override
+        @JsonSetter("budget_currency")
+        public ClickThroughRateStage budgetCurrency(@NotNull String budgetCurrency) {
+            this.budgetCurrency = Objects.requireNonNull(budgetCurrency, "budgetCurrency must not be null");
+            return this;
+        }
+
+        /**
          * <p>Clicks divided by impressions, between 0 and 1.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
@@ -2200,7 +2151,6 @@ public final class AdGroup {
 
         /**
          * <p>The number of clicks.</p>
-         * <p>The number of clicks.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
@@ -2211,7 +2161,6 @@ public final class AdGroup {
         }
 
         /**
-         * <p>USD value attributed to complete-registration events. Sums the value sent with each event, normalized to USD; events without a value contribute 0.</p>
          * <p>USD value attributed to complete-registration events. Sums the value sent with each event, normalized to USD; events without a value contribute 0.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
@@ -2224,7 +2173,6 @@ public final class AdGroup {
 
         /**
          * <p>Whop pixel-attributed complete-registration events, last-click.</p>
-         * <p>Whop pixel-attributed complete-registration events, last-click.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
@@ -2235,7 +2183,6 @@ public final class AdGroup {
         }
 
         /**
-         * <p>USD value attributed to contact events. Sums the value sent with each event, normalized to USD; events without a value contribute 0.</p>
          * <p>USD value attributed to contact events. Sums the value sent with each event, normalized to USD; events without a value contribute 0.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
@@ -2248,7 +2195,6 @@ public final class AdGroup {
 
         /**
          * <p>Whop pixel-attributed contact events, last-click.</p>
-         * <p>Whop pixel-attributed contact events, last-click.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
@@ -2259,7 +2205,6 @@ public final class AdGroup {
         }
 
         /**
-         * <p>Spend divided by clicks; 0 when there are no clicks.</p>
          * <p>Spend divided by clicks; 0 when there are no clicks.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
@@ -2272,7 +2217,6 @@ public final class AdGroup {
 
         /**
          * <p>Spend per 1,000 impressions; 0 when there are no impressions.</p>
-         * <p>Spend per 1,000 impressions; 0 when there are no impressions.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
@@ -2283,7 +2227,6 @@ public final class AdGroup {
         }
 
         /**
-         * <p>When the ad group was created, as an ISO 8601 timestamp.</p>
          * <p>When the ad group was created, as an ISO 8601 timestamp.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
@@ -2296,7 +2239,6 @@ public final class AdGroup {
 
         /**
          * <p>Whop pixel-attributed custom (merchant-defined) conversion events, last-click, across all custom event names.</p>
-         * <p>Whop pixel-attributed custom (merchant-defined) conversion events, last-click, across all custom event names.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
@@ -2307,7 +2249,6 @@ public final class AdGroup {
         }
 
         /**
-         * <p>Whether ads in this ad group are delivering right now, and if not, why. When several states apply at once, the highest-precedence one is returned.</p>
          * <p>Whether ads in this ad group are delivering right now, and if not, why. When several states apply at once, the highest-precedence one is returned.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
@@ -2320,30 +2261,16 @@ public final class AdGroup {
 
         /**
          * <p>Age, gender, and automatic-audience targeting.</p>
-         * <p>Age, gender, and automatic-audience targeting.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
         @JsonSetter("demographics")
-        public DetailedTargetingStage demographics(@NotNull AdGroupDemographics demographics) {
+        public DevicesStage demographics(@NotNull AdGroupDemographics demographics) {
             this.demographics = Objects.requireNonNull(demographics, "demographics must not be null");
             return this;
         }
 
         /**
-         * <p>Interest, behavior, and demographic targeting, using categories from the ad platform's targeting taxonomy. Entries across interests, behaviors, and demographics are OR'd together (anyone matching any entry is reached), matching Ads Manager's detailed-targeting box. Can't be combined with automatic audience targeting, and unavailable to campaigns with special_ad_categories.</p>
-         * <p>Interest, behavior, and demographic targeting, using categories from the ad platform's targeting taxonomy. Entries across interests, behaviors, and demographics are OR'd together (anyone matching any entry is reached), matching Ads Manager's detailed-targeting box. Can't be combined with automatic audience targeting, and unavailable to campaigns with special_ad_categories.</p>
-         * @return Reference to {@code this} so that method calls can be chained together.
-         */
-        @java.lang.Override
-        @JsonSetter("detailed_targeting")
-        public DevicesStage detailedTargeting(@NotNull AdGroupDetailedTargeting detailedTargeting) {
-            this.detailedTargeting = Objects.requireNonNull(detailedTargeting, "detailedTargeting must not be null");
-            return this;
-        }
-
-        /**
-         * <p>Device platforms and operating systems targeted.</p>
          * <p>Device platforms and operating systems targeted.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
@@ -2356,7 +2283,6 @@ public final class AdGroup {
 
         /**
          * <p>Unique identifier for the ad group, prefixed <code>adgrp_</code>.</p>
-         * <p>Unique identifier for the ad group, prefixed <code>adgrp_</code>.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
@@ -2367,7 +2293,6 @@ public final class AdGroup {
         }
 
         /**
-         * <p>The number of impressions.</p>
          * <p>The number of impressions.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
@@ -2380,7 +2305,6 @@ public final class AdGroup {
 
         /**
          * <p>USD value attributed to lead events. Sums the value sent with each event, normalized to USD; events without a value contribute 0.</p>
-         * <p>USD value attributed to lead events. Sums the value sent with each event, normalized to USD; events without a value contribute 0.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
@@ -2392,18 +2316,27 @@ public final class AdGroup {
 
         /**
          * <p>Whop pixel-attributed leads, last-click.</p>
-         * <p>Whop pixel-attributed leads, last-click.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
         @JsonSetter("leads")
-        public PurchaseValueStage leads(double leads) {
+        public LinkClicksStage leads(double leads) {
             this.leads = leads;
             return this;
         }
 
         /**
-         * <p>USD value of pixel-attributed purchases.</p>
+         * <p>Page views on your destination from people who clicked the ad, recorded by the Whop pixel. Counted the same way on every ad platform.</p>
+         * @return Reference to {@code this} so that method calls can be chained together.
+         */
+        @java.lang.Override
+        @JsonSetter("link_clicks")
+        public PurchaseValueStage linkClicks(double linkClicks) {
+            this.linkClicks = linkClicks;
+            return this;
+        }
+
+        /**
          * <p>USD value of pixel-attributed purchases.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
@@ -2416,7 +2349,6 @@ public final class AdGroup {
 
         /**
          * <p>Whop pixel-attributed purchases, last-click.</p>
-         * <p>Whop pixel-attributed purchases, last-click.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
@@ -2427,7 +2359,6 @@ public final class AdGroup {
         }
 
         /**
-         * <p>The number of unique people who saw this.</p>
          * <p>The number of unique people who saw this.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
@@ -2440,7 +2371,6 @@ public final class AdGroup {
 
         /**
          * <p>Locations targeted and excluded.</p>
-         * <p>Locations targeted and excluded.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
@@ -2451,7 +2381,6 @@ public final class AdGroup {
         }
 
         /**
-         * <p>Purchase value divided by spend, both in USD (a currency-neutral ratio); 0 when there is no spend.</p>
          * <p>Purchase value divided by spend, both in USD (a currency-neutral ratio); 0 when there is no spend.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
@@ -2464,7 +2393,6 @@ public final class AdGroup {
 
         /**
          * <p>USD value attributed to schedule events. Sums the value sent with each event, normalized to USD; events without a value contribute 0.</p>
-         * <p>USD value attributed to schedule events. Sums the value sent with each event, normalized to USD; events without a value contribute 0.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
@@ -2475,7 +2403,6 @@ public final class AdGroup {
         }
 
         /**
-         * <p>Whop pixel-attributed schedule events, last-click.</p>
          * <p>Whop pixel-attributed schedule events, last-click.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
@@ -2488,7 +2415,6 @@ public final class AdGroup {
 
         /**
          * <p>The amount charged, in spend_currency.</p>
-         * <p>The amount charged, in spend_currency.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
@@ -2499,7 +2425,6 @@ public final class AdGroup {
         }
 
         /**
-         * <p>Whether the ad group is enabled. <code>active</code> and <code>paused</code> are set by you; <code>rejected</code> means it failed ad review; <code>duplicating</code> is a copy still being filled in.</p>
          * <p>Whether the ad group is enabled. <code>active</code> and <code>paused</code> are set by you; <code>rejected</code> means it failed ad review; <code>duplicating</code> is a copy still being filled in.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
@@ -2512,7 +2437,6 @@ public final class AdGroup {
 
         /**
          * <p>USD value attributed to submit-application events. Sums the value sent with each event, normalized to USD; events without a value contribute 0.</p>
-         * <p>USD value attributed to submit-application events. Sums the value sent with each event, normalized to USD; events without a value contribute 0.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
@@ -2523,7 +2447,6 @@ public final class AdGroup {
         }
 
         /**
-         * <p>Whop pixel-attributed submit-application events, last-click.</p>
          * <p>Whop pixel-attributed submit-application events, last-click.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
@@ -2536,7 +2459,6 @@ public final class AdGroup {
 
         /**
          * <p>People who clicked, reported by the Whop pixel, counted once per person.</p>
-         * <p>People who clicked, reported by the Whop pixel, counted once per person.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
@@ -2547,7 +2469,6 @@ public final class AdGroup {
         }
 
         /**
-         * <p>When the ad group was last updated, as an ISO 8601 timestamp.</p>
          * <p>When the ad group was last updated, as an ISO 8601 timestamp.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
@@ -2560,7 +2481,6 @@ public final class AdGroup {
 
         /**
          * <p>USD value attributed to view-content events. Sums the value sent with each event, normalized to USD; events without a value contribute 0.</p>
-         * <p>USD value attributed to view-content events. Sums the value sent with each event, normalized to USD; events without a value contribute 0.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
@@ -2571,7 +2491,6 @@ public final class AdGroup {
         }
 
         /**
-         * <p>Whop pixel-attributed view-content events, last-click.</p>
          * <p>Whop pixel-attributed view-content events, last-click.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
@@ -2834,112 +2753,39 @@ public final class AdGroup {
             return this;
         }
 
-        @java.lang.Override
-        public _FinalStage addAllPlacements(List<AdGroupPlacement> placements) {
-            if (placements != null) {
-                this.placements.addAll(placements);
-            }
-            return this;
-        }
-
-        @java.lang.Override
-        public _FinalStage addPlacements(AdGroupPlacement placements) {
-            this.placements.add(placements);
-            return this;
-        }
-
-        @java.lang.Override
-        @JsonSetter(value = "placements", nulls = Nulls.SKIP)
-        public _FinalStage placements(List<AdGroupPlacement> placements) {
-            this.placements.clear();
-            if (placements != null) {
-                this.placements.addAll(placements);
-            }
-            return this;
-        }
-
         /**
-         * <p>The result the ad group's delivery is optimized to get the most of.</p>
+         * <p>Progress toward the conversions this ad group's learning phase needs. Null unless it is learning or learning limited and valid counts are available. Reaching the threshold does not determine delivery status.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
-        public _FinalStage optimizationGoal(Nullable<AdGroupOptimizationGoal> optimizationGoal) {
-            if (optimizationGoal.isNull()) {
-                this.optimizationGoal = null;
-            } else if (optimizationGoal.isEmpty()) {
-                this.optimizationGoal = Optional.empty();
+        public _FinalStage learningProgress(Nullable<AdGroupLearningProgress> learningProgress) {
+            if (learningProgress.isNull()) {
+                this.learningProgress = null;
+            } else if (learningProgress.isEmpty()) {
+                this.learningProgress = Optional.empty();
             } else {
-                this.optimizationGoal = Optional.of(optimizationGoal.get());
+                this.learningProgress = Optional.of(learningProgress.get());
             }
             return this;
         }
 
         /**
-         * <p>The result the ad group's delivery is optimized to get the most of.</p>
+         * <p>Progress toward the conversions this ad group's learning phase needs. Null unless it is learning or learning limited and valid counts are available. Reaching the threshold does not determine delivery status.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
-        public _FinalStage optimizationGoal(AdGroupOptimizationGoal optimizationGoal) {
-            this.optimizationGoal = Optional.ofNullable(optimizationGoal);
+        public _FinalStage learningProgress(AdGroupLearningProgress learningProgress) {
+            this.learningProgress = Optional.ofNullable(learningProgress);
             return this;
         }
 
         /**
-         * <p>The result the ad group's delivery is optimized to get the most of.</p>
+         * <p>Progress toward the conversions this ad group's learning phase needs. Null unless it is learning or learning limited and valid counts are available. Reaching the threshold does not determine delivery status.</p>
          */
         @java.lang.Override
-        @JsonSetter(value = "optimization_goal", nulls = Nulls.SKIP)
-        public _FinalStage optimizationGoal(Optional<AdGroupOptimizationGoal> optimizationGoal) {
-            this.optimizationGoal = optimizationGoal;
-            return this;
-        }
-
-        /**
-         * <p>Minimum the ad group tries to spend each day. <code>null</code> when no floor is set.</p>
-         * @return Reference to {@code this} so that method calls can be chained together.
-         */
-        @java.lang.Override
-        public _FinalStage minimumDailySpend(Nullable<Double> minimumDailySpend) {
-            if (minimumDailySpend.isNull()) {
-                this.minimumDailySpend = null;
-            } else if (minimumDailySpend.isEmpty()) {
-                this.minimumDailySpend = Optional.empty();
-            } else {
-                this.minimumDailySpend = Optional.of(minimumDailySpend.get());
-            }
-            return this;
-        }
-
-        /**
-         * <p>Minimum the ad group tries to spend each day. <code>null</code> when no floor is set.</p>
-         * @return Reference to {@code this} so that method calls can be chained together.
-         */
-        @java.lang.Override
-        public _FinalStage minimumDailySpend(Double minimumDailySpend) {
-            this.minimumDailySpend = Optional.ofNullable(minimumDailySpend);
-            return this;
-        }
-
-        /**
-         * <p>Minimum the ad group tries to spend each day. <code>null</code> when no floor is set.</p>
-         */
-        @java.lang.Override
-        @JsonSetter(value = "minimum_daily_spend", nulls = Nulls.SKIP)
-        public _FinalStage minimumDailySpend(Optional<Double> minimumDailySpend) {
-            this.minimumDailySpend = minimumDailySpend;
-            return this;
-        }
-
-        @java.lang.Override
-        public _FinalStage messageApps(List<AdGroupMessageAppsItem> messageApps) {
-            this.messageApps = Optional.ofNullable(messageApps);
-            return this;
-        }
-
-        @java.lang.Override
-        @JsonSetter(value = "message_apps", nulls = Nulls.SKIP)
-        public _FinalStage messageApps(Optional<List<AdGroupMessageAppsItem>> messageApps) {
-            this.messageApps = messageApps;
+        @JsonSetter(value = "learning_progress", nulls = Nulls.SKIP)
+        public _FinalStage learningProgress(Optional<AdGroupLearningProgress> learningProgress) {
+            this.learningProgress = learningProgress;
             return this;
         }
 
@@ -2968,6 +2814,19 @@ public final class AdGroup {
         }
 
         @java.lang.Override
+        public _FinalStage keywords(List<AdGroupKeyword> keywords) {
+            this.keywords = Optional.ofNullable(keywords);
+            return this;
+        }
+
+        @java.lang.Override
+        @JsonSetter(value = "keywords", nulls = Nulls.SKIP)
+        public _FinalStage keywords(Optional<List<AdGroupKeyword>> keywords) {
+            this.keywords = keywords;
+            return this;
+        }
+
+        @java.lang.Override
         public _FinalStage addAllIssues(List<AdPlatformIssue> issues) {
             if (issues != null) {
                 this.issues.addAll(issues);
@@ -2992,43 +2851,7 @@ public final class AdGroup {
         }
 
         /**
-         * <p>Cap on how often one person sees ads from this ad group. Only available on campaigns with the <code>awareness</code> objective; <code>null</code> when uncapped.</p>
-         * @return Reference to {@code this} so that method calls can be chained together.
-         */
-        @java.lang.Override
-        public _FinalStage frequencyCap(Nullable<AdGroupFrequencyCap> frequencyCap) {
-            if (frequencyCap.isNull()) {
-                this.frequencyCap = null;
-            } else if (frequencyCap.isEmpty()) {
-                this.frequencyCap = Optional.empty();
-            } else {
-                this.frequencyCap = Optional.of(frequencyCap.get());
-            }
-            return this;
-        }
-
-        /**
-         * <p>Cap on how often one person sees ads from this ad group. Only available on campaigns with the <code>awareness</code> objective; <code>null</code> when uncapped.</p>
-         * @return Reference to {@code this} so that method calls can be chained together.
-         */
-        @java.lang.Override
-        public _FinalStage frequencyCap(AdGroupFrequencyCap frequencyCap) {
-            this.frequencyCap = Optional.ofNullable(frequencyCap);
-            return this;
-        }
-
-        /**
-         * <p>Cap on how often one person sees ads from this ad group. Only available on campaigns with the <code>awareness</code> objective; <code>null</code> when uncapped.</p>
-         */
-        @java.lang.Override
-        @JsonSetter(value = "frequency_cap", nulls = Nulls.SKIP)
-        public _FinalStage frequencyCap(Optional<AdGroupFrequencyCap> frequencyCap) {
-            this.frequencyCap = frequencyCap;
-            return this;
-        }
-
-        /**
-         * <p>Platform-reported impressions divided by reach.</p>
+         * <p>Impressions divided by reach.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
@@ -3044,7 +2867,7 @@ public final class AdGroup {
         }
 
         /**
-         * <p>Platform-reported impressions divided by reach.</p>
+         * <p>Impressions divided by reach.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
@@ -3054,7 +2877,7 @@ public final class AdGroup {
         }
 
         /**
-         * <p>Platform-reported impressions divided by reach.</p>
+         * <p>Impressions divided by reach.</p>
          */
         @java.lang.Override
         @JsonSetter(value = "frequency", nulls = Nulls.SKIP)
@@ -3100,26 +2923,6 @@ public final class AdGroup {
         }
 
         /**
-         * <p>Whether the ad platform automatically mixes and matches this ad group's creatives and copy to find the best-performing combinations.</p>
-         * @return Reference to {@code this} so that method calls can be chained together.
-         */
-        @java.lang.Override
-        public _FinalStage dynamicCreative(Boolean dynamicCreative) {
-            this.dynamicCreative = Optional.ofNullable(dynamicCreative);
-            return this;
-        }
-
-        /**
-         * <p>Whether the ad platform automatically mixes and matches this ad group's creatives and copy to find the best-performing combinations.</p>
-         */
-        @java.lang.Override
-        @JsonSetter(value = "dynamic_creative", nulls = Nulls.SKIP)
-        public _FinalStage dynamicCreative(Optional<Boolean> dynamicCreative) {
-            this.dynamicCreative = dynamicCreative;
-            return this;
-        }
-
-        /**
          * <p>Cost per result to aim for (<code>average_target</code>) or never exceed (<code>maximum_target</code>). <code>null</code> for <code>minimum_cost</code> bidding.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
@@ -3152,6 +2955,42 @@ public final class AdGroup {
         @JsonSetter(value = "desired_cost_per_result", nulls = Nulls.SKIP)
         public _FinalStage desiredCostPerResult(Optional<Double> desiredCostPerResult) {
             this.desiredCostPerResult = desiredCostPerResult;
+            return this;
+        }
+
+        /**
+         * <p>Hours the ad group delivers in each week, keyed by day. Days it doesn't deliver are omitted. <code>null</code> when it delivers at every hour. Some platforms need a lifetime <code>budget_type</code> for a schedule, on the ad group or on its campaign when the campaign holds the budget.</p>
+         * @return Reference to {@code this} so that method calls can be chained together.
+         */
+        @java.lang.Override
+        public _FinalStage deliverySchedule(Nullable<AdGroupDeliverySchedule> deliverySchedule) {
+            if (deliverySchedule.isNull()) {
+                this.deliverySchedule = null;
+            } else if (deliverySchedule.isEmpty()) {
+                this.deliverySchedule = Optional.empty();
+            } else {
+                this.deliverySchedule = Optional.of(deliverySchedule.get());
+            }
+            return this;
+        }
+
+        /**
+         * <p>Hours the ad group delivers in each week, keyed by day. Days it doesn't deliver are omitted. <code>null</code> when it delivers at every hour. Some platforms need a lifetime <code>budget_type</code> for a schedule, on the ad group or on its campaign when the campaign holds the budget.</p>
+         * @return Reference to {@code this} so that method calls can be chained together.
+         */
+        @java.lang.Override
+        public _FinalStage deliverySchedule(AdGroupDeliverySchedule deliverySchedule) {
+            this.deliverySchedule = Optional.ofNullable(deliverySchedule);
+            return this;
+        }
+
+        /**
+         * <p>Hours the ad group delivers in each week, keyed by day. Days it doesn't deliver are omitted. <code>null</code> when it delivers at every hour. Some platforms need a lifetime <code>budget_type</code> for a schedule, on the ad group or on its campaign when the campaign holds the budget.</p>
+         */
+        @java.lang.Override
+        @JsonSetter(value = "delivery_schedule", nulls = Nulls.SKIP)
+        public _FinalStage deliverySchedule(Optional<AdGroupDeliverySchedule> deliverySchedule) {
+            this.deliverySchedule = deliverySchedule;
             return this;
         }
 
@@ -3585,42 +3424,6 @@ public final class AdGroup {
             return this;
         }
 
-        /**
-         * <p>Where the outcome being optimized for occurs, such as a website visit, social-profile visit, messaging conversation, ad interaction, or lead-form submission.</p>
-         * @return Reference to {@code this} so that method calls can be chained together.
-         */
-        @java.lang.Override
-        public _FinalStage conversionLocation(Nullable<AdGroupConversionLocation> conversionLocation) {
-            if (conversionLocation.isNull()) {
-                this.conversionLocation = null;
-            } else if (conversionLocation.isEmpty()) {
-                this.conversionLocation = Optional.empty();
-            } else {
-                this.conversionLocation = Optional.of(conversionLocation.get());
-            }
-            return this;
-        }
-
-        /**
-         * <p>Where the outcome being optimized for occurs, such as a website visit, social-profile visit, messaging conversation, ad interaction, or lead-form submission.</p>
-         * @return Reference to {@code this} so that method calls can be chained together.
-         */
-        @java.lang.Override
-        public _FinalStage conversionLocation(AdGroupConversionLocation conversionLocation) {
-            this.conversionLocation = Optional.ofNullable(conversionLocation);
-            return this;
-        }
-
-        /**
-         * <p>Where the outcome being optimized for occurs, such as a website visit, social-profile visit, messaging conversation, ad interaction, or lead-form submission.</p>
-         */
-        @java.lang.Override
-        @JsonSetter(value = "conversion_location", nulls = Nulls.SKIP)
-        public _FinalStage conversionLocation(Optional<AdGroupConversionLocation> conversionLocation) {
-            this.conversionLocation = conversionLocation;
-            return this;
-        }
-
         @java.lang.Override
         public _FinalStage conversionEvent(Nullable<ConversionEvent> conversionEvent) {
             if (conversionEvent.isNull()) {
@@ -3647,7 +3450,7 @@ public final class AdGroup {
         }
 
         /**
-         * <p>Whether <code>budget_amount</code> is spent per day (<code>daily</code>) or over the ad group's full run (<code>lifetime</code>).</p>
+         * <p>Whether <code>budget_amount</code> is spent per day (<code>daily</code>) or over the ad group's full run (<code>lifetime</code>). A <code>lifetime</code> ad group also needs <code>ends_at</code>, at least 24 hours after it starts.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
@@ -3663,7 +3466,7 @@ public final class AdGroup {
         }
 
         /**
-         * <p>Whether <code>budget_amount</code> is spent per day (<code>daily</code>) or over the ad group's full run (<code>lifetime</code>).</p>
+         * <p>Whether <code>budget_amount</code> is spent per day (<code>daily</code>) or over the ad group's full run (<code>lifetime</code>). A <code>lifetime</code> ad group also needs <code>ends_at</code>, at least 24 hours after it starts.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
@@ -3673,7 +3476,7 @@ public final class AdGroup {
         }
 
         /**
-         * <p>Whether <code>budget_amount</code> is spent per day (<code>daily</code>) or over the ad group's full run (<code>lifetime</code>).</p>
+         * <p>Whether <code>budget_amount</code> is spent per day (<code>daily</code>) or over the ad group's full run (<code>lifetime</code>). A <code>lifetime</code> ad group also needs <code>ends_at</code>, at least 24 hours after it starts.</p>
          */
         @java.lang.Override
         @JsonSetter(value = "budget_type", nulls = Nulls.SKIP)
@@ -3683,7 +3486,43 @@ public final class AdGroup {
         }
 
         /**
-         * <p>This ad group's budget, in the ad account's currency. <code>null</code> when the budget is set on the campaign instead.</p>
+         * <p>The same budget stated in <code>budget_currency</code> at today's exchange rate, for display in the account's ads reporting currency. <code>null</code> when <code>budget_amount</code> is.</p>
+         * @return Reference to {@code this} so that method calls can be chained together.
+         */
+        @java.lang.Override
+        public _FinalStage budgetAmountLocal(Nullable<Double> budgetAmountLocal) {
+            if (budgetAmountLocal.isNull()) {
+                this.budgetAmountLocal = null;
+            } else if (budgetAmountLocal.isEmpty()) {
+                this.budgetAmountLocal = Optional.empty();
+            } else {
+                this.budgetAmountLocal = Optional.of(budgetAmountLocal.get());
+            }
+            return this;
+        }
+
+        /**
+         * <p>The same budget stated in <code>budget_currency</code> at today's exchange rate, for display in the account's ads reporting currency. <code>null</code> when <code>budget_amount</code> is.</p>
+         * @return Reference to {@code this} so that method calls can be chained together.
+         */
+        @java.lang.Override
+        public _FinalStage budgetAmountLocal(Double budgetAmountLocal) {
+            this.budgetAmountLocal = Optional.ofNullable(budgetAmountLocal);
+            return this;
+        }
+
+        /**
+         * <p>The same budget stated in <code>budget_currency</code> at today's exchange rate, for display in the account's ads reporting currency. <code>null</code> when <code>budget_amount</code> is.</p>
+         */
+        @java.lang.Override
+        @JsonSetter(value = "budget_amount_local", nulls = Nulls.SKIP)
+        public _FinalStage budgetAmountLocal(Optional<Double> budgetAmountLocal) {
+            this.budgetAmountLocal = budgetAmountLocal;
+            return this;
+        }
+
+        /**
+         * <p>This ad group's budget in USD, which is what it is stored and billed in. <code>null</code> when the budget is set on the campaign instead.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
@@ -3699,7 +3538,7 @@ public final class AdGroup {
         }
 
         /**
-         * <p>This ad group's budget, in the ad account's currency. <code>null</code> when the budget is set on the campaign instead.</p>
+         * <p>This ad group's budget in USD, which is what it is stored and billed in. <code>null</code> when the budget is set on the campaign instead.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
@@ -3709,7 +3548,7 @@ public final class AdGroup {
         }
 
         /**
-         * <p>This ad group's budget, in the ad account's currency. <code>null</code> when the budget is set on the campaign instead.</p>
+         * <p>This ad group's budget in USD, which is what it is stored and billed in. <code>null</code> when the budget is set on the campaign instead.</p>
          */
         @java.lang.Override
         @JsonSetter(value = "budget_amount", nulls = Nulls.SKIP)
@@ -3763,6 +3602,8 @@ public final class AdGroup {
                     audiences,
                     bidType,
                     budgetAmount,
+                    budgetAmountLocal,
+                    budgetCurrency,
                     budgetType,
                     clickThroughRate,
                     clicks,
@@ -3771,7 +3612,6 @@ public final class AdGroup {
                     contactValue,
                     contacts,
                     conversionEvent,
-                    conversionLocation,
                     costPerAddedToCart,
                     costPerClick,
                     costPerCompletedRegistration,
@@ -3788,25 +3628,22 @@ public final class AdGroup {
                     customConversions,
                     customEventCounts,
                     customEventValues,
+                    deliverySchedule,
                     deliveryStatus,
                     demographics,
                     desiredCostPerResult,
-                    detailedTargeting,
                     devices,
-                    dynamicCreative,
                     endsAt,
                     frequency,
-                    frequencyCap,
                     id,
                     impressions,
                     issues,
+                    keywords,
                     languages,
                     leadValue,
                     leads,
-                    messageApps,
-                    minimumDailySpend,
-                    optimizationGoal,
-                    placements,
+                    learningProgress,
+                    linkClicks,
                     purchaseValue,
                     purchases,
                     reach,
@@ -3830,6 +3667,83 @@ public final class AdGroup {
                     viewedContentValue,
                     viewedContents,
                     additionalProperties);
+        }
+
+        @JsonAnySetter
+        private void putAdditionalPropertyFromJson(String key, Object value) {
+            if (key.equalsIgnoreCase("ad_campaign")
+                    || key.equalsIgnoreCase("added_to_cart_value")
+                    || key.equalsIgnoreCase("added_to_carts")
+                    || key.equalsIgnoreCase("audiences")
+                    || key.equalsIgnoreCase("bid_type")
+                    || key.equalsIgnoreCase("budget_amount")
+                    || key.equalsIgnoreCase("budget_amount_local")
+                    || key.equalsIgnoreCase("budget_currency")
+                    || key.equalsIgnoreCase("budget_type")
+                    || key.equalsIgnoreCase("click_through_rate")
+                    || key.equalsIgnoreCase("clicks")
+                    || key.equalsIgnoreCase("completed_registration_value")
+                    || key.equalsIgnoreCase("completed_registrations")
+                    || key.equalsIgnoreCase("contact_value")
+                    || key.equalsIgnoreCase("contacts")
+                    || key.equalsIgnoreCase("conversion_event")
+                    || key.equalsIgnoreCase("cost_per_added_to_cart")
+                    || key.equalsIgnoreCase("cost_per_click")
+                    || key.equalsIgnoreCase("cost_per_completed_registration")
+                    || key.equalsIgnoreCase("cost_per_contact")
+                    || key.equalsIgnoreCase("cost_per_lead")
+                    || key.equalsIgnoreCase("cost_per_mille")
+                    || key.equalsIgnoreCase("cost_per_purchase")
+                    || key.equalsIgnoreCase("cost_per_result")
+                    || key.equalsIgnoreCase("cost_per_schedule")
+                    || key.equalsIgnoreCase("cost_per_submitted_application")
+                    || key.equalsIgnoreCase("cost_per_unique_click")
+                    || key.equalsIgnoreCase("cost_per_viewed_content")
+                    || key.equalsIgnoreCase("created_at")
+                    || key.equalsIgnoreCase("custom_conversions")
+                    || key.equalsIgnoreCase("custom_event_counts")
+                    || key.equalsIgnoreCase("custom_event_values")
+                    || key.equalsIgnoreCase("delivery_schedule")
+                    || key.equalsIgnoreCase("delivery_status")
+                    || key.equalsIgnoreCase("demographics")
+                    || key.equalsIgnoreCase("desired_cost_per_result")
+                    || key.equalsIgnoreCase("devices")
+                    || key.equalsIgnoreCase("ends_at")
+                    || key.equalsIgnoreCase("frequency")
+                    || key.equalsIgnoreCase("id")
+                    || key.equalsIgnoreCase("impressions")
+                    || key.equalsIgnoreCase("issues")
+                    || key.equalsIgnoreCase("keywords")
+                    || key.equalsIgnoreCase("languages")
+                    || key.equalsIgnoreCase("lead_value")
+                    || key.equalsIgnoreCase("leads")
+                    || key.equalsIgnoreCase("learning_progress")
+                    || key.equalsIgnoreCase("link_clicks")
+                    || key.equalsIgnoreCase("purchase_value")
+                    || key.equalsIgnoreCase("purchases")
+                    || key.equalsIgnoreCase("reach")
+                    || key.equalsIgnoreCase("regions")
+                    || key.equalsIgnoreCase("result_event")
+                    || key.equalsIgnoreCase("result_event_name")
+                    || key.equalsIgnoreCase("results")
+                    || key.equalsIgnoreCase("return_on_ad_spend")
+                    || key.equalsIgnoreCase("schedule_value")
+                    || key.equalsIgnoreCase("schedules")
+                    || key.equalsIgnoreCase("spend")
+                    || key.equalsIgnoreCase("spend_currency")
+                    || key.equalsIgnoreCase("starts_at")
+                    || key.equalsIgnoreCase("status")
+                    || key.equalsIgnoreCase("submitted_application_value")
+                    || key.equalsIgnoreCase("submitted_applications")
+                    || key.equalsIgnoreCase("title")
+                    || key.equalsIgnoreCase("unique_click_through_rate")
+                    || key.equalsIgnoreCase("unique_clicks")
+                    || key.equalsIgnoreCase("updated_at")
+                    || key.equalsIgnoreCase("viewed_content_value")
+                    || key.equalsIgnoreCase("viewed_contents")) {
+                return;
+            }
+            this.additionalProperties.put(key, value);
         }
 
         @java.lang.Override

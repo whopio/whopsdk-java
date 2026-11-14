@@ -4,11 +4,14 @@
 package com.whop.api.resources.swaps;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
+import com.whop.api.core.BodyProperties;
 import com.whop.api.core.ClientOptions;
 import com.whop.api.core.MediaTypes;
 import com.whop.api.core.ObjectMappers;
+import com.whop.api.core.PathSegments;
 import com.whop.api.core.QueryStringMapper;
 import com.whop.api.core.RequestOptions;
+import com.whop.api.core.RetryInterceptor;
 import com.whop.api.core.WhopApiApiException;
 import com.whop.api.core.WhopApiException;
 import com.whop.api.core.WhopApiHttpResponse;
@@ -24,7 +27,6 @@ import com.whop.api.resources.swaps.types.CreateQuoteSwapsResponse;
 import com.whop.api.resources.swaps.types.CreateSwapsResponse;
 import com.whop.api.resources.swaps.types.ListSwapsResponse;
 import com.whop.api.resources.swaps.types.RetrieveSwapsResponse;
-import com.whop.api.types.V1ErrorResponse;
 import java.io.IOException;
 import okhttp3.Headers;
 import okhttp3.HttpUrl;
@@ -42,20 +44,41 @@ public class RawSwapsClient {
     }
 
     /**
-     * Retrieve the account's completed or pending swaps — currently just the latest one.
+     * Lists the completed or pending swaps for an account or user — currently only the most recent one.
+     */
+    public WhopApiHttpResponse<ListSwapsResponse> list() {
+        return list(ListSwapsRequest.builder().build());
+    }
+
+    /**
+     * Lists the completed or pending swaps for an account or user — currently only the most recent one.
+     */
+    public WhopApiHttpResponse<ListSwapsResponse> list(RequestOptions requestOptions) {
+        return list(ListSwapsRequest.builder().build(), requestOptions);
+    }
+
+    /**
+     * Lists the completed or pending swaps for an account or user — currently only the most recent one.
      */
     public WhopApiHttpResponse<ListSwapsResponse> list(ListSwapsRequest request) {
         return list(request, null);
     }
 
     /**
-     * Retrieve the account's completed or pending swaps — currently just the latest one.
+     * Lists the completed or pending swaps for an account or user — currently only the most recent one.
      */
     public WhopApiHttpResponse<ListSwapsResponse> list(ListSwapsRequest request, RequestOptions requestOptions) {
-        HttpUrl.Builder httpUrl = HttpUrl.parse(this.clientOptions.environment().getUrl())
+        HttpUrl.Builder httpUrl = HttpUrl.parse(this.clientOptions.environment().getApiURL())
                 .newBuilder()
                 .addPathSegments("swaps");
-        QueryStringMapper.addQueryParameter(httpUrl, "account_id", request.getAccountId(), false);
+        if (request.getAccountId().isPresent()) {
+            QueryStringMapper.addQueryParameter(
+                    httpUrl, "account_id", request.getAccountId().get(), false);
+        }
+        if (request.getUserId().isPresent()) {
+            QueryStringMapper.addQueryParameter(
+                    httpUrl, "user_id", request.getUserId().get(), false);
+        }
         if (requestOptions != null) {
             requestOptions.getQueryParameters().forEach((_key, _value) -> {
                 httpUrl.addQueryParameter(_key, _value);
@@ -70,6 +93,15 @@ public class RawSwapsClient {
         OkHttpClient client = clientOptions.httpClient();
         if (requestOptions != null && requestOptions.getTimeout().isPresent()) {
             client = clientOptions.httpClientWithTimeout(requestOptions);
+        }
+        if (requestOptions != null && requestOptions.getMaxRetries().isPresent()) {
+            okhttpRequest = okhttpRequest
+                    .newBuilder()
+                    .tag(
+                            RetryInterceptor.MaxRetriesOverride.class,
+                            new RetryInterceptor.MaxRetriesOverride(
+                                    requestOptions.getMaxRetries().get()))
+                    .build();
         }
         try (Response response = client.newCall(okhttpRequest).execute()) {
             ResponseBody responseBody = response.body();
@@ -89,23 +121,25 @@ public class RawSwapsClient {
             Object errorBody = ObjectMappers.parseErrorBody(responseBodyString);
             throw new WhopApiApiException(
                     "Error with status code " + response.code(), response.code(), errorBody, response);
+        } catch (JsonProcessingException e) {
+            throw new WhopApiException("Failed to deserialize response: " + e.getMessage(), e);
         } catch (IOException e) {
             throw new WhopApiException("Network error executing HTTP request", e);
         }
     }
 
     /**
-     * Swaps one token for another from the account's wallet, or converts between fiat currencies in the account's ledger at the mid-market rate. Crypto swaps finish in the background — check the swap for its status.
+     * Swaps one token for another in an account or user's wallet, or converts between their fiat balances. Crypto swaps finish in the background — retrieve the swap to follow its status.
      */
     public WhopApiHttpResponse<CreateSwapsResponse> create(CreateSwapsRequest request) {
         return create(request, null);
     }
 
     /**
-     * Swaps one token for another from the account's wallet, or converts between fiat currencies in the account's ledger at the mid-market rate. Crypto swaps finish in the background — check the swap for its status.
+     * Swaps one token for another in an account or user's wallet, or converts between their fiat balances. Crypto swaps finish in the background — retrieve the swap to follow its status.
      */
     public WhopApiHttpResponse<CreateSwapsResponse> create(CreateSwapsRequest request, RequestOptions requestOptions) {
-        HttpUrl.Builder httpUrl = HttpUrl.parse(this.clientOptions.environment().getUrl())
+        HttpUrl.Builder httpUrl = HttpUrl.parse(this.clientOptions.environment().getApiURL())
                 .newBuilder()
                 .addPathSegments("swaps");
         if (requestOptions != null) {
@@ -116,7 +150,9 @@ public class RawSwapsClient {
         RequestBody body;
         try {
             body = RequestBody.create(
-                    ObjectMappers.JSON_MAPPER.writeValueAsBytes(request), MediaTypes.APPLICATION_JSON);
+                    ObjectMappers.JSON_MAPPER.writeValueAsBytes(BodyProperties.merge(
+                            request, requestOptions != null ? requestOptions.getBodyProperties() : null)),
+                    MediaTypes.APPLICATION_JSON);
         } catch (JsonProcessingException e) {
             throw new WhopApiException("Failed to serialize request", e);
         }
@@ -130,6 +166,15 @@ public class RawSwapsClient {
         OkHttpClient client = clientOptions.httpClient();
         if (requestOptions != null && requestOptions.getTimeout().isPresent()) {
             client = clientOptions.httpClientWithTimeout(requestOptions);
+        }
+        if (requestOptions != null && requestOptions.getMaxRetries().isPresent()) {
+            okhttpRequest = okhttpRequest
+                    .newBuilder()
+                    .tag(
+                            RetryInterceptor.MaxRetriesOverride.class,
+                            new RetryInterceptor.MaxRetriesOverride(
+                                    requestOptions.getMaxRetries().get()))
+                    .build();
         }
         try (Response response = client.newCall(okhttpRequest).execute()) {
             ResponseBody responseBody = response.body();
@@ -148,8 +193,7 @@ public class RawSwapsClient {
                                 ObjectMappers.JSON_MAPPER.readValue(responseBodyString, Object.class), response);
                     case 409:
                         throw new ConflictError(
-                                ObjectMappers.JSON_MAPPER.readValue(responseBodyString, V1ErrorResponse.class),
-                                response);
+                                ObjectMappers.JSON_MAPPER.readValue(responseBodyString, Object.class), response);
                 }
             } catch (JsonProcessingException ignored) {
                 // unable to map error response, throwing generic error
@@ -157,24 +201,26 @@ public class RawSwapsClient {
             Object errorBody = ObjectMappers.parseErrorBody(responseBodyString);
             throw new WhopApiApiException(
                     "Error with status code " + response.code(), response.code(), errorBody, response);
+        } catch (JsonProcessingException e) {
+            throw new WhopApiException("Failed to deserialize response: " + e.getMessage(), e);
         } catch (IOException e) {
             throw new WhopApiException("Network error executing HTTP request", e);
         }
     }
 
     /**
-     * Previews the price of a swap. Fiat pairs quote the in-ledger mid-market conversion — the same rate creating the swap fills at. No funds move and nothing is saved.
+     * Previews the price of a swap before you create it. A fiat pair quotes the same rate creating the swap fills at; name the account with <code>account_id</code> or <code>user_id</code> to quote the rate for that account. No funds move, nothing is saved, and no authentication is required unless you name an account.
      */
     public WhopApiHttpResponse<CreateQuoteSwapsResponse> createQuote(CreateQuoteSwapsRequest request) {
         return createQuote(request, null);
     }
 
     /**
-     * Previews the price of a swap. Fiat pairs quote the in-ledger mid-market conversion — the same rate creating the swap fills at. No funds move and nothing is saved.
+     * Previews the price of a swap before you create it. A fiat pair quotes the same rate creating the swap fills at; name the account with <code>account_id</code> or <code>user_id</code> to quote the rate for that account. No funds move, nothing is saved, and no authentication is required unless you name an account.
      */
     public WhopApiHttpResponse<CreateQuoteSwapsResponse> createQuote(
             CreateQuoteSwapsRequest request, RequestOptions requestOptions) {
-        HttpUrl.Builder httpUrl = HttpUrl.parse(this.clientOptions.environment().getUrl())
+        HttpUrl.Builder httpUrl = HttpUrl.parse(this.clientOptions.environment().getApiURL())
                 .newBuilder()
                 .addPathSegments("swaps/quote");
         if (requestOptions != null) {
@@ -185,7 +231,9 @@ public class RawSwapsClient {
         RequestBody body;
         try {
             body = RequestBody.create(
-                    ObjectMappers.JSON_MAPPER.writeValueAsBytes(request), MediaTypes.APPLICATION_JSON);
+                    ObjectMappers.JSON_MAPPER.writeValueAsBytes(BodyProperties.merge(
+                            request, requestOptions != null ? requestOptions.getBodyProperties() : null)),
+                    MediaTypes.APPLICATION_JSON);
         } catch (JsonProcessingException e) {
             throw new WhopApiException("Failed to serialize request", e);
         }
@@ -199,6 +247,15 @@ public class RawSwapsClient {
         OkHttpClient client = clientOptions.httpClient();
         if (requestOptions != null && requestOptions.getTimeout().isPresent()) {
             client = clientOptions.httpClientWithTimeout(requestOptions);
+        }
+        if (requestOptions != null && requestOptions.getMaxRetries().isPresent()) {
+            okhttpRequest = okhttpRequest
+                    .newBuilder()
+                    .tag(
+                            RetryInterceptor.MaxRetriesOverride.class,
+                            new RetryInterceptor.MaxRetriesOverride(
+                                    requestOptions.getMaxRetries().get()))
+                    .build();
         }
         try (Response response = client.newCall(okhttpRequest).execute()) {
             ResponseBody responseBody = response.body();
@@ -215,8 +272,7 @@ public class RawSwapsClient {
                                 ObjectMappers.JSON_MAPPER.readValue(responseBodyString, Object.class), response);
                     case 409:
                         throw new ConflictError(
-                                ObjectMappers.JSON_MAPPER.readValue(responseBodyString, V1ErrorResponse.class),
-                                response);
+                                ObjectMappers.JSON_MAPPER.readValue(responseBodyString, Object.class), response);
                 }
             } catch (JsonProcessingException ignored) {
                 // unable to map error response, throwing generic error
@@ -224,41 +280,43 @@ public class RawSwapsClient {
             Object errorBody = ObjectMappers.parseErrorBody(responseBodyString);
             throw new WhopApiApiException(
                     "Error with status code " + response.code(), response.code(), errorBody, response);
+        } catch (JsonProcessingException e) {
+            throw new WhopApiException("Failed to deserialize response: " + e.getMessage(), e);
         } catch (IOException e) {
             throw new WhopApiException("Network error executing HTTP request", e);
         }
     }
 
     /**
-     * Retrieves a single swap and its status.
+     * Retrieves a swap and its status. Poll it after creating a crypto swap, which finishes in the background.
      */
     public WhopApiHttpResponse<RetrieveSwapsResponse> retrieve(String id) {
         return retrieve(id, RetrieveSwapsRequest.builder().build());
     }
 
     /**
-     * Retrieves a single swap and its status.
+     * Retrieves a swap and its status. Poll it after creating a crypto swap, which finishes in the background.
      */
     public WhopApiHttpResponse<RetrieveSwapsResponse> retrieve(String id, RequestOptions requestOptions) {
         return retrieve(id, RetrieveSwapsRequest.builder().build(), requestOptions);
     }
 
     /**
-     * Retrieves a single swap and its status.
+     * Retrieves a swap and its status. Poll it after creating a crypto swap, which finishes in the background.
      */
     public WhopApiHttpResponse<RetrieveSwapsResponse> retrieve(String id, RetrieveSwapsRequest request) {
         return retrieve(id, request, null);
     }
 
     /**
-     * Retrieves a single swap and its status.
+     * Retrieves a swap and its status. Poll it after creating a crypto swap, which finishes in the background.
      */
     public WhopApiHttpResponse<RetrieveSwapsResponse> retrieve(
             String id, RetrieveSwapsRequest request, RequestOptions requestOptions) {
-        HttpUrl.Builder httpUrl = HttpUrl.parse(this.clientOptions.environment().getUrl())
+        HttpUrl.Builder httpUrl = HttpUrl.parse(this.clientOptions.environment().getApiURL())
                 .newBuilder()
                 .addPathSegments("swaps")
-                .addPathSegment(id);
+                .addPathSegment(PathSegments.validate(id));
         if (requestOptions != null) {
             requestOptions.getQueryParameters().forEach((_key, _value) -> {
                 httpUrl.addQueryParameter(_key, _value);
@@ -273,6 +331,15 @@ public class RawSwapsClient {
         OkHttpClient client = clientOptions.httpClient();
         if (requestOptions != null && requestOptions.getTimeout().isPresent()) {
             client = clientOptions.httpClientWithTimeout(requestOptions);
+        }
+        if (requestOptions != null && requestOptions.getMaxRetries().isPresent()) {
+            okhttpRequest = okhttpRequest
+                    .newBuilder()
+                    .tag(
+                            RetryInterceptor.MaxRetriesOverride.class,
+                            new RetryInterceptor.MaxRetriesOverride(
+                                    requestOptions.getMaxRetries().get()))
+                    .build();
         }
         try (Response response = client.newCall(okhttpRequest).execute()) {
             ResponseBody responseBody = response.body();
@@ -299,6 +366,8 @@ public class RawSwapsClient {
             Object errorBody = ObjectMappers.parseErrorBody(responseBodyString);
             throw new WhopApiApiException(
                     "Error with status code " + response.code(), response.code(), errorBody, response);
+        } catch (JsonProcessingException e) {
+            throw new WhopApiException("Failed to deserialize response: " + e.getMessage(), e);
         } catch (IOException e) {
             throw new WhopApiException("Network error executing HTTP request", e);
         }

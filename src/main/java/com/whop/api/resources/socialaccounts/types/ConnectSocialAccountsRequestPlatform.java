@@ -7,8 +7,16 @@ import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonValue;
 
 public final class ConnectSocialAccountsRequestPlatform {
-    public static final ConnectSocialAccountsRequestPlatform META_BUSINESS =
-            new ConnectSocialAccountsRequestPlatform(Value.META_BUSINESS, "meta_business");
+    public static final ConnectSocialAccountsRequestPlatform YOUTUBE =
+            new ConnectSocialAccountsRequestPlatform(Value.YOUTUBE, "youtube");
+
+    public static final ConnectSocialAccountsRequestPlatform QUICKBOOKS =
+            new ConnectSocialAccountsRequestPlatform(Value.QUICKBOOKS, "quickbooks");
+
+    public static final ConnectSocialAccountsRequestPlatform LINKEDIN =
+            new ConnectSocialAccountsRequestPlatform(Value.LINKEDIN, "linkedin");
+
+    public static final ConnectSocialAccountsRequestPlatform X = new ConnectSocialAccountsRequestPlatform(Value.X, "x");
 
     public static final ConnectSocialAccountsRequestPlatform TIKTOK =
             new ConnectSocialAccountsRequestPlatform(Value.TIKTOK, "tiktok");
@@ -46,8 +54,14 @@ public final class ConnectSocialAccountsRequestPlatform {
 
     public <T> T visit(Visitor<T> visitor) {
         switch (value) {
-            case META_BUSINESS:
-                return visitor.visitMetaBusiness();
+            case YOUTUBE:
+                return visitor.visitYoutube();
+            case QUICKBOOKS:
+                return visitor.visitQuickbooks();
+            case LINKEDIN:
+                return visitor.visitLinkedin();
+            case X:
+                return visitor.visitX();
             case TIKTOK:
                 return visitor.visitTiktok();
             case UNKNOWN:
@@ -59,8 +73,14 @@ public final class ConnectSocialAccountsRequestPlatform {
     @JsonCreator(mode = JsonCreator.Mode.DELEGATING)
     public static ConnectSocialAccountsRequestPlatform valueOf(String value) {
         switch (value) {
-            case "meta_business":
-                return META_BUSINESS;
+            case "youtube":
+                return YOUTUBE;
+            case "quickbooks":
+                return QUICKBOOKS;
+            case "linkedin":
+                return LINKEDIN;
+            case "x":
+                return X;
             case "tiktok":
                 return TIKTOK;
             default:
@@ -69,17 +89,29 @@ public final class ConnectSocialAccountsRequestPlatform {
     }
 
     public enum Value {
-        META_BUSINESS,
-
         TIKTOK,
+
+        LINKEDIN,
+
+        YOUTUBE,
+
+        X,
+
+        QUICKBOOKS,
 
         UNKNOWN
     }
 
     public interface Visitor<T> {
-        T visitMetaBusiness();
-
         T visitTiktok();
+
+        T visitLinkedin();
+
+        T visitYoutube();
+
+        T visitX();
+
+        T visitQuickbooks();
 
         T visitUnknown(String unknownType);
     }

@@ -9,30 +9,58 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonSetter;
+import com.fasterxml.jackson.annotation.Nulls;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.whop.api.core.ObjectMappers;
+import com.whop.api.resources.payouts.methods.types.UpdateMethodsRequestAddress;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
-import org.jetbrains.annotations.NotNull;
+import java.util.Optional;
 
 @JsonInclude(JsonInclude.Include.NON_ABSENT)
 @JsonDeserialize(builder = UpdateMethodsRequest.Builder.class)
 public final class UpdateMethodsRequest {
-    private final String nickname;
+    private final Optional<UpdateMethodsRequestAddress> address;
+
+    private final Optional<Boolean> isDefault;
+
+    private final Optional<String> nickname;
 
     private final Map<String, Object> additionalProperties;
 
-    private UpdateMethodsRequest(String nickname, Map<String, Object> additionalProperties) {
+    private UpdateMethodsRequest(
+            Optional<UpdateMethodsRequestAddress> address,
+            Optional<Boolean> isDefault,
+            Optional<String> nickname,
+            Map<String, Object> additionalProperties) {
+        this.address = address;
+        this.isDefault = isDefault;
         this.nickname = nickname;
         this.additionalProperties = additionalProperties;
+    }
+
+    /**
+     * @return The payout address to keep on file for this payout method. Only the fields you send are changed; blank fields are ignored.
+     */
+    @JsonProperty("address")
+    public Optional<UpdateMethodsRequestAddress> getAddress() {
+        return address;
+    }
+
+    /**
+     * @return Set to <code>true</code> to make this the account's default payout method. <code>false</code> is not accepted.
+     */
+    @JsonProperty("is_default")
+    public Optional<Boolean> getIsDefault() {
+        return isDefault;
     }
 
     /**
      * @return New label for the payout method, with at least one non-whitespace character and a maximum of 100 characters.
      */
     @JsonProperty("nickname")
-    public String getNickname() {
+    public Optional<String> getNickname() {
         return nickname;
     }
 
@@ -48,12 +76,12 @@ public final class UpdateMethodsRequest {
     }
 
     private boolean equalTo(UpdateMethodsRequest other) {
-        return nickname.equals(other.nickname);
+        return address.equals(other.address) && isDefault.equals(other.isDefault) && nickname.equals(other.nickname);
     }
 
     @java.lang.Override
     public int hashCode() {
-        return Objects.hash(this.nickname);
+        return Objects.hash(this.address, this.isDefault, this.nickname);
     }
 
     @java.lang.Override
@@ -61,66 +89,90 @@ public final class UpdateMethodsRequest {
         return ObjectMappers.stringify(this);
     }
 
-    public static NicknameStage builder() {
+    public static Builder builder() {
         return new Builder();
     }
 
-    public interface NicknameStage {
-        /**
-         * <p>New label for the payout method, with at least one non-whitespace character and a maximum of 100 characters.</p>
-         */
-        _FinalStage nickname(@NotNull String nickname);
-
-        Builder from(UpdateMethodsRequest other);
-    }
-
-    public interface _FinalStage {
-        UpdateMethodsRequest build();
-
-        _FinalStage additionalProperty(String key, Object value);
-
-        _FinalStage additionalProperties(Map<String, Object> additionalProperties);
-    }
-
     @JsonIgnoreProperties(ignoreUnknown = true)
-    public static final class Builder implements NicknameStage, _FinalStage {
-        private String nickname;
+    public static final class Builder {
+        private Optional<UpdateMethodsRequestAddress> address = Optional.empty();
 
-        @JsonAnySetter
+        private Optional<Boolean> isDefault = Optional.empty();
+
+        private Optional<String> nickname = Optional.empty();
+
         private Map<String, Object> additionalProperties = new HashMap<>();
 
         private Builder() {}
 
-        @java.lang.Override
         public Builder from(UpdateMethodsRequest other) {
+            address(other.getAddress());
+            isDefault(other.getIsDefault());
             nickname(other.getNickname());
             return this;
         }
 
         /**
-         * <p>New label for the payout method, with at least one non-whitespace character and a maximum of 100 characters.</p>
-         * <p>New label for the payout method, with at least one non-whitespace character and a maximum of 100 characters.</p>
-         * @return Reference to {@code this} so that method calls can be chained together.
+         * <p>The payout address to keep on file for this payout method. Only the fields you send are changed; blank fields are ignored.</p>
          */
-        @java.lang.Override
-        @JsonSetter("nickname")
-        public _FinalStage nickname(@NotNull String nickname) {
-            this.nickname = Objects.requireNonNull(nickname, "nickname must not be null");
+        @JsonSetter(value = "address", nulls = Nulls.SKIP)
+        public Builder address(Optional<UpdateMethodsRequestAddress> address) {
+            this.address = address;
             return this;
         }
 
-        @java.lang.Override
-        public UpdateMethodsRequest build() {
-            return new UpdateMethodsRequest(nickname, additionalProperties);
+        public Builder address(UpdateMethodsRequestAddress address) {
+            this.address = Optional.ofNullable(address);
+            return this;
         }
 
-        @java.lang.Override
+        /**
+         * <p>Set to <code>true</code> to make this the account's default payout method. <code>false</code> is not accepted.</p>
+         */
+        @JsonSetter(value = "is_default", nulls = Nulls.SKIP)
+        public Builder isDefault(Optional<Boolean> isDefault) {
+            this.isDefault = isDefault;
+            return this;
+        }
+
+        public Builder isDefault(Boolean isDefault) {
+            this.isDefault = Optional.ofNullable(isDefault);
+            return this;
+        }
+
+        /**
+         * <p>New label for the payout method, with at least one non-whitespace character and a maximum of 100 characters.</p>
+         */
+        @JsonSetter(value = "nickname", nulls = Nulls.SKIP)
+        public Builder nickname(Optional<String> nickname) {
+            this.nickname = nickname;
+            return this;
+        }
+
+        public Builder nickname(String nickname) {
+            this.nickname = Optional.ofNullable(nickname);
+            return this;
+        }
+
+        public UpdateMethodsRequest build() {
+            return new UpdateMethodsRequest(address, isDefault, nickname, additionalProperties);
+        }
+
+        @JsonAnySetter
+        private void putAdditionalPropertyFromJson(String key, Object value) {
+            if (key.equalsIgnoreCase("address")
+                    || key.equalsIgnoreCase("is_default")
+                    || key.equalsIgnoreCase("nickname")) {
+                return;
+            }
+            this.additionalProperties.put(key, value);
+        }
+
         public Builder additionalProperty(String key, Object value) {
             this.additionalProperties.put(key, value);
             return this;
         }
 
-        @java.lang.Override
         public Builder additionalProperties(Map<String, Object> additionalProperties) {
             this.additionalProperties.putAll(additionalProperties);
             return this;

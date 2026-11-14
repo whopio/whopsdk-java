@@ -5,6 +5,7 @@ package com.whop.api.resources.identityprofiles;
 
 import com.whop.api.core.ClientOptions;
 import com.whop.api.core.RequestOptions;
+import com.whop.api.core.WhopApiHttpResponse;
 import com.whop.api.core.pagination.SyncPagingIterable;
 import com.whop.api.resources.identityprofiles.requests.ListIdentityProfileRequest;
 import com.whop.api.resources.identityprofiles.requests.ListVerificationsIdentityProfileRequest;
@@ -33,18 +34,27 @@ public class AsyncIdentityProfilesClient {
     }
 
     /**
-     * Returns a paginated list of identity profiles. When company_id is provided, lists IPs currently linked to that company's ledger. When omitted, lists IPs linked to any ledger the actor can read (including child companies under a parent).
+     * Lists the identity profiles currently linked to an account, or to every account you can read when <code>account_id</code> is omitted.
      * <p>Required permissions:</p>
      * <ul>
      * <li><code>identity:read</code></li>
      * </ul>
      */
     public CompletableFuture<SyncPagingIterable<IdentityProfileListItem>> listIdentityProfile() {
-        return this.rawClient.listIdentityProfile().thenApply(response -> response.body());
+        CompletableFuture<WhopApiHttpResponse<SyncPagingIterable<IdentityProfileListItem>>> rawFuture =
+                this.rawClient.listIdentityProfile();
+        CompletableFuture<SyncPagingIterable<IdentityProfileListItem>> future =
+                rawFuture.thenApply(response -> response.body());
+        future.whenComplete((result_, throwable_) -> {
+            if (future.isCancelled()) {
+                rawFuture.cancel(true);
+            }
+        });
+        return future;
     }
 
     /**
-     * Returns a paginated list of identity profiles. When company_id is provided, lists IPs currently linked to that company's ledger. When omitted, lists IPs linked to any ledger the actor can read (including child companies under a parent).
+     * Lists the identity profiles currently linked to an account, or to every account you can read when <code>account_id</code> is omitted.
      * <p>Required permissions:</p>
      * <ul>
      * <li><code>identity:read</code></li>
@@ -52,11 +62,20 @@ public class AsyncIdentityProfilesClient {
      */
     public CompletableFuture<SyncPagingIterable<IdentityProfileListItem>> listIdentityProfile(
             RequestOptions requestOptions) {
-        return this.rawClient.listIdentityProfile(requestOptions).thenApply(response -> response.body());
+        CompletableFuture<WhopApiHttpResponse<SyncPagingIterable<IdentityProfileListItem>>> rawFuture =
+                this.rawClient.listIdentityProfile(requestOptions);
+        CompletableFuture<SyncPagingIterable<IdentityProfileListItem>> future =
+                rawFuture.thenApply(response -> response.body());
+        future.whenComplete((result_, throwable_) -> {
+            if (future.isCancelled()) {
+                rawFuture.cancel(true);
+            }
+        });
+        return future;
     }
 
     /**
-     * Returns a paginated list of identity profiles. When company_id is provided, lists IPs currently linked to that company's ledger. When omitted, lists IPs linked to any ledger the actor can read (including child companies under a parent).
+     * Lists the identity profiles currently linked to an account, or to every account you can read when <code>account_id</code> is omitted.
      * <p>Required permissions:</p>
      * <ul>
      * <li><code>identity:read</code></li>
@@ -64,11 +83,20 @@ public class AsyncIdentityProfilesClient {
      */
     public CompletableFuture<SyncPagingIterable<IdentityProfileListItem>> listIdentityProfile(
             ListIdentityProfileRequest request) {
-        return this.rawClient.listIdentityProfile(request).thenApply(response -> response.body());
+        CompletableFuture<WhopApiHttpResponse<SyncPagingIterable<IdentityProfileListItem>>> rawFuture =
+                this.rawClient.listIdentityProfile(request);
+        CompletableFuture<SyncPagingIterable<IdentityProfileListItem>> future =
+                rawFuture.thenApply(response -> response.body());
+        future.whenComplete((result_, throwable_) -> {
+            if (future.isCancelled()) {
+                rawFuture.cancel(true);
+            }
+        });
+        return future;
     }
 
     /**
-     * Returns a paginated list of identity profiles. When company_id is provided, lists IPs currently linked to that company's ledger. When omitted, lists IPs linked to any ledger the actor can read (including child companies under a parent).
+     * Lists the identity profiles currently linked to an account, or to every account you can read when <code>account_id</code> is omitted.
      * <p>Required permissions:</p>
      * <ul>
      * <li><code>identity:read</code></li>
@@ -76,7 +104,16 @@ public class AsyncIdentityProfilesClient {
      */
     public CompletableFuture<SyncPagingIterable<IdentityProfileListItem>> listIdentityProfile(
             ListIdentityProfileRequest request, RequestOptions requestOptions) {
-        return this.rawClient.listIdentityProfile(request, requestOptions).thenApply(response -> response.body());
+        CompletableFuture<WhopApiHttpResponse<SyncPagingIterable<IdentityProfileListItem>>> rawFuture =
+                this.rawClient.listIdentityProfile(request, requestOptions);
+        CompletableFuture<SyncPagingIterable<IdentityProfileListItem>> future =
+                rawFuture.thenApply(response -> response.body());
+        future.whenComplete((result_, throwable_) -> {
+            if (future.isCancelled()) {
+                rawFuture.cancel(true);
+            }
+        });
+        return future;
     }
 
     /**
@@ -87,7 +124,14 @@ public class AsyncIdentityProfilesClient {
      * </ul>
      */
     public CompletableFuture<IdentityProfile> retrieveIdentityProfile(String id) {
-        return this.rawClient.retrieveIdentityProfile(id).thenApply(response -> response.body());
+        CompletableFuture<WhopApiHttpResponse<IdentityProfile>> rawFuture = this.rawClient.retrieveIdentityProfile(id);
+        CompletableFuture<IdentityProfile> future = rawFuture.thenApply(response -> response.body());
+        future.whenComplete((result_, throwable_) -> {
+            if (future.isCancelled()) {
+                rawFuture.cancel(true);
+            }
+        });
+        return future;
     }
 
     /**
@@ -98,7 +142,15 @@ public class AsyncIdentityProfilesClient {
      * </ul>
      */
     public CompletableFuture<IdentityProfile> retrieveIdentityProfile(String id, RequestOptions requestOptions) {
-        return this.rawClient.retrieveIdentityProfile(id, requestOptions).thenApply(response -> response.body());
+        CompletableFuture<WhopApiHttpResponse<IdentityProfile>> rawFuture =
+                this.rawClient.retrieveIdentityProfile(id, requestOptions);
+        CompletableFuture<IdentityProfile> future = rawFuture.thenApply(response -> response.body());
+        future.whenComplete((result_, throwable_) -> {
+            if (future.isCancelled()) {
+                rawFuture.cancel(true);
+            }
+        });
+        return future;
     }
 
     /**
@@ -110,7 +162,15 @@ public class AsyncIdentityProfilesClient {
      */
     public CompletableFuture<IdentityProfile> retrieveIdentityProfile(
             String id, RetrieveIdentityProfileRequest request) {
-        return this.rawClient.retrieveIdentityProfile(id, request).thenApply(response -> response.body());
+        CompletableFuture<WhopApiHttpResponse<IdentityProfile>> rawFuture =
+                this.rawClient.retrieveIdentityProfile(id, request);
+        CompletableFuture<IdentityProfile> future = rawFuture.thenApply(response -> response.body());
+        future.whenComplete((result_, throwable_) -> {
+            if (future.isCancelled()) {
+                rawFuture.cancel(true);
+            }
+        });
+        return future;
     }
 
     /**
@@ -122,24 +182,54 @@ public class AsyncIdentityProfilesClient {
      */
     public CompletableFuture<IdentityProfile> retrieveIdentityProfile(
             String id, RetrieveIdentityProfileRequest request, RequestOptions requestOptions) {
-        return this.rawClient
-                .retrieveIdentityProfile(id, request, requestOptions)
-                .thenApply(response -> response.body());
+        CompletableFuture<WhopApiHttpResponse<IdentityProfile>> rawFuture =
+                this.rawClient.retrieveIdentityProfile(id, request, requestOptions);
+        CompletableFuture<IdentityProfile> future = rawFuture.thenApply(response -> response.body());
+        future.whenComplete((result_, throwable_) -> {
+            if (future.isCancelled()) {
+                rawFuture.cancel(true);
+            }
+        });
+        return future;
     }
 
     /**
-     * Unlinks an IdentityProfile from a LedgerAccount (flips the matching link to is_current=false).
+     * Unlinks an identity profile from the account or user that owns <code>ledger_account_id</code>. Requires <code>identity:write</code> on that account or user.
+     * <p>Required permissions:</p>
+     * <ul>
+     * <li><code>identity:write</code></li>
+     * </ul>
      */
     public CompletableFuture<IdentityProfile> unlinkIdentityProfile(String id, UnlinkIdentityProfileRequest request) {
-        return this.rawClient.unlinkIdentityProfile(id, request).thenApply(response -> response.body());
+        CompletableFuture<WhopApiHttpResponse<IdentityProfile>> rawFuture =
+                this.rawClient.unlinkIdentityProfile(id, request);
+        CompletableFuture<IdentityProfile> future = rawFuture.thenApply(response -> response.body());
+        future.whenComplete((result_, throwable_) -> {
+            if (future.isCancelled()) {
+                rawFuture.cancel(true);
+            }
+        });
+        return future;
     }
 
     /**
-     * Unlinks an IdentityProfile from a LedgerAccount (flips the matching link to is_current=false).
+     * Unlinks an identity profile from the account or user that owns <code>ledger_account_id</code>. Requires <code>identity:write</code> on that account or user.
+     * <p>Required permissions:</p>
+     * <ul>
+     * <li><code>identity:write</code></li>
+     * </ul>
      */
     public CompletableFuture<IdentityProfile> unlinkIdentityProfile(
             String id, UnlinkIdentityProfileRequest request, RequestOptions requestOptions) {
-        return this.rawClient.unlinkIdentityProfile(id, request, requestOptions).thenApply(response -> response.body());
+        CompletableFuture<WhopApiHttpResponse<IdentityProfile>> rawFuture =
+                this.rawClient.unlinkIdentityProfile(id, request, requestOptions);
+        CompletableFuture<IdentityProfile> future = rawFuture.thenApply(response -> response.body());
+        future.whenComplete((result_, throwable_) -> {
+            if (future.isCancelled()) {
+                rawFuture.cancel(true);
+            }
+        });
+        return future;
     }
 
     /**
@@ -151,7 +241,16 @@ public class AsyncIdentityProfilesClient {
      */
     public CompletableFuture<SyncPagingIterable<ListVerificationsIdentityProfileResponseDataItem>>
             listVerificationsIdentityProfile(String id) {
-        return this.rawClient.listVerificationsIdentityProfile(id).thenApply(response -> response.body());
+        CompletableFuture<WhopApiHttpResponse<SyncPagingIterable<ListVerificationsIdentityProfileResponseDataItem>>>
+                rawFuture = this.rawClient.listVerificationsIdentityProfile(id);
+        CompletableFuture<SyncPagingIterable<ListVerificationsIdentityProfileResponseDataItem>> future =
+                rawFuture.thenApply(response -> response.body());
+        future.whenComplete((result_, throwable_) -> {
+            if (future.isCancelled()) {
+                rawFuture.cancel(true);
+            }
+        });
+        return future;
     }
 
     /**
@@ -163,9 +262,16 @@ public class AsyncIdentityProfilesClient {
      */
     public CompletableFuture<SyncPagingIterable<ListVerificationsIdentityProfileResponseDataItem>>
             listVerificationsIdentityProfile(String id, RequestOptions requestOptions) {
-        return this.rawClient
-                .listVerificationsIdentityProfile(id, requestOptions)
-                .thenApply(response -> response.body());
+        CompletableFuture<WhopApiHttpResponse<SyncPagingIterable<ListVerificationsIdentityProfileResponseDataItem>>>
+                rawFuture = this.rawClient.listVerificationsIdentityProfile(id, requestOptions);
+        CompletableFuture<SyncPagingIterable<ListVerificationsIdentityProfileResponseDataItem>> future =
+                rawFuture.thenApply(response -> response.body());
+        future.whenComplete((result_, throwable_) -> {
+            if (future.isCancelled()) {
+                rawFuture.cancel(true);
+            }
+        });
+        return future;
     }
 
     /**
@@ -177,7 +283,16 @@ public class AsyncIdentityProfilesClient {
      */
     public CompletableFuture<SyncPagingIterable<ListVerificationsIdentityProfileResponseDataItem>>
             listVerificationsIdentityProfile(String id, ListVerificationsIdentityProfileRequest request) {
-        return this.rawClient.listVerificationsIdentityProfile(id, request).thenApply(response -> response.body());
+        CompletableFuture<WhopApiHttpResponse<SyncPagingIterable<ListVerificationsIdentityProfileResponseDataItem>>>
+                rawFuture = this.rawClient.listVerificationsIdentityProfile(id, request);
+        CompletableFuture<SyncPagingIterable<ListVerificationsIdentityProfileResponseDataItem>> future =
+                rawFuture.thenApply(response -> response.body());
+        future.whenComplete((result_, throwable_) -> {
+            if (future.isCancelled()) {
+                rawFuture.cancel(true);
+            }
+        });
+        return future;
     }
 
     /**
@@ -190,8 +305,15 @@ public class AsyncIdentityProfilesClient {
     public CompletableFuture<SyncPagingIterable<ListVerificationsIdentityProfileResponseDataItem>>
             listVerificationsIdentityProfile(
                     String id, ListVerificationsIdentityProfileRequest request, RequestOptions requestOptions) {
-        return this.rawClient
-                .listVerificationsIdentityProfile(id, request, requestOptions)
-                .thenApply(response -> response.body());
+        CompletableFuture<WhopApiHttpResponse<SyncPagingIterable<ListVerificationsIdentityProfileResponseDataItem>>>
+                rawFuture = this.rawClient.listVerificationsIdentityProfile(id, request, requestOptions);
+        CompletableFuture<SyncPagingIterable<ListVerificationsIdentityProfileResponseDataItem>> future =
+                rawFuture.thenApply(response -> response.body());
+        future.whenComplete((result_, throwable_) -> {
+            if (future.isCancelled()) {
+                rawFuture.cancel(true);
+            }
+        });
+        return future;
     }
 }

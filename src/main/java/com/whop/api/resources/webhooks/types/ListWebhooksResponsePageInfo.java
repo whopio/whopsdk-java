@@ -156,7 +156,6 @@ public final class ListWebhooksResponsePageInfo {
 
         private Optional<String> endCursor = Optional.empty();
 
-        @JsonAnySetter
         private Map<String, Object> additionalProperties = new HashMap<>();
 
         private Builder() {}
@@ -238,6 +237,17 @@ public final class ListWebhooksResponsePageInfo {
         public ListWebhooksResponsePageInfo build() {
             return new ListWebhooksResponsePageInfo(
                     endCursor, hasNextPage, hasPreviousPage, startCursor, additionalProperties);
+        }
+
+        @JsonAnySetter
+        private void putAdditionalPropertyFromJson(String key, Object value) {
+            if (key.equalsIgnoreCase("end_cursor")
+                    || key.equalsIgnoreCase("has_next_page")
+                    || key.equalsIgnoreCase("has_previous_page")
+                    || key.equalsIgnoreCase("start_cursor")) {
+                return;
+            }
+            this.additionalProperties.put(key, value);
         }
 
         @java.lang.Override

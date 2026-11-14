@@ -12,7 +12,8 @@ import com.fasterxml.jackson.annotation.JsonSetter;
 import com.fasterxml.jackson.annotation.Nulls;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.whop.api.core.ObjectMappers;
-import com.whop.api.types.Direction;
+import com.whop.api.resources.messages.types.ListMessagesRequestDirection;
+import com.whop.api.resources.messages.types.ListMessagesRequestOrder;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
@@ -22,55 +23,187 @@ import org.jetbrains.annotations.NotNull;
 @JsonInclude(JsonInclude.Include.NON_ABSENT)
 @JsonDeserialize(builder = ListMessagesRequest.Builder.class)
 public final class ListMessagesRequest {
-    private final Optional<String> after;
+    private final String channelId;
 
-    private final Optional<String> before;
+    private final Optional<String> replyingToMessageId;
+
+    private final Optional<Boolean> pinned;
+
+    private final Optional<Boolean> includeDeleted;
+
+    private final Optional<String> createdAfter;
+
+    private final Optional<String> createdBefore;
+
+    private final Optional<String> updatedAfter;
+
+    private final Optional<String> beforeMessageId;
+
+    private final Optional<String> afterMessageId;
+
+    private final Optional<String> aroundMessageId;
+
+    private final Optional<String> aroundTimestamp;
+
+    private final Optional<ListMessagesRequestOrder> order;
+
+    private final Optional<ListMessagesRequestDirection> direction;
 
     private final Optional<Integer> first;
 
+    private final Optional<String> after;
+
     private final Optional<Integer> last;
 
-    private final String channelId;
-
-    private final Optional<Direction> direction;
+    private final Optional<String> before;
 
     private final Map<String, Object> additionalProperties;
 
     private ListMessagesRequest(
-            Optional<String> after,
-            Optional<String> before,
-            Optional<Integer> first,
-            Optional<Integer> last,
             String channelId,
-            Optional<Direction> direction,
+            Optional<String> replyingToMessageId,
+            Optional<Boolean> pinned,
+            Optional<Boolean> includeDeleted,
+            Optional<String> createdAfter,
+            Optional<String> createdBefore,
+            Optional<String> updatedAfter,
+            Optional<String> beforeMessageId,
+            Optional<String> afterMessageId,
+            Optional<String> aroundMessageId,
+            Optional<String> aroundTimestamp,
+            Optional<ListMessagesRequestOrder> order,
+            Optional<ListMessagesRequestDirection> direction,
+            Optional<Integer> first,
+            Optional<String> after,
+            Optional<Integer> last,
+            Optional<String> before,
             Map<String, Object> additionalProperties) {
-        this.after = after;
-        this.before = before;
-        this.first = first;
-        this.last = last;
         this.channelId = channelId;
+        this.replyingToMessageId = replyingToMessageId;
+        this.pinned = pinned;
+        this.includeDeleted = includeDeleted;
+        this.createdAfter = createdAfter;
+        this.createdBefore = createdBefore;
+        this.updatedAfter = updatedAfter;
+        this.beforeMessageId = beforeMessageId;
+        this.afterMessageId = afterMessageId;
+        this.aroundMessageId = aroundMessageId;
+        this.aroundTimestamp = aroundTimestamp;
+        this.order = order;
         this.direction = direction;
+        this.first = first;
+        this.after = after;
+        this.last = last;
+        this.before = before;
         this.additionalProperties = additionalProperties;
     }
 
     /**
-     * @return <p>the elements in the list that come after the specified cursor.</p>
+     * @return Filter by public channel ID. An experience ID is also accepted for experience chat.
      */
-    @JsonProperty("after")
-    public Optional<String> getAfter() {
-        return after;
+    @JsonProperty("channel_id")
+    public String getChannelId() {
+        return channelId;
     }
 
     /**
-     * @return <p>the elements in the list that come before the specified cursor.</p>
+     * @return Return replies to this message.
      */
-    @JsonProperty("before")
-    public Optional<String> getBefore() {
-        return before;
+    @JsonProperty("replying_to_message_id")
+    public Optional<String> getReplyingToMessageId() {
+        return replyingToMessageId;
     }
 
     /**
-     * @return <p>the first <em>n</em> elements from the list.</p>
+     * @return Filter by message pin state.
+     */
+    @JsonProperty("pinned")
+    public Optional<Boolean> getPinned() {
+        return pinned;
+    }
+
+    /**
+     * @return Include redacted deletion entries for cache synchronization.
+     */
+    @JsonProperty("include_deleted")
+    public Optional<Boolean> getIncludeDeleted() {
+        return includeDeleted;
+    }
+
+    /**
+     * @return Return messages created strictly after this ISO 8601 timestamp.
+     */
+    @JsonProperty("created_after")
+    public Optional<String> getCreatedAfter() {
+        return createdAfter;
+    }
+
+    /**
+     * @return Return messages created strictly before this ISO 8601 timestamp.
+     */
+    @JsonProperty("created_before")
+    public Optional<String> getCreatedBefore() {
+        return createdBefore;
+    }
+
+    /**
+     * @return Return messages changed at or after this ISO 8601 timestamp in ascending change order. Cannot be combined with history filters, around anchors, order, or direction.
+     */
+    @JsonProperty("updated_after")
+    public Optional<String> getUpdatedAfter() {
+        return updatedAfter;
+    }
+
+    /**
+     * @return Filter messages strictly before this message in channel_id by creation time and message ID. Deleted anchors are accepted; missing or other-channel IDs return 404. Cannot be combined with around anchors or updated_after.
+     */
+    @JsonProperty("before_message_id")
+    public Optional<String> getBeforeMessageId() {
+        return beforeMessageId;
+    }
+
+    /**
+     * @return Filter messages strictly after this message in channel_id by creation time and message ID. Deleted anchors are accepted; missing or other-channel IDs return 404. Cannot be combined with around anchors or updated_after.
+     */
+    @JsonProperty("after_message_id")
+    public Optional<String> getAfterMessageId() {
+        return afterMessageId;
+    }
+
+    /**
+     * @return Center the first page around this live message in the selected channel.
+     */
+    @JsonProperty("around_message_id")
+    public Optional<String> getAroundMessageId() {
+        return aroundMessageId;
+    }
+
+    /**
+     * @return Center the first page around this ISO 8601 timestamp in the selected channel.
+     */
+    @JsonProperty("around_timestamp")
+    public Optional<String> getAroundTimestamp() {
+        return aroundTimestamp;
+    }
+
+    /**
+     * @return History sort field. Defaults to created_at. Cannot be supplied with updated_after or around anchors.
+     */
+    @JsonProperty("order")
+    public Optional<ListMessagesRequestOrder> getOrder() {
+        return order;
+    }
+
+    /**
+     * @return History sort direction. Defaults to desc. Cannot be supplied with updated_after or around anchors.
+     */
+    @JsonProperty("direction")
+    public Optional<ListMessagesRequestDirection> getDirection() {
+        return direction;
+    }
+
+    /**
+     * @return Number of results to return from the start of the range.
      */
     @JsonProperty("first")
     public Optional<Integer> getFirst() {
@@ -78,7 +211,15 @@ public final class ListMessagesRequest {
     }
 
     /**
-     * @return <p>the last <em>n</em> elements from the list.</p>
+     * @return Return results after this cursor. Use <code>page_info.end_cursor</code> from the previous response to fetch the next page.
+     */
+    @JsonProperty("after")
+    public Optional<String> getAfter() {
+        return after;
+    }
+
+    /**
+     * @return Number of results to return from the end of the range.
      */
     @JsonProperty("last")
     public Optional<Integer> getLast() {
@@ -86,16 +227,11 @@ public final class ListMessagesRequest {
     }
 
     /**
-     * @return The unique identifier of the channel or experience to list messages for.
+     * @return Return results before this cursor. Use <code>page_info.start_cursor</code> from the previous response to fetch the previous page.
      */
-    @JsonProperty("channel_id")
-    public String getChannelId() {
-        return channelId;
-    }
-
-    @JsonProperty("direction")
-    public Optional<Direction> getDirection() {
-        return direction;
+    @JsonProperty("before")
+    public Optional<String> getBefore() {
+        return before;
     }
 
     @java.lang.Override
@@ -110,17 +246,45 @@ public final class ListMessagesRequest {
     }
 
     private boolean equalTo(ListMessagesRequest other) {
-        return after.equals(other.after)
-                && before.equals(other.before)
+        return channelId.equals(other.channelId)
+                && replyingToMessageId.equals(other.replyingToMessageId)
+                && pinned.equals(other.pinned)
+                && includeDeleted.equals(other.includeDeleted)
+                && createdAfter.equals(other.createdAfter)
+                && createdBefore.equals(other.createdBefore)
+                && updatedAfter.equals(other.updatedAfter)
+                && beforeMessageId.equals(other.beforeMessageId)
+                && afterMessageId.equals(other.afterMessageId)
+                && aroundMessageId.equals(other.aroundMessageId)
+                && aroundTimestamp.equals(other.aroundTimestamp)
+                && order.equals(other.order)
+                && direction.equals(other.direction)
                 && first.equals(other.first)
+                && after.equals(other.after)
                 && last.equals(other.last)
-                && channelId.equals(other.channelId)
-                && direction.equals(other.direction);
+                && before.equals(other.before);
     }
 
     @java.lang.Override
     public int hashCode() {
-        return Objects.hash(this.after, this.before, this.first, this.last, this.channelId, this.direction);
+        return Objects.hash(
+                this.channelId,
+                this.replyingToMessageId,
+                this.pinned,
+                this.includeDeleted,
+                this.createdAfter,
+                this.createdBefore,
+                this.updatedAfter,
+                this.beforeMessageId,
+                this.afterMessageId,
+                this.aroundMessageId,
+                this.aroundTimestamp,
+                this.order,
+                this.direction,
+                this.first,
+                this.after,
+                this.last,
+                this.before);
     }
 
     @java.lang.Override
@@ -134,7 +298,7 @@ public final class ListMessagesRequest {
 
     public interface ChannelIdStage {
         /**
-         * <p>The unique identifier of the channel or experience to list messages for.</p>
+         * <p>Filter by public channel ID. An experience ID is also accepted for experience chat.</p>
          */
         _FinalStage channelId(@NotNull String channelId);
 
@@ -149,71 +313,182 @@ public final class ListMessagesRequest {
         _FinalStage additionalProperties(Map<String, Object> additionalProperties);
 
         /**
-         * <p>Returns the elements in the list that come after the specified cursor.</p>
+         * <p>Return replies to this message.</p>
          */
-        _FinalStage after(Optional<String> after);
+        _FinalStage replyingToMessageId(Optional<String> replyingToMessageId);
 
-        _FinalStage after(String after);
+        _FinalStage replyingToMessageId(String replyingToMessageId);
 
         /**
-         * <p>Returns the elements in the list that come before the specified cursor.</p>
+         * <p>Filter by message pin state.</p>
          */
-        _FinalStage before(Optional<String> before);
+        _FinalStage pinned(Optional<Boolean> pinned);
 
-        _FinalStage before(String before);
+        _FinalStage pinned(Boolean pinned);
 
         /**
-         * <p>Returns the first <em>n</em> elements from the list.</p>
+         * <p>Include redacted deletion entries for cache synchronization.</p>
+         */
+        _FinalStage includeDeleted(Optional<Boolean> includeDeleted);
+
+        _FinalStage includeDeleted(Boolean includeDeleted);
+
+        /**
+         * <p>Return messages created strictly after this ISO 8601 timestamp.</p>
+         */
+        _FinalStage createdAfter(Optional<String> createdAfter);
+
+        _FinalStage createdAfter(String createdAfter);
+
+        /**
+         * <p>Return messages created strictly before this ISO 8601 timestamp.</p>
+         */
+        _FinalStage createdBefore(Optional<String> createdBefore);
+
+        _FinalStage createdBefore(String createdBefore);
+
+        /**
+         * <p>Return messages changed at or after this ISO 8601 timestamp in ascending change order. Cannot be combined with history filters, around anchors, order, or direction.</p>
+         */
+        _FinalStage updatedAfter(Optional<String> updatedAfter);
+
+        _FinalStage updatedAfter(String updatedAfter);
+
+        /**
+         * <p>Filter messages strictly before this message in channel_id by creation time and message ID. Deleted anchors are accepted; missing or other-channel IDs return 404. Cannot be combined with around anchors or updated_after.</p>
+         */
+        _FinalStage beforeMessageId(Optional<String> beforeMessageId);
+
+        _FinalStage beforeMessageId(String beforeMessageId);
+
+        /**
+         * <p>Filter messages strictly after this message in channel_id by creation time and message ID. Deleted anchors are accepted; missing or other-channel IDs return 404. Cannot be combined with around anchors or updated_after.</p>
+         */
+        _FinalStage afterMessageId(Optional<String> afterMessageId);
+
+        _FinalStage afterMessageId(String afterMessageId);
+
+        /**
+         * <p>Center the first page around this live message in the selected channel.</p>
+         */
+        _FinalStage aroundMessageId(Optional<String> aroundMessageId);
+
+        _FinalStage aroundMessageId(String aroundMessageId);
+
+        /**
+         * <p>Center the first page around this ISO 8601 timestamp in the selected channel.</p>
+         */
+        _FinalStage aroundTimestamp(Optional<String> aroundTimestamp);
+
+        _FinalStage aroundTimestamp(String aroundTimestamp);
+
+        /**
+         * <p>History sort field. Defaults to created_at. Cannot be supplied with updated_after or around anchors.</p>
+         */
+        _FinalStage order(Optional<ListMessagesRequestOrder> order);
+
+        _FinalStage order(ListMessagesRequestOrder order);
+
+        /**
+         * <p>History sort direction. Defaults to desc. Cannot be supplied with updated_after or around anchors.</p>
+         */
+        _FinalStage direction(Optional<ListMessagesRequestDirection> direction);
+
+        _FinalStage direction(ListMessagesRequestDirection direction);
+
+        /**
+         * <p>Number of results to return from the start of the range.</p>
          */
         _FinalStage first(Optional<Integer> first);
 
         _FinalStage first(Integer first);
 
         /**
-         * <p>Returns the last <em>n</em> elements from the list.</p>
+         * <p>Return results after this cursor. Use <code>page_info.end_cursor</code> from the previous response to fetch the next page.</p>
+         */
+        _FinalStage after(Optional<String> after);
+
+        _FinalStage after(String after);
+
+        /**
+         * <p>Number of results to return from the end of the range.</p>
          */
         _FinalStage last(Optional<Integer> last);
 
         _FinalStage last(Integer last);
 
-        _FinalStage direction(Optional<Direction> direction);
+        /**
+         * <p>Return results before this cursor. Use <code>page_info.start_cursor</code> from the previous response to fetch the previous page.</p>
+         */
+        _FinalStage before(Optional<String> before);
 
-        _FinalStage direction(Direction direction);
+        _FinalStage before(String before);
     }
 
     @JsonIgnoreProperties(ignoreUnknown = true)
     public static final class Builder implements ChannelIdStage, _FinalStage {
         private String channelId;
 
-        private Optional<Direction> direction = Optional.empty();
+        private Optional<String> before = Optional.empty();
 
         private Optional<Integer> last = Optional.empty();
 
-        private Optional<Integer> first = Optional.empty();
-
-        private Optional<String> before = Optional.empty();
-
         private Optional<String> after = Optional.empty();
 
-        @JsonAnySetter
+        private Optional<Integer> first = Optional.empty();
+
+        private Optional<ListMessagesRequestDirection> direction = Optional.empty();
+
+        private Optional<ListMessagesRequestOrder> order = Optional.empty();
+
+        private Optional<String> aroundTimestamp = Optional.empty();
+
+        private Optional<String> aroundMessageId = Optional.empty();
+
+        private Optional<String> afterMessageId = Optional.empty();
+
+        private Optional<String> beforeMessageId = Optional.empty();
+
+        private Optional<String> updatedAfter = Optional.empty();
+
+        private Optional<String> createdBefore = Optional.empty();
+
+        private Optional<String> createdAfter = Optional.empty();
+
+        private Optional<Boolean> includeDeleted = Optional.empty();
+
+        private Optional<Boolean> pinned = Optional.empty();
+
+        private Optional<String> replyingToMessageId = Optional.empty();
+
         private Map<String, Object> additionalProperties = new HashMap<>();
 
         private Builder() {}
 
         @java.lang.Override
         public Builder from(ListMessagesRequest other) {
-            after(other.getAfter());
-            before(other.getBefore());
-            first(other.getFirst());
-            last(other.getLast());
             channelId(other.getChannelId());
+            replyingToMessageId(other.getReplyingToMessageId());
+            pinned(other.getPinned());
+            includeDeleted(other.getIncludeDeleted());
+            createdAfter(other.getCreatedAfter());
+            createdBefore(other.getCreatedBefore());
+            updatedAfter(other.getUpdatedAfter());
+            beforeMessageId(other.getBeforeMessageId());
+            afterMessageId(other.getAfterMessageId());
+            aroundMessageId(other.getAroundMessageId());
+            aroundTimestamp(other.getAroundTimestamp());
+            order(other.getOrder());
             direction(other.getDirection());
+            first(other.getFirst());
+            after(other.getAfter());
+            last(other.getLast());
+            before(other.getBefore());
             return this;
         }
 
         /**
-         * <p>The unique identifier of the channel or experience to list messages for.</p>
-         * <p>The unique identifier of the channel or experience to list messages for.</p>
+         * <p>Filter by public channel ID. An experience ID is also accepted for experience chat.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
@@ -223,61 +498,8 @@ public final class ListMessagesRequest {
             return this;
         }
 
-        @java.lang.Override
-        public _FinalStage direction(Direction direction) {
-            this.direction = Optional.ofNullable(direction);
-            return this;
-        }
-
-        @java.lang.Override
-        @JsonSetter(value = "direction", nulls = Nulls.SKIP)
-        public _FinalStage direction(Optional<Direction> direction) {
-            this.direction = direction;
-            return this;
-        }
-
         /**
-         * <p>Returns the last <em>n</em> elements from the list.</p>
-         * @return Reference to {@code this} so that method calls can be chained together.
-         */
-        @java.lang.Override
-        public _FinalStage last(Integer last) {
-            this.last = Optional.ofNullable(last);
-            return this;
-        }
-
-        /**
-         * <p>Returns the last <em>n</em> elements from the list.</p>
-         */
-        @java.lang.Override
-        @JsonSetter(value = "last", nulls = Nulls.SKIP)
-        public _FinalStage last(Optional<Integer> last) {
-            this.last = last;
-            return this;
-        }
-
-        /**
-         * <p>Returns the first <em>n</em> elements from the list.</p>
-         * @return Reference to {@code this} so that method calls can be chained together.
-         */
-        @java.lang.Override
-        public _FinalStage first(Integer first) {
-            this.first = Optional.ofNullable(first);
-            return this;
-        }
-
-        /**
-         * <p>Returns the first <em>n</em> elements from the list.</p>
-         */
-        @java.lang.Override
-        @JsonSetter(value = "first", nulls = Nulls.SKIP)
-        public _FinalStage first(Optional<Integer> first) {
-            this.first = first;
-            return this;
-        }
-
-        /**
-         * <p>Returns the elements in the list that come before the specified cursor.</p>
+         * <p>Return results before this cursor. Use <code>page_info.start_cursor</code> from the previous response to fetch the previous page.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
@@ -287,7 +509,7 @@ public final class ListMessagesRequest {
         }
 
         /**
-         * <p>Returns the elements in the list that come before the specified cursor.</p>
+         * <p>Return results before this cursor. Use <code>page_info.start_cursor</code> from the previous response to fetch the previous page.</p>
          */
         @java.lang.Override
         @JsonSetter(value = "before", nulls = Nulls.SKIP)
@@ -297,7 +519,27 @@ public final class ListMessagesRequest {
         }
 
         /**
-         * <p>Returns the elements in the list that come after the specified cursor.</p>
+         * <p>Number of results to return from the end of the range.</p>
+         * @return Reference to {@code this} so that method calls can be chained together.
+         */
+        @java.lang.Override
+        public _FinalStage last(Integer last) {
+            this.last = Optional.ofNullable(last);
+            return this;
+        }
+
+        /**
+         * <p>Number of results to return from the end of the range.</p>
+         */
+        @java.lang.Override
+        @JsonSetter(value = "last", nulls = Nulls.SKIP)
+        public _FinalStage last(Optional<Integer> last) {
+            this.last = last;
+            return this;
+        }
+
+        /**
+         * <p>Return results after this cursor. Use <code>page_info.end_cursor</code> from the previous response to fetch the next page.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
@@ -307,7 +549,7 @@ public final class ListMessagesRequest {
         }
 
         /**
-         * <p>Returns the elements in the list that come after the specified cursor.</p>
+         * <p>Return results after this cursor. Use <code>page_info.end_cursor</code> from the previous response to fetch the next page.</p>
          */
         @java.lang.Override
         @JsonSetter(value = "after", nulls = Nulls.SKIP)
@@ -316,9 +558,311 @@ public final class ListMessagesRequest {
             return this;
         }
 
+        /**
+         * <p>Number of results to return from the start of the range.</p>
+         * @return Reference to {@code this} so that method calls can be chained together.
+         */
+        @java.lang.Override
+        public _FinalStage first(Integer first) {
+            this.first = Optional.ofNullable(first);
+            return this;
+        }
+
+        /**
+         * <p>Number of results to return from the start of the range.</p>
+         */
+        @java.lang.Override
+        @JsonSetter(value = "first", nulls = Nulls.SKIP)
+        public _FinalStage first(Optional<Integer> first) {
+            this.first = first;
+            return this;
+        }
+
+        /**
+         * <p>History sort direction. Defaults to desc. Cannot be supplied with updated_after or around anchors.</p>
+         * @return Reference to {@code this} so that method calls can be chained together.
+         */
+        @java.lang.Override
+        public _FinalStage direction(ListMessagesRequestDirection direction) {
+            this.direction = Optional.ofNullable(direction);
+            return this;
+        }
+
+        /**
+         * <p>History sort direction. Defaults to desc. Cannot be supplied with updated_after or around anchors.</p>
+         */
+        @java.lang.Override
+        @JsonSetter(value = "direction", nulls = Nulls.SKIP)
+        public _FinalStage direction(Optional<ListMessagesRequestDirection> direction) {
+            this.direction = direction;
+            return this;
+        }
+
+        /**
+         * <p>History sort field. Defaults to created_at. Cannot be supplied with updated_after or around anchors.</p>
+         * @return Reference to {@code this} so that method calls can be chained together.
+         */
+        @java.lang.Override
+        public _FinalStage order(ListMessagesRequestOrder order) {
+            this.order = Optional.ofNullable(order);
+            return this;
+        }
+
+        /**
+         * <p>History sort field. Defaults to created_at. Cannot be supplied with updated_after or around anchors.</p>
+         */
+        @java.lang.Override
+        @JsonSetter(value = "order", nulls = Nulls.SKIP)
+        public _FinalStage order(Optional<ListMessagesRequestOrder> order) {
+            this.order = order;
+            return this;
+        }
+
+        /**
+         * <p>Center the first page around this ISO 8601 timestamp in the selected channel.</p>
+         * @return Reference to {@code this} so that method calls can be chained together.
+         */
+        @java.lang.Override
+        public _FinalStage aroundTimestamp(String aroundTimestamp) {
+            this.aroundTimestamp = Optional.ofNullable(aroundTimestamp);
+            return this;
+        }
+
+        /**
+         * <p>Center the first page around this ISO 8601 timestamp in the selected channel.</p>
+         */
+        @java.lang.Override
+        @JsonSetter(value = "around_timestamp", nulls = Nulls.SKIP)
+        public _FinalStage aroundTimestamp(Optional<String> aroundTimestamp) {
+            this.aroundTimestamp = aroundTimestamp;
+            return this;
+        }
+
+        /**
+         * <p>Center the first page around this live message in the selected channel.</p>
+         * @return Reference to {@code this} so that method calls can be chained together.
+         */
+        @java.lang.Override
+        public _FinalStage aroundMessageId(String aroundMessageId) {
+            this.aroundMessageId = Optional.ofNullable(aroundMessageId);
+            return this;
+        }
+
+        /**
+         * <p>Center the first page around this live message in the selected channel.</p>
+         */
+        @java.lang.Override
+        @JsonSetter(value = "around_message_id", nulls = Nulls.SKIP)
+        public _FinalStage aroundMessageId(Optional<String> aroundMessageId) {
+            this.aroundMessageId = aroundMessageId;
+            return this;
+        }
+
+        /**
+         * <p>Filter messages strictly after this message in channel_id by creation time and message ID. Deleted anchors are accepted; missing or other-channel IDs return 404. Cannot be combined with around anchors or updated_after.</p>
+         * @return Reference to {@code this} so that method calls can be chained together.
+         */
+        @java.lang.Override
+        public _FinalStage afterMessageId(String afterMessageId) {
+            this.afterMessageId = Optional.ofNullable(afterMessageId);
+            return this;
+        }
+
+        /**
+         * <p>Filter messages strictly after this message in channel_id by creation time and message ID. Deleted anchors are accepted; missing or other-channel IDs return 404. Cannot be combined with around anchors or updated_after.</p>
+         */
+        @java.lang.Override
+        @JsonSetter(value = "after_message_id", nulls = Nulls.SKIP)
+        public _FinalStage afterMessageId(Optional<String> afterMessageId) {
+            this.afterMessageId = afterMessageId;
+            return this;
+        }
+
+        /**
+         * <p>Filter messages strictly before this message in channel_id by creation time and message ID. Deleted anchors are accepted; missing or other-channel IDs return 404. Cannot be combined with around anchors or updated_after.</p>
+         * @return Reference to {@code this} so that method calls can be chained together.
+         */
+        @java.lang.Override
+        public _FinalStage beforeMessageId(String beforeMessageId) {
+            this.beforeMessageId = Optional.ofNullable(beforeMessageId);
+            return this;
+        }
+
+        /**
+         * <p>Filter messages strictly before this message in channel_id by creation time and message ID. Deleted anchors are accepted; missing or other-channel IDs return 404. Cannot be combined with around anchors or updated_after.</p>
+         */
+        @java.lang.Override
+        @JsonSetter(value = "before_message_id", nulls = Nulls.SKIP)
+        public _FinalStage beforeMessageId(Optional<String> beforeMessageId) {
+            this.beforeMessageId = beforeMessageId;
+            return this;
+        }
+
+        /**
+         * <p>Return messages changed at or after this ISO 8601 timestamp in ascending change order. Cannot be combined with history filters, around anchors, order, or direction.</p>
+         * @return Reference to {@code this} so that method calls can be chained together.
+         */
+        @java.lang.Override
+        public _FinalStage updatedAfter(String updatedAfter) {
+            this.updatedAfter = Optional.ofNullable(updatedAfter);
+            return this;
+        }
+
+        /**
+         * <p>Return messages changed at or after this ISO 8601 timestamp in ascending change order. Cannot be combined with history filters, around anchors, order, or direction.</p>
+         */
+        @java.lang.Override
+        @JsonSetter(value = "updated_after", nulls = Nulls.SKIP)
+        public _FinalStage updatedAfter(Optional<String> updatedAfter) {
+            this.updatedAfter = updatedAfter;
+            return this;
+        }
+
+        /**
+         * <p>Return messages created strictly before this ISO 8601 timestamp.</p>
+         * @return Reference to {@code this} so that method calls can be chained together.
+         */
+        @java.lang.Override
+        public _FinalStage createdBefore(String createdBefore) {
+            this.createdBefore = Optional.ofNullable(createdBefore);
+            return this;
+        }
+
+        /**
+         * <p>Return messages created strictly before this ISO 8601 timestamp.</p>
+         */
+        @java.lang.Override
+        @JsonSetter(value = "created_before", nulls = Nulls.SKIP)
+        public _FinalStage createdBefore(Optional<String> createdBefore) {
+            this.createdBefore = createdBefore;
+            return this;
+        }
+
+        /**
+         * <p>Return messages created strictly after this ISO 8601 timestamp.</p>
+         * @return Reference to {@code this} so that method calls can be chained together.
+         */
+        @java.lang.Override
+        public _FinalStage createdAfter(String createdAfter) {
+            this.createdAfter = Optional.ofNullable(createdAfter);
+            return this;
+        }
+
+        /**
+         * <p>Return messages created strictly after this ISO 8601 timestamp.</p>
+         */
+        @java.lang.Override
+        @JsonSetter(value = "created_after", nulls = Nulls.SKIP)
+        public _FinalStage createdAfter(Optional<String> createdAfter) {
+            this.createdAfter = createdAfter;
+            return this;
+        }
+
+        /**
+         * <p>Include redacted deletion entries for cache synchronization.</p>
+         * @return Reference to {@code this} so that method calls can be chained together.
+         */
+        @java.lang.Override
+        public _FinalStage includeDeleted(Boolean includeDeleted) {
+            this.includeDeleted = Optional.ofNullable(includeDeleted);
+            return this;
+        }
+
+        /**
+         * <p>Include redacted deletion entries for cache synchronization.</p>
+         */
+        @java.lang.Override
+        @JsonSetter(value = "include_deleted", nulls = Nulls.SKIP)
+        public _FinalStage includeDeleted(Optional<Boolean> includeDeleted) {
+            this.includeDeleted = includeDeleted;
+            return this;
+        }
+
+        /**
+         * <p>Filter by message pin state.</p>
+         * @return Reference to {@code this} so that method calls can be chained together.
+         */
+        @java.lang.Override
+        public _FinalStage pinned(Boolean pinned) {
+            this.pinned = Optional.ofNullable(pinned);
+            return this;
+        }
+
+        /**
+         * <p>Filter by message pin state.</p>
+         */
+        @java.lang.Override
+        @JsonSetter(value = "pinned", nulls = Nulls.SKIP)
+        public _FinalStage pinned(Optional<Boolean> pinned) {
+            this.pinned = pinned;
+            return this;
+        }
+
+        /**
+         * <p>Return replies to this message.</p>
+         * @return Reference to {@code this} so that method calls can be chained together.
+         */
+        @java.lang.Override
+        public _FinalStage replyingToMessageId(String replyingToMessageId) {
+            this.replyingToMessageId = Optional.ofNullable(replyingToMessageId);
+            return this;
+        }
+
+        /**
+         * <p>Return replies to this message.</p>
+         */
+        @java.lang.Override
+        @JsonSetter(value = "replying_to_message_id", nulls = Nulls.SKIP)
+        public _FinalStage replyingToMessageId(Optional<String> replyingToMessageId) {
+            this.replyingToMessageId = replyingToMessageId;
+            return this;
+        }
+
         @java.lang.Override
         public ListMessagesRequest build() {
-            return new ListMessagesRequest(after, before, first, last, channelId, direction, additionalProperties);
+            return new ListMessagesRequest(
+                    channelId,
+                    replyingToMessageId,
+                    pinned,
+                    includeDeleted,
+                    createdAfter,
+                    createdBefore,
+                    updatedAfter,
+                    beforeMessageId,
+                    afterMessageId,
+                    aroundMessageId,
+                    aroundTimestamp,
+                    order,
+                    direction,
+                    first,
+                    after,
+                    last,
+                    before,
+                    additionalProperties);
+        }
+
+        @JsonAnySetter
+        private void putAdditionalPropertyFromJson(String key, Object value) {
+            if (key.equalsIgnoreCase("channel_id")
+                    || key.equalsIgnoreCase("replying_to_message_id")
+                    || key.equalsIgnoreCase("pinned")
+                    || key.equalsIgnoreCase("include_deleted")
+                    || key.equalsIgnoreCase("created_after")
+                    || key.equalsIgnoreCase("created_before")
+                    || key.equalsIgnoreCase("updated_after")
+                    || key.equalsIgnoreCase("before_message_id")
+                    || key.equalsIgnoreCase("after_message_id")
+                    || key.equalsIgnoreCase("around_message_id")
+                    || key.equalsIgnoreCase("around_timestamp")
+                    || key.equalsIgnoreCase("order")
+                    || key.equalsIgnoreCase("direction")
+                    || key.equalsIgnoreCase("first")
+                    || key.equalsIgnoreCase("after")
+                    || key.equalsIgnoreCase("last")
+                    || key.equalsIgnoreCase("before")) {
+                return;
+            }
+            this.additionalProperties.put(key, value);
         }
 
         @java.lang.Override

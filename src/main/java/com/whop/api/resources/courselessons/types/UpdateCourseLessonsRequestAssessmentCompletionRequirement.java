@@ -109,7 +109,6 @@ public final class UpdateCourseLessonsRequestAssessmentCompletionRequirement {
 
         private Optional<Integer> minimumQuestionsCorrect = Optional.empty();
 
-        @JsonAnySetter
         private Map<String, Object> additionalProperties = new HashMap<>();
 
         private Builder() {}
@@ -173,6 +172,14 @@ public final class UpdateCourseLessonsRequestAssessmentCompletionRequirement {
         public UpdateCourseLessonsRequestAssessmentCompletionRequirement build() {
             return new UpdateCourseLessonsRequestAssessmentCompletionRequirement(
                     minimumGradePercent, minimumQuestionsCorrect, additionalProperties);
+        }
+
+        @JsonAnySetter
+        private void putAdditionalPropertyFromJson(String key, Object value) {
+            if (key.equalsIgnoreCase("minimum_grade_percent") || key.equalsIgnoreCase("minimum_questions_correct")) {
+                return;
+            }
+            this.additionalProperties.put(key, value);
         }
 
         public Builder additionalProperty(String key, Object value) {

@@ -5,9 +5,12 @@ package com.whop.api.resources.files;
 
 import com.whop.api.core.ClientOptions;
 import com.whop.api.core.RequestOptions;
+import com.whop.api.core.WhopApiHttpResponse;
+import com.whop.api.core.pagination.SyncPagingIterable;
+import com.whop.api.resources.files.requests.CompleteFilesRequest;
 import com.whop.api.resources.files.requests.CreateFilesRequest;
+import com.whop.api.resources.files.requests.ListFilesRequest;
 import com.whop.api.resources.files.requests.RetrieveFilesRequest;
-import com.whop.api.resources.files.types.CreateFilesResponse;
 import com.whop.api.types.File;
 import java.util.concurrent.CompletableFuture;
 
@@ -29,44 +32,172 @@ public class AsyncFilesClient {
     }
 
     /**
-     * Create a new file record and receive a presigned URL for uploading content to S3.
+     * Returns the files with the given IDs, newest first — fetch a batch in one request instead of retrieving each file individually. Only files you created are returned; IDs that do not exist, or that another credential created, are omitted. For a batch larger than one page, follow <code>page_info</code> with the same <code>file_ids</code> to walk the rest.
      */
-    public CompletableFuture<CreateFilesResponse> create(CreateFilesRequest request) {
-        return this.rawClient.create(request).thenApply(response -> response.body());
+    public CompletableFuture<SyncPagingIterable<File>> list() {
+        CompletableFuture<WhopApiHttpResponse<SyncPagingIterable<File>>> rawFuture = this.rawClient.list();
+        CompletableFuture<SyncPagingIterable<File>> future = rawFuture.thenApply(response -> response.body());
+        future.whenComplete((result_, throwable_) -> {
+            if (future.isCancelled()) {
+                rawFuture.cancel(true);
+            }
+        });
+        return future;
     }
 
     /**
-     * Create a new file record and receive a presigned URL for uploading content to S3.
+     * Returns the files with the given IDs, newest first — fetch a batch in one request instead of retrieving each file individually. Only files you created are returned; IDs that do not exist, or that another credential created, are omitted. For a batch larger than one page, follow <code>page_info</code> with the same <code>file_ids</code> to walk the rest.
      */
-    public CompletableFuture<CreateFilesResponse> create(CreateFilesRequest request, RequestOptions requestOptions) {
-        return this.rawClient.create(request, requestOptions).thenApply(response -> response.body());
+    public CompletableFuture<SyncPagingIterable<File>> list(RequestOptions requestOptions) {
+        CompletableFuture<WhopApiHttpResponse<SyncPagingIterable<File>>> rawFuture =
+                this.rawClient.list(requestOptions);
+        CompletableFuture<SyncPagingIterable<File>> future = rawFuture.thenApply(response -> response.body());
+        future.whenComplete((result_, throwable_) -> {
+            if (future.isCancelled()) {
+                rawFuture.cancel(true);
+            }
+        });
+        return future;
     }
 
     /**
-     * Retrieves the details of an existing file.
+     * Returns the files with the given IDs, newest first — fetch a batch in one request instead of retrieving each file individually. Only files you created are returned; IDs that do not exist, or that another credential created, are omitted. For a batch larger than one page, follow <code>page_info</code> with the same <code>file_ids</code> to walk the rest.
+     */
+    public CompletableFuture<SyncPagingIterable<File>> list(ListFilesRequest request) {
+        CompletableFuture<WhopApiHttpResponse<SyncPagingIterable<File>>> rawFuture = this.rawClient.list(request);
+        CompletableFuture<SyncPagingIterable<File>> future = rawFuture.thenApply(response -> response.body());
+        future.whenComplete((result_, throwable_) -> {
+            if (future.isCancelled()) {
+                rawFuture.cancel(true);
+            }
+        });
+        return future;
+    }
+
+    /**
+     * Returns the files with the given IDs, newest first — fetch a batch in one request instead of retrieving each file individually. Only files you created are returned; IDs that do not exist, or that another credential created, are omitted. For a batch larger than one page, follow <code>page_info</code> with the same <code>file_ids</code> to walk the rest.
+     */
+    public CompletableFuture<SyncPagingIterable<File>> list(ListFilesRequest request, RequestOptions requestOptions) {
+        CompletableFuture<WhopApiHttpResponse<SyncPagingIterable<File>>> rawFuture =
+                this.rawClient.list(request, requestOptions);
+        CompletableFuture<SyncPagingIterable<File>> future = rawFuture.thenApply(response -> response.body());
+        future.whenComplete((result_, throwable_) -> {
+            if (future.isCancelled()) {
+                rawFuture.cancel(true);
+            }
+        });
+        return future;
+    }
+
+    /**
+     * Creates a file and returns a presigned destination to upload its bytes to. PUT the bytes to <code>upload_url</code> (single-part), or to each of <code>multipart_upload_urls</code> and then call Complete File Multipart Upload. Once the bytes land the file becomes <code>ready</code>, and its ID can be attached wherever a file is accepted — account legal documents, dispute evidence documents. For a step-by-step walkthrough of single-part and multipart uploads, see the <a href="/developer/guides/direct-file-uploads">direct file uploads guide</a>.
+     */
+    public CompletableFuture<File> create(CreateFilesRequest request) {
+        CompletableFuture<WhopApiHttpResponse<File>> rawFuture = this.rawClient.create(request);
+        CompletableFuture<File> future = rawFuture.thenApply(response -> response.body());
+        future.whenComplete((result_, throwable_) -> {
+            if (future.isCancelled()) {
+                rawFuture.cancel(true);
+            }
+        });
+        return future;
+    }
+
+    /**
+     * Creates a file and returns a presigned destination to upload its bytes to. PUT the bytes to <code>upload_url</code> (single-part), or to each of <code>multipart_upload_urls</code> and then call Complete File Multipart Upload. Once the bytes land the file becomes <code>ready</code>, and its ID can be attached wherever a file is accepted — account legal documents, dispute evidence documents. For a step-by-step walkthrough of single-part and multipart uploads, see the <a href="/developer/guides/direct-file-uploads">direct file uploads guide</a>.
+     */
+    public CompletableFuture<File> create(CreateFilesRequest request, RequestOptions requestOptions) {
+        CompletableFuture<WhopApiHttpResponse<File>> rawFuture = this.rawClient.create(request, requestOptions);
+        CompletableFuture<File> future = rawFuture.thenApply(response -> response.body());
+        future.whenComplete((result_, throwable_) -> {
+            if (future.isCancelled()) {
+                rawFuture.cancel(true);
+            }
+        });
+        return future;
+    }
+
+    /**
+     * Retrieves a file you uploaded — poll it after uploading the bytes to see <code>upload_status</code> become <code>ready</code>. Only the creator can retrieve a file this way; a file attached to another resource is read through that resource.
      */
     public CompletableFuture<File> retrieve(String id) {
-        return this.rawClient.retrieve(id).thenApply(response -> response.body());
+        CompletableFuture<WhopApiHttpResponse<File>> rawFuture = this.rawClient.retrieve(id);
+        CompletableFuture<File> future = rawFuture.thenApply(response -> response.body());
+        future.whenComplete((result_, throwable_) -> {
+            if (future.isCancelled()) {
+                rawFuture.cancel(true);
+            }
+        });
+        return future;
     }
 
     /**
-     * Retrieves the details of an existing file.
+     * Retrieves a file you uploaded — poll it after uploading the bytes to see <code>upload_status</code> become <code>ready</code>. Only the creator can retrieve a file this way; a file attached to another resource is read through that resource.
      */
     public CompletableFuture<File> retrieve(String id, RequestOptions requestOptions) {
-        return this.rawClient.retrieve(id, requestOptions).thenApply(response -> response.body());
+        CompletableFuture<WhopApiHttpResponse<File>> rawFuture = this.rawClient.retrieve(id, requestOptions);
+        CompletableFuture<File> future = rawFuture.thenApply(response -> response.body());
+        future.whenComplete((result_, throwable_) -> {
+            if (future.isCancelled()) {
+                rawFuture.cancel(true);
+            }
+        });
+        return future;
     }
 
     /**
-     * Retrieves the details of an existing file.
+     * Retrieves a file you uploaded — poll it after uploading the bytes to see <code>upload_status</code> become <code>ready</code>. Only the creator can retrieve a file this way; a file attached to another resource is read through that resource.
      */
     public CompletableFuture<File> retrieve(String id, RetrieveFilesRequest request) {
-        return this.rawClient.retrieve(id, request).thenApply(response -> response.body());
+        CompletableFuture<WhopApiHttpResponse<File>> rawFuture = this.rawClient.retrieve(id, request);
+        CompletableFuture<File> future = rawFuture.thenApply(response -> response.body());
+        future.whenComplete((result_, throwable_) -> {
+            if (future.isCancelled()) {
+                rawFuture.cancel(true);
+            }
+        });
+        return future;
     }
 
     /**
-     * Retrieves the details of an existing file.
+     * Retrieves a file you uploaded — poll it after uploading the bytes to see <code>upload_status</code> become <code>ready</code>. Only the creator can retrieve a file this way; a file attached to another resource is read through that resource.
      */
     public CompletableFuture<File> retrieve(String id, RetrieveFilesRequest request, RequestOptions requestOptions) {
-        return this.rawClient.retrieve(id, request, requestOptions).thenApply(response -> response.body());
+        CompletableFuture<WhopApiHttpResponse<File>> rawFuture = this.rawClient.retrieve(id, request, requestOptions);
+        CompletableFuture<File> future = rawFuture.thenApply(response -> response.body());
+        future.whenComplete((result_, throwable_) -> {
+            if (future.isCancelled()) {
+                rawFuture.cancel(true);
+            }
+        });
+        return future;
+    }
+
+    /**
+     * Assembles the parts of a multipart upload after every part has been PUT to its presigned URL. Pass the <code>multipart_upload_id</code> from Create File and each part's <code>ETag</code> response header. For a step-by-step walkthrough of multipart uploads, see the <a href="/developer/guides/direct-file-uploads">direct file uploads guide</a>.
+     */
+    public CompletableFuture<File> complete(String id, CompleteFilesRequest request) {
+        CompletableFuture<WhopApiHttpResponse<File>> rawFuture = this.rawClient.complete(id, request);
+        CompletableFuture<File> future = rawFuture.thenApply(response -> response.body());
+        future.whenComplete((result_, throwable_) -> {
+            if (future.isCancelled()) {
+                rawFuture.cancel(true);
+            }
+        });
+        return future;
+    }
+
+    /**
+     * Assembles the parts of a multipart upload after every part has been PUT to its presigned URL. Pass the <code>multipart_upload_id</code> from Create File and each part's <code>ETag</code> response header. For a step-by-step walkthrough of multipart uploads, see the <a href="/developer/guides/direct-file-uploads">direct file uploads guide</a>.
+     */
+    public CompletableFuture<File> complete(String id, CompleteFilesRequest request, RequestOptions requestOptions) {
+        CompletableFuture<WhopApiHttpResponse<File>> rawFuture = this.rawClient.complete(id, request, requestOptions);
+        CompletableFuture<File> future = rawFuture.thenApply(response -> response.body());
+        future.whenComplete((result_, throwable_) -> {
+            if (future.isCancelled()) {
+                rawFuture.cancel(true);
+            }
+        });
+        return future;
     }
 }

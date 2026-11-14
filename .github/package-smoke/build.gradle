@@ -1,0 +1,16 @@
+plugins {
+    id 'application'
+}
+
+repositories {
+    maven { url = uri(providers.gradleProperty('sdkRepository').get()) }
+    mavenCentral()
+}
+
+dependencies {
+    implementation "com.whop.api:whop-java:${providers.gradleProperty('sdkVersion').get()}"
+}
+
+application {
+    mainClass = 'PackageConsumer'
+}

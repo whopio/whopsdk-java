@@ -111,7 +111,6 @@ public final class RetrievePeopleResponsePurchasesItem {
 
         private double usdValue;
 
-        @JsonAnySetter
         private Map<String, Object> additionalProperties = new HashMap<>();
 
         private Builder() {}
@@ -148,6 +147,16 @@ public final class RetrievePeopleResponsePurchasesItem {
         @java.lang.Override
         public RetrievePeopleResponsePurchasesItem build() {
             return new RetrievePeopleResponsePurchasesItem(eventId, occurredAt, usdValue, additionalProperties);
+        }
+
+        @JsonAnySetter
+        private void putAdditionalPropertyFromJson(String key, Object value) {
+            if (key.equalsIgnoreCase("event_id")
+                    || key.equalsIgnoreCase("occurred_at")
+                    || key.equalsIgnoreCase("usd_value")) {
+                return;
+            }
+            this.additionalProperties.put(key, value);
         }
 
         @java.lang.Override

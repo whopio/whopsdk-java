@@ -8,11 +8,16 @@ import com.whop.api.core.RequestOptions;
 import com.whop.api.core.Suppliers;
 import com.whop.api.core.pagination.SyncPagingIterable;
 import com.whop.api.resources.payouts.methods.MethodsClient;
+import com.whop.api.resources.payouts.paypallinksessions.PaypalLinkSessionsClient;
+import com.whop.api.resources.payouts.requests.CancelPayoutsRequest;
+import com.whop.api.resources.payouts.requests.CreatePayoutsRequest;
+import com.whop.api.resources.payouts.requests.CreateQuotePayoutsRequest;
 import com.whop.api.resources.payouts.requests.ListPayoutsRequest;
 import com.whop.api.resources.payouts.requests.RetrievePayoutsRequest;
 import com.whop.api.resources.payouts.supportedmethods.SupportedMethodsClient;
-import com.whop.api.resources.payouts.types.CreatePayoutsRequestBody;
+import com.whop.api.resources.payouts.types.CancelPayoutsResponse;
 import com.whop.api.resources.payouts.types.CreatePayoutsResponse;
+import com.whop.api.resources.payouts.types.CreateQuotePayoutsResponse;
 import com.whop.api.resources.payouts.types.ListPayoutsResponseDataItem;
 import com.whop.api.resources.payouts.types.RetrievePayoutsResponse;
 import java.util.function.Supplier;
@@ -24,12 +29,15 @@ public class PayoutsClient {
 
     protected final Supplier<MethodsClient> methodsClient;
 
+    protected final Supplier<PaypalLinkSessionsClient> paypalLinkSessionsClient;
+
     protected final Supplier<SupportedMethodsClient> supportedMethodsClient;
 
     public PayoutsClient(ClientOptions clientOptions) {
         this.clientOptions = clientOptions;
         this.rawClient = new RawPayoutsClient(clientOptions);
         this.methodsClient = Suppliers.memoize(() -> new MethodsClient(clientOptions));
+        this.paypalLinkSessionsClient = Suppliers.memoize(() -> new PaypalLinkSessionsClient(clientOptions));
         this.supportedMethodsClient = Suppliers.memoize(() -> new SupportedMethodsClient(clientOptions));
     }
 
@@ -70,49 +78,95 @@ public class PayoutsClient {
     }
 
     /**
-     * Sends money from an account or user balance to a saved payout method for that owner.
+     * Sends money from an account or user balance to a saved payout method for that owner. First create a quote with POST /payouts/quotes, then submit its quote_token with the same payout details before it expires.
      */
-    public CreatePayoutsResponse create(CreatePayoutsRequestBody request) {
+    public CreatePayoutsResponse create(CreatePayoutsRequest request) {
         return this.rawClient.create(request).body();
     }
 
     /**
-     * Sends money from an account or user balance to a saved payout method for that owner.
+     * Sends money from an account or user balance to a saved payout method for that owner. First create a quote with POST /payouts/quotes, then submit its quote_token with the same payout details before it expires.
      */
-    public CreatePayoutsResponse create(CreatePayoutsRequestBody request, RequestOptions requestOptions) {
+    public CreatePayoutsResponse create(CreatePayoutsRequest request, RequestOptions requestOptions) {
         return this.rawClient.create(request, requestOptions).body();
     }
 
     /**
-     * Fetches one payout by its <code>wdrl_</code> ID, or by the <code>cofr_</code> conversion request ID a stablecoin payout carries as <code>payout_request_id</code> — both ids answer with the same payout object.
+     * Creates a short-lived, provider-backed quote of a payout's fee, exchange rate, and destination amount. No funds move until you submit the returned <code>quote_token</code> to <code>POST /payouts</code>.
+     */
+    public CreateQuotePayoutsResponse createQuote(CreateQuotePayoutsRequest request) {
+        return this.rawClient.createQuote(request).body();
+    }
+
+    /**
+     * Creates a short-lived, provider-backed quote of a payout's fee, exchange rate, and destination amount. No funds move until you submit the returned <code>quote_token</code> to <code>POST /payouts</code>.
+     */
+    public CreateQuotePayoutsResponse createQuote(CreateQuotePayoutsRequest request, RequestOptions requestOptions) {
+        return this.rawClient.createQuote(request, requestOptions).body();
+    }
+
+    /**
+     * Retrieves a payout by its <code>wdrl_</code> ID, or by the <code>cofr_</code> conversion request ID a payout carries as <code>payout_request_id</code>. Authentication is optional: anyone with the ID can view tracking details, including notes, trace code, exchange rate, and payout request ID, while accounting fields require <code>payout:withdrawal:read</code> on the account or user that owns the payout. A supplied invalid credential returns 401.
      */
     public RetrievePayoutsResponse retrieve(String id) {
         return this.rawClient.retrieve(id).body();
     }
 
     /**
-     * Fetches one payout by its <code>wdrl_</code> ID, or by the <code>cofr_</code> conversion request ID a stablecoin payout carries as <code>payout_request_id</code> — both ids answer with the same payout object.
+     * Retrieves a payout by its <code>wdrl_</code> ID, or by the <code>cofr_</code> conversion request ID a payout carries as <code>payout_request_id</code>. Authentication is optional: anyone with the ID can view tracking details, including notes, trace code, exchange rate, and payout request ID, while accounting fields require <code>payout:withdrawal:read</code> on the account or user that owns the payout. A supplied invalid credential returns 401.
      */
     public RetrievePayoutsResponse retrieve(String id, RequestOptions requestOptions) {
         return this.rawClient.retrieve(id, requestOptions).body();
     }
 
     /**
-     * Fetches one payout by its <code>wdrl_</code> ID, or by the <code>cofr_</code> conversion request ID a stablecoin payout carries as <code>payout_request_id</code> — both ids answer with the same payout object.
+     * Retrieves a payout by its <code>wdrl_</code> ID, or by the <code>cofr_</code> conversion request ID a payout carries as <code>payout_request_id</code>. Authentication is optional: anyone with the ID can view tracking details, including notes, trace code, exchange rate, and payout request ID, while accounting fields require <code>payout:withdrawal:read</code> on the account or user that owns the payout. A supplied invalid credential returns 401.
      */
     public RetrievePayoutsResponse retrieve(String id, RetrievePayoutsRequest request) {
         return this.rawClient.retrieve(id, request).body();
     }
 
     /**
-     * Fetches one payout by its <code>wdrl_</code> ID, or by the <code>cofr_</code> conversion request ID a stablecoin payout carries as <code>payout_request_id</code> — both ids answer with the same payout object.
+     * Retrieves a payout by its <code>wdrl_</code> ID, or by the <code>cofr_</code> conversion request ID a payout carries as <code>payout_request_id</code>. Authentication is optional: anyone with the ID can view tracking details, including notes, trace code, exchange rate, and payout request ID, while accounting fields require <code>payout:withdrawal:read</code> on the account or user that owns the payout. A supplied invalid credential returns 401.
      */
     public RetrievePayoutsResponse retrieve(String id, RetrievePayoutsRequest request, RequestOptions requestOptions) {
         return this.rawClient.retrieve(id, request, requestOptions).body();
     }
 
+    /**
+     * Cancels a payout before it is sent to the payout provider, or asks the provider to stop one already sent. While the payout is <code>in_review</code>, or <code>processing</code> with nothing sent yet (see <code>cancelable</code>), it is canceled and the funds, fees included, return to the balance. Once sent, the response is 202 with a <code>cancellation</code> object, and the payout reads <code>canceled</code> only if the provider confirms it stopped. A <code>requested</code> payout returns 409 until it reaches review, a payout the provider can no longer stop returns 409 with error type <code>not_cancelable</code>, and canceling an already-canceled payout returns it unchanged.
+     */
+    public CancelPayoutsResponse cancel(String id) {
+        return this.rawClient.cancel(id).body();
+    }
+
+    /**
+     * Cancels a payout before it is sent to the payout provider, or asks the provider to stop one already sent. While the payout is <code>in_review</code>, or <code>processing</code> with nothing sent yet (see <code>cancelable</code>), it is canceled and the funds, fees included, return to the balance. Once sent, the response is 202 with a <code>cancellation</code> object, and the payout reads <code>canceled</code> only if the provider confirms it stopped. A <code>requested</code> payout returns 409 until it reaches review, a payout the provider can no longer stop returns 409 with error type <code>not_cancelable</code>, and canceling an already-canceled payout returns it unchanged.
+     */
+    public CancelPayoutsResponse cancel(String id, RequestOptions requestOptions) {
+        return this.rawClient.cancel(id, requestOptions).body();
+    }
+
+    /**
+     * Cancels a payout before it is sent to the payout provider, or asks the provider to stop one already sent. While the payout is <code>in_review</code>, or <code>processing</code> with nothing sent yet (see <code>cancelable</code>), it is canceled and the funds, fees included, return to the balance. Once sent, the response is 202 with a <code>cancellation</code> object, and the payout reads <code>canceled</code> only if the provider confirms it stopped. A <code>requested</code> payout returns 409 until it reaches review, a payout the provider can no longer stop returns 409 with error type <code>not_cancelable</code>, and canceling an already-canceled payout returns it unchanged.
+     */
+    public CancelPayoutsResponse cancel(String id, CancelPayoutsRequest request) {
+        return this.rawClient.cancel(id, request).body();
+    }
+
+    /**
+     * Cancels a payout before it is sent to the payout provider, or asks the provider to stop one already sent. While the payout is <code>in_review</code>, or <code>processing</code> with nothing sent yet (see <code>cancelable</code>), it is canceled and the funds, fees included, return to the balance. Once sent, the response is 202 with a <code>cancellation</code> object, and the payout reads <code>canceled</code> only if the provider confirms it stopped. A <code>requested</code> payout returns 409 until it reaches review, a payout the provider can no longer stop returns 409 with error type <code>not_cancelable</code>, and canceling an already-canceled payout returns it unchanged.
+     */
+    public CancelPayoutsResponse cancel(String id, CancelPayoutsRequest request, RequestOptions requestOptions) {
+        return this.rawClient.cancel(id, request, requestOptions).body();
+    }
+
     public MethodsClient methods() {
         return this.methodsClient.get();
+    }
+
+    public PaypalLinkSessionsClient paypalLinkSessions() {
+        return this.paypalLinkSessionsClient.get();
     }
 
     public SupportedMethodsClient supportedMethods() {

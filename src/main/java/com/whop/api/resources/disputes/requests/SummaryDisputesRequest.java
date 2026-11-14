@@ -36,6 +36,10 @@ public final class SummaryDisputesRequest {
 
     private final Optional<String> createdAfter;
 
+    private final Optional<String> query;
+
+    private final Optional<Boolean> includeSubaccounts;
+
     private final Map<String, Object> additionalProperties;
 
     private SummaryDisputesRequest(
@@ -45,6 +49,8 @@ public final class SummaryDisputesRequest {
             Optional<String> currency,
             Optional<String> createdBefore,
             Optional<String> createdAfter,
+            Optional<String> query,
+            Optional<Boolean> includeSubaccounts,
             Map<String, Object> additionalProperties) {
         this.groups = groups;
         this.status = status;
@@ -52,6 +58,8 @@ public final class SummaryDisputesRequest {
         this.currency = currency;
         this.createdBefore = createdBefore;
         this.createdAfter = createdAfter;
+        this.query = query;
+        this.includeSubaccounts = includeSubaccounts;
         this.additionalProperties = additionalProperties;
     }
 
@@ -103,6 +111,22 @@ public final class SummaryDisputesRequest {
         return createdAfter;
     }
 
+    /**
+     * @return Search disputes by dispute ID, payment ID, user ID, membership ID, user email, name, or username. Email filtering requires the member:email:read permission.
+     */
+    @JsonProperty("query")
+    public Optional<String> getQuery() {
+        return query;
+    }
+
+    /**
+     * @return Also cover the account's subaccounts. Requires <code>account_id</code>, and is a 400 without it. Without <code>query</code>, covers the disputes of the account and every subaccount, in any order. The listing is cut off after 10 seconds; add a <code>query</code> to narrow it. With <code>query</code>, matches on dispute, payment, user or membership ID, buyer email, or a card's first 6 or 8 digits and last 4 separated by a space or dash (<code>424242 4242</code>); free-text queries such as a name search only the named account. Subaccounts' disputes are returned only for subaccounts you can read disputes on.
+     */
+    @JsonProperty("include_subaccounts")
+    public Optional<Boolean> getIncludeSubaccounts() {
+        return includeSubaccounts;
+    }
+
     @java.lang.Override
     public boolean equals(Object other) {
         if (this == other) return true;
@@ -120,13 +144,22 @@ public final class SummaryDisputesRequest {
                 && accountId.equals(other.accountId)
                 && currency.equals(other.currency)
                 && createdBefore.equals(other.createdBefore)
-                && createdAfter.equals(other.createdAfter);
+                && createdAfter.equals(other.createdAfter)
+                && query.equals(other.query)
+                && includeSubaccounts.equals(other.includeSubaccounts);
     }
 
     @java.lang.Override
     public int hashCode() {
         return Objects.hash(
-                this.groups, this.status, this.accountId, this.currency, this.createdBefore, this.createdAfter);
+                this.groups,
+                this.status,
+                this.accountId,
+                this.currency,
+                this.createdBefore,
+                this.createdAfter,
+                this.query,
+                this.includeSubaccounts);
     }
 
     @java.lang.Override
@@ -152,7 +185,10 @@ public final class SummaryDisputesRequest {
 
         private Optional<String> createdAfter = Optional.empty();
 
-        @JsonAnySetter
+        private Optional<String> query = Optional.empty();
+
+        private Optional<Boolean> includeSubaccounts = Optional.empty();
+
         private Map<String, Object> additionalProperties = new HashMap<>();
 
         private Builder() {}
@@ -164,6 +200,8 @@ public final class SummaryDisputesRequest {
             currency(other.getCurrency());
             createdBefore(other.getCreatedBefore());
             createdAfter(other.getCreatedAfter());
+            query(other.getQuery());
+            includeSubaccounts(other.getIncludeSubaccounts());
             return this;
         }
 
@@ -261,9 +299,60 @@ public final class SummaryDisputesRequest {
             return this;
         }
 
+        /**
+         * <p>Search disputes by dispute ID, payment ID, user ID, membership ID, user email, name, or username. Email filtering requires the member:email:read permission.</p>
+         */
+        @JsonSetter(value = "query", nulls = Nulls.SKIP)
+        public Builder query(Optional<String> query) {
+            this.query = query;
+            return this;
+        }
+
+        public Builder query(String query) {
+            this.query = Optional.ofNullable(query);
+            return this;
+        }
+
+        /**
+         * <p>Also cover the account's subaccounts. Requires <code>account_id</code>, and is a 400 without it. Without <code>query</code>, covers the disputes of the account and every subaccount, in any order. The listing is cut off after 10 seconds; add a <code>query</code> to narrow it. With <code>query</code>, matches on dispute, payment, user or membership ID, buyer email, or a card's first 6 or 8 digits and last 4 separated by a space or dash (<code>424242 4242</code>); free-text queries such as a name search only the named account. Subaccounts' disputes are returned only for subaccounts you can read disputes on.</p>
+         */
+        @JsonSetter(value = "include_subaccounts", nulls = Nulls.SKIP)
+        public Builder includeSubaccounts(Optional<Boolean> includeSubaccounts) {
+            this.includeSubaccounts = includeSubaccounts;
+            return this;
+        }
+
+        public Builder includeSubaccounts(Boolean includeSubaccounts) {
+            this.includeSubaccounts = Optional.ofNullable(includeSubaccounts);
+            return this;
+        }
+
         public SummaryDisputesRequest build() {
             return new SummaryDisputesRequest(
-                    groups, status, accountId, currency, createdBefore, createdAfter, additionalProperties);
+                    groups,
+                    status,
+                    accountId,
+                    currency,
+                    createdBefore,
+                    createdAfter,
+                    query,
+                    includeSubaccounts,
+                    additionalProperties);
+        }
+
+        @JsonAnySetter
+        private void putAdditionalPropertyFromJson(String key, Object value) {
+            if (key.equalsIgnoreCase("groups")
+                    || key.equalsIgnoreCase("status")
+                    || key.equalsIgnoreCase("account_id")
+                    || key.equalsIgnoreCase("currency")
+                    || key.equalsIgnoreCase("created_before")
+                    || key.equalsIgnoreCase("created_after")
+                    || key.equalsIgnoreCase("query")
+                    || key.equalsIgnoreCase("include_subaccounts")) {
+                return;
+            }
+            this.additionalProperties.put(key, value);
         }
 
         public Builder additionalProperty(String key, Object value) {

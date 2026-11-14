@@ -272,7 +272,6 @@ public final class Entry {
 
         private Optional<OffsetDateTime> createdAt = Optional.empty();
 
-        @JsonAnySetter
         private Map<String, Object> additionalProperties = new HashMap<>();
 
         private Builder() {}
@@ -291,7 +290,6 @@ public final class Entry {
 
         /**
          * <p>The unique identifier for the entry.</p>
-         * <p>The unique identifier for the entry.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
@@ -303,7 +301,6 @@ public final class Entry {
 
         /**
          * <p>The current status of the waitlist entry (e.g., drafted, pending, approved, denied).</p>
-         * <p>The current status of the waitlist entry (e.g., drafted, pending, approved, denied).</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
@@ -314,7 +311,6 @@ public final class Entry {
         }
 
         /**
-         * <p>The user who submitted this waitlist entry.</p>
          * <p>The user who submitted this waitlist entry.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
@@ -472,6 +468,20 @@ public final class Entry {
         @java.lang.Override
         public Entry build() {
             return new Entry(createdAt, customFieldResponses, id, plan, product, status, user, additionalProperties);
+        }
+
+        @JsonAnySetter
+        private void putAdditionalPropertyFromJson(String key, Object value) {
+            if (key.equalsIgnoreCase("created_at")
+                    || key.equalsIgnoreCase("custom_field_responses")
+                    || key.equalsIgnoreCase("id")
+                    || key.equalsIgnoreCase("plan")
+                    || key.equalsIgnoreCase("product")
+                    || key.equalsIgnoreCase("status")
+                    || key.equalsIgnoreCase("user")) {
+                return;
+            }
+            this.additionalProperties.put(key, value);
         }
 
         @java.lang.Override

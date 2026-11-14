@@ -32,7 +32,7 @@ public class IdentityProfilesClient {
     }
 
     /**
-     * Returns a paginated list of identity profiles. When company_id is provided, lists IPs currently linked to that company's ledger. When omitted, lists IPs linked to any ledger the actor can read (including child companies under a parent).
+     * Lists the identity profiles currently linked to an account, or to every account you can read when <code>account_id</code> is omitted.
      * <p>Required permissions:</p>
      * <ul>
      * <li><code>identity:read</code></li>
@@ -43,7 +43,7 @@ public class IdentityProfilesClient {
     }
 
     /**
-     * Returns a paginated list of identity profiles. When company_id is provided, lists IPs currently linked to that company's ledger. When omitted, lists IPs linked to any ledger the actor can read (including child companies under a parent).
+     * Lists the identity profiles currently linked to an account, or to every account you can read when <code>account_id</code> is omitted.
      * <p>Required permissions:</p>
      * <ul>
      * <li><code>identity:read</code></li>
@@ -54,7 +54,7 @@ public class IdentityProfilesClient {
     }
 
     /**
-     * Returns a paginated list of identity profiles. When company_id is provided, lists IPs currently linked to that company's ledger. When omitted, lists IPs linked to any ledger the actor can read (including child companies under a parent).
+     * Lists the identity profiles currently linked to an account, or to every account you can read when <code>account_id</code> is omitted.
      * <p>Required permissions:</p>
      * <ul>
      * <li><code>identity:read</code></li>
@@ -65,7 +65,7 @@ public class IdentityProfilesClient {
     }
 
     /**
-     * Returns a paginated list of identity profiles. When company_id is provided, lists IPs currently linked to that company's ledger. When omitted, lists IPs linked to any ledger the actor can read (including child companies under a parent).
+     * Lists the identity profiles currently linked to an account, or to every account you can read when <code>account_id</code> is omitted.
      * <p>Required permissions:</p>
      * <ul>
      * <li><code>identity:read</code></li>
@@ -124,14 +124,22 @@ public class IdentityProfilesClient {
     }
 
     /**
-     * Unlinks an IdentityProfile from a LedgerAccount (flips the matching link to is_current=false).
+     * Unlinks an identity profile from the account or user that owns <code>ledger_account_id</code>. Requires <code>identity:write</code> on that account or user.
+     * <p>Required permissions:</p>
+     * <ul>
+     * <li><code>identity:write</code></li>
+     * </ul>
      */
     public IdentityProfile unlinkIdentityProfile(String id, UnlinkIdentityProfileRequest request) {
         return this.rawClient.unlinkIdentityProfile(id, request).body();
     }
 
     /**
-     * Unlinks an IdentityProfile from a LedgerAccount (flips the matching link to is_current=false).
+     * Unlinks an identity profile from the account or user that owns <code>ledger_account_id</code>. Requires <code>identity:write</code> on that account or user.
+     * <p>Required permissions:</p>
+     * <ul>
+     * <li><code>identity:write</code></li>
+     * </ul>
      */
     public IdentityProfile unlinkIdentityProfile(
             String id, UnlinkIdentityProfileRequest request, RequestOptions requestOptions) {

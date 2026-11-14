@@ -131,7 +131,6 @@ public final class AdGroupGeoLocations {
 
         private List<String> zips = new ArrayList<>();
 
-        @JsonAnySetter
         private Map<String, Object> additionalProperties = new HashMap<>();
 
         private Builder() {}
@@ -275,6 +274,19 @@ public final class AdGroupGeoLocations {
         public AdGroupGeoLocations build() {
             return new AdGroupGeoLocations(
                     cities, countries, countryGroups, customLocations, regions, zips, additionalProperties);
+        }
+
+        @JsonAnySetter
+        private void putAdditionalPropertyFromJson(String key, Object value) {
+            if (key.equalsIgnoreCase("cities")
+                    || key.equalsIgnoreCase("countries")
+                    || key.equalsIgnoreCase("country_groups")
+                    || key.equalsIgnoreCase("custom_locations")
+                    || key.equalsIgnoreCase("regions")
+                    || key.equalsIgnoreCase("zips")) {
+                return;
+            }
+            this.additionalProperties.put(key, value);
         }
 
         public Builder additionalProperty(String key, Object value) {

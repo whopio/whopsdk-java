@@ -157,7 +157,6 @@ public final class ListEventsResponseDataItemRelatedAudience {
 
         private Optional<String> title = Optional.empty();
 
-        @JsonAnySetter
         private Map<String, Object> additionalProperties = new HashMap<>();
 
         private Builder() {}
@@ -273,6 +272,18 @@ public final class ListEventsResponseDataItemRelatedAudience {
         public ListEventsResponseDataItemRelatedAudience build() {
             return new ListEventsResponseDataItemRelatedAudience(
                     audienceType, fileName, id, sourceType, title, additionalProperties);
+        }
+
+        @JsonAnySetter
+        private void putAdditionalPropertyFromJson(String key, Object value) {
+            if (key.equalsIgnoreCase("audience_type")
+                    || key.equalsIgnoreCase("file_name")
+                    || key.equalsIgnoreCase("id")
+                    || key.equalsIgnoreCase("source_type")
+                    || key.equalsIgnoreCase("title")) {
+                return;
+            }
+            this.additionalProperties.put(key, value);
         }
 
         public Builder additionalProperty(String key, Object value) {

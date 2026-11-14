@@ -20,6 +20,8 @@ import java.util.Optional;
 @JsonInclude(JsonInclude.Include.NON_ABSENT)
 @JsonDeserialize(builder = ListUsersRequest.Builder.class)
 public final class ListUsersRequest {
+    private final Optional<String> contextChannelId;
+
     private final Optional<String> query;
 
     private final Optional<Integer> first;
@@ -33,18 +35,28 @@ public final class ListUsersRequest {
     private final Map<String, Object> additionalProperties;
 
     private ListUsersRequest(
+            Optional<String> contextChannelId,
             Optional<String> query,
             Optional<Integer> first,
             Optional<String> after,
             Optional<Integer> last,
             Optional<String> before,
             Map<String, Object> additionalProperties) {
+        this.contextChannelId = contextChannelId;
         this.query = query;
         this.first = first;
         this.after = after;
         this.last = last;
         this.before = before;
         this.additionalProperties = additionalProperties;
+    }
+
+    /**
+     * @return Prioritize people relevant to this channel for mentions. Results remain global; channel access is required.
+     */
+    @JsonProperty("context_channel_id")
+    public Optional<String> getContextChannelId() {
+        return contextChannelId;
     }
 
     /**
@@ -56,7 +68,7 @@ public final class ListUsersRequest {
     }
 
     /**
-     * @return The number of users to return (max 50).
+     * @return Number of results to return from the start of the range.
      */
     @JsonProperty("first")
     public Optional<Integer> getFirst() {
@@ -64,7 +76,7 @@ public final class ListUsersRequest {
     }
 
     /**
-     * @return A cursor; returns users after this position.
+     * @return Return results after this cursor. Use <code>page_info.end_cursor</code> from the previous response to fetch the next page.
      */
     @JsonProperty("after")
     public Optional<String> getAfter() {
@@ -72,7 +84,7 @@ public final class ListUsersRequest {
     }
 
     /**
-     * @return The number of users to return from the end of the range.
+     * @return Number of results to return from the end of the range.
      */
     @JsonProperty("last")
     public Optional<Integer> getLast() {
@@ -80,7 +92,7 @@ public final class ListUsersRequest {
     }
 
     /**
-     * @return A cursor; returns users before this position.
+     * @return Return results before this cursor. Use <code>page_info.start_cursor</code> from the previous response to fetch the previous page.
      */
     @JsonProperty("before")
     public Optional<String> getBefore() {
@@ -99,7 +111,8 @@ public final class ListUsersRequest {
     }
 
     private boolean equalTo(ListUsersRequest other) {
-        return query.equals(other.query)
+        return contextChannelId.equals(other.contextChannelId)
+                && query.equals(other.query)
                 && first.equals(other.first)
                 && after.equals(other.after)
                 && last.equals(other.last)
@@ -108,7 +121,7 @@ public final class ListUsersRequest {
 
     @java.lang.Override
     public int hashCode() {
-        return Objects.hash(this.query, this.first, this.after, this.last, this.before);
+        return Objects.hash(this.contextChannelId, this.query, this.first, this.after, this.last, this.before);
     }
 
     @java.lang.Override
@@ -122,6 +135,8 @@ public final class ListUsersRequest {
 
     @JsonIgnoreProperties(ignoreUnknown = true)
     public static final class Builder {
+        private Optional<String> contextChannelId = Optional.empty();
+
         private Optional<String> query = Optional.empty();
 
         private Optional<Integer> first = Optional.empty();
@@ -132,17 +147,31 @@ public final class ListUsersRequest {
 
         private Optional<String> before = Optional.empty();
 
-        @JsonAnySetter
         private Map<String, Object> additionalProperties = new HashMap<>();
 
         private Builder() {}
 
         public Builder from(ListUsersRequest other) {
+            contextChannelId(other.getContextChannelId());
             query(other.getQuery());
             first(other.getFirst());
             after(other.getAfter());
             last(other.getLast());
             before(other.getBefore());
+            return this;
+        }
+
+        /**
+         * <p>Prioritize people relevant to this channel for mentions. Results remain global; channel access is required.</p>
+         */
+        @JsonSetter(value = "context_channel_id", nulls = Nulls.SKIP)
+        public Builder contextChannelId(Optional<String> contextChannelId) {
+            this.contextChannelId = contextChannelId;
+            return this;
+        }
+
+        public Builder contextChannelId(String contextChannelId) {
+            this.contextChannelId = Optional.ofNullable(contextChannelId);
             return this;
         }
 
@@ -161,7 +190,7 @@ public final class ListUsersRequest {
         }
 
         /**
-         * <p>The number of users to return (max 50).</p>
+         * <p>Number of results to return from the start of the range.</p>
          */
         @JsonSetter(value = "first", nulls = Nulls.SKIP)
         public Builder first(Optional<Integer> first) {
@@ -175,7 +204,7 @@ public final class ListUsersRequest {
         }
 
         /**
-         * <p>A cursor; returns users after this position.</p>
+         * <p>Return results after this cursor. Use <code>page_info.end_cursor</code> from the previous response to fetch the next page.</p>
          */
         @JsonSetter(value = "after", nulls = Nulls.SKIP)
         public Builder after(Optional<String> after) {
@@ -189,7 +218,7 @@ public final class ListUsersRequest {
         }
 
         /**
-         * <p>The number of users to return from the end of the range.</p>
+         * <p>Number of results to return from the end of the range.</p>
          */
         @JsonSetter(value = "last", nulls = Nulls.SKIP)
         public Builder last(Optional<Integer> last) {
@@ -203,7 +232,7 @@ public final class ListUsersRequest {
         }
 
         /**
-         * <p>A cursor; returns users before this position.</p>
+         * <p>Return results before this cursor. Use <code>page_info.start_cursor</code> from the previous response to fetch the previous page.</p>
          */
         @JsonSetter(value = "before", nulls = Nulls.SKIP)
         public Builder before(Optional<String> before) {
@@ -217,7 +246,20 @@ public final class ListUsersRequest {
         }
 
         public ListUsersRequest build() {
-            return new ListUsersRequest(query, first, after, last, before, additionalProperties);
+            return new ListUsersRequest(contextChannelId, query, first, after, last, before, additionalProperties);
+        }
+
+        @JsonAnySetter
+        private void putAdditionalPropertyFromJson(String key, Object value) {
+            if (key.equalsIgnoreCase("context_channel_id")
+                    || key.equalsIgnoreCase("query")
+                    || key.equalsIgnoreCase("first")
+                    || key.equalsIgnoreCase("after")
+                    || key.equalsIgnoreCase("last")
+                    || key.equalsIgnoreCase("before")) {
+                return;
+            }
+            this.additionalProperties.put(key, value);
         }
 
         public Builder additionalProperty(String key, Object value) {

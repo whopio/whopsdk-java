@@ -5,6 +5,7 @@ package com.whop.api.resources.accountlinks;
 
 import com.whop.api.core.ClientOptions;
 import com.whop.api.core.RequestOptions;
+import com.whop.api.core.WhopApiHttpResponse;
 import com.whop.api.resources.accountlinks.requests.CreateAccountLinksRequest;
 import com.whop.api.types.AccountLink;
 import java.util.concurrent.CompletableFuture;
@@ -27,16 +28,30 @@ public class AsyncAccountLinksClient {
     }
 
     /**
-     * Generate a URL that directs a sub-merchant to their account portal, such as the hosted payouts dashboard or the KYC onboarding flow.
+     * Generates a URL that sends a sub-merchant to a hosted Whop page, such as the payouts dashboard or the KYC onboarding flow. Requires an API key.
      */
     public CompletableFuture<AccountLink> create(CreateAccountLinksRequest request) {
-        return this.rawClient.create(request).thenApply(response -> response.body());
+        CompletableFuture<WhopApiHttpResponse<AccountLink>> rawFuture = this.rawClient.create(request);
+        CompletableFuture<AccountLink> future = rawFuture.thenApply(response -> response.body());
+        future.whenComplete((result_, throwable_) -> {
+            if (future.isCancelled()) {
+                rawFuture.cancel(true);
+            }
+        });
+        return future;
     }
 
     /**
-     * Generate a URL that directs a sub-merchant to their account portal, such as the hosted payouts dashboard or the KYC onboarding flow.
+     * Generates a URL that sends a sub-merchant to a hosted Whop page, such as the payouts dashboard or the KYC onboarding flow. Requires an API key.
      */
     public CompletableFuture<AccountLink> create(CreateAccountLinksRequest request, RequestOptions requestOptions) {
-        return this.rawClient.create(request, requestOptions).thenApply(response -> response.body());
+        CompletableFuture<WhopApiHttpResponse<AccountLink>> rawFuture = this.rawClient.create(request, requestOptions);
+        CompletableFuture<AccountLink> future = rawFuture.thenApply(response -> response.body());
+        future.whenComplete((result_, throwable_) -> {
+            if (future.isCancelled()) {
+                rawFuture.cancel(true);
+            }
+        });
+        return future;
     }
 }

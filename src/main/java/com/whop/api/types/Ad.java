@@ -49,6 +49,8 @@ public final class Ad {
 
     private final double contacts;
 
+    private final AdContentReview contentReview;
+
     private final Optional<Double> costPerAddedToCart;
 
     private final double costPerClick;
@@ -85,11 +87,11 @@ public final class Ad {
 
     private final AdDeliveryStatus deliveryStatus;
 
-    private final List<String> descriptions;
+    private final List<AdText> descriptions;
 
     private final Optional<Double> frequency;
 
-    private final List<String> headlines;
+    private final List<AdText> headlines;
 
     private final String id;
 
@@ -97,25 +99,13 @@ public final class Ad {
 
     private final List<AdPlatformIssue> issues;
 
-    private final Optional<AdLeadForm> leadForm;
-
-    private final Optional<String> leadFormId;
-
     private final double leadValue;
 
     private final double leads;
 
-    private final Optional<AdMessagingConfig> messagingConfig;
+    private final double linkClicks;
 
-    private final Optional<Boolean> multiAdvertiserAds;
-
-    private final Optional<String> postId;
-
-    private final Optional<AdPostSource> postSource;
-
-    private final Optional<String> postThumbnailUrl;
-
-    private final List<String> primaryTexts;
+    private final List<AdText> primaryTexts;
 
     private final double purchaseValue;
 
@@ -134,8 +124,6 @@ public final class Ad {
     private final double scheduleValue;
 
     private final double schedules;
-
-    private final List<AdEntityReference> socialAccounts;
 
     private final double spend;
 
@@ -177,6 +165,7 @@ public final class Ad {
             double completedRegistrations,
             double contactValue,
             double contacts,
+            AdContentReview contentReview,
             Optional<Double> costPerAddedToCart,
             double costPerClick,
             Optional<Double> costPerCompletedRegistration,
@@ -195,22 +184,16 @@ public final class Ad {
             Map<String, Object> customEventCounts,
             Map<String, Object> customEventValues,
             AdDeliveryStatus deliveryStatus,
-            List<String> descriptions,
+            List<AdText> descriptions,
             Optional<Double> frequency,
-            List<String> headlines,
+            List<AdText> headlines,
             String id,
             double impressions,
             List<AdPlatformIssue> issues,
-            Optional<AdLeadForm> leadForm,
-            Optional<String> leadFormId,
             double leadValue,
             double leads,
-            Optional<AdMessagingConfig> messagingConfig,
-            Optional<Boolean> multiAdvertiserAds,
-            Optional<String> postId,
-            Optional<AdPostSource> postSource,
-            Optional<String> postThumbnailUrl,
-            List<String> primaryTexts,
+            double linkClicks,
+            List<AdText> primaryTexts,
             double purchaseValue,
             double purchases,
             double reach,
@@ -220,7 +203,6 @@ public final class Ad {
             double returnOnAdSpend,
             double scheduleValue,
             double schedules,
-            List<AdEntityReference> socialAccounts,
             double spend,
             Optional<String> spendCurrency,
             AdStatus status,
@@ -246,6 +228,7 @@ public final class Ad {
         this.completedRegistrations = completedRegistrations;
         this.contactValue = contactValue;
         this.contacts = contacts;
+        this.contentReview = contentReview;
         this.costPerAddedToCart = costPerAddedToCart;
         this.costPerClick = costPerClick;
         this.costPerCompletedRegistration = costPerCompletedRegistration;
@@ -270,15 +253,9 @@ public final class Ad {
         this.id = id;
         this.impressions = impressions;
         this.issues = issues;
-        this.leadForm = leadForm;
-        this.leadFormId = leadFormId;
         this.leadValue = leadValue;
         this.leads = leads;
-        this.messagingConfig = messagingConfig;
-        this.multiAdvertiserAds = multiAdvertiserAds;
-        this.postId = postId;
-        this.postSource = postSource;
-        this.postThumbnailUrl = postThumbnailUrl;
+        this.linkClicks = linkClicks;
         this.primaryTexts = primaryTexts;
         this.purchaseValue = purchaseValue;
         this.purchases = purchases;
@@ -289,7 +266,6 @@ public final class Ad {
         this.returnOnAdSpend = returnOnAdSpend;
         this.scheduleValue = scheduleValue;
         this.schedules = schedules;
-        this.socialAccounts = socialAccounts;
         this.spend = spend;
         this.spendCurrency = spendCurrency;
         this.status = status;
@@ -395,6 +371,14 @@ public final class Ad {
     @JsonProperty("contacts")
     public double getContacts() {
         return contacts;
+    }
+
+    /**
+     * @return Whop's content review of this ad: whether it has finished, which ad networks it is recommended for, and the content rules it breaks.
+     */
+    @JsonProperty("content_review")
+    public AdContentReview getContentReview() {
+        return contentReview;
     }
 
     /**
@@ -569,12 +553,12 @@ public final class Ad {
     }
 
     @JsonProperty("descriptions")
-    public List<String> getDescriptions() {
+    public List<AdText> getDescriptions() {
         return descriptions;
     }
 
     /**
-     * @return Platform-reported impressions divided by reach.
+     * @return Impressions divided by reach.
      */
     @JsonIgnore
     public Optional<Double> getFrequency() {
@@ -585,7 +569,7 @@ public final class Ad {
     }
 
     @JsonProperty("headlines")
-    public List<String> getHeadlines() {
+    public List<AdText> getHeadlines() {
         return headlines;
     }
 
@@ -611,28 +595,6 @@ public final class Ad {
     }
 
     /**
-     * @return The instant lead form shown when someone taps this ad. <code>null</code> when the ad group's conversion_location is not an instant-form destination.
-     */
-    @JsonIgnore
-    public Optional<AdLeadForm> getLeadForm() {
-        if (leadForm == null) {
-            return Optional.empty();
-        }
-        return leadForm;
-    }
-
-    /**
-     * @return The ad platform's ID for the instant form the ad uses. Set when the ad references an existing form via <code>lead_form_id</code>, or once a form built from <code>lead_form</code> has been created on the platform.
-     */
-    @JsonIgnore
-    public Optional<String> getLeadFormId() {
-        if (leadFormId == null) {
-            return Optional.empty();
-        }
-        return leadFormId;
-    }
-
-    /**
      * @return USD value attributed to lead events. Sums the value sent with each event, normalized to USD; events without a value contribute 0.
      */
     @JsonProperty("lead_value")
@@ -649,59 +611,15 @@ public final class Ad {
     }
 
     /**
-     * @return Welcome message for click-to-message ads, shown when the conversation opens. <code>null</code> when the ad has none.
+     * @return Page views on your destination from people who clicked the ad, recorded by the Whop pixel. Counted the same way on every ad platform.
      */
-    @JsonIgnore
-    public Optional<AdMessagingConfig> getMessagingConfig() {
-        if (messagingConfig == null) {
-            return Optional.empty();
-        }
-        return messagingConfig;
-    }
-
-    /**
-     * @return Whether the ad can appear alongside other advertisers' ads in the same unit. Defaults to true.
-     */
-    @JsonProperty("multi_advertiser_ads")
-    public Optional<Boolean> getMultiAdvertiserAds() {
-        return multiAdvertiserAds;
-    }
-
-    /**
-     * @return The existing post this ad promotes — a Facebook post or Instagram media ID. <code>null</code> when the ad uses uploaded creatives.
-     */
-    @JsonIgnore
-    public Optional<String> getPostId() {
-        if (postId == null) {
-            return Optional.empty();
-        }
-        return postId;
-    }
-
-    /**
-     * @return Identifies the network that owns <code>post_id</code>; <code>null</code> when the ad uses uploaded creatives.
-     */
-    @JsonIgnore
-    public Optional<AdPostSource> getPostSource() {
-        if (postSource == null) {
-            return Optional.empty();
-        }
-        return postSource;
-    }
-
-    /**
-     * @return Preview image of the existing post this ad promotes. <code>null</code> for ads that use uploaded creatives, or until the post's media has been fetched from the network.
-     */
-    @JsonIgnore
-    public Optional<String> getPostThumbnailUrl() {
-        if (postThumbnailUrl == null) {
-            return Optional.empty();
-        }
-        return postThumbnailUrl;
+    @JsonProperty("link_clicks")
+    public double getLinkClicks() {
+        return linkClicks;
     }
 
     @JsonProperty("primary_texts")
-    public List<String> getPrimaryTexts() {
+    public List<AdText> getPrimaryTexts() {
         return primaryTexts;
     }
 
@@ -784,11 +702,6 @@ public final class Ad {
     @JsonProperty("schedules")
     public double getSchedules() {
         return schedules;
-    }
-
-    @JsonProperty("social_accounts")
-    public List<AdEntityReference> getSocialAccounts() {
-        return socialAccounts;
     }
 
     /**
@@ -884,7 +797,7 @@ public final class Ad {
     }
 
     /**
-     * @return Every query parameter appended to the URL, keyed by parameter name — including any you sent on <code>url</code> itself. Whop adds its own click-attribution parameters on top; those are reserved and rejected if you set them (utm_meta_ad_id, utm_meta_adset_id, utm_meta_campaign_id, utm_source, utm_placement, utm_medium, utm_content, utm_adset, utm_whop, wacid, wasid, waid, tw_source, tw_adid).
+     * @return Query parameters appended to <code>url</code>, keyed by name. Whop's click-attribution parameters are reserved.
      */
     @JsonProperty("url_parameters")
     public Map<String, Object> getUrlParameters() {
@@ -980,42 +893,6 @@ public final class Ad {
     }
 
     @JsonInclude(value = JsonInclude.Include.CUSTOM, valueFilter = NullableNonemptyFilter.class)
-    @JsonProperty("lead_form")
-    private Optional<AdLeadForm> _getLeadForm() {
-        return leadForm;
-    }
-
-    @JsonInclude(value = JsonInclude.Include.CUSTOM, valueFilter = NullableNonemptyFilter.class)
-    @JsonProperty("lead_form_id")
-    private Optional<String> _getLeadFormId() {
-        return leadFormId;
-    }
-
-    @JsonInclude(value = JsonInclude.Include.CUSTOM, valueFilter = NullableNonemptyFilter.class)
-    @JsonProperty("messaging_config")
-    private Optional<AdMessagingConfig> _getMessagingConfig() {
-        return messagingConfig;
-    }
-
-    @JsonInclude(value = JsonInclude.Include.CUSTOM, valueFilter = NullableNonemptyFilter.class)
-    @JsonProperty("post_id")
-    private Optional<String> _getPostId() {
-        return postId;
-    }
-
-    @JsonInclude(value = JsonInclude.Include.CUSTOM, valueFilter = NullableNonemptyFilter.class)
-    @JsonProperty("post_source")
-    private Optional<AdPostSource> _getPostSource() {
-        return postSource;
-    }
-
-    @JsonInclude(value = JsonInclude.Include.CUSTOM, valueFilter = NullableNonemptyFilter.class)
-    @JsonProperty("post_thumbnail_url")
-    private Optional<String> _getPostThumbnailUrl() {
-        return postThumbnailUrl;
-    }
-
-    @JsonInclude(value = JsonInclude.Include.CUSTOM, valueFilter = NullableNonemptyFilter.class)
     @JsonProperty("result_event")
     private Optional<AdResultEvent> _getResultEvent() {
         return resultEvent;
@@ -1080,6 +957,7 @@ public final class Ad {
                 && completedRegistrations == other.completedRegistrations
                 && contactValue == other.contactValue
                 && contacts == other.contacts
+                && contentReview.equals(other.contentReview)
                 && costPerAddedToCart.equals(other.costPerAddedToCart)
                 && costPerClick == other.costPerClick
                 && costPerCompletedRegistration.equals(other.costPerCompletedRegistration)
@@ -1104,15 +982,9 @@ public final class Ad {
                 && id.equals(other.id)
                 && impressions == other.impressions
                 && issues.equals(other.issues)
-                && leadForm.equals(other.leadForm)
-                && leadFormId.equals(other.leadFormId)
                 && leadValue == other.leadValue
                 && leads == other.leads
-                && messagingConfig.equals(other.messagingConfig)
-                && multiAdvertiserAds.equals(other.multiAdvertiserAds)
-                && postId.equals(other.postId)
-                && postSource.equals(other.postSource)
-                && postThumbnailUrl.equals(other.postThumbnailUrl)
+                && linkClicks == other.linkClicks
                 && primaryTexts.equals(other.primaryTexts)
                 && purchaseValue == other.purchaseValue
                 && purchases == other.purchases
@@ -1123,7 +995,6 @@ public final class Ad {
                 && returnOnAdSpend == other.returnOnAdSpend
                 && scheduleValue == other.scheduleValue
                 && schedules == other.schedules
-                && socialAccounts.equals(other.socialAccounts)
                 && spend == other.spend
                 && spendCurrency.equals(other.spendCurrency)
                 && status.equals(other.status)
@@ -1153,6 +1024,7 @@ public final class Ad {
                 this.completedRegistrations,
                 this.contactValue,
                 this.contacts,
+                this.contentReview,
                 this.costPerAddedToCart,
                 this.costPerClick,
                 this.costPerCompletedRegistration,
@@ -1177,15 +1049,9 @@ public final class Ad {
                 this.id,
                 this.impressions,
                 this.issues,
-                this.leadForm,
-                this.leadFormId,
                 this.leadValue,
                 this.leads,
-                this.messagingConfig,
-                this.multiAdvertiserAds,
-                this.postId,
-                this.postSource,
-                this.postThumbnailUrl,
+                this.linkClicks,
                 this.primaryTexts,
                 this.purchaseValue,
                 this.purchases,
@@ -1196,7 +1062,6 @@ public final class Ad {
                 this.returnOnAdSpend,
                 this.scheduleValue,
                 this.schedules,
-                this.socialAccounts,
                 this.spend,
                 this.spendCurrency,
                 this.status,
@@ -1290,7 +1155,14 @@ public final class Ad {
         /**
          * <p>Whop pixel-attributed contact events, last-click.</p>
          */
-        CostPerClickStage contacts(double contacts);
+        ContentReviewStage contacts(double contacts);
+    }
+
+    public interface ContentReviewStage {
+        /**
+         * <p>Whop's content review of this ad: whether it has finished, which ad networks it is recommended for, and the content rules it breaks.</p>
+         */
+        CostPerClickStage contentReview(@NotNull AdContentReview contentReview);
     }
 
     public interface CostPerClickStage {
@@ -1353,7 +1225,14 @@ public final class Ad {
         /**
          * <p>Whop pixel-attributed leads, last-click.</p>
          */
-        PurchaseValueStage leads(double leads);
+        LinkClicksStage leads(double leads);
+    }
+
+    public interface LinkClicksStage {
+        /**
+         * <p>Page views on your destination from people who clicked the ad, recorded by the Whop pixel. Counted the same way on every ad platform.</p>
+         */
+        PurchaseValueStage linkClicks(double linkClicks);
     }
 
     public interface PurchaseValueStage {
@@ -1584,14 +1463,14 @@ public final class Ad {
 
         _FinalStage customEventValues(String key, Object value);
 
-        _FinalStage descriptions(List<String> descriptions);
+        _FinalStage descriptions(List<AdText> descriptions);
 
-        _FinalStage addDescriptions(String descriptions);
+        _FinalStage addDescriptions(AdText descriptions);
 
-        _FinalStage addAllDescriptions(List<String> descriptions);
+        _FinalStage addAllDescriptions(List<AdText> descriptions);
 
         /**
-         * <p>Platform-reported impressions divided by reach.</p>
+         * <p>Impressions divided by reach.</p>
          */
         _FinalStage frequency(Optional<Double> frequency);
 
@@ -1599,11 +1478,11 @@ public final class Ad {
 
         _FinalStage frequency(Nullable<Double> frequency);
 
-        _FinalStage headlines(List<String> headlines);
+        _FinalStage headlines(List<AdText> headlines);
 
-        _FinalStage addHeadlines(String headlines);
+        _FinalStage addHeadlines(AdText headlines);
 
-        _FinalStage addAllHeadlines(List<String> headlines);
+        _FinalStage addAllHeadlines(List<AdText> headlines);
 
         _FinalStage issues(List<AdPlatformIssue> issues);
 
@@ -1611,72 +1490,11 @@ public final class Ad {
 
         _FinalStage addAllIssues(List<AdPlatformIssue> issues);
 
-        /**
-         * <p>The instant lead form shown when someone taps this ad. <code>null</code> when the ad group's conversion_location is not an instant-form destination.</p>
-         */
-        _FinalStage leadForm(Optional<AdLeadForm> leadForm);
+        _FinalStage primaryTexts(List<AdText> primaryTexts);
 
-        _FinalStage leadForm(AdLeadForm leadForm);
+        _FinalStage addPrimaryTexts(AdText primaryTexts);
 
-        _FinalStage leadForm(Nullable<AdLeadForm> leadForm);
-
-        /**
-         * <p>The ad platform's ID for the instant form the ad uses. Set when the ad references an existing form via <code>lead_form_id</code>, or once a form built from <code>lead_form</code> has been created on the platform.</p>
-         */
-        _FinalStage leadFormId(Optional<String> leadFormId);
-
-        _FinalStage leadFormId(String leadFormId);
-
-        _FinalStage leadFormId(Nullable<String> leadFormId);
-
-        /**
-         * <p>Welcome message for click-to-message ads, shown when the conversation opens. <code>null</code> when the ad has none.</p>
-         */
-        _FinalStage messagingConfig(Optional<AdMessagingConfig> messagingConfig);
-
-        _FinalStage messagingConfig(AdMessagingConfig messagingConfig);
-
-        _FinalStage messagingConfig(Nullable<AdMessagingConfig> messagingConfig);
-
-        /**
-         * <p>Whether the ad can appear alongside other advertisers' ads in the same unit. Defaults to true.</p>
-         */
-        _FinalStage multiAdvertiserAds(Optional<Boolean> multiAdvertiserAds);
-
-        _FinalStage multiAdvertiserAds(Boolean multiAdvertiserAds);
-
-        /**
-         * <p>The existing post this ad promotes — a Facebook post or Instagram media ID. <code>null</code> when the ad uses uploaded creatives.</p>
-         */
-        _FinalStage postId(Optional<String> postId);
-
-        _FinalStage postId(String postId);
-
-        _FinalStage postId(Nullable<String> postId);
-
-        /**
-         * <p>Identifies the network that owns <code>post_id</code>; <code>null</code> when the ad uses uploaded creatives.</p>
-         */
-        _FinalStage postSource(Optional<AdPostSource> postSource);
-
-        _FinalStage postSource(AdPostSource postSource);
-
-        _FinalStage postSource(Nullable<AdPostSource> postSource);
-
-        /**
-         * <p>Preview image of the existing post this ad promotes. <code>null</code> for ads that use uploaded creatives, or until the post's media has been fetched from the network.</p>
-         */
-        _FinalStage postThumbnailUrl(Optional<String> postThumbnailUrl);
-
-        _FinalStage postThumbnailUrl(String postThumbnailUrl);
-
-        _FinalStage postThumbnailUrl(Nullable<String> postThumbnailUrl);
-
-        _FinalStage primaryTexts(List<String> primaryTexts);
-
-        _FinalStage addPrimaryTexts(String primaryTexts);
-
-        _FinalStage addAllPrimaryTexts(List<String> primaryTexts);
+        _FinalStage addAllPrimaryTexts(List<AdText> primaryTexts);
 
         /**
          * <p>The Whop pixel conversion event whose attributed count represents results — the optimization goal, or the highest-volume attributed event for campaigns that budget per ad group. Null when the goal isn't a Whop-attributed event.</p>
@@ -1704,12 +1522,6 @@ public final class Ad {
         _FinalStage results(Double results);
 
         _FinalStage results(Nullable<Double> results);
-
-        _FinalStage socialAccounts(List<AdEntityReference> socialAccounts);
-
-        _FinalStage addSocialAccounts(AdEntityReference socialAccounts);
-
-        _FinalStage addAllSocialAccounts(List<AdEntityReference> socialAccounts);
 
         /**
          * <p>The ISO 4217 currency code of all monetary metrics.</p>
@@ -1748,7 +1560,7 @@ public final class Ad {
         _FinalStage url(Nullable<String> url);
 
         /**
-         * <p>Every query parameter appended to the URL, keyed by parameter name — including any you sent on <code>url</code> itself. Whop adds its own click-attribution parameters on top; those are reserved and rejected if you set them (utm_meta_ad_id, utm_meta_adset_id, utm_meta_campaign_id, utm_source, utm_placement, utm_medium, utm_content, utm_adset, utm_whop, wacid, wasid, waid, tw_source, tw_adid).</p>
+         * <p>Query parameters appended to <code>url</code>, keyed by name. Whop's click-attribution parameters are reserved.</p>
          */
         _FinalStage urlParameters(Map<String, Object> urlParameters);
 
@@ -1769,6 +1581,7 @@ public final class Ad {
                     CompletedRegistrationsStage,
                     ContactValueStage,
                     ContactsStage,
+                    ContentReviewStage,
                     CostPerClickStage,
                     CostPerMilleStage,
                     CreatedAtStage,
@@ -1778,6 +1591,7 @@ public final class Ad {
                     ImpressionsStage,
                     LeadValueStage,
                     LeadsStage,
+                    LinkClicksStage,
                     PurchaseValueStage,
                     PurchasesStage,
                     ReachStage,
@@ -1813,6 +1627,8 @@ public final class Ad {
 
         private double contacts;
 
+        private AdContentReview contentReview;
+
         private double costPerClick;
 
         private double costPerMille;
@@ -1830,6 +1646,8 @@ public final class Ad {
         private double leadValue;
 
         private double leads;
+
+        private double linkClicks;
 
         private double purchaseValue;
 
@@ -1869,37 +1687,21 @@ public final class Ad {
 
         private Optional<String> spendCurrency = Optional.empty();
 
-        private List<AdEntityReference> socialAccounts = new ArrayList<>();
-
         private Optional<Double> results = Optional.empty();
 
         private Optional<String> resultEventName = Optional.empty();
 
         private Optional<AdResultEvent> resultEvent = Optional.empty();
 
-        private List<String> primaryTexts = new ArrayList<>();
-
-        private Optional<String> postThumbnailUrl = Optional.empty();
-
-        private Optional<AdPostSource> postSource = Optional.empty();
-
-        private Optional<String> postId = Optional.empty();
-
-        private Optional<Boolean> multiAdvertiserAds = Optional.empty();
-
-        private Optional<AdMessagingConfig> messagingConfig = Optional.empty();
-
-        private Optional<String> leadFormId = Optional.empty();
-
-        private Optional<AdLeadForm> leadForm = Optional.empty();
+        private List<AdText> primaryTexts = new ArrayList<>();
 
         private List<AdPlatformIssue> issues = new ArrayList<>();
 
-        private List<String> headlines = new ArrayList<>();
+        private List<AdText> headlines = new ArrayList<>();
 
         private Optional<Double> frequency = Optional.empty();
 
-        private List<String> descriptions = new ArrayList<>();
+        private List<AdText> descriptions = new ArrayList<>();
 
         private Map<String, Object> customEventValues = new LinkedHashMap<>();
 
@@ -1929,7 +1731,6 @@ public final class Ad {
 
         private Optional<AdCallToAction> callToAction = Optional.empty();
 
-        @JsonAnySetter
         private Map<String, Object> additionalProperties = new HashMap<>();
 
         private Builder() {}
@@ -1947,6 +1748,7 @@ public final class Ad {
             completedRegistrations(other.getCompletedRegistrations());
             contactValue(other.getContactValue());
             contacts(other.getContacts());
+            contentReview(other.getContentReview());
             costPerAddedToCart(other.getCostPerAddedToCart());
             costPerClick(other.getCostPerClick());
             costPerCompletedRegistration(other.getCostPerCompletedRegistration());
@@ -1971,15 +1773,9 @@ public final class Ad {
             id(other.getId());
             impressions(other.getImpressions());
             issues(other.getIssues());
-            leadForm(other.getLeadForm());
-            leadFormId(other.getLeadFormId());
             leadValue(other.getLeadValue());
             leads(other.getLeads());
-            messagingConfig(other.getMessagingConfig());
-            multiAdvertiserAds(other.getMultiAdvertiserAds());
-            postId(other.getPostId());
-            postSource(other.getPostSource());
-            postThumbnailUrl(other.getPostThumbnailUrl());
+            linkClicks(other.getLinkClicks());
             primaryTexts(other.getPrimaryTexts());
             purchaseValue(other.getPurchaseValue());
             purchases(other.getPurchases());
@@ -1990,7 +1786,6 @@ public final class Ad {
             returnOnAdSpend(other.getReturnOnAdSpend());
             scheduleValue(other.getScheduleValue());
             schedules(other.getSchedules());
-            socialAccounts(other.getSocialAccounts());
             spend(other.getSpend());
             spendCurrency(other.getSpendCurrency());
             status(other.getStatus());
@@ -2009,7 +1804,6 @@ public final class Ad {
 
         /**
          * <p>The ad campaign this ad belongs to.</p>
-         * <p>The ad campaign this ad belongs to.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
@@ -2020,7 +1814,6 @@ public final class Ad {
         }
 
         /**
-         * <p>The ad group this ad belongs to.</p>
          * <p>The ad group this ad belongs to.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
@@ -2033,7 +1826,6 @@ public final class Ad {
 
         /**
          * <p>USD value attributed to add-to-cart events. Sums the value sent with each event, normalized to USD; events without a value contribute 0.</p>
-         * <p>USD value attributed to add-to-cart events. Sums the value sent with each event, normalized to USD; events without a value contribute 0.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
@@ -2044,7 +1836,6 @@ public final class Ad {
         }
 
         /**
-         * <p>Whop pixel-attributed add-to-cart events, last-click.</p>
          * <p>Whop pixel-attributed add-to-cart events, last-click.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
@@ -2057,7 +1848,6 @@ public final class Ad {
 
         /**
          * <p>Clicks divided by impressions, between 0 and 1.</p>
-         * <p>Clicks divided by impressions, between 0 and 1.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
@@ -2068,7 +1858,6 @@ public final class Ad {
         }
 
         /**
-         * <p>The number of clicks.</p>
          * <p>The number of clicks.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
@@ -2081,7 +1870,6 @@ public final class Ad {
 
         /**
          * <p>USD value attributed to complete-registration events. Sums the value sent with each event, normalized to USD; events without a value contribute 0.</p>
-         * <p>USD value attributed to complete-registration events. Sums the value sent with each event, normalized to USD; events without a value contribute 0.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
@@ -2092,7 +1880,6 @@ public final class Ad {
         }
 
         /**
-         * <p>Whop pixel-attributed complete-registration events, last-click.</p>
          * <p>Whop pixel-attributed complete-registration events, last-click.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
@@ -2105,7 +1892,6 @@ public final class Ad {
 
         /**
          * <p>USD value attributed to contact events. Sums the value sent with each event, normalized to USD; events without a value contribute 0.</p>
-         * <p>USD value attributed to contact events. Sums the value sent with each event, normalized to USD; events without a value contribute 0.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
@@ -2117,18 +1903,27 @@ public final class Ad {
 
         /**
          * <p>Whop pixel-attributed contact events, last-click.</p>
-         * <p>Whop pixel-attributed contact events, last-click.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
         @JsonSetter("contacts")
-        public CostPerClickStage contacts(double contacts) {
+        public ContentReviewStage contacts(double contacts) {
             this.contacts = contacts;
             return this;
         }
 
         /**
-         * <p>Spend divided by clicks; 0 when there are no clicks.</p>
+         * <p>Whop's content review of this ad: whether it has finished, which ad networks it is recommended for, and the content rules it breaks.</p>
+         * @return Reference to {@code this} so that method calls can be chained together.
+         */
+        @java.lang.Override
+        @JsonSetter("content_review")
+        public CostPerClickStage contentReview(@NotNull AdContentReview contentReview) {
+            this.contentReview = Objects.requireNonNull(contentReview, "contentReview must not be null");
+            return this;
+        }
+
+        /**
          * <p>Spend divided by clicks; 0 when there are no clicks.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
@@ -2141,7 +1936,6 @@ public final class Ad {
 
         /**
          * <p>Spend per 1,000 impressions; 0 when there are no impressions.</p>
-         * <p>Spend per 1,000 impressions; 0 when there are no impressions.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
@@ -2152,7 +1946,6 @@ public final class Ad {
         }
 
         /**
-         * <p>When the ad was created, as an ISO 8601 timestamp.</p>
          * <p>When the ad was created, as an ISO 8601 timestamp.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
@@ -2165,7 +1958,6 @@ public final class Ad {
 
         /**
          * <p>Whop pixel-attributed custom (merchant-defined) conversion events, last-click, across all custom event names.</p>
-         * <p>Whop pixel-attributed custom (merchant-defined) conversion events, last-click, across all custom event names.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
@@ -2176,7 +1968,6 @@ public final class Ad {
         }
 
         /**
-         * <p>Whether the ad is delivering right now, and if not, why. When several states apply at once, the highest-precedence one is returned.</p>
          * <p>Whether the ad is delivering right now, and if not, why. When several states apply at once, the highest-precedence one is returned.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
@@ -2189,7 +1980,6 @@ public final class Ad {
 
         /**
          * <p>Unique identifier for the ad, prefixed <code>ad_</code>.</p>
-         * <p>Unique identifier for the ad, prefixed <code>ad_</code>.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
@@ -2200,7 +1990,6 @@ public final class Ad {
         }
 
         /**
-         * <p>The number of impressions.</p>
          * <p>The number of impressions.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
@@ -2213,7 +2002,6 @@ public final class Ad {
 
         /**
          * <p>USD value attributed to lead events. Sums the value sent with each event, normalized to USD; events without a value contribute 0.</p>
-         * <p>USD value attributed to lead events. Sums the value sent with each event, normalized to USD; events without a value contribute 0.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
@@ -2225,18 +2013,27 @@ public final class Ad {
 
         /**
          * <p>Whop pixel-attributed leads, last-click.</p>
-         * <p>Whop pixel-attributed leads, last-click.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
         @JsonSetter("leads")
-        public PurchaseValueStage leads(double leads) {
+        public LinkClicksStage leads(double leads) {
             this.leads = leads;
             return this;
         }
 
         /**
-         * <p>USD value of pixel-attributed purchases.</p>
+         * <p>Page views on your destination from people who clicked the ad, recorded by the Whop pixel. Counted the same way on every ad platform.</p>
+         * @return Reference to {@code this} so that method calls can be chained together.
+         */
+        @java.lang.Override
+        @JsonSetter("link_clicks")
+        public PurchaseValueStage linkClicks(double linkClicks) {
+            this.linkClicks = linkClicks;
+            return this;
+        }
+
+        /**
          * <p>USD value of pixel-attributed purchases.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
@@ -2249,7 +2046,6 @@ public final class Ad {
 
         /**
          * <p>Whop pixel-attributed purchases, last-click.</p>
-         * <p>Whop pixel-attributed purchases, last-click.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
@@ -2260,7 +2056,6 @@ public final class Ad {
         }
 
         /**
-         * <p>The number of unique people who saw this.</p>
          * <p>The number of unique people who saw this.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
@@ -2273,7 +2068,6 @@ public final class Ad {
 
         /**
          * <p>Purchase value divided by spend, both in USD (a currency-neutral ratio); 0 when there is no spend.</p>
-         * <p>Purchase value divided by spend, both in USD (a currency-neutral ratio); 0 when there is no spend.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
@@ -2284,7 +2078,6 @@ public final class Ad {
         }
 
         /**
-         * <p>USD value attributed to schedule events. Sums the value sent with each event, normalized to USD; events without a value contribute 0.</p>
          * <p>USD value attributed to schedule events. Sums the value sent with each event, normalized to USD; events without a value contribute 0.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
@@ -2297,7 +2090,6 @@ public final class Ad {
 
         /**
          * <p>Whop pixel-attributed schedule events, last-click.</p>
-         * <p>Whop pixel-attributed schedule events, last-click.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
@@ -2308,7 +2100,6 @@ public final class Ad {
         }
 
         /**
-         * <p>The amount charged, in spend_currency.</p>
          * <p>The amount charged, in spend_currency.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
@@ -2321,7 +2112,6 @@ public final class Ad {
 
         /**
          * <p>Whether the ad is enabled. <code>active</code> and <code>paused</code> are set by you; <code>in_review</code> and <code>rejected</code> come from ad review.</p>
-         * <p>Whether the ad is enabled. <code>active</code> and <code>paused</code> are set by you; <code>in_review</code> and <code>rejected</code> come from ad review.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
@@ -2332,7 +2122,6 @@ public final class Ad {
         }
 
         /**
-         * <p>USD value attributed to submit-application events. Sums the value sent with each event, normalized to USD; events without a value contribute 0.</p>
          * <p>USD value attributed to submit-application events. Sums the value sent with each event, normalized to USD; events without a value contribute 0.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
@@ -2345,7 +2134,6 @@ public final class Ad {
 
         /**
          * <p>Whop pixel-attributed submit-application events, last-click.</p>
-         * <p>Whop pixel-attributed submit-application events, last-click.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
@@ -2356,7 +2144,6 @@ public final class Ad {
         }
 
         /**
-         * <p>People who clicked, reported by the Whop pixel, counted once per person.</p>
          * <p>People who clicked, reported by the Whop pixel, counted once per person.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
@@ -2369,7 +2156,6 @@ public final class Ad {
 
         /**
          * <p>When the ad was last updated, as an ISO 8601 timestamp.</p>
-         * <p>When the ad was last updated, as an ISO 8601 timestamp.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
@@ -2380,7 +2166,6 @@ public final class Ad {
         }
 
         /**
-         * <p>USD value attributed to view-content events. Sums the value sent with each event, normalized to USD; events without a value contribute 0.</p>
          * <p>USD value attributed to view-content events. Sums the value sent with each event, normalized to USD; events without a value contribute 0.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
@@ -2393,7 +2178,6 @@ public final class Ad {
 
         /**
          * <p>Whop pixel-attributed view-content events, last-click.</p>
-         * <p>Whop pixel-attributed view-content events, last-click.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
@@ -2404,7 +2188,7 @@ public final class Ad {
         }
 
         /**
-         * <p>Every query parameter appended to the URL, keyed by parameter name — including any you sent on <code>url</code> itself. Whop adds its own click-attribution parameters on top; those are reserved and rejected if you set them (utm_meta_ad_id, utm_meta_adset_id, utm_meta_campaign_id, utm_source, utm_placement, utm_medium, utm_content, utm_adset, utm_whop, wacid, wasid, waid, tw_source, tw_adid).</p>
+         * <p>Query parameters appended to <code>url</code>, keyed by name. Whop's click-attribution parameters are reserved.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
@@ -2414,7 +2198,7 @@ public final class Ad {
         }
 
         /**
-         * <p>Every query parameter appended to the URL, keyed by parameter name — including any you sent on <code>url</code> itself. Whop adds its own click-attribution parameters on top; those are reserved and rejected if you set them (utm_meta_ad_id, utm_meta_adset_id, utm_meta_campaign_id, utm_source, utm_placement, utm_medium, utm_content, utm_adset, utm_whop, wacid, wasid, waid, tw_source, tw_adid).</p>
+         * <p>Query parameters appended to <code>url</code>, keyed by name. Whop's click-attribution parameters are reserved.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
@@ -2426,7 +2210,7 @@ public final class Ad {
         }
 
         /**
-         * <p>Every query parameter appended to the URL, keyed by parameter name — including any you sent on <code>url</code> itself. Whop adds its own click-attribution parameters on top; those are reserved and rejected if you set them (utm_meta_ad_id, utm_meta_adset_id, utm_meta_campaign_id, utm_source, utm_placement, utm_medium, utm_content, utm_adset, utm_whop, wacid, wasid, waid, tw_source, tw_adid).</p>
+         * <p>Query parameters appended to <code>url</code>, keyed by name. Whop's click-attribution parameters are reserved.</p>
          */
         @java.lang.Override
         @JsonSetter(value = "url_parameters", nulls = Nulls.SKIP)
@@ -2582,30 +2366,6 @@ public final class Ad {
             return this;
         }
 
-        @java.lang.Override
-        public _FinalStage addAllSocialAccounts(List<AdEntityReference> socialAccounts) {
-            if (socialAccounts != null) {
-                this.socialAccounts.addAll(socialAccounts);
-            }
-            return this;
-        }
-
-        @java.lang.Override
-        public _FinalStage addSocialAccounts(AdEntityReference socialAccounts) {
-            this.socialAccounts.add(socialAccounts);
-            return this;
-        }
-
-        @java.lang.Override
-        @JsonSetter(value = "social_accounts", nulls = Nulls.SKIP)
-        public _FinalStage socialAccounts(List<AdEntityReference> socialAccounts) {
-            this.socialAccounts.clear();
-            if (socialAccounts != null) {
-                this.socialAccounts.addAll(socialAccounts);
-            }
-            return this;
-        }
-
         /**
          * <p>The Whop pixel-attributed count behind result_event. When a campaign's ad groups optimize different goals there is no single result_event (it is null), and this is instead the sum of each ad group's own attributed results. Null when nothing Whop-attributable is being optimized for.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
@@ -2715,7 +2475,7 @@ public final class Ad {
         }
 
         @java.lang.Override
-        public _FinalStage addAllPrimaryTexts(List<String> primaryTexts) {
+        public _FinalStage addAllPrimaryTexts(List<AdText> primaryTexts) {
             if (primaryTexts != null) {
                 this.primaryTexts.addAll(primaryTexts);
             }
@@ -2723,254 +2483,18 @@ public final class Ad {
         }
 
         @java.lang.Override
-        public _FinalStage addPrimaryTexts(String primaryTexts) {
+        public _FinalStage addPrimaryTexts(AdText primaryTexts) {
             this.primaryTexts.add(primaryTexts);
             return this;
         }
 
         @java.lang.Override
         @JsonSetter(value = "primary_texts", nulls = Nulls.SKIP)
-        public _FinalStage primaryTexts(List<String> primaryTexts) {
+        public _FinalStage primaryTexts(List<AdText> primaryTexts) {
             this.primaryTexts.clear();
             if (primaryTexts != null) {
                 this.primaryTexts.addAll(primaryTexts);
             }
-            return this;
-        }
-
-        /**
-         * <p>Preview image of the existing post this ad promotes. <code>null</code> for ads that use uploaded creatives, or until the post's media has been fetched from the network.</p>
-         * @return Reference to {@code this} so that method calls can be chained together.
-         */
-        @java.lang.Override
-        public _FinalStage postThumbnailUrl(Nullable<String> postThumbnailUrl) {
-            if (postThumbnailUrl.isNull()) {
-                this.postThumbnailUrl = null;
-            } else if (postThumbnailUrl.isEmpty()) {
-                this.postThumbnailUrl = Optional.empty();
-            } else {
-                this.postThumbnailUrl = Optional.of(postThumbnailUrl.get());
-            }
-            return this;
-        }
-
-        /**
-         * <p>Preview image of the existing post this ad promotes. <code>null</code> for ads that use uploaded creatives, or until the post's media has been fetched from the network.</p>
-         * @return Reference to {@code this} so that method calls can be chained together.
-         */
-        @java.lang.Override
-        public _FinalStage postThumbnailUrl(String postThumbnailUrl) {
-            this.postThumbnailUrl = Optional.ofNullable(postThumbnailUrl);
-            return this;
-        }
-
-        /**
-         * <p>Preview image of the existing post this ad promotes. <code>null</code> for ads that use uploaded creatives, or until the post's media has been fetched from the network.</p>
-         */
-        @java.lang.Override
-        @JsonSetter(value = "post_thumbnail_url", nulls = Nulls.SKIP)
-        public _FinalStage postThumbnailUrl(Optional<String> postThumbnailUrl) {
-            this.postThumbnailUrl = postThumbnailUrl;
-            return this;
-        }
-
-        /**
-         * <p>Identifies the network that owns <code>post_id</code>; <code>null</code> when the ad uses uploaded creatives.</p>
-         * @return Reference to {@code this} so that method calls can be chained together.
-         */
-        @java.lang.Override
-        public _FinalStage postSource(Nullable<AdPostSource> postSource) {
-            if (postSource.isNull()) {
-                this.postSource = null;
-            } else if (postSource.isEmpty()) {
-                this.postSource = Optional.empty();
-            } else {
-                this.postSource = Optional.of(postSource.get());
-            }
-            return this;
-        }
-
-        /**
-         * <p>Identifies the network that owns <code>post_id</code>; <code>null</code> when the ad uses uploaded creatives.</p>
-         * @return Reference to {@code this} so that method calls can be chained together.
-         */
-        @java.lang.Override
-        public _FinalStage postSource(AdPostSource postSource) {
-            this.postSource = Optional.ofNullable(postSource);
-            return this;
-        }
-
-        /**
-         * <p>Identifies the network that owns <code>post_id</code>; <code>null</code> when the ad uses uploaded creatives.</p>
-         */
-        @java.lang.Override
-        @JsonSetter(value = "post_source", nulls = Nulls.SKIP)
-        public _FinalStage postSource(Optional<AdPostSource> postSource) {
-            this.postSource = postSource;
-            return this;
-        }
-
-        /**
-         * <p>The existing post this ad promotes — a Facebook post or Instagram media ID. <code>null</code> when the ad uses uploaded creatives.</p>
-         * @return Reference to {@code this} so that method calls can be chained together.
-         */
-        @java.lang.Override
-        public _FinalStage postId(Nullable<String> postId) {
-            if (postId.isNull()) {
-                this.postId = null;
-            } else if (postId.isEmpty()) {
-                this.postId = Optional.empty();
-            } else {
-                this.postId = Optional.of(postId.get());
-            }
-            return this;
-        }
-
-        /**
-         * <p>The existing post this ad promotes — a Facebook post or Instagram media ID. <code>null</code> when the ad uses uploaded creatives.</p>
-         * @return Reference to {@code this} so that method calls can be chained together.
-         */
-        @java.lang.Override
-        public _FinalStage postId(String postId) {
-            this.postId = Optional.ofNullable(postId);
-            return this;
-        }
-
-        /**
-         * <p>The existing post this ad promotes — a Facebook post or Instagram media ID. <code>null</code> when the ad uses uploaded creatives.</p>
-         */
-        @java.lang.Override
-        @JsonSetter(value = "post_id", nulls = Nulls.SKIP)
-        public _FinalStage postId(Optional<String> postId) {
-            this.postId = postId;
-            return this;
-        }
-
-        /**
-         * <p>Whether the ad can appear alongside other advertisers' ads in the same unit. Defaults to true.</p>
-         * @return Reference to {@code this} so that method calls can be chained together.
-         */
-        @java.lang.Override
-        public _FinalStage multiAdvertiserAds(Boolean multiAdvertiserAds) {
-            this.multiAdvertiserAds = Optional.ofNullable(multiAdvertiserAds);
-            return this;
-        }
-
-        /**
-         * <p>Whether the ad can appear alongside other advertisers' ads in the same unit. Defaults to true.</p>
-         */
-        @java.lang.Override
-        @JsonSetter(value = "multi_advertiser_ads", nulls = Nulls.SKIP)
-        public _FinalStage multiAdvertiserAds(Optional<Boolean> multiAdvertiserAds) {
-            this.multiAdvertiserAds = multiAdvertiserAds;
-            return this;
-        }
-
-        /**
-         * <p>Welcome message for click-to-message ads, shown when the conversation opens. <code>null</code> when the ad has none.</p>
-         * @return Reference to {@code this} so that method calls can be chained together.
-         */
-        @java.lang.Override
-        public _FinalStage messagingConfig(Nullable<AdMessagingConfig> messagingConfig) {
-            if (messagingConfig.isNull()) {
-                this.messagingConfig = null;
-            } else if (messagingConfig.isEmpty()) {
-                this.messagingConfig = Optional.empty();
-            } else {
-                this.messagingConfig = Optional.of(messagingConfig.get());
-            }
-            return this;
-        }
-
-        /**
-         * <p>Welcome message for click-to-message ads, shown when the conversation opens. <code>null</code> when the ad has none.</p>
-         * @return Reference to {@code this} so that method calls can be chained together.
-         */
-        @java.lang.Override
-        public _FinalStage messagingConfig(AdMessagingConfig messagingConfig) {
-            this.messagingConfig = Optional.ofNullable(messagingConfig);
-            return this;
-        }
-
-        /**
-         * <p>Welcome message for click-to-message ads, shown when the conversation opens. <code>null</code> when the ad has none.</p>
-         */
-        @java.lang.Override
-        @JsonSetter(value = "messaging_config", nulls = Nulls.SKIP)
-        public _FinalStage messagingConfig(Optional<AdMessagingConfig> messagingConfig) {
-            this.messagingConfig = messagingConfig;
-            return this;
-        }
-
-        /**
-         * <p>The ad platform's ID for the instant form the ad uses. Set when the ad references an existing form via <code>lead_form_id</code>, or once a form built from <code>lead_form</code> has been created on the platform.</p>
-         * @return Reference to {@code this} so that method calls can be chained together.
-         */
-        @java.lang.Override
-        public _FinalStage leadFormId(Nullable<String> leadFormId) {
-            if (leadFormId.isNull()) {
-                this.leadFormId = null;
-            } else if (leadFormId.isEmpty()) {
-                this.leadFormId = Optional.empty();
-            } else {
-                this.leadFormId = Optional.of(leadFormId.get());
-            }
-            return this;
-        }
-
-        /**
-         * <p>The ad platform's ID for the instant form the ad uses. Set when the ad references an existing form via <code>lead_form_id</code>, or once a form built from <code>lead_form</code> has been created on the platform.</p>
-         * @return Reference to {@code this} so that method calls can be chained together.
-         */
-        @java.lang.Override
-        public _FinalStage leadFormId(String leadFormId) {
-            this.leadFormId = Optional.ofNullable(leadFormId);
-            return this;
-        }
-
-        /**
-         * <p>The ad platform's ID for the instant form the ad uses. Set when the ad references an existing form via <code>lead_form_id</code>, or once a form built from <code>lead_form</code> has been created on the platform.</p>
-         */
-        @java.lang.Override
-        @JsonSetter(value = "lead_form_id", nulls = Nulls.SKIP)
-        public _FinalStage leadFormId(Optional<String> leadFormId) {
-            this.leadFormId = leadFormId;
-            return this;
-        }
-
-        /**
-         * <p>The instant lead form shown when someone taps this ad. <code>null</code> when the ad group's conversion_location is not an instant-form destination.</p>
-         * @return Reference to {@code this} so that method calls can be chained together.
-         */
-        @java.lang.Override
-        public _FinalStage leadForm(Nullable<AdLeadForm> leadForm) {
-            if (leadForm.isNull()) {
-                this.leadForm = null;
-            } else if (leadForm.isEmpty()) {
-                this.leadForm = Optional.empty();
-            } else {
-                this.leadForm = Optional.of(leadForm.get());
-            }
-            return this;
-        }
-
-        /**
-         * <p>The instant lead form shown when someone taps this ad. <code>null</code> when the ad group's conversion_location is not an instant-form destination.</p>
-         * @return Reference to {@code this} so that method calls can be chained together.
-         */
-        @java.lang.Override
-        public _FinalStage leadForm(AdLeadForm leadForm) {
-            this.leadForm = Optional.ofNullable(leadForm);
-            return this;
-        }
-
-        /**
-         * <p>The instant lead form shown when someone taps this ad. <code>null</code> when the ad group's conversion_location is not an instant-form destination.</p>
-         */
-        @java.lang.Override
-        @JsonSetter(value = "lead_form", nulls = Nulls.SKIP)
-        public _FinalStage leadForm(Optional<AdLeadForm> leadForm) {
-            this.leadForm = leadForm;
             return this;
         }
 
@@ -2999,7 +2523,7 @@ public final class Ad {
         }
 
         @java.lang.Override
-        public _FinalStage addAllHeadlines(List<String> headlines) {
+        public _FinalStage addAllHeadlines(List<AdText> headlines) {
             if (headlines != null) {
                 this.headlines.addAll(headlines);
             }
@@ -3007,14 +2531,14 @@ public final class Ad {
         }
 
         @java.lang.Override
-        public _FinalStage addHeadlines(String headlines) {
+        public _FinalStage addHeadlines(AdText headlines) {
             this.headlines.add(headlines);
             return this;
         }
 
         @java.lang.Override
         @JsonSetter(value = "headlines", nulls = Nulls.SKIP)
-        public _FinalStage headlines(List<String> headlines) {
+        public _FinalStage headlines(List<AdText> headlines) {
             this.headlines.clear();
             if (headlines != null) {
                 this.headlines.addAll(headlines);
@@ -3023,7 +2547,7 @@ public final class Ad {
         }
 
         /**
-         * <p>Platform-reported impressions divided by reach.</p>
+         * <p>Impressions divided by reach.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
@@ -3039,7 +2563,7 @@ public final class Ad {
         }
 
         /**
-         * <p>Platform-reported impressions divided by reach.</p>
+         * <p>Impressions divided by reach.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
@@ -3049,7 +2573,7 @@ public final class Ad {
         }
 
         /**
-         * <p>Platform-reported impressions divided by reach.</p>
+         * <p>Impressions divided by reach.</p>
          */
         @java.lang.Override
         @JsonSetter(value = "frequency", nulls = Nulls.SKIP)
@@ -3059,7 +2583,7 @@ public final class Ad {
         }
 
         @java.lang.Override
-        public _FinalStage addAllDescriptions(List<String> descriptions) {
+        public _FinalStage addAllDescriptions(List<AdText> descriptions) {
             if (descriptions != null) {
                 this.descriptions.addAll(descriptions);
             }
@@ -3067,14 +2591,14 @@ public final class Ad {
         }
 
         @java.lang.Override
-        public _FinalStage addDescriptions(String descriptions) {
+        public _FinalStage addDescriptions(AdText descriptions) {
             this.descriptions.add(descriptions);
             return this;
         }
 
         @java.lang.Override
         @JsonSetter(value = "descriptions", nulls = Nulls.SKIP)
-        public _FinalStage descriptions(List<String> descriptions) {
+        public _FinalStage descriptions(List<AdText> descriptions) {
             this.descriptions.clear();
             if (descriptions != null) {
                 this.descriptions.addAll(descriptions);
@@ -3586,6 +3110,7 @@ public final class Ad {
                     completedRegistrations,
                     contactValue,
                     contacts,
+                    contentReview,
                     costPerAddedToCart,
                     costPerClick,
                     costPerCompletedRegistration,
@@ -3610,15 +3135,9 @@ public final class Ad {
                     id,
                     impressions,
                     issues,
-                    leadForm,
-                    leadFormId,
                     leadValue,
                     leads,
-                    messagingConfig,
-                    multiAdvertiserAds,
-                    postId,
-                    postSource,
-                    postThumbnailUrl,
+                    linkClicks,
                     primaryTexts,
                     purchaseValue,
                     purchases,
@@ -3629,7 +3148,6 @@ public final class Ad {
                     returnOnAdSpend,
                     scheduleValue,
                     schedules,
-                    socialAccounts,
                     spend,
                     spendCurrency,
                     status,
@@ -3644,6 +3162,75 @@ public final class Ad {
                     viewedContentValue,
                     viewedContents,
                     additionalProperties);
+        }
+
+        @JsonAnySetter
+        private void putAdditionalPropertyFromJson(String key, Object value) {
+            if (key.equalsIgnoreCase("ad_campaign")
+                    || key.equalsIgnoreCase("ad_group")
+                    || key.equalsIgnoreCase("added_to_cart_value")
+                    || key.equalsIgnoreCase("added_to_carts")
+                    || key.equalsIgnoreCase("call_to_action")
+                    || key.equalsIgnoreCase("click_through_rate")
+                    || key.equalsIgnoreCase("clicks")
+                    || key.equalsIgnoreCase("completed_registration_value")
+                    || key.equalsIgnoreCase("completed_registrations")
+                    || key.equalsIgnoreCase("contact_value")
+                    || key.equalsIgnoreCase("contacts")
+                    || key.equalsIgnoreCase("content_review")
+                    || key.equalsIgnoreCase("cost_per_added_to_cart")
+                    || key.equalsIgnoreCase("cost_per_click")
+                    || key.equalsIgnoreCase("cost_per_completed_registration")
+                    || key.equalsIgnoreCase("cost_per_contact")
+                    || key.equalsIgnoreCase("cost_per_lead")
+                    || key.equalsIgnoreCase("cost_per_mille")
+                    || key.equalsIgnoreCase("cost_per_purchase")
+                    || key.equalsIgnoreCase("cost_per_result")
+                    || key.equalsIgnoreCase("cost_per_schedule")
+                    || key.equalsIgnoreCase("cost_per_submitted_application")
+                    || key.equalsIgnoreCase("cost_per_unique_click")
+                    || key.equalsIgnoreCase("cost_per_viewed_content")
+                    || key.equalsIgnoreCase("created_at")
+                    || key.equalsIgnoreCase("creatives")
+                    || key.equalsIgnoreCase("custom_conversions")
+                    || key.equalsIgnoreCase("custom_event_counts")
+                    || key.equalsIgnoreCase("custom_event_values")
+                    || key.equalsIgnoreCase("delivery_status")
+                    || key.equalsIgnoreCase("descriptions")
+                    || key.equalsIgnoreCase("frequency")
+                    || key.equalsIgnoreCase("headlines")
+                    || key.equalsIgnoreCase("id")
+                    || key.equalsIgnoreCase("impressions")
+                    || key.equalsIgnoreCase("issues")
+                    || key.equalsIgnoreCase("lead_value")
+                    || key.equalsIgnoreCase("leads")
+                    || key.equalsIgnoreCase("link_clicks")
+                    || key.equalsIgnoreCase("primary_texts")
+                    || key.equalsIgnoreCase("purchase_value")
+                    || key.equalsIgnoreCase("purchases")
+                    || key.equalsIgnoreCase("reach")
+                    || key.equalsIgnoreCase("result_event")
+                    || key.equalsIgnoreCase("result_event_name")
+                    || key.equalsIgnoreCase("results")
+                    || key.equalsIgnoreCase("return_on_ad_spend")
+                    || key.equalsIgnoreCase("schedule_value")
+                    || key.equalsIgnoreCase("schedules")
+                    || key.equalsIgnoreCase("spend")
+                    || key.equalsIgnoreCase("spend_currency")
+                    || key.equalsIgnoreCase("status")
+                    || key.equalsIgnoreCase("submitted_application_value")
+                    || key.equalsIgnoreCase("submitted_applications")
+                    || key.equalsIgnoreCase("title")
+                    || key.equalsIgnoreCase("unique_click_through_rate")
+                    || key.equalsIgnoreCase("unique_clicks")
+                    || key.equalsIgnoreCase("updated_at")
+                    || key.equalsIgnoreCase("url")
+                    || key.equalsIgnoreCase("url_parameters")
+                    || key.equalsIgnoreCase("viewed_content_value")
+                    || key.equalsIgnoreCase("viewed_contents")) {
+                return;
+            }
+            this.additionalProperties.put(key, value);
         }
 
         @java.lang.Override

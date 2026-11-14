@@ -157,7 +157,6 @@ public final class RetrievePeopleResponseUser {
 
         private Optional<String> name = Optional.empty();
 
-        @JsonAnySetter
         private Map<String, Object> additionalProperties = new HashMap<>();
 
         private Builder() {}
@@ -238,6 +237,17 @@ public final class RetrievePeopleResponseUser {
         @java.lang.Override
         public RetrievePeopleResponseUser build() {
             return new RetrievePeopleResponseUser(id, name, profilePicUrl, username, additionalProperties);
+        }
+
+        @JsonAnySetter
+        private void putAdditionalPropertyFromJson(String key, Object value) {
+            if (key.equalsIgnoreCase("id")
+                    || key.equalsIgnoreCase("name")
+                    || key.equalsIgnoreCase("profile_pic_url")
+                    || key.equalsIgnoreCase("username")) {
+                return;
+            }
+            this.additionalProperties.put(key, value);
         }
 
         @java.lang.Override

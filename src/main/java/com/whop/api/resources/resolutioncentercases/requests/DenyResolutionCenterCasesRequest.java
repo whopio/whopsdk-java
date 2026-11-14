@@ -113,7 +113,6 @@ public final class DenyResolutionCenterCasesRequest {
 
         private Optional<List<DenyResolutionCenterCasesRequestAttachmentsItem>> attachments = Optional.empty();
 
-        @JsonAnySetter
         private Map<String, Object> additionalProperties = new HashMap<>();
 
         private Builder() {}
@@ -126,7 +125,6 @@ public final class DenyResolutionCenterCasesRequest {
         }
 
         /**
-         * <p>Why the claim is being denied. Shown to the customer.</p>
          * <p>Why the claim is being denied. Shown to the customer.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
@@ -160,6 +158,14 @@ public final class DenyResolutionCenterCasesRequest {
         @java.lang.Override
         public DenyResolutionCenterCasesRequest build() {
             return new DenyResolutionCenterCasesRequest(attachments, message, additionalProperties);
+        }
+
+        @JsonAnySetter
+        private void putAdditionalPropertyFromJson(String key, Object value) {
+            if (key.equalsIgnoreCase("attachments") || key.equalsIgnoreCase("message")) {
+                return;
+            }
+            this.additionalProperties.put(key, value);
         }
 
         @java.lang.Override

@@ -15,6 +15,9 @@ public final class ListAdCampaignsRequestOrder {
     public static final ListAdCampaignsRequestOrder COST_PER_CLICK =
             new ListAdCampaignsRequestOrder(Value.COST_PER_CLICK, "cost_per_click");
 
+    public static final ListAdCampaignsRequestOrder LINK_CLICKS =
+            new ListAdCampaignsRequestOrder(Value.LINK_CLICKS, "link_clicks");
+
     public static final ListAdCampaignsRequestOrder FREQUENCY =
             new ListAdCampaignsRequestOrder(Value.FREQUENCY, "frequency");
 
@@ -84,6 +87,8 @@ public final class ListAdCampaignsRequestOrder {
                 return visitor.visitCostPerResult();
             case COST_PER_CLICK:
                 return visitor.visitCostPerClick();
+            case LINK_CLICKS:
+                return visitor.visitLinkClicks();
             case FREQUENCY:
                 return visitor.visitFrequency();
             case RESULTS:
@@ -121,6 +126,8 @@ public final class ListAdCampaignsRequestOrder {
                 return COST_PER_RESULT;
             case "cost_per_click":
                 return COST_PER_CLICK;
+            case "link_clicks":
+                return LINK_CLICKS;
             case "frequency":
                 return FREQUENCY;
             case "results":
@@ -161,6 +168,8 @@ public final class ListAdCampaignsRequestOrder {
 
         CLICKS,
 
+        LINK_CLICKS,
+
         UNIQUE_CLICKS,
 
         FREQUENCY,
@@ -192,6 +201,8 @@ public final class ListAdCampaignsRequestOrder {
         T visitReach();
 
         T visitClicks();
+
+        T visitLinkClicks();
 
         T visitUniqueClicks();
 
