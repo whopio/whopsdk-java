@@ -101,6 +101,10 @@ public class AsyncRawInvoicesClient {
             QueryStringMapper.addQueryParameter(
                     httpUrl, "overdue", request.getOverdue().get(), false);
         }
+        if (request.getScheduled().isPresent()) {
+            QueryStringMapper.addQueryParameter(
+                    httpUrl, "scheduled", request.getScheduled().get(), false);
+        }
         if (request.getMemberId().isPresent()) {
             QueryStringMapper.addQueryParameter(
                     httpUrl, "member_id", request.getMemberId().get(), false);

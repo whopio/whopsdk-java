@@ -64,7 +64,6 @@ import com.whop.api.resources.forumposts.AsyncForumPostsClient;
 import com.whop.api.resources.forums.AsyncForumsClient;
 import com.whop.api.resources.identityprofiles.AsyncIdentityProfilesClient;
 import com.whop.api.resources.invoices.AsyncInvoicesClient;
-import com.whop.api.resources.leads.AsyncLeadsClient;
 import com.whop.api.resources.ledgeraccounts.AsyncLedgerAccountsClient;
 import com.whop.api.resources.livestreams.AsyncLivestreamsClient;
 import com.whop.api.resources.media.AsyncMediaClient;
@@ -231,8 +230,6 @@ public class AsyncWhopApiClient implements AutoCloseable {
 
     protected final Supplier<AsyncInvoicesClient> invoicesClient;
 
-    protected final Supplier<AsyncLeadsClient> leadsClient;
-
     protected final Supplier<AsyncLedgerAccountsClient> ledgerAccountsClient;
 
     protected final Supplier<AsyncLivestreamsClient> livestreamsClient;
@@ -383,7 +380,6 @@ public class AsyncWhopApiClient implements AutoCloseable {
         this.forumsClient = Suppliers.memoize(() -> new AsyncForumsClient(clientOptions));
         this.identityProfilesClient = Suppliers.memoize(() -> new AsyncIdentityProfilesClient(clientOptions));
         this.invoicesClient = Suppliers.memoize(() -> new AsyncInvoicesClient(clientOptions));
-        this.leadsClient = Suppliers.memoize(() -> new AsyncLeadsClient(clientOptions));
         this.ledgerAccountsClient = Suppliers.memoize(() -> new AsyncLedgerAccountsClient(clientOptions));
         this.livestreamsClient = Suppliers.memoize(() -> new AsyncLivestreamsClient(clientOptions));
         this.mediaClient = Suppliers.memoize(() -> new AsyncMediaClient(clientOptions));
@@ -664,10 +660,6 @@ public class AsyncWhopApiClient implements AutoCloseable {
 
     public AsyncInvoicesClient invoices() {
         return this.invoicesClient.get();
-    }
-
-    public AsyncLeadsClient leads() {
-        return this.leadsClient.get();
     }
 
     public AsyncLedgerAccountsClient ledgerAccounts() {

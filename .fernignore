@@ -54,8 +54,10 @@
 .github/workflows/publish-main.yml
 .github/release.gradle
 .github/stamp-version.py
+.github/package-smoke/
 gradle.properties
 LICENSE
+MIGRATING.md
 
 # src/main/java/com/whop/api/helpers/oidc is the hand-written OIDC helper. OidcToken and
 # IdentityTokens trade a cloud provider's identity token for a short-lived Whop access token and

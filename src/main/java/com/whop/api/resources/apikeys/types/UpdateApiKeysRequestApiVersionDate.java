@@ -169,6 +169,9 @@ public final class UpdateApiKeysRequestApiVersionDate {
     public static final UpdateApiKeysRequestApiVersionDate TWO_THOUSAND_TWENTY_SIX0906 =
             new UpdateApiKeysRequestApiVersionDate(Value.TWO_THOUSAND_TWENTY_SIX0906, "2026-09-06");
 
+    public static final UpdateApiKeysRequestApiVersionDate TWO_THOUSAND_TWENTY_SIX1113 =
+            new UpdateApiKeysRequestApiVersionDate(Value.TWO_THOUSAND_TWENTY_SIX1113, "2026-11-13");
+
     public static final UpdateApiKeysRequestApiVersionDate TWO_THOUSAND_TWENTY_SIX10271 =
             new UpdateApiKeysRequestApiVersionDate(Value.TWO_THOUSAND_TWENTY_SIX10271, "2026-10-27-1");
 
@@ -210,6 +213,9 @@ public final class UpdateApiKeysRequestApiVersionDate {
 
     public static final UpdateApiKeysRequestApiVersionDate TWO_THOUSAND_TWENTY_SIX10091 =
             new UpdateApiKeysRequestApiVersionDate(Value.TWO_THOUSAND_TWENTY_SIX10091, "2026-10-09-1");
+
+    public static final UpdateApiKeysRequestApiVersionDate TWO_THOUSAND_TWENTY_SIX11131 =
+            new UpdateApiKeysRequestApiVersionDate(Value.TWO_THOUSAND_TWENTY_SIX11131, "2026-11-13-1");
 
     public static final UpdateApiKeysRequestApiVersionDate TWO_THOUSAND_TWENTY_SIX0718 =
             new UpdateApiKeysRequestApiVersionDate(Value.TWO_THOUSAND_TWENTY_SIX0718, "2026-07-18");
@@ -445,6 +451,8 @@ public final class UpdateApiKeysRequestApiVersionDate {
                 return visitor.visitTwoThousandTwentySix11041();
             case TWO_THOUSAND_TWENTY_SIX0906:
                 return visitor.visitTwoThousandTwentySix0906();
+            case TWO_THOUSAND_TWENTY_SIX1113:
+                return visitor.visitTwoThousandTwentySix1113();
             case TWO_THOUSAND_TWENTY_SIX10271:
                 return visitor.visitTwoThousandTwentySix10271();
             case TWO_THOUSAND_TWENTY_SIX1024:
@@ -473,6 +481,8 @@ public final class UpdateApiKeysRequestApiVersionDate {
                 return visitor.visitTwoThousandTwentySix0720();
             case TWO_THOUSAND_TWENTY_SIX10091:
                 return visitor.visitTwoThousandTwentySix10091();
+            case TWO_THOUSAND_TWENTY_SIX11131:
+                return visitor.visitTwoThousandTwentySix11131();
             case TWO_THOUSAND_TWENTY_SIX0718:
                 return visitor.visitTwoThousandTwentySix0718();
             case TWO_THOUSAND_TWENTY_SIX0805:
@@ -652,6 +662,8 @@ public final class UpdateApiKeysRequestApiVersionDate {
                 return TWO_THOUSAND_TWENTY_SIX11041;
             case "2026-09-06":
                 return TWO_THOUSAND_TWENTY_SIX0906;
+            case "2026-11-13":
+                return TWO_THOUSAND_TWENTY_SIX1113;
             case "2026-10-27-1":
                 return TWO_THOUSAND_TWENTY_SIX10271;
             case "2026-10-24":
@@ -680,6 +692,8 @@ public final class UpdateApiKeysRequestApiVersionDate {
                 return TWO_THOUSAND_TWENTY_SIX0720;
             case "2026-10-09-1":
                 return TWO_THOUSAND_TWENTY_SIX10091;
+            case "2026-11-13-1":
+                return TWO_THOUSAND_TWENTY_SIX11131;
             case "2026-07-18":
                 return TWO_THOUSAND_TWENTY_SIX0718;
             case "2026-08-05":
@@ -946,6 +960,10 @@ public final class UpdateApiKeysRequestApiVersionDate {
 
         TWO_THOUSAND_TWENTY_SIX1112,
 
+        TWO_THOUSAND_TWENTY_SIX1113,
+
+        TWO_THOUSAND_TWENTY_SIX11131,
+
         UNKNOWN
     }
 
@@ -1147,6 +1165,10 @@ public final class UpdateApiKeysRequestApiVersionDate {
         T visitTwoThousandTwentySix1111();
 
         T visitTwoThousandTwentySix1112();
+
+        T visitTwoThousandTwentySix1113();
+
+        T visitTwoThousandTwentySix11131();
 
         T visitUnknown(String unknownType);
     }

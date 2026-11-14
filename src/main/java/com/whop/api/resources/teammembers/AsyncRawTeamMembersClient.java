@@ -53,21 +53,38 @@ public class AsyncRawTeamMembersClient {
     }
 
     /**
-     * Lists an account's team members, including pending invites. A user credential with <code>company:basic:read</code> may list only its own joined membership by passing its own <code>user_id</code> and <code>status=joined</code>. Listing <code>role=workforce</code> is also allowed with the <code>bounty:create</code> scope. A signed-in Partner, or a member others report to, without <code>company:authorized_user:read</code> lists only their own joined membership and the members who report up to them, never pending invites. Members with the view-only Partner role are listed after all other members.
+     * Lists team members, including pending invites. Pass <code>account_id</code> to list one account's team. Without it, a signed-in user can pass <code>user_id=me</code> to list their own joined memberships across accounts. The list has one for each account they can read. An API key without <code>account_id</code> lists the team of its own account. With <code>company:basic:read</code>, a user can list their own joined membership on one account. To do this, pass <code>status=joined</code> and their own <code>user_id</code> with the account ID. The <code>bounty:create</code> scope also allows listing <code>role=workforce</code> members. A signed-in Partner without <code>company:authorized_user:read</code> lists only their own joined membership and the members who report up to them. A member others report to gets the same list. Neither of them sees pending invites. Members with the view-only Partner role are listed after all other members.
+     */
+    public CompletableFuture<WhopApiHttpResponse<SyncPagingIterable<TeamMember>>> list() {
+        return list(ListTeamMembersRequest.builder().build());
+    }
+
+    /**
+     * Lists team members, including pending invites. Pass <code>account_id</code> to list one account's team. Without it, a signed-in user can pass <code>user_id=me</code> to list their own joined memberships across accounts. The list has one for each account they can read. An API key without <code>account_id</code> lists the team of its own account. With <code>company:basic:read</code>, a user can list their own joined membership on one account. To do this, pass <code>status=joined</code> and their own <code>user_id</code> with the account ID. The <code>bounty:create</code> scope also allows listing <code>role=workforce</code> members. A signed-in Partner without <code>company:authorized_user:read</code> lists only their own joined membership and the members who report up to them. A member others report to gets the same list. Neither of them sees pending invites. Members with the view-only Partner role are listed after all other members.
+     */
+    public CompletableFuture<WhopApiHttpResponse<SyncPagingIterable<TeamMember>>> list(RequestOptions requestOptions) {
+        return list(ListTeamMembersRequest.builder().build(), requestOptions);
+    }
+
+    /**
+     * Lists team members, including pending invites. Pass <code>account_id</code> to list one account's team. Without it, a signed-in user can pass <code>user_id=me</code> to list their own joined memberships across accounts. The list has one for each account they can read. An API key without <code>account_id</code> lists the team of its own account. With <code>company:basic:read</code>, a user can list their own joined membership on one account. To do this, pass <code>status=joined</code> and their own <code>user_id</code> with the account ID. The <code>bounty:create</code> scope also allows listing <code>role=workforce</code> members. A signed-in Partner without <code>company:authorized_user:read</code> lists only their own joined membership and the members who report up to them. A member others report to gets the same list. Neither of them sees pending invites. Members with the view-only Partner role are listed after all other members.
      */
     public CompletableFuture<WhopApiHttpResponse<SyncPagingIterable<TeamMember>>> list(ListTeamMembersRequest request) {
         return list(request, null);
     }
 
     /**
-     * Lists an account's team members, including pending invites. A user credential with <code>company:basic:read</code> may list only its own joined membership by passing its own <code>user_id</code> and <code>status=joined</code>. Listing <code>role=workforce</code> is also allowed with the <code>bounty:create</code> scope. A signed-in Partner, or a member others report to, without <code>company:authorized_user:read</code> lists only their own joined membership and the members who report up to them, never pending invites. Members with the view-only Partner role are listed after all other members.
+     * Lists team members, including pending invites. Pass <code>account_id</code> to list one account's team. Without it, a signed-in user can pass <code>user_id=me</code> to list their own joined memberships across accounts. The list has one for each account they can read. An API key without <code>account_id</code> lists the team of its own account. With <code>company:basic:read</code>, a user can list their own joined membership on one account. To do this, pass <code>status=joined</code> and their own <code>user_id</code> with the account ID. The <code>bounty:create</code> scope also allows listing <code>role=workforce</code> members. A signed-in Partner without <code>company:authorized_user:read</code> lists only their own joined membership and the members who report up to them. A member others report to gets the same list. Neither of them sees pending invites. Members with the view-only Partner role are listed after all other members.
      */
     public CompletableFuture<WhopApiHttpResponse<SyncPagingIterable<TeamMember>>> list(
             ListTeamMembersRequest request, RequestOptions requestOptions) {
         HttpUrl.Builder httpUrl = HttpUrl.parse(this.clientOptions.environment().getApiURL())
                 .newBuilder()
                 .addPathSegments("team_members");
-        QueryStringMapper.addQueryParameter(httpUrl, "account_id", request.getAccountId(), false);
+        if (request.getAccountId().isPresent()) {
+            QueryStringMapper.addQueryParameter(
+                    httpUrl, "account_id", request.getAccountId().get(), false);
+        }
         if (request.getStatus().isPresent()) {
             QueryStringMapper.addQueryParameter(
                     httpUrl, "status", request.getStatus().get(), false);
@@ -106,6 +123,10 @@ public class AsyncRawTeamMembersClient {
                     "has_referred_businesses",
                     request.getHasReferredBusinesses().get(),
                     false);
+        }
+        if (request.getIsPartner().isPresent()) {
+            QueryStringMapper.addQueryParameter(
+                    httpUrl, "is_partner", request.getIsPartner().get(), false);
         }
         if (request.getCreatedBefore().isPresent()) {
             QueryStringMapper.addQueryParameter(

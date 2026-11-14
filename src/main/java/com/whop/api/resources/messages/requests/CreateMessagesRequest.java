@@ -34,6 +34,8 @@ public final class CreateMessagesRequest {
 
     private final String content;
 
+    private final Optional<String> emailAddress;
+
     private final Optional<List<CreateMessagesRequestGifsItem>> gifs;
 
     private final Optional<String> id;
@@ -51,6 +53,7 @@ public final class CreateMessagesRequest {
             Optional<Boolean> autoDetectLinks,
             String channelId,
             String content,
+            Optional<String> emailAddress,
             Optional<List<CreateMessagesRequestGifsItem>> gifs,
             Optional<String> id,
             Optional<List<CreateMessagesRequestLinkPreviewsItem>> linkPreviews,
@@ -61,6 +64,7 @@ public final class CreateMessagesRequest {
         this.autoDetectLinks = autoDetectLinks;
         this.channelId = channelId;
         this.content = content;
+        this.emailAddress = emailAddress;
         this.gifs = gifs;
         this.id = id;
         this.linkPreviews = linkPreviews;
@@ -99,6 +103,14 @@ public final class CreateMessagesRequest {
     @JsonProperty("content")
     public String getContent() {
         return content;
+    }
+
+    /**
+     * @return Also send this message as an email from this email address. Pass the address, like <code>support@example.com</code>, or its ID, prefixed <code>emaddr_</code>.
+     */
+    @JsonProperty("email_address")
+    public Optional<String> getEmailAddress() {
+        return emailAddress;
     }
 
     /**
@@ -154,6 +166,7 @@ public final class CreateMessagesRequest {
                 && autoDetectLinks.equals(other.autoDetectLinks)
                 && channelId.equals(other.channelId)
                 && content.equals(other.content)
+                && emailAddress.equals(other.emailAddress)
                 && gifs.equals(other.gifs)
                 && id.equals(other.id)
                 && linkPreviews.equals(other.linkPreviews)
@@ -168,6 +181,7 @@ public final class CreateMessagesRequest {
                 this.autoDetectLinks,
                 this.channelId,
                 this.content,
+                this.emailAddress,
                 this.gifs,
                 this.id,
                 this.linkPreviews,
@@ -222,6 +236,13 @@ public final class CreateMessagesRequest {
         _FinalStage autoDetectLinks(Boolean autoDetectLinks);
 
         /**
+         * <p>Also send this message as an email from this email address. Pass the address, like <code>support@example.com</code>, or its ID, prefixed <code>emaddr_</code>.</p>
+         */
+        _FinalStage emailAddress(Optional<String> emailAddress);
+
+        _FinalStage emailAddress(String emailAddress);
+
+        /**
          * <p>Up to 10 GIFs to attach. URLs must use HTTPS on static.klipy.com, static1.klipy.com, or static2.klipy.com. Omit to preserve on edit; an empty list clears them.</p>
          */
         _FinalStage gifs(Optional<List<CreateMessagesRequestGifsItem>> gifs);
@@ -270,6 +291,8 @@ public final class CreateMessagesRequest {
 
         private Optional<List<CreateMessagesRequestGifsItem>> gifs = Optional.empty();
 
+        private Optional<String> emailAddress = Optional.empty();
+
         private Optional<Boolean> autoDetectLinks = Optional.empty();
 
         private Optional<List<CreateMessagesRequestAttachmentsItem>> attachments = Optional.empty();
@@ -284,6 +307,7 @@ public final class CreateMessagesRequest {
             autoDetectLinks(other.getAutoDetectLinks());
             channelId(other.getChannelId());
             content(other.getContent());
+            emailAddress(other.getEmailAddress());
             gifs(other.getGifs());
             id(other.getId());
             linkPreviews(other.getLinkPreviews());
@@ -408,6 +432,26 @@ public final class CreateMessagesRequest {
         }
 
         /**
+         * <p>Also send this message as an email from this email address. Pass the address, like <code>support@example.com</code>, or its ID, prefixed <code>emaddr_</code>.</p>
+         * @return Reference to {@code this} so that method calls can be chained together.
+         */
+        @java.lang.Override
+        public _FinalStage emailAddress(String emailAddress) {
+            this.emailAddress = Optional.ofNullable(emailAddress);
+            return this;
+        }
+
+        /**
+         * <p>Also send this message as an email from this email address. Pass the address, like <code>support@example.com</code>, or its ID, prefixed <code>emaddr_</code>.</p>
+         */
+        @java.lang.Override
+        @JsonSetter(value = "email_address", nulls = Nulls.SKIP)
+        public _FinalStage emailAddress(Optional<String> emailAddress) {
+            this.emailAddress = emailAddress;
+            return this;
+        }
+
+        /**
          * <p>Generate previews for URLs in content. Mutually exclusive with link_previews.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
@@ -454,6 +498,7 @@ public final class CreateMessagesRequest {
                     autoDetectLinks,
                     channelId,
                     content,
+                    emailAddress,
                     gifs,
                     id,
                     linkPreviews,
@@ -468,6 +513,7 @@ public final class CreateMessagesRequest {
                     || key.equalsIgnoreCase("auto_detect_links")
                     || key.equalsIgnoreCase("channel_id")
                     || key.equalsIgnoreCase("content")
+                    || key.equalsIgnoreCase("email_address")
                     || key.equalsIgnoreCase("gifs")
                     || key.equalsIgnoreCase("id")
                     || key.equalsIgnoreCase("link_previews")

@@ -72,7 +72,8 @@ public final class ClientOptions {
         this.headers.putAll(new HashMap<String, String>() {
             {
                 put("X-Fern-Language", "JAVA");
-                put("X-Fern-SDK-Name", "com.whop.fern:api-sdk");
+                put("X-Fern-SDK-Name", "com.whop.api:whop-java");
+                put("X-Fern-SDK-Version", "2.8.1");
             }
         });
         this.headerSuppliers = headerSuppliers;

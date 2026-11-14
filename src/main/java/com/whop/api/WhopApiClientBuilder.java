@@ -37,7 +37,7 @@ public class WhopApiClientBuilder {
 
     private String token = null;
 
-    private String apiVersionDate = "2026-11-12";
+    private String apiVersionDate = "2026-11-13-1";
 
     private String idempotencyKey = null;
 

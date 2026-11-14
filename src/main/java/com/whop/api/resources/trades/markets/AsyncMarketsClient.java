@@ -31,7 +31,7 @@ public class AsyncMarketsClient {
     /**
      * Returns every market you can trade on Whop.
      * <ul>
-     * <li><strong>Spot:</strong> listed by symbol: <code>BTC</code>, <code>SOL</code> and <code>XAUT</code> (gold), and tokenized stocks by ticker, such as <code>AAPL</code>, with their 24-hour change and logo.</li>
+     * <li><strong>Spot:</strong> listed by symbol: <code>BTC</code>, <code>SOL</code> and <code>XAUT</code> (gold), and tokenized stocks by ticker, such as <code>AAPL</code>, with their 24-hour change and logo. Spot markets also carry <code>volume_24h</code>, the value traded across exchanges over the last 24 hours.</li>
      * <li><strong>Perpetuals:</strong> such as <code>BTC</code>, and stock and commodity perpetuals from Hyperliquid's <code>xyz</code> exchange, such as <code>xyz:TSLA</code>. Send the <code>id</code> as <code>market</code> when you create a trade.</li>
      * </ul>
      * <p>The same symbol can appear twice, once as a perpetual and once as spot, so use <code>id</code> together with <code>instrument_type</code> to tell them apart. Results are sorted by <code>id</code>, then <code>instrument_type</code>.</p>
@@ -51,7 +51,7 @@ public class AsyncMarketsClient {
     /**
      * Returns every market you can trade on Whop.
      * <ul>
-     * <li><strong>Spot:</strong> listed by symbol: <code>BTC</code>, <code>SOL</code> and <code>XAUT</code> (gold), and tokenized stocks by ticker, such as <code>AAPL</code>, with their 24-hour change and logo.</li>
+     * <li><strong>Spot:</strong> listed by symbol: <code>BTC</code>, <code>SOL</code> and <code>XAUT</code> (gold), and tokenized stocks by ticker, such as <code>AAPL</code>, with their 24-hour change and logo. Spot markets also carry <code>volume_24h</code>, the value traded across exchanges over the last 24 hours.</li>
      * <li><strong>Perpetuals:</strong> such as <code>BTC</code>, and stock and commodity perpetuals from Hyperliquid's <code>xyz</code> exchange, such as <code>xyz:TSLA</code>. Send the <code>id</code> as <code>market</code> when you create a trade.</li>
      * </ul>
      * <p>The same symbol can appear twice, once as a perpetual and once as spot, so use <code>id</code> together with <code>instrument_type</code> to tell them apart. Results are sorted by <code>id</code>, then <code>instrument_type</code>.</p>
@@ -72,7 +72,7 @@ public class AsyncMarketsClient {
     /**
      * Returns every market you can trade on Whop.
      * <ul>
-     * <li><strong>Spot:</strong> listed by symbol: <code>BTC</code>, <code>SOL</code> and <code>XAUT</code> (gold), and tokenized stocks by ticker, such as <code>AAPL</code>, with their 24-hour change and logo.</li>
+     * <li><strong>Spot:</strong> listed by symbol: <code>BTC</code>, <code>SOL</code> and <code>XAUT</code> (gold), and tokenized stocks by ticker, such as <code>AAPL</code>, with their 24-hour change and logo. Spot markets also carry <code>volume_24h</code>, the value traded across exchanges over the last 24 hours.</li>
      * <li><strong>Perpetuals:</strong> such as <code>BTC</code>, and stock and commodity perpetuals from Hyperliquid's <code>xyz</code> exchange, such as <code>xyz:TSLA</code>. Send the <code>id</code> as <code>market</code> when you create a trade.</li>
      * </ul>
      * <p>The same symbol can appear twice, once as a perpetual and once as spot, so use <code>id</code> together with <code>instrument_type</code> to tell them apart. Results are sorted by <code>id</code>, then <code>instrument_type</code>.</p>
@@ -92,7 +92,7 @@ public class AsyncMarketsClient {
     /**
      * Returns every market you can trade on Whop.
      * <ul>
-     * <li><strong>Spot:</strong> listed by symbol: <code>BTC</code>, <code>SOL</code> and <code>XAUT</code> (gold), and tokenized stocks by ticker, such as <code>AAPL</code>, with their 24-hour change and logo.</li>
+     * <li><strong>Spot:</strong> listed by symbol: <code>BTC</code>, <code>SOL</code> and <code>XAUT</code> (gold), and tokenized stocks by ticker, such as <code>AAPL</code>, with their 24-hour change and logo. Spot markets also carry <code>volume_24h</code>, the value traded across exchanges over the last 24 hours.</li>
      * <li><strong>Perpetuals:</strong> such as <code>BTC</code>, and stock and commodity perpetuals from Hyperliquid's <code>xyz</code> exchange, such as <code>xyz:TSLA</code>. Send the <code>id</code> as <code>market</code> when you create a trade.</li>
      * </ul>
      * <p>The same symbol can appear twice, once as a perpetual and once as spot, so use <code>id</code> together with <code>instrument_type</code> to tell them apart. Results are sorted by <code>id</code>, then <code>instrument_type</code>.</p>

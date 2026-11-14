@@ -30,6 +30,8 @@ public final class CreatePayoutsResponse {
 
     private final boolean cancelable;
 
+    private final Optional<CreatePayoutsResponseConversion> conversion;
+
     private final OffsetDateTime createdAt;
 
     private final String currency;
@@ -83,6 +85,7 @@ public final class CreatePayoutsResponse {
     private CreatePayoutsResponse(
             String amount,
             boolean cancelable,
+            Optional<CreatePayoutsResponseConversion> conversion,
             OffsetDateTime createdAt,
             String currency,
             Optional<String> destinationAmount,
@@ -110,6 +113,7 @@ public final class CreatePayoutsResponse {
             Map<String, Object> additionalProperties) {
         this.amount = amount;
         this.cancelable = cancelable;
+        this.conversion = conversion;
         this.createdAt = createdAt;
         this.currency = currency;
         this.destinationAmount = destinationAmount;
@@ -151,6 +155,17 @@ public final class CreatePayoutsResponse {
     @JsonProperty("cancelable")
     public boolean getCancelable() {
         return cancelable;
+    }
+
+    /**
+     * @return How the balance was converted into the payout currency before the payout was sent. <code>null</code> when the payout was sent from a balance in its own currency.
+     */
+    @JsonIgnore
+    public Optional<CreatePayoutsResponseConversion> getConversion() {
+        if (conversion == null) {
+            return Optional.empty();
+        }
+        return conversion;
     }
 
     /**
@@ -379,6 +394,12 @@ public final class CreatePayoutsResponse {
     }
 
     @JsonInclude(value = JsonInclude.Include.CUSTOM, valueFilter = NullableNonemptyFilter.class)
+    @JsonProperty("conversion")
+    private Optional<CreatePayoutsResponseConversion> _getConversion() {
+        return conversion;
+    }
+
+    @JsonInclude(value = JsonInclude.Include.CUSTOM, valueFilter = NullableNonemptyFilter.class)
     @JsonProperty("destination_amount")
     private Optional<String> _getDestinationAmount() {
         return destinationAmount;
@@ -464,6 +485,7 @@ public final class CreatePayoutsResponse {
     private boolean equalTo(CreatePayoutsResponse other) {
         return amount.equals(other.amount)
                 && cancelable == other.cancelable
+                && conversion.equals(other.conversion)
                 && createdAt.equals(other.createdAt)
                 && currency.equals(other.currency)
                 && destinationAmount.equals(other.destinationAmount)
@@ -495,6 +517,7 @@ public final class CreatePayoutsResponse {
         return Objects.hash(
                 this.amount,
                 this.cancelable,
+                this.conversion,
                 this.createdAt,
                 this.currency,
                 this.destinationAmount,
@@ -626,6 +649,15 @@ public final class CreatePayoutsResponse {
         _FinalStage additionalProperty(String key, Object value);
 
         _FinalStage additionalProperties(Map<String, Object> additionalProperties);
+
+        /**
+         * <p>How the balance was converted into the payout currency before the payout was sent. <code>null</code> when the payout was sent from a balance in its own currency.</p>
+         */
+        _FinalStage conversion(Optional<CreatePayoutsResponseConversion> conversion);
+
+        _FinalStage conversion(CreatePayoutsResponseConversion conversion);
+
+        _FinalStage conversion(Nullable<CreatePayoutsResponseConversion> conversion);
 
         /**
          * <p>The amount delivered in the destination currency, as a decimal string. Null until the payout settles; appears on the payout in GET /payouts once assigned.</p>
@@ -813,6 +845,8 @@ public final class CreatePayoutsResponse {
 
         private Optional<String> destinationAmount = Optional.empty();
 
+        private Optional<CreatePayoutsResponseConversion> conversion = Optional.empty();
+
         private Map<String, Object> additionalProperties = new HashMap<>();
 
         private Builder() {}
@@ -821,6 +855,7 @@ public final class CreatePayoutsResponse {
         public Builder from(CreatePayoutsResponse other) {
             amount(other.getAmount());
             cancelable(other.getCancelable());
+            conversion(other.getConversion());
             createdAt(other.getCreatedAt());
             currency(other.getCurrency());
             destinationAmount(other.getDestinationAmount());
@@ -1454,11 +1489,48 @@ public final class CreatePayoutsResponse {
             return this;
         }
 
+        /**
+         * <p>How the balance was converted into the payout currency before the payout was sent. <code>null</code> when the payout was sent from a balance in its own currency.</p>
+         * @return Reference to {@code this} so that method calls can be chained together.
+         */
+        @java.lang.Override
+        public _FinalStage conversion(Nullable<CreatePayoutsResponseConversion> conversion) {
+            if (conversion.isNull()) {
+                this.conversion = null;
+            } else if (conversion.isEmpty()) {
+                this.conversion = Optional.empty();
+            } else {
+                this.conversion = Optional.of(conversion.get());
+            }
+            return this;
+        }
+
+        /**
+         * <p>How the balance was converted into the payout currency before the payout was sent. <code>null</code> when the payout was sent from a balance in its own currency.</p>
+         * @return Reference to {@code this} so that method calls can be chained together.
+         */
+        @java.lang.Override
+        public _FinalStage conversion(CreatePayoutsResponseConversion conversion) {
+            this.conversion = Optional.ofNullable(conversion);
+            return this;
+        }
+
+        /**
+         * <p>How the balance was converted into the payout currency before the payout was sent. <code>null</code> when the payout was sent from a balance in its own currency.</p>
+         */
+        @java.lang.Override
+        @JsonSetter(value = "conversion", nulls = Nulls.SKIP)
+        public _FinalStage conversion(Optional<CreatePayoutsResponseConversion> conversion) {
+            this.conversion = conversion;
+            return this;
+        }
+
         @java.lang.Override
         public CreatePayoutsResponse build() {
             return new CreatePayoutsResponse(
                     amount,
                     cancelable,
+                    conversion,
                     createdAt,
                     currency,
                     destinationAmount,
@@ -1490,6 +1562,7 @@ public final class CreatePayoutsResponse {
         private void putAdditionalPropertyFromJson(String key, Object value) {
             if (key.equalsIgnoreCase("amount")
                     || key.equalsIgnoreCase("cancelable")
+                    || key.equalsIgnoreCase("conversion")
                     || key.equalsIgnoreCase("created_at")
                     || key.equalsIgnoreCase("currency")
                     || key.equalsIgnoreCase("destination_amount")

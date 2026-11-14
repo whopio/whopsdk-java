@@ -6,13 +6,18 @@ package com.whop.api.resources.stats.reports;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.whop.api.core.ClientOptions;
 import com.whop.api.core.ObjectMappers;
+import com.whop.api.core.QueryStringMapper;
 import com.whop.api.core.RequestOptions;
 import com.whop.api.core.RetryInterceptor;
 import com.whop.api.core.WhopApiApiException;
 import com.whop.api.core.WhopApiException;
 import com.whop.api.core.WhopApiHttpResponse;
+import com.whop.api.errors.BadRequestError;
+import com.whop.api.errors.ForbiddenError;
 import com.whop.api.errors.UnauthorizedError;
+import com.whop.api.resources.stats.reports.requests.PlatformTrendsReportsRequest;
 import com.whop.api.resources.stats.reports.types.ListReportsResponse;
+import com.whop.api.resources.stats.reports.types.PlatformTrendsReportsResponse;
 import java.io.IOException;
 import java.util.concurrent.CompletableFuture;
 import okhttp3.Call;
@@ -88,6 +93,176 @@ public class AsyncRawReportsClient {
                             future.completeExceptionally(new UnauthorizedError(
                                     ObjectMappers.JSON_MAPPER.readValue(responseBodyString, Object.class), response));
                             return;
+                        }
+                    } catch (JsonProcessingException ignored) {
+                        // unable to map error response, throwing generic error
+                    }
+                    Object errorBody = ObjectMappers.parseErrorBody(responseBodyString);
+                    future.completeExceptionally(new WhopApiApiException(
+                            "Error with status code " + response.code(), response.code(), errorBody, response));
+                    return;
+                } catch (JsonProcessingException e) {
+                    future.completeExceptionally(
+                            new WhopApiException("Failed to deserialize response: " + e.getMessage(), e));
+                } catch (IOException e) {
+                    future.completeExceptionally(new WhopApiException("Network error executing HTTP request", e));
+                }
+            }
+
+            @Override
+            public void onFailure(@NotNull Call call, @NotNull IOException e) {
+                future.completeExceptionally(new WhopApiException("Network error executing HTTP request", e));
+            }
+        });
+        future.whenComplete((result_, throwable_) -> {
+            if (future.isCancelled()) {
+                okhttpCall.cancel();
+            }
+        });
+        return future;
+    }
+
+    /**
+     * Retrieves payments across all of Whop for up to four windows at once. Pass <code>breakdown_by</code> to split them by business type, industry type, product category, account country or customer country. The report covers the whole platform, so it takes no <code>account_id</code>. Only users with Trends access can read it, from whop.com, the Whop apps, the Whop CLI or the Whop MCP.
+     */
+    public CompletableFuture<WhopApiHttpResponse<PlatformTrendsReportsResponse>> platformTrends() {
+        return platformTrends(PlatformTrendsReportsRequest.builder().build());
+    }
+
+    /**
+     * Retrieves payments across all of Whop for up to four windows at once. Pass <code>breakdown_by</code> to split them by business type, industry type, product category, account country or customer country. The report covers the whole platform, so it takes no <code>account_id</code>. Only users with Trends access can read it, from whop.com, the Whop apps, the Whop CLI or the Whop MCP.
+     */
+    public CompletableFuture<WhopApiHttpResponse<PlatformTrendsReportsResponse>> platformTrends(
+            RequestOptions requestOptions) {
+        return platformTrends(PlatformTrendsReportsRequest.builder().build(), requestOptions);
+    }
+
+    /**
+     * Retrieves payments across all of Whop for up to four windows at once. Pass <code>breakdown_by</code> to split them by business type, industry type, product category, account country or customer country. The report covers the whole platform, so it takes no <code>account_id</code>. Only users with Trends access can read it, from whop.com, the Whop apps, the Whop CLI or the Whop MCP.
+     */
+    public CompletableFuture<WhopApiHttpResponse<PlatformTrendsReportsResponse>> platformTrends(
+            PlatformTrendsReportsRequest request) {
+        return platformTrends(request, null);
+    }
+
+    /**
+     * Retrieves payments across all of Whop for up to four windows at once. Pass <code>breakdown_by</code> to split them by business type, industry type, product category, account country or customer country. The report covers the whole platform, so it takes no <code>account_id</code>. Only users with Trends access can read it, from whop.com, the Whop apps, the Whop CLI or the Whop MCP.
+     */
+    public CompletableFuture<WhopApiHttpResponse<PlatformTrendsReportsResponse>> platformTrends(
+            PlatformTrendsReportsRequest request, RequestOptions requestOptions) {
+        HttpUrl.Builder httpUrl = HttpUrl.parse(this.clientOptions.environment().getApiURL())
+                .newBuilder()
+                .addPathSegments("stats/reports/platform_trends");
+        if (request.getBreakdownBy().isPresent()) {
+            QueryStringMapper.addQueryParameter(
+                    httpUrl, "breakdown_by", request.getBreakdownBy().get(), false);
+        }
+        if (request.getColumns().isPresent()) {
+            QueryStringMapper.addQueryParameter(
+                    httpUrl, "columns", request.getColumns().get(), false);
+        }
+        if (request.getWindows().isPresent()) {
+            QueryStringMapper.addQueryParameter(
+                    httpUrl, "windows", request.getWindows().get(), false);
+        }
+        if (request.getTimeZone().isPresent()) {
+            QueryStringMapper.addQueryParameter(
+                    httpUrl, "time_zone", request.getTimeZone().get(), false);
+        }
+        if (request.getOrder().isPresent()) {
+            QueryStringMapper.addQueryParameter(
+                    httpUrl, "order", request.getOrder().get(), false);
+        }
+        if (request.getDirection().isPresent()) {
+            QueryStringMapper.addQueryParameter(
+                    httpUrl, "direction", request.getDirection().get(), false);
+        }
+        if (request.getConvertTo().isPresent()) {
+            QueryStringMapper.addQueryParameter(
+                    httpUrl, "convert_to", request.getConvertTo().get(), false);
+        }
+        if (request.getBusinessType().isPresent()) {
+            QueryStringMapper.addQueryParameter(
+                    httpUrl, "business_type", request.getBusinessType().get(), false);
+        }
+        if (request.getIndustryType().isPresent()) {
+            QueryStringMapper.addQueryParameter(
+                    httpUrl, "industry_type", request.getIndustryType().get(), false);
+        }
+        if (request.getProductCategory().isPresent()) {
+            QueryStringMapper.addQueryParameter(
+                    httpUrl, "product_category", request.getProductCategory().get(), false);
+        }
+        if (request.getAccountCountry().isPresent()) {
+            QueryStringMapper.addQueryParameter(
+                    httpUrl, "account_country", request.getAccountCountry().get(), false);
+        }
+        if (request.getCustomerCountry().isPresent()) {
+            QueryStringMapper.addQueryParameter(
+                    httpUrl, "customer_country", request.getCustomerCountry().get(), false);
+        }
+        if (request.getBlueprint().isPresent()) {
+            QueryStringMapper.addQueryParameter(
+                    httpUrl, "blueprint", request.getBlueprint().get(), false);
+        }
+        if (request.getFirst().isPresent()) {
+            QueryStringMapper.addQueryParameter(
+                    httpUrl, "first", request.getFirst().get(), false);
+        }
+        if (request.getAfter().isPresent()) {
+            QueryStringMapper.addQueryParameter(
+                    httpUrl, "after", request.getAfter().get(), false);
+        }
+        if (requestOptions != null) {
+            requestOptions.getQueryParameters().forEach((_key, _value) -> {
+                httpUrl.addQueryParameter(_key, _value);
+            });
+        }
+        Request.Builder _requestBuilder = new Request.Builder()
+                .url(httpUrl.build())
+                .method("GET", null)
+                .headers(Headers.of(clientOptions.headers(requestOptions)))
+                .addHeader("Accept", "application/json");
+        Request okhttpRequest = _requestBuilder.build();
+        OkHttpClient client = clientOptions.httpClient();
+        if (requestOptions != null && requestOptions.getTimeout().isPresent()) {
+            client = clientOptions.httpClientWithTimeout(requestOptions);
+        }
+        if (requestOptions != null && requestOptions.getMaxRetries().isPresent()) {
+            okhttpRequest = okhttpRequest
+                    .newBuilder()
+                    .tag(
+                            RetryInterceptor.MaxRetriesOverride.class,
+                            new RetryInterceptor.MaxRetriesOverride(
+                                    requestOptions.getMaxRetries().get()))
+                    .build();
+        }
+        CompletableFuture<WhopApiHttpResponse<PlatformTrendsReportsResponse>> future = new CompletableFuture<>();
+        RetryInterceptor.AsyncCall okhttpCall = RetryInterceptor.newAsyncCall(client, okhttpRequest);
+        okhttpCall.enqueue(new Callback() {
+            @Override
+            public void onResponse(@NotNull Call call, @NotNull Response response) throws IOException {
+                try (ResponseBody responseBody = response.body()) {
+                    String responseBodyString = responseBody != null ? responseBody.string() : "{}";
+                    if (response.isSuccessful()) {
+                        future.complete(new WhopApiHttpResponse<>(
+                                ObjectMappers.JSON_MAPPER.readValue(
+                                        responseBodyString, PlatformTrendsReportsResponse.class),
+                                response));
+                        return;
+                    }
+                    try {
+                        switch (response.code()) {
+                            case 400:
+                                future.completeExceptionally(new BadRequestError(
+                                        ObjectMappers.JSON_MAPPER.readValue(responseBodyString, Object.class),
+                                        response));
+                                return;
+                            case 403:
+                                future.completeExceptionally(new ForbiddenError(
+                                        ObjectMappers.JSON_MAPPER.readValue(responseBodyString, Object.class),
+                                        response));
+                                return;
                         }
                     } catch (JsonProcessingException ignored) {
                         // unable to map error response, throwing generic error

@@ -64,7 +64,6 @@ import com.whop.api.resources.forumposts.ForumPostsClient;
 import com.whop.api.resources.forums.ForumsClient;
 import com.whop.api.resources.identityprofiles.IdentityProfilesClient;
 import com.whop.api.resources.invoices.InvoicesClient;
-import com.whop.api.resources.leads.LeadsClient;
 import com.whop.api.resources.ledgeraccounts.LedgerAccountsClient;
 import com.whop.api.resources.livestreams.LivestreamsClient;
 import com.whop.api.resources.media.MediaClient;
@@ -231,8 +230,6 @@ public class WhopApiClient implements AutoCloseable {
 
     protected final Supplier<InvoicesClient> invoicesClient;
 
-    protected final Supplier<LeadsClient> leadsClient;
-
     protected final Supplier<LedgerAccountsClient> ledgerAccountsClient;
 
     protected final Supplier<LivestreamsClient> livestreamsClient;
@@ -382,7 +379,6 @@ public class WhopApiClient implements AutoCloseable {
         this.forumsClient = Suppliers.memoize(() -> new ForumsClient(clientOptions));
         this.identityProfilesClient = Suppliers.memoize(() -> new IdentityProfilesClient(clientOptions));
         this.invoicesClient = Suppliers.memoize(() -> new InvoicesClient(clientOptions));
-        this.leadsClient = Suppliers.memoize(() -> new LeadsClient(clientOptions));
         this.ledgerAccountsClient = Suppliers.memoize(() -> new LedgerAccountsClient(clientOptions));
         this.livestreamsClient = Suppliers.memoize(() -> new LivestreamsClient(clientOptions));
         this.mediaClient = Suppliers.memoize(() -> new MediaClient(clientOptions));
@@ -662,10 +658,6 @@ public class WhopApiClient implements AutoCloseable {
 
     public InvoicesClient invoices() {
         return this.invoicesClient.get();
-    }
-
-    public LeadsClient leads() {
-        return this.leadsClient.get();
     }
 
     public LedgerAccountsClient ledgerAccounts() {

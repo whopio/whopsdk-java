@@ -30,6 +30,8 @@ public final class ListInvoicesRequest {
 
     private final Optional<Boolean> overdue;
 
+    private final Optional<Boolean> scheduled;
+
     private final Optional<String> memberId;
 
     private final Optional<String> productId;
@@ -58,6 +60,7 @@ public final class ListInvoicesRequest {
             Optional<String> accountId,
             Optional<ListInvoicesRequestStatus> status,
             Optional<Boolean> overdue,
+            Optional<Boolean> scheduled,
             Optional<String> memberId,
             Optional<String> productId,
             Optional<OffsetDateTime> createdAfter,
@@ -73,6 +76,7 @@ public final class ListInvoicesRequest {
         this.accountId = accountId;
         this.status = status;
         this.overdue = overdue;
+        this.scheduled = scheduled;
         this.memberId = memberId;
         this.productId = productId;
         this.createdAfter = createdAfter;
@@ -102,6 +106,14 @@ public final class ListInvoicesRequest {
         return overdue;
     }
 
+    /**
+     * @return Set to <code>true</code> for drafts with a scheduled send, which are the invoices with a <code>scheduled_send_at</code>. Set to <code>false</code> for every other invoice. Only a <code>draft</code> can be scheduled. An <code>open</code> invoice is not scheduled, even with a <code>scheduled_charge_at</code>. A draft that sends on its due date (<code>sends_on_due_date</code>) is not scheduled. Omit to include both.
+     */
+    @JsonProperty("scheduled")
+    public Optional<Boolean> getScheduled() {
+        return scheduled;
+    }
+
     @JsonProperty("member_id")
     public Optional<String> getMemberId() {
         return memberId;
@@ -122,6 +134,9 @@ public final class ListInvoicesRequest {
         return createdBefore;
     }
 
+    /**
+     * @return Field to sort by. Sorting by <code>due_at</code> or <code>scheduled_send_at</code> puts invoices without that date last in both directions.
+     */
     @JsonProperty("order")
     public Optional<ListInvoicesRequestOrder> getOrder() {
         return order;
@@ -187,6 +202,7 @@ public final class ListInvoicesRequest {
         return accountId.equals(other.accountId)
                 && status.equals(other.status)
                 && overdue.equals(other.overdue)
+                && scheduled.equals(other.scheduled)
                 && memberId.equals(other.memberId)
                 && productId.equals(other.productId)
                 && createdAfter.equals(other.createdAfter)
@@ -206,6 +222,7 @@ public final class ListInvoicesRequest {
                 this.accountId,
                 this.status,
                 this.overdue,
+                this.scheduled,
                 this.memberId,
                 this.productId,
                 this.createdAfter,
@@ -235,6 +252,8 @@ public final class ListInvoicesRequest {
         private Optional<ListInvoicesRequestStatus> status = Optional.empty();
 
         private Optional<Boolean> overdue = Optional.empty();
+
+        private Optional<Boolean> scheduled = Optional.empty();
 
         private Optional<String> memberId = Optional.empty();
 
@@ -266,6 +285,7 @@ public final class ListInvoicesRequest {
             accountId(other.getAccountId());
             status(other.getStatus());
             overdue(other.getOverdue());
+            scheduled(other.getScheduled());
             memberId(other.getMemberId());
             productId(other.getProductId());
             createdAfter(other.getCreatedAfter());
@@ -313,6 +333,20 @@ public final class ListInvoicesRequest {
             return this;
         }
 
+        /**
+         * <p>Set to <code>true</code> for drafts with a scheduled send, which are the invoices with a <code>scheduled_send_at</code>. Set to <code>false</code> for every other invoice. Only a <code>draft</code> can be scheduled. An <code>open</code> invoice is not scheduled, even with a <code>scheduled_charge_at</code>. A draft that sends on its due date (<code>sends_on_due_date</code>) is not scheduled. Omit to include both.</p>
+         */
+        @JsonSetter(value = "scheduled", nulls = Nulls.SKIP)
+        public Builder scheduled(Optional<Boolean> scheduled) {
+            this.scheduled = scheduled;
+            return this;
+        }
+
+        public Builder scheduled(Boolean scheduled) {
+            this.scheduled = Optional.ofNullable(scheduled);
+            return this;
+        }
+
         @JsonSetter(value = "member_id", nulls = Nulls.SKIP)
         public Builder memberId(Optional<String> memberId) {
             this.memberId = memberId;
@@ -357,6 +391,9 @@ public final class ListInvoicesRequest {
             return this;
         }
 
+        /**
+         * <p>Field to sort by. Sorting by <code>due_at</code> or <code>scheduled_send_at</code> puts invoices without that date last in both directions.</p>
+         */
         @JsonSetter(value = "order", nulls = Nulls.SKIP)
         public Builder order(Optional<ListInvoicesRequestOrder> order) {
             this.order = order;
@@ -454,6 +491,7 @@ public final class ListInvoicesRequest {
                     accountId,
                     status,
                     overdue,
+                    scheduled,
                     memberId,
                     productId,
                     createdAfter,
@@ -473,6 +511,7 @@ public final class ListInvoicesRequest {
             if (key.equalsIgnoreCase("account_id")
                     || key.equalsIgnoreCase("status")
                     || key.equalsIgnoreCase("overdue")
+                    || key.equalsIgnoreCase("scheduled")
                     || key.equalsIgnoreCase("member_id")
                     || key.equalsIgnoreCase("product_id")
                     || key.equalsIgnoreCase("created_after")

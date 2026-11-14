@@ -440,7 +440,7 @@ public final class Membership {
     }
 
     /**
-     * @return What the next renewal charges, after any promo code that still applies. <code>null</code> for non-renewing memberships.
+     * @return The variant's renewal price, in the variant's currency, after any promo code that still applies. A membership billed in the buyer's local currency is charged this price converted at the exchange rate on each billing date. <code>null</code> for non-renewing memberships.
      */
     @JsonIgnore
     public Optional<Money> getRenewalPrice() {
@@ -998,7 +998,7 @@ public final class Membership {
         _FinalStage promoCodeId(Nullable<String> promoCodeId);
 
         /**
-         * <p>What the next renewal charges, after any promo code that still applies. <code>null</code> for non-renewing memberships.</p>
+         * <p>The variant's renewal price, in the variant's currency, after any promo code that still applies. A membership billed in the buyer's local currency is charged this price converted at the exchange rate on each billing date. <code>null</code> for non-renewing memberships.</p>
          */
         _FinalStage renewalPrice(Optional<Money> renewalPrice);
 
@@ -1377,7 +1377,7 @@ public final class Membership {
         }
 
         /**
-         * <p>What the next renewal charges, after any promo code that still applies. <code>null</code> for non-renewing memberships.</p>
+         * <p>The variant's renewal price, in the variant's currency, after any promo code that still applies. A membership billed in the buyer's local currency is charged this price converted at the exchange rate on each billing date. <code>null</code> for non-renewing memberships.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
@@ -1393,7 +1393,7 @@ public final class Membership {
         }
 
         /**
-         * <p>What the next renewal charges, after any promo code that still applies. <code>null</code> for non-renewing memberships.</p>
+         * <p>The variant's renewal price, in the variant's currency, after any promo code that still applies. A membership billed in the buyer's local currency is charged this price converted at the exchange rate on each billing date. <code>null</code> for non-renewing memberships.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
@@ -1403,7 +1403,7 @@ public final class Membership {
         }
 
         /**
-         * <p>What the next renewal charges, after any promo code that still applies. <code>null</code> for non-renewing memberships.</p>
+         * <p>The variant's renewal price, in the variant's currency, after any promo code that still applies. A membership billed in the buyer's local currency is charged this price converted at the exchange rate on each billing date. <code>null</code> for non-renewing memberships.</p>
          */
         @java.lang.Override
         @JsonSetter(value = "renewal_price", nulls = Nulls.SKIP)

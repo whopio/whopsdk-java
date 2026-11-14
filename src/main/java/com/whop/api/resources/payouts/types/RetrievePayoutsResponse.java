@@ -30,6 +30,8 @@ public final class RetrievePayoutsResponse {
 
     private final Optional<Boolean> cancelable;
 
+    private final Optional<RetrievePayoutsResponseConversion> conversion;
+
     private final OffsetDateTime createdAt;
 
     private final String currency;
@@ -93,6 +95,7 @@ public final class RetrievePayoutsResponse {
     private RetrievePayoutsResponse(
             Optional<String> amount,
             Optional<Boolean> cancelable,
+            Optional<RetrievePayoutsResponseConversion> conversion,
             OffsetDateTime createdAt,
             String currency,
             Optional<Boolean> delayed,
@@ -125,6 +128,7 @@ public final class RetrievePayoutsResponse {
             Map<String, Object> additionalProperties) {
         this.amount = amount;
         this.cancelable = cancelable;
+        this.conversion = conversion;
         this.createdAt = createdAt;
         this.currency = currency;
         this.delayed = delayed;
@@ -171,6 +175,17 @@ public final class RetrievePayoutsResponse {
     @JsonProperty("cancelable")
     public Optional<Boolean> getCancelable() {
         return cancelable;
+    }
+
+    /**
+     * @return How the balance was converted into the payout currency before the payout was sent. <code>null</code> when the payout was sent from a balance in its own currency. Only returned to callers with payout:withdrawal:read on the owning ledger.
+     */
+    @JsonIgnore
+    public Optional<RetrievePayoutsResponseConversion> getConversion() {
+        if (conversion == null) {
+            return Optional.empty();
+        }
+        return conversion;
     }
 
     /**
@@ -448,6 +463,12 @@ public final class RetrievePayoutsResponse {
     }
 
     @JsonInclude(value = JsonInclude.Include.CUSTOM, valueFilter = NullableNonemptyFilter.class)
+    @JsonProperty("conversion")
+    private Optional<RetrievePayoutsResponseConversion> _getConversion() {
+        return conversion;
+    }
+
+    @JsonInclude(value = JsonInclude.Include.CUSTOM, valueFilter = NullableNonemptyFilter.class)
     @JsonProperty("destination_amount")
     private Optional<String> _getDestinationAmount() {
         return destinationAmount;
@@ -551,6 +572,7 @@ public final class RetrievePayoutsResponse {
     private boolean equalTo(RetrievePayoutsResponse other) {
         return amount.equals(other.amount)
                 && cancelable.equals(other.cancelable)
+                && conversion.equals(other.conversion)
                 && createdAt.equals(other.createdAt)
                 && currency.equals(other.currency)
                 && delayed.equals(other.delayed)
@@ -587,6 +609,7 @@ public final class RetrievePayoutsResponse {
         return Objects.hash(
                 this.amount,
                 this.cancelable,
+                this.conversion,
                 this.createdAt,
                 this.currency,
                 this.delayed,
@@ -702,6 +725,15 @@ public final class RetrievePayoutsResponse {
         _FinalStage cancelable(Optional<Boolean> cancelable);
 
         _FinalStage cancelable(Boolean cancelable);
+
+        /**
+         * <p>How the balance was converted into the payout currency before the payout was sent. <code>null</code> when the payout was sent from a balance in its own currency. Only returned to callers with payout:withdrawal:read on the owning ledger.</p>
+         */
+        _FinalStage conversion(Optional<RetrievePayoutsResponseConversion> conversion);
+
+        _FinalStage conversion(RetrievePayoutsResponseConversion conversion);
+
+        _FinalStage conversion(Nullable<RetrievePayoutsResponseConversion> conversion);
 
         /**
          * <p>Whether an in-transit withdrawal is past its settlement window.</p>
@@ -950,6 +982,8 @@ public final class RetrievePayoutsResponse {
 
         private Optional<Boolean> delayed = Optional.empty();
 
+        private Optional<RetrievePayoutsResponseConversion> conversion = Optional.empty();
+
         private Optional<Boolean> cancelable = Optional.empty();
 
         private Optional<String> amount = Optional.empty();
@@ -962,6 +996,7 @@ public final class RetrievePayoutsResponse {
         public Builder from(RetrievePayoutsResponse other) {
             amount(other.getAmount());
             cancelable(other.getCancelable());
+            conversion(other.getConversion());
             createdAt(other.getCreatedAt());
             currency(other.getCurrency());
             delayed(other.getDelayed());
@@ -1739,6 +1774,42 @@ public final class RetrievePayoutsResponse {
         }
 
         /**
+         * <p>How the balance was converted into the payout currency before the payout was sent. <code>null</code> when the payout was sent from a balance in its own currency. Only returned to callers with payout:withdrawal:read on the owning ledger.</p>
+         * @return Reference to {@code this} so that method calls can be chained together.
+         */
+        @java.lang.Override
+        public _FinalStage conversion(Nullable<RetrievePayoutsResponseConversion> conversion) {
+            if (conversion.isNull()) {
+                this.conversion = null;
+            } else if (conversion.isEmpty()) {
+                this.conversion = Optional.empty();
+            } else {
+                this.conversion = Optional.of(conversion.get());
+            }
+            return this;
+        }
+
+        /**
+         * <p>How the balance was converted into the payout currency before the payout was sent. <code>null</code> when the payout was sent from a balance in its own currency. Only returned to callers with payout:withdrawal:read on the owning ledger.</p>
+         * @return Reference to {@code this} so that method calls can be chained together.
+         */
+        @java.lang.Override
+        public _FinalStage conversion(RetrievePayoutsResponseConversion conversion) {
+            this.conversion = Optional.ofNullable(conversion);
+            return this;
+        }
+
+        /**
+         * <p>How the balance was converted into the payout currency before the payout was sent. <code>null</code> when the payout was sent from a balance in its own currency. Only returned to callers with payout:withdrawal:read on the owning ledger.</p>
+         */
+        @java.lang.Override
+        @JsonSetter(value = "conversion", nulls = Nulls.SKIP)
+        public _FinalStage conversion(Optional<RetrievePayoutsResponseConversion> conversion) {
+            this.conversion = conversion;
+            return this;
+        }
+
+        /**
          * <p>Whether <code>POST /payouts/{id}/cancel</code> would act on this payout right now: <code>true</code> while it is <code>in_review</code>, while it is <code>processing</code> with nothing yet submitted to the payout provider, or while a submitted payout can still be asked to cancel at the provider. <code>false</code> once the money has arrived or the payout has already ended. Only returned to callers with payout:withdrawal:read on the owning ledger.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
@@ -1783,6 +1854,7 @@ public final class RetrievePayoutsResponse {
             return new RetrievePayoutsResponse(
                     amount,
                     cancelable,
+                    conversion,
                     createdAt,
                     currency,
                     delayed,
@@ -1819,6 +1891,7 @@ public final class RetrievePayoutsResponse {
         private void putAdditionalPropertyFromJson(String key, Object value) {
             if (key.equalsIgnoreCase("amount")
                     || key.equalsIgnoreCase("cancelable")
+                    || key.equalsIgnoreCase("conversion")
                     || key.equalsIgnoreCase("created_at")
                     || key.equalsIgnoreCase("currency")
                     || key.equalsIgnoreCase("delayed")

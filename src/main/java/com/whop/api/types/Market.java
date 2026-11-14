@@ -38,6 +38,8 @@ public final class Market {
 
     private final int sizeDecimals;
 
+    private final Optional<Money> volume24H;
+
     private final Map<String, Object> additionalProperties;
 
     private Market(
@@ -48,6 +50,7 @@ public final class Market {
             Optional<Integer> maxLeverage,
             Optional<Money> price,
             int sizeDecimals,
+            Optional<Money> volume24H,
             Map<String, Object> additionalProperties) {
         this.change24HPercentage = change24HPercentage;
         this.id = id;
@@ -56,6 +59,7 @@ public final class Market {
         this.maxLeverage = maxLeverage;
         this.price = price;
         this.sizeDecimals = sizeDecimals;
+        this.volume24H = volume24H;
         this.additionalProperties = additionalProperties;
     }
 
@@ -127,6 +131,17 @@ public final class Market {
         return sizeDecimals;
     }
 
+    /**
+     * @return The value of the asset traded on all exchanges in the last 24 hours, in USD. For a tokenized stock, this counts trades of the token. <code>null</code> for a perpetual. <code>null</code> when the volume is not available.
+     */
+    @JsonIgnore
+    public Optional<Money> getVolume24H() {
+        if (volume24H == null) {
+            return Optional.empty();
+        }
+        return volume24H;
+    }
+
     @JsonInclude(value = JsonInclude.Include.CUSTOM, valueFilter = NullableNonemptyFilter.class)
     @JsonProperty("change_24h_percentage")
     private Optional<Double> _getChange24HPercentage() {
@@ -151,6 +166,12 @@ public final class Market {
         return price;
     }
 
+    @JsonInclude(value = JsonInclude.Include.CUSTOM, valueFilter = NullableNonemptyFilter.class)
+    @JsonProperty("volume_24h")
+    private Optional<Money> _getVolume24H() {
+        return volume24H;
+    }
+
     @java.lang.Override
     public boolean equals(Object other) {
         if (this == other) return true;
@@ -169,7 +190,8 @@ public final class Market {
                 && logoUrl.equals(other.logoUrl)
                 && maxLeverage.equals(other.maxLeverage)
                 && price.equals(other.price)
-                && sizeDecimals == other.sizeDecimals;
+                && sizeDecimals == other.sizeDecimals
+                && volume24H.equals(other.volume24H);
     }
 
     @java.lang.Override
@@ -181,7 +203,8 @@ public final class Market {
                 this.logoUrl,
                 this.maxLeverage,
                 this.price,
-                this.sizeDecimals);
+                this.sizeDecimals,
+                this.volume24H);
     }
 
     @java.lang.Override
@@ -258,6 +281,15 @@ public final class Market {
         _FinalStage price(Money price);
 
         _FinalStage price(Nullable<Money> price);
+
+        /**
+         * <p>The value of the asset traded on all exchanges in the last 24 hours, in USD. For a tokenized stock, this counts trades of the token. <code>null</code> for a perpetual. <code>null</code> when the volume is not available.</p>
+         */
+        _FinalStage volume24H(Optional<Money> volume24H);
+
+        _FinalStage volume24H(Money volume24H);
+
+        _FinalStage volume24H(Nullable<Money> volume24H);
     }
 
     @JsonIgnoreProperties(ignoreUnknown = true)
@@ -267,6 +299,8 @@ public final class Market {
         private MarketInstrumentType instrumentType;
 
         private int sizeDecimals;
+
+        private Optional<Money> volume24H = Optional.empty();
 
         private Optional<Money> price = Optional.empty();
 
@@ -289,6 +323,7 @@ public final class Market {
             maxLeverage(other.getMaxLeverage());
             price(other.getPrice());
             sizeDecimals(other.getSizeDecimals());
+            volume24H(other.getVolume24H());
             return this;
         }
 
@@ -322,6 +357,42 @@ public final class Market {
         @JsonSetter("size_decimals")
         public _FinalStage sizeDecimals(int sizeDecimals) {
             this.sizeDecimals = sizeDecimals;
+            return this;
+        }
+
+        /**
+         * <p>The value of the asset traded on all exchanges in the last 24 hours, in USD. For a tokenized stock, this counts trades of the token. <code>null</code> for a perpetual. <code>null</code> when the volume is not available.</p>
+         * @return Reference to {@code this} so that method calls can be chained together.
+         */
+        @java.lang.Override
+        public _FinalStage volume24H(Nullable<Money> volume24H) {
+            if (volume24H.isNull()) {
+                this.volume24H = null;
+            } else if (volume24H.isEmpty()) {
+                this.volume24H = Optional.empty();
+            } else {
+                this.volume24H = Optional.of(volume24H.get());
+            }
+            return this;
+        }
+
+        /**
+         * <p>The value of the asset traded on all exchanges in the last 24 hours, in USD. For a tokenized stock, this counts trades of the token. <code>null</code> for a perpetual. <code>null</code> when the volume is not available.</p>
+         * @return Reference to {@code this} so that method calls can be chained together.
+         */
+        @java.lang.Override
+        public _FinalStage volume24H(Money volume24H) {
+            this.volume24H = Optional.ofNullable(volume24H);
+            return this;
+        }
+
+        /**
+         * <p>The value of the asset traded on all exchanges in the last 24 hours, in USD. For a tokenized stock, this counts trades of the token. <code>null</code> for a perpetual. <code>null</code> when the volume is not available.</p>
+         */
+        @java.lang.Override
+        @JsonSetter(value = "volume_24h", nulls = Nulls.SKIP)
+        public _FinalStage volume24H(Optional<Money> volume24H) {
+            this.volume24H = volume24H;
             return this;
         }
 
@@ -479,6 +550,7 @@ public final class Market {
                     maxLeverage,
                     price,
                     sizeDecimals,
+                    volume24H,
                     additionalProperties);
         }
 
@@ -490,7 +562,8 @@ public final class Market {
                     || key.equalsIgnoreCase("logo_url")
                     || key.equalsIgnoreCase("max_leverage")
                     || key.equalsIgnoreCase("price")
-                    || key.equalsIgnoreCase("size_decimals")) {
+                    || key.equalsIgnoreCase("size_decimals")
+                    || key.equalsIgnoreCase("volume_24h")) {
                 return;
             }
             this.additionalProperties.put(key, value);

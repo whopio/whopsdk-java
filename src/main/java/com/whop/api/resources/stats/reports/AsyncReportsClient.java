@@ -6,7 +6,9 @@ package com.whop.api.resources.stats.reports;
 import com.whop.api.core.ClientOptions;
 import com.whop.api.core.RequestOptions;
 import com.whop.api.core.WhopApiHttpResponse;
+import com.whop.api.resources.stats.reports.requests.PlatformTrendsReportsRequest;
 import com.whop.api.resources.stats.reports.types.ListReportsResponse;
+import com.whop.api.resources.stats.reports.types.PlatformTrendsReportsResponse;
 import java.util.concurrent.CompletableFuture;
 
 public class AsyncReportsClient {
@@ -46,6 +48,67 @@ public class AsyncReportsClient {
     public CompletableFuture<ListReportsResponse> list(RequestOptions requestOptions) {
         CompletableFuture<WhopApiHttpResponse<ListReportsResponse>> rawFuture = this.rawClient.list(requestOptions);
         CompletableFuture<ListReportsResponse> future = rawFuture.thenApply(response -> response.body());
+        future.whenComplete((result_, throwable_) -> {
+            if (future.isCancelled()) {
+                rawFuture.cancel(true);
+            }
+        });
+        return future;
+    }
+
+    /**
+     * Retrieves payments across all of Whop for up to four windows at once. Pass <code>breakdown_by</code> to split them by business type, industry type, product category, account country or customer country. The report covers the whole platform, so it takes no <code>account_id</code>. Only users with Trends access can read it, from whop.com, the Whop apps, the Whop CLI or the Whop MCP.
+     */
+    public CompletableFuture<PlatformTrendsReportsResponse> platformTrends() {
+        CompletableFuture<WhopApiHttpResponse<PlatformTrendsReportsResponse>> rawFuture =
+                this.rawClient.platformTrends();
+        CompletableFuture<PlatformTrendsReportsResponse> future = rawFuture.thenApply(response -> response.body());
+        future.whenComplete((result_, throwable_) -> {
+            if (future.isCancelled()) {
+                rawFuture.cancel(true);
+            }
+        });
+        return future;
+    }
+
+    /**
+     * Retrieves payments across all of Whop for up to four windows at once. Pass <code>breakdown_by</code> to split them by business type, industry type, product category, account country or customer country. The report covers the whole platform, so it takes no <code>account_id</code>. Only users with Trends access can read it, from whop.com, the Whop apps, the Whop CLI or the Whop MCP.
+     */
+    public CompletableFuture<PlatformTrendsReportsResponse> platformTrends(RequestOptions requestOptions) {
+        CompletableFuture<WhopApiHttpResponse<PlatformTrendsReportsResponse>> rawFuture =
+                this.rawClient.platformTrends(requestOptions);
+        CompletableFuture<PlatformTrendsReportsResponse> future = rawFuture.thenApply(response -> response.body());
+        future.whenComplete((result_, throwable_) -> {
+            if (future.isCancelled()) {
+                rawFuture.cancel(true);
+            }
+        });
+        return future;
+    }
+
+    /**
+     * Retrieves payments across all of Whop for up to four windows at once. Pass <code>breakdown_by</code> to split them by business type, industry type, product category, account country or customer country. The report covers the whole platform, so it takes no <code>account_id</code>. Only users with Trends access can read it, from whop.com, the Whop apps, the Whop CLI or the Whop MCP.
+     */
+    public CompletableFuture<PlatformTrendsReportsResponse> platformTrends(PlatformTrendsReportsRequest request) {
+        CompletableFuture<WhopApiHttpResponse<PlatformTrendsReportsResponse>> rawFuture =
+                this.rawClient.platformTrends(request);
+        CompletableFuture<PlatformTrendsReportsResponse> future = rawFuture.thenApply(response -> response.body());
+        future.whenComplete((result_, throwable_) -> {
+            if (future.isCancelled()) {
+                rawFuture.cancel(true);
+            }
+        });
+        return future;
+    }
+
+    /**
+     * Retrieves payments across all of Whop for up to four windows at once. Pass <code>breakdown_by</code> to split them by business type, industry type, product category, account country or customer country. The report covers the whole platform, so it takes no <code>account_id</code>. Only users with Trends access can read it, from whop.com, the Whop apps, the Whop CLI or the Whop MCP.
+     */
+    public CompletableFuture<PlatformTrendsReportsResponse> platformTrends(
+            PlatformTrendsReportsRequest request, RequestOptions requestOptions) {
+        CompletableFuture<WhopApiHttpResponse<PlatformTrendsReportsResponse>> rawFuture =
+                this.rawClient.platformTrends(request, requestOptions);
+        CompletableFuture<PlatformTrendsReportsResponse> future = rawFuture.thenApply(response -> response.body());
         future.whenComplete((result_, throwable_) -> {
             if (future.isCancelled()) {
                 rawFuture.cancel(true);

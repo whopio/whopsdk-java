@@ -7,6 +7,11 @@ import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonValue;
 
 public final class ListInvoicesRequestOrder {
+    public static final ListInvoicesRequestOrder SCHEDULED_SEND_AT =
+            new ListInvoicesRequestOrder(Value.SCHEDULED_SEND_AT, "scheduled_send_at");
+
+    public static final ListInvoicesRequestOrder STATUS = new ListInvoicesRequestOrder(Value.STATUS, "status");
+
     public static final ListInvoicesRequestOrder DUE_AT = new ListInvoicesRequestOrder(Value.DUE_AT, "due_at");
 
     public static final ListInvoicesRequestOrder CREATED_AT =
@@ -45,6 +50,10 @@ public final class ListInvoicesRequestOrder {
 
     public <T> T visit(Visitor<T> visitor) {
         switch (value) {
+            case SCHEDULED_SEND_AT:
+                return visitor.visitScheduledSendAt();
+            case STATUS:
+                return visitor.visitStatus();
             case DUE_AT:
                 return visitor.visitDueAt();
             case CREATED_AT:
@@ -58,6 +67,10 @@ public final class ListInvoicesRequestOrder {
     @JsonCreator(mode = JsonCreator.Mode.DELEGATING)
     public static ListInvoicesRequestOrder valueOf(String value) {
         switch (value) {
+            case "scheduled_send_at":
+                return SCHEDULED_SEND_AT;
+            case "status":
+                return STATUS;
             case "due_at":
                 return DUE_AT;
             case "created_at":
@@ -72,6 +85,10 @@ public final class ListInvoicesRequestOrder {
 
         DUE_AT,
 
+        STATUS,
+
+        SCHEDULED_SEND_AT,
+
         UNKNOWN
     }
 
@@ -79,6 +96,10 @@ public final class ListInvoicesRequestOrder {
         T visitCreatedAt();
 
         T visitDueAt();
+
+        T visitStatus();
+
+        T visitScheduledSendAt();
 
         T visitUnknown(String unknownType);
     }

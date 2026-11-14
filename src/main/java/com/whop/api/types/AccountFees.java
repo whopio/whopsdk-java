@@ -430,7 +430,7 @@ public final class AccountFees {
     }
 
     /**
-     * @return Charged when tax is calculated on a payment.
+     * @return Charged when Whop calculates tax on a payment and the account remits the tax itself. An account whose <code>tax_remitted_by</code> is <code>null</code> pays it on every taxed payment.
      */
     @JsonProperty("tax_calculation")
     public AccountFee getTaxCalculation() {
@@ -763,7 +763,7 @@ public final class AccountFees {
 
     public interface TaxCalculationStage {
         /**
-         * <p>Charged when tax is calculated on a payment.</p>
+         * <p>Charged when Whop calculates tax on a payment and the account remits the tax itself. An account whose <code>tax_remitted_by</code> is <code>null</code> pays it on every taxed payment.</p>
          */
         TaxServiceStage taxCalculation(@NotNull AccountFee taxCalculation);
     }
@@ -1277,7 +1277,7 @@ public final class AccountFees {
         }
 
         /**
-         * <p>Charged when tax is calculated on a payment.</p>
+         * <p>Charged when Whop calculates tax on a payment and the account remits the tax itself. An account whose <code>tax_remitted_by</code> is <code>null</code> pays it on every taxed payment.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
