@@ -15,7 +15,11 @@ import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.whop.api.core.Nullable;
 import com.whop.api.core.NullableNonemptyFilter;
 import com.whop.api.core.ObjectMappers;
+import com.whop.api.types.FunnelComparison;
+import com.whop.api.types.FunnelConfidenceInterval;
+import com.whop.api.types.FunnelStepResult;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
@@ -24,17 +28,50 @@ import org.jetbrains.annotations.NotNull;
 @JsonInclude(JsonInclude.Include.NON_ABSENT)
 @JsonDeserialize(builder = RetrieveStatsResponseDataTotalsItem.Builder.class)
 public final class RetrieveStatsResponseDataTotalsItem {
+    private final Optional<FunnelComparison> comparison;
+
+    private final Optional<FunnelConfidenceInterval> confidenceInterval;
+
     private final String name;
+
+    private final Optional<List<FunnelStepResult>> steps;
 
     private final Optional<Double> value;
 
     private final Map<String, Object> additionalProperties;
 
     private RetrieveStatsResponseDataTotalsItem(
-            String name, Optional<Double> value, Map<String, Object> additionalProperties) {
+            Optional<FunnelComparison> comparison,
+            Optional<FunnelConfidenceInterval> confidenceInterval,
+            String name,
+            Optional<List<FunnelStepResult>> steps,
+            Optional<Double> value,
+            Map<String, Object> additionalProperties) {
+        this.comparison = comparison;
+        this.confidenceInterval = confidenceInterval;
         this.name = name;
+        this.steps = steps;
         this.value = value;
         this.additionalProperties = additionalProperties;
+    }
+
+    @JsonIgnore
+    public Optional<FunnelComparison> getComparison() {
+        if (comparison == null) {
+            return Optional.empty();
+        }
+        return comparison;
+    }
+
+    /**
+     * @return Funnel only. The Wilson interval for final conversion, present when confidence_level or compare_to is supplied.
+     */
+    @JsonIgnore
+    public Optional<FunnelConfidenceInterval> getConfidenceInterval() {
+        if (confidenceInterval == null) {
+            return Optional.empty();
+        }
+        return confidenceInterval;
     }
 
     /**
@@ -46,6 +83,14 @@ public final class RetrieveStatsResponseDataTotalsItem {
     }
 
     /**
+     * @return Present for the funnel metric. People reaching each step in order, starting with the entry step.
+     */
+    @JsonProperty("steps")
+    public Optional<List<FunnelStepResult>> getSteps() {
+        return steps;
+    }
+
+    /**
      * @return The metric's whole-window value for this entry.
      */
     @JsonIgnore
@@ -54,6 +99,18 @@ public final class RetrieveStatsResponseDataTotalsItem {
             return Optional.empty();
         }
         return value;
+    }
+
+    @JsonInclude(value = JsonInclude.Include.CUSTOM, valueFilter = NullableNonemptyFilter.class)
+    @JsonProperty("comparison")
+    private Optional<FunnelComparison> _getComparison() {
+        return comparison;
+    }
+
+    @JsonInclude(value = JsonInclude.Include.CUSTOM, valueFilter = NullableNonemptyFilter.class)
+    @JsonProperty("confidence_interval")
+    private Optional<FunnelConfidenceInterval> _getConfidenceInterval() {
+        return confidenceInterval;
     }
 
     @JsonInclude(value = JsonInclude.Include.CUSTOM, valueFilter = NullableNonemptyFilter.class)
@@ -75,12 +132,16 @@ public final class RetrieveStatsResponseDataTotalsItem {
     }
 
     private boolean equalTo(RetrieveStatsResponseDataTotalsItem other) {
-        return name.equals(other.name) && value.equals(other.value);
+        return comparison.equals(other.comparison)
+                && confidenceInterval.equals(other.confidenceInterval)
+                && name.equals(other.name)
+                && steps.equals(other.steps)
+                && value.equals(other.value);
     }
 
     @java.lang.Override
     public int hashCode() {
-        return Objects.hash(this.name, this.value);
+        return Objects.hash(this.comparison, this.confidenceInterval, this.name, this.steps, this.value);
     }
 
     @java.lang.Override
@@ -108,6 +169,28 @@ public final class RetrieveStatsResponseDataTotalsItem {
 
         _FinalStage additionalProperties(Map<String, Object> additionalProperties);
 
+        _FinalStage comparison(Optional<FunnelComparison> comparison);
+
+        _FinalStage comparison(FunnelComparison comparison);
+
+        _FinalStage comparison(Nullable<FunnelComparison> comparison);
+
+        /**
+         * <p>Funnel only. The Wilson interval for final conversion, present when confidence_level or compare_to is supplied.</p>
+         */
+        _FinalStage confidenceInterval(Optional<FunnelConfidenceInterval> confidenceInterval);
+
+        _FinalStage confidenceInterval(FunnelConfidenceInterval confidenceInterval);
+
+        _FinalStage confidenceInterval(Nullable<FunnelConfidenceInterval> confidenceInterval);
+
+        /**
+         * <p>Present for the funnel metric. People reaching each step in order, starting with the entry step.</p>
+         */
+        _FinalStage steps(Optional<List<FunnelStepResult>> steps);
+
+        _FinalStage steps(List<FunnelStepResult> steps);
+
         /**
          * <p>The metric's whole-window value for this entry.</p>
          */
@@ -124,20 +207,27 @@ public final class RetrieveStatsResponseDataTotalsItem {
 
         private Optional<Double> value = Optional.empty();
 
-        @JsonAnySetter
+        private Optional<List<FunnelStepResult>> steps = Optional.empty();
+
+        private Optional<FunnelConfidenceInterval> confidenceInterval = Optional.empty();
+
+        private Optional<FunnelComparison> comparison = Optional.empty();
+
         private Map<String, Object> additionalProperties = new HashMap<>();
 
         private Builder() {}
 
         @java.lang.Override
         public Builder from(RetrieveStatsResponseDataTotalsItem other) {
+            comparison(other.getComparison());
+            confidenceInterval(other.getConfidenceInterval());
             name(other.getName());
+            steps(other.getSteps());
             value(other.getValue());
             return this;
         }
 
         /**
-         * <p>The property value this total is for, or the metric's name when it isn't split by a property.</p>
          * <p>The property value this total is for, or the metric's name when it isn't split by a property.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
@@ -184,9 +274,103 @@ public final class RetrieveStatsResponseDataTotalsItem {
             return this;
         }
 
+        /**
+         * <p>Present for the funnel metric. People reaching each step in order, starting with the entry step.</p>
+         * @return Reference to {@code this} so that method calls can be chained together.
+         */
+        @java.lang.Override
+        public _FinalStage steps(List<FunnelStepResult> steps) {
+            this.steps = Optional.ofNullable(steps);
+            return this;
+        }
+
+        /**
+         * <p>Present for the funnel metric. People reaching each step in order, starting with the entry step.</p>
+         */
+        @java.lang.Override
+        @JsonSetter(value = "steps", nulls = Nulls.SKIP)
+        public _FinalStage steps(Optional<List<FunnelStepResult>> steps) {
+            this.steps = steps;
+            return this;
+        }
+
+        /**
+         * <p>Funnel only. The Wilson interval for final conversion, present when confidence_level or compare_to is supplied.</p>
+         * @return Reference to {@code this} so that method calls can be chained together.
+         */
+        @java.lang.Override
+        public _FinalStage confidenceInterval(Nullable<FunnelConfidenceInterval> confidenceInterval) {
+            if (confidenceInterval.isNull()) {
+                this.confidenceInterval = null;
+            } else if (confidenceInterval.isEmpty()) {
+                this.confidenceInterval = Optional.empty();
+            } else {
+                this.confidenceInterval = Optional.of(confidenceInterval.get());
+            }
+            return this;
+        }
+
+        /**
+         * <p>Funnel only. The Wilson interval for final conversion, present when confidence_level or compare_to is supplied.</p>
+         * @return Reference to {@code this} so that method calls can be chained together.
+         */
+        @java.lang.Override
+        public _FinalStage confidenceInterval(FunnelConfidenceInterval confidenceInterval) {
+            this.confidenceInterval = Optional.ofNullable(confidenceInterval);
+            return this;
+        }
+
+        /**
+         * <p>Funnel only. The Wilson interval for final conversion, present when confidence_level or compare_to is supplied.</p>
+         */
+        @java.lang.Override
+        @JsonSetter(value = "confidence_interval", nulls = Nulls.SKIP)
+        public _FinalStage confidenceInterval(Optional<FunnelConfidenceInterval> confidenceInterval) {
+            this.confidenceInterval = confidenceInterval;
+            return this;
+        }
+
+        @java.lang.Override
+        public _FinalStage comparison(Nullable<FunnelComparison> comparison) {
+            if (comparison.isNull()) {
+                this.comparison = null;
+            } else if (comparison.isEmpty()) {
+                this.comparison = Optional.empty();
+            } else {
+                this.comparison = Optional.of(comparison.get());
+            }
+            return this;
+        }
+
+        @java.lang.Override
+        public _FinalStage comparison(FunnelComparison comparison) {
+            this.comparison = Optional.ofNullable(comparison);
+            return this;
+        }
+
+        @java.lang.Override
+        @JsonSetter(value = "comparison", nulls = Nulls.SKIP)
+        public _FinalStage comparison(Optional<FunnelComparison> comparison) {
+            this.comparison = comparison;
+            return this;
+        }
+
         @java.lang.Override
         public RetrieveStatsResponseDataTotalsItem build() {
-            return new RetrieveStatsResponseDataTotalsItem(name, value, additionalProperties);
+            return new RetrieveStatsResponseDataTotalsItem(
+                    comparison, confidenceInterval, name, steps, value, additionalProperties);
+        }
+
+        @JsonAnySetter
+        private void putAdditionalPropertyFromJson(String key, Object value) {
+            if (key.equalsIgnoreCase("comparison")
+                    || key.equalsIgnoreCase("confidence_interval")
+                    || key.equalsIgnoreCase("name")
+                    || key.equalsIgnoreCase("steps")
+                    || key.equalsIgnoreCase("value")) {
+                return;
+            }
+            this.additionalProperties.put(key, value);
         }
 
         @java.lang.Override

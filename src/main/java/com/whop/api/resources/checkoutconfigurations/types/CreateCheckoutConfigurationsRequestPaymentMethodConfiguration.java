@@ -12,6 +12,7 @@ import com.fasterxml.jackson.annotation.JsonSetter;
 import com.fasterxml.jackson.annotation.Nulls;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.whop.api.core.ObjectMappers;
+import com.whop.api.types.PaymentMethodTypes;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -21,17 +22,17 @@ import java.util.Optional;
 @JsonInclude(JsonInclude.Include.NON_ABSENT)
 @JsonDeserialize(builder = CreateCheckoutConfigurationsRequestPaymentMethodConfiguration.Builder.class)
 public final class CreateCheckoutConfigurationsRequestPaymentMethodConfiguration {
-    private final Optional<List<String>> disabled;
+    private final Optional<List<PaymentMethodTypes>> disabled;
 
-    private final Optional<List<String>> enabled;
+    private final Optional<List<PaymentMethodTypes>> enabled;
 
     private final Optional<Boolean> includePlatformDefaults;
 
     private final Map<String, Object> additionalProperties;
 
     private CreateCheckoutConfigurationsRequestPaymentMethodConfiguration(
-            Optional<List<String>> disabled,
-            Optional<List<String>> enabled,
+            Optional<List<PaymentMethodTypes>> disabled,
+            Optional<List<PaymentMethodTypes>> enabled,
             Optional<Boolean> includePlatformDefaults,
             Map<String, Object> additionalProperties) {
         this.disabled = disabled;
@@ -41,18 +42,18 @@ public final class CreateCheckoutConfigurationsRequestPaymentMethodConfiguration
     }
 
     /**
-     * @return Payment methods explicitly disabled for checkout.
+     * @return Payment method types explicitly disabled for checkout — the <code>type</code> values from the payment method types catalogue. Types Whop no longer offers, and the read-only <code>unknown</code> placeholder, are dropped.
      */
     @JsonProperty("disabled")
-    public Optional<List<String>> getDisabled() {
+    public Optional<List<PaymentMethodTypes>> getDisabled() {
         return disabled;
     }
 
     /**
-     * @return Payment methods explicitly enabled for checkout.
+     * @return Payment method types explicitly enabled for checkout — the <code>type</code> values from the payment method types catalogue. Types Whop no longer offers, and the read-only <code>unknown</code> placeholder, are dropped.
      */
     @JsonProperty("enabled")
-    public Optional<List<String>> getEnabled() {
+    public Optional<List<PaymentMethodTypes>> getEnabled() {
         return enabled;
     }
 
@@ -98,13 +99,12 @@ public final class CreateCheckoutConfigurationsRequestPaymentMethodConfiguration
 
     @JsonIgnoreProperties(ignoreUnknown = true)
     public static final class Builder {
-        private Optional<List<String>> disabled = Optional.empty();
+        private Optional<List<PaymentMethodTypes>> disabled = Optional.empty();
 
-        private Optional<List<String>> enabled = Optional.empty();
+        private Optional<List<PaymentMethodTypes>> enabled = Optional.empty();
 
         private Optional<Boolean> includePlatformDefaults = Optional.empty();
 
-        @JsonAnySetter
         private Map<String, Object> additionalProperties = new HashMap<>();
 
         private Builder() {}
@@ -117,29 +117,29 @@ public final class CreateCheckoutConfigurationsRequestPaymentMethodConfiguration
         }
 
         /**
-         * <p>Payment methods explicitly disabled for checkout.</p>
+         * <p>Payment method types explicitly disabled for checkout — the <code>type</code> values from the payment method types catalogue. Types Whop no longer offers, and the read-only <code>unknown</code> placeholder, are dropped.</p>
          */
         @JsonSetter(value = "disabled", nulls = Nulls.SKIP)
-        public Builder disabled(Optional<List<String>> disabled) {
+        public Builder disabled(Optional<List<PaymentMethodTypes>> disabled) {
             this.disabled = disabled;
             return this;
         }
 
-        public Builder disabled(List<String> disabled) {
+        public Builder disabled(List<PaymentMethodTypes> disabled) {
             this.disabled = Optional.ofNullable(disabled);
             return this;
         }
 
         /**
-         * <p>Payment methods explicitly enabled for checkout.</p>
+         * <p>Payment method types explicitly enabled for checkout — the <code>type</code> values from the payment method types catalogue. Types Whop no longer offers, and the read-only <code>unknown</code> placeholder, are dropped.</p>
          */
         @JsonSetter(value = "enabled", nulls = Nulls.SKIP)
-        public Builder enabled(Optional<List<String>> enabled) {
+        public Builder enabled(Optional<List<PaymentMethodTypes>> enabled) {
             this.enabled = enabled;
             return this;
         }
 
-        public Builder enabled(List<String> enabled) {
+        public Builder enabled(List<PaymentMethodTypes> enabled) {
             this.enabled = Optional.ofNullable(enabled);
             return this;
         }
@@ -161,6 +161,16 @@ public final class CreateCheckoutConfigurationsRequestPaymentMethodConfiguration
         public CreateCheckoutConfigurationsRequestPaymentMethodConfiguration build() {
             return new CreateCheckoutConfigurationsRequestPaymentMethodConfiguration(
                     disabled, enabled, includePlatformDefaults, additionalProperties);
+        }
+
+        @JsonAnySetter
+        private void putAdditionalPropertyFromJson(String key, Object value) {
+            if (key.equalsIgnoreCase("disabled")
+                    || key.equalsIgnoreCase("enabled")
+                    || key.equalsIgnoreCase("include_platform_defaults")) {
+                return;
+            }
+            this.additionalProperties.put(key, value);
         }
 
         public Builder additionalProperty(String key, Object value) {

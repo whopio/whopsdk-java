@@ -81,7 +81,6 @@ public final class UnprocessableEntityErrorBody {
     public static final class Builder implements ErrorStage, _FinalStage {
         private UnprocessableEntityErrorBodyError error;
 
-        @JsonAnySetter
         private Map<String, Object> additionalProperties = new HashMap<>();
 
         private Builder() {}
@@ -102,6 +101,14 @@ public final class UnprocessableEntityErrorBody {
         @java.lang.Override
         public UnprocessableEntityErrorBody build() {
             return new UnprocessableEntityErrorBody(error, additionalProperties);
+        }
+
+        @JsonAnySetter
+        private void putAdditionalPropertyFromJson(String key, Object value) {
+            if (key.equalsIgnoreCase("error")) {
+                return;
+            }
+            this.additionalProperties.put(key, value);
         }
 
         @java.lang.Override

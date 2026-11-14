@@ -69,7 +69,7 @@ public final class LeaderboardPartnersResponseMe {
     }
 
     /**
-     * @return The referrer's pending + completed earnings across all referred businesses, in USD.
+     * @return The referrer's pending + completed earnings across all referred businesses, in USD, without commission advances. Whop Sales commission counts only the share that reaches its people.
      */
     @JsonProperty("total_earnings_usd")
     public String getTotalEarningsUsd() {
@@ -153,7 +153,7 @@ public final class LeaderboardPartnersResponseMe {
 
     public interface TotalEarningsUsdStage {
         /**
-         * <p>The referrer's pending + completed earnings across all referred businesses, in USD.</p>
+         * <p>The referrer's pending + completed earnings across all referred businesses, in USD, without commission advances. Whop Sales commission counts only the share that reaches its people.</p>
          */
         TotalVolumeUsdStage totalEarningsUsd(@NotNull String totalEarningsUsd);
     }
@@ -195,7 +195,6 @@ public final class LeaderboardPartnersResponseMe {
 
         private Optional<LeaderboardPartnersResponseMeUser> user = Optional.empty();
 
-        @JsonAnySetter
         private Map<String, Object> additionalProperties = new HashMap<>();
 
         private Builder() {}
@@ -212,7 +211,6 @@ public final class LeaderboardPartnersResponseMe {
 
         /**
          * <p>When the referrer's earliest partner business became active.</p>
-         * <p>When the referrer's earliest partner business became active.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
@@ -225,7 +223,6 @@ public final class LeaderboardPartnersResponseMe {
 
         /**
          * <p>1-based leaderboard position.</p>
-         * <p>1-based leaderboard position.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
@@ -236,8 +233,7 @@ public final class LeaderboardPartnersResponseMe {
         }
 
         /**
-         * <p>The referrer's pending + completed earnings across all referred businesses, in USD.</p>
-         * <p>The referrer's pending + completed earnings across all referred businesses, in USD.</p>
+         * <p>The referrer's pending + completed earnings across all referred businesses, in USD, without commission advances. Whop Sales commission counts only the share that reaches its people.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
@@ -248,7 +244,6 @@ public final class LeaderboardPartnersResponseMe {
         }
 
         /**
-         * <p>Credited GMV across all the referrer's referred businesses, in USD.</p>
          * <p>Credited GMV across all the referrer's referred businesses, in USD.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
@@ -299,6 +294,18 @@ public final class LeaderboardPartnersResponseMe {
         public LeaderboardPartnersResponseMe build() {
             return new LeaderboardPartnersResponseMe(
                     firstReferralStartedAt, rank, totalEarningsUsd, totalVolumeUsd, user, additionalProperties);
+        }
+
+        @JsonAnySetter
+        private void putAdditionalPropertyFromJson(String key, Object value) {
+            if (key.equalsIgnoreCase("first_referral_started_at")
+                    || key.equalsIgnoreCase("rank")
+                    || key.equalsIgnoreCase("total_earnings_usd")
+                    || key.equalsIgnoreCase("total_volume_usd")
+                    || key.equalsIgnoreCase("user")) {
+                return;
+            }
+            this.additionalProperties.put(key, value);
         }
 
         @java.lang.Override

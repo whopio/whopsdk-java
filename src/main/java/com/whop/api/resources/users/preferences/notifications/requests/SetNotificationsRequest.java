@@ -73,7 +73,6 @@ public final class SetNotificationsRequest {
     public static final class Builder {
         private List<SetNotificationsRequestPreferencesItem> preferences = new ArrayList<>();
 
-        @JsonAnySetter
         private Map<String, Object> additionalProperties = new HashMap<>();
 
         private Builder() {}
@@ -109,6 +108,14 @@ public final class SetNotificationsRequest {
 
         public SetNotificationsRequest build() {
             return new SetNotificationsRequest(preferences, additionalProperties);
+        }
+
+        @JsonAnySetter
+        private void putAdditionalPropertyFromJson(String key, Object value) {
+            if (key.equalsIgnoreCase("preferences")) {
+                return;
+            }
+            this.additionalProperties.put(key, value);
         }
 
         public Builder additionalProperty(String key, Object value) {

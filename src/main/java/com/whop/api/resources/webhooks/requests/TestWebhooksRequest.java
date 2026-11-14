@@ -86,7 +86,6 @@ public final class TestWebhooksRequest {
     public static final class Builder implements EventStage, _FinalStage {
         private String event;
 
-        @JsonAnySetter
         private Map<String, Object> additionalProperties = new HashMap<>();
 
         private Builder() {}
@@ -98,7 +97,6 @@ public final class TestWebhooksRequest {
         }
 
         /**
-         * <p>The event to test the webhook for, in dot form (for example <code>payment.succeeded</code>).</p>
          * <p>The event to test the webhook for, in dot form (for example <code>payment.succeeded</code>).</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
@@ -112,6 +110,14 @@ public final class TestWebhooksRequest {
         @java.lang.Override
         public TestWebhooksRequest build() {
             return new TestWebhooksRequest(event, additionalProperties);
+        }
+
+        @JsonAnySetter
+        private void putAdditionalPropertyFromJson(String key, Object value) {
+            if (key.equalsIgnoreCase("event")) {
+                return;
+            }
+            this.additionalProperties.put(key, value);
         }
 
         @java.lang.Override

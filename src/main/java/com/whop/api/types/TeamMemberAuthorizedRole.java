@@ -106,7 +106,6 @@ public final class TeamMemberAuthorizedRole {
 
         private String name;
 
-        @JsonAnySetter
         private Map<String, Object> additionalProperties = new HashMap<>();
 
         private Builder() {}
@@ -120,7 +119,6 @@ public final class TeamMemberAuthorizedRole {
 
         /**
          * <p>Custom role ID, prefixed <code>aurl_</code>.</p>
-         * <p>Custom role ID, prefixed <code>aurl_</code>.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
@@ -131,7 +129,6 @@ public final class TeamMemberAuthorizedRole {
         }
 
         /**
-         * <p>Custom role name.</p>
          * <p>Custom role name.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
@@ -145,6 +142,14 @@ public final class TeamMemberAuthorizedRole {
         @java.lang.Override
         public TeamMemberAuthorizedRole build() {
             return new TeamMemberAuthorizedRole(id, name, additionalProperties);
+        }
+
+        @JsonAnySetter
+        private void putAdditionalPropertyFromJson(String key, Object value) {
+            if (key.equalsIgnoreCase("id") || key.equalsIgnoreCase("name")) {
+                return;
+            }
+            this.additionalProperties.put(key, value);
         }
 
         @java.lang.Override

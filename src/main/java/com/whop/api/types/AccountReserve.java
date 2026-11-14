@@ -46,7 +46,7 @@ public final class AccountReserve {
     }
 
     /**
-     * @return Total held in this currency, in native units, as a decimal string. <code>usd</code> and <code>usdt</code> are reported as one <code>usd</code> entry, matching how the balance row groups them.
+     * @return Total held in this currency, in native units, as a decimal string. All dollar holdings are reported as one <code>usd</code> entry, matching how the balance row groups them.
      */
     @JsonProperty("amount")
     public String getAmount() {
@@ -105,7 +105,7 @@ public final class AccountReserve {
 
     public interface AmountStage {
         /**
-         * <p>Total held in this currency, in native units, as a decimal string. <code>usd</code> and <code>usdt</code> are reported as one <code>usd</code> entry, matching how the balance row groups them.</p>
+         * <p>Total held in this currency, in native units, as a decimal string. All dollar holdings are reported as one <code>usd</code> entry, matching how the balance row groups them.</p>
          */
         CurrencyStage amount(@NotNull String amount);
 
@@ -149,7 +149,6 @@ public final class AccountReserve {
 
         private List<AccountReserveType> byType = new ArrayList<>();
 
-        @JsonAnySetter
         private Map<String, Object> additionalProperties = new HashMap<>();
 
         private Builder() {}
@@ -164,8 +163,7 @@ public final class AccountReserve {
         }
 
         /**
-         * <p>Total held in this currency, in native units, as a decimal string. <code>usd</code> and <code>usdt</code> are reported as one <code>usd</code> entry, matching how the balance row groups them.</p>
-         * <p>Total held in this currency, in native units, as a decimal string. <code>usd</code> and <code>usdt</code> are reported as one <code>usd</code> entry, matching how the balance row groups them.</p>
+         * <p>Total held in this currency, in native units, as a decimal string. All dollar holdings are reported as one <code>usd</code> entry, matching how the balance row groups them.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
@@ -176,7 +174,6 @@ public final class AccountReserve {
         }
 
         /**
-         * <p>Lowercase ISO currency code, such as <code>usd</code> or <code>eur</code>.</p>
          * <p>Lowercase ISO currency code, such as <code>usd</code> or <code>eur</code>.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
@@ -238,6 +235,17 @@ public final class AccountReserve {
         @java.lang.Override
         public AccountReserve build() {
             return new AccountReserve(amount, byType, currency, unlocksByDate, additionalProperties);
+        }
+
+        @JsonAnySetter
+        private void putAdditionalPropertyFromJson(String key, Object value) {
+            if (key.equalsIgnoreCase("amount")
+                    || key.equalsIgnoreCase("by_type")
+                    || key.equalsIgnoreCase("currency")
+                    || key.equalsIgnoreCase("unlocks_by_date")) {
+                return;
+            }
+            this.additionalProperties.put(key, value);
         }
 
         @java.lang.Override

@@ -28,42 +28,42 @@ public class OauthGrantsClient {
     }
 
     /**
-     * Lists the authenticated user's own OAuth grants — one per app they have authorized, per account they authorized it for. The list is always the caller's own; there is no parameter for reading another user's grants. Requires a user session: an API key or an OAuth token is refused, so an app can never enumerate the other apps a user has authorized.
+     * Lists the authenticated user's own OAuth grants: one per app they have authorized, per account they authorized it for. You cannot read another user's grants. Requires a user session: an API key or an OAuth token is refused, so an app can never enumerate the other apps a user has authorized.
      */
     public SyncPagingIterable<OauthGrant> list() {
         return this.rawClient.list().body();
     }
 
     /**
-     * Lists the authenticated user's own OAuth grants — one per app they have authorized, per account they authorized it for. The list is always the caller's own; there is no parameter for reading another user's grants. Requires a user session: an API key or an OAuth token is refused, so an app can never enumerate the other apps a user has authorized.
+     * Lists the authenticated user's own OAuth grants: one per app they have authorized, per account they authorized it for. You cannot read another user's grants. Requires a user session: an API key or an OAuth token is refused, so an app can never enumerate the other apps a user has authorized.
      */
     public SyncPagingIterable<OauthGrant> list(RequestOptions requestOptions) {
         return this.rawClient.list(requestOptions).body();
     }
 
     /**
-     * Lists the authenticated user's own OAuth grants — one per app they have authorized, per account they authorized it for. The list is always the caller's own; there is no parameter for reading another user's grants. Requires a user session: an API key or an OAuth token is refused, so an app can never enumerate the other apps a user has authorized.
+     * Lists the authenticated user's own OAuth grants: one per app they have authorized, per account they authorized it for. You cannot read another user's grants. Requires a user session: an API key or an OAuth token is refused, so an app can never enumerate the other apps a user has authorized.
      */
     public SyncPagingIterable<OauthGrant> list(ListOauthGrantsRequest request) {
         return this.rawClient.list(request).body();
     }
 
     /**
-     * Lists the authenticated user's own OAuth grants — one per app they have authorized, per account they authorized it for. The list is always the caller's own; there is no parameter for reading another user's grants. Requires a user session: an API key or an OAuth token is refused, so an app can never enumerate the other apps a user has authorized.
+     * Lists the authenticated user's own OAuth grants: one per app they have authorized, per account they authorized it for. You cannot read another user's grants. Requires a user session: an API key or an OAuth token is refused, so an app can never enumerate the other apps a user has authorized.
      */
     public SyncPagingIterable<OauthGrant> list(ListOauthGrantsRequest request, RequestOptions requestOptions) {
         return this.rawClient.list(request, requestOptions).body();
     }
 
     /**
-     * Completes the OAuth authorization step for the authenticated user: records their consent for the scopes an app asked for and mints the authorization code to hand back to it. Returns the grant, plus a <code>redirect_url</code> carrying that code — the one and only time it is returned. Exchange the code at <code>POST /oauth/token</code> with the verifier for <code>code_challenge</code>. Requires a user session, because consent has to come from the account holder: an API key or an OAuth token is refused, so an app can never authorize itself. Send an <code>Idempotency-Key</code> to make a retry safe — a replay returns the original <code>redirect_url</code> and its code rather than issuing a second one.
+     * Completes the OAuth authorization step for the authenticated user: records their consent to the scopes an app asked for and mints an authorization code. Returns the grant plus a <code>redirect_url</code> carrying the code, which is returned only this once; the app exchanges it at <code>POST /oauth/token</code>. Requires a user session, because consent has to come from the account holder: an API key or an OAuth token is refused, so an app can never authorize itself. Send an <code>Idempotency-Key</code> so a retry returns the original <code>redirect_url</code> and code instead of issuing a second one.
      */
     public OauthGrant create(CreateOauthGrantsRequest request) {
         return this.rawClient.create(request).body();
     }
 
     /**
-     * Completes the OAuth authorization step for the authenticated user: records their consent for the scopes an app asked for and mints the authorization code to hand back to it. Returns the grant, plus a <code>redirect_url</code> carrying that code — the one and only time it is returned. Exchange the code at <code>POST /oauth/token</code> with the verifier for <code>code_challenge</code>. Requires a user session, because consent has to come from the account holder: an API key or an OAuth token is refused, so an app can never authorize itself. Send an <code>Idempotency-Key</code> to make a retry safe — a replay returns the original <code>redirect_url</code> and its code rather than issuing a second one.
+     * Completes the OAuth authorization step for the authenticated user: records their consent to the scopes an app asked for and mints an authorization code. Returns the grant plus a <code>redirect_url</code> carrying the code, which is returned only this once; the app exchanges it at <code>POST /oauth/token</code>. Requires a user session, because consent has to come from the account holder: an API key or an OAuth token is refused, so an app can never authorize itself. Send an <code>Idempotency-Key</code> so a retry returns the original <code>redirect_url</code> and code instead of issuing a second one.
      */
     public OauthGrant create(CreateOauthGrantsRequest request, RequestOptions requestOptions) {
         return this.rawClient.create(request, requestOptions).body();

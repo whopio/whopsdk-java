@@ -148,7 +148,6 @@ public final class UpdateAccountsRequestStorePageConfig {
 
         private Optional<Boolean> whopAffiliateLink = Optional.empty();
 
-        @JsonAnySetter
         private Map<String, Object> additionalProperties = new HashMap<>();
 
         private Builder() {}
@@ -253,6 +252,17 @@ public final class UpdateAccountsRequestStorePageConfig {
         public UpdateAccountsRequestStorePageConfig build() {
             return new UpdateAccountsRequestStorePageConfig(
                     accentColor, layout, profileVariant, whopAffiliateLink, additionalProperties);
+        }
+
+        @JsonAnySetter
+        private void putAdditionalPropertyFromJson(String key, Object value) {
+            if (key.equalsIgnoreCase("accent_color")
+                    || key.equalsIgnoreCase("layout")
+                    || key.equalsIgnoreCase("profile_variant")
+                    || key.equalsIgnoreCase("whop_affiliate_link")) {
+                return;
+            }
+            this.additionalProperties.put(key, value);
         }
 
         public Builder additionalProperty(String key, Object value) {

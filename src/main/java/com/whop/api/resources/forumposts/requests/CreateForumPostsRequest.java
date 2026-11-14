@@ -29,9 +29,9 @@ import org.jetbrains.annotations.NotNull;
 @JsonInclude(JsonInclude.Include.NON_ABSENT)
 @JsonDeserialize(builder = CreateForumPostsRequest.Builder.class)
 public final class CreateForumPostsRequest {
-    private final Optional<List<CreateForumPostsRequestAttachmentsItem>> attachments;
+    private final Optional<String> accountId;
 
-    private final Optional<String> companyId;
+    private final Optional<List<CreateForumPostsRequestAttachmentsItem>> attachments;
 
     private final Optional<String> content;
 
@@ -58,8 +58,8 @@ public final class CreateForumPostsRequest {
     private final Map<String, Object> additionalProperties;
 
     private CreateForumPostsRequest(
+            Optional<String> accountId,
             Optional<List<CreateForumPostsRequestAttachmentsItem>> attachments,
-            Optional<String> companyId,
             Optional<String> content,
             String experienceId,
             Optional<Boolean> isMention,
@@ -72,8 +72,8 @@ public final class CreateForumPostsRequest {
             Optional<String> title,
             Optional<ForumPostVisibilityTypes> visibility,
             Map<String, Object> additionalProperties) {
+        this.accountId = accountId;
         this.attachments = attachments;
-        this.companyId = companyId;
         this.content = content;
         this.experienceId = experienceId;
         this.isMention = isMention;
@@ -89,6 +89,17 @@ public final class CreateForumPostsRequest {
     }
 
     /**
+     * @return The unique identifier of the company whose public forum to post in. Required when experience_id is 'public'. For example, 'biz_xxxxx'.
+     */
+    @JsonIgnore
+    public Optional<String> getAccountId() {
+        if (accountId == null) {
+            return Optional.empty();
+        }
+        return accountId;
+    }
+
+    /**
      * @return A list of file attachments to include with the post, such as images or videos.
      */
     @JsonIgnore
@@ -97,17 +108,6 @@ public final class CreateForumPostsRequest {
             return Optional.empty();
         }
         return attachments;
-    }
-
-    /**
-     * @return The unique identifier of the company whose public forum to post in. Required when experience_id is 'public'. For example, 'biz_xxxxx'.
-     */
-    @JsonIgnore
-    public Optional<String> getCompanyId() {
-        if (companyId == null) {
-            return Optional.empty();
-        }
-        return companyId;
     }
 
     /**
@@ -122,7 +122,7 @@ public final class CreateForumPostsRequest {
     }
 
     /**
-     * @return The unique identifier of the experience to create this post in. For example, 'exp_xxxxx'. Pass 'public' along with company_id to automatically use the company's public forum.
+     * @return The unique identifier of the experience to create this post in. For example, 'exp_xxxxx'. Pass 'public' along with account_id to automatically use the account's public forum.
      */
     @JsonProperty("experience_id")
     public String getExperienceId() {
@@ -229,15 +229,15 @@ public final class CreateForumPostsRequest {
     }
 
     @JsonInclude(value = JsonInclude.Include.CUSTOM, valueFilter = NullableNonemptyFilter.class)
-    @JsonProperty("attachments")
-    private Optional<List<CreateForumPostsRequestAttachmentsItem>> _getAttachments() {
-        return attachments;
+    @JsonProperty("account_id")
+    private Optional<String> _getAccountId() {
+        return accountId;
     }
 
     @JsonInclude(value = JsonInclude.Include.CUSTOM, valueFilter = NullableNonemptyFilter.class)
-    @JsonProperty("company_id")
-    private Optional<String> _getCompanyId() {
-        return companyId;
+    @JsonProperty("attachments")
+    private Optional<List<CreateForumPostsRequestAttachmentsItem>> _getAttachments() {
+        return attachments;
     }
 
     @JsonInclude(value = JsonInclude.Include.CUSTOM, valueFilter = NullableNonemptyFilter.class)
@@ -312,8 +312,8 @@ public final class CreateForumPostsRequest {
     }
 
     private boolean equalTo(CreateForumPostsRequest other) {
-        return attachments.equals(other.attachments)
-                && companyId.equals(other.companyId)
+        return accountId.equals(other.accountId)
+                && attachments.equals(other.attachments)
                 && content.equals(other.content)
                 && experienceId.equals(other.experienceId)
                 && isMention.equals(other.isMention)
@@ -330,8 +330,8 @@ public final class CreateForumPostsRequest {
     @java.lang.Override
     public int hashCode() {
         return Objects.hash(
+                this.accountId,
                 this.attachments,
-                this.companyId,
                 this.content,
                 this.experienceId,
                 this.isMention,
@@ -356,7 +356,7 @@ public final class CreateForumPostsRequest {
 
     public interface ExperienceIdStage {
         /**
-         * <p>The unique identifier of the experience to create this post in. For example, 'exp_xxxxx'. Pass 'public' along with company_id to automatically use the company's public forum.</p>
+         * <p>The unique identifier of the experience to create this post in. For example, 'exp_xxxxx'. Pass 'public' along with account_id to automatically use the account's public forum.</p>
          */
         _FinalStage experienceId(@NotNull String experienceId);
 
@@ -371,6 +371,15 @@ public final class CreateForumPostsRequest {
         _FinalStage additionalProperties(Map<String, Object> additionalProperties);
 
         /**
+         * <p>The unique identifier of the company whose public forum to post in. Required when experience_id is 'public'. For example, 'biz_xxxxx'.</p>
+         */
+        _FinalStage accountId(Optional<String> accountId);
+
+        _FinalStage accountId(String accountId);
+
+        _FinalStage accountId(Nullable<String> accountId);
+
+        /**
          * <p>A list of file attachments to include with the post, such as images or videos.</p>
          */
         _FinalStage attachments(Optional<List<CreateForumPostsRequestAttachmentsItem>> attachments);
@@ -378,15 +387,6 @@ public final class CreateForumPostsRequest {
         _FinalStage attachments(List<CreateForumPostsRequestAttachmentsItem> attachments);
 
         _FinalStage attachments(Nullable<List<CreateForumPostsRequestAttachmentsItem>> attachments);
-
-        /**
-         * <p>The unique identifier of the company whose public forum to post in. Required when experience_id is 'public'. For example, 'biz_xxxxx'.</p>
-         */
-        _FinalStage companyId(Optional<String> companyId);
-
-        _FinalStage companyId(String companyId);
-
-        _FinalStage companyId(Nullable<String> companyId);
 
         /**
          * <p>The main body of the post in Markdown format. For example, 'Check out this <strong>update</strong>'. Hidden if the post is paywalled and the viewer has not purchased access.</p>
@@ -503,19 +503,18 @@ public final class CreateForumPostsRequest {
 
         private Optional<String> content = Optional.empty();
 
-        private Optional<String> companyId = Optional.empty();
-
         private Optional<List<CreateForumPostsRequestAttachmentsItem>> attachments = Optional.empty();
 
-        @JsonAnySetter
+        private Optional<String> accountId = Optional.empty();
+
         private Map<String, Object> additionalProperties = new HashMap<>();
 
         private Builder() {}
 
         @java.lang.Override
         public Builder from(CreateForumPostsRequest other) {
+            accountId(other.getAccountId());
             attachments(other.getAttachments());
-            companyId(other.getCompanyId());
             content(other.getContent());
             experienceId(other.getExperienceId());
             isMention(other.getIsMention());
@@ -531,8 +530,7 @@ public final class CreateForumPostsRequest {
         }
 
         /**
-         * <p>The unique identifier of the experience to create this post in. For example, 'exp_xxxxx'. Pass 'public' along with company_id to automatically use the company's public forum.</p>
-         * <p>The unique identifier of the experience to create this post in. For example, 'exp_xxxxx'. Pass 'public' along with company_id to automatically use the company's public forum.</p>
+         * <p>The unique identifier of the experience to create this post in. For example, 'exp_xxxxx'. Pass 'public' along with account_id to automatically use the account's public forum.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
@@ -903,42 +901,6 @@ public final class CreateForumPostsRequest {
         }
 
         /**
-         * <p>The unique identifier of the company whose public forum to post in. Required when experience_id is 'public'. For example, 'biz_xxxxx'.</p>
-         * @return Reference to {@code this} so that method calls can be chained together.
-         */
-        @java.lang.Override
-        public _FinalStage companyId(Nullable<String> companyId) {
-            if (companyId.isNull()) {
-                this.companyId = null;
-            } else if (companyId.isEmpty()) {
-                this.companyId = Optional.empty();
-            } else {
-                this.companyId = Optional.of(companyId.get());
-            }
-            return this;
-        }
-
-        /**
-         * <p>The unique identifier of the company whose public forum to post in. Required when experience_id is 'public'. For example, 'biz_xxxxx'.</p>
-         * @return Reference to {@code this} so that method calls can be chained together.
-         */
-        @java.lang.Override
-        public _FinalStage companyId(String companyId) {
-            this.companyId = Optional.ofNullable(companyId);
-            return this;
-        }
-
-        /**
-         * <p>The unique identifier of the company whose public forum to post in. Required when experience_id is 'public'. For example, 'biz_xxxxx'.</p>
-         */
-        @java.lang.Override
-        @JsonSetter(value = "company_id", nulls = Nulls.SKIP)
-        public _FinalStage companyId(Optional<String> companyId) {
-            this.companyId = companyId;
-            return this;
-        }
-
-        /**
          * <p>A list of file attachments to include with the post, such as images or videos.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
@@ -974,11 +936,47 @@ public final class CreateForumPostsRequest {
             return this;
         }
 
+        /**
+         * <p>The unique identifier of the company whose public forum to post in. Required when experience_id is 'public'. For example, 'biz_xxxxx'.</p>
+         * @return Reference to {@code this} so that method calls can be chained together.
+         */
+        @java.lang.Override
+        public _FinalStage accountId(Nullable<String> accountId) {
+            if (accountId.isNull()) {
+                this.accountId = null;
+            } else if (accountId.isEmpty()) {
+                this.accountId = Optional.empty();
+            } else {
+                this.accountId = Optional.of(accountId.get());
+            }
+            return this;
+        }
+
+        /**
+         * <p>The unique identifier of the company whose public forum to post in. Required when experience_id is 'public'. For example, 'biz_xxxxx'.</p>
+         * @return Reference to {@code this} so that method calls can be chained together.
+         */
+        @java.lang.Override
+        public _FinalStage accountId(String accountId) {
+            this.accountId = Optional.ofNullable(accountId);
+            return this;
+        }
+
+        /**
+         * <p>The unique identifier of the company whose public forum to post in. Required when experience_id is 'public'. For example, 'biz_xxxxx'.</p>
+         */
+        @java.lang.Override
+        @JsonSetter(value = "account_id", nulls = Nulls.SKIP)
+        public _FinalStage accountId(Optional<String> accountId) {
+            this.accountId = accountId;
+            return this;
+        }
+
         @java.lang.Override
         public CreateForumPostsRequest build() {
             return new CreateForumPostsRequest(
+                    accountId,
                     attachments,
-                    companyId,
                     content,
                     experienceId,
                     isMention,
@@ -991,6 +989,26 @@ public final class CreateForumPostsRequest {
                     title,
                     visibility,
                     additionalProperties);
+        }
+
+        @JsonAnySetter
+        private void putAdditionalPropertyFromJson(String key, Object value) {
+            if (key.equalsIgnoreCase("account_id")
+                    || key.equalsIgnoreCase("attachments")
+                    || key.equalsIgnoreCase("content")
+                    || key.equalsIgnoreCase("experience_id")
+                    || key.equalsIgnoreCase("is_mention")
+                    || key.equalsIgnoreCase("parent_id")
+                    || key.equalsIgnoreCase("paywall_amount")
+                    || key.equalsIgnoreCase("paywall_currency")
+                    || key.equalsIgnoreCase("pinned")
+                    || key.equalsIgnoreCase("poll")
+                    || key.equalsIgnoreCase("rich_content")
+                    || key.equalsIgnoreCase("title")
+                    || key.equalsIgnoreCase("visibility")) {
+                return;
+            }
+            this.additionalProperties.put(key, value);
         }
 
         @java.lang.Override

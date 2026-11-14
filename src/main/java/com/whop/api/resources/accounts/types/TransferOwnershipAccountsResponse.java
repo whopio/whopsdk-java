@@ -79,7 +79,6 @@ public final class TransferOwnershipAccountsResponse {
     public static final class Builder implements SuccessStage, _FinalStage {
         private boolean success;
 
-        @JsonAnySetter
         private Map<String, Object> additionalProperties = new HashMap<>();
 
         private Builder() {}
@@ -100,6 +99,14 @@ public final class TransferOwnershipAccountsResponse {
         @java.lang.Override
         public TransferOwnershipAccountsResponse build() {
             return new TransferOwnershipAccountsResponse(success, additionalProperties);
+        }
+
+        @JsonAnySetter
+        private void putAdditionalPropertyFromJson(String key, Object value) {
+            if (key.equalsIgnoreCase("success")) {
+                return;
+            }
+            this.additionalProperties.put(key, value);
         }
 
         @java.lang.Override

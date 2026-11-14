@@ -24,9 +24,9 @@ import org.jetbrains.annotations.NotNull;
 @JsonInclude(JsonInclude.Include.NON_ABSENT)
 @JsonDeserialize(builder = CreateCompanyTokenTransactionsRequestTransfer.Builder.class)
 public final class CreateCompanyTokenTransactionsRequestTransfer {
-    private final double amount;
+    private final String accountId;
 
-    private final String companyId;
+    private final double amount;
 
     private final Optional<String> description;
 
@@ -39,15 +39,15 @@ public final class CreateCompanyTokenTransactionsRequestTransfer {
     private final Map<String, Object> additionalProperties;
 
     private CreateCompanyTokenTransactionsRequestTransfer(
+            String accountId,
             double amount,
-            String companyId,
             Optional<String> description,
             String destinationUserId,
             Optional<String> idempotencyKey,
             String userId,
             Map<String, Object> additionalProperties) {
+        this.accountId = accountId;
         this.amount = amount;
-        this.companyId = companyId;
         this.description = description;
         this.destinationUserId = destinationUserId;
         this.idempotencyKey = idempotencyKey;
@@ -56,19 +56,19 @@ public final class CreateCompanyTokenTransactionsRequestTransfer {
     }
 
     /**
+     * @return The unique identifier of the company to create the transaction in, starting with 'biz_'.
+     */
+    @JsonProperty("account_id")
+    public String getAccountId() {
+        return accountId;
+    }
+
+    /**
      * @return The positive number of tokens to transact. For example, 100.0 for 100 tokens.
      */
     @JsonProperty("amount")
     public double getAmount() {
         return amount;
-    }
-
-    /**
-     * @return The unique identifier of the company to create the transaction in, starting with 'biz_'.
-     */
-    @JsonProperty("company_id")
-    public String getCompanyId() {
-        return companyId;
     }
 
     /**
@@ -134,8 +134,8 @@ public final class CreateCompanyTokenTransactionsRequestTransfer {
     }
 
     private boolean equalTo(CreateCompanyTokenTransactionsRequestTransfer other) {
-        return amount == other.amount
-                && companyId.equals(other.companyId)
+        return accountId.equals(other.accountId)
+                && amount == other.amount
                 && description.equals(other.description)
                 && destinationUserId.equals(other.destinationUserId)
                 && idempotencyKey.equals(other.idempotencyKey)
@@ -145,8 +145,8 @@ public final class CreateCompanyTokenTransactionsRequestTransfer {
     @java.lang.Override
     public int hashCode() {
         return Objects.hash(
+                this.accountId,
                 this.amount,
-                this.companyId,
                 this.description,
                 this.destinationUserId,
                 this.idempotencyKey,
@@ -158,24 +158,24 @@ public final class CreateCompanyTokenTransactionsRequestTransfer {
         return ObjectMappers.stringify(this);
     }
 
-    public static AmountStage builder() {
+    public static AccountIdStage builder() {
         return new Builder();
+    }
+
+    public interface AccountIdStage {
+        /**
+         * <p>The unique identifier of the company to create the transaction in, starting with 'biz_'.</p>
+         */
+        AmountStage accountId(@NotNull String accountId);
+
+        Builder from(CreateCompanyTokenTransactionsRequestTransfer other);
     }
 
     public interface AmountStage {
         /**
          * <p>The positive number of tokens to transact. For example, 100.0 for 100 tokens.</p>
          */
-        CompanyIdStage amount(double amount);
-
-        Builder from(CreateCompanyTokenTransactionsRequestTransfer other);
-    }
-
-    public interface CompanyIdStage {
-        /**
-         * <p>The unique identifier of the company to create the transaction in, starting with 'biz_'.</p>
-         */
-        DestinationUserIdStage companyId(@NotNull String companyId);
+        DestinationUserIdStage amount(double amount);
     }
 
     public interface DestinationUserIdStage {
@@ -220,10 +220,10 @@ public final class CreateCompanyTokenTransactionsRequestTransfer {
 
     @JsonIgnoreProperties(ignoreUnknown = true)
     public static final class Builder
-            implements AmountStage, CompanyIdStage, DestinationUserIdStage, UserIdStage, _FinalStage {
-        private double amount;
+            implements AccountIdStage, AmountStage, DestinationUserIdStage, UserIdStage, _FinalStage {
+        private String accountId;
 
-        private String companyId;
+        private double amount;
 
         private String destinationUserId;
 
@@ -233,15 +233,14 @@ public final class CreateCompanyTokenTransactionsRequestTransfer {
 
         private Optional<String> description = Optional.empty();
 
-        @JsonAnySetter
         private Map<String, Object> additionalProperties = new HashMap<>();
 
         private Builder() {}
 
         @java.lang.Override
         public Builder from(CreateCompanyTokenTransactionsRequestTransfer other) {
+            accountId(other.getAccountId());
             amount(other.getAmount());
-            companyId(other.getCompanyId());
             description(other.getDescription());
             destinationUserId(other.getDestinationUserId());
             idempotencyKey(other.getIdempotencyKey());
@@ -250,31 +249,28 @@ public final class CreateCompanyTokenTransactionsRequestTransfer {
         }
 
         /**
-         * <p>The positive number of tokens to transact. For example, 100.0 for 100 tokens.</p>
+         * <p>The unique identifier of the company to create the transaction in, starting with 'biz_'.</p>
+         * @return Reference to {@code this} so that method calls can be chained together.
+         */
+        @java.lang.Override
+        @JsonSetter("account_id")
+        public AmountStage accountId(@NotNull String accountId) {
+            this.accountId = Objects.requireNonNull(accountId, "accountId must not be null");
+            return this;
+        }
+
+        /**
          * <p>The positive number of tokens to transact. For example, 100.0 for 100 tokens.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
         @JsonSetter("amount")
-        public CompanyIdStage amount(double amount) {
+        public DestinationUserIdStage amount(double amount) {
             this.amount = amount;
             return this;
         }
 
         /**
-         * <p>The unique identifier of the company to create the transaction in, starting with 'biz_'.</p>
-         * <p>The unique identifier of the company to create the transaction in, starting with 'biz_'.</p>
-         * @return Reference to {@code this} so that method calls can be chained together.
-         */
-        @java.lang.Override
-        @JsonSetter("company_id")
-        public DestinationUserIdStage companyId(@NotNull String companyId) {
-            this.companyId = Objects.requireNonNull(companyId, "companyId must not be null");
-            return this;
-        }
-
-        /**
-         * <p>The unique identifier of the user receiving the tokens. Required when the transaction type is 'transfer'.</p>
          * <p>The unique identifier of the user receiving the tokens. Required when the transaction type is 'transfer'.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
@@ -286,7 +282,6 @@ public final class CreateCompanyTokenTransactionsRequestTransfer {
         }
 
         /**
-         * <p>The unique identifier of the user whose token balance will be affected, starting with 'user_'.</p>
          * <p>The unique identifier of the user whose token balance will be affected, starting with 'user_'.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
@@ -372,7 +367,20 @@ public final class CreateCompanyTokenTransactionsRequestTransfer {
         @java.lang.Override
         public CreateCompanyTokenTransactionsRequestTransfer build() {
             return new CreateCompanyTokenTransactionsRequestTransfer(
-                    amount, companyId, description, destinationUserId, idempotencyKey, userId, additionalProperties);
+                    accountId, amount, description, destinationUserId, idempotencyKey, userId, additionalProperties);
+        }
+
+        @JsonAnySetter
+        private void putAdditionalPropertyFromJson(String key, Object value) {
+            if (key.equalsIgnoreCase("account_id")
+                    || key.equalsIgnoreCase("amount")
+                    || key.equalsIgnoreCase("description")
+                    || key.equalsIgnoreCase("destination_user_id")
+                    || key.equalsIgnoreCase("idempotency_key")
+                    || key.equalsIgnoreCase("user_id")) {
+                return;
+            }
+            this.additionalProperties.put(key, value);
         }
 
         @java.lang.Override

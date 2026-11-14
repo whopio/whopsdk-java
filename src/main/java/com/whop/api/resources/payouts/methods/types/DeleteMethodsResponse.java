@@ -106,7 +106,6 @@ public final class DeleteMethodsResponse {
 
         private String id;
 
-        @JsonAnySetter
         private Map<String, Object> additionalProperties = new HashMap<>();
 
         private Builder() {}
@@ -120,7 +119,6 @@ public final class DeleteMethodsResponse {
 
         /**
          * <p>Always <code>true</code>.</p>
-         * <p>Always <code>true</code>.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
@@ -131,7 +129,6 @@ public final class DeleteMethodsResponse {
         }
 
         /**
-         * <p>ID of the deleted payout method, prefixed <code>potk_</code>.</p>
          * <p>ID of the deleted payout method, prefixed <code>potk_</code>.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
@@ -145,6 +142,14 @@ public final class DeleteMethodsResponse {
         @java.lang.Override
         public DeleteMethodsResponse build() {
             return new DeleteMethodsResponse(deleted, id, additionalProperties);
+        }
+
+        @JsonAnySetter
+        private void putAdditionalPropertyFromJson(String key, Object value) {
+            if (key.equalsIgnoreCase("deleted") || key.equalsIgnoreCase("id")) {
+                return;
+            }
+            this.additionalProperties.put(key, value);
         }
 
         @java.lang.Override

@@ -39,6 +39,8 @@ public final class LedgerAccount {
 
     private final Optional<LedgerAccountPayoutAccountDetails> payoutAccountDetails;
 
+    private final boolean payoutQuoteRequired;
+
     private final Optional<OffsetDateTime> settlementTimeAt;
 
     private final Optional<Double> transferFee;
@@ -54,6 +56,7 @@ public final class LedgerAccount {
             LedgerAccountOwner owner,
             Optional<PaymentsApprovalStatuses> paymentsApprovalStatus,
             Optional<LedgerAccountPayoutAccountDetails> payoutAccountDetails,
+            boolean payoutQuoteRequired,
             Optional<OffsetDateTime> settlementTimeAt,
             Optional<Double> transferFee,
             Optional<LedgerAccountTreasuryBalance> treasuryBalance,
@@ -64,6 +67,7 @@ public final class LedgerAccount {
         this.owner = owner;
         this.paymentsApprovalStatus = paymentsApprovalStatus;
         this.payoutAccountDetails = payoutAccountDetails;
+        this.payoutQuoteRequired = payoutQuoteRequired;
         this.settlementTimeAt = settlementTimeAt;
         this.transferFee = transferFee;
         this.treasuryBalance = treasuryBalance;
@@ -122,6 +126,14 @@ public final class LedgerAccount {
             return Optional.empty();
         }
         return payoutAccountDetails;
+    }
+
+    /**
+     * @return Whether legacy payout clients should confirm a provider-backed quote for this account. REST POST /payouts on API version 2026-11-03 or later always requires quote_token from POST /payouts/quotes, regardless of this flag.
+     */
+    @JsonProperty("payout_quote_required")
+    public boolean getPayoutQuoteRequired() {
+        return payoutQuoteRequired;
     }
 
     /**
@@ -205,6 +217,7 @@ public final class LedgerAccount {
                 && owner.equals(other.owner)
                 && paymentsApprovalStatus.equals(other.paymentsApprovalStatus)
                 && payoutAccountDetails.equals(other.payoutAccountDetails)
+                && payoutQuoteRequired == other.payoutQuoteRequired
                 && settlementTimeAt.equals(other.settlementTimeAt)
                 && transferFee.equals(other.transferFee)
                 && treasuryBalance.equals(other.treasuryBalance);
@@ -219,6 +232,7 @@ public final class LedgerAccount {
                 this.owner,
                 this.paymentsApprovalStatus,
                 this.payoutAccountDetails,
+                this.payoutQuoteRequired,
                 this.settlementTimeAt,
                 this.transferFee,
                 this.treasuryBalance);
@@ -253,7 +267,14 @@ public final class LedgerAccount {
         /**
          * <p>The owner of the ledger account.</p>
          */
-        _FinalStage owner(@NotNull LedgerAccountOwner owner);
+        PayoutQuoteRequiredStage owner(@NotNull LedgerAccountOwner owner);
+    }
+
+    public interface PayoutQuoteRequiredStage {
+        /**
+         * <p>Whether legacy payout clients should confirm a provider-backed quote for this account. REST POST /payouts on API version 2026-11-03 or later always requires quote_token from POST /payouts/quotes, regardless of this flag.</p>
+         */
+        _FinalStage payoutQuoteRequired(boolean payoutQuoteRequired);
     }
 
     public interface _FinalStage {
@@ -319,12 +340,15 @@ public final class LedgerAccount {
     }
 
     @JsonIgnoreProperties(ignoreUnknown = true)
-    public static final class Builder implements IdStage, LedgerTypeStage, OwnerStage, _FinalStage {
+    public static final class Builder
+            implements IdStage, LedgerTypeStage, OwnerStage, PayoutQuoteRequiredStage, _FinalStage {
         private String id;
 
         private LedgerTypes ledgerType;
 
         private LedgerAccountOwner owner;
+
+        private boolean payoutQuoteRequired;
 
         private Optional<LedgerAccountTreasuryBalance> treasuryBalance = Optional.empty();
 
@@ -338,7 +362,6 @@ public final class LedgerAccount {
 
         private List<LedgerAccountBalancesItem> balances = new ArrayList<>();
 
-        @JsonAnySetter
         private Map<String, Object> additionalProperties = new HashMap<>();
 
         private Builder() {}
@@ -351,6 +374,7 @@ public final class LedgerAccount {
             owner(other.getOwner());
             paymentsApprovalStatus(other.getPaymentsApprovalStatus());
             payoutAccountDetails(other.getPayoutAccountDetails());
+            payoutQuoteRequired(other.getPayoutQuoteRequired());
             settlementTimeAt(other.getSettlementTimeAt());
             transferFee(other.getTransferFee());
             treasuryBalance(other.getTreasuryBalance());
@@ -358,7 +382,6 @@ public final class LedgerAccount {
         }
 
         /**
-         * <p>The unique identifier for the ledger account.</p>
          * <p>The unique identifier for the ledger account.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
@@ -371,7 +394,6 @@ public final class LedgerAccount {
 
         /**
          * <p>The type of ledger account.</p>
-         * <p>The type of ledger account.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
@@ -383,13 +405,23 @@ public final class LedgerAccount {
 
         /**
          * <p>The owner of the ledger account.</p>
-         * <p>The owner of the ledger account.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
         @JsonSetter("owner")
-        public _FinalStage owner(@NotNull LedgerAccountOwner owner) {
+        public PayoutQuoteRequiredStage owner(@NotNull LedgerAccountOwner owner) {
             this.owner = Objects.requireNonNull(owner, "owner must not be null");
+            return this;
+        }
+
+        /**
+         * <p>Whether legacy payout clients should confirm a provider-backed quote for this account. REST POST /payouts on API version 2026-11-03 or later always requires quote_token from POST /payouts/quotes, regardless of this flag.</p>
+         * @return Reference to {@code this} so that method calls can be chained together.
+         */
+        @java.lang.Override
+        @JsonSetter("payout_quote_required")
+        public _FinalStage payoutQuoteRequired(boolean payoutQuoteRequired) {
+            this.payoutQuoteRequired = payoutQuoteRequired;
             return this;
         }
 
@@ -617,10 +649,28 @@ public final class LedgerAccount {
                     owner,
                     paymentsApprovalStatus,
                     payoutAccountDetails,
+                    payoutQuoteRequired,
                     settlementTimeAt,
                     transferFee,
                     treasuryBalance,
                     additionalProperties);
+        }
+
+        @JsonAnySetter
+        private void putAdditionalPropertyFromJson(String key, Object value) {
+            if (key.equalsIgnoreCase("balances")
+                    || key.equalsIgnoreCase("id")
+                    || key.equalsIgnoreCase("ledger_type")
+                    || key.equalsIgnoreCase("owner")
+                    || key.equalsIgnoreCase("payments_approval_status")
+                    || key.equalsIgnoreCase("payout_account_details")
+                    || key.equalsIgnoreCase("payout_quote_required")
+                    || key.equalsIgnoreCase("settlement_time_at")
+                    || key.equalsIgnoreCase("transfer_fee")
+                    || key.equalsIgnoreCase("treasury_balance")) {
+                return;
+            }
+            this.additionalProperties.put(key, value);
         }
 
         @java.lang.Override

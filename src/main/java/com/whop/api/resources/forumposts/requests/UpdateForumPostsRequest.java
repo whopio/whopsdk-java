@@ -183,7 +183,6 @@ public final class UpdateForumPostsRequest {
 
         private Optional<ForumPostVisibilityTypes> visibility = Optional.empty();
 
-        @JsonAnySetter
         private Map<String, Object> additionalProperties = new HashMap<>();
 
         private Builder() {}
@@ -324,6 +323,18 @@ public final class UpdateForumPostsRequest {
 
         public UpdateForumPostsRequest build() {
             return new UpdateForumPostsRequest(attachments, content, isPinned, title, visibility, additionalProperties);
+        }
+
+        @JsonAnySetter
+        private void putAdditionalPropertyFromJson(String key, Object value) {
+            if (key.equalsIgnoreCase("attachments")
+                    || key.equalsIgnoreCase("content")
+                    || key.equalsIgnoreCase("is_pinned")
+                    || key.equalsIgnoreCase("title")
+                    || key.equalsIgnoreCase("visibility")) {
+                return;
+            }
+            this.additionalProperties.put(key, value);
         }
 
         public Builder additionalProperty(String key, Object value) {

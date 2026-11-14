@@ -9,6 +9,9 @@ import com.fasterxml.jackson.annotation.JsonValue;
 public final class ListBusinessesRequestTier {
     public static final ListBusinessesRequestTier SECOND = new ListBusinessesRequestTier(Value.SECOND, "second");
 
+    public static final ListBusinessesRequestTier BLUEPRINT =
+            new ListBusinessesRequestTier(Value.BLUEPRINT, "blueprint");
+
     public static final ListBusinessesRequestTier FIRST = new ListBusinessesRequestTier(Value.FIRST, "first");
 
     private final Value value;
@@ -46,6 +49,8 @@ public final class ListBusinessesRequestTier {
         switch (value) {
             case SECOND:
                 return visitor.visitSecond();
+            case BLUEPRINT:
+                return visitor.visitBlueprint();
             case FIRST:
                 return visitor.visitFirst();
             case UNKNOWN:
@@ -59,6 +64,8 @@ public final class ListBusinessesRequestTier {
         switch (value) {
             case "second":
                 return SECOND;
+            case "blueprint":
+                return BLUEPRINT;
             case "first":
                 return FIRST;
             default:
@@ -71,6 +78,8 @@ public final class ListBusinessesRequestTier {
 
         SECOND,
 
+        BLUEPRINT,
+
         UNKNOWN
     }
 
@@ -78,6 +87,8 @@ public final class ListBusinessesRequestTier {
         T visitFirst();
 
         T visitSecond();
+
+        T visitBlueprint();
 
         T visitUnknown(String unknownType);
     }

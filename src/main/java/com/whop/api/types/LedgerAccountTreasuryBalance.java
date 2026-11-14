@@ -211,7 +211,6 @@ public final class LedgerAccountTreasuryBalance {
 
         private double totalWithdrawableBalance;
 
-        @JsonAnySetter
         private Map<String, Object> additionalProperties = new HashMap<>();
 
         private Builder() {}
@@ -229,7 +228,6 @@ public final class LedgerAccountTreasuryBalance {
 
         /**
          * <p>The amount of the balance.</p>
-         * <p>The amount of the balance.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
@@ -240,7 +238,6 @@ public final class LedgerAccountTreasuryBalance {
         }
 
         /**
-         * <p>The balance converted to USD.</p>
          * <p>The balance converted to USD.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
@@ -253,7 +250,6 @@ public final class LedgerAccountTreasuryBalance {
 
         /**
          * <p>The currency of the balance.</p>
-         * <p>The currency of the balance.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
@@ -264,7 +260,6 @@ public final class LedgerAccountTreasuryBalance {
         }
 
         /**
-         * <p>The amount of the balance that is pending.</p>
          * <p>The amount of the balance that is pending.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
@@ -277,7 +272,6 @@ public final class LedgerAccountTreasuryBalance {
 
         /**
          * <p>The amount of the balance that is reserved.</p>
-         * <p>The amount of the balance that is reserved.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
@@ -288,7 +282,6 @@ public final class LedgerAccountTreasuryBalance {
         }
 
         /**
-         * <p>The amount of the balance that is withdrawable.</p>
          * <p>The amount of the balance that is withdrawable.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
@@ -309,6 +302,19 @@ public final class LedgerAccountTreasuryBalance {
                     reserveBalance,
                     totalWithdrawableBalance,
                     additionalProperties);
+        }
+
+        @JsonAnySetter
+        private void putAdditionalPropertyFromJson(String key, Object value) {
+            if (key.equalsIgnoreCase("balance")
+                    || key.equalsIgnoreCase("balance_usd")
+                    || key.equalsIgnoreCase("currency")
+                    || key.equalsIgnoreCase("pending_balance")
+                    || key.equalsIgnoreCase("reserve_balance")
+                    || key.equalsIgnoreCase("total_withdrawable_balance")) {
+                return;
+            }
+            this.additionalProperties.put(key, value);
         }
 
         @java.lang.Override

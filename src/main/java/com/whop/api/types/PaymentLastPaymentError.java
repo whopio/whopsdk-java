@@ -130,7 +130,6 @@ public final class PaymentLastPaymentError {
 
         private Optional<String> message = Optional.empty();
 
-        @JsonAnySetter
         private Map<String, Object> additionalProperties = new HashMap<>();
 
         private Builder() {}
@@ -219,6 +218,16 @@ public final class PaymentLastPaymentError {
 
         public PaymentLastPaymentError build() {
             return new PaymentLastPaymentError(code, declineCode, message, additionalProperties);
+        }
+
+        @JsonAnySetter
+        private void putAdditionalPropertyFromJson(String key, Object value) {
+            if (key.equalsIgnoreCase("code")
+                    || key.equalsIgnoreCase("decline_code")
+                    || key.equalsIgnoreCase("message")) {
+                return;
+            }
+            this.additionalProperties.put(key, value);
         }
 
         public Builder additionalProperty(String key, Object value) {

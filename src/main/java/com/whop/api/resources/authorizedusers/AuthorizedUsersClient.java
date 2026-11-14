@@ -31,7 +31,7 @@ public class AuthorizedUsersClient {
     }
 
     /**
-     * Returns a paginated list of authorized team members for a company, with optional filtering by user, role, and creation date.
+     * Lists the authorized users on an account's team.
      * <p>Required permissions:</p>
      * <ul>
      * <li><code>company:authorized_user:read</code></li>
@@ -43,7 +43,7 @@ public class AuthorizedUsersClient {
     }
 
     /**
-     * Returns a paginated list of authorized team members for a company, with optional filtering by user, role, and creation date.
+     * Lists the authorized users on an account's team.
      * <p>Required permissions:</p>
      * <ul>
      * <li><code>company:authorized_user:read</code></li>
@@ -55,7 +55,7 @@ public class AuthorizedUsersClient {
     }
 
     /**
-     * Returns a paginated list of authorized team members for a company, with optional filtering by user, role, and creation date.
+     * Lists the authorized users on an account's team.
      * <p>Required permissions:</p>
      * <ul>
      * <li><code>company:authorized_user:read</code></li>
@@ -67,7 +67,7 @@ public class AuthorizedUsersClient {
     }
 
     /**
-     * Returns a paginated list of authorized team members for a company, with optional filtering by user, role, and creation date.
+     * Lists the authorized users on an account's team.
      * <p>Required permissions:</p>
      * <ul>
      * <li><code>company:authorized_user:read</code></li>
@@ -80,7 +80,7 @@ public class AuthorizedUsersClient {
     }
 
     /**
-     * Add a new authorized user to a company.
+     * Adds a user to an account's team as an authorized user with the given role.
      * <p>Required permissions:</p>
      * <ul>
      * <li><code>authorized_user:create</code></li>
@@ -92,7 +92,7 @@ public class AuthorizedUsersClient {
     }
 
     /**
-     * Add a new authorized user to a company.
+     * Adds a user to an account's team as an authorized user with the given role.
      * <p>Required permissions:</p>
      * <ul>
      * <li><code>authorized_user:create</code></li>
@@ -152,7 +152,7 @@ public class AuthorizedUsersClient {
     }
 
     /**
-     * Remove an authorized user from a company.
+     * Removes an authorized user from an account's team.
      * <p>Required permissions:</p>
      * <ul>
      * <li><code>authorized_user:delete</code></li>
@@ -163,7 +163,7 @@ public class AuthorizedUsersClient {
     }
 
     /**
-     * Remove an authorized user from a company.
+     * Removes an authorized user from an account's team.
      * <p>Required permissions:</p>
      * <ul>
      * <li><code>authorized_user:delete</code></li>
@@ -174,7 +174,7 @@ public class AuthorizedUsersClient {
     }
 
     /**
-     * Remove an authorized user from a company.
+     * Removes an authorized user from an account's team.
      * <p>Required permissions:</p>
      * <ul>
      * <li><code>authorized_user:delete</code></li>
@@ -185,7 +185,7 @@ public class AuthorizedUsersClient {
     }
 
     /**
-     * Remove an authorized user from a company.
+     * Removes an authorized user from an account's team.
      * <p>Required permissions:</p>
      * <ul>
      * <li><code>authorized_user:delete</code></li>

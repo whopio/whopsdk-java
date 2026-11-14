@@ -165,7 +165,6 @@ public final class UpdateApiKeysRequest {
 
         private Optional<UpdateApiKeysRequestPermissions> permissions = Optional.empty();
 
-        @JsonAnySetter
         private Map<String, Object> additionalProperties = new HashMap<>();
 
         private Builder() {}
@@ -285,6 +284,18 @@ public final class UpdateApiKeysRequest {
         public UpdateApiKeysRequest build() {
             return new UpdateApiKeysRequest(
                     apiVersionDate, expiresAt, ipAllowlist, name, permissions, additionalProperties);
+        }
+
+        @JsonAnySetter
+        private void putAdditionalPropertyFromJson(String key, Object value) {
+            if (key.equalsIgnoreCase("api_version_date")
+                    || key.equalsIgnoreCase("expires_at")
+                    || key.equalsIgnoreCase("ip_allowlist")
+                    || key.equalsIgnoreCase("name")
+                    || key.equalsIgnoreCase("permissions")) {
+                return;
+            }
+            this.additionalProperties.put(key, value);
         }
 
         public Builder additionalProperty(String key, Object value) {

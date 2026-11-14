@@ -84,7 +84,6 @@ public final class PulseEventsResponseDataItemUser {
 
         private Optional<String> country = Optional.empty();
 
-        @JsonAnySetter
         private Map<String, Object> additionalProperties = new HashMap<>();
 
         private Builder() {}
@@ -125,6 +124,14 @@ public final class PulseEventsResponseDataItemUser {
 
         public PulseEventsResponseDataItemUser build() {
             return new PulseEventsResponseDataItemUser(city, country, additionalProperties);
+        }
+
+        @JsonAnySetter
+        private void putAdditionalPropertyFromJson(String key, Object value) {
+            if (key.equalsIgnoreCase("city") || key.equalsIgnoreCase("country")) {
+                return;
+            }
+            this.additionalProperties.put(key, value);
         }
 
         public Builder additionalProperty(String key, Object value) {

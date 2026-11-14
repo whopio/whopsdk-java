@@ -18,12 +18,23 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
-import org.jetbrains.annotations.NotNull;
 
 @JsonInclude(JsonInclude.Include.NON_ABSENT)
 @JsonDeserialize(builder = ListVerificationsRequest.Builder.class)
 public final class ListVerificationsRequest {
-    private final String accountId;
+    private final Optional<String> accountId;
+
+    private final Optional<String> userId;
+
+    private final Optional<Boolean> includeSubaccounts;
+
+    private final Optional<Integer> first;
+
+    private final Optional<String> after;
+
+    private final Optional<Integer> last;
+
+    private final Optional<String> before;
 
     private final Optional<ListVerificationsRequestOrder> order;
 
@@ -32,22 +43,82 @@ public final class ListVerificationsRequest {
     private final Map<String, Object> additionalProperties;
 
     private ListVerificationsRequest(
-            String accountId,
+            Optional<String> accountId,
+            Optional<String> userId,
+            Optional<Boolean> includeSubaccounts,
+            Optional<Integer> first,
+            Optional<String> after,
+            Optional<Integer> last,
+            Optional<String> before,
             Optional<ListVerificationsRequestOrder> order,
             Optional<ListVerificationsRequestDirection> direction,
             Map<String, Object> additionalProperties) {
         this.accountId = accountId;
+        this.userId = userId;
+        this.includeSubaccounts = includeSubaccounts;
+        this.first = first;
+        this.after = after;
+        this.last = last;
+        this.before = before;
         this.order = order;
         this.direction = direction;
         this.additionalProperties = additionalProperties;
     }
 
     /**
-     * @return Account or user ID whose verifications you want to list. Use a <code>biz_</code> account ID, or the caller's <code>user_</code> ID for personal verifications.
+     * @return Business account whose verifications you want to list, prefixed <code>biz_</code>. Provide this or <code>user_id</code>.
      */
     @JsonProperty("account_id")
-    public String getAccountId() {
+    public Optional<String> getAccountId() {
         return accountId;
+    }
+
+    /**
+     * @return The caller's own user ID, prefixed <code>user_</code>, to list personal verifications. Provide this or <code>account_id</code>.
+     */
+    @JsonProperty("user_id")
+    public Optional<String> getUserId() {
+        return userId;
+    }
+
+    /**
+     * @return Also cover the account's subaccounts. Requires <code>account_id</code>, and is a 400 without it. Lists the verifications of the account and every subaccount in account order, oldest account first, paging forward; <code>status</code>, <code>order</code>, <code>direction</code>, <code>last</code> and <code>before</code> are a 400. Leaves out removed subaccounts and ones you can't read verifications on. A page can hold fewer than <code>first</code> verifications while <code>has_next_page</code> is <code>true</code>; keep following <code>end_cursor</code>. On a subaccount, lists only that account's verifications.
+     */
+    @JsonProperty("include_subaccounts")
+    public Optional<Boolean> getIncludeSubaccounts() {
+        return includeSubaccounts;
+    }
+
+    /**
+     * @return Number of results to return from the start of the range.
+     */
+    @JsonProperty("first")
+    public Optional<Integer> getFirst() {
+        return first;
+    }
+
+    /**
+     * @return Return results after this cursor. Use <code>page_info.end_cursor</code> from the previous response to fetch the next page.
+     */
+    @JsonProperty("after")
+    public Optional<String> getAfter() {
+        return after;
+    }
+
+    /**
+     * @return Number of results to return from the end of the range.
+     */
+    @JsonProperty("last")
+    public Optional<Integer> getLast() {
+        return last;
+    }
+
+    /**
+     * @return Return results before this cursor. Use <code>page_info.start_cursor</code> from the previous response to fetch the previous page.
+     */
+    @JsonProperty("before")
+    public Optional<String> getBefore() {
+        return before;
     }
 
     /**
@@ -78,12 +149,29 @@ public final class ListVerificationsRequest {
     }
 
     private boolean equalTo(ListVerificationsRequest other) {
-        return accountId.equals(other.accountId) && order.equals(other.order) && direction.equals(other.direction);
+        return accountId.equals(other.accountId)
+                && userId.equals(other.userId)
+                && includeSubaccounts.equals(other.includeSubaccounts)
+                && first.equals(other.first)
+                && after.equals(other.after)
+                && last.equals(other.last)
+                && before.equals(other.before)
+                && order.equals(other.order)
+                && direction.equals(other.direction);
     }
 
     @java.lang.Override
     public int hashCode() {
-        return Objects.hash(this.accountId, this.order, this.direction);
+        return Objects.hash(
+                this.accountId,
+                this.userId,
+                this.includeSubaccounts,
+                this.first,
+                this.after,
+                this.last,
+                this.before,
+                this.order,
+                this.direction);
     }
 
     @java.lang.Override
@@ -91,126 +179,208 @@ public final class ListVerificationsRequest {
         return ObjectMappers.stringify(this);
     }
 
-    public static AccountIdStage builder() {
+    public static Builder builder() {
         return new Builder();
     }
 
-    public interface AccountIdStage {
-        /**
-         * <p>Account or user ID whose verifications you want to list. Use a <code>biz_</code> account ID, or the caller's <code>user_</code> ID for personal verifications.</p>
-         */
-        _FinalStage accountId(@NotNull String accountId);
-
-        Builder from(ListVerificationsRequest other);
-    }
-
-    public interface _FinalStage {
-        ListVerificationsRequest build();
-
-        _FinalStage additionalProperty(String key, Object value);
-
-        _FinalStage additionalProperties(Map<String, Object> additionalProperties);
-
-        /**
-         * <p>Field used to sort returned verifications.</p>
-         */
-        _FinalStage order(Optional<ListVerificationsRequestOrder> order);
-
-        _FinalStage order(ListVerificationsRequestOrder order);
-
-        /**
-         * <p>Sort direction for returned verifications.</p>
-         */
-        _FinalStage direction(Optional<ListVerificationsRequestDirection> direction);
-
-        _FinalStage direction(ListVerificationsRequestDirection direction);
-    }
-
     @JsonIgnoreProperties(ignoreUnknown = true)
-    public static final class Builder implements AccountIdStage, _FinalStage {
-        private String accountId;
+    public static final class Builder {
+        private Optional<String> accountId = Optional.empty();
 
-        private Optional<ListVerificationsRequestDirection> direction = Optional.empty();
+        private Optional<String> userId = Optional.empty();
+
+        private Optional<Boolean> includeSubaccounts = Optional.empty();
+
+        private Optional<Integer> first = Optional.empty();
+
+        private Optional<String> after = Optional.empty();
+
+        private Optional<Integer> last = Optional.empty();
+
+        private Optional<String> before = Optional.empty();
 
         private Optional<ListVerificationsRequestOrder> order = Optional.empty();
 
-        @JsonAnySetter
+        private Optional<ListVerificationsRequestDirection> direction = Optional.empty();
+
         private Map<String, Object> additionalProperties = new HashMap<>();
 
         private Builder() {}
 
-        @java.lang.Override
         public Builder from(ListVerificationsRequest other) {
             accountId(other.getAccountId());
+            userId(other.getUserId());
+            includeSubaccounts(other.getIncludeSubaccounts());
+            first(other.getFirst());
+            after(other.getAfter());
+            last(other.getLast());
+            before(other.getBefore());
             order(other.getOrder());
             direction(other.getDirection());
             return this;
         }
 
         /**
-         * <p>Account or user ID whose verifications you want to list. Use a <code>biz_</code> account ID, or the caller's <code>user_</code> ID for personal verifications.</p>
-         * <p>Account or user ID whose verifications you want to list. Use a <code>biz_</code> account ID, or the caller's <code>user_</code> ID for personal verifications.</p>
-         * @return Reference to {@code this} so that method calls can be chained together.
+         * <p>Business account whose verifications you want to list, prefixed <code>biz_</code>. Provide this or <code>user_id</code>.</p>
          */
-        @java.lang.Override
-        @JsonSetter("account_id")
-        public _FinalStage accountId(@NotNull String accountId) {
-            this.accountId = Objects.requireNonNull(accountId, "accountId must not be null");
+        @JsonSetter(value = "account_id", nulls = Nulls.SKIP)
+        public Builder accountId(Optional<String> accountId) {
+            this.accountId = accountId;
+            return this;
+        }
+
+        public Builder accountId(String accountId) {
+            this.accountId = Optional.ofNullable(accountId);
             return this;
         }
 
         /**
-         * <p>Sort direction for returned verifications.</p>
-         * @return Reference to {@code this} so that method calls can be chained together.
+         * <p>The caller's own user ID, prefixed <code>user_</code>, to list personal verifications. Provide this or <code>account_id</code>.</p>
          */
-        @java.lang.Override
-        public _FinalStage direction(ListVerificationsRequestDirection direction) {
-            this.direction = Optional.ofNullable(direction);
+        @JsonSetter(value = "user_id", nulls = Nulls.SKIP)
+        public Builder userId(Optional<String> userId) {
+            this.userId = userId;
+            return this;
+        }
+
+        public Builder userId(String userId) {
+            this.userId = Optional.ofNullable(userId);
             return this;
         }
 
         /**
-         * <p>Sort direction for returned verifications.</p>
+         * <p>Also cover the account's subaccounts. Requires <code>account_id</code>, and is a 400 without it. Lists the verifications of the account and every subaccount in account order, oldest account first, paging forward; <code>status</code>, <code>order</code>, <code>direction</code>, <code>last</code> and <code>before</code> are a 400. Leaves out removed subaccounts and ones you can't read verifications on. A page can hold fewer than <code>first</code> verifications while <code>has_next_page</code> is <code>true</code>; keep following <code>end_cursor</code>. On a subaccount, lists only that account's verifications.</p>
          */
-        @java.lang.Override
-        @JsonSetter(value = "direction", nulls = Nulls.SKIP)
-        public _FinalStage direction(Optional<ListVerificationsRequestDirection> direction) {
-            this.direction = direction;
+        @JsonSetter(value = "include_subaccounts", nulls = Nulls.SKIP)
+        public Builder includeSubaccounts(Optional<Boolean> includeSubaccounts) {
+            this.includeSubaccounts = includeSubaccounts;
+            return this;
+        }
+
+        public Builder includeSubaccounts(Boolean includeSubaccounts) {
+            this.includeSubaccounts = Optional.ofNullable(includeSubaccounts);
+            return this;
+        }
+
+        /**
+         * <p>Number of results to return from the start of the range.</p>
+         */
+        @JsonSetter(value = "first", nulls = Nulls.SKIP)
+        public Builder first(Optional<Integer> first) {
+            this.first = first;
+            return this;
+        }
+
+        public Builder first(Integer first) {
+            this.first = Optional.ofNullable(first);
+            return this;
+        }
+
+        /**
+         * <p>Return results after this cursor. Use <code>page_info.end_cursor</code> from the previous response to fetch the next page.</p>
+         */
+        @JsonSetter(value = "after", nulls = Nulls.SKIP)
+        public Builder after(Optional<String> after) {
+            this.after = after;
+            return this;
+        }
+
+        public Builder after(String after) {
+            this.after = Optional.ofNullable(after);
+            return this;
+        }
+
+        /**
+         * <p>Number of results to return from the end of the range.</p>
+         */
+        @JsonSetter(value = "last", nulls = Nulls.SKIP)
+        public Builder last(Optional<Integer> last) {
+            this.last = last;
+            return this;
+        }
+
+        public Builder last(Integer last) {
+            this.last = Optional.ofNullable(last);
+            return this;
+        }
+
+        /**
+         * <p>Return results before this cursor. Use <code>page_info.start_cursor</code> from the previous response to fetch the previous page.</p>
+         */
+        @JsonSetter(value = "before", nulls = Nulls.SKIP)
+        public Builder before(Optional<String> before) {
+            this.before = before;
+            return this;
+        }
+
+        public Builder before(String before) {
+            this.before = Optional.ofNullable(before);
             return this;
         }
 
         /**
          * <p>Field used to sort returned verifications.</p>
-         * @return Reference to {@code this} so that method calls can be chained together.
          */
-        @java.lang.Override
-        public _FinalStage order(ListVerificationsRequestOrder order) {
+        @JsonSetter(value = "order", nulls = Nulls.SKIP)
+        public Builder order(Optional<ListVerificationsRequestOrder> order) {
+            this.order = order;
+            return this;
+        }
+
+        public Builder order(ListVerificationsRequestOrder order) {
             this.order = Optional.ofNullable(order);
             return this;
         }
 
         /**
-         * <p>Field used to sort returned verifications.</p>
+         * <p>Sort direction for returned verifications.</p>
          */
-        @java.lang.Override
-        @JsonSetter(value = "order", nulls = Nulls.SKIP)
-        public _FinalStage order(Optional<ListVerificationsRequestOrder> order) {
-            this.order = order;
+        @JsonSetter(value = "direction", nulls = Nulls.SKIP)
+        public Builder direction(Optional<ListVerificationsRequestDirection> direction) {
+            this.direction = direction;
             return this;
         }
 
-        @java.lang.Override
-        public ListVerificationsRequest build() {
-            return new ListVerificationsRequest(accountId, order, direction, additionalProperties);
+        public Builder direction(ListVerificationsRequestDirection direction) {
+            this.direction = Optional.ofNullable(direction);
+            return this;
         }
 
-        @java.lang.Override
+        public ListVerificationsRequest build() {
+            return new ListVerificationsRequest(
+                    accountId,
+                    userId,
+                    includeSubaccounts,
+                    first,
+                    after,
+                    last,
+                    before,
+                    order,
+                    direction,
+                    additionalProperties);
+        }
+
+        @JsonAnySetter
+        private void putAdditionalPropertyFromJson(String key, Object value) {
+            if (key.equalsIgnoreCase("account_id")
+                    || key.equalsIgnoreCase("user_id")
+                    || key.equalsIgnoreCase("include_subaccounts")
+                    || key.equalsIgnoreCase("first")
+                    || key.equalsIgnoreCase("after")
+                    || key.equalsIgnoreCase("last")
+                    || key.equalsIgnoreCase("before")
+                    || key.equalsIgnoreCase("order")
+                    || key.equalsIgnoreCase("direction")) {
+                return;
+            }
+            this.additionalProperties.put(key, value);
+        }
+
         public Builder additionalProperty(String key, Object value) {
             this.additionalProperties.put(key, value);
             return this;
         }
 
-        @java.lang.Override
         public Builder additionalProperties(Map<String, Object> additionalProperties) {
             this.additionalProperties.putAll(additionalProperties);
             return this;

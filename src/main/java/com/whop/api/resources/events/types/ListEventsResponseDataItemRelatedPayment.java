@@ -15,7 +15,9 @@ import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.whop.api.core.Nullable;
 import com.whop.api.core.NullableNonemptyFilter;
 import com.whop.api.core.ObjectMappers;
+import com.whop.api.types.ReceiptLineItem;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
@@ -29,6 +31,8 @@ public final class ListEventsResponseDataItemRelatedPayment {
 
     private final Optional<String> id;
 
+    private final Optional<List<ReceiptLineItem>> lineItems;
+
     private final Optional<String> provider;
 
     private final Map<String, Object> additionalProperties;
@@ -37,11 +41,13 @@ public final class ListEventsResponseDataItemRelatedPayment {
             Optional<String> cardBrand,
             Optional<String> cardLast4,
             Optional<String> id,
+            Optional<List<ReceiptLineItem>> lineItems,
             Optional<String> provider,
             Map<String, Object> additionalProperties) {
         this.cardBrand = cardBrand;
         this.cardLast4 = cardLast4;
         this.id = id;
+        this.lineItems = lineItems;
         this.provider = provider;
         this.additionalProperties = additionalProperties;
     }
@@ -65,6 +71,14 @@ public final class ListEventsResponseDataItemRelatedPayment {
     @JsonProperty("id")
     public Optional<String> getId() {
         return id;
+    }
+
+    /**
+     * @return Everything this payment charged for, in purchase order, including quantities. Older payments fall back to their original variant.
+     */
+    @JsonProperty("line_items")
+    public Optional<List<ReceiptLineItem>> getLineItems() {
+        return lineItems;
     }
 
     @JsonIgnore
@@ -109,12 +123,13 @@ public final class ListEventsResponseDataItemRelatedPayment {
         return cardBrand.equals(other.cardBrand)
                 && cardLast4.equals(other.cardLast4)
                 && id.equals(other.id)
+                && lineItems.equals(other.lineItems)
                 && provider.equals(other.provider);
     }
 
     @java.lang.Override
     public int hashCode() {
-        return Objects.hash(this.cardBrand, this.cardLast4, this.id, this.provider);
+        return Objects.hash(this.cardBrand, this.cardLast4, this.id, this.lineItems, this.provider);
     }
 
     @java.lang.Override
@@ -134,9 +149,10 @@ public final class ListEventsResponseDataItemRelatedPayment {
 
         private Optional<String> id = Optional.empty();
 
+        private Optional<List<ReceiptLineItem>> lineItems = Optional.empty();
+
         private Optional<String> provider = Optional.empty();
 
-        @JsonAnySetter
         private Map<String, Object> additionalProperties = new HashMap<>();
 
         private Builder() {}
@@ -145,6 +161,7 @@ public final class ListEventsResponseDataItemRelatedPayment {
             cardBrand(other.getCardBrand());
             cardLast4(other.getCardLast4());
             id(other.getId());
+            lineItems(other.getLineItems());
             provider(other.getProvider());
             return this;
         }
@@ -204,6 +221,20 @@ public final class ListEventsResponseDataItemRelatedPayment {
             return this;
         }
 
+        /**
+         * <p>Everything this payment charged for, in purchase order, including quantities. Older payments fall back to their original variant.</p>
+         */
+        @JsonSetter(value = "line_items", nulls = Nulls.SKIP)
+        public Builder lineItems(Optional<List<ReceiptLineItem>> lineItems) {
+            this.lineItems = lineItems;
+            return this;
+        }
+
+        public Builder lineItems(List<ReceiptLineItem> lineItems) {
+            this.lineItems = Optional.ofNullable(lineItems);
+            return this;
+        }
+
         @JsonSetter(value = "provider", nulls = Nulls.SKIP)
         public Builder provider(Optional<String> provider) {
             this.provider = provider;
@@ -228,7 +259,19 @@ public final class ListEventsResponseDataItemRelatedPayment {
 
         public ListEventsResponseDataItemRelatedPayment build() {
             return new ListEventsResponseDataItemRelatedPayment(
-                    cardBrand, cardLast4, id, provider, additionalProperties);
+                    cardBrand, cardLast4, id, lineItems, provider, additionalProperties);
+        }
+
+        @JsonAnySetter
+        private void putAdditionalPropertyFromJson(String key, Object value) {
+            if (key.equalsIgnoreCase("card_brand")
+                    || key.equalsIgnoreCase("card_last4")
+                    || key.equalsIgnoreCase("id")
+                    || key.equalsIgnoreCase("line_items")
+                    || key.equalsIgnoreCase("provider")) {
+                return;
+            }
+            this.additionalProperties.put(key, value);
         }
 
         public Builder additionalProperty(String key, Object value) {

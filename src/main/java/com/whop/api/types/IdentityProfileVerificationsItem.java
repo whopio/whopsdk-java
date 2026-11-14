@@ -238,7 +238,6 @@ public final class IdentityProfileVerificationsItem {
 
         private Optional<VerificationErrorCodes> lastErrorCode = Optional.empty();
 
-        @JsonAnySetter
         private Map<String, Object> additionalProperties = new HashMap<>();
 
         private Builder() {}
@@ -256,7 +255,6 @@ public final class IdentityProfileVerificationsItem {
 
         /**
          * <p>When the verification record was created.</p>
-         * <p>When the verification record was created.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
@@ -268,7 +266,6 @@ public final class IdentityProfileVerificationsItem {
 
         /**
          * <p>The numeric id of the verification record.</p>
-         * <p>The numeric id of the verification record.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
@@ -279,7 +276,6 @@ public final class IdentityProfileVerificationsItem {
         }
 
         /**
-         * <p>The current status of this verification session.</p>
          * <p>The current status of this verification session.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
@@ -402,6 +398,19 @@ public final class IdentityProfileVerificationsItem {
         public IdentityProfileVerificationsItem build() {
             return new IdentityProfileVerificationsItem(
                     createdAt, id, lastErrorCode, lastErrorReason, sessionUrl, status, additionalProperties);
+        }
+
+        @JsonAnySetter
+        private void putAdditionalPropertyFromJson(String key, Object value) {
+            if (key.equalsIgnoreCase("created_at")
+                    || key.equalsIgnoreCase("id")
+                    || key.equalsIgnoreCase("last_error_code")
+                    || key.equalsIgnoreCase("last_error_reason")
+                    || key.equalsIgnoreCase("session_url")
+                    || key.equalsIgnoreCase("status")) {
+                return;
+            }
+            this.additionalProperties.put(key, value);
         }
 
         @java.lang.Override

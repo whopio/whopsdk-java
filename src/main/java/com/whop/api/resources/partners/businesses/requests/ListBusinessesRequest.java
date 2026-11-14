@@ -12,6 +12,7 @@ import com.fasterxml.jackson.annotation.JsonSetter;
 import com.fasterxml.jackson.annotation.Nulls;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.whop.api.core.ObjectMappers;
+import com.whop.api.resources.partners.businesses.types.ListBusinessesRequestAdvanceStatus;
 import com.whop.api.resources.partners.businesses.types.ListBusinessesRequestDirection;
 import com.whop.api.resources.partners.businesses.types.ListBusinessesRequestOrder;
 import com.whop.api.resources.partners.businesses.types.ListBusinessesRequestStatus;
@@ -24,6 +25,10 @@ import java.util.Optional;
 @JsonInclude(JsonInclude.Include.NON_ABSENT)
 @JsonDeserialize(builder = ListBusinessesRequest.Builder.class)
 public final class ListBusinessesRequest {
+    private final Optional<String> referringAccountId;
+
+    private final Optional<ListBusinessesRequestAdvanceStatus> advanceStatus;
+
     private final Optional<ListBusinessesRequestStatus> status;
 
     private final Optional<Boolean> hasEarnings;
@@ -36,6 +41,8 @@ public final class ListBusinessesRequest {
 
     private final Optional<String> before;
 
+    private final Optional<Boolean> includeTotalCount;
+
     private final Optional<ListBusinessesRequestOrder> order;
 
     private final Optional<ListBusinessesRequestDirection> direction;
@@ -44,43 +51,81 @@ public final class ListBusinessesRequest {
 
     private final Optional<String> createdAfter;
 
+    private final Optional<String> firstSaleBefore;
+
+    private final Optional<String> firstSaleAfter;
+
     private final Optional<String> referredUserId;
 
     private final Optional<String> referredUsername;
 
     private final Optional<ListBusinessesRequestTier> tier;
 
+    private final Optional<String> businessPrefixQuery;
+
+    private final Optional<String> earningPartnerId;
+
     private final Map<String, Object> additionalProperties;
 
     private ListBusinessesRequest(
+            Optional<String> referringAccountId,
+            Optional<ListBusinessesRequestAdvanceStatus> advanceStatus,
             Optional<ListBusinessesRequestStatus> status,
             Optional<Boolean> hasEarnings,
             Optional<Integer> first,
             Optional<String> after,
             Optional<Integer> last,
             Optional<String> before,
+            Optional<Boolean> includeTotalCount,
             Optional<ListBusinessesRequestOrder> order,
             Optional<ListBusinessesRequestDirection> direction,
             Optional<String> createdBefore,
             Optional<String> createdAfter,
+            Optional<String> firstSaleBefore,
+            Optional<String> firstSaleAfter,
             Optional<String> referredUserId,
             Optional<String> referredUsername,
             Optional<ListBusinessesRequestTier> tier,
+            Optional<String> businessPrefixQuery,
+            Optional<String> earningPartnerId,
             Map<String, Object> additionalProperties) {
+        this.referringAccountId = referringAccountId;
+        this.advanceStatus = advanceStatus;
         this.status = status;
         this.hasEarnings = hasEarnings;
         this.first = first;
         this.after = after;
         this.last = last;
         this.before = before;
+        this.includeTotalCount = includeTotalCount;
         this.order = order;
         this.direction = direction;
         this.createdBefore = createdBefore;
         this.createdAfter = createdAfter;
+        this.firstSaleBefore = firstSaleBefore;
+        this.firstSaleAfter = firstSaleAfter;
         this.referredUserId = referredUserId;
         this.referredUsername = referredUsername;
         this.tier = tier;
+        this.businessPrefixQuery = businessPrefixQuery;
+        this.earningPartnerId = earningPartnerId;
         this.additionalProperties = additionalProperties;
+    }
+
+    /**
+     * @return List the referrals this business's team members made, past members included, instead of the authenticated user's own. Requires company:basic:read on that business, which every team member holds, and cannot be combined with user_id. The owner role reads every referral; anyone else reads only the referrals made by themselves and by the people under them in the org chart.
+     */
+    @JsonProperty("referring_account_id")
+    public Optional<String> getReferringAccountId() {
+        return referringAccountId;
+    }
+
+    /**
+     * @return Filter the authenticated partner's CPA offers by status, or with referring_account_id, the CPA terms of the reps the caller manages. Use offered for every state after qualification.
+     */
+    @JsonProperty("advance_status")
+    public Optional<ListBusinessesRequestAdvanceStatus> getAdvanceStatus() {
+        return advanceStatus;
     }
 
     /**
@@ -100,7 +145,7 @@ public final class ListBusinessesRequest {
     }
 
     /**
-     * @return Number of partner businesses to return from the start of the window.
+     * @return Number of results to return from the start of the range.
      */
     @JsonProperty("first")
     public Optional<Integer> getFirst() {
@@ -108,7 +153,7 @@ public final class ListBusinessesRequest {
     }
 
     /**
-     * @return Cursor to fetch the page after (from page_info.end_cursor).
+     * @return Return results after this cursor. Use <code>page_info.end_cursor</code> from the previous response to fetch the next page.
      */
     @JsonProperty("after")
     public Optional<String> getAfter() {
@@ -116,7 +161,7 @@ public final class ListBusinessesRequest {
     }
 
     /**
-     * @return Number of partner businesses to return from the end of the window.
+     * @return Number of results to return from the end of the range.
      */
     @JsonProperty("last")
     public Optional<Integer> getLast() {
@@ -124,11 +169,19 @@ public final class ListBusinessesRequest {
     }
 
     /**
-     * @return Cursor to fetch the page before (from page_info.start_cursor).
+     * @return Return results before this cursor. Use <code>page_info.start_cursor</code> from the previous response to fetch the previous page.
      */
     @JsonProperty("before")
     public Optional<String> getBefore() {
         return before;
+    }
+
+    /**
+     * @return Set to <code>true</code> to return the number of matching results in <code>page_info.total_count</code>. Send <code>first=0</code> as well to return the count without any results.
+     */
+    @JsonProperty("include_total_count")
+    public Optional<Boolean> getIncludeTotalCount() {
+        return includeTotalCount;
     }
 
     /**
@@ -164,6 +217,22 @@ public final class ListBusinessesRequest {
     }
 
     /**
+     * @return Only return partner businesses whose first paid sale above zero happened before this timestamp.
+     */
+    @JsonProperty("first_sale_before")
+    public Optional<String> getFirstSaleBefore() {
+        return firstSaleBefore;
+    }
+
+    /**
+     * @return Only return partner businesses whose first paid sale above zero happened after this timestamp. Combined with first_sale_before, this is the net new set: businesses that processed their first $1 inside the window.
+     */
+    @JsonProperty("first_sale_after")
+    public Optional<String> getFirstSaleAfter() {
+        return firstSaleAfter;
+    }
+
+    /**
      * @return Filter to referrals attributed to this user. For first-tier referrals, this is the referred account owner; for second-tier referrals, this is the partner you recruited.
      */
     @JsonProperty("referred_user_id")
@@ -180,11 +249,27 @@ public final class ListBusinessesRequest {
     }
 
     /**
-     * @return Filter to only first-tier referrals or only second-tier referrals.
+     * @return Filter to referrals from a single tier: first, second, or blueprint.
      */
     @JsonProperty("tier")
     public Optional<ListBusinessesRequestTier> getTier() {
         return tier;
+    }
+
+    /**
+     * @return Case-insensitive business-name prefix, or an exact <code>biz_</code> account ID. Surrounding whitespace is ignored; blank values apply no filter.
+     */
+    @JsonProperty("business_prefix_query")
+    public Optional<String> getBusinessPrefixQuery() {
+        return businessPrefixQuery;
+    }
+
+    /**
+     * @return Only the referrals this team member made, plus the ones they were added to as a deal participant. User ID, prefixed <code>user_</code>. Requires <code>referring_account_id</code>.
+     */
+    @JsonProperty("earning_partner_id")
+    public Optional<String> getEarningPartnerId() {
+        return earningPartnerId;
     }
 
     @java.lang.Override
@@ -199,37 +284,51 @@ public final class ListBusinessesRequest {
     }
 
     private boolean equalTo(ListBusinessesRequest other) {
-        return status.equals(other.status)
+        return referringAccountId.equals(other.referringAccountId)
+                && advanceStatus.equals(other.advanceStatus)
+                && status.equals(other.status)
                 && hasEarnings.equals(other.hasEarnings)
                 && first.equals(other.first)
                 && after.equals(other.after)
                 && last.equals(other.last)
                 && before.equals(other.before)
+                && includeTotalCount.equals(other.includeTotalCount)
                 && order.equals(other.order)
                 && direction.equals(other.direction)
                 && createdBefore.equals(other.createdBefore)
                 && createdAfter.equals(other.createdAfter)
+                && firstSaleBefore.equals(other.firstSaleBefore)
+                && firstSaleAfter.equals(other.firstSaleAfter)
                 && referredUserId.equals(other.referredUserId)
                 && referredUsername.equals(other.referredUsername)
-                && tier.equals(other.tier);
+                && tier.equals(other.tier)
+                && businessPrefixQuery.equals(other.businessPrefixQuery)
+                && earningPartnerId.equals(other.earningPartnerId);
     }
 
     @java.lang.Override
     public int hashCode() {
         return Objects.hash(
+                this.referringAccountId,
+                this.advanceStatus,
                 this.status,
                 this.hasEarnings,
                 this.first,
                 this.after,
                 this.last,
                 this.before,
+                this.includeTotalCount,
                 this.order,
                 this.direction,
                 this.createdBefore,
                 this.createdAfter,
+                this.firstSaleBefore,
+                this.firstSaleAfter,
                 this.referredUserId,
                 this.referredUsername,
-                this.tier);
+                this.tier,
+                this.businessPrefixQuery,
+                this.earningPartnerId);
     }
 
     @java.lang.Override
@@ -243,6 +342,10 @@ public final class ListBusinessesRequest {
 
     @JsonIgnoreProperties(ignoreUnknown = true)
     public static final class Builder {
+        private Optional<String> referringAccountId = Optional.empty();
+
+        private Optional<ListBusinessesRequestAdvanceStatus> advanceStatus = Optional.empty();
+
         private Optional<ListBusinessesRequestStatus> status = Optional.empty();
 
         private Optional<Boolean> hasEarnings = Optional.empty();
@@ -255,6 +358,8 @@ public final class ListBusinessesRequest {
 
         private Optional<String> before = Optional.empty();
 
+        private Optional<Boolean> includeTotalCount = Optional.empty();
+
         private Optional<ListBusinessesRequestOrder> order = Optional.empty();
 
         private Optional<ListBusinessesRequestDirection> direction = Optional.empty();
@@ -263,31 +368,73 @@ public final class ListBusinessesRequest {
 
         private Optional<String> createdAfter = Optional.empty();
 
+        private Optional<String> firstSaleBefore = Optional.empty();
+
+        private Optional<String> firstSaleAfter = Optional.empty();
+
         private Optional<String> referredUserId = Optional.empty();
 
         private Optional<String> referredUsername = Optional.empty();
 
         private Optional<ListBusinessesRequestTier> tier = Optional.empty();
 
-        @JsonAnySetter
+        private Optional<String> businessPrefixQuery = Optional.empty();
+
+        private Optional<String> earningPartnerId = Optional.empty();
+
         private Map<String, Object> additionalProperties = new HashMap<>();
 
         private Builder() {}
 
         public Builder from(ListBusinessesRequest other) {
+            referringAccountId(other.getReferringAccountId());
+            advanceStatus(other.getAdvanceStatus());
             status(other.getStatus());
             hasEarnings(other.getHasEarnings());
             first(other.getFirst());
             after(other.getAfter());
             last(other.getLast());
             before(other.getBefore());
+            includeTotalCount(other.getIncludeTotalCount());
             order(other.getOrder());
             direction(other.getDirection());
             createdBefore(other.getCreatedBefore());
             createdAfter(other.getCreatedAfter());
+            firstSaleBefore(other.getFirstSaleBefore());
+            firstSaleAfter(other.getFirstSaleAfter());
             referredUserId(other.getReferredUserId());
             referredUsername(other.getReferredUsername());
             tier(other.getTier());
+            businessPrefixQuery(other.getBusinessPrefixQuery());
+            earningPartnerId(other.getEarningPartnerId());
+            return this;
+        }
+
+        /**
+         * <p>List the referrals this business's team members made, past members included, instead of the authenticated user's own. Requires company:basic:read on that business, which every team member holds, and cannot be combined with user_id. The owner role reads every referral; anyone else reads only the referrals made by themselves and by the people under them in the org chart.</p>
+         */
+        @JsonSetter(value = "referring_account_id", nulls = Nulls.SKIP)
+        public Builder referringAccountId(Optional<String> referringAccountId) {
+            this.referringAccountId = referringAccountId;
+            return this;
+        }
+
+        public Builder referringAccountId(String referringAccountId) {
+            this.referringAccountId = Optional.ofNullable(referringAccountId);
+            return this;
+        }
+
+        /**
+         * <p>Filter the authenticated partner's CPA offers by status, or with referring_account_id, the CPA terms of the reps the caller manages. Use offered for every state after qualification.</p>
+         */
+        @JsonSetter(value = "advance_status", nulls = Nulls.SKIP)
+        public Builder advanceStatus(Optional<ListBusinessesRequestAdvanceStatus> advanceStatus) {
+            this.advanceStatus = advanceStatus;
+            return this;
+        }
+
+        public Builder advanceStatus(ListBusinessesRequestAdvanceStatus advanceStatus) {
+            this.advanceStatus = Optional.ofNullable(advanceStatus);
             return this;
         }
 
@@ -320,7 +467,7 @@ public final class ListBusinessesRequest {
         }
 
         /**
-         * <p>Number of partner businesses to return from the start of the window.</p>
+         * <p>Number of results to return from the start of the range.</p>
          */
         @JsonSetter(value = "first", nulls = Nulls.SKIP)
         public Builder first(Optional<Integer> first) {
@@ -334,7 +481,7 @@ public final class ListBusinessesRequest {
         }
 
         /**
-         * <p>Cursor to fetch the page after (from page_info.end_cursor).</p>
+         * <p>Return results after this cursor. Use <code>page_info.end_cursor</code> from the previous response to fetch the next page.</p>
          */
         @JsonSetter(value = "after", nulls = Nulls.SKIP)
         public Builder after(Optional<String> after) {
@@ -348,7 +495,7 @@ public final class ListBusinessesRequest {
         }
 
         /**
-         * <p>Number of partner businesses to return from the end of the window.</p>
+         * <p>Number of results to return from the end of the range.</p>
          */
         @JsonSetter(value = "last", nulls = Nulls.SKIP)
         public Builder last(Optional<Integer> last) {
@@ -362,7 +509,7 @@ public final class ListBusinessesRequest {
         }
 
         /**
-         * <p>Cursor to fetch the page before (from page_info.start_cursor).</p>
+         * <p>Return results before this cursor. Use <code>page_info.start_cursor</code> from the previous response to fetch the previous page.</p>
          */
         @JsonSetter(value = "before", nulls = Nulls.SKIP)
         public Builder before(Optional<String> before) {
@@ -372,6 +519,20 @@ public final class ListBusinessesRequest {
 
         public Builder before(String before) {
             this.before = Optional.ofNullable(before);
+            return this;
+        }
+
+        /**
+         * <p>Set to <code>true</code> to return the number of matching results in <code>page_info.total_count</code>. Send <code>first=0</code> as well to return the count without any results.</p>
+         */
+        @JsonSetter(value = "include_total_count", nulls = Nulls.SKIP)
+        public Builder includeTotalCount(Optional<Boolean> includeTotalCount) {
+            this.includeTotalCount = includeTotalCount;
+            return this;
+        }
+
+        public Builder includeTotalCount(Boolean includeTotalCount) {
+            this.includeTotalCount = Optional.ofNullable(includeTotalCount);
             return this;
         }
 
@@ -432,6 +593,34 @@ public final class ListBusinessesRequest {
         }
 
         /**
+         * <p>Only return partner businesses whose first paid sale above zero happened before this timestamp.</p>
+         */
+        @JsonSetter(value = "first_sale_before", nulls = Nulls.SKIP)
+        public Builder firstSaleBefore(Optional<String> firstSaleBefore) {
+            this.firstSaleBefore = firstSaleBefore;
+            return this;
+        }
+
+        public Builder firstSaleBefore(String firstSaleBefore) {
+            this.firstSaleBefore = Optional.ofNullable(firstSaleBefore);
+            return this;
+        }
+
+        /**
+         * <p>Only return partner businesses whose first paid sale above zero happened after this timestamp. Combined with first_sale_before, this is the net new set: businesses that processed their first $1 inside the window.</p>
+         */
+        @JsonSetter(value = "first_sale_after", nulls = Nulls.SKIP)
+        public Builder firstSaleAfter(Optional<String> firstSaleAfter) {
+            this.firstSaleAfter = firstSaleAfter;
+            return this;
+        }
+
+        public Builder firstSaleAfter(String firstSaleAfter) {
+            this.firstSaleAfter = Optional.ofNullable(firstSaleAfter);
+            return this;
+        }
+
+        /**
          * <p>Filter to referrals attributed to this user. For first-tier referrals, this is the referred account owner; for second-tier referrals, this is the partner you recruited.</p>
          */
         @JsonSetter(value = "referred_user_id", nulls = Nulls.SKIP)
@@ -460,7 +649,7 @@ public final class ListBusinessesRequest {
         }
 
         /**
-         * <p>Filter to only first-tier referrals or only second-tier referrals.</p>
+         * <p>Filter to referrals from a single tier: first, second, or blueprint.</p>
          */
         @JsonSetter(value = "tier", nulls = Nulls.SKIP)
         public Builder tier(Optional<ListBusinessesRequestTier> tier) {
@@ -473,22 +662,84 @@ public final class ListBusinessesRequest {
             return this;
         }
 
+        /**
+         * <p>Case-insensitive business-name prefix, or an exact <code>biz_</code> account ID. Surrounding whitespace is ignored; blank values apply no filter.</p>
+         */
+        @JsonSetter(value = "business_prefix_query", nulls = Nulls.SKIP)
+        public Builder businessPrefixQuery(Optional<String> businessPrefixQuery) {
+            this.businessPrefixQuery = businessPrefixQuery;
+            return this;
+        }
+
+        public Builder businessPrefixQuery(String businessPrefixQuery) {
+            this.businessPrefixQuery = Optional.ofNullable(businessPrefixQuery);
+            return this;
+        }
+
+        /**
+         * <p>Only the referrals this team member made, plus the ones they were added to as a deal participant. User ID, prefixed <code>user_</code>. Requires <code>referring_account_id</code>.</p>
+         */
+        @JsonSetter(value = "earning_partner_id", nulls = Nulls.SKIP)
+        public Builder earningPartnerId(Optional<String> earningPartnerId) {
+            this.earningPartnerId = earningPartnerId;
+            return this;
+        }
+
+        public Builder earningPartnerId(String earningPartnerId) {
+            this.earningPartnerId = Optional.ofNullable(earningPartnerId);
+            return this;
+        }
+
         public ListBusinessesRequest build() {
             return new ListBusinessesRequest(
+                    referringAccountId,
+                    advanceStatus,
                     status,
                     hasEarnings,
                     first,
                     after,
                     last,
                     before,
+                    includeTotalCount,
                     order,
                     direction,
                     createdBefore,
                     createdAfter,
+                    firstSaleBefore,
+                    firstSaleAfter,
                     referredUserId,
                     referredUsername,
                     tier,
+                    businessPrefixQuery,
+                    earningPartnerId,
                     additionalProperties);
+        }
+
+        @JsonAnySetter
+        private void putAdditionalPropertyFromJson(String key, Object value) {
+            if (key.equalsIgnoreCase("referring_account_id")
+                    || key.equalsIgnoreCase("advance_status")
+                    || key.equalsIgnoreCase("status")
+                    || key.equalsIgnoreCase("has_earnings")
+                    || key.equalsIgnoreCase("first")
+                    || key.equalsIgnoreCase("after")
+                    || key.equalsIgnoreCase("last")
+                    || key.equalsIgnoreCase("before")
+                    || key.equalsIgnoreCase("include_total_count")
+                    || key.equalsIgnoreCase("order")
+                    || key.equalsIgnoreCase("direction")
+                    || key.equalsIgnoreCase("created_before")
+                    || key.equalsIgnoreCase("created_after")
+                    || key.equalsIgnoreCase("first_sale_before")
+                    || key.equalsIgnoreCase("first_sale_after")
+                    || key.equalsIgnoreCase("referred_user_id")
+                    || key.equalsIgnoreCase("referred_username")
+                    || key.equalsIgnoreCase("tier")
+                    || key.equalsIgnoreCase("business_prefix_query")
+                    || key.equalsIgnoreCase("earning_partner_id")) {
+                return;
+            }
+            this.additionalProperties.put(key, value);
         }
 
         public Builder additionalProperty(String key, Object value) {

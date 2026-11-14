@@ -17,15 +17,11 @@ import com.whop.api.core.NullableNonemptyFilter;
 import com.whop.api.core.ObjectMappers;
 import com.whop.api.resources.adgroups.types.UpdateAdGroupsRequestBidType;
 import com.whop.api.resources.adgroups.types.UpdateAdGroupsRequestBudgetType;
-import com.whop.api.resources.adgroups.types.UpdateAdGroupsRequestConversionLocation;
-import com.whop.api.resources.adgroups.types.UpdateAdGroupsRequestFrequencyCap;
-import com.whop.api.resources.adgroups.types.UpdateAdGroupsRequestMessageAppsItem;
-import com.whop.api.resources.adgroups.types.UpdateAdGroupsRequestOptimizationGoal;
-import com.whop.api.resources.adgroups.types.UpdateAdGroupsRequestPlacements;
+import com.whop.api.resources.adgroups.types.UpdateAdGroupsRequestDeliverySchedule;
+import com.whop.api.resources.adgroups.types.UpdateAdGroupsRequestKeywordsItem;
 import com.whop.api.resources.adgroups.types.UpdateAdGroupsRequestStatus;
 import com.whop.api.types.AdGroupAudiencesBody;
 import com.whop.api.types.AdGroupDemographicsBody;
-import com.whop.api.types.AdGroupDetailedTargetingBody;
 import com.whop.api.types.AdGroupDevicesBody;
 import com.whop.api.types.AdGroupRegionsBody;
 import com.whop.api.types.ConversionEvent;
@@ -44,33 +40,25 @@ public final class UpdateAdGroupsRequest {
 
     private final Optional<Double> budgetAmount;
 
+    private final Optional<Double> budgetAmountLocal;
+
     private final Optional<UpdateAdGroupsRequestBudgetType> budgetType;
 
     private final Optional<ConversionEvent> conversionEvent;
 
-    private final Optional<UpdateAdGroupsRequestConversionLocation> conversionLocation;
+    private final Optional<UpdateAdGroupsRequestDeliverySchedule> deliverySchedule;
 
     private final Optional<AdGroupDemographicsBody> demographics;
 
     private final Optional<Double> desiredCostPerResult;
 
-    private final Optional<AdGroupDetailedTargetingBody> detailedTargeting;
-
     private final Optional<AdGroupDevicesBody> devices;
 
     private final Optional<String> endsAt;
 
-    private final Optional<UpdateAdGroupsRequestFrequencyCap> frequencyCap;
+    private final Optional<List<UpdateAdGroupsRequestKeywordsItem>> keywords;
 
     private final Optional<List<String>> languages;
-
-    private final Optional<List<UpdateAdGroupsRequestMessageAppsItem>> messageApps;
-
-    private final Optional<Double> minimumDailySpend;
-
-    private final Optional<UpdateAdGroupsRequestOptimizationGoal> optimizationGoal;
-
-    private final Optional<UpdateAdGroupsRequestPlacements> placements;
 
     private final Optional<AdGroupRegionsBody> regions;
 
@@ -86,20 +74,16 @@ public final class UpdateAdGroupsRequest {
             Optional<AdGroupAudiencesBody> audiences,
             Optional<UpdateAdGroupsRequestBidType> bidType,
             Optional<Double> budgetAmount,
+            Optional<Double> budgetAmountLocal,
             Optional<UpdateAdGroupsRequestBudgetType> budgetType,
             Optional<ConversionEvent> conversionEvent,
-            Optional<UpdateAdGroupsRequestConversionLocation> conversionLocation,
+            Optional<UpdateAdGroupsRequestDeliverySchedule> deliverySchedule,
             Optional<AdGroupDemographicsBody> demographics,
             Optional<Double> desiredCostPerResult,
-            Optional<AdGroupDetailedTargetingBody> detailedTargeting,
             Optional<AdGroupDevicesBody> devices,
             Optional<String> endsAt,
-            Optional<UpdateAdGroupsRequestFrequencyCap> frequencyCap,
+            Optional<List<UpdateAdGroupsRequestKeywordsItem>> keywords,
             Optional<List<String>> languages,
-            Optional<List<UpdateAdGroupsRequestMessageAppsItem>> messageApps,
-            Optional<Double> minimumDailySpend,
-            Optional<UpdateAdGroupsRequestOptimizationGoal> optimizationGoal,
-            Optional<UpdateAdGroupsRequestPlacements> placements,
             Optional<AdGroupRegionsBody> regions,
             Optional<String> startsAt,
             Optional<UpdateAdGroupsRequestStatus> status,
@@ -108,20 +92,16 @@ public final class UpdateAdGroupsRequest {
         this.audiences = audiences;
         this.bidType = bidType;
         this.budgetAmount = budgetAmount;
+        this.budgetAmountLocal = budgetAmountLocal;
         this.budgetType = budgetType;
         this.conversionEvent = conversionEvent;
-        this.conversionLocation = conversionLocation;
+        this.deliverySchedule = deliverySchedule;
         this.demographics = demographics;
         this.desiredCostPerResult = desiredCostPerResult;
-        this.detailedTargeting = detailedTargeting;
         this.devices = devices;
         this.endsAt = endsAt;
-        this.frequencyCap = frequencyCap;
+        this.keywords = keywords;
         this.languages = languages;
-        this.messageApps = messageApps;
-        this.minimumDailySpend = minimumDailySpend;
-        this.optimizationGoal = optimizationGoal;
-        this.placements = placements;
         this.regions = regions;
         this.startsAt = startsAt;
         this.status = status;
@@ -146,11 +126,19 @@ public final class UpdateAdGroupsRequest {
     }
 
     /**
-     * @return This ad group's budget, in the ad account's currency. Omit when the budget is set on the campaign instead.
+     * @return This ad group's budget in USD, which is what it is stored and billed in. Omit when the budget is set on the campaign instead.
      */
     @JsonProperty("budget_amount")
     public Optional<Double> getBudgetAmount() {
         return budgetAmount;
+    }
+
+    /**
+     * @return This ad group's budget stated in the account's ads reporting currency (<code>budget_currency</code> on the response) instead of USD. Converted to USD at the current exchange rate and stored as budget_amount; on an update, an amount equal to the current budget_amount_local keeps the stored USD budget as is. Provide this or budget_amount, not both.
+     */
+    @JsonProperty("budget_amount_local")
+    public Optional<Double> getBudgetAmountLocal() {
+        return budgetAmountLocal;
     }
 
     /**
@@ -170,11 +158,14 @@ public final class UpdateAdGroupsRequest {
     }
 
     /**
-     * @return Where the outcome being optimized for occurs, such as a website visit, social-profile visit, messaging conversation, ad interaction, or lead-form submission. The lead form itself is set on the ad.
+     * @return Hours the ad group delivers in each week, keyed by day. Each window runs from <code>start</code> to <code>end</code> on the hour, with <code>24:00</code> for midnight, and a day's windows can't overlap or touch. A day that's empty or left out doesn't deliver. Replaces the whole schedule; <code>null</code> delivers at every hour. Some platforms need a lifetime <code>budget_type</code> for a schedule, on the ad group or on its campaign when the campaign holds the budget.
      */
-    @JsonProperty("conversion_location")
-    public Optional<UpdateAdGroupsRequestConversionLocation> getConversionLocation() {
-        return conversionLocation;
+    @JsonIgnore
+    public Optional<UpdateAdGroupsRequestDeliverySchedule> getDeliverySchedule() {
+        if (deliverySchedule == null) {
+            return Optional.empty();
+        }
+        return deliverySchedule;
     }
 
     /**
@@ -194,14 +185,6 @@ public final class UpdateAdGroupsRequest {
     }
 
     /**
-     * @return Interest, behavior, and demographic targeting, using categories from the ad platform's targeting taxonomy. Entries across interests, behaviors, and demographics are OR'd together (anyone matching any entry is reached), matching Ads Manager's detailed-targeting box. At most 100 entries per section. Can't be combined with demographics.automatic, and unavailable to campaigns with special_ad_categories. Send the complete intended state — a section you omit is cleared.
-     */
-    @JsonProperty("detailed_targeting")
-    public Optional<AdGroupDetailedTargetingBody> getDetailedTargeting() {
-        return detailedTargeting;
-    }
-
-    /**
      * @return Device platforms and operating systems to target.
      */
     @JsonProperty("devices")
@@ -218,11 +201,11 @@ public final class UpdateAdGroupsRequest {
     }
 
     /**
-     * @return Cap on how often one person sees ads from this ad group. Only available on campaigns with the <code>awareness</code> objective.
+     * @return Search terms the ad group's ads can show for, and terms they never show for. Only search campaigns take keywords, and each of their ad groups needs at least one before launch. Replaces the stored list; omit to keep it.
      */
-    @JsonProperty("frequency_cap")
-    public Optional<UpdateAdGroupsRequestFrequencyCap> getFrequencyCap() {
-        return frequencyCap;
+    @JsonProperty("keywords")
+    public Optional<List<UpdateAdGroupsRequestKeywordsItem>> getKeywords() {
+        return keywords;
     }
 
     /**
@@ -231,47 +214,6 @@ public final class UpdateAdGroupsRequest {
     @JsonProperty("languages")
     public Optional<List<String>> getLanguages() {
         return languages;
-    }
-
-    /**
-     * @return Apps the conversation opens in. Required when setting <code>conversion_location</code> to <code>messaging</code>, and rejected unless the ad group's conversion location is <code>messaging</code>.
-     */
-    @JsonProperty("message_apps")
-    public Optional<List<UpdateAdGroupsRequestMessageAppsItem>> getMessageApps() {
-        return messageApps;
-    }
-
-    /**
-     * @return Minimum the ad group tries to spend each day.
-     */
-    @JsonProperty("minimum_daily_spend")
-    public Optional<Double> getMinimumDailySpend() {
-        return minimumDailySpend;
-    }
-
-    /**
-     * @return The result the ad group's delivery is optimized to get the most of.
-     */
-    @JsonProperty("optimization_goal")
-    public Optional<UpdateAdGroupsRequestOptimizationGoal> getOptimizationGoal() {
-        return optimizationGoal;
-    }
-
-    /**
-     * @return <code>automatic</code> to let the ad platform choose placements, or the list of platforms and positions to target. Omit a platform's positions to target all of them.
-     * <p>Valid positions per platform:</p>
-     * <ul>
-     * <li><code>facebook</code>: <code>feed</code>, <code>right_hand_column</code>, <code>marketplace</code>, <code>search</code>, <code>profile_feed</code>, <code>notification</code>, <code>story</code>, <code>instream_video</code>, <code>facebook_reels</code>, <code>facebook_reels_overlay</code>, <code>biz_disco_feed</code></li>
-     * <li><code>instagram</code>: <code>stream</code>, <code>story</code>, <code>explore</code>, <code>explore_home</code>, <code>reels</code>, <code>profile_feed</code>, <code>profile_reels</code>, <code>ig_search</code></li>
-     * <li><code>messenger</code>: <code>story</code></li>
-     * <li><code>audience_network</code>: <code>classic</code>, <code>rewarded_video</code></li>
-     * <li><code>threads</code>: <code>threads_stream</code></li>
-     * <li><code>whatsapp</code>: <code>status</code></li>
-     * </ul>
-     */
-    @JsonProperty("placements")
-    public Optional<UpdateAdGroupsRequestPlacements> getPlacements() {
-        return placements;
     }
 
     /**
@@ -312,6 +254,12 @@ public final class UpdateAdGroupsRequest {
         return conversionEvent;
     }
 
+    @JsonInclude(value = JsonInclude.Include.CUSTOM, valueFilter = NullableNonemptyFilter.class)
+    @JsonProperty("delivery_schedule")
+    private Optional<UpdateAdGroupsRequestDeliverySchedule> _getDeliverySchedule() {
+        return deliverySchedule;
+    }
+
     @java.lang.Override
     public boolean equals(Object other) {
         if (this == other) return true;
@@ -327,20 +275,16 @@ public final class UpdateAdGroupsRequest {
         return audiences.equals(other.audiences)
                 && bidType.equals(other.bidType)
                 && budgetAmount.equals(other.budgetAmount)
+                && budgetAmountLocal.equals(other.budgetAmountLocal)
                 && budgetType.equals(other.budgetType)
                 && conversionEvent.equals(other.conversionEvent)
-                && conversionLocation.equals(other.conversionLocation)
+                && deliverySchedule.equals(other.deliverySchedule)
                 && demographics.equals(other.demographics)
                 && desiredCostPerResult.equals(other.desiredCostPerResult)
-                && detailedTargeting.equals(other.detailedTargeting)
                 && devices.equals(other.devices)
                 && endsAt.equals(other.endsAt)
-                && frequencyCap.equals(other.frequencyCap)
+                && keywords.equals(other.keywords)
                 && languages.equals(other.languages)
-                && messageApps.equals(other.messageApps)
-                && minimumDailySpend.equals(other.minimumDailySpend)
-                && optimizationGoal.equals(other.optimizationGoal)
-                && placements.equals(other.placements)
                 && regions.equals(other.regions)
                 && startsAt.equals(other.startsAt)
                 && status.equals(other.status)
@@ -353,20 +297,16 @@ public final class UpdateAdGroupsRequest {
                 this.audiences,
                 this.bidType,
                 this.budgetAmount,
+                this.budgetAmountLocal,
                 this.budgetType,
                 this.conversionEvent,
-                this.conversionLocation,
+                this.deliverySchedule,
                 this.demographics,
                 this.desiredCostPerResult,
-                this.detailedTargeting,
                 this.devices,
                 this.endsAt,
-                this.frequencyCap,
+                this.keywords,
                 this.languages,
-                this.messageApps,
-                this.minimumDailySpend,
-                this.optimizationGoal,
-                this.placements,
                 this.regions,
                 this.startsAt,
                 this.status,
@@ -390,33 +330,25 @@ public final class UpdateAdGroupsRequest {
 
         private Optional<Double> budgetAmount = Optional.empty();
 
+        private Optional<Double> budgetAmountLocal = Optional.empty();
+
         private Optional<UpdateAdGroupsRequestBudgetType> budgetType = Optional.empty();
 
         private Optional<ConversionEvent> conversionEvent = Optional.empty();
 
-        private Optional<UpdateAdGroupsRequestConversionLocation> conversionLocation = Optional.empty();
+        private Optional<UpdateAdGroupsRequestDeliverySchedule> deliverySchedule = Optional.empty();
 
         private Optional<AdGroupDemographicsBody> demographics = Optional.empty();
 
         private Optional<Double> desiredCostPerResult = Optional.empty();
 
-        private Optional<AdGroupDetailedTargetingBody> detailedTargeting = Optional.empty();
-
         private Optional<AdGroupDevicesBody> devices = Optional.empty();
 
         private Optional<String> endsAt = Optional.empty();
 
-        private Optional<UpdateAdGroupsRequestFrequencyCap> frequencyCap = Optional.empty();
+        private Optional<List<UpdateAdGroupsRequestKeywordsItem>> keywords = Optional.empty();
 
         private Optional<List<String>> languages = Optional.empty();
-
-        private Optional<List<UpdateAdGroupsRequestMessageAppsItem>> messageApps = Optional.empty();
-
-        private Optional<Double> minimumDailySpend = Optional.empty();
-
-        private Optional<UpdateAdGroupsRequestOptimizationGoal> optimizationGoal = Optional.empty();
-
-        private Optional<UpdateAdGroupsRequestPlacements> placements = Optional.empty();
 
         private Optional<AdGroupRegionsBody> regions = Optional.empty();
 
@@ -426,7 +358,6 @@ public final class UpdateAdGroupsRequest {
 
         private Optional<String> title = Optional.empty();
 
-        @JsonAnySetter
         private Map<String, Object> additionalProperties = new HashMap<>();
 
         private Builder() {}
@@ -435,20 +366,16 @@ public final class UpdateAdGroupsRequest {
             audiences(other.getAudiences());
             bidType(other.getBidType());
             budgetAmount(other.getBudgetAmount());
+            budgetAmountLocal(other.getBudgetAmountLocal());
             budgetType(other.getBudgetType());
             conversionEvent(other.getConversionEvent());
-            conversionLocation(other.getConversionLocation());
+            deliverySchedule(other.getDeliverySchedule());
             demographics(other.getDemographics());
             desiredCostPerResult(other.getDesiredCostPerResult());
-            detailedTargeting(other.getDetailedTargeting());
             devices(other.getDevices());
             endsAt(other.getEndsAt());
-            frequencyCap(other.getFrequencyCap());
+            keywords(other.getKeywords());
             languages(other.getLanguages());
-            messageApps(other.getMessageApps());
-            minimumDailySpend(other.getMinimumDailySpend());
-            optimizationGoal(other.getOptimizationGoal());
-            placements(other.getPlacements());
             regions(other.getRegions());
             startsAt(other.getStartsAt());
             status(other.getStatus());
@@ -485,7 +412,7 @@ public final class UpdateAdGroupsRequest {
         }
 
         /**
-         * <p>This ad group's budget, in the ad account's currency. Omit when the budget is set on the campaign instead.</p>
+         * <p>This ad group's budget in USD, which is what it is stored and billed in. Omit when the budget is set on the campaign instead.</p>
          */
         @JsonSetter(value = "budget_amount", nulls = Nulls.SKIP)
         public Builder budgetAmount(Optional<Double> budgetAmount) {
@@ -495,6 +422,20 @@ public final class UpdateAdGroupsRequest {
 
         public Builder budgetAmount(Double budgetAmount) {
             this.budgetAmount = Optional.ofNullable(budgetAmount);
+            return this;
+        }
+
+        /**
+         * <p>This ad group's budget stated in the account's ads reporting currency (<code>budget_currency</code> on the response) instead of USD. Converted to USD at the current exchange rate and stored as budget_amount; on an update, an amount equal to the current budget_amount_local keeps the stored USD budget as is. Provide this or budget_amount, not both.</p>
+         */
+        @JsonSetter(value = "budget_amount_local", nulls = Nulls.SKIP)
+        public Builder budgetAmountLocal(Optional<Double> budgetAmountLocal) {
+            this.budgetAmountLocal = budgetAmountLocal;
+            return this;
+        }
+
+        public Builder budgetAmountLocal(Double budgetAmountLocal) {
+            this.budgetAmountLocal = Optional.ofNullable(budgetAmountLocal);
             return this;
         }
 
@@ -535,16 +476,27 @@ public final class UpdateAdGroupsRequest {
         }
 
         /**
-         * <p>Where the outcome being optimized for occurs, such as a website visit, social-profile visit, messaging conversation, ad interaction, or lead-form submission. The lead form itself is set on the ad.</p>
+         * <p>Hours the ad group delivers in each week, keyed by day. Each window runs from <code>start</code> to <code>end</code> on the hour, with <code>24:00</code> for midnight, and a day's windows can't overlap or touch. A day that's empty or left out doesn't deliver. Replaces the whole schedule; <code>null</code> delivers at every hour. Some platforms need a lifetime <code>budget_type</code> for a schedule, on the ad group or on its campaign when the campaign holds the budget.</p>
          */
-        @JsonSetter(value = "conversion_location", nulls = Nulls.SKIP)
-        public Builder conversionLocation(Optional<UpdateAdGroupsRequestConversionLocation> conversionLocation) {
-            this.conversionLocation = conversionLocation;
+        @JsonSetter(value = "delivery_schedule", nulls = Nulls.SKIP)
+        public Builder deliverySchedule(Optional<UpdateAdGroupsRequestDeliverySchedule> deliverySchedule) {
+            this.deliverySchedule = deliverySchedule;
             return this;
         }
 
-        public Builder conversionLocation(UpdateAdGroupsRequestConversionLocation conversionLocation) {
-            this.conversionLocation = Optional.ofNullable(conversionLocation);
+        public Builder deliverySchedule(UpdateAdGroupsRequestDeliverySchedule deliverySchedule) {
+            this.deliverySchedule = Optional.ofNullable(deliverySchedule);
+            return this;
+        }
+
+        public Builder deliverySchedule(Nullable<UpdateAdGroupsRequestDeliverySchedule> deliverySchedule) {
+            if (deliverySchedule.isNull()) {
+                this.deliverySchedule = null;
+            } else if (deliverySchedule.isEmpty()) {
+                this.deliverySchedule = Optional.empty();
+            } else {
+                this.deliverySchedule = Optional.of(deliverySchedule.get());
+            }
             return this;
         }
 
@@ -577,20 +529,6 @@ public final class UpdateAdGroupsRequest {
         }
 
         /**
-         * <p>Interest, behavior, and demographic targeting, using categories from the ad platform's targeting taxonomy. Entries across interests, behaviors, and demographics are OR'd together (anyone matching any entry is reached), matching Ads Manager's detailed-targeting box. At most 100 entries per section. Can't be combined with demographics.automatic, and unavailable to campaigns with special_ad_categories. Send the complete intended state — a section you omit is cleared.</p>
-         */
-        @JsonSetter(value = "detailed_targeting", nulls = Nulls.SKIP)
-        public Builder detailedTargeting(Optional<AdGroupDetailedTargetingBody> detailedTargeting) {
-            this.detailedTargeting = detailedTargeting;
-            return this;
-        }
-
-        public Builder detailedTargeting(AdGroupDetailedTargetingBody detailedTargeting) {
-            this.detailedTargeting = Optional.ofNullable(detailedTargeting);
-            return this;
-        }
-
-        /**
          * <p>Device platforms and operating systems to target.</p>
          */
         @JsonSetter(value = "devices", nulls = Nulls.SKIP)
@@ -619,16 +557,16 @@ public final class UpdateAdGroupsRequest {
         }
 
         /**
-         * <p>Cap on how often one person sees ads from this ad group. Only available on campaigns with the <code>awareness</code> objective.</p>
+         * <p>Search terms the ad group's ads can show for, and terms they never show for. Only search campaigns take keywords, and each of their ad groups needs at least one before launch. Replaces the stored list; omit to keep it.</p>
          */
-        @JsonSetter(value = "frequency_cap", nulls = Nulls.SKIP)
-        public Builder frequencyCap(Optional<UpdateAdGroupsRequestFrequencyCap> frequencyCap) {
-            this.frequencyCap = frequencyCap;
+        @JsonSetter(value = "keywords", nulls = Nulls.SKIP)
+        public Builder keywords(Optional<List<UpdateAdGroupsRequestKeywordsItem>> keywords) {
+            this.keywords = keywords;
             return this;
         }
 
-        public Builder frequencyCap(UpdateAdGroupsRequestFrequencyCap frequencyCap) {
-            this.frequencyCap = Optional.ofNullable(frequencyCap);
+        public Builder keywords(List<UpdateAdGroupsRequestKeywordsItem> keywords) {
+            this.keywords = Optional.ofNullable(keywords);
             return this;
         }
 
@@ -643,71 +581,6 @@ public final class UpdateAdGroupsRequest {
 
         public Builder languages(List<String> languages) {
             this.languages = Optional.ofNullable(languages);
-            return this;
-        }
-
-        /**
-         * <p>Apps the conversation opens in. Required when setting <code>conversion_location</code> to <code>messaging</code>, and rejected unless the ad group's conversion location is <code>messaging</code>.</p>
-         */
-        @JsonSetter(value = "message_apps", nulls = Nulls.SKIP)
-        public Builder messageApps(Optional<List<UpdateAdGroupsRequestMessageAppsItem>> messageApps) {
-            this.messageApps = messageApps;
-            return this;
-        }
-
-        public Builder messageApps(List<UpdateAdGroupsRequestMessageAppsItem> messageApps) {
-            this.messageApps = Optional.ofNullable(messageApps);
-            return this;
-        }
-
-        /**
-         * <p>Minimum the ad group tries to spend each day.</p>
-         */
-        @JsonSetter(value = "minimum_daily_spend", nulls = Nulls.SKIP)
-        public Builder minimumDailySpend(Optional<Double> minimumDailySpend) {
-            this.minimumDailySpend = minimumDailySpend;
-            return this;
-        }
-
-        public Builder minimumDailySpend(Double minimumDailySpend) {
-            this.minimumDailySpend = Optional.ofNullable(minimumDailySpend);
-            return this;
-        }
-
-        /**
-         * <p>The result the ad group's delivery is optimized to get the most of.</p>
-         */
-        @JsonSetter(value = "optimization_goal", nulls = Nulls.SKIP)
-        public Builder optimizationGoal(Optional<UpdateAdGroupsRequestOptimizationGoal> optimizationGoal) {
-            this.optimizationGoal = optimizationGoal;
-            return this;
-        }
-
-        public Builder optimizationGoal(UpdateAdGroupsRequestOptimizationGoal optimizationGoal) {
-            this.optimizationGoal = Optional.ofNullable(optimizationGoal);
-            return this;
-        }
-
-        /**
-         * <p><code>automatic</code> to let the ad platform choose placements, or the list of platforms and positions to target. Omit a platform's positions to target all of them.</p>
-         * <p>Valid positions per platform:</p>
-         * <ul>
-         * <li><code>facebook</code>: <code>feed</code>, <code>right_hand_column</code>, <code>marketplace</code>, <code>search</code>, <code>profile_feed</code>, <code>notification</code>, <code>story</code>, <code>instream_video</code>, <code>facebook_reels</code>, <code>facebook_reels_overlay</code>, <code>biz_disco_feed</code></li>
-         * <li><code>instagram</code>: <code>stream</code>, <code>story</code>, <code>explore</code>, <code>explore_home</code>, <code>reels</code>, <code>profile_feed</code>, <code>profile_reels</code>, <code>ig_search</code></li>
-         * <li><code>messenger</code>: <code>story</code></li>
-         * <li><code>audience_network</code>: <code>classic</code>, <code>rewarded_video</code></li>
-         * <li><code>threads</code>: <code>threads_stream</code></li>
-         * <li><code>whatsapp</code>: <code>status</code></li>
-         * </ul>
-         */
-        @JsonSetter(value = "placements", nulls = Nulls.SKIP)
-        public Builder placements(Optional<UpdateAdGroupsRequestPlacements> placements) {
-            this.placements = placements;
-            return this;
-        }
-
-        public Builder placements(UpdateAdGroupsRequestPlacements placements) {
-            this.placements = Optional.ofNullable(placements);
             return this;
         }
 
@@ -772,25 +645,45 @@ public final class UpdateAdGroupsRequest {
                     audiences,
                     bidType,
                     budgetAmount,
+                    budgetAmountLocal,
                     budgetType,
                     conversionEvent,
-                    conversionLocation,
+                    deliverySchedule,
                     demographics,
                     desiredCostPerResult,
-                    detailedTargeting,
                     devices,
                     endsAt,
-                    frequencyCap,
+                    keywords,
                     languages,
-                    messageApps,
-                    minimumDailySpend,
-                    optimizationGoal,
-                    placements,
                     regions,
                     startsAt,
                     status,
                     title,
                     additionalProperties);
+        }
+
+        @JsonAnySetter
+        private void putAdditionalPropertyFromJson(String key, Object value) {
+            if (key.equalsIgnoreCase("audiences")
+                    || key.equalsIgnoreCase("bid_type")
+                    || key.equalsIgnoreCase("budget_amount")
+                    || key.equalsIgnoreCase("budget_amount_local")
+                    || key.equalsIgnoreCase("budget_type")
+                    || key.equalsIgnoreCase("conversion_event")
+                    || key.equalsIgnoreCase("delivery_schedule")
+                    || key.equalsIgnoreCase("demographics")
+                    || key.equalsIgnoreCase("desired_cost_per_result")
+                    || key.equalsIgnoreCase("devices")
+                    || key.equalsIgnoreCase("ends_at")
+                    || key.equalsIgnoreCase("keywords")
+                    || key.equalsIgnoreCase("languages")
+                    || key.equalsIgnoreCase("regions")
+                    || key.equalsIgnoreCase("starts_at")
+                    || key.equalsIgnoreCase("status")
+                    || key.equalsIgnoreCase("title")) {
+                return;
+            }
+            this.additionalProperties.put(key, value);
         }
 
         public Builder additionalProperty(String key, Object value) {

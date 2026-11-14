@@ -99,7 +99,6 @@ public final class CreateApiKeysRequestPermissions {
 
         private Optional<CreateApiKeysRequestPermissionsSystemRole> systemRole = Optional.empty();
 
-        @JsonAnySetter
         private Map<String, Object> additionalProperties = new HashMap<>();
 
         private Builder() {}
@@ -151,6 +150,14 @@ public final class CreateApiKeysRequestPermissions {
 
         public CreateApiKeysRequestPermissions build() {
             return new CreateApiKeysRequestPermissions(statements, systemRole, additionalProperties);
+        }
+
+        @JsonAnySetter
+        private void putAdditionalPropertyFromJson(String key, Object value) {
+            if (key.equalsIgnoreCase("statements") || key.equalsIgnoreCase("system_role")) {
+                return;
+            }
+            this.additionalProperties.put(key, value);
         }
 
         public Builder additionalProperty(String key, Object value) {

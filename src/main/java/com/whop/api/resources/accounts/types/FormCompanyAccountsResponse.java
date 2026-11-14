@@ -155,7 +155,6 @@ public final class FormCompanyAccountsResponse {
 
         private int total;
 
-        @JsonAnySetter
         private Map<String, Object> additionalProperties = new HashMap<>();
 
         private Builder() {}
@@ -171,7 +170,6 @@ public final class FormCompanyAccountsResponse {
 
         /**
          * <p>Checkout session ID, prefixed <code>ch_</code>.</p>
-         * <p>Checkout session ID, prefixed <code>ch_</code>.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
@@ -182,7 +180,6 @@ public final class FormCompanyAccountsResponse {
         }
 
         /**
-         * <p>Hosted checkout URL. Send the buyer here to pay for the formation; the filing is submitted once payment completes.</p>
          * <p>Hosted checkout URL. Send the buyer here to pay for the formation; the filing is submitted once payment completes.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
@@ -195,7 +192,6 @@ public final class FormCompanyAccountsResponse {
 
         /**
          * <p>Always <code>usd</code>.</p>
-         * <p>Always <code>usd</code>.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
@@ -206,7 +202,6 @@ public final class FormCompanyAccountsResponse {
         }
 
         /**
-         * <p>Total due at checkout in USD cents.</p>
          * <p>Total due at checkout in USD cents.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
@@ -221,6 +216,17 @@ public final class FormCompanyAccountsResponse {
         public FormCompanyAccountsResponse build() {
             return new FormCompanyAccountsResponse(
                     checkoutSessionId, checkoutUrl, currency, total, additionalProperties);
+        }
+
+        @JsonAnySetter
+        private void putAdditionalPropertyFromJson(String key, Object value) {
+            if (key.equalsIgnoreCase("checkout_session_id")
+                    || key.equalsIgnoreCase("checkout_url")
+                    || key.equalsIgnoreCase("currency")
+                    || key.equalsIgnoreCase("total")) {
+                return;
+            }
+            this.additionalProperties.put(key, value);
         }
 
         @java.lang.Override

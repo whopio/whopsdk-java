@@ -34,42 +34,42 @@ public class ApiKeysClient {
     }
 
     /**
-     * Lists the API keys of an account or app, newest first. Responses never include the full secret — only its obfuscated form.
+     * Lists the API keys of an account, app, or your own user, newest first. Responses never include the full secret — only its obfuscated form.
      */
     public SyncPagingIterable<ApiKey> list(ListApiKeysRequest request) {
         return this.rawClient.list(request).body();
     }
 
     /**
-     * Lists the API keys of an account or app, newest first. Responses never include the full secret — only its obfuscated form.
+     * Lists the API keys of an account, app, or your own user, newest first. Responses never include the full secret — only its obfuscated form.
      */
     public SyncPagingIterable<ApiKey> list(ListApiKeysRequest request, RequestOptions requestOptions) {
         return this.rawClient.list(request, requestOptions).body();
     }
 
     /**
-     * Creates an API key for an account or app. The response is the only place the full <code>secret_key</code> is returned — store it immediately. Requires a user session; API keys cannot manage API keys.
+     * Creates an API key for an account, an app, or your own user. A user API key acts as you and can only grant <code>ad_campaign:basic:read</code>, <code>ad_campaign:update</code>, <code>ad_pixel:manage</code>, <code>member:journey:read</code>. The response is the only place the full <code>secret_key</code> is returned — store it immediately. Requires a user session; API keys cannot manage API keys.
      */
     public ApiKey create(CreateApiKeysRequest request) {
         return this.rawClient.create(request).body();
     }
 
     /**
-     * Creates an API key for an account or app. The response is the only place the full <code>secret_key</code> is returned — store it immediately. Requires a user session; API keys cannot manage API keys.
+     * Creates an API key for an account, an app, or your own user. A user API key acts as you and can only grant <code>ad_campaign:basic:read</code>, <code>ad_campaign:update</code>, <code>ad_pixel:manage</code>, <code>member:journey:read</code>. The response is the only place the full <code>secret_key</code> is returned — store it immediately. Requires a user session; API keys cannot manage API keys.
      */
     public ApiKey create(CreateApiKeysRequest request, RequestOptions requestOptions) {
         return this.rawClient.create(request, requestOptions).body();
     }
 
     /**
-     * Lists the catalog of permission actions that can be granted to users, apps, and API keys — the source for the dashboard's permission pickers. Small and returned in full on one page.
+     * Lists the catalog of permission actions that can be granted to users, apps, and API keys. Use it to choose the <code>permissions</code> for an API key or to build a permission picker. Small and returned in full on one page.
      */
     public ListPermissionsApiKeysResponse listPermissions() {
         return this.rawClient.listPermissions().body();
     }
 
     /**
-     * Lists the catalog of permission actions that can be granted to users, apps, and API keys — the source for the dashboard's permission pickers. Small and returned in full on one page.
+     * Lists the catalog of permission actions that can be granted to users, apps, and API keys. Use it to choose the <code>permissions</code> for an API key or to build a permission picker. Small and returned in full on one page.
      */
     public ListPermissionsApiKeysResponse listPermissions(RequestOptions requestOptions) {
         return this.rawClient.listPermissions(requestOptions).body();

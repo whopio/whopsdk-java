@@ -34,9 +34,13 @@ public final class Bounty {
 
     private final int acceptedSubmissionsPerUserLimit;
 
+    private final List<BountyActiveLivestreamFeed> activeProofLivestreamFeeds;
+
     private final double affiliateShareAmount;
 
     private final List<String> allowedCountryCodes;
+
+    private final int awaitingReviewSubmissionsCount;
 
     private final double budgetAmount;
 
@@ -49,6 +53,8 @@ public final class Bounty {
     private final String createdAt;
 
     private final BountyCurrency currency;
+
+    private final int deniedSubmissionsCount;
 
     private final String description;
 
@@ -69,6 +75,8 @@ public final class Bounty {
     private final Optional<StorefrontAccount> hostingAccount;
 
     private final String id;
+
+    private final Optional<Integer> minTotalVerifiedDurationSeconds;
 
     private final double netRewardAmount;
 
@@ -99,14 +107,17 @@ public final class Bounty {
             int acceptedSubmissionsCount,
             int acceptedSubmissionsLimit,
             int acceptedSubmissionsPerUserLimit,
+            List<BountyActiveLivestreamFeed> activeProofLivestreamFeeds,
             double affiliateShareAmount,
             List<String> allowedCountryCodes,
+            int awaitingReviewSubmissionsCount,
             double budgetAmount,
             Optional<BountyBusinessGoalType> businessGoalType,
             Optional<String> cancelRequestedAt,
             Optional<CaptureSpec> captureSpec,
             String createdAt,
             BountyCurrency currency,
+            int deniedSubmissionsCount,
             String description,
             Optional<String> discussionExperienceId,
             Optional<String> discussionFeedId,
@@ -117,6 +128,7 @@ public final class Bounty {
             double grossRewardAmount,
             Optional<StorefrontAccount> hostingAccount,
             String id,
+            Optional<Integer> minTotalVerifiedDurationSeconds,
             double netRewardAmount,
             UserSummary poster,
             Optional<BountyScheduledFrequency> scheduledFrequency,
@@ -133,14 +145,17 @@ public final class Bounty {
         this.acceptedSubmissionsCount = acceptedSubmissionsCount;
         this.acceptedSubmissionsLimit = acceptedSubmissionsLimit;
         this.acceptedSubmissionsPerUserLimit = acceptedSubmissionsPerUserLimit;
+        this.activeProofLivestreamFeeds = activeProofLivestreamFeeds;
         this.affiliateShareAmount = affiliateShareAmount;
         this.allowedCountryCodes = allowedCountryCodes;
+        this.awaitingReviewSubmissionsCount = awaitingReviewSubmissionsCount;
         this.budgetAmount = budgetAmount;
         this.businessGoalType = businessGoalType;
         this.cancelRequestedAt = cancelRequestedAt;
         this.captureSpec = captureSpec;
         this.createdAt = createdAt;
         this.currency = currency;
+        this.deniedSubmissionsCount = deniedSubmissionsCount;
         this.description = description;
         this.discussionExperienceId = discussionExperienceId;
         this.discussionFeedId = discussionFeedId;
@@ -151,6 +166,7 @@ public final class Bounty {
         this.grossRewardAmount = grossRewardAmount;
         this.hostingAccount = hostingAccount;
         this.id = id;
+        this.minTotalVerifiedDurationSeconds = minTotalVerifiedDurationSeconds;
         this.netRewardAmount = netRewardAmount;
         this.poster = poster;
         this.scheduledFrequency = scheduledFrequency;
@@ -194,6 +210,11 @@ public final class Bounty {
         return acceptedSubmissionsPerUserLimit;
     }
 
+    @JsonProperty("active_proof_livestream_feeds")
+    public List<BountyActiveLivestreamFeed> getActiveProofLivestreamFeeds() {
+        return activeProofLivestreamFeeds;
+    }
+
     /**
      * @return What a referrer earns per accepted submission when the worker arrived through their affiliate link, in whole currency units, at the standard platform fee rate. Taken out of the worker's post-fee reward rather than added on top. <code>0</code> when the bounty pays no affiliate share, including bounties tied to no account, which cannot record a referral.
      */
@@ -205,6 +226,14 @@ public final class Bounty {
     @JsonProperty("allowed_country_codes")
     public List<String> getAllowedCountryCodes() {
         return allowedCountryCodes;
+    }
+
+    /**
+     * @return Submissions delivered and waiting on review. A subset of <code>unresolved_submissions_count</code>, which also counts attempts still in progress.
+     */
+    @JsonProperty("awaiting_review_submissions_count")
+    public int getAwaitingReviewSubmissionsCount() {
+        return awaitingReviewSubmissionsCount;
     }
 
     /**
@@ -262,6 +291,14 @@ public final class Bounty {
     @JsonProperty("currency")
     public BountyCurrency getCurrency() {
         return currency;
+    }
+
+    /**
+     * @return Submissions reviewed and turned down.
+     */
+    @JsonProperty("denied_submissions_count")
+    public int getDeniedSubmissionsCount() {
+        return deniedSubmissionsCount;
     }
 
     /**
@@ -360,6 +397,17 @@ public final class Bounty {
     @JsonProperty("id")
     public String getId() {
         return id;
+    }
+
+    /**
+     * @return Total verified footage a submission must accumulate before it can be submitted, in seconds. Always a whole number of hours. Present only on <code>data_capture</code> bounties — it is what <code>net_reward_amount</code> pays for, so rate displays divide by it. <code>null</code> for every other goal type.
+     */
+    @JsonIgnore
+    public Optional<Integer> getMinTotalVerifiedDurationSeconds() {
+        if (minTotalVerifiedDurationSeconds == null) {
+            return Optional.empty();
+        }
+        return minTotalVerifiedDurationSeconds;
     }
 
     /**
@@ -514,6 +562,12 @@ public final class Bounty {
     }
 
     @JsonInclude(value = JsonInclude.Include.CUSTOM, valueFilter = NullableNonemptyFilter.class)
+    @JsonProperty("min_total_verified_duration_seconds")
+    private Optional<Integer> _getMinTotalVerifiedDurationSeconds() {
+        return minTotalVerifiedDurationSeconds;
+    }
+
+    @JsonInclude(value = JsonInclude.Include.CUSTOM, valueFilter = NullableNonemptyFilter.class)
     @JsonProperty("scheduled_frequency")
     private Optional<BountyScheduledFrequency> _getScheduledFrequency() {
         return scheduledFrequency;
@@ -547,14 +601,17 @@ public final class Bounty {
                 && acceptedSubmissionsCount == other.acceptedSubmissionsCount
                 && acceptedSubmissionsLimit == other.acceptedSubmissionsLimit
                 && acceptedSubmissionsPerUserLimit == other.acceptedSubmissionsPerUserLimit
+                && activeProofLivestreamFeeds.equals(other.activeProofLivestreamFeeds)
                 && affiliateShareAmount == other.affiliateShareAmount
                 && allowedCountryCodes.equals(other.allowedCountryCodes)
+                && awaitingReviewSubmissionsCount == other.awaitingReviewSubmissionsCount
                 && budgetAmount == other.budgetAmount
                 && businessGoalType.equals(other.businessGoalType)
                 && cancelRequestedAt.equals(other.cancelRequestedAt)
                 && captureSpec.equals(other.captureSpec)
                 && createdAt.equals(other.createdAt)
                 && currency.equals(other.currency)
+                && deniedSubmissionsCount == other.deniedSubmissionsCount
                 && description.equals(other.description)
                 && discussionExperienceId.equals(other.discussionExperienceId)
                 && discussionFeedId.equals(other.discussionFeedId)
@@ -565,6 +622,7 @@ public final class Bounty {
                 && grossRewardAmount == other.grossRewardAmount
                 && hostingAccount.equals(other.hostingAccount)
                 && id.equals(other.id)
+                && minTotalVerifiedDurationSeconds.equals(other.minTotalVerifiedDurationSeconds)
                 && netRewardAmount == other.netRewardAmount
                 && poster.equals(other.poster)
                 && scheduledFrequency.equals(other.scheduledFrequency)
@@ -585,14 +643,17 @@ public final class Bounty {
                 this.acceptedSubmissionsCount,
                 this.acceptedSubmissionsLimit,
                 this.acceptedSubmissionsPerUserLimit,
+                this.activeProofLivestreamFeeds,
                 this.affiliateShareAmount,
                 this.allowedCountryCodes,
+                this.awaitingReviewSubmissionsCount,
                 this.budgetAmount,
                 this.businessGoalType,
                 this.cancelRequestedAt,
                 this.captureSpec,
                 this.createdAt,
                 this.currency,
+                this.deniedSubmissionsCount,
                 this.description,
                 this.discussionExperienceId,
                 this.discussionFeedId,
@@ -603,6 +664,7 @@ public final class Bounty {
                 this.grossRewardAmount,
                 this.hostingAccount,
                 this.id,
+                this.minTotalVerifiedDurationSeconds,
                 this.netRewardAmount,
                 this.poster,
                 this.scheduledFrequency,
@@ -652,7 +714,14 @@ public final class Bounty {
         /**
          * <p>What a referrer earns per accepted submission when the worker arrived through their affiliate link, in whole currency units, at the standard platform fee rate. Taken out of the worker's post-fee reward rather than added on top. <code>0</code> when the bounty pays no affiliate share, including bounties tied to no account, which cannot record a referral.</p>
          */
-        BudgetAmountStage affiliateShareAmount(double affiliateShareAmount);
+        AwaitingReviewSubmissionsCountStage affiliateShareAmount(double affiliateShareAmount);
+    }
+
+    public interface AwaitingReviewSubmissionsCountStage {
+        /**
+         * <p>Submissions delivered and waiting on review. A subset of <code>unresolved_submissions_count</code>, which also counts attempts still in progress.</p>
+         */
+        BudgetAmountStage awaitingReviewSubmissionsCount(int awaitingReviewSubmissionsCount);
     }
 
     public interface BudgetAmountStage {
@@ -673,7 +742,14 @@ public final class Bounty {
         /**
          * <p>Currency for all amounts on the bounty, as a lowercase ISO 4217 code.</p>
          */
-        DescriptionStage currency(@NotNull BountyCurrency currency);
+        DeniedSubmissionsCountStage currency(@NotNull BountyCurrency currency);
+    }
+
+    public interface DeniedSubmissionsCountStage {
+        /**
+         * <p>Submissions reviewed and turned down.</p>
+         */
+        DescriptionStage deniedSubmissionsCount(int deniedSubmissionsCount);
     }
 
     public interface DescriptionStage {
@@ -773,6 +849,12 @@ public final class Bounty {
 
         _FinalStage addAllAcceptedDeliverableTypes(List<BountyAcceptedDeliverableTypesItem> acceptedDeliverableTypes);
 
+        _FinalStage activeProofLivestreamFeeds(List<BountyActiveLivestreamFeed> activeProofLivestreamFeeds);
+
+        _FinalStage addActiveProofLivestreamFeeds(BountyActiveLivestreamFeed activeProofLivestreamFeeds);
+
+        _FinalStage addAllActiveProofLivestreamFeeds(List<BountyActiveLivestreamFeed> activeProofLivestreamFeeds);
+
         _FinalStage allowedCountryCodes(List<String> allowedCountryCodes);
 
         _FinalStage addAllowedCountryCodes(String allowedCountryCodes);
@@ -861,6 +943,15 @@ public final class Bounty {
         _FinalStage hostingAccount(Nullable<StorefrontAccount> hostingAccount);
 
         /**
+         * <p>Total verified footage a submission must accumulate before it can be submitted, in seconds. Always a whole number of hours. Present only on <code>data_capture</code> bounties — it is what <code>net_reward_amount</code> pays for, so rate displays divide by it. <code>null</code> for every other goal type.</p>
+         */
+        _FinalStage minTotalVerifiedDurationSeconds(Optional<Integer> minTotalVerifiedDurationSeconds);
+
+        _FinalStage minTotalVerifiedDurationSeconds(Integer minTotalVerifiedDurationSeconds);
+
+        _FinalStage minTotalVerifiedDurationSeconds(Nullable<Integer> minTotalVerifiedDurationSeconds);
+
+        /**
          * <p>How often the schedule creates a new bounty. Each occurrence is a separate bounty; the original is not republished.</p>
          */
         _FinalStage scheduledFrequency(Optional<BountyScheduledFrequency> scheduledFrequency);
@@ -894,9 +985,11 @@ public final class Bounty {
                     AcceptedSubmissionsLimitStage,
                     AcceptedSubmissionsPerUserLimitStage,
                     AffiliateShareAmountStage,
+                    AwaitingReviewSubmissionsCountStage,
                     BudgetAmountStage,
                     CreatedAtStage,
                     CurrencyStage,
+                    DeniedSubmissionsCountStage,
                     DescriptionStage,
                     GrossPaidOutAmountStage,
                     GrossRewardAmountStage,
@@ -918,11 +1011,15 @@ public final class Bounty {
 
         private double affiliateShareAmount;
 
+        private int awaitingReviewSubmissionsCount;
+
         private double budgetAmount;
 
         private String createdAt;
 
         private BountyCurrency currency;
+
+        private int deniedSubmissionsCount;
 
         private String description;
 
@@ -954,6 +1051,8 @@ public final class Bounty {
 
         private Optional<BountyScheduledFrequency> scheduledFrequency = Optional.empty();
 
+        private Optional<Integer> minTotalVerifiedDurationSeconds = Optional.empty();
+
         private Optional<StorefrontAccount> hostingAccount = Optional.empty();
 
         private Optional<AccountSummary> fundingAccount = Optional.empty();
@@ -974,9 +1073,10 @@ public final class Bounty {
 
         private List<String> allowedCountryCodes = new ArrayList<>();
 
+        private List<BountyActiveLivestreamFeed> activeProofLivestreamFeeds = new ArrayList<>();
+
         private List<BountyAcceptedDeliverableTypesItem> acceptedDeliverableTypes = new ArrayList<>();
 
-        @JsonAnySetter
         private Map<String, Object> additionalProperties = new HashMap<>();
 
         private Builder() {}
@@ -987,14 +1087,17 @@ public final class Bounty {
             acceptedSubmissionsCount(other.getAcceptedSubmissionsCount());
             acceptedSubmissionsLimit(other.getAcceptedSubmissionsLimit());
             acceptedSubmissionsPerUserLimit(other.getAcceptedSubmissionsPerUserLimit());
+            activeProofLivestreamFeeds(other.getActiveProofLivestreamFeeds());
             affiliateShareAmount(other.getAffiliateShareAmount());
             allowedCountryCodes(other.getAllowedCountryCodes());
+            awaitingReviewSubmissionsCount(other.getAwaitingReviewSubmissionsCount());
             budgetAmount(other.getBudgetAmount());
             businessGoalType(other.getBusinessGoalType());
             cancelRequestedAt(other.getCancelRequestedAt());
             captureSpec(other.getCaptureSpec());
             createdAt(other.getCreatedAt());
             currency(other.getCurrency());
+            deniedSubmissionsCount(other.getDeniedSubmissionsCount());
             description(other.getDescription());
             discussionExperienceId(other.getDiscussionExperienceId());
             discussionFeedId(other.getDiscussionFeedId());
@@ -1005,6 +1108,7 @@ public final class Bounty {
             grossRewardAmount(other.getGrossRewardAmount());
             hostingAccount(other.getHostingAccount());
             id(other.getId());
+            minTotalVerifiedDurationSeconds(other.getMinTotalVerifiedDurationSeconds());
             netRewardAmount(other.getNetRewardAmount());
             poster(other.getPoster());
             scheduledFrequency(other.getScheduledFrequency());
@@ -1021,7 +1125,6 @@ public final class Bounty {
 
         /**
          * <p>Submissions accepted so far.</p>
-         * <p>Submissions accepted so far.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
@@ -1032,7 +1135,6 @@ public final class Bounty {
         }
 
         /**
-         * <p>Number of submissions that can be accepted (winner slots).</p>
          * <p>Number of submissions that can be accepted (winner slots).</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
@@ -1045,7 +1147,6 @@ public final class Bounty {
 
         /**
          * <p>How many winner slots one worker can win. Defaults to <code>1</code>. Wins plus proofs awaiting review never exceed this number, and a worker runs one attempt at a time. Cannot exceed <code>accepted_submissions_limit</code>.</p>
-         * <p>How many winner slots one worker can win. Defaults to <code>1</code>. Wins plus proofs awaiting review never exceed this number, and a worker runs one attempt at a time. Cannot exceed <code>accepted_submissions_limit</code>.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
@@ -1057,18 +1158,27 @@ public final class Bounty {
 
         /**
          * <p>What a referrer earns per accepted submission when the worker arrived through their affiliate link, in whole currency units, at the standard platform fee rate. Taken out of the worker's post-fee reward rather than added on top. <code>0</code> when the bounty pays no affiliate share, including bounties tied to no account, which cannot record a referral.</p>
-         * <p>What a referrer earns per accepted submission when the worker arrived through their affiliate link, in whole currency units, at the standard platform fee rate. Taken out of the worker's post-fee reward rather than added on top. <code>0</code> when the bounty pays no affiliate share, including bounties tied to no account, which cannot record a referral.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
         @JsonSetter("affiliate_share_amount")
-        public BudgetAmountStage affiliateShareAmount(double affiliateShareAmount) {
+        public AwaitingReviewSubmissionsCountStage affiliateShareAmount(double affiliateShareAmount) {
             this.affiliateShareAmount = affiliateShareAmount;
             return this;
         }
 
         /**
-         * <p>Total gross budget committed to the bounty: <code>gross_reward_amount</code> times <code>accepted_submissions_limit</code>.</p>
+         * <p>Submissions delivered and waiting on review. A subset of <code>unresolved_submissions_count</code>, which also counts attempts still in progress.</p>
+         * @return Reference to {@code this} so that method calls can be chained together.
+         */
+        @java.lang.Override
+        @JsonSetter("awaiting_review_submissions_count")
+        public BudgetAmountStage awaitingReviewSubmissionsCount(int awaitingReviewSubmissionsCount) {
+            this.awaitingReviewSubmissionsCount = awaitingReviewSubmissionsCount;
+            return this;
+        }
+
+        /**
          * <p>Total gross budget committed to the bounty: <code>gross_reward_amount</code> times <code>accepted_submissions_limit</code>.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
@@ -1081,7 +1191,6 @@ public final class Bounty {
 
         /**
          * <p>When the bounty was created, as an ISO 8601 timestamp.</p>
-         * <p>When the bounty was created, as an ISO 8601 timestamp.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
@@ -1093,18 +1202,27 @@ public final class Bounty {
 
         /**
          * <p>Currency for all amounts on the bounty, as a lowercase ISO 4217 code.</p>
-         * <p>Currency for all amounts on the bounty, as a lowercase ISO 4217 code.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
         @JsonSetter("currency")
-        public DescriptionStage currency(@NotNull BountyCurrency currency) {
+        public DeniedSubmissionsCountStage currency(@NotNull BountyCurrency currency) {
             this.currency = Objects.requireNonNull(currency, "currency must not be null");
             return this;
         }
 
         /**
-         * <p>Full task instructions shown to workers.</p>
+         * <p>Submissions reviewed and turned down.</p>
+         * @return Reference to {@code this} so that method calls can be chained together.
+         */
+        @java.lang.Override
+        @JsonSetter("denied_submissions_count")
+        public DescriptionStage deniedSubmissionsCount(int deniedSubmissionsCount) {
+            this.deniedSubmissionsCount = deniedSubmissionsCount;
+            return this;
+        }
+
+        /**
          * <p>Full task instructions shown to workers.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
@@ -1117,7 +1235,6 @@ public final class Bounty {
 
         /**
          * <p>Gross amount paid out from the bounty pool across accepted submissions — worker payouts, platform fees, and affiliate shares together. Tips and reviewer rewards are excluded.</p>
-         * <p>Gross amount paid out from the bounty pool across accepted submissions — worker payouts, platform fees, and affiliate shares together. Tips and reviewer rewards are excluded.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
@@ -1128,7 +1245,6 @@ public final class Bounty {
         }
 
         /**
-         * <p>Gross bounty-pool amount allocated per accepted submission, in whole currency units.</p>
          * <p>Gross bounty-pool amount allocated per accepted submission, in whole currency units.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
@@ -1141,7 +1257,6 @@ public final class Bounty {
 
         /**
          * <p>Bounty ID, prefixed <code>bnty_</code>.</p>
-         * <p>Bounty ID, prefixed <code>bnty_</code>.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
@@ -1152,7 +1267,6 @@ public final class Bounty {
         }
 
         /**
-         * <p>What a worker is quoted per accepted submission after the platform fee, in whole currency units. The exact post-fee figure, at the standard platform fee rate — a worker who locked a different rate, or who arrived through an affiliate link, is paid a different amount.</p>
          * <p>What a worker is quoted per accepted submission after the platform fee, in whole currency units. The exact post-fee figure, at the standard platform fee rate — a worker who locked a different rate, or who arrived through an affiliate link, is paid a different amount.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
@@ -1165,7 +1279,6 @@ public final class Bounty {
 
         /**
          * <p>User who posted the bounty — the account owner when created with an account API key.</p>
-         * <p>User who posted the bounty — the account owner when created with an account API key.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
@@ -1176,7 +1289,6 @@ public final class Bounty {
         }
 
         /**
-         * <p>Unfilled winner capacity: <code>accepted_submissions_limit</code> minus <code>accepted_submissions_count</code>, clamped to zero. Not on its own a signal that the bounty accepts new claims — read <code>status</code> for that: only an <code>open</code> bounty takes new submissions.</p>
          * <p>Unfilled winner capacity: <code>accepted_submissions_limit</code> minus <code>accepted_submissions_count</code>, clamped to zero. Not on its own a signal that the bounty accepts new claims — read <code>status</code> for that: only an <code>open</code> bounty takes new submissions.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
@@ -1189,7 +1301,6 @@ public final class Bounty {
 
         /**
          * <p>Lifecycle state. <code>scheduled</code> bounties are unpublished drafts, visible to their poster and the account's authorized managers; <code>open</code> bounties accept new submissions; <code>closed</code> bounties are live but no longer accept new submissions; <code>completed</code> bounties paid out every winner slot; <code>canceled</code> bounties ended before filling their slots.</p>
-         * <p>Lifecycle state. <code>scheduled</code> bounties are unpublished drafts, visible to their poster and the account's authorized managers; <code>open</code> bounties accept new submissions; <code>closed</code> bounties are live but no longer accept new submissions; <code>completed</code> bounties paid out every winner slot; <code>canceled</code> bounties ended before filling their slots.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
@@ -1200,7 +1311,6 @@ public final class Bounty {
         }
 
         /**
-         * <p>Short name of the task shown to workers.</p>
          * <p>Short name of the task shown to workers.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
@@ -1213,7 +1323,6 @@ public final class Bounty {
 
         /**
          * <p>Submissions still awaiting an outcome: in progress or pending review.</p>
-         * <p>Submissions still awaiting an outcome: in progress or pending review.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
@@ -1225,7 +1334,6 @@ public final class Bounty {
 
         /**
          * <p>When the bounty was last updated, as an ISO 8601 timestamp.</p>
-         * <p>When the bounty was last updated, as an ISO 8601 timestamp.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
@@ -1236,7 +1344,6 @@ public final class Bounty {
         }
 
         /**
-         * <p>How many winner slots the authenticated user has already won on this bounty. Read against <code>accepted_submissions_per_user_limit</code> to show a worker their remaining allowance. <code>0</code> when the request has no authenticated user.</p>
          * <p>How many winner slots the authenticated user has already won on this bounty. Read against <code>accepted_submissions_per_user_limit</code> to show a worker their remaining allowance. <code>0</code> when the request has no authenticated user.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
@@ -1352,6 +1459,42 @@ public final class Bounty {
         @JsonSetter(value = "scheduled_frequency", nulls = Nulls.SKIP)
         public _FinalStage scheduledFrequency(Optional<BountyScheduledFrequency> scheduledFrequency) {
             this.scheduledFrequency = scheduledFrequency;
+            return this;
+        }
+
+        /**
+         * <p>Total verified footage a submission must accumulate before it can be submitted, in seconds. Always a whole number of hours. Present only on <code>data_capture</code> bounties — it is what <code>net_reward_amount</code> pays for, so rate displays divide by it. <code>null</code> for every other goal type.</p>
+         * @return Reference to {@code this} so that method calls can be chained together.
+         */
+        @java.lang.Override
+        public _FinalStage minTotalVerifiedDurationSeconds(Nullable<Integer> minTotalVerifiedDurationSeconds) {
+            if (minTotalVerifiedDurationSeconds.isNull()) {
+                this.minTotalVerifiedDurationSeconds = null;
+            } else if (minTotalVerifiedDurationSeconds.isEmpty()) {
+                this.minTotalVerifiedDurationSeconds = Optional.empty();
+            } else {
+                this.minTotalVerifiedDurationSeconds = Optional.of(minTotalVerifiedDurationSeconds.get());
+            }
+            return this;
+        }
+
+        /**
+         * <p>Total verified footage a submission must accumulate before it can be submitted, in seconds. Always a whole number of hours. Present only on <code>data_capture</code> bounties — it is what <code>net_reward_amount</code> pays for, so rate displays divide by it. <code>null</code> for every other goal type.</p>
+         * @return Reference to {@code this} so that method calls can be chained together.
+         */
+        @java.lang.Override
+        public _FinalStage minTotalVerifiedDurationSeconds(Integer minTotalVerifiedDurationSeconds) {
+            this.minTotalVerifiedDurationSeconds = Optional.ofNullable(minTotalVerifiedDurationSeconds);
+            return this;
+        }
+
+        /**
+         * <p>Total verified footage a submission must accumulate before it can be submitted, in seconds. Always a whole number of hours. Present only on <code>data_capture</code> bounties — it is what <code>net_reward_amount</code> pays for, so rate displays divide by it. <code>null</code> for every other goal type.</p>
+         */
+        @java.lang.Override
+        @JsonSetter(value = "min_total_verified_duration_seconds", nulls = Nulls.SKIP)
+        public _FinalStage minTotalVerifiedDurationSeconds(Optional<Integer> minTotalVerifiedDurationSeconds) {
+            this.minTotalVerifiedDurationSeconds = minTotalVerifiedDurationSeconds;
             return this;
         }
 
@@ -1704,6 +1847,31 @@ public final class Bounty {
         }
 
         @java.lang.Override
+        public _FinalStage addAllActiveProofLivestreamFeeds(
+                List<BountyActiveLivestreamFeed> activeProofLivestreamFeeds) {
+            if (activeProofLivestreamFeeds != null) {
+                this.activeProofLivestreamFeeds.addAll(activeProofLivestreamFeeds);
+            }
+            return this;
+        }
+
+        @java.lang.Override
+        public _FinalStage addActiveProofLivestreamFeeds(BountyActiveLivestreamFeed activeProofLivestreamFeeds) {
+            this.activeProofLivestreamFeeds.add(activeProofLivestreamFeeds);
+            return this;
+        }
+
+        @java.lang.Override
+        @JsonSetter(value = "active_proof_livestream_feeds", nulls = Nulls.SKIP)
+        public _FinalStage activeProofLivestreamFeeds(List<BountyActiveLivestreamFeed> activeProofLivestreamFeeds) {
+            this.activeProofLivestreamFeeds.clear();
+            if (activeProofLivestreamFeeds != null) {
+                this.activeProofLivestreamFeeds.addAll(activeProofLivestreamFeeds);
+            }
+            return this;
+        }
+
+        @java.lang.Override
         public _FinalStage addAllAcceptedDeliverableTypes(
                 List<BountyAcceptedDeliverableTypesItem> acceptedDeliverableTypes) {
             if (acceptedDeliverableTypes != null) {
@@ -1735,14 +1903,17 @@ public final class Bounty {
                     acceptedSubmissionsCount,
                     acceptedSubmissionsLimit,
                     acceptedSubmissionsPerUserLimit,
+                    activeProofLivestreamFeeds,
                     affiliateShareAmount,
                     allowedCountryCodes,
+                    awaitingReviewSubmissionsCount,
                     budgetAmount,
                     businessGoalType,
                     cancelRequestedAt,
                     captureSpec,
                     createdAt,
                     currency,
+                    deniedSubmissionsCount,
                     description,
                     discussionExperienceId,
                     discussionFeedId,
@@ -1753,6 +1924,7 @@ public final class Bounty {
                     grossRewardAmount,
                     hostingAccount,
                     id,
+                    minTotalVerifiedDurationSeconds,
                     netRewardAmount,
                     poster,
                     scheduledFrequency,
@@ -1765,6 +1937,50 @@ public final class Bounty {
                     updatedAt,
                     viewerAcceptedSubmissionsCount,
                     additionalProperties);
+        }
+
+        @JsonAnySetter
+        private void putAdditionalPropertyFromJson(String key, Object value) {
+            if (key.equalsIgnoreCase("accepted_deliverable_types")
+                    || key.equalsIgnoreCase("accepted_submissions_count")
+                    || key.equalsIgnoreCase("accepted_submissions_limit")
+                    || key.equalsIgnoreCase("accepted_submissions_per_user_limit")
+                    || key.equalsIgnoreCase("active_proof_livestream_feeds")
+                    || key.equalsIgnoreCase("affiliate_share_amount")
+                    || key.equalsIgnoreCase("allowed_country_codes")
+                    || key.equalsIgnoreCase("awaiting_review_submissions_count")
+                    || key.equalsIgnoreCase("budget_amount")
+                    || key.equalsIgnoreCase("business_goal_type")
+                    || key.equalsIgnoreCase("cancel_requested_at")
+                    || key.equalsIgnoreCase("capture_spec")
+                    || key.equalsIgnoreCase("created_at")
+                    || key.equalsIgnoreCase("currency")
+                    || key.equalsIgnoreCase("denied_submissions_count")
+                    || key.equalsIgnoreCase("description")
+                    || key.equalsIgnoreCase("discussion_experience_id")
+                    || key.equalsIgnoreCase("discussion_feed_id")
+                    || key.equalsIgnoreCase("discussion_post_id")
+                    || key.equalsIgnoreCase("experience_id")
+                    || key.equalsIgnoreCase("funding_account")
+                    || key.equalsIgnoreCase("gross_paid_out_amount")
+                    || key.equalsIgnoreCase("gross_reward_amount")
+                    || key.equalsIgnoreCase("hosting_account")
+                    || key.equalsIgnoreCase("id")
+                    || key.equalsIgnoreCase("min_total_verified_duration_seconds")
+                    || key.equalsIgnoreCase("net_reward_amount")
+                    || key.equalsIgnoreCase("poster")
+                    || key.equalsIgnoreCase("scheduled_frequency")
+                    || key.equalsIgnoreCase("scheduled_publish_at")
+                    || key.equalsIgnoreCase("spots_remaining")
+                    || key.equalsIgnoreCase("status")
+                    || key.equalsIgnoreCase("submissions_closed_at")
+                    || key.equalsIgnoreCase("title")
+                    || key.equalsIgnoreCase("unresolved_submissions_count")
+                    || key.equalsIgnoreCase("updated_at")
+                    || key.equalsIgnoreCase("viewer_accepted_submissions_count")) {
+                return;
+            }
+            this.additionalProperties.put(key, value);
         }
 
         @java.lang.Override

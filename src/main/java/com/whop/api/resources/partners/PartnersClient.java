@@ -10,9 +10,12 @@ import com.whop.api.core.pagination.SyncPagingIterable;
 import com.whop.api.resources.partners.businesses.BusinessesClient;
 import com.whop.api.resources.partners.requests.LeaderboardPartnersRequest;
 import com.whop.api.resources.partners.requests.ReferredUsersPartnersRequest;
+import com.whop.api.resources.partners.requests.RetrievePartnersRequest;
 import com.whop.api.resources.partners.types.CreatePartnersResponse;
+import com.whop.api.resources.partners.types.FeeOptionsPartnersResponse;
 import com.whop.api.resources.partners.types.LeaderboardPartnersResponse;
 import com.whop.api.resources.partners.types.ReferredUsersPartnersResponseDataItem;
+import com.whop.api.types.Partner;
 import java.util.function.Supplier;
 
 public class PartnersClient {
@@ -50,49 +53,63 @@ public class PartnersClient {
     }
 
     /**
-     * Ranks referrers by partner business earnings — all-time by default, or over the current day, month, year, or trailing 30 days. Authentication is optional: authenticated callers also get their own standing, anonymous callers get the rankings alone.
+     * Lists, per income stream, the fee a business the caller refers would be charged, how low the caller may price it, and the commission the caller earns on that stream. Answers for a referral that does not exist yet, so a referral flow can price the deal before the business is created. Requires <code>partner:fees:update</code>, since the floors a partner may price down to are only for a credential that can set them.
+     */
+    public FeeOptionsPartnersResponse feeOptions() {
+        return this.rawClient.feeOptions().body();
+    }
+
+    /**
+     * Lists, per income stream, the fee a business the caller refers would be charged, how low the caller may price it, and the commission the caller earns on that stream. Answers for a referral that does not exist yet, so a referral flow can price the deal before the business is created. Requires <code>partner:fees:update</code>, since the floors a partner may price down to are only for a credential that can set them.
+     */
+    public FeeOptionsPartnersResponse feeOptions(RequestOptions requestOptions) {
+        return this.rawClient.feeOptions(requestOptions).body();
+    }
+
+    /**
+     * Ranks referrers by partner business earnings over the chosen <code>period</code>, all-time by default. Authentication is optional: authenticated callers also get their own standing, anonymous callers get the rankings alone.
      */
     public LeaderboardPartnersResponse leaderboard() {
         return this.rawClient.leaderboard().body();
     }
 
     /**
-     * Ranks referrers by partner business earnings — all-time by default, or over the current day, month, year, or trailing 30 days. Authentication is optional: authenticated callers also get their own standing, anonymous callers get the rankings alone.
+     * Ranks referrers by partner business earnings over the chosen <code>period</code>, all-time by default. Authentication is optional: authenticated callers also get their own standing, anonymous callers get the rankings alone.
      */
     public LeaderboardPartnersResponse leaderboard(RequestOptions requestOptions) {
         return this.rawClient.leaderboard(requestOptions).body();
     }
 
     /**
-     * Ranks referrers by partner business earnings — all-time by default, or over the current day, month, year, or trailing 30 days. Authentication is optional: authenticated callers also get their own standing, anonymous callers get the rankings alone.
+     * Ranks referrers by partner business earnings over the chosen <code>period</code>, all-time by default. Authentication is optional: authenticated callers also get their own standing, anonymous callers get the rankings alone.
      */
     public LeaderboardPartnersResponse leaderboard(LeaderboardPartnersRequest request) {
         return this.rawClient.leaderboard(request).body();
     }
 
     /**
-     * Ranks referrers by partner business earnings — all-time by default, or over the current day, month, year, or trailing 30 days. Authentication is optional: authenticated callers also get their own standing, anonymous callers get the rankings alone.
+     * Ranks referrers by partner business earnings over the chosen <code>period</code>, all-time by default. Authentication is optional: authenticated callers also get their own standing, anonymous callers get the rankings alone.
      */
     public LeaderboardPartnersResponse leaderboard(LeaderboardPartnersRequest request, RequestOptions requestOptions) {
         return this.rawClient.leaderboard(request, requestOptions).body();
     }
 
     /**
-     * Lists the users the caller referred onto Whop (newest first), each with the second-tier earnings the caller has made from that user's businesses.
+     * Lists the users the caller referred onto Whop, newest first by default, each with the caller's total affiliate earnings from that user across all tiers. Deprecated: this list is retired and no longer appears in the API reference. It keeps responding for existing integrations and has no replacement.
      */
     public SyncPagingIterable<ReferredUsersPartnersResponseDataItem> referredUsers() {
         return this.rawClient.referredUsers().body();
     }
 
     /**
-     * Lists the users the caller referred onto Whop (newest first), each with the second-tier earnings the caller has made from that user's businesses.
+     * Lists the users the caller referred onto Whop, newest first by default, each with the caller's total affiliate earnings from that user across all tiers. Deprecated: this list is retired and no longer appears in the API reference. It keeps responding for existing integrations and has no replacement.
      */
     public SyncPagingIterable<ReferredUsersPartnersResponseDataItem> referredUsers(RequestOptions requestOptions) {
         return this.rawClient.referredUsers(requestOptions).body();
     }
 
     /**
-     * Lists the users the caller referred onto Whop (newest first), each with the second-tier earnings the caller has made from that user's businesses.
+     * Lists the users the caller referred onto Whop, newest first by default, each with the caller's total affiliate earnings from that user across all tiers. Deprecated: this list is retired and no longer appears in the API reference. It keeps responding for existing integrations and has no replacement.
      */
     public SyncPagingIterable<ReferredUsersPartnersResponseDataItem> referredUsers(
             ReferredUsersPartnersRequest request) {
@@ -100,11 +117,39 @@ public class PartnersClient {
     }
 
     /**
-     * Lists the users the caller referred onto Whop (newest first), each with the second-tier earnings the caller has made from that user's businesses.
+     * Lists the users the caller referred onto Whop, newest first by default, each with the caller's total affiliate earnings from that user across all tiers. Deprecated: this list is retired and no longer appears in the API reference. It keeps responding for existing integrations and has no replacement.
      */
     public SyncPagingIterable<ReferredUsersPartnersResponseDataItem> referredUsers(
             ReferredUsersPartnersRequest request, RequestOptions requestOptions) {
         return this.rawClient.referredUsers(request, requestOptions).body();
+    }
+
+    /**
+     * Retrieves the authenticated user's partner profile: enrollment and verification status, certification completion, active direct business referral count, and default payout rates. Other users' profiles are not accessible. To create and manage referral links, use <code>/partner_referral_requests</code>.
+     */
+    public Partner retrieve(String id) {
+        return this.rawClient.retrieve(id).body();
+    }
+
+    /**
+     * Retrieves the authenticated user's partner profile: enrollment and verification status, certification completion, active direct business referral count, and default payout rates. Other users' profiles are not accessible. To create and manage referral links, use <code>/partner_referral_requests</code>.
+     */
+    public Partner retrieve(String id, RequestOptions requestOptions) {
+        return this.rawClient.retrieve(id, requestOptions).body();
+    }
+
+    /**
+     * Retrieves the authenticated user's partner profile: enrollment and verification status, certification completion, active direct business referral count, and default payout rates. Other users' profiles are not accessible. To create and manage referral links, use <code>/partner_referral_requests</code>.
+     */
+    public Partner retrieve(String id, RetrievePartnersRequest request) {
+        return this.rawClient.retrieve(id, request).body();
+    }
+
+    /**
+     * Retrieves the authenticated user's partner profile: enrollment and verification status, certification completion, active direct business referral count, and default payout rates. Other users' profiles are not accessible. To create and manage referral links, use <code>/partner_referral_requests</code>.
+     */
+    public Partner retrieve(String id, RetrievePartnersRequest request, RequestOptions requestOptions) {
+        return this.rawClient.retrieve(id, request, requestOptions).body();
     }
 
     public BusinessesClient businesses() {

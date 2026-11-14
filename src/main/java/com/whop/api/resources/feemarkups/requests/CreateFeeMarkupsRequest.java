@@ -25,7 +25,7 @@ import org.jetbrains.annotations.NotNull;
 @JsonInclude(JsonInclude.Include.NON_ABSENT)
 @JsonDeserialize(builder = CreateFeeMarkupsRequest.Builder.class)
 public final class CreateFeeMarkupsRequest {
-    private final String companyId;
+    private final String accountId;
 
     private final FeeMarkupTypes feeType;
 
@@ -40,14 +40,14 @@ public final class CreateFeeMarkupsRequest {
     private final Map<String, Object> additionalProperties;
 
     private CreateFeeMarkupsRequest(
-            String companyId,
+            String accountId,
             FeeMarkupTypes feeType,
             Optional<Double> fixedFeeUsd,
             Optional<Map<String, Object>> metadata,
             Optional<String> notes,
             Optional<Double> percentageFee,
             Map<String, Object> additionalProperties) {
-        this.companyId = companyId;
+        this.accountId = accountId;
         this.feeType = feeType;
         this.fixedFeeUsd = fixedFeeUsd;
         this.metadata = metadata;
@@ -59,9 +59,9 @@ public final class CreateFeeMarkupsRequest {
     /**
      * @return The unique identifier of the company to create or update the fee markup for.
      */
-    @JsonProperty("company_id")
-    public String getCompanyId() {
-        return companyId;
+    @JsonProperty("account_id")
+    public String getAccountId() {
+        return accountId;
     }
 
     /**
@@ -152,7 +152,7 @@ public final class CreateFeeMarkupsRequest {
     }
 
     private boolean equalTo(CreateFeeMarkupsRequest other) {
-        return companyId.equals(other.companyId)
+        return accountId.equals(other.accountId)
                 && feeType.equals(other.feeType)
                 && fixedFeeUsd.equals(other.fixedFeeUsd)
                 && metadata.equals(other.metadata)
@@ -163,7 +163,7 @@ public final class CreateFeeMarkupsRequest {
     @java.lang.Override
     public int hashCode() {
         return Objects.hash(
-                this.companyId, this.feeType, this.fixedFeeUsd, this.metadata, this.notes, this.percentageFee);
+                this.accountId, this.feeType, this.fixedFeeUsd, this.metadata, this.notes, this.percentageFee);
     }
 
     @java.lang.Override
@@ -171,15 +171,15 @@ public final class CreateFeeMarkupsRequest {
         return ObjectMappers.stringify(this);
     }
 
-    public static CompanyIdStage builder() {
+    public static AccountIdStage builder() {
         return new Builder();
     }
 
-    public interface CompanyIdStage {
+    public interface AccountIdStage {
         /**
          * <p>The unique identifier of the company to create or update the fee markup for.</p>
          */
-        FeeTypeStage companyId(@NotNull String companyId);
+        FeeTypeStage accountId(@NotNull String accountId);
 
         Builder from(CreateFeeMarkupsRequest other);
     }
@@ -236,8 +236,8 @@ public final class CreateFeeMarkupsRequest {
     }
 
     @JsonIgnoreProperties(ignoreUnknown = true)
-    public static final class Builder implements CompanyIdStage, FeeTypeStage, _FinalStage {
-        private String companyId;
+    public static final class Builder implements AccountIdStage, FeeTypeStage, _FinalStage {
+        private String accountId;
 
         private FeeMarkupTypes feeType;
 
@@ -249,14 +249,13 @@ public final class CreateFeeMarkupsRequest {
 
         private Optional<Double> fixedFeeUsd = Optional.empty();
 
-        @JsonAnySetter
         private Map<String, Object> additionalProperties = new HashMap<>();
 
         private Builder() {}
 
         @java.lang.Override
         public Builder from(CreateFeeMarkupsRequest other) {
-            companyId(other.getCompanyId());
+            accountId(other.getAccountId());
             feeType(other.getFeeType());
             fixedFeeUsd(other.getFixedFeeUsd());
             metadata(other.getMetadata());
@@ -267,18 +266,16 @@ public final class CreateFeeMarkupsRequest {
 
         /**
          * <p>The unique identifier of the company to create or update the fee markup for.</p>
-         * <p>The unique identifier of the company to create or update the fee markup for.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
-        @JsonSetter("company_id")
-        public FeeTypeStage companyId(@NotNull String companyId) {
-            this.companyId = Objects.requireNonNull(companyId, "companyId must not be null");
+        @JsonSetter("account_id")
+        public FeeTypeStage accountId(@NotNull String accountId) {
+            this.accountId = Objects.requireNonNull(accountId, "accountId must not be null");
             return this;
         }
 
         /**
-         * <p>The type of fee this markup applies to, such as processing or platform fees.</p>
          * <p>The type of fee this markup applies to, such as processing or platform fees.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
@@ -436,7 +433,20 @@ public final class CreateFeeMarkupsRequest {
         @java.lang.Override
         public CreateFeeMarkupsRequest build() {
             return new CreateFeeMarkupsRequest(
-                    companyId, feeType, fixedFeeUsd, metadata, notes, percentageFee, additionalProperties);
+                    accountId, feeType, fixedFeeUsd, metadata, notes, percentageFee, additionalProperties);
+        }
+
+        @JsonAnySetter
+        private void putAdditionalPropertyFromJson(String key, Object value) {
+            if (key.equalsIgnoreCase("account_id")
+                    || key.equalsIgnoreCase("fee_type")
+                    || key.equalsIgnoreCase("fixed_fee_usd")
+                    || key.equalsIgnoreCase("metadata")
+                    || key.equalsIgnoreCase("notes")
+                    || key.equalsIgnoreCase("percentage_fee")) {
+                return;
+            }
+            this.additionalProperties.put(key, value);
         }
 
         @java.lang.Override

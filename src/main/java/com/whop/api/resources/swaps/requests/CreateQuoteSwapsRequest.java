@@ -26,6 +26,8 @@ import org.jetbrains.annotations.NotNull;
 @JsonInclude(JsonInclude.Include.NON_ABSENT)
 @JsonDeserialize(builder = CreateQuoteSwapsRequest.Builder.class)
 public final class CreateQuoteSwapsRequest {
+    private final Optional<String> accountId;
+
     private final String amount;
 
     private final Optional<String> fromAddress;
@@ -44,9 +46,12 @@ public final class CreateQuoteSwapsRequest {
 
     private final String toToken;
 
+    private final Optional<String> userId;
+
     private final Map<String, Object> additionalProperties;
 
     private CreateQuoteSwapsRequest(
+            Optional<String> accountId,
             String amount,
             Optional<String> fromAddress,
             Optional<CreateQuoteSwapsRequestFromChain> fromChain,
@@ -56,7 +61,9 @@ public final class CreateQuoteSwapsRequest {
             Optional<String> toAddress,
             Optional<CreateQuoteSwapsRequestToChain> toChain,
             String toToken,
+            Optional<String> userId,
             Map<String, Object> additionalProperties) {
+        this.accountId = accountId;
         this.amount = amount;
         this.fromAddress = fromAddress;
         this.fromChain = fromChain;
@@ -66,7 +73,16 @@ public final class CreateQuoteSwapsRequest {
         this.toAddress = toAddress;
         this.toChain = toChain;
         this.toToken = toToken;
+        this.userId = userId;
         this.additionalProperties = additionalProperties;
+    }
+
+    /**
+     * @return Fiat pairs only: business account to quote the swap for, prefixed <code>biz_</code>. Requires a credential with <code>payout:transfer_funds</code> on that account. Provide this, <code>user_id</code>, or neither for a public quote.
+     */
+    @JsonProperty("account_id")
+    public Optional<String> getAccountId() {
+        return accountId;
     }
 
     /**
@@ -156,6 +172,14 @@ public final class CreateQuoteSwapsRequest {
         return toToken;
     }
 
+    /**
+     * @return Fiat pairs only: the caller's own user ID, prefixed <code>user_</code>, to quote the swap for their personal account. Provide this or <code>account_id</code>.
+     */
+    @JsonProperty("user_id")
+    public Optional<String> getUserId() {
+        return userId;
+    }
+
     @JsonInclude(value = JsonInclude.Include.CUSTOM, valueFilter = NullableNonemptyFilter.class)
     @JsonProperty("from_address")
     private Optional<String> _getFromAddress() {
@@ -198,7 +222,8 @@ public final class CreateQuoteSwapsRequest {
     }
 
     private boolean equalTo(CreateQuoteSwapsRequest other) {
-        return amount.equals(other.amount)
+        return accountId.equals(other.accountId)
+                && amount.equals(other.amount)
                 && fromAddress.equals(other.fromAddress)
                 && fromChain.equals(other.fromChain)
                 && fromToken.equals(other.fromToken)
@@ -206,12 +231,14 @@ public final class CreateQuoteSwapsRequest {
                 && slippageBps.equals(other.slippageBps)
                 && toAddress.equals(other.toAddress)
                 && toChain.equals(other.toChain)
-                && toToken.equals(other.toToken);
+                && toToken.equals(other.toToken)
+                && userId.equals(other.userId);
     }
 
     @java.lang.Override
     public int hashCode() {
         return Objects.hash(
+                this.accountId,
                 this.amount,
                 this.fromAddress,
                 this.fromChain,
@@ -220,7 +247,8 @@ public final class CreateQuoteSwapsRequest {
                 this.slippageBps,
                 this.toAddress,
                 this.toChain,
-                this.toToken);
+                this.toToken,
+                this.userId);
     }
 
     @java.lang.Override
@@ -261,6 +289,13 @@ public final class CreateQuoteSwapsRequest {
         _FinalStage additionalProperty(String key, Object value);
 
         _FinalStage additionalProperties(Map<String, Object> additionalProperties);
+
+        /**
+         * <p>Fiat pairs only: business account to quote the swap for, prefixed <code>biz_</code>. Requires a credential with <code>payout:transfer_funds</code> on that account. Provide this, <code>user_id</code>, or neither for a public quote.</p>
+         */
+        _FinalStage accountId(Optional<String> accountId);
+
+        _FinalStage accountId(String accountId);
 
         /**
          * <p>Source wallet address used for the quote.</p>
@@ -313,6 +348,13 @@ public final class CreateQuoteSwapsRequest {
         _FinalStage toChain(CreateQuoteSwapsRequestToChain toChain);
 
         _FinalStage toChain(Nullable<CreateQuoteSwapsRequestToChain> toChain);
+
+        /**
+         * <p>Fiat pairs only: the caller's own user ID, prefixed <code>user_</code>, to quote the swap for their personal account. Provide this or <code>account_id</code>.</p>
+         */
+        _FinalStage userId(Optional<String> userId);
+
+        _FinalStage userId(String userId);
     }
 
     @JsonIgnoreProperties(ignoreUnknown = true)
@@ -322,6 +364,8 @@ public final class CreateQuoteSwapsRequest {
         private String fromToken;
 
         private String toToken;
+
+        private Optional<String> userId = Optional.empty();
 
         private Optional<CreateQuoteSwapsRequestToChain> toChain = Optional.empty();
 
@@ -335,13 +379,15 @@ public final class CreateQuoteSwapsRequest {
 
         private Optional<String> fromAddress = Optional.empty();
 
-        @JsonAnySetter
+        private Optional<String> accountId = Optional.empty();
+
         private Map<String, Object> additionalProperties = new HashMap<>();
 
         private Builder() {}
 
         @java.lang.Override
         public Builder from(CreateQuoteSwapsRequest other) {
+            accountId(other.getAccountId());
             amount(other.getAmount());
             fromAddress(other.getFromAddress());
             fromChain(other.getFromChain());
@@ -351,11 +397,11 @@ public final class CreateQuoteSwapsRequest {
             toAddress(other.getToAddress());
             toChain(other.getToChain());
             toToken(other.getToToken());
+            userId(other.getUserId());
             return this;
         }
 
         /**
-         * <p>Source token amount.</p>
          * <p>Source token amount.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
@@ -368,7 +414,6 @@ public final class CreateQuoteSwapsRequest {
 
         /**
          * <p>Source token contract address or ticker symbol, such as &quot;USDT&quot;.</p>
-         * <p>Source token contract address or ticker symbol, such as &quot;USDT&quot;.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
@@ -380,13 +425,32 @@ public final class CreateQuoteSwapsRequest {
 
         /**
          * <p>Destination token contract address or ticker symbol, such as &quot;XAUT&quot;.</p>
-         * <p>Destination token contract address or ticker symbol, such as &quot;XAUT&quot;.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
         @JsonSetter("to_token")
         public _FinalStage toToken(@NotNull String toToken) {
             this.toToken = Objects.requireNonNull(toToken, "toToken must not be null");
+            return this;
+        }
+
+        /**
+         * <p>Fiat pairs only: the caller's own user ID, prefixed <code>user_</code>, to quote the swap for their personal account. Provide this or <code>account_id</code>.</p>
+         * @return Reference to {@code this} so that method calls can be chained together.
+         */
+        @java.lang.Override
+        public _FinalStage userId(String userId) {
+            this.userId = Optional.ofNullable(userId);
+            return this;
+        }
+
+        /**
+         * <p>Fiat pairs only: the caller's own user ID, prefixed <code>user_</code>, to quote the swap for their personal account. Provide this or <code>account_id</code>.</p>
+         */
+        @java.lang.Override
+        @JsonSetter(value = "user_id", nulls = Nulls.SKIP)
+        public _FinalStage userId(Optional<String> userId) {
+            this.userId = userId;
             return this;
         }
 
@@ -590,9 +654,30 @@ public final class CreateQuoteSwapsRequest {
             return this;
         }
 
+        /**
+         * <p>Fiat pairs only: business account to quote the swap for, prefixed <code>biz_</code>. Requires a credential with <code>payout:transfer_funds</code> on that account. Provide this, <code>user_id</code>, or neither for a public quote.</p>
+         * @return Reference to {@code this} so that method calls can be chained together.
+         */
+        @java.lang.Override
+        public _FinalStage accountId(String accountId) {
+            this.accountId = Optional.ofNullable(accountId);
+            return this;
+        }
+
+        /**
+         * <p>Fiat pairs only: business account to quote the swap for, prefixed <code>biz_</code>. Requires a credential with <code>payout:transfer_funds</code> on that account. Provide this, <code>user_id</code>, or neither for a public quote.</p>
+         */
+        @java.lang.Override
+        @JsonSetter(value = "account_id", nulls = Nulls.SKIP)
+        public _FinalStage accountId(Optional<String> accountId) {
+            this.accountId = accountId;
+            return this;
+        }
+
         @java.lang.Override
         public CreateQuoteSwapsRequest build() {
             return new CreateQuoteSwapsRequest(
+                    accountId,
                     amount,
                     fromAddress,
                     fromChain,
@@ -602,7 +687,26 @@ public final class CreateQuoteSwapsRequest {
                     toAddress,
                     toChain,
                     toToken,
+                    userId,
                     additionalProperties);
+        }
+
+        @JsonAnySetter
+        private void putAdditionalPropertyFromJson(String key, Object value) {
+            if (key.equalsIgnoreCase("account_id")
+                    || key.equalsIgnoreCase("amount")
+                    || key.equalsIgnoreCase("from_address")
+                    || key.equalsIgnoreCase("from_chain")
+                    || key.equalsIgnoreCase("from_token")
+                    || key.equalsIgnoreCase("metadata")
+                    || key.equalsIgnoreCase("slippage_bps")
+                    || key.equalsIgnoreCase("to_address")
+                    || key.equalsIgnoreCase("to_chain")
+                    || key.equalsIgnoreCase("to_token")
+                    || key.equalsIgnoreCase("user_id")) {
+                return;
+            }
+            this.additionalProperties.put(key, value);
         }
 
         @java.lang.Override

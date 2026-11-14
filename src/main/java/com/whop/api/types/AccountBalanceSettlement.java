@@ -106,7 +106,6 @@ public final class AccountBalanceSettlement {
 
         private String date;
 
-        @JsonAnySetter
         private Map<String, Object> additionalProperties = new HashMap<>();
 
         private Builder() {}
@@ -120,7 +119,6 @@ public final class AccountBalanceSettlement {
 
         /**
          * <p>Amount expected that day, in native units, as a decimal string.</p>
-         * <p>Amount expected that day, in native units, as a decimal string.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
@@ -131,7 +129,6 @@ public final class AccountBalanceSettlement {
         }
 
         /**
-         * <p>The day this money is expected to finish settling, as an ISO 8601 date.</p>
          * <p>The day this money is expected to finish settling, as an ISO 8601 date.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
@@ -145,6 +142,14 @@ public final class AccountBalanceSettlement {
         @java.lang.Override
         public AccountBalanceSettlement build() {
             return new AccountBalanceSettlement(amount, date, additionalProperties);
+        }
+
+        @JsonAnySetter
+        private void putAdditionalPropertyFromJson(String key, Object value) {
+            if (key.equalsIgnoreCase("amount") || key.equalsIgnoreCase("date")) {
+                return;
+            }
+            this.additionalProperties.put(key, value);
         }
 
         @java.lang.Override

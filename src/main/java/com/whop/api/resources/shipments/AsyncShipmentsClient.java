@@ -5,12 +5,15 @@ package com.whop.api.resources.shipments;
 
 import com.whop.api.core.ClientOptions;
 import com.whop.api.core.RequestOptions;
+import com.whop.api.core.WhopApiHttpResponse;
 import com.whop.api.core.pagination.SyncPagingIterable;
 import com.whop.api.resources.shipments.requests.CreateShipmentsRequest;
 import com.whop.api.resources.shipments.requests.ListShipmentsRequest;
+import com.whop.api.resources.shipments.requests.LookupShipmentsRequest;
 import com.whop.api.resources.shipments.requests.RetrieveShipmentsRequest;
 import com.whop.api.resources.shipments.requests.UpdateShipmentsRequest;
 import com.whop.api.types.Shipment;
+import com.whop.api.types.ShipmentLookup;
 import java.util.concurrent.CompletableFuture;
 
 public class AsyncShipmentsClient {
@@ -31,82 +34,191 @@ public class AsyncShipmentsClient {
     }
 
     /**
-     * Returns a paginated list of shipments for an account.
+     * Lists an account's shipments.
      */
     public CompletableFuture<SyncPagingIterable<Shipment>> list() {
-        return this.rawClient.list().thenApply(response -> response.body());
+        CompletableFuture<WhopApiHttpResponse<SyncPagingIterable<Shipment>>> rawFuture = this.rawClient.list();
+        CompletableFuture<SyncPagingIterable<Shipment>> future = rawFuture.thenApply(response -> response.body());
+        future.whenComplete((result_, throwable_) -> {
+            if (future.isCancelled()) {
+                rawFuture.cancel(true);
+            }
+        });
+        return future;
     }
 
     /**
-     * Returns a paginated list of shipments for an account.
+     * Lists an account's shipments.
      */
     public CompletableFuture<SyncPagingIterable<Shipment>> list(RequestOptions requestOptions) {
-        return this.rawClient.list(requestOptions).thenApply(response -> response.body());
+        CompletableFuture<WhopApiHttpResponse<SyncPagingIterable<Shipment>>> rawFuture =
+                this.rawClient.list(requestOptions);
+        CompletableFuture<SyncPagingIterable<Shipment>> future = rawFuture.thenApply(response -> response.body());
+        future.whenComplete((result_, throwable_) -> {
+            if (future.isCancelled()) {
+                rawFuture.cancel(true);
+            }
+        });
+        return future;
     }
 
     /**
-     * Returns a paginated list of shipments for an account.
+     * Lists an account's shipments.
      */
     public CompletableFuture<SyncPagingIterable<Shipment>> list(ListShipmentsRequest request) {
-        return this.rawClient.list(request).thenApply(response -> response.body());
+        CompletableFuture<WhopApiHttpResponse<SyncPagingIterable<Shipment>>> rawFuture = this.rawClient.list(request);
+        CompletableFuture<SyncPagingIterable<Shipment>> future = rawFuture.thenApply(response -> response.body());
+        future.whenComplete((result_, throwable_) -> {
+            if (future.isCancelled()) {
+                rawFuture.cancel(true);
+            }
+        });
+        return future;
     }
 
     /**
-     * Returns a paginated list of shipments for an account.
+     * Lists an account's shipments.
      */
     public CompletableFuture<SyncPagingIterable<Shipment>> list(
             ListShipmentsRequest request, RequestOptions requestOptions) {
-        return this.rawClient.list(request, requestOptions).thenApply(response -> response.body());
+        CompletableFuture<WhopApiHttpResponse<SyncPagingIterable<Shipment>>> rawFuture =
+                this.rawClient.list(request, requestOptions);
+        CompletableFuture<SyncPagingIterable<Shipment>> future = rawFuture.thenApply(response -> response.body());
+        future.whenComplete((result_, throwable_) -> {
+            if (future.isCancelled()) {
+                rawFuture.cancel(true);
+            }
+        });
+        return future;
     }
 
     /**
      * Attaches a carrier tracking number to a payment and begins tracking it.
      */
     public CompletableFuture<Shipment> create(CreateShipmentsRequest request) {
-        return this.rawClient.create(request).thenApply(response -> response.body());
+        CompletableFuture<WhopApiHttpResponse<Shipment>> rawFuture = this.rawClient.create(request);
+        CompletableFuture<Shipment> future = rawFuture.thenApply(response -> response.body());
+        future.whenComplete((result_, throwable_) -> {
+            if (future.isCancelled()) {
+                rawFuture.cancel(true);
+            }
+        });
+        return future;
     }
 
     /**
      * Attaches a carrier tracking number to a payment and begins tracking it.
      */
     public CompletableFuture<Shipment> create(CreateShipmentsRequest request, RequestOptions requestOptions) {
-        return this.rawClient.create(request, requestOptions).thenApply(response -> response.body());
+        CompletableFuture<WhopApiHttpResponse<Shipment>> rawFuture = this.rawClient.create(request, requestOptions);
+        CompletableFuture<Shipment> future = rawFuture.thenApply(response -> response.body());
+        future.whenComplete((result_, throwable_) -> {
+            if (future.isCancelled()) {
+                rawFuture.cancel(true);
+            }
+        });
+        return future;
     }
 
     /**
-     * Retrieves a shipment by its id, or by the payment id it fulfills.
+     * Finds the delivery for a purchase from an account with customer tracking turned on, using exactly one order or tracking number plus the buyer's current receipt email. No authentication is required and no sign-in or session is created. Email matching ignores case and surrounding whitespace, but dots and +tags must match. Every miss returns the same 404: an unknown account, tracking turned off, a wrong number or email, an unpaid order or a purchase with nothing to ship. <code>shipment</code> is <code>null</code> while a paid physical purchase has no tracking yet, unless it has been fully refunded. Limited to 10 attempts per hour per order or tracking number within the account, and 30 attempts per five minutes per client IP and per email within the account. Responses are never cached or replayed with Idempotency-Key.
+     */
+    public CompletableFuture<ShipmentLookup> lookup(LookupShipmentsRequest request) {
+        CompletableFuture<WhopApiHttpResponse<ShipmentLookup>> rawFuture = this.rawClient.lookup(request);
+        CompletableFuture<ShipmentLookup> future = rawFuture.thenApply(response -> response.body());
+        future.whenComplete((result_, throwable_) -> {
+            if (future.isCancelled()) {
+                rawFuture.cancel(true);
+            }
+        });
+        return future;
+    }
+
+    /**
+     * Finds the delivery for a purchase from an account with customer tracking turned on, using exactly one order or tracking number plus the buyer's current receipt email. No authentication is required and no sign-in or session is created. Email matching ignores case and surrounding whitespace, but dots and +tags must match. Every miss returns the same 404: an unknown account, tracking turned off, a wrong number or email, an unpaid order or a purchase with nothing to ship. <code>shipment</code> is <code>null</code> while a paid physical purchase has no tracking yet, unless it has been fully refunded. Limited to 10 attempts per hour per order or tracking number within the account, and 30 attempts per five minutes per client IP and per email within the account. Responses are never cached or replayed with Idempotency-Key.
+     */
+    public CompletableFuture<ShipmentLookup> lookup(LookupShipmentsRequest request, RequestOptions requestOptions) {
+        CompletableFuture<WhopApiHttpResponse<ShipmentLookup>> rawFuture =
+                this.rawClient.lookup(request, requestOptions);
+        CompletableFuture<ShipmentLookup> future = rawFuture.thenApply(response -> response.body());
+        future.whenComplete((result_, throwable_) -> {
+            if (future.isCancelled()) {
+                rawFuture.cancel(true);
+            }
+        });
+        return future;
+    }
+
+    /**
+     * Retrieves a shipment by its ID, or by the ID of the payment it fulfills.
      */
     public CompletableFuture<Shipment> retrieve(String id) {
-        return this.rawClient.retrieve(id).thenApply(response -> response.body());
+        CompletableFuture<WhopApiHttpResponse<Shipment>> rawFuture = this.rawClient.retrieve(id);
+        CompletableFuture<Shipment> future = rawFuture.thenApply(response -> response.body());
+        future.whenComplete((result_, throwable_) -> {
+            if (future.isCancelled()) {
+                rawFuture.cancel(true);
+            }
+        });
+        return future;
     }
 
     /**
-     * Retrieves a shipment by its id, or by the payment id it fulfills.
+     * Retrieves a shipment by its ID, or by the ID of the payment it fulfills.
      */
     public CompletableFuture<Shipment> retrieve(String id, RequestOptions requestOptions) {
-        return this.rawClient.retrieve(id, requestOptions).thenApply(response -> response.body());
+        CompletableFuture<WhopApiHttpResponse<Shipment>> rawFuture = this.rawClient.retrieve(id, requestOptions);
+        CompletableFuture<Shipment> future = rawFuture.thenApply(response -> response.body());
+        future.whenComplete((result_, throwable_) -> {
+            if (future.isCancelled()) {
+                rawFuture.cancel(true);
+            }
+        });
+        return future;
     }
 
     /**
-     * Retrieves a shipment by its id, or by the payment id it fulfills.
+     * Retrieves a shipment by its ID, or by the ID of the payment it fulfills.
      */
     public CompletableFuture<Shipment> retrieve(String id, RetrieveShipmentsRequest request) {
-        return this.rawClient.retrieve(id, request).thenApply(response -> response.body());
+        CompletableFuture<WhopApiHttpResponse<Shipment>> rawFuture = this.rawClient.retrieve(id, request);
+        CompletableFuture<Shipment> future = rawFuture.thenApply(response -> response.body());
+        future.whenComplete((result_, throwable_) -> {
+            if (future.isCancelled()) {
+                rawFuture.cancel(true);
+            }
+        });
+        return future;
     }
 
     /**
-     * Retrieves a shipment by its id, or by the payment id it fulfills.
+     * Retrieves a shipment by its ID, or by the ID of the payment it fulfills.
      */
     public CompletableFuture<Shipment> retrieve(
             String id, RetrieveShipmentsRequest request, RequestOptions requestOptions) {
-        return this.rawClient.retrieve(id, request, requestOptions).thenApply(response -> response.body());
+        CompletableFuture<WhopApiHttpResponse<Shipment>> rawFuture =
+                this.rawClient.retrieve(id, request, requestOptions);
+        CompletableFuture<Shipment> future = rawFuture.thenApply(response -> response.body());
+        future.whenComplete((result_, throwable_) -> {
+            if (future.isCancelled()) {
+                rawFuture.cancel(true);
+            }
+        });
+        return future;
     }
 
     /**
      * Updates a shipment's tracking number and re-tracks it with the carrier.
      */
     public CompletableFuture<Shipment> update(String id, UpdateShipmentsRequest request) {
-        return this.rawClient.update(id, request).thenApply(response -> response.body());
+        CompletableFuture<WhopApiHttpResponse<Shipment>> rawFuture = this.rawClient.update(id, request);
+        CompletableFuture<Shipment> future = rawFuture.thenApply(response -> response.body());
+        future.whenComplete((result_, throwable_) -> {
+            if (future.isCancelled()) {
+                rawFuture.cancel(true);
+            }
+        });
+        return future;
     }
 
     /**
@@ -114,6 +226,13 @@ public class AsyncShipmentsClient {
      */
     public CompletableFuture<Shipment> update(
             String id, UpdateShipmentsRequest request, RequestOptions requestOptions) {
-        return this.rawClient.update(id, request, requestOptions).thenApply(response -> response.body());
+        CompletableFuture<WhopApiHttpResponse<Shipment>> rawFuture = this.rawClient.update(id, request, requestOptions);
+        CompletableFuture<Shipment> future = rawFuture.thenApply(response -> response.body());
+        future.whenComplete((result_, throwable_) -> {
+            if (future.isCancelled()) {
+                rawFuture.cancel(true);
+            }
+        });
+        return future;
     }
 }

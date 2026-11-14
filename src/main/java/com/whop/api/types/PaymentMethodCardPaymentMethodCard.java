@@ -321,7 +321,6 @@ public final class PaymentMethodCardPaymentMethodCard {
 
         private Optional<CardBrands> brand = Optional.empty();
 
-        @JsonAnySetter
         private Map<String, Object> additionalProperties = new HashMap<>();
 
         private Builder() {}
@@ -341,7 +340,6 @@ public final class PaymentMethodCardPaymentMethodCard {
 
         /**
          * <p>Whether the card is past its expiration month. An expired card cannot take a new charge.</p>
-         * <p>Whether the card is past its expiration month. An expired card cannot take a new charge.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
@@ -352,7 +350,6 @@ public final class PaymentMethodCardPaymentMethodCard {
         }
 
         /**
-         * <p>Whether this card was verified with 3D Secure, either when it was saved or on a payment that used it.</p>
          * <p>Whether this card was verified with 3D Secure, either when it was saved or on a payment that used it.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
@@ -591,6 +588,21 @@ public final class PaymentMethodCardPaymentMethodCard {
                     last4,
                     threeDsVerified,
                     additionalProperties);
+        }
+
+        @JsonAnySetter
+        private void putAdditionalPropertyFromJson(String key, Object value) {
+            if (key.equalsIgnoreCase("brand")
+                    || key.equalsIgnoreCase("exp_month")
+                    || key.equalsIgnoreCase("exp_year")
+                    || key.equalsIgnoreCase("expired")
+                    || key.equalsIgnoreCase("fingerprint")
+                    || key.equalsIgnoreCase("funding_type")
+                    || key.equalsIgnoreCase("last4")
+                    || key.equalsIgnoreCase("three_ds_verified")) {
+                return;
+            }
+            this.additionalProperties.put(key, value);
         }
 
         @java.lang.Override

@@ -70,7 +70,6 @@ public final class DeployAppsRequest {
     public static final class Builder {
         private Optional<Boolean> draft = Optional.empty();
 
-        @JsonAnySetter
         private Map<String, Object> additionalProperties = new HashMap<>();
 
         private Builder() {}
@@ -96,6 +95,14 @@ public final class DeployAppsRequest {
 
         public DeployAppsRequest build() {
             return new DeployAppsRequest(draft, additionalProperties);
+        }
+
+        @JsonAnySetter
+        private void putAdditionalPropertyFromJson(String key, Object value) {
+            if (key.equalsIgnoreCase("draft")) {
+                return;
+            }
+            this.additionalProperties.put(key, value);
         }
 
         public Builder additionalProperty(String key, Object value) {

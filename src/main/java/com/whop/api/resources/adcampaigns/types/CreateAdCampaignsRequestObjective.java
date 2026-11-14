@@ -13,9 +13,6 @@ public final class CreateAdCampaignsRequestObjective {
     public static final CreateAdCampaignsRequestObjective SALES =
             new CreateAdCampaignsRequestObjective(Value.SALES, "sales");
 
-    public static final CreateAdCampaignsRequestObjective AWARENESS =
-            new CreateAdCampaignsRequestObjective(Value.AWARENESS, "awareness");
-
     public static final CreateAdCampaignsRequestObjective TRAFFIC =
             new CreateAdCampaignsRequestObjective(Value.TRAFFIC, "traffic");
 
@@ -59,8 +56,6 @@ public final class CreateAdCampaignsRequestObjective {
                 return visitor.visitLeads();
             case SALES:
                 return visitor.visitSales();
-            case AWARENESS:
-                return visitor.visitAwareness();
             case TRAFFIC:
                 return visitor.visitTraffic();
             case ENGAGEMENT:
@@ -78,8 +73,6 @@ public final class CreateAdCampaignsRequestObjective {
                 return LEADS;
             case "sales":
                 return SALES;
-            case "awareness":
-                return AWARENESS;
             case "traffic":
                 return TRAFFIC;
             case "engagement":
@@ -90,8 +83,6 @@ public final class CreateAdCampaignsRequestObjective {
     }
 
     public enum Value {
-        AWARENESS,
-
         TRAFFIC,
 
         ENGAGEMENT,
@@ -104,8 +95,6 @@ public final class CreateAdCampaignsRequestObjective {
     }
 
     public interface Visitor<T> {
-        T visitAwareness();
-
         T visitTraffic();
 
         T visitEngagement();

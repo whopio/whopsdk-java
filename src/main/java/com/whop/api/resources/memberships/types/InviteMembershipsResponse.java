@@ -79,7 +79,6 @@ public final class InviteMembershipsResponse {
     public static final class Builder implements InvitationSentStage, _FinalStage {
         private boolean invitationSent;
 
-        @JsonAnySetter
         private Map<String, Object> additionalProperties = new HashMap<>();
 
         private Builder() {}
@@ -100,6 +99,14 @@ public final class InviteMembershipsResponse {
         @java.lang.Override
         public InviteMembershipsResponse build() {
             return new InviteMembershipsResponse(invitationSent, additionalProperties);
+        }
+
+        @JsonAnySetter
+        private void putAdditionalPropertyFromJson(String key, Object value) {
+            if (key.equalsIgnoreCase("invitation_sent")) {
+                return;
+            }
+            this.additionalProperties.put(key, value);
         }
 
         @java.lang.Override

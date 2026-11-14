@@ -86,7 +86,6 @@ public final class AddPeopleAudiencesRequest {
     public static final class Builder implements FileIdStage, _FinalStage {
         private String fileId;
 
-        @JsonAnySetter
         private Map<String, Object> additionalProperties = new HashMap<>();
 
         private Builder() {}
@@ -98,7 +97,6 @@ public final class AddPeopleAudiencesRequest {
         }
 
         /**
-         * <p>The new customer CSV — a file id (<code>file_...</code>) returned by <code>POST /files</code>. Its headers must match the audience's saved column mapping.</p>
          * <p>The new customer CSV — a file id (<code>file_...</code>) returned by <code>POST /files</code>. Its headers must match the audience's saved column mapping.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
@@ -112,6 +110,14 @@ public final class AddPeopleAudiencesRequest {
         @java.lang.Override
         public AddPeopleAudiencesRequest build() {
             return new AddPeopleAudiencesRequest(fileId, additionalProperties);
+        }
+
+        @JsonAnySetter
+        private void putAdditionalPropertyFromJson(String key, Object value) {
+            if (key.equalsIgnoreCase("file_id")) {
+                return;
+            }
+            this.additionalProperties.put(key, value);
         }
 
         @java.lang.Override

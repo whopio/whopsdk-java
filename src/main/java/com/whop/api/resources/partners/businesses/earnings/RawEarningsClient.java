@@ -6,8 +6,10 @@ package com.whop.api.resources.partners.businesses.earnings;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.whop.api.core.ClientOptions;
 import com.whop.api.core.ObjectMappers;
+import com.whop.api.core.PathSegments;
 import com.whop.api.core.QueryStringMapper;
 import com.whop.api.core.RequestOptions;
+import com.whop.api.core.RetryInterceptor;
 import com.whop.api.core.WhopApiApiException;
 import com.whop.api.core.WhopApiException;
 import com.whop.api.core.WhopApiHttpResponse;
@@ -34,14 +36,14 @@ public class RawEarningsClient {
     }
 
     /**
-     * Lists the earnings Whop pays out for one referred business's activity, most recent first.
+     * Lists the earnings Whop pays out for one referred business's activity, most recent first. The original referrer or a caller with company:basic:read on the business credited for the referral can read them.
      */
     public WhopApiHttpResponse<SyncPagingIterable<ListEarningsResponseDataItem>> list(String id) {
         return list(id, ListEarningsRequest.builder().build());
     }
 
     /**
-     * Lists the earnings Whop pays out for one referred business's activity, most recent first.
+     * Lists the earnings Whop pays out for one referred business's activity, most recent first. The original referrer or a caller with company:basic:read on the business credited for the referral can read them.
      */
     public WhopApiHttpResponse<SyncPagingIterable<ListEarningsResponseDataItem>> list(
             String id, RequestOptions requestOptions) {
@@ -49,7 +51,7 @@ public class RawEarningsClient {
     }
 
     /**
-     * Lists the earnings Whop pays out for one referred business's activity, most recent first.
+     * Lists the earnings Whop pays out for one referred business's activity, most recent first. The original referrer or a caller with company:basic:read on the business credited for the referral can read them.
      */
     public WhopApiHttpResponse<SyncPagingIterable<ListEarningsResponseDataItem>> list(
             String id, ListEarningsRequest request) {
@@ -57,14 +59,14 @@ public class RawEarningsClient {
     }
 
     /**
-     * Lists the earnings Whop pays out for one referred business's activity, most recent first.
+     * Lists the earnings Whop pays out for one referred business's activity, most recent first. The original referrer or a caller with company:basic:read on the business credited for the referral can read them.
      */
     public WhopApiHttpResponse<SyncPagingIterable<ListEarningsResponseDataItem>> list(
             String id, ListEarningsRequest request, RequestOptions requestOptions) {
-        HttpUrl.Builder httpUrl = HttpUrl.parse(this.clientOptions.environment().getUrl())
+        HttpUrl.Builder httpUrl = HttpUrl.parse(this.clientOptions.environment().getApiURL())
                 .newBuilder()
                 .addPathSegments("partners/businesses")
-                .addPathSegment(id)
+                .addPathSegment(PathSegments.validate(id))
                 .addPathSegments("earnings");
         if (request.getStatus().isPresent()) {
             QueryStringMapper.addQueryParameter(
@@ -121,6 +123,15 @@ public class RawEarningsClient {
         if (requestOptions != null && requestOptions.getTimeout().isPresent()) {
             client = clientOptions.httpClientWithTimeout(requestOptions);
         }
+        if (requestOptions != null && requestOptions.getMaxRetries().isPresent()) {
+            okhttpRequest = okhttpRequest
+                    .newBuilder()
+                    .tag(
+                            RetryInterceptor.MaxRetriesOverride.class,
+                            new RetryInterceptor.MaxRetriesOverride(
+                                    requestOptions.getMaxRetries().get()))
+                    .build();
+        }
         try (Response response = client.newCall(okhttpRequest).execute()) {
             ResponseBody responseBody = response.body();
             String responseBodyString = responseBody != null ? responseBody.string() : "{}";
@@ -135,9 +146,11 @@ public class RawEarningsClient {
                 List<ListEarningsResponseDataItem> result = parsedResponse.getData();
                 return new WhopApiHttpResponse<>(
                         new SyncPagingIterable<ListEarningsResponseDataItem>(
-                                startingAfter != null, result, parsedResponse, () -> list(
-                                                id, nextRequest, requestOptions)
-                                        .body()),
+                                startingAfter.isPresent()
+                                        && !startingAfter.get().isEmpty(),
+                                result,
+                                parsedResponse,
+                                () -> list(id, nextRequest, requestOptions).body()),
                         response);
             }
             try {
@@ -151,6 +164,8 @@ public class RawEarningsClient {
             Object errorBody = ObjectMappers.parseErrorBody(responseBodyString);
             throw new WhopApiApiException(
                     "Error with status code " + response.code(), response.code(), errorBody, response);
+        } catch (JsonProcessingException e) {
+            throw new WhopApiException("Failed to deserialize response: " + e.getMessage(), e);
         } catch (IOException e) {
             throw new WhopApiException("Network error executing HTTP request", e);
         }

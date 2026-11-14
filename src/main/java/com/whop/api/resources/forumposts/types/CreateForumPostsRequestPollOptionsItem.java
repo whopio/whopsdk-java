@@ -107,7 +107,6 @@ public final class CreateForumPostsRequestPollOptionsItem {
 
         private String text;
 
-        @JsonAnySetter
         private Map<String, Object> additionalProperties = new HashMap<>();
 
         private Builder() {}
@@ -121,7 +120,6 @@ public final class CreateForumPostsRequestPollOptionsItem {
 
         /**
          * <p>Sequential ID for the poll option (starting from '1')</p>
-         * <p>Sequential ID for the poll option (starting from '1')</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
@@ -132,7 +130,6 @@ public final class CreateForumPostsRequestPollOptionsItem {
         }
 
         /**
-         * <p>The text of the poll option</p>
          * <p>The text of the poll option</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
@@ -146,6 +143,14 @@ public final class CreateForumPostsRequestPollOptionsItem {
         @java.lang.Override
         public CreateForumPostsRequestPollOptionsItem build() {
             return new CreateForumPostsRequestPollOptionsItem(id, text, additionalProperties);
+        }
+
+        @JsonAnySetter
+        private void putAdditionalPropertyFromJson(String key, Object value) {
+            if (key.equalsIgnoreCase("id") || key.equalsIgnoreCase("text")) {
+                return;
+            }
+            this.additionalProperties.put(key, value);
         }
 
         @java.lang.Override

@@ -5,6 +5,7 @@ package com.whop.api.resources.cards;
 
 import com.whop.api.core.ClientOptions;
 import com.whop.api.core.RequestOptions;
+import com.whop.api.core.WhopApiHttpResponse;
 import com.whop.api.resources.cards.requests.CreateCardsRequest;
 import com.whop.api.resources.cards.requests.ListCardsRequest;
 import com.whop.api.resources.cards.requests.RetrieveCardsRequest;
@@ -36,113 +37,231 @@ public class AsyncCardsClient {
      * Lists the Whop cards of an account or user, including ones still being set up. Team members only see the cards assigned to them.
      */
     public CompletableFuture<ListCardsResponse> list() {
-        return this.rawClient.list().thenApply(response -> response.body());
+        CompletableFuture<WhopApiHttpResponse<ListCardsResponse>> rawFuture = this.rawClient.list();
+        CompletableFuture<ListCardsResponse> future = rawFuture.thenApply(response -> response.body());
+        future.whenComplete((result_, throwable_) -> {
+            if (future.isCancelled()) {
+                rawFuture.cancel(true);
+            }
+        });
+        return future;
     }
 
     /**
      * Lists the Whop cards of an account or user, including ones still being set up. Team members only see the cards assigned to them.
      */
     public CompletableFuture<ListCardsResponse> list(RequestOptions requestOptions) {
-        return this.rawClient.list(requestOptions).thenApply(response -> response.body());
+        CompletableFuture<WhopApiHttpResponse<ListCardsResponse>> rawFuture = this.rawClient.list(requestOptions);
+        CompletableFuture<ListCardsResponse> future = rawFuture.thenApply(response -> response.body());
+        future.whenComplete((result_, throwable_) -> {
+            if (future.isCancelled()) {
+                rawFuture.cancel(true);
+            }
+        });
+        return future;
     }
 
     /**
      * Lists the Whop cards of an account or user, including ones still being set up. Team members only see the cards assigned to them.
      */
     public CompletableFuture<ListCardsResponse> list(ListCardsRequest request) {
-        return this.rawClient.list(request).thenApply(response -> response.body());
+        CompletableFuture<WhopApiHttpResponse<ListCardsResponse>> rawFuture = this.rawClient.list(request);
+        CompletableFuture<ListCardsResponse> future = rawFuture.thenApply(response -> response.body());
+        future.whenComplete((result_, throwable_) -> {
+            if (future.isCancelled()) {
+                rawFuture.cancel(true);
+            }
+        });
+        return future;
     }
 
     /**
      * Lists the Whop cards of an account or user, including ones still being set up. Team members only see the cards assigned to them.
      */
     public CompletableFuture<ListCardsResponse> list(ListCardsRequest request, RequestOptions requestOptions) {
-        return this.rawClient.list(request, requestOptions).thenApply(response -> response.body());
+        CompletableFuture<WhopApiHttpResponse<ListCardsResponse>> rawFuture =
+                this.rawClient.list(request, requestOptions);
+        CompletableFuture<ListCardsResponse> future = rawFuture.thenApply(response -> response.body());
+        future.whenComplete((result_, throwable_) -> {
+            if (future.isCancelled()) {
+                rawFuture.cancel(true);
+            }
+        });
+        return future;
     }
 
     /**
-     * Issue a virtual card, or apply for card issuing.
+     * Issues a virtual card, or applies for card issuing. An account with no application files one here and gets back a <code>202</code>; call again to issue the card once it is approved. An account whose application was denied or canceled applies again the same way, replacing that application.
      */
     public CompletableFuture<CreateCardsResponse> create() {
-        return this.rawClient.create().thenApply(response -> response.body());
+        CompletableFuture<WhopApiHttpResponse<CreateCardsResponse>> rawFuture = this.rawClient.create();
+        CompletableFuture<CreateCardsResponse> future = rawFuture.thenApply(response -> response.body());
+        future.whenComplete((result_, throwable_) -> {
+            if (future.isCancelled()) {
+                rawFuture.cancel(true);
+            }
+        });
+        return future;
     }
 
     /**
-     * Issue a virtual card, or apply for card issuing.
+     * Issues a virtual card, or applies for card issuing. An account with no application files one here and gets back a <code>202</code>; call again to issue the card once it is approved. An account whose application was denied or canceled applies again the same way, replacing that application.
      */
     public CompletableFuture<CreateCardsResponse> create(RequestOptions requestOptions) {
-        return this.rawClient.create(requestOptions).thenApply(response -> response.body());
+        CompletableFuture<WhopApiHttpResponse<CreateCardsResponse>> rawFuture = this.rawClient.create(requestOptions);
+        CompletableFuture<CreateCardsResponse> future = rawFuture.thenApply(response -> response.body());
+        future.whenComplete((result_, throwable_) -> {
+            if (future.isCancelled()) {
+                rawFuture.cancel(true);
+            }
+        });
+        return future;
     }
 
     /**
-     * Issue a virtual card, or apply for card issuing.
+     * Issues a virtual card, or applies for card issuing. An account with no application files one here and gets back a <code>202</code>; call again to issue the card once it is approved. An account whose application was denied or canceled applies again the same way, replacing that application.
      */
     public CompletableFuture<CreateCardsResponse> create(CreateCardsRequest request) {
-        return this.rawClient.create(request).thenApply(response -> response.body());
+        CompletableFuture<WhopApiHttpResponse<CreateCardsResponse>> rawFuture = this.rawClient.create(request);
+        CompletableFuture<CreateCardsResponse> future = rawFuture.thenApply(response -> response.body());
+        future.whenComplete((result_, throwable_) -> {
+            if (future.isCancelled()) {
+                rawFuture.cancel(true);
+            }
+        });
+        return future;
     }
 
     /**
-     * Issue a virtual card, or apply for card issuing.
+     * Issues a virtual card, or applies for card issuing. An account with no application files one here and gets back a <code>202</code>; call again to issue the card once it is approved. An account whose application was denied or canceled applies again the same way, replacing that application.
      */
     public CompletableFuture<CreateCardsResponse> create(CreateCardsRequest request, RequestOptions requestOptions) {
-        return this.rawClient.create(request, requestOptions).thenApply(response -> response.body());
+        CompletableFuture<WhopApiHttpResponse<CreateCardsResponse>> rawFuture =
+                this.rawClient.create(request, requestOptions);
+        CompletableFuture<CreateCardsResponse> future = rawFuture.thenApply(response -> response.body());
+        future.whenComplete((result_, throwable_) -> {
+            if (future.isCancelled()) {
+                rawFuture.cancel(true);
+            }
+        });
+        return future;
     }
 
     /**
-     * Retrieve a single card.
+     * Retrieves a single card, including its <code>secrets</code> (card number, CVC, and PIN), which List Cards does not return.
      */
     public CompletableFuture<RetrieveCardsResponse> retrieve(String id) {
-        return this.rawClient.retrieve(id).thenApply(response -> response.body());
+        CompletableFuture<WhopApiHttpResponse<RetrieveCardsResponse>> rawFuture = this.rawClient.retrieve(id);
+        CompletableFuture<RetrieveCardsResponse> future = rawFuture.thenApply(response -> response.body());
+        future.whenComplete((result_, throwable_) -> {
+            if (future.isCancelled()) {
+                rawFuture.cancel(true);
+            }
+        });
+        return future;
     }
 
     /**
-     * Retrieve a single card.
+     * Retrieves a single card, including its <code>secrets</code> (card number, CVC, and PIN), which List Cards does not return.
      */
     public CompletableFuture<RetrieveCardsResponse> retrieve(String id, RequestOptions requestOptions) {
-        return this.rawClient.retrieve(id, requestOptions).thenApply(response -> response.body());
+        CompletableFuture<WhopApiHttpResponse<RetrieveCardsResponse>> rawFuture =
+                this.rawClient.retrieve(id, requestOptions);
+        CompletableFuture<RetrieveCardsResponse> future = rawFuture.thenApply(response -> response.body());
+        future.whenComplete((result_, throwable_) -> {
+            if (future.isCancelled()) {
+                rawFuture.cancel(true);
+            }
+        });
+        return future;
     }
 
     /**
-     * Retrieve a single card.
+     * Retrieves a single card, including its <code>secrets</code> (card number, CVC, and PIN), which List Cards does not return.
      */
     public CompletableFuture<RetrieveCardsResponse> retrieve(String id, RetrieveCardsRequest request) {
-        return this.rawClient.retrieve(id, request).thenApply(response -> response.body());
+        CompletableFuture<WhopApiHttpResponse<RetrieveCardsResponse>> rawFuture = this.rawClient.retrieve(id, request);
+        CompletableFuture<RetrieveCardsResponse> future = rawFuture.thenApply(response -> response.body());
+        future.whenComplete((result_, throwable_) -> {
+            if (future.isCancelled()) {
+                rawFuture.cancel(true);
+            }
+        });
+        return future;
     }
 
     /**
-     * Retrieve a single card.
+     * Retrieves a single card, including its <code>secrets</code> (card number, CVC, and PIN), which List Cards does not return.
      */
     public CompletableFuture<RetrieveCardsResponse> retrieve(
             String id, RetrieveCardsRequest request, RequestOptions requestOptions) {
-        return this.rawClient.retrieve(id, request, requestOptions).thenApply(response -> response.body());
+        CompletableFuture<WhopApiHttpResponse<RetrieveCardsResponse>> rawFuture =
+                this.rawClient.retrieve(id, request, requestOptions);
+        CompletableFuture<RetrieveCardsResponse> future = rawFuture.thenApply(response -> response.body());
+        future.whenComplete((result_, throwable_) -> {
+            if (future.isCancelled()) {
+                rawFuture.cancel(true);
+            }
+        });
+        return future;
     }
 
     /**
-     * Update, freeze, or cancel a card. Updating the card's name, billing address, or limits requires both <code>payout:account:update</code> and <code>company:balance:read</code>; a card's assigned holder may update their own card's pin and frozen state with any user token.
+     * Updates, freezes, or cancels a card. Updating the card's name, billing address, or limits requires both <code>payout:account:update</code> and <code>company:balance:read</code>; a card's assigned holder may update their own card's pin and frozen state with any user token.
      */
     public CompletableFuture<UpdateCardsResponse> update(String id) {
-        return this.rawClient.update(id).thenApply(response -> response.body());
+        CompletableFuture<WhopApiHttpResponse<UpdateCardsResponse>> rawFuture = this.rawClient.update(id);
+        CompletableFuture<UpdateCardsResponse> future = rawFuture.thenApply(response -> response.body());
+        future.whenComplete((result_, throwable_) -> {
+            if (future.isCancelled()) {
+                rawFuture.cancel(true);
+            }
+        });
+        return future;
     }
 
     /**
-     * Update, freeze, or cancel a card. Updating the card's name, billing address, or limits requires both <code>payout:account:update</code> and <code>company:balance:read</code>; a card's assigned holder may update their own card's pin and frozen state with any user token.
+     * Updates, freezes, or cancels a card. Updating the card's name, billing address, or limits requires both <code>payout:account:update</code> and <code>company:balance:read</code>; a card's assigned holder may update their own card's pin and frozen state with any user token.
      */
     public CompletableFuture<UpdateCardsResponse> update(String id, RequestOptions requestOptions) {
-        return this.rawClient.update(id, requestOptions).thenApply(response -> response.body());
+        CompletableFuture<WhopApiHttpResponse<UpdateCardsResponse>> rawFuture =
+                this.rawClient.update(id, requestOptions);
+        CompletableFuture<UpdateCardsResponse> future = rawFuture.thenApply(response -> response.body());
+        future.whenComplete((result_, throwable_) -> {
+            if (future.isCancelled()) {
+                rawFuture.cancel(true);
+            }
+        });
+        return future;
     }
 
     /**
-     * Update, freeze, or cancel a card. Updating the card's name, billing address, or limits requires both <code>payout:account:update</code> and <code>company:balance:read</code>; a card's assigned holder may update their own card's pin and frozen state with any user token.
+     * Updates, freezes, or cancels a card. Updating the card's name, billing address, or limits requires both <code>payout:account:update</code> and <code>company:balance:read</code>; a card's assigned holder may update their own card's pin and frozen state with any user token.
      */
     public CompletableFuture<UpdateCardsResponse> update(String id, UpdateCardsRequest request) {
-        return this.rawClient.update(id, request).thenApply(response -> response.body());
+        CompletableFuture<WhopApiHttpResponse<UpdateCardsResponse>> rawFuture = this.rawClient.update(id, request);
+        CompletableFuture<UpdateCardsResponse> future = rawFuture.thenApply(response -> response.body());
+        future.whenComplete((result_, throwable_) -> {
+            if (future.isCancelled()) {
+                rawFuture.cancel(true);
+            }
+        });
+        return future;
     }
 
     /**
-     * Update, freeze, or cancel a card. Updating the card's name, billing address, or limits requires both <code>payout:account:update</code> and <code>company:balance:read</code>; a card's assigned holder may update their own card's pin and frozen state with any user token.
+     * Updates, freezes, or cancels a card. Updating the card's name, billing address, or limits requires both <code>payout:account:update</code> and <code>company:balance:read</code>; a card's assigned holder may update their own card's pin and frozen state with any user token.
      */
     public CompletableFuture<UpdateCardsResponse> update(
             String id, UpdateCardsRequest request, RequestOptions requestOptions) {
-        return this.rawClient.update(id, request, requestOptions).thenApply(response -> response.body());
+        CompletableFuture<WhopApiHttpResponse<UpdateCardsResponse>> rawFuture =
+                this.rawClient.update(id, request, requestOptions);
+        CompletableFuture<UpdateCardsResponse> future = rawFuture.thenApply(response -> response.body());
+        future.whenComplete((result_, throwable_) -> {
+            if (future.isCancelled()) {
+                rawFuture.cancel(true);
+            }
+        });
+        return future;
     }
 }

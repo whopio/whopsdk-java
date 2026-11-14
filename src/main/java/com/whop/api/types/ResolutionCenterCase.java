@@ -44,11 +44,11 @@ public final class ResolutionCenterCase {
 
     private final String id;
 
+    private final List<ReceiptLineItem> lineItems;
+
     private final Optional<ResolutionCenterCaseOutcome> outcome;
 
     private final ResolutionPayment payment;
-
-    private final Optional<String> planId;
 
     private final Optional<String> productId;
 
@@ -62,6 +62,8 @@ public final class ResolutionCenterCase {
 
     private final String updatedAt;
 
+    private final Optional<String> variantId;
+
     private final Map<String, Object> additionalProperties;
 
     private ResolutionCenterCase(
@@ -74,15 +76,16 @@ public final class ResolutionCenterCase {
             boolean customerAppealed,
             boolean escalated,
             String id,
+            List<ReceiptLineItem> lineItems,
             Optional<ResolutionCenterCaseOutcome> outcome,
             ResolutionPayment payment,
-            Optional<String> planId,
             Optional<String> productId,
             ResolutionCenterCaseReason reason,
             Optional<ResolutionCenterCaseRefund> refund,
             Optional<String> responseDueAt,
             ResolutionCenterCaseStatus status,
             String updatedAt,
+            Optional<String> variantId,
             Map<String, Object> additionalProperties) {
         this.account = account;
         this.amount = amount;
@@ -93,15 +96,16 @@ public final class ResolutionCenterCase {
         this.customerAppealed = customerAppealed;
         this.escalated = escalated;
         this.id = id;
+        this.lineItems = lineItems;
         this.outcome = outcome;
         this.payment = payment;
-        this.planId = planId;
         this.productId = productId;
         this.reason = reason;
         this.refund = refund;
         this.responseDueAt = responseDueAt;
         this.status = status;
         this.updatedAt = updatedAt;
+        this.variantId = variantId;
         this.additionalProperties = additionalProperties;
     }
 
@@ -180,6 +184,11 @@ public final class ResolutionCenterCase {
         return id;
     }
 
+    @JsonProperty("line_items")
+    public List<ReceiptLineItem> getLineItems() {
+        return lineItems;
+    }
+
     /**
      * @return Who prevailed on the claim. <code>null</code> until the case closes. Read <code>refund</code> for whether any money actually moved.
      */
@@ -197,17 +206,6 @@ public final class ResolutionCenterCase {
     @JsonProperty("payment")
     public ResolutionPayment getPayment() {
         return payment;
-    }
-
-    /**
-     * @return The plan the payment was made on, prefixed <code>plan_</code>.
-     */
-    @JsonIgnore
-    public Optional<String> getPlanId() {
-        if (planId == null) {
-            return Optional.empty();
-        }
-        return planId;
     }
 
     /**
@@ -267,6 +265,17 @@ public final class ResolutionCenterCase {
         return updatedAt;
     }
 
+    /**
+     * @return The variant the payment was made on, prefixed <code>plan_</code>.
+     */
+    @JsonIgnore
+    public Optional<String> getVariantId() {
+        if (variantId == null) {
+            return Optional.empty();
+        }
+        return variantId;
+    }
+
     @JsonInclude(value = JsonInclude.Include.CUSTOM, valueFilter = NullableNonemptyFilter.class)
     @JsonProperty("account")
     private Optional<AccountSummary> _getAccount() {
@@ -286,12 +295,6 @@ public final class ResolutionCenterCase {
     }
 
     @JsonInclude(value = JsonInclude.Include.CUSTOM, valueFilter = NullableNonemptyFilter.class)
-    @JsonProperty("plan_id")
-    private Optional<String> _getPlanId() {
-        return planId;
-    }
-
-    @JsonInclude(value = JsonInclude.Include.CUSTOM, valueFilter = NullableNonemptyFilter.class)
     @JsonProperty("product_id")
     private Optional<String> _getProductId() {
         return productId;
@@ -307,6 +310,12 @@ public final class ResolutionCenterCase {
     @JsonProperty("response_due_at")
     private Optional<String> _getResponseDueAt() {
         return responseDueAt;
+    }
+
+    @JsonInclude(value = JsonInclude.Include.CUSTOM, valueFilter = NullableNonemptyFilter.class)
+    @JsonProperty("variant_id")
+    private Optional<String> _getVariantId() {
+        return variantId;
     }
 
     @java.lang.Override
@@ -330,15 +339,16 @@ public final class ResolutionCenterCase {
                 && customerAppealed == other.customerAppealed
                 && escalated == other.escalated
                 && id.equals(other.id)
+                && lineItems.equals(other.lineItems)
                 && outcome.equals(other.outcome)
                 && payment.equals(other.payment)
-                && planId.equals(other.planId)
                 && productId.equals(other.productId)
                 && reason.equals(other.reason)
                 && refund.equals(other.refund)
                 && responseDueAt.equals(other.responseDueAt)
                 && status.equals(other.status)
-                && updatedAt.equals(other.updatedAt);
+                && updatedAt.equals(other.updatedAt)
+                && variantId.equals(other.variantId);
     }
 
     @java.lang.Override
@@ -353,15 +363,16 @@ public final class ResolutionCenterCase {
                 this.customerAppealed,
                 this.escalated,
                 this.id,
+                this.lineItems,
                 this.outcome,
                 this.payment,
-                this.planId,
                 this.productId,
                 this.reason,
                 this.refund,
                 this.responseDueAt,
                 this.status,
-                this.updatedAt);
+                this.updatedAt,
+                this.variantId);
     }
 
     @java.lang.Override
@@ -476,6 +487,12 @@ public final class ResolutionCenterCase {
 
         _FinalStage currency(Nullable<String> currency);
 
+        _FinalStage lineItems(List<ReceiptLineItem> lineItems);
+
+        _FinalStage addLineItems(ReceiptLineItem lineItems);
+
+        _FinalStage addAllLineItems(List<ReceiptLineItem> lineItems);
+
         /**
          * <p>Who prevailed on the claim. <code>null</code> until the case closes. Read <code>refund</code> for whether any money actually moved.</p>
          */
@@ -484,15 +501,6 @@ public final class ResolutionCenterCase {
         _FinalStage outcome(ResolutionCenterCaseOutcome outcome);
 
         _FinalStage outcome(Nullable<ResolutionCenterCaseOutcome> outcome);
-
-        /**
-         * <p>The plan the payment was made on, prefixed <code>plan_</code>.</p>
-         */
-        _FinalStage planId(Optional<String> planId);
-
-        _FinalStage planId(String planId);
-
-        _FinalStage planId(Nullable<String> planId);
 
         /**
          * <p>The product the payment was for, prefixed <code>prod_</code>.</p>
@@ -520,6 +528,15 @@ public final class ResolutionCenterCase {
         _FinalStage responseDueAt(String responseDueAt);
 
         _FinalStage responseDueAt(Nullable<String> responseDueAt);
+
+        /**
+         * <p>The variant the payment was made on, prefixed <code>plan_</code>.</p>
+         */
+        _FinalStage variantId(Optional<String> variantId);
+
+        _FinalStage variantId(String variantId);
+
+        _FinalStage variantId(Nullable<String> variantId);
     }
 
     @JsonIgnoreProperties(ignoreUnknown = true)
@@ -555,15 +572,17 @@ public final class ResolutionCenterCase {
 
         private String updatedAt;
 
+        private Optional<String> variantId = Optional.empty();
+
         private Optional<String> responseDueAt = Optional.empty();
 
         private Optional<ResolutionCenterCaseRefund> refund = Optional.empty();
 
         private Optional<String> productId = Optional.empty();
 
-        private Optional<String> planId = Optional.empty();
-
         private Optional<ResolutionCenterCaseOutcome> outcome = Optional.empty();
+
+        private List<ReceiptLineItem> lineItems = new ArrayList<>();
 
         private Optional<String> currency = Optional.empty();
 
@@ -571,7 +590,6 @@ public final class ResolutionCenterCase {
 
         private Optional<AccountSummary> account = Optional.empty();
 
-        @JsonAnySetter
         private Map<String, Object> additionalProperties = new HashMap<>();
 
         private Builder() {}
@@ -587,20 +605,20 @@ public final class ResolutionCenterCase {
             customerAppealed(other.getCustomerAppealed());
             escalated(other.getEscalated());
             id(other.getId());
+            lineItems(other.getLineItems());
             outcome(other.getOutcome());
             payment(other.getPayment());
-            planId(other.getPlanId());
             productId(other.getProductId());
             reason(other.getReason());
             refund(other.getRefund());
             responseDueAt(other.getResponseDueAt());
             status(other.getStatus());
             updatedAt(other.getUpdatedAt());
+            variantId(other.getVariantId());
             return this;
         }
 
         /**
-         * <p>The amount in question, in whole units of <code>currency</code>.</p>
          * <p>The amount in question, in whole units of <code>currency</code>.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
@@ -613,7 +631,6 @@ public final class ResolutionCenterCase {
 
         /**
          * <p>The customer who opened the case.</p>
-         * <p>The customer who opened the case.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
@@ -624,7 +641,6 @@ public final class ResolutionCenterCase {
         }
 
         /**
-         * <p>When the case was opened, as an ISO 8601 timestamp.</p>
          * <p>When the case was opened, as an ISO 8601 timestamp.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
@@ -637,7 +653,6 @@ public final class ResolutionCenterCase {
 
         /**
          * <p>Whether the customer has appealed a decision on this case.</p>
-         * <p>Whether the customer has appealed a decision on this case.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
@@ -648,7 +663,6 @@ public final class ResolutionCenterCase {
         }
 
         /**
-         * <p>Whether Whop is involved — either reviewing the case, or waiting on the side named by <code>status</code> for something it asked for while reviewing.</p>
          * <p>Whether Whop is involved — either reviewing the case, or waiting on the side named by <code>status</code> for something it asked for while reviewing.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
@@ -661,7 +675,6 @@ public final class ResolutionCenterCase {
 
         /**
          * <p>Resolution center case ID, prefixed <code>reso_</code>.</p>
-         * <p>Resolution center case ID, prefixed <code>reso_</code>.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
@@ -672,7 +685,6 @@ public final class ResolutionCenterCase {
         }
 
         /**
-         * <p>The payment the case was opened against.</p>
          * <p>The payment the case was opened against.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
@@ -685,7 +697,6 @@ public final class ResolutionCenterCase {
 
         /**
          * <p>What the customer says went wrong. Shares the <code>/disputes</code> vocabulary, so a case that later becomes a chargeback reports the same complaint.</p>
-         * <p>What the customer says went wrong. Shares the <code>/disputes</code> vocabulary, so a case that later becomes a chargeback reports the same complaint.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
@@ -696,7 +707,6 @@ public final class ResolutionCenterCase {
         }
 
         /**
-         * <p>Who the case is waiting on. <code>awaiting_merchant</code> and <code>awaiting_customer</code> name the side that owes a response, <code>under_review</code> means Whop is deciding, and <code>closed</code> means it is settled — read <code>outcome</code> for how.</p>
          * <p>Who the case is waiting on. <code>awaiting_merchant</code> and <code>awaiting_customer</code> name the side that owes a response, <code>under_review</code> means Whop is deciding, and <code>closed</code> means it is settled — read <code>outcome</code> for how.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
@@ -709,13 +719,48 @@ public final class ResolutionCenterCase {
 
         /**
          * <p>When the case was last changed, as an ISO 8601 timestamp.</p>
-         * <p>When the case was last changed, as an ISO 8601 timestamp.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
         @JsonSetter("updated_at")
         public _FinalStage updatedAt(@NotNull String updatedAt) {
             this.updatedAt = Objects.requireNonNull(updatedAt, "updatedAt must not be null");
+            return this;
+        }
+
+        /**
+         * <p>The variant the payment was made on, prefixed <code>plan_</code>.</p>
+         * @return Reference to {@code this} so that method calls can be chained together.
+         */
+        @java.lang.Override
+        public _FinalStage variantId(Nullable<String> variantId) {
+            if (variantId.isNull()) {
+                this.variantId = null;
+            } else if (variantId.isEmpty()) {
+                this.variantId = Optional.empty();
+            } else {
+                this.variantId = Optional.of(variantId.get());
+            }
+            return this;
+        }
+
+        /**
+         * <p>The variant the payment was made on, prefixed <code>plan_</code>.</p>
+         * @return Reference to {@code this} so that method calls can be chained together.
+         */
+        @java.lang.Override
+        public _FinalStage variantId(String variantId) {
+            this.variantId = Optional.ofNullable(variantId);
+            return this;
+        }
+
+        /**
+         * <p>The variant the payment was made on, prefixed <code>plan_</code>.</p>
+         */
+        @java.lang.Override
+        @JsonSetter(value = "variant_id", nulls = Nulls.SKIP)
+        public _FinalStage variantId(Optional<String> variantId) {
+            this.variantId = variantId;
             return this;
         }
 
@@ -828,42 +873,6 @@ public final class ResolutionCenterCase {
         }
 
         /**
-         * <p>The plan the payment was made on, prefixed <code>plan_</code>.</p>
-         * @return Reference to {@code this} so that method calls can be chained together.
-         */
-        @java.lang.Override
-        public _FinalStage planId(Nullable<String> planId) {
-            if (planId.isNull()) {
-                this.planId = null;
-            } else if (planId.isEmpty()) {
-                this.planId = Optional.empty();
-            } else {
-                this.planId = Optional.of(planId.get());
-            }
-            return this;
-        }
-
-        /**
-         * <p>The plan the payment was made on, prefixed <code>plan_</code>.</p>
-         * @return Reference to {@code this} so that method calls can be chained together.
-         */
-        @java.lang.Override
-        public _FinalStage planId(String planId) {
-            this.planId = Optional.ofNullable(planId);
-            return this;
-        }
-
-        /**
-         * <p>The plan the payment was made on, prefixed <code>plan_</code>.</p>
-         */
-        @java.lang.Override
-        @JsonSetter(value = "plan_id", nulls = Nulls.SKIP)
-        public _FinalStage planId(Optional<String> planId) {
-            this.planId = planId;
-            return this;
-        }
-
-        /**
          * <p>Who prevailed on the claim. <code>null</code> until the case closes. Read <code>refund</code> for whether any money actually moved.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
@@ -896,6 +905,30 @@ public final class ResolutionCenterCase {
         @JsonSetter(value = "outcome", nulls = Nulls.SKIP)
         public _FinalStage outcome(Optional<ResolutionCenterCaseOutcome> outcome) {
             this.outcome = outcome;
+            return this;
+        }
+
+        @java.lang.Override
+        public _FinalStage addAllLineItems(List<ReceiptLineItem> lineItems) {
+            if (lineItems != null) {
+                this.lineItems.addAll(lineItems);
+            }
+            return this;
+        }
+
+        @java.lang.Override
+        public _FinalStage addLineItems(ReceiptLineItem lineItems) {
+            this.lineItems.add(lineItems);
+            return this;
+        }
+
+        @java.lang.Override
+        @JsonSetter(value = "line_items", nulls = Nulls.SKIP)
+        public _FinalStage lineItems(List<ReceiptLineItem> lineItems) {
+            this.lineItems.clear();
+            if (lineItems != null) {
+                this.lineItems.addAll(lineItems);
+            }
             return this;
         }
 
@@ -1007,16 +1040,43 @@ public final class ResolutionCenterCase {
                     customerAppealed,
                     escalated,
                     id,
+                    lineItems,
                     outcome,
                     payment,
-                    planId,
                     productId,
                     reason,
                     refund,
                     responseDueAt,
                     status,
                     updatedAt,
+                    variantId,
                     additionalProperties);
+        }
+
+        @JsonAnySetter
+        private void putAdditionalPropertyFromJson(String key, Object value) {
+            if (key.equalsIgnoreCase("account")
+                    || key.equalsIgnoreCase("amount")
+                    || key.equalsIgnoreCase("available_actions")
+                    || key.equalsIgnoreCase("buyer")
+                    || key.equalsIgnoreCase("created_at")
+                    || key.equalsIgnoreCase("currency")
+                    || key.equalsIgnoreCase("customer_appealed")
+                    || key.equalsIgnoreCase("escalated")
+                    || key.equalsIgnoreCase("id")
+                    || key.equalsIgnoreCase("line_items")
+                    || key.equalsIgnoreCase("outcome")
+                    || key.equalsIgnoreCase("payment")
+                    || key.equalsIgnoreCase("product_id")
+                    || key.equalsIgnoreCase("reason")
+                    || key.equalsIgnoreCase("refund")
+                    || key.equalsIgnoreCase("response_due_at")
+                    || key.equalsIgnoreCase("status")
+                    || key.equalsIgnoreCase("updated_at")
+                    || key.equalsIgnoreCase("variant_id")) {
+                return;
+            }
+            this.additionalProperties.put(key, value);
         }
 
         @java.lang.Override

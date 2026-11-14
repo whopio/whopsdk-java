@@ -182,7 +182,6 @@ public final class DmChannel {
 
         private Optional<OffsetDateTime> lastMessageAt = Optional.empty();
 
-        @JsonAnySetter
         private Map<String, Object> additionalProperties = new HashMap<>();
 
         private Builder() {}
@@ -198,7 +197,6 @@ public final class DmChannel {
 
         /**
          * <p>The time the entity was created (in milliseconds since Unix epoch)</p>
-         * <p>The time the entity was created (in milliseconds since Unix epoch)</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
@@ -209,7 +207,6 @@ public final class DmChannel {
         }
 
         /**
-         * <p>The unique identifier for the entity</p>
          * <p>The unique identifier for the entity</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
@@ -295,6 +292,17 @@ public final class DmChannel {
         @java.lang.Override
         public DmChannel build() {
             return new DmChannel(createdAt, id, lastMessageAt, name, additionalProperties);
+        }
+
+        @JsonAnySetter
+        private void putAdditionalPropertyFromJson(String key, Object value) {
+            if (key.equalsIgnoreCase("created_at")
+                    || key.equalsIgnoreCase("id")
+                    || key.equalsIgnoreCase("last_message_at")
+                    || key.equalsIgnoreCase("name")) {
+                return;
+            }
+            this.additionalProperties.put(key, value);
         }
 
         @java.lang.Override

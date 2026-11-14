@@ -9,6 +9,9 @@ import com.fasterxml.jackson.annotation.JsonValue;
 public final class RetrieveStatsRequestInterval {
     public static final RetrieveStatsRequestInterval MONTH = new RetrieveStatsRequestInterval(Value.MONTH, "month");
 
+    public static final RetrieveStatsRequestInterval FIFTEEN_MINUTES =
+            new RetrieveStatsRequestInterval(Value.FIFTEEN_MINUTES, "fifteen_minutes");
+
     public static final RetrieveStatsRequestInterval HOUR = new RetrieveStatsRequestInterval(Value.HOUR, "hour");
 
     public static final RetrieveStatsRequestInterval DAY = new RetrieveStatsRequestInterval(Value.DAY, "day");
@@ -60,6 +63,8 @@ public final class RetrieveStatsRequestInterval {
         switch (value) {
             case MONTH:
                 return visitor.visitMonth();
+            case FIFTEEN_MINUTES:
+                return visitor.visitFifteenMinutes();
             case HOUR:
                 return visitor.visitHour();
             case DAY:
@@ -85,6 +90,8 @@ public final class RetrieveStatsRequestInterval {
         switch (value) {
             case "month":
                 return MONTH;
+            case "fifteen_minutes":
+                return FIFTEEN_MINUTES;
             case "hour":
                 return HOUR;
             case "day":
@@ -109,6 +116,8 @@ public final class RetrieveStatsRequestInterval {
 
         FIVE_MINUTES,
 
+        FIFTEEN_MINUTES,
+
         THIRTY_MINUTES,
 
         HOUR,
@@ -128,6 +137,8 @@ public final class RetrieveStatsRequestInterval {
         T visitMinute();
 
         T visitFiveMinutes();
+
+        T visitFifteenMinutes();
 
         T visitThirtyMinutes();
 

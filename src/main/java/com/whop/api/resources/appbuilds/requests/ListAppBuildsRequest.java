@@ -109,7 +109,7 @@ public final class ListAppBuildsRequest {
     }
 
     /**
-     * @return The number of builds to return (default 20, max 100).
+     * @return Number of results to return from the start of the range.
      */
     @JsonProperty("first")
     public Optional<Integer> getFirst() {
@@ -117,7 +117,7 @@ public final class ListAppBuildsRequest {
     }
 
     /**
-     * @return A cursor; returns builds after this position.
+     * @return Return results after this cursor. Use <code>page_info.end_cursor</code> from the previous response to fetch the next page.
      */
     @JsonProperty("after")
     public Optional<String> getAfter() {
@@ -125,7 +125,7 @@ public final class ListAppBuildsRequest {
     }
 
     /**
-     * @return The number of builds to return from the end of the range.
+     * @return Number of results to return from the end of the range.
      */
     @JsonProperty("last")
     public Optional<Integer> getLast() {
@@ -133,7 +133,7 @@ public final class ListAppBuildsRequest {
     }
 
     /**
-     * @return A cursor; returns builds before this position.
+     * @return Return results before this cursor. Use <code>page_info.start_cursor</code> from the previous response to fetch the previous page.
      */
     @JsonProperty("before")
     public Optional<String> getBefore() {
@@ -231,28 +231,28 @@ public final class ListAppBuildsRequest {
         _FinalStage createdAfter(ListAppBuildsRequestCreatedAfter createdAfter);
 
         /**
-         * <p>The number of builds to return (default 20, max 100).</p>
+         * <p>Number of results to return from the start of the range.</p>
          */
         _FinalStage first(Optional<Integer> first);
 
         _FinalStage first(Integer first);
 
         /**
-         * <p>A cursor; returns builds after this position.</p>
+         * <p>Return results after this cursor. Use <code>page_info.end_cursor</code> from the previous response to fetch the next page.</p>
          */
         _FinalStage after(Optional<String> after);
 
         _FinalStage after(String after);
 
         /**
-         * <p>The number of builds to return from the end of the range.</p>
+         * <p>Number of results to return from the end of the range.</p>
          */
         _FinalStage last(Optional<Integer> last);
 
         _FinalStage last(Integer last);
 
         /**
-         * <p>A cursor; returns builds before this position.</p>
+         * <p>Return results before this cursor. Use <code>page_info.start_cursor</code> from the previous response to fetch the previous page.</p>
          */
         _FinalStage before(Optional<String> before);
 
@@ -279,7 +279,6 @@ public final class ListAppBuildsRequest {
 
         private Optional<ListAppBuildsRequestPlatform> platform = Optional.empty();
 
-        @JsonAnySetter
         private Map<String, Object> additionalProperties = new HashMap<>();
 
         private Builder() {}
@@ -300,7 +299,6 @@ public final class ListAppBuildsRequest {
 
         /**
          * <p>The app to list builds for, prefixed <code>app_</code>.</p>
-         * <p>The app to list builds for, prefixed <code>app_</code>.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
@@ -311,7 +309,7 @@ public final class ListAppBuildsRequest {
         }
 
         /**
-         * <p>A cursor; returns builds before this position.</p>
+         * <p>Return results before this cursor. Use <code>page_info.start_cursor</code> from the previous response to fetch the previous page.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
@@ -321,7 +319,7 @@ public final class ListAppBuildsRequest {
         }
 
         /**
-         * <p>A cursor; returns builds before this position.</p>
+         * <p>Return results before this cursor. Use <code>page_info.start_cursor</code> from the previous response to fetch the previous page.</p>
          */
         @java.lang.Override
         @JsonSetter(value = "before", nulls = Nulls.SKIP)
@@ -331,7 +329,7 @@ public final class ListAppBuildsRequest {
         }
 
         /**
-         * <p>The number of builds to return from the end of the range.</p>
+         * <p>Number of results to return from the end of the range.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
@@ -341,7 +339,7 @@ public final class ListAppBuildsRequest {
         }
 
         /**
-         * <p>The number of builds to return from the end of the range.</p>
+         * <p>Number of results to return from the end of the range.</p>
          */
         @java.lang.Override
         @JsonSetter(value = "last", nulls = Nulls.SKIP)
@@ -351,7 +349,7 @@ public final class ListAppBuildsRequest {
         }
 
         /**
-         * <p>A cursor; returns builds after this position.</p>
+         * <p>Return results after this cursor. Use <code>page_info.end_cursor</code> from the previous response to fetch the next page.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
@@ -361,7 +359,7 @@ public final class ListAppBuildsRequest {
         }
 
         /**
-         * <p>A cursor; returns builds after this position.</p>
+         * <p>Return results after this cursor. Use <code>page_info.end_cursor</code> from the previous response to fetch the next page.</p>
          */
         @java.lang.Override
         @JsonSetter(value = "after", nulls = Nulls.SKIP)
@@ -371,7 +369,7 @@ public final class ListAppBuildsRequest {
         }
 
         /**
-         * <p>The number of builds to return (default 20, max 100).</p>
+         * <p>Number of results to return from the start of the range.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
@@ -381,7 +379,7 @@ public final class ListAppBuildsRequest {
         }
 
         /**
-         * <p>The number of builds to return (default 20, max 100).</p>
+         * <p>Number of results to return from the start of the range.</p>
          */
         @java.lang.Override
         @JsonSetter(value = "first", nulls = Nulls.SKIP)
@@ -483,6 +481,22 @@ public final class ListAppBuildsRequest {
                     last,
                     before,
                     additionalProperties);
+        }
+
+        @JsonAnySetter
+        private void putAdditionalPropertyFromJson(String key, Object value) {
+            if (key.equalsIgnoreCase("app_id")
+                    || key.equalsIgnoreCase("platform")
+                    || key.equalsIgnoreCase("status")
+                    || key.equalsIgnoreCase("created_before")
+                    || key.equalsIgnoreCase("created_after")
+                    || key.equalsIgnoreCase("first")
+                    || key.equalsIgnoreCase("after")
+                    || key.equalsIgnoreCase("last")
+                    || key.equalsIgnoreCase("before")) {
+                return;
+            }
+            this.additionalProperties.put(key, value);
         }
 
         @java.lang.Override

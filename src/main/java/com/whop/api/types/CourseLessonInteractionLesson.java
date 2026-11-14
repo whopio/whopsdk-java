@@ -130,7 +130,6 @@ public final class CourseLessonInteractionLesson {
 
         private String title;
 
-        @JsonAnySetter
         private Map<String, Object> additionalProperties = new HashMap<>();
 
         private Builder() {}
@@ -145,7 +144,6 @@ public final class CourseLessonInteractionLesson {
 
         /**
          * <p>The parent chapter that contains this lesson.</p>
-         * <p>The parent chapter that contains this lesson.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
@@ -157,7 +155,6 @@ public final class CourseLessonInteractionLesson {
 
         /**
          * <p>The unique identifier for the lesson.</p>
-         * <p>The unique identifier for the lesson.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
@@ -168,7 +165,6 @@ public final class CourseLessonInteractionLesson {
         }
 
         /**
-         * <p>The display name of the lesson shown to students. Maximum 120 characters.</p>
          * <p>The display name of the lesson shown to students. Maximum 120 characters.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
@@ -182,6 +178,14 @@ public final class CourseLessonInteractionLesson {
         @java.lang.Override
         public CourseLessonInteractionLesson build() {
             return new CourseLessonInteractionLesson(chapter, id, title, additionalProperties);
+        }
+
+        @JsonAnySetter
+        private void putAdditionalPropertyFromJson(String key, Object value) {
+            if (key.equalsIgnoreCase("chapter") || key.equalsIgnoreCase("id") || key.equalsIgnoreCase("title")) {
+                return;
+            }
+            this.additionalProperties.put(key, value);
         }
 
         @java.lang.Override

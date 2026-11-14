@@ -129,7 +129,6 @@ public final class PostChatReactionCreatedPayloadDataChannel {
 
         private Optional<String> experienceId = Optional.empty();
 
-        @JsonAnySetter
         private Map<String, Object> additionalProperties = new HashMap<>();
 
         private Builder() {}
@@ -184,6 +183,14 @@ public final class PostChatReactionCreatedPayloadDataChannel {
         @java.lang.Override
         public PostChatReactionCreatedPayloadDataChannel build() {
             return new PostChatReactionCreatedPayloadDataChannel(experienceId, id, type, additionalProperties);
+        }
+
+        @JsonAnySetter
+        private void putAdditionalPropertyFromJson(String key, Object value) {
+            if (key.equalsIgnoreCase("experience_id") || key.equalsIgnoreCase("id") || key.equalsIgnoreCase("type")) {
+                return;
+            }
+            this.additionalProperties.put(key, value);
         }
 
         @java.lang.Override

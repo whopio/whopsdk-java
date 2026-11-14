@@ -87,7 +87,6 @@ public final class PaymentBankTransferInstructions {
     public static final class Builder implements BankTransferStage, _FinalStage {
         private PaymentBankTransfer bankTransfer;
 
-        @JsonAnySetter
         private Map<String, Object> additionalProperties = new HashMap<>();
 
         private Builder() {}
@@ -99,7 +98,6 @@ public final class PaymentBankTransferInstructions {
         }
 
         /**
-         * <p>The account details to show.</p>
          * <p>The account details to show.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
@@ -113,6 +111,14 @@ public final class PaymentBankTransferInstructions {
         @java.lang.Override
         public PaymentBankTransferInstructions build() {
             return new PaymentBankTransferInstructions(bankTransfer, additionalProperties);
+        }
+
+        @JsonAnySetter
+        private void putAdditionalPropertyFromJson(String key, Object value) {
+            if (key.equalsIgnoreCase("bank_transfer")) {
+                return;
+            }
+            this.additionalProperties.put(key, value);
         }
 
         @java.lang.Override

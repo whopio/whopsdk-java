@@ -3,221 +3,318 @@
  */
 package com.whop.api.resources.transfers.types;
 
-import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonAnyGetter;
+import com.fasterxml.jackson.annotation.JsonAnySetter;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
-import com.fasterxml.jackson.annotation.JsonSubTypes;
-import com.fasterxml.jackson.annotation.JsonTypeInfo;
-import com.fasterxml.jackson.annotation.JsonTypeName;
-import com.fasterxml.jackson.annotation.JsonUnwrapped;
-import com.fasterxml.jackson.annotation.JsonValue;
+import com.fasterxml.jackson.annotation.JsonSetter;
+import com.fasterxml.jackson.annotation.Nulls;
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
+import com.whop.api.core.Nullable;
+import com.whop.api.core.NullableNonemptyFilter;
+import com.whop.api.core.ObjectMappers;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
+import org.jetbrains.annotations.NotNull;
 
+@JsonInclude(JsonInclude.Include.NON_ABSENT)
+@JsonDeserialize(builder = PostTransferCreatedPayloadDataDestination.Builder.class)
 public final class PostTransferCreatedPayloadDataDestination {
-    private final Value value;
+    private final String id;
 
-    @JsonCreator(mode = JsonCreator.Mode.DELEGATING)
-    private PostTransferCreatedPayloadDataDestination(Value value) {
-        this.value = value;
+    private final Optional<String> logoUrl;
+
+    private final Optional<String> name;
+
+    private final PostTransferCreatedPayloadDataDestinationObject object;
+
+    private final Map<String, Object> additionalProperties;
+
+    private PostTransferCreatedPayloadDataDestination(
+            String id,
+            Optional<String> logoUrl,
+            Optional<String> name,
+            PostTransferCreatedPayloadDataDestinationObject object,
+            Map<String, Object> additionalProperties) {
+        this.id = id;
+        this.logoUrl = logoUrl;
+        this.name = name;
+        this.object = object;
+        this.additionalProperties = additionalProperties;
     }
 
-    public <T> T visit(Visitor<T> visitor) {
-        return value.visit(visitor);
+    /**
+     * @return Account or user ID.
+     */
+    @JsonProperty("id")
+    public String getId() {
+        return id;
     }
 
-    public static PostTransferCreatedPayloadDataDestination company(
-            PostTransferCreatedPayloadDataDestinationCompany value) {
-        return new PostTransferCreatedPayloadDataDestination(new CompanyValue(value));
-    }
-
-    public static PostTransferCreatedPayloadDataDestination user(PostTransferCreatedPayloadDataDestinationUser value) {
-        return new PostTransferCreatedPayloadDataDestination(new UserValue(value));
-    }
-
-    public boolean isCompany() {
-        return value instanceof CompanyValue;
-    }
-
-    public boolean isUser() {
-        return value instanceof UserValue;
-    }
-
-    public boolean _isUnknown() {
-        return value instanceof _UnknownValue;
-    }
-
-    public Optional<PostTransferCreatedPayloadDataDestinationCompany> getCompany() {
-        if (isCompany()) {
-            return Optional.of(((CompanyValue) value).value);
+    /**
+     * @return Business logo or user avatar URL. Null when no image is available.
+     */
+    @JsonIgnore
+    public Optional<String> getLogoUrl() {
+        if (logoUrl == null) {
+            return Optional.empty();
         }
-        return Optional.empty();
+        return logoUrl;
     }
 
-    public Optional<PostTransferCreatedPayloadDataDestinationUser> getUser() {
-        if (isUser()) {
-            return Optional.of(((UserValue) value).value);
+    /**
+     * @return Business or user display name.
+     */
+    @JsonIgnore
+    public Optional<String> getName() {
+        if (name == null) {
+            return Optional.empty();
         }
-        return Optional.empty();
+        return name;
     }
 
-    public Optional<Object> _getUnknown() {
-        if (_isUnknown()) {
-            return Optional.of(((_UnknownValue) value).value);
-        }
-        return Optional.empty();
+    /**
+     * @return Whether the profile is a business account or a user.
+     */
+    @JsonProperty("object")
+    public PostTransferCreatedPayloadDataDestinationObject getObject() {
+        return object;
     }
 
-    @Override
+    @JsonInclude(value = JsonInclude.Include.CUSTOM, valueFilter = NullableNonemptyFilter.class)
+    @JsonProperty("logo_url")
+    private Optional<String> _getLogoUrl() {
+        return logoUrl;
+    }
+
+    @JsonInclude(value = JsonInclude.Include.CUSTOM, valueFilter = NullableNonemptyFilter.class)
+    @JsonProperty("name")
+    private Optional<String> _getName() {
+        return name;
+    }
+
+    @java.lang.Override
     public boolean equals(Object other) {
         if (this == other) return true;
         return other instanceof PostTransferCreatedPayloadDataDestination
-                && value.equals(((PostTransferCreatedPayloadDataDestination) other).value);
+                && equalTo((PostTransferCreatedPayloadDataDestination) other);
     }
 
-    @Override
+    @JsonAnyGetter
+    public Map<String, Object> getAdditionalProperties() {
+        return this.additionalProperties;
+    }
+
+    private boolean equalTo(PostTransferCreatedPayloadDataDestination other) {
+        return id.equals(other.id)
+                && logoUrl.equals(other.logoUrl)
+                && name.equals(other.name)
+                && object.equals(other.object);
+    }
+
+    @java.lang.Override
     public int hashCode() {
-        return Objects.hash(value);
+        return Objects.hash(this.id, this.logoUrl, this.name, this.object);
     }
 
-    @Override
+    @java.lang.Override
     public String toString() {
-        return value.toString();
+        return ObjectMappers.stringify(this);
     }
 
-    @JsonValue
-    private Value getValue() {
-        return this.value;
+    public static IdStage builder() {
+        return new Builder();
     }
 
-    public interface Visitor<T> {
-        T visitCompany(PostTransferCreatedPayloadDataDestinationCompany company);
+    public interface IdStage {
+        /**
+         * <p>Account or user ID.</p>
+         */
+        ObjectStage id(@NotNull String id);
 
-        T visitUser(PostTransferCreatedPayloadDataDestinationUser user);
-
-        T _visitUnknown(Object unknownType);
+        Builder from(PostTransferCreatedPayloadDataDestination other);
     }
 
-    @JsonTypeInfo(use = JsonTypeInfo.Id.NAME, property = "typename", visible = true, defaultImpl = _UnknownValue.class)
-    @JsonSubTypes({@JsonSubTypes.Type(CompanyValue.class), @JsonSubTypes.Type(UserValue.class)})
+    public interface ObjectStage {
+        /**
+         * <p>Whether the profile is a business account or a user.</p>
+         */
+        _FinalStage object(@NotNull PostTransferCreatedPayloadDataDestinationObject object);
+    }
+
+    public interface _FinalStage {
+        PostTransferCreatedPayloadDataDestination build();
+
+        _FinalStage additionalProperty(String key, Object value);
+
+        _FinalStage additionalProperties(Map<String, Object> additionalProperties);
+
+        /**
+         * <p>Business logo or user avatar URL. Null when no image is available.</p>
+         */
+        _FinalStage logoUrl(Optional<String> logoUrl);
+
+        _FinalStage logoUrl(String logoUrl);
+
+        _FinalStage logoUrl(Nullable<String> logoUrl);
+
+        /**
+         * <p>Business or user display name.</p>
+         */
+        _FinalStage name(Optional<String> name);
+
+        _FinalStage name(String name);
+
+        _FinalStage name(Nullable<String> name);
+    }
+
     @JsonIgnoreProperties(ignoreUnknown = true)
-    private interface Value {
-        <T> T visit(Visitor<T> visitor);
-    }
+    public static final class Builder implements IdStage, ObjectStage, _FinalStage {
+        private String id;
 
-    @JsonTypeName("Company")
-    @JsonIgnoreProperties("typename")
-    private static final class CompanyValue implements Value {
-        @JsonUnwrapped
-        @JsonIgnoreProperties(value = "typename", allowSetters = true)
-        private PostTransferCreatedPayloadDataDestinationCompany value;
+        private PostTransferCreatedPayloadDataDestinationObject object;
 
-        @JsonCreator(mode = JsonCreator.Mode.PROPERTIES)
-        private CompanyValue() {}
+        private Optional<String> name = Optional.empty();
 
-        private CompanyValue(PostTransferCreatedPayloadDataDestinationCompany value) {
-            this.value = value;
+        private Optional<String> logoUrl = Optional.empty();
+
+        private Map<String, Object> additionalProperties = new HashMap<>();
+
+        private Builder() {}
+
+        @java.lang.Override
+        public Builder from(PostTransferCreatedPayloadDataDestination other) {
+            id(other.getId());
+            logoUrl(other.getLogoUrl());
+            name(other.getName());
+            object(other.getObject());
+            return this;
+        }
+
+        /**
+         * <p>Account or user ID.</p>
+         * @return Reference to {@code this} so that method calls can be chained together.
+         */
+        @java.lang.Override
+        @JsonSetter("id")
+        public ObjectStage id(@NotNull String id) {
+            this.id = Objects.requireNonNull(id, "id must not be null");
+            return this;
+        }
+
+        /**
+         * <p>Whether the profile is a business account or a user.</p>
+         * @return Reference to {@code this} so that method calls can be chained together.
+         */
+        @java.lang.Override
+        @JsonSetter("object")
+        public _FinalStage object(@NotNull PostTransferCreatedPayloadDataDestinationObject object) {
+            this.object = Objects.requireNonNull(object, "object must not be null");
+            return this;
+        }
+
+        /**
+         * <p>Business or user display name.</p>
+         * @return Reference to {@code this} so that method calls can be chained together.
+         */
+        @java.lang.Override
+        public _FinalStage name(Nullable<String> name) {
+            if (name.isNull()) {
+                this.name = null;
+            } else if (name.isEmpty()) {
+                this.name = Optional.empty();
+            } else {
+                this.name = Optional.of(name.get());
+            }
+            return this;
+        }
+
+        /**
+         * <p>Business or user display name.</p>
+         * @return Reference to {@code this} so that method calls can be chained together.
+         */
+        @java.lang.Override
+        public _FinalStage name(String name) {
+            this.name = Optional.ofNullable(name);
+            return this;
+        }
+
+        /**
+         * <p>Business or user display name.</p>
+         */
+        @java.lang.Override
+        @JsonSetter(value = "name", nulls = Nulls.SKIP)
+        public _FinalStage name(Optional<String> name) {
+            this.name = name;
+            return this;
+        }
+
+        /**
+         * <p>Business logo or user avatar URL. Null when no image is available.</p>
+         * @return Reference to {@code this} so that method calls can be chained together.
+         */
+        @java.lang.Override
+        public _FinalStage logoUrl(Nullable<String> logoUrl) {
+            if (logoUrl.isNull()) {
+                this.logoUrl = null;
+            } else if (logoUrl.isEmpty()) {
+                this.logoUrl = Optional.empty();
+            } else {
+                this.logoUrl = Optional.of(logoUrl.get());
+            }
+            return this;
+        }
+
+        /**
+         * <p>Business logo or user avatar URL. Null when no image is available.</p>
+         * @return Reference to {@code this} so that method calls can be chained together.
+         */
+        @java.lang.Override
+        public _FinalStage logoUrl(String logoUrl) {
+            this.logoUrl = Optional.ofNullable(logoUrl);
+            return this;
+        }
+
+        /**
+         * <p>Business logo or user avatar URL. Null when no image is available.</p>
+         */
+        @java.lang.Override
+        @JsonSetter(value = "logo_url", nulls = Nulls.SKIP)
+        public _FinalStage logoUrl(Optional<String> logoUrl) {
+            this.logoUrl = logoUrl;
+            return this;
         }
 
         @java.lang.Override
-        public <T> T visit(Visitor<T> visitor) {
-            return visitor.visitCompany(value);
+        public PostTransferCreatedPayloadDataDestination build() {
+            return new PostTransferCreatedPayloadDataDestination(id, logoUrl, name, object, additionalProperties);
+        }
+
+        @JsonAnySetter
+        private void putAdditionalPropertyFromJson(String key, Object value) {
+            if (key.equalsIgnoreCase("id")
+                    || key.equalsIgnoreCase("logo_url")
+                    || key.equalsIgnoreCase("name")
+                    || key.equalsIgnoreCase("object")) {
+                return;
+            }
+            this.additionalProperties.put(key, value);
         }
 
         @java.lang.Override
-        public boolean equals(Object other) {
-            if (this == other) return true;
-            return other instanceof CompanyValue && equalTo((CompanyValue) other);
-        }
-
-        private boolean equalTo(CompanyValue other) {
-            return value.equals(other.value);
+        public Builder additionalProperty(String key, Object value) {
+            this.additionalProperties.put(key, value);
+            return this;
         }
 
         @java.lang.Override
-        public int hashCode() {
-            return Objects.hash(this.value);
-        }
-
-        @java.lang.Override
-        public String toString() {
-            return "PostTransferCreatedPayloadDataDestination{" + "value: " + value + "}";
-        }
-    }
-
-    @JsonTypeName("User")
-    @JsonIgnoreProperties("typename")
-    private static final class UserValue implements Value {
-        @JsonUnwrapped
-        @JsonIgnoreProperties(value = "typename", allowSetters = true)
-        private PostTransferCreatedPayloadDataDestinationUser value;
-
-        @JsonCreator(mode = JsonCreator.Mode.PROPERTIES)
-        private UserValue() {}
-
-        private UserValue(PostTransferCreatedPayloadDataDestinationUser value) {
-            this.value = value;
-        }
-
-        @java.lang.Override
-        public <T> T visit(Visitor<T> visitor) {
-            return visitor.visitUser(value);
-        }
-
-        @java.lang.Override
-        public boolean equals(Object other) {
-            if (this == other) return true;
-            return other instanceof UserValue && equalTo((UserValue) other);
-        }
-
-        private boolean equalTo(UserValue other) {
-            return value.equals(other.value);
-        }
-
-        @java.lang.Override
-        public int hashCode() {
-            return Objects.hash(this.value);
-        }
-
-        @java.lang.Override
-        public String toString() {
-            return "PostTransferCreatedPayloadDataDestination{" + "value: " + value + "}";
-        }
-    }
-
-    @JsonIgnoreProperties("typename")
-    private static final class _UnknownValue implements Value {
-        private String type;
-
-        @JsonValue
-        private Object value;
-
-        @JsonCreator(mode = JsonCreator.Mode.PROPERTIES)
-        private _UnknownValue(@JsonProperty("value") Object value) {}
-
-        @java.lang.Override
-        public <T> T visit(Visitor<T> visitor) {
-            return visitor._visitUnknown(value);
-        }
-
-        @java.lang.Override
-        public boolean equals(Object other) {
-            if (this == other) return true;
-            return other instanceof _UnknownValue && equalTo((_UnknownValue) other);
-        }
-
-        private boolean equalTo(_UnknownValue other) {
-            return type.equals(other.type) && value.equals(other.value);
-        }
-
-        @java.lang.Override
-        public int hashCode() {
-            return Objects.hash(this.type, this.value);
-        }
-
-        @java.lang.Override
-        public String toString() {
-            return "PostTransferCreatedPayloadDataDestination{" + "type: " + type + ", value: " + value + "}";
+        public Builder additionalProperties(Map<String, Object> additionalProperties) {
+            this.additionalProperties.putAll(additionalProperties);
+            return this;
         }
     }
 }

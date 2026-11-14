@@ -319,7 +319,6 @@ public final class DisputeAlertListItem {
 
         private Optional<DisputeAlertListItemDispute> dispute = Optional.empty();
 
-        @JsonAnySetter
         private Map<String, Object> additionalProperties = new HashMap<>();
 
         private Builder() {}
@@ -340,7 +339,6 @@ public final class DisputeAlertListItem {
 
         /**
          * <p>The type of the dispute alert.</p>
-         * <p>The type of the dispute alert.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
@@ -351,7 +349,6 @@ public final class DisputeAlertListItem {
         }
 
         /**
-         * <p>The alerted amount in the specified currency.</p>
          * <p>The alerted amount in the specified currency.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
@@ -364,7 +361,6 @@ public final class DisputeAlertListItem {
 
         /**
          * <p>Whether this alert incurs a charge.</p>
-         * <p>Whether this alert incurs a charge.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
@@ -375,7 +371,6 @@ public final class DisputeAlertListItem {
         }
 
         /**
-         * <p>The time the dispute alert was created.</p>
          * <p>The time the dispute alert was created.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
@@ -388,7 +383,6 @@ public final class DisputeAlertListItem {
 
         /**
          * <p>The three-letter ISO currency code for the alerted amount.</p>
-         * <p>The three-letter ISO currency code for the alerted amount.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
@@ -399,7 +393,6 @@ public final class DisputeAlertListItem {
         }
 
         /**
-         * <p>The unique identifier of the dispute alert.</p>
          * <p>The unique identifier of the dispute alert.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
@@ -531,6 +524,22 @@ public final class DisputeAlertListItem {
                     payment,
                     transactionDate,
                     additionalProperties);
+        }
+
+        @JsonAnySetter
+        private void putAdditionalPropertyFromJson(String key, Object value) {
+            if (key.equalsIgnoreCase("alert_type")
+                    || key.equalsIgnoreCase("amount")
+                    || key.equalsIgnoreCase("charge_for_alert")
+                    || key.equalsIgnoreCase("created_at")
+                    || key.equalsIgnoreCase("currency")
+                    || key.equalsIgnoreCase("dispute")
+                    || key.equalsIgnoreCase("id")
+                    || key.equalsIgnoreCase("payment")
+                    || key.equalsIgnoreCase("transaction_date")) {
+                return;
+            }
+            this.additionalProperties.put(key, value);
         }
 
         @java.lang.Override

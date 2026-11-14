@@ -29,28 +29,28 @@ public class PeopleClient {
     }
 
     /**
-     * Lists the people (visitors and customers) of an account: the identity-linked person profiles aggregated from every pixel, payment, and platform event — identities, purchases and LTV, geo/device profile, traffic sources, and first/last marketing touches.
+     * Lists the people (visitors and customers) of an account: identity-linked profiles assembled from every pixel, payment, and platform event. Filter and sort them to segment an account's audience.
      */
     public SyncPagingIterable<ListPeopleResponseDataItem> list() {
         return this.rawClient.list().body();
     }
 
     /**
-     * Lists the people (visitors and customers) of an account: the identity-linked person profiles aggregated from every pixel, payment, and platform event — identities, purchases and LTV, geo/device profile, traffic sources, and first/last marketing touches.
+     * Lists the people (visitors and customers) of an account: identity-linked profiles assembled from every pixel, payment, and platform event. Filter and sort them to segment an account's audience.
      */
     public SyncPagingIterable<ListPeopleResponseDataItem> list(RequestOptions requestOptions) {
         return this.rawClient.list(requestOptions).body();
     }
 
     /**
-     * Lists the people (visitors and customers) of an account: the identity-linked person profiles aggregated from every pixel, payment, and platform event — identities, purchases and LTV, geo/device profile, traffic sources, and first/last marketing touches.
+     * Lists the people (visitors and customers) of an account: identity-linked profiles assembled from every pixel, payment, and platform event. Filter and sort them to segment an account's audience.
      */
     public SyncPagingIterable<ListPeopleResponseDataItem> list(ListPeopleRequest request) {
         return this.rawClient.list(request).body();
     }
 
     /**
-     * Lists the people (visitors and customers) of an account: the identity-linked person profiles aggregated from every pixel, payment, and platform event — identities, purchases and LTV, geo/device profile, traffic sources, and first/last marketing touches.
+     * Lists the people (visitors and customers) of an account: identity-linked profiles assembled from every pixel, payment, and platform event. Filter and sort them to segment an account's audience.
      */
     public SyncPagingIterable<ListPeopleResponseDataItem> list(
             ListPeopleRequest request, RequestOptions requestOptions) {
@@ -58,28 +58,28 @@ public class PeopleClient {
     }
 
     /**
-     * Retrieves one person for an account. The identifier can be a person ID (prefixed <code>prsn_</code>), a user ID (prefixed <code>user_</code>), an email address, or a phone number — merged people resolve to the surviving profile.
+     * Retrieves one person for an account, looked up by person ID, user ID, email address, or phone number.
      */
     public RetrievePeopleResponse retrieve(String id) {
         return this.rawClient.retrieve(id).body();
     }
 
     /**
-     * Retrieves one person for an account. The identifier can be a person ID (prefixed <code>prsn_</code>), a user ID (prefixed <code>user_</code>), an email address, or a phone number — merged people resolve to the surviving profile.
+     * Retrieves one person for an account, looked up by person ID, user ID, email address, or phone number.
      */
     public RetrievePeopleResponse retrieve(String id, RequestOptions requestOptions) {
         return this.rawClient.retrieve(id, requestOptions).body();
     }
 
     /**
-     * Retrieves one person for an account. The identifier can be a person ID (prefixed <code>prsn_</code>), a user ID (prefixed <code>user_</code>), an email address, or a phone number — merged people resolve to the surviving profile.
+     * Retrieves one person for an account, looked up by person ID, user ID, email address, or phone number.
      */
     public RetrievePeopleResponse retrieve(String id, RetrievePeopleRequest request) {
         return this.rawClient.retrieve(id, request).body();
     }
 
     /**
-     * Retrieves one person for an account. The identifier can be a person ID (prefixed <code>prsn_</code>), a user ID (prefixed <code>user_</code>), an email address, or a phone number — merged people resolve to the surviving profile.
+     * Retrieves one person for an account, looked up by person ID, user ID, email address, or phone number.
      */
     public RetrievePeopleResponse retrieve(String id, RetrievePeopleRequest request, RequestOptions requestOptions) {
         return this.rawClient.retrieve(id, request, requestOptions).body();

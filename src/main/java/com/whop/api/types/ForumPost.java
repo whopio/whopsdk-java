@@ -462,7 +462,6 @@ public final class ForumPost {
 
         private List<ForumPostAttachmentsItem> attachments = new ArrayList<>();
 
-        @JsonAnySetter
         private Map<String, Object> additionalProperties = new HashMap<>();
 
         private Builder() {}
@@ -488,7 +487,6 @@ public final class ForumPost {
 
         /**
          * <p>The total number of direct comments on this post.</p>
-         * <p>The total number of direct comments on this post.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
@@ -499,7 +497,6 @@ public final class ForumPost {
         }
 
         /**
-         * <p>The time this post was created, as a Unix timestamp.</p>
          * <p>The time this post was created, as a Unix timestamp.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
@@ -512,7 +509,6 @@ public final class ForumPost {
 
         /**
          * <p>Represents a unique identifier that is Base64 obfuscated. It is often used to refetch an object or as key for a cache. The ID type appears in a JSON response as a String; however, it is not intended to be human-readable. When expected as an input type, any string (such as <code>&quot;VXNlci0xMA==&quot;</code>) or integer (such as <code>4</code>) input value will be accepted as an ID.</p>
-         * <p>Represents a unique identifier that is Base64 obfuscated. It is often used to refetch an object or as key for a cache. The ID type appears in a JSON response as a String; however, it is not intended to be human-readable. When expected as an input type, any string (such as <code>&quot;VXNlci0xMA==&quot;</code>) or integer (such as <code>4</code>) input value will be accepted as an ID.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
@@ -523,7 +519,6 @@ public final class ForumPost {
         }
 
         /**
-         * <p>Whether this post has been edited after its initial creation.</p>
          * <p>Whether this post has been edited after its initial creation.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
@@ -536,7 +531,6 @@ public final class ForumPost {
 
         /**
          * <p>Whether this post is pinned to the top of the forum feed.</p>
-         * <p>Whether this post is pinned to the top of the forum feed.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
@@ -547,7 +541,6 @@ public final class ForumPost {
         }
 
         /**
-         * <p>Whether the author of this post is an admin of the company that owns the forum.</p>
          * <p>Whether the author of this post is an admin of the company that owns the forum.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
@@ -560,7 +553,6 @@ public final class ForumPost {
 
         /**
          * <p>The time this post was last updated, as a Unix timestamp.</p>
-         * <p>The time this post was last updated, as a Unix timestamp.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
@@ -571,7 +563,6 @@ public final class ForumPost {
         }
 
         /**
-         * <p>The user who authored this forum post.</p>
          * <p>The user who authored this forum post.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
@@ -815,6 +806,27 @@ public final class ForumPost {
                     user,
                     viewCount,
                     additionalProperties);
+        }
+
+        @JsonAnySetter
+        private void putAdditionalPropertyFromJson(String key, Object value) {
+            if (key.equalsIgnoreCase("attachments")
+                    || key.equalsIgnoreCase("comment_count")
+                    || key.equalsIgnoreCase("content")
+                    || key.equalsIgnoreCase("created_at")
+                    || key.equalsIgnoreCase("id")
+                    || key.equalsIgnoreCase("is_edited")
+                    || key.equalsIgnoreCase("is_pinned")
+                    || key.equalsIgnoreCase("is_poster_admin")
+                    || key.equalsIgnoreCase("like_count")
+                    || key.equalsIgnoreCase("parent_id")
+                    || key.equalsIgnoreCase("title")
+                    || key.equalsIgnoreCase("updated_at")
+                    || key.equalsIgnoreCase("user")
+                    || key.equalsIgnoreCase("view_count")) {
+                return;
+            }
+            this.additionalProperties.put(key, value);
         }
 
         @java.lang.Override

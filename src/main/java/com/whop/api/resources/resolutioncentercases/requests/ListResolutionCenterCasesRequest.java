@@ -127,7 +127,7 @@ public final class ListResolutionCenterCasesRequest {
     }
 
     /**
-     * @return The number of cases to return (default 20, max 100).
+     * @return Number of results to return from the start of the range.
      */
     @JsonProperty("first")
     public Optional<Integer> getFirst() {
@@ -135,7 +135,7 @@ public final class ListResolutionCenterCasesRequest {
     }
 
     /**
-     * @return A cursor; returns cases after this position.
+     * @return Return results after this cursor. Use <code>page_info.end_cursor</code> from the previous response to fetch the next page.
      */
     @JsonProperty("after")
     public Optional<String> getAfter() {
@@ -143,7 +143,7 @@ public final class ListResolutionCenterCasesRequest {
     }
 
     /**
-     * @return The number of cases to return from the end of the range.
+     * @return Number of results to return from the end of the range.
      */
     @JsonProperty("last")
     public Optional<Integer> getLast() {
@@ -151,7 +151,7 @@ public final class ListResolutionCenterCasesRequest {
     }
 
     /**
-     * @return A cursor; returns cases before this position.
+     * @return Return results before this cursor. Use <code>page_info.start_cursor</code> from the previous response to fetch the previous page.
      */
     @JsonProperty("before")
     public Optional<String> getBefore() {
@@ -272,7 +272,6 @@ public final class ListResolutionCenterCasesRequest {
 
         private Optional<String> createdAfter = Optional.empty();
 
-        @JsonAnySetter
         private Map<String, Object> additionalProperties = new HashMap<>();
 
         private Builder() {}
@@ -380,7 +379,7 @@ public final class ListResolutionCenterCasesRequest {
         }
 
         /**
-         * <p>The number of cases to return (default 20, max 100).</p>
+         * <p>Number of results to return from the start of the range.</p>
          */
         @JsonSetter(value = "first", nulls = Nulls.SKIP)
         public Builder first(Optional<Integer> first) {
@@ -394,7 +393,7 @@ public final class ListResolutionCenterCasesRequest {
         }
 
         /**
-         * <p>A cursor; returns cases after this position.</p>
+         * <p>Return results after this cursor. Use <code>page_info.end_cursor</code> from the previous response to fetch the next page.</p>
          */
         @JsonSetter(value = "after", nulls = Nulls.SKIP)
         public Builder after(Optional<String> after) {
@@ -408,7 +407,7 @@ public final class ListResolutionCenterCasesRequest {
         }
 
         /**
-         * <p>The number of cases to return from the end of the range.</p>
+         * <p>Number of results to return from the end of the range.</p>
          */
         @JsonSetter(value = "last", nulls = Nulls.SKIP)
         public Builder last(Optional<Integer> last) {
@@ -422,7 +421,7 @@ public final class ListResolutionCenterCasesRequest {
         }
 
         /**
-         * <p>A cursor; returns cases before this position.</p>
+         * <p>Return results before this cursor. Use <code>page_info.start_cursor</code> from the previous response to fetch the previous page.</p>
          */
         @JsonSetter(value = "before", nulls = Nulls.SKIP)
         public Builder before(Optional<String> before) {
@@ -507,6 +506,26 @@ public final class ListResolutionCenterCasesRequest {
                     createdBefore,
                     createdAfter,
                     additionalProperties);
+        }
+
+        @JsonAnySetter
+        private void putAdditionalPropertyFromJson(String key, Object value) {
+            if (key.equalsIgnoreCase("status")
+                    || key.equalsIgnoreCase("reason")
+                    || key.equalsIgnoreCase("outcome")
+                    || key.equalsIgnoreCase("account_id")
+                    || key.equalsIgnoreCase("user_id")
+                    || key.equalsIgnoreCase("first")
+                    || key.equalsIgnoreCase("after")
+                    || key.equalsIgnoreCase("last")
+                    || key.equalsIgnoreCase("before")
+                    || key.equalsIgnoreCase("order")
+                    || key.equalsIgnoreCase("direction")
+                    || key.equalsIgnoreCase("created_before")
+                    || key.equalsIgnoreCase("created_after")) {
+                return;
+            }
+            this.additionalProperties.put(key, value);
         }
 
         public Builder additionalProperty(String key, Object value) {

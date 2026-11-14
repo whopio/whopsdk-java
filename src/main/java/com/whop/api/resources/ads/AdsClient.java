@@ -11,12 +11,16 @@ import com.whop.api.resources.ads.requests.DeleteAdsRequest;
 import com.whop.api.resources.ads.requests.DuplicateAdsRequest;
 import com.whop.api.resources.ads.requests.ListAdsRequest;
 import com.whop.api.resources.ads.requests.PauseAdsRequest;
+import com.whop.api.resources.ads.requests.ReportIssuesAdsRequest;
+import com.whop.api.resources.ads.requests.ReportStatsAdsRequest;
 import com.whop.api.resources.ads.requests.RetrieveAdsRequest;
 import com.whop.api.resources.ads.requests.UnpauseAdsRequest;
 import com.whop.api.resources.ads.requests.UpdateAdsRequest;
 import com.whop.api.resources.ads.types.DeleteAdsResponse;
 import com.whop.api.resources.ads.types.DuplicateAdsResponse;
+import com.whop.api.resources.ads.types.ReportIssuesAdsResponse;
 import com.whop.api.types.Ad;
+import com.whop.api.types.AdStat;
 
 public class AdsClient {
     protected final ClientOptions clientOptions;
@@ -33,6 +37,34 @@ public class AdsClient {
      */
     public RawAdsClient withRawResponse() {
         return this.rawClient;
+    }
+
+    /**
+     * Reports why one of a runner's ads or ad groups can't deliver yet, and replaces what the runner reported for it before. The account running the campaign sees each issue, with what to change when it can fix it. An empty <code>issues</code> list clears the object's issues, and they also clear when the runner stops holding the campaign. Takes the runner's Whop session, a user API key, or a user OAuth token with <code>ad_campaign:update</code>. A token without that scope gets a 403, and anyone not holding the whole campaign gets a 404.
+     */
+    public ReportIssuesAdsResponse reportIssues(ReportIssuesAdsRequest request) {
+        return this.rawClient.reportIssues(request).body();
+    }
+
+    /**
+     * Reports why one of a runner's ads or ad groups can't deliver yet, and replaces what the runner reported for it before. The account running the campaign sees each issue, with what to change when it can fix it. An empty <code>issues</code> list clears the object's issues, and they also clear when the runner stops holding the campaign. Takes the runner's Whop session, a user API key, or a user OAuth token with <code>ad_campaign:update</code>. A token without that scope gets a 403, and anyone not holding the whole campaign gets a 404.
+     */
+    public ReportIssuesAdsResponse reportIssues(ReportIssuesAdsRequest request, RequestOptions requestOptions) {
+        return this.rawClient.reportIssues(request, requestOptions).body();
+    }
+
+    /**
+     * Records a runner's stats for one of their ads in one hour, and pays them for the spend. Send the ad's totals so far for an hour that has started; they replace what the ad held for that hour, and its ad group's and campaign's hours are rebuilt from their ads. The spend can go up but never down. Hours before the runner's first report on the campaign can be reported too. The spend is recorded and paid exactly as sent, with no markup added, so send it with the runner's markup already applied. Takes the runner's Whop session, a user API key, or a user OAuth token with <code>ad_campaign:update</code>. A token without that scope gets a 403, and anyone not holding the ad's campaign gets a 404.
+     */
+    public AdStat reportStats(ReportStatsAdsRequest request) {
+        return this.rawClient.reportStats(request).body();
+    }
+
+    /**
+     * Records a runner's stats for one of their ads in one hour, and pays them for the spend. Send the ad's totals so far for an hour that has started; they replace what the ad held for that hour, and its ad group's and campaign's hours are rebuilt from their ads. The spend can go up but never down. Hours before the runner's first report on the campaign can be reported too. The spend is recorded and paid exactly as sent, with no markup added, so send it with the runner's markup already applied. Takes the runner's Whop session, a user API key, or a user OAuth token with <code>ad_campaign:update</code>. A token without that scope gets a 403, and anyone not holding the ad's campaign gets a 404.
+     */
+    public AdStat reportStats(ReportStatsAdsRequest request, RequestOptions requestOptions) {
+        return this.rawClient.reportStats(request, requestOptions).body();
     }
 
     /**
@@ -64,28 +96,28 @@ public class AdsClient {
     }
 
     /**
-     * Creates an ad in an ad group.
+     * Creates an ad in an ad group. Any campaign status other than <code>draft</code> launches the campaign, which requires an ads payment method on the account.
      */
     public Ad create() {
         return this.rawClient.create().body();
     }
 
     /**
-     * Creates an ad in an ad group.
+     * Creates an ad in an ad group. Any campaign status other than <code>draft</code> launches the campaign, which requires an ads payment method on the account.
      */
     public Ad create(RequestOptions requestOptions) {
         return this.rawClient.create(requestOptions).body();
     }
 
     /**
-     * Creates an ad in an ad group.
+     * Creates an ad in an ad group. Any campaign status other than <code>draft</code> launches the campaign, which requires an ads payment method on the account.
      */
     public Ad create(CreateAdsRequest request) {
         return this.rawClient.create(request).body();
     }
 
     /**
-     * Creates an ad in an ad group.
+     * Creates an ad in an ad group. Any campaign status other than <code>draft</code> launches the campaign, which requires an ads payment method on the account.
      */
     public Ad create(CreateAdsRequest request, RequestOptions requestOptions) {
         return this.rawClient.create(request, requestOptions).body();
@@ -176,28 +208,28 @@ public class AdsClient {
     }
 
     /**
-     * Copies the ad into its own ad group, or into target_ad_group_id (which must belong to the same account and be compatible with the ad). Copies keep the source ad's active/paused state.
+     * Copies an ad into its own ad group or into another one. Copies keep the source ad's active or paused state.
      */
     public DuplicateAdsResponse duplicate(String id) {
         return this.rawClient.duplicate(id).body();
     }
 
     /**
-     * Copies the ad into its own ad group, or into target_ad_group_id (which must belong to the same account and be compatible with the ad). Copies keep the source ad's active/paused state.
+     * Copies an ad into its own ad group or into another one. Copies keep the source ad's active or paused state.
      */
     public DuplicateAdsResponse duplicate(String id, RequestOptions requestOptions) {
         return this.rawClient.duplicate(id, requestOptions).body();
     }
 
     /**
-     * Copies the ad into its own ad group, or into target_ad_group_id (which must belong to the same account and be compatible with the ad). Copies keep the source ad's active/paused state.
+     * Copies an ad into its own ad group or into another one. Copies keep the source ad's active or paused state.
      */
     public DuplicateAdsResponse duplicate(String id, DuplicateAdsRequest request) {
         return this.rawClient.duplicate(id, request).body();
     }
 
     /**
-     * Copies the ad into its own ad group, or into target_ad_group_id (which must belong to the same account and be compatible with the ad). Copies keep the source ad's active/paused state.
+     * Copies an ad into its own ad group or into another one. Copies keep the source ad's active or paused state.
      */
     public DuplicateAdsResponse duplicate(String id, DuplicateAdsRequest request, RequestOptions requestOptions) {
         return this.rawClient.duplicate(id, request, requestOptions).body();

@@ -5,6 +5,7 @@ package com.whop.api.resources.appbuilds;
 
 import com.whop.api.core.ClientOptions;
 import com.whop.api.core.RequestOptions;
+import com.whop.api.core.WhopApiHttpResponse;
 import com.whop.api.core.pagination.SyncPagingIterable;
 import com.whop.api.resources.appbuilds.requests.CreateAppBuildsRequest;
 import com.whop.api.resources.appbuilds.requests.ListAppBuildsRequest;
@@ -34,7 +35,14 @@ public class AsyncAppBuildsClient {
      * Returns a paginated list of build artifacts for an app, newest first, with optional platform, status, and creation-date filters.
      */
     public CompletableFuture<SyncPagingIterable<AppBuild>> list(ListAppBuildsRequest request) {
-        return this.rawClient.list(request).thenApply(response -> response.body());
+        CompletableFuture<WhopApiHttpResponse<SyncPagingIterable<AppBuild>>> rawFuture = this.rawClient.list(request);
+        CompletableFuture<SyncPagingIterable<AppBuild>> future = rawFuture.thenApply(response -> response.body());
+        future.whenComplete((result_, throwable_) -> {
+            if (future.isCancelled()) {
+                rawFuture.cancel(true);
+            }
+        });
+        return future;
     }
 
     /**
@@ -42,42 +50,85 @@ public class AsyncAppBuildsClient {
      */
     public CompletableFuture<SyncPagingIterable<AppBuild>> list(
             ListAppBuildsRequest request, RequestOptions requestOptions) {
-        return this.rawClient.list(request, requestOptions).thenApply(response -> response.body());
+        CompletableFuture<WhopApiHttpResponse<SyncPagingIterable<AppBuild>>> rawFuture =
+                this.rawClient.list(request, requestOptions);
+        CompletableFuture<SyncPagingIterable<AppBuild>> future = rawFuture.thenApply(response -> response.body());
+        future.whenComplete((result_, throwable_) -> {
+            if (future.isCancelled()) {
+                rawFuture.cancel(true);
+            }
+        });
+        return future;
     }
 
     /**
-     * Uploads a new build artifact for an app. Upload the file first (POST /files or a direct upload), then reference it here; iOS and Android take a .zip bundle, web takes a JavaScript file or a .zip archive of the hosted site.
+     * Uploads a new build artifact for an app. Upload the file first with <code>POST /files</code> or a direct upload, then reference it in <code>attachment</code>.
      */
     public CompletableFuture<AppBuild> create(CreateAppBuildsRequest request) {
-        return this.rawClient.create(request).thenApply(response -> response.body());
+        CompletableFuture<WhopApiHttpResponse<AppBuild>> rawFuture = this.rawClient.create(request);
+        CompletableFuture<AppBuild> future = rawFuture.thenApply(response -> response.body());
+        future.whenComplete((result_, throwable_) -> {
+            if (future.isCancelled()) {
+                rawFuture.cancel(true);
+            }
+        });
+        return future;
     }
 
     /**
-     * Uploads a new build artifact for an app. Upload the file first (POST /files or a direct upload), then reference it here; iOS and Android take a .zip bundle, web takes a JavaScript file or a .zip archive of the hosted site.
+     * Uploads a new build artifact for an app. Upload the file first with <code>POST /files</code> or a direct upload, then reference it in <code>attachment</code>.
      */
     public CompletableFuture<AppBuild> create(CreateAppBuildsRequest request, RequestOptions requestOptions) {
-        return this.rawClient.create(request, requestOptions).thenApply(response -> response.body());
+        CompletableFuture<WhopApiHttpResponse<AppBuild>> rawFuture = this.rawClient.create(request, requestOptions);
+        CompletableFuture<AppBuild> future = rawFuture.thenApply(response -> response.body());
+        future.whenComplete((result_, throwable_) -> {
+            if (future.isCancelled()) {
+                rawFuture.cancel(true);
+            }
+        });
+        return future;
     }
 
     /**
      * Retrieves the details of an existing app build.
      */
     public CompletableFuture<AppBuild> retrieve(String id) {
-        return this.rawClient.retrieve(id).thenApply(response -> response.body());
+        CompletableFuture<WhopApiHttpResponse<AppBuild>> rawFuture = this.rawClient.retrieve(id);
+        CompletableFuture<AppBuild> future = rawFuture.thenApply(response -> response.body());
+        future.whenComplete((result_, throwable_) -> {
+            if (future.isCancelled()) {
+                rawFuture.cancel(true);
+            }
+        });
+        return future;
     }
 
     /**
      * Retrieves the details of an existing app build.
      */
     public CompletableFuture<AppBuild> retrieve(String id, RequestOptions requestOptions) {
-        return this.rawClient.retrieve(id, requestOptions).thenApply(response -> response.body());
+        CompletableFuture<WhopApiHttpResponse<AppBuild>> rawFuture = this.rawClient.retrieve(id, requestOptions);
+        CompletableFuture<AppBuild> future = rawFuture.thenApply(response -> response.body());
+        future.whenComplete((result_, throwable_) -> {
+            if (future.isCancelled()) {
+                rawFuture.cancel(true);
+            }
+        });
+        return future;
     }
 
     /**
      * Retrieves the details of an existing app build.
      */
     public CompletableFuture<AppBuild> retrieve(String id, RetrieveAppBuildsRequest request) {
-        return this.rawClient.retrieve(id, request).thenApply(response -> response.body());
+        CompletableFuture<WhopApiHttpResponse<AppBuild>> rawFuture = this.rawClient.retrieve(id, request);
+        CompletableFuture<AppBuild> future = rawFuture.thenApply(response -> response.body());
+        future.whenComplete((result_, throwable_) -> {
+            if (future.isCancelled()) {
+                rawFuture.cancel(true);
+            }
+        });
+        return future;
     }
 
     /**
@@ -85,28 +136,57 @@ public class AsyncAppBuildsClient {
      */
     public CompletableFuture<AppBuild> retrieve(
             String id, RetrieveAppBuildsRequest request, RequestOptions requestOptions) {
-        return this.rawClient.retrieve(id, request, requestOptions).thenApply(response -> response.body());
+        CompletableFuture<WhopApiHttpResponse<AppBuild>> rawFuture =
+                this.rawClient.retrieve(id, request, requestOptions);
+        CompletableFuture<AppBuild> future = rawFuture.thenApply(response -> response.body());
+        future.whenComplete((result_, throwable_) -> {
+            if (future.isCancelled()) {
+                rawFuture.cancel(true);
+            }
+        });
+        return future;
     }
 
     /**
      * Promotes a draft or approved app build to production so it becomes the active version served to users. Draft builds enter review first.
      */
     public CompletableFuture<AppBuild> promote(String id) {
-        return this.rawClient.promote(id).thenApply(response -> response.body());
+        CompletableFuture<WhopApiHttpResponse<AppBuild>> rawFuture = this.rawClient.promote(id);
+        CompletableFuture<AppBuild> future = rawFuture.thenApply(response -> response.body());
+        future.whenComplete((result_, throwable_) -> {
+            if (future.isCancelled()) {
+                rawFuture.cancel(true);
+            }
+        });
+        return future;
     }
 
     /**
      * Promotes a draft or approved app build to production so it becomes the active version served to users. Draft builds enter review first.
      */
     public CompletableFuture<AppBuild> promote(String id, RequestOptions requestOptions) {
-        return this.rawClient.promote(id, requestOptions).thenApply(response -> response.body());
+        CompletableFuture<WhopApiHttpResponse<AppBuild>> rawFuture = this.rawClient.promote(id, requestOptions);
+        CompletableFuture<AppBuild> future = rawFuture.thenApply(response -> response.body());
+        future.whenComplete((result_, throwable_) -> {
+            if (future.isCancelled()) {
+                rawFuture.cancel(true);
+            }
+        });
+        return future;
     }
 
     /**
      * Promotes a draft or approved app build to production so it becomes the active version served to users. Draft builds enter review first.
      */
     public CompletableFuture<AppBuild> promote(String id, PromoteAppBuildsRequest request) {
-        return this.rawClient.promote(id, request).thenApply(response -> response.body());
+        CompletableFuture<WhopApiHttpResponse<AppBuild>> rawFuture = this.rawClient.promote(id, request);
+        CompletableFuture<AppBuild> future = rawFuture.thenApply(response -> response.body());
+        future.whenComplete((result_, throwable_) -> {
+            if (future.isCancelled()) {
+                rawFuture.cancel(true);
+            }
+        });
+        return future;
     }
 
     /**
@@ -114,6 +194,14 @@ public class AsyncAppBuildsClient {
      */
     public CompletableFuture<AppBuild> promote(
             String id, PromoteAppBuildsRequest request, RequestOptions requestOptions) {
-        return this.rawClient.promote(id, request, requestOptions).thenApply(response -> response.body());
+        CompletableFuture<WhopApiHttpResponse<AppBuild>> rawFuture =
+                this.rawClient.promote(id, request, requestOptions);
+        CompletableFuture<AppBuild> future = rawFuture.thenApply(response -> response.body());
+        future.whenComplete((result_, throwable_) -> {
+            if (future.isCancelled()) {
+                rawFuture.cancel(true);
+            }
+        });
+        return future;
     }
 }

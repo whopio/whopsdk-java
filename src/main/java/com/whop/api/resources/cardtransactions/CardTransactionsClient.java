@@ -28,28 +28,28 @@ public class CardTransactionsClient {
     }
 
     /**
-     * Lists an account's card transactions, newest first. Defaults to the account the credential belongs to. Covers every card the owner has ever had, including canceled cards and spend that predates a re-application, and team members only see transactions on the cards assigned to them. Pass <code>transaction_ids</code> to fetch specific transactions instead of paging for them.
+     * Lists the card transactions of an account or a user, newest first. Covers every card the owner has ever had, including canceled cards and spend that predates a re-application, and team members only see transactions on the cards assigned to them. Pass <code>transaction_ids</code> to fetch specific transactions instead of paging for them.
      */
     public SyncPagingIterable<CardTransaction> list() {
         return this.rawClient.list().body();
     }
 
     /**
-     * Lists an account's card transactions, newest first. Defaults to the account the credential belongs to. Covers every card the owner has ever had, including canceled cards and spend that predates a re-application, and team members only see transactions on the cards assigned to them. Pass <code>transaction_ids</code> to fetch specific transactions instead of paging for them.
+     * Lists the card transactions of an account or a user, newest first. Covers every card the owner has ever had, including canceled cards and spend that predates a re-application, and team members only see transactions on the cards assigned to them. Pass <code>transaction_ids</code> to fetch specific transactions instead of paging for them.
      */
     public SyncPagingIterable<CardTransaction> list(RequestOptions requestOptions) {
         return this.rawClient.list(requestOptions).body();
     }
 
     /**
-     * Lists an account's card transactions, newest first. Defaults to the account the credential belongs to. Covers every card the owner has ever had, including canceled cards and spend that predates a re-application, and team members only see transactions on the cards assigned to them. Pass <code>transaction_ids</code> to fetch specific transactions instead of paging for them.
+     * Lists the card transactions of an account or a user, newest first. Covers every card the owner has ever had, including canceled cards and spend that predates a re-application, and team members only see transactions on the cards assigned to them. Pass <code>transaction_ids</code> to fetch specific transactions instead of paging for them.
      */
     public SyncPagingIterable<CardTransaction> list(ListCardTransactionsRequest request) {
         return this.rawClient.list(request).body();
     }
 
     /**
-     * Lists an account's card transactions, newest first. Defaults to the account the credential belongs to. Covers every card the owner has ever had, including canceled cards and spend that predates a re-application, and team members only see transactions on the cards assigned to them. Pass <code>transaction_ids</code> to fetch specific transactions instead of paging for them.
+     * Lists the card transactions of an account or a user, newest first. Covers every card the owner has ever had, including canceled cards and spend that predates a re-application, and team members only see transactions on the cards assigned to them. Pass <code>transaction_ids</code> to fetch specific transactions instead of paging for them.
      */
     public SyncPagingIterable<CardTransaction> list(
             ListCardTransactionsRequest request, RequestOptions requestOptions) {
@@ -57,28 +57,28 @@ public class CardTransactionsClient {
     }
 
     /**
-     * Fetches a single card transaction by its <code>citx_</code> identifier. The owner defaults to the account the credential belongs to.
+     * Retrieves a single card transaction from any card the owner has ever had, including canceled cards. Team members can retrieve only transactions on the cards assigned to them.
      */
     public CardTransaction retrieve(String id) {
         return this.rawClient.retrieve(id).body();
     }
 
     /**
-     * Fetches a single card transaction by its <code>citx_</code> identifier. The owner defaults to the account the credential belongs to.
+     * Retrieves a single card transaction from any card the owner has ever had, including canceled cards. Team members can retrieve only transactions on the cards assigned to them.
      */
     public CardTransaction retrieve(String id, RequestOptions requestOptions) {
         return this.rawClient.retrieve(id, requestOptions).body();
     }
 
     /**
-     * Fetches a single card transaction by its <code>citx_</code> identifier. The owner defaults to the account the credential belongs to.
+     * Retrieves a single card transaction from any card the owner has ever had, including canceled cards. Team members can retrieve only transactions on the cards assigned to them.
      */
     public CardTransaction retrieve(String id, RetrieveCardTransactionsRequest request) {
         return this.rawClient.retrieve(id, request).body();
     }
 
     /**
-     * Fetches a single card transaction by its <code>citx_</code> identifier. The owner defaults to the account the credential belongs to.
+     * Retrieves a single card transaction from any card the owner has ever had, including canceled cards. Team members can retrieve only transactions on the cards assigned to them.
      */
     public CardTransaction retrieve(String id, RetrieveCardTransactionsRequest request, RequestOptions requestOptions) {
         return this.rawClient.retrieve(id, request, requestOptions).body();

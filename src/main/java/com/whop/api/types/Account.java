@@ -27,6 +27,8 @@ import org.jetbrains.annotations.NotNull;
 @JsonInclude(JsonInclude.Include.NON_ABSENT)
 @JsonDeserialize(builder = Account.Builder.class)
 public final class Account {
+    private final Optional<Double> adsSpendUsd;
+
     private final List<AccountBalanceToken> balances;
 
     private final Optional<String> bannerImageUrl;
@@ -35,9 +37,11 @@ public final class Account {
 
     private final Optional<String> businessName;
 
-    private final Optional<AccountBusinessType> businessType;
+    private final Optional<String> businessType;
 
     private final boolean canTransferPendingBalanceToChildren;
+
+    private final Optional<File> cancellationPolicy;
 
     private final Optional<AccountCapabilities> capabilities;
 
@@ -51,19 +55,35 @@ public final class Account {
 
     private final String createdAt;
 
+    private final Optional<Integer> customersL30D;
+
     private final Optional<String> description;
 
+    private final Optional<Integer> directReportsCount;
+
+    private final boolean disputeFighterEnabled;
+
+    private final boolean economicIntelligence;
+
     private final Optional<String> email;
+
+    private final Optional<File> eula;
+
+    private final Optional<String> externalId;
+
+    private final Optional<AccountFinancing> financing;
+
+    private final Optional<String> fundsReleaseAt;
 
     private final List<AccountHomePreferencesItem> homePreferences;
 
     private final String id;
 
-    private final Optional<AccountIndustryGroup> industryGroup;
-
     private final Optional<String> industryType;
 
     private final Optional<String> invoicePrefix;
+
+    private final Optional<AccountLevel> level;
 
     private final Optional<String> logoUrl;
 
@@ -75,6 +95,8 @@ public final class Account {
 
     private final Optional<AccountOpengraphImageVariant> opengraphImageVariant;
 
+    private final boolean orchestrationEnabled;
+
     private final Optional<String> otherBusinessDescription;
 
     private final Optional<String> otherIndustryDescription;
@@ -83,7 +105,15 @@ public final class Account {
 
     private final Optional<AccountParent> parentAccount;
 
+    private final Optional<AccountPartner> partner;
+
     private final Optional<AccountPaymentControls> paymentControls;
+
+    private final Optional<CheckoutSessionPaymentMethodConfiguration> paymentMethodConfiguration;
+
+    private final List<Money> platformCredits;
+
+    private final Optional<File> privacyPolicy;
 
     private final Optional<Map<String, Object>> productTaxCode;
 
@@ -93,9 +123,15 @@ public final class Account {
 
     private final Optional<List<AccountRequiredAction>> requiredActions;
 
+    private final Optional<File> returnPolicy;
+
+    private final Optional<List<AccountPartnerReward>> rewards;
+
     private final String route;
 
     private final boolean sendCustomerEmails;
+
+    private final Optional<File> shippingPolicy;
 
     private final boolean showJoinedWhops;
 
@@ -104,8 +140,6 @@ public final class Account {
     private final boolean showUserDirectory;
 
     private final List<AccountSocialLink> socialLinks;
-
-    private final boolean stablecoinRails;
 
     private final Optional<String> status;
 
@@ -123,6 +157,8 @@ public final class Account {
 
     private final Optional<AccountTaxType> taxType;
 
+    private final Optional<File> termsOfService;
+
     private final Optional<AccountThreeDsLevel> threeDsLevel;
 
     private final String title;
@@ -131,57 +167,82 @@ public final class Account {
 
     private final Optional<String> totalUsd;
 
+    private final Optional<TradingAccount> trading;
+
     private final boolean useLogoAsOpengraphImageFallback;
 
     private final Map<String, Object> verification;
+
+    private final Optional<Double> volumeL30DUsd;
 
     private final Optional<Double> volumeUsd;
 
     private final Optional<AccountWallet> wallet;
 
+    private final Optional<String> website;
+
+    private final Optional<String> whopPartnerEnabledAt;
+
     private final Map<String, Object> additionalProperties;
 
     private Account(
+            Optional<Double> adsSpendUsd,
             List<AccountBalanceToken> balances,
             Optional<String> bannerImageUrl,
             Optional<Map<String, Object>> businessAddress,
             Optional<String> businessName,
-            Optional<AccountBusinessType> businessType,
+            Optional<String> businessType,
             boolean canTransferPendingBalanceToChildren,
+            Optional<File> cancellationPolicy,
             Optional<AccountCapabilities> capabilities,
             Optional<AccountCards> cards,
             boolean collectVatId,
             AccountCompanyFormation companyFormation,
             Optional<String> country,
             String createdAt,
+            Optional<Integer> customersL30D,
             Optional<String> description,
+            Optional<Integer> directReportsCount,
+            boolean disputeFighterEnabled,
+            boolean economicIntelligence,
             Optional<String> email,
+            Optional<File> eula,
+            Optional<String> externalId,
+            Optional<AccountFinancing> financing,
+            Optional<String> fundsReleaseAt,
             List<AccountHomePreferencesItem> homePreferences,
             String id,
-            Optional<AccountIndustryGroup> industryGroup,
             Optional<String> industryType,
             Optional<String> invoicePrefix,
+            Optional<AccountLevel> level,
             Optional<String> logoUrl,
             Map<String, Object> metadata,
             Optional<AccountOnboardingType> onboardingType,
             Optional<String> opengraphImageUrl,
             Optional<AccountOpengraphImageVariant> opengraphImageVariant,
+            boolean orchestrationEnabled,
             Optional<String> otherBusinessDescription,
             Optional<String> otherIndustryDescription,
             UserSummary owner,
             Optional<AccountParent> parentAccount,
+            Optional<AccountPartner> partner,
             Optional<AccountPaymentControls> paymentControls,
+            Optional<CheckoutSessionPaymentMethodConfiguration> paymentMethodConfiguration,
+            List<Money> platformCredits,
+            Optional<File> privacyPolicy,
             Optional<Map<String, Object>> productTaxCode,
             Optional<List<AccountRecommendedAction>> recommendedActions,
             boolean require2Fa,
             Optional<List<AccountRequiredAction>> requiredActions,
+            Optional<File> returnPolicy,
+            Optional<List<AccountPartnerReward>> rewards,
             String route,
             boolean sendCustomerEmails,
+            Optional<File> shippingPolicy,
             boolean showJoinedWhops,
             boolean showReviewsDtc,
             boolean showUserDirectory,
             List<AccountSocialLink> socialLinks,
-            boolean stablecoinRails,
             Optional<String> status,
             Optional<String> statusReason,
             AccountStorePageConfig storePageConfig,
@@ -190,55 +251,77 @@ public final class Account {
             List<AccountTaxIdentifier> taxIdentifiers,
             Optional<AccountTaxRemittedBy> taxRemittedBy,
             Optional<AccountTaxType> taxType,
+            Optional<File> termsOfService,
             Optional<AccountThreeDsLevel> threeDsLevel,
             String title,
             Optional<Double> totalEarnedUsd,
             Optional<String> totalUsd,
+            Optional<TradingAccount> trading,
             boolean useLogoAsOpengraphImageFallback,
             Map<String, Object> verification,
+            Optional<Double> volumeL30DUsd,
             Optional<Double> volumeUsd,
             Optional<AccountWallet> wallet,
+            Optional<String> website,
+            Optional<String> whopPartnerEnabledAt,
             Map<String, Object> additionalProperties) {
+        this.adsSpendUsd = adsSpendUsd;
         this.balances = balances;
         this.bannerImageUrl = bannerImageUrl;
         this.businessAddress = businessAddress;
         this.businessName = businessName;
         this.businessType = businessType;
         this.canTransferPendingBalanceToChildren = canTransferPendingBalanceToChildren;
+        this.cancellationPolicy = cancellationPolicy;
         this.capabilities = capabilities;
         this.cards = cards;
         this.collectVatId = collectVatId;
         this.companyFormation = companyFormation;
         this.country = country;
         this.createdAt = createdAt;
+        this.customersL30D = customersL30D;
         this.description = description;
+        this.directReportsCount = directReportsCount;
+        this.disputeFighterEnabled = disputeFighterEnabled;
+        this.economicIntelligence = economicIntelligence;
         this.email = email;
+        this.eula = eula;
+        this.externalId = externalId;
+        this.financing = financing;
+        this.fundsReleaseAt = fundsReleaseAt;
         this.homePreferences = homePreferences;
         this.id = id;
-        this.industryGroup = industryGroup;
         this.industryType = industryType;
         this.invoicePrefix = invoicePrefix;
+        this.level = level;
         this.logoUrl = logoUrl;
         this.metadata = metadata;
         this.onboardingType = onboardingType;
         this.opengraphImageUrl = opengraphImageUrl;
         this.opengraphImageVariant = opengraphImageVariant;
+        this.orchestrationEnabled = orchestrationEnabled;
         this.otherBusinessDescription = otherBusinessDescription;
         this.otherIndustryDescription = otherIndustryDescription;
         this.owner = owner;
         this.parentAccount = parentAccount;
+        this.partner = partner;
         this.paymentControls = paymentControls;
+        this.paymentMethodConfiguration = paymentMethodConfiguration;
+        this.platformCredits = platformCredits;
+        this.privacyPolicy = privacyPolicy;
         this.productTaxCode = productTaxCode;
         this.recommendedActions = recommendedActions;
         this.require2Fa = require2Fa;
         this.requiredActions = requiredActions;
+        this.returnPolicy = returnPolicy;
+        this.rewards = rewards;
         this.route = route;
         this.sendCustomerEmails = sendCustomerEmails;
+        this.shippingPolicy = shippingPolicy;
         this.showJoinedWhops = showJoinedWhops;
         this.showReviewsDtc = showReviewsDtc;
         this.showUserDirectory = showUserDirectory;
         this.socialLinks = socialLinks;
-        this.stablecoinRails = stablecoinRails;
         this.status = status;
         this.statusReason = statusReason;
         this.storePageConfig = storePageConfig;
@@ -247,15 +330,31 @@ public final class Account {
         this.taxIdentifiers = taxIdentifiers;
         this.taxRemittedBy = taxRemittedBy;
         this.taxType = taxType;
+        this.termsOfService = termsOfService;
         this.threeDsLevel = threeDsLevel;
         this.title = title;
         this.totalEarnedUsd = totalEarnedUsd;
         this.totalUsd = totalUsd;
+        this.trading = trading;
         this.useLogoAsOpengraphImageFallback = useLogoAsOpengraphImageFallback;
         this.verification = verification;
+        this.volumeL30DUsd = volumeL30DUsd;
         this.volumeUsd = volumeUsd;
         this.wallet = wallet;
+        this.website = website;
+        this.whopPartnerEnabledAt = whopPartnerEnabledAt;
         this.additionalProperties = additionalProperties;
+    }
+
+    /**
+     * @return Lifetime charged ad spend for the account, in USD. Computed only on <code>list</code> for callers with <code>stats:read</code> on the account; <code>null</code> otherwise.
+     */
+    @JsonIgnore
+    public Optional<Double> getAdsSpendUsd() {
+        if (adsSpendUsd == null) {
+            return Optional.empty();
+        }
+        return adsSpendUsd;
     }
 
     @JsonProperty("balances")
@@ -297,10 +396,10 @@ public final class Account {
     }
 
     /**
-     * @return High-level business category for the account. See the <a href="/api-reference/beta/accounts/account#business-types-and-industries-glossary">business types and industries glossary</a> for valid values.
+     * @return High-level business category for the account. See the <a href="/api-reference/accounts/account#business-types-and-industries-glossary">business types and industries glossary</a> for valid values.
      */
     @JsonIgnore
-    public Optional<AccountBusinessType> getBusinessType() {
+    public Optional<String> getBusinessType() {
         if (businessType == null) {
             return Optional.empty();
         }
@@ -308,11 +407,22 @@ public final class Account {
     }
 
     /**
-     * @return Whether pending funds may be transferred from this platform account to its connected accounts.
+     * @return Whether pending funds may be transferred from this platform account to its subaccounts.
      */
     @JsonProperty("can_transfer_pending_balance_to_children")
     public boolean getCanTransferPendingBalanceToChildren() {
         return canTransferPendingBalanceToChildren;
+    }
+
+    /**
+     * @return The account's cancellation policy document, or <code>null</code> if they have not published one.
+     */
+    @JsonIgnore
+    public Optional<File> getCancellationPolicy() {
+        if (cancellationPolicy == null) {
+            return Optional.empty();
+        }
+        return cancellationPolicy;
     }
 
     /**
@@ -327,7 +437,7 @@ public final class Account {
     }
 
     /**
-     * @return Whop Cards application details for the account. Computed only on <code>retrieve</code> and <code>me</code> for callers with <code>company:balance:read</code> scope; <code>null</code> otherwise, or when the account has no card application.
+     * @return Whop Cards application details for the account. Returned on <code>list</code>, <code>retrieve</code>, and <code>me</code> for callers with <code>company:balance:read</code> scope; <code>null</code> otherwise, or when the account has no card application or blocking application review.
      */
     @JsonIgnore
     public Optional<AccountCards> getCards() {
@@ -346,7 +456,7 @@ public final class Account {
     }
 
     /**
-     * @return Company formation state for the account, managed through <a href="/api-reference/beta/accounts/form-company">Form Company</a>. A <code>draft</code> <code>status</code> until the formation checkout is paid, then filing progress with downloadable documents and signatures awaiting action. Empty when the formation state is temporarily unavailable.
+     * @return Company formation state for the account, managed through <a href="/api-reference/accounts/form-company">Form Company</a>. A <code>draft</code> <code>status</code> until the formation checkout is paid, then filing progress with downloadable documents and signatures awaiting action. Empty when the formation state is temporarily unavailable.
      */
     @JsonProperty("company_formation")
     public AccountCompanyFormation getCompanyFormation() {
@@ -373,6 +483,17 @@ public final class Account {
     }
 
     /**
+     * @return Distinct customers with a paid receipt at the account in the last 30 days, refreshed every few hours. Computed only on <code>retrieve</code> for callers with <code>stats:read</code> on the account; <code>null</code> otherwise, and when the count is unavailable.
+     */
+    @JsonIgnore
+    public Optional<Integer> getCustomersL30D() {
+        if (customersL30D == null) {
+            return Optional.empty();
+        }
+        return customersL30D;
+    }
+
+    /**
      * @return Account promotional description.
      */
     @JsonIgnore
@@ -384,6 +505,30 @@ public final class Account {
     }
 
     /**
+     * @return How many team members report to the business directly, with no manager above them. Present on single-account reads.
+     */
+    @JsonProperty("direct_reports_count")
+    public Optional<Integer> getDirectReportsCount() {
+        return directReportsCount;
+    }
+
+    /**
+     * @return Whether Whop assembles and files dispute evidence for this account. Enabling it opts the account into the success fee charged on disputes it wins.
+     */
+    @JsonProperty("dispute_fighter_enabled")
+    public boolean getDisputeFighterEnabled() {
+        return disputeFighterEnabled;
+    }
+
+    /**
+     * @return Whether Economic Intelligence is on for the account. It turns off automatically when its committed period ends. While it is off, the account can't activate an experiment or run a recommendation.
+     */
+    @JsonProperty("economic_intelligence")
+    public boolean getEconomicIntelligence() {
+        return economicIntelligence;
+    }
+
+    /**
      * @return Account owner email address.
      */
     @JsonIgnore
@@ -392,6 +537,50 @@ public final class Account {
             return Optional.empty();
         }
         return email;
+    }
+
+    /**
+     * @return The account's end-user license agreement document, or <code>null</code> if they have not published one.
+     */
+    @JsonIgnore
+    public Optional<File> getEula() {
+        if (eula == null) {
+            return Optional.empty();
+        }
+        return eula;
+    }
+
+    /**
+     * @return The parent platform's own identifier for this subaccount, unique among the platform's subaccounts. <code>null</code> when unset.
+     */
+    @JsonIgnore
+    public Optional<String> getExternalId() {
+        if (externalId == null) {
+            return Optional.empty();
+        }
+        return externalId;
+    }
+
+    /**
+     * @return The account's most recent financing application. Computed only on <code>retrieve</code> and <code>me</code> for callers with <code>company:balance:read</code> scope; <code>null</code> otherwise, or when the account has never applied for financing.
+     */
+    @JsonIgnore
+    public Optional<AccountFinancing> getFinancing() {
+        if (financing == null) {
+            return Optional.empty();
+        }
+        return financing;
+    }
+
+    /**
+     * @return When a suspended account can pay out its balance to its own payout method, as an ISO 8601 timestamp. A dispute can move it later. Computed on <code>retrieve</code>, <code>me</code>, and <code>suspend</code>; <code>null</code> otherwise, when <code>status</code> is not <code>suspended</code>, and when the suspension holds the balance.
+     */
+    @JsonIgnore
+    public Optional<String> getFundsReleaseAt() {
+        if (fundsReleaseAt == null) {
+            return Optional.empty();
+        }
+        return fundsReleaseAt;
     }
 
     @JsonProperty("home_preferences")
@@ -408,18 +597,7 @@ public final class Account {
     }
 
     /**
-     * @return Account industry group. See the <a href="/api-reference/beta/accounts/account#business-types-and-industries-glossary">business types and industries glossary</a> for valid values.
-     */
-    @JsonIgnore
-    public Optional<AccountIndustryGroup> getIndustryGroup() {
-        if (industryGroup == null) {
-            return Optional.empty();
-        }
-        return industryGroup;
-    }
-
-    /**
-     * @return Specific industry vertical for the account. See the <a href="/api-reference/beta/accounts/account#business-types-and-industries-glossary">business types and industries glossary</a> for valid values.
+     * @return Specific industry vertical for the account. See the <a href="/api-reference/accounts/account#business-types-and-industries-glossary">business types and industries glossary</a> for valid values.
      */
     @JsonIgnore
     public Optional<String> getIndustryType() {
@@ -438,6 +616,17 @@ public final class Account {
             return Optional.empty();
         }
         return invoicePrefix;
+    }
+
+    /**
+     * @return The Whop Levels progress of the account's <code>owner</code>, counted across every account they own, so all of them show the same level. Computed only on <code>retrieve</code> and <code>me</code> for callers with <code>company:basic:read</code> scope; <code>null</code> otherwise, and when the account is not in Whop Levels.
+     */
+    @JsonIgnore
+    public Optional<AccountLevel> getLevel() {
+        if (level == null) {
+            return Optional.empty();
+        }
+        return level;
     }
 
     /**
@@ -493,6 +682,14 @@ public final class Account {
     }
 
     /**
+     * @return Whether payment orchestration is enabled for this account.
+     */
+    @JsonProperty("orchestration_enabled")
+    public boolean getOrchestrationEnabled() {
+        return orchestrationEnabled;
+    }
+
+    /**
      * @return Business type details when business_type is <code>other</code>.
      */
     @JsonIgnore
@@ -523,7 +720,7 @@ public final class Account {
     }
 
     /**
-     * @return Parent account for connected accounts, or <code>null</code> for standalone accounts.
+     * @return Parent account for subaccounts, or <code>null</code> for standalone accounts.
      */
     @JsonIgnore
     public Optional<AccountParent> getParentAccount() {
@@ -531,6 +728,17 @@ public final class Account {
             return Optional.empty();
         }
         return parentAccount;
+    }
+
+    /**
+     * @return The account's active first-tier partner. Present on retrieve responses; null when no active first-tier partner is attributed to the account. Omitted from other responses.
+     */
+    @JsonIgnore
+    public Optional<AccountPartner> getPartner() {
+        if (partner == null) {
+            return Optional.empty();
+        }
+        return partner;
     }
 
     /**
@@ -545,6 +753,33 @@ public final class Account {
     }
 
     /**
+     * @return The account's default payment methods at checkout. A variant's or checkout configuration's own <code>payment_method_configuration</code> takes precedence. <code>null</code> when the account uses Whop's platform defaults.
+     */
+    @JsonIgnore
+    public Optional<CheckoutSessionPaymentMethodConfiguration> getPaymentMethodConfiguration() {
+        if (paymentMethodConfiguration == null) {
+            return Optional.empty();
+        }
+        return paymentMethodConfiguration;
+    }
+
+    @JsonProperty("platform_credits")
+    public List<Money> getPlatformCredits() {
+        return platformCredits;
+    }
+
+    /**
+     * @return The account's privacy policy document, or <code>null</code> if they have not published one.
+     */
+    @JsonIgnore
+    public Optional<File> getPrivacyPolicy() {
+        if (privacyPolicy == null) {
+            return Optional.empty();
+        }
+        return privacyPolicy;
+    }
+
+    /**
      * @return Tax classification code applied by default to the account's products, with <code>id</code>, <code>name</code>, and <code>product_type</code>. <code>null</code> when no default is set.
      */
     @JsonIgnore
@@ -556,7 +791,7 @@ public final class Account {
     }
 
     /**
-     * @return DEPRECATED: Use the <code>GET /recommended_actions?account_id={account_id}</code> endpoint instead.
+     * @return DEPRECATED: Use the <code>GET /economic_intelligence?account_id={account_id}</code> endpoint instead.
      */
     @JsonIgnore
     public Optional<List<AccountRecommendedAction>> getRecommendedActions() {
@@ -583,6 +818,22 @@ public final class Account {
     }
 
     /**
+     * @return The account's return policy document, or <code>null</code> if they have not published one.
+     */
+    @JsonIgnore
+    public Optional<File> getReturnPolicy() {
+        if (returnPolicy == null) {
+            return Optional.empty();
+        }
+        return returnPolicy;
+    }
+
+    @JsonProperty("rewards")
+    public Optional<List<AccountPartnerReward>> getRewards() {
+        return rewards;
+    }
+
+    /**
      * @return Account public route identifier.
      */
     @JsonProperty("route")
@@ -596,6 +847,17 @@ public final class Account {
     @JsonProperty("send_customer_emails")
     public boolean getSendCustomerEmails() {
         return sendCustomerEmails;
+    }
+
+    /**
+     * @return The account's shipping policy document, or <code>null</code> if they have not published one.
+     */
+    @JsonIgnore
+    public Optional<File> getShippingPolicy() {
+        if (shippingPolicy == null) {
+            return Optional.empty();
+        }
+        return shippingPolicy;
     }
 
     /**
@@ -628,15 +890,7 @@ public final class Account {
     }
 
     /**
-     * @return Whether the account settles on stablecoin rails — its balance is held on-chain as USDT and paid out over crypto, rather than as fiat cash.
-     */
-    @JsonProperty("stablecoin_rails")
-    public boolean getStablecoinRails() {
-        return stablecoinRails;
-    }
-
-    /**
-     * @return Whether the account can operate on Whop: <code>active</code> or <code>suspended</code>. Computed on <code>list</code>, <code>retrieve</code>, and <code>me</code>; <code>null</code> otherwise.
+     * @return Whether the account can operate on Whop: <code>active</code> or <code>suspended</code>. Computed on <code>list</code>, <code>retrieve</code>, <code>me</code>, and <code>suspend</code>; <code>null</code> otherwise.
      */
     @JsonIgnore
     public Optional<String> getStatus() {
@@ -647,7 +901,7 @@ public final class Account {
     }
 
     /**
-     * @return Why the account was suspended, in language safe to show the account owner. Computed only on <code>retrieve</code> and <code>me</code>; <code>null</code> otherwise, when <code>status</code> is not <code>suspended</code>, and when the suspension was recorded without a reason.
+     * @return Why the account was suspended, as the label shown to the account owner, such as <code>Suspended - Fraudulent activity</code>. Computed on <code>retrieve</code>, <code>me</code>, and <code>suspend</code>; <code>null</code> otherwise, when <code>status</code> is not <code>suspended</code>, and when the suspension was recorded without a reason.
      */
     @JsonIgnore
     public Optional<String> getStatusReason() {
@@ -687,7 +941,7 @@ public final class Account {
     }
 
     /**
-     * @return Who calculates and remits tax for the account: <code>whop</code> (Whop calculates and remits), <code>self</code> (Whop calculates; the account collects and remits), or <code>none</code> (neither; the account is responsible). <code>null</code> until the account enrolls in the Whop tax service.
+     * @return Who calculates and remits tax for the account. <code>whop</code> means Whop calculates and remits. <code>self</code> means Whop calculates, and the account collects and remits. <code>none</code> means neither, and the account is responsible. New businesses start on <code>whop</code>, and new connected accounts start on <code>none</code>. <code>null</code> means the account has no setting yet.
      */
     @JsonIgnore
     public Optional<AccountTaxRemittedBy> getTaxRemittedBy() {
@@ -709,7 +963,18 @@ public final class Account {
     }
 
     /**
-     * @return Account-level 3D Secure behavior. <code>mandate_challenge</code> requires cardholder verification on supported card payments; <code>null</code> uses the standard checkout flow.
+     * @return The account's terms of service document, or <code>null</code> if they have not published one.
+     */
+    @JsonIgnore
+    public Optional<File> getTermsOfService() {
+        if (termsOfService == null) {
+            return Optional.empty();
+        }
+        return termsOfService;
+    }
+
+    /**
+     * @return 3D Secure behavior for supported on-session card payments. <code>mandate_challenge</code> requires a 3DS challenge before payment processing; <code>mandate_if_required</code> mandates a challenge only when the payment processor requires it; <code>frictionless_if_required</code> uses the regular frictionless 3DS flow. Payments of $1,000 or more use <code>mandate_if_required</code> unless <code>mandate_challenge</code> is selected. Risk and authentication recovery requirements can override the preference. <code>null</code> uses the standard checkout flow.
      */
     @JsonIgnore
     public Optional<AccountThreeDsLevel> getThreeDsLevel() {
@@ -750,6 +1015,17 @@ public final class Account {
     }
 
     /**
+     * @return The trading account address, a snapshot of its margin and open positions, and its WebSocket subscriptions. Opt in with <code>include_trading=true</code> on single-account reads. <code>null</code> otherwise, without trading permission, or without an Ethereum wallet.
+     */
+    @JsonIgnore
+    public Optional<TradingAccount> getTrading() {
+        if (trading == null) {
+            return Optional.empty();
+        }
+        return trading;
+    }
+
+    /**
      * @return Whether the account uses its logo as the fallback Open Graph image.
      */
     @JsonProperty("use_logo_as_opengraph_image_fallback")
@@ -763,6 +1039,17 @@ public final class Account {
     @JsonProperty("verification")
     public Map<String, Object> getVerification() {
         return verification;
+    }
+
+    /**
+     * @return Volume through the account in the last 30 days (GMV from paid receipts), normalized to USD. Computed only on <code>list</code> for callers with <code>stats:read</code> on the account; <code>null</code> otherwise.
+     */
+    @JsonIgnore
+    public Optional<Double> getVolumeL30DUsd() {
+        if (volumeL30DUsd == null) {
+            return Optional.empty();
+        }
+        return volumeL30DUsd;
     }
 
     /**
@@ -787,6 +1074,34 @@ public final class Account {
         return wallet;
     }
 
+    /**
+     * @return The account's business website URL, or <code>null</code> if none has been provided. Setting it also adds a <code>website</code> entry to <code>social_links</code>.
+     */
+    @JsonIgnore
+    public Optional<String> getWebsite() {
+        if (website == null) {
+            return Optional.empty();
+        }
+        return website;
+    }
+
+    /**
+     * @return When the account turned on Whop Partner mode, as an ISO 8601 timestamp. Present on single-account reads and update responses; <code>null</code> until the account turns Whop Partner mode on by sending <code>whop_partner_enabled: true</code> on update.
+     */
+    @JsonIgnore
+    public Optional<String> getWhopPartnerEnabledAt() {
+        if (whopPartnerEnabledAt == null) {
+            return Optional.empty();
+        }
+        return whopPartnerEnabledAt;
+    }
+
+    @JsonInclude(value = JsonInclude.Include.CUSTOM, valueFilter = NullableNonemptyFilter.class)
+    @JsonProperty("ads_spend_usd")
+    private Optional<Double> _getAdsSpendUsd() {
+        return adsSpendUsd;
+    }
+
     @JsonInclude(value = JsonInclude.Include.CUSTOM, valueFilter = NullableNonemptyFilter.class)
     @JsonProperty("banner_image_url")
     private Optional<String> _getBannerImageUrl() {
@@ -807,8 +1122,14 @@ public final class Account {
 
     @JsonInclude(value = JsonInclude.Include.CUSTOM, valueFilter = NullableNonemptyFilter.class)
     @JsonProperty("business_type")
-    private Optional<AccountBusinessType> _getBusinessType() {
+    private Optional<String> _getBusinessType() {
         return businessType;
+    }
+
+    @JsonInclude(value = JsonInclude.Include.CUSTOM, valueFilter = NullableNonemptyFilter.class)
+    @JsonProperty("cancellation_policy")
+    private Optional<File> _getCancellationPolicy() {
+        return cancellationPolicy;
     }
 
     @JsonInclude(value = JsonInclude.Include.CUSTOM, valueFilter = NullableNonemptyFilter.class)
@@ -830,6 +1151,12 @@ public final class Account {
     }
 
     @JsonInclude(value = JsonInclude.Include.CUSTOM, valueFilter = NullableNonemptyFilter.class)
+    @JsonProperty("customers_l30d")
+    private Optional<Integer> _getCustomersL30D() {
+        return customersL30D;
+    }
+
+    @JsonInclude(value = JsonInclude.Include.CUSTOM, valueFilter = NullableNonemptyFilter.class)
     @JsonProperty("description")
     private Optional<String> _getDescription() {
         return description;
@@ -842,9 +1169,27 @@ public final class Account {
     }
 
     @JsonInclude(value = JsonInclude.Include.CUSTOM, valueFilter = NullableNonemptyFilter.class)
-    @JsonProperty("industry_group")
-    private Optional<AccountIndustryGroup> _getIndustryGroup() {
-        return industryGroup;
+    @JsonProperty("eula")
+    private Optional<File> _getEula() {
+        return eula;
+    }
+
+    @JsonInclude(value = JsonInclude.Include.CUSTOM, valueFilter = NullableNonemptyFilter.class)
+    @JsonProperty("external_id")
+    private Optional<String> _getExternalId() {
+        return externalId;
+    }
+
+    @JsonInclude(value = JsonInclude.Include.CUSTOM, valueFilter = NullableNonemptyFilter.class)
+    @JsonProperty("financing")
+    private Optional<AccountFinancing> _getFinancing() {
+        return financing;
+    }
+
+    @JsonInclude(value = JsonInclude.Include.CUSTOM, valueFilter = NullableNonemptyFilter.class)
+    @JsonProperty("funds_release_at")
+    private Optional<String> _getFundsReleaseAt() {
+        return fundsReleaseAt;
     }
 
     @JsonInclude(value = JsonInclude.Include.CUSTOM, valueFilter = NullableNonemptyFilter.class)
@@ -857,6 +1202,12 @@ public final class Account {
     @JsonProperty("invoice_prefix")
     private Optional<String> _getInvoicePrefix() {
         return invoicePrefix;
+    }
+
+    @JsonInclude(value = JsonInclude.Include.CUSTOM, valueFilter = NullableNonemptyFilter.class)
+    @JsonProperty("level")
+    private Optional<AccountLevel> _getLevel() {
+        return level;
     }
 
     @JsonInclude(value = JsonInclude.Include.CUSTOM, valueFilter = NullableNonemptyFilter.class)
@@ -902,9 +1253,27 @@ public final class Account {
     }
 
     @JsonInclude(value = JsonInclude.Include.CUSTOM, valueFilter = NullableNonemptyFilter.class)
+    @JsonProperty("partner")
+    private Optional<AccountPartner> _getPartner() {
+        return partner;
+    }
+
+    @JsonInclude(value = JsonInclude.Include.CUSTOM, valueFilter = NullableNonemptyFilter.class)
     @JsonProperty("payment_controls")
     private Optional<AccountPaymentControls> _getPaymentControls() {
         return paymentControls;
+    }
+
+    @JsonInclude(value = JsonInclude.Include.CUSTOM, valueFilter = NullableNonemptyFilter.class)
+    @JsonProperty("payment_method_configuration")
+    private Optional<CheckoutSessionPaymentMethodConfiguration> _getPaymentMethodConfiguration() {
+        return paymentMethodConfiguration;
+    }
+
+    @JsonInclude(value = JsonInclude.Include.CUSTOM, valueFilter = NullableNonemptyFilter.class)
+    @JsonProperty("privacy_policy")
+    private Optional<File> _getPrivacyPolicy() {
+        return privacyPolicy;
     }
 
     @JsonInclude(value = JsonInclude.Include.CUSTOM, valueFilter = NullableNonemptyFilter.class)
@@ -923,6 +1292,18 @@ public final class Account {
     @JsonProperty("required_actions")
     private Optional<List<AccountRequiredAction>> _getRequiredActions() {
         return requiredActions;
+    }
+
+    @JsonInclude(value = JsonInclude.Include.CUSTOM, valueFilter = NullableNonemptyFilter.class)
+    @JsonProperty("return_policy")
+    private Optional<File> _getReturnPolicy() {
+        return returnPolicy;
+    }
+
+    @JsonInclude(value = JsonInclude.Include.CUSTOM, valueFilter = NullableNonemptyFilter.class)
+    @JsonProperty("shipping_policy")
+    private Optional<File> _getShippingPolicy() {
+        return shippingPolicy;
     }
 
     @JsonInclude(value = JsonInclude.Include.CUSTOM, valueFilter = NullableNonemptyFilter.class)
@@ -956,6 +1337,12 @@ public final class Account {
     }
 
     @JsonInclude(value = JsonInclude.Include.CUSTOM, valueFilter = NullableNonemptyFilter.class)
+    @JsonProperty("terms_of_service")
+    private Optional<File> _getTermsOfService() {
+        return termsOfService;
+    }
+
+    @JsonInclude(value = JsonInclude.Include.CUSTOM, valueFilter = NullableNonemptyFilter.class)
     @JsonProperty("three_ds_level")
     private Optional<AccountThreeDsLevel> _getThreeDsLevel() {
         return threeDsLevel;
@@ -974,6 +1361,18 @@ public final class Account {
     }
 
     @JsonInclude(value = JsonInclude.Include.CUSTOM, valueFilter = NullableNonemptyFilter.class)
+    @JsonProperty("trading")
+    private Optional<TradingAccount> _getTrading() {
+        return trading;
+    }
+
+    @JsonInclude(value = JsonInclude.Include.CUSTOM, valueFilter = NullableNonemptyFilter.class)
+    @JsonProperty("volume_l30d_usd")
+    private Optional<Double> _getVolumeL30DUsd() {
+        return volumeL30DUsd;
+    }
+
+    @JsonInclude(value = JsonInclude.Include.CUSTOM, valueFilter = NullableNonemptyFilter.class)
     @JsonProperty("volume_usd")
     private Optional<Double> _getVolumeUsd() {
         return volumeUsd;
@@ -983,6 +1382,18 @@ public final class Account {
     @JsonProperty("wallet")
     private Optional<AccountWallet> _getWallet() {
         return wallet;
+    }
+
+    @JsonInclude(value = JsonInclude.Include.CUSTOM, valueFilter = NullableNonemptyFilter.class)
+    @JsonProperty("website")
+    private Optional<String> _getWebsite() {
+        return website;
+    }
+
+    @JsonInclude(value = JsonInclude.Include.CUSTOM, valueFilter = NullableNonemptyFilter.class)
+    @JsonProperty("whop_partner_enabled_at")
+    private Optional<String> _getWhopPartnerEnabledAt() {
+        return whopPartnerEnabledAt;
     }
 
     @java.lang.Override
@@ -997,46 +1408,63 @@ public final class Account {
     }
 
     private boolean equalTo(Account other) {
-        return balances.equals(other.balances)
+        return adsSpendUsd.equals(other.adsSpendUsd)
+                && balances.equals(other.balances)
                 && bannerImageUrl.equals(other.bannerImageUrl)
                 && businessAddress.equals(other.businessAddress)
                 && businessName.equals(other.businessName)
                 && businessType.equals(other.businessType)
                 && canTransferPendingBalanceToChildren == other.canTransferPendingBalanceToChildren
+                && cancellationPolicy.equals(other.cancellationPolicy)
                 && capabilities.equals(other.capabilities)
                 && cards.equals(other.cards)
                 && collectVatId == other.collectVatId
                 && companyFormation.equals(other.companyFormation)
                 && country.equals(other.country)
                 && createdAt.equals(other.createdAt)
+                && customersL30D.equals(other.customersL30D)
                 && description.equals(other.description)
+                && directReportsCount.equals(other.directReportsCount)
+                && disputeFighterEnabled == other.disputeFighterEnabled
+                && economicIntelligence == other.economicIntelligence
                 && email.equals(other.email)
+                && eula.equals(other.eula)
+                && externalId.equals(other.externalId)
+                && financing.equals(other.financing)
+                && fundsReleaseAt.equals(other.fundsReleaseAt)
                 && homePreferences.equals(other.homePreferences)
                 && id.equals(other.id)
-                && industryGroup.equals(other.industryGroup)
                 && industryType.equals(other.industryType)
                 && invoicePrefix.equals(other.invoicePrefix)
+                && level.equals(other.level)
                 && logoUrl.equals(other.logoUrl)
                 && metadata.equals(other.metadata)
                 && onboardingType.equals(other.onboardingType)
                 && opengraphImageUrl.equals(other.opengraphImageUrl)
                 && opengraphImageVariant.equals(other.opengraphImageVariant)
+                && orchestrationEnabled == other.orchestrationEnabled
                 && otherBusinessDescription.equals(other.otherBusinessDescription)
                 && otherIndustryDescription.equals(other.otherIndustryDescription)
                 && owner.equals(other.owner)
                 && parentAccount.equals(other.parentAccount)
+                && partner.equals(other.partner)
                 && paymentControls.equals(other.paymentControls)
+                && paymentMethodConfiguration.equals(other.paymentMethodConfiguration)
+                && platformCredits.equals(other.platformCredits)
+                && privacyPolicy.equals(other.privacyPolicy)
                 && productTaxCode.equals(other.productTaxCode)
                 && recommendedActions.equals(other.recommendedActions)
                 && require2Fa == other.require2Fa
                 && requiredActions.equals(other.requiredActions)
+                && returnPolicy.equals(other.returnPolicy)
+                && rewards.equals(other.rewards)
                 && route.equals(other.route)
                 && sendCustomerEmails == other.sendCustomerEmails
+                && shippingPolicy.equals(other.shippingPolicy)
                 && showJoinedWhops == other.showJoinedWhops
                 && showReviewsDtc == other.showReviewsDtc
                 && showUserDirectory == other.showUserDirectory
                 && socialLinks.equals(other.socialLinks)
-                && stablecoinRails == other.stablecoinRails
                 && status.equals(other.status)
                 && statusReason.equals(other.statusReason)
                 && storePageConfig.equals(other.storePageConfig)
@@ -1045,59 +1473,81 @@ public final class Account {
                 && taxIdentifiers.equals(other.taxIdentifiers)
                 && taxRemittedBy.equals(other.taxRemittedBy)
                 && taxType.equals(other.taxType)
+                && termsOfService.equals(other.termsOfService)
                 && threeDsLevel.equals(other.threeDsLevel)
                 && title.equals(other.title)
                 && totalEarnedUsd.equals(other.totalEarnedUsd)
                 && totalUsd.equals(other.totalUsd)
+                && trading.equals(other.trading)
                 && useLogoAsOpengraphImageFallback == other.useLogoAsOpengraphImageFallback
                 && verification.equals(other.verification)
+                && volumeL30DUsd.equals(other.volumeL30DUsd)
                 && volumeUsd.equals(other.volumeUsd)
-                && wallet.equals(other.wallet);
+                && wallet.equals(other.wallet)
+                && website.equals(other.website)
+                && whopPartnerEnabledAt.equals(other.whopPartnerEnabledAt);
     }
 
     @java.lang.Override
     public int hashCode() {
         return Objects.hash(
+                this.adsSpendUsd,
                 this.balances,
                 this.bannerImageUrl,
                 this.businessAddress,
                 this.businessName,
                 this.businessType,
                 this.canTransferPendingBalanceToChildren,
+                this.cancellationPolicy,
                 this.capabilities,
                 this.cards,
                 this.collectVatId,
                 this.companyFormation,
                 this.country,
                 this.createdAt,
+                this.customersL30D,
                 this.description,
+                this.directReportsCount,
+                this.disputeFighterEnabled,
+                this.economicIntelligence,
                 this.email,
+                this.eula,
+                this.externalId,
+                this.financing,
+                this.fundsReleaseAt,
                 this.homePreferences,
                 this.id,
-                this.industryGroup,
                 this.industryType,
                 this.invoicePrefix,
+                this.level,
                 this.logoUrl,
                 this.metadata,
                 this.onboardingType,
                 this.opengraphImageUrl,
                 this.opengraphImageVariant,
+                this.orchestrationEnabled,
                 this.otherBusinessDescription,
                 this.otherIndustryDescription,
                 this.owner,
                 this.parentAccount,
+                this.partner,
                 this.paymentControls,
+                this.paymentMethodConfiguration,
+                this.platformCredits,
+                this.privacyPolicy,
                 this.productTaxCode,
                 this.recommendedActions,
                 this.require2Fa,
                 this.requiredActions,
+                this.returnPolicy,
+                this.rewards,
                 this.route,
                 this.sendCustomerEmails,
+                this.shippingPolicy,
                 this.showJoinedWhops,
                 this.showReviewsDtc,
                 this.showUserDirectory,
                 this.socialLinks,
-                this.stablecoinRails,
                 this.status,
                 this.statusReason,
                 this.storePageConfig,
@@ -1106,14 +1556,19 @@ public final class Account {
                 this.taxIdentifiers,
                 this.taxRemittedBy,
                 this.taxType,
+                this.termsOfService,
                 this.threeDsLevel,
                 this.title,
                 this.totalEarnedUsd,
                 this.totalUsd,
+                this.trading,
                 this.useLogoAsOpengraphImageFallback,
                 this.verification,
+                this.volumeL30DUsd,
                 this.volumeUsd,
-                this.wallet);
+                this.wallet,
+                this.website,
+                this.whopPartnerEnabledAt);
     }
 
     @java.lang.Override
@@ -1127,7 +1582,7 @@ public final class Account {
 
     public interface CanTransferPendingBalanceToChildrenStage {
         /**
-         * <p>Whether pending funds may be transferred from this platform account to its connected accounts.</p>
+         * <p>Whether pending funds may be transferred from this platform account to its subaccounts.</p>
          */
         CollectVatIdStage canTransferPendingBalanceToChildren(boolean canTransferPendingBalanceToChildren);
 
@@ -1143,7 +1598,7 @@ public final class Account {
 
     public interface CompanyFormationStage {
         /**
-         * <p>Company formation state for the account, managed through <a href="/api-reference/beta/accounts/form-company">Form Company</a>. A <code>draft</code> <code>status</code> until the formation checkout is paid, then filing progress with downloadable documents and signatures awaiting action. Empty when the formation state is temporarily unavailable.</p>
+         * <p>Company formation state for the account, managed through <a href="/api-reference/accounts/form-company">Form Company</a>. A <code>draft</code> <code>status</code> until the formation checkout is paid, then filing progress with downloadable documents and signatures awaiting action. Empty when the formation state is temporarily unavailable.</p>
          */
         CreatedAtStage companyFormation(@NotNull AccountCompanyFormation companyFormation);
     }
@@ -1152,14 +1607,35 @@ public final class Account {
         /**
          * <p>When the account was created, as an ISO 8601 timestamp.</p>
          */
-        IdStage createdAt(@NotNull String createdAt);
+        DisputeFighterEnabledStage createdAt(@NotNull String createdAt);
+    }
+
+    public interface DisputeFighterEnabledStage {
+        /**
+         * <p>Whether Whop assembles and files dispute evidence for this account. Enabling it opts the account into the success fee charged on disputes it wins.</p>
+         */
+        EconomicIntelligenceStage disputeFighterEnabled(boolean disputeFighterEnabled);
+    }
+
+    public interface EconomicIntelligenceStage {
+        /**
+         * <p>Whether Economic Intelligence is on for the account. It turns off automatically when its committed period ends. While it is off, the account can't activate an experiment or run a recommendation.</p>
+         */
+        IdStage economicIntelligence(boolean economicIntelligence);
     }
 
     public interface IdStage {
         /**
          * <p>Account ID, prefixed <code>biz_</code>.</p>
          */
-        OwnerStage id(@NotNull String id);
+        OrchestrationEnabledStage id(@NotNull String id);
+    }
+
+    public interface OrchestrationEnabledStage {
+        /**
+         * <p>Whether payment orchestration is enabled for this account.</p>
+         */
+        OwnerStage orchestrationEnabled(boolean orchestrationEnabled);
     }
 
     public interface OwnerStage {
@@ -1208,14 +1684,7 @@ public final class Account {
         /**
          * <p>Whether the account shows users in the user directory.</p>
          */
-        StablecoinRailsStage showUserDirectory(boolean showUserDirectory);
-    }
-
-    public interface StablecoinRailsStage {
-        /**
-         * <p>Whether the account settles on stablecoin rails — its balance is held on-chain as USDT and paid out over crypto, rather than as fiat cash.</p>
-         */
-        StorePageConfigStage stablecoinRails(boolean stablecoinRails);
+        StorePageConfigStage showUserDirectory(boolean showUserDirectory);
     }
 
     public interface StorePageConfigStage {
@@ -1245,6 +1714,15 @@ public final class Account {
         _FinalStage additionalProperty(String key, Object value);
 
         _FinalStage additionalProperties(Map<String, Object> additionalProperties);
+
+        /**
+         * <p>Lifetime charged ad spend for the account, in USD. Computed only on <code>list</code> for callers with <code>stats:read</code> on the account; <code>null</code> otherwise.</p>
+         */
+        _FinalStage adsSpendUsd(Optional<Double> adsSpendUsd);
+
+        _FinalStage adsSpendUsd(Double adsSpendUsd);
+
+        _FinalStage adsSpendUsd(Nullable<Double> adsSpendUsd);
 
         _FinalStage balances(List<AccountBalanceToken> balances);
 
@@ -1280,13 +1758,22 @@ public final class Account {
         _FinalStage businessName(Nullable<String> businessName);
 
         /**
-         * <p>High-level business category for the account. See the <a href="/api-reference/beta/accounts/account#business-types-and-industries-glossary">business types and industries glossary</a> for valid values.</p>
+         * <p>High-level business category for the account. See the <a href="/api-reference/accounts/account#business-types-and-industries-glossary">business types and industries glossary</a> for valid values.</p>
          */
-        _FinalStage businessType(Optional<AccountBusinessType> businessType);
+        _FinalStage businessType(Optional<String> businessType);
 
-        _FinalStage businessType(AccountBusinessType businessType);
+        _FinalStage businessType(String businessType);
 
-        _FinalStage businessType(Nullable<AccountBusinessType> businessType);
+        _FinalStage businessType(Nullable<String> businessType);
+
+        /**
+         * <p>The account's cancellation policy document, or <code>null</code> if they have not published one.</p>
+         */
+        _FinalStage cancellationPolicy(Optional<File> cancellationPolicy);
+
+        _FinalStage cancellationPolicy(File cancellationPolicy);
+
+        _FinalStage cancellationPolicy(Nullable<File> cancellationPolicy);
 
         /**
          * <p>Payment rails enabled for this account, each <code>active</code>, <code>inactive</code>, or <code>pending</code> (onboarding or review in progress). Computed only on <code>retrieve</code> and <code>me</code> for callers with <code>company:balance:read</code> scope; <code>null</code> otherwise.</p>
@@ -1298,7 +1785,7 @@ public final class Account {
         _FinalStage capabilities(Nullable<AccountCapabilities> capabilities);
 
         /**
-         * <p>Whop Cards application details for the account. Computed only on <code>retrieve</code> and <code>me</code> for callers with <code>company:balance:read</code> scope; <code>null</code> otherwise, or when the account has no card application.</p>
+         * <p>Whop Cards application details for the account. Returned on <code>list</code>, <code>retrieve</code>, and <code>me</code> for callers with <code>company:balance:read</code> scope; <code>null</code> otherwise, or when the account has no card application or blocking application review.</p>
          */
         _FinalStage cards(Optional<AccountCards> cards);
 
@@ -1316,6 +1803,15 @@ public final class Account {
         _FinalStage country(Nullable<String> country);
 
         /**
+         * <p>Distinct customers with a paid receipt at the account in the last 30 days, refreshed every few hours. Computed only on <code>retrieve</code> for callers with <code>stats:read</code> on the account; <code>null</code> otherwise, and when the count is unavailable.</p>
+         */
+        _FinalStage customersL30D(Optional<Integer> customersL30D);
+
+        _FinalStage customersL30D(Integer customersL30D);
+
+        _FinalStage customersL30D(Nullable<Integer> customersL30D);
+
+        /**
          * <p>Account promotional description.</p>
          */
         _FinalStage description(Optional<String> description);
@@ -1323,6 +1819,13 @@ public final class Account {
         _FinalStage description(String description);
 
         _FinalStage description(Nullable<String> description);
+
+        /**
+         * <p>How many team members report to the business directly, with no manager above them. Present on single-account reads.</p>
+         */
+        _FinalStage directReportsCount(Optional<Integer> directReportsCount);
+
+        _FinalStage directReportsCount(Integer directReportsCount);
 
         /**
          * <p>Account owner email address.</p>
@@ -1333,6 +1836,42 @@ public final class Account {
 
         _FinalStage email(Nullable<String> email);
 
+        /**
+         * <p>The account's end-user license agreement document, or <code>null</code> if they have not published one.</p>
+         */
+        _FinalStage eula(Optional<File> eula);
+
+        _FinalStage eula(File eula);
+
+        _FinalStage eula(Nullable<File> eula);
+
+        /**
+         * <p>The parent platform's own identifier for this subaccount, unique among the platform's subaccounts. <code>null</code> when unset.</p>
+         */
+        _FinalStage externalId(Optional<String> externalId);
+
+        _FinalStage externalId(String externalId);
+
+        _FinalStage externalId(Nullable<String> externalId);
+
+        /**
+         * <p>The account's most recent financing application. Computed only on <code>retrieve</code> and <code>me</code> for callers with <code>company:balance:read</code> scope; <code>null</code> otherwise, or when the account has never applied for financing.</p>
+         */
+        _FinalStage financing(Optional<AccountFinancing> financing);
+
+        _FinalStage financing(AccountFinancing financing);
+
+        _FinalStage financing(Nullable<AccountFinancing> financing);
+
+        /**
+         * <p>When a suspended account can pay out its balance to its own payout method, as an ISO 8601 timestamp. A dispute can move it later. Computed on <code>retrieve</code>, <code>me</code>, and <code>suspend</code>; <code>null</code> otherwise, when <code>status</code> is not <code>suspended</code>, and when the suspension holds the balance.</p>
+         */
+        _FinalStage fundsReleaseAt(Optional<String> fundsReleaseAt);
+
+        _FinalStage fundsReleaseAt(String fundsReleaseAt);
+
+        _FinalStage fundsReleaseAt(Nullable<String> fundsReleaseAt);
+
         _FinalStage homePreferences(List<AccountHomePreferencesItem> homePreferences);
 
         _FinalStage addHomePreferences(AccountHomePreferencesItem homePreferences);
@@ -1340,16 +1879,7 @@ public final class Account {
         _FinalStage addAllHomePreferences(List<AccountHomePreferencesItem> homePreferences);
 
         /**
-         * <p>Account industry group. See the <a href="/api-reference/beta/accounts/account#business-types-and-industries-glossary">business types and industries glossary</a> for valid values.</p>
-         */
-        _FinalStage industryGroup(Optional<AccountIndustryGroup> industryGroup);
-
-        _FinalStage industryGroup(AccountIndustryGroup industryGroup);
-
-        _FinalStage industryGroup(Nullable<AccountIndustryGroup> industryGroup);
-
-        /**
-         * <p>Specific industry vertical for the account. See the <a href="/api-reference/beta/accounts/account#business-types-and-industries-glossary">business types and industries glossary</a> for valid values.</p>
+         * <p>Specific industry vertical for the account. See the <a href="/api-reference/accounts/account#business-types-and-industries-glossary">business types and industries glossary</a> for valid values.</p>
          */
         _FinalStage industryType(Optional<String> industryType);
 
@@ -1365,6 +1895,15 @@ public final class Account {
         _FinalStage invoicePrefix(String invoicePrefix);
 
         _FinalStage invoicePrefix(Nullable<String> invoicePrefix);
+
+        /**
+         * <p>The Whop Levels progress of the account's <code>owner</code>, counted across every account they own, so all of them show the same level. Computed only on <code>retrieve</code> and <code>me</code> for callers with <code>company:basic:read</code> scope; <code>null</code> otherwise, and when the account is not in Whop Levels.</p>
+         */
+        _FinalStage level(Optional<AccountLevel> level);
+
+        _FinalStage level(AccountLevel level);
+
+        _FinalStage level(Nullable<AccountLevel> level);
 
         /**
          * <p>Account logo image URL.</p>
@@ -1430,13 +1969,22 @@ public final class Account {
         _FinalStage otherIndustryDescription(Nullable<String> otherIndustryDescription);
 
         /**
-         * <p>Parent account for connected accounts, or <code>null</code> for standalone accounts.</p>
+         * <p>Parent account for subaccounts, or <code>null</code> for standalone accounts.</p>
          */
         _FinalStage parentAccount(Optional<AccountParent> parentAccount);
 
         _FinalStage parentAccount(AccountParent parentAccount);
 
         _FinalStage parentAccount(Nullable<AccountParent> parentAccount);
+
+        /**
+         * <p>The account's active first-tier partner. Present on retrieve responses; null when no active first-tier partner is attributed to the account. Omitted from other responses.</p>
+         */
+        _FinalStage partner(Optional<AccountPartner> partner);
+
+        _FinalStage partner(AccountPartner partner);
+
+        _FinalStage partner(Nullable<AccountPartner> partner);
 
         /**
          * <p>Payment health controls currently applied to the account. Computed only on <code>retrieve</code> and <code>me</code> for callers with <code>company:balance:read</code> scope; <code>null</code> otherwise.</p>
@@ -1448,6 +1996,32 @@ public final class Account {
         _FinalStage paymentControls(Nullable<AccountPaymentControls> paymentControls);
 
         /**
+         * <p>The account's default payment methods at checkout. A variant's or checkout configuration's own <code>payment_method_configuration</code> takes precedence. <code>null</code> when the account uses Whop's platform defaults.</p>
+         */
+        _FinalStage paymentMethodConfiguration(
+                Optional<CheckoutSessionPaymentMethodConfiguration> paymentMethodConfiguration);
+
+        _FinalStage paymentMethodConfiguration(CheckoutSessionPaymentMethodConfiguration paymentMethodConfiguration);
+
+        _FinalStage paymentMethodConfiguration(
+                Nullable<CheckoutSessionPaymentMethodConfiguration> paymentMethodConfiguration);
+
+        _FinalStage platformCredits(List<Money> platformCredits);
+
+        _FinalStage addPlatformCredits(Money platformCredits);
+
+        _FinalStage addAllPlatformCredits(List<Money> platformCredits);
+
+        /**
+         * <p>The account's privacy policy document, or <code>null</code> if they have not published one.</p>
+         */
+        _FinalStage privacyPolicy(Optional<File> privacyPolicy);
+
+        _FinalStage privacyPolicy(File privacyPolicy);
+
+        _FinalStage privacyPolicy(Nullable<File> privacyPolicy);
+
+        /**
          * <p>Tax classification code applied by default to the account's products, with <code>id</code>, <code>name</code>, and <code>product_type</code>. <code>null</code> when no default is set.</p>
          */
         _FinalStage productTaxCode(Optional<Map<String, Object>> productTaxCode);
@@ -1457,7 +2031,7 @@ public final class Account {
         _FinalStage productTaxCode(Nullable<Map<String, Object>> productTaxCode);
 
         /**
-         * <p>DEPRECATED: Use the <code>GET /recommended_actions?account_id={account_id}</code> endpoint instead.</p>
+         * <p>DEPRECATED: Use the <code>GET /economic_intelligence?account_id={account_id}</code> endpoint instead.</p>
          */
         _FinalStage recommendedActions(Optional<List<AccountRecommendedAction>> recommendedActions);
 
@@ -1471,6 +2045,28 @@ public final class Account {
 
         _FinalStage requiredActions(Nullable<List<AccountRequiredAction>> requiredActions);
 
+        /**
+         * <p>The account's return policy document, or <code>null</code> if they have not published one.</p>
+         */
+        _FinalStage returnPolicy(Optional<File> returnPolicy);
+
+        _FinalStage returnPolicy(File returnPolicy);
+
+        _FinalStage returnPolicy(Nullable<File> returnPolicy);
+
+        _FinalStage rewards(Optional<List<AccountPartnerReward>> rewards);
+
+        _FinalStage rewards(List<AccountPartnerReward> rewards);
+
+        /**
+         * <p>The account's shipping policy document, or <code>null</code> if they have not published one.</p>
+         */
+        _FinalStage shippingPolicy(Optional<File> shippingPolicy);
+
+        _FinalStage shippingPolicy(File shippingPolicy);
+
+        _FinalStage shippingPolicy(Nullable<File> shippingPolicy);
+
         _FinalStage socialLinks(List<AccountSocialLink> socialLinks);
 
         _FinalStage addSocialLinks(AccountSocialLink socialLinks);
@@ -1478,7 +2074,7 @@ public final class Account {
         _FinalStage addAllSocialLinks(List<AccountSocialLink> socialLinks);
 
         /**
-         * <p>Whether the account can operate on Whop: <code>active</code> or <code>suspended</code>. Computed on <code>list</code>, <code>retrieve</code>, and <code>me</code>; <code>null</code> otherwise.</p>
+         * <p>Whether the account can operate on Whop: <code>active</code> or <code>suspended</code>. Computed on <code>list</code>, <code>retrieve</code>, <code>me</code>, and <code>suspend</code>; <code>null</code> otherwise.</p>
          */
         _FinalStage status(Optional<String> status);
 
@@ -1487,7 +2083,7 @@ public final class Account {
         _FinalStage status(Nullable<String> status);
 
         /**
-         * <p>Why the account was suspended, in language safe to show the account owner. Computed only on <code>retrieve</code> and <code>me</code>; <code>null</code> otherwise, when <code>status</code> is not <code>suspended</code>, and when the suspension was recorded without a reason.</p>
+         * <p>Why the account was suspended, as the label shown to the account owner, such as <code>Suspended - Fraudulent activity</code>. Computed on <code>retrieve</code>, <code>me</code>, and <code>suspend</code>; <code>null</code> otherwise, when <code>status</code> is not <code>suspended</code>, and when the suspension was recorded without a reason.</p>
          */
         _FinalStage statusReason(Optional<String> statusReason);
 
@@ -1517,7 +2113,7 @@ public final class Account {
         _FinalStage addAllTaxIdentifiers(List<AccountTaxIdentifier> taxIdentifiers);
 
         /**
-         * <p>Who calculates and remits tax for the account: <code>whop</code> (Whop calculates and remits), <code>self</code> (Whop calculates; the account collects and remits), or <code>none</code> (neither; the account is responsible). <code>null</code> until the account enrolls in the Whop tax service.</p>
+         * <p>Who calculates and remits tax for the account. <code>whop</code> means Whop calculates and remits. <code>self</code> means Whop calculates, and the account collects and remits. <code>none</code> means neither, and the account is responsible. New businesses start on <code>whop</code>, and new connected accounts start on <code>none</code>. <code>null</code> means the account has no setting yet.</p>
          */
         _FinalStage taxRemittedBy(Optional<AccountTaxRemittedBy> taxRemittedBy);
 
@@ -1535,7 +2131,16 @@ public final class Account {
         _FinalStage taxType(Nullable<AccountTaxType> taxType);
 
         /**
-         * <p>Account-level 3D Secure behavior. <code>mandate_challenge</code> requires cardholder verification on supported card payments; <code>null</code> uses the standard checkout flow.</p>
+         * <p>The account's terms of service document, or <code>null</code> if they have not published one.</p>
+         */
+        _FinalStage termsOfService(Optional<File> termsOfService);
+
+        _FinalStage termsOfService(File termsOfService);
+
+        _FinalStage termsOfService(Nullable<File> termsOfService);
+
+        /**
+         * <p>3D Secure behavior for supported on-session card payments. <code>mandate_challenge</code> requires a 3DS challenge before payment processing; <code>mandate_if_required</code> mandates a challenge only when the payment processor requires it; <code>frictionless_if_required</code> uses the regular frictionless 3DS flow. Payments of $1,000 or more use <code>mandate_if_required</code> unless <code>mandate_challenge</code> is selected. Risk and authentication recovery requirements can override the preference. <code>null</code> uses the standard checkout flow.</p>
          */
         _FinalStage threeDsLevel(Optional<AccountThreeDsLevel> threeDsLevel);
 
@@ -1562,6 +2167,15 @@ public final class Account {
         _FinalStage totalUsd(Nullable<String> totalUsd);
 
         /**
+         * <p>The trading account address, a snapshot of its margin and open positions, and its WebSocket subscriptions. Opt in with <code>include_trading=true</code> on single-account reads. <code>null</code> otherwise, without trading permission, or without an Ethereum wallet.</p>
+         */
+        _FinalStage trading(Optional<TradingAccount> trading);
+
+        _FinalStage trading(TradingAccount trading);
+
+        _FinalStage trading(Nullable<TradingAccount> trading);
+
+        /**
          * <p>Account identity verification status for the <code>individual</code> (KYC) and <code>business</code> (KYB) profiles. Each is <code>null</code> until created, otherwise a <code>status</code> of <code>not_started</code>, <code>pending</code>, <code>manual_review</code>, <code>approved</code>, or <code>rejected</code>.</p>
          */
         _FinalStage verification(Map<String, Object> verification);
@@ -1569,6 +2183,15 @@ public final class Account {
         _FinalStage putAllVerification(Map<String, Object> verification);
 
         _FinalStage verification(String key, Object value);
+
+        /**
+         * <p>Volume through the account in the last 30 days (GMV from paid receipts), normalized to USD. Computed only on <code>list</code> for callers with <code>stats:read</code> on the account; <code>null</code> otherwise.</p>
+         */
+        _FinalStage volumeL30DUsd(Optional<Double> volumeL30DUsd);
+
+        _FinalStage volumeL30DUsd(Double volumeL30DUsd);
+
+        _FinalStage volumeL30DUsd(Nullable<Double> volumeL30DUsd);
 
         /**
          * <p>Lifetime volume through the account — sales plus transfers received — normalized to USD. Computed only on <code>list</code> for callers with <code>stats:read</code> on the account; <code>null</code> otherwise.</p>
@@ -1587,6 +2210,24 @@ public final class Account {
         _FinalStage wallet(AccountWallet wallet);
 
         _FinalStage wallet(Nullable<AccountWallet> wallet);
+
+        /**
+         * <p>The account's business website URL, or <code>null</code> if none has been provided. Setting it also adds a <code>website</code> entry to <code>social_links</code>.</p>
+         */
+        _FinalStage website(Optional<String> website);
+
+        _FinalStage website(String website);
+
+        _FinalStage website(Nullable<String> website);
+
+        /**
+         * <p>When the account turned on Whop Partner mode, as an ISO 8601 timestamp. Present on single-account reads and update responses; <code>null</code> until the account turns Whop Partner mode on by sending <code>whop_partner_enabled: true</code> on update.</p>
+         */
+        _FinalStage whopPartnerEnabledAt(Optional<String> whopPartnerEnabledAt);
+
+        _FinalStage whopPartnerEnabledAt(String whopPartnerEnabledAt);
+
+        _FinalStage whopPartnerEnabledAt(Nullable<String> whopPartnerEnabledAt);
     }
 
     @JsonIgnoreProperties(ignoreUnknown = true)
@@ -1595,7 +2236,10 @@ public final class Account {
                     CollectVatIdStage,
                     CompanyFormationStage,
                     CreatedAtStage,
+                    DisputeFighterEnabledStage,
+                    EconomicIntelligenceStage,
                     IdStage,
+                    OrchestrationEnabledStage,
                     OwnerStage,
                     Require2FaStage,
                     RouteStage,
@@ -1603,7 +2247,6 @@ public final class Account {
                     ShowJoinedWhopsStage,
                     ShowReviewsDtcStage,
                     ShowUserDirectoryStage,
-                    StablecoinRailsStage,
                     StorePageConfigStage,
                     TitleStage,
                     UseLogoAsOpengraphImageFallbackStage,
@@ -1616,7 +2259,13 @@ public final class Account {
 
         private String createdAt;
 
+        private boolean disputeFighterEnabled;
+
+        private boolean economicIntelligence;
+
         private String id;
+
+        private boolean orchestrationEnabled;
 
         private UserSummary owner;
 
@@ -1632,25 +2281,33 @@ public final class Account {
 
         private boolean showUserDirectory;
 
-        private boolean stablecoinRails;
-
         private AccountStorePageConfig storePageConfig;
 
         private String title;
 
         private boolean useLogoAsOpengraphImageFallback;
 
+        private Optional<String> whopPartnerEnabledAt = Optional.empty();
+
+        private Optional<String> website = Optional.empty();
+
         private Optional<AccountWallet> wallet = Optional.empty();
 
         private Optional<Double> volumeUsd = Optional.empty();
 
+        private Optional<Double> volumeL30DUsd = Optional.empty();
+
         private Map<String, Object> verification = new LinkedHashMap<>();
+
+        private Optional<TradingAccount> trading = Optional.empty();
 
         private Optional<String> totalUsd = Optional.empty();
 
         private Optional<Double> totalEarnedUsd = Optional.empty();
 
         private Optional<AccountThreeDsLevel> threeDsLevel = Optional.empty();
+
+        private Optional<File> termsOfService = Optional.empty();
 
         private Optional<AccountTaxType> taxType = Optional.empty();
 
@@ -1668,13 +2325,27 @@ public final class Account {
 
         private List<AccountSocialLink> socialLinks = new ArrayList<>();
 
+        private Optional<File> shippingPolicy = Optional.empty();
+
+        private Optional<List<AccountPartnerReward>> rewards = Optional.empty();
+
+        private Optional<File> returnPolicy = Optional.empty();
+
         private Optional<List<AccountRequiredAction>> requiredActions = Optional.empty();
 
         private Optional<List<AccountRecommendedAction>> recommendedActions = Optional.empty();
 
         private Optional<Map<String, Object>> productTaxCode = Optional.empty();
 
+        private Optional<File> privacyPolicy = Optional.empty();
+
+        private List<Money> platformCredits = new ArrayList<>();
+
+        private Optional<CheckoutSessionPaymentMethodConfiguration> paymentMethodConfiguration = Optional.empty();
+
         private Optional<AccountPaymentControls> paymentControls = Optional.empty();
+
+        private Optional<AccountPartner> partner = Optional.empty();
 
         private Optional<AccountParent> parentAccount = Optional.empty();
 
@@ -1692,17 +2363,29 @@ public final class Account {
 
         private Optional<String> logoUrl = Optional.empty();
 
+        private Optional<AccountLevel> level = Optional.empty();
+
         private Optional<String> invoicePrefix = Optional.empty();
 
         private Optional<String> industryType = Optional.empty();
 
-        private Optional<AccountIndustryGroup> industryGroup = Optional.empty();
-
         private List<AccountHomePreferencesItem> homePreferences = new ArrayList<>();
+
+        private Optional<String> fundsReleaseAt = Optional.empty();
+
+        private Optional<AccountFinancing> financing = Optional.empty();
+
+        private Optional<String> externalId = Optional.empty();
+
+        private Optional<File> eula = Optional.empty();
 
         private Optional<String> email = Optional.empty();
 
+        private Optional<Integer> directReportsCount = Optional.empty();
+
         private Optional<String> description = Optional.empty();
+
+        private Optional<Integer> customersL30D = Optional.empty();
 
         private Optional<String> country = Optional.empty();
 
@@ -1710,7 +2393,9 @@ public final class Account {
 
         private Optional<AccountCapabilities> capabilities = Optional.empty();
 
-        private Optional<AccountBusinessType> businessType = Optional.empty();
+        private Optional<File> cancellationPolicy = Optional.empty();
+
+        private Optional<String> businessType = Optional.empty();
 
         private Optional<String> businessName = Optional.empty();
 
@@ -1720,53 +2405,71 @@ public final class Account {
 
         private List<AccountBalanceToken> balances = new ArrayList<>();
 
-        @JsonAnySetter
+        private Optional<Double> adsSpendUsd = Optional.empty();
+
         private Map<String, Object> additionalProperties = new HashMap<>();
 
         private Builder() {}
 
         @java.lang.Override
         public Builder from(Account other) {
+            adsSpendUsd(other.getAdsSpendUsd());
             balances(other.getBalances());
             bannerImageUrl(other.getBannerImageUrl());
             businessAddress(other.getBusinessAddress());
             businessName(other.getBusinessName());
             businessType(other.getBusinessType());
             canTransferPendingBalanceToChildren(other.getCanTransferPendingBalanceToChildren());
+            cancellationPolicy(other.getCancellationPolicy());
             capabilities(other.getCapabilities());
             cards(other.getCards());
             collectVatId(other.getCollectVatId());
             companyFormation(other.getCompanyFormation());
             country(other.getCountry());
             createdAt(other.getCreatedAt());
+            customersL30D(other.getCustomersL30D());
             description(other.getDescription());
+            directReportsCount(other.getDirectReportsCount());
+            disputeFighterEnabled(other.getDisputeFighterEnabled());
+            economicIntelligence(other.getEconomicIntelligence());
             email(other.getEmail());
+            eula(other.getEula());
+            externalId(other.getExternalId());
+            financing(other.getFinancing());
+            fundsReleaseAt(other.getFundsReleaseAt());
             homePreferences(other.getHomePreferences());
             id(other.getId());
-            industryGroup(other.getIndustryGroup());
             industryType(other.getIndustryType());
             invoicePrefix(other.getInvoicePrefix());
+            level(other.getLevel());
             logoUrl(other.getLogoUrl());
             metadata(other.getMetadata());
             onboardingType(other.getOnboardingType());
             opengraphImageUrl(other.getOpengraphImageUrl());
             opengraphImageVariant(other.getOpengraphImageVariant());
+            orchestrationEnabled(other.getOrchestrationEnabled());
             otherBusinessDescription(other.getOtherBusinessDescription());
             otherIndustryDescription(other.getOtherIndustryDescription());
             owner(other.getOwner());
             parentAccount(other.getParentAccount());
+            partner(other.getPartner());
             paymentControls(other.getPaymentControls());
+            paymentMethodConfiguration(other.getPaymentMethodConfiguration());
+            platformCredits(other.getPlatformCredits());
+            privacyPolicy(other.getPrivacyPolicy());
             productTaxCode(other.getProductTaxCode());
             recommendedActions(other.getRecommendedActions());
             require2Fa(other.getRequire2Fa());
             requiredActions(other.getRequiredActions());
+            returnPolicy(other.getReturnPolicy());
+            rewards(other.getRewards());
             route(other.getRoute());
             sendCustomerEmails(other.getSendCustomerEmails());
+            shippingPolicy(other.getShippingPolicy());
             showJoinedWhops(other.getShowJoinedWhops());
             showReviewsDtc(other.getShowReviewsDtc());
             showUserDirectory(other.getShowUserDirectory());
             socialLinks(other.getSocialLinks());
-            stablecoinRails(other.getStablecoinRails());
             status(other.getStatus());
             statusReason(other.getStatusReason());
             storePageConfig(other.getStorePageConfig());
@@ -1775,20 +2478,24 @@ public final class Account {
             taxIdentifiers(other.getTaxIdentifiers());
             taxRemittedBy(other.getTaxRemittedBy());
             taxType(other.getTaxType());
+            termsOfService(other.getTermsOfService());
             threeDsLevel(other.getThreeDsLevel());
             title(other.getTitle());
             totalEarnedUsd(other.getTotalEarnedUsd());
             totalUsd(other.getTotalUsd());
+            trading(other.getTrading());
             useLogoAsOpengraphImageFallback(other.getUseLogoAsOpengraphImageFallback());
             verification(other.getVerification());
+            volumeL30DUsd(other.getVolumeL30DUsd());
             volumeUsd(other.getVolumeUsd());
             wallet(other.getWallet());
+            website(other.getWebsite());
+            whopPartnerEnabledAt(other.getWhopPartnerEnabledAt());
             return this;
         }
 
         /**
-         * <p>Whether pending funds may be transferred from this platform account to its connected accounts.</p>
-         * <p>Whether pending funds may be transferred from this platform account to its connected accounts.</p>
+         * <p>Whether pending funds may be transferred from this platform account to its subaccounts.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
@@ -1800,7 +2507,6 @@ public final class Account {
 
         /**
          * <p>Whether checkout shows a VAT/tax ID field for buyers to optionally enter. Does not require a VAT ID to purchase.</p>
-         * <p>Whether checkout shows a VAT/tax ID field for buyers to optionally enter. Does not require a VAT ID to purchase.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
@@ -1811,8 +2517,7 @@ public final class Account {
         }
 
         /**
-         * <p>Company formation state for the account, managed through <a href="/api-reference/beta/accounts/form-company">Form Company</a>. A <code>draft</code> <code>status</code> until the formation checkout is paid, then filing progress with downloadable documents and signatures awaiting action. Empty when the formation state is temporarily unavailable.</p>
-         * <p>Company formation state for the account, managed through <a href="/api-reference/beta/accounts/form-company">Form Company</a>. A <code>draft</code> <code>status</code> until the formation checkout is paid, then filing progress with downloadable documents and signatures awaiting action. Empty when the formation state is temporarily unavailable.</p>
+         * <p>Company formation state for the account, managed through <a href="/api-reference/accounts/form-company">Form Company</a>. A <code>draft</code> <code>status</code> until the formation checkout is paid, then filing progress with downloadable documents and signatures awaiting action. Empty when the formation state is temporarily unavailable.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
@@ -1824,30 +2529,60 @@ public final class Account {
 
         /**
          * <p>When the account was created, as an ISO 8601 timestamp.</p>
-         * <p>When the account was created, as an ISO 8601 timestamp.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
         @JsonSetter("created_at")
-        public IdStage createdAt(@NotNull String createdAt) {
+        public DisputeFighterEnabledStage createdAt(@NotNull String createdAt) {
             this.createdAt = Objects.requireNonNull(createdAt, "createdAt must not be null");
             return this;
         }
 
         /**
-         * <p>Account ID, prefixed <code>biz_</code>.</p>
+         * <p>Whether Whop assembles and files dispute evidence for this account. Enabling it opts the account into the success fee charged on disputes it wins.</p>
+         * @return Reference to {@code this} so that method calls can be chained together.
+         */
+        @java.lang.Override
+        @JsonSetter("dispute_fighter_enabled")
+        public EconomicIntelligenceStage disputeFighterEnabled(boolean disputeFighterEnabled) {
+            this.disputeFighterEnabled = disputeFighterEnabled;
+            return this;
+        }
+
+        /**
+         * <p>Whether Economic Intelligence is on for the account. It turns off automatically when its committed period ends. While it is off, the account can't activate an experiment or run a recommendation.</p>
+         * @return Reference to {@code this} so that method calls can be chained together.
+         */
+        @java.lang.Override
+        @JsonSetter("economic_intelligence")
+        public IdStage economicIntelligence(boolean economicIntelligence) {
+            this.economicIntelligence = economicIntelligence;
+            return this;
+        }
+
+        /**
          * <p>Account ID, prefixed <code>biz_</code>.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
         @JsonSetter("id")
-        public OwnerStage id(@NotNull String id) {
+        public OrchestrationEnabledStage id(@NotNull String id) {
             this.id = Objects.requireNonNull(id, "id must not be null");
             return this;
         }
 
         /**
-         * <p>The single user who owns the account, whose email is the <code>email</code> above. Distinct from the <code>owner</code> role on team members, which any number of them can hold.</p>
+         * <p>Whether payment orchestration is enabled for this account.</p>
+         * @return Reference to {@code this} so that method calls can be chained together.
+         */
+        @java.lang.Override
+        @JsonSetter("orchestration_enabled")
+        public OwnerStage orchestrationEnabled(boolean orchestrationEnabled) {
+            this.orchestrationEnabled = orchestrationEnabled;
+            return this;
+        }
+
+        /**
          * <p>The single user who owns the account, whose email is the <code>email</code> above. Distinct from the <code>owner</code> role on team members, which any number of them can hold.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
@@ -1860,7 +2595,6 @@ public final class Account {
 
         /**
          * <p>Whether authorized users must enable two-factor authentication.</p>
-         * <p>Whether authorized users must enable two-factor authentication.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
@@ -1871,7 +2605,6 @@ public final class Account {
         }
 
         /**
-         * <p>Account public route identifier.</p>
          * <p>Account public route identifier.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
@@ -1884,7 +2617,6 @@ public final class Account {
 
         /**
          * <p>Whether Whop sends transactional emails to customers on behalf of this account.</p>
-         * <p>Whether Whop sends transactional emails to customers on behalf of this account.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
@@ -1895,7 +2627,6 @@ public final class Account {
         }
 
         /**
-         * <p>Whether the account appears in joined whops on other accounts.</p>
          * <p>Whether the account appears in joined whops on other accounts.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
@@ -1908,7 +2639,6 @@ public final class Account {
 
         /**
          * <p>Whether reviews are displayed on direct-to-consumer product pages.</p>
-         * <p>Whether reviews are displayed on direct-to-consumer product pages.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
@@ -1920,30 +2650,16 @@ public final class Account {
 
         /**
          * <p>Whether the account shows users in the user directory.</p>
-         * <p>Whether the account shows users in the user directory.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
         @JsonSetter("show_user_directory")
-        public StablecoinRailsStage showUserDirectory(boolean showUserDirectory) {
+        public StorePageConfigStage showUserDirectory(boolean showUserDirectory) {
             this.showUserDirectory = showUserDirectory;
             return this;
         }
 
         /**
-         * <p>Whether the account settles on stablecoin rails — its balance is held on-chain as USDT and paid out over crypto, rather than as fiat cash.</p>
-         * <p>Whether the account settles on stablecoin rails — its balance is held on-chain as USDT and paid out over crypto, rather than as fiat cash.</p>
-         * @return Reference to {@code this} so that method calls can be chained together.
-         */
-        @java.lang.Override
-        @JsonSetter("stablecoin_rails")
-        public StorePageConfigStage stablecoinRails(boolean stablecoinRails) {
-            this.stablecoinRails = stablecoinRails;
-            return this;
-        }
-
-        /**
-         * <p>Account store page display configuration.</p>
          * <p>Account store page display configuration.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
@@ -1956,7 +2672,6 @@ public final class Account {
 
         /**
          * <p>Account display name.</p>
-         * <p>Account display name.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
@@ -1968,13 +2683,84 @@ public final class Account {
 
         /**
          * <p>Whether the account uses its logo as the fallback Open Graph image.</p>
-         * <p>Whether the account uses its logo as the fallback Open Graph image.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
         @JsonSetter("use_logo_as_opengraph_image_fallback")
         public _FinalStage useLogoAsOpengraphImageFallback(boolean useLogoAsOpengraphImageFallback) {
             this.useLogoAsOpengraphImageFallback = useLogoAsOpengraphImageFallback;
+            return this;
+        }
+
+        /**
+         * <p>When the account turned on Whop Partner mode, as an ISO 8601 timestamp. Present on single-account reads and update responses; <code>null</code> until the account turns Whop Partner mode on by sending <code>whop_partner_enabled: true</code> on update.</p>
+         * @return Reference to {@code this} so that method calls can be chained together.
+         */
+        @java.lang.Override
+        public _FinalStage whopPartnerEnabledAt(Nullable<String> whopPartnerEnabledAt) {
+            if (whopPartnerEnabledAt.isNull()) {
+                this.whopPartnerEnabledAt = null;
+            } else if (whopPartnerEnabledAt.isEmpty()) {
+                this.whopPartnerEnabledAt = Optional.empty();
+            } else {
+                this.whopPartnerEnabledAt = Optional.of(whopPartnerEnabledAt.get());
+            }
+            return this;
+        }
+
+        /**
+         * <p>When the account turned on Whop Partner mode, as an ISO 8601 timestamp. Present on single-account reads and update responses; <code>null</code> until the account turns Whop Partner mode on by sending <code>whop_partner_enabled: true</code> on update.</p>
+         * @return Reference to {@code this} so that method calls can be chained together.
+         */
+        @java.lang.Override
+        public _FinalStage whopPartnerEnabledAt(String whopPartnerEnabledAt) {
+            this.whopPartnerEnabledAt = Optional.ofNullable(whopPartnerEnabledAt);
+            return this;
+        }
+
+        /**
+         * <p>When the account turned on Whop Partner mode, as an ISO 8601 timestamp. Present on single-account reads and update responses; <code>null</code> until the account turns Whop Partner mode on by sending <code>whop_partner_enabled: true</code> on update.</p>
+         */
+        @java.lang.Override
+        @JsonSetter(value = "whop_partner_enabled_at", nulls = Nulls.SKIP)
+        public _FinalStage whopPartnerEnabledAt(Optional<String> whopPartnerEnabledAt) {
+            this.whopPartnerEnabledAt = whopPartnerEnabledAt;
+            return this;
+        }
+
+        /**
+         * <p>The account's business website URL, or <code>null</code> if none has been provided. Setting it also adds a <code>website</code> entry to <code>social_links</code>.</p>
+         * @return Reference to {@code this} so that method calls can be chained together.
+         */
+        @java.lang.Override
+        public _FinalStage website(Nullable<String> website) {
+            if (website.isNull()) {
+                this.website = null;
+            } else if (website.isEmpty()) {
+                this.website = Optional.empty();
+            } else {
+                this.website = Optional.of(website.get());
+            }
+            return this;
+        }
+
+        /**
+         * <p>The account's business website URL, or <code>null</code> if none has been provided. Setting it also adds a <code>website</code> entry to <code>social_links</code>.</p>
+         * @return Reference to {@code this} so that method calls can be chained together.
+         */
+        @java.lang.Override
+        public _FinalStage website(String website) {
+            this.website = Optional.ofNullable(website);
+            return this;
+        }
+
+        /**
+         * <p>The account's business website URL, or <code>null</code> if none has been provided. Setting it also adds a <code>website</code> entry to <code>social_links</code>.</p>
+         */
+        @java.lang.Override
+        @JsonSetter(value = "website", nulls = Nulls.SKIP)
+        public _FinalStage website(Optional<String> website) {
+            this.website = website;
             return this;
         }
 
@@ -2051,6 +2837,42 @@ public final class Account {
         }
 
         /**
+         * <p>Volume through the account in the last 30 days (GMV from paid receipts), normalized to USD. Computed only on <code>list</code> for callers with <code>stats:read</code> on the account; <code>null</code> otherwise.</p>
+         * @return Reference to {@code this} so that method calls can be chained together.
+         */
+        @java.lang.Override
+        public _FinalStage volumeL30DUsd(Nullable<Double> volumeL30DUsd) {
+            if (volumeL30DUsd.isNull()) {
+                this.volumeL30DUsd = null;
+            } else if (volumeL30DUsd.isEmpty()) {
+                this.volumeL30DUsd = Optional.empty();
+            } else {
+                this.volumeL30DUsd = Optional.of(volumeL30DUsd.get());
+            }
+            return this;
+        }
+
+        /**
+         * <p>Volume through the account in the last 30 days (GMV from paid receipts), normalized to USD. Computed only on <code>list</code> for callers with <code>stats:read</code> on the account; <code>null</code> otherwise.</p>
+         * @return Reference to {@code this} so that method calls can be chained together.
+         */
+        @java.lang.Override
+        public _FinalStage volumeL30DUsd(Double volumeL30DUsd) {
+            this.volumeL30DUsd = Optional.ofNullable(volumeL30DUsd);
+            return this;
+        }
+
+        /**
+         * <p>Volume through the account in the last 30 days (GMV from paid receipts), normalized to USD. Computed only on <code>list</code> for callers with <code>stats:read</code> on the account; <code>null</code> otherwise.</p>
+         */
+        @java.lang.Override
+        @JsonSetter(value = "volume_l30d_usd", nulls = Nulls.SKIP)
+        public _FinalStage volumeL30DUsd(Optional<Double> volumeL30DUsd) {
+            this.volumeL30DUsd = volumeL30DUsd;
+            return this;
+        }
+
+        /**
          * <p>Account identity verification status for the <code>individual</code> (KYC) and <code>business</code> (KYB) profiles. Each is <code>null</code> until created, otherwise a <code>status</code> of <code>not_started</code>, <code>pending</code>, <code>manual_review</code>, <code>approved</code>, or <code>rejected</code>.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
@@ -2082,6 +2904,42 @@ public final class Account {
             if (verification != null) {
                 this.verification.putAll(verification);
             }
+            return this;
+        }
+
+        /**
+         * <p>The trading account address, a snapshot of its margin and open positions, and its WebSocket subscriptions. Opt in with <code>include_trading=true</code> on single-account reads. <code>null</code> otherwise, without trading permission, or without an Ethereum wallet.</p>
+         * @return Reference to {@code this} so that method calls can be chained together.
+         */
+        @java.lang.Override
+        public _FinalStage trading(Nullable<TradingAccount> trading) {
+            if (trading.isNull()) {
+                this.trading = null;
+            } else if (trading.isEmpty()) {
+                this.trading = Optional.empty();
+            } else {
+                this.trading = Optional.of(trading.get());
+            }
+            return this;
+        }
+
+        /**
+         * <p>The trading account address, a snapshot of its margin and open positions, and its WebSocket subscriptions. Opt in with <code>include_trading=true</code> on single-account reads. <code>null</code> otherwise, without trading permission, or without an Ethereum wallet.</p>
+         * @return Reference to {@code this} so that method calls can be chained together.
+         */
+        @java.lang.Override
+        public _FinalStage trading(TradingAccount trading) {
+            this.trading = Optional.ofNullable(trading);
+            return this;
+        }
+
+        /**
+         * <p>The trading account address, a snapshot of its margin and open positions, and its WebSocket subscriptions. Opt in with <code>include_trading=true</code> on single-account reads. <code>null</code> otherwise, without trading permission, or without an Ethereum wallet.</p>
+         */
+        @java.lang.Override
+        @JsonSetter(value = "trading", nulls = Nulls.SKIP)
+        public _FinalStage trading(Optional<TradingAccount> trading) {
+            this.trading = trading;
             return this;
         }
 
@@ -2158,7 +3016,7 @@ public final class Account {
         }
 
         /**
-         * <p>Account-level 3D Secure behavior. <code>mandate_challenge</code> requires cardholder verification on supported card payments; <code>null</code> uses the standard checkout flow.</p>
+         * <p>3D Secure behavior for supported on-session card payments. <code>mandate_challenge</code> requires a 3DS challenge before payment processing; <code>mandate_if_required</code> mandates a challenge only when the payment processor requires it; <code>frictionless_if_required</code> uses the regular frictionless 3DS flow. Payments of $1,000 or more use <code>mandate_if_required</code> unless <code>mandate_challenge</code> is selected. Risk and authentication recovery requirements can override the preference. <code>null</code> uses the standard checkout flow.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
@@ -2174,7 +3032,7 @@ public final class Account {
         }
 
         /**
-         * <p>Account-level 3D Secure behavior. <code>mandate_challenge</code> requires cardholder verification on supported card payments; <code>null</code> uses the standard checkout flow.</p>
+         * <p>3D Secure behavior for supported on-session card payments. <code>mandate_challenge</code> requires a 3DS challenge before payment processing; <code>mandate_if_required</code> mandates a challenge only when the payment processor requires it; <code>frictionless_if_required</code> uses the regular frictionless 3DS flow. Payments of $1,000 or more use <code>mandate_if_required</code> unless <code>mandate_challenge</code> is selected. Risk and authentication recovery requirements can override the preference. <code>null</code> uses the standard checkout flow.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
@@ -2184,12 +3042,48 @@ public final class Account {
         }
 
         /**
-         * <p>Account-level 3D Secure behavior. <code>mandate_challenge</code> requires cardholder verification on supported card payments; <code>null</code> uses the standard checkout flow.</p>
+         * <p>3D Secure behavior for supported on-session card payments. <code>mandate_challenge</code> requires a 3DS challenge before payment processing; <code>mandate_if_required</code> mandates a challenge only when the payment processor requires it; <code>frictionless_if_required</code> uses the regular frictionless 3DS flow. Payments of $1,000 or more use <code>mandate_if_required</code> unless <code>mandate_challenge</code> is selected. Risk and authentication recovery requirements can override the preference. <code>null</code> uses the standard checkout flow.</p>
          */
         @java.lang.Override
         @JsonSetter(value = "three_ds_level", nulls = Nulls.SKIP)
         public _FinalStage threeDsLevel(Optional<AccountThreeDsLevel> threeDsLevel) {
             this.threeDsLevel = threeDsLevel;
+            return this;
+        }
+
+        /**
+         * <p>The account's terms of service document, or <code>null</code> if they have not published one.</p>
+         * @return Reference to {@code this} so that method calls can be chained together.
+         */
+        @java.lang.Override
+        public _FinalStage termsOfService(Nullable<File> termsOfService) {
+            if (termsOfService.isNull()) {
+                this.termsOfService = null;
+            } else if (termsOfService.isEmpty()) {
+                this.termsOfService = Optional.empty();
+            } else {
+                this.termsOfService = Optional.of(termsOfService.get());
+            }
+            return this;
+        }
+
+        /**
+         * <p>The account's terms of service document, or <code>null</code> if they have not published one.</p>
+         * @return Reference to {@code this} so that method calls can be chained together.
+         */
+        @java.lang.Override
+        public _FinalStage termsOfService(File termsOfService) {
+            this.termsOfService = Optional.ofNullable(termsOfService);
+            return this;
+        }
+
+        /**
+         * <p>The account's terms of service document, or <code>null</code> if they have not published one.</p>
+         */
+        @java.lang.Override
+        @JsonSetter(value = "terms_of_service", nulls = Nulls.SKIP)
+        public _FinalStage termsOfService(Optional<File> termsOfService) {
+            this.termsOfService = termsOfService;
             return this;
         }
 
@@ -2230,7 +3124,7 @@ public final class Account {
         }
 
         /**
-         * <p>Who calculates and remits tax for the account: <code>whop</code> (Whop calculates and remits), <code>self</code> (Whop calculates; the account collects and remits), or <code>none</code> (neither; the account is responsible). <code>null</code> until the account enrolls in the Whop tax service.</p>
+         * <p>Who calculates and remits tax for the account. <code>whop</code> means Whop calculates and remits. <code>self</code> means Whop calculates, and the account collects and remits. <code>none</code> means neither, and the account is responsible. New businesses start on <code>whop</code>, and new connected accounts start on <code>none</code>. <code>null</code> means the account has no setting yet.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
@@ -2246,7 +3140,7 @@ public final class Account {
         }
 
         /**
-         * <p>Who calculates and remits tax for the account: <code>whop</code> (Whop calculates and remits), <code>self</code> (Whop calculates; the account collects and remits), or <code>none</code> (neither; the account is responsible). <code>null</code> until the account enrolls in the Whop tax service.</p>
+         * <p>Who calculates and remits tax for the account. <code>whop</code> means Whop calculates and remits. <code>self</code> means Whop calculates, and the account collects and remits. <code>none</code> means neither, and the account is responsible. New businesses start on <code>whop</code>, and new connected accounts start on <code>none</code>. <code>null</code> means the account has no setting yet.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
@@ -2256,7 +3150,7 @@ public final class Account {
         }
 
         /**
-         * <p>Who calculates and remits tax for the account: <code>whop</code> (Whop calculates and remits), <code>self</code> (Whop calculates; the account collects and remits), or <code>none</code> (neither; the account is responsible). <code>null</code> until the account enrolls in the Whop tax service.</p>
+         * <p>Who calculates and remits tax for the account. <code>whop</code> means Whop calculates and remits. <code>self</code> means Whop calculates, and the account collects and remits. <code>none</code> means neither, and the account is responsible. New businesses start on <code>whop</code>, and new connected accounts start on <code>none</code>. <code>null</code> means the account has no setting yet.</p>
          */
         @java.lang.Override
         @JsonSetter(value = "tax_remitted_by", nulls = Nulls.SKIP)
@@ -2350,7 +3244,7 @@ public final class Account {
         }
 
         /**
-         * <p>Why the account was suspended, in language safe to show the account owner. Computed only on <code>retrieve</code> and <code>me</code>; <code>null</code> otherwise, when <code>status</code> is not <code>suspended</code>, and when the suspension was recorded without a reason.</p>
+         * <p>Why the account was suspended, as the label shown to the account owner, such as <code>Suspended - Fraudulent activity</code>. Computed on <code>retrieve</code>, <code>me</code>, and <code>suspend</code>; <code>null</code> otherwise, when <code>status</code> is not <code>suspended</code>, and when the suspension was recorded without a reason.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
@@ -2366,7 +3260,7 @@ public final class Account {
         }
 
         /**
-         * <p>Why the account was suspended, in language safe to show the account owner. Computed only on <code>retrieve</code> and <code>me</code>; <code>null</code> otherwise, when <code>status</code> is not <code>suspended</code>, and when the suspension was recorded without a reason.</p>
+         * <p>Why the account was suspended, as the label shown to the account owner, such as <code>Suspended - Fraudulent activity</code>. Computed on <code>retrieve</code>, <code>me</code>, and <code>suspend</code>; <code>null</code> otherwise, when <code>status</code> is not <code>suspended</code>, and when the suspension was recorded without a reason.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
@@ -2376,7 +3270,7 @@ public final class Account {
         }
 
         /**
-         * <p>Why the account was suspended, in language safe to show the account owner. Computed only on <code>retrieve</code> and <code>me</code>; <code>null</code> otherwise, when <code>status</code> is not <code>suspended</code>, and when the suspension was recorded without a reason.</p>
+         * <p>Why the account was suspended, as the label shown to the account owner, such as <code>Suspended - Fraudulent activity</code>. Computed on <code>retrieve</code>, <code>me</code>, and <code>suspend</code>; <code>null</code> otherwise, when <code>status</code> is not <code>suspended</code>, and when the suspension was recorded without a reason.</p>
          */
         @java.lang.Override
         @JsonSetter(value = "status_reason", nulls = Nulls.SKIP)
@@ -2386,7 +3280,7 @@ public final class Account {
         }
 
         /**
-         * <p>Whether the account can operate on Whop: <code>active</code> or <code>suspended</code>. Computed on <code>list</code>, <code>retrieve</code>, and <code>me</code>; <code>null</code> otherwise.</p>
+         * <p>Whether the account can operate on Whop: <code>active</code> or <code>suspended</code>. Computed on <code>list</code>, <code>retrieve</code>, <code>me</code>, and <code>suspend</code>; <code>null</code> otherwise.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
@@ -2402,7 +3296,7 @@ public final class Account {
         }
 
         /**
-         * <p>Whether the account can operate on Whop: <code>active</code> or <code>suspended</code>. Computed on <code>list</code>, <code>retrieve</code>, and <code>me</code>; <code>null</code> otherwise.</p>
+         * <p>Whether the account can operate on Whop: <code>active</code> or <code>suspended</code>. Computed on <code>list</code>, <code>retrieve</code>, <code>me</code>, and <code>suspend</code>; <code>null</code> otherwise.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
@@ -2412,7 +3306,7 @@ public final class Account {
         }
 
         /**
-         * <p>Whether the account can operate on Whop: <code>active</code> or <code>suspended</code>. Computed on <code>list</code>, <code>retrieve</code>, and <code>me</code>; <code>null</code> otherwise.</p>
+         * <p>Whether the account can operate on Whop: <code>active</code> or <code>suspended</code>. Computed on <code>list</code>, <code>retrieve</code>, <code>me</code>, and <code>suspend</code>; <code>null</code> otherwise.</p>
          */
         @java.lang.Override
         @JsonSetter(value = "status", nulls = Nulls.SKIP)
@@ -2445,6 +3339,91 @@ public final class Account {
             return this;
         }
 
+        /**
+         * <p>The account's shipping policy document, or <code>null</code> if they have not published one.</p>
+         * @return Reference to {@code this} so that method calls can be chained together.
+         */
+        @java.lang.Override
+        public _FinalStage shippingPolicy(Nullable<File> shippingPolicy) {
+            if (shippingPolicy.isNull()) {
+                this.shippingPolicy = null;
+            } else if (shippingPolicy.isEmpty()) {
+                this.shippingPolicy = Optional.empty();
+            } else {
+                this.shippingPolicy = Optional.of(shippingPolicy.get());
+            }
+            return this;
+        }
+
+        /**
+         * <p>The account's shipping policy document, or <code>null</code> if they have not published one.</p>
+         * @return Reference to {@code this} so that method calls can be chained together.
+         */
+        @java.lang.Override
+        public _FinalStage shippingPolicy(File shippingPolicy) {
+            this.shippingPolicy = Optional.ofNullable(shippingPolicy);
+            return this;
+        }
+
+        /**
+         * <p>The account's shipping policy document, or <code>null</code> if they have not published one.</p>
+         */
+        @java.lang.Override
+        @JsonSetter(value = "shipping_policy", nulls = Nulls.SKIP)
+        public _FinalStage shippingPolicy(Optional<File> shippingPolicy) {
+            this.shippingPolicy = shippingPolicy;
+            return this;
+        }
+
+        @java.lang.Override
+        public _FinalStage rewards(List<AccountPartnerReward> rewards) {
+            this.rewards = Optional.ofNullable(rewards);
+            return this;
+        }
+
+        @java.lang.Override
+        @JsonSetter(value = "rewards", nulls = Nulls.SKIP)
+        public _FinalStage rewards(Optional<List<AccountPartnerReward>> rewards) {
+            this.rewards = rewards;
+            return this;
+        }
+
+        /**
+         * <p>The account's return policy document, or <code>null</code> if they have not published one.</p>
+         * @return Reference to {@code this} so that method calls can be chained together.
+         */
+        @java.lang.Override
+        public _FinalStage returnPolicy(Nullable<File> returnPolicy) {
+            if (returnPolicy.isNull()) {
+                this.returnPolicy = null;
+            } else if (returnPolicy.isEmpty()) {
+                this.returnPolicy = Optional.empty();
+            } else {
+                this.returnPolicy = Optional.of(returnPolicy.get());
+            }
+            return this;
+        }
+
+        /**
+         * <p>The account's return policy document, or <code>null</code> if they have not published one.</p>
+         * @return Reference to {@code this} so that method calls can be chained together.
+         */
+        @java.lang.Override
+        public _FinalStage returnPolicy(File returnPolicy) {
+            this.returnPolicy = Optional.ofNullable(returnPolicy);
+            return this;
+        }
+
+        /**
+         * <p>The account's return policy document, or <code>null</code> if they have not published one.</p>
+         */
+        @java.lang.Override
+        @JsonSetter(value = "return_policy", nulls = Nulls.SKIP)
+        public _FinalStage returnPolicy(Optional<File> returnPolicy) {
+            this.returnPolicy = returnPolicy;
+            return this;
+        }
+
         @java.lang.Override
         public _FinalStage requiredActions(Nullable<List<AccountRequiredAction>> requiredActions) {
             if (requiredActions.isNull()) {
@@ -2471,7 +3450,7 @@ public final class Account {
         }
 
         /**
-         * <p>DEPRECATED: Use the <code>GET /recommended_actions?account_id={account_id}</code> endpoint instead.</p>
+         * <p>DEPRECATED: Use the <code>GET /economic_intelligence?account_id={account_id}</code> endpoint instead.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
@@ -2487,7 +3466,7 @@ public final class Account {
         }
 
         /**
-         * <p>DEPRECATED: Use the <code>GET /recommended_actions?account_id={account_id}</code> endpoint instead.</p>
+         * <p>DEPRECATED: Use the <code>GET /economic_intelligence?account_id={account_id}</code> endpoint instead.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
@@ -2497,7 +3476,7 @@ public final class Account {
         }
 
         /**
-         * <p>DEPRECATED: Use the <code>GET /recommended_actions?account_id={account_id}</code> endpoint instead.</p>
+         * <p>DEPRECATED: Use the <code>GET /economic_intelligence?account_id={account_id}</code> endpoint instead.</p>
          */
         @java.lang.Override
         @JsonSetter(value = "recommended_actions", nulls = Nulls.SKIP)
@@ -2543,6 +3522,105 @@ public final class Account {
         }
 
         /**
+         * <p>The account's privacy policy document, or <code>null</code> if they have not published one.</p>
+         * @return Reference to {@code this} so that method calls can be chained together.
+         */
+        @java.lang.Override
+        public _FinalStage privacyPolicy(Nullable<File> privacyPolicy) {
+            if (privacyPolicy.isNull()) {
+                this.privacyPolicy = null;
+            } else if (privacyPolicy.isEmpty()) {
+                this.privacyPolicy = Optional.empty();
+            } else {
+                this.privacyPolicy = Optional.of(privacyPolicy.get());
+            }
+            return this;
+        }
+
+        /**
+         * <p>The account's privacy policy document, or <code>null</code> if they have not published one.</p>
+         * @return Reference to {@code this} so that method calls can be chained together.
+         */
+        @java.lang.Override
+        public _FinalStage privacyPolicy(File privacyPolicy) {
+            this.privacyPolicy = Optional.ofNullable(privacyPolicy);
+            return this;
+        }
+
+        /**
+         * <p>The account's privacy policy document, or <code>null</code> if they have not published one.</p>
+         */
+        @java.lang.Override
+        @JsonSetter(value = "privacy_policy", nulls = Nulls.SKIP)
+        public _FinalStage privacyPolicy(Optional<File> privacyPolicy) {
+            this.privacyPolicy = privacyPolicy;
+            return this;
+        }
+
+        @java.lang.Override
+        public _FinalStage addAllPlatformCredits(List<Money> platformCredits) {
+            if (platformCredits != null) {
+                this.platformCredits.addAll(platformCredits);
+            }
+            return this;
+        }
+
+        @java.lang.Override
+        public _FinalStage addPlatformCredits(Money platformCredits) {
+            this.platformCredits.add(platformCredits);
+            return this;
+        }
+
+        @java.lang.Override
+        @JsonSetter(value = "platform_credits", nulls = Nulls.SKIP)
+        public _FinalStage platformCredits(List<Money> platformCredits) {
+            this.platformCredits.clear();
+            if (platformCredits != null) {
+                this.platformCredits.addAll(platformCredits);
+            }
+            return this;
+        }
+
+        /**
+         * <p>The account's default payment methods at checkout. A variant's or checkout configuration's own <code>payment_method_configuration</code> takes precedence. <code>null</code> when the account uses Whop's platform defaults.</p>
+         * @return Reference to {@code this} so that method calls can be chained together.
+         */
+        @java.lang.Override
+        public _FinalStage paymentMethodConfiguration(
+                Nullable<CheckoutSessionPaymentMethodConfiguration> paymentMethodConfiguration) {
+            if (paymentMethodConfiguration.isNull()) {
+                this.paymentMethodConfiguration = null;
+            } else if (paymentMethodConfiguration.isEmpty()) {
+                this.paymentMethodConfiguration = Optional.empty();
+            } else {
+                this.paymentMethodConfiguration = Optional.of(paymentMethodConfiguration.get());
+            }
+            return this;
+        }
+
+        /**
+         * <p>The account's default payment methods at checkout. A variant's or checkout configuration's own <code>payment_method_configuration</code> takes precedence. <code>null</code> when the account uses Whop's platform defaults.</p>
+         * @return Reference to {@code this} so that method calls can be chained together.
+         */
+        @java.lang.Override
+        public _FinalStage paymentMethodConfiguration(
+                CheckoutSessionPaymentMethodConfiguration paymentMethodConfiguration) {
+            this.paymentMethodConfiguration = Optional.ofNullable(paymentMethodConfiguration);
+            return this;
+        }
+
+        /**
+         * <p>The account's default payment methods at checkout. A variant's or checkout configuration's own <code>payment_method_configuration</code> takes precedence. <code>null</code> when the account uses Whop's platform defaults.</p>
+         */
+        @java.lang.Override
+        @JsonSetter(value = "payment_method_configuration", nulls = Nulls.SKIP)
+        public _FinalStage paymentMethodConfiguration(
+                Optional<CheckoutSessionPaymentMethodConfiguration> paymentMethodConfiguration) {
+            this.paymentMethodConfiguration = paymentMethodConfiguration;
+            return this;
+        }
+
+        /**
          * <p>Payment health controls currently applied to the account. Computed only on <code>retrieve</code> and <code>me</code> for callers with <code>company:balance:read</code> scope; <code>null</code> otherwise.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
@@ -2579,7 +3657,43 @@ public final class Account {
         }
 
         /**
-         * <p>Parent account for connected accounts, or <code>null</code> for standalone accounts.</p>
+         * <p>The account's active first-tier partner. Present on retrieve responses; null when no active first-tier partner is attributed to the account. Omitted from other responses.</p>
+         * @return Reference to {@code this} so that method calls can be chained together.
+         */
+        @java.lang.Override
+        public _FinalStage partner(Nullable<AccountPartner> partner) {
+            if (partner.isNull()) {
+                this.partner = null;
+            } else if (partner.isEmpty()) {
+                this.partner = Optional.empty();
+            } else {
+                this.partner = Optional.of(partner.get());
+            }
+            return this;
+        }
+
+        /**
+         * <p>The account's active first-tier partner. Present on retrieve responses; null when no active first-tier partner is attributed to the account. Omitted from other responses.</p>
+         * @return Reference to {@code this} so that method calls can be chained together.
+         */
+        @java.lang.Override
+        public _FinalStage partner(AccountPartner partner) {
+            this.partner = Optional.ofNullable(partner);
+            return this;
+        }
+
+        /**
+         * <p>The account's active first-tier partner. Present on retrieve responses; null when no active first-tier partner is attributed to the account. Omitted from other responses.</p>
+         */
+        @java.lang.Override
+        @JsonSetter(value = "partner", nulls = Nulls.SKIP)
+        public _FinalStage partner(Optional<AccountPartner> partner) {
+            this.partner = partner;
+            return this;
+        }
+
+        /**
+         * <p>Parent account for subaccounts, or <code>null</code> for standalone accounts.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
@@ -2595,7 +3709,7 @@ public final class Account {
         }
 
         /**
-         * <p>Parent account for connected accounts, or <code>null</code> for standalone accounts.</p>
+         * <p>Parent account for subaccounts, or <code>null</code> for standalone accounts.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
@@ -2605,7 +3719,7 @@ public final class Account {
         }
 
         /**
-         * <p>Parent account for connected accounts, or <code>null</code> for standalone accounts.</p>
+         * <p>Parent account for subaccounts, or <code>null</code> for standalone accounts.</p>
          */
         @java.lang.Override
         @JsonSetter(value = "parent_account", nulls = Nulls.SKIP)
@@ -2866,6 +3980,42 @@ public final class Account {
         }
 
         /**
+         * <p>The Whop Levels progress of the account's <code>owner</code>, counted across every account they own, so all of them show the same level. Computed only on <code>retrieve</code> and <code>me</code> for callers with <code>company:basic:read</code> scope; <code>null</code> otherwise, and when the account is not in Whop Levels.</p>
+         * @return Reference to {@code this} so that method calls can be chained together.
+         */
+        @java.lang.Override
+        public _FinalStage level(Nullable<AccountLevel> level) {
+            if (level.isNull()) {
+                this.level = null;
+            } else if (level.isEmpty()) {
+                this.level = Optional.empty();
+            } else {
+                this.level = Optional.of(level.get());
+            }
+            return this;
+        }
+
+        /**
+         * <p>The Whop Levels progress of the account's <code>owner</code>, counted across every account they own, so all of them show the same level. Computed only on <code>retrieve</code> and <code>me</code> for callers with <code>company:basic:read</code> scope; <code>null</code> otherwise, and when the account is not in Whop Levels.</p>
+         * @return Reference to {@code this} so that method calls can be chained together.
+         */
+        @java.lang.Override
+        public _FinalStage level(AccountLevel level) {
+            this.level = Optional.ofNullable(level);
+            return this;
+        }
+
+        /**
+         * <p>The Whop Levels progress of the account's <code>owner</code>, counted across every account they own, so all of them show the same level. Computed only on <code>retrieve</code> and <code>me</code> for callers with <code>company:basic:read</code> scope; <code>null</code> otherwise, and when the account is not in Whop Levels.</p>
+         */
+        @java.lang.Override
+        @JsonSetter(value = "level", nulls = Nulls.SKIP)
+        public _FinalStage level(Optional<AccountLevel> level) {
+            this.level = level;
+            return this;
+        }
+
+        /**
          * <p>Prefix used for account invoices.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
@@ -2902,7 +4052,7 @@ public final class Account {
         }
 
         /**
-         * <p>Specific industry vertical for the account. See the <a href="/api-reference/beta/accounts/account#business-types-and-industries-glossary">business types and industries glossary</a> for valid values.</p>
+         * <p>Specific industry vertical for the account. See the <a href="/api-reference/accounts/account#business-types-and-industries-glossary">business types and industries glossary</a> for valid values.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
@@ -2918,7 +4068,7 @@ public final class Account {
         }
 
         /**
-         * <p>Specific industry vertical for the account. See the <a href="/api-reference/beta/accounts/account#business-types-and-industries-glossary">business types and industries glossary</a> for valid values.</p>
+         * <p>Specific industry vertical for the account. See the <a href="/api-reference/accounts/account#business-types-and-industries-glossary">business types and industries glossary</a> for valid values.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
@@ -2928,48 +4078,12 @@ public final class Account {
         }
 
         /**
-         * <p>Specific industry vertical for the account. See the <a href="/api-reference/beta/accounts/account#business-types-and-industries-glossary">business types and industries glossary</a> for valid values.</p>
+         * <p>Specific industry vertical for the account. See the <a href="/api-reference/accounts/account#business-types-and-industries-glossary">business types and industries glossary</a> for valid values.</p>
          */
         @java.lang.Override
         @JsonSetter(value = "industry_type", nulls = Nulls.SKIP)
         public _FinalStage industryType(Optional<String> industryType) {
             this.industryType = industryType;
-            return this;
-        }
-
-        /**
-         * <p>Account industry group. See the <a href="/api-reference/beta/accounts/account#business-types-and-industries-glossary">business types and industries glossary</a> for valid values.</p>
-         * @return Reference to {@code this} so that method calls can be chained together.
-         */
-        @java.lang.Override
-        public _FinalStage industryGroup(Nullable<AccountIndustryGroup> industryGroup) {
-            if (industryGroup.isNull()) {
-                this.industryGroup = null;
-            } else if (industryGroup.isEmpty()) {
-                this.industryGroup = Optional.empty();
-            } else {
-                this.industryGroup = Optional.of(industryGroup.get());
-            }
-            return this;
-        }
-
-        /**
-         * <p>Account industry group. See the <a href="/api-reference/beta/accounts/account#business-types-and-industries-glossary">business types and industries glossary</a> for valid values.</p>
-         * @return Reference to {@code this} so that method calls can be chained together.
-         */
-        @java.lang.Override
-        public _FinalStage industryGroup(AccountIndustryGroup industryGroup) {
-            this.industryGroup = Optional.ofNullable(industryGroup);
-            return this;
-        }
-
-        /**
-         * <p>Account industry group. See the <a href="/api-reference/beta/accounts/account#business-types-and-industries-glossary">business types and industries glossary</a> for valid values.</p>
-         */
-        @java.lang.Override
-        @JsonSetter(value = "industry_group", nulls = Nulls.SKIP)
-        public _FinalStage industryGroup(Optional<AccountIndustryGroup> industryGroup) {
-            this.industryGroup = industryGroup;
             return this;
         }
 
@@ -2994,6 +4108,150 @@ public final class Account {
             if (homePreferences != null) {
                 this.homePreferences.addAll(homePreferences);
             }
+            return this;
+        }
+
+        /**
+         * <p>When a suspended account can pay out its balance to its own payout method, as an ISO 8601 timestamp. A dispute can move it later. Computed on <code>retrieve</code>, <code>me</code>, and <code>suspend</code>; <code>null</code> otherwise, when <code>status</code> is not <code>suspended</code>, and when the suspension holds the balance.</p>
+         * @return Reference to {@code this} so that method calls can be chained together.
+         */
+        @java.lang.Override
+        public _FinalStage fundsReleaseAt(Nullable<String> fundsReleaseAt) {
+            if (fundsReleaseAt.isNull()) {
+                this.fundsReleaseAt = null;
+            } else if (fundsReleaseAt.isEmpty()) {
+                this.fundsReleaseAt = Optional.empty();
+            } else {
+                this.fundsReleaseAt = Optional.of(fundsReleaseAt.get());
+            }
+            return this;
+        }
+
+        /**
+         * <p>When a suspended account can pay out its balance to its own payout method, as an ISO 8601 timestamp. A dispute can move it later. Computed on <code>retrieve</code>, <code>me</code>, and <code>suspend</code>; <code>null</code> otherwise, when <code>status</code> is not <code>suspended</code>, and when the suspension holds the balance.</p>
+         * @return Reference to {@code this} so that method calls can be chained together.
+         */
+        @java.lang.Override
+        public _FinalStage fundsReleaseAt(String fundsReleaseAt) {
+            this.fundsReleaseAt = Optional.ofNullable(fundsReleaseAt);
+            return this;
+        }
+
+        /**
+         * <p>When a suspended account can pay out its balance to its own payout method, as an ISO 8601 timestamp. A dispute can move it later. Computed on <code>retrieve</code>, <code>me</code>, and <code>suspend</code>; <code>null</code> otherwise, when <code>status</code> is not <code>suspended</code>, and when the suspension holds the balance.</p>
+         */
+        @java.lang.Override
+        @JsonSetter(value = "funds_release_at", nulls = Nulls.SKIP)
+        public _FinalStage fundsReleaseAt(Optional<String> fundsReleaseAt) {
+            this.fundsReleaseAt = fundsReleaseAt;
+            return this;
+        }
+
+        /**
+         * <p>The account's most recent financing application. Computed only on <code>retrieve</code> and <code>me</code> for callers with <code>company:balance:read</code> scope; <code>null</code> otherwise, or when the account has never applied for financing.</p>
+         * @return Reference to {@code this} so that method calls can be chained together.
+         */
+        @java.lang.Override
+        public _FinalStage financing(Nullable<AccountFinancing> financing) {
+            if (financing.isNull()) {
+                this.financing = null;
+            } else if (financing.isEmpty()) {
+                this.financing = Optional.empty();
+            } else {
+                this.financing = Optional.of(financing.get());
+            }
+            return this;
+        }
+
+        /**
+         * <p>The account's most recent financing application. Computed only on <code>retrieve</code> and <code>me</code> for callers with <code>company:balance:read</code> scope; <code>null</code> otherwise, or when the account has never applied for financing.</p>
+         * @return Reference to {@code this} so that method calls can be chained together.
+         */
+        @java.lang.Override
+        public _FinalStage financing(AccountFinancing financing) {
+            this.financing = Optional.ofNullable(financing);
+            return this;
+        }
+
+        /**
+         * <p>The account's most recent financing application. Computed only on <code>retrieve</code> and <code>me</code> for callers with <code>company:balance:read</code> scope; <code>null</code> otherwise, or when the account has never applied for financing.</p>
+         */
+        @java.lang.Override
+        @JsonSetter(value = "financing", nulls = Nulls.SKIP)
+        public _FinalStage financing(Optional<AccountFinancing> financing) {
+            this.financing = financing;
+            return this;
+        }
+
+        /**
+         * <p>The parent platform's own identifier for this subaccount, unique among the platform's subaccounts. <code>null</code> when unset.</p>
+         * @return Reference to {@code this} so that method calls can be chained together.
+         */
+        @java.lang.Override
+        public _FinalStage externalId(Nullable<String> externalId) {
+            if (externalId.isNull()) {
+                this.externalId = null;
+            } else if (externalId.isEmpty()) {
+                this.externalId = Optional.empty();
+            } else {
+                this.externalId = Optional.of(externalId.get());
+            }
+            return this;
+        }
+
+        /**
+         * <p>The parent platform's own identifier for this subaccount, unique among the platform's subaccounts. <code>null</code> when unset.</p>
+         * @return Reference to {@code this} so that method calls can be chained together.
+         */
+        @java.lang.Override
+        public _FinalStage externalId(String externalId) {
+            this.externalId = Optional.ofNullable(externalId);
+            return this;
+        }
+
+        /**
+         * <p>The parent platform's own identifier for this subaccount, unique among the platform's subaccounts. <code>null</code> when unset.</p>
+         */
+        @java.lang.Override
+        @JsonSetter(value = "external_id", nulls = Nulls.SKIP)
+        public _FinalStage externalId(Optional<String> externalId) {
+            this.externalId = externalId;
+            return this;
+        }
+
+        /**
+         * <p>The account's end-user license agreement document, or <code>null</code> if they have not published one.</p>
+         * @return Reference to {@code this} so that method calls can be chained together.
+         */
+        @java.lang.Override
+        public _FinalStage eula(Nullable<File> eula) {
+            if (eula.isNull()) {
+                this.eula = null;
+            } else if (eula.isEmpty()) {
+                this.eula = Optional.empty();
+            } else {
+                this.eula = Optional.of(eula.get());
+            }
+            return this;
+        }
+
+        /**
+         * <p>The account's end-user license agreement document, or <code>null</code> if they have not published one.</p>
+         * @return Reference to {@code this} so that method calls can be chained together.
+         */
+        @java.lang.Override
+        public _FinalStage eula(File eula) {
+            this.eula = Optional.ofNullable(eula);
+            return this;
+        }
+
+        /**
+         * <p>The account's end-user license agreement document, or <code>null</code> if they have not published one.</p>
+         */
+        @java.lang.Override
+        @JsonSetter(value = "eula", nulls = Nulls.SKIP)
+        public _FinalStage eula(Optional<File> eula) {
+            this.eula = eula;
             return this;
         }
 
@@ -3034,6 +4292,26 @@ public final class Account {
         }
 
         /**
+         * <p>How many team members report to the business directly, with no manager above them. Present on single-account reads.</p>
+         * @return Reference to {@code this} so that method calls can be chained together.
+         */
+        @java.lang.Override
+        public _FinalStage directReportsCount(Integer directReportsCount) {
+            this.directReportsCount = Optional.ofNullable(directReportsCount);
+            return this;
+        }
+
+        /**
+         * <p>How many team members report to the business directly, with no manager above them. Present on single-account reads.</p>
+         */
+        @java.lang.Override
+        @JsonSetter(value = "direct_reports_count", nulls = Nulls.SKIP)
+        public _FinalStage directReportsCount(Optional<Integer> directReportsCount) {
+            this.directReportsCount = directReportsCount;
+            return this;
+        }
+
+        /**
          * <p>Account promotional description.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
@@ -3066,6 +4344,42 @@ public final class Account {
         @JsonSetter(value = "description", nulls = Nulls.SKIP)
         public _FinalStage description(Optional<String> description) {
             this.description = description;
+            return this;
+        }
+
+        /**
+         * <p>Distinct customers with a paid receipt at the account in the last 30 days, refreshed every few hours. Computed only on <code>retrieve</code> for callers with <code>stats:read</code> on the account; <code>null</code> otherwise, and when the count is unavailable.</p>
+         * @return Reference to {@code this} so that method calls can be chained together.
+         */
+        @java.lang.Override
+        public _FinalStage customersL30D(Nullable<Integer> customersL30D) {
+            if (customersL30D.isNull()) {
+                this.customersL30D = null;
+            } else if (customersL30D.isEmpty()) {
+                this.customersL30D = Optional.empty();
+            } else {
+                this.customersL30D = Optional.of(customersL30D.get());
+            }
+            return this;
+        }
+
+        /**
+         * <p>Distinct customers with a paid receipt at the account in the last 30 days, refreshed every few hours. Computed only on <code>retrieve</code> for callers with <code>stats:read</code> on the account; <code>null</code> otherwise, and when the count is unavailable.</p>
+         * @return Reference to {@code this} so that method calls can be chained together.
+         */
+        @java.lang.Override
+        public _FinalStage customersL30D(Integer customersL30D) {
+            this.customersL30D = Optional.ofNullable(customersL30D);
+            return this;
+        }
+
+        /**
+         * <p>Distinct customers with a paid receipt at the account in the last 30 days, refreshed every few hours. Computed only on <code>retrieve</code> for callers with <code>stats:read</code> on the account; <code>null</code> otherwise, and when the count is unavailable.</p>
+         */
+        @java.lang.Override
+        @JsonSetter(value = "customers_l30d", nulls = Nulls.SKIP)
+        public _FinalStage customersL30D(Optional<Integer> customersL30D) {
+            this.customersL30D = customersL30D;
             return this;
         }
 
@@ -3106,7 +4420,7 @@ public final class Account {
         }
 
         /**
-         * <p>Whop Cards application details for the account. Computed only on <code>retrieve</code> and <code>me</code> for callers with <code>company:balance:read</code> scope; <code>null</code> otherwise, or when the account has no card application.</p>
+         * <p>Whop Cards application details for the account. Returned on <code>list</code>, <code>retrieve</code>, and <code>me</code> for callers with <code>company:balance:read</code> scope; <code>null</code> otherwise, or when the account has no card application or blocking application review.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
@@ -3122,7 +4436,7 @@ public final class Account {
         }
 
         /**
-         * <p>Whop Cards application details for the account. Computed only on <code>retrieve</code> and <code>me</code> for callers with <code>company:balance:read</code> scope; <code>null</code> otherwise, or when the account has no card application.</p>
+         * <p>Whop Cards application details for the account. Returned on <code>list</code>, <code>retrieve</code>, and <code>me</code> for callers with <code>company:balance:read</code> scope; <code>null</code> otherwise, or when the account has no card application or blocking application review.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
@@ -3132,7 +4446,7 @@ public final class Account {
         }
 
         /**
-         * <p>Whop Cards application details for the account. Computed only on <code>retrieve</code> and <code>me</code> for callers with <code>company:balance:read</code> scope; <code>null</code> otherwise, or when the account has no card application.</p>
+         * <p>Whop Cards application details for the account. Returned on <code>list</code>, <code>retrieve</code>, and <code>me</code> for callers with <code>company:balance:read</code> scope; <code>null</code> otherwise, or when the account has no card application or blocking application review.</p>
          */
         @java.lang.Override
         @JsonSetter(value = "cards", nulls = Nulls.SKIP)
@@ -3178,11 +4492,47 @@ public final class Account {
         }
 
         /**
-         * <p>High-level business category for the account. See the <a href="/api-reference/beta/accounts/account#business-types-and-industries-glossary">business types and industries glossary</a> for valid values.</p>
+         * <p>The account's cancellation policy document, or <code>null</code> if they have not published one.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
-        public _FinalStage businessType(Nullable<AccountBusinessType> businessType) {
+        public _FinalStage cancellationPolicy(Nullable<File> cancellationPolicy) {
+            if (cancellationPolicy.isNull()) {
+                this.cancellationPolicy = null;
+            } else if (cancellationPolicy.isEmpty()) {
+                this.cancellationPolicy = Optional.empty();
+            } else {
+                this.cancellationPolicy = Optional.of(cancellationPolicy.get());
+            }
+            return this;
+        }
+
+        /**
+         * <p>The account's cancellation policy document, or <code>null</code> if they have not published one.</p>
+         * @return Reference to {@code this} so that method calls can be chained together.
+         */
+        @java.lang.Override
+        public _FinalStage cancellationPolicy(File cancellationPolicy) {
+            this.cancellationPolicy = Optional.ofNullable(cancellationPolicy);
+            return this;
+        }
+
+        /**
+         * <p>The account's cancellation policy document, or <code>null</code> if they have not published one.</p>
+         */
+        @java.lang.Override
+        @JsonSetter(value = "cancellation_policy", nulls = Nulls.SKIP)
+        public _FinalStage cancellationPolicy(Optional<File> cancellationPolicy) {
+            this.cancellationPolicy = cancellationPolicy;
+            return this;
+        }
+
+        /**
+         * <p>High-level business category for the account. See the <a href="/api-reference/accounts/account#business-types-and-industries-glossary">business types and industries glossary</a> for valid values.</p>
+         * @return Reference to {@code this} so that method calls can be chained together.
+         */
+        @java.lang.Override
+        public _FinalStage businessType(Nullable<String> businessType) {
             if (businessType.isNull()) {
                 this.businessType = null;
             } else if (businessType.isEmpty()) {
@@ -3194,21 +4544,21 @@ public final class Account {
         }
 
         /**
-         * <p>High-level business category for the account. See the <a href="/api-reference/beta/accounts/account#business-types-and-industries-glossary">business types and industries glossary</a> for valid values.</p>
+         * <p>High-level business category for the account. See the <a href="/api-reference/accounts/account#business-types-and-industries-glossary">business types and industries glossary</a> for valid values.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
-        public _FinalStage businessType(AccountBusinessType businessType) {
+        public _FinalStage businessType(String businessType) {
             this.businessType = Optional.ofNullable(businessType);
             return this;
         }
 
         /**
-         * <p>High-level business category for the account. See the <a href="/api-reference/beta/accounts/account#business-types-and-industries-glossary">business types and industries glossary</a> for valid values.</p>
+         * <p>High-level business category for the account. See the <a href="/api-reference/accounts/account#business-types-and-industries-glossary">business types and industries glossary</a> for valid values.</p>
          */
         @java.lang.Override
         @JsonSetter(value = "business_type", nulls = Nulls.SKIP)
-        public _FinalStage businessType(Optional<AccountBusinessType> businessType) {
+        public _FinalStage businessType(Optional<String> businessType) {
             this.businessType = businessType;
             return this;
         }
@@ -3345,49 +4695,102 @@ public final class Account {
             return this;
         }
 
+        /**
+         * <p>Lifetime charged ad spend for the account, in USD. Computed only on <code>list</code> for callers with <code>stats:read</code> on the account; <code>null</code> otherwise.</p>
+         * @return Reference to {@code this} so that method calls can be chained together.
+         */
+        @java.lang.Override
+        public _FinalStage adsSpendUsd(Nullable<Double> adsSpendUsd) {
+            if (adsSpendUsd.isNull()) {
+                this.adsSpendUsd = null;
+            } else if (adsSpendUsd.isEmpty()) {
+                this.adsSpendUsd = Optional.empty();
+            } else {
+                this.adsSpendUsd = Optional.of(adsSpendUsd.get());
+            }
+            return this;
+        }
+
+        /**
+         * <p>Lifetime charged ad spend for the account, in USD. Computed only on <code>list</code> for callers with <code>stats:read</code> on the account; <code>null</code> otherwise.</p>
+         * @return Reference to {@code this} so that method calls can be chained together.
+         */
+        @java.lang.Override
+        public _FinalStage adsSpendUsd(Double adsSpendUsd) {
+            this.adsSpendUsd = Optional.ofNullable(adsSpendUsd);
+            return this;
+        }
+
+        /**
+         * <p>Lifetime charged ad spend for the account, in USD. Computed only on <code>list</code> for callers with <code>stats:read</code> on the account; <code>null</code> otherwise.</p>
+         */
+        @java.lang.Override
+        @JsonSetter(value = "ads_spend_usd", nulls = Nulls.SKIP)
+        public _FinalStage adsSpendUsd(Optional<Double> adsSpendUsd) {
+            this.adsSpendUsd = adsSpendUsd;
+            return this;
+        }
+
         @java.lang.Override
         public Account build() {
             return new Account(
+                    adsSpendUsd,
                     balances,
                     bannerImageUrl,
                     businessAddress,
                     businessName,
                     businessType,
                     canTransferPendingBalanceToChildren,
+                    cancellationPolicy,
                     capabilities,
                     cards,
                     collectVatId,
                     companyFormation,
                     country,
                     createdAt,
+                    customersL30D,
                     description,
+                    directReportsCount,
+                    disputeFighterEnabled,
+                    economicIntelligence,
                     email,
+                    eula,
+                    externalId,
+                    financing,
+                    fundsReleaseAt,
                     homePreferences,
                     id,
-                    industryGroup,
                     industryType,
                     invoicePrefix,
+                    level,
                     logoUrl,
                     metadata,
                     onboardingType,
                     opengraphImageUrl,
                     opengraphImageVariant,
+                    orchestrationEnabled,
                     otherBusinessDescription,
                     otherIndustryDescription,
                     owner,
                     parentAccount,
+                    partner,
                     paymentControls,
+                    paymentMethodConfiguration,
+                    platformCredits,
+                    privacyPolicy,
                     productTaxCode,
                     recommendedActions,
                     require2Fa,
                     requiredActions,
+                    returnPolicy,
+                    rewards,
                     route,
                     sendCustomerEmails,
+                    shippingPolicy,
                     showJoinedWhops,
                     showReviewsDtc,
                     showUserDirectory,
                     socialLinks,
-                    stablecoinRails,
                     status,
                     statusReason,
                     storePageConfig,
@@ -3396,15 +4799,105 @@ public final class Account {
                     taxIdentifiers,
                     taxRemittedBy,
                     taxType,
+                    termsOfService,
                     threeDsLevel,
                     title,
                     totalEarnedUsd,
                     totalUsd,
+                    trading,
                     useLogoAsOpengraphImageFallback,
                     verification,
+                    volumeL30DUsd,
                     volumeUsd,
                     wallet,
+                    website,
+                    whopPartnerEnabledAt,
                     additionalProperties);
+        }
+
+        @JsonAnySetter
+        private void putAdditionalPropertyFromJson(String key, Object value) {
+            if (key.equalsIgnoreCase("ads_spend_usd")
+                    || key.equalsIgnoreCase("balances")
+                    || key.equalsIgnoreCase("banner_image_url")
+                    || key.equalsIgnoreCase("business_address")
+                    || key.equalsIgnoreCase("business_name")
+                    || key.equalsIgnoreCase("business_type")
+                    || key.equalsIgnoreCase("can_transfer_pending_balance_to_children")
+                    || key.equalsIgnoreCase("cancellation_policy")
+                    || key.equalsIgnoreCase("capabilities")
+                    || key.equalsIgnoreCase("cards")
+                    || key.equalsIgnoreCase("collect_vat_id")
+                    || key.equalsIgnoreCase("company_formation")
+                    || key.equalsIgnoreCase("country")
+                    || key.equalsIgnoreCase("created_at")
+                    || key.equalsIgnoreCase("customers_l30d")
+                    || key.equalsIgnoreCase("description")
+                    || key.equalsIgnoreCase("direct_reports_count")
+                    || key.equalsIgnoreCase("dispute_fighter_enabled")
+                    || key.equalsIgnoreCase("economic_intelligence")
+                    || key.equalsIgnoreCase("email")
+                    || key.equalsIgnoreCase("eula")
+                    || key.equalsIgnoreCase("external_id")
+                    || key.equalsIgnoreCase("financing")
+                    || key.equalsIgnoreCase("funds_release_at")
+                    || key.equalsIgnoreCase("home_preferences")
+                    || key.equalsIgnoreCase("id")
+                    || key.equalsIgnoreCase("industry_type")
+                    || key.equalsIgnoreCase("invoice_prefix")
+                    || key.equalsIgnoreCase("level")
+                    || key.equalsIgnoreCase("logo_url")
+                    || key.equalsIgnoreCase("metadata")
+                    || key.equalsIgnoreCase("onboarding_type")
+                    || key.equalsIgnoreCase("opengraph_image_url")
+                    || key.equalsIgnoreCase("opengraph_image_variant")
+                    || key.equalsIgnoreCase("orchestration_enabled")
+                    || key.equalsIgnoreCase("other_business_description")
+                    || key.equalsIgnoreCase("other_industry_description")
+                    || key.equalsIgnoreCase("owner")
+                    || key.equalsIgnoreCase("parent_account")
+                    || key.equalsIgnoreCase("partner")
+                    || key.equalsIgnoreCase("payment_controls")
+                    || key.equalsIgnoreCase("payment_method_configuration")
+                    || key.equalsIgnoreCase("platform_credits")
+                    || key.equalsIgnoreCase("privacy_policy")
+                    || key.equalsIgnoreCase("product_tax_code")
+                    || key.equalsIgnoreCase("recommended_actions")
+                    || key.equalsIgnoreCase("require_2fa")
+                    || key.equalsIgnoreCase("required_actions")
+                    || key.equalsIgnoreCase("return_policy")
+                    || key.equalsIgnoreCase("rewards")
+                    || key.equalsIgnoreCase("route")
+                    || key.equalsIgnoreCase("send_customer_emails")
+                    || key.equalsIgnoreCase("shipping_policy")
+                    || key.equalsIgnoreCase("show_joined_whops")
+                    || key.equalsIgnoreCase("show_reviews_dtc")
+                    || key.equalsIgnoreCase("show_user_directory")
+                    || key.equalsIgnoreCase("social_links")
+                    || key.equalsIgnoreCase("status")
+                    || key.equalsIgnoreCase("status_reason")
+                    || key.equalsIgnoreCase("store_page_config")
+                    || key.equalsIgnoreCase("target_audience")
+                    || key.equalsIgnoreCase("tax_collection_enabled_states")
+                    || key.equalsIgnoreCase("tax_identifiers")
+                    || key.equalsIgnoreCase("tax_remitted_by")
+                    || key.equalsIgnoreCase("tax_type")
+                    || key.equalsIgnoreCase("terms_of_service")
+                    || key.equalsIgnoreCase("three_ds_level")
+                    || key.equalsIgnoreCase("title")
+                    || key.equalsIgnoreCase("total_earned_usd")
+                    || key.equalsIgnoreCase("total_usd")
+                    || key.equalsIgnoreCase("trading")
+                    || key.equalsIgnoreCase("use_logo_as_opengraph_image_fallback")
+                    || key.equalsIgnoreCase("verification")
+                    || key.equalsIgnoreCase("volume_l30d_usd")
+                    || key.equalsIgnoreCase("volume_usd")
+                    || key.equalsIgnoreCase("wallet")
+                    || key.equalsIgnoreCase("website")
+                    || key.equalsIgnoreCase("whop_partner_enabled_at")) {
+                return;
+            }
+            this.additionalProperties.put(key, value);
         }
 
         @java.lang.Override

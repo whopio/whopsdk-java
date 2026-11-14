@@ -88,7 +88,6 @@ public final class UpdateCourseLessonsRequestAssessmentQuestionsItemImage {
     public static final class Builder implements IdStage, _FinalStage {
         private String id;
 
-        @JsonAnySetter
         private Map<String, Object> additionalProperties = new HashMap<>();
 
         private Builder() {}
@@ -100,7 +99,6 @@ public final class UpdateCourseLessonsRequestAssessmentQuestionsItemImage {
         }
 
         /**
-         * <p>The ID of an existing file object.</p>
          * <p>The ID of an existing file object.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
@@ -114,6 +112,14 @@ public final class UpdateCourseLessonsRequestAssessmentQuestionsItemImage {
         @java.lang.Override
         public UpdateCourseLessonsRequestAssessmentQuestionsItemImage build() {
             return new UpdateCourseLessonsRequestAssessmentQuestionsItemImage(id, additionalProperties);
+        }
+
+        @JsonAnySetter
+        private void putAdditionalPropertyFromJson(String key, Object value) {
+            if (key.equalsIgnoreCase("id")) {
+                return;
+            }
+            this.additionalProperties.put(key, value);
         }
 
         @java.lang.Override

@@ -130,7 +130,6 @@ public final class ListOverridesRequest {
 
         private Optional<AffiliateOverrideRoles> overrideType = Optional.empty();
 
-        @JsonAnySetter
         private Map<String, Object> additionalProperties = new HashMap<>();
 
         private Builder() {}
@@ -213,6 +212,18 @@ public final class ListOverridesRequest {
 
         public ListOverridesRequest build() {
             return new ListOverridesRequest(after, before, first, last, overrideType, additionalProperties);
+        }
+
+        @JsonAnySetter
+        private void putAdditionalPropertyFromJson(String key, Object value) {
+            if (key.equalsIgnoreCase("after")
+                    || key.equalsIgnoreCase("before")
+                    || key.equalsIgnoreCase("first")
+                    || key.equalsIgnoreCase("last")
+                    || key.equalsIgnoreCase("override_type")) {
+                return;
+            }
+            this.additionalProperties.put(key, value);
         }
 
         public Builder additionalProperty(String key, Object value) {

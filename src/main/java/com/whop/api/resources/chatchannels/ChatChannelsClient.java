@@ -30,7 +30,7 @@ public class ChatChannelsClient {
     }
 
     /**
-     * Returns a paginated list of chat channels within a specific company, with optional filtering by product.
+     * Lists the chat channels in an account.
      * <p>Required permissions:</p>
      * <ul>
      * <li><code>chat:read</code></li>
@@ -41,7 +41,7 @@ public class ChatChannelsClient {
     }
 
     /**
-     * Returns a paginated list of chat channels within a specific company, with optional filtering by product.
+     * Lists the chat channels in an account.
      * <p>Required permissions:</p>
      * <ul>
      * <li><code>chat:read</code></li>
@@ -97,7 +97,7 @@ public class ChatChannelsClient {
     }
 
     /**
-     * Update moderation settings for a chat channel, such as who can post, banned words, and media restrictions.
+     * Updates a chat channel's moderation settings, such as who can post, banned words, and media restrictions.
      * <p>Required permissions:</p>
      * <ul>
      * <li><code>chat:moderate</code></li>
@@ -108,7 +108,7 @@ public class ChatChannelsClient {
     }
 
     /**
-     * Update moderation settings for a chat channel, such as who can post, banned words, and media restrictions.
+     * Updates a chat channel's moderation settings, such as who can post, banned words, and media restrictions.
      * <p>Required permissions:</p>
      * <ul>
      * <li><code>chat:moderate</code></li>
@@ -119,7 +119,7 @@ public class ChatChannelsClient {
     }
 
     /**
-     * Update moderation settings for a chat channel, such as who can post, banned words, and media restrictions.
+     * Updates a chat channel's moderation settings, such as who can post, banned words, and media restrictions.
      * <p>Required permissions:</p>
      * <ul>
      * <li><code>chat:moderate</code></li>
@@ -130,7 +130,7 @@ public class ChatChannelsClient {
     }
 
     /**
-     * Update moderation settings for a chat channel, such as who can post, banned words, and media restrictions.
+     * Updates a chat channel's moderation settings, such as who can post, banned words, and media restrictions.
      * <p>Required permissions:</p>
      * <ul>
      * <li><code>chat:moderate</code></li>

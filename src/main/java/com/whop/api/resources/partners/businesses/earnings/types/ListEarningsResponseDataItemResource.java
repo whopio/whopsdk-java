@@ -39,6 +39,14 @@ public final class ListEarningsResponseDataItemResource {
         } else if (this.type == 1) {
             return visitor.visit((ListEarningsResponseDataItemResourceOne) this.value);
         } else if (this.type == 2) {
+            return visitor.visit((ListEarningsResponseDataItemResourceTwo) this.value);
+        } else if (this.type == 3) {
+            return visitor.visit((ListEarningsResponseDataItemResourceMerchantName) this.value);
+        } else if (this.type == 4) {
+            return visitor.visit((ListEarningsResponseDataItemResourceSlug) this.value);
+        } else if (this.type == 5) {
+            return visitor.visit((ListEarningsResponseDataItemResourceFive) this.value);
+        } else if (this.type == 6) {
             return visitor.visit((ListEarningsResponseDataItemResourceCreatedAt) this.value);
         }
         throw new IllegalStateException("Failed to visit value. This should never happen.");
@@ -74,14 +82,38 @@ public final class ListEarningsResponseDataItemResource {
         return new ListEarningsResponseDataItemResource(value, 1);
     }
 
-    public static ListEarningsResponseDataItemResource of(ListEarningsResponseDataItemResourceCreatedAt value) {
+    public static ListEarningsResponseDataItemResource of(ListEarningsResponseDataItemResourceTwo value) {
         return new ListEarningsResponseDataItemResource(value, 2);
+    }
+
+    public static ListEarningsResponseDataItemResource of(ListEarningsResponseDataItemResourceMerchantName value) {
+        return new ListEarningsResponseDataItemResource(value, 3);
+    }
+
+    public static ListEarningsResponseDataItemResource of(ListEarningsResponseDataItemResourceSlug value) {
+        return new ListEarningsResponseDataItemResource(value, 4);
+    }
+
+    public static ListEarningsResponseDataItemResource of(ListEarningsResponseDataItemResourceFive value) {
+        return new ListEarningsResponseDataItemResource(value, 5);
+    }
+
+    public static ListEarningsResponseDataItemResource of(ListEarningsResponseDataItemResourceCreatedAt value) {
+        return new ListEarningsResponseDataItemResource(value, 6);
     }
 
     public interface Visitor<T> {
         T visit(Optional<ListEarningsResponseDataItemResourceAlternativePaymentMethod> value);
 
         T visit(ListEarningsResponseDataItemResourceOne value);
+
+        T visit(ListEarningsResponseDataItemResourceTwo value);
+
+        T visit(ListEarningsResponseDataItemResourceMerchantName value);
+
+        T visit(ListEarningsResponseDataItemResourceSlug value);
+
+        T visit(ListEarningsResponseDataItemResourceFive value);
 
         T visit(ListEarningsResponseDataItemResourceCreatedAt value);
     }
@@ -108,7 +140,50 @@ public final class ListEarningsResponseDataItemResource {
             }
             if (value instanceof Map<?, ?>
                     && ((Map<?, ?>) value).containsKey("created_at")
+                    && ((Map<?, ?>) value).containsKey("currency")
                     && ((Map<?, ?>) value).containsKey("id")
+                    && ((Map<?, ?>) value).containsKey("object")) {
+                try {
+                    return of(ObjectMappers.JSON_MAPPER.convertValue(
+                            value, ListEarningsResponseDataItemResourceTwo.class));
+                } catch (RuntimeException e) {
+                }
+            }
+            if (value instanceof Map<?, ?>
+                    && ((Map<?, ?>) value).containsKey("created_at")
+                    && ((Map<?, ?>) value).containsKey("id")
+                    && ((Map<?, ?>) value).containsKey("object")) {
+                try {
+                    return of(ObjectMappers.JSON_MAPPER.convertValue(
+                            value, ListEarningsResponseDataItemResourceMerchantName.class));
+                } catch (RuntimeException e) {
+                }
+            }
+            if (value instanceof Map<?, ?>
+                    && ((Map<?, ?>) value).containsKey("business_id")
+                    && ((Map<?, ?>) value).containsKey("created_at")
+                    && ((Map<?, ?>) value).containsKey("object")) {
+                try {
+                    return of(ObjectMappers.JSON_MAPPER.convertValue(
+                            value, ListEarningsResponseDataItemResourceSlug.class));
+                } catch (RuntimeException e) {
+                }
+            }
+            if (value instanceof Map<?, ?>
+                    && ((Map<?, ?>) value).containsKey("business_id")
+                    && ((Map<?, ?>) value).containsKey("created_at")
+                    && ((Map<?, ?>) value).containsKey("id")
+                    && ((Map<?, ?>) value).containsKey("object")) {
+                try {
+                    return of(ObjectMappers.JSON_MAPPER.convertValue(
+                            value, ListEarningsResponseDataItemResourceFive.class));
+                } catch (RuntimeException e) {
+                }
+            }
+            if (value instanceof Map<?, ?>
+                    && ((Map<?, ?>) value).containsKey("created_at")
+                    && ((Map<?, ?>) value).containsKey("id")
+                    && ((Map<?, ?>) value).containsKey("income_source")
                     && ((Map<?, ?>) value).containsKey("object")) {
                 try {
                     return of(ObjectMappers.JSON_MAPPER.convertValue(

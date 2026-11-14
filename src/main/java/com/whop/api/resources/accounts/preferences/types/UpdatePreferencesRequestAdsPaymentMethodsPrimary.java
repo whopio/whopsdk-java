@@ -112,7 +112,6 @@ public final class UpdatePreferencesRequestAdsPaymentMethodsPrimary {
 
         private Optional<String> id = Optional.empty();
 
-        @JsonAnySetter
         private Map<String, Object> additionalProperties = new HashMap<>();
 
         private Builder() {}
@@ -125,7 +124,6 @@ public final class UpdatePreferencesRequestAdsPaymentMethodsPrimary {
         }
 
         /**
-         * <p>The funding source kind.</p>
          * <p>The funding source kind.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
@@ -159,6 +157,14 @@ public final class UpdatePreferencesRequestAdsPaymentMethodsPrimary {
         @java.lang.Override
         public UpdatePreferencesRequestAdsPaymentMethodsPrimary build() {
             return new UpdatePreferencesRequestAdsPaymentMethodsPrimary(id, type, additionalProperties);
+        }
+
+        @JsonAnySetter
+        private void putAdditionalPropertyFromJson(String key, Object value) {
+            if (key.equalsIgnoreCase("id") || key.equalsIgnoreCase("type")) {
+                return;
+            }
+            this.additionalProperties.put(key, value);
         }
 
         @java.lang.Override

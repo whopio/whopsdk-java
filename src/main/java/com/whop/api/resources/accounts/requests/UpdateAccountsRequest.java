@@ -17,18 +17,22 @@ import com.whop.api.core.NullableNonemptyFilter;
 import com.whop.api.core.ObjectMappers;
 import com.whop.api.resources.accounts.types.UpdateAccountsRequestBannerImage;
 import com.whop.api.resources.accounts.types.UpdateAccountsRequestBusinessAddress;
-import com.whop.api.resources.accounts.types.UpdateAccountsRequestBusinessType;
+import com.whop.api.resources.accounts.types.UpdateAccountsRequestCancellationPolicy;
+import com.whop.api.resources.accounts.types.UpdateAccountsRequestEula;
 import com.whop.api.resources.accounts.types.UpdateAccountsRequestHomePreferencesItem;
-import com.whop.api.resources.accounts.types.UpdateAccountsRequestIndustryGroup;
 import com.whop.api.resources.accounts.types.UpdateAccountsRequestLogo;
 import com.whop.api.resources.accounts.types.UpdateAccountsRequestOnboardingType;
 import com.whop.api.resources.accounts.types.UpdateAccountsRequestOpengraphImage;
 import com.whop.api.resources.accounts.types.UpdateAccountsRequestOpengraphImageVariant;
+import com.whop.api.resources.accounts.types.UpdateAccountsRequestPrivacyPolicy;
+import com.whop.api.resources.accounts.types.UpdateAccountsRequestReturnPolicy;
+import com.whop.api.resources.accounts.types.UpdateAccountsRequestShippingPolicy;
 import com.whop.api.resources.accounts.types.UpdateAccountsRequestStorePageConfig;
 import com.whop.api.resources.accounts.types.UpdateAccountsRequestTaxCollectionEnabledStatesItem;
 import com.whop.api.resources.accounts.types.UpdateAccountsRequestTaxIdentifiersItem;
 import com.whop.api.resources.accounts.types.UpdateAccountsRequestTaxRemittedBy;
 import com.whop.api.resources.accounts.types.UpdateAccountsRequestTaxType;
+import com.whop.api.resources.accounts.types.UpdateAccountsRequestTermsOfService;
 import com.whop.api.resources.accounts.types.UpdateAccountsRequestThreeDsLevel;
 import java.util.HashMap;
 import java.util.List;
@@ -49,7 +53,7 @@ public final class UpdateAccountsRequest {
 
     private final Optional<String> businessName;
 
-    private final Optional<UpdateAccountsRequestBusinessType> businessType;
+    private final Optional<UpdateAccountsRequestCancellationPolicy> cancellationPolicy;
 
     private final Optional<Boolean> collectVatId;
 
@@ -57,13 +61,15 @@ public final class UpdateAccountsRequest {
 
     private final Optional<String> description;
 
+    private final Optional<Boolean> disputeFighterEnabled;
+
+    private final Optional<UpdateAccountsRequestEula> eula;
+
+    private final Optional<String> externalId;
+
     private final Optional<String> featuredAffiliateProductId;
 
     private final Optional<List<UpdateAccountsRequestHomePreferencesItem>> homePreferences;
-
-    private final Optional<UpdateAccountsRequestIndustryGroup> industryGroup;
-
-    private final Optional<String> industryType;
 
     private final Optional<String> invoicePrefix;
 
@@ -77,17 +83,25 @@ public final class UpdateAccountsRequest {
 
     private final Optional<UpdateAccountsRequestOpengraphImageVariant> opengraphImageVariant;
 
+    private final Optional<Boolean> orchestrationEnabled;
+
     private final Optional<String> otherBusinessDescription;
 
     private final Optional<String> otherIndustryDescription;
+
+    private final Optional<UpdateAccountsRequestPrivacyPolicy> privacyPolicy;
 
     private final Optional<String> productTaxCodeId;
 
     private final Optional<Boolean> require2Fa;
 
+    private final Optional<UpdateAccountsRequestReturnPolicy> returnPolicy;
+
     private final Optional<String> route;
 
     private final Optional<Boolean> sendCustomerEmails;
+
+    private final Optional<UpdateAccountsRequestShippingPolicy> shippingPolicy;
 
     private final Optional<Boolean> showJoinedWhops;
 
@@ -109,11 +123,19 @@ public final class UpdateAccountsRequest {
 
     private final Optional<UpdateAccountsRequestTaxType> taxType;
 
+    private final Optional<UpdateAccountsRequestTermsOfService> termsOfService;
+
     private final Optional<UpdateAccountsRequestThreeDsLevel> threeDsLevel;
 
     private final Optional<String> title;
 
     private final Optional<Boolean> useLogoAsOpengraphImageFallback;
+
+    private final Optional<String> website;
+
+    private final Optional<Boolean> whopPartnerEnabled;
+
+    private final Optional<Object> industryType;
 
     private final Map<String, Object> additionalProperties;
 
@@ -123,26 +145,31 @@ public final class UpdateAccountsRequest {
             Optional<UpdateAccountsRequestBannerImage> bannerImage,
             Optional<UpdateAccountsRequestBusinessAddress> businessAddress,
             Optional<String> businessName,
-            Optional<UpdateAccountsRequestBusinessType> businessType,
+            Optional<UpdateAccountsRequestCancellationPolicy> cancellationPolicy,
             Optional<Boolean> collectVatId,
             Optional<String> country,
             Optional<String> description,
+            Optional<Boolean> disputeFighterEnabled,
+            Optional<UpdateAccountsRequestEula> eula,
+            Optional<String> externalId,
             Optional<String> featuredAffiliateProductId,
             Optional<List<UpdateAccountsRequestHomePreferencesItem>> homePreferences,
-            Optional<UpdateAccountsRequestIndustryGroup> industryGroup,
-            Optional<String> industryType,
             Optional<String> invoicePrefix,
             Optional<UpdateAccountsRequestLogo> logo,
             Optional<Map<String, Object>> metadata,
             Optional<UpdateAccountsRequestOnboardingType> onboardingType,
             Optional<UpdateAccountsRequestOpengraphImage> opengraphImage,
             Optional<UpdateAccountsRequestOpengraphImageVariant> opengraphImageVariant,
+            Optional<Boolean> orchestrationEnabled,
             Optional<String> otherBusinessDescription,
             Optional<String> otherIndustryDescription,
+            Optional<UpdateAccountsRequestPrivacyPolicy> privacyPolicy,
             Optional<String> productTaxCodeId,
             Optional<Boolean> require2Fa,
+            Optional<UpdateAccountsRequestReturnPolicy> returnPolicy,
             Optional<String> route,
             Optional<Boolean> sendCustomerEmails,
+            Optional<UpdateAccountsRequestShippingPolicy> shippingPolicy,
             Optional<Boolean> showJoinedWhops,
             Optional<Boolean> showReviewsDtc,
             Optional<Boolean> showUserDirectory,
@@ -153,35 +180,44 @@ public final class UpdateAccountsRequest {
             Optional<List<UpdateAccountsRequestTaxIdentifiersItem>> taxIdentifiers,
             Optional<UpdateAccountsRequestTaxRemittedBy> taxRemittedBy,
             Optional<UpdateAccountsRequestTaxType> taxType,
+            Optional<UpdateAccountsRequestTermsOfService> termsOfService,
             Optional<UpdateAccountsRequestThreeDsLevel> threeDsLevel,
             Optional<String> title,
             Optional<Boolean> useLogoAsOpengraphImageFallback,
+            Optional<String> website,
+            Optional<Boolean> whopPartnerEnabled,
+            Optional<Object> industryType,
             Map<String, Object> additionalProperties) {
         this.affiliateApplicationRequired = affiliateApplicationRequired;
         this.affiliateInstructions = affiliateInstructions;
         this.bannerImage = bannerImage;
         this.businessAddress = businessAddress;
         this.businessName = businessName;
-        this.businessType = businessType;
+        this.cancellationPolicy = cancellationPolicy;
         this.collectVatId = collectVatId;
         this.country = country;
         this.description = description;
+        this.disputeFighterEnabled = disputeFighterEnabled;
+        this.eula = eula;
+        this.externalId = externalId;
         this.featuredAffiliateProductId = featuredAffiliateProductId;
         this.homePreferences = homePreferences;
-        this.industryGroup = industryGroup;
-        this.industryType = industryType;
         this.invoicePrefix = invoicePrefix;
         this.logo = logo;
         this.metadata = metadata;
         this.onboardingType = onboardingType;
         this.opengraphImage = opengraphImage;
         this.opengraphImageVariant = opengraphImageVariant;
+        this.orchestrationEnabled = orchestrationEnabled;
         this.otherBusinessDescription = otherBusinessDescription;
         this.otherIndustryDescription = otherIndustryDescription;
+        this.privacyPolicy = privacyPolicy;
         this.productTaxCodeId = productTaxCodeId;
         this.require2Fa = require2Fa;
+        this.returnPolicy = returnPolicy;
         this.route = route;
         this.sendCustomerEmails = sendCustomerEmails;
+        this.shippingPolicy = shippingPolicy;
         this.showJoinedWhops = showJoinedWhops;
         this.showReviewsDtc = showReviewsDtc;
         this.showUserDirectory = showUserDirectory;
@@ -192,9 +228,13 @@ public final class UpdateAccountsRequest {
         this.taxIdentifiers = taxIdentifiers;
         this.taxRemittedBy = taxRemittedBy;
         this.taxType = taxType;
+        this.termsOfService = termsOfService;
         this.threeDsLevel = threeDsLevel;
         this.title = title;
         this.useLogoAsOpengraphImageFallback = useLogoAsOpengraphImageFallback;
+        this.website = website;
+        this.whopPartnerEnabled = whopPartnerEnabled;
+        this.industryType = industryType;
         this.additionalProperties = additionalProperties;
     }
 
@@ -248,14 +288,14 @@ public final class UpdateAccountsRequest {
     }
 
     /**
-     * @return High-level business category for the account. See the <a href="/api-reference/beta/accounts/account#business-types-and-industries-glossary">business types and industries glossary</a> for valid values.
+     * @return The account's cancellation policy document. Attached to new disputes as the cancellation policy evidence, with the terms of service as the fallback. PDF only. Pass a JSON object containing an <code>id</code> from <a href="/api-reference/files/create-file">Create File</a>, or <code>null</code> to remove it.
      */
     @JsonIgnore
-    public Optional<UpdateAccountsRequestBusinessType> getBusinessType() {
-        if (businessType == null) {
+    public Optional<UpdateAccountsRequestCancellationPolicy> getCancellationPolicy() {
+        if (cancellationPolicy == null) {
             return Optional.empty();
         }
-        return businessType;
+        return cancellationPolicy;
     }
 
     /**
@@ -289,6 +329,36 @@ public final class UpdateAccountsRequest {
     }
 
     /**
+     * @return Whether Whop assembles and files dispute evidence for this account. Enabling it opts into the success fee charged on disputes it wins. Requires payment:dispute. Omit to preserve the existing setting or creation default.
+     */
+    @JsonProperty("dispute_fighter_enabled")
+    public Optional<Boolean> getDisputeFighterEnabled() {
+        return disputeFighterEnabled;
+    }
+
+    /**
+     * @return The account's end-user license agreement document. PDF only. Pass a JSON object containing an <code>id</code> from <a href="/api-reference/files/create-file">Create File</a>, or <code>null</code> to remove it.
+     */
+    @JsonIgnore
+    public Optional<UpdateAccountsRequestEula> getEula() {
+        if (eula == null) {
+            return Optional.empty();
+        }
+        return eula;
+    }
+
+    /**
+     * @return Your platform's own identifier for this subaccount. It must be unique among your subaccounts, and a duplicate returns a 409. Only the parent account can set it. Pass <code>null</code> to clear.
+     */
+    @JsonIgnore
+    public Optional<String> getExternalId() {
+        if (externalId == null) {
+            return Optional.empty();
+        }
+        return externalId;
+    }
+
+    /**
      * @return The ID of the product to feature for affiliates. Pass <code>null</code> to clear.
      */
     @JsonIgnore
@@ -305,28 +375,6 @@ public final class UpdateAccountsRequest {
     @JsonProperty("home_preferences")
     public Optional<List<UpdateAccountsRequestHomePreferencesItem>> getHomePreferences() {
         return homePreferences;
-    }
-
-    /**
-     * @return Account industry group. See the <a href="/api-reference/beta/accounts/account#business-types-and-industries-glossary">business types and industries glossary</a> for valid values.
-     */
-    @JsonIgnore
-    public Optional<UpdateAccountsRequestIndustryGroup> getIndustryGroup() {
-        if (industryGroup == null) {
-            return Optional.empty();
-        }
-        return industryGroup;
-    }
-
-    /**
-     * @return Specific industry vertical for the account. See the <a href="/api-reference/beta/accounts/account#business-types-and-industries-glossary">business types and industries glossary</a> for valid values.
-     */
-    @JsonIgnore
-    public Optional<String> getIndustryType() {
-        if (industryType == null) {
-            return Optional.empty();
-        }
-        return industryType;
     }
 
     /**
@@ -393,6 +441,14 @@ public final class UpdateAccountsRequest {
     }
 
     /**
+     * @return Whether payment orchestration is enabled for this account. Requires payout:account:update. Omit to preserve the existing setting or creation default.
+     */
+    @JsonProperty("orchestration_enabled")
+    public Optional<Boolean> getOrchestrationEnabled() {
+        return orchestrationEnabled;
+    }
+
+    /**
      * @return The description of the business type when business_type is other.
      */
     @JsonIgnore
@@ -415,6 +471,17 @@ public final class UpdateAccountsRequest {
     }
 
     /**
+     * @return The account's privacy policy document. PDF only. Pass a JSON object containing an <code>id</code> from <a href="/api-reference/files/create-file">Create File</a>, or <code>null</code> to remove it.
+     */
+    @JsonIgnore
+    public Optional<UpdateAccountsRequestPrivacyPolicy> getPrivacyPolicy() {
+        if (privacyPolicy == null) {
+            return Optional.empty();
+        }
+        return privacyPolicy;
+    }
+
+    /**
      * @return ID of the tax classification code applied by default to the account's products. See the available <a href="https://docs.numeral.com/essentials/product-categories">product categories</a>.
      */
     @JsonIgnore
@@ -434,6 +501,17 @@ public final class UpdateAccountsRequest {
     }
 
     /**
+     * @return The account's return and refund policy document. Attached to new disputes as the refund policy evidence, with the terms of service as the fallback. PDF only. Pass a JSON object containing an <code>id</code> from <a href="/api-reference/files/create-file">Create File</a>, or <code>null</code> to remove it.
+     */
+    @JsonIgnore
+    public Optional<UpdateAccountsRequestReturnPolicy> getReturnPolicy() {
+        if (returnPolicy == null) {
+            return Optional.empty();
+        }
+        return returnPolicy;
+    }
+
+    /**
      * @return The unique URL slug for the account.
      */
     @JsonIgnore
@@ -450,6 +528,17 @@ public final class UpdateAccountsRequest {
     @JsonProperty("send_customer_emails")
     public Optional<Boolean> getSendCustomerEmails() {
         return sendCustomerEmails;
+    }
+
+    /**
+     * @return The account's shipping policy document. Sent with physical-goods dispute evidence. PDF only. Pass a JSON object containing an <code>id</code> from <a href="/api-reference/files/create-file">Create File</a>, or <code>null</code> to remove it.
+     */
+    @JsonIgnore
+    public Optional<UpdateAccountsRequestShippingPolicy> getShippingPolicy() {
+        if (shippingPolicy == null) {
+            return Optional.empty();
+        }
+        return shippingPolicy;
     }
 
     /**
@@ -515,7 +604,7 @@ public final class UpdateAccountsRequest {
     }
 
     /**
-     * @return Account tax/VAT registrations to add or update. When <code>tax_remitted_by</code> is <code>self</code>, tax is calculated and collected only in the countries where the account holds a registration.
+     * @return Tax IDs to add to the account, or to replace when the account already has one of that type. When <code>tax_remitted_by</code> is <code>self</code>, tax outside the US is calculated and collected only in the countries where the account has a tax ID. US collection follows <code>tax_collection_enabled_states</code>.
      */
     @JsonProperty("tax_identifiers")
     public Optional<List<UpdateAccountsRequestTaxIdentifiersItem>> getTaxIdentifiers() {
@@ -539,7 +628,18 @@ public final class UpdateAccountsRequest {
     }
 
     /**
-     * @return Account-level 3D Secure behavior. Set <code>mandate_challenge</code> to require cardholder verification on supported card payments, or <code>null</code> to use the standard checkout flow.
+     * @return The account's terms of service document. Attached to new disputes as the cancellation policy evidence when no cancellation policy is set. PDF only. Pass a JSON object containing an <code>id</code> from <a href="/api-reference/files/create-file">Create File</a>, or <code>null</code> to remove it.
+     */
+    @JsonIgnore
+    public Optional<UpdateAccountsRequestTermsOfService> getTermsOfService() {
+        if (termsOfService == null) {
+            return Optional.empty();
+        }
+        return termsOfService;
+    }
+
+    /**
+     * @return 3D Secure behavior for supported on-session card payments. <code>mandate_challenge</code> requires a 3DS challenge before payment processing; <code>mandate_if_required</code> mandates a challenge only when the payment processor requires it; <code>frictionless_if_required</code> uses the regular frictionless 3DS flow. Payments of $1,000 or more use <code>mandate_if_required</code> unless <code>mandate_challenge</code> is selected. Risk and authentication recovery requirements can override the preference. <code>null</code> uses the standard checkout flow.
      */
     @JsonIgnore
     public Optional<UpdateAccountsRequestThreeDsLevel> getThreeDsLevel() {
@@ -568,6 +668,30 @@ public final class UpdateAccountsRequest {
         return useLogoAsOpengraphImageFallback;
     }
 
+    /**
+     * @return The account's business website, as an <code>http</code> or <code>https</code> URL of at most 255 characters. Also added to the account's <code>social_links</code> as a <code>website</code> entry. Pass <code>null</code> to clear the website; existing social links are left unchanged.
+     */
+    @JsonIgnore
+    public Optional<String> getWebsite() {
+        if (website == null) {
+            return Optional.empty();
+        }
+        return website;
+    }
+
+    /**
+     * @return Set to <code>true</code> to turn on Whop Partner mode for the account, so its team can refer businesses and the account is paid partner commission on their sales. Recorded once; <code>false</code> is rejected. Only a verified Whop Partner can turn it on.
+     */
+    @JsonProperty("whop_partner_enabled")
+    public Optional<Boolean> getWhopPartnerEnabled() {
+        return whopPartnerEnabled;
+    }
+
+    @JsonProperty("industry_type")
+    public Optional<Object> getIndustryType() {
+        return industryType;
+    }
+
     @JsonInclude(value = JsonInclude.Include.CUSTOM, valueFilter = NullableNonemptyFilter.class)
     @JsonProperty("affiliate_instructions")
     private Optional<String> _getAffiliateInstructions() {
@@ -587,9 +711,9 @@ public final class UpdateAccountsRequest {
     }
 
     @JsonInclude(value = JsonInclude.Include.CUSTOM, valueFilter = NullableNonemptyFilter.class)
-    @JsonProperty("business_type")
-    private Optional<UpdateAccountsRequestBusinessType> _getBusinessType() {
-        return businessType;
+    @JsonProperty("cancellation_policy")
+    private Optional<UpdateAccountsRequestCancellationPolicy> _getCancellationPolicy() {
+        return cancellationPolicy;
     }
 
     @JsonInclude(value = JsonInclude.Include.CUSTOM, valueFilter = NullableNonemptyFilter.class)
@@ -605,21 +729,21 @@ public final class UpdateAccountsRequest {
     }
 
     @JsonInclude(value = JsonInclude.Include.CUSTOM, valueFilter = NullableNonemptyFilter.class)
+    @JsonProperty("eula")
+    private Optional<UpdateAccountsRequestEula> _getEula() {
+        return eula;
+    }
+
+    @JsonInclude(value = JsonInclude.Include.CUSTOM, valueFilter = NullableNonemptyFilter.class)
+    @JsonProperty("external_id")
+    private Optional<String> _getExternalId() {
+        return externalId;
+    }
+
+    @JsonInclude(value = JsonInclude.Include.CUSTOM, valueFilter = NullableNonemptyFilter.class)
     @JsonProperty("featured_affiliate_product_id")
     private Optional<String> _getFeaturedAffiliateProductId() {
         return featuredAffiliateProductId;
-    }
-
-    @JsonInclude(value = JsonInclude.Include.CUSTOM, valueFilter = NullableNonemptyFilter.class)
-    @JsonProperty("industry_group")
-    private Optional<UpdateAccountsRequestIndustryGroup> _getIndustryGroup() {
-        return industryGroup;
-    }
-
-    @JsonInclude(value = JsonInclude.Include.CUSTOM, valueFilter = NullableNonemptyFilter.class)
-    @JsonProperty("industry_type")
-    private Optional<String> _getIndustryType() {
-        return industryType;
     }
 
     @JsonInclude(value = JsonInclude.Include.CUSTOM, valueFilter = NullableNonemptyFilter.class)
@@ -665,15 +789,33 @@ public final class UpdateAccountsRequest {
     }
 
     @JsonInclude(value = JsonInclude.Include.CUSTOM, valueFilter = NullableNonemptyFilter.class)
+    @JsonProperty("privacy_policy")
+    private Optional<UpdateAccountsRequestPrivacyPolicy> _getPrivacyPolicy() {
+        return privacyPolicy;
+    }
+
+    @JsonInclude(value = JsonInclude.Include.CUSTOM, valueFilter = NullableNonemptyFilter.class)
     @JsonProperty("product_tax_code_id")
     private Optional<String> _getProductTaxCodeId() {
         return productTaxCodeId;
     }
 
     @JsonInclude(value = JsonInclude.Include.CUSTOM, valueFilter = NullableNonemptyFilter.class)
+    @JsonProperty("return_policy")
+    private Optional<UpdateAccountsRequestReturnPolicy> _getReturnPolicy() {
+        return returnPolicy;
+    }
+
+    @JsonInclude(value = JsonInclude.Include.CUSTOM, valueFilter = NullableNonemptyFilter.class)
     @JsonProperty("route")
     private Optional<String> _getRoute() {
         return route;
+    }
+
+    @JsonInclude(value = JsonInclude.Include.CUSTOM, valueFilter = NullableNonemptyFilter.class)
+    @JsonProperty("shipping_policy")
+    private Optional<UpdateAccountsRequestShippingPolicy> _getShippingPolicy() {
+        return shippingPolicy;
     }
 
     @JsonInclude(value = JsonInclude.Include.CUSTOM, valueFilter = NullableNonemptyFilter.class)
@@ -689,6 +831,12 @@ public final class UpdateAccountsRequest {
     }
 
     @JsonInclude(value = JsonInclude.Include.CUSTOM, valueFilter = NullableNonemptyFilter.class)
+    @JsonProperty("terms_of_service")
+    private Optional<UpdateAccountsRequestTermsOfService> _getTermsOfService() {
+        return termsOfService;
+    }
+
+    @JsonInclude(value = JsonInclude.Include.CUSTOM, valueFilter = NullableNonemptyFilter.class)
     @JsonProperty("three_ds_level")
     private Optional<UpdateAccountsRequestThreeDsLevel> _getThreeDsLevel() {
         return threeDsLevel;
@@ -698,6 +846,12 @@ public final class UpdateAccountsRequest {
     @JsonProperty("title")
     private Optional<String> _getTitle() {
         return title;
+    }
+
+    @JsonInclude(value = JsonInclude.Include.CUSTOM, valueFilter = NullableNonemptyFilter.class)
+    @JsonProperty("website")
+    private Optional<String> _getWebsite() {
+        return website;
     }
 
     @java.lang.Override
@@ -717,26 +871,31 @@ public final class UpdateAccountsRequest {
                 && bannerImage.equals(other.bannerImage)
                 && businessAddress.equals(other.businessAddress)
                 && businessName.equals(other.businessName)
-                && businessType.equals(other.businessType)
+                && cancellationPolicy.equals(other.cancellationPolicy)
                 && collectVatId.equals(other.collectVatId)
                 && country.equals(other.country)
                 && description.equals(other.description)
+                && disputeFighterEnabled.equals(other.disputeFighterEnabled)
+                && eula.equals(other.eula)
+                && externalId.equals(other.externalId)
                 && featuredAffiliateProductId.equals(other.featuredAffiliateProductId)
                 && homePreferences.equals(other.homePreferences)
-                && industryGroup.equals(other.industryGroup)
-                && industryType.equals(other.industryType)
                 && invoicePrefix.equals(other.invoicePrefix)
                 && logo.equals(other.logo)
                 && metadata.equals(other.metadata)
                 && onboardingType.equals(other.onboardingType)
                 && opengraphImage.equals(other.opengraphImage)
                 && opengraphImageVariant.equals(other.opengraphImageVariant)
+                && orchestrationEnabled.equals(other.orchestrationEnabled)
                 && otherBusinessDescription.equals(other.otherBusinessDescription)
                 && otherIndustryDescription.equals(other.otherIndustryDescription)
+                && privacyPolicy.equals(other.privacyPolicy)
                 && productTaxCodeId.equals(other.productTaxCodeId)
                 && require2Fa.equals(other.require2Fa)
+                && returnPolicy.equals(other.returnPolicy)
                 && route.equals(other.route)
                 && sendCustomerEmails.equals(other.sendCustomerEmails)
+                && shippingPolicy.equals(other.shippingPolicy)
                 && showJoinedWhops.equals(other.showJoinedWhops)
                 && showReviewsDtc.equals(other.showReviewsDtc)
                 && showUserDirectory.equals(other.showUserDirectory)
@@ -747,9 +906,13 @@ public final class UpdateAccountsRequest {
                 && taxIdentifiers.equals(other.taxIdentifiers)
                 && taxRemittedBy.equals(other.taxRemittedBy)
                 && taxType.equals(other.taxType)
+                && termsOfService.equals(other.termsOfService)
                 && threeDsLevel.equals(other.threeDsLevel)
                 && title.equals(other.title)
-                && useLogoAsOpengraphImageFallback.equals(other.useLogoAsOpengraphImageFallback);
+                && useLogoAsOpengraphImageFallback.equals(other.useLogoAsOpengraphImageFallback)
+                && website.equals(other.website)
+                && whopPartnerEnabled.equals(other.whopPartnerEnabled)
+                && industryType.equals(other.industryType);
     }
 
     @java.lang.Override
@@ -760,26 +923,31 @@ public final class UpdateAccountsRequest {
                 this.bannerImage,
                 this.businessAddress,
                 this.businessName,
-                this.businessType,
+                this.cancellationPolicy,
                 this.collectVatId,
                 this.country,
                 this.description,
+                this.disputeFighterEnabled,
+                this.eula,
+                this.externalId,
                 this.featuredAffiliateProductId,
                 this.homePreferences,
-                this.industryGroup,
-                this.industryType,
                 this.invoicePrefix,
                 this.logo,
                 this.metadata,
                 this.onboardingType,
                 this.opengraphImage,
                 this.opengraphImageVariant,
+                this.orchestrationEnabled,
                 this.otherBusinessDescription,
                 this.otherIndustryDescription,
+                this.privacyPolicy,
                 this.productTaxCodeId,
                 this.require2Fa,
+                this.returnPolicy,
                 this.route,
                 this.sendCustomerEmails,
+                this.shippingPolicy,
                 this.showJoinedWhops,
                 this.showReviewsDtc,
                 this.showUserDirectory,
@@ -790,9 +958,13 @@ public final class UpdateAccountsRequest {
                 this.taxIdentifiers,
                 this.taxRemittedBy,
                 this.taxType,
+                this.termsOfService,
                 this.threeDsLevel,
                 this.title,
-                this.useLogoAsOpengraphImageFallback);
+                this.useLogoAsOpengraphImageFallback,
+                this.website,
+                this.whopPartnerEnabled,
+                this.industryType);
     }
 
     @java.lang.Override
@@ -816,7 +988,7 @@ public final class UpdateAccountsRequest {
 
         private Optional<String> businessName = Optional.empty();
 
-        private Optional<UpdateAccountsRequestBusinessType> businessType = Optional.empty();
+        private Optional<UpdateAccountsRequestCancellationPolicy> cancellationPolicy = Optional.empty();
 
         private Optional<Boolean> collectVatId = Optional.empty();
 
@@ -824,13 +996,15 @@ public final class UpdateAccountsRequest {
 
         private Optional<String> description = Optional.empty();
 
+        private Optional<Boolean> disputeFighterEnabled = Optional.empty();
+
+        private Optional<UpdateAccountsRequestEula> eula = Optional.empty();
+
+        private Optional<String> externalId = Optional.empty();
+
         private Optional<String> featuredAffiliateProductId = Optional.empty();
 
         private Optional<List<UpdateAccountsRequestHomePreferencesItem>> homePreferences = Optional.empty();
-
-        private Optional<UpdateAccountsRequestIndustryGroup> industryGroup = Optional.empty();
-
-        private Optional<String> industryType = Optional.empty();
 
         private Optional<String> invoicePrefix = Optional.empty();
 
@@ -844,17 +1018,25 @@ public final class UpdateAccountsRequest {
 
         private Optional<UpdateAccountsRequestOpengraphImageVariant> opengraphImageVariant = Optional.empty();
 
+        private Optional<Boolean> orchestrationEnabled = Optional.empty();
+
         private Optional<String> otherBusinessDescription = Optional.empty();
 
         private Optional<String> otherIndustryDescription = Optional.empty();
+
+        private Optional<UpdateAccountsRequestPrivacyPolicy> privacyPolicy = Optional.empty();
 
         private Optional<String> productTaxCodeId = Optional.empty();
 
         private Optional<Boolean> require2Fa = Optional.empty();
 
+        private Optional<UpdateAccountsRequestReturnPolicy> returnPolicy = Optional.empty();
+
         private Optional<String> route = Optional.empty();
 
         private Optional<Boolean> sendCustomerEmails = Optional.empty();
+
+        private Optional<UpdateAccountsRequestShippingPolicy> shippingPolicy = Optional.empty();
 
         private Optional<Boolean> showJoinedWhops = Optional.empty();
 
@@ -877,13 +1059,20 @@ public final class UpdateAccountsRequest {
 
         private Optional<UpdateAccountsRequestTaxType> taxType = Optional.empty();
 
+        private Optional<UpdateAccountsRequestTermsOfService> termsOfService = Optional.empty();
+
         private Optional<UpdateAccountsRequestThreeDsLevel> threeDsLevel = Optional.empty();
 
         private Optional<String> title = Optional.empty();
 
         private Optional<Boolean> useLogoAsOpengraphImageFallback = Optional.empty();
 
-        @JsonAnySetter
+        private Optional<String> website = Optional.empty();
+
+        private Optional<Boolean> whopPartnerEnabled = Optional.empty();
+
+        private Optional<Object> industryType = Optional.empty();
+
         private Map<String, Object> additionalProperties = new HashMap<>();
 
         private Builder() {}
@@ -894,26 +1083,31 @@ public final class UpdateAccountsRequest {
             bannerImage(other.getBannerImage());
             businessAddress(other.getBusinessAddress());
             businessName(other.getBusinessName());
-            businessType(other.getBusinessType());
+            cancellationPolicy(other.getCancellationPolicy());
             collectVatId(other.getCollectVatId());
             country(other.getCountry());
             description(other.getDescription());
+            disputeFighterEnabled(other.getDisputeFighterEnabled());
+            eula(other.getEula());
+            externalId(other.getExternalId());
             featuredAffiliateProductId(other.getFeaturedAffiliateProductId());
             homePreferences(other.getHomePreferences());
-            industryGroup(other.getIndustryGroup());
-            industryType(other.getIndustryType());
             invoicePrefix(other.getInvoicePrefix());
             logo(other.getLogo());
             metadata(other.getMetadata());
             onboardingType(other.getOnboardingType());
             opengraphImage(other.getOpengraphImage());
             opengraphImageVariant(other.getOpengraphImageVariant());
+            orchestrationEnabled(other.getOrchestrationEnabled());
             otherBusinessDescription(other.getOtherBusinessDescription());
             otherIndustryDescription(other.getOtherIndustryDescription());
+            privacyPolicy(other.getPrivacyPolicy());
             productTaxCodeId(other.getProductTaxCodeId());
             require2Fa(other.getRequire2Fa());
+            returnPolicy(other.getReturnPolicy());
             route(other.getRoute());
             sendCustomerEmails(other.getSendCustomerEmails());
+            shippingPolicy(other.getShippingPolicy());
             showJoinedWhops(other.getShowJoinedWhops());
             showReviewsDtc(other.getShowReviewsDtc());
             showUserDirectory(other.getShowUserDirectory());
@@ -924,9 +1118,13 @@ public final class UpdateAccountsRequest {
             taxIdentifiers(other.getTaxIdentifiers());
             taxRemittedBy(other.getTaxRemittedBy());
             taxType(other.getTaxType());
+            termsOfService(other.getTermsOfService());
             threeDsLevel(other.getThreeDsLevel());
             title(other.getTitle());
             useLogoAsOpengraphImageFallback(other.getUseLogoAsOpengraphImageFallback());
+            website(other.getWebsite());
+            whopPartnerEnabled(other.getWhopPartnerEnabled());
+            industryType(other.getIndustryType());
             return this;
         }
 
@@ -1034,26 +1232,26 @@ public final class UpdateAccountsRequest {
         }
 
         /**
-         * <p>High-level business category for the account. See the <a href="/api-reference/beta/accounts/account#business-types-and-industries-glossary">business types and industries glossary</a> for valid values.</p>
+         * <p>The account's cancellation policy document. Attached to new disputes as the cancellation policy evidence, with the terms of service as the fallback. PDF only. Pass a JSON object containing an <code>id</code> from <a href="/api-reference/files/create-file">Create File</a>, or <code>null</code> to remove it.</p>
          */
-        @JsonSetter(value = "business_type", nulls = Nulls.SKIP)
-        public Builder businessType(Optional<UpdateAccountsRequestBusinessType> businessType) {
-            this.businessType = businessType;
+        @JsonSetter(value = "cancellation_policy", nulls = Nulls.SKIP)
+        public Builder cancellationPolicy(Optional<UpdateAccountsRequestCancellationPolicy> cancellationPolicy) {
+            this.cancellationPolicy = cancellationPolicy;
             return this;
         }
 
-        public Builder businessType(UpdateAccountsRequestBusinessType businessType) {
-            this.businessType = Optional.ofNullable(businessType);
+        public Builder cancellationPolicy(UpdateAccountsRequestCancellationPolicy cancellationPolicy) {
+            this.cancellationPolicy = Optional.ofNullable(cancellationPolicy);
             return this;
         }
 
-        public Builder businessType(Nullable<UpdateAccountsRequestBusinessType> businessType) {
-            if (businessType.isNull()) {
-                this.businessType = null;
-            } else if (businessType.isEmpty()) {
-                this.businessType = Optional.empty();
+        public Builder cancellationPolicy(Nullable<UpdateAccountsRequestCancellationPolicy> cancellationPolicy) {
+            if (cancellationPolicy.isNull()) {
+                this.cancellationPolicy = null;
+            } else if (cancellationPolicy.isEmpty()) {
+                this.cancellationPolicy = Optional.empty();
             } else {
-                this.businessType = Optional.of(businessType.get());
+                this.cancellationPolicy = Optional.of(cancellationPolicy.get());
             }
             return this;
         }
@@ -1123,6 +1321,70 @@ public final class UpdateAccountsRequest {
         }
 
         /**
+         * <p>Whether Whop assembles and files dispute evidence for this account. Enabling it opts into the success fee charged on disputes it wins. Requires payment:dispute. Omit to preserve the existing setting or creation default.</p>
+         */
+        @JsonSetter(value = "dispute_fighter_enabled", nulls = Nulls.SKIP)
+        public Builder disputeFighterEnabled(Optional<Boolean> disputeFighterEnabled) {
+            this.disputeFighterEnabled = disputeFighterEnabled;
+            return this;
+        }
+
+        public Builder disputeFighterEnabled(Boolean disputeFighterEnabled) {
+            this.disputeFighterEnabled = Optional.ofNullable(disputeFighterEnabled);
+            return this;
+        }
+
+        /**
+         * <p>The account's end-user license agreement document. PDF only. Pass a JSON object containing an <code>id</code> from <a href="/api-reference/files/create-file">Create File</a>, or <code>null</code> to remove it.</p>
+         */
+        @JsonSetter(value = "eula", nulls = Nulls.SKIP)
+        public Builder eula(Optional<UpdateAccountsRequestEula> eula) {
+            this.eula = eula;
+            return this;
+        }
+
+        public Builder eula(UpdateAccountsRequestEula eula) {
+            this.eula = Optional.ofNullable(eula);
+            return this;
+        }
+
+        public Builder eula(Nullable<UpdateAccountsRequestEula> eula) {
+            if (eula.isNull()) {
+                this.eula = null;
+            } else if (eula.isEmpty()) {
+                this.eula = Optional.empty();
+            } else {
+                this.eula = Optional.of(eula.get());
+            }
+            return this;
+        }
+
+        /**
+         * <p>Your platform's own identifier for this subaccount. It must be unique among your subaccounts, and a duplicate returns a 409. Only the parent account can set it. Pass <code>null</code> to clear.</p>
+         */
+        @JsonSetter(value = "external_id", nulls = Nulls.SKIP)
+        public Builder externalId(Optional<String> externalId) {
+            this.externalId = externalId;
+            return this;
+        }
+
+        public Builder externalId(String externalId) {
+            this.externalId = Optional.ofNullable(externalId);
+            return this;
+        }
+
+        public Builder externalId(Nullable<String> externalId) {
+            if (externalId.isNull()) {
+                this.externalId = null;
+            } else if (externalId.isEmpty()) {
+                this.externalId = Optional.empty();
+            } else {
+                this.externalId = Optional.of(externalId.get());
+            }
+            return this;
+        }
+
+        /**
          * <p>The ID of the product to feature for affiliates. Pass <code>null</code> to clear.</p>
          */
         @JsonSetter(value = "featured_affiliate_product_id", nulls = Nulls.SKIP)
@@ -1158,56 +1420,6 @@ public final class UpdateAccountsRequest {
 
         public Builder homePreferences(List<UpdateAccountsRequestHomePreferencesItem> homePreferences) {
             this.homePreferences = Optional.ofNullable(homePreferences);
-            return this;
-        }
-
-        /**
-         * <p>Account industry group. See the <a href="/api-reference/beta/accounts/account#business-types-and-industries-glossary">business types and industries glossary</a> for valid values.</p>
-         */
-        @JsonSetter(value = "industry_group", nulls = Nulls.SKIP)
-        public Builder industryGroup(Optional<UpdateAccountsRequestIndustryGroup> industryGroup) {
-            this.industryGroup = industryGroup;
-            return this;
-        }
-
-        public Builder industryGroup(UpdateAccountsRequestIndustryGroup industryGroup) {
-            this.industryGroup = Optional.ofNullable(industryGroup);
-            return this;
-        }
-
-        public Builder industryGroup(Nullable<UpdateAccountsRequestIndustryGroup> industryGroup) {
-            if (industryGroup.isNull()) {
-                this.industryGroup = null;
-            } else if (industryGroup.isEmpty()) {
-                this.industryGroup = Optional.empty();
-            } else {
-                this.industryGroup = Optional.of(industryGroup.get());
-            }
-            return this;
-        }
-
-        /**
-         * <p>Specific industry vertical for the account. See the <a href="/api-reference/beta/accounts/account#business-types-and-industries-glossary">business types and industries glossary</a> for valid values.</p>
-         */
-        @JsonSetter(value = "industry_type", nulls = Nulls.SKIP)
-        public Builder industryType(Optional<String> industryType) {
-            this.industryType = industryType;
-            return this;
-        }
-
-        public Builder industryType(String industryType) {
-            this.industryType = Optional.ofNullable(industryType);
-            return this;
-        }
-
-        public Builder industryType(Nullable<String> industryType) {
-            if (industryType.isNull()) {
-                this.industryType = null;
-            } else if (industryType.isEmpty()) {
-                this.industryType = Optional.empty();
-            } else {
-                this.industryType = Optional.of(industryType.get());
-            }
             return this;
         }
 
@@ -1353,6 +1565,20 @@ public final class UpdateAccountsRequest {
         }
 
         /**
+         * <p>Whether payment orchestration is enabled for this account. Requires payout:account:update. Omit to preserve the existing setting or creation default.</p>
+         */
+        @JsonSetter(value = "orchestration_enabled", nulls = Nulls.SKIP)
+        public Builder orchestrationEnabled(Optional<Boolean> orchestrationEnabled) {
+            this.orchestrationEnabled = orchestrationEnabled;
+            return this;
+        }
+
+        public Builder orchestrationEnabled(Boolean orchestrationEnabled) {
+            this.orchestrationEnabled = Optional.ofNullable(orchestrationEnabled);
+            return this;
+        }
+
+        /**
          * <p>The description of the business type when business_type is other.</p>
          */
         @JsonSetter(value = "other_business_description", nulls = Nulls.SKIP)
@@ -1403,6 +1629,31 @@ public final class UpdateAccountsRequest {
         }
 
         /**
+         * <p>The account's privacy policy document. PDF only. Pass a JSON object containing an <code>id</code> from <a href="/api-reference/files/create-file">Create File</a>, or <code>null</code> to remove it.</p>
+         */
+        @JsonSetter(value = "privacy_policy", nulls = Nulls.SKIP)
+        public Builder privacyPolicy(Optional<UpdateAccountsRequestPrivacyPolicy> privacyPolicy) {
+            this.privacyPolicy = privacyPolicy;
+            return this;
+        }
+
+        public Builder privacyPolicy(UpdateAccountsRequestPrivacyPolicy privacyPolicy) {
+            this.privacyPolicy = Optional.ofNullable(privacyPolicy);
+            return this;
+        }
+
+        public Builder privacyPolicy(Nullable<UpdateAccountsRequestPrivacyPolicy> privacyPolicy) {
+            if (privacyPolicy.isNull()) {
+                this.privacyPolicy = null;
+            } else if (privacyPolicy.isEmpty()) {
+                this.privacyPolicy = Optional.empty();
+            } else {
+                this.privacyPolicy = Optional.of(privacyPolicy.get());
+            }
+            return this;
+        }
+
+        /**
          * <p>ID of the tax classification code applied by default to the account's products. See the available <a href="https://docs.numeral.com/essentials/product-categories">product categories</a>.</p>
          */
         @JsonSetter(value = "product_tax_code_id", nulls = Nulls.SKIP)
@@ -1442,6 +1693,31 @@ public final class UpdateAccountsRequest {
         }
 
         /**
+         * <p>The account's return and refund policy document. Attached to new disputes as the refund policy evidence, with the terms of service as the fallback. PDF only. Pass a JSON object containing an <code>id</code> from <a href="/api-reference/files/create-file">Create File</a>, or <code>null</code> to remove it.</p>
+         */
+        @JsonSetter(value = "return_policy", nulls = Nulls.SKIP)
+        public Builder returnPolicy(Optional<UpdateAccountsRequestReturnPolicy> returnPolicy) {
+            this.returnPolicy = returnPolicy;
+            return this;
+        }
+
+        public Builder returnPolicy(UpdateAccountsRequestReturnPolicy returnPolicy) {
+            this.returnPolicy = Optional.ofNullable(returnPolicy);
+            return this;
+        }
+
+        public Builder returnPolicy(Nullable<UpdateAccountsRequestReturnPolicy> returnPolicy) {
+            if (returnPolicy.isNull()) {
+                this.returnPolicy = null;
+            } else if (returnPolicy.isEmpty()) {
+                this.returnPolicy = Optional.empty();
+            } else {
+                this.returnPolicy = Optional.of(returnPolicy.get());
+            }
+            return this;
+        }
+
+        /**
          * <p>The unique URL slug for the account.</p>
          */
         @JsonSetter(value = "route", nulls = Nulls.SKIP)
@@ -1477,6 +1753,31 @@ public final class UpdateAccountsRequest {
 
         public Builder sendCustomerEmails(Boolean sendCustomerEmails) {
             this.sendCustomerEmails = Optional.ofNullable(sendCustomerEmails);
+            return this;
+        }
+
+        /**
+         * <p>The account's shipping policy document. Sent with physical-goods dispute evidence. PDF only. Pass a JSON object containing an <code>id</code> from <a href="/api-reference/files/create-file">Create File</a>, or <code>null</code> to remove it.</p>
+         */
+        @JsonSetter(value = "shipping_policy", nulls = Nulls.SKIP)
+        public Builder shippingPolicy(Optional<UpdateAccountsRequestShippingPolicy> shippingPolicy) {
+            this.shippingPolicy = shippingPolicy;
+            return this;
+        }
+
+        public Builder shippingPolicy(UpdateAccountsRequestShippingPolicy shippingPolicy) {
+            this.shippingPolicy = Optional.ofNullable(shippingPolicy);
+            return this;
+        }
+
+        public Builder shippingPolicy(Nullable<UpdateAccountsRequestShippingPolicy> shippingPolicy) {
+            if (shippingPolicy.isNull()) {
+                this.shippingPolicy = null;
+            } else if (shippingPolicy.isEmpty()) {
+                this.shippingPolicy = Optional.empty();
+            } else {
+                this.shippingPolicy = Optional.of(shippingPolicy.get());
+            }
             return this;
         }
 
@@ -1603,7 +1904,7 @@ public final class UpdateAccountsRequest {
         }
 
         /**
-         * <p>Account tax/VAT registrations to add or update. When <code>tax_remitted_by</code> is <code>self</code>, tax is calculated and collected only in the countries where the account holds a registration.</p>
+         * <p>Tax IDs to add to the account, or to replace when the account already has one of that type. When <code>tax_remitted_by</code> is <code>self</code>, tax outside the US is calculated and collected only in the countries where the account has a tax ID. US collection follows <code>tax_collection_enabled_states</code>.</p>
          */
         @JsonSetter(value = "tax_identifiers", nulls = Nulls.SKIP)
         public Builder taxIdentifiers(Optional<List<UpdateAccountsRequestTaxIdentifiersItem>> taxIdentifiers) {
@@ -1645,7 +1946,32 @@ public final class UpdateAccountsRequest {
         }
 
         /**
-         * <p>Account-level 3D Secure behavior. Set <code>mandate_challenge</code> to require cardholder verification on supported card payments, or <code>null</code> to use the standard checkout flow.</p>
+         * <p>The account's terms of service document. Attached to new disputes as the cancellation policy evidence when no cancellation policy is set. PDF only. Pass a JSON object containing an <code>id</code> from <a href="/api-reference/files/create-file">Create File</a>, or <code>null</code> to remove it.</p>
+         */
+        @JsonSetter(value = "terms_of_service", nulls = Nulls.SKIP)
+        public Builder termsOfService(Optional<UpdateAccountsRequestTermsOfService> termsOfService) {
+            this.termsOfService = termsOfService;
+            return this;
+        }
+
+        public Builder termsOfService(UpdateAccountsRequestTermsOfService termsOfService) {
+            this.termsOfService = Optional.ofNullable(termsOfService);
+            return this;
+        }
+
+        public Builder termsOfService(Nullable<UpdateAccountsRequestTermsOfService> termsOfService) {
+            if (termsOfService.isNull()) {
+                this.termsOfService = null;
+            } else if (termsOfService.isEmpty()) {
+                this.termsOfService = Optional.empty();
+            } else {
+                this.termsOfService = Optional.of(termsOfService.get());
+            }
+            return this;
+        }
+
+        /**
+         * <p>3D Secure behavior for supported on-session card payments. <code>mandate_challenge</code> requires a 3DS challenge before payment processing; <code>mandate_if_required</code> mandates a challenge only when the payment processor requires it; <code>frictionless_if_required</code> uses the regular frictionless 3DS flow. Payments of $1,000 or more use <code>mandate_if_required</code> unless <code>mandate_challenge</code> is selected. Risk and authentication recovery requirements can override the preference. <code>null</code> uses the standard checkout flow.</p>
          */
         @JsonSetter(value = "three_ds_level", nulls = Nulls.SKIP)
         public Builder threeDsLevel(Optional<UpdateAccountsRequestThreeDsLevel> threeDsLevel) {
@@ -1708,6 +2034,56 @@ public final class UpdateAccountsRequest {
             return this;
         }
 
+        /**
+         * <p>The account's business website, as an <code>http</code> or <code>https</code> URL of at most 255 characters. Also added to the account's <code>social_links</code> as a <code>website</code> entry. Pass <code>null</code> to clear the website; existing social links are left unchanged.</p>
+         */
+        @JsonSetter(value = "website", nulls = Nulls.SKIP)
+        public Builder website(Optional<String> website) {
+            this.website = website;
+            return this;
+        }
+
+        public Builder website(String website) {
+            this.website = Optional.ofNullable(website);
+            return this;
+        }
+
+        public Builder website(Nullable<String> website) {
+            if (website.isNull()) {
+                this.website = null;
+            } else if (website.isEmpty()) {
+                this.website = Optional.empty();
+            } else {
+                this.website = Optional.of(website.get());
+            }
+            return this;
+        }
+
+        /**
+         * <p>Set to <code>true</code> to turn on Whop Partner mode for the account, so its team can refer businesses and the account is paid partner commission on their sales. Recorded once; <code>false</code> is rejected. Only a verified Whop Partner can turn it on.</p>
+         */
+        @JsonSetter(value = "whop_partner_enabled", nulls = Nulls.SKIP)
+        public Builder whopPartnerEnabled(Optional<Boolean> whopPartnerEnabled) {
+            this.whopPartnerEnabled = whopPartnerEnabled;
+            return this;
+        }
+
+        public Builder whopPartnerEnabled(Boolean whopPartnerEnabled) {
+            this.whopPartnerEnabled = Optional.ofNullable(whopPartnerEnabled);
+            return this;
+        }
+
+        @JsonSetter(value = "industry_type", nulls = Nulls.SKIP)
+        public Builder industryType(Optional<Object> industryType) {
+            this.industryType = industryType;
+            return this;
+        }
+
+        public Builder industryType(Object industryType) {
+            this.industryType = Optional.ofNullable(industryType);
+            return this;
+        }
+
         public UpdateAccountsRequest build() {
             return new UpdateAccountsRequest(
                     affiliateApplicationRequired,
@@ -1715,26 +2091,31 @@ public final class UpdateAccountsRequest {
                     bannerImage,
                     businessAddress,
                     businessName,
-                    businessType,
+                    cancellationPolicy,
                     collectVatId,
                     country,
                     description,
+                    disputeFighterEnabled,
+                    eula,
+                    externalId,
                     featuredAffiliateProductId,
                     homePreferences,
-                    industryGroup,
-                    industryType,
                     invoicePrefix,
                     logo,
                     metadata,
                     onboardingType,
                     opengraphImage,
                     opengraphImageVariant,
+                    orchestrationEnabled,
                     otherBusinessDescription,
                     otherIndustryDescription,
+                    privacyPolicy,
                     productTaxCodeId,
                     require2Fa,
+                    returnPolicy,
                     route,
                     sendCustomerEmails,
+                    shippingPolicy,
                     showJoinedWhops,
                     showReviewsDtc,
                     showUserDirectory,
@@ -1745,10 +2126,68 @@ public final class UpdateAccountsRequest {
                     taxIdentifiers,
                     taxRemittedBy,
                     taxType,
+                    termsOfService,
                     threeDsLevel,
                     title,
                     useLogoAsOpengraphImageFallback,
+                    website,
+                    whopPartnerEnabled,
+                    industryType,
                     additionalProperties);
+        }
+
+        @JsonAnySetter
+        private void putAdditionalPropertyFromJson(String key, Object value) {
+            if (key.equalsIgnoreCase("affiliate_application_required")
+                    || key.equalsIgnoreCase("affiliate_instructions")
+                    || key.equalsIgnoreCase("banner_image")
+                    || key.equalsIgnoreCase("business_address")
+                    || key.equalsIgnoreCase("business_name")
+                    || key.equalsIgnoreCase("cancellation_policy")
+                    || key.equalsIgnoreCase("collect_vat_id")
+                    || key.equalsIgnoreCase("country")
+                    || key.equalsIgnoreCase("description")
+                    || key.equalsIgnoreCase("dispute_fighter_enabled")
+                    || key.equalsIgnoreCase("eula")
+                    || key.equalsIgnoreCase("external_id")
+                    || key.equalsIgnoreCase("featured_affiliate_product_id")
+                    || key.equalsIgnoreCase("home_preferences")
+                    || key.equalsIgnoreCase("invoice_prefix")
+                    || key.equalsIgnoreCase("logo")
+                    || key.equalsIgnoreCase("metadata")
+                    || key.equalsIgnoreCase("onboarding_type")
+                    || key.equalsIgnoreCase("opengraph_image")
+                    || key.equalsIgnoreCase("opengraph_image_variant")
+                    || key.equalsIgnoreCase("orchestration_enabled")
+                    || key.equalsIgnoreCase("other_business_description")
+                    || key.equalsIgnoreCase("other_industry_description")
+                    || key.equalsIgnoreCase("privacy_policy")
+                    || key.equalsIgnoreCase("product_tax_code_id")
+                    || key.equalsIgnoreCase("require_2fa")
+                    || key.equalsIgnoreCase("return_policy")
+                    || key.equalsIgnoreCase("route")
+                    || key.equalsIgnoreCase("send_customer_emails")
+                    || key.equalsIgnoreCase("shipping_policy")
+                    || key.equalsIgnoreCase("show_joined_whops")
+                    || key.equalsIgnoreCase("show_reviews_dtc")
+                    || key.equalsIgnoreCase("show_user_directory")
+                    || key.equalsIgnoreCase("social_links")
+                    || key.equalsIgnoreCase("store_page_config")
+                    || key.equalsIgnoreCase("target_audience")
+                    || key.equalsIgnoreCase("tax_collection_enabled_states")
+                    || key.equalsIgnoreCase("tax_identifiers")
+                    || key.equalsIgnoreCase("tax_remitted_by")
+                    || key.equalsIgnoreCase("tax_type")
+                    || key.equalsIgnoreCase("terms_of_service")
+                    || key.equalsIgnoreCase("three_ds_level")
+                    || key.equalsIgnoreCase("title")
+                    || key.equalsIgnoreCase("use_logo_as_opengraph_image_fallback")
+                    || key.equalsIgnoreCase("website")
+                    || key.equalsIgnoreCase("whop_partner_enabled")
+                    || key.equalsIgnoreCase("industry_type")) {
+                return;
+            }
+            this.additionalProperties.put(key, value);
         }
 
         public Builder additionalProperty(String key, Object value) {

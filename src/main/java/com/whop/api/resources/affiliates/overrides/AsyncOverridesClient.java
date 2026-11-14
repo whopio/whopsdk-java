@@ -5,6 +5,7 @@ package com.whop.api.resources.affiliates.overrides;
 
 import com.whop.api.core.ClientOptions;
 import com.whop.api.core.RequestOptions;
+import com.whop.api.core.WhopApiHttpResponse;
 import com.whop.api.core.pagination.SyncPagingIterable;
 import com.whop.api.resources.affiliates.overrides.requests.CreateOverridesRequest;
 import com.whop.api.resources.affiliates.overrides.requests.DeleteOverridesRequest;
@@ -42,7 +43,16 @@ public class AsyncOverridesClient {
      * </ul>
      */
     public CompletableFuture<SyncPagingIterable<ListOverridesResponseDataItem>> list(String id) {
-        return this.rawClient.list(id).thenApply(response -> response.body());
+        CompletableFuture<WhopApiHttpResponse<SyncPagingIterable<ListOverridesResponseDataItem>>> rawFuture =
+                this.rawClient.list(id);
+        CompletableFuture<SyncPagingIterable<ListOverridesResponseDataItem>> future =
+                rawFuture.thenApply(response -> response.body());
+        future.whenComplete((result_, throwable_) -> {
+            if (future.isCancelled()) {
+                rawFuture.cancel(true);
+            }
+        });
+        return future;
     }
 
     /**
@@ -54,7 +64,16 @@ public class AsyncOverridesClient {
      */
     public CompletableFuture<SyncPagingIterable<ListOverridesResponseDataItem>> list(
             String id, RequestOptions requestOptions) {
-        return this.rawClient.list(id, requestOptions).thenApply(response -> response.body());
+        CompletableFuture<WhopApiHttpResponse<SyncPagingIterable<ListOverridesResponseDataItem>>> rawFuture =
+                this.rawClient.list(id, requestOptions);
+        CompletableFuture<SyncPagingIterable<ListOverridesResponseDataItem>> future =
+                rawFuture.thenApply(response -> response.body());
+        future.whenComplete((result_, throwable_) -> {
+            if (future.isCancelled()) {
+                rawFuture.cancel(true);
+            }
+        });
+        return future;
     }
 
     /**
@@ -66,7 +85,16 @@ public class AsyncOverridesClient {
      */
     public CompletableFuture<SyncPagingIterable<ListOverridesResponseDataItem>> list(
             String id, ListOverridesRequest request) {
-        return this.rawClient.list(id, request).thenApply(response -> response.body());
+        CompletableFuture<WhopApiHttpResponse<SyncPagingIterable<ListOverridesResponseDataItem>>> rawFuture =
+                this.rawClient.list(id, request);
+        CompletableFuture<SyncPagingIterable<ListOverridesResponseDataItem>> future =
+                rawFuture.thenApply(response -> response.body());
+        future.whenComplete((result_, throwable_) -> {
+            if (future.isCancelled()) {
+                rawFuture.cancel(true);
+            }
+        });
+        return future;
     }
 
     /**
@@ -78,7 +106,16 @@ public class AsyncOverridesClient {
      */
     public CompletableFuture<SyncPagingIterable<ListOverridesResponseDataItem>> list(
             String id, ListOverridesRequest request, RequestOptions requestOptions) {
-        return this.rawClient.list(id, request, requestOptions).thenApply(response -> response.body());
+        CompletableFuture<WhopApiHttpResponse<SyncPagingIterable<ListOverridesResponseDataItem>>> rawFuture =
+                this.rawClient.list(id, request, requestOptions);
+        CompletableFuture<SyncPagingIterable<ListOverridesResponseDataItem>> future =
+                rawFuture.thenApply(response -> response.body());
+        future.whenComplete((result_, throwable_) -> {
+            if (future.isCancelled()) {
+                rawFuture.cancel(true);
+            }
+        });
+        return future;
     }
 
     /**
@@ -89,7 +126,14 @@ public class AsyncOverridesClient {
      * </ul>
      */
     public CompletableFuture<CreateOverridesResponse> create(String id, CreateOverridesRequest request) {
-        return this.rawClient.create(id, request).thenApply(response -> response.body());
+        CompletableFuture<WhopApiHttpResponse<CreateOverridesResponse>> rawFuture = this.rawClient.create(id, request);
+        CompletableFuture<CreateOverridesResponse> future = rawFuture.thenApply(response -> response.body());
+        future.whenComplete((result_, throwable_) -> {
+            if (future.isCancelled()) {
+                rawFuture.cancel(true);
+            }
+        });
+        return future;
     }
 
     /**
@@ -101,7 +145,15 @@ public class AsyncOverridesClient {
      */
     public CompletableFuture<CreateOverridesResponse> create(
             String id, CreateOverridesRequest request, RequestOptions requestOptions) {
-        return this.rawClient.create(id, request, requestOptions).thenApply(response -> response.body());
+        CompletableFuture<WhopApiHttpResponse<CreateOverridesResponse>> rawFuture =
+                this.rawClient.create(id, request, requestOptions);
+        CompletableFuture<CreateOverridesResponse> future = rawFuture.thenApply(response -> response.body());
+        future.whenComplete((result_, throwable_) -> {
+            if (future.isCancelled()) {
+                rawFuture.cancel(true);
+            }
+        });
+        return future;
     }
 
     /**
@@ -112,7 +164,15 @@ public class AsyncOverridesClient {
      * </ul>
      */
     public CompletableFuture<RetrieveOverridesResponse> retrieve(String id, String overrideId) {
-        return this.rawClient.retrieve(id, overrideId).thenApply(response -> response.body());
+        CompletableFuture<WhopApiHttpResponse<RetrieveOverridesResponse>> rawFuture =
+                this.rawClient.retrieve(id, overrideId);
+        CompletableFuture<RetrieveOverridesResponse> future = rawFuture.thenApply(response -> response.body());
+        future.whenComplete((result_, throwable_) -> {
+            if (future.isCancelled()) {
+                rawFuture.cancel(true);
+            }
+        });
+        return future;
     }
 
     /**
@@ -124,7 +184,15 @@ public class AsyncOverridesClient {
      */
     public CompletableFuture<RetrieveOverridesResponse> retrieve(
             String id, String overrideId, RequestOptions requestOptions) {
-        return this.rawClient.retrieve(id, overrideId, requestOptions).thenApply(response -> response.body());
+        CompletableFuture<WhopApiHttpResponse<RetrieveOverridesResponse>> rawFuture =
+                this.rawClient.retrieve(id, overrideId, requestOptions);
+        CompletableFuture<RetrieveOverridesResponse> future = rawFuture.thenApply(response -> response.body());
+        future.whenComplete((result_, throwable_) -> {
+            if (future.isCancelled()) {
+                rawFuture.cancel(true);
+            }
+        });
+        return future;
     }
 
     /**
@@ -136,7 +204,15 @@ public class AsyncOverridesClient {
      */
     public CompletableFuture<RetrieveOverridesResponse> retrieve(
             String id, String overrideId, RetrieveOverridesRequest request) {
-        return this.rawClient.retrieve(id, overrideId, request).thenApply(response -> response.body());
+        CompletableFuture<WhopApiHttpResponse<RetrieveOverridesResponse>> rawFuture =
+                this.rawClient.retrieve(id, overrideId, request);
+        CompletableFuture<RetrieveOverridesResponse> future = rawFuture.thenApply(response -> response.body());
+        future.whenComplete((result_, throwable_) -> {
+            if (future.isCancelled()) {
+                rawFuture.cancel(true);
+            }
+        });
+        return future;
     }
 
     /**
@@ -148,7 +224,15 @@ public class AsyncOverridesClient {
      */
     public CompletableFuture<RetrieveOverridesResponse> retrieve(
             String id, String overrideId, RetrieveOverridesRequest request, RequestOptions requestOptions) {
-        return this.rawClient.retrieve(id, overrideId, request, requestOptions).thenApply(response -> response.body());
+        CompletableFuture<WhopApiHttpResponse<RetrieveOverridesResponse>> rawFuture =
+                this.rawClient.retrieve(id, overrideId, request, requestOptions);
+        CompletableFuture<RetrieveOverridesResponse> future = rawFuture.thenApply(response -> response.body());
+        future.whenComplete((result_, throwable_) -> {
+            if (future.isCancelled()) {
+                rawFuture.cancel(true);
+            }
+        });
+        return future;
     }
 
     /**
@@ -159,7 +243,14 @@ public class AsyncOverridesClient {
      * </ul>
      */
     public CompletableFuture<Boolean> delete(String id, String overrideId) {
-        return this.rawClient.delete(id, overrideId).thenApply(response -> response.body());
+        CompletableFuture<WhopApiHttpResponse<Boolean>> rawFuture = this.rawClient.delete(id, overrideId);
+        CompletableFuture<Boolean> future = rawFuture.thenApply(response -> response.body());
+        future.whenComplete((result_, throwable_) -> {
+            if (future.isCancelled()) {
+                rawFuture.cancel(true);
+            }
+        });
+        return future;
     }
 
     /**
@@ -170,7 +261,15 @@ public class AsyncOverridesClient {
      * </ul>
      */
     public CompletableFuture<Boolean> delete(String id, String overrideId, RequestOptions requestOptions) {
-        return this.rawClient.delete(id, overrideId, requestOptions).thenApply(response -> response.body());
+        CompletableFuture<WhopApiHttpResponse<Boolean>> rawFuture =
+                this.rawClient.delete(id, overrideId, requestOptions);
+        CompletableFuture<Boolean> future = rawFuture.thenApply(response -> response.body());
+        future.whenComplete((result_, throwable_) -> {
+            if (future.isCancelled()) {
+                rawFuture.cancel(true);
+            }
+        });
+        return future;
     }
 
     /**
@@ -181,7 +280,14 @@ public class AsyncOverridesClient {
      * </ul>
      */
     public CompletableFuture<Boolean> delete(String id, String overrideId, DeleteOverridesRequest request) {
-        return this.rawClient.delete(id, overrideId, request).thenApply(response -> response.body());
+        CompletableFuture<WhopApiHttpResponse<Boolean>> rawFuture = this.rawClient.delete(id, overrideId, request);
+        CompletableFuture<Boolean> future = rawFuture.thenApply(response -> response.body());
+        future.whenComplete((result_, throwable_) -> {
+            if (future.isCancelled()) {
+                rawFuture.cancel(true);
+            }
+        });
+        return future;
     }
 
     /**
@@ -193,7 +299,15 @@ public class AsyncOverridesClient {
      */
     public CompletableFuture<Boolean> delete(
             String id, String overrideId, DeleteOverridesRequest request, RequestOptions requestOptions) {
-        return this.rawClient.delete(id, overrideId, request, requestOptions).thenApply(response -> response.body());
+        CompletableFuture<WhopApiHttpResponse<Boolean>> rawFuture =
+                this.rawClient.delete(id, overrideId, request, requestOptions);
+        CompletableFuture<Boolean> future = rawFuture.thenApply(response -> response.body());
+        future.whenComplete((result_, throwable_) -> {
+            if (future.isCancelled()) {
+                rawFuture.cancel(true);
+            }
+        });
+        return future;
     }
 
     /**
@@ -204,7 +318,15 @@ public class AsyncOverridesClient {
      * </ul>
      */
     public CompletableFuture<UpdateOverridesResponse> update(String id, String overrideId) {
-        return this.rawClient.update(id, overrideId).thenApply(response -> response.body());
+        CompletableFuture<WhopApiHttpResponse<UpdateOverridesResponse>> rawFuture =
+                this.rawClient.update(id, overrideId);
+        CompletableFuture<UpdateOverridesResponse> future = rawFuture.thenApply(response -> response.body());
+        future.whenComplete((result_, throwable_) -> {
+            if (future.isCancelled()) {
+                rawFuture.cancel(true);
+            }
+        });
+        return future;
     }
 
     /**
@@ -216,7 +338,15 @@ public class AsyncOverridesClient {
      */
     public CompletableFuture<UpdateOverridesResponse> update(
             String id, String overrideId, RequestOptions requestOptions) {
-        return this.rawClient.update(id, overrideId, requestOptions).thenApply(response -> response.body());
+        CompletableFuture<WhopApiHttpResponse<UpdateOverridesResponse>> rawFuture =
+                this.rawClient.update(id, overrideId, requestOptions);
+        CompletableFuture<UpdateOverridesResponse> future = rawFuture.thenApply(response -> response.body());
+        future.whenComplete((result_, throwable_) -> {
+            if (future.isCancelled()) {
+                rawFuture.cancel(true);
+            }
+        });
+        return future;
     }
 
     /**
@@ -228,7 +358,15 @@ public class AsyncOverridesClient {
      */
     public CompletableFuture<UpdateOverridesResponse> update(
             String id, String overrideId, UpdateOverridesRequest request) {
-        return this.rawClient.update(id, overrideId, request).thenApply(response -> response.body());
+        CompletableFuture<WhopApiHttpResponse<UpdateOverridesResponse>> rawFuture =
+                this.rawClient.update(id, overrideId, request);
+        CompletableFuture<UpdateOverridesResponse> future = rawFuture.thenApply(response -> response.body());
+        future.whenComplete((result_, throwable_) -> {
+            if (future.isCancelled()) {
+                rawFuture.cancel(true);
+            }
+        });
+        return future;
     }
 
     /**
@@ -240,6 +378,14 @@ public class AsyncOverridesClient {
      */
     public CompletableFuture<UpdateOverridesResponse> update(
             String id, String overrideId, UpdateOverridesRequest request, RequestOptions requestOptions) {
-        return this.rawClient.update(id, overrideId, request, requestOptions).thenApply(response -> response.body());
+        CompletableFuture<WhopApiHttpResponse<UpdateOverridesResponse>> rawFuture =
+                this.rawClient.update(id, overrideId, request, requestOptions);
+        CompletableFuture<UpdateOverridesResponse> future = rawFuture.thenApply(response -> response.body());
+        future.whenComplete((result_, throwable_) -> {
+            if (future.isCancelled()) {
+                rawFuture.cancel(true);
+            }
+        });
+        return future;
     }
 }

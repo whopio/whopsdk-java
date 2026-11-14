@@ -32,7 +32,17 @@ public final class CreatePlansRequest {
 
     private final Optional<Boolean> adaptivePricingEnabled;
 
+    private final Optional<Boolean> allowMultipleQuantity;
+
+    private final Optional<Map<String, Object>> attributes;
+
     private final Optional<Integer> billingPeriod;
+
+    private final Optional<String> billingType;
+
+    private final Optional<Integer> cancelDiscountIntervals;
+
+    private final Optional<Integer> cancelDiscountPercentage;
 
     private final Optional<Map<String, Object>> checkoutStyling;
 
@@ -52,17 +62,19 @@ public final class CreatePlansRequest {
 
     private final Optional<Map<String, Object>> metadata;
 
+    private final Optional<Boolean> offerCancelDiscount;
+
     private final Optional<String> overrideTaxType;
 
     private final Optional<CreatePlansRequestPaymentMethodConfiguration> paymentMethodConfiguration;
-
-    private final Optional<String> planType;
 
     private final Optional<String> productId;
 
     private final Optional<String> releaseMethod;
 
     private final Optional<Double> renewalPrice;
+
+    private final Optional<String> sku;
 
     private final Optional<Integer> splitPayRequiredPayments;
 
@@ -83,7 +95,12 @@ public final class CreatePlansRequest {
     private CreatePlansRequest(
             Optional<String> accountId,
             Optional<Boolean> adaptivePricingEnabled,
+            Optional<Boolean> allowMultipleQuantity,
+            Optional<Map<String, Object>> attributes,
             Optional<Integer> billingPeriod,
+            Optional<String> billingType,
+            Optional<Integer> cancelDiscountIntervals,
+            Optional<Integer> cancelDiscountPercentage,
             Optional<Map<String, Object>> checkoutStyling,
             Optional<String> currency,
             Optional<List<CreatePlansRequestCustomFieldsItem>> customFields,
@@ -93,12 +110,13 @@ public final class CreatePlansRequest {
             Optional<Double> initialPrice,
             Optional<String> internalNotes,
             Optional<Map<String, Object>> metadata,
+            Optional<Boolean> offerCancelDiscount,
             Optional<String> overrideTaxType,
             Optional<CreatePlansRequestPaymentMethodConfiguration> paymentMethodConfiguration,
-            Optional<String> planType,
             Optional<String> productId,
             Optional<String> releaseMethod,
             Optional<Double> renewalPrice,
+            Optional<String> sku,
             Optional<Integer> splitPayRequiredPayments,
             Optional<Integer> stock,
             Optional<CreatePlansRequestThreeDsLevel> threeDsLevel,
@@ -109,7 +127,12 @@ public final class CreatePlansRequest {
             Map<String, Object> additionalProperties) {
         this.accountId = accountId;
         this.adaptivePricingEnabled = adaptivePricingEnabled;
+        this.allowMultipleQuantity = allowMultipleQuantity;
+        this.attributes = attributes;
         this.billingPeriod = billingPeriod;
+        this.billingType = billingType;
+        this.cancelDiscountIntervals = cancelDiscountIntervals;
+        this.cancelDiscountPercentage = cancelDiscountPercentage;
         this.checkoutStyling = checkoutStyling;
         this.currency = currency;
         this.customFields = customFields;
@@ -119,12 +142,13 @@ public final class CreatePlansRequest {
         this.initialPrice = initialPrice;
         this.internalNotes = internalNotes;
         this.metadata = metadata;
+        this.offerCancelDiscount = offerCancelDiscount;
         this.overrideTaxType = overrideTaxType;
         this.paymentMethodConfiguration = paymentMethodConfiguration;
-        this.planType = planType;
         this.productId = productId;
         this.releaseMethod = releaseMethod;
         this.renewalPrice = renewalPrice;
+        this.sku = sku;
         this.splitPayRequiredPayments = splitPayRequiredPayments;
         this.stock = stock;
         this.threeDsLevel = threeDsLevel;
@@ -135,17 +159,11 @@ public final class CreatePlansRequest {
         this.additionalProperties = additionalProperties;
     }
 
-    /**
-     * @return The unique identifier of the account to create this plan for. Defaults to the caller's account.
-     */
     @JsonProperty("account_id")
     public Optional<String> getAccountId() {
         return accountId;
     }
 
-    /**
-     * @return Whether this plan accepts local currency payments via adaptive pricing.
-     */
     @JsonIgnore
     public Optional<Boolean> getAdaptivePricingEnabled() {
         if (adaptivePricingEnabled == null) {
@@ -154,9 +172,19 @@ public final class CreatePlansRequest {
         return adaptivePricingEnabled;
     }
 
-    /**
-     * @return Recurring billing interval in days, such as 30 for monthly or 365 for annual.
-     */
+    @JsonProperty("allow_multiple_quantity")
+    public Optional<Boolean> getAllowMultipleQuantity() {
+        return allowMultipleQuantity;
+    }
+
+    @JsonIgnore
+    public Optional<Map<String, Object>> getAttributes() {
+        if (attributes == null) {
+            return Optional.empty();
+        }
+        return attributes;
+    }
+
     @JsonIgnore
     public Optional<Integer> getBillingPeriod() {
         if (billingPeriod == null) {
@@ -165,9 +193,27 @@ public final class CreatePlansRequest {
         return billingPeriod;
     }
 
-    /**
-     * @return Checkout styling overrides for this plan.
-     */
+    @JsonProperty("billing_type")
+    public Optional<String> getBillingType() {
+        return billingType;
+    }
+
+    @JsonIgnore
+    public Optional<Integer> getCancelDiscountIntervals() {
+        if (cancelDiscountIntervals == null) {
+            return Optional.empty();
+        }
+        return cancelDiscountIntervals;
+    }
+
+    @JsonIgnore
+    public Optional<Integer> getCancelDiscountPercentage() {
+        if (cancelDiscountPercentage == null) {
+            return Optional.empty();
+        }
+        return cancelDiscountPercentage;
+    }
+
     @JsonIgnore
     public Optional<Map<String, Object>> getCheckoutStyling() {
         if (checkoutStyling == null) {
@@ -176,17 +222,11 @@ public final class CreatePlansRequest {
         return checkoutStyling;
     }
 
-    /**
-     * @return The three-letter ISO currency code for the plan's pricing. Defaults to USD.
-     */
     @JsonProperty("currency")
     public Optional<String> getCurrency() {
         return currency;
     }
 
-    /**
-     * @return An array of custom field definitions to collect from customers at checkout. Omitting this field clears existing custom fields.
-     */
     @JsonIgnore
     public Optional<List<CreatePlansRequestCustomFieldsItem>> getCustomFields() {
         if (customFields == null) {
@@ -195,9 +235,6 @@ public final class CreatePlansRequest {
         return customFields;
     }
 
-    /**
-     * @return A text description of the plan displayed to customers on the product page.
-     */
     @JsonIgnore
     public Optional<String> getDescription() {
         if (description == null) {
@@ -206,9 +243,6 @@ public final class CreatePlansRequest {
         return description;
     }
 
-    /**
-     * @return Access duration in days before the membership expires.
-     */
     @JsonIgnore
     public Optional<Integer> getExpirationDays() {
         if (expirationDays == null) {
@@ -217,9 +251,6 @@ public final class CreatePlansRequest {
         return expirationDays;
     }
 
-    /**
-     * @return An image displayed on the product page to represent this plan.
-     */
     @JsonIgnore
     public Optional<CreatePlansRequestImage> getImage() {
         if (image == null) {
@@ -228,9 +259,6 @@ public final class CreatePlansRequest {
         return image;
     }
 
-    /**
-     * @return Initial amount charged in the plan's currency, e.g. 10.43 for $10.43.
-     */
     @JsonIgnore
     public Optional<Double> getInitialPrice() {
         if (initialPrice == null) {
@@ -239,9 +267,6 @@ public final class CreatePlansRequest {
         return initialPrice;
     }
 
-    /**
-     * @return Private notes visible only to the account owner. Not shown to customers.
-     */
     @JsonIgnore
     public Optional<String> getInternalNotes() {
         if (internalNotes == null) {
@@ -250,9 +275,6 @@ public final class CreatePlansRequest {
         return internalNotes;
     }
 
-    /**
-     * @return Custom key-value pairs to store on the plan. Included in webhook payloads for payment and membership events. Max 50 keys, 100 chars per key, 500 chars per string value. The reserved keys <code>custom_cta</code> (a checkout call-to-action button label — one of the product custom CTA values, e.g. <code>subscribe</code>, <code>get_offer</code>) and <code>custom_cta_url</code> (a URL the button links to; web or <code>tel:</code>) override the product's call to action for this plan and are validated on save.
-     */
     @JsonIgnore
     public Optional<Map<String, Object>> getMetadata() {
         if (metadata == null) {
@@ -261,17 +283,19 @@ public final class CreatePlansRequest {
         return metadata;
     }
 
-    /**
-     * @return Override the default tax classification for this specific plan.
-     */
+    @JsonIgnore
+    public Optional<Boolean> getOfferCancelDiscount() {
+        if (offerCancelDiscount == null) {
+            return Optional.empty();
+        }
+        return offerCancelDiscount;
+    }
+
     @JsonProperty("override_tax_type")
     public Optional<String> getOverrideTaxType() {
         return overrideTaxType;
     }
 
-    /**
-     * @return Explicit payment method configuration for the plan. When not provided, the account's defaults apply.
-     */
     @JsonIgnore
     public Optional<CreatePlansRequestPaymentMethodConfiguration> getPaymentMethodConfiguration() {
         if (paymentMethodConfiguration == null) {
@@ -280,33 +304,16 @@ public final class CreatePlansRequest {
         return paymentMethodConfiguration;
     }
 
-    /**
-     * @return Plan billing type, such as <code>one_time</code> or <code>renewal</code>.
-     */
-    @JsonProperty("plan_type")
-    public Optional<String> getPlanType() {
-        return planType;
-    }
-
-    /**
-     * @return The unique identifier of the product to attach this plan to.
-     */
     @JsonProperty("product_id")
     public Optional<String> getProductId() {
         return productId;
     }
 
-    /**
-     * @return Sales method for this plan.
-     */
     @JsonProperty("release_method")
     public Optional<String> getReleaseMethod() {
         return releaseMethod;
     }
 
-    /**
-     * @return The amount charged each billing period for recurring plans, in the plan's currency.
-     */
     @JsonIgnore
     public Optional<Double> getRenewalPrice() {
         if (renewalPrice == null) {
@@ -315,9 +322,14 @@ public final class CreatePlansRequest {
         return renewalPrice;
     }
 
-    /**
-     * @return Installment payments required before the subscription pauses.
-     */
+    @JsonIgnore
+    public Optional<String> getSku() {
+        if (sku == null) {
+            return Optional.empty();
+        }
+        return sku;
+    }
+
     @JsonIgnore
     public Optional<Integer> getSplitPayRequiredPayments() {
         if (splitPayRequiredPayments == null) {
@@ -326,9 +338,6 @@ public final class CreatePlansRequest {
         return splitPayRequiredPayments;
     }
 
-    /**
-     * @return The maximum number of units available for purchase. Ignored when unlimited_stock is true.
-     */
     @JsonIgnore
     public Optional<Integer> getStock() {
         if (stock == null) {
@@ -337,9 +346,6 @@ public final class CreatePlansRequest {
         return stock;
     }
 
-    /**
-     * @return 3D Secure behavior for this plan. Send <code>null</code> to inherit the account default.
-     */
     @JsonIgnore
     public Optional<CreatePlansRequestThreeDsLevel> getThreeDsLevel() {
         if (threeDsLevel == null) {
@@ -348,9 +354,6 @@ public final class CreatePlansRequest {
         return threeDsLevel;
     }
 
-    /**
-     * @return The display name of the plan shown to customers on the product page.
-     */
     @JsonIgnore
     public Optional<String> getTitle() {
         if (title == null) {
@@ -359,9 +362,6 @@ public final class CreatePlansRequest {
         return title;
     }
 
-    /**
-     * @return Free trial duration before the first recurring charge.
-     */
     @JsonIgnore
     public Optional<Integer> getTrialPeriodDays() {
         if (trialPeriodDays == null) {
@@ -370,9 +370,6 @@ public final class CreatePlansRequest {
         return trialPeriodDays;
     }
 
-    /**
-     * @return Whether the plan has unlimited stock. When true, the stock field is ignored.
-     */
     @JsonIgnore
     public Optional<Boolean> getUnlimitedStock() {
         if (unlimitedStock == null) {
@@ -381,9 +378,6 @@ public final class CreatePlansRequest {
         return unlimitedStock;
     }
 
-    /**
-     * @return Whether the plan is visible to customers or hidden from public view.
-     */
     @JsonProperty("visibility")
     public Optional<String> getVisibility() {
         return visibility;
@@ -396,9 +390,27 @@ public final class CreatePlansRequest {
     }
 
     @JsonInclude(value = JsonInclude.Include.CUSTOM, valueFilter = NullableNonemptyFilter.class)
+    @JsonProperty("attributes")
+    private Optional<Map<String, Object>> _getAttributes() {
+        return attributes;
+    }
+
+    @JsonInclude(value = JsonInclude.Include.CUSTOM, valueFilter = NullableNonemptyFilter.class)
     @JsonProperty("billing_period")
     private Optional<Integer> _getBillingPeriod() {
         return billingPeriod;
+    }
+
+    @JsonInclude(value = JsonInclude.Include.CUSTOM, valueFilter = NullableNonemptyFilter.class)
+    @JsonProperty("cancel_discount_intervals")
+    private Optional<Integer> _getCancelDiscountIntervals() {
+        return cancelDiscountIntervals;
+    }
+
+    @JsonInclude(value = JsonInclude.Include.CUSTOM, valueFilter = NullableNonemptyFilter.class)
+    @JsonProperty("cancel_discount_percentage")
+    private Optional<Integer> _getCancelDiscountPercentage() {
+        return cancelDiscountPercentage;
     }
 
     @JsonInclude(value = JsonInclude.Include.CUSTOM, valueFilter = NullableNonemptyFilter.class)
@@ -450,6 +462,12 @@ public final class CreatePlansRequest {
     }
 
     @JsonInclude(value = JsonInclude.Include.CUSTOM, valueFilter = NullableNonemptyFilter.class)
+    @JsonProperty("offer_cancel_discount")
+    private Optional<Boolean> _getOfferCancelDiscount() {
+        return offerCancelDiscount;
+    }
+
+    @JsonInclude(value = JsonInclude.Include.CUSTOM, valueFilter = NullableNonemptyFilter.class)
     @JsonProperty("payment_method_configuration")
     private Optional<CreatePlansRequestPaymentMethodConfiguration> _getPaymentMethodConfiguration() {
         return paymentMethodConfiguration;
@@ -459,6 +477,12 @@ public final class CreatePlansRequest {
     @JsonProperty("renewal_price")
     private Optional<Double> _getRenewalPrice() {
         return renewalPrice;
+    }
+
+    @JsonInclude(value = JsonInclude.Include.CUSTOM, valueFilter = NullableNonemptyFilter.class)
+    @JsonProperty("sku")
+    private Optional<String> _getSku() {
+        return sku;
     }
 
     @JsonInclude(value = JsonInclude.Include.CUSTOM, valueFilter = NullableNonemptyFilter.class)
@@ -511,7 +535,12 @@ public final class CreatePlansRequest {
     private boolean equalTo(CreatePlansRequest other) {
         return accountId.equals(other.accountId)
                 && adaptivePricingEnabled.equals(other.adaptivePricingEnabled)
+                && allowMultipleQuantity.equals(other.allowMultipleQuantity)
+                && attributes.equals(other.attributes)
                 && billingPeriod.equals(other.billingPeriod)
+                && billingType.equals(other.billingType)
+                && cancelDiscountIntervals.equals(other.cancelDiscountIntervals)
+                && cancelDiscountPercentage.equals(other.cancelDiscountPercentage)
                 && checkoutStyling.equals(other.checkoutStyling)
                 && currency.equals(other.currency)
                 && customFields.equals(other.customFields)
@@ -521,12 +550,13 @@ public final class CreatePlansRequest {
                 && initialPrice.equals(other.initialPrice)
                 && internalNotes.equals(other.internalNotes)
                 && metadata.equals(other.metadata)
+                && offerCancelDiscount.equals(other.offerCancelDiscount)
                 && overrideTaxType.equals(other.overrideTaxType)
                 && paymentMethodConfiguration.equals(other.paymentMethodConfiguration)
-                && planType.equals(other.planType)
                 && productId.equals(other.productId)
                 && releaseMethod.equals(other.releaseMethod)
                 && renewalPrice.equals(other.renewalPrice)
+                && sku.equals(other.sku)
                 && splitPayRequiredPayments.equals(other.splitPayRequiredPayments)
                 && stock.equals(other.stock)
                 && threeDsLevel.equals(other.threeDsLevel)
@@ -541,7 +571,12 @@ public final class CreatePlansRequest {
         return Objects.hash(
                 this.accountId,
                 this.adaptivePricingEnabled,
+                this.allowMultipleQuantity,
+                this.attributes,
                 this.billingPeriod,
+                this.billingType,
+                this.cancelDiscountIntervals,
+                this.cancelDiscountPercentage,
                 this.checkoutStyling,
                 this.currency,
                 this.customFields,
@@ -551,12 +586,13 @@ public final class CreatePlansRequest {
                 this.initialPrice,
                 this.internalNotes,
                 this.metadata,
+                this.offerCancelDiscount,
                 this.overrideTaxType,
                 this.paymentMethodConfiguration,
-                this.planType,
                 this.productId,
                 this.releaseMethod,
                 this.renewalPrice,
+                this.sku,
                 this.splitPayRequiredPayments,
                 this.stock,
                 this.threeDsLevel,
@@ -581,7 +617,17 @@ public final class CreatePlansRequest {
 
         private Optional<Boolean> adaptivePricingEnabled = Optional.empty();
 
+        private Optional<Boolean> allowMultipleQuantity = Optional.empty();
+
+        private Optional<Map<String, Object>> attributes = Optional.empty();
+
         private Optional<Integer> billingPeriod = Optional.empty();
+
+        private Optional<String> billingType = Optional.empty();
+
+        private Optional<Integer> cancelDiscountIntervals = Optional.empty();
+
+        private Optional<Integer> cancelDiscountPercentage = Optional.empty();
 
         private Optional<Map<String, Object>> checkoutStyling = Optional.empty();
 
@@ -601,17 +647,19 @@ public final class CreatePlansRequest {
 
         private Optional<Map<String, Object>> metadata = Optional.empty();
 
+        private Optional<Boolean> offerCancelDiscount = Optional.empty();
+
         private Optional<String> overrideTaxType = Optional.empty();
 
         private Optional<CreatePlansRequestPaymentMethodConfiguration> paymentMethodConfiguration = Optional.empty();
-
-        private Optional<String> planType = Optional.empty();
 
         private Optional<String> productId = Optional.empty();
 
         private Optional<String> releaseMethod = Optional.empty();
 
         private Optional<Double> renewalPrice = Optional.empty();
+
+        private Optional<String> sku = Optional.empty();
 
         private Optional<Integer> splitPayRequiredPayments = Optional.empty();
 
@@ -627,7 +675,6 @@ public final class CreatePlansRequest {
 
         private Optional<String> visibility = Optional.empty();
 
-        @JsonAnySetter
         private Map<String, Object> additionalProperties = new HashMap<>();
 
         private Builder() {}
@@ -635,7 +682,12 @@ public final class CreatePlansRequest {
         public Builder from(CreatePlansRequest other) {
             accountId(other.getAccountId());
             adaptivePricingEnabled(other.getAdaptivePricingEnabled());
+            allowMultipleQuantity(other.getAllowMultipleQuantity());
+            attributes(other.getAttributes());
             billingPeriod(other.getBillingPeriod());
+            billingType(other.getBillingType());
+            cancelDiscountIntervals(other.getCancelDiscountIntervals());
+            cancelDiscountPercentage(other.getCancelDiscountPercentage());
             checkoutStyling(other.getCheckoutStyling());
             currency(other.getCurrency());
             customFields(other.getCustomFields());
@@ -645,12 +697,13 @@ public final class CreatePlansRequest {
             initialPrice(other.getInitialPrice());
             internalNotes(other.getInternalNotes());
             metadata(other.getMetadata());
+            offerCancelDiscount(other.getOfferCancelDiscount());
             overrideTaxType(other.getOverrideTaxType());
             paymentMethodConfiguration(other.getPaymentMethodConfiguration());
-            planType(other.getPlanType());
             productId(other.getProductId());
             releaseMethod(other.getReleaseMethod());
             renewalPrice(other.getRenewalPrice());
+            sku(other.getSku());
             splitPayRequiredPayments(other.getSplitPayRequiredPayments());
             stock(other.getStock());
             threeDsLevel(other.getThreeDsLevel());
@@ -661,9 +714,6 @@ public final class CreatePlansRequest {
             return this;
         }
 
-        /**
-         * <p>The unique identifier of the account to create this plan for. Defaults to the caller's account.</p>
-         */
         @JsonSetter(value = "account_id", nulls = Nulls.SKIP)
         public Builder accountId(Optional<String> accountId) {
             this.accountId = accountId;
@@ -675,9 +725,6 @@ public final class CreatePlansRequest {
             return this;
         }
 
-        /**
-         * <p>Whether this plan accepts local currency payments via adaptive pricing.</p>
-         */
         @JsonSetter(value = "adaptive_pricing_enabled", nulls = Nulls.SKIP)
         public Builder adaptivePricingEnabled(Optional<Boolean> adaptivePricingEnabled) {
             this.adaptivePricingEnabled = adaptivePricingEnabled;
@@ -700,9 +747,39 @@ public final class CreatePlansRequest {
             return this;
         }
 
-        /**
-         * <p>Recurring billing interval in days, such as 30 for monthly or 365 for annual.</p>
-         */
+        @JsonSetter(value = "allow_multiple_quantity", nulls = Nulls.SKIP)
+        public Builder allowMultipleQuantity(Optional<Boolean> allowMultipleQuantity) {
+            this.allowMultipleQuantity = allowMultipleQuantity;
+            return this;
+        }
+
+        public Builder allowMultipleQuantity(Boolean allowMultipleQuantity) {
+            this.allowMultipleQuantity = Optional.ofNullable(allowMultipleQuantity);
+            return this;
+        }
+
+        @JsonSetter(value = "attributes", nulls = Nulls.SKIP)
+        public Builder attributes(Optional<Map<String, Object>> attributes) {
+            this.attributes = attributes;
+            return this;
+        }
+
+        public Builder attributes(Map<String, Object> attributes) {
+            this.attributes = Optional.ofNullable(attributes);
+            return this;
+        }
+
+        public Builder attributes(Nullable<Map<String, Object>> attributes) {
+            if (attributes.isNull()) {
+                this.attributes = null;
+            } else if (attributes.isEmpty()) {
+                this.attributes = Optional.empty();
+            } else {
+                this.attributes = Optional.of(attributes.get());
+            }
+            return this;
+        }
+
         @JsonSetter(value = "billing_period", nulls = Nulls.SKIP)
         public Builder billingPeriod(Optional<Integer> billingPeriod) {
             this.billingPeriod = billingPeriod;
@@ -725,9 +802,61 @@ public final class CreatePlansRequest {
             return this;
         }
 
-        /**
-         * <p>Checkout styling overrides for this plan.</p>
-         */
+        @JsonSetter(value = "billing_type", nulls = Nulls.SKIP)
+        public Builder billingType(Optional<String> billingType) {
+            this.billingType = billingType;
+            return this;
+        }
+
+        public Builder billingType(String billingType) {
+            this.billingType = Optional.ofNullable(billingType);
+            return this;
+        }
+
+        @JsonSetter(value = "cancel_discount_intervals", nulls = Nulls.SKIP)
+        public Builder cancelDiscountIntervals(Optional<Integer> cancelDiscountIntervals) {
+            this.cancelDiscountIntervals = cancelDiscountIntervals;
+            return this;
+        }
+
+        public Builder cancelDiscountIntervals(Integer cancelDiscountIntervals) {
+            this.cancelDiscountIntervals = Optional.ofNullable(cancelDiscountIntervals);
+            return this;
+        }
+
+        public Builder cancelDiscountIntervals(Nullable<Integer> cancelDiscountIntervals) {
+            if (cancelDiscountIntervals.isNull()) {
+                this.cancelDiscountIntervals = null;
+            } else if (cancelDiscountIntervals.isEmpty()) {
+                this.cancelDiscountIntervals = Optional.empty();
+            } else {
+                this.cancelDiscountIntervals = Optional.of(cancelDiscountIntervals.get());
+            }
+            return this;
+        }
+
+        @JsonSetter(value = "cancel_discount_percentage", nulls = Nulls.SKIP)
+        public Builder cancelDiscountPercentage(Optional<Integer> cancelDiscountPercentage) {
+            this.cancelDiscountPercentage = cancelDiscountPercentage;
+            return this;
+        }
+
+        public Builder cancelDiscountPercentage(Integer cancelDiscountPercentage) {
+            this.cancelDiscountPercentage = Optional.ofNullable(cancelDiscountPercentage);
+            return this;
+        }
+
+        public Builder cancelDiscountPercentage(Nullable<Integer> cancelDiscountPercentage) {
+            if (cancelDiscountPercentage.isNull()) {
+                this.cancelDiscountPercentage = null;
+            } else if (cancelDiscountPercentage.isEmpty()) {
+                this.cancelDiscountPercentage = Optional.empty();
+            } else {
+                this.cancelDiscountPercentage = Optional.of(cancelDiscountPercentage.get());
+            }
+            return this;
+        }
+
         @JsonSetter(value = "checkout_styling", nulls = Nulls.SKIP)
         public Builder checkoutStyling(Optional<Map<String, Object>> checkoutStyling) {
             this.checkoutStyling = checkoutStyling;
@@ -750,9 +879,6 @@ public final class CreatePlansRequest {
             return this;
         }
 
-        /**
-         * <p>The three-letter ISO currency code for the plan's pricing. Defaults to USD.</p>
-         */
         @JsonSetter(value = "currency", nulls = Nulls.SKIP)
         public Builder currency(Optional<String> currency) {
             this.currency = currency;
@@ -764,9 +890,6 @@ public final class CreatePlansRequest {
             return this;
         }
 
-        /**
-         * <p>An array of custom field definitions to collect from customers at checkout. Omitting this field clears existing custom fields.</p>
-         */
         @JsonSetter(value = "custom_fields", nulls = Nulls.SKIP)
         public Builder customFields(Optional<List<CreatePlansRequestCustomFieldsItem>> customFields) {
             this.customFields = customFields;
@@ -789,9 +912,6 @@ public final class CreatePlansRequest {
             return this;
         }
 
-        /**
-         * <p>A text description of the plan displayed to customers on the product page.</p>
-         */
         @JsonSetter(value = "description", nulls = Nulls.SKIP)
         public Builder description(Optional<String> description) {
             this.description = description;
@@ -814,9 +934,6 @@ public final class CreatePlansRequest {
             return this;
         }
 
-        /**
-         * <p>Access duration in days before the membership expires.</p>
-         */
         @JsonSetter(value = "expiration_days", nulls = Nulls.SKIP)
         public Builder expirationDays(Optional<Integer> expirationDays) {
             this.expirationDays = expirationDays;
@@ -839,9 +956,6 @@ public final class CreatePlansRequest {
             return this;
         }
 
-        /**
-         * <p>An image displayed on the product page to represent this plan.</p>
-         */
         @JsonSetter(value = "image", nulls = Nulls.SKIP)
         public Builder image(Optional<CreatePlansRequestImage> image) {
             this.image = image;
@@ -864,9 +978,6 @@ public final class CreatePlansRequest {
             return this;
         }
 
-        /**
-         * <p>Initial amount charged in the plan's currency, e.g. 10.43 for $10.43.</p>
-         */
         @JsonSetter(value = "initial_price", nulls = Nulls.SKIP)
         public Builder initialPrice(Optional<Double> initialPrice) {
             this.initialPrice = initialPrice;
@@ -889,9 +1000,6 @@ public final class CreatePlansRequest {
             return this;
         }
 
-        /**
-         * <p>Private notes visible only to the account owner. Not shown to customers.</p>
-         */
         @JsonSetter(value = "internal_notes", nulls = Nulls.SKIP)
         public Builder internalNotes(Optional<String> internalNotes) {
             this.internalNotes = internalNotes;
@@ -914,9 +1022,6 @@ public final class CreatePlansRequest {
             return this;
         }
 
-        /**
-         * <p>Custom key-value pairs to store on the plan. Included in webhook payloads for payment and membership events. Max 50 keys, 100 chars per key, 500 chars per string value. The reserved keys <code>custom_cta</code> (a checkout call-to-action button label — one of the product custom CTA values, e.g. <code>subscribe</code>, <code>get_offer</code>) and <code>custom_cta_url</code> (a URL the button links to; web or <code>tel:</code>) override the product's call to action for this plan and are validated on save.</p>
-         */
         @JsonSetter(value = "metadata", nulls = Nulls.SKIP)
         public Builder metadata(Optional<Map<String, Object>> metadata) {
             this.metadata = metadata;
@@ -939,9 +1044,28 @@ public final class CreatePlansRequest {
             return this;
         }
 
-        /**
-         * <p>Override the default tax classification for this specific plan.</p>
-         */
+        @JsonSetter(value = "offer_cancel_discount", nulls = Nulls.SKIP)
+        public Builder offerCancelDiscount(Optional<Boolean> offerCancelDiscount) {
+            this.offerCancelDiscount = offerCancelDiscount;
+            return this;
+        }
+
+        public Builder offerCancelDiscount(Boolean offerCancelDiscount) {
+            this.offerCancelDiscount = Optional.ofNullable(offerCancelDiscount);
+            return this;
+        }
+
+        public Builder offerCancelDiscount(Nullable<Boolean> offerCancelDiscount) {
+            if (offerCancelDiscount.isNull()) {
+                this.offerCancelDiscount = null;
+            } else if (offerCancelDiscount.isEmpty()) {
+                this.offerCancelDiscount = Optional.empty();
+            } else {
+                this.offerCancelDiscount = Optional.of(offerCancelDiscount.get());
+            }
+            return this;
+        }
+
         @JsonSetter(value = "override_tax_type", nulls = Nulls.SKIP)
         public Builder overrideTaxType(Optional<String> overrideTaxType) {
             this.overrideTaxType = overrideTaxType;
@@ -953,9 +1077,6 @@ public final class CreatePlansRequest {
             return this;
         }
 
-        /**
-         * <p>Explicit payment method configuration for the plan. When not provided, the account's defaults apply.</p>
-         */
         @JsonSetter(value = "payment_method_configuration", nulls = Nulls.SKIP)
         public Builder paymentMethodConfiguration(
                 Optional<CreatePlansRequestPaymentMethodConfiguration> paymentMethodConfiguration) {
@@ -981,23 +1102,6 @@ public final class CreatePlansRequest {
             return this;
         }
 
-        /**
-         * <p>Plan billing type, such as <code>one_time</code> or <code>renewal</code>.</p>
-         */
-        @JsonSetter(value = "plan_type", nulls = Nulls.SKIP)
-        public Builder planType(Optional<String> planType) {
-            this.planType = planType;
-            return this;
-        }
-
-        public Builder planType(String planType) {
-            this.planType = Optional.ofNullable(planType);
-            return this;
-        }
-
-        /**
-         * <p>The unique identifier of the product to attach this plan to.</p>
-         */
         @JsonSetter(value = "product_id", nulls = Nulls.SKIP)
         public Builder productId(Optional<String> productId) {
             this.productId = productId;
@@ -1009,9 +1113,6 @@ public final class CreatePlansRequest {
             return this;
         }
 
-        /**
-         * <p>Sales method for this plan.</p>
-         */
         @JsonSetter(value = "release_method", nulls = Nulls.SKIP)
         public Builder releaseMethod(Optional<String> releaseMethod) {
             this.releaseMethod = releaseMethod;
@@ -1023,9 +1124,6 @@ public final class CreatePlansRequest {
             return this;
         }
 
-        /**
-         * <p>The amount charged each billing period for recurring plans, in the plan's currency.</p>
-         */
         @JsonSetter(value = "renewal_price", nulls = Nulls.SKIP)
         public Builder renewalPrice(Optional<Double> renewalPrice) {
             this.renewalPrice = renewalPrice;
@@ -1048,9 +1146,28 @@ public final class CreatePlansRequest {
             return this;
         }
 
-        /**
-         * <p>Installment payments required before the subscription pauses.</p>
-         */
+        @JsonSetter(value = "sku", nulls = Nulls.SKIP)
+        public Builder sku(Optional<String> sku) {
+            this.sku = sku;
+            return this;
+        }
+
+        public Builder sku(String sku) {
+            this.sku = Optional.ofNullable(sku);
+            return this;
+        }
+
+        public Builder sku(Nullable<String> sku) {
+            if (sku.isNull()) {
+                this.sku = null;
+            } else if (sku.isEmpty()) {
+                this.sku = Optional.empty();
+            } else {
+                this.sku = Optional.of(sku.get());
+            }
+            return this;
+        }
+
         @JsonSetter(value = "split_pay_required_payments", nulls = Nulls.SKIP)
         public Builder splitPayRequiredPayments(Optional<Integer> splitPayRequiredPayments) {
             this.splitPayRequiredPayments = splitPayRequiredPayments;
@@ -1073,9 +1190,6 @@ public final class CreatePlansRequest {
             return this;
         }
 
-        /**
-         * <p>The maximum number of units available for purchase. Ignored when unlimited_stock is true.</p>
-         */
         @JsonSetter(value = "stock", nulls = Nulls.SKIP)
         public Builder stock(Optional<Integer> stock) {
             this.stock = stock;
@@ -1098,9 +1212,6 @@ public final class CreatePlansRequest {
             return this;
         }
 
-        /**
-         * <p>3D Secure behavior for this plan. Send <code>null</code> to inherit the account default.</p>
-         */
         @JsonSetter(value = "three_ds_level", nulls = Nulls.SKIP)
         public Builder threeDsLevel(Optional<CreatePlansRequestThreeDsLevel> threeDsLevel) {
             this.threeDsLevel = threeDsLevel;
@@ -1123,9 +1234,6 @@ public final class CreatePlansRequest {
             return this;
         }
 
-        /**
-         * <p>The display name of the plan shown to customers on the product page.</p>
-         */
         @JsonSetter(value = "title", nulls = Nulls.SKIP)
         public Builder title(Optional<String> title) {
             this.title = title;
@@ -1148,9 +1256,6 @@ public final class CreatePlansRequest {
             return this;
         }
 
-        /**
-         * <p>Free trial duration before the first recurring charge.</p>
-         */
         @JsonSetter(value = "trial_period_days", nulls = Nulls.SKIP)
         public Builder trialPeriodDays(Optional<Integer> trialPeriodDays) {
             this.trialPeriodDays = trialPeriodDays;
@@ -1173,9 +1278,6 @@ public final class CreatePlansRequest {
             return this;
         }
 
-        /**
-         * <p>Whether the plan has unlimited stock. When true, the stock field is ignored.</p>
-         */
         @JsonSetter(value = "unlimited_stock", nulls = Nulls.SKIP)
         public Builder unlimitedStock(Optional<Boolean> unlimitedStock) {
             this.unlimitedStock = unlimitedStock;
@@ -1198,9 +1300,6 @@ public final class CreatePlansRequest {
             return this;
         }
 
-        /**
-         * <p>Whether the plan is visible to customers or hidden from public view.</p>
-         */
         @JsonSetter(value = "visibility", nulls = Nulls.SKIP)
         public Builder visibility(Optional<String> visibility) {
             this.visibility = visibility;
@@ -1216,7 +1315,12 @@ public final class CreatePlansRequest {
             return new CreatePlansRequest(
                     accountId,
                     adaptivePricingEnabled,
+                    allowMultipleQuantity,
+                    attributes,
                     billingPeriod,
+                    billingType,
+                    cancelDiscountIntervals,
+                    cancelDiscountPercentage,
                     checkoutStyling,
                     currency,
                     customFields,
@@ -1226,12 +1330,13 @@ public final class CreatePlansRequest {
                     initialPrice,
                     internalNotes,
                     metadata,
+                    offerCancelDiscount,
                     overrideTaxType,
                     paymentMethodConfiguration,
-                    planType,
                     productId,
                     releaseMethod,
                     renewalPrice,
+                    sku,
                     splitPayRequiredPayments,
                     stock,
                     threeDsLevel,
@@ -1240,6 +1345,44 @@ public final class CreatePlansRequest {
                     unlimitedStock,
                     visibility,
                     additionalProperties);
+        }
+
+        @JsonAnySetter
+        private void putAdditionalPropertyFromJson(String key, Object value) {
+            if (key.equalsIgnoreCase("account_id")
+                    || key.equalsIgnoreCase("adaptive_pricing_enabled")
+                    || key.equalsIgnoreCase("allow_multiple_quantity")
+                    || key.equalsIgnoreCase("attributes")
+                    || key.equalsIgnoreCase("billing_period")
+                    || key.equalsIgnoreCase("billing_type")
+                    || key.equalsIgnoreCase("cancel_discount_intervals")
+                    || key.equalsIgnoreCase("cancel_discount_percentage")
+                    || key.equalsIgnoreCase("checkout_styling")
+                    || key.equalsIgnoreCase("currency")
+                    || key.equalsIgnoreCase("custom_fields")
+                    || key.equalsIgnoreCase("description")
+                    || key.equalsIgnoreCase("expiration_days")
+                    || key.equalsIgnoreCase("image")
+                    || key.equalsIgnoreCase("initial_price")
+                    || key.equalsIgnoreCase("internal_notes")
+                    || key.equalsIgnoreCase("metadata")
+                    || key.equalsIgnoreCase("offer_cancel_discount")
+                    || key.equalsIgnoreCase("override_tax_type")
+                    || key.equalsIgnoreCase("payment_method_configuration")
+                    || key.equalsIgnoreCase("product_id")
+                    || key.equalsIgnoreCase("release_method")
+                    || key.equalsIgnoreCase("renewal_price")
+                    || key.equalsIgnoreCase("sku")
+                    || key.equalsIgnoreCase("split_pay_required_payments")
+                    || key.equalsIgnoreCase("stock")
+                    || key.equalsIgnoreCase("three_ds_level")
+                    || key.equalsIgnoreCase("title")
+                    || key.equalsIgnoreCase("trial_period_days")
+                    || key.equalsIgnoreCase("unlimited_stock")
+                    || key.equalsIgnoreCase("visibility")) {
+                return;
+            }
+            this.additionalProperties.put(key, value);
         }
 
         public Builder additionalProperty(String key, Object value) {

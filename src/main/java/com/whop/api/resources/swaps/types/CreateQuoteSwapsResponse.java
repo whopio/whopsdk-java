@@ -450,7 +450,6 @@ public final class CreateQuoteSwapsResponse {
 
         private Optional<String> amountOutMin = Optional.empty();
 
-        @JsonAnySetter
         private Map<String, Object> additionalProperties = new HashMap<>();
 
         private Builder() {}
@@ -476,7 +475,6 @@ public final class CreateQuoteSwapsResponse {
 
         /**
          * <p>Source token amount used for the quote.</p>
-         * <p>Source token amount used for the quote.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
@@ -488,7 +486,6 @@ public final class CreateQuoteSwapsResponse {
 
         /**
          * <p>Estimated destination token amount.</p>
-         * <p>Estimated destination token amount.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
@@ -499,7 +496,6 @@ public final class CreateQuoteSwapsResponse {
         }
 
         /**
-         * <p>Whop fee in basis points.</p>
          * <p>Whop fee in basis points.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
@@ -518,7 +514,6 @@ public final class CreateQuoteSwapsResponse {
         }
 
         /**
-         * <p>Quoted exchange rate.</p>
          * <p>Quoted exchange rate.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
@@ -852,6 +847,27 @@ public final class CreateQuoteSwapsResponse {
                     toAddress,
                     toToken,
                     additionalProperties);
+        }
+
+        @JsonAnySetter
+        private void putAdditionalPropertyFromJson(String key, Object value) {
+            if (key.equalsIgnoreCase("amount_in")
+                    || key.equalsIgnoreCase("amount_out")
+                    || key.equalsIgnoreCase("amount_out_min")
+                    || key.equalsIgnoreCase("bridge_fee")
+                    || key.equalsIgnoreCase("estimated_duration_seconds")
+                    || key.equalsIgnoreCase("fee_bps")
+                    || key.equalsIgnoreCase("from_address")
+                    || key.equalsIgnoreCase("from_token")
+                    || key.equalsIgnoreCase("metadata")
+                    || key.equalsIgnoreCase("object")
+                    || key.equalsIgnoreCase("rate")
+                    || key.equalsIgnoreCase("requires_token_approval")
+                    || key.equalsIgnoreCase("to_address")
+                    || key.equalsIgnoreCase("to_token")) {
+                return;
+            }
+            this.additionalProperties.put(key, value);
         }
 
         @java.lang.Override

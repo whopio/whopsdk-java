@@ -35,8 +35,6 @@ public final class FormCompanyAccountsRequest {
 
     private final Optional<String> businessPhone;
 
-    private final String businessType;
-
     private final Optional<String> businessWebsite;
 
     private final Optional<FormCompanyAccountsRequestEntitySuffix> entitySuffix;
@@ -49,10 +47,6 @@ public final class FormCompanyAccountsRequest {
 
     private final List<FormCompanyAccountsRequestFoundersItem> founders;
 
-    private final String industryGroup;
-
-    private final String industryType;
-
     private final Optional<FormCompanyAccountsRequestShareStructure> shareStructure;
 
     private final Optional<Boolean> useRegisteredAgent;
@@ -63,30 +57,24 @@ public final class FormCompanyAccountsRequest {
             Optional<FormCompanyAccountsRequestBusinessAddress> businessAddress,
             String businessName,
             Optional<String> businessPhone,
-            String businessType,
             Optional<String> businessWebsite,
             Optional<FormCompanyAccountsRequestEntitySuffix> entitySuffix,
             Optional<FormCompanyAccountsRequestEntityType> entityType,
             Optional<Boolean> expediteEin,
             FormCompanyAccountsRequestFormationState formationState,
             List<FormCompanyAccountsRequestFoundersItem> founders,
-            String industryGroup,
-            String industryType,
             Optional<FormCompanyAccountsRequestShareStructure> shareStructure,
             Optional<Boolean> useRegisteredAgent,
             Map<String, Object> additionalProperties) {
         this.businessAddress = businessAddress;
         this.businessName = businessName;
         this.businessPhone = businessPhone;
-        this.businessType = businessType;
         this.businessWebsite = businessWebsite;
         this.entitySuffix = entitySuffix;
         this.entityType = entityType;
         this.expediteEin = expediteEin;
         this.formationState = formationState;
         this.founders = founders;
-        this.industryGroup = industryGroup;
-        this.industryType = industryType;
         this.shareStructure = shareStructure;
         this.useRegisteredAgent = useRegisteredAgent;
         this.additionalProperties = additionalProperties;
@@ -114,14 +102,6 @@ public final class FormCompanyAccountsRequest {
     @JsonProperty("business_phone")
     public Optional<String> getBusinessPhone() {
         return businessPhone;
-    }
-
-    /**
-     * @return High-level business category, from the Whop business taxonomy. Valid values are listed on <a href="/api-reference/beta/accounts/account#business-types-and-industries-glossary">business types and industries glossary</a>.
-     */
-    @JsonProperty("business_type")
-    public String getBusinessType() {
-        return businessType;
     }
 
     /**
@@ -157,7 +137,7 @@ public final class FormCompanyAccountsRequest {
     }
 
     /**
-     * @return Two-letter code of the US state (or <code>DC</code>) to form the company in.
+     * @return Two-letter code of the US state (or <code>DC</code>) to form the company in. We recommend <code>WY</code> because Wyoming formations are completed the same day.
      */
     @JsonProperty("formation_state")
     public FormCompanyAccountsRequestFormationState getFormationState() {
@@ -170,22 +150,6 @@ public final class FormCompanyAccountsRequest {
     @JsonProperty("founders")
     public List<FormCompanyAccountsRequestFoundersItem> getFounders() {
         return founders;
-    }
-
-    /**
-     * @return Industry group, from the Whop business taxonomy. Valid values are listed on <a href="/api-reference/beta/accounts/account#business-types-and-industries-glossary">business types and industries glossary</a>.
-     */
-    @JsonProperty("industry_group")
-    public String getIndustryGroup() {
-        return industryGroup;
-    }
-
-    /**
-     * @return Specific industry vertical, from the Whop business taxonomy. Valid values are listed on <a href="/api-reference/beta/accounts/account#business-types-and-industries-glossary">business types and industries glossary</a>.
-     */
-    @JsonProperty("industry_type")
-    public String getIndustryType() {
-        return industryType;
     }
 
     /**
@@ -219,15 +183,12 @@ public final class FormCompanyAccountsRequest {
         return businessAddress.equals(other.businessAddress)
                 && businessName.equals(other.businessName)
                 && businessPhone.equals(other.businessPhone)
-                && businessType.equals(other.businessType)
                 && businessWebsite.equals(other.businessWebsite)
                 && entitySuffix.equals(other.entitySuffix)
                 && entityType.equals(other.entityType)
                 && expediteEin.equals(other.expediteEin)
                 && formationState.equals(other.formationState)
                 && founders.equals(other.founders)
-                && industryGroup.equals(other.industryGroup)
-                && industryType.equals(other.industryType)
                 && shareStructure.equals(other.shareStructure)
                 && useRegisteredAgent.equals(other.useRegisteredAgent);
     }
@@ -238,15 +199,12 @@ public final class FormCompanyAccountsRequest {
                 this.businessAddress,
                 this.businessName,
                 this.businessPhone,
-                this.businessType,
                 this.businessWebsite,
                 this.entitySuffix,
                 this.entityType,
                 this.expediteEin,
                 this.formationState,
                 this.founders,
-                this.industryGroup,
-                this.industryType,
                 this.shareStructure,
                 this.useRegisteredAgent);
     }
@@ -264,37 +222,16 @@ public final class FormCompanyAccountsRequest {
         /**
          * <p>Legal name for the new company.</p>
          */
-        BusinessTypeStage businessName(@NotNull String businessName);
+        FormationStateStage businessName(@NotNull String businessName);
 
         Builder from(FormCompanyAccountsRequest other);
     }
 
-    public interface BusinessTypeStage {
-        /**
-         * <p>High-level business category, from the Whop business taxonomy. Valid values are listed on <a href="/api-reference/beta/accounts/account#business-types-and-industries-glossary">business types and industries glossary</a>.</p>
-         */
-        FormationStateStage businessType(@NotNull String businessType);
-    }
-
     public interface FormationStateStage {
         /**
-         * <p>Two-letter code of the US state (or <code>DC</code>) to form the company in.</p>
+         * <p>Two-letter code of the US state (or <code>DC</code>) to form the company in. We recommend <code>WY</code> because Wyoming formations are completed the same day.</p>
          */
-        IndustryGroupStage formationState(@NotNull FormCompanyAccountsRequestFormationState formationState);
-    }
-
-    public interface IndustryGroupStage {
-        /**
-         * <p>Industry group, from the Whop business taxonomy. Valid values are listed on <a href="/api-reference/beta/accounts/account#business-types-and-industries-glossary">business types and industries glossary</a>.</p>
-         */
-        IndustryTypeStage industryGroup(@NotNull String industryGroup);
-    }
-
-    public interface IndustryTypeStage {
-        /**
-         * <p>Specific industry vertical, from the Whop business taxonomy. Valid values are listed on <a href="/api-reference/beta/accounts/account#business-types-and-industries-glossary">business types and industries glossary</a>.</p>
-         */
-        _FinalStage industryType(@NotNull String industryType);
+        _FinalStage formationState(@NotNull FormCompanyAccountsRequestFormationState formationState);
     }
 
     public interface _FinalStage {
@@ -371,22 +308,10 @@ public final class FormCompanyAccountsRequest {
     }
 
     @JsonIgnoreProperties(ignoreUnknown = true)
-    public static final class Builder
-            implements BusinessNameStage,
-                    BusinessTypeStage,
-                    FormationStateStage,
-                    IndustryGroupStage,
-                    IndustryTypeStage,
-                    _FinalStage {
+    public static final class Builder implements BusinessNameStage, FormationStateStage, _FinalStage {
         private String businessName;
 
-        private String businessType;
-
         private FormCompanyAccountsRequestFormationState formationState;
-
-        private String industryGroup;
-
-        private String industryType;
 
         private Optional<Boolean> useRegisteredAgent = Optional.empty();
 
@@ -406,7 +331,6 @@ public final class FormCompanyAccountsRequest {
 
         private Optional<FormCompanyAccountsRequestBusinessAddress> businessAddress = Optional.empty();
 
-        @JsonAnySetter
         private Map<String, Object> additionalProperties = new HashMap<>();
 
         private Builder() {}
@@ -416,15 +340,12 @@ public final class FormCompanyAccountsRequest {
             businessAddress(other.getBusinessAddress());
             businessName(other.getBusinessName());
             businessPhone(other.getBusinessPhone());
-            businessType(other.getBusinessType());
             businessWebsite(other.getBusinessWebsite());
             entitySuffix(other.getEntitySuffix());
             entityType(other.getEntityType());
             expediteEin(other.getExpediteEin());
             formationState(other.getFormationState());
             founders(other.getFounders());
-            industryGroup(other.getIndustryGroup());
-            industryType(other.getIndustryType());
             shareStructure(other.getShareStructure());
             useRegisteredAgent(other.getUseRegisteredAgent());
             return this;
@@ -432,61 +353,23 @@ public final class FormCompanyAccountsRequest {
 
         /**
          * <p>Legal name for the new company.</p>
-         * <p>Legal name for the new company.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
         @JsonSetter("business_name")
-        public BusinessTypeStage businessName(@NotNull String businessName) {
+        public FormationStateStage businessName(@NotNull String businessName) {
             this.businessName = Objects.requireNonNull(businessName, "businessName must not be null");
             return this;
         }
 
         /**
-         * <p>High-level business category, from the Whop business taxonomy. Valid values are listed on <a href="/api-reference/beta/accounts/account#business-types-and-industries-glossary">business types and industries glossary</a>.</p>
-         * <p>High-level business category, from the Whop business taxonomy. Valid values are listed on <a href="/api-reference/beta/accounts/account#business-types-and-industries-glossary">business types and industries glossary</a>.</p>
-         * @return Reference to {@code this} so that method calls can be chained together.
-         */
-        @java.lang.Override
-        @JsonSetter("business_type")
-        public FormationStateStage businessType(@NotNull String businessType) {
-            this.businessType = Objects.requireNonNull(businessType, "businessType must not be null");
-            return this;
-        }
-
-        /**
-         * <p>Two-letter code of the US state (or <code>DC</code>) to form the company in.</p>
-         * <p>Two-letter code of the US state (or <code>DC</code>) to form the company in.</p>
+         * <p>Two-letter code of the US state (or <code>DC</code>) to form the company in. We recommend <code>WY</code> because Wyoming formations are completed the same day.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
         @JsonSetter("formation_state")
-        public IndustryGroupStage formationState(@NotNull FormCompanyAccountsRequestFormationState formationState) {
+        public _FinalStage formationState(@NotNull FormCompanyAccountsRequestFormationState formationState) {
             this.formationState = Objects.requireNonNull(formationState, "formationState must not be null");
-            return this;
-        }
-
-        /**
-         * <p>Industry group, from the Whop business taxonomy. Valid values are listed on <a href="/api-reference/beta/accounts/account#business-types-and-industries-glossary">business types and industries glossary</a>.</p>
-         * <p>Industry group, from the Whop business taxonomy. Valid values are listed on <a href="/api-reference/beta/accounts/account#business-types-and-industries-glossary">business types and industries glossary</a>.</p>
-         * @return Reference to {@code this} so that method calls can be chained together.
-         */
-        @java.lang.Override
-        @JsonSetter("industry_group")
-        public IndustryTypeStage industryGroup(@NotNull String industryGroup) {
-            this.industryGroup = Objects.requireNonNull(industryGroup, "industryGroup must not be null");
-            return this;
-        }
-
-        /**
-         * <p>Specific industry vertical, from the Whop business taxonomy. Valid values are listed on <a href="/api-reference/beta/accounts/account#business-types-and-industries-glossary">business types and industries glossary</a>.</p>
-         * <p>Specific industry vertical, from the Whop business taxonomy. Valid values are listed on <a href="/api-reference/beta/accounts/account#business-types-and-industries-glossary">business types and industries glossary</a>.</p>
-         * @return Reference to {@code this} so that method calls can be chained together.
-         */
-        @java.lang.Override
-        @JsonSetter("industry_type")
-        public _FinalStage industryType(@NotNull String industryType) {
-            this.industryType = Objects.requireNonNull(industryType, "industryType must not be null");
             return this;
         }
 
@@ -691,18 +574,33 @@ public final class FormCompanyAccountsRequest {
                     businessAddress,
                     businessName,
                     businessPhone,
-                    businessType,
                     businessWebsite,
                     entitySuffix,
                     entityType,
                     expediteEin,
                     formationState,
                     founders,
-                    industryGroup,
-                    industryType,
                     shareStructure,
                     useRegisteredAgent,
                     additionalProperties);
+        }
+
+        @JsonAnySetter
+        private void putAdditionalPropertyFromJson(String key, Object value) {
+            if (key.equalsIgnoreCase("business_address")
+                    || key.equalsIgnoreCase("business_name")
+                    || key.equalsIgnoreCase("business_phone")
+                    || key.equalsIgnoreCase("business_website")
+                    || key.equalsIgnoreCase("entity_suffix")
+                    || key.equalsIgnoreCase("entity_type")
+                    || key.equalsIgnoreCase("expedite_ein")
+                    || key.equalsIgnoreCase("formation_state")
+                    || key.equalsIgnoreCase("founders")
+                    || key.equalsIgnoreCase("share_structure")
+                    || key.equalsIgnoreCase("use_registered_agent")) {
+                return;
+            }
+            this.additionalProperties.put(key, value);
         }
 
         @java.lang.Override

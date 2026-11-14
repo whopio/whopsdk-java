@@ -181,7 +181,6 @@ public final class UserBalanceBusiness {
 
         private Optional<String> logoUrl = Optional.empty();
 
-        @JsonAnySetter
         private Map<String, Object> additionalProperties = new HashMap<>();
 
         private Builder() {}
@@ -197,7 +196,6 @@ public final class UserBalanceBusiness {
 
         /**
          * <p>The account's total balance in USD.</p>
-         * <p>The account's total balance in USD.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
@@ -208,7 +206,6 @@ public final class UserBalanceBusiness {
         }
 
         /**
-         * <p>The account ID, which looks like biz_*************.</p>
          * <p>The account ID, which looks like biz_*************.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
@@ -294,6 +291,17 @@ public final class UserBalanceBusiness {
         @java.lang.Override
         public UserBalanceBusiness build() {
             return new UserBalanceBusiness(balanceUsd, id, logoUrl, name, additionalProperties);
+        }
+
+        @JsonAnySetter
+        private void putAdditionalPropertyFromJson(String key, Object value) {
+            if (key.equalsIgnoreCase("balance_usd")
+                    || key.equalsIgnoreCase("id")
+                    || key.equalsIgnoreCase("logo_url")
+                    || key.equalsIgnoreCase("name")) {
+                return;
+            }
+            this.additionalProperties.put(key, value);
         }
 
         @java.lang.Override

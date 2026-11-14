@@ -33,7 +33,7 @@ public final class UploadEvidenceDisputesRequest {
     }
 
     /**
-     * @return The full set of evidence documents the dispute should carry. Replaces all previously uploaded documents.
+     * @return The full set of evidence documents the dispute should carry, beyond the four fixed evidence slots. Replaces all previously uploaded documents; an empty list removes them all. Send up to 10, 10MB each and 25MB in total. Accepted content types: application/pdf, application/json, image/jpeg, image/png, image/webp — any other type is rejected. Upload files through <code>POST /files</code> and reference them by <code>id</code>, or send the files as multipart file parts to upload and attach in one call. Policy documents (<code>return_policy</code>, <code>shipping_policy</code>, <code>cancellation_policy</code>, <code>terms_of_service</code>) default from the account's own documents; uploading one here replaces the account copy for this dispute, and a <code>cancellation_policy</code> or <code>return_policy</code> upload also takes precedence over the matching fixed evidence slot.
      */
     @JsonProperty("documents")
     public List<UploadEvidenceDisputesRequestDocumentsItem> getDocuments() {
@@ -73,7 +73,6 @@ public final class UploadEvidenceDisputesRequest {
     public static final class Builder {
         private List<UploadEvidenceDisputesRequestDocumentsItem> documents = new ArrayList<>();
 
-        @JsonAnySetter
         private Map<String, Object> additionalProperties = new HashMap<>();
 
         private Builder() {}
@@ -84,7 +83,7 @@ public final class UploadEvidenceDisputesRequest {
         }
 
         /**
-         * <p>The full set of evidence documents the dispute should carry. Replaces all previously uploaded documents.</p>
+         * <p>The full set of evidence documents the dispute should carry, beyond the four fixed evidence slots. Replaces all previously uploaded documents; an empty list removes them all. Send up to 10, 10MB each and 25MB in total. Accepted content types: application/pdf, application/json, image/jpeg, image/png, image/webp — any other type is rejected. Upload files through <code>POST /files</code> and reference them by <code>id</code>, or send the files as multipart file parts to upload and attach in one call. Policy documents (<code>return_policy</code>, <code>shipping_policy</code>, <code>cancellation_policy</code>, <code>terms_of_service</code>) default from the account's own documents; uploading one here replaces the account copy for this dispute, and a <code>cancellation_policy</code> or <code>return_policy</code> upload also takes precedence over the matching fixed evidence slot.</p>
          */
         @JsonSetter(value = "documents", nulls = Nulls.SKIP)
         public Builder documents(List<UploadEvidenceDisputesRequestDocumentsItem> documents) {
@@ -109,6 +108,14 @@ public final class UploadEvidenceDisputesRequest {
 
         public UploadEvidenceDisputesRequest build() {
             return new UploadEvidenceDisputesRequest(documents, additionalProperties);
+        }
+
+        @JsonAnySetter
+        private void putAdditionalPropertyFromJson(String key, Object value) {
+            if (key.equalsIgnoreCase("documents")) {
+                return;
+            }
+            this.additionalProperties.put(key, value);
         }
 
         public Builder additionalProperty(String key, Object value) {

@@ -277,7 +277,6 @@ public final class UpdateBountiesRequest {
 
         private Optional<String> title = Optional.empty();
 
-        @JsonAnySetter
         private Map<String, Object> additionalProperties = new HashMap<>();
 
         private Builder() {}
@@ -515,6 +514,23 @@ public final class UpdateBountiesRequest {
                     publishAtTimezone,
                     title,
                     additionalProperties);
+        }
+
+        @JsonAnySetter
+        private void putAdditionalPropertyFromJson(String key, Object value) {
+            if (key.equalsIgnoreCase("accepted_submissions_limit")
+                    || key.equalsIgnoreCase("accepted_submissions_per_user_limit")
+                    || key.equalsIgnoreCase("allowed_country_codes")
+                    || key.equalsIgnoreCase("business_goal_type")
+                    || key.equalsIgnoreCase("description")
+                    || key.equalsIgnoreCase("frequency")
+                    || key.equalsIgnoreCase("gross_reward_amount")
+                    || key.equalsIgnoreCase("publish_at")
+                    || key.equalsIgnoreCase("publish_at_timezone")
+                    || key.equalsIgnoreCase("title")) {
+                return;
+            }
+            this.additionalProperties.put(key, value);
         }
 
         public Builder additionalProperty(String key, Object value) {

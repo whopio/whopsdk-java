@@ -16,6 +16,7 @@ import com.whop.api.resources.socialaccounts.types.ListSocialAccountsRequestDire
 import com.whop.api.resources.socialaccounts.types.ListSocialAccountsRequestOrder;
 import com.whop.api.resources.socialaccounts.types.ListSocialAccountsRequestPlatform;
 import com.whop.api.resources.socialaccounts.types.ListSocialAccountsRequestScopesItem;
+import com.whop.api.resources.socialaccounts.types.ListSocialAccountsRequestTrustLevel;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
@@ -33,6 +34,8 @@ public final class ListSocialAccountsRequest {
     private final Optional<String> userId;
 
     private final Optional<ListSocialAccountsRequestPlatform> platform;
+
+    private final Optional<ListSocialAccountsRequestTrustLevel> trustLevel;
 
     private final Optional<Boolean> verified;
 
@@ -55,6 +58,7 @@ public final class ListSocialAccountsRequest {
             Optional<String> accountId,
             Optional<String> userId,
             Optional<ListSocialAccountsRequestPlatform> platform,
+            Optional<ListSocialAccountsRequestTrustLevel> trustLevel,
             Optional<Boolean> verified,
             Optional<Integer> first,
             Optional<String> after,
@@ -67,6 +71,7 @@ public final class ListSocialAccountsRequest {
         this.accountId = accountId;
         this.userId = userId;
         this.platform = platform;
+        this.trustLevel = trustLevel;
         this.verified = verified;
         this.first = first;
         this.after = after;
@@ -78,7 +83,7 @@ public final class ListSocialAccountsRequest {
     }
 
     /**
-     * @return Only return social accounts that have these scopes.
+     * @return Only return external accounts that have these scopes.
      */
     @JsonProperty("scopes")
     public Optional<List<ListSocialAccountsRequestScopesItem>> getScopes() {
@@ -86,7 +91,7 @@ public final class ListSocialAccountsRequest {
     }
 
     /**
-     * @return The Account that the social accounts are connected to. Provide either this or user_id.
+     * @return The Account that the external accounts are connected to. Provide either this or user_id.
      */
     @JsonProperty("account_id")
     public Optional<String> getAccountId() {
@@ -94,7 +99,7 @@ public final class ListSocialAccountsRequest {
     }
 
     /**
-     * @return The User that the social accounts are connected to. Provide either this or account_id.
+     * @return The User that the external accounts are connected to. Provide either this or account_id.
      */
     @JsonProperty("user_id")
     public Optional<String> getUserId() {
@@ -102,7 +107,7 @@ public final class ListSocialAccountsRequest {
     }
 
     /**
-     * @return Only return social accounts for the platform that is specified.
+     * @return Only return external accounts for the platform that is specified. An <code>aimerce</code> account is returned only with this filter, which requires the <code>company:manage_checkout</code> scope instead of <code>social_account:read</code>.
      */
     @JsonProperty("platform")
     public Optional<ListSocialAccountsRequestPlatform> getPlatform() {
@@ -110,7 +115,15 @@ public final class ListSocialAccountsRequest {
     }
 
     /**
-     * @return Only return social accounts that are verified on the platform.
+     * @return Only return external accounts linked with this trust level, such as <code>oauth</code> for accounts connected through OAuth.
+     */
+    @JsonProperty("trust_level")
+    public Optional<ListSocialAccountsRequestTrustLevel> getTrustLevel() {
+        return trustLevel;
+    }
+
+    /**
+     * @return Only return external accounts that are verified on the platform.
      */
     @JsonProperty("verified")
     public Optional<Boolean> getVerified() {
@@ -118,7 +131,7 @@ public final class ListSocialAccountsRequest {
     }
 
     /**
-     * @return The number of social accounts to return.
+     * @return Number of results to return from the start of the range.
      */
     @JsonProperty("first")
     public Optional<Integer> getFirst() {
@@ -126,7 +139,7 @@ public final class ListSocialAccountsRequest {
     }
 
     /**
-     * @return Cursor to fetch the page after (from page_info.end_cursor).
+     * @return Return results after this cursor. Use <code>page_info.end_cursor</code> from the previous response to fetch the next page.
      */
     @JsonProperty("after")
     public Optional<String> getAfter() {
@@ -134,7 +147,7 @@ public final class ListSocialAccountsRequest {
     }
 
     /**
-     * @return The number of social accounts to return from the end of the range.
+     * @return Number of results to return from the end of the range.
      */
     @JsonProperty("last")
     public Optional<Integer> getLast() {
@@ -142,7 +155,7 @@ public final class ListSocialAccountsRequest {
     }
 
     /**
-     * @return Cursor to fetch the page before (from page_info.start_cursor).
+     * @return Return results before this cursor. Use <code>page_info.start_cursor</code> from the previous response to fetch the previous page.
      */
     @JsonProperty("before")
     public Optional<String> getBefore() {
@@ -150,7 +163,7 @@ public final class ListSocialAccountsRequest {
     }
 
     /**
-     * @return The field to sort social accounts by.
+     * @return The field to sort external accounts by.
      */
     @JsonProperty("order")
     public Optional<ListSocialAccountsRequestOrder> getOrder() {
@@ -181,6 +194,7 @@ public final class ListSocialAccountsRequest {
                 && accountId.equals(other.accountId)
                 && userId.equals(other.userId)
                 && platform.equals(other.platform)
+                && trustLevel.equals(other.trustLevel)
                 && verified.equals(other.verified)
                 && first.equals(other.first)
                 && after.equals(other.after)
@@ -197,6 +211,7 @@ public final class ListSocialAccountsRequest {
                 this.accountId,
                 this.userId,
                 this.platform,
+                this.trustLevel,
                 this.verified,
                 this.first,
                 this.after,
@@ -225,6 +240,8 @@ public final class ListSocialAccountsRequest {
 
         private Optional<ListSocialAccountsRequestPlatform> platform = Optional.empty();
 
+        private Optional<ListSocialAccountsRequestTrustLevel> trustLevel = Optional.empty();
+
         private Optional<Boolean> verified = Optional.empty();
 
         private Optional<Integer> first = Optional.empty();
@@ -239,7 +256,6 @@ public final class ListSocialAccountsRequest {
 
         private Optional<ListSocialAccountsRequestDirection> direction = Optional.empty();
 
-        @JsonAnySetter
         private Map<String, Object> additionalProperties = new HashMap<>();
 
         private Builder() {}
@@ -249,6 +265,7 @@ public final class ListSocialAccountsRequest {
             accountId(other.getAccountId());
             userId(other.getUserId());
             platform(other.getPlatform());
+            trustLevel(other.getTrustLevel());
             verified(other.getVerified());
             first(other.getFirst());
             after(other.getAfter());
@@ -260,7 +277,7 @@ public final class ListSocialAccountsRequest {
         }
 
         /**
-         * <p>Only return social accounts that have these scopes.</p>
+         * <p>Only return external accounts that have these scopes.</p>
          */
         @JsonSetter(value = "scopes", nulls = Nulls.SKIP)
         public Builder scopes(Optional<List<ListSocialAccountsRequestScopesItem>> scopes) {
@@ -279,7 +296,7 @@ public final class ListSocialAccountsRequest {
         }
 
         /**
-         * <p>The Account that the social accounts are connected to. Provide either this or user_id.</p>
+         * <p>The Account that the external accounts are connected to. Provide either this or user_id.</p>
          */
         @JsonSetter(value = "account_id", nulls = Nulls.SKIP)
         public Builder accountId(Optional<String> accountId) {
@@ -293,7 +310,7 @@ public final class ListSocialAccountsRequest {
         }
 
         /**
-         * <p>The User that the social accounts are connected to. Provide either this or account_id.</p>
+         * <p>The User that the external accounts are connected to. Provide either this or account_id.</p>
          */
         @JsonSetter(value = "user_id", nulls = Nulls.SKIP)
         public Builder userId(Optional<String> userId) {
@@ -307,7 +324,7 @@ public final class ListSocialAccountsRequest {
         }
 
         /**
-         * <p>Only return social accounts for the platform that is specified.</p>
+         * <p>Only return external accounts for the platform that is specified. An <code>aimerce</code> account is returned only with this filter, which requires the <code>company:manage_checkout</code> scope instead of <code>social_account:read</code>.</p>
          */
         @JsonSetter(value = "platform", nulls = Nulls.SKIP)
         public Builder platform(Optional<ListSocialAccountsRequestPlatform> platform) {
@@ -321,7 +338,21 @@ public final class ListSocialAccountsRequest {
         }
 
         /**
-         * <p>Only return social accounts that are verified on the platform.</p>
+         * <p>Only return external accounts linked with this trust level, such as <code>oauth</code> for accounts connected through OAuth.</p>
+         */
+        @JsonSetter(value = "trust_level", nulls = Nulls.SKIP)
+        public Builder trustLevel(Optional<ListSocialAccountsRequestTrustLevel> trustLevel) {
+            this.trustLevel = trustLevel;
+            return this;
+        }
+
+        public Builder trustLevel(ListSocialAccountsRequestTrustLevel trustLevel) {
+            this.trustLevel = Optional.ofNullable(trustLevel);
+            return this;
+        }
+
+        /**
+         * <p>Only return external accounts that are verified on the platform.</p>
          */
         @JsonSetter(value = "verified", nulls = Nulls.SKIP)
         public Builder verified(Optional<Boolean> verified) {
@@ -335,7 +366,7 @@ public final class ListSocialAccountsRequest {
         }
 
         /**
-         * <p>The number of social accounts to return.</p>
+         * <p>Number of results to return from the start of the range.</p>
          */
         @JsonSetter(value = "first", nulls = Nulls.SKIP)
         public Builder first(Optional<Integer> first) {
@@ -349,7 +380,7 @@ public final class ListSocialAccountsRequest {
         }
 
         /**
-         * <p>Cursor to fetch the page after (from page_info.end_cursor).</p>
+         * <p>Return results after this cursor. Use <code>page_info.end_cursor</code> from the previous response to fetch the next page.</p>
          */
         @JsonSetter(value = "after", nulls = Nulls.SKIP)
         public Builder after(Optional<String> after) {
@@ -363,7 +394,7 @@ public final class ListSocialAccountsRequest {
         }
 
         /**
-         * <p>The number of social accounts to return from the end of the range.</p>
+         * <p>Number of results to return from the end of the range.</p>
          */
         @JsonSetter(value = "last", nulls = Nulls.SKIP)
         public Builder last(Optional<Integer> last) {
@@ -377,7 +408,7 @@ public final class ListSocialAccountsRequest {
         }
 
         /**
-         * <p>Cursor to fetch the page before (from page_info.start_cursor).</p>
+         * <p>Return results before this cursor. Use <code>page_info.start_cursor</code> from the previous response to fetch the previous page.</p>
          */
         @JsonSetter(value = "before", nulls = Nulls.SKIP)
         public Builder before(Optional<String> before) {
@@ -391,7 +422,7 @@ public final class ListSocialAccountsRequest {
         }
 
         /**
-         * <p>The field to sort social accounts by.</p>
+         * <p>The field to sort external accounts by.</p>
          */
         @JsonSetter(value = "order", nulls = Nulls.SKIP)
         public Builder order(Optional<ListSocialAccountsRequestOrder> order) {
@@ -424,6 +455,7 @@ public final class ListSocialAccountsRequest {
                     accountId,
                     userId,
                     platform,
+                    trustLevel,
                     verified,
                     first,
                     after,
@@ -432,6 +464,25 @@ public final class ListSocialAccountsRequest {
                     order,
                     direction,
                     additionalProperties);
+        }
+
+        @JsonAnySetter
+        private void putAdditionalPropertyFromJson(String key, Object value) {
+            if (key.equalsIgnoreCase("scopes")
+                    || key.equalsIgnoreCase("account_id")
+                    || key.equalsIgnoreCase("user_id")
+                    || key.equalsIgnoreCase("platform")
+                    || key.equalsIgnoreCase("trust_level")
+                    || key.equalsIgnoreCase("verified")
+                    || key.equalsIgnoreCase("first")
+                    || key.equalsIgnoreCase("after")
+                    || key.equalsIgnoreCase("last")
+                    || key.equalsIgnoreCase("before")
+                    || key.equalsIgnoreCase("order")
+                    || key.equalsIgnoreCase("direction")) {
+                return;
+            }
+            this.additionalProperties.put(key, value);
         }
 
         public Builder additionalProperty(String key, Object value) {

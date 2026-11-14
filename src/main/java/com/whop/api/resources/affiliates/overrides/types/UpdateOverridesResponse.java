@@ -150,7 +150,7 @@ public final class UpdateOverridesResponse {
     }
 
     /**
-     * @return The plan ID (for standard overrides).
+     * @return The plan ID (for standard overrides). Null for a product-wide override, which sets the terms for plans added to the product later.
      */
     @JsonIgnore
     public Optional<String> getPlanId() {
@@ -172,7 +172,7 @@ public final class UpdateOverridesResponse {
     }
 
     /**
-     * @return The product ID (for rev-share overrides).
+     * @return The product ID (for rev-share overrides, and for product-wide overrides that set the terms for plans added to the product later).
      */
     @JsonIgnore
     public Optional<String> getProductId() {
@@ -367,7 +367,7 @@ public final class UpdateOverridesResponse {
         _FinalStage checkoutDirectLink(Nullable<String> checkoutDirectLink);
 
         /**
-         * <p>The plan ID (for standard overrides).</p>
+         * <p>The plan ID (for standard overrides). Null for a product-wide override, which sets the terms for plans added to the product later.</p>
          */
         _FinalStage planId(Optional<String> planId);
 
@@ -385,7 +385,7 @@ public final class UpdateOverridesResponse {
         _FinalStage productDirectLink(Nullable<String> productDirectLink);
 
         /**
-         * <p>The product ID (for rev-share overrides).</p>
+         * <p>The product ID (for rev-share overrides, and for product-wide overrides that set the terms for plans added to the product later).</p>
          */
         _FinalStage productId(Optional<String> productId);
 
@@ -435,7 +435,6 @@ public final class UpdateOverridesResponse {
 
         private Optional<AffiliateAppliesToPayments> appliesToPayments = Optional.empty();
 
-        @JsonAnySetter
         private Map<String, Object> additionalProperties = new HashMap<>();
 
         private Builder() {}
@@ -459,7 +458,6 @@ public final class UpdateOverridesResponse {
 
         /**
          * <p>The type of commission (percentage or flat_fee).</p>
-         * <p>The type of commission (percentage or flat_fee).</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
@@ -470,7 +468,6 @@ public final class UpdateOverridesResponse {
         }
 
         /**
-         * <p>The commission amount. A percentage (1-100) when commission_type is percentage, or a dollar amount when flat_fee.</p>
          * <p>The commission amount. A percentage (1-100) when commission_type is percentage, or a dollar amount when flat_fee.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
@@ -483,7 +480,6 @@ public final class UpdateOverridesResponse {
 
         /**
          * <p>The unique identifier for the affiliate override.</p>
-         * <p>The unique identifier for the affiliate override.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
@@ -495,7 +491,6 @@ public final class UpdateOverridesResponse {
 
         /**
          * <p>The type of override (standard or rev_share).</p>
-         * <p>The type of override (standard or rev_share).</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
@@ -506,7 +501,6 @@ public final class UpdateOverridesResponse {
         }
 
         /**
-         * <p>The total earnings paid to this affiliate for referrals to this specific plan, in USD.</p>
          * <p>The total earnings paid to this affiliate for referrals to this specific plan, in USD.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
@@ -554,7 +548,7 @@ public final class UpdateOverridesResponse {
         }
 
         /**
-         * <p>The product ID (for rev-share overrides).</p>
+         * <p>The product ID (for rev-share overrides, and for product-wide overrides that set the terms for plans added to the product later).</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
@@ -570,7 +564,7 @@ public final class UpdateOverridesResponse {
         }
 
         /**
-         * <p>The product ID (for rev-share overrides).</p>
+         * <p>The product ID (for rev-share overrides, and for product-wide overrides that set the terms for plans added to the product later).</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
@@ -580,7 +574,7 @@ public final class UpdateOverridesResponse {
         }
 
         /**
-         * <p>The product ID (for rev-share overrides).</p>
+         * <p>The product ID (for rev-share overrides, and for product-wide overrides that set the terms for plans added to the product later).</p>
          */
         @java.lang.Override
         @JsonSetter(value = "product_id", nulls = Nulls.SKIP)
@@ -626,7 +620,7 @@ public final class UpdateOverridesResponse {
         }
 
         /**
-         * <p>The plan ID (for standard overrides).</p>
+         * <p>The plan ID (for standard overrides). Null for a product-wide override, which sets the terms for plans added to the product later.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
@@ -642,7 +636,7 @@ public final class UpdateOverridesResponse {
         }
 
         /**
-         * <p>The plan ID (for standard overrides).</p>
+         * <p>The plan ID (for standard overrides). Null for a product-wide override, which sets the terms for plans added to the product later.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
@@ -652,7 +646,7 @@ public final class UpdateOverridesResponse {
         }
 
         /**
-         * <p>The plan ID (for standard overrides).</p>
+         * <p>The plan ID (for standard overrides). Null for a product-wide override, which sets the terms for plans added to the product later.</p>
          */
         @java.lang.Override
         @JsonSetter(value = "plan_id", nulls = Nulls.SKIP)
@@ -785,6 +779,25 @@ public final class UpdateOverridesResponse {
                     revenueBasis,
                     totalReferralEarningsUsd,
                     additionalProperties);
+        }
+
+        @JsonAnySetter
+        private void putAdditionalPropertyFromJson(String key, Object value) {
+            if (key.equalsIgnoreCase("applies_to_payments")
+                    || key.equalsIgnoreCase("applies_to_products")
+                    || key.equalsIgnoreCase("checkout_direct_link")
+                    || key.equalsIgnoreCase("commission_type")
+                    || key.equalsIgnoreCase("commission_value")
+                    || key.equalsIgnoreCase("id")
+                    || key.equalsIgnoreCase("override_type")
+                    || key.equalsIgnoreCase("plan_id")
+                    || key.equalsIgnoreCase("product_direct_link")
+                    || key.equalsIgnoreCase("product_id")
+                    || key.equalsIgnoreCase("revenue_basis")
+                    || key.equalsIgnoreCase("total_referral_earnings_usd")) {
+                return;
+            }
+            this.additionalProperties.put(key, value);
         }
 
         @java.lang.Override

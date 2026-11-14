@@ -82,7 +82,6 @@ public final class PaymentProcessingDetails {
     public static final class Builder {
         private Optional<String> expectedBy = Optional.empty();
 
-        @JsonAnySetter
         private Map<String, Object> additionalProperties = new HashMap<>();
 
         private Builder() {}
@@ -119,6 +118,14 @@ public final class PaymentProcessingDetails {
 
         public PaymentProcessingDetails build() {
             return new PaymentProcessingDetails(expectedBy, additionalProperties);
+        }
+
+        @JsonAnySetter
+        private void putAdditionalPropertyFromJson(String key, Object value) {
+            if (key.equalsIgnoreCase("expected_by")) {
+                return;
+            }
+            this.additionalProperties.put(key, value);
         }
 
         public Builder additionalProperty(String key, Object value) {

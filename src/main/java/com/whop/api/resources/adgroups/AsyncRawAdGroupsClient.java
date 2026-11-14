@@ -4,37 +4,33 @@
 package com.whop.api.resources.adgroups;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
+import com.whop.api.core.BodyProperties;
 import com.whop.api.core.ClientOptions;
 import com.whop.api.core.MediaTypes;
 import com.whop.api.core.ObjectMappers;
+import com.whop.api.core.PathSegments;
 import com.whop.api.core.QueryStringMapper;
 import com.whop.api.core.RequestOptions;
+import com.whop.api.core.RetryInterceptor;
 import com.whop.api.core.WhopApiApiException;
 import com.whop.api.core.WhopApiException;
 import com.whop.api.core.WhopApiHttpResponse;
 import com.whop.api.core.pagination.SyncPagingIterable;
 import com.whop.api.errors.BadRequestError;
 import com.whop.api.errors.ConflictError;
-import com.whop.api.errors.ForbiddenError;
 import com.whop.api.errors.NotFoundError;
-import com.whop.api.errors.UnauthorizedError;
 import com.whop.api.resources.adgroups.requests.CreateAdGroupsRequest;
 import com.whop.api.resources.adgroups.requests.DeleteAdGroupsRequest;
 import com.whop.api.resources.adgroups.requests.DuplicateAdGroupsRequest;
-import com.whop.api.resources.adgroups.requests.EstimateReachAdGroupsRequest;
 import com.whop.api.resources.adgroups.requests.ListAdGroupsRequest;
 import com.whop.api.resources.adgroups.requests.PauseAdGroupsRequest;
 import com.whop.api.resources.adgroups.requests.RetrieveAdGroupsRequest;
-import com.whop.api.resources.adgroups.requests.SearchTargetingOptionsAdGroupsRequest;
 import com.whop.api.resources.adgroups.requests.UnpauseAdGroupsRequest;
 import com.whop.api.resources.adgroups.requests.UpdateAdGroupsRequest;
 import com.whop.api.resources.adgroups.types.DeleteAdGroupsResponse;
 import com.whop.api.resources.adgroups.types.DuplicateAdGroupsResponse;
 import com.whop.api.resources.adgroups.types.ListAdGroupsResponse;
-import com.whop.api.resources.adgroups.types.SearchTargetingOptionsAdGroupsResponse;
 import com.whop.api.types.AdGroup;
-import com.whop.api.types.ReachEstimate;
-import com.whop.api.types.V1ErrorResponse;
 import java.io.IOException;
 import java.util.List;
 import java.util.Optional;
@@ -84,7 +80,7 @@ public class AsyncRawAdGroupsClient {
      */
     public CompletableFuture<WhopApiHttpResponse<SyncPagingIterable<AdGroup>>> list(
             ListAdGroupsRequest request, RequestOptions requestOptions) {
-        HttpUrl.Builder httpUrl = HttpUrl.parse(this.clientOptions.environment().getUrl())
+        HttpUrl.Builder httpUrl = HttpUrl.parse(this.clientOptions.environment().getApiURL())
                 .newBuilder()
                 .addPathSegments("ad_groups");
         if (request.getAccountId().isPresent()) {
@@ -170,8 +166,18 @@ public class AsyncRawAdGroupsClient {
         if (requestOptions != null && requestOptions.getTimeout().isPresent()) {
             client = clientOptions.httpClientWithTimeout(requestOptions);
         }
+        if (requestOptions != null && requestOptions.getMaxRetries().isPresent()) {
+            okhttpRequest = okhttpRequest
+                    .newBuilder()
+                    .tag(
+                            RetryInterceptor.MaxRetriesOverride.class,
+                            new RetryInterceptor.MaxRetriesOverride(
+                                    requestOptions.getMaxRetries().get()))
+                    .build();
+        }
         CompletableFuture<WhopApiHttpResponse<SyncPagingIterable<AdGroup>>> future = new CompletableFuture<>();
-        client.newCall(okhttpRequest).enqueue(new Callback() {
+        RetryInterceptor.AsyncCall okhttpCall = RetryInterceptor.newAsyncCall(client, okhttpRequest);
+        okhttpCall.enqueue(new Callback() {
             @Override
             public void onResponse(@NotNull Call call, @NotNull Response response) throws IOException {
                 try (ResponseBody responseBody = response.body()) {
@@ -187,15 +193,20 @@ public class AsyncRawAdGroupsClient {
                                 .build();
                         List<AdGroup> result = parsedResponse.getData();
                         future.complete(new WhopApiHttpResponse<>(
-                                new SyncPagingIterable<AdGroup>(startingAfter != null, result, parsedResponse, () -> {
-                                    try {
-                                        return list(nextRequest, requestOptions)
-                                                .get()
-                                                .body();
-                                    } catch (InterruptedException | ExecutionException e) {
-                                        throw new RuntimeException(e);
-                                    }
-                                }),
+                                new SyncPagingIterable<AdGroup>(
+                                        startingAfter.isPresent()
+                                                && !startingAfter.get().isEmpty(),
+                                        result,
+                                        parsedResponse,
+                                        () -> {
+                                            try {
+                                                return list(nextRequest, requestOptions)
+                                                        .get()
+                                                        .body();
+                                            } catch (InterruptedException | ExecutionException e) {
+                                                throw new RuntimeException(e);
+                                            }
+                                        }),
                                 response));
                         return;
                     }
@@ -203,6 +214,9 @@ public class AsyncRawAdGroupsClient {
                     future.completeExceptionally(new WhopApiApiException(
                             "Error with status code " + response.code(), response.code(), errorBody, response));
                     return;
+                } catch (JsonProcessingException e) {
+                    future.completeExceptionally(
+                            new WhopApiException("Failed to deserialize response: " + e.getMessage(), e));
                 } catch (IOException e) {
                     future.completeExceptionally(new WhopApiException("Network error executing HTTP request", e));
                 }
@@ -211,6 +225,11 @@ public class AsyncRawAdGroupsClient {
             @Override
             public void onFailure(@NotNull Call call, @NotNull IOException e) {
                 future.completeExceptionally(new WhopApiException("Network error executing HTTP request", e));
+            }
+        });
+        future.whenComplete((result_, throwable_) -> {
+            if (future.isCancelled()) {
+                okhttpCall.cancel();
             }
         });
         return future;
@@ -228,7 +247,7 @@ public class AsyncRawAdGroupsClient {
      */
     public CompletableFuture<WhopApiHttpResponse<AdGroup>> create(
             CreateAdGroupsRequest request, RequestOptions requestOptions) {
-        HttpUrl.Builder httpUrl = HttpUrl.parse(this.clientOptions.environment().getUrl())
+        HttpUrl.Builder httpUrl = HttpUrl.parse(this.clientOptions.environment().getApiURL())
                 .newBuilder()
                 .addPathSegments("ad_groups");
         if (requestOptions != null) {
@@ -239,7 +258,9 @@ public class AsyncRawAdGroupsClient {
         RequestBody body;
         try {
             body = RequestBody.create(
-                    ObjectMappers.JSON_MAPPER.writeValueAsBytes(request), MediaTypes.APPLICATION_JSON);
+                    ObjectMappers.JSON_MAPPER.writeValueAsBytes(BodyProperties.merge(
+                            request, requestOptions != null ? requestOptions.getBodyProperties() : null)),
+                    MediaTypes.APPLICATION_JSON);
         } catch (JsonProcessingException e) {
             throw new WhopApiException("Failed to serialize request", e);
         }
@@ -254,8 +275,18 @@ public class AsyncRawAdGroupsClient {
         if (requestOptions != null && requestOptions.getTimeout().isPresent()) {
             client = clientOptions.httpClientWithTimeout(requestOptions);
         }
+        if (requestOptions != null && requestOptions.getMaxRetries().isPresent()) {
+            okhttpRequest = okhttpRequest
+                    .newBuilder()
+                    .tag(
+                            RetryInterceptor.MaxRetriesOverride.class,
+                            new RetryInterceptor.MaxRetriesOverride(
+                                    requestOptions.getMaxRetries().get()))
+                    .build();
+        }
         CompletableFuture<WhopApiHttpResponse<AdGroup>> future = new CompletableFuture<>();
-        client.newCall(okhttpRequest).enqueue(new Callback() {
+        RetryInterceptor.AsyncCall okhttpCall = RetryInterceptor.newAsyncCall(client, okhttpRequest);
+        okhttpCall.enqueue(new Callback() {
             @Override
             public void onResponse(@NotNull Call call, @NotNull Response response) throws IOException {
                 try (ResponseBody responseBody = response.body()) {
@@ -274,207 +305,6 @@ public class AsyncRawAdGroupsClient {
                                 return;
                             case 409:
                                 future.completeExceptionally(new ConflictError(
-                                        ObjectMappers.JSON_MAPPER.readValue(responseBodyString, V1ErrorResponse.class),
-                                        response));
-                                return;
-                        }
-                    } catch (JsonProcessingException ignored) {
-                        // unable to map error response, throwing generic error
-                    }
-                    Object errorBody = ObjectMappers.parseErrorBody(responseBodyString);
-                    future.completeExceptionally(new WhopApiApiException(
-                            "Error with status code " + response.code(), response.code(), errorBody, response));
-                    return;
-                } catch (IOException e) {
-                    future.completeExceptionally(new WhopApiException("Network error executing HTTP request", e));
-                }
-            }
-
-            @Override
-            public void onFailure(@NotNull Call call, @NotNull IOException e) {
-                future.completeExceptionally(new WhopApiException("Network error executing HTTP request", e));
-            }
-        });
-        return future;
-    }
-
-    /**
-     * Estimates how many people a draft targeting spec can reach, before an ad group is created. The body takes the same targeting fields as creating an ad group — <code>regions</code>, <code>demographics</code>, <code>detailed_targeting</code>, <code>audiences</code>, <code>languages</code>, and <code>devices</code> — and nothing is persisted.
-     */
-    public CompletableFuture<WhopApiHttpResponse<ReachEstimate>> estimateReach(EstimateReachAdGroupsRequest request) {
-        return estimateReach(request, null);
-    }
-
-    /**
-     * Estimates how many people a draft targeting spec can reach, before an ad group is created. The body takes the same targeting fields as creating an ad group — <code>regions</code>, <code>demographics</code>, <code>detailed_targeting</code>, <code>audiences</code>, <code>languages</code>, and <code>devices</code> — and nothing is persisted.
-     */
-    public CompletableFuture<WhopApiHttpResponse<ReachEstimate>> estimateReach(
-            EstimateReachAdGroupsRequest request, RequestOptions requestOptions) {
-        HttpUrl.Builder httpUrl = HttpUrl.parse(this.clientOptions.environment().getUrl())
-                .newBuilder()
-                .addPathSegments("ad_groups/estimate_reach");
-        if (requestOptions != null) {
-            requestOptions.getQueryParameters().forEach((_key, _value) -> {
-                httpUrl.addQueryParameter(_key, _value);
-            });
-        }
-        RequestBody body;
-        try {
-            body = RequestBody.create(
-                    ObjectMappers.JSON_MAPPER.writeValueAsBytes(request), MediaTypes.APPLICATION_JSON);
-        } catch (JsonProcessingException e) {
-            throw new WhopApiException("Failed to serialize request", e);
-        }
-        Request okhttpRequest = new Request.Builder()
-                .url(httpUrl.build())
-                .method("POST", body)
-                .headers(Headers.of(clientOptions.headers(requestOptions)))
-                .addHeader("Content-Type", "application/json")
-                .addHeader("Accept", "application/json")
-                .build();
-        OkHttpClient client = clientOptions.httpClient();
-        if (requestOptions != null && requestOptions.getTimeout().isPresent()) {
-            client = clientOptions.httpClientWithTimeout(requestOptions);
-        }
-        CompletableFuture<WhopApiHttpResponse<ReachEstimate>> future = new CompletableFuture<>();
-        client.newCall(okhttpRequest).enqueue(new Callback() {
-            @Override
-            public void onResponse(@NotNull Call call, @NotNull Response response) throws IOException {
-                try (ResponseBody responseBody = response.body()) {
-                    String responseBodyString = responseBody != null ? responseBody.string() : "{}";
-                    if (response.isSuccessful()) {
-                        future.complete(new WhopApiHttpResponse<>(
-                                ObjectMappers.JSON_MAPPER.readValue(responseBodyString, ReachEstimate.class),
-                                response));
-                        return;
-                    }
-                    try {
-                        switch (response.code()) {
-                            case 400:
-                                future.completeExceptionally(new BadRequestError(
-                                        ObjectMappers.JSON_MAPPER.readValue(responseBodyString, Object.class),
-                                        response));
-                                return;
-                            case 401:
-                                future.completeExceptionally(new UnauthorizedError(
-                                        ObjectMappers.JSON_MAPPER.readValue(responseBodyString, Object.class),
-                                        response));
-                                return;
-                            case 403:
-                                future.completeExceptionally(new ForbiddenError(
-                                        ObjectMappers.JSON_MAPPER.readValue(responseBodyString, Object.class),
-                                        response));
-                                return;
-                            case 409:
-                                future.completeExceptionally(new ConflictError(
-                                        ObjectMappers.JSON_MAPPER.readValue(responseBodyString, V1ErrorResponse.class),
-                                        response));
-                                return;
-                        }
-                    } catch (JsonProcessingException ignored) {
-                        // unable to map error response, throwing generic error
-                    }
-                    Object errorBody = ObjectMappers.parseErrorBody(responseBodyString);
-                    future.completeExceptionally(new WhopApiApiException(
-                            "Error with status code " + response.code(), response.code(), errorBody, response));
-                    return;
-                } catch (IOException e) {
-                    future.completeExceptionally(new WhopApiException("Network error executing HTTP request", e));
-                }
-            }
-
-            @Override
-            public void onFailure(@NotNull Call call, @NotNull IOException e) {
-                future.completeExceptionally(new WhopApiException("Network error executing HTTP request", e));
-            }
-        });
-        return future;
-    }
-
-    /**
-     * Searches the ad platform's targeting taxonomy for options to target an ad group with. Each result comes back in the exact shape the ad-group body accepts for its <code>type</code>, so it can be used in <code>detailed_targeting</code>, <code>regions</code>, or <code>languages</code> as-is. A blank <code>query</code> browses the small fixed lists (behaviors, browse demographic categories, languages); interests, work employers, job titles, schools, majors, and locations need a search term.
-     */
-    public CompletableFuture<WhopApiHttpResponse<SearchTargetingOptionsAdGroupsResponse>> searchTargetingOptions(
-            SearchTargetingOptionsAdGroupsRequest request) {
-        return searchTargetingOptions(request, null);
-    }
-
-    /**
-     * Searches the ad platform's targeting taxonomy for options to target an ad group with. Each result comes back in the exact shape the ad-group body accepts for its <code>type</code>, so it can be used in <code>detailed_targeting</code>, <code>regions</code>, or <code>languages</code> as-is. A blank <code>query</code> browses the small fixed lists (behaviors, browse demographic categories, languages); interests, work employers, job titles, schools, majors, and locations need a search term.
-     */
-    public CompletableFuture<WhopApiHttpResponse<SearchTargetingOptionsAdGroupsResponse>> searchTargetingOptions(
-            SearchTargetingOptionsAdGroupsRequest request, RequestOptions requestOptions) {
-        HttpUrl.Builder httpUrl = HttpUrl.parse(this.clientOptions.environment().getUrl())
-                .newBuilder()
-                .addPathSegments("ad_groups/targeting_options");
-        if (request.getAccountId().isPresent()) {
-            QueryStringMapper.addQueryParameter(
-                    httpUrl, "account_id", request.getAccountId().get(), false);
-        }
-        QueryStringMapper.addQueryParameter(httpUrl, "platform", request.getPlatform(), false);
-        if (request.getQuery().isPresent()) {
-            QueryStringMapper.addQueryParameter(
-                    httpUrl, "query", request.getQuery().get(), false);
-        }
-        if (request.getCountry().isPresent()) {
-            QueryStringMapper.addQueryParameter(
-                    httpUrl, "country", request.getCountry().get(), false);
-        }
-        if (request.getLimit().isPresent()) {
-            QueryStringMapper.addQueryParameter(
-                    httpUrl, "limit", request.getLimit().get(), false);
-        }
-        if (request.getTypes().isPresent()) {
-            QueryStringMapper.addQueryParameter(
-                    httpUrl, "types", request.getTypes().get(), true);
-        }
-        if (request.getLocationTypes().isPresent()) {
-            QueryStringMapper.addQueryParameter(
-                    httpUrl, "location_types", request.getLocationTypes().get(), true);
-        }
-        if (requestOptions != null) {
-            requestOptions.getQueryParameters().forEach((_key, _value) -> {
-                httpUrl.addQueryParameter(_key, _value);
-            });
-        }
-        Request.Builder _requestBuilder = new Request.Builder()
-                .url(httpUrl.build())
-                .method("GET", null)
-                .headers(Headers.of(clientOptions.headers(requestOptions)))
-                .addHeader("Accept", "application/json");
-        Request okhttpRequest = _requestBuilder.build();
-        OkHttpClient client = clientOptions.httpClient();
-        if (requestOptions != null && requestOptions.getTimeout().isPresent()) {
-            client = clientOptions.httpClientWithTimeout(requestOptions);
-        }
-        CompletableFuture<WhopApiHttpResponse<SearchTargetingOptionsAdGroupsResponse>> future =
-                new CompletableFuture<>();
-        client.newCall(okhttpRequest).enqueue(new Callback() {
-            @Override
-            public void onResponse(@NotNull Call call, @NotNull Response response) throws IOException {
-                try (ResponseBody responseBody = response.body()) {
-                    String responseBodyString = responseBody != null ? responseBody.string() : "{}";
-                    if (response.isSuccessful()) {
-                        future.complete(new WhopApiHttpResponse<>(
-                                ObjectMappers.JSON_MAPPER.readValue(
-                                        responseBodyString, SearchTargetingOptionsAdGroupsResponse.class),
-                                response));
-                        return;
-                    }
-                    try {
-                        switch (response.code()) {
-                            case 400:
-                                future.completeExceptionally(new BadRequestError(
-                                        ObjectMappers.JSON_MAPPER.readValue(responseBodyString, Object.class),
-                                        response));
-                                return;
-                            case 401:
-                                future.completeExceptionally(new UnauthorizedError(
-                                        ObjectMappers.JSON_MAPPER.readValue(responseBodyString, Object.class),
-                                        response));
-                                return;
-                            case 403:
-                                future.completeExceptionally(new ForbiddenError(
                                         ObjectMappers.JSON_MAPPER.readValue(responseBodyString, Object.class),
                                         response));
                                 return;
@@ -486,6 +316,9 @@ public class AsyncRawAdGroupsClient {
                     future.completeExceptionally(new WhopApiApiException(
                             "Error with status code " + response.code(), response.code(), errorBody, response));
                     return;
+                } catch (JsonProcessingException e) {
+                    future.completeExceptionally(
+                            new WhopApiException("Failed to deserialize response: " + e.getMessage(), e));
                 } catch (IOException e) {
                     future.completeExceptionally(new WhopApiException("Network error executing HTTP request", e));
                 }
@@ -496,39 +329,44 @@ public class AsyncRawAdGroupsClient {
                 future.completeExceptionally(new WhopApiException("Network error executing HTTP request", e));
             }
         });
+        future.whenComplete((result_, throwable_) -> {
+            if (future.isCancelled()) {
+                okhttpCall.cancel();
+            }
+        });
         return future;
     }
 
     /**
-     * Retrieves a single ad group.
+     * Retrieves an ad group, with performance stats for the window set by <code>stats_from</code> and <code>stats_to</code>.
      */
     public CompletableFuture<WhopApiHttpResponse<AdGroup>> retrieve(String id) {
         return retrieve(id, RetrieveAdGroupsRequest.builder().build());
     }
 
     /**
-     * Retrieves a single ad group.
+     * Retrieves an ad group, with performance stats for the window set by <code>stats_from</code> and <code>stats_to</code>.
      */
     public CompletableFuture<WhopApiHttpResponse<AdGroup>> retrieve(String id, RequestOptions requestOptions) {
         return retrieve(id, RetrieveAdGroupsRequest.builder().build(), requestOptions);
     }
 
     /**
-     * Retrieves a single ad group.
+     * Retrieves an ad group, with performance stats for the window set by <code>stats_from</code> and <code>stats_to</code>.
      */
     public CompletableFuture<WhopApiHttpResponse<AdGroup>> retrieve(String id, RetrieveAdGroupsRequest request) {
         return retrieve(id, request, null);
     }
 
     /**
-     * Retrieves a single ad group.
+     * Retrieves an ad group, with performance stats for the window set by <code>stats_from</code> and <code>stats_to</code>.
      */
     public CompletableFuture<WhopApiHttpResponse<AdGroup>> retrieve(
             String id, RetrieveAdGroupsRequest request, RequestOptions requestOptions) {
-        HttpUrl.Builder httpUrl = HttpUrl.parse(this.clientOptions.environment().getUrl())
+        HttpUrl.Builder httpUrl = HttpUrl.parse(this.clientOptions.environment().getApiURL())
                 .newBuilder()
                 .addPathSegments("ad_groups")
-                .addPathSegment(id);
+                .addPathSegment(PathSegments.validate(id));
         if (request.getStatsFrom().isPresent()) {
             QueryStringMapper.addQueryParameter(
                     httpUrl, "stats_from", request.getStatsFrom().get(), false);
@@ -560,8 +398,18 @@ public class AsyncRawAdGroupsClient {
         if (requestOptions != null && requestOptions.getTimeout().isPresent()) {
             client = clientOptions.httpClientWithTimeout(requestOptions);
         }
+        if (requestOptions != null && requestOptions.getMaxRetries().isPresent()) {
+            okhttpRequest = okhttpRequest
+                    .newBuilder()
+                    .tag(
+                            RetryInterceptor.MaxRetriesOverride.class,
+                            new RetryInterceptor.MaxRetriesOverride(
+                                    requestOptions.getMaxRetries().get()))
+                    .build();
+        }
         CompletableFuture<WhopApiHttpResponse<AdGroup>> future = new CompletableFuture<>();
-        client.newCall(okhttpRequest).enqueue(new Callback() {
+        RetryInterceptor.AsyncCall okhttpCall = RetryInterceptor.newAsyncCall(client, okhttpRequest);
+        okhttpCall.enqueue(new Callback() {
             @Override
             public void onResponse(@NotNull Call call, @NotNull Response response) throws IOException {
                 try (ResponseBody responseBody = response.body()) {
@@ -584,6 +432,9 @@ public class AsyncRawAdGroupsClient {
                     future.completeExceptionally(new WhopApiApiException(
                             "Error with status code " + response.code(), response.code(), errorBody, response));
                     return;
+                } catch (JsonProcessingException e) {
+                    future.completeExceptionally(
+                            new WhopApiException("Failed to deserialize response: " + e.getMessage(), e));
                 } catch (IOException e) {
                     future.completeExceptionally(new WhopApiException("Network error executing HTTP request", e));
                 }
@@ -594,18 +445,23 @@ public class AsyncRawAdGroupsClient {
                 future.completeExceptionally(new WhopApiException("Network error executing HTTP request", e));
             }
         });
+        future.whenComplete((result_, throwable_) -> {
+            if (future.isCancelled()) {
+                okhttpCall.cancel();
+            }
+        });
         return future;
     }
 
     /**
-     * Deletes an ad group.
+     * Deletes an ad group and stops its delivery.
      */
     public CompletableFuture<WhopApiHttpResponse<DeleteAdGroupsResponse>> delete(String id) {
         return delete(id, DeleteAdGroupsRequest.builder().build());
     }
 
     /**
-     * Deletes an ad group.
+     * Deletes an ad group and stops its delivery.
      */
     public CompletableFuture<WhopApiHttpResponse<DeleteAdGroupsResponse>> delete(
             String id, RequestOptions requestOptions) {
@@ -613,7 +469,7 @@ public class AsyncRawAdGroupsClient {
     }
 
     /**
-     * Deletes an ad group.
+     * Deletes an ad group and stops its delivery.
      */
     public CompletableFuture<WhopApiHttpResponse<DeleteAdGroupsResponse>> delete(
             String id, DeleteAdGroupsRequest request) {
@@ -621,14 +477,14 @@ public class AsyncRawAdGroupsClient {
     }
 
     /**
-     * Deletes an ad group.
+     * Deletes an ad group and stops its delivery.
      */
     public CompletableFuture<WhopApiHttpResponse<DeleteAdGroupsResponse>> delete(
             String id, DeleteAdGroupsRequest request, RequestOptions requestOptions) {
-        HttpUrl.Builder httpUrl = HttpUrl.parse(this.clientOptions.environment().getUrl())
+        HttpUrl.Builder httpUrl = HttpUrl.parse(this.clientOptions.environment().getApiURL())
                 .newBuilder()
                 .addPathSegments("ad_groups")
-                .addPathSegment(id);
+                .addPathSegment(PathSegments.validate(id));
         if (requestOptions != null) {
             requestOptions.getQueryParameters().forEach((_key, _value) -> {
                 httpUrl.addQueryParameter(_key, _value);
@@ -636,7 +492,10 @@ public class AsyncRawAdGroupsClient {
         }
         Request.Builder _requestBuilder = new Request.Builder()
                 .url(httpUrl.build())
-                .method("DELETE", null)
+                .method(
+                        "DELETE",
+                        BodyProperties.toRequestBody(
+                                requestOptions != null ? requestOptions.getBodyProperties() : null, null))
                 .headers(Headers.of(clientOptions.headers(requestOptions)))
                 .addHeader("Accept", "application/json");
         Request okhttpRequest = _requestBuilder.build();
@@ -644,8 +503,18 @@ public class AsyncRawAdGroupsClient {
         if (requestOptions != null && requestOptions.getTimeout().isPresent()) {
             client = clientOptions.httpClientWithTimeout(requestOptions);
         }
+        if (requestOptions != null && requestOptions.getMaxRetries().isPresent()) {
+            okhttpRequest = okhttpRequest
+                    .newBuilder()
+                    .tag(
+                            RetryInterceptor.MaxRetriesOverride.class,
+                            new RetryInterceptor.MaxRetriesOverride(
+                                    requestOptions.getMaxRetries().get()))
+                    .build();
+        }
         CompletableFuture<WhopApiHttpResponse<DeleteAdGroupsResponse>> future = new CompletableFuture<>();
-        client.newCall(okhttpRequest).enqueue(new Callback() {
+        RetryInterceptor.AsyncCall okhttpCall = RetryInterceptor.newAsyncCall(client, okhttpRequest);
+        okhttpCall.enqueue(new Callback() {
             @Override
             public void onResponse(@NotNull Call call, @NotNull Response response) throws IOException {
                 try (ResponseBody responseBody = response.body()) {
@@ -669,6 +538,9 @@ public class AsyncRawAdGroupsClient {
                     future.completeExceptionally(new WhopApiApiException(
                             "Error with status code " + response.code(), response.code(), errorBody, response));
                     return;
+                } catch (JsonProcessingException e) {
+                    future.completeExceptionally(
+                            new WhopApiException("Failed to deserialize response: " + e.getMessage(), e));
                 } catch (IOException e) {
                     future.completeExceptionally(new WhopApiException("Network error executing HTTP request", e));
                 }
@@ -677,6 +549,11 @@ public class AsyncRawAdGroupsClient {
             @Override
             public void onFailure(@NotNull Call call, @NotNull IOException e) {
                 future.completeExceptionally(new WhopApiException("Network error executing HTTP request", e));
+            }
+        });
+        future.whenComplete((result_, throwable_) -> {
+            if (future.isCancelled()) {
+                okhttpCall.cancel();
             }
         });
         return future;
@@ -708,10 +585,10 @@ public class AsyncRawAdGroupsClient {
      */
     public CompletableFuture<WhopApiHttpResponse<AdGroup>> update(
             String id, UpdateAdGroupsRequest request, RequestOptions requestOptions) {
-        HttpUrl.Builder httpUrl = HttpUrl.parse(this.clientOptions.environment().getUrl())
+        HttpUrl.Builder httpUrl = HttpUrl.parse(this.clientOptions.environment().getApiURL())
                 .newBuilder()
                 .addPathSegments("ad_groups")
-                .addPathSegment(id);
+                .addPathSegment(PathSegments.validate(id));
         if (requestOptions != null) {
             requestOptions.getQueryParameters().forEach((_key, _value) -> {
                 httpUrl.addQueryParameter(_key, _value);
@@ -720,7 +597,9 @@ public class AsyncRawAdGroupsClient {
         RequestBody body;
         try {
             body = RequestBody.create(
-                    ObjectMappers.JSON_MAPPER.writeValueAsBytes(request), MediaTypes.APPLICATION_JSON);
+                    ObjectMappers.JSON_MAPPER.writeValueAsBytes(BodyProperties.merge(
+                            request, requestOptions != null ? requestOptions.getBodyProperties() : null)),
+                    MediaTypes.APPLICATION_JSON);
         } catch (JsonProcessingException e) {
             throw new WhopApiException("Failed to serialize request", e);
         }
@@ -735,8 +614,18 @@ public class AsyncRawAdGroupsClient {
         if (requestOptions != null && requestOptions.getTimeout().isPresent()) {
             client = clientOptions.httpClientWithTimeout(requestOptions);
         }
+        if (requestOptions != null && requestOptions.getMaxRetries().isPresent()) {
+            okhttpRequest = okhttpRequest
+                    .newBuilder()
+                    .tag(
+                            RetryInterceptor.MaxRetriesOverride.class,
+                            new RetryInterceptor.MaxRetriesOverride(
+                                    requestOptions.getMaxRetries().get()))
+                    .build();
+        }
         CompletableFuture<WhopApiHttpResponse<AdGroup>> future = new CompletableFuture<>();
-        client.newCall(okhttpRequest).enqueue(new Callback() {
+        RetryInterceptor.AsyncCall okhttpCall = RetryInterceptor.newAsyncCall(client, okhttpRequest);
+        okhttpCall.enqueue(new Callback() {
             @Override
             public void onResponse(@NotNull Call call, @NotNull Response response) throws IOException {
                 try (ResponseBody responseBody = response.body()) {
@@ -746,10 +635,22 @@ public class AsyncRawAdGroupsClient {
                                 ObjectMappers.JSON_MAPPER.readValue(responseBodyString, AdGroup.class), response));
                         return;
                     }
+                    try {
+                        if (response.code() == 400) {
+                            future.completeExceptionally(new BadRequestError(
+                                    ObjectMappers.JSON_MAPPER.readValue(responseBodyString, Object.class), response));
+                            return;
+                        }
+                    } catch (JsonProcessingException ignored) {
+                        // unable to map error response, throwing generic error
+                    }
                     Object errorBody = ObjectMappers.parseErrorBody(responseBodyString);
                     future.completeExceptionally(new WhopApiApiException(
                             "Error with status code " + response.code(), response.code(), errorBody, response));
                     return;
+                } catch (JsonProcessingException e) {
+                    future.completeExceptionally(
+                            new WhopApiException("Failed to deserialize response: " + e.getMessage(), e));
                 } catch (IOException e) {
                     future.completeExceptionally(new WhopApiException("Network error executing HTTP request", e));
                 }
@@ -760,18 +661,23 @@ public class AsyncRawAdGroupsClient {
                 future.completeExceptionally(new WhopApiException("Network error executing HTTP request", e));
             }
         });
+        future.whenComplete((result_, throwable_) -> {
+            if (future.isCancelled()) {
+                okhttpCall.cancel();
+            }
+        });
         return future;
     }
 
     /**
-     * Creates copies of the ad group in <code>duplicating</code> status and returns them — into its own campaign, or into target_ad_campaign_id (which must belong to the same account and be compatible with the ad group's targeting and goals); each copy transitions to its final status (matching the source's active/paused state) once duplication completes. Poll each returned ad group until it leaves <code>duplicating</code> — a copy that could not be completed is deleted and returns 404.
+     * Starts copying an ad group and returns the copies in <code>duplicating</code> status. Poll each returned ad group until it leaves <code>duplicating</code>: it then takes the source's <code>active</code> or <code>paused</code> status, or, if the copy could not be completed, is deleted and returns 404.
      */
     public CompletableFuture<WhopApiHttpResponse<DuplicateAdGroupsResponse>> duplicate(String id) {
         return duplicate(id, DuplicateAdGroupsRequest.builder().build());
     }
 
     /**
-     * Creates copies of the ad group in <code>duplicating</code> status and returns them — into its own campaign, or into target_ad_campaign_id (which must belong to the same account and be compatible with the ad group's targeting and goals); each copy transitions to its final status (matching the source's active/paused state) once duplication completes. Poll each returned ad group until it leaves <code>duplicating</code> — a copy that could not be completed is deleted and returns 404.
+     * Starts copying an ad group and returns the copies in <code>duplicating</code> status. Poll each returned ad group until it leaves <code>duplicating</code>: it then takes the source's <code>active</code> or <code>paused</code> status, or, if the copy could not be completed, is deleted and returns 404.
      */
     public CompletableFuture<WhopApiHttpResponse<DuplicateAdGroupsResponse>> duplicate(
             String id, RequestOptions requestOptions) {
@@ -779,7 +685,7 @@ public class AsyncRawAdGroupsClient {
     }
 
     /**
-     * Creates copies of the ad group in <code>duplicating</code> status and returns them — into its own campaign, or into target_ad_campaign_id (which must belong to the same account and be compatible with the ad group's targeting and goals); each copy transitions to its final status (matching the source's active/paused state) once duplication completes. Poll each returned ad group until it leaves <code>duplicating</code> — a copy that could not be completed is deleted and returns 404.
+     * Starts copying an ad group and returns the copies in <code>duplicating</code> status. Poll each returned ad group until it leaves <code>duplicating</code>: it then takes the source's <code>active</code> or <code>paused</code> status, or, if the copy could not be completed, is deleted and returns 404.
      */
     public CompletableFuture<WhopApiHttpResponse<DuplicateAdGroupsResponse>> duplicate(
             String id, DuplicateAdGroupsRequest request) {
@@ -787,14 +693,14 @@ public class AsyncRawAdGroupsClient {
     }
 
     /**
-     * Creates copies of the ad group in <code>duplicating</code> status and returns them — into its own campaign, or into target_ad_campaign_id (which must belong to the same account and be compatible with the ad group's targeting and goals); each copy transitions to its final status (matching the source's active/paused state) once duplication completes. Poll each returned ad group until it leaves <code>duplicating</code> — a copy that could not be completed is deleted and returns 404.
+     * Starts copying an ad group and returns the copies in <code>duplicating</code> status. Poll each returned ad group until it leaves <code>duplicating</code>: it then takes the source's <code>active</code> or <code>paused</code> status, or, if the copy could not be completed, is deleted and returns 404.
      */
     public CompletableFuture<WhopApiHttpResponse<DuplicateAdGroupsResponse>> duplicate(
             String id, DuplicateAdGroupsRequest request, RequestOptions requestOptions) {
-        HttpUrl.Builder httpUrl = HttpUrl.parse(this.clientOptions.environment().getUrl())
+        HttpUrl.Builder httpUrl = HttpUrl.parse(this.clientOptions.environment().getApiURL())
                 .newBuilder()
                 .addPathSegments("ad_groups")
-                .addPathSegment(id)
+                .addPathSegment(PathSegments.validate(id))
                 .addPathSegments("duplicate");
         if (requestOptions != null) {
             requestOptions.getQueryParameters().forEach((_key, _value) -> {
@@ -804,7 +710,9 @@ public class AsyncRawAdGroupsClient {
         RequestBody body;
         try {
             body = RequestBody.create(
-                    ObjectMappers.JSON_MAPPER.writeValueAsBytes(request), MediaTypes.APPLICATION_JSON);
+                    ObjectMappers.JSON_MAPPER.writeValueAsBytes(BodyProperties.merge(
+                            request, requestOptions != null ? requestOptions.getBodyProperties() : null)),
+                    MediaTypes.APPLICATION_JSON);
         } catch (JsonProcessingException e) {
             throw new WhopApiException("Failed to serialize request", e);
         }
@@ -819,8 +727,18 @@ public class AsyncRawAdGroupsClient {
         if (requestOptions != null && requestOptions.getTimeout().isPresent()) {
             client = clientOptions.httpClientWithTimeout(requestOptions);
         }
+        if (requestOptions != null && requestOptions.getMaxRetries().isPresent()) {
+            okhttpRequest = okhttpRequest
+                    .newBuilder()
+                    .tag(
+                            RetryInterceptor.MaxRetriesOverride.class,
+                            new RetryInterceptor.MaxRetriesOverride(
+                                    requestOptions.getMaxRetries().get()))
+                    .build();
+        }
         CompletableFuture<WhopApiHttpResponse<DuplicateAdGroupsResponse>> future = new CompletableFuture<>();
-        client.newCall(okhttpRequest).enqueue(new Callback() {
+        RetryInterceptor.AsyncCall okhttpCall = RetryInterceptor.newAsyncCall(client, okhttpRequest);
+        okhttpCall.enqueue(new Callback() {
             @Override
             public void onResponse(@NotNull Call call, @NotNull Response response) throws IOException {
                 try (ResponseBody responseBody = response.body()) {
@@ -846,7 +764,7 @@ public class AsyncRawAdGroupsClient {
                                 return;
                             case 409:
                                 future.completeExceptionally(new ConflictError(
-                                        ObjectMappers.JSON_MAPPER.readValue(responseBodyString, V1ErrorResponse.class),
+                                        ObjectMappers.JSON_MAPPER.readValue(responseBodyString, Object.class),
                                         response));
                                 return;
                         }
@@ -857,6 +775,9 @@ public class AsyncRawAdGroupsClient {
                     future.completeExceptionally(new WhopApiApiException(
                             "Error with status code " + response.code(), response.code(), errorBody, response));
                     return;
+                } catch (JsonProcessingException e) {
+                    future.completeExceptionally(
+                            new WhopApiException("Failed to deserialize response: " + e.getMessage(), e));
                 } catch (IOException e) {
                     future.completeExceptionally(new WhopApiException("Network error executing HTTP request", e));
                 }
@@ -865,6 +786,11 @@ public class AsyncRawAdGroupsClient {
             @Override
             public void onFailure(@NotNull Call call, @NotNull IOException e) {
                 future.completeExceptionally(new WhopApiException("Network error executing HTTP request", e));
+            }
+        });
+        future.whenComplete((result_, throwable_) -> {
+            if (future.isCancelled()) {
+                okhttpCall.cancel();
             }
         });
         return future;
@@ -896,10 +822,10 @@ public class AsyncRawAdGroupsClient {
      */
     public CompletableFuture<WhopApiHttpResponse<AdGroup>> pause(
             String id, PauseAdGroupsRequest request, RequestOptions requestOptions) {
-        HttpUrl.Builder httpUrl = HttpUrl.parse(this.clientOptions.environment().getUrl())
+        HttpUrl.Builder httpUrl = HttpUrl.parse(this.clientOptions.environment().getApiURL())
                 .newBuilder()
                 .addPathSegments("ad_groups")
-                .addPathSegment(id)
+                .addPathSegment(PathSegments.validate(id))
                 .addPathSegments("pause");
         if (requestOptions != null) {
             requestOptions.getQueryParameters().forEach((_key, _value) -> {
@@ -908,7 +834,11 @@ public class AsyncRawAdGroupsClient {
         }
         Request.Builder _requestBuilder = new Request.Builder()
                 .url(httpUrl.build())
-                .method("POST", RequestBody.create("", null))
+                .method(
+                        "POST",
+                        BodyProperties.toRequestBody(
+                                requestOptions != null ? requestOptions.getBodyProperties() : null,
+                                RequestBody.create("", null)))
                 .headers(Headers.of(clientOptions.headers(requestOptions)))
                 .addHeader("Accept", "application/json");
         Request okhttpRequest = _requestBuilder.build();
@@ -916,8 +846,18 @@ public class AsyncRawAdGroupsClient {
         if (requestOptions != null && requestOptions.getTimeout().isPresent()) {
             client = clientOptions.httpClientWithTimeout(requestOptions);
         }
+        if (requestOptions != null && requestOptions.getMaxRetries().isPresent()) {
+            okhttpRequest = okhttpRequest
+                    .newBuilder()
+                    .tag(
+                            RetryInterceptor.MaxRetriesOverride.class,
+                            new RetryInterceptor.MaxRetriesOverride(
+                                    requestOptions.getMaxRetries().get()))
+                    .build();
+        }
         CompletableFuture<WhopApiHttpResponse<AdGroup>> future = new CompletableFuture<>();
-        client.newCall(okhttpRequest).enqueue(new Callback() {
+        RetryInterceptor.AsyncCall okhttpCall = RetryInterceptor.newAsyncCall(client, okhttpRequest);
+        okhttpCall.enqueue(new Callback() {
             @Override
             public void onResponse(@NotNull Call call, @NotNull Response response) throws IOException {
                 try (ResponseBody responseBody = response.body()) {
@@ -930,8 +870,7 @@ public class AsyncRawAdGroupsClient {
                     try {
                         if (response.code() == 409) {
                             future.completeExceptionally(new ConflictError(
-                                    ObjectMappers.JSON_MAPPER.readValue(responseBodyString, V1ErrorResponse.class),
-                                    response));
+                                    ObjectMappers.JSON_MAPPER.readValue(responseBodyString, Object.class), response));
                             return;
                         }
                     } catch (JsonProcessingException ignored) {
@@ -941,6 +880,9 @@ public class AsyncRawAdGroupsClient {
                     future.completeExceptionally(new WhopApiApiException(
                             "Error with status code " + response.code(), response.code(), errorBody, response));
                     return;
+                } catch (JsonProcessingException e) {
+                    future.completeExceptionally(
+                            new WhopApiException("Failed to deserialize response: " + e.getMessage(), e));
                 } catch (IOException e) {
                     future.completeExceptionally(new WhopApiException("Network error executing HTTP request", e));
                 }
@@ -949,6 +891,11 @@ public class AsyncRawAdGroupsClient {
             @Override
             public void onFailure(@NotNull Call call, @NotNull IOException e) {
                 future.completeExceptionally(new WhopApiException("Network error executing HTTP request", e));
+            }
+        });
+        future.whenComplete((result_, throwable_) -> {
+            if (future.isCancelled()) {
+                okhttpCall.cancel();
             }
         });
         return future;
@@ -980,10 +927,10 @@ public class AsyncRawAdGroupsClient {
      */
     public CompletableFuture<WhopApiHttpResponse<AdGroup>> unpause(
             String id, UnpauseAdGroupsRequest request, RequestOptions requestOptions) {
-        HttpUrl.Builder httpUrl = HttpUrl.parse(this.clientOptions.environment().getUrl())
+        HttpUrl.Builder httpUrl = HttpUrl.parse(this.clientOptions.environment().getApiURL())
                 .newBuilder()
                 .addPathSegments("ad_groups")
-                .addPathSegment(id)
+                .addPathSegment(PathSegments.validate(id))
                 .addPathSegments("unpause");
         if (requestOptions != null) {
             requestOptions.getQueryParameters().forEach((_key, _value) -> {
@@ -992,7 +939,11 @@ public class AsyncRawAdGroupsClient {
         }
         Request.Builder _requestBuilder = new Request.Builder()
                 .url(httpUrl.build())
-                .method("POST", RequestBody.create("", null))
+                .method(
+                        "POST",
+                        BodyProperties.toRequestBody(
+                                requestOptions != null ? requestOptions.getBodyProperties() : null,
+                                RequestBody.create("", null)))
                 .headers(Headers.of(clientOptions.headers(requestOptions)))
                 .addHeader("Accept", "application/json");
         Request okhttpRequest = _requestBuilder.build();
@@ -1000,8 +951,18 @@ public class AsyncRawAdGroupsClient {
         if (requestOptions != null && requestOptions.getTimeout().isPresent()) {
             client = clientOptions.httpClientWithTimeout(requestOptions);
         }
+        if (requestOptions != null && requestOptions.getMaxRetries().isPresent()) {
+            okhttpRequest = okhttpRequest
+                    .newBuilder()
+                    .tag(
+                            RetryInterceptor.MaxRetriesOverride.class,
+                            new RetryInterceptor.MaxRetriesOverride(
+                                    requestOptions.getMaxRetries().get()))
+                    .build();
+        }
         CompletableFuture<WhopApiHttpResponse<AdGroup>> future = new CompletableFuture<>();
-        client.newCall(okhttpRequest).enqueue(new Callback() {
+        RetryInterceptor.AsyncCall okhttpCall = RetryInterceptor.newAsyncCall(client, okhttpRequest);
+        okhttpCall.enqueue(new Callback() {
             @Override
             public void onResponse(@NotNull Call call, @NotNull Response response) throws IOException {
                 try (ResponseBody responseBody = response.body()) {
@@ -1014,8 +975,7 @@ public class AsyncRawAdGroupsClient {
                     try {
                         if (response.code() == 409) {
                             future.completeExceptionally(new ConflictError(
-                                    ObjectMappers.JSON_MAPPER.readValue(responseBodyString, V1ErrorResponse.class),
-                                    response));
+                                    ObjectMappers.JSON_MAPPER.readValue(responseBodyString, Object.class), response));
                             return;
                         }
                     } catch (JsonProcessingException ignored) {
@@ -1025,6 +985,9 @@ public class AsyncRawAdGroupsClient {
                     future.completeExceptionally(new WhopApiApiException(
                             "Error with status code " + response.code(), response.code(), errorBody, response));
                     return;
+                } catch (JsonProcessingException e) {
+                    future.completeExceptionally(
+                            new WhopApiException("Failed to deserialize response: " + e.getMessage(), e));
                 } catch (IOException e) {
                     future.completeExceptionally(new WhopApiException("Network error executing HTTP request", e));
                 }
@@ -1033,6 +996,11 @@ public class AsyncRawAdGroupsClient {
             @Override
             public void onFailure(@NotNull Call call, @NotNull IOException e) {
                 future.completeExceptionally(new WhopApiException("Network error executing HTTP request", e));
+            }
+        });
+        future.whenComplete((result_, throwable_) -> {
+            if (future.isCancelled()) {
+                okhttpCall.cancel();
             }
         });
         return future;

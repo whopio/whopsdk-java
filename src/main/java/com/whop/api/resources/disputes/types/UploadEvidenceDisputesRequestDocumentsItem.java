@@ -53,7 +53,7 @@ public final class UploadEvidenceDisputesRequestDocumentsItem {
     }
 
     /**
-     * @return What kind of evidence the document is.
+     * @return What this document proves. <code>return_policy</code>, <code>cancellation_policy</code> and <code>terms_of_service</code> are the seller's policy documents. A policy document replaces the account's copy for this dispute. <code>return_policy</code>, <code>cancellation_policy</code> and <code>customer_communication</code> also replace the matching fixed evidence slot. <code>shipping_policy</code> is the seller's shipping terms. <code>customer_communication</code> is correspondence with the buyer, such as a support thread or chat log. <code>product_image</code> is a photo of the product or service the buyer received. <code>physical_fulfillment</code> is proof that a physical order shipped and arrived. <code>digital_fulfillment</code> is proof that the buyer accessed a digital product. <code>customer_order_history</code> is the buyer's past orders with this seller. <code>prior_transactions</code> is the buyer's payment history across the platform, for a fraud defense. <code>customer_session</code> is checkout data, such as IP address, device fingerprint, AVS and CVV results, and the 3D Secure result. <code>subscription</code> is membership lifecycle evidence, such as renewals, cancellation and reminders sent. <code>complete_evidence</code> is the seller's whole response as one PDF of at most 19 pages, and it must be the only document. Whop sends a <code>complete_evidence</code> document to the processor in place of every other evidence field, attachment and document.
      */
     @JsonProperty("document_type")
     public UploadEvidenceDisputesRequestDocumentsItemDocumentType getDocumentType() {
@@ -111,7 +111,7 @@ public final class UploadEvidenceDisputesRequestDocumentsItem {
 
     public interface DocumentTypeStage {
         /**
-         * <p>What kind of evidence the document is.</p>
+         * <p>What this document proves. <code>return_policy</code>, <code>cancellation_policy</code> and <code>terms_of_service</code> are the seller's policy documents. A policy document replaces the account's copy for this dispute. <code>return_policy</code>, <code>cancellation_policy</code> and <code>customer_communication</code> also replace the matching fixed evidence slot. <code>shipping_policy</code> is the seller's shipping terms. <code>customer_communication</code> is correspondence with the buyer, such as a support thread or chat log. <code>product_image</code> is a photo of the product or service the buyer received. <code>physical_fulfillment</code> is proof that a physical order shipped and arrived. <code>digital_fulfillment</code> is proof that the buyer accessed a digital product. <code>customer_order_history</code> is the buyer's past orders with this seller. <code>prior_transactions</code> is the buyer's payment history across the platform, for a fraud defense. <code>customer_session</code> is checkout data, such as IP address, device fingerprint, AVS and CVV results, and the 3D Secure result. <code>subscription</code> is membership lifecycle evidence, such as renewals, cancellation and reminders sent. <code>complete_evidence</code> is the seller's whole response as one PDF of at most 19 pages, and it must be the only document. Whop sends a <code>complete_evidence</code> document to the processor in place of every other evidence field, attachment and document.</p>
          */
         _FinalStage documentType(@NotNull UploadEvidenceDisputesRequestDocumentsItemDocumentType documentType);
 
@@ -157,7 +157,6 @@ public final class UploadEvidenceDisputesRequestDocumentsItem {
 
         private Optional<String> directUploadId = Optional.empty();
 
-        @JsonAnySetter
         private Map<String, Object> additionalProperties = new HashMap<>();
 
         private Builder() {}
@@ -172,8 +171,7 @@ public final class UploadEvidenceDisputesRequestDocumentsItem {
         }
 
         /**
-         * <p>What kind of evidence the document is.</p>
-         * <p>What kind of evidence the document is.</p>
+         * <p>What this document proves. <code>return_policy</code>, <code>cancellation_policy</code> and <code>terms_of_service</code> are the seller's policy documents. A policy document replaces the account's copy for this dispute. <code>return_policy</code>, <code>cancellation_policy</code> and <code>customer_communication</code> also replace the matching fixed evidence slot. <code>shipping_policy</code> is the seller's shipping terms. <code>customer_communication</code> is correspondence with the buyer, such as a support thread or chat log. <code>product_image</code> is a photo of the product or service the buyer received. <code>physical_fulfillment</code> is proof that a physical order shipped and arrived. <code>digital_fulfillment</code> is proof that the buyer accessed a digital product. <code>customer_order_history</code> is the buyer's past orders with this seller. <code>prior_transactions</code> is the buyer's payment history across the platform, for a fraud defense. <code>customer_session</code> is checkout data, such as IP address, device fingerprint, AVS and CVV results, and the 3D Secure result. <code>subscription</code> is membership lifecycle evidence, such as renewals, cancellation and reminders sent. <code>complete_evidence</code> is the seller's whole response as one PDF of at most 19 pages, and it must be the only document. Whop sends a <code>complete_evidence</code> document to the processor in place of every other evidence field, attachment and document.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
@@ -247,6 +245,17 @@ public final class UploadEvidenceDisputesRequestDocumentsItem {
         public UploadEvidenceDisputesRequestDocumentsItem build() {
             return new UploadEvidenceDisputesRequestDocumentsItem(
                     directUploadId, documentType, file, id, additionalProperties);
+        }
+
+        @JsonAnySetter
+        private void putAdditionalPropertyFromJson(String key, Object value) {
+            if (key.equalsIgnoreCase("direct_upload_id")
+                    || key.equalsIgnoreCase("document_type")
+                    || key.equalsIgnoreCase("file")
+                    || key.equalsIgnoreCase("id")) {
+                return;
+            }
+            this.additionalProperties.put(key, value);
         }
 
         @java.lang.Override

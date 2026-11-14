@@ -15,7 +15,9 @@ import com.whop.api.core.ObjectMappers;
 import com.whop.api.types.Direction;
 import com.whop.api.types.MessageChannelOrder;
 import com.whop.api.types.SupportChannelView;
+import java.util.Collections;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
@@ -23,6 +25,8 @@ import java.util.Optional;
 @JsonInclude(JsonInclude.Include.NON_ABSENT)
 @JsonDeserialize(builder = ListSupportChannelsRequest.Builder.class)
 public final class ListSupportChannelsRequest {
+    private final Optional<List<String>> customerUserIds;
+
     private final Optional<String> after;
 
     private final Optional<String> before;
@@ -31,39 +35,65 @@ public final class ListSupportChannelsRequest {
 
     private final Optional<Integer> last;
 
-    private final Optional<String> companyId;
-
     private final Optional<SupportChannelView> view;
 
     private final Optional<Boolean> open;
+
+    private final Optional<String> customerUserId;
+
+    private final Optional<Boolean> participated;
+
+    private final Optional<Boolean> includeLastMessage;
+
+    private final Optional<Boolean> includeParticipated;
 
     private final Optional<Direction> direction;
 
     private final Optional<MessageChannelOrder> order;
 
+    private final Optional<String> accountId;
+
     private final Map<String, Object> additionalProperties;
 
     private ListSupportChannelsRequest(
+            Optional<List<String>> customerUserIds,
             Optional<String> after,
             Optional<String> before,
             Optional<Integer> first,
             Optional<Integer> last,
-            Optional<String> companyId,
             Optional<SupportChannelView> view,
             Optional<Boolean> open,
+            Optional<String> customerUserId,
+            Optional<Boolean> participated,
+            Optional<Boolean> includeLastMessage,
+            Optional<Boolean> includeParticipated,
             Optional<Direction> direction,
             Optional<MessageChannelOrder> order,
+            Optional<String> accountId,
             Map<String, Object> additionalProperties) {
+        this.customerUserIds = customerUserIds;
         this.after = after;
         this.before = before;
         this.first = first;
         this.last = last;
-        this.companyId = companyId;
         this.view = view;
         this.open = open;
+        this.customerUserId = customerUserId;
+        this.participated = participated;
+        this.includeLastMessage = includeLastMessage;
+        this.includeParticipated = includeParticipated;
         this.direction = direction;
         this.order = order;
+        this.accountId = accountId;
         this.additionalProperties = additionalProperties;
+    }
+
+    /**
+     * @return Only return support channels opened by any of these customers. Maximum 100 IDs per request.
+     */
+    @JsonProperty("customer_user_ids")
+    public Optional<List<String>> getCustomerUserIds() {
+        return customerUserIds;
     }
 
     /**
@@ -98,14 +128,6 @@ public final class ListSupportChannelsRequest {
         return last;
     }
 
-    /**
-     * @return The unique identifier of the company to list support channels for. Includes channels of child companies. When omitted, returns support channels across all companies the user has access to.
-     */
-    @JsonProperty("company_id")
-    public Optional<String> getCompanyId() {
-        return companyId;
-    }
-
     @JsonProperty("view")
     public Optional<SupportChannelView> getView() {
         return view;
@@ -119,6 +141,38 @@ public final class ListSupportChannelsRequest {
         return open;
     }
 
+    /**
+     * @return Only return support channels opened by this customer.
+     */
+    @JsonProperty("customer_user_id")
+    public Optional<String> getCustomerUserId() {
+        return customerUserId;
+    }
+
+    /**
+     * @return Set to true to only return channels the authenticated user has joined as a participant. Requires a user.
+     */
+    @JsonProperty("participated")
+    public Optional<Boolean> getParticipated() {
+        return participated;
+    }
+
+    /**
+     * @return Set to true to return <code>last_message</code> and <code>unread</code> on each channel. Both are <code>null</code> otherwise, which keeps large lists fast.
+     */
+    @JsonProperty("include_last_message")
+    public Optional<Boolean> getIncludeLastMessage() {
+        return includeLastMessage;
+    }
+
+    /**
+     * @return Set to true to return <code>participated</code> on each channel. It is <code>null</code> otherwise, which keeps large lists fast.
+     */
+    @JsonProperty("include_participated")
+    public Optional<Boolean> getIncludeParticipated() {
+        return includeParticipated;
+    }
+
     @JsonProperty("direction")
     public Optional<Direction> getDirection() {
         return direction;
@@ -127,6 +181,14 @@ public final class ListSupportChannelsRequest {
     @JsonProperty("order")
     public Optional<MessageChannelOrder> getOrder() {
         return order;
+    }
+
+    /**
+     * @return The unique identifier of the company to list support channels for. Includes channels of child companies. When omitted, returns support channels across all companies the user has access to.
+     */
+    @JsonProperty("account_id")
+    public Optional<String> getAccountId() {
+        return accountId;
     }
 
     @java.lang.Override
@@ -141,29 +203,39 @@ public final class ListSupportChannelsRequest {
     }
 
     private boolean equalTo(ListSupportChannelsRequest other) {
-        return after.equals(other.after)
+        return customerUserIds.equals(other.customerUserIds)
+                && after.equals(other.after)
                 && before.equals(other.before)
                 && first.equals(other.first)
                 && last.equals(other.last)
-                && companyId.equals(other.companyId)
                 && view.equals(other.view)
                 && open.equals(other.open)
+                && customerUserId.equals(other.customerUserId)
+                && participated.equals(other.participated)
+                && includeLastMessage.equals(other.includeLastMessage)
+                && includeParticipated.equals(other.includeParticipated)
                 && direction.equals(other.direction)
-                && order.equals(other.order);
+                && order.equals(other.order)
+                && accountId.equals(other.accountId);
     }
 
     @java.lang.Override
     public int hashCode() {
         return Objects.hash(
+                this.customerUserIds,
                 this.after,
                 this.before,
                 this.first,
                 this.last,
-                this.companyId,
                 this.view,
                 this.open,
+                this.customerUserId,
+                this.participated,
+                this.includeLastMessage,
+                this.includeParticipated,
                 this.direction,
-                this.order);
+                this.order,
+                this.accountId);
     }
 
     @java.lang.Override
@@ -177,6 +249,8 @@ public final class ListSupportChannelsRequest {
 
     @JsonIgnoreProperties(ignoreUnknown = true)
     public static final class Builder {
+        private Optional<List<String>> customerUserIds = Optional.empty();
+
         private Optional<String> after = Optional.empty();
 
         private Optional<String> before = Optional.empty();
@@ -185,31 +259,62 @@ public final class ListSupportChannelsRequest {
 
         private Optional<Integer> last = Optional.empty();
 
-        private Optional<String> companyId = Optional.empty();
-
         private Optional<SupportChannelView> view = Optional.empty();
 
         private Optional<Boolean> open = Optional.empty();
+
+        private Optional<String> customerUserId = Optional.empty();
+
+        private Optional<Boolean> participated = Optional.empty();
+
+        private Optional<Boolean> includeLastMessage = Optional.empty();
+
+        private Optional<Boolean> includeParticipated = Optional.empty();
 
         private Optional<Direction> direction = Optional.empty();
 
         private Optional<MessageChannelOrder> order = Optional.empty();
 
-        @JsonAnySetter
+        private Optional<String> accountId = Optional.empty();
+
         private Map<String, Object> additionalProperties = new HashMap<>();
 
         private Builder() {}
 
         public Builder from(ListSupportChannelsRequest other) {
+            customerUserIds(other.getCustomerUserIds());
             after(other.getAfter());
             before(other.getBefore());
             first(other.getFirst());
             last(other.getLast());
-            companyId(other.getCompanyId());
             view(other.getView());
             open(other.getOpen());
+            customerUserId(other.getCustomerUserId());
+            participated(other.getParticipated());
+            includeLastMessage(other.getIncludeLastMessage());
+            includeParticipated(other.getIncludeParticipated());
             direction(other.getDirection());
             order(other.getOrder());
+            accountId(other.getAccountId());
+            return this;
+        }
+
+        /**
+         * <p>Only return support channels opened by any of these customers. Maximum 100 IDs per request.</p>
+         */
+        @JsonSetter(value = "customer_user_ids", nulls = Nulls.SKIP)
+        public Builder customerUserIds(Optional<List<String>> customerUserIds) {
+            this.customerUserIds = customerUserIds;
+            return this;
+        }
+
+        public Builder customerUserIds(List<String> customerUserIds) {
+            this.customerUserIds = Optional.ofNullable(customerUserIds);
+            return this;
+        }
+
+        public Builder customerUserIds(String customerUserIds) {
+            this.customerUserIds = Optional.of(Collections.singletonList(customerUserIds));
             return this;
         }
 
@@ -269,20 +374,6 @@ public final class ListSupportChannelsRequest {
             return this;
         }
 
-        /**
-         * <p>The unique identifier of the company to list support channels for. Includes channels of child companies. When omitted, returns support channels across all companies the user has access to.</p>
-         */
-        @JsonSetter(value = "company_id", nulls = Nulls.SKIP)
-        public Builder companyId(Optional<String> companyId) {
-            this.companyId = companyId;
-            return this;
-        }
-
-        public Builder companyId(String companyId) {
-            this.companyId = Optional.ofNullable(companyId);
-            return this;
-        }
-
         @JsonSetter(value = "view", nulls = Nulls.SKIP)
         public Builder view(Optional<SupportChannelView> view) {
             this.view = view;
@@ -308,6 +399,62 @@ public final class ListSupportChannelsRequest {
             return this;
         }
 
+        /**
+         * <p>Only return support channels opened by this customer.</p>
+         */
+        @JsonSetter(value = "customer_user_id", nulls = Nulls.SKIP)
+        public Builder customerUserId(Optional<String> customerUserId) {
+            this.customerUserId = customerUserId;
+            return this;
+        }
+
+        public Builder customerUserId(String customerUserId) {
+            this.customerUserId = Optional.ofNullable(customerUserId);
+            return this;
+        }
+
+        /**
+         * <p>Set to true to only return channels the authenticated user has joined as a participant. Requires a user.</p>
+         */
+        @JsonSetter(value = "participated", nulls = Nulls.SKIP)
+        public Builder participated(Optional<Boolean> participated) {
+            this.participated = participated;
+            return this;
+        }
+
+        public Builder participated(Boolean participated) {
+            this.participated = Optional.ofNullable(participated);
+            return this;
+        }
+
+        /**
+         * <p>Set to true to return <code>last_message</code> and <code>unread</code> on each channel. Both are <code>null</code> otherwise, which keeps large lists fast.</p>
+         */
+        @JsonSetter(value = "include_last_message", nulls = Nulls.SKIP)
+        public Builder includeLastMessage(Optional<Boolean> includeLastMessage) {
+            this.includeLastMessage = includeLastMessage;
+            return this;
+        }
+
+        public Builder includeLastMessage(Boolean includeLastMessage) {
+            this.includeLastMessage = Optional.ofNullable(includeLastMessage);
+            return this;
+        }
+
+        /**
+         * <p>Set to true to return <code>participated</code> on each channel. It is <code>null</code> otherwise, which keeps large lists fast.</p>
+         */
+        @JsonSetter(value = "include_participated", nulls = Nulls.SKIP)
+        public Builder includeParticipated(Optional<Boolean> includeParticipated) {
+            this.includeParticipated = includeParticipated;
+            return this;
+        }
+
+        public Builder includeParticipated(Boolean includeParticipated) {
+            this.includeParticipated = Optional.ofNullable(includeParticipated);
+            return this;
+        }
+
         @JsonSetter(value = "direction", nulls = Nulls.SKIP)
         public Builder direction(Optional<Direction> direction) {
             this.direction = direction;
@@ -330,9 +477,58 @@ public final class ListSupportChannelsRequest {
             return this;
         }
 
+        /**
+         * <p>The unique identifier of the company to list support channels for. Includes channels of child companies. When omitted, returns support channels across all companies the user has access to.</p>
+         */
+        @JsonSetter(value = "account_id", nulls = Nulls.SKIP)
+        public Builder accountId(Optional<String> accountId) {
+            this.accountId = accountId;
+            return this;
+        }
+
+        public Builder accountId(String accountId) {
+            this.accountId = Optional.ofNullable(accountId);
+            return this;
+        }
+
         public ListSupportChannelsRequest build() {
             return new ListSupportChannelsRequest(
-                    after, before, first, last, companyId, view, open, direction, order, additionalProperties);
+                    customerUserIds,
+                    after,
+                    before,
+                    first,
+                    last,
+                    view,
+                    open,
+                    customerUserId,
+                    participated,
+                    includeLastMessage,
+                    includeParticipated,
+                    direction,
+                    order,
+                    accountId,
+                    additionalProperties);
+        }
+
+        @JsonAnySetter
+        private void putAdditionalPropertyFromJson(String key, Object value) {
+            if (key.equalsIgnoreCase("customer_user_ids")
+                    || key.equalsIgnoreCase("after")
+                    || key.equalsIgnoreCase("before")
+                    || key.equalsIgnoreCase("first")
+                    || key.equalsIgnoreCase("last")
+                    || key.equalsIgnoreCase("view")
+                    || key.equalsIgnoreCase("open")
+                    || key.equalsIgnoreCase("customer_user_id")
+                    || key.equalsIgnoreCase("participated")
+                    || key.equalsIgnoreCase("include_last_message")
+                    || key.equalsIgnoreCase("include_participated")
+                    || key.equalsIgnoreCase("direction")
+                    || key.equalsIgnoreCase("order")
+                    || key.equalsIgnoreCase("account_id")) {
+                return;
+            }
+            this.additionalProperties.put(key, value);
         }
 
         public Builder additionalProperty(String key, Object value) {

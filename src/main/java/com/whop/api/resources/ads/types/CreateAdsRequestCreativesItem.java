@@ -97,7 +97,6 @@ public final class CreateAdsRequestCreativesItem {
 
         private Optional<String> id = Optional.empty();
 
-        @JsonAnySetter
         private Map<String, Object> additionalProperties = new HashMap<>();
 
         private Builder() {}
@@ -150,6 +149,14 @@ public final class CreateAdsRequestCreativesItem {
 
         public CreateAdsRequestCreativesItem build() {
             return new CreateAdsRequestCreativesItem(crop, format, id, additionalProperties);
+        }
+
+        @JsonAnySetter
+        private void putAdditionalPropertyFromJson(String key, Object value) {
+            if (key.equalsIgnoreCase("crop") || key.equalsIgnoreCase("format") || key.equalsIgnoreCase("id")) {
+                return;
+            }
+            this.additionalProperties.put(key, value);
         }
 
         public Builder additionalProperty(String key, Object value) {

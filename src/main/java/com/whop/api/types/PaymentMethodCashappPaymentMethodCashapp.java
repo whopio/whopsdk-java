@@ -106,7 +106,6 @@ public final class PaymentMethodCashappPaymentMethodCashapp {
 
         private Optional<String> cashtag = Optional.empty();
 
-        @JsonAnySetter
         private Map<String, Object> additionalProperties = new HashMap<>();
 
         private Builder() {}
@@ -169,6 +168,14 @@ public final class PaymentMethodCashappPaymentMethodCashapp {
 
         public PaymentMethodCashappPaymentMethodCashapp build() {
             return new PaymentMethodCashappPaymentMethodCashapp(buyerId, cashtag, additionalProperties);
+        }
+
+        @JsonAnySetter
+        private void putAdditionalPropertyFromJson(String key, Object value) {
+            if (key.equalsIgnoreCase("buyer_id") || key.equalsIgnoreCase("cashtag")) {
+                return;
+            }
+            this.additionalProperties.put(key, value);
         }
 
         public Builder additionalProperty(String key, Object value) {

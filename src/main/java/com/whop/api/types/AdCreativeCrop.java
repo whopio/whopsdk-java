@@ -145,7 +145,6 @@ public final class AdCreativeCrop {
 
         private double y;
 
-        @JsonAnySetter
         private Map<String, Object> additionalProperties = new HashMap<>();
 
         private Builder() {}
@@ -161,7 +160,6 @@ public final class AdCreativeCrop {
 
         /**
          * <p>Height of the crop window in source pixels.</p>
-         * <p>Height of the crop window in source pixels.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
@@ -172,7 +170,6 @@ public final class AdCreativeCrop {
         }
 
         /**
-         * <p>Width of the crop window in source pixels.</p>
          * <p>Width of the crop window in source pixels.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
@@ -185,7 +182,6 @@ public final class AdCreativeCrop {
 
         /**
          * <p>Left edge of the crop window in source pixels.</p>
-         * <p>Left edge of the crop window in source pixels.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
@@ -196,7 +192,6 @@ public final class AdCreativeCrop {
         }
 
         /**
-         * <p>Top edge of the crop window in source pixels.</p>
          * <p>Top edge of the crop window in source pixels.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
@@ -210,6 +205,17 @@ public final class AdCreativeCrop {
         @java.lang.Override
         public AdCreativeCrop build() {
             return new AdCreativeCrop(height, width, x, y, additionalProperties);
+        }
+
+        @JsonAnySetter
+        private void putAdditionalPropertyFromJson(String key, Object value) {
+            if (key.equalsIgnoreCase("height")
+                    || key.equalsIgnoreCase("width")
+                    || key.equalsIgnoreCase("x")
+                    || key.equalsIgnoreCase("y")) {
+                return;
+            }
+            this.additionalProperties.put(key, value);
         }
 
         @java.lang.Override

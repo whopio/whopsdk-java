@@ -229,7 +229,6 @@ public final class CreateBountySubmissionsRequestMetadata {
 
         private Optional<String> station = Optional.empty();
 
-        @JsonAnySetter
         private Map<String, Object> additionalProperties = new HashMap<>();
 
         private Builder() {}
@@ -423,6 +422,20 @@ public final class CreateBountySubmissionsRequestMetadata {
         public CreateBountySubmissionsRequestMetadata build() {
             return new CreateBountySubmissionsRequestMetadata(
                     city, country, device, fov, operator, site, station, additionalProperties);
+        }
+
+        @JsonAnySetter
+        private void putAdditionalPropertyFromJson(String key, Object value) {
+            if (key.equalsIgnoreCase("city")
+                    || key.equalsIgnoreCase("country")
+                    || key.equalsIgnoreCase("device")
+                    || key.equalsIgnoreCase("fov")
+                    || key.equalsIgnoreCase("operator")
+                    || key.equalsIgnoreCase("site")
+                    || key.equalsIgnoreCase("station")) {
+                return;
+            }
+            this.additionalProperties.put(key, value);
         }
 
         public Builder additionalProperty(String key, Object value) {

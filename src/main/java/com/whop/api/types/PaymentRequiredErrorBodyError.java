@@ -118,7 +118,6 @@ public final class PaymentRequiredErrorBodyError {
 
         private PaymentRequiredErrorBodyErrorType type;
 
-        @JsonAnySetter
         private Map<String, Object> additionalProperties = new HashMap<>();
 
         private Builder() {}
@@ -132,7 +131,6 @@ public final class PaymentRequiredErrorBodyError {
         }
 
         /**
-         * <p>Hosted page where the account can deposit funds before retrying.</p>
          * <p>Hosted page where the account can deposit funds before retrying.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
@@ -160,6 +158,16 @@ public final class PaymentRequiredErrorBodyError {
         @java.lang.Override
         public PaymentRequiredErrorBodyError build() {
             return new PaymentRequiredErrorBodyError(depositUrl, message, type, additionalProperties);
+        }
+
+        @JsonAnySetter
+        private void putAdditionalPropertyFromJson(String key, Object value) {
+            if (key.equalsIgnoreCase("deposit_url")
+                    || key.equalsIgnoreCase("message")
+                    || key.equalsIgnoreCase("type")) {
+                return;
+            }
+            this.additionalProperties.put(key, value);
         }
 
         @java.lang.Override

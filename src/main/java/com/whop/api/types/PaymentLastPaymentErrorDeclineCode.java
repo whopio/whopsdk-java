@@ -238,6 +238,9 @@ public final class PaymentLastPaymentErrorDeclineCode {
             new PaymentLastPaymentErrorDeclineCode(
                     Value.THREE_D_SECURE_REJECTED_BY_BANK, "three_d_secure_rejected_by_bank");
 
+    public static final PaymentLastPaymentErrorDeclineCode CARD_DECLINED_BY_ISSUER =
+            new PaymentLastPaymentErrorDeclineCode(Value.CARD_DECLINED_BY_ISSUER, "card_declined_by_issuer");
+
     public static final PaymentLastPaymentErrorDeclineCode SEPA_MANDATE_DATA_INVALID =
             new PaymentLastPaymentErrorDeclineCode(Value.SEPA_MANDATE_DATA_INVALID, "sepa_mandate_data_invalid");
 
@@ -454,6 +457,8 @@ public final class PaymentLastPaymentErrorDeclineCode {
                 return visitor.visitThreeDSecureFraud();
             case THREE_D_SECURE_REJECTED_BY_BANK:
                 return visitor.visitThreeDSecureRejectedByBank();
+            case CARD_DECLINED_BY_ISSUER:
+                return visitor.visitCardDeclinedByIssuer();
             case SEPA_MANDATE_DATA_INVALID:
                 return visitor.visitSepaMandateDataInvalid();
             case ISSUER_UNAVAILABLE:
@@ -635,6 +640,8 @@ public final class PaymentLastPaymentErrorDeclineCode {
                 return THREE_D_SECURE_FRAUD;
             case "three_d_secure_rejected_by_bank":
                 return THREE_D_SECURE_REJECTED_BY_BANK;
+            case "card_declined_by_issuer":
+                return CARD_DECLINED_BY_ISSUER;
             case "sepa_mandate_data_invalid":
                 return SEPA_MANDATE_DATA_INVALID;
             case "issuer_unavailable":
@@ -702,6 +709,8 @@ public final class PaymentLastPaymentErrorDeclineCode {
         CARD_VELOCITY_EXCEEDED,
 
         CONTACT_ISSUER,
+
+        CARD_DECLINED_BY_ISSUER,
 
         BANK_DECLINED,
 
@@ -878,6 +887,8 @@ public final class PaymentLastPaymentErrorDeclineCode {
         T visitCardVelocityExceeded();
 
         T visitContactIssuer();
+
+        T visitCardDeclinedByIssuer();
 
         T visitBankDeclined();
 

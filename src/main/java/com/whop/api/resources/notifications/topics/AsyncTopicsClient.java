@@ -5,6 +5,7 @@ package com.whop.api.resources.notifications.topics;
 
 import com.whop.api.core.ClientOptions;
 import com.whop.api.core.RequestOptions;
+import com.whop.api.core.WhopApiHttpResponse;
 import com.whop.api.core.pagination.SyncPagingIterable;
 import com.whop.api.resources.notifications.topics.requests.ListTopicsRequest;
 import com.whop.api.types.NotificationTopic;
@@ -28,31 +29,66 @@ public class AsyncTopicsClient {
     }
 
     /**
-     * Lists the platform's visible notification topics — the categories users can set notification preferences on. App-created topics are internal and not returned.
+     * Lists the platform's visible notification topics — the categories users can set notification preferences on. App-created topics are not returned.
      */
     public CompletableFuture<SyncPagingIterable<NotificationTopic>> list() {
-        return this.rawClient.list().thenApply(response -> response.body());
+        CompletableFuture<WhopApiHttpResponse<SyncPagingIterable<NotificationTopic>>> rawFuture = this.rawClient.list();
+        CompletableFuture<SyncPagingIterable<NotificationTopic>> future =
+                rawFuture.thenApply(response -> response.body());
+        future.whenComplete((result_, throwable_) -> {
+            if (future.isCancelled()) {
+                rawFuture.cancel(true);
+            }
+        });
+        return future;
     }
 
     /**
-     * Lists the platform's visible notification topics — the categories users can set notification preferences on. App-created topics are internal and not returned.
+     * Lists the platform's visible notification topics — the categories users can set notification preferences on. App-created topics are not returned.
      */
     public CompletableFuture<SyncPagingIterable<NotificationTopic>> list(RequestOptions requestOptions) {
-        return this.rawClient.list(requestOptions).thenApply(response -> response.body());
+        CompletableFuture<WhopApiHttpResponse<SyncPagingIterable<NotificationTopic>>> rawFuture =
+                this.rawClient.list(requestOptions);
+        CompletableFuture<SyncPagingIterable<NotificationTopic>> future =
+                rawFuture.thenApply(response -> response.body());
+        future.whenComplete((result_, throwable_) -> {
+            if (future.isCancelled()) {
+                rawFuture.cancel(true);
+            }
+        });
+        return future;
     }
 
     /**
-     * Lists the platform's visible notification topics — the categories users can set notification preferences on. App-created topics are internal and not returned.
+     * Lists the platform's visible notification topics — the categories users can set notification preferences on. App-created topics are not returned.
      */
     public CompletableFuture<SyncPagingIterable<NotificationTopic>> list(ListTopicsRequest request) {
-        return this.rawClient.list(request).thenApply(response -> response.body());
+        CompletableFuture<WhopApiHttpResponse<SyncPagingIterable<NotificationTopic>>> rawFuture =
+                this.rawClient.list(request);
+        CompletableFuture<SyncPagingIterable<NotificationTopic>> future =
+                rawFuture.thenApply(response -> response.body());
+        future.whenComplete((result_, throwable_) -> {
+            if (future.isCancelled()) {
+                rawFuture.cancel(true);
+            }
+        });
+        return future;
     }
 
     /**
-     * Lists the platform's visible notification topics — the categories users can set notification preferences on. App-created topics are internal and not returned.
+     * Lists the platform's visible notification topics — the categories users can set notification preferences on. App-created topics are not returned.
      */
     public CompletableFuture<SyncPagingIterable<NotificationTopic>> list(
             ListTopicsRequest request, RequestOptions requestOptions) {
-        return this.rawClient.list(request, requestOptions).thenApply(response -> response.body());
+        CompletableFuture<WhopApiHttpResponse<SyncPagingIterable<NotificationTopic>>> rawFuture =
+                this.rawClient.list(request, requestOptions);
+        CompletableFuture<SyncPagingIterable<NotificationTopic>> future =
+                rawFuture.thenApply(response -> response.body());
+        future.whenComplete((result_, throwable_) -> {
+            if (future.isCancelled()) {
+                rawFuture.cancel(true);
+            }
+        });
+        return future;
     }
 }

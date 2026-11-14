@@ -115,7 +115,6 @@ public final class ListCourseLessonInteractionsResponse {
 
         private List<CourseLessonInteractionListItem> data = new ArrayList<>();
 
-        @JsonAnySetter
         private Map<String, Object> additionalProperties = new HashMap<>();
 
         private Builder() {}
@@ -128,7 +127,6 @@ public final class ListCourseLessonInteractionsResponse {
         }
 
         /**
-         * <p>Information to aid in pagination.</p>
          * <p>Information to aid in pagination.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
@@ -177,6 +175,14 @@ public final class ListCourseLessonInteractionsResponse {
         @java.lang.Override
         public ListCourseLessonInteractionsResponse build() {
             return new ListCourseLessonInteractionsResponse(data, pageInfo, additionalProperties);
+        }
+
+        @JsonAnySetter
+        private void putAdditionalPropertyFromJson(String key, Object value) {
+            if (key.equalsIgnoreCase("data") || key.equalsIgnoreCase("page_info")) {
+                return;
+            }
+            this.additionalProperties.put(key, value);
         }
 
         @java.lang.Override

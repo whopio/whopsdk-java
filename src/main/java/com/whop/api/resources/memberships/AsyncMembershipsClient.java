@@ -5,19 +5,21 @@ package com.whop.api.resources.memberships;
 
 import com.whop.api.core.ClientOptions;
 import com.whop.api.core.RequestOptions;
+import com.whop.api.core.WhopApiHttpResponse;
 import com.whop.api.core.pagination.SyncPagingIterable;
-import com.whop.api.resources.memberships.requests.AddFreeDaysMembershipRequest;
+import com.whop.api.resources.memberships.requests.ApplyPromoCodeMembershipsRequest;
+import com.whop.api.resources.memberships.requests.AssignAffiliateMembershipsRequest;
 import com.whop.api.resources.memberships.requests.CancelMembershipsRequest;
 import com.whop.api.resources.memberships.requests.ExtendMembershipsRequest;
+import com.whop.api.resources.memberships.requests.InviteMembershipsRequest;
 import com.whop.api.resources.memberships.requests.ListMembershipsRequest;
 import com.whop.api.resources.memberships.requests.PauseMembershipsRequest;
+import com.whop.api.resources.memberships.requests.ReactivateMembershipsRequest;
 import com.whop.api.resources.memberships.requests.ResumeMembershipsRequest;
-import com.whop.api.resources.memberships.requests.ResyncAccessMembershipRequest;
+import com.whop.api.resources.memberships.requests.ResyncAccessMembershipsRequest;
 import com.whop.api.resources.memberships.requests.RetrieveMembershipsRequest;
 import com.whop.api.resources.memberships.requests.TransferMembershipsRequest;
-import com.whop.api.resources.memberships.requests.UncancelMembershipRequest;
 import com.whop.api.resources.memberships.requests.UpdateMembershipsRequest;
-import com.whop.api.resources.memberships.types.InviteMembershipsRequestBody;
 import com.whop.api.resources.memberships.types.InviteMembershipsResponse;
 import com.whop.api.resources.memberships.types.TransferMembershipsResponse;
 import com.whop.api.types.Membership;
@@ -44,21 +46,43 @@ public class AsyncMembershipsClient {
      * Lists every membership the caller can read: an account API key its account's; a user credential their own plus those of every account they manage. <code>account_id</code> and <code>user_id</code> only narrow that list — values outside the caller's reach return fewer results, not an error.
      */
     public CompletableFuture<SyncPagingIterable<Membership>> list() {
-        return this.rawClient.list().thenApply(response -> response.body());
+        CompletableFuture<WhopApiHttpResponse<SyncPagingIterable<Membership>>> rawFuture = this.rawClient.list();
+        CompletableFuture<SyncPagingIterable<Membership>> future = rawFuture.thenApply(response -> response.body());
+        future.whenComplete((result_, throwable_) -> {
+            if (future.isCancelled()) {
+                rawFuture.cancel(true);
+            }
+        });
+        return future;
     }
 
     /**
      * Lists every membership the caller can read: an account API key its account's; a user credential their own plus those of every account they manage. <code>account_id</code> and <code>user_id</code> only narrow that list — values outside the caller's reach return fewer results, not an error.
      */
     public CompletableFuture<SyncPagingIterable<Membership>> list(RequestOptions requestOptions) {
-        return this.rawClient.list(requestOptions).thenApply(response -> response.body());
+        CompletableFuture<WhopApiHttpResponse<SyncPagingIterable<Membership>>> rawFuture =
+                this.rawClient.list(requestOptions);
+        CompletableFuture<SyncPagingIterable<Membership>> future = rawFuture.thenApply(response -> response.body());
+        future.whenComplete((result_, throwable_) -> {
+            if (future.isCancelled()) {
+                rawFuture.cancel(true);
+            }
+        });
+        return future;
     }
 
     /**
      * Lists every membership the caller can read: an account API key its account's; a user credential their own plus those of every account they manage. <code>account_id</code> and <code>user_id</code> only narrow that list — values outside the caller's reach return fewer results, not an error.
      */
     public CompletableFuture<SyncPagingIterable<Membership>> list(ListMembershipsRequest request) {
-        return this.rawClient.list(request).thenApply(response -> response.body());
+        CompletableFuture<WhopApiHttpResponse<SyncPagingIterable<Membership>>> rawFuture = this.rawClient.list(request);
+        CompletableFuture<SyncPagingIterable<Membership>> future = rawFuture.thenApply(response -> response.body());
+        future.whenComplete((result_, throwable_) -> {
+            if (future.isCancelled()) {
+                rawFuture.cancel(true);
+            }
+        });
+        return future;
     }
 
     /**
@@ -66,43 +90,87 @@ public class AsyncMembershipsClient {
      */
     public CompletableFuture<SyncPagingIterable<Membership>> list(
             ListMembershipsRequest request, RequestOptions requestOptions) {
-        return this.rawClient.list(request, requestOptions).thenApply(response -> response.body());
+        CompletableFuture<WhopApiHttpResponse<SyncPagingIterable<Membership>>> rawFuture =
+                this.rawClient.list(request, requestOptions);
+        CompletableFuture<SyncPagingIterable<Membership>> future = rawFuture.thenApply(response -> response.body());
+        future.whenComplete((result_, throwable_) -> {
+            if (future.isCancelled()) {
+                rawFuture.cancel(true);
+            }
+        });
+        return future;
     }
 
     /**
-     * Sends an email inviting one recipient to join the account through a free plan. Identify the recipient by exactly one of <code>user_id</code> or <code>email</code>. The invitation is bound to that recipient; after signing in, accepting it immediately grants the membership without checkout. This Experimental endpoint is available only to accounts enabled for membership invitations.
+     * Emails one recipient an invitation to a free variant's membership. The invitation is bound to that recipient; after signing in, accepting it immediately grants the membership without checkout. This Experimental endpoint is available only to accounts enabled for membership invitations.
      */
-    public CompletableFuture<InviteMembershipsResponse> invite(InviteMembershipsRequestBody request) {
-        return this.rawClient.invite(request).thenApply(response -> response.body());
+    public CompletableFuture<InviteMembershipsResponse> invite(InviteMembershipsRequest request) {
+        CompletableFuture<WhopApiHttpResponse<InviteMembershipsResponse>> rawFuture = this.rawClient.invite(request);
+        CompletableFuture<InviteMembershipsResponse> future = rawFuture.thenApply(response -> response.body());
+        future.whenComplete((result_, throwable_) -> {
+            if (future.isCancelled()) {
+                rawFuture.cancel(true);
+            }
+        });
+        return future;
     }
 
     /**
-     * Sends an email inviting one recipient to join the account through a free plan. Identify the recipient by exactly one of <code>user_id</code> or <code>email</code>. The invitation is bound to that recipient; after signing in, accepting it immediately grants the membership without checkout. This Experimental endpoint is available only to accounts enabled for membership invitations.
+     * Emails one recipient an invitation to a free variant's membership. The invitation is bound to that recipient; after signing in, accepting it immediately grants the membership without checkout. This Experimental endpoint is available only to accounts enabled for membership invitations.
      */
     public CompletableFuture<InviteMembershipsResponse> invite(
-            InviteMembershipsRequestBody request, RequestOptions requestOptions) {
-        return this.rawClient.invite(request, requestOptions).thenApply(response -> response.body());
+            InviteMembershipsRequest request, RequestOptions requestOptions) {
+        CompletableFuture<WhopApiHttpResponse<InviteMembershipsResponse>> rawFuture =
+                this.rawClient.invite(request, requestOptions);
+        CompletableFuture<InviteMembershipsResponse> future = rawFuture.thenApply(response -> response.body());
+        future.whenComplete((result_, throwable_) -> {
+            if (future.isCancelled()) {
+                rawFuture.cancel(true);
+            }
+        });
+        return future;
     }
 
     /**
      * Retrieves a membership by ID or license key. Accessible to the account and to the membership's own user.
      */
     public CompletableFuture<Membership> retrieve(String id) {
-        return this.rawClient.retrieve(id).thenApply(response -> response.body());
+        CompletableFuture<WhopApiHttpResponse<Membership>> rawFuture = this.rawClient.retrieve(id);
+        CompletableFuture<Membership> future = rawFuture.thenApply(response -> response.body());
+        future.whenComplete((result_, throwable_) -> {
+            if (future.isCancelled()) {
+                rawFuture.cancel(true);
+            }
+        });
+        return future;
     }
 
     /**
      * Retrieves a membership by ID or license key. Accessible to the account and to the membership's own user.
      */
     public CompletableFuture<Membership> retrieve(String id, RequestOptions requestOptions) {
-        return this.rawClient.retrieve(id, requestOptions).thenApply(response -> response.body());
+        CompletableFuture<WhopApiHttpResponse<Membership>> rawFuture = this.rawClient.retrieve(id, requestOptions);
+        CompletableFuture<Membership> future = rawFuture.thenApply(response -> response.body());
+        future.whenComplete((result_, throwable_) -> {
+            if (future.isCancelled()) {
+                rawFuture.cancel(true);
+            }
+        });
+        return future;
     }
 
     /**
      * Retrieves a membership by ID or license key. Accessible to the account and to the membership's own user.
      */
     public CompletableFuture<Membership> retrieve(String id, RetrieveMembershipsRequest request) {
-        return this.rawClient.retrieve(id, request).thenApply(response -> response.body());
+        CompletableFuture<WhopApiHttpResponse<Membership>> rawFuture = this.rawClient.retrieve(id, request);
+        CompletableFuture<Membership> future = rawFuture.thenApply(response -> response.body());
+        future.whenComplete((result_, throwable_) -> {
+            if (future.isCancelled()) {
+                rawFuture.cancel(true);
+            }
+        });
+        return future;
     }
 
     /**
@@ -110,99 +178,205 @@ public class AsyncMembershipsClient {
      */
     public CompletableFuture<Membership> retrieve(
             String id, RetrieveMembershipsRequest request, RequestOptions requestOptions) {
-        return this.rawClient.retrieve(id, request, requestOptions).thenApply(response -> response.body());
+        CompletableFuture<WhopApiHttpResponse<Membership>> rawFuture =
+                this.rawClient.retrieve(id, request, requestOptions);
+        CompletableFuture<Membership> future = rawFuture.thenApply(response -> response.body());
+        future.whenComplete((result_, throwable_) -> {
+            if (future.isCancelled()) {
+                rawFuture.cancel(true);
+            }
+        });
+        return future;
     }
 
     /**
-     * Updates a membership: merge metadata key-value pairs, or toggle <code>cancel_at_period_end</code> — <code>true</code> schedules the cancellation for the end of the current billing period, <code>false</code> reverses a pending one.
+     * Updates a membership's metadata, scheduled cancellation, renewal payment method, renewal cadence, next renewal date, or renewal price.
      */
     public CompletableFuture<Membership> update(String id) {
-        return this.rawClient.update(id).thenApply(response -> response.body());
+        CompletableFuture<WhopApiHttpResponse<Membership>> rawFuture = this.rawClient.update(id);
+        CompletableFuture<Membership> future = rawFuture.thenApply(response -> response.body());
+        future.whenComplete((result_, throwable_) -> {
+            if (future.isCancelled()) {
+                rawFuture.cancel(true);
+            }
+        });
+        return future;
     }
 
     /**
-     * Updates a membership: merge metadata key-value pairs, or toggle <code>cancel_at_period_end</code> — <code>true</code> schedules the cancellation for the end of the current billing period, <code>false</code> reverses a pending one.
+     * Updates a membership's metadata, scheduled cancellation, renewal payment method, renewal cadence, next renewal date, or renewal price.
      */
     public CompletableFuture<Membership> update(String id, RequestOptions requestOptions) {
-        return this.rawClient.update(id, requestOptions).thenApply(response -> response.body());
+        CompletableFuture<WhopApiHttpResponse<Membership>> rawFuture = this.rawClient.update(id, requestOptions);
+        CompletableFuture<Membership> future = rawFuture.thenApply(response -> response.body());
+        future.whenComplete((result_, throwable_) -> {
+            if (future.isCancelled()) {
+                rawFuture.cancel(true);
+            }
+        });
+        return future;
     }
 
     /**
-     * Updates a membership: merge metadata key-value pairs, or toggle <code>cancel_at_period_end</code> — <code>true</code> schedules the cancellation for the end of the current billing period, <code>false</code> reverses a pending one.
+     * Updates a membership's metadata, scheduled cancellation, renewal payment method, renewal cadence, next renewal date, or renewal price.
      */
     public CompletableFuture<Membership> update(String id, UpdateMembershipsRequest request) {
-        return this.rawClient.update(id, request).thenApply(response -> response.body());
+        CompletableFuture<WhopApiHttpResponse<Membership>> rawFuture = this.rawClient.update(id, request);
+        CompletableFuture<Membership> future = rawFuture.thenApply(response -> response.body());
+        future.whenComplete((result_, throwable_) -> {
+            if (future.isCancelled()) {
+                rawFuture.cancel(true);
+            }
+        });
+        return future;
     }
 
     /**
-     * Updates a membership: merge metadata key-value pairs, or toggle <code>cancel_at_period_end</code> — <code>true</code> schedules the cancellation for the end of the current billing period, <code>false</code> reverses a pending one.
+     * Updates a membership's metadata, scheduled cancellation, renewal payment method, renewal cadence, next renewal date, or renewal price.
      */
     public CompletableFuture<Membership> update(
             String id, UpdateMembershipsRequest request, RequestOptions requestOptions) {
-        return this.rawClient.update(id, request, requestOptions).thenApply(response -> response.body());
+        CompletableFuture<WhopApiHttpResponse<Membership>> rawFuture =
+                this.rawClient.update(id, request, requestOptions);
+        CompletableFuture<Membership> future = rawFuture.thenApply(response -> response.body());
+        future.whenComplete((result_, throwable_) -> {
+            if (future.isCancelled()) {
+                rawFuture.cancel(true);
+            }
+        });
+        return future;
     }
 
     /**
-     * Add free days to extend a membership's current billing period, expiration date, or Stripe trial.
-     * <p>Required permissions:</p>
-     * <ul>
-     * <li><code>member:manage</code></li>
-     * <li><code>member:email:read</code></li>
-     * <li><code>member:basic:read</code></li>
-     * </ul>
+     * Applies a promo code to an <code>active</code> or <code>trialing</code> membership that does not already have one and has exactly one recurring item, for Stripe-billed memberships and memberships billed by Whop's billing engine. The discount lands on the next invoice and follows the code's duration (<code>once</code>, <code>repeating</code>, or <code>forever</code>).
      */
-    public CompletableFuture<Membership> addFreeDaysMembership(String id, AddFreeDaysMembershipRequest request) {
-        return this.rawClient.addFreeDaysMembership(id, request).thenApply(response -> response.body());
+    public CompletableFuture<Membership> applyPromoCode(String id, ApplyPromoCodeMembershipsRequest request) {
+        CompletableFuture<WhopApiHttpResponse<Membership>> rawFuture = this.rawClient.applyPromoCode(id, request);
+        CompletableFuture<Membership> future = rawFuture.thenApply(response -> response.body());
+        future.whenComplete((result_, throwable_) -> {
+            if (future.isCancelled()) {
+                rawFuture.cancel(true);
+            }
+        });
+        return future;
     }
 
     /**
-     * Add free days to extend a membership's current billing period, expiration date, or Stripe trial.
-     * <p>Required permissions:</p>
-     * <ul>
-     * <li><code>member:manage</code></li>
-     * <li><code>member:email:read</code></li>
-     * <li><code>member:basic:read</code></li>
-     * </ul>
+     * Applies a promo code to an <code>active</code> or <code>trialing</code> membership that does not already have one and has exactly one recurring item, for Stripe-billed memberships and memberships billed by Whop's billing engine. The discount lands on the next invoice and follows the code's duration (<code>once</code>, <code>repeating</code>, or <code>forever</code>).
      */
-    public CompletableFuture<Membership> addFreeDaysMembership(
-            String id, AddFreeDaysMembershipRequest request, RequestOptions requestOptions) {
-        return this.rawClient.addFreeDaysMembership(id, request, requestOptions).thenApply(response -> response.body());
+    public CompletableFuture<Membership> applyPromoCode(
+            String id, ApplyPromoCodeMembershipsRequest request, RequestOptions requestOptions) {
+        CompletableFuture<WhopApiHttpResponse<Membership>> rawFuture =
+                this.rawClient.applyPromoCode(id, request, requestOptions);
+        CompletableFuture<Membership> future = rawFuture.thenApply(response -> response.body());
+        future.whenComplete((result_, throwable_) -> {
+            if (future.isCancelled()) {
+                rawFuture.cancel(true);
+            }
+        });
+        return future;
     }
 
     /**
-     * Cancels a membership. Pass <code>cancel_at_period_end: true</code> to stop auto-renewal and keep access until the current billing period ends. Omit it (or pass <code>false</code>) to revoke access immediately. Buyers cannot cancel buy-now-pay-later (<code>splitit</code>, <code>sezzle</code>) or non-trial split-pay memberships.
+     * Assigns an affiliate to a membership and pays them the commission you set on its future payments; past payments are not recalculated. A user who is not yet an affiliate of your account becomes one, which also requires <code>affiliate:create</code>. Send a new <code>commission_type</code> or <code>commission_value</code> for the membership's current affiliate to change their commission; a membership that already has a different affiliate returns a conflict. Works for active or trialing memberships with one recurring variant that bill through Stripe or Whop's billing engine, and not for marketplace memberships, paused payments, or a scheduled cancellation. You cannot assign yourself.
+     */
+    public CompletableFuture<Membership> assignAffiliate(String id, AssignAffiliateMembershipsRequest request) {
+        CompletableFuture<WhopApiHttpResponse<Membership>> rawFuture = this.rawClient.assignAffiliate(id, request);
+        CompletableFuture<Membership> future = rawFuture.thenApply(response -> response.body());
+        future.whenComplete((result_, throwable_) -> {
+            if (future.isCancelled()) {
+                rawFuture.cancel(true);
+            }
+        });
+        return future;
+    }
+
+    /**
+     * Assigns an affiliate to a membership and pays them the commission you set on its future payments; past payments are not recalculated. A user who is not yet an affiliate of your account becomes one, which also requires <code>affiliate:create</code>. Send a new <code>commission_type</code> or <code>commission_value</code> for the membership's current affiliate to change their commission; a membership that already has a different affiliate returns a conflict. Works for active or trialing memberships with one recurring variant that bill through Stripe or Whop's billing engine, and not for marketplace memberships, paused payments, or a scheduled cancellation. You cannot assign yourself.
+     */
+    public CompletableFuture<Membership> assignAffiliate(
+            String id, AssignAffiliateMembershipsRequest request, RequestOptions requestOptions) {
+        CompletableFuture<WhopApiHttpResponse<Membership>> rawFuture =
+                this.rawClient.assignAffiliate(id, request, requestOptions);
+        CompletableFuture<Membership> future = rawFuture.thenApply(response -> response.body());
+        future.whenComplete((result_, throwable_) -> {
+            if (future.isCancelled()) {
+                rawFuture.cancel(true);
+            }
+        });
+        return future;
+    }
+
+    /**
+     * Cancels a membership, either immediately or at the end of the current billing period. Buyers cannot cancel buy-now-pay-later (<code>splitit</code>, <code>sezzle</code>) or non-trial split-pay memberships.
      */
     public CompletableFuture<Membership> cancel(String id) {
-        return this.rawClient.cancel(id).thenApply(response -> response.body());
+        CompletableFuture<WhopApiHttpResponse<Membership>> rawFuture = this.rawClient.cancel(id);
+        CompletableFuture<Membership> future = rawFuture.thenApply(response -> response.body());
+        future.whenComplete((result_, throwable_) -> {
+            if (future.isCancelled()) {
+                rawFuture.cancel(true);
+            }
+        });
+        return future;
     }
 
     /**
-     * Cancels a membership. Pass <code>cancel_at_period_end: true</code> to stop auto-renewal and keep access until the current billing period ends. Omit it (or pass <code>false</code>) to revoke access immediately. Buyers cannot cancel buy-now-pay-later (<code>splitit</code>, <code>sezzle</code>) or non-trial split-pay memberships.
+     * Cancels a membership, either immediately or at the end of the current billing period. Buyers cannot cancel buy-now-pay-later (<code>splitit</code>, <code>sezzle</code>) or non-trial split-pay memberships.
      */
     public CompletableFuture<Membership> cancel(String id, RequestOptions requestOptions) {
-        return this.rawClient.cancel(id, requestOptions).thenApply(response -> response.body());
+        CompletableFuture<WhopApiHttpResponse<Membership>> rawFuture = this.rawClient.cancel(id, requestOptions);
+        CompletableFuture<Membership> future = rawFuture.thenApply(response -> response.body());
+        future.whenComplete((result_, throwable_) -> {
+            if (future.isCancelled()) {
+                rawFuture.cancel(true);
+            }
+        });
+        return future;
     }
 
     /**
-     * Cancels a membership. Pass <code>cancel_at_period_end: true</code> to stop auto-renewal and keep access until the current billing period ends. Omit it (or pass <code>false</code>) to revoke access immediately. Buyers cannot cancel buy-now-pay-later (<code>splitit</code>, <code>sezzle</code>) or non-trial split-pay memberships.
+     * Cancels a membership, either immediately or at the end of the current billing period. Buyers cannot cancel buy-now-pay-later (<code>splitit</code>, <code>sezzle</code>) or non-trial split-pay memberships.
      */
     public CompletableFuture<Membership> cancel(String id, CancelMembershipsRequest request) {
-        return this.rawClient.cancel(id, request).thenApply(response -> response.body());
+        CompletableFuture<WhopApiHttpResponse<Membership>> rawFuture = this.rawClient.cancel(id, request);
+        CompletableFuture<Membership> future = rawFuture.thenApply(response -> response.body());
+        future.whenComplete((result_, throwable_) -> {
+            if (future.isCancelled()) {
+                rawFuture.cancel(true);
+            }
+        });
+        return future;
     }
 
     /**
-     * Cancels a membership. Pass <code>cancel_at_period_end: true</code> to stop auto-renewal and keep access until the current billing period ends. Omit it (or pass <code>false</code>) to revoke access immediately. Buyers cannot cancel buy-now-pay-later (<code>splitit</code>, <code>sezzle</code>) or non-trial split-pay memberships.
+     * Cancels a membership, either immediately or at the end of the current billing period. Buyers cannot cancel buy-now-pay-later (<code>splitit</code>, <code>sezzle</code>) or non-trial split-pay memberships.
      */
     public CompletableFuture<Membership> cancel(
             String id, CancelMembershipsRequest request, RequestOptions requestOptions) {
-        return this.rawClient.cancel(id, request, requestOptions).thenApply(response -> response.body());
+        CompletableFuture<WhopApiHttpResponse<Membership>> rawFuture =
+                this.rawClient.cancel(id, request, requestOptions);
+        CompletableFuture<Membership> future = rawFuture.thenApply(response -> response.body());
+        future.whenComplete((result_, throwable_) -> {
+            if (future.isCancelled()) {
+                rawFuture.cancel(true);
+            }
+        });
+        return future;
     }
 
     /**
      * Adds free days to a membership, extending its current billing period, expiration date, or trial depending on the plan type.
      */
     public CompletableFuture<Membership> extend(String id, ExtendMembershipsRequest request) {
-        return this.rawClient.extend(id, request).thenApply(response -> response.body());
+        CompletableFuture<WhopApiHttpResponse<Membership>> rawFuture = this.rawClient.extend(id, request);
+        CompletableFuture<Membership> future = rawFuture.thenApply(response -> response.body());
+        future.whenComplete((result_, throwable_) -> {
+            if (future.isCancelled()) {
+                rawFuture.cancel(true);
+            }
+        });
+        return future;
     }
 
     /**
@@ -210,28 +384,57 @@ public class AsyncMembershipsClient {
      */
     public CompletableFuture<Membership> extend(
             String id, ExtendMembershipsRequest request, RequestOptions requestOptions) {
-        return this.rawClient.extend(id, request, requestOptions).thenApply(response -> response.body());
+        CompletableFuture<WhopApiHttpResponse<Membership>> rawFuture =
+                this.rawClient.extend(id, request, requestOptions);
+        CompletableFuture<Membership> future = rawFuture.thenApply(response -> response.body());
+        future.whenComplete((result_, throwable_) -> {
+            if (future.isCancelled()) {
+                rawFuture.cancel(true);
+            }
+        });
+        return future;
     }
 
     /**
      * Pauses a membership's recurring payment collection. The customer keeps access but is not charged until the membership is resumed.
      */
     public CompletableFuture<Membership> pause(String id) {
-        return this.rawClient.pause(id).thenApply(response -> response.body());
+        CompletableFuture<WhopApiHttpResponse<Membership>> rawFuture = this.rawClient.pause(id);
+        CompletableFuture<Membership> future = rawFuture.thenApply(response -> response.body());
+        future.whenComplete((result_, throwable_) -> {
+            if (future.isCancelled()) {
+                rawFuture.cancel(true);
+            }
+        });
+        return future;
     }
 
     /**
      * Pauses a membership's recurring payment collection. The customer keeps access but is not charged until the membership is resumed.
      */
     public CompletableFuture<Membership> pause(String id, RequestOptions requestOptions) {
-        return this.rawClient.pause(id, requestOptions).thenApply(response -> response.body());
+        CompletableFuture<WhopApiHttpResponse<Membership>> rawFuture = this.rawClient.pause(id, requestOptions);
+        CompletableFuture<Membership> future = rawFuture.thenApply(response -> response.body());
+        future.whenComplete((result_, throwable_) -> {
+            if (future.isCancelled()) {
+                rawFuture.cancel(true);
+            }
+        });
+        return future;
     }
 
     /**
      * Pauses a membership's recurring payment collection. The customer keeps access but is not charged until the membership is resumed.
      */
     public CompletableFuture<Membership> pause(String id, PauseMembershipsRequest request) {
-        return this.rawClient.pause(id, request).thenApply(response -> response.body());
+        CompletableFuture<WhopApiHttpResponse<Membership>> rawFuture = this.rawClient.pause(id, request);
+        CompletableFuture<Membership> future = rawFuture.thenApply(response -> response.body());
+        future.whenComplete((result_, throwable_) -> {
+            if (future.isCancelled()) {
+                rawFuture.cancel(true);
+            }
+        });
+        return future;
     }
 
     /**
@@ -239,28 +442,115 @@ public class AsyncMembershipsClient {
      */
     public CompletableFuture<Membership> pause(
             String id, PauseMembershipsRequest request, RequestOptions requestOptions) {
-        return this.rawClient.pause(id, request, requestOptions).thenApply(response -> response.body());
+        CompletableFuture<WhopApiHttpResponse<Membership>> rawFuture =
+                this.rawClient.pause(id, request, requestOptions);
+        CompletableFuture<Membership> future = rawFuture.thenApply(response -> response.body());
+        future.whenComplete((result_, throwable_) -> {
+            if (future.isCancelled()) {
+                rawFuture.cancel(true);
+            }
+        });
+        return future;
+    }
+
+    /**
+     * Restores access to a <code>canceled</code> or <code>expired</code> membership that contains only one-time purchases and sets its <code>status</code> to <code>completed</code>. Lifetime memberships regain lifetime access; for memberships with an expiration, <code>days</code> sets the new <code>current_period_end</code>. Active and recurring memberships cannot be reactivated.
+     */
+    public CompletableFuture<Membership> reactivate(String id) {
+        CompletableFuture<WhopApiHttpResponse<Membership>> rawFuture = this.rawClient.reactivate(id);
+        CompletableFuture<Membership> future = rawFuture.thenApply(response -> response.body());
+        future.whenComplete((result_, throwable_) -> {
+            if (future.isCancelled()) {
+                rawFuture.cancel(true);
+            }
+        });
+        return future;
+    }
+
+    /**
+     * Restores access to a <code>canceled</code> or <code>expired</code> membership that contains only one-time purchases and sets its <code>status</code> to <code>completed</code>. Lifetime memberships regain lifetime access; for memberships with an expiration, <code>days</code> sets the new <code>current_period_end</code>. Active and recurring memberships cannot be reactivated.
+     */
+    public CompletableFuture<Membership> reactivate(String id, RequestOptions requestOptions) {
+        CompletableFuture<WhopApiHttpResponse<Membership>> rawFuture = this.rawClient.reactivate(id, requestOptions);
+        CompletableFuture<Membership> future = rawFuture.thenApply(response -> response.body());
+        future.whenComplete((result_, throwable_) -> {
+            if (future.isCancelled()) {
+                rawFuture.cancel(true);
+            }
+        });
+        return future;
+    }
+
+    /**
+     * Restores access to a <code>canceled</code> or <code>expired</code> membership that contains only one-time purchases and sets its <code>status</code> to <code>completed</code>. Lifetime memberships regain lifetime access; for memberships with an expiration, <code>days</code> sets the new <code>current_period_end</code>. Active and recurring memberships cannot be reactivated.
+     */
+    public CompletableFuture<Membership> reactivate(String id, ReactivateMembershipsRequest request) {
+        CompletableFuture<WhopApiHttpResponse<Membership>> rawFuture = this.rawClient.reactivate(id, request);
+        CompletableFuture<Membership> future = rawFuture.thenApply(response -> response.body());
+        future.whenComplete((result_, throwable_) -> {
+            if (future.isCancelled()) {
+                rawFuture.cancel(true);
+            }
+        });
+        return future;
+    }
+
+    /**
+     * Restores access to a <code>canceled</code> or <code>expired</code> membership that contains only one-time purchases and sets its <code>status</code> to <code>completed</code>. Lifetime memberships regain lifetime access; for memberships with an expiration, <code>days</code> sets the new <code>current_period_end</code>. Active and recurring memberships cannot be reactivated.
+     */
+    public CompletableFuture<Membership> reactivate(
+            String id, ReactivateMembershipsRequest request, RequestOptions requestOptions) {
+        CompletableFuture<WhopApiHttpResponse<Membership>> rawFuture =
+                this.rawClient.reactivate(id, request, requestOptions);
+        CompletableFuture<Membership> future = rawFuture.thenApply(response -> response.body());
+        future.whenComplete((result_, throwable_) -> {
+            if (future.isCancelled()) {
+                rawFuture.cancel(true);
+            }
+        });
+        return future;
     }
 
     /**
      * Resumes a previously paused membership's recurring payment collection. Billing resumes on the next cycle.
      */
     public CompletableFuture<Membership> resume(String id) {
-        return this.rawClient.resume(id).thenApply(response -> response.body());
+        CompletableFuture<WhopApiHttpResponse<Membership>> rawFuture = this.rawClient.resume(id);
+        CompletableFuture<Membership> future = rawFuture.thenApply(response -> response.body());
+        future.whenComplete((result_, throwable_) -> {
+            if (future.isCancelled()) {
+                rawFuture.cancel(true);
+            }
+        });
+        return future;
     }
 
     /**
      * Resumes a previously paused membership's recurring payment collection. Billing resumes on the next cycle.
      */
     public CompletableFuture<Membership> resume(String id, RequestOptions requestOptions) {
-        return this.rawClient.resume(id, requestOptions).thenApply(response -> response.body());
+        CompletableFuture<WhopApiHttpResponse<Membership>> rawFuture = this.rawClient.resume(id, requestOptions);
+        CompletableFuture<Membership> future = rawFuture.thenApply(response -> response.body());
+        future.whenComplete((result_, throwable_) -> {
+            if (future.isCancelled()) {
+                rawFuture.cancel(true);
+            }
+        });
+        return future;
     }
 
     /**
      * Resumes a previously paused membership's recurring payment collection. Billing resumes on the next cycle.
      */
     public CompletableFuture<Membership> resume(String id, ResumeMembershipsRequest request) {
-        return this.rawClient.resume(id, request).thenApply(response -> response.body());
+        CompletableFuture<WhopApiHttpResponse<Membership>> rawFuture = this.rawClient.resume(id, request);
+        CompletableFuture<Membership> future = rawFuture.thenApply(response -> response.body());
+        future.whenComplete((result_, throwable_) -> {
+            if (future.isCancelled()) {
+                rawFuture.cancel(true);
+            }
+        });
+        return future;
     }
 
     /**
@@ -268,83 +558,117 @@ public class AsyncMembershipsClient {
      */
     public CompletableFuture<Membership> resume(
             String id, ResumeMembershipsRequest request, RequestOptions requestOptions) {
-        return this.rawClient.resume(id, request, requestOptions).thenApply(response -> response.body());
+        CompletableFuture<WhopApiHttpResponse<Membership>> rawFuture =
+                this.rawClient.resume(id, request, requestOptions);
+        CompletableFuture<Membership> future = rawFuture.thenApply(response -> response.body());
+        future.whenComplete((result_, throwable_) -> {
+            if (future.isCancelled()) {
+                rawFuture.cancel(true);
+            }
+        });
+        return future;
     }
 
     /**
-     * Re-run access fulfillment for a membership. Recomputes the member's content access on Whop, re-validates their Discord link (re-adding them to the server and re-assigning roles if needed), and re-fulfills TradingView indicator access. Telegram access is invite-based and cannot be resynced here. The outcome is written to the membership's logs.
-     * <p>Required permissions:</p>
-     * <ul>
-     * <li><code>membership:resync_access</code></li>
-     * <li><code>member:email:read</code></li>
-     * <li><code>member:basic:read</code></li>
-     * </ul>
+     * Re-runs access fulfillment for a membership: recomputes the member's content access on Whop, re-validates their Discord link (re-adding them to the server and re-assigning roles if needed), and re-fulfills TradingView indicator access. Telegram access is invite-based and is not resynced. The work runs in the background and the outcome is written to the membership's logs.
      */
-    public CompletableFuture<Membership> resyncAccessMembership(String id) {
-        return this.rawClient.resyncAccessMembership(id).thenApply(response -> response.body());
+    public CompletableFuture<Membership> resyncAccess(String id) {
+        CompletableFuture<WhopApiHttpResponse<Membership>> rawFuture = this.rawClient.resyncAccess(id);
+        CompletableFuture<Membership> future = rawFuture.thenApply(response -> response.body());
+        future.whenComplete((result_, throwable_) -> {
+            if (future.isCancelled()) {
+                rawFuture.cancel(true);
+            }
+        });
+        return future;
     }
 
     /**
-     * Re-run access fulfillment for a membership. Recomputes the member's content access on Whop, re-validates their Discord link (re-adding them to the server and re-assigning roles if needed), and re-fulfills TradingView indicator access. Telegram access is invite-based and cannot be resynced here. The outcome is written to the membership's logs.
-     * <p>Required permissions:</p>
-     * <ul>
-     * <li><code>membership:resync_access</code></li>
-     * <li><code>member:email:read</code></li>
-     * <li><code>member:basic:read</code></li>
-     * </ul>
+     * Re-runs access fulfillment for a membership: recomputes the member's content access on Whop, re-validates their Discord link (re-adding them to the server and re-assigning roles if needed), and re-fulfills TradingView indicator access. Telegram access is invite-based and is not resynced. The work runs in the background and the outcome is written to the membership's logs.
      */
-    public CompletableFuture<Membership> resyncAccessMembership(String id, RequestOptions requestOptions) {
-        return this.rawClient.resyncAccessMembership(id, requestOptions).thenApply(response -> response.body());
+    public CompletableFuture<Membership> resyncAccess(String id, RequestOptions requestOptions) {
+        CompletableFuture<WhopApiHttpResponse<Membership>> rawFuture = this.rawClient.resyncAccess(id, requestOptions);
+        CompletableFuture<Membership> future = rawFuture.thenApply(response -> response.body());
+        future.whenComplete((result_, throwable_) -> {
+            if (future.isCancelled()) {
+                rawFuture.cancel(true);
+            }
+        });
+        return future;
     }
 
     /**
-     * Re-run access fulfillment for a membership. Recomputes the member's content access on Whop, re-validates their Discord link (re-adding them to the server and re-assigning roles if needed), and re-fulfills TradingView indicator access. Telegram access is invite-based and cannot be resynced here. The outcome is written to the membership's logs.
-     * <p>Required permissions:</p>
-     * <ul>
-     * <li><code>membership:resync_access</code></li>
-     * <li><code>member:email:read</code></li>
-     * <li><code>member:basic:read</code></li>
-     * </ul>
+     * Re-runs access fulfillment for a membership: recomputes the member's content access on Whop, re-validates their Discord link (re-adding them to the server and re-assigning roles if needed), and re-fulfills TradingView indicator access. Telegram access is invite-based and is not resynced. The work runs in the background and the outcome is written to the membership's logs.
      */
-    public CompletableFuture<Membership> resyncAccessMembership(String id, ResyncAccessMembershipRequest request) {
-        return this.rawClient.resyncAccessMembership(id, request).thenApply(response -> response.body());
+    public CompletableFuture<Membership> resyncAccess(String id, ResyncAccessMembershipsRequest request) {
+        CompletableFuture<WhopApiHttpResponse<Membership>> rawFuture = this.rawClient.resyncAccess(id, request);
+        CompletableFuture<Membership> future = rawFuture.thenApply(response -> response.body());
+        future.whenComplete((result_, throwable_) -> {
+            if (future.isCancelled()) {
+                rawFuture.cancel(true);
+            }
+        });
+        return future;
     }
 
     /**
-     * Re-run access fulfillment for a membership. Recomputes the member's content access on Whop, re-validates their Discord link (re-adding them to the server and re-assigning roles if needed), and re-fulfills TradingView indicator access. Telegram access is invite-based and cannot be resynced here. The outcome is written to the membership's logs.
-     * <p>Required permissions:</p>
-     * <ul>
-     * <li><code>membership:resync_access</code></li>
-     * <li><code>member:email:read</code></li>
-     * <li><code>member:basic:read</code></li>
-     * </ul>
+     * Re-runs access fulfillment for a membership: recomputes the member's content access on Whop, re-validates their Discord link (re-adding them to the server and re-assigning roles if needed), and re-fulfills TradingView indicator access. Telegram access is invite-based and is not resynced. The work runs in the background and the outcome is written to the membership's logs.
      */
-    public CompletableFuture<Membership> resyncAccessMembership(
-            String id, ResyncAccessMembershipRequest request, RequestOptions requestOptions) {
-        return this.rawClient
-                .resyncAccessMembership(id, request, requestOptions)
-                .thenApply(response -> response.body());
+    public CompletableFuture<Membership> resyncAccess(
+            String id, ResyncAccessMembershipsRequest request, RequestOptions requestOptions) {
+        CompletableFuture<WhopApiHttpResponse<Membership>> rawFuture =
+                this.rawClient.resyncAccess(id, request, requestOptions);
+        CompletableFuture<Membership> future = rawFuture.thenApply(response -> response.body());
+        future.whenComplete((result_, throwable_) -> {
+            if (future.isCancelled()) {
+                rawFuture.cancel(true);
+            }
+        });
+        return future;
     }
 
     /**
      * Creates a one-use transfer URL for a membership. Opening the URL while logged into a different Whop account claims the membership onto that account. The membership's buyer can generate a link for their own membership with <code>membership:transfer</code> when the product allows transfers and the membership is <code>trialing</code>, <code>active</code>, or <code>completed</code>. An account credential with <code>membership:update</code> bypasses both restrictions.
      */
     public CompletableFuture<TransferMembershipsResponse> transfer(String id) {
-        return this.rawClient.transfer(id).thenApply(response -> response.body());
+        CompletableFuture<WhopApiHttpResponse<TransferMembershipsResponse>> rawFuture = this.rawClient.transfer(id);
+        CompletableFuture<TransferMembershipsResponse> future = rawFuture.thenApply(response -> response.body());
+        future.whenComplete((result_, throwable_) -> {
+            if (future.isCancelled()) {
+                rawFuture.cancel(true);
+            }
+        });
+        return future;
     }
 
     /**
      * Creates a one-use transfer URL for a membership. Opening the URL while logged into a different Whop account claims the membership onto that account. The membership's buyer can generate a link for their own membership with <code>membership:transfer</code> when the product allows transfers and the membership is <code>trialing</code>, <code>active</code>, or <code>completed</code>. An account credential with <code>membership:update</code> bypasses both restrictions.
      */
     public CompletableFuture<TransferMembershipsResponse> transfer(String id, RequestOptions requestOptions) {
-        return this.rawClient.transfer(id, requestOptions).thenApply(response -> response.body());
+        CompletableFuture<WhopApiHttpResponse<TransferMembershipsResponse>> rawFuture =
+                this.rawClient.transfer(id, requestOptions);
+        CompletableFuture<TransferMembershipsResponse> future = rawFuture.thenApply(response -> response.body());
+        future.whenComplete((result_, throwable_) -> {
+            if (future.isCancelled()) {
+                rawFuture.cancel(true);
+            }
+        });
+        return future;
     }
 
     /**
      * Creates a one-use transfer URL for a membership. Opening the URL while logged into a different Whop account claims the membership onto that account. The membership's buyer can generate a link for their own membership with <code>membership:transfer</code> when the product allows transfers and the membership is <code>trialing</code>, <code>active</code>, or <code>completed</code>. An account credential with <code>membership:update</code> bypasses both restrictions.
      */
     public CompletableFuture<TransferMembershipsResponse> transfer(String id, TransferMembershipsRequest request) {
-        return this.rawClient.transfer(id, request).thenApply(response -> response.body());
+        CompletableFuture<WhopApiHttpResponse<TransferMembershipsResponse>> rawFuture =
+                this.rawClient.transfer(id, request);
+        CompletableFuture<TransferMembershipsResponse> future = rawFuture.thenApply(response -> response.body());
+        future.whenComplete((result_, throwable_) -> {
+            if (future.isCancelled()) {
+                rawFuture.cancel(true);
+            }
+        });
+        return future;
     }
 
     /**
@@ -352,59 +676,14 @@ public class AsyncMembershipsClient {
      */
     public CompletableFuture<TransferMembershipsResponse> transfer(
             String id, TransferMembershipsRequest request, RequestOptions requestOptions) {
-        return this.rawClient.transfer(id, request, requestOptions).thenApply(response -> response.body());
-    }
-
-    /**
-     * Reverse a pending cancellation for a membership that was scheduled to cancel at period end.
-     * <p>Required permissions:</p>
-     * <ul>
-     * <li><code>member:manage</code></li>
-     * <li><code>member:email:read</code></li>
-     * <li><code>member:basic:read</code></li>
-     * </ul>
-     */
-    public CompletableFuture<Membership> uncancelMembership(String id) {
-        return this.rawClient.uncancelMembership(id).thenApply(response -> response.body());
-    }
-
-    /**
-     * Reverse a pending cancellation for a membership that was scheduled to cancel at period end.
-     * <p>Required permissions:</p>
-     * <ul>
-     * <li><code>member:manage</code></li>
-     * <li><code>member:email:read</code></li>
-     * <li><code>member:basic:read</code></li>
-     * </ul>
-     */
-    public CompletableFuture<Membership> uncancelMembership(String id, RequestOptions requestOptions) {
-        return this.rawClient.uncancelMembership(id, requestOptions).thenApply(response -> response.body());
-    }
-
-    /**
-     * Reverse a pending cancellation for a membership that was scheduled to cancel at period end.
-     * <p>Required permissions:</p>
-     * <ul>
-     * <li><code>member:manage</code></li>
-     * <li><code>member:email:read</code></li>
-     * <li><code>member:basic:read</code></li>
-     * </ul>
-     */
-    public CompletableFuture<Membership> uncancelMembership(String id, UncancelMembershipRequest request) {
-        return this.rawClient.uncancelMembership(id, request).thenApply(response -> response.body());
-    }
-
-    /**
-     * Reverse a pending cancellation for a membership that was scheduled to cancel at period end.
-     * <p>Required permissions:</p>
-     * <ul>
-     * <li><code>member:manage</code></li>
-     * <li><code>member:email:read</code></li>
-     * <li><code>member:basic:read</code></li>
-     * </ul>
-     */
-    public CompletableFuture<Membership> uncancelMembership(
-            String id, UncancelMembershipRequest request, RequestOptions requestOptions) {
-        return this.rawClient.uncancelMembership(id, request, requestOptions).thenApply(response -> response.body());
+        CompletableFuture<WhopApiHttpResponse<TransferMembershipsResponse>> rawFuture =
+                this.rawClient.transfer(id, request, requestOptions);
+        CompletableFuture<TransferMembershipsResponse> future = rawFuture.thenApply(response -> response.body());
+        future.whenComplete((result_, throwable_) -> {
+            if (future.isCancelled()) {
+                rawFuture.cancel(true);
+            }
+        });
+        return future;
     }
 }

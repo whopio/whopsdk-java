@@ -30,8 +30,6 @@ public final class ListAuthorizedUsersRequest {
 
     private final Optional<Integer> last;
 
-    private final Optional<String> companyId;
-
     private final Optional<String> userId;
 
     private final Optional<AuthorizedUserRoles> role;
@@ -40,6 +38,8 @@ public final class ListAuthorizedUsersRequest {
 
     private final Optional<OffsetDateTime> createdAfter;
 
+    private final Optional<String> accountId;
+
     private final Map<String, Object> additionalProperties;
 
     private ListAuthorizedUsersRequest(
@@ -47,21 +47,21 @@ public final class ListAuthorizedUsersRequest {
             Optional<String> before,
             Optional<Integer> first,
             Optional<Integer> last,
-            Optional<String> companyId,
             Optional<String> userId,
             Optional<AuthorizedUserRoles> role,
             Optional<OffsetDateTime> createdBefore,
             Optional<OffsetDateTime> createdAfter,
+            Optional<String> accountId,
             Map<String, Object> additionalProperties) {
         this.after = after;
         this.before = before;
         this.first = first;
         this.last = last;
-        this.companyId = companyId;
         this.userId = userId;
         this.role = role;
         this.createdBefore = createdBefore;
         this.createdAfter = createdAfter;
+        this.accountId = accountId;
         this.additionalProperties = additionalProperties;
     }
 
@@ -98,14 +98,6 @@ public final class ListAuthorizedUsersRequest {
     }
 
     /**
-     * @return The unique identifier of the company to list authorized users for.
-     */
-    @JsonProperty("company_id")
-    public Optional<String> getCompanyId() {
-        return companyId;
-    }
-
-    /**
      * @return Filter results to a specific user to check if they are an authorized team member.
      */
     @JsonProperty("user_id")
@@ -134,6 +126,14 @@ public final class ListAuthorizedUsersRequest {
         return createdAfter;
     }
 
+    /**
+     * @return The unique identifier of the company to list authorized users for.
+     */
+    @JsonProperty("account_id")
+    public Optional<String> getAccountId() {
+        return accountId;
+    }
+
     @java.lang.Override
     public boolean equals(Object other) {
         if (this == other) return true;
@@ -150,11 +150,11 @@ public final class ListAuthorizedUsersRequest {
                 && before.equals(other.before)
                 && first.equals(other.first)
                 && last.equals(other.last)
-                && companyId.equals(other.companyId)
                 && userId.equals(other.userId)
                 && role.equals(other.role)
                 && createdBefore.equals(other.createdBefore)
-                && createdAfter.equals(other.createdAfter);
+                && createdAfter.equals(other.createdAfter)
+                && accountId.equals(other.accountId);
     }
 
     @java.lang.Override
@@ -164,11 +164,11 @@ public final class ListAuthorizedUsersRequest {
                 this.before,
                 this.first,
                 this.last,
-                this.companyId,
                 this.userId,
                 this.role,
                 this.createdBefore,
-                this.createdAfter);
+                this.createdAfter,
+                this.accountId);
     }
 
     @java.lang.Override
@@ -190,8 +190,6 @@ public final class ListAuthorizedUsersRequest {
 
         private Optional<Integer> last = Optional.empty();
 
-        private Optional<String> companyId = Optional.empty();
-
         private Optional<String> userId = Optional.empty();
 
         private Optional<AuthorizedUserRoles> role = Optional.empty();
@@ -200,7 +198,8 @@ public final class ListAuthorizedUsersRequest {
 
         private Optional<OffsetDateTime> createdAfter = Optional.empty();
 
-        @JsonAnySetter
+        private Optional<String> accountId = Optional.empty();
+
         private Map<String, Object> additionalProperties = new HashMap<>();
 
         private Builder() {}
@@ -210,11 +209,11 @@ public final class ListAuthorizedUsersRequest {
             before(other.getBefore());
             first(other.getFirst());
             last(other.getLast());
-            companyId(other.getCompanyId());
             userId(other.getUserId());
             role(other.getRole());
             createdBefore(other.getCreatedBefore());
             createdAfter(other.getCreatedAfter());
+            accountId(other.getAccountId());
             return this;
         }
 
@@ -275,20 +274,6 @@ public final class ListAuthorizedUsersRequest {
         }
 
         /**
-         * <p>The unique identifier of the company to list authorized users for.</p>
-         */
-        @JsonSetter(value = "company_id", nulls = Nulls.SKIP)
-        public Builder companyId(Optional<String> companyId) {
-            this.companyId = companyId;
-            return this;
-        }
-
-        public Builder companyId(String companyId) {
-            this.companyId = Optional.ofNullable(companyId);
-            return this;
-        }
-
-        /**
          * <p>Filter results to a specific user to check if they are an authorized team member.</p>
          */
         @JsonSetter(value = "user_id", nulls = Nulls.SKIP)
@@ -341,18 +326,48 @@ public final class ListAuthorizedUsersRequest {
             return this;
         }
 
+        /**
+         * <p>The unique identifier of the company to list authorized users for.</p>
+         */
+        @JsonSetter(value = "account_id", nulls = Nulls.SKIP)
+        public Builder accountId(Optional<String> accountId) {
+            this.accountId = accountId;
+            return this;
+        }
+
+        public Builder accountId(String accountId) {
+            this.accountId = Optional.ofNullable(accountId);
+            return this;
+        }
+
         public ListAuthorizedUsersRequest build() {
             return new ListAuthorizedUsersRequest(
                     after,
                     before,
                     first,
                     last,
-                    companyId,
                     userId,
                     role,
                     createdBefore,
                     createdAfter,
+                    accountId,
                     additionalProperties);
+        }
+
+        @JsonAnySetter
+        private void putAdditionalPropertyFromJson(String key, Object value) {
+            if (key.equalsIgnoreCase("after")
+                    || key.equalsIgnoreCase("before")
+                    || key.equalsIgnoreCase("first")
+                    || key.equalsIgnoreCase("last")
+                    || key.equalsIgnoreCase("user_id")
+                    || key.equalsIgnoreCase("role")
+                    || key.equalsIgnoreCase("created_before")
+                    || key.equalsIgnoreCase("created_after")
+                    || key.equalsIgnoreCase("account_id")) {
+                return;
+            }
+            this.additionalProperties.put(key, value);
         }
 
         public Builder additionalProperty(String key, Object value) {

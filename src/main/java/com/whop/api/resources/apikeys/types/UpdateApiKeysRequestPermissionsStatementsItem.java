@@ -58,7 +58,7 @@ public final class UpdateApiKeysRequestPermissionsStatementsItem {
     }
 
     /**
-     * @return Resource identifiers the statement applies to, for example <code>biz_xxx</code> or <code>biz_xxx|pass_*</code>. Defaults to the key's owning resource when omitted.
+     * @return Resource identifiers the statement applies to, for example <code>biz_xxx</code> or <code>biz_xxx|prod_*</code>. Defaults to the key's owning resource when omitted.
      */
     @JsonProperty("resources")
     public Optional<List<String>> getResources() {
@@ -121,7 +121,7 @@ public final class UpdateApiKeysRequestPermissionsStatementsItem {
         _FinalStage addAllActions(List<String> actions);
 
         /**
-         * <p>Resource identifiers the statement applies to, for example <code>biz_xxx</code> or <code>biz_xxx|pass_*</code>. Defaults to the key's owning resource when omitted.</p>
+         * <p>Resource identifiers the statement applies to, for example <code>biz_xxx</code> or <code>biz_xxx|prod_*</code>. Defaults to the key's owning resource when omitted.</p>
          */
         _FinalStage resources(Optional<List<String>> resources);
 
@@ -136,7 +136,6 @@ public final class UpdateApiKeysRequestPermissionsStatementsItem {
 
         private List<String> actions = new ArrayList<>();
 
-        @JsonAnySetter
         private Map<String, Object> additionalProperties = new HashMap<>();
 
         private Builder() {}
@@ -151,7 +150,6 @@ public final class UpdateApiKeysRequestPermissionsStatementsItem {
 
         /**
          * <p>Whether the actions are granted (<code>true</code>) or denied (<code>false</code>).</p>
-         * <p>Whether the actions are granted (<code>true</code>) or denied (<code>false</code>).</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
@@ -162,7 +160,7 @@ public final class UpdateApiKeysRequestPermissionsStatementsItem {
         }
 
         /**
-         * <p>Resource identifiers the statement applies to, for example <code>biz_xxx</code> or <code>biz_xxx|pass_*</code>. Defaults to the key's owning resource when omitted.</p>
+         * <p>Resource identifiers the statement applies to, for example <code>biz_xxx</code> or <code>biz_xxx|prod_*</code>. Defaults to the key's owning resource when omitted.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
@@ -172,7 +170,7 @@ public final class UpdateApiKeysRequestPermissionsStatementsItem {
         }
 
         /**
-         * <p>Resource identifiers the statement applies to, for example <code>biz_xxx</code> or <code>biz_xxx|pass_*</code>. Defaults to the key's owning resource when omitted.</p>
+         * <p>Resource identifiers the statement applies to, for example <code>biz_xxx</code> or <code>biz_xxx|prod_*</code>. Defaults to the key's owning resource when omitted.</p>
          */
         @java.lang.Override
         @JsonSetter(value = "resources", nulls = Nulls.SKIP)
@@ -219,6 +217,14 @@ public final class UpdateApiKeysRequestPermissionsStatementsItem {
         @java.lang.Override
         public UpdateApiKeysRequestPermissionsStatementsItem build() {
             return new UpdateApiKeysRequestPermissionsStatementsItem(actions, grant, resources, additionalProperties);
+        }
+
+        @JsonAnySetter
+        private void putAdditionalPropertyFromJson(String key, Object value) {
+            if (key.equalsIgnoreCase("actions") || key.equalsIgnoreCase("grant") || key.equalsIgnoreCase("resources")) {
+                return;
+            }
+            this.additionalProperties.put(key, value);
         }
 
         @java.lang.Override

@@ -15,9 +15,9 @@ import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.whop.api.core.Nullable;
 import com.whop.api.core.NullableNonemptyFilter;
 import com.whop.api.core.ObjectMappers;
-import java.time.OffsetDateTime;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -27,159 +27,201 @@ import org.jetbrains.annotations.NotNull;
 @JsonInclude(JsonInclude.Include.NON_ABSENT)
 @JsonDeserialize(builder = Invoice.Builder.class)
 public final class Invoice {
-    private final Optional<OffsetDateTime> automaticallyFinalizesAt;
+    private final String accountId;
 
-    private final boolean chargeBuyerFee;
+    private final Money amountDue;
 
-    private final InvoiceCollectionMethods collectionMethod;
+    private final Optional<PaymentAddress> billingAddress;
 
-    private final InvoiceCompany company;
+    private final Money buyerFeeAmount;
 
-    private final OffsetDateTime createdAt;
+    private final double buyerFeePercentage;
 
-    private final InvoiceCurrentPlan currentPlan;
+    private final Optional<String> checkoutLink;
+
+    private final String createdAt;
 
     private final Optional<String> customerName;
 
-    private final Optional<OffsetDateTime> dueDate;
+    private final boolean deletable;
+
+    private final Optional<String> dueAt;
 
     private final Optional<String> emailAddress;
 
-    private final String fetchInvoiceToken;
-
     private final String id;
 
-    private final List<InvoiceLineItemsItem> lineItems;
+    private final Optional<String> invoicePrefix;
 
-    private final Optional<InvoiceMailingAddress> mailingAddress;
+    private final List<InvoiceLineItem> lineItems;
 
-    private final Optional<InvoiceMember> member;
+    private final Optional<String> mailingAddressId;
+
+    private final Optional<String> memberId;
+
+    private final Optional<String> membershipId;
+
+    private final Optional<String> memo;
+
+    private final Map<String, String> metadata;
 
     private final String number;
 
-    private final Optional<String> payOnlineUrl;
+    private final InvoiceObject object;
 
-    private final Optional<InvoicePayment> payment;
+    private final boolean overdue;
 
-    private final boolean paymentProcessing;
+    private final Optional<String> paidAt;
 
-    private final InvoiceProduct product;
+    private final Optional<CheckoutSessionPaymentMethodConfiguration> paymentMethodConfiguration;
 
-    private final InvoiceStatuses status;
+    private final Optional<String> paymentMethodId;
 
-    private final Optional<OffsetDateTime> subscriptionBillingAnchorAt;
+    private final List<String> recipientEmails;
 
-    private final OffsetDateTime updatedAt;
+    private final Optional<String> scheduledChargeAt;
 
-    private final Optional<InvoiceUser> user;
+    private final Optional<InvoiceScheduledCollectionMethod> scheduledCollectionMethod;
+
+    private final Optional<String> scheduledSendAt;
+
+    private final boolean sendsOnDueDate;
+
+    private final InvoiceStatus status;
+
+    private final Money subtotal;
+
+    private final Optional<Money> taxAmount;
+
+    private final Money total;
+
+    private final InvoiceTotalsStatus totalsStatus;
+
+    private final String updatedAt;
 
     private final Map<String, Object> additionalProperties;
 
     private Invoice(
-            Optional<OffsetDateTime> automaticallyFinalizesAt,
-            boolean chargeBuyerFee,
-            InvoiceCollectionMethods collectionMethod,
-            InvoiceCompany company,
-            OffsetDateTime createdAt,
-            InvoiceCurrentPlan currentPlan,
+            String accountId,
+            Money amountDue,
+            Optional<PaymentAddress> billingAddress,
+            Money buyerFeeAmount,
+            double buyerFeePercentage,
+            Optional<String> checkoutLink,
+            String createdAt,
             Optional<String> customerName,
-            Optional<OffsetDateTime> dueDate,
+            boolean deletable,
+            Optional<String> dueAt,
             Optional<String> emailAddress,
-            String fetchInvoiceToken,
             String id,
-            List<InvoiceLineItemsItem> lineItems,
-            Optional<InvoiceMailingAddress> mailingAddress,
-            Optional<InvoiceMember> member,
+            Optional<String> invoicePrefix,
+            List<InvoiceLineItem> lineItems,
+            Optional<String> mailingAddressId,
+            Optional<String> memberId,
+            Optional<String> membershipId,
+            Optional<String> memo,
+            Map<String, String> metadata,
             String number,
-            Optional<String> payOnlineUrl,
-            Optional<InvoicePayment> payment,
-            boolean paymentProcessing,
-            InvoiceProduct product,
-            InvoiceStatuses status,
-            Optional<OffsetDateTime> subscriptionBillingAnchorAt,
-            OffsetDateTime updatedAt,
-            Optional<InvoiceUser> user,
+            InvoiceObject object,
+            boolean overdue,
+            Optional<String> paidAt,
+            Optional<CheckoutSessionPaymentMethodConfiguration> paymentMethodConfiguration,
+            Optional<String> paymentMethodId,
+            List<String> recipientEmails,
+            Optional<String> scheduledChargeAt,
+            Optional<InvoiceScheduledCollectionMethod> scheduledCollectionMethod,
+            Optional<String> scheduledSendAt,
+            boolean sendsOnDueDate,
+            InvoiceStatus status,
+            Money subtotal,
+            Optional<Money> taxAmount,
+            Money total,
+            InvoiceTotalsStatus totalsStatus,
+            String updatedAt,
             Map<String, Object> additionalProperties) {
-        this.automaticallyFinalizesAt = automaticallyFinalizesAt;
-        this.chargeBuyerFee = chargeBuyerFee;
-        this.collectionMethod = collectionMethod;
-        this.company = company;
+        this.accountId = accountId;
+        this.amountDue = amountDue;
+        this.billingAddress = billingAddress;
+        this.buyerFeeAmount = buyerFeeAmount;
+        this.buyerFeePercentage = buyerFeePercentage;
+        this.checkoutLink = checkoutLink;
         this.createdAt = createdAt;
-        this.currentPlan = currentPlan;
         this.customerName = customerName;
-        this.dueDate = dueDate;
+        this.deletable = deletable;
+        this.dueAt = dueAt;
         this.emailAddress = emailAddress;
-        this.fetchInvoiceToken = fetchInvoiceToken;
         this.id = id;
+        this.invoicePrefix = invoicePrefix;
         this.lineItems = lineItems;
-        this.mailingAddress = mailingAddress;
-        this.member = member;
+        this.mailingAddressId = mailingAddressId;
+        this.memberId = memberId;
+        this.membershipId = membershipId;
+        this.memo = memo;
+        this.metadata = metadata;
         this.number = number;
-        this.payOnlineUrl = payOnlineUrl;
-        this.payment = payment;
-        this.paymentProcessing = paymentProcessing;
-        this.product = product;
+        this.object = object;
+        this.overdue = overdue;
+        this.paidAt = paidAt;
+        this.paymentMethodConfiguration = paymentMethodConfiguration;
+        this.paymentMethodId = paymentMethodId;
+        this.recipientEmails = recipientEmails;
+        this.scheduledChargeAt = scheduledChargeAt;
+        this.scheduledCollectionMethod = scheduledCollectionMethod;
+        this.scheduledSendAt = scheduledSendAt;
+        this.sendsOnDueDate = sendsOnDueDate;
         this.status = status;
-        this.subscriptionBillingAnchorAt = subscriptionBillingAnchorAt;
+        this.subtotal = subtotal;
+        this.taxAmount = taxAmount;
+        this.total = total;
+        this.totalsStatus = totalsStatus;
         this.updatedAt = updatedAt;
-        this.user = user;
         this.additionalProperties = additionalProperties;
     }
 
-    /**
-     * @return The date and time when the invoice will be automatically finalized. For charge_automatically, triggers an automatic charge. For send_invoice, sends the invoice email at the specified time.
-     */
+    @JsonProperty("account_id")
+    public String getAccountId() {
+        return accountId;
+    }
+
+    @JsonProperty("amount_due")
+    public Money getAmountDue() {
+        return amountDue;
+    }
+
     @JsonIgnore
-    public Optional<OffsetDateTime> getAutomaticallyFinalizesAt() {
-        if (automaticallyFinalizesAt == null) {
+    public Optional<PaymentAddress> getBillingAddress() {
+        if (billingAddress == null) {
             return Optional.empty();
         }
-        return automaticallyFinalizesAt;
+        return billingAddress;
+    }
+
+    @JsonProperty("buyer_fee_amount")
+    public Money getBuyerFeeAmount() {
+        return buyerFeeAmount;
+    }
+
+    @JsonProperty("buyer_fee_percentage")
+    public double getBuyerFeePercentage() {
+        return buyerFeePercentage;
     }
 
     /**
-     * @return Whether the invoice includes a buyer processing fee on top of the plan price.
+     * @return A signed link that opens this invoice in a checkout session so the buyer can pay it. Pass it as <code>link</code> to <code>POST /checkout_sessions</code>. Present while the invoice is open. <code>null</code> in any other status, for an invoice billed to a business buyer, and for an invoice whose membership was canceled. Also <code>null</code> unless you have <code>payment:charge</code>, or <code>invoice:create</code> or <code>invoice:update</code> on an invoice with no <code>payment_method_id</code>.
      */
-    @JsonProperty("charge_buyer_fee")
-    public boolean getChargeBuyerFee() {
-        return chargeBuyerFee;
+    @JsonIgnore
+    public Optional<String> getCheckoutLink() {
+        if (checkoutLink == null) {
+            return Optional.empty();
+        }
+        return checkoutLink;
     }
 
-    /**
-     * @return The method used to collect payment for this invoice, such as automatic charging or manual payment.
-     */
-    @JsonProperty("collection_method")
-    public InvoiceCollectionMethods getCollectionMethod() {
-        return collectionMethod;
-    }
-
-    /**
-     * @return The company that issued this invoice.
-     */
-    @JsonProperty("company")
-    public InvoiceCompany getCompany() {
-        return company;
-    }
-
-    /**
-     * @return The datetime the invoice was created.
-     */
     @JsonProperty("created_at")
-    public OffsetDateTime getCreatedAt() {
+    public String getCreatedAt() {
         return createdAt;
     }
 
-    /**
-     * @return The plan that this invoice charges for.
-     */
-    @JsonProperty("current_plan")
-    public InvoiceCurrentPlan getCurrentPlan() {
-        return currentPlan;
-    }
-
-    /**
-     * @return The full name of the customer this invoice is addressed to. Null if no name is on file.
-     */
     @JsonIgnore
     public Optional<String> getCustomerName() {
         if (customerName == null) {
@@ -189,19 +231,21 @@ public final class Invoice {
     }
 
     /**
-     * @return The deadline by which payment is expected. Null if the invoice is collected automatically.
+     * @return True when <code>DELETE /invoices/{id}</code> can delete this invoice. A draft qualifies unless it is scheduled or bills a subscription. A void invoice qualifies unless it collected money or still awaits a bank wire.
      */
-    @JsonIgnore
-    public Optional<OffsetDateTime> getDueDate() {
-        if (dueDate == null) {
-            return Optional.empty();
-        }
-        return dueDate;
+    @JsonProperty("deletable")
+    public boolean getDeletable() {
+        return deletable;
     }
 
-    /**
-     * @return The email address of the customer this invoice is addressed to. Null if no email is on file.
-     */
+    @JsonIgnore
+    public Optional<String> getDueAt() {
+        if (dueAt == null) {
+            return Optional.empty();
+        }
+        return dueAt;
+    }
+
     @JsonIgnore
     public Optional<String> getEmailAddress() {
         if (emailAddress == null) {
@@ -210,140 +254,195 @@ public final class Invoice {
         return emailAddress;
     }
 
-    /**
-     * @return A signed token that allows fetching invoice data publicly without authentication.
-     */
-    @JsonProperty("fetch_invoice_token")
-    public String getFetchInvoiceToken() {
-        return fetchInvoiceToken;
-    }
-
-    /**
-     * @return The unique identifier for the invoice.
-     */
     @JsonProperty("id")
     public String getId() {
         return id;
     }
 
-    /**
-     * @return Optional line items that break down the invoice total into individual charges.
-     */
+    @JsonIgnore
+    public Optional<String> getInvoicePrefix() {
+        if (invoicePrefix == null) {
+            return Optional.empty();
+        }
+        return invoicePrefix;
+    }
+
     @JsonProperty("line_items")
-    public List<InvoiceLineItemsItem> getLineItems() {
+    public List<InvoiceLineItem> getLineItems() {
         return lineItems;
     }
 
-    /**
-     * @return The billing/mailing address associated with this invoice, if one was provided at creation time.
-     */
     @JsonIgnore
-    public Optional<InvoiceMailingAddress> getMailingAddress() {
-        if (mailingAddress == null) {
+    public Optional<String> getMailingAddressId() {
+        if (mailingAddressId == null) {
             return Optional.empty();
         }
-        return mailingAddress;
+        return mailingAddressId;
+    }
+
+    @JsonIgnore
+    public Optional<String> getMemberId() {
+        if (memberId == null) {
+            return Optional.empty();
+        }
+        return memberId;
     }
 
     /**
-     * @return The member that the invoice was created for. Null when the invoice is addressed to an email address with no member record behind it.
+     * @return The membership this invoice bills, prefixed <code>mem_</code>. For a renewal invoice, it is the subscription that renews. For an invoice with a recurring item, it is the membership created when the invoice is issued. Null for one-off invoices, for a draft not yet issued, and without the member:basic:read permission.
      */
     @JsonIgnore
-    public Optional<InvoiceMember> getMember() {
-        if (member == null) {
+    public Optional<String> getMembershipId() {
+        if (membershipId == null) {
             return Optional.empty();
         }
-        return member;
+        return membershipId;
     }
 
     /**
-     * @return The sequential invoice number for display purposes.
+     * @return A note to the customer, shown on the invoice email, PDF, and checkout page with its line breaks kept. <code>null</code> when none is set.
      */
+    @JsonIgnore
+    public Optional<String> getMemo() {
+        if (memo == null) {
+            return Optional.empty();
+        }
+        return memo;
+    }
+
+    @JsonProperty("metadata")
+    public Map<String, String> getMetadata() {
+        return metadata;
+    }
+
     @JsonProperty("number")
     public String getNumber() {
         return number;
     }
 
-    /**
-     * @return The checkout URL where the customer can pay this invoice online, with their email address pre-filled and locked.
-     */
+    @JsonProperty("object")
+    public InvoiceObject getObject() {
+        return object;
+    }
+
+    @JsonProperty("overdue")
+    public boolean getOverdue() {
+        return overdue;
+    }
+
     @JsonIgnore
-    public Optional<String> getPayOnlineUrl() {
-        if (payOnlineUrl == null) {
+    public Optional<String> getPaidAt() {
+        if (paidAt == null) {
             return Optional.empty();
         }
-        return payOnlineUrl;
+        return paidAt;
     }
 
     /**
-     * @return The payment that settled this invoice. Null while the invoice is unpaid, when the invoice was marked paid manually, and on a subscription renewal invoice, where the settling payment cannot yet be identified.
+     * @return The payment methods the customer can choose from when paying through the invoice's checkout link. It takes precedence over the invoice's variants and the account. <code>null</code> when the invoice uses its variants' payment methods.
      */
     @JsonIgnore
-    public Optional<InvoicePayment> getPayment() {
-        if (payment == null) {
+    public Optional<CheckoutSessionPaymentMethodConfiguration> getPaymentMethodConfiguration() {
+        if (paymentMethodConfiguration == null) {
             return Optional.empty();
         }
-        return payment;
+        return paymentMethodConfiguration;
+    }
+
+    @JsonIgnore
+    public Optional<String> getPaymentMethodId() {
+        if (paymentMethodId == null) {
+            return Optional.empty();
+        }
+        return paymentMethodId;
+    }
+
+    @JsonProperty("recipient_emails")
+    public List<String> getRecipientEmails() {
+        return recipientEmails;
     }
 
     /**
-     * @return Whether a payment on this invoice is still clearing. True while a delayed payment method such as ACH or SEPA settles, during which the invoice stays open and is not marked past due.
+     * @return When the invoice's saved payment method will be charged, as an ISO 8601 timestamp. It is the <code>charge_at</code> the invoice was sent or issued with. Without one, it is <code>due_at</code> when an invoice with a <code>payment_method_id</code> is sent or issued before it is due. On a draft, it is the <code>charge_at</code> of its scheduled send. <code>null</code> otherwise, once the charge starts, and once the invoice is paid, void, or uncollectible.
      */
-    @JsonProperty("payment_processing")
-    public boolean getPaymentProcessing() {
-        return paymentProcessing;
+    @JsonIgnore
+    public Optional<String> getScheduledChargeAt() {
+        if (scheduledChargeAt == null) {
+            return Optional.empty();
+        }
+        return scheduledChargeAt;
     }
 
     /**
-     * @return The product that this invoice was generated for.
+     * @return The <code>collection_method</code> a draft's scheduled send applies when it fires. <code>null</code> when the draft has no scheduled send or it was scheduled without one, and once the invoice is issued.
      */
-    @JsonProperty("product")
-    public InvoiceProduct getProduct() {
-        return product;
+    @JsonIgnore
+    public Optional<InvoiceScheduledCollectionMethod> getScheduledCollectionMethod() {
+        if (scheduledCollectionMethod == null) {
+            return Optional.empty();
+        }
+        return scheduledCollectionMethod;
+    }
+
+    @JsonIgnore
+    public Optional<String> getScheduledSendAt() {
+        if (scheduledSendAt == null) {
+            return Optional.empty();
+        }
+        return scheduledSendAt;
     }
 
     /**
-     * @return The current payment status of the invoice, such as draft, open, paid, or void.
+     * @return Whether this draft is issued automatically when its <code>due_at</code> arrives. Issuing it charges its <code>payment_method_id</code>, or emails its payment link to its <code>recipient_emails</code>. <code>false</code> for an invoice that is not a draft and for a draft with a scheduled send. <code>false</code> while sending the draft would fail for missing recipients or an unavailable payment link. <code>false</code> for a draft that had no future <code>due_at</code> when it was last saved. <code>false</code> for a draft created before 2026-11-12T22:00:00Z.
      */
+    @JsonProperty("sends_on_due_date")
+    public boolean getSendsOnDueDate() {
+        return sendsOnDueDate;
+    }
+
     @JsonProperty("status")
-    public InvoiceStatuses getStatus() {
+    public InvoiceStatus getStatus() {
         return status;
     }
 
-    /**
-     * @return The date that defines when the subscription billing cycle starts. When set on a renewal plan invoice, all future billing periods anchor to this date.
-     */
-    @JsonIgnore
-    public Optional<OffsetDateTime> getSubscriptionBillingAnchorAt() {
-        if (subscriptionBillingAnchorAt == null) {
-            return Optional.empty();
-        }
-        return subscriptionBillingAnchorAt;
+    @JsonProperty("subtotal")
+    public Money getSubtotal() {
+        return subtotal;
     }
 
-    /**
-     * @return The datetime the invoice was last updated.
-     */
+    @JsonIgnore
+    public Optional<Money> getTaxAmount() {
+        if (taxAmount == null) {
+            return Optional.empty();
+        }
+        return taxAmount;
+    }
+
+    @JsonProperty("total")
+    public Money getTotal() {
+        return total;
+    }
+
+    @JsonProperty("totals_status")
+    public InvoiceTotalsStatus getTotalsStatus() {
+        return totalsStatus;
+    }
+
     @JsonProperty("updated_at")
-    public OffsetDateTime getUpdatedAt() {
+    public String getUpdatedAt() {
         return updatedAt;
     }
 
-    /**
-     * @return The user this invoice is addressed to. Null if the user account has been removed.
-     */
-    @JsonIgnore
-    public Optional<InvoiceUser> getUser() {
-        if (user == null) {
-            return Optional.empty();
-        }
-        return user;
+    @JsonInclude(value = JsonInclude.Include.CUSTOM, valueFilter = NullableNonemptyFilter.class)
+    @JsonProperty("billing_address")
+    private Optional<PaymentAddress> _getBillingAddress() {
+        return billingAddress;
     }
 
     @JsonInclude(value = JsonInclude.Include.CUSTOM, valueFilter = NullableNonemptyFilter.class)
-    @JsonProperty("automatically_finalizes_at")
-    private Optional<OffsetDateTime> _getAutomaticallyFinalizesAt() {
-        return automaticallyFinalizesAt;
+    @JsonProperty("checkout_link")
+    private Optional<String> _getCheckoutLink() {
+        return checkoutLink;
     }
 
     @JsonInclude(value = JsonInclude.Include.CUSTOM, valueFilter = NullableNonemptyFilter.class)
@@ -353,9 +452,9 @@ public final class Invoice {
     }
 
     @JsonInclude(value = JsonInclude.Include.CUSTOM, valueFilter = NullableNonemptyFilter.class)
-    @JsonProperty("due_date")
-    private Optional<OffsetDateTime> _getDueDate() {
-        return dueDate;
+    @JsonProperty("due_at")
+    private Optional<String> _getDueAt() {
+        return dueAt;
     }
 
     @JsonInclude(value = JsonInclude.Include.CUSTOM, valueFilter = NullableNonemptyFilter.class)
@@ -365,39 +464,75 @@ public final class Invoice {
     }
 
     @JsonInclude(value = JsonInclude.Include.CUSTOM, valueFilter = NullableNonemptyFilter.class)
-    @JsonProperty("mailing_address")
-    private Optional<InvoiceMailingAddress> _getMailingAddress() {
-        return mailingAddress;
+    @JsonProperty("invoice_prefix")
+    private Optional<String> _getInvoicePrefix() {
+        return invoicePrefix;
     }
 
     @JsonInclude(value = JsonInclude.Include.CUSTOM, valueFilter = NullableNonemptyFilter.class)
-    @JsonProperty("member")
-    private Optional<InvoiceMember> _getMember() {
-        return member;
+    @JsonProperty("mailing_address_id")
+    private Optional<String> _getMailingAddressId() {
+        return mailingAddressId;
     }
 
     @JsonInclude(value = JsonInclude.Include.CUSTOM, valueFilter = NullableNonemptyFilter.class)
-    @JsonProperty("pay_online_url")
-    private Optional<String> _getPayOnlineUrl() {
-        return payOnlineUrl;
+    @JsonProperty("member_id")
+    private Optional<String> _getMemberId() {
+        return memberId;
     }
 
     @JsonInclude(value = JsonInclude.Include.CUSTOM, valueFilter = NullableNonemptyFilter.class)
-    @JsonProperty("payment")
-    private Optional<InvoicePayment> _getPayment() {
-        return payment;
+    @JsonProperty("membership_id")
+    private Optional<String> _getMembershipId() {
+        return membershipId;
     }
 
     @JsonInclude(value = JsonInclude.Include.CUSTOM, valueFilter = NullableNonemptyFilter.class)
-    @JsonProperty("subscription_billing_anchor_at")
-    private Optional<OffsetDateTime> _getSubscriptionBillingAnchorAt() {
-        return subscriptionBillingAnchorAt;
+    @JsonProperty("memo")
+    private Optional<String> _getMemo() {
+        return memo;
     }
 
     @JsonInclude(value = JsonInclude.Include.CUSTOM, valueFilter = NullableNonemptyFilter.class)
-    @JsonProperty("user")
-    private Optional<InvoiceUser> _getUser() {
-        return user;
+    @JsonProperty("paid_at")
+    private Optional<String> _getPaidAt() {
+        return paidAt;
+    }
+
+    @JsonInclude(value = JsonInclude.Include.CUSTOM, valueFilter = NullableNonemptyFilter.class)
+    @JsonProperty("payment_method_configuration")
+    private Optional<CheckoutSessionPaymentMethodConfiguration> _getPaymentMethodConfiguration() {
+        return paymentMethodConfiguration;
+    }
+
+    @JsonInclude(value = JsonInclude.Include.CUSTOM, valueFilter = NullableNonemptyFilter.class)
+    @JsonProperty("payment_method_id")
+    private Optional<String> _getPaymentMethodId() {
+        return paymentMethodId;
+    }
+
+    @JsonInclude(value = JsonInclude.Include.CUSTOM, valueFilter = NullableNonemptyFilter.class)
+    @JsonProperty("scheduled_charge_at")
+    private Optional<String> _getScheduledChargeAt() {
+        return scheduledChargeAt;
+    }
+
+    @JsonInclude(value = JsonInclude.Include.CUSTOM, valueFilter = NullableNonemptyFilter.class)
+    @JsonProperty("scheduled_collection_method")
+    private Optional<InvoiceScheduledCollectionMethod> _getScheduledCollectionMethod() {
+        return scheduledCollectionMethod;
+    }
+
+    @JsonInclude(value = JsonInclude.Include.CUSTOM, valueFilter = NullableNonemptyFilter.class)
+    @JsonProperty("scheduled_send_at")
+    private Optional<String> _getScheduledSendAt() {
+        return scheduledSendAt;
+    }
+
+    @JsonInclude(value = JsonInclude.Include.CUSTOM, valueFilter = NullableNonemptyFilter.class)
+    @JsonProperty("tax_amount")
+    private Optional<Money> _getTaxAmount() {
+        return taxAmount;
     }
 
     @java.lang.Override
@@ -412,57 +547,83 @@ public final class Invoice {
     }
 
     private boolean equalTo(Invoice other) {
-        return automaticallyFinalizesAt.equals(other.automaticallyFinalizesAt)
-                && chargeBuyerFee == other.chargeBuyerFee
-                && collectionMethod.equals(other.collectionMethod)
-                && company.equals(other.company)
+        return accountId.equals(other.accountId)
+                && amountDue.equals(other.amountDue)
+                && billingAddress.equals(other.billingAddress)
+                && buyerFeeAmount.equals(other.buyerFeeAmount)
+                && buyerFeePercentage == other.buyerFeePercentage
+                && checkoutLink.equals(other.checkoutLink)
                 && createdAt.equals(other.createdAt)
-                && currentPlan.equals(other.currentPlan)
                 && customerName.equals(other.customerName)
-                && dueDate.equals(other.dueDate)
+                && deletable == other.deletable
+                && dueAt.equals(other.dueAt)
                 && emailAddress.equals(other.emailAddress)
-                && fetchInvoiceToken.equals(other.fetchInvoiceToken)
                 && id.equals(other.id)
+                && invoicePrefix.equals(other.invoicePrefix)
                 && lineItems.equals(other.lineItems)
-                && mailingAddress.equals(other.mailingAddress)
-                && member.equals(other.member)
+                && mailingAddressId.equals(other.mailingAddressId)
+                && memberId.equals(other.memberId)
+                && membershipId.equals(other.membershipId)
+                && memo.equals(other.memo)
+                && metadata.equals(other.metadata)
                 && number.equals(other.number)
-                && payOnlineUrl.equals(other.payOnlineUrl)
-                && payment.equals(other.payment)
-                && paymentProcessing == other.paymentProcessing
-                && product.equals(other.product)
+                && object.equals(other.object)
+                && overdue == other.overdue
+                && paidAt.equals(other.paidAt)
+                && paymentMethodConfiguration.equals(other.paymentMethodConfiguration)
+                && paymentMethodId.equals(other.paymentMethodId)
+                && recipientEmails.equals(other.recipientEmails)
+                && scheduledChargeAt.equals(other.scheduledChargeAt)
+                && scheduledCollectionMethod.equals(other.scheduledCollectionMethod)
+                && scheduledSendAt.equals(other.scheduledSendAt)
+                && sendsOnDueDate == other.sendsOnDueDate
                 && status.equals(other.status)
-                && subscriptionBillingAnchorAt.equals(other.subscriptionBillingAnchorAt)
-                && updatedAt.equals(other.updatedAt)
-                && user.equals(other.user);
+                && subtotal.equals(other.subtotal)
+                && taxAmount.equals(other.taxAmount)
+                && total.equals(other.total)
+                && totalsStatus.equals(other.totalsStatus)
+                && updatedAt.equals(other.updatedAt);
     }
 
     @java.lang.Override
     public int hashCode() {
         return Objects.hash(
-                this.automaticallyFinalizesAt,
-                this.chargeBuyerFee,
-                this.collectionMethod,
-                this.company,
+                this.accountId,
+                this.amountDue,
+                this.billingAddress,
+                this.buyerFeeAmount,
+                this.buyerFeePercentage,
+                this.checkoutLink,
                 this.createdAt,
-                this.currentPlan,
                 this.customerName,
-                this.dueDate,
+                this.deletable,
+                this.dueAt,
                 this.emailAddress,
-                this.fetchInvoiceToken,
                 this.id,
+                this.invoicePrefix,
                 this.lineItems,
-                this.mailingAddress,
-                this.member,
+                this.mailingAddressId,
+                this.memberId,
+                this.membershipId,
+                this.memo,
+                this.metadata,
                 this.number,
-                this.payOnlineUrl,
-                this.payment,
-                this.paymentProcessing,
-                this.product,
+                this.object,
+                this.overdue,
+                this.paidAt,
+                this.paymentMethodConfiguration,
+                this.paymentMethodId,
+                this.recipientEmails,
+                this.scheduledChargeAt,
+                this.scheduledCollectionMethod,
+                this.scheduledSendAt,
+                this.sendsOnDueDate,
                 this.status,
-                this.subscriptionBillingAnchorAt,
-                this.updatedAt,
-                this.user);
+                this.subtotal,
+                this.taxAmount,
+                this.total,
+                this.totalsStatus,
+                this.updatedAt);
     }
 
     @java.lang.Override
@@ -470,94 +631,80 @@ public final class Invoice {
         return ObjectMappers.stringify(this);
     }
 
-    public static ChargeBuyerFeeStage builder() {
+    public static AccountIdStage builder() {
         return new Builder();
     }
 
-    public interface ChargeBuyerFeeStage {
-        /**
-         * <p>Whether the invoice includes a buyer processing fee on top of the plan price.</p>
-         */
-        CollectionMethodStage chargeBuyerFee(boolean chargeBuyerFee);
+    public interface AccountIdStage {
+        AmountDueStage accountId(@NotNull String accountId);
 
         Builder from(Invoice other);
     }
 
-    public interface CollectionMethodStage {
-        /**
-         * <p>The method used to collect payment for this invoice, such as automatic charging or manual payment.</p>
-         */
-        CompanyStage collectionMethod(@NotNull InvoiceCollectionMethods collectionMethod);
+    public interface AmountDueStage {
+        BuyerFeeAmountStage amountDue(@NotNull Money amountDue);
     }
 
-    public interface CompanyStage {
-        /**
-         * <p>The company that issued this invoice.</p>
-         */
-        CreatedAtStage company(@NotNull InvoiceCompany company);
+    public interface BuyerFeeAmountStage {
+        BuyerFeePercentageStage buyerFeeAmount(@NotNull Money buyerFeeAmount);
+    }
+
+    public interface BuyerFeePercentageStage {
+        CreatedAtStage buyerFeePercentage(double buyerFeePercentage);
     }
 
     public interface CreatedAtStage {
-        /**
-         * <p>The datetime the invoice was created.</p>
-         */
-        CurrentPlanStage createdAt(@NotNull OffsetDateTime createdAt);
+        DeletableStage createdAt(@NotNull String createdAt);
     }
 
-    public interface CurrentPlanStage {
+    public interface DeletableStage {
         /**
-         * <p>The plan that this invoice charges for.</p>
+         * <p>True when <code>DELETE /invoices/{id}</code> can delete this invoice. A draft qualifies unless it is scheduled or bills a subscription. A void invoice qualifies unless it collected money or still awaits a bank wire.</p>
          */
-        FetchInvoiceTokenStage currentPlan(@NotNull InvoiceCurrentPlan currentPlan);
-    }
-
-    public interface FetchInvoiceTokenStage {
-        /**
-         * <p>A signed token that allows fetching invoice data publicly without authentication.</p>
-         */
-        IdStage fetchInvoiceToken(@NotNull String fetchInvoiceToken);
+        IdStage deletable(boolean deletable);
     }
 
     public interface IdStage {
-        /**
-         * <p>The unique identifier for the invoice.</p>
-         */
         NumberStage id(@NotNull String id);
     }
 
     public interface NumberStage {
-        /**
-         * <p>The sequential invoice number for display purposes.</p>
-         */
-        PaymentProcessingStage number(@NotNull String number);
+        ObjectStage number(@NotNull String number);
     }
 
-    public interface PaymentProcessingStage {
-        /**
-         * <p>Whether a payment on this invoice is still clearing. True while a delayed payment method such as ACH or SEPA settles, during which the invoice stays open and is not marked past due.</p>
-         */
-        ProductStage paymentProcessing(boolean paymentProcessing);
+    public interface ObjectStage {
+        OverdueStage object(@NotNull InvoiceObject object);
     }
 
-    public interface ProductStage {
+    public interface OverdueStage {
+        SendsOnDueDateStage overdue(boolean overdue);
+    }
+
+    public interface SendsOnDueDateStage {
         /**
-         * <p>The product that this invoice was generated for.</p>
+         * <p>Whether this draft is issued automatically when its <code>due_at</code> arrives. Issuing it charges its <code>payment_method_id</code>, or emails its payment link to its <code>recipient_emails</code>. <code>false</code> for an invoice that is not a draft and for a draft with a scheduled send. <code>false</code> while sending the draft would fail for missing recipients or an unavailable payment link. <code>false</code> for a draft that had no future <code>due_at</code> when it was last saved. <code>false</code> for a draft created before 2026-11-12T22:00:00Z.</p>
          */
-        StatusStage product(@NotNull InvoiceProduct product);
+        StatusStage sendsOnDueDate(boolean sendsOnDueDate);
     }
 
     public interface StatusStage {
-        /**
-         * <p>The current payment status of the invoice, such as draft, open, paid, or void.</p>
-         */
-        UpdatedAtStage status(@NotNull InvoiceStatuses status);
+        SubtotalStage status(@NotNull InvoiceStatus status);
+    }
+
+    public interface SubtotalStage {
+        TotalStage subtotal(@NotNull Money subtotal);
+    }
+
+    public interface TotalStage {
+        TotalsStatusStage total(@NotNull Money total);
+    }
+
+    public interface TotalsStatusStage {
+        UpdatedAtStage totalsStatus(@NotNull InvoiceTotalsStatus totalsStatus);
     }
 
     public interface UpdatedAtStage {
-        /**
-         * <p>The datetime the invoice was last updated.</p>
-         */
-        _FinalStage updatedAt(@NotNull OffsetDateTime updatedAt);
+        _FinalStage updatedAt(@NotNull String updatedAt);
     }
 
     public interface _FinalStage {
@@ -567,277 +714,329 @@ public final class Invoice {
 
         _FinalStage additionalProperties(Map<String, Object> additionalProperties);
 
-        /**
-         * <p>The date and time when the invoice will be automatically finalized. For charge_automatically, triggers an automatic charge. For send_invoice, sends the invoice email at the specified time.</p>
-         */
-        _FinalStage automaticallyFinalizesAt(Optional<OffsetDateTime> automaticallyFinalizesAt);
+        _FinalStage billingAddress(Optional<PaymentAddress> billingAddress);
 
-        _FinalStage automaticallyFinalizesAt(OffsetDateTime automaticallyFinalizesAt);
+        _FinalStage billingAddress(PaymentAddress billingAddress);
 
-        _FinalStage automaticallyFinalizesAt(Nullable<OffsetDateTime> automaticallyFinalizesAt);
+        _FinalStage billingAddress(Nullable<PaymentAddress> billingAddress);
 
         /**
-         * <p>The full name of the customer this invoice is addressed to. Null if no name is on file.</p>
+         * <p>A signed link that opens this invoice in a checkout session so the buyer can pay it. Pass it as <code>link</code> to <code>POST /checkout_sessions</code>. Present while the invoice is open. <code>null</code> in any other status, for an invoice billed to a business buyer, and for an invoice whose membership was canceled. Also <code>null</code> unless you have <code>payment:charge</code>, or <code>invoice:create</code> or <code>invoice:update</code> on an invoice with no <code>payment_method_id</code>.</p>
          */
+        _FinalStage checkoutLink(Optional<String> checkoutLink);
+
+        _FinalStage checkoutLink(String checkoutLink);
+
+        _FinalStage checkoutLink(Nullable<String> checkoutLink);
+
         _FinalStage customerName(Optional<String> customerName);
 
         _FinalStage customerName(String customerName);
 
         _FinalStage customerName(Nullable<String> customerName);
 
-        /**
-         * <p>The deadline by which payment is expected. Null if the invoice is collected automatically.</p>
-         */
-        _FinalStage dueDate(Optional<OffsetDateTime> dueDate);
+        _FinalStage dueAt(Optional<String> dueAt);
 
-        _FinalStage dueDate(OffsetDateTime dueDate);
+        _FinalStage dueAt(String dueAt);
 
-        _FinalStage dueDate(Nullable<OffsetDateTime> dueDate);
+        _FinalStage dueAt(Nullable<String> dueAt);
 
-        /**
-         * <p>The email address of the customer this invoice is addressed to. Null if no email is on file.</p>
-         */
         _FinalStage emailAddress(Optional<String> emailAddress);
 
         _FinalStage emailAddress(String emailAddress);
 
         _FinalStage emailAddress(Nullable<String> emailAddress);
 
-        /**
-         * <p>Optional line items that break down the invoice total into individual charges.</p>
-         */
-        _FinalStage lineItems(List<InvoiceLineItemsItem> lineItems);
+        _FinalStage invoicePrefix(Optional<String> invoicePrefix);
 
-        _FinalStage addLineItems(InvoiceLineItemsItem lineItems);
+        _FinalStage invoicePrefix(String invoicePrefix);
 
-        _FinalStage addAllLineItems(List<InvoiceLineItemsItem> lineItems);
+        _FinalStage invoicePrefix(Nullable<String> invoicePrefix);
 
-        /**
-         * <p>The billing/mailing address associated with this invoice, if one was provided at creation time.</p>
-         */
-        _FinalStage mailingAddress(Optional<InvoiceMailingAddress> mailingAddress);
+        _FinalStage lineItems(List<InvoiceLineItem> lineItems);
 
-        _FinalStage mailingAddress(InvoiceMailingAddress mailingAddress);
+        _FinalStage addLineItems(InvoiceLineItem lineItems);
 
-        _FinalStage mailingAddress(Nullable<InvoiceMailingAddress> mailingAddress);
+        _FinalStage addAllLineItems(List<InvoiceLineItem> lineItems);
 
-        /**
-         * <p>The member that the invoice was created for. Null when the invoice is addressed to an email address with no member record behind it.</p>
-         */
-        _FinalStage member(Optional<InvoiceMember> member);
+        _FinalStage mailingAddressId(Optional<String> mailingAddressId);
 
-        _FinalStage member(InvoiceMember member);
+        _FinalStage mailingAddressId(String mailingAddressId);
 
-        _FinalStage member(Nullable<InvoiceMember> member);
+        _FinalStage mailingAddressId(Nullable<String> mailingAddressId);
+
+        _FinalStage memberId(Optional<String> memberId);
+
+        _FinalStage memberId(String memberId);
+
+        _FinalStage memberId(Nullable<String> memberId);
 
         /**
-         * <p>The checkout URL where the customer can pay this invoice online, with their email address pre-filled and locked.</p>
+         * <p>The membership this invoice bills, prefixed <code>mem_</code>. For a renewal invoice, it is the subscription that renews. For an invoice with a recurring item, it is the membership created when the invoice is issued. Null for one-off invoices, for a draft not yet issued, and without the member:basic:read permission.</p>
          */
-        _FinalStage payOnlineUrl(Optional<String> payOnlineUrl);
+        _FinalStage membershipId(Optional<String> membershipId);
 
-        _FinalStage payOnlineUrl(String payOnlineUrl);
+        _FinalStage membershipId(String membershipId);
 
-        _FinalStage payOnlineUrl(Nullable<String> payOnlineUrl);
+        _FinalStage membershipId(Nullable<String> membershipId);
 
         /**
-         * <p>The payment that settled this invoice. Null while the invoice is unpaid, when the invoice was marked paid manually, and on a subscription renewal invoice, where the settling payment cannot yet be identified.</p>
+         * <p>A note to the customer, shown on the invoice email, PDF, and checkout page with its line breaks kept. <code>null</code> when none is set.</p>
          */
-        _FinalStage payment(Optional<InvoicePayment> payment);
+        _FinalStage memo(Optional<String> memo);
 
-        _FinalStage payment(InvoicePayment payment);
+        _FinalStage memo(String memo);
 
-        _FinalStage payment(Nullable<InvoicePayment> payment);
+        _FinalStage memo(Nullable<String> memo);
+
+        _FinalStage metadata(Map<String, String> metadata);
+
+        _FinalStage putAllMetadata(Map<String, String> metadata);
+
+        _FinalStage metadata(String key, String value);
+
+        _FinalStage paidAt(Optional<String> paidAt);
+
+        _FinalStage paidAt(String paidAt);
+
+        _FinalStage paidAt(Nullable<String> paidAt);
 
         /**
-         * <p>The date that defines when the subscription billing cycle starts. When set on a renewal plan invoice, all future billing periods anchor to this date.</p>
+         * <p>The payment methods the customer can choose from when paying through the invoice's checkout link. It takes precedence over the invoice's variants and the account. <code>null</code> when the invoice uses its variants' payment methods.</p>
          */
-        _FinalStage subscriptionBillingAnchorAt(Optional<OffsetDateTime> subscriptionBillingAnchorAt);
+        _FinalStage paymentMethodConfiguration(
+                Optional<CheckoutSessionPaymentMethodConfiguration> paymentMethodConfiguration);
 
-        _FinalStage subscriptionBillingAnchorAt(OffsetDateTime subscriptionBillingAnchorAt);
+        _FinalStage paymentMethodConfiguration(CheckoutSessionPaymentMethodConfiguration paymentMethodConfiguration);
 
-        _FinalStage subscriptionBillingAnchorAt(Nullable<OffsetDateTime> subscriptionBillingAnchorAt);
+        _FinalStage paymentMethodConfiguration(
+                Nullable<CheckoutSessionPaymentMethodConfiguration> paymentMethodConfiguration);
+
+        _FinalStage paymentMethodId(Optional<String> paymentMethodId);
+
+        _FinalStage paymentMethodId(String paymentMethodId);
+
+        _FinalStage paymentMethodId(Nullable<String> paymentMethodId);
+
+        _FinalStage recipientEmails(List<String> recipientEmails);
+
+        _FinalStage addRecipientEmails(String recipientEmails);
+
+        _FinalStage addAllRecipientEmails(List<String> recipientEmails);
 
         /**
-         * <p>The user this invoice is addressed to. Null if the user account has been removed.</p>
+         * <p>When the invoice's saved payment method will be charged, as an ISO 8601 timestamp. It is the <code>charge_at</code> the invoice was sent or issued with. Without one, it is <code>due_at</code> when an invoice with a <code>payment_method_id</code> is sent or issued before it is due. On a draft, it is the <code>charge_at</code> of its scheduled send. <code>null</code> otherwise, once the charge starts, and once the invoice is paid, void, or uncollectible.</p>
          */
-        _FinalStage user(Optional<InvoiceUser> user);
+        _FinalStage scheduledChargeAt(Optional<String> scheduledChargeAt);
 
-        _FinalStage user(InvoiceUser user);
+        _FinalStage scheduledChargeAt(String scheduledChargeAt);
 
-        _FinalStage user(Nullable<InvoiceUser> user);
+        _FinalStage scheduledChargeAt(Nullable<String> scheduledChargeAt);
+
+        /**
+         * <p>The <code>collection_method</code> a draft's scheduled send applies when it fires. <code>null</code> when the draft has no scheduled send or it was scheduled without one, and once the invoice is issued.</p>
+         */
+        _FinalStage scheduledCollectionMethod(Optional<InvoiceScheduledCollectionMethod> scheduledCollectionMethod);
+
+        _FinalStage scheduledCollectionMethod(InvoiceScheduledCollectionMethod scheduledCollectionMethod);
+
+        _FinalStage scheduledCollectionMethod(Nullable<InvoiceScheduledCollectionMethod> scheduledCollectionMethod);
+
+        _FinalStage scheduledSendAt(Optional<String> scheduledSendAt);
+
+        _FinalStage scheduledSendAt(String scheduledSendAt);
+
+        _FinalStage scheduledSendAt(Nullable<String> scheduledSendAt);
+
+        _FinalStage taxAmount(Optional<Money> taxAmount);
+
+        _FinalStage taxAmount(Money taxAmount);
+
+        _FinalStage taxAmount(Nullable<Money> taxAmount);
     }
 
     @JsonIgnoreProperties(ignoreUnknown = true)
     public static final class Builder
-            implements ChargeBuyerFeeStage,
-                    CollectionMethodStage,
-                    CompanyStage,
+            implements AccountIdStage,
+                    AmountDueStage,
+                    BuyerFeeAmountStage,
+                    BuyerFeePercentageStage,
                     CreatedAtStage,
-                    CurrentPlanStage,
-                    FetchInvoiceTokenStage,
+                    DeletableStage,
                     IdStage,
                     NumberStage,
-                    PaymentProcessingStage,
-                    ProductStage,
+                    ObjectStage,
+                    OverdueStage,
+                    SendsOnDueDateStage,
                     StatusStage,
+                    SubtotalStage,
+                    TotalStage,
+                    TotalsStatusStage,
                     UpdatedAtStage,
                     _FinalStage {
-        private boolean chargeBuyerFee;
+        private String accountId;
 
-        private InvoiceCollectionMethods collectionMethod;
+        private Money amountDue;
 
-        private InvoiceCompany company;
+        private Money buyerFeeAmount;
 
-        private OffsetDateTime createdAt;
+        private double buyerFeePercentage;
 
-        private InvoiceCurrentPlan currentPlan;
+        private String createdAt;
 
-        private String fetchInvoiceToken;
+        private boolean deletable;
 
         private String id;
 
         private String number;
 
-        private boolean paymentProcessing;
+        private InvoiceObject object;
 
-        private InvoiceProduct product;
+        private boolean overdue;
 
-        private InvoiceStatuses status;
+        private boolean sendsOnDueDate;
 
-        private OffsetDateTime updatedAt;
+        private InvoiceStatus status;
 
-        private Optional<InvoiceUser> user = Optional.empty();
+        private Money subtotal;
 
-        private Optional<OffsetDateTime> subscriptionBillingAnchorAt = Optional.empty();
+        private Money total;
 
-        private Optional<InvoicePayment> payment = Optional.empty();
+        private InvoiceTotalsStatus totalsStatus;
 
-        private Optional<String> payOnlineUrl = Optional.empty();
+        private String updatedAt;
 
-        private Optional<InvoiceMember> member = Optional.empty();
+        private Optional<Money> taxAmount = Optional.empty();
 
-        private Optional<InvoiceMailingAddress> mailingAddress = Optional.empty();
+        private Optional<String> scheduledSendAt = Optional.empty();
 
-        private List<InvoiceLineItemsItem> lineItems = new ArrayList<>();
+        private Optional<InvoiceScheduledCollectionMethod> scheduledCollectionMethod = Optional.empty();
+
+        private Optional<String> scheduledChargeAt = Optional.empty();
+
+        private List<String> recipientEmails = new ArrayList<>();
+
+        private Optional<String> paymentMethodId = Optional.empty();
+
+        private Optional<CheckoutSessionPaymentMethodConfiguration> paymentMethodConfiguration = Optional.empty();
+
+        private Optional<String> paidAt = Optional.empty();
+
+        private Map<String, String> metadata = new LinkedHashMap<>();
+
+        private Optional<String> memo = Optional.empty();
+
+        private Optional<String> membershipId = Optional.empty();
+
+        private Optional<String> memberId = Optional.empty();
+
+        private Optional<String> mailingAddressId = Optional.empty();
+
+        private List<InvoiceLineItem> lineItems = new ArrayList<>();
+
+        private Optional<String> invoicePrefix = Optional.empty();
 
         private Optional<String> emailAddress = Optional.empty();
 
-        private Optional<OffsetDateTime> dueDate = Optional.empty();
+        private Optional<String> dueAt = Optional.empty();
 
         private Optional<String> customerName = Optional.empty();
 
-        private Optional<OffsetDateTime> automaticallyFinalizesAt = Optional.empty();
+        private Optional<String> checkoutLink = Optional.empty();
 
-        @JsonAnySetter
+        private Optional<PaymentAddress> billingAddress = Optional.empty();
+
         private Map<String, Object> additionalProperties = new HashMap<>();
 
         private Builder() {}
 
         @java.lang.Override
         public Builder from(Invoice other) {
-            automaticallyFinalizesAt(other.getAutomaticallyFinalizesAt());
-            chargeBuyerFee(other.getChargeBuyerFee());
-            collectionMethod(other.getCollectionMethod());
-            company(other.getCompany());
+            accountId(other.getAccountId());
+            amountDue(other.getAmountDue());
+            billingAddress(other.getBillingAddress());
+            buyerFeeAmount(other.getBuyerFeeAmount());
+            buyerFeePercentage(other.getBuyerFeePercentage());
+            checkoutLink(other.getCheckoutLink());
             createdAt(other.getCreatedAt());
-            currentPlan(other.getCurrentPlan());
             customerName(other.getCustomerName());
-            dueDate(other.getDueDate());
+            deletable(other.getDeletable());
+            dueAt(other.getDueAt());
             emailAddress(other.getEmailAddress());
-            fetchInvoiceToken(other.getFetchInvoiceToken());
             id(other.getId());
+            invoicePrefix(other.getInvoicePrefix());
             lineItems(other.getLineItems());
-            mailingAddress(other.getMailingAddress());
-            member(other.getMember());
+            mailingAddressId(other.getMailingAddressId());
+            memberId(other.getMemberId());
+            membershipId(other.getMembershipId());
+            memo(other.getMemo());
+            metadata(other.getMetadata());
             number(other.getNumber());
-            payOnlineUrl(other.getPayOnlineUrl());
-            payment(other.getPayment());
-            paymentProcessing(other.getPaymentProcessing());
-            product(other.getProduct());
+            object(other.getObject());
+            overdue(other.getOverdue());
+            paidAt(other.getPaidAt());
+            paymentMethodConfiguration(other.getPaymentMethodConfiguration());
+            paymentMethodId(other.getPaymentMethodId());
+            recipientEmails(other.getRecipientEmails());
+            scheduledChargeAt(other.getScheduledChargeAt());
+            scheduledCollectionMethod(other.getScheduledCollectionMethod());
+            scheduledSendAt(other.getScheduledSendAt());
+            sendsOnDueDate(other.getSendsOnDueDate());
             status(other.getStatus());
-            subscriptionBillingAnchorAt(other.getSubscriptionBillingAnchorAt());
+            subtotal(other.getSubtotal());
+            taxAmount(other.getTaxAmount());
+            total(other.getTotal());
+            totalsStatus(other.getTotalsStatus());
             updatedAt(other.getUpdatedAt());
-            user(other.getUser());
             return this;
         }
 
-        /**
-         * <p>Whether the invoice includes a buyer processing fee on top of the plan price.</p>
-         * <p>Whether the invoice includes a buyer processing fee on top of the plan price.</p>
-         * @return Reference to {@code this} so that method calls can be chained together.
-         */
         @java.lang.Override
-        @JsonSetter("charge_buyer_fee")
-        public CollectionMethodStage chargeBuyerFee(boolean chargeBuyerFee) {
-            this.chargeBuyerFee = chargeBuyerFee;
+        @JsonSetter("account_id")
+        public AmountDueStage accountId(@NotNull String accountId) {
+            this.accountId = Objects.requireNonNull(accountId, "accountId must not be null");
             return this;
         }
 
-        /**
-         * <p>The method used to collect payment for this invoice, such as automatic charging or manual payment.</p>
-         * <p>The method used to collect payment for this invoice, such as automatic charging or manual payment.</p>
-         * @return Reference to {@code this} so that method calls can be chained together.
-         */
         @java.lang.Override
-        @JsonSetter("collection_method")
-        public CompanyStage collectionMethod(@NotNull InvoiceCollectionMethods collectionMethod) {
-            this.collectionMethod = Objects.requireNonNull(collectionMethod, "collectionMethod must not be null");
+        @JsonSetter("amount_due")
+        public BuyerFeeAmountStage amountDue(@NotNull Money amountDue) {
+            this.amountDue = Objects.requireNonNull(amountDue, "amountDue must not be null");
             return this;
         }
 
-        /**
-         * <p>The company that issued this invoice.</p>
-         * <p>The company that issued this invoice.</p>
-         * @return Reference to {@code this} so that method calls can be chained together.
-         */
         @java.lang.Override
-        @JsonSetter("company")
-        public CreatedAtStage company(@NotNull InvoiceCompany company) {
-            this.company = Objects.requireNonNull(company, "company must not be null");
+        @JsonSetter("buyer_fee_amount")
+        public BuyerFeePercentageStage buyerFeeAmount(@NotNull Money buyerFeeAmount) {
+            this.buyerFeeAmount = Objects.requireNonNull(buyerFeeAmount, "buyerFeeAmount must not be null");
             return this;
         }
 
-        /**
-         * <p>The datetime the invoice was created.</p>
-         * <p>The datetime the invoice was created.</p>
-         * @return Reference to {@code this} so that method calls can be chained together.
-         */
+        @java.lang.Override
+        @JsonSetter("buyer_fee_percentage")
+        public CreatedAtStage buyerFeePercentage(double buyerFeePercentage) {
+            this.buyerFeePercentage = buyerFeePercentage;
+            return this;
+        }
+
         @java.lang.Override
         @JsonSetter("created_at")
-        public CurrentPlanStage createdAt(@NotNull OffsetDateTime createdAt) {
+        public DeletableStage createdAt(@NotNull String createdAt) {
             this.createdAt = Objects.requireNonNull(createdAt, "createdAt must not be null");
             return this;
         }
 
         /**
-         * <p>The plan that this invoice charges for.</p>
-         * <p>The plan that this invoice charges for.</p>
+         * <p>True when <code>DELETE /invoices/{id}</code> can delete this invoice. A draft qualifies unless it is scheduled or bills a subscription. A void invoice qualifies unless it collected money or still awaits a bank wire.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
-        @JsonSetter("current_plan")
-        public FetchInvoiceTokenStage currentPlan(@NotNull InvoiceCurrentPlan currentPlan) {
-            this.currentPlan = Objects.requireNonNull(currentPlan, "currentPlan must not be null");
+        @JsonSetter("deletable")
+        public IdStage deletable(boolean deletable) {
+            this.deletable = deletable;
             return this;
         }
 
-        /**
-         * <p>A signed token that allows fetching invoice data publicly without authentication.</p>
-         * <p>A signed token that allows fetching invoice data publicly without authentication.</p>
-         * @return Reference to {@code this} so that method calls can be chained together.
-         */
-        @java.lang.Override
-        @JsonSetter("fetch_invoice_token")
-        public IdStage fetchInvoiceToken(@NotNull String fetchInvoiceToken) {
-            this.fetchInvoiceToken = Objects.requireNonNull(fetchInvoiceToken, "fetchInvoiceToken must not be null");
-            return this;
-        }
-
-        /**
-         * <p>The unique identifier for the invoice.</p>
-         * <p>The unique identifier for the invoice.</p>
-         * @return Reference to {@code this} so that method calls can be chained together.
-         */
         @java.lang.Override
         @JsonSetter("id")
         public NumberStage id(@NotNull String id) {
@@ -845,310 +1044,473 @@ public final class Invoice {
             return this;
         }
 
-        /**
-         * <p>The sequential invoice number for display purposes.</p>
-         * <p>The sequential invoice number for display purposes.</p>
-         * @return Reference to {@code this} so that method calls can be chained together.
-         */
         @java.lang.Override
         @JsonSetter("number")
-        public PaymentProcessingStage number(@NotNull String number) {
+        public ObjectStage number(@NotNull String number) {
             this.number = Objects.requireNonNull(number, "number must not be null");
             return this;
         }
 
-        /**
-         * <p>Whether a payment on this invoice is still clearing. True while a delayed payment method such as ACH or SEPA settles, during which the invoice stays open and is not marked past due.</p>
-         * <p>Whether a payment on this invoice is still clearing. True while a delayed payment method such as ACH or SEPA settles, during which the invoice stays open and is not marked past due.</p>
-         * @return Reference to {@code this} so that method calls can be chained together.
-         */
         @java.lang.Override
-        @JsonSetter("payment_processing")
-        public ProductStage paymentProcessing(boolean paymentProcessing) {
-            this.paymentProcessing = paymentProcessing;
+        @JsonSetter("object")
+        public OverdueStage object(@NotNull InvoiceObject object) {
+            this.object = Objects.requireNonNull(object, "object must not be null");
+            return this;
+        }
+
+        @java.lang.Override
+        @JsonSetter("overdue")
+        public SendsOnDueDateStage overdue(boolean overdue) {
+            this.overdue = overdue;
             return this;
         }
 
         /**
-         * <p>The product that this invoice was generated for.</p>
-         * <p>The product that this invoice was generated for.</p>
+         * <p>Whether this draft is issued automatically when its <code>due_at</code> arrives. Issuing it charges its <code>payment_method_id</code>, or emails its payment link to its <code>recipient_emails</code>. <code>false</code> for an invoice that is not a draft and for a draft with a scheduled send. <code>false</code> while sending the draft would fail for missing recipients or an unavailable payment link. <code>false</code> for a draft that had no future <code>due_at</code> when it was last saved. <code>false</code> for a draft created before 2026-11-12T22:00:00Z.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
-        @JsonSetter("product")
-        public StatusStage product(@NotNull InvoiceProduct product) {
-            this.product = Objects.requireNonNull(product, "product must not be null");
+        @JsonSetter("sends_on_due_date")
+        public StatusStage sendsOnDueDate(boolean sendsOnDueDate) {
+            this.sendsOnDueDate = sendsOnDueDate;
             return this;
         }
 
-        /**
-         * <p>The current payment status of the invoice, such as draft, open, paid, or void.</p>
-         * <p>The current payment status of the invoice, such as draft, open, paid, or void.</p>
-         * @return Reference to {@code this} so that method calls can be chained together.
-         */
         @java.lang.Override
         @JsonSetter("status")
-        public UpdatedAtStage status(@NotNull InvoiceStatuses status) {
+        public SubtotalStage status(@NotNull InvoiceStatus status) {
             this.status = Objects.requireNonNull(status, "status must not be null");
             return this;
         }
 
-        /**
-         * <p>The datetime the invoice was last updated.</p>
-         * <p>The datetime the invoice was last updated.</p>
-         * @return Reference to {@code this} so that method calls can be chained together.
-         */
+        @java.lang.Override
+        @JsonSetter("subtotal")
+        public TotalStage subtotal(@NotNull Money subtotal) {
+            this.subtotal = Objects.requireNonNull(subtotal, "subtotal must not be null");
+            return this;
+        }
+
+        @java.lang.Override
+        @JsonSetter("total")
+        public TotalsStatusStage total(@NotNull Money total) {
+            this.total = Objects.requireNonNull(total, "total must not be null");
+            return this;
+        }
+
+        @java.lang.Override
+        @JsonSetter("totals_status")
+        public UpdatedAtStage totalsStatus(@NotNull InvoiceTotalsStatus totalsStatus) {
+            this.totalsStatus = Objects.requireNonNull(totalsStatus, "totalsStatus must not be null");
+            return this;
+        }
+
         @java.lang.Override
         @JsonSetter("updated_at")
-        public _FinalStage updatedAt(@NotNull OffsetDateTime updatedAt) {
+        public _FinalStage updatedAt(@NotNull String updatedAt) {
             this.updatedAt = Objects.requireNonNull(updatedAt, "updatedAt must not be null");
             return this;
         }
 
+        @java.lang.Override
+        public _FinalStage taxAmount(Nullable<Money> taxAmount) {
+            if (taxAmount.isNull()) {
+                this.taxAmount = null;
+            } else if (taxAmount.isEmpty()) {
+                this.taxAmount = Optional.empty();
+            } else {
+                this.taxAmount = Optional.of(taxAmount.get());
+            }
+            return this;
+        }
+
+        @java.lang.Override
+        public _FinalStage taxAmount(Money taxAmount) {
+            this.taxAmount = Optional.ofNullable(taxAmount);
+            return this;
+        }
+
+        @java.lang.Override
+        @JsonSetter(value = "tax_amount", nulls = Nulls.SKIP)
+        public _FinalStage taxAmount(Optional<Money> taxAmount) {
+            this.taxAmount = taxAmount;
+            return this;
+        }
+
+        @java.lang.Override
+        public _FinalStage scheduledSendAt(Nullable<String> scheduledSendAt) {
+            if (scheduledSendAt.isNull()) {
+                this.scheduledSendAt = null;
+            } else if (scheduledSendAt.isEmpty()) {
+                this.scheduledSendAt = Optional.empty();
+            } else {
+                this.scheduledSendAt = Optional.of(scheduledSendAt.get());
+            }
+            return this;
+        }
+
+        @java.lang.Override
+        public _FinalStage scheduledSendAt(String scheduledSendAt) {
+            this.scheduledSendAt = Optional.ofNullable(scheduledSendAt);
+            return this;
+        }
+
+        @java.lang.Override
+        @JsonSetter(value = "scheduled_send_at", nulls = Nulls.SKIP)
+        public _FinalStage scheduledSendAt(Optional<String> scheduledSendAt) {
+            this.scheduledSendAt = scheduledSendAt;
+            return this;
+        }
+
         /**
-         * <p>The user this invoice is addressed to. Null if the user account has been removed.</p>
+         * <p>The <code>collection_method</code> a draft's scheduled send applies when it fires. <code>null</code> when the draft has no scheduled send or it was scheduled without one, and once the invoice is issued.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
-        public _FinalStage user(Nullable<InvoiceUser> user) {
-            if (user.isNull()) {
-                this.user = null;
-            } else if (user.isEmpty()) {
-                this.user = Optional.empty();
+        public _FinalStage scheduledCollectionMethod(
+                Nullable<InvoiceScheduledCollectionMethod> scheduledCollectionMethod) {
+            if (scheduledCollectionMethod.isNull()) {
+                this.scheduledCollectionMethod = null;
+            } else if (scheduledCollectionMethod.isEmpty()) {
+                this.scheduledCollectionMethod = Optional.empty();
             } else {
-                this.user = Optional.of(user.get());
+                this.scheduledCollectionMethod = Optional.of(scheduledCollectionMethod.get());
             }
             return this;
         }
 
         /**
-         * <p>The user this invoice is addressed to. Null if the user account has been removed.</p>
+         * <p>The <code>collection_method</code> a draft's scheduled send applies when it fires. <code>null</code> when the draft has no scheduled send or it was scheduled without one, and once the invoice is issued.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
-        public _FinalStage user(InvoiceUser user) {
-            this.user = Optional.ofNullable(user);
+        public _FinalStage scheduledCollectionMethod(InvoiceScheduledCollectionMethod scheduledCollectionMethod) {
+            this.scheduledCollectionMethod = Optional.ofNullable(scheduledCollectionMethod);
             return this;
         }
 
         /**
-         * <p>The user this invoice is addressed to. Null if the user account has been removed.</p>
+         * <p>The <code>collection_method</code> a draft's scheduled send applies when it fires. <code>null</code> when the draft has no scheduled send or it was scheduled without one, and once the invoice is issued.</p>
          */
         @java.lang.Override
-        @JsonSetter(value = "user", nulls = Nulls.SKIP)
-        public _FinalStage user(Optional<InvoiceUser> user) {
-            this.user = user;
+        @JsonSetter(value = "scheduled_collection_method", nulls = Nulls.SKIP)
+        public _FinalStage scheduledCollectionMethod(
+                Optional<InvoiceScheduledCollectionMethod> scheduledCollectionMethod) {
+            this.scheduledCollectionMethod = scheduledCollectionMethod;
             return this;
         }
 
         /**
-         * <p>The date that defines when the subscription billing cycle starts. When set on a renewal plan invoice, all future billing periods anchor to this date.</p>
+         * <p>When the invoice's saved payment method will be charged, as an ISO 8601 timestamp. It is the <code>charge_at</code> the invoice was sent or issued with. Without one, it is <code>due_at</code> when an invoice with a <code>payment_method_id</code> is sent or issued before it is due. On a draft, it is the <code>charge_at</code> of its scheduled send. <code>null</code> otherwise, once the charge starts, and once the invoice is paid, void, or uncollectible.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
-        public _FinalStage subscriptionBillingAnchorAt(Nullable<OffsetDateTime> subscriptionBillingAnchorAt) {
-            if (subscriptionBillingAnchorAt.isNull()) {
-                this.subscriptionBillingAnchorAt = null;
-            } else if (subscriptionBillingAnchorAt.isEmpty()) {
-                this.subscriptionBillingAnchorAt = Optional.empty();
+        public _FinalStage scheduledChargeAt(Nullable<String> scheduledChargeAt) {
+            if (scheduledChargeAt.isNull()) {
+                this.scheduledChargeAt = null;
+            } else if (scheduledChargeAt.isEmpty()) {
+                this.scheduledChargeAt = Optional.empty();
             } else {
-                this.subscriptionBillingAnchorAt = Optional.of(subscriptionBillingAnchorAt.get());
+                this.scheduledChargeAt = Optional.of(scheduledChargeAt.get());
             }
             return this;
         }
 
         /**
-         * <p>The date that defines when the subscription billing cycle starts. When set on a renewal plan invoice, all future billing periods anchor to this date.</p>
+         * <p>When the invoice's saved payment method will be charged, as an ISO 8601 timestamp. It is the <code>charge_at</code> the invoice was sent or issued with. Without one, it is <code>due_at</code> when an invoice with a <code>payment_method_id</code> is sent or issued before it is due. On a draft, it is the <code>charge_at</code> of its scheduled send. <code>null</code> otherwise, once the charge starts, and once the invoice is paid, void, or uncollectible.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
-        public _FinalStage subscriptionBillingAnchorAt(OffsetDateTime subscriptionBillingAnchorAt) {
-            this.subscriptionBillingAnchorAt = Optional.ofNullable(subscriptionBillingAnchorAt);
+        public _FinalStage scheduledChargeAt(String scheduledChargeAt) {
+            this.scheduledChargeAt = Optional.ofNullable(scheduledChargeAt);
             return this;
         }
 
         /**
-         * <p>The date that defines when the subscription billing cycle starts. When set on a renewal plan invoice, all future billing periods anchor to this date.</p>
+         * <p>When the invoice's saved payment method will be charged, as an ISO 8601 timestamp. It is the <code>charge_at</code> the invoice was sent or issued with. Without one, it is <code>due_at</code> when an invoice with a <code>payment_method_id</code> is sent or issued before it is due. On a draft, it is the <code>charge_at</code> of its scheduled send. <code>null</code> otherwise, once the charge starts, and once the invoice is paid, void, or uncollectible.</p>
          */
         @java.lang.Override
-        @JsonSetter(value = "subscription_billing_anchor_at", nulls = Nulls.SKIP)
-        public _FinalStage subscriptionBillingAnchorAt(Optional<OffsetDateTime> subscriptionBillingAnchorAt) {
-            this.subscriptionBillingAnchorAt = subscriptionBillingAnchorAt;
+        @JsonSetter(value = "scheduled_charge_at", nulls = Nulls.SKIP)
+        public _FinalStage scheduledChargeAt(Optional<String> scheduledChargeAt) {
+            this.scheduledChargeAt = scheduledChargeAt;
             return this;
         }
 
-        /**
-         * <p>The payment that settled this invoice. Null while the invoice is unpaid, when the invoice was marked paid manually, and on a subscription renewal invoice, where the settling payment cannot yet be identified.</p>
-         * @return Reference to {@code this} so that method calls can be chained together.
-         */
         @java.lang.Override
-        public _FinalStage payment(Nullable<InvoicePayment> payment) {
-            if (payment.isNull()) {
-                this.payment = null;
-            } else if (payment.isEmpty()) {
-                this.payment = Optional.empty();
+        public _FinalStage addAllRecipientEmails(List<String> recipientEmails) {
+            if (recipientEmails != null) {
+                this.recipientEmails.addAll(recipientEmails);
+            }
+            return this;
+        }
+
+        @java.lang.Override
+        public _FinalStage addRecipientEmails(String recipientEmails) {
+            this.recipientEmails.add(recipientEmails);
+            return this;
+        }
+
+        @java.lang.Override
+        @JsonSetter(value = "recipient_emails", nulls = Nulls.SKIP)
+        public _FinalStage recipientEmails(List<String> recipientEmails) {
+            this.recipientEmails.clear();
+            if (recipientEmails != null) {
+                this.recipientEmails.addAll(recipientEmails);
+            }
+            return this;
+        }
+
+        @java.lang.Override
+        public _FinalStage paymentMethodId(Nullable<String> paymentMethodId) {
+            if (paymentMethodId.isNull()) {
+                this.paymentMethodId = null;
+            } else if (paymentMethodId.isEmpty()) {
+                this.paymentMethodId = Optional.empty();
             } else {
-                this.payment = Optional.of(payment.get());
+                this.paymentMethodId = Optional.of(paymentMethodId.get());
+            }
+            return this;
+        }
+
+        @java.lang.Override
+        public _FinalStage paymentMethodId(String paymentMethodId) {
+            this.paymentMethodId = Optional.ofNullable(paymentMethodId);
+            return this;
+        }
+
+        @java.lang.Override
+        @JsonSetter(value = "payment_method_id", nulls = Nulls.SKIP)
+        public _FinalStage paymentMethodId(Optional<String> paymentMethodId) {
+            this.paymentMethodId = paymentMethodId;
+            return this;
+        }
+
+        /**
+         * <p>The payment methods the customer can choose from when paying through the invoice's checkout link. It takes precedence over the invoice's variants and the account. <code>null</code> when the invoice uses its variants' payment methods.</p>
+         * @return Reference to {@code this} so that method calls can be chained together.
+         */
+        @java.lang.Override
+        public _FinalStage paymentMethodConfiguration(
+                Nullable<CheckoutSessionPaymentMethodConfiguration> paymentMethodConfiguration) {
+            if (paymentMethodConfiguration.isNull()) {
+                this.paymentMethodConfiguration = null;
+            } else if (paymentMethodConfiguration.isEmpty()) {
+                this.paymentMethodConfiguration = Optional.empty();
+            } else {
+                this.paymentMethodConfiguration = Optional.of(paymentMethodConfiguration.get());
             }
             return this;
         }
 
         /**
-         * <p>The payment that settled this invoice. Null while the invoice is unpaid, when the invoice was marked paid manually, and on a subscription renewal invoice, where the settling payment cannot yet be identified.</p>
+         * <p>The payment methods the customer can choose from when paying through the invoice's checkout link. It takes precedence over the invoice's variants and the account. <code>null</code> when the invoice uses its variants' payment methods.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
-        public _FinalStage payment(InvoicePayment payment) {
-            this.payment = Optional.ofNullable(payment);
+        public _FinalStage paymentMethodConfiguration(
+                CheckoutSessionPaymentMethodConfiguration paymentMethodConfiguration) {
+            this.paymentMethodConfiguration = Optional.ofNullable(paymentMethodConfiguration);
             return this;
         }
 
         /**
-         * <p>The payment that settled this invoice. Null while the invoice is unpaid, when the invoice was marked paid manually, and on a subscription renewal invoice, where the settling payment cannot yet be identified.</p>
+         * <p>The payment methods the customer can choose from when paying through the invoice's checkout link. It takes precedence over the invoice's variants and the account. <code>null</code> when the invoice uses its variants' payment methods.</p>
          */
         @java.lang.Override
-        @JsonSetter(value = "payment", nulls = Nulls.SKIP)
-        public _FinalStage payment(Optional<InvoicePayment> payment) {
-            this.payment = payment;
+        @JsonSetter(value = "payment_method_configuration", nulls = Nulls.SKIP)
+        public _FinalStage paymentMethodConfiguration(
+                Optional<CheckoutSessionPaymentMethodConfiguration> paymentMethodConfiguration) {
+            this.paymentMethodConfiguration = paymentMethodConfiguration;
             return this;
         }
 
-        /**
-         * <p>The checkout URL where the customer can pay this invoice online, with their email address pre-filled and locked.</p>
-         * @return Reference to {@code this} so that method calls can be chained together.
-         */
         @java.lang.Override
-        public _FinalStage payOnlineUrl(Nullable<String> payOnlineUrl) {
-            if (payOnlineUrl.isNull()) {
-                this.payOnlineUrl = null;
-            } else if (payOnlineUrl.isEmpty()) {
-                this.payOnlineUrl = Optional.empty();
+        public _FinalStage paidAt(Nullable<String> paidAt) {
+            if (paidAt.isNull()) {
+                this.paidAt = null;
+            } else if (paidAt.isEmpty()) {
+                this.paidAt = Optional.empty();
             } else {
-                this.payOnlineUrl = Optional.of(payOnlineUrl.get());
+                this.paidAt = Optional.of(paidAt.get());
+            }
+            return this;
+        }
+
+        @java.lang.Override
+        public _FinalStage paidAt(String paidAt) {
+            this.paidAt = Optional.ofNullable(paidAt);
+            return this;
+        }
+
+        @java.lang.Override
+        @JsonSetter(value = "paid_at", nulls = Nulls.SKIP)
+        public _FinalStage paidAt(Optional<String> paidAt) {
+            this.paidAt = paidAt;
+            return this;
+        }
+
+        @java.lang.Override
+        public _FinalStage metadata(String key, String value) {
+            this.metadata.put(key, value);
+            return this;
+        }
+
+        @java.lang.Override
+        public _FinalStage putAllMetadata(Map<String, String> metadata) {
+            if (metadata != null) {
+                this.metadata.putAll(metadata);
+            }
+            return this;
+        }
+
+        @java.lang.Override
+        @JsonSetter(value = "metadata", nulls = Nulls.SKIP)
+        public _FinalStage metadata(Map<String, String> metadata) {
+            this.metadata.clear();
+            if (metadata != null) {
+                this.metadata.putAll(metadata);
             }
             return this;
         }
 
         /**
-         * <p>The checkout URL where the customer can pay this invoice online, with their email address pre-filled and locked.</p>
+         * <p>A note to the customer, shown on the invoice email, PDF, and checkout page with its line breaks kept. <code>null</code> when none is set.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
-        public _FinalStage payOnlineUrl(String payOnlineUrl) {
-            this.payOnlineUrl = Optional.ofNullable(payOnlineUrl);
-            return this;
-        }
-
-        /**
-         * <p>The checkout URL where the customer can pay this invoice online, with their email address pre-filled and locked.</p>
-         */
-        @java.lang.Override
-        @JsonSetter(value = "pay_online_url", nulls = Nulls.SKIP)
-        public _FinalStage payOnlineUrl(Optional<String> payOnlineUrl) {
-            this.payOnlineUrl = payOnlineUrl;
-            return this;
-        }
-
-        /**
-         * <p>The member that the invoice was created for. Null when the invoice is addressed to an email address with no member record behind it.</p>
-         * @return Reference to {@code this} so that method calls can be chained together.
-         */
-        @java.lang.Override
-        public _FinalStage member(Nullable<InvoiceMember> member) {
-            if (member.isNull()) {
-                this.member = null;
-            } else if (member.isEmpty()) {
-                this.member = Optional.empty();
+        public _FinalStage memo(Nullable<String> memo) {
+            if (memo.isNull()) {
+                this.memo = null;
+            } else if (memo.isEmpty()) {
+                this.memo = Optional.empty();
             } else {
-                this.member = Optional.of(member.get());
+                this.memo = Optional.of(memo.get());
             }
             return this;
         }
 
         /**
-         * <p>The member that the invoice was created for. Null when the invoice is addressed to an email address with no member record behind it.</p>
+         * <p>A note to the customer, shown on the invoice email, PDF, and checkout page with its line breaks kept. <code>null</code> when none is set.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
-        public _FinalStage member(InvoiceMember member) {
-            this.member = Optional.ofNullable(member);
+        public _FinalStage memo(String memo) {
+            this.memo = Optional.ofNullable(memo);
             return this;
         }
 
         /**
-         * <p>The member that the invoice was created for. Null when the invoice is addressed to an email address with no member record behind it.</p>
+         * <p>A note to the customer, shown on the invoice email, PDF, and checkout page with its line breaks kept. <code>null</code> when none is set.</p>
          */
         @java.lang.Override
-        @JsonSetter(value = "member", nulls = Nulls.SKIP)
-        public _FinalStage member(Optional<InvoiceMember> member) {
-            this.member = member;
+        @JsonSetter(value = "memo", nulls = Nulls.SKIP)
+        public _FinalStage memo(Optional<String> memo) {
+            this.memo = memo;
             return this;
         }
 
         /**
-         * <p>The billing/mailing address associated with this invoice, if one was provided at creation time.</p>
+         * <p>The membership this invoice bills, prefixed <code>mem_</code>. For a renewal invoice, it is the subscription that renews. For an invoice with a recurring item, it is the membership created when the invoice is issued. Null for one-off invoices, for a draft not yet issued, and without the member:basic:read permission.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
-        public _FinalStage mailingAddress(Nullable<InvoiceMailingAddress> mailingAddress) {
-            if (mailingAddress.isNull()) {
-                this.mailingAddress = null;
-            } else if (mailingAddress.isEmpty()) {
-                this.mailingAddress = Optional.empty();
+        public _FinalStage membershipId(Nullable<String> membershipId) {
+            if (membershipId.isNull()) {
+                this.membershipId = null;
+            } else if (membershipId.isEmpty()) {
+                this.membershipId = Optional.empty();
             } else {
-                this.mailingAddress = Optional.of(mailingAddress.get());
+                this.membershipId = Optional.of(membershipId.get());
             }
             return this;
         }
 
         /**
-         * <p>The billing/mailing address associated with this invoice, if one was provided at creation time.</p>
+         * <p>The membership this invoice bills, prefixed <code>mem_</code>. For a renewal invoice, it is the subscription that renews. For an invoice with a recurring item, it is the membership created when the invoice is issued. Null for one-off invoices, for a draft not yet issued, and without the member:basic:read permission.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
-        public _FinalStage mailingAddress(InvoiceMailingAddress mailingAddress) {
-            this.mailingAddress = Optional.ofNullable(mailingAddress);
+        public _FinalStage membershipId(String membershipId) {
+            this.membershipId = Optional.ofNullable(membershipId);
             return this;
         }
 
         /**
-         * <p>The billing/mailing address associated with this invoice, if one was provided at creation time.</p>
+         * <p>The membership this invoice bills, prefixed <code>mem_</code>. For a renewal invoice, it is the subscription that renews. For an invoice with a recurring item, it is the membership created when the invoice is issued. Null for one-off invoices, for a draft not yet issued, and without the member:basic:read permission.</p>
          */
         @java.lang.Override
-        @JsonSetter(value = "mailing_address", nulls = Nulls.SKIP)
-        public _FinalStage mailingAddress(Optional<InvoiceMailingAddress> mailingAddress) {
-            this.mailingAddress = mailingAddress;
+        @JsonSetter(value = "membership_id", nulls = Nulls.SKIP)
+        public _FinalStage membershipId(Optional<String> membershipId) {
+            this.membershipId = membershipId;
             return this;
         }
 
-        /**
-         * <p>Optional line items that break down the invoice total into individual charges.</p>
-         * @return Reference to {@code this} so that method calls can be chained together.
-         */
         @java.lang.Override
-        public _FinalStage addAllLineItems(List<InvoiceLineItemsItem> lineItems) {
+        public _FinalStage memberId(Nullable<String> memberId) {
+            if (memberId.isNull()) {
+                this.memberId = null;
+            } else if (memberId.isEmpty()) {
+                this.memberId = Optional.empty();
+            } else {
+                this.memberId = Optional.of(memberId.get());
+            }
+            return this;
+        }
+
+        @java.lang.Override
+        public _FinalStage memberId(String memberId) {
+            this.memberId = Optional.ofNullable(memberId);
+            return this;
+        }
+
+        @java.lang.Override
+        @JsonSetter(value = "member_id", nulls = Nulls.SKIP)
+        public _FinalStage memberId(Optional<String> memberId) {
+            this.memberId = memberId;
+            return this;
+        }
+
+        @java.lang.Override
+        public _FinalStage mailingAddressId(Nullable<String> mailingAddressId) {
+            if (mailingAddressId.isNull()) {
+                this.mailingAddressId = null;
+            } else if (mailingAddressId.isEmpty()) {
+                this.mailingAddressId = Optional.empty();
+            } else {
+                this.mailingAddressId = Optional.of(mailingAddressId.get());
+            }
+            return this;
+        }
+
+        @java.lang.Override
+        public _FinalStage mailingAddressId(String mailingAddressId) {
+            this.mailingAddressId = Optional.ofNullable(mailingAddressId);
+            return this;
+        }
+
+        @java.lang.Override
+        @JsonSetter(value = "mailing_address_id", nulls = Nulls.SKIP)
+        public _FinalStage mailingAddressId(Optional<String> mailingAddressId) {
+            this.mailingAddressId = mailingAddressId;
+            return this;
+        }
+
+        @java.lang.Override
+        public _FinalStage addAllLineItems(List<InvoiceLineItem> lineItems) {
             if (lineItems != null) {
                 this.lineItems.addAll(lineItems);
             }
             return this;
         }
 
-        /**
-         * <p>Optional line items that break down the invoice total into individual charges.</p>
-         * @return Reference to {@code this} so that method calls can be chained together.
-         */
         @java.lang.Override
-        public _FinalStage addLineItems(InvoiceLineItemsItem lineItems) {
+        public _FinalStage addLineItems(InvoiceLineItem lineItems) {
             this.lineItems.add(lineItems);
             return this;
         }
 
-        /**
-         * <p>Optional line items that break down the invoice total into individual charges.</p>
-         */
         @java.lang.Override
         @JsonSetter(value = "line_items", nulls = Nulls.SKIP)
-        public _FinalStage lineItems(List<InvoiceLineItemsItem> lineItems) {
+        public _FinalStage lineItems(List<InvoiceLineItem> lineItems) {
             this.lineItems.clear();
             if (lineItems != null) {
                 this.lineItems.addAll(lineItems);
@@ -1156,10 +1518,31 @@ public final class Invoice {
             return this;
         }
 
-        /**
-         * <p>The email address of the customer this invoice is addressed to. Null if no email is on file.</p>
-         * @return Reference to {@code this} so that method calls can be chained together.
-         */
+        @java.lang.Override
+        public _FinalStage invoicePrefix(Nullable<String> invoicePrefix) {
+            if (invoicePrefix.isNull()) {
+                this.invoicePrefix = null;
+            } else if (invoicePrefix.isEmpty()) {
+                this.invoicePrefix = Optional.empty();
+            } else {
+                this.invoicePrefix = Optional.of(invoicePrefix.get());
+            }
+            return this;
+        }
+
+        @java.lang.Override
+        public _FinalStage invoicePrefix(String invoicePrefix) {
+            this.invoicePrefix = Optional.ofNullable(invoicePrefix);
+            return this;
+        }
+
+        @java.lang.Override
+        @JsonSetter(value = "invoice_prefix", nulls = Nulls.SKIP)
+        public _FinalStage invoicePrefix(Optional<String> invoicePrefix) {
+            this.invoicePrefix = invoicePrefix;
+            return this;
+        }
+
         @java.lang.Override
         public _FinalStage emailAddress(Nullable<String> emailAddress) {
             if (emailAddress.isNull()) {
@@ -1172,19 +1555,12 @@ public final class Invoice {
             return this;
         }
 
-        /**
-         * <p>The email address of the customer this invoice is addressed to. Null if no email is on file.</p>
-         * @return Reference to {@code this} so that method calls can be chained together.
-         */
         @java.lang.Override
         public _FinalStage emailAddress(String emailAddress) {
             this.emailAddress = Optional.ofNullable(emailAddress);
             return this;
         }
 
-        /**
-         * <p>The email address of the customer this invoice is addressed to. Null if no email is on file.</p>
-         */
         @java.lang.Override
         @JsonSetter(value = "email_address", nulls = Nulls.SKIP)
         public _FinalStage emailAddress(Optional<String> emailAddress) {
@@ -1192,46 +1568,31 @@ public final class Invoice {
             return this;
         }
 
-        /**
-         * <p>The deadline by which payment is expected. Null if the invoice is collected automatically.</p>
-         * @return Reference to {@code this} so that method calls can be chained together.
-         */
         @java.lang.Override
-        public _FinalStage dueDate(Nullable<OffsetDateTime> dueDate) {
-            if (dueDate.isNull()) {
-                this.dueDate = null;
-            } else if (dueDate.isEmpty()) {
-                this.dueDate = Optional.empty();
+        public _FinalStage dueAt(Nullable<String> dueAt) {
+            if (dueAt.isNull()) {
+                this.dueAt = null;
+            } else if (dueAt.isEmpty()) {
+                this.dueAt = Optional.empty();
             } else {
-                this.dueDate = Optional.of(dueDate.get());
+                this.dueAt = Optional.of(dueAt.get());
             }
             return this;
         }
 
-        /**
-         * <p>The deadline by which payment is expected. Null if the invoice is collected automatically.</p>
-         * @return Reference to {@code this} so that method calls can be chained together.
-         */
         @java.lang.Override
-        public _FinalStage dueDate(OffsetDateTime dueDate) {
-            this.dueDate = Optional.ofNullable(dueDate);
+        public _FinalStage dueAt(String dueAt) {
+            this.dueAt = Optional.ofNullable(dueAt);
             return this;
         }
 
-        /**
-         * <p>The deadline by which payment is expected. Null if the invoice is collected automatically.</p>
-         */
         @java.lang.Override
-        @JsonSetter(value = "due_date", nulls = Nulls.SKIP)
-        public _FinalStage dueDate(Optional<OffsetDateTime> dueDate) {
-            this.dueDate = dueDate;
+        @JsonSetter(value = "due_at", nulls = Nulls.SKIP)
+        public _FinalStage dueAt(Optional<String> dueAt) {
+            this.dueAt = dueAt;
             return this;
         }
 
-        /**
-         * <p>The full name of the customer this invoice is addressed to. Null if no name is on file.</p>
-         * @return Reference to {@code this} so that method calls can be chained together.
-         */
         @java.lang.Override
         public _FinalStage customerName(Nullable<String> customerName) {
             if (customerName.isNull()) {
@@ -1244,19 +1605,12 @@ public final class Invoice {
             return this;
         }
 
-        /**
-         * <p>The full name of the customer this invoice is addressed to. Null if no name is on file.</p>
-         * @return Reference to {@code this} so that method calls can be chained together.
-         */
         @java.lang.Override
         public _FinalStage customerName(String customerName) {
             this.customerName = Optional.ofNullable(customerName);
             return this;
         }
 
-        /**
-         * <p>The full name of the customer this invoice is addressed to. Null if no name is on file.</p>
-         */
         @java.lang.Override
         @JsonSetter(value = "customer_name", nulls = Nulls.SKIP)
         public _FinalStage customerName(Optional<String> customerName) {
@@ -1265,68 +1619,149 @@ public final class Invoice {
         }
 
         /**
-         * <p>The date and time when the invoice will be automatically finalized. For charge_automatically, triggers an automatic charge. For send_invoice, sends the invoice email at the specified time.</p>
+         * <p>A signed link that opens this invoice in a checkout session so the buyer can pay it. Pass it as <code>link</code> to <code>POST /checkout_sessions</code>. Present while the invoice is open. <code>null</code> in any other status, for an invoice billed to a business buyer, and for an invoice whose membership was canceled. Also <code>null</code> unless you have <code>payment:charge</code>, or <code>invoice:create</code> or <code>invoice:update</code> on an invoice with no <code>payment_method_id</code>.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
-        public _FinalStage automaticallyFinalizesAt(Nullable<OffsetDateTime> automaticallyFinalizesAt) {
-            if (automaticallyFinalizesAt.isNull()) {
-                this.automaticallyFinalizesAt = null;
-            } else if (automaticallyFinalizesAt.isEmpty()) {
-                this.automaticallyFinalizesAt = Optional.empty();
+        public _FinalStage checkoutLink(Nullable<String> checkoutLink) {
+            if (checkoutLink.isNull()) {
+                this.checkoutLink = null;
+            } else if (checkoutLink.isEmpty()) {
+                this.checkoutLink = Optional.empty();
             } else {
-                this.automaticallyFinalizesAt = Optional.of(automaticallyFinalizesAt.get());
+                this.checkoutLink = Optional.of(checkoutLink.get());
             }
             return this;
         }
 
         /**
-         * <p>The date and time when the invoice will be automatically finalized. For charge_automatically, triggers an automatic charge. For send_invoice, sends the invoice email at the specified time.</p>
+         * <p>A signed link that opens this invoice in a checkout session so the buyer can pay it. Pass it as <code>link</code> to <code>POST /checkout_sessions</code>. Present while the invoice is open. <code>null</code> in any other status, for an invoice billed to a business buyer, and for an invoice whose membership was canceled. Also <code>null</code> unless you have <code>payment:charge</code>, or <code>invoice:create</code> or <code>invoice:update</code> on an invoice with no <code>payment_method_id</code>.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
-        public _FinalStage automaticallyFinalizesAt(OffsetDateTime automaticallyFinalizesAt) {
-            this.automaticallyFinalizesAt = Optional.ofNullable(automaticallyFinalizesAt);
+        public _FinalStage checkoutLink(String checkoutLink) {
+            this.checkoutLink = Optional.ofNullable(checkoutLink);
             return this;
         }
 
         /**
-         * <p>The date and time when the invoice will be automatically finalized. For charge_automatically, triggers an automatic charge. For send_invoice, sends the invoice email at the specified time.</p>
+         * <p>A signed link that opens this invoice in a checkout session so the buyer can pay it. Pass it as <code>link</code> to <code>POST /checkout_sessions</code>. Present while the invoice is open. <code>null</code> in any other status, for an invoice billed to a business buyer, and for an invoice whose membership was canceled. Also <code>null</code> unless you have <code>payment:charge</code>, or <code>invoice:create</code> or <code>invoice:update</code> on an invoice with no <code>payment_method_id</code>.</p>
          */
         @java.lang.Override
-        @JsonSetter(value = "automatically_finalizes_at", nulls = Nulls.SKIP)
-        public _FinalStage automaticallyFinalizesAt(Optional<OffsetDateTime> automaticallyFinalizesAt) {
-            this.automaticallyFinalizesAt = automaticallyFinalizesAt;
+        @JsonSetter(value = "checkout_link", nulls = Nulls.SKIP)
+        public _FinalStage checkoutLink(Optional<String> checkoutLink) {
+            this.checkoutLink = checkoutLink;
+            return this;
+        }
+
+        @java.lang.Override
+        public _FinalStage billingAddress(Nullable<PaymentAddress> billingAddress) {
+            if (billingAddress.isNull()) {
+                this.billingAddress = null;
+            } else if (billingAddress.isEmpty()) {
+                this.billingAddress = Optional.empty();
+            } else {
+                this.billingAddress = Optional.of(billingAddress.get());
+            }
+            return this;
+        }
+
+        @java.lang.Override
+        public _FinalStage billingAddress(PaymentAddress billingAddress) {
+            this.billingAddress = Optional.ofNullable(billingAddress);
+            return this;
+        }
+
+        @java.lang.Override
+        @JsonSetter(value = "billing_address", nulls = Nulls.SKIP)
+        public _FinalStage billingAddress(Optional<PaymentAddress> billingAddress) {
+            this.billingAddress = billingAddress;
             return this;
         }
 
         @java.lang.Override
         public Invoice build() {
             return new Invoice(
-                    automaticallyFinalizesAt,
-                    chargeBuyerFee,
-                    collectionMethod,
-                    company,
+                    accountId,
+                    amountDue,
+                    billingAddress,
+                    buyerFeeAmount,
+                    buyerFeePercentage,
+                    checkoutLink,
                     createdAt,
-                    currentPlan,
                     customerName,
-                    dueDate,
+                    deletable,
+                    dueAt,
                     emailAddress,
-                    fetchInvoiceToken,
                     id,
+                    invoicePrefix,
                     lineItems,
-                    mailingAddress,
-                    member,
+                    mailingAddressId,
+                    memberId,
+                    membershipId,
+                    memo,
+                    metadata,
                     number,
-                    payOnlineUrl,
-                    payment,
-                    paymentProcessing,
-                    product,
+                    object,
+                    overdue,
+                    paidAt,
+                    paymentMethodConfiguration,
+                    paymentMethodId,
+                    recipientEmails,
+                    scheduledChargeAt,
+                    scheduledCollectionMethod,
+                    scheduledSendAt,
+                    sendsOnDueDate,
                     status,
-                    subscriptionBillingAnchorAt,
+                    subtotal,
+                    taxAmount,
+                    total,
+                    totalsStatus,
                     updatedAt,
-                    user,
                     additionalProperties);
+        }
+
+        @JsonAnySetter
+        private void putAdditionalPropertyFromJson(String key, Object value) {
+            if (key.equalsIgnoreCase("account_id")
+                    || key.equalsIgnoreCase("amount_due")
+                    || key.equalsIgnoreCase("billing_address")
+                    || key.equalsIgnoreCase("buyer_fee_amount")
+                    || key.equalsIgnoreCase("buyer_fee_percentage")
+                    || key.equalsIgnoreCase("checkout_link")
+                    || key.equalsIgnoreCase("created_at")
+                    || key.equalsIgnoreCase("customer_name")
+                    || key.equalsIgnoreCase("deletable")
+                    || key.equalsIgnoreCase("due_at")
+                    || key.equalsIgnoreCase("email_address")
+                    || key.equalsIgnoreCase("id")
+                    || key.equalsIgnoreCase("invoice_prefix")
+                    || key.equalsIgnoreCase("line_items")
+                    || key.equalsIgnoreCase("mailing_address_id")
+                    || key.equalsIgnoreCase("member_id")
+                    || key.equalsIgnoreCase("membership_id")
+                    || key.equalsIgnoreCase("memo")
+                    || key.equalsIgnoreCase("metadata")
+                    || key.equalsIgnoreCase("number")
+                    || key.equalsIgnoreCase("object")
+                    || key.equalsIgnoreCase("overdue")
+                    || key.equalsIgnoreCase("paid_at")
+                    || key.equalsIgnoreCase("payment_method_configuration")
+                    || key.equalsIgnoreCase("payment_method_id")
+                    || key.equalsIgnoreCase("recipient_emails")
+                    || key.equalsIgnoreCase("scheduled_charge_at")
+                    || key.equalsIgnoreCase("scheduled_collection_method")
+                    || key.equalsIgnoreCase("scheduled_send_at")
+                    || key.equalsIgnoreCase("sends_on_due_date")
+                    || key.equalsIgnoreCase("status")
+                    || key.equalsIgnoreCase("subtotal")
+                    || key.equalsIgnoreCase("tax_amount")
+                    || key.equalsIgnoreCase("total")
+                    || key.equalsIgnoreCase("totals_status")
+                    || key.equalsIgnoreCase("updated_at")) {
+                return;
+            }
+            this.additionalProperties.put(key, value);
         }
 
         @java.lang.Override

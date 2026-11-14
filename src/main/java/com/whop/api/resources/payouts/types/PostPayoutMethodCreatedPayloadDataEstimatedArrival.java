@@ -109,7 +109,6 @@ public final class PostPayoutMethodCreatedPayloadDataEstimatedArrival {
 
         private Optional<OffsetDateTime> standard = Optional.empty();
 
-        @JsonAnySetter
         private Map<String, Object> additionalProperties = new HashMap<>();
 
         private Builder() {}
@@ -172,6 +171,14 @@ public final class PostPayoutMethodCreatedPayloadDataEstimatedArrival {
 
         public PostPayoutMethodCreatedPayloadDataEstimatedArrival build() {
             return new PostPayoutMethodCreatedPayloadDataEstimatedArrival(instant, standard, additionalProperties);
+        }
+
+        @JsonAnySetter
+        private void putAdditionalPropertyFromJson(String key, Object value) {
+            if (key.equalsIgnoreCase("instant") || key.equalsIgnoreCase("standard")) {
+                return;
+            }
+            this.additionalProperties.put(key, value);
         }
 
         public Builder additionalProperty(String key, Object value) {

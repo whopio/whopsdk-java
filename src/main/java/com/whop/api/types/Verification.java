@@ -181,7 +181,6 @@ public final class Verification {
 
         private Optional<VerificationErrorCodes> lastErrorCode = Optional.empty();
 
-        @JsonAnySetter
         private Map<String, Object> additionalProperties = new HashMap<>();
 
         private Builder() {}
@@ -197,7 +196,6 @@ public final class Verification {
 
         /**
          * <p>The numeric id of the verification record.</p>
-         * <p>The numeric id of the verification record.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
@@ -208,7 +206,6 @@ public final class Verification {
         }
 
         /**
-         * <p>The current status of this verification session.</p>
          * <p>The current status of this verification session.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
@@ -294,6 +291,17 @@ public final class Verification {
         @java.lang.Override
         public Verification build() {
             return new Verification(id, lastErrorCode, lastErrorReason, status, additionalProperties);
+        }
+
+        @JsonAnySetter
+        private void putAdditionalPropertyFromJson(String key, Object value) {
+            if (key.equalsIgnoreCase("id")
+                    || key.equalsIgnoreCase("last_error_code")
+                    || key.equalsIgnoreCase("last_error_reason")
+                    || key.equalsIgnoreCase("status")) {
+                return;
+            }
+            this.additionalProperties.put(key, value);
         }
 
         @java.lang.Override

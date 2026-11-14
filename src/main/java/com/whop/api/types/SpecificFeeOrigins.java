@@ -7,6 +7,12 @@ import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonValue;
 
 public final class SpecificFeeOrigins {
+    public static final SpecificFeeOrigins ECONOMIC_INTELLIGENCE_PERCENTAGE_FEE =
+            new SpecificFeeOrigins(Value.ECONOMIC_INTELLIGENCE_PERCENTAGE_FEE, "economic_intelligence_percentage_fee");
+
+    public static final SpecificFeeOrigins DISPUTE_REPRESENTMENT_FEE =
+            new SpecificFeeOrigins(Value.DISPUTE_REPRESENTMENT_FEE, "dispute_representment_fee");
+
     public static final SpecificFeeOrigins APPLE_PROCESSING_FEE =
             new SpecificFeeOrigins(Value.APPLE_PROCESSING_FEE, "apple_processing_fee");
 
@@ -60,6 +66,9 @@ public final class SpecificFeeOrigins {
 
     public static final SpecificFeeOrigins REVSHARE_PERCENTAGE_FEE =
             new SpecificFeeOrigins(Value.REVSHARE_PERCENTAGE_FEE, "revshare_percentage_fee");
+
+    public static final SpecificFeeOrigins PAYMENT_RETURN_FEE =
+            new SpecificFeeOrigins(Value.PAYMENT_RETURN_FEE, "payment_return_fee");
 
     public static final SpecificFeeOrigins CROSS_BORDER_PERCENTAGE_FEE =
             new SpecificFeeOrigins(Value.CROSS_BORDER_PERCENTAGE_FEE, "cross_border_percentage_fee");
@@ -130,6 +139,10 @@ public final class SpecificFeeOrigins {
 
     public <T> T visit(Visitor<T> visitor) {
         switch (value) {
+            case ECONOMIC_INTELLIGENCE_PERCENTAGE_FEE:
+                return visitor.visitEconomicIntelligencePercentageFee();
+            case DISPUTE_REPRESENTMENT_FEE:
+                return visitor.visitDisputeRepresentmentFee();
             case APPLE_PROCESSING_FEE:
                 return visitor.visitAppleProcessingFee();
             case STRIPE_INTERNATIONAL_PROCESSING_FEE:
@@ -168,6 +181,8 @@ public final class SpecificFeeOrigins {
                 return visitor.visitSalesTaxRemittanceReversal();
             case REVSHARE_PERCENTAGE_FEE:
                 return visitor.visitRevsharePercentageFee();
+            case PAYMENT_RETURN_FEE:
+                return visitor.visitPaymentReturnFee();
             case CROSS_BORDER_PERCENTAGE_FEE:
                 return visitor.visitCrossBorderPercentageFee();
             case STRIPE_PAYOUT_FEE:
@@ -203,6 +218,10 @@ public final class SpecificFeeOrigins {
     @JsonCreator(mode = JsonCreator.Mode.DELEGATING)
     public static SpecificFeeOrigins valueOf(String value) {
         switch (value) {
+            case "economic_intelligence_percentage_fee":
+                return ECONOMIC_INTELLIGENCE_PERCENTAGE_FEE;
+            case "dispute_representment_fee":
+                return DISPUTE_REPRESENTMENT_FEE;
             case "apple_processing_fee":
                 return APPLE_PROCESSING_FEE;
             case "stripe_international_processing_fee":
@@ -241,6 +260,8 @@ public final class SpecificFeeOrigins {
                 return SALES_TAX_REMITTANCE_REVERSAL;
             case "revshare_percentage_fee":
                 return REVSHARE_PERCENTAGE_FEE;
+            case "payment_return_fee":
+                return PAYMENT_RETURN_FEE;
             case "cross_border_percentage_fee":
                 return CROSS_BORDER_PERCENTAGE_FEE;
             case "stripe_payout_fee":
@@ -307,6 +328,8 @@ public final class SpecificFeeOrigins {
 
         DISPUTE_ALERT_FEE,
 
+        DISPUTE_REPRESENTMENT_FEE,
+
         APPLE_PROCESSING_FEE,
 
         BUYER_FEE,
@@ -336,6 +359,10 @@ public final class SpecificFeeOrigins {
         APPLICATION_FEE,
 
         HIGH_RISK_MERCHANT_FEE,
+
+        ECONOMIC_INTELLIGENCE_PERCENTAGE_FEE,
+
+        PAYMENT_RETURN_FEE,
 
         UNKNOWN
     }
@@ -375,6 +402,8 @@ public final class SpecificFeeOrigins {
 
         T visitDisputeAlertFee();
 
+        T visitDisputeRepresentmentFee();
+
         T visitAppleProcessingFee();
 
         T visitBuyerFee();
@@ -404,6 +433,10 @@ public final class SpecificFeeOrigins {
         T visitApplicationFee();
 
         T visitHighRiskMerchantFee();
+
+        T visitEconomicIntelligencePercentageFee();
+
+        T visitPaymentReturnFee();
 
         T visitUnknown(String unknownType);
     }

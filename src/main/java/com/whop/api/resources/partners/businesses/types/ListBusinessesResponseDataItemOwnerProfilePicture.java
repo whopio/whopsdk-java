@@ -87,7 +87,6 @@ public final class ListBusinessesResponseDataItemOwnerProfilePicture {
     public static final class Builder implements UrlStage, _FinalStage {
         private String url;
 
-        @JsonAnySetter
         private Map<String, Object> additionalProperties = new HashMap<>();
 
         private Builder() {}
@@ -99,7 +98,6 @@ public final class ListBusinessesResponseDataItemOwnerProfilePicture {
         }
 
         /**
-         * <p>The user's profile picture URL.</p>
          * <p>The user's profile picture URL.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
@@ -113,6 +111,14 @@ public final class ListBusinessesResponseDataItemOwnerProfilePicture {
         @java.lang.Override
         public ListBusinessesResponseDataItemOwnerProfilePicture build() {
             return new ListBusinessesResponseDataItemOwnerProfilePicture(url, additionalProperties);
+        }
+
+        @JsonAnySetter
+        private void putAdditionalPropertyFromJson(String key, Object value) {
+            if (key.equalsIgnoreCase("url")) {
+                return;
+            }
+            this.additionalProperties.put(key, value);
         }
 
         @java.lang.Override

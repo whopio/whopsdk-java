@@ -53,7 +53,7 @@ public final class ListRecipientsTransfersRequest {
     }
 
     /**
-     * @return Search anyone on Whop by name or username, plus your own accounts by name or ID. Omit it to get the team around the balance, the people you follow, and your own accounts. The list is the same whether the balance belongs to a company or to you. Searching from a <code>biz_</code> origin additionally requires the member:basic:read scope. A credential scoped to a single company is the exception to the search itself: it only ever sees that company's own people. Complete email addresses return no matches.
+     * @return Search anyone on Whop by name or username, plus your own accounts by name or ID. An exact business ID (<code>biz_</code>), user ID (<code>user_</code>), or username returns that recipient first; an ID or an <code>@username</code> returns only that recipient. Omit it to get the team around the balance, the people you follow, and your own accounts. The list is the same whether the balance belongs to a company or to you. Searching from a <code>biz_</code> origin additionally requires the member:basic:read scope. A credential scoped to a single company is the exception to the search itself: it only ever sees that company's own people. Complete email addresses return no matches. Search results are limited to 20 recipients.
      */
     @JsonProperty("query")
     public Optional<String> getQuery() {
@@ -61,7 +61,7 @@ public final class ListRecipientsTransfersRequest {
     }
 
     /**
-     * @return Number of recipients per page. Search queries preserve the dashboard's 20-result maximum.
+     * @return Number of results to return from the start of the range.
      */
     @JsonProperty("first")
     public Optional<Integer> getFirst() {
@@ -69,7 +69,7 @@ public final class ListRecipientsTransfersRequest {
     }
 
     /**
-     * @return Cursor to fetch the page after (from page_info.end_cursor).
+     * @return Return results after this cursor. Use <code>page_info.end_cursor</code> from the previous response to fetch the next page.
      */
     @JsonProperty("after")
     public Optional<String> getAfter() {
@@ -125,21 +125,21 @@ public final class ListRecipientsTransfersRequest {
         _FinalStage additionalProperties(Map<String, Object> additionalProperties);
 
         /**
-         * <p>Search anyone on Whop by name or username, plus your own accounts by name or ID. Omit it to get the team around the balance, the people you follow, and your own accounts. The list is the same whether the balance belongs to a company or to you. Searching from a <code>biz_</code> origin additionally requires the member:basic:read scope. A credential scoped to a single company is the exception to the search itself: it only ever sees that company's own people. Complete email addresses return no matches.</p>
+         * <p>Search anyone on Whop by name or username, plus your own accounts by name or ID. An exact business ID (<code>biz_</code>), user ID (<code>user_</code>), or username returns that recipient first; an ID or an <code>@username</code> returns only that recipient. Omit it to get the team around the balance, the people you follow, and your own accounts. The list is the same whether the balance belongs to a company or to you. Searching from a <code>biz_</code> origin additionally requires the member:basic:read scope. A credential scoped to a single company is the exception to the search itself: it only ever sees that company's own people. Complete email addresses return no matches. Search results are limited to 20 recipients.</p>
          */
         _FinalStage query(Optional<String> query);
 
         _FinalStage query(String query);
 
         /**
-         * <p>Number of recipients per page. Search queries preserve the dashboard's 20-result maximum.</p>
+         * <p>Number of results to return from the start of the range.</p>
          */
         _FinalStage first(Optional<Integer> first);
 
         _FinalStage first(Integer first);
 
         /**
-         * <p>Cursor to fetch the page after (from page_info.end_cursor).</p>
+         * <p>Return results after this cursor. Use <code>page_info.end_cursor</code> from the previous response to fetch the next page.</p>
          */
         _FinalStage after(Optional<String> after);
 
@@ -156,7 +156,6 @@ public final class ListRecipientsTransfersRequest {
 
         private Optional<String> query = Optional.empty();
 
-        @JsonAnySetter
         private Map<String, Object> additionalProperties = new HashMap<>();
 
         private Builder() {}
@@ -172,7 +171,6 @@ public final class ListRecipientsTransfersRequest {
 
         /**
          * <p>The account sending the money: a company account ID (<code>biz_</code>), or a user ID (<code>user_</code>) for that user's own personal balance.</p>
-         * <p>The account sending the money: a company account ID (<code>biz_</code>), or a user ID (<code>user_</code>) for that user's own personal balance.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
@@ -183,7 +181,7 @@ public final class ListRecipientsTransfersRequest {
         }
 
         /**
-         * <p>Cursor to fetch the page after (from page_info.end_cursor).</p>
+         * <p>Return results after this cursor. Use <code>page_info.end_cursor</code> from the previous response to fetch the next page.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
@@ -193,7 +191,7 @@ public final class ListRecipientsTransfersRequest {
         }
 
         /**
-         * <p>Cursor to fetch the page after (from page_info.end_cursor).</p>
+         * <p>Return results after this cursor. Use <code>page_info.end_cursor</code> from the previous response to fetch the next page.</p>
          */
         @java.lang.Override
         @JsonSetter(value = "after", nulls = Nulls.SKIP)
@@ -203,7 +201,7 @@ public final class ListRecipientsTransfersRequest {
         }
 
         /**
-         * <p>Number of recipients per page. Search queries preserve the dashboard's 20-result maximum.</p>
+         * <p>Number of results to return from the start of the range.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
@@ -213,7 +211,7 @@ public final class ListRecipientsTransfersRequest {
         }
 
         /**
-         * <p>Number of recipients per page. Search queries preserve the dashboard's 20-result maximum.</p>
+         * <p>Number of results to return from the start of the range.</p>
          */
         @java.lang.Override
         @JsonSetter(value = "first", nulls = Nulls.SKIP)
@@ -223,7 +221,7 @@ public final class ListRecipientsTransfersRequest {
         }
 
         /**
-         * <p>Search anyone on Whop by name or username, plus your own accounts by name or ID. Omit it to get the team around the balance, the people you follow, and your own accounts. The list is the same whether the balance belongs to a company or to you. Searching from a <code>biz_</code> origin additionally requires the member:basic:read scope. A credential scoped to a single company is the exception to the search itself: it only ever sees that company's own people. Complete email addresses return no matches.</p>
+         * <p>Search anyone on Whop by name or username, plus your own accounts by name or ID. An exact business ID (<code>biz_</code>), user ID (<code>user_</code>), or username returns that recipient first; an ID or an <code>@username</code> returns only that recipient. Omit it to get the team around the balance, the people you follow, and your own accounts. The list is the same whether the balance belongs to a company or to you. Searching from a <code>biz_</code> origin additionally requires the member:basic:read scope. A credential scoped to a single company is the exception to the search itself: it only ever sees that company's own people. Complete email addresses return no matches. Search results are limited to 20 recipients.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
@@ -233,7 +231,7 @@ public final class ListRecipientsTransfersRequest {
         }
 
         /**
-         * <p>Search anyone on Whop by name or username, plus your own accounts by name or ID. Omit it to get the team around the balance, the people you follow, and your own accounts. The list is the same whether the balance belongs to a company or to you. Searching from a <code>biz_</code> origin additionally requires the member:basic:read scope. A credential scoped to a single company is the exception to the search itself: it only ever sees that company's own people. Complete email addresses return no matches.</p>
+         * <p>Search anyone on Whop by name or username, plus your own accounts by name or ID. An exact business ID (<code>biz_</code>), user ID (<code>user_</code>), or username returns that recipient first; an ID or an <code>@username</code> returns only that recipient. Omit it to get the team around the balance, the people you follow, and your own accounts. The list is the same whether the balance belongs to a company or to you. Searching from a <code>biz_</code> origin additionally requires the member:basic:read scope. A credential scoped to a single company is the exception to the search itself: it only ever sees that company's own people. Complete email addresses return no matches. Search results are limited to 20 recipients.</p>
          */
         @java.lang.Override
         @JsonSetter(value = "query", nulls = Nulls.SKIP)
@@ -245,6 +243,17 @@ public final class ListRecipientsTransfersRequest {
         @java.lang.Override
         public ListRecipientsTransfersRequest build() {
             return new ListRecipientsTransfersRequest(originId, query, first, after, additionalProperties);
+        }
+
+        @JsonAnySetter
+        private void putAdditionalPropertyFromJson(String key, Object value) {
+            if (key.equalsIgnoreCase("origin_id")
+                    || key.equalsIgnoreCase("query")
+                    || key.equalsIgnoreCase("first")
+                    || key.equalsIgnoreCase("after")) {
+                return;
+            }
+            this.additionalProperties.put(key, value);
         }
 
         @java.lang.Override

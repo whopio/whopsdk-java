@@ -9,31 +9,44 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonSetter;
+import com.fasterxml.jackson.annotation.Nulls;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.whop.api.core.ObjectMappers;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
-import org.jetbrains.annotations.NotNull;
+import java.util.Optional;
 
 @JsonInclude(JsonInclude.Include.NON_ABSENT)
 @JsonDeserialize(builder = ListSwapsRequest.Builder.class)
 public final class ListSwapsRequest {
-    private final String accountId;
+    private final Optional<String> accountId;
+
+    private final Optional<String> userId;
 
     private final Map<String, Object> additionalProperties;
 
-    private ListSwapsRequest(String accountId, Map<String, Object> additionalProperties) {
+    private ListSwapsRequest(
+            Optional<String> accountId, Optional<String> userId, Map<String, Object> additionalProperties) {
         this.accountId = accountId;
+        this.userId = userId;
         this.additionalProperties = additionalProperties;
     }
 
     /**
-     * @return Business or user account ID (biz_* / user_*).
+     * @return Business account whose swaps to list, prefixed <code>biz_</code>. Provide this or <code>user_id</code>.
      */
     @JsonProperty("account_id")
-    public String getAccountId() {
+    public Optional<String> getAccountId() {
         return accountId;
+    }
+
+    /**
+     * @return The caller's own user ID, prefixed <code>user_</code>, to list swaps in their personal account. Provide this or <code>account_id</code>.
+     */
+    @JsonProperty("user_id")
+    public Optional<String> getUserId() {
+        return userId;
     }
 
     @java.lang.Override
@@ -48,12 +61,12 @@ public final class ListSwapsRequest {
     }
 
     private boolean equalTo(ListSwapsRequest other) {
-        return accountId.equals(other.accountId);
+        return accountId.equals(other.accountId) && userId.equals(other.userId);
     }
 
     @java.lang.Override
     public int hashCode() {
-        return Objects.hash(this.accountId);
+        return Objects.hash(this.accountId, this.userId);
     }
 
     @java.lang.Override
@@ -61,66 +74,71 @@ public final class ListSwapsRequest {
         return ObjectMappers.stringify(this);
     }
 
-    public static AccountIdStage builder() {
+    public static Builder builder() {
         return new Builder();
     }
 
-    public interface AccountIdStage {
-        /**
-         * <p>Business or user account ID (biz_* / user_*).</p>
-         */
-        _FinalStage accountId(@NotNull String accountId);
-
-        Builder from(ListSwapsRequest other);
-    }
-
-    public interface _FinalStage {
-        ListSwapsRequest build();
-
-        _FinalStage additionalProperty(String key, Object value);
-
-        _FinalStage additionalProperties(Map<String, Object> additionalProperties);
-    }
-
     @JsonIgnoreProperties(ignoreUnknown = true)
-    public static final class Builder implements AccountIdStage, _FinalStage {
-        private String accountId;
+    public static final class Builder {
+        private Optional<String> accountId = Optional.empty();
 
-        @JsonAnySetter
+        private Optional<String> userId = Optional.empty();
+
         private Map<String, Object> additionalProperties = new HashMap<>();
 
         private Builder() {}
 
-        @java.lang.Override
         public Builder from(ListSwapsRequest other) {
             accountId(other.getAccountId());
+            userId(other.getUserId());
             return this;
         }
 
         /**
-         * <p>Business or user account ID (biz_* / user_*).</p>
-         * <p>Business or user account ID (biz_* / user_*).</p>
-         * @return Reference to {@code this} so that method calls can be chained together.
+         * <p>Business account whose swaps to list, prefixed <code>biz_</code>. Provide this or <code>user_id</code>.</p>
          */
-        @java.lang.Override
-        @JsonSetter("account_id")
-        public _FinalStage accountId(@NotNull String accountId) {
-            this.accountId = Objects.requireNonNull(accountId, "accountId must not be null");
+        @JsonSetter(value = "account_id", nulls = Nulls.SKIP)
+        public Builder accountId(Optional<String> accountId) {
+            this.accountId = accountId;
             return this;
         }
 
-        @java.lang.Override
-        public ListSwapsRequest build() {
-            return new ListSwapsRequest(accountId, additionalProperties);
+        public Builder accountId(String accountId) {
+            this.accountId = Optional.ofNullable(accountId);
+            return this;
         }
 
-        @java.lang.Override
+        /**
+         * <p>The caller's own user ID, prefixed <code>user_</code>, to list swaps in their personal account. Provide this or <code>account_id</code>.</p>
+         */
+        @JsonSetter(value = "user_id", nulls = Nulls.SKIP)
+        public Builder userId(Optional<String> userId) {
+            this.userId = userId;
+            return this;
+        }
+
+        public Builder userId(String userId) {
+            this.userId = Optional.ofNullable(userId);
+            return this;
+        }
+
+        public ListSwapsRequest build() {
+            return new ListSwapsRequest(accountId, userId, additionalProperties);
+        }
+
+        @JsonAnySetter
+        private void putAdditionalPropertyFromJson(String key, Object value) {
+            if (key.equalsIgnoreCase("account_id") || key.equalsIgnoreCase("user_id")) {
+                return;
+            }
+            this.additionalProperties.put(key, value);
+        }
+
         public Builder additionalProperty(String key, Object value) {
             this.additionalProperties.put(key, value);
             return this;
         }
 
-        @java.lang.Override
         public Builder additionalProperties(Map<String, Object> additionalProperties) {
             this.additionalProperties.putAll(additionalProperties);
             return this;

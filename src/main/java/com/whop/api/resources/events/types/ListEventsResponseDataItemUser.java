@@ -207,7 +207,6 @@ public final class ListEventsResponseDataItemUser {
 
         private Optional<String> phone = Optional.empty();
 
-        @JsonAnySetter
         private Map<String, Object> additionalProperties = new HashMap<>();
 
         private Builder() {}
@@ -380,6 +379,20 @@ public final class ListEventsResponseDataItemUser {
         public ListEventsResponseDataItemUser build() {
             return new ListEventsResponseDataItemUser(
                     city, country, email, firstName, lastName, name, phone, additionalProperties);
+        }
+
+        @JsonAnySetter
+        private void putAdditionalPropertyFromJson(String key, Object value) {
+            if (key.equalsIgnoreCase("city")
+                    || key.equalsIgnoreCase("country")
+                    || key.equalsIgnoreCase("email")
+                    || key.equalsIgnoreCase("first_name")
+                    || key.equalsIgnoreCase("last_name")
+                    || key.equalsIgnoreCase("name")
+                    || key.equalsIgnoreCase("phone")) {
+                return;
+            }
+            this.additionalProperties.put(key, value);
         }
 
         public Builder additionalProperty(String key, Object value) {

@@ -16,6 +16,7 @@ import com.whop.api.core.Nullable;
 import com.whop.api.core.NullableNonemptyFilter;
 import com.whop.api.core.ObjectMappers;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
@@ -24,17 +25,25 @@ import org.jetbrains.annotations.NotNull;
 @JsonInclude(JsonInclude.Include.NON_ABSENT)
 @JsonDeserialize(builder = TeamMember.Builder.class)
 public final class TeamMember {
-    private final String accountId;
+    private final AccountParent account;
 
     private final Optional<TeamMemberAuthorizedRole> authorizedRole;
 
     private final String createdAt;
+
+    private final Optional<Integer> directReportsCount;
 
     private final Optional<String> email;
 
     private final String id;
 
     private final boolean isAgent;
+
+    private final boolean isPartner;
+
+    private final Optional<List<TeamMemberManager>> reportsToChain;
+
+    private final Optional<String> reportsToId;
 
     private final TeamMemberRole role;
 
@@ -47,23 +56,31 @@ public final class TeamMember {
     private final Map<String, Object> additionalProperties;
 
     private TeamMember(
-            String accountId,
+            AccountParent account,
             Optional<TeamMemberAuthorizedRole> authorizedRole,
             String createdAt,
+            Optional<Integer> directReportsCount,
             Optional<String> email,
             String id,
             boolean isAgent,
+            boolean isPartner,
+            Optional<List<TeamMemberManager>> reportsToChain,
+            Optional<String> reportsToId,
             TeamMemberRole role,
             TeamMemberStatus status,
             String updatedAt,
             Optional<UserSummary> user,
             Map<String, Object> additionalProperties) {
-        this.accountId = accountId;
+        this.account = account;
         this.authorizedRole = authorizedRole;
         this.createdAt = createdAt;
+        this.directReportsCount = directReportsCount;
         this.email = email;
         this.id = id;
         this.isAgent = isAgent;
+        this.isPartner = isPartner;
+        this.reportsToChain = reportsToChain;
+        this.reportsToId = reportsToId;
         this.role = role;
         this.status = status;
         this.updatedAt = updatedAt;
@@ -72,11 +89,11 @@ public final class TeamMember {
     }
 
     /**
-     * @return The account this membership belongs to, prefixed <code>biz_</code>.
+     * @return The account this membership belongs to.
      */
-    @JsonProperty("account_id")
-    public String getAccountId() {
-        return accountId;
+    @JsonProperty("account")
+    public AccountParent getAccount() {
+        return account;
     }
 
     /**
@@ -91,7 +108,7 @@ public final class TeamMember {
     }
 
     /**
-     * @return When the member joined or the invite was sent, as an ISO 8601 timestamp.
+     * @return When the member joined the team or the invite was sent, as an ISO 8601 timestamp. A member who was a customer first keeps the date they were given their role.
      */
     @JsonProperty("created_at")
     public String getCreatedAt() {
@@ -99,7 +116,18 @@ public final class TeamMember {
     }
 
     /**
-     * @return The member's email address. For accepted members, <code>null</code> unless the caller holds the email read scope; for invites, the invited address.
+     * @return How many team members report directly to this member. <code>null</code> for invites.
+     */
+    @JsonIgnore
+    public Optional<Integer> getDirectReportsCount() {
+        if (directReportsCount == null) {
+            return Optional.empty();
+        }
+        return directReportsCount;
+    }
+
+    /**
+     * @return The member's email address. For an invite to an email with no Whop account yet, this is the invited address. Otherwise it is <code>null</code> unless the caller holds the <code>company:authorized_user:email:read</code> scope.
      */
     @JsonIgnore
     public Optional<String> getEmail() {
@@ -110,7 +138,7 @@ public final class TeamMember {
     }
 
     /**
-     * @return Team member ID — <code>ausr_</code> for accepted members, <code>ausri_</code> for pending invites.
+     * @return Team member ID. Accepted members have an ID starting with <code>ausr_</code> or <code>mber_</code>, and pending invites one starting with <code>ausri_</code>. Treat it as opaque: both member prefixes are accepted wherever a team member ID is.
      */
     @JsonProperty("id")
     public String getId() {
@@ -123,6 +151,33 @@ public final class TeamMember {
     @JsonProperty("is_agent")
     public boolean getIsAgent() {
         return isAgent;
+    }
+
+    /**
+     * @return Whether this member or invite has the view-only Partner role, directly or through a custom role based on it. A Partner can read only the account's basic details.
+     */
+    @JsonProperty("is_partner")
+    public boolean getIsPartner() {
+        return isPartner;
+    }
+
+    @JsonIgnore
+    public Optional<List<TeamMemberManager>> getReportsToChain() {
+        if (reportsToChain == null) {
+            return Optional.empty();
+        }
+        return reportsToChain;
+    }
+
+    /**
+     * @return The ID of the team member this member reports to, starting with <code>ausr_</code> or <code>mber_</code>; treat it as opaque. <code>null</code> when the member reports to the business directly, and for invites.
+     */
+    @JsonIgnore
+    public Optional<String> getReportsToId() {
+        if (reportsToId == null) {
+            return Optional.empty();
+        }
+        return reportsToId;
     }
 
     /**
@@ -167,9 +222,27 @@ public final class TeamMember {
     }
 
     @JsonInclude(value = JsonInclude.Include.CUSTOM, valueFilter = NullableNonemptyFilter.class)
+    @JsonProperty("direct_reports_count")
+    private Optional<Integer> _getDirectReportsCount() {
+        return directReportsCount;
+    }
+
+    @JsonInclude(value = JsonInclude.Include.CUSTOM, valueFilter = NullableNonemptyFilter.class)
     @JsonProperty("email")
     private Optional<String> _getEmail() {
         return email;
+    }
+
+    @JsonInclude(value = JsonInclude.Include.CUSTOM, valueFilter = NullableNonemptyFilter.class)
+    @JsonProperty("reports_to_chain")
+    private Optional<List<TeamMemberManager>> _getReportsToChain() {
+        return reportsToChain;
+    }
+
+    @JsonInclude(value = JsonInclude.Include.CUSTOM, valueFilter = NullableNonemptyFilter.class)
+    @JsonProperty("reports_to_id")
+    private Optional<String> _getReportsToId() {
+        return reportsToId;
     }
 
     @JsonInclude(value = JsonInclude.Include.CUSTOM, valueFilter = NullableNonemptyFilter.class)
@@ -190,12 +263,16 @@ public final class TeamMember {
     }
 
     private boolean equalTo(TeamMember other) {
-        return accountId.equals(other.accountId)
+        return account.equals(other.account)
                 && authorizedRole.equals(other.authorizedRole)
                 && createdAt.equals(other.createdAt)
+                && directReportsCount.equals(other.directReportsCount)
                 && email.equals(other.email)
                 && id.equals(other.id)
                 && isAgent == other.isAgent
+                && isPartner == other.isPartner
+                && reportsToChain.equals(other.reportsToChain)
+                && reportsToId.equals(other.reportsToId)
                 && role.equals(other.role)
                 && status.equals(other.status)
                 && updatedAt.equals(other.updatedAt)
@@ -205,12 +282,16 @@ public final class TeamMember {
     @java.lang.Override
     public int hashCode() {
         return Objects.hash(
-                this.accountId,
+                this.account,
                 this.authorizedRole,
                 this.createdAt,
+                this.directReportsCount,
                 this.email,
                 this.id,
                 this.isAgent,
+                this.isPartner,
+                this.reportsToChain,
+                this.reportsToId,
                 this.role,
                 this.status,
                 this.updatedAt,
@@ -222,29 +303,29 @@ public final class TeamMember {
         return ObjectMappers.stringify(this);
     }
 
-    public static AccountIdStage builder() {
+    public static AccountStage builder() {
         return new Builder();
     }
 
-    public interface AccountIdStage {
+    public interface AccountStage {
         /**
-         * <p>The account this membership belongs to, prefixed <code>biz_</code>.</p>
+         * <p>The account this membership belongs to.</p>
          */
-        CreatedAtStage accountId(@NotNull String accountId);
+        CreatedAtStage account(@NotNull AccountParent account);
 
         Builder from(TeamMember other);
     }
 
     public interface CreatedAtStage {
         /**
-         * <p>When the member joined or the invite was sent, as an ISO 8601 timestamp.</p>
+         * <p>When the member joined the team or the invite was sent, as an ISO 8601 timestamp. A member who was a customer first keeps the date they were given their role.</p>
          */
         IdStage createdAt(@NotNull String createdAt);
     }
 
     public interface IdStage {
         /**
-         * <p>Team member ID — <code>ausr_</code> for accepted members, <code>ausri_</code> for pending invites.</p>
+         * <p>Team member ID. Accepted members have an ID starting with <code>ausr_</code> or <code>mber_</code>, and pending invites one starting with <code>ausri_</code>. Treat it as opaque: both member prefixes are accepted wherever a team member ID is.</p>
          */
         IsAgentStage id(@NotNull String id);
     }
@@ -253,7 +334,14 @@ public final class TeamMember {
         /**
          * <p>Whether this member is an agent (app-controlled account) rather than a human team member. Always <code>false</code> for invites.</p>
          */
-        RoleStage isAgent(boolean isAgent);
+        IsPartnerStage isAgent(boolean isAgent);
+    }
+
+    public interface IsPartnerStage {
+        /**
+         * <p>Whether this member or invite has the view-only Partner role, directly or through a custom role based on it. A Partner can read only the account's basic details.</p>
+         */
+        RoleStage isPartner(boolean isPartner);
     }
 
     public interface RoleStage {
@@ -294,13 +382,37 @@ public final class TeamMember {
         _FinalStage authorizedRole(Nullable<TeamMemberAuthorizedRole> authorizedRole);
 
         /**
-         * <p>The member's email address. For accepted members, <code>null</code> unless the caller holds the email read scope; for invites, the invited address.</p>
+         * <p>How many team members report directly to this member. <code>null</code> for invites.</p>
+         */
+        _FinalStage directReportsCount(Optional<Integer> directReportsCount);
+
+        _FinalStage directReportsCount(Integer directReportsCount);
+
+        _FinalStage directReportsCount(Nullable<Integer> directReportsCount);
+
+        /**
+         * <p>The member's email address. For an invite to an email with no Whop account yet, this is the invited address. Otherwise it is <code>null</code> unless the caller holds the <code>company:authorized_user:email:read</code> scope.</p>
          */
         _FinalStage email(Optional<String> email);
 
         _FinalStage email(String email);
 
         _FinalStage email(Nullable<String> email);
+
+        _FinalStage reportsToChain(Optional<List<TeamMemberManager>> reportsToChain);
+
+        _FinalStage reportsToChain(List<TeamMemberManager> reportsToChain);
+
+        _FinalStage reportsToChain(Nullable<List<TeamMemberManager>> reportsToChain);
+
+        /**
+         * <p>The ID of the team member this member reports to, starting with <code>ausr_</code> or <code>mber_</code>; treat it as opaque. <code>null</code> when the member reports to the business directly, and for invites.</p>
+         */
+        _FinalStage reportsToId(Optional<String> reportsToId);
+
+        _FinalStage reportsToId(String reportsToId);
+
+        _FinalStage reportsToId(Nullable<String> reportsToId);
 
         /**
          * <p>The user behind this team membership. <code>null</code> for an invite sent to an email with no Whop account yet.</p>
@@ -314,21 +426,24 @@ public final class TeamMember {
 
     @JsonIgnoreProperties(ignoreUnknown = true)
     public static final class Builder
-            implements AccountIdStage,
+            implements AccountStage,
                     CreatedAtStage,
                     IdStage,
                     IsAgentStage,
+                    IsPartnerStage,
                     RoleStage,
                     StatusStage,
                     UpdatedAtStage,
                     _FinalStage {
-        private String accountId;
+        private AccountParent account;
 
         private String createdAt;
 
         private String id;
 
         private boolean isAgent;
+
+        private boolean isPartner;
 
         private TeamMemberRole role;
 
@@ -338,23 +453,32 @@ public final class TeamMember {
 
         private Optional<UserSummary> user = Optional.empty();
 
+        private Optional<String> reportsToId = Optional.empty();
+
+        private Optional<List<TeamMemberManager>> reportsToChain = Optional.empty();
+
         private Optional<String> email = Optional.empty();
+
+        private Optional<Integer> directReportsCount = Optional.empty();
 
         private Optional<TeamMemberAuthorizedRole> authorizedRole = Optional.empty();
 
-        @JsonAnySetter
         private Map<String, Object> additionalProperties = new HashMap<>();
 
         private Builder() {}
 
         @java.lang.Override
         public Builder from(TeamMember other) {
-            accountId(other.getAccountId());
+            account(other.getAccount());
             authorizedRole(other.getAuthorizedRole());
             createdAt(other.getCreatedAt());
+            directReportsCount(other.getDirectReportsCount());
             email(other.getEmail());
             id(other.getId());
             isAgent(other.getIsAgent());
+            isPartner(other.getIsPartner());
+            reportsToChain(other.getReportsToChain());
+            reportsToId(other.getReportsToId());
             role(other.getRole());
             status(other.getStatus());
             updatedAt(other.getUpdatedAt());
@@ -363,20 +487,18 @@ public final class TeamMember {
         }
 
         /**
-         * <p>The account this membership belongs to, prefixed <code>biz_</code>.</p>
-         * <p>The account this membership belongs to, prefixed <code>biz_</code>.</p>
+         * <p>The account this membership belongs to.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
-        @JsonSetter("account_id")
-        public CreatedAtStage accountId(@NotNull String accountId) {
-            this.accountId = Objects.requireNonNull(accountId, "accountId must not be null");
+        @JsonSetter("account")
+        public CreatedAtStage account(@NotNull AccountParent account) {
+            this.account = Objects.requireNonNull(account, "account must not be null");
             return this;
         }
 
         /**
-         * <p>When the member joined or the invite was sent, as an ISO 8601 timestamp.</p>
-         * <p>When the member joined or the invite was sent, as an ISO 8601 timestamp.</p>
+         * <p>When the member joined the team or the invite was sent, as an ISO 8601 timestamp. A member who was a customer first keeps the date they were given their role.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
@@ -387,8 +509,7 @@ public final class TeamMember {
         }
 
         /**
-         * <p>Team member ID — <code>ausr_</code> for accepted members, <code>ausri_</code> for pending invites.</p>
-         * <p>Team member ID — <code>ausr_</code> for accepted members, <code>ausri_</code> for pending invites.</p>
+         * <p>Team member ID. Accepted members have an ID starting with <code>ausr_</code> or <code>mber_</code>, and pending invites one starting with <code>ausri_</code>. Treat it as opaque: both member prefixes are accepted wherever a team member ID is.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
@@ -400,18 +521,27 @@ public final class TeamMember {
 
         /**
          * <p>Whether this member is an agent (app-controlled account) rather than a human team member. Always <code>false</code> for invites.</p>
-         * <p>Whether this member is an agent (app-controlled account) rather than a human team member. Always <code>false</code> for invites.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
         @JsonSetter("is_agent")
-        public RoleStage isAgent(boolean isAgent) {
+        public IsPartnerStage isAgent(boolean isAgent) {
             this.isAgent = isAgent;
             return this;
         }
 
         /**
-         * <p>The member's role on the account. <code>custom</code> means a bespoke dashboard-managed role; the API can read but not grant it.</p>
+         * <p>Whether this member or invite has the view-only Partner role, directly or through a custom role based on it. A Partner can read only the account's basic details.</p>
+         * @return Reference to {@code this} so that method calls can be chained together.
+         */
+        @java.lang.Override
+        @JsonSetter("is_partner")
+        public RoleStage isPartner(boolean isPartner) {
+            this.isPartner = isPartner;
+            return this;
+        }
+
+        /**
          * <p>The member's role on the account. <code>custom</code> means a bespoke dashboard-managed role; the API can read but not grant it.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
@@ -424,7 +554,6 @@ public final class TeamMember {
 
         /**
          * <p><code>joined</code> for accepted members, <code>pending</code> while the invite is pending.</p>
-         * <p><code>joined</code> for accepted members, <code>pending</code> while the invite is pending.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
@@ -435,7 +564,6 @@ public final class TeamMember {
         }
 
         /**
-         * <p>When the membership was last updated, as an ISO 8601 timestamp.</p>
          * <p>When the membership was last updated, as an ISO 8601 timestamp.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
@@ -483,7 +611,68 @@ public final class TeamMember {
         }
 
         /**
-         * <p>The member's email address. For accepted members, <code>null</code> unless the caller holds the email read scope; for invites, the invited address.</p>
+         * <p>The ID of the team member this member reports to, starting with <code>ausr_</code> or <code>mber_</code>; treat it as opaque. <code>null</code> when the member reports to the business directly, and for invites.</p>
+         * @return Reference to {@code this} so that method calls can be chained together.
+         */
+        @java.lang.Override
+        public _FinalStage reportsToId(Nullable<String> reportsToId) {
+            if (reportsToId.isNull()) {
+                this.reportsToId = null;
+            } else if (reportsToId.isEmpty()) {
+                this.reportsToId = Optional.empty();
+            } else {
+                this.reportsToId = Optional.of(reportsToId.get());
+            }
+            return this;
+        }
+
+        /**
+         * <p>The ID of the team member this member reports to, starting with <code>ausr_</code> or <code>mber_</code>; treat it as opaque. <code>null</code> when the member reports to the business directly, and for invites.</p>
+         * @return Reference to {@code this} so that method calls can be chained together.
+         */
+        @java.lang.Override
+        public _FinalStage reportsToId(String reportsToId) {
+            this.reportsToId = Optional.ofNullable(reportsToId);
+            return this;
+        }
+
+        /**
+         * <p>The ID of the team member this member reports to, starting with <code>ausr_</code> or <code>mber_</code>; treat it as opaque. <code>null</code> when the member reports to the business directly, and for invites.</p>
+         */
+        @java.lang.Override
+        @JsonSetter(value = "reports_to_id", nulls = Nulls.SKIP)
+        public _FinalStage reportsToId(Optional<String> reportsToId) {
+            this.reportsToId = reportsToId;
+            return this;
+        }
+
+        @java.lang.Override
+        public _FinalStage reportsToChain(Nullable<List<TeamMemberManager>> reportsToChain) {
+            if (reportsToChain.isNull()) {
+                this.reportsToChain = null;
+            } else if (reportsToChain.isEmpty()) {
+                this.reportsToChain = Optional.empty();
+            } else {
+                this.reportsToChain = Optional.of(reportsToChain.get());
+            }
+            return this;
+        }
+
+        @java.lang.Override
+        public _FinalStage reportsToChain(List<TeamMemberManager> reportsToChain) {
+            this.reportsToChain = Optional.ofNullable(reportsToChain);
+            return this;
+        }
+
+        @java.lang.Override
+        @JsonSetter(value = "reports_to_chain", nulls = Nulls.SKIP)
+        public _FinalStage reportsToChain(Optional<List<TeamMemberManager>> reportsToChain) {
+            this.reportsToChain = reportsToChain;
+            return this;
+        }
+
+        /**
+         * <p>The member's email address. For an invite to an email with no Whop account yet, this is the invited address. Otherwise it is <code>null</code> unless the caller holds the <code>company:authorized_user:email:read</code> scope.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
@@ -499,7 +688,7 @@ public final class TeamMember {
         }
 
         /**
-         * <p>The member's email address. For accepted members, <code>null</code> unless the caller holds the email read scope; for invites, the invited address.</p>
+         * <p>The member's email address. For an invite to an email with no Whop account yet, this is the invited address. Otherwise it is <code>null</code> unless the caller holds the <code>company:authorized_user:email:read</code> scope.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
@@ -509,12 +698,48 @@ public final class TeamMember {
         }
 
         /**
-         * <p>The member's email address. For accepted members, <code>null</code> unless the caller holds the email read scope; for invites, the invited address.</p>
+         * <p>The member's email address. For an invite to an email with no Whop account yet, this is the invited address. Otherwise it is <code>null</code> unless the caller holds the <code>company:authorized_user:email:read</code> scope.</p>
          */
         @java.lang.Override
         @JsonSetter(value = "email", nulls = Nulls.SKIP)
         public _FinalStage email(Optional<String> email) {
             this.email = email;
+            return this;
+        }
+
+        /**
+         * <p>How many team members report directly to this member. <code>null</code> for invites.</p>
+         * @return Reference to {@code this} so that method calls can be chained together.
+         */
+        @java.lang.Override
+        public _FinalStage directReportsCount(Nullable<Integer> directReportsCount) {
+            if (directReportsCount.isNull()) {
+                this.directReportsCount = null;
+            } else if (directReportsCount.isEmpty()) {
+                this.directReportsCount = Optional.empty();
+            } else {
+                this.directReportsCount = Optional.of(directReportsCount.get());
+            }
+            return this;
+        }
+
+        /**
+         * <p>How many team members report directly to this member. <code>null</code> for invites.</p>
+         * @return Reference to {@code this} so that method calls can be chained together.
+         */
+        @java.lang.Override
+        public _FinalStage directReportsCount(Integer directReportsCount) {
+            this.directReportsCount = Optional.ofNullable(directReportsCount);
+            return this;
+        }
+
+        /**
+         * <p>How many team members report directly to this member. <code>null</code> for invites.</p>
+         */
+        @java.lang.Override
+        @JsonSetter(value = "direct_reports_count", nulls = Nulls.SKIP)
+        public _FinalStage directReportsCount(Optional<Integer> directReportsCount) {
+            this.directReportsCount = directReportsCount;
             return this;
         }
 
@@ -557,17 +782,42 @@ public final class TeamMember {
         @java.lang.Override
         public TeamMember build() {
             return new TeamMember(
-                    accountId,
+                    account,
                     authorizedRole,
                     createdAt,
+                    directReportsCount,
                     email,
                     id,
                     isAgent,
+                    isPartner,
+                    reportsToChain,
+                    reportsToId,
                     role,
                     status,
                     updatedAt,
                     user,
                     additionalProperties);
+        }
+
+        @JsonAnySetter
+        private void putAdditionalPropertyFromJson(String key, Object value) {
+            if (key.equalsIgnoreCase("account")
+                    || key.equalsIgnoreCase("authorized_role")
+                    || key.equalsIgnoreCase("created_at")
+                    || key.equalsIgnoreCase("direct_reports_count")
+                    || key.equalsIgnoreCase("email")
+                    || key.equalsIgnoreCase("id")
+                    || key.equalsIgnoreCase("is_agent")
+                    || key.equalsIgnoreCase("is_partner")
+                    || key.equalsIgnoreCase("reports_to_chain")
+                    || key.equalsIgnoreCase("reports_to_id")
+                    || key.equalsIgnoreCase("role")
+                    || key.equalsIgnoreCase("status")
+                    || key.equalsIgnoreCase("updated_at")
+                    || key.equalsIgnoreCase("user")) {
+                return;
+            }
+            this.additionalProperties.put(key, value);
         }
 
         @java.lang.Override

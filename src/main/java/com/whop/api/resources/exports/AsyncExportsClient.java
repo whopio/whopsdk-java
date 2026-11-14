@@ -5,6 +5,7 @@ package com.whop.api.resources.exports;
 
 import com.whop.api.core.ClientOptions;
 import com.whop.api.core.RequestOptions;
+import com.whop.api.core.WhopApiHttpResponse;
 import com.whop.api.resources.exports.requests.CreateExportsRequest;
 import com.whop.api.resources.exports.requests.ListExportsRequest;
 import com.whop.api.resources.exports.requests.RetrieveExportsRequest;
@@ -33,63 +34,127 @@ public class AsyncExportsClient {
      * Lists the exports requested for an account, newest first. Only exports of resources the credential is allowed to export are returned.
      */
     public CompletableFuture<ListExportsResponse> list() {
-        return this.rawClient.list().thenApply(response -> response.body());
+        CompletableFuture<WhopApiHttpResponse<ListExportsResponse>> rawFuture = this.rawClient.list();
+        CompletableFuture<ListExportsResponse> future = rawFuture.thenApply(response -> response.body());
+        future.whenComplete((result_, throwable_) -> {
+            if (future.isCancelled()) {
+                rawFuture.cancel(true);
+            }
+        });
+        return future;
     }
 
     /**
      * Lists the exports requested for an account, newest first. Only exports of resources the credential is allowed to export are returned.
      */
     public CompletableFuture<ListExportsResponse> list(RequestOptions requestOptions) {
-        return this.rawClient.list(requestOptions).thenApply(response -> response.body());
+        CompletableFuture<WhopApiHttpResponse<ListExportsResponse>> rawFuture = this.rawClient.list(requestOptions);
+        CompletableFuture<ListExportsResponse> future = rawFuture.thenApply(response -> response.body());
+        future.whenComplete((result_, throwable_) -> {
+            if (future.isCancelled()) {
+                rawFuture.cancel(true);
+            }
+        });
+        return future;
     }
 
     /**
      * Lists the exports requested for an account, newest first. Only exports of resources the credential is allowed to export are returned.
      */
     public CompletableFuture<ListExportsResponse> list(ListExportsRequest request) {
-        return this.rawClient.list(request).thenApply(response -> response.body());
+        CompletableFuture<WhopApiHttpResponse<ListExportsResponse>> rawFuture = this.rawClient.list(request);
+        CompletableFuture<ListExportsResponse> future = rawFuture.thenApply(response -> response.body());
+        future.whenComplete((result_, throwable_) -> {
+            if (future.isCancelled()) {
+                rawFuture.cancel(true);
+            }
+        });
+        return future;
     }
 
     /**
      * Lists the exports requested for an account, newest first. Only exports of resources the credential is allowed to export are returned.
      */
     public CompletableFuture<ListExportsResponse> list(ListExportsRequest request, RequestOptions requestOptions) {
-        return this.rawClient.list(request, requestOptions).thenApply(response -> response.body());
+        CompletableFuture<WhopApiHttpResponse<ListExportsResponse>> rawFuture =
+                this.rawClient.list(request, requestOptions);
+        CompletableFuture<ListExportsResponse> future = rawFuture.thenApply(response -> response.body());
+        future.whenComplete((result_, throwable_) -> {
+            if (future.isCancelled()) {
+                rawFuture.cancel(true);
+            }
+        });
+        return future;
     }
 
     /**
-     * Starts an asynchronous CSV export of a resource for an account. Returns the export in <code>pending</code>; poll <code>GET /exports/{id}</code> until <code>download_url</code> is set.
+     * Starts an asynchronous export of a resource for an account. Returns the export in <code>pending</code>; poll <code>GET /exports/:id</code> until <code>download_url</code> is set.
      */
     public CompletableFuture<Export> create(CreateExportsRequest request) {
-        return this.rawClient.create(request).thenApply(response -> response.body());
+        CompletableFuture<WhopApiHttpResponse<Export>> rawFuture = this.rawClient.create(request);
+        CompletableFuture<Export> future = rawFuture.thenApply(response -> response.body());
+        future.whenComplete((result_, throwable_) -> {
+            if (future.isCancelled()) {
+                rawFuture.cancel(true);
+            }
+        });
+        return future;
     }
 
     /**
-     * Starts an asynchronous CSV export of a resource for an account. Returns the export in <code>pending</code>; poll <code>GET /exports/{id}</code> until <code>download_url</code> is set.
+     * Starts an asynchronous export of a resource for an account. Returns the export in <code>pending</code>; poll <code>GET /exports/:id</code> until <code>download_url</code> is set.
      */
     public CompletableFuture<Export> create(CreateExportsRequest request, RequestOptions requestOptions) {
-        return this.rawClient.create(request, requestOptions).thenApply(response -> response.body());
+        CompletableFuture<WhopApiHttpResponse<Export>> rawFuture = this.rawClient.create(request, requestOptions);
+        CompletableFuture<Export> future = rawFuture.thenApply(response -> response.body());
+        future.whenComplete((result_, throwable_) -> {
+            if (future.isCancelled()) {
+                rawFuture.cancel(true);
+            }
+        });
+        return future;
     }
 
     /**
      * Fetches an export's status and, once complete, its download link.
      */
     public CompletableFuture<Export> retrieve(String id) {
-        return this.rawClient.retrieve(id).thenApply(response -> response.body());
+        CompletableFuture<WhopApiHttpResponse<Export>> rawFuture = this.rawClient.retrieve(id);
+        CompletableFuture<Export> future = rawFuture.thenApply(response -> response.body());
+        future.whenComplete((result_, throwable_) -> {
+            if (future.isCancelled()) {
+                rawFuture.cancel(true);
+            }
+        });
+        return future;
     }
 
     /**
      * Fetches an export's status and, once complete, its download link.
      */
     public CompletableFuture<Export> retrieve(String id, RequestOptions requestOptions) {
-        return this.rawClient.retrieve(id, requestOptions).thenApply(response -> response.body());
+        CompletableFuture<WhopApiHttpResponse<Export>> rawFuture = this.rawClient.retrieve(id, requestOptions);
+        CompletableFuture<Export> future = rawFuture.thenApply(response -> response.body());
+        future.whenComplete((result_, throwable_) -> {
+            if (future.isCancelled()) {
+                rawFuture.cancel(true);
+            }
+        });
+        return future;
     }
 
     /**
      * Fetches an export's status and, once complete, its download link.
      */
     public CompletableFuture<Export> retrieve(String id, RetrieveExportsRequest request) {
-        return this.rawClient.retrieve(id, request).thenApply(response -> response.body());
+        CompletableFuture<WhopApiHttpResponse<Export>> rawFuture = this.rawClient.retrieve(id, request);
+        CompletableFuture<Export> future = rawFuture.thenApply(response -> response.body());
+        future.whenComplete((result_, throwable_) -> {
+            if (future.isCancelled()) {
+                rawFuture.cancel(true);
+            }
+        });
+        return future;
     }
 
     /**
@@ -97,6 +162,13 @@ public class AsyncExportsClient {
      */
     public CompletableFuture<Export> retrieve(
             String id, RetrieveExportsRequest request, RequestOptions requestOptions) {
-        return this.rawClient.retrieve(id, request, requestOptions).thenApply(response -> response.body());
+        CompletableFuture<WhopApiHttpResponse<Export>> rawFuture = this.rawClient.retrieve(id, request, requestOptions);
+        CompletableFuture<Export> future = rawFuture.thenApply(response -> response.body());
+        future.whenComplete((result_, throwable_) -> {
+            if (future.isCancelled()) {
+                rawFuture.cancel(true);
+            }
+        });
+        return future;
     }
 }

@@ -149,7 +149,6 @@ public final class UserBalanceHistory {
 
         private List<UserBalanceHistoryPoint> data = new ArrayList<>();
 
-        @JsonAnySetter
         private Map<String, Object> additionalProperties = new HashMap<>();
 
         private Builder() {}
@@ -165,7 +164,6 @@ public final class UserBalanceHistory {
 
         /**
          * <p>Value of the most recent point, in USD.</p>
-         * <p>Value of the most recent point, in USD.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
@@ -177,7 +175,6 @@ public final class UserBalanceHistory {
 
         /**
          * <p>Maximum value across the window, in USD.</p>
-         * <p>Maximum value across the window, in USD.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
@@ -188,7 +185,6 @@ public final class UserBalanceHistory {
         }
 
         /**
-         * <p>Minimum value across the window, in USD.</p>
          * <p>Minimum value across the window, in USD.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
@@ -226,6 +222,17 @@ public final class UserBalanceHistory {
         @java.lang.Override
         public UserBalanceHistory build() {
             return new UserBalanceHistory(data, last, max, min, additionalProperties);
+        }
+
+        @JsonAnySetter
+        private void putAdditionalPropertyFromJson(String key, Object value) {
+            if (key.equalsIgnoreCase("data")
+                    || key.equalsIgnoreCase("last")
+                    || key.equalsIgnoreCase("max")
+                    || key.equalsIgnoreCase("min")) {
+                return;
+            }
+            this.additionalProperties.put(key, value);
         }
 
         @java.lang.Override

@@ -5,6 +5,7 @@ package com.whop.api.resources.teammembers;
 
 import com.whop.api.core.ClientOptions;
 import com.whop.api.core.RequestOptions;
+import com.whop.api.core.WhopApiHttpResponse;
 import com.whop.api.core.pagination.SyncPagingIterable;
 import com.whop.api.resources.teammembers.requests.CreateTeamMembersRequest;
 import com.whop.api.resources.teammembers.requests.DeleteTeamMembersRequest;
@@ -33,82 +34,192 @@ public class AsyncTeamMembersClient {
     }
 
     /**
-     * Lists an account's team members, including pending invites (<code>status: &quot;pending&quot;</code>, <code>ausri_</code> ids; <code>user</code> is <code>null</code> for invites sent to an email with no Whop account yet). For accepted members, <code>email</code> requires the <code>company:authorized_user:email:read</code> scope and is <code>null</code> otherwise. Listing <code>role=workforce</code> is also allowed with the <code>bounty:create</code> scope.
+     * Lists team members, including pending invites. Pass <code>account_id</code> to list one account's team. Without it, a signed-in user can pass <code>user_id=me</code> to list their own joined memberships across accounts. The list has one for each account they can read. An API key without <code>account_id</code> lists the team of its own account. With <code>company:basic:read</code>, a user can list their own joined membership on one account. To do this, pass <code>status=joined</code> and their own <code>user_id</code> with the account ID. The <code>bounty:create</code> scope also allows listing <code>role=workforce</code> members. A signed-in Partner without <code>company:authorized_user:read</code> lists only their own joined membership and the members who report up to them. A member others report to gets the same list. Neither of them sees pending invites. Members with the view-only Partner role are listed after all other members.
      */
-    public CompletableFuture<SyncPagingIterable<TeamMember>> list(ListTeamMembersRequest request) {
-        return this.rawClient.list(request).thenApply(response -> response.body());
+    public CompletableFuture<SyncPagingIterable<TeamMember>> list() {
+        CompletableFuture<WhopApiHttpResponse<SyncPagingIterable<TeamMember>>> rawFuture = this.rawClient.list();
+        CompletableFuture<SyncPagingIterable<TeamMember>> future = rawFuture.thenApply(response -> response.body());
+        future.whenComplete((result_, throwable_) -> {
+            if (future.isCancelled()) {
+                rawFuture.cancel(true);
+            }
+        });
+        return future;
     }
 
     /**
-     * Lists an account's team members, including pending invites (<code>status: &quot;pending&quot;</code>, <code>ausri_</code> ids; <code>user</code> is <code>null</code> for invites sent to an email with no Whop account yet). For accepted members, <code>email</code> requires the <code>company:authorized_user:email:read</code> scope and is <code>null</code> otherwise. Listing <code>role=workforce</code> is also allowed with the <code>bounty:create</code> scope.
+     * Lists team members, including pending invites. Pass <code>account_id</code> to list one account's team. Without it, a signed-in user can pass <code>user_id=me</code> to list their own joined memberships across accounts. The list has one for each account they can read. An API key without <code>account_id</code> lists the team of its own account. With <code>company:basic:read</code>, a user can list their own joined membership on one account. To do this, pass <code>status=joined</code> and their own <code>user_id</code> with the account ID. The <code>bounty:create</code> scope also allows listing <code>role=workforce</code> members. A signed-in Partner without <code>company:authorized_user:read</code> lists only their own joined membership and the members who report up to them. A member others report to gets the same list. Neither of them sees pending invites. Members with the view-only Partner role are listed after all other members.
+     */
+    public CompletableFuture<SyncPagingIterable<TeamMember>> list(RequestOptions requestOptions) {
+        CompletableFuture<WhopApiHttpResponse<SyncPagingIterable<TeamMember>>> rawFuture =
+                this.rawClient.list(requestOptions);
+        CompletableFuture<SyncPagingIterable<TeamMember>> future = rawFuture.thenApply(response -> response.body());
+        future.whenComplete((result_, throwable_) -> {
+            if (future.isCancelled()) {
+                rawFuture.cancel(true);
+            }
+        });
+        return future;
+    }
+
+    /**
+     * Lists team members, including pending invites. Pass <code>account_id</code> to list one account's team. Without it, a signed-in user can pass <code>user_id=me</code> to list their own joined memberships across accounts. The list has one for each account they can read. An API key without <code>account_id</code> lists the team of its own account. With <code>company:basic:read</code>, a user can list their own joined membership on one account. To do this, pass <code>status=joined</code> and their own <code>user_id</code> with the account ID. The <code>bounty:create</code> scope also allows listing <code>role=workforce</code> members. A signed-in Partner without <code>company:authorized_user:read</code> lists only their own joined membership and the members who report up to them. A member others report to gets the same list. Neither of them sees pending invites. Members with the view-only Partner role are listed after all other members.
+     */
+    public CompletableFuture<SyncPagingIterable<TeamMember>> list(ListTeamMembersRequest request) {
+        CompletableFuture<WhopApiHttpResponse<SyncPagingIterable<TeamMember>>> rawFuture = this.rawClient.list(request);
+        CompletableFuture<SyncPagingIterable<TeamMember>> future = rawFuture.thenApply(response -> response.body());
+        future.whenComplete((result_, throwable_) -> {
+            if (future.isCancelled()) {
+                rawFuture.cancel(true);
+            }
+        });
+        return future;
+    }
+
+    /**
+     * Lists team members, including pending invites. Pass <code>account_id</code> to list one account's team. Without it, a signed-in user can pass <code>user_id=me</code> to list their own joined memberships across accounts. The list has one for each account they can read. An API key without <code>account_id</code> lists the team of its own account. With <code>company:basic:read</code>, a user can list their own joined membership on one account. To do this, pass <code>status=joined</code> and their own <code>user_id</code> with the account ID. The <code>bounty:create</code> scope also allows listing <code>role=workforce</code> members. A signed-in Partner without <code>company:authorized_user:read</code> lists only their own joined membership and the members who report up to them. A member others report to gets the same list. Neither of them sees pending invites. Members with the view-only Partner role are listed after all other members.
      */
     public CompletableFuture<SyncPagingIterable<TeamMember>> list(
             ListTeamMembersRequest request, RequestOptions requestOptions) {
-        return this.rawClient.list(request, requestOptions).thenApply(response -> response.body());
+        CompletableFuture<WhopApiHttpResponse<SyncPagingIterable<TeamMember>>> rawFuture =
+                this.rawClient.list(request, requestOptions);
+        CompletableFuture<SyncPagingIterable<TeamMember>> future = rawFuture.thenApply(response -> response.body());
+        future.whenComplete((result_, throwable_) -> {
+            if (future.isCancelled()) {
+                rawFuture.cancel(true);
+            }
+        });
+        return future;
     }
 
     /**
-     * Adds a member to an account's team with a system role. Identify them by exactly one of <code>user_id</code> or <code>email</code>. If the person has not yet accepted — or the email does not belong to a Whop account yet — an invitation is sent instead and the response is <code>202</code> with <code>{ &quot;object&quot;: &quot;team_member_invite&quot;, &quot;invitation_sent&quot;: true }</code>. If they already have a pending invite, the request fails with a <code>400</code>. Custom roles cannot be granted via the API. Granting the <code>workforce</code> role is also allowed with the <code>bounty:create</code> scope.
+     * Adds a member to an account's team with a system role. Identify them by exactly one of <code>user_id</code> or <code>email</code>. If the person has not yet accepted, or the email does not belong to a Whop account yet, an invitation is sent instead and the response is <code>202</code> with the pending team member, whose <code>status</code> is <code>pending</code> and whose id is prefixed <code>ausri_</code>. If they already have a pending invite, the request fails with a <code>400</code>. Granting the <code>workforce</code> role is also allowed with the <code>bounty:create</code> scope.
      */
     public CompletableFuture<TeamMember> create(CreateTeamMembersRequest request) {
-        return this.rawClient.create(request).thenApply(response -> response.body());
+        CompletableFuture<WhopApiHttpResponse<TeamMember>> rawFuture = this.rawClient.create(request);
+        CompletableFuture<TeamMember> future = rawFuture.thenApply(response -> response.body());
+        future.whenComplete((result_, throwable_) -> {
+            if (future.isCancelled()) {
+                rawFuture.cancel(true);
+            }
+        });
+        return future;
     }
 
     /**
-     * Adds a member to an account's team with a system role. Identify them by exactly one of <code>user_id</code> or <code>email</code>. If the person has not yet accepted — or the email does not belong to a Whop account yet — an invitation is sent instead and the response is <code>202</code> with <code>{ &quot;object&quot;: &quot;team_member_invite&quot;, &quot;invitation_sent&quot;: true }</code>. If they already have a pending invite, the request fails with a <code>400</code>. Custom roles cannot be granted via the API. Granting the <code>workforce</code> role is also allowed with the <code>bounty:create</code> scope.
+     * Adds a member to an account's team with a system role. Identify them by exactly one of <code>user_id</code> or <code>email</code>. If the person has not yet accepted, or the email does not belong to a Whop account yet, an invitation is sent instead and the response is <code>202</code> with the pending team member, whose <code>status</code> is <code>pending</code> and whose id is prefixed <code>ausri_</code>. If they already have a pending invite, the request fails with a <code>400</code>. Granting the <code>workforce</code> role is also allowed with the <code>bounty:create</code> scope.
      */
     public CompletableFuture<TeamMember> create(CreateTeamMembersRequest request, RequestOptions requestOptions) {
-        return this.rawClient.create(request, requestOptions).thenApply(response -> response.body());
+        CompletableFuture<WhopApiHttpResponse<TeamMember>> rawFuture = this.rawClient.create(request, requestOptions);
+        CompletableFuture<TeamMember> future = rawFuture.thenApply(response -> response.body());
+        future.whenComplete((result_, throwable_) -> {
+            if (future.isCancelled()) {
+                rawFuture.cancel(true);
+            }
+        });
+        return future;
     }
 
     /**
-     * Retrieves a team member by ID. <code>email</code> requires the <code>company:authorized_user:email:read</code> scope and is <code>null</code> otherwise.
+     * Retrieves a team member or pending invite by ID.
      */
     public CompletableFuture<TeamMember> retrieve(String id) {
-        return this.rawClient.retrieve(id).thenApply(response -> response.body());
+        CompletableFuture<WhopApiHttpResponse<TeamMember>> rawFuture = this.rawClient.retrieve(id);
+        CompletableFuture<TeamMember> future = rawFuture.thenApply(response -> response.body());
+        future.whenComplete((result_, throwable_) -> {
+            if (future.isCancelled()) {
+                rawFuture.cancel(true);
+            }
+        });
+        return future;
     }
 
     /**
-     * Retrieves a team member by ID. <code>email</code> requires the <code>company:authorized_user:email:read</code> scope and is <code>null</code> otherwise.
+     * Retrieves a team member or pending invite by ID.
      */
     public CompletableFuture<TeamMember> retrieve(String id, RequestOptions requestOptions) {
-        return this.rawClient.retrieve(id, requestOptions).thenApply(response -> response.body());
+        CompletableFuture<WhopApiHttpResponse<TeamMember>> rawFuture = this.rawClient.retrieve(id, requestOptions);
+        CompletableFuture<TeamMember> future = rawFuture.thenApply(response -> response.body());
+        future.whenComplete((result_, throwable_) -> {
+            if (future.isCancelled()) {
+                rawFuture.cancel(true);
+            }
+        });
+        return future;
     }
 
     /**
-     * Retrieves a team member by ID. <code>email</code> requires the <code>company:authorized_user:email:read</code> scope and is <code>null</code> otherwise.
+     * Retrieves a team member or pending invite by ID.
      */
     public CompletableFuture<TeamMember> retrieve(String id, RetrieveTeamMembersRequest request) {
-        return this.rawClient.retrieve(id, request).thenApply(response -> response.body());
+        CompletableFuture<WhopApiHttpResponse<TeamMember>> rawFuture = this.rawClient.retrieve(id, request);
+        CompletableFuture<TeamMember> future = rawFuture.thenApply(response -> response.body());
+        future.whenComplete((result_, throwable_) -> {
+            if (future.isCancelled()) {
+                rawFuture.cancel(true);
+            }
+        });
+        return future;
     }
 
     /**
-     * Retrieves a team member by ID. <code>email</code> requires the <code>company:authorized_user:email:read</code> scope and is <code>null</code> otherwise.
+     * Retrieves a team member or pending invite by ID.
      */
     public CompletableFuture<TeamMember> retrieve(
             String id, RetrieveTeamMembersRequest request, RequestOptions requestOptions) {
-        return this.rawClient.retrieve(id, request, requestOptions).thenApply(response -> response.body());
+        CompletableFuture<WhopApiHttpResponse<TeamMember>> rawFuture =
+                this.rawClient.retrieve(id, request, requestOptions);
+        CompletableFuture<TeamMember> future = rawFuture.thenApply(response -> response.body());
+        future.whenComplete((result_, throwable_) -> {
+            if (future.isCancelled()) {
+                rawFuture.cancel(true);
+            }
+        });
+        return future;
     }
 
     /**
      * Removes a team member from the account, or revokes a pending invite when given an <code>ausri_</code> ID. A user session may delete its own membership to leave the team without the delete scope. Removing a member on the <code>workforce</code> role is also allowed with the <code>bounty:create</code> scope. The account owner cannot be removed.
      */
     public CompletableFuture<DeleteTeamMembersResponse> delete(String id) {
-        return this.rawClient.delete(id).thenApply(response -> response.body());
+        CompletableFuture<WhopApiHttpResponse<DeleteTeamMembersResponse>> rawFuture = this.rawClient.delete(id);
+        CompletableFuture<DeleteTeamMembersResponse> future = rawFuture.thenApply(response -> response.body());
+        future.whenComplete((result_, throwable_) -> {
+            if (future.isCancelled()) {
+                rawFuture.cancel(true);
+            }
+        });
+        return future;
     }
 
     /**
      * Removes a team member from the account, or revokes a pending invite when given an <code>ausri_</code> ID. A user session may delete its own membership to leave the team without the delete scope. Removing a member on the <code>workforce</code> role is also allowed with the <code>bounty:create</code> scope. The account owner cannot be removed.
      */
     public CompletableFuture<DeleteTeamMembersResponse> delete(String id, RequestOptions requestOptions) {
-        return this.rawClient.delete(id, requestOptions).thenApply(response -> response.body());
+        CompletableFuture<WhopApiHttpResponse<DeleteTeamMembersResponse>> rawFuture =
+                this.rawClient.delete(id, requestOptions);
+        CompletableFuture<DeleteTeamMembersResponse> future = rawFuture.thenApply(response -> response.body());
+        future.whenComplete((result_, throwable_) -> {
+            if (future.isCancelled()) {
+                rawFuture.cancel(true);
+            }
+        });
+        return future;
     }
 
     /**
      * Removes a team member from the account, or revokes a pending invite when given an <code>ausri_</code> ID. A user session may delete its own membership to leave the team without the delete scope. Removing a member on the <code>workforce</code> role is also allowed with the <code>bounty:create</code> scope. The account owner cannot be removed.
      */
     public CompletableFuture<DeleteTeamMembersResponse> delete(String id, DeleteTeamMembersRequest request) {
-        return this.rawClient.delete(id, request).thenApply(response -> response.body());
+        CompletableFuture<WhopApiHttpResponse<DeleteTeamMembersResponse>> rawFuture =
+                this.rawClient.delete(id, request);
+        CompletableFuture<DeleteTeamMembersResponse> future = rawFuture.thenApply(response -> response.body());
+        future.whenComplete((result_, throwable_) -> {
+            if (future.isCancelled()) {
+                rawFuture.cancel(true);
+            }
+        });
+        return future;
     }
 
     /**
@@ -116,14 +227,57 @@ public class AsyncTeamMembersClient {
      */
     public CompletableFuture<DeleteTeamMembersResponse> delete(
             String id, DeleteTeamMembersRequest request, RequestOptions requestOptions) {
-        return this.rawClient.delete(id, request, requestOptions).thenApply(response -> response.body());
+        CompletableFuture<WhopApiHttpResponse<DeleteTeamMembersResponse>> rawFuture =
+                this.rawClient.delete(id, request, requestOptions);
+        CompletableFuture<DeleteTeamMembersResponse> future = rawFuture.thenApply(response -> response.body());
+        future.whenComplete((result_, throwable_) -> {
+            if (future.isCancelled()) {
+                rawFuture.cancel(true);
+            }
+        });
+        return future;
+    }
+
+    /**
+     * Changes a team member's system role. Requires a user session — account API keys cannot change member roles. The account owner's role cannot be changed, and you cannot change your own role.
+     */
+    public CompletableFuture<TeamMember> update(String id) {
+        CompletableFuture<WhopApiHttpResponse<TeamMember>> rawFuture = this.rawClient.update(id);
+        CompletableFuture<TeamMember> future = rawFuture.thenApply(response -> response.body());
+        future.whenComplete((result_, throwable_) -> {
+            if (future.isCancelled()) {
+                rawFuture.cancel(true);
+            }
+        });
+        return future;
+    }
+
+    /**
+     * Changes a team member's system role. Requires a user session — account API keys cannot change member roles. The account owner's role cannot be changed, and you cannot change your own role.
+     */
+    public CompletableFuture<TeamMember> update(String id, RequestOptions requestOptions) {
+        CompletableFuture<WhopApiHttpResponse<TeamMember>> rawFuture = this.rawClient.update(id, requestOptions);
+        CompletableFuture<TeamMember> future = rawFuture.thenApply(response -> response.body());
+        future.whenComplete((result_, throwable_) -> {
+            if (future.isCancelled()) {
+                rawFuture.cancel(true);
+            }
+        });
+        return future;
     }
 
     /**
      * Changes a team member's system role. Requires a user session — account API keys cannot change member roles. The account owner's role cannot be changed, and you cannot change your own role.
      */
     public CompletableFuture<TeamMember> update(String id, UpdateTeamMembersRequest request) {
-        return this.rawClient.update(id, request).thenApply(response -> response.body());
+        CompletableFuture<WhopApiHttpResponse<TeamMember>> rawFuture = this.rawClient.update(id, request);
+        CompletableFuture<TeamMember> future = rawFuture.thenApply(response -> response.body());
+        future.whenComplete((result_, throwable_) -> {
+            if (future.isCancelled()) {
+                rawFuture.cancel(true);
+            }
+        });
+        return future;
     }
 
     /**
@@ -131,6 +285,14 @@ public class AsyncTeamMembersClient {
      */
     public CompletableFuture<TeamMember> update(
             String id, UpdateTeamMembersRequest request, RequestOptions requestOptions) {
-        return this.rawClient.update(id, request, requestOptions).thenApply(response -> response.body());
+        CompletableFuture<WhopApiHttpResponse<TeamMember>> rawFuture =
+                this.rawClient.update(id, request, requestOptions);
+        CompletableFuture<TeamMember> future = rawFuture.thenApply(response -> response.body());
+        future.whenComplete((result_, throwable_) -> {
+            if (future.isCancelled()) {
+                rawFuture.cancel(true);
+            }
+        });
+        return future;
     }
 }

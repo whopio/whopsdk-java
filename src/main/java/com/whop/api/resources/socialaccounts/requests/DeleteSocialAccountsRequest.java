@@ -33,17 +33,11 @@ public final class DeleteSocialAccountsRequest {
         this.additionalProperties = additionalProperties;
     }
 
-    /**
-     * @return The Account that the social account is connected to. Provide either this or user_id.
-     */
     @JsonProperty("account_id")
     public Optional<String> getAccountId() {
         return accountId;
     }
 
-    /**
-     * @return The User that the social account is connected to. Provide either this or account_id.
-     */
     @JsonProperty("user_id")
     public Optional<String> getUserId() {
         return userId;
@@ -84,7 +78,6 @@ public final class DeleteSocialAccountsRequest {
 
         private Optional<String> userId = Optional.empty();
 
-        @JsonAnySetter
         private Map<String, Object> additionalProperties = new HashMap<>();
 
         private Builder() {}
@@ -95,9 +88,6 @@ public final class DeleteSocialAccountsRequest {
             return this;
         }
 
-        /**
-         * <p>The Account that the social account is connected to. Provide either this or user_id.</p>
-         */
         @JsonSetter(value = "account_id", nulls = Nulls.SKIP)
         public Builder accountId(Optional<String> accountId) {
             this.accountId = accountId;
@@ -109,9 +99,6 @@ public final class DeleteSocialAccountsRequest {
             return this;
         }
 
-        /**
-         * <p>The User that the social account is connected to. Provide either this or account_id.</p>
-         */
         @JsonSetter(value = "user_id", nulls = Nulls.SKIP)
         public Builder userId(Optional<String> userId) {
             this.userId = userId;
@@ -125,6 +112,14 @@ public final class DeleteSocialAccountsRequest {
 
         public DeleteSocialAccountsRequest build() {
             return new DeleteSocialAccountsRequest(accountId, userId, additionalProperties);
+        }
+
+        @JsonAnySetter
+        private void putAdditionalPropertyFromJson(String key, Object value) {
+            if (key.equalsIgnoreCase("account_id") || key.equalsIgnoreCase("user_id")) {
+                return;
+            }
+            this.additionalProperties.put(key, value);
         }
 
         public Builder additionalProperty(String key, Object value) {

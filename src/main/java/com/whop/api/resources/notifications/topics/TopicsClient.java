@@ -27,28 +27,28 @@ public class TopicsClient {
     }
 
     /**
-     * Lists the platform's visible notification topics — the categories users can set notification preferences on. App-created topics are internal and not returned.
+     * Lists the platform's visible notification topics — the categories users can set notification preferences on. App-created topics are not returned.
      */
     public SyncPagingIterable<NotificationTopic> list() {
         return this.rawClient.list().body();
     }
 
     /**
-     * Lists the platform's visible notification topics — the categories users can set notification preferences on. App-created topics are internal and not returned.
+     * Lists the platform's visible notification topics — the categories users can set notification preferences on. App-created topics are not returned.
      */
     public SyncPagingIterable<NotificationTopic> list(RequestOptions requestOptions) {
         return this.rawClient.list(requestOptions).body();
     }
 
     /**
-     * Lists the platform's visible notification topics — the categories users can set notification preferences on. App-created topics are internal and not returned.
+     * Lists the platform's visible notification topics — the categories users can set notification preferences on. App-created topics are not returned.
      */
     public SyncPagingIterable<NotificationTopic> list(ListTopicsRequest request) {
         return this.rawClient.list(request).body();
     }
 
     /**
-     * Lists the platform's visible notification topics — the categories users can set notification preferences on. App-created topics are internal and not returned.
+     * Lists the platform's visible notification topics — the categories users can set notification preferences on. App-created topics are not returned.
      */
     public SyncPagingIterable<NotificationTopic> list(ListTopicsRequest request, RequestOptions requestOptions) {
         return this.rawClient.list(request, requestOptions).body();

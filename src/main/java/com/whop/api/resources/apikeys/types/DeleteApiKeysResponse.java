@@ -106,7 +106,6 @@ public final class DeleteApiKeysResponse {
 
         private String id;
 
-        @JsonAnySetter
         private Map<String, Object> additionalProperties = new HashMap<>();
 
         private Builder() {}
@@ -120,7 +119,6 @@ public final class DeleteApiKeysResponse {
 
         /**
          * <p>Always <code>true</code>: the key was revoked.</p>
-         * <p>Always <code>true</code>: the key was revoked.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
@@ -131,7 +129,6 @@ public final class DeleteApiKeysResponse {
         }
 
         /**
-         * <p>The ID of the revoked key.</p>
          * <p>The ID of the revoked key.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
@@ -145,6 +142,14 @@ public final class DeleteApiKeysResponse {
         @java.lang.Override
         public DeleteApiKeysResponse build() {
             return new DeleteApiKeysResponse(deleted, id, additionalProperties);
+        }
+
+        @JsonAnySetter
+        private void putAdditionalPropertyFromJson(String key, Object value) {
+            if (key.equalsIgnoreCase("deleted") || key.equalsIgnoreCase("id")) {
+                return;
+            }
+            this.additionalProperties.put(key, value);
         }
 
         @java.lang.Override

@@ -5,6 +5,7 @@ package com.whop.api.resources.financialactivity;
 
 import com.whop.api.core.ClientOptions;
 import com.whop.api.core.RequestOptions;
+import com.whop.api.core.WhopApiHttpResponse;
 import com.whop.api.resources.financialactivity.requests.ListFinancialActivityRequest;
 import com.whop.api.resources.financialactivity.types.ListFinancialActivityResponse;
 import java.util.concurrent.CompletableFuture;
@@ -30,21 +31,43 @@ public class AsyncFinancialActivityClient {
      * Returns an account's or user's activity feed: every movement of money in or out.
      */
     public CompletableFuture<ListFinancialActivityResponse> list() {
-        return this.rawClient.list().thenApply(response -> response.body());
+        CompletableFuture<WhopApiHttpResponse<ListFinancialActivityResponse>> rawFuture = this.rawClient.list();
+        CompletableFuture<ListFinancialActivityResponse> future = rawFuture.thenApply(response -> response.body());
+        future.whenComplete((result_, throwable_) -> {
+            if (future.isCancelled()) {
+                rawFuture.cancel(true);
+            }
+        });
+        return future;
     }
 
     /**
      * Returns an account's or user's activity feed: every movement of money in or out.
      */
     public CompletableFuture<ListFinancialActivityResponse> list(RequestOptions requestOptions) {
-        return this.rawClient.list(requestOptions).thenApply(response -> response.body());
+        CompletableFuture<WhopApiHttpResponse<ListFinancialActivityResponse>> rawFuture =
+                this.rawClient.list(requestOptions);
+        CompletableFuture<ListFinancialActivityResponse> future = rawFuture.thenApply(response -> response.body());
+        future.whenComplete((result_, throwable_) -> {
+            if (future.isCancelled()) {
+                rawFuture.cancel(true);
+            }
+        });
+        return future;
     }
 
     /**
      * Returns an account's or user's activity feed: every movement of money in or out.
      */
     public CompletableFuture<ListFinancialActivityResponse> list(ListFinancialActivityRequest request) {
-        return this.rawClient.list(request).thenApply(response -> response.body());
+        CompletableFuture<WhopApiHttpResponse<ListFinancialActivityResponse>> rawFuture = this.rawClient.list(request);
+        CompletableFuture<ListFinancialActivityResponse> future = rawFuture.thenApply(response -> response.body());
+        future.whenComplete((result_, throwable_) -> {
+            if (future.isCancelled()) {
+                rawFuture.cancel(true);
+            }
+        });
+        return future;
     }
 
     /**
@@ -52,6 +75,14 @@ public class AsyncFinancialActivityClient {
      */
     public CompletableFuture<ListFinancialActivityResponse> list(
             ListFinancialActivityRequest request, RequestOptions requestOptions) {
-        return this.rawClient.list(request, requestOptions).thenApply(response -> response.body());
+        CompletableFuture<WhopApiHttpResponse<ListFinancialActivityResponse>> rawFuture =
+                this.rawClient.list(request, requestOptions);
+        CompletableFuture<ListFinancialActivityResponse> future = rawFuture.thenApply(response -> response.body());
+        future.whenComplete((result_, throwable_) -> {
+            if (future.isCancelled()) {
+                rawFuture.cancel(true);
+            }
+        });
+        return future;
     }
 }

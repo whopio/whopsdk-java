@@ -103,7 +103,6 @@ public final class ListFinancialActivityResponse {
 
         private List<LedgerActivity> data = new ArrayList<>();
 
-        @JsonAnySetter
         private Map<String, Object> additionalProperties = new HashMap<>();
 
         private Builder() {}
@@ -149,6 +148,14 @@ public final class ListFinancialActivityResponse {
         @java.lang.Override
         public ListFinancialActivityResponse build() {
             return new ListFinancialActivityResponse(data, pageInfo, additionalProperties);
+        }
+
+        @JsonAnySetter
+        private void putAdditionalPropertyFromJson(String key, Object value) {
+            if (key.equalsIgnoreCase("data") || key.equalsIgnoreCase("page_info")) {
+                return;
+            }
+            this.additionalProperties.put(key, value);
         }
 
         @java.lang.Override

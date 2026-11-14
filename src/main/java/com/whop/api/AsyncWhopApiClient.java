@@ -10,23 +10,32 @@ import com.whop.api.resources.accountlinks.AsyncAccountLinksClient;
 import com.whop.api.resources.accounts.AsyncAccountsClient;
 import com.whop.api.resources.adcampaigns.AsyncAdCampaignsClient;
 import com.whop.api.resources.adgroups.AsyncAdGroupsClient;
-import com.whop.api.resources.adreports.AsyncAdReportsClient;
+import com.whop.api.resources.adpixels.AsyncAdPixelsClient;
 import com.whop.api.resources.ads.AsyncAdsClient;
 import com.whop.api.resources.affiliates.AsyncAffiliatesClient;
 import com.whop.api.resources.aichats.AsyncAiChatsClient;
 import com.whop.api.resources.apikeys.AsyncApiKeysClient;
+import com.whop.api.resources.apilogs.AsyncApiLogsClient;
 import com.whop.api.resources.appbuilds.AsyncAppBuildsClient;
+import com.whop.api.resources.appinstallations.AsyncAppInstallationsClient;
 import com.whop.api.resources.apps.AsyncAppsClient;
 import com.whop.api.resources.audiences.AsyncAudiencesClient;
 import com.whop.api.resources.authorizedusers.AsyncAuthorizedUsersClient;
+import com.whop.api.resources.automationenrollments.AsyncAutomationEnrollmentsClient;
+import com.whop.api.resources.automations.AsyncAutomationsClient;
+import com.whop.api.resources.automationsteps.AsyncAutomationStepsClient;
 import com.whop.api.resources.bounties.AsyncBountiesClient;
 import com.whop.api.resources.bountysubmissions.AsyncBountySubmissionsClient;
 import com.whop.api.resources.cards.AsyncCardsClient;
 import com.whop.api.resources.cardtransactions.AsyncCardTransactionsClient;
+import com.whop.api.resources.cashbackrules.AsyncCashbackRulesClient;
+import com.whop.api.resources.channelmembers.AsyncChannelMembersClient;
+import com.whop.api.resources.channels.AsyncChannelsClient;
 import com.whop.api.resources.chatchannels.AsyncChatChannelsClient;
 import com.whop.api.resources.checkoutconfigurations.AsyncCheckoutConfigurationsClient;
-import com.whop.api.resources.companies.AsyncCompaniesClient;
+import com.whop.api.resources.claimlinks.AsyncClaimLinksClient;
 import com.whop.api.resources.companytokentransactions.AsyncCompanyTokenTransactionsClient;
+import com.whop.api.resources.confirmationtokens.AsyncConfirmationTokensClient;
 import com.whop.api.resources.coursechapters.AsyncCourseChaptersClient;
 import com.whop.api.resources.courselessoninteractions.AsyncCourseLessonInteractionsClient;
 import com.whop.api.resources.courselessons.AsyncCourseLessonsClient;
@@ -37,28 +46,37 @@ import com.whop.api.resources.disputealerts.AsyncDisputeAlertsClient;
 import com.whop.api.resources.disputes.AsyncDisputesClient;
 import com.whop.api.resources.dmchannels.AsyncDmChannelsClient;
 import com.whop.api.resources.dmmembers.AsyncDmMembersClient;
-import com.whop.api.resources.entries.AsyncEntriesClient;
+import com.whop.api.resources.domains.AsyncDomainsClient;
+import com.whop.api.resources.economicintelligence.AsyncEconomicIntelligenceClient;
+import com.whop.api.resources.emailaddresses.AsyncEmailAddressesClient;
 import com.whop.api.resources.events.AsyncEventsClient;
 import com.whop.api.resources.experiences.AsyncExperiencesClient;
+import com.whop.api.resources.experiments.AsyncExperimentsClient;
 import com.whop.api.resources.exports.AsyncExportsClient;
+import com.whop.api.resources.externalaccounts.AsyncExternalAccountsClient;
+import com.whop.api.resources.feedbacksubmissions.AsyncFeedbackSubmissionsClient;
 import com.whop.api.resources.feemarkups.AsyncFeeMarkupsClient;
 import com.whop.api.resources.files.AsyncFilesClient;
 import com.whop.api.resources.financialactivity.AsyncFinancialActivityClient;
+import com.whop.api.resources.financialreports.AsyncFinancialReportsClient;
+import com.whop.api.resources.financingapplications.AsyncFinancingApplicationsClient;
 import com.whop.api.resources.forumposts.AsyncForumPostsClient;
 import com.whop.api.resources.forums.AsyncForumsClient;
 import com.whop.api.resources.identityprofiles.AsyncIdentityProfilesClient;
 import com.whop.api.resources.invoices.AsyncInvoicesClient;
-import com.whop.api.resources.leads.AsyncLeadsClient;
 import com.whop.api.resources.ledgeraccounts.AsyncLedgerAccountsClient;
-import com.whop.api.resources.ledgers.AsyncLedgersClient;
+import com.whop.api.resources.livestreams.AsyncLivestreamsClient;
 import com.whop.api.resources.media.AsyncMediaClient;
 import com.whop.api.resources.members.AsyncMembersClient;
 import com.whop.api.resources.memberships.AsyncMembershipsClient;
 import com.whop.api.resources.messages.AsyncMessagesClient;
 import com.whop.api.resources.notifications.AsyncNotificationsClient;
+import com.whop.api.resources.partnerreferralrequests.AsyncPartnerReferralRequestsClient;
 import com.whop.api.resources.partners.AsyncPartnersClient;
 import com.whop.api.resources.paymentmethoddomains.AsyncPaymentMethodDomainsClient;
 import com.whop.api.resources.paymentmethods.AsyncPaymentMethodsClient;
+import com.whop.api.resources.paymentquotes.AsyncPaymentQuotesClient;
+import com.whop.api.resources.paymentrules.AsyncPaymentRulesClient;
 import com.whop.api.resources.payments.AsyncPaymentsClient;
 import com.whop.api.resources.payoutaccounts.AsyncPayoutAccountsClient;
 import com.whop.api.resources.payoutmethods.AsyncPayoutMethodsClient;
@@ -66,13 +84,15 @@ import com.whop.api.resources.payouts.AsyncPayoutsClient;
 import com.whop.api.resources.people.AsyncPeopleClient;
 import com.whop.api.resources.permissions.AsyncPermissionsClient;
 import com.whop.api.resources.plans.AsyncPlansClient;
+import com.whop.api.resources.productaffiliates.AsyncProductAffiliatesClient;
 import com.whop.api.resources.products.AsyncProductsClient;
 import com.whop.api.resources.promocodes.AsyncPromoCodesClient;
 import com.whop.api.resources.reactions.AsyncReactionsClient;
-import com.whop.api.resources.recommendedactions.AsyncRecommendedActionsClient;
 import com.whop.api.resources.refunds.AsyncRefundsClient;
 import com.whop.api.resources.resolutioncentercases.AsyncResolutionCenterCasesClient;
+import com.whop.api.resources.reviewreports.AsyncReviewReportsClient;
 import com.whop.api.resources.reviews.AsyncReviewsClient;
+import com.whop.api.resources.search.AsyncSearchClient;
 import com.whop.api.resources.setupintents.AsyncSetupIntentsClient;
 import com.whop.api.resources.shipments.AsyncShipmentsClient;
 import com.whop.api.resources.socialaccounts.AsyncSocialAccountsClient;
@@ -80,15 +100,16 @@ import com.whop.api.resources.stats.AsyncStatsClient;
 import com.whop.api.resources.supportchannels.AsyncSupportChannelsClient;
 import com.whop.api.resources.swaps.AsyncSwapsClient;
 import com.whop.api.resources.teammembers.AsyncTeamMembersClient;
-import com.whop.api.resources.topups.AsyncTopupsClient;
+import com.whop.api.resources.trades.AsyncTradesClient;
 import com.whop.api.resources.transfers.AsyncTransfersClient;
 import com.whop.api.resources.users.AsyncUsersClient;
+import com.whop.api.resources.variants.AsyncVariantsClient;
 import com.whop.api.resources.verifications.AsyncVerificationsClient;
+import com.whop.api.resources.waitlistentries.AsyncWaitlistEntriesClient;
 import com.whop.api.resources.webhooks.AsyncWebhooksClient;
-import com.whop.api.resources.withdrawals.AsyncWithdrawalsClient;
 import java.util.function.Supplier;
 
-public class AsyncWhopApiClient {
+public class AsyncWhopApiClient implements AutoCloseable {
     protected final ClientOptions clientOptions;
 
     protected final Supplier<AsyncAccessTokensClient> accessTokensClient;
@@ -101,9 +122,9 @@ public class AsyncWhopApiClient {
 
     protected final Supplier<AsyncAdGroupsClient> adGroupsClient;
 
-    protected final Supplier<AsyncAdReportsClient> adReportsClient;
-
     protected final Supplier<AsyncAdsClient> adsClient;
+
+    protected final Supplier<AsyncAdPixelsClient> adPixelsClient;
 
     protected final Supplier<AsyncAffiliatesClient> affiliatesClient;
 
@@ -111,13 +132,23 @@ public class AsyncWhopApiClient {
 
     protected final Supplier<AsyncApiKeysClient> apiKeysClient;
 
+    protected final Supplier<AsyncApiLogsClient> apiLogsClient;
+
     protected final Supplier<AsyncAppBuildsClient> appBuildsClient;
+
+    protected final Supplier<AsyncAppInstallationsClient> appInstallationsClient;
 
     protected final Supplier<AsyncAppsClient> appsClient;
 
     protected final Supplier<AsyncAudiencesClient> audiencesClient;
 
     protected final Supplier<AsyncAuthorizedUsersClient> authorizedUsersClient;
+
+    protected final Supplier<AsyncAutomationEnrollmentsClient> automationEnrollmentsClient;
+
+    protected final Supplier<AsyncAutomationStepsClient> automationStepsClient;
+
+    protected final Supplier<AsyncAutomationsClient> automationsClient;
 
     protected final Supplier<AsyncBountiesClient> bountiesClient;
 
@@ -127,13 +158,21 @@ public class AsyncWhopApiClient {
 
     protected final Supplier<AsyncCardsClient> cardsClient;
 
+    protected final Supplier<AsyncCashbackRulesClient> cashbackRulesClient;
+
+    protected final Supplier<AsyncChannelMembersClient> channelMembersClient;
+
+    protected final Supplier<AsyncChannelsClient> channelsClient;
+
     protected final Supplier<AsyncChatChannelsClient> chatChannelsClient;
 
     protected final Supplier<AsyncCheckoutConfigurationsClient> checkoutConfigurationsClient;
 
-    protected final Supplier<AsyncCompaniesClient> companiesClient;
+    protected final Supplier<AsyncClaimLinksClient> claimLinksClient;
 
     protected final Supplier<AsyncCompanyTokenTransactionsClient> companyTokenTransactionsClient;
+
+    protected final Supplier<AsyncConfirmationTokensClient> confirmationTokensClient;
 
     protected final Supplier<AsyncCourseChaptersClient> courseChaptersClient;
 
@@ -155,21 +194,33 @@ public class AsyncWhopApiClient {
 
     protected final Supplier<AsyncDmMembersClient> dmMembersClient;
 
-    protected final Supplier<AsyncEntriesClient> entriesClient;
+    protected final Supplier<AsyncDomainsClient> domainsClient;
+
+    protected final Supplier<AsyncEconomicIntelligenceClient> economicIntelligenceClient;
+
+    protected final Supplier<AsyncEmailAddressesClient> emailAddressesClient;
 
     protected final Supplier<AsyncEventsClient> eventsClient;
 
     protected final Supplier<AsyncExperiencesClient> experiencesClient;
 
+    protected final Supplier<AsyncExperimentsClient> experimentsClient;
+
     protected final Supplier<AsyncExportsClient> exportsClient;
 
+    protected final Supplier<AsyncExternalAccountsClient> externalAccountsClient;
+
     protected final Supplier<AsyncFeeMarkupsClient> feeMarkupsClient;
+
+    protected final Supplier<AsyncFeedbackSubmissionsClient> feedbackSubmissionsClient;
 
     protected final Supplier<AsyncFilesClient> filesClient;
 
     protected final Supplier<AsyncFinancialActivityClient> financialActivityClient;
 
-    protected final Supplier<AsyncLedgersClient> ledgersClient;
+    protected final Supplier<AsyncFinancialReportsClient> financialReportsClient;
+
+    protected final Supplier<AsyncFinancingApplicationsClient> financingApplicationsClient;
 
     protected final Supplier<AsyncForumPostsClient> forumPostsClient;
 
@@ -179,9 +230,9 @@ public class AsyncWhopApiClient {
 
     protected final Supplier<AsyncInvoicesClient> invoicesClient;
 
-    protected final Supplier<AsyncLeadsClient> leadsClient;
-
     protected final Supplier<AsyncLedgerAccountsClient> ledgerAccountsClient;
+
+    protected final Supplier<AsyncLivestreamsClient> livestreamsClient;
 
     protected final Supplier<AsyncMediaClient> mediaClient;
 
@@ -193,11 +244,17 @@ public class AsyncWhopApiClient {
 
     protected final Supplier<AsyncNotificationsClient> notificationsClient;
 
+    protected final Supplier<AsyncPartnerReferralRequestsClient> partnerReferralRequestsClient;
+
     protected final Supplier<AsyncPartnersClient> partnersClient;
 
     protected final Supplier<AsyncPaymentMethodDomainsClient> paymentMethodDomainsClient;
 
     protected final Supplier<AsyncPaymentMethodsClient> paymentMethodsClient;
+
+    protected final Supplier<AsyncPaymentQuotesClient> paymentQuotesClient;
+
+    protected final Supplier<AsyncPaymentRulesClient> paymentRulesClient;
 
     protected final Supplier<AsyncPaymentsClient> paymentsClient;
 
@@ -213,19 +270,23 @@ public class AsyncWhopApiClient {
 
     protected final Supplier<AsyncPlansClient> plansClient;
 
+    protected final Supplier<AsyncProductAffiliatesClient> productAffiliatesClient;
+
     protected final Supplier<AsyncProductsClient> productsClient;
 
     protected final Supplier<AsyncPromoCodesClient> promoCodesClient;
 
     protected final Supplier<AsyncReactionsClient> reactionsClient;
 
-    protected final Supplier<AsyncRecommendedActionsClient> recommendedActionsClient;
-
     protected final Supplier<AsyncRefundsClient> refundsClient;
 
     protected final Supplier<AsyncResolutionCenterCasesClient> resolutionCenterCasesClient;
 
+    protected final Supplier<AsyncReviewReportsClient> reviewReportsClient;
+
     protected final Supplier<AsyncReviewsClient> reviewsClient;
+
+    protected final Supplier<AsyncSearchClient> searchClient;
 
     protected final Supplier<AsyncSetupIntentsClient> setupIntentsClient;
 
@@ -241,17 +302,19 @@ public class AsyncWhopApiClient {
 
     protected final Supplier<AsyncTeamMembersClient> teamMembersClient;
 
-    protected final Supplier<AsyncTopupsClient> topupsClient;
+    protected final Supplier<AsyncTradesClient> tradesClient;
 
     protected final Supplier<AsyncTransfersClient> transfersClient;
 
     protected final Supplier<AsyncUsersClient> usersClient;
 
+    protected final Supplier<AsyncVariantsClient> variantsClient;
+
     protected final Supplier<AsyncVerificationsClient> verificationsClient;
 
-    protected final Supplier<AsyncWebhooksClient> webhooksClient;
+    protected final Supplier<AsyncWaitlistEntriesClient> waitlistEntriesClient;
 
-    protected final Supplier<AsyncWithdrawalsClient> withdrawalsClient;
+    protected final Supplier<AsyncWebhooksClient> webhooksClient;
 
     public AsyncWhopApiClient(ClientOptions clientOptions) {
         this.clientOptions = clientOptions;
@@ -260,25 +323,34 @@ public class AsyncWhopApiClient {
         this.accountsClient = Suppliers.memoize(() -> new AsyncAccountsClient(clientOptions));
         this.adCampaignsClient = Suppliers.memoize(() -> new AsyncAdCampaignsClient(clientOptions));
         this.adGroupsClient = Suppliers.memoize(() -> new AsyncAdGroupsClient(clientOptions));
-        this.adReportsClient = Suppliers.memoize(() -> new AsyncAdReportsClient(clientOptions));
         this.adsClient = Suppliers.memoize(() -> new AsyncAdsClient(clientOptions));
+        this.adPixelsClient = Suppliers.memoize(() -> new AsyncAdPixelsClient(clientOptions));
         this.affiliatesClient = Suppliers.memoize(() -> new AsyncAffiliatesClient(clientOptions));
         this.aiChatsClient = Suppliers.memoize(() -> new AsyncAiChatsClient(clientOptions));
         this.apiKeysClient = Suppliers.memoize(() -> new AsyncApiKeysClient(clientOptions));
+        this.apiLogsClient = Suppliers.memoize(() -> new AsyncApiLogsClient(clientOptions));
         this.appBuildsClient = Suppliers.memoize(() -> new AsyncAppBuildsClient(clientOptions));
+        this.appInstallationsClient = Suppliers.memoize(() -> new AsyncAppInstallationsClient(clientOptions));
         this.appsClient = Suppliers.memoize(() -> new AsyncAppsClient(clientOptions));
         this.audiencesClient = Suppliers.memoize(() -> new AsyncAudiencesClient(clientOptions));
         this.authorizedUsersClient = Suppliers.memoize(() -> new AsyncAuthorizedUsersClient(clientOptions));
+        this.automationEnrollmentsClient = Suppliers.memoize(() -> new AsyncAutomationEnrollmentsClient(clientOptions));
+        this.automationStepsClient = Suppliers.memoize(() -> new AsyncAutomationStepsClient(clientOptions));
+        this.automationsClient = Suppliers.memoize(() -> new AsyncAutomationsClient(clientOptions));
         this.bountiesClient = Suppliers.memoize(() -> new AsyncBountiesClient(clientOptions));
         this.bountySubmissionsClient = Suppliers.memoize(() -> new AsyncBountySubmissionsClient(clientOptions));
         this.cardTransactionsClient = Suppliers.memoize(() -> new AsyncCardTransactionsClient(clientOptions));
         this.cardsClient = Suppliers.memoize(() -> new AsyncCardsClient(clientOptions));
+        this.cashbackRulesClient = Suppliers.memoize(() -> new AsyncCashbackRulesClient(clientOptions));
+        this.channelMembersClient = Suppliers.memoize(() -> new AsyncChannelMembersClient(clientOptions));
+        this.channelsClient = Suppliers.memoize(() -> new AsyncChannelsClient(clientOptions));
         this.chatChannelsClient = Suppliers.memoize(() -> new AsyncChatChannelsClient(clientOptions));
         this.checkoutConfigurationsClient =
                 Suppliers.memoize(() -> new AsyncCheckoutConfigurationsClient(clientOptions));
-        this.companiesClient = Suppliers.memoize(() -> new AsyncCompaniesClient(clientOptions));
+        this.claimLinksClient = Suppliers.memoize(() -> new AsyncClaimLinksClient(clientOptions));
         this.companyTokenTransactionsClient =
                 Suppliers.memoize(() -> new AsyncCompanyTokenTransactionsClient(clientOptions));
+        this.confirmationTokensClient = Suppliers.memoize(() -> new AsyncConfirmationTokensClient(clientOptions));
         this.courseChaptersClient = Suppliers.memoize(() -> new AsyncCourseChaptersClient(clientOptions));
         this.courseLessonInteractionsClient =
                 Suppliers.memoize(() -> new AsyncCourseLessonInteractionsClient(clientOptions));
@@ -290,28 +362,38 @@ public class AsyncWhopApiClient {
         this.disputesClient = Suppliers.memoize(() -> new AsyncDisputesClient(clientOptions));
         this.dmChannelsClient = Suppliers.memoize(() -> new AsyncDmChannelsClient(clientOptions));
         this.dmMembersClient = Suppliers.memoize(() -> new AsyncDmMembersClient(clientOptions));
-        this.entriesClient = Suppliers.memoize(() -> new AsyncEntriesClient(clientOptions));
+        this.domainsClient = Suppliers.memoize(() -> new AsyncDomainsClient(clientOptions));
+        this.economicIntelligenceClient = Suppliers.memoize(() -> new AsyncEconomicIntelligenceClient(clientOptions));
+        this.emailAddressesClient = Suppliers.memoize(() -> new AsyncEmailAddressesClient(clientOptions));
         this.eventsClient = Suppliers.memoize(() -> new AsyncEventsClient(clientOptions));
         this.experiencesClient = Suppliers.memoize(() -> new AsyncExperiencesClient(clientOptions));
+        this.experimentsClient = Suppliers.memoize(() -> new AsyncExperimentsClient(clientOptions));
         this.exportsClient = Suppliers.memoize(() -> new AsyncExportsClient(clientOptions));
+        this.externalAccountsClient = Suppliers.memoize(() -> new AsyncExternalAccountsClient(clientOptions));
         this.feeMarkupsClient = Suppliers.memoize(() -> new AsyncFeeMarkupsClient(clientOptions));
+        this.feedbackSubmissionsClient = Suppliers.memoize(() -> new AsyncFeedbackSubmissionsClient(clientOptions));
         this.filesClient = Suppliers.memoize(() -> new AsyncFilesClient(clientOptions));
         this.financialActivityClient = Suppliers.memoize(() -> new AsyncFinancialActivityClient(clientOptions));
-        this.ledgersClient = Suppliers.memoize(() -> new AsyncLedgersClient(clientOptions));
+        this.financialReportsClient = Suppliers.memoize(() -> new AsyncFinancialReportsClient(clientOptions));
+        this.financingApplicationsClient = Suppliers.memoize(() -> new AsyncFinancingApplicationsClient(clientOptions));
         this.forumPostsClient = Suppliers.memoize(() -> new AsyncForumPostsClient(clientOptions));
         this.forumsClient = Suppliers.memoize(() -> new AsyncForumsClient(clientOptions));
         this.identityProfilesClient = Suppliers.memoize(() -> new AsyncIdentityProfilesClient(clientOptions));
         this.invoicesClient = Suppliers.memoize(() -> new AsyncInvoicesClient(clientOptions));
-        this.leadsClient = Suppliers.memoize(() -> new AsyncLeadsClient(clientOptions));
         this.ledgerAccountsClient = Suppliers.memoize(() -> new AsyncLedgerAccountsClient(clientOptions));
+        this.livestreamsClient = Suppliers.memoize(() -> new AsyncLivestreamsClient(clientOptions));
         this.mediaClient = Suppliers.memoize(() -> new AsyncMediaClient(clientOptions));
         this.membersClient = Suppliers.memoize(() -> new AsyncMembersClient(clientOptions));
         this.membershipsClient = Suppliers.memoize(() -> new AsyncMembershipsClient(clientOptions));
         this.messagesClient = Suppliers.memoize(() -> new AsyncMessagesClient(clientOptions));
         this.notificationsClient = Suppliers.memoize(() -> new AsyncNotificationsClient(clientOptions));
+        this.partnerReferralRequestsClient =
+                Suppliers.memoize(() -> new AsyncPartnerReferralRequestsClient(clientOptions));
         this.partnersClient = Suppliers.memoize(() -> new AsyncPartnersClient(clientOptions));
         this.paymentMethodDomainsClient = Suppliers.memoize(() -> new AsyncPaymentMethodDomainsClient(clientOptions));
         this.paymentMethodsClient = Suppliers.memoize(() -> new AsyncPaymentMethodsClient(clientOptions));
+        this.paymentQuotesClient = Suppliers.memoize(() -> new AsyncPaymentQuotesClient(clientOptions));
+        this.paymentRulesClient = Suppliers.memoize(() -> new AsyncPaymentRulesClient(clientOptions));
         this.paymentsClient = Suppliers.memoize(() -> new AsyncPaymentsClient(clientOptions));
         this.payoutAccountsClient = Suppliers.memoize(() -> new AsyncPayoutAccountsClient(clientOptions));
         this.payoutMethodsClient = Suppliers.memoize(() -> new AsyncPayoutMethodsClient(clientOptions));
@@ -319,13 +401,15 @@ public class AsyncWhopApiClient {
         this.peopleClient = Suppliers.memoize(() -> new AsyncPeopleClient(clientOptions));
         this.permissionsClient = Suppliers.memoize(() -> new AsyncPermissionsClient(clientOptions));
         this.plansClient = Suppliers.memoize(() -> new AsyncPlansClient(clientOptions));
+        this.productAffiliatesClient = Suppliers.memoize(() -> new AsyncProductAffiliatesClient(clientOptions));
         this.productsClient = Suppliers.memoize(() -> new AsyncProductsClient(clientOptions));
         this.promoCodesClient = Suppliers.memoize(() -> new AsyncPromoCodesClient(clientOptions));
         this.reactionsClient = Suppliers.memoize(() -> new AsyncReactionsClient(clientOptions));
-        this.recommendedActionsClient = Suppliers.memoize(() -> new AsyncRecommendedActionsClient(clientOptions));
         this.refundsClient = Suppliers.memoize(() -> new AsyncRefundsClient(clientOptions));
         this.resolutionCenterCasesClient = Suppliers.memoize(() -> new AsyncResolutionCenterCasesClient(clientOptions));
+        this.reviewReportsClient = Suppliers.memoize(() -> new AsyncReviewReportsClient(clientOptions));
         this.reviewsClient = Suppliers.memoize(() -> new AsyncReviewsClient(clientOptions));
+        this.searchClient = Suppliers.memoize(() -> new AsyncSearchClient(clientOptions));
         this.setupIntentsClient = Suppliers.memoize(() -> new AsyncSetupIntentsClient(clientOptions));
         this.shipmentsClient = Suppliers.memoize(() -> new AsyncShipmentsClient(clientOptions));
         this.socialAccountsClient = Suppliers.memoize(() -> new AsyncSocialAccountsClient(clientOptions));
@@ -333,12 +417,13 @@ public class AsyncWhopApiClient {
         this.supportChannelsClient = Suppliers.memoize(() -> new AsyncSupportChannelsClient(clientOptions));
         this.swapsClient = Suppliers.memoize(() -> new AsyncSwapsClient(clientOptions));
         this.teamMembersClient = Suppliers.memoize(() -> new AsyncTeamMembersClient(clientOptions));
-        this.topupsClient = Suppliers.memoize(() -> new AsyncTopupsClient(clientOptions));
+        this.tradesClient = Suppliers.memoize(() -> new AsyncTradesClient(clientOptions));
         this.transfersClient = Suppliers.memoize(() -> new AsyncTransfersClient(clientOptions));
         this.usersClient = Suppliers.memoize(() -> new AsyncUsersClient(clientOptions));
+        this.variantsClient = Suppliers.memoize(() -> new AsyncVariantsClient(clientOptions));
         this.verificationsClient = Suppliers.memoize(() -> new AsyncVerificationsClient(clientOptions));
+        this.waitlistEntriesClient = Suppliers.memoize(() -> new AsyncWaitlistEntriesClient(clientOptions));
         this.webhooksClient = Suppliers.memoize(() -> new AsyncWebhooksClient(clientOptions));
-        this.withdrawalsClient = Suppliers.memoize(() -> new AsyncWithdrawalsClient(clientOptions));
     }
 
     public AsyncAccessTokensClient accessTokens() {
@@ -361,12 +446,12 @@ public class AsyncWhopApiClient {
         return this.adGroupsClient.get();
     }
 
-    public AsyncAdReportsClient adReports() {
-        return this.adReportsClient.get();
-    }
-
     public AsyncAdsClient ads() {
         return this.adsClient.get();
+    }
+
+    public AsyncAdPixelsClient adPixels() {
+        return this.adPixelsClient.get();
     }
 
     public AsyncAffiliatesClient affiliates() {
@@ -381,8 +466,16 @@ public class AsyncWhopApiClient {
         return this.apiKeysClient.get();
     }
 
+    public AsyncApiLogsClient apiLogs() {
+        return this.apiLogsClient.get();
+    }
+
     public AsyncAppBuildsClient appBuilds() {
         return this.appBuildsClient.get();
+    }
+
+    public AsyncAppInstallationsClient appInstallations() {
+        return this.appInstallationsClient.get();
     }
 
     public AsyncAppsClient apps() {
@@ -395,6 +488,18 @@ public class AsyncWhopApiClient {
 
     public AsyncAuthorizedUsersClient authorizedUsers() {
         return this.authorizedUsersClient.get();
+    }
+
+    public AsyncAutomationEnrollmentsClient automationEnrollments() {
+        return this.automationEnrollmentsClient.get();
+    }
+
+    public AsyncAutomationStepsClient automationSteps() {
+        return this.automationStepsClient.get();
+    }
+
+    public AsyncAutomationsClient automations() {
+        return this.automationsClient.get();
     }
 
     public AsyncBountiesClient bounties() {
@@ -413,6 +518,18 @@ public class AsyncWhopApiClient {
         return this.cardsClient.get();
     }
 
+    public AsyncCashbackRulesClient cashbackRules() {
+        return this.cashbackRulesClient.get();
+    }
+
+    public AsyncChannelMembersClient channelMembers() {
+        return this.channelMembersClient.get();
+    }
+
+    public AsyncChannelsClient channels() {
+        return this.channelsClient.get();
+    }
+
     public AsyncChatChannelsClient chatChannels() {
         return this.chatChannelsClient.get();
     }
@@ -421,12 +538,16 @@ public class AsyncWhopApiClient {
         return this.checkoutConfigurationsClient.get();
     }
 
-    public AsyncCompaniesClient companies() {
-        return this.companiesClient.get();
+    public AsyncClaimLinksClient claimLinks() {
+        return this.claimLinksClient.get();
     }
 
     public AsyncCompanyTokenTransactionsClient companyTokenTransactions() {
         return this.companyTokenTransactionsClient.get();
+    }
+
+    public AsyncConfirmationTokensClient confirmationTokens() {
+        return this.confirmationTokensClient.get();
     }
 
     public AsyncCourseChaptersClient courseChapters() {
@@ -469,8 +590,16 @@ public class AsyncWhopApiClient {
         return this.dmMembersClient.get();
     }
 
-    public AsyncEntriesClient entries() {
-        return this.entriesClient.get();
+    public AsyncDomainsClient domains() {
+        return this.domainsClient.get();
+    }
+
+    public AsyncEconomicIntelligenceClient economicIntelligence() {
+        return this.economicIntelligenceClient.get();
+    }
+
+    public AsyncEmailAddressesClient emailAddresses() {
+        return this.emailAddressesClient.get();
     }
 
     public AsyncEventsClient events() {
@@ -481,12 +610,24 @@ public class AsyncWhopApiClient {
         return this.experiencesClient.get();
     }
 
+    public AsyncExperimentsClient experiments() {
+        return this.experimentsClient.get();
+    }
+
     public AsyncExportsClient exports() {
         return this.exportsClient.get();
     }
 
+    public AsyncExternalAccountsClient externalAccounts() {
+        return this.externalAccountsClient.get();
+    }
+
     public AsyncFeeMarkupsClient feeMarkups() {
         return this.feeMarkupsClient.get();
+    }
+
+    public AsyncFeedbackSubmissionsClient feedbackSubmissions() {
+        return this.feedbackSubmissionsClient.get();
     }
 
     public AsyncFilesClient files() {
@@ -497,8 +638,12 @@ public class AsyncWhopApiClient {
         return this.financialActivityClient.get();
     }
 
-    public AsyncLedgersClient ledgers() {
-        return this.ledgersClient.get();
+    public AsyncFinancialReportsClient financialReports() {
+        return this.financialReportsClient.get();
+    }
+
+    public AsyncFinancingApplicationsClient financingApplications() {
+        return this.financingApplicationsClient.get();
     }
 
     public AsyncForumPostsClient forumPosts() {
@@ -517,12 +662,12 @@ public class AsyncWhopApiClient {
         return this.invoicesClient.get();
     }
 
-    public AsyncLeadsClient leads() {
-        return this.leadsClient.get();
-    }
-
     public AsyncLedgerAccountsClient ledgerAccounts() {
         return this.ledgerAccountsClient.get();
+    }
+
+    public AsyncLivestreamsClient livestreams() {
+        return this.livestreamsClient.get();
     }
 
     public AsyncMediaClient media() {
@@ -545,6 +690,10 @@ public class AsyncWhopApiClient {
         return this.notificationsClient.get();
     }
 
+    public AsyncPartnerReferralRequestsClient partnerReferralRequests() {
+        return this.partnerReferralRequestsClient.get();
+    }
+
     public AsyncPartnersClient partners() {
         return this.partnersClient.get();
     }
@@ -555,6 +704,14 @@ public class AsyncWhopApiClient {
 
     public AsyncPaymentMethodsClient paymentMethods() {
         return this.paymentMethodsClient.get();
+    }
+
+    public AsyncPaymentQuotesClient paymentQuotes() {
+        return this.paymentQuotesClient.get();
+    }
+
+    public AsyncPaymentRulesClient paymentRules() {
+        return this.paymentRulesClient.get();
     }
 
     public AsyncPaymentsClient payments() {
@@ -585,6 +742,10 @@ public class AsyncWhopApiClient {
         return this.plansClient.get();
     }
 
+    public AsyncProductAffiliatesClient productAffiliates() {
+        return this.productAffiliatesClient.get();
+    }
+
     public AsyncProductsClient products() {
         return this.productsClient.get();
     }
@@ -597,10 +758,6 @@ public class AsyncWhopApiClient {
         return this.reactionsClient.get();
     }
 
-    public AsyncRecommendedActionsClient recommendedActions() {
-        return this.recommendedActionsClient.get();
-    }
-
     public AsyncRefundsClient refunds() {
         return this.refundsClient.get();
     }
@@ -609,8 +766,16 @@ public class AsyncWhopApiClient {
         return this.resolutionCenterCasesClient.get();
     }
 
+    public AsyncReviewReportsClient reviewReports() {
+        return this.reviewReportsClient.get();
+    }
+
     public AsyncReviewsClient reviews() {
         return this.reviewsClient.get();
+    }
+
+    public AsyncSearchClient search() {
+        return this.searchClient.get();
     }
 
     public AsyncSetupIntentsClient setupIntents() {
@@ -641,8 +806,8 @@ public class AsyncWhopApiClient {
         return this.teamMembersClient.get();
     }
 
-    public AsyncTopupsClient topups() {
-        return this.topupsClient.get();
+    public AsyncTradesClient trades() {
+        return this.tradesClient.get();
     }
 
     public AsyncTransfersClient transfers() {
@@ -653,16 +818,30 @@ public class AsyncWhopApiClient {
         return this.usersClient.get();
     }
 
+    public AsyncVariantsClient variants() {
+        return this.variantsClient.get();
+    }
+
     public AsyncVerificationsClient verifications() {
         return this.verificationsClient.get();
+    }
+
+    public AsyncWaitlistEntriesClient waitlistEntries() {
+        return this.waitlistEntriesClient.get();
     }
 
     public AsyncWebhooksClient webhooks() {
         return this.webhooksClient.get();
     }
 
-    public AsyncWithdrawalsClient withdrawals() {
-        return this.withdrawalsClient.get();
+    /**
+     * Releases resources owned by this client: any WebSocket clients still connected through
+     * it are disconnected first, then the SDK-owned HTTP client is shut down. See
+     * {@code ClientOptions.close()} for what is and is not released.
+     */
+    @Override
+    public void close() {
+        this.clientOptions.close();
     }
 
     public static AsyncWhopApiClientBuilder builder() {

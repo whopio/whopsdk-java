@@ -31,8 +31,6 @@ public final class LedgerActivity {
 
     private final Optional<OffsetDateTime> availableAt;
 
-    private final Optional<OffsetDateTime> createdAt;
-
     private final LedgerActivityCurrency currency;
 
     private final String id;
@@ -43,11 +41,31 @@ public final class LedgerActivity {
 
     private final LedgerActivityObject object;
 
+    private final Optional<LedgerActivityPayment> payment;
+
+    private final Optional<String> paymentId;
+
+    private final Optional<String> planId;
+
+    private final Optional<String> planName;
+
     private final OffsetDateTime postedAt;
+
+    private final Optional<String> productId;
+
+    private final Optional<String> productName;
 
     private final Optional<LedgerActivityResource> resource;
 
     private final Optional<LedgerActivitySource> source;
+
+    private final Optional<String> usdAmount;
+
+    private final Optional<String> userEmail;
+
+    private final Optional<String> userId;
+
+    private final Optional<String> userName;
 
     private final Map<String, Object> additionalProperties;
 
@@ -55,28 +73,46 @@ public final class LedgerActivity {
             Optional<LedgerActivityAccount> account,
             String amount,
             Optional<OffsetDateTime> availableAt,
-            Optional<OffsetDateTime> createdAt,
             LedgerActivityCurrency currency,
             String id,
             Optional<String> ledgerAccountId,
             LedgerActivityLineType lineType,
             LedgerActivityObject object,
+            Optional<LedgerActivityPayment> payment,
+            Optional<String> paymentId,
+            Optional<String> planId,
+            Optional<String> planName,
             OffsetDateTime postedAt,
+            Optional<String> productId,
+            Optional<String> productName,
             Optional<LedgerActivityResource> resource,
             Optional<LedgerActivitySource> source,
+            Optional<String> usdAmount,
+            Optional<String> userEmail,
+            Optional<String> userId,
+            Optional<String> userName,
             Map<String, Object> additionalProperties) {
         this.account = account;
         this.amount = amount;
         this.availableAt = availableAt;
-        this.createdAt = createdAt;
         this.currency = currency;
         this.id = id;
         this.ledgerAccountId = ledgerAccountId;
         this.lineType = lineType;
         this.object = object;
+        this.payment = payment;
+        this.paymentId = paymentId;
+        this.planId = planId;
+        this.planName = planName;
         this.postedAt = postedAt;
+        this.productId = productId;
+        this.productName = productName;
         this.resource = resource;
         this.source = source;
+        this.usdAmount = usdAmount;
+        this.userEmail = userEmail;
+        this.userId = userId;
+        this.userName = userName;
         this.additionalProperties = additionalProperties;
     }
 
@@ -97,7 +133,7 @@ public final class LedgerActivity {
     }
 
     /**
-     * @return ISO 8601 timestamp these funds became (or are scheduled to become) withdrawable: the posted time for already-settled funds, or 00:00:00 UTC on the scheduled release date for pending funds. Present only on inflows entering the balance (payments, top-ups, incoming transfers/affiliate); null on withdrawals, refunds, disputes and on-chain rows. The available_after/before filters window on its UTC settlement date.
+     * @return ISO 8601 timestamp when this activity affects available funds: 00:00:00 UTC on the scheduled release date for credits and debits in a pending good-funds release bucket; the posted time for credits and debits to settled available funds, including refunds, disputes and payouts. Null for activity outside these paths, including on-chain rows. The available_after/before filters use its UTC date; default activity excludes some movements, including opt-in reserves.
      */
     @JsonIgnore
     public Optional<OffsetDateTime> getAvailableAt() {
@@ -105,17 +141,6 @@ public final class LedgerActivity {
             return Optional.empty();
         }
         return availableAt;
-    }
-
-    /**
-     * @return When the activity record was created.
-     */
-    @JsonIgnore
-    public Optional<OffsetDateTime> getCreatedAt() {
-        if (createdAt == null) {
-            return Optional.empty();
-        }
-        return createdAt;
     }
 
     /**
@@ -159,11 +184,77 @@ public final class LedgerActivity {
     }
 
     /**
+     * @return Payment related to this ledger activity. Included when rich resource hydration is enabled and the movement is tied to a payment.
+     */
+    @JsonIgnore
+    public Optional<LedgerActivityPayment> getPayment() {
+        if (payment == null) {
+            return Optional.empty();
+        }
+        return payment;
+    }
+
+    /**
+     * @return Payment ID for any payment-related activity, including refunds and disputes.
+     */
+    @JsonIgnore
+    public Optional<String> getPaymentId() {
+        if (paymentId == null) {
+            return Optional.empty();
+        }
+        return paymentId;
+    }
+
+    /**
+     * @return ID of the variant associated with the payment, when applicable.
+     */
+    @JsonIgnore
+    public Optional<String> getPlanId() {
+        if (planId == null) {
+            return Optional.empty();
+        }
+        return planId;
+    }
+
+    /**
+     * @return Name of the variant associated with the payment, when applicable.
+     */
+    @JsonIgnore
+    public Optional<String> getPlanName() {
+        if (planName == null) {
+            return Optional.empty();
+        }
+        return planName;
+    }
+
+    /**
      * @return When the activity posted to the ledger.
      */
     @JsonProperty("posted_at")
     public OffsetDateTime getPostedAt() {
         return postedAt;
+    }
+
+    /**
+     * @return ID of the product associated with the payment, when applicable.
+     */
+    @JsonIgnore
+    public Optional<String> getProductId() {
+        if (productId == null) {
+            return Optional.empty();
+        }
+        return productId;
+    }
+
+    /**
+     * @return Name of the product associated with the payment, when applicable.
+     */
+    @JsonIgnore
+    public Optional<String> getProductName() {
+        if (productName == null) {
+            return Optional.empty();
+        }
+        return productName;
     }
 
     /**
@@ -178,7 +269,7 @@ public final class LedgerActivity {
     }
 
     /**
-     * @return Source of this ledger activity.
+     * @return Source of this ledger activity. Platform markup fees use object platform_fee and the ledger activity ID.
      */
     @JsonIgnore
     public Optional<LedgerActivitySource> getSource() {
@@ -188,6 +279,50 @@ public final class LedgerActivity {
         return source;
     }
 
+    /**
+     * @return Dollar value of this movement as a decimal string, signed like <code>amount</code>. Converted from the posted amount at the rate that was live when the line posted — the same pricing the wallet balance chart and the financial reports use — so a crypto row carries its dollar value too. <code>null</code> for a currency Whop holds no exchange rate for.
+     */
+    @JsonIgnore
+    public Optional<String> getUsdAmount() {
+        if (usdAmount == null) {
+            return Optional.empty();
+        }
+        return usdAmount;
+    }
+
+    /**
+     * @return Email of the customer associated with the payment. Requires member:email:read.
+     */
+    @JsonIgnore
+    public Optional<String> getUserEmail() {
+        if (userEmail == null) {
+            return Optional.empty();
+        }
+        return userEmail;
+    }
+
+    /**
+     * @return ID of the customer associated with the payment.
+     */
+    @JsonIgnore
+    public Optional<String> getUserId() {
+        if (userId == null) {
+            return Optional.empty();
+        }
+        return userId;
+    }
+
+    /**
+     * @return Display name of the customer associated with the payment.
+     */
+    @JsonIgnore
+    public Optional<String> getUserName() {
+        if (userName == null) {
+            return Optional.empty();
+        }
+        return userName;
+    }
+
     @JsonInclude(value = JsonInclude.Include.CUSTOM, valueFilter = NullableNonemptyFilter.class)
     @JsonProperty("available_at")
     private Optional<OffsetDateTime> _getAvailableAt() {
@@ -195,15 +330,45 @@ public final class LedgerActivity {
     }
 
     @JsonInclude(value = JsonInclude.Include.CUSTOM, valueFilter = NullableNonemptyFilter.class)
-    @JsonProperty("created_at")
-    private Optional<OffsetDateTime> _getCreatedAt() {
-        return createdAt;
-    }
-
-    @JsonInclude(value = JsonInclude.Include.CUSTOM, valueFilter = NullableNonemptyFilter.class)
     @JsonProperty("ledger_account_id")
     private Optional<String> _getLedgerAccountId() {
         return ledgerAccountId;
+    }
+
+    @JsonInclude(value = JsonInclude.Include.CUSTOM, valueFilter = NullableNonemptyFilter.class)
+    @JsonProperty("payment")
+    private Optional<LedgerActivityPayment> _getPayment() {
+        return payment;
+    }
+
+    @JsonInclude(value = JsonInclude.Include.CUSTOM, valueFilter = NullableNonemptyFilter.class)
+    @JsonProperty("payment_id")
+    private Optional<String> _getPaymentId() {
+        return paymentId;
+    }
+
+    @JsonInclude(value = JsonInclude.Include.CUSTOM, valueFilter = NullableNonemptyFilter.class)
+    @JsonProperty("plan_id")
+    private Optional<String> _getPlanId() {
+        return planId;
+    }
+
+    @JsonInclude(value = JsonInclude.Include.CUSTOM, valueFilter = NullableNonemptyFilter.class)
+    @JsonProperty("plan_name")
+    private Optional<String> _getPlanName() {
+        return planName;
+    }
+
+    @JsonInclude(value = JsonInclude.Include.CUSTOM, valueFilter = NullableNonemptyFilter.class)
+    @JsonProperty("product_id")
+    private Optional<String> _getProductId() {
+        return productId;
+    }
+
+    @JsonInclude(value = JsonInclude.Include.CUSTOM, valueFilter = NullableNonemptyFilter.class)
+    @JsonProperty("product_name")
+    private Optional<String> _getProductName() {
+        return productName;
     }
 
     @JsonInclude(value = JsonInclude.Include.CUSTOM, valueFilter = NullableNonemptyFilter.class)
@@ -216,6 +381,30 @@ public final class LedgerActivity {
     @JsonProperty("source")
     private Optional<LedgerActivitySource> _getSource() {
         return source;
+    }
+
+    @JsonInclude(value = JsonInclude.Include.CUSTOM, valueFilter = NullableNonemptyFilter.class)
+    @JsonProperty("usd_amount")
+    private Optional<String> _getUsdAmount() {
+        return usdAmount;
+    }
+
+    @JsonInclude(value = JsonInclude.Include.CUSTOM, valueFilter = NullableNonemptyFilter.class)
+    @JsonProperty("user_email")
+    private Optional<String> _getUserEmail() {
+        return userEmail;
+    }
+
+    @JsonInclude(value = JsonInclude.Include.CUSTOM, valueFilter = NullableNonemptyFilter.class)
+    @JsonProperty("user_id")
+    private Optional<String> _getUserId() {
+        return userId;
+    }
+
+    @JsonInclude(value = JsonInclude.Include.CUSTOM, valueFilter = NullableNonemptyFilter.class)
+    @JsonProperty("user_name")
+    private Optional<String> _getUserName() {
+        return userName;
     }
 
     @java.lang.Override
@@ -233,15 +422,24 @@ public final class LedgerActivity {
         return account.equals(other.account)
                 && amount.equals(other.amount)
                 && availableAt.equals(other.availableAt)
-                && createdAt.equals(other.createdAt)
                 && currency.equals(other.currency)
                 && id.equals(other.id)
                 && ledgerAccountId.equals(other.ledgerAccountId)
                 && lineType.equals(other.lineType)
                 && object.equals(other.object)
+                && payment.equals(other.payment)
+                && paymentId.equals(other.paymentId)
+                && planId.equals(other.planId)
+                && planName.equals(other.planName)
                 && postedAt.equals(other.postedAt)
+                && productId.equals(other.productId)
+                && productName.equals(other.productName)
                 && resource.equals(other.resource)
-                && source.equals(other.source);
+                && source.equals(other.source)
+                && usdAmount.equals(other.usdAmount)
+                && userEmail.equals(other.userEmail)
+                && userId.equals(other.userId)
+                && userName.equals(other.userName);
     }
 
     @java.lang.Override
@@ -250,15 +448,24 @@ public final class LedgerActivity {
                 this.account,
                 this.amount,
                 this.availableAt,
-                this.createdAt,
                 this.currency,
                 this.id,
                 this.ledgerAccountId,
                 this.lineType,
                 this.object,
+                this.payment,
+                this.paymentId,
+                this.planId,
+                this.planName,
                 this.postedAt,
+                this.productId,
+                this.productName,
                 this.resource,
-                this.source);
+                this.source,
+                this.usdAmount,
+                this.userEmail,
+                this.userId,
+                this.userName);
     }
 
     @java.lang.Override
@@ -326,22 +533,13 @@ public final class LedgerActivity {
         _FinalStage account(LedgerActivityAccount account);
 
         /**
-         * <p>ISO 8601 timestamp these funds became (or are scheduled to become) withdrawable: the posted time for already-settled funds, or 00:00:00 UTC on the scheduled release date for pending funds. Present only on inflows entering the balance (payments, top-ups, incoming transfers/affiliate); null on withdrawals, refunds, disputes and on-chain rows. The available_after/before filters window on its UTC settlement date.</p>
+         * <p>ISO 8601 timestamp when this activity affects available funds: 00:00:00 UTC on the scheduled release date for credits and debits in a pending good-funds release bucket; the posted time for credits and debits to settled available funds, including refunds, disputes and payouts. Null for activity outside these paths, including on-chain rows. The available_after/before filters use its UTC date; default activity excludes some movements, including opt-in reserves.</p>
          */
         _FinalStage availableAt(Optional<OffsetDateTime> availableAt);
 
         _FinalStage availableAt(OffsetDateTime availableAt);
 
         _FinalStage availableAt(Nullable<OffsetDateTime> availableAt);
-
-        /**
-         * <p>When the activity record was created.</p>
-         */
-        _FinalStage createdAt(Optional<OffsetDateTime> createdAt);
-
-        _FinalStage createdAt(OffsetDateTime createdAt);
-
-        _FinalStage createdAt(Nullable<OffsetDateTime> createdAt);
 
         /**
          * <p>The ledger account (a ldgr_ identifier) this row belongs to. Present only when the response aggregates owned accounts (include_owned_accounts=true); omitted otherwise. Pair it with <code>account</code> to scope drawers and dashboard links to the owning business.</p>
@@ -353,6 +551,60 @@ public final class LedgerActivity {
         _FinalStage ledgerAccountId(Nullable<String> ledgerAccountId);
 
         /**
+         * <p>Payment related to this ledger activity. Included when rich resource hydration is enabled and the movement is tied to a payment.</p>
+         */
+        _FinalStage payment(Optional<LedgerActivityPayment> payment);
+
+        _FinalStage payment(LedgerActivityPayment payment);
+
+        _FinalStage payment(Nullable<LedgerActivityPayment> payment);
+
+        /**
+         * <p>Payment ID for any payment-related activity, including refunds and disputes.</p>
+         */
+        _FinalStage paymentId(Optional<String> paymentId);
+
+        _FinalStage paymentId(String paymentId);
+
+        _FinalStage paymentId(Nullable<String> paymentId);
+
+        /**
+         * <p>ID of the variant associated with the payment, when applicable.</p>
+         */
+        _FinalStage planId(Optional<String> planId);
+
+        _FinalStage planId(String planId);
+
+        _FinalStage planId(Nullable<String> planId);
+
+        /**
+         * <p>Name of the variant associated with the payment, when applicable.</p>
+         */
+        _FinalStage planName(Optional<String> planName);
+
+        _FinalStage planName(String planName);
+
+        _FinalStage planName(Nullable<String> planName);
+
+        /**
+         * <p>ID of the product associated with the payment, when applicable.</p>
+         */
+        _FinalStage productId(Optional<String> productId);
+
+        _FinalStage productId(String productId);
+
+        _FinalStage productId(Nullable<String> productId);
+
+        /**
+         * <p>Name of the product associated with the payment, when applicable.</p>
+         */
+        _FinalStage productName(Optional<String> productName);
+
+        _FinalStage productName(String productName);
+
+        _FinalStage productName(Nullable<String> productName);
+
+        /**
          * <p>Resource associated with this ledger activity.</p>
          */
         _FinalStage resource(Optional<LedgerActivityResource> resource);
@@ -362,13 +614,49 @@ public final class LedgerActivity {
         _FinalStage resource(Nullable<LedgerActivityResource> resource);
 
         /**
-         * <p>Source of this ledger activity.</p>
+         * <p>Source of this ledger activity. Platform markup fees use object platform_fee and the ledger activity ID.</p>
          */
         _FinalStage source(Optional<LedgerActivitySource> source);
 
         _FinalStage source(LedgerActivitySource source);
 
         _FinalStage source(Nullable<LedgerActivitySource> source);
+
+        /**
+         * <p>Dollar value of this movement as a decimal string, signed like <code>amount</code>. Converted from the posted amount at the rate that was live when the line posted — the same pricing the wallet balance chart and the financial reports use — so a crypto row carries its dollar value too. <code>null</code> for a currency Whop holds no exchange rate for.</p>
+         */
+        _FinalStage usdAmount(Optional<String> usdAmount);
+
+        _FinalStage usdAmount(String usdAmount);
+
+        _FinalStage usdAmount(Nullable<String> usdAmount);
+
+        /**
+         * <p>Email of the customer associated with the payment. Requires member:email:read.</p>
+         */
+        _FinalStage userEmail(Optional<String> userEmail);
+
+        _FinalStage userEmail(String userEmail);
+
+        _FinalStage userEmail(Nullable<String> userEmail);
+
+        /**
+         * <p>ID of the customer associated with the payment.</p>
+         */
+        _FinalStage userId(Optional<String> userId);
+
+        _FinalStage userId(String userId);
+
+        _FinalStage userId(Nullable<String> userId);
+
+        /**
+         * <p>Display name of the customer associated with the payment.</p>
+         */
+        _FinalStage userName(Optional<String> userName);
+
+        _FinalStage userName(String userName);
+
+        _FinalStage userName(Nullable<String> userName);
     }
 
     @JsonIgnoreProperties(ignoreUnknown = true)
@@ -386,19 +674,36 @@ public final class LedgerActivity {
 
         private OffsetDateTime postedAt;
 
+        private Optional<String> userName = Optional.empty();
+
+        private Optional<String> userId = Optional.empty();
+
+        private Optional<String> userEmail = Optional.empty();
+
+        private Optional<String> usdAmount = Optional.empty();
+
         private Optional<LedgerActivitySource> source = Optional.empty();
 
         private Optional<LedgerActivityResource> resource = Optional.empty();
 
-        private Optional<String> ledgerAccountId = Optional.empty();
+        private Optional<String> productName = Optional.empty();
 
-        private Optional<OffsetDateTime> createdAt = Optional.empty();
+        private Optional<String> productId = Optional.empty();
+
+        private Optional<String> planName = Optional.empty();
+
+        private Optional<String> planId = Optional.empty();
+
+        private Optional<String> paymentId = Optional.empty();
+
+        private Optional<LedgerActivityPayment> payment = Optional.empty();
+
+        private Optional<String> ledgerAccountId = Optional.empty();
 
         private Optional<OffsetDateTime> availableAt = Optional.empty();
 
         private Optional<LedgerActivityAccount> account = Optional.empty();
 
-        @JsonAnySetter
         private Map<String, Object> additionalProperties = new HashMap<>();
 
         private Builder() {}
@@ -408,20 +713,28 @@ public final class LedgerActivity {
             account(other.getAccount());
             amount(other.getAmount());
             availableAt(other.getAvailableAt());
-            createdAt(other.getCreatedAt());
             currency(other.getCurrency());
             id(other.getId());
             ledgerAccountId(other.getLedgerAccountId());
             lineType(other.getLineType());
             object(other.getObject());
+            payment(other.getPayment());
+            paymentId(other.getPaymentId());
+            planId(other.getPlanId());
+            planName(other.getPlanName());
             postedAt(other.getPostedAt());
+            productId(other.getProductId());
+            productName(other.getProductName());
             resource(other.getResource());
             source(other.getSource());
+            usdAmount(other.getUsdAmount());
+            userEmail(other.getUserEmail());
+            userId(other.getUserId());
+            userName(other.getUserName());
             return this;
         }
 
         /**
-         * <p>Signed amount in the currency's smallest precision units.</p>
          * <p>Signed amount in the currency's smallest precision units.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
@@ -434,7 +747,6 @@ public final class LedgerActivity {
 
         /**
          * <p>Currency for this ledger activity.</p>
-         * <p>Currency for this ledger activity.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
@@ -446,7 +758,6 @@ public final class LedgerActivity {
 
         /**
          * <p>Ledger activity ID.</p>
-         * <p>Ledger activity ID.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
@@ -457,7 +768,6 @@ public final class LedgerActivity {
         }
 
         /**
-         * <p>The ledger line category this activity was posted under.</p>
          * <p>The ledger line category this activity was posted under.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
@@ -477,7 +787,6 @@ public final class LedgerActivity {
 
         /**
          * <p>When the activity posted to the ledger.</p>
-         * <p>When the activity posted to the ledger.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
@@ -488,7 +797,151 @@ public final class LedgerActivity {
         }
 
         /**
-         * <p>Source of this ledger activity.</p>
+         * <p>Display name of the customer associated with the payment.</p>
+         * @return Reference to {@code this} so that method calls can be chained together.
+         */
+        @java.lang.Override
+        public _FinalStage userName(Nullable<String> userName) {
+            if (userName.isNull()) {
+                this.userName = null;
+            } else if (userName.isEmpty()) {
+                this.userName = Optional.empty();
+            } else {
+                this.userName = Optional.of(userName.get());
+            }
+            return this;
+        }
+
+        /**
+         * <p>Display name of the customer associated with the payment.</p>
+         * @return Reference to {@code this} so that method calls can be chained together.
+         */
+        @java.lang.Override
+        public _FinalStage userName(String userName) {
+            this.userName = Optional.ofNullable(userName);
+            return this;
+        }
+
+        /**
+         * <p>Display name of the customer associated with the payment.</p>
+         */
+        @java.lang.Override
+        @JsonSetter(value = "user_name", nulls = Nulls.SKIP)
+        public _FinalStage userName(Optional<String> userName) {
+            this.userName = userName;
+            return this;
+        }
+
+        /**
+         * <p>ID of the customer associated with the payment.</p>
+         * @return Reference to {@code this} so that method calls can be chained together.
+         */
+        @java.lang.Override
+        public _FinalStage userId(Nullable<String> userId) {
+            if (userId.isNull()) {
+                this.userId = null;
+            } else if (userId.isEmpty()) {
+                this.userId = Optional.empty();
+            } else {
+                this.userId = Optional.of(userId.get());
+            }
+            return this;
+        }
+
+        /**
+         * <p>ID of the customer associated with the payment.</p>
+         * @return Reference to {@code this} so that method calls can be chained together.
+         */
+        @java.lang.Override
+        public _FinalStage userId(String userId) {
+            this.userId = Optional.ofNullable(userId);
+            return this;
+        }
+
+        /**
+         * <p>ID of the customer associated with the payment.</p>
+         */
+        @java.lang.Override
+        @JsonSetter(value = "user_id", nulls = Nulls.SKIP)
+        public _FinalStage userId(Optional<String> userId) {
+            this.userId = userId;
+            return this;
+        }
+
+        /**
+         * <p>Email of the customer associated with the payment. Requires member:email:read.</p>
+         * @return Reference to {@code this} so that method calls can be chained together.
+         */
+        @java.lang.Override
+        public _FinalStage userEmail(Nullable<String> userEmail) {
+            if (userEmail.isNull()) {
+                this.userEmail = null;
+            } else if (userEmail.isEmpty()) {
+                this.userEmail = Optional.empty();
+            } else {
+                this.userEmail = Optional.of(userEmail.get());
+            }
+            return this;
+        }
+
+        /**
+         * <p>Email of the customer associated with the payment. Requires member:email:read.</p>
+         * @return Reference to {@code this} so that method calls can be chained together.
+         */
+        @java.lang.Override
+        public _FinalStage userEmail(String userEmail) {
+            this.userEmail = Optional.ofNullable(userEmail);
+            return this;
+        }
+
+        /**
+         * <p>Email of the customer associated with the payment. Requires member:email:read.</p>
+         */
+        @java.lang.Override
+        @JsonSetter(value = "user_email", nulls = Nulls.SKIP)
+        public _FinalStage userEmail(Optional<String> userEmail) {
+            this.userEmail = userEmail;
+            return this;
+        }
+
+        /**
+         * <p>Dollar value of this movement as a decimal string, signed like <code>amount</code>. Converted from the posted amount at the rate that was live when the line posted — the same pricing the wallet balance chart and the financial reports use — so a crypto row carries its dollar value too. <code>null</code> for a currency Whop holds no exchange rate for.</p>
+         * @return Reference to {@code this} so that method calls can be chained together.
+         */
+        @java.lang.Override
+        public _FinalStage usdAmount(Nullable<String> usdAmount) {
+            if (usdAmount.isNull()) {
+                this.usdAmount = null;
+            } else if (usdAmount.isEmpty()) {
+                this.usdAmount = Optional.empty();
+            } else {
+                this.usdAmount = Optional.of(usdAmount.get());
+            }
+            return this;
+        }
+
+        /**
+         * <p>Dollar value of this movement as a decimal string, signed like <code>amount</code>. Converted from the posted amount at the rate that was live when the line posted — the same pricing the wallet balance chart and the financial reports use — so a crypto row carries its dollar value too. <code>null</code> for a currency Whop holds no exchange rate for.</p>
+         * @return Reference to {@code this} so that method calls can be chained together.
+         */
+        @java.lang.Override
+        public _FinalStage usdAmount(String usdAmount) {
+            this.usdAmount = Optional.ofNullable(usdAmount);
+            return this;
+        }
+
+        /**
+         * <p>Dollar value of this movement as a decimal string, signed like <code>amount</code>. Converted from the posted amount at the rate that was live when the line posted — the same pricing the wallet balance chart and the financial reports use — so a crypto row carries its dollar value too. <code>null</code> for a currency Whop holds no exchange rate for.</p>
+         */
+        @java.lang.Override
+        @JsonSetter(value = "usd_amount", nulls = Nulls.SKIP)
+        public _FinalStage usdAmount(Optional<String> usdAmount) {
+            this.usdAmount = usdAmount;
+            return this;
+        }
+
+        /**
+         * <p>Source of this ledger activity. Platform markup fees use object platform_fee and the ledger activity ID.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
@@ -504,7 +957,7 @@ public final class LedgerActivity {
         }
 
         /**
-         * <p>Source of this ledger activity.</p>
+         * <p>Source of this ledger activity. Platform markup fees use object platform_fee and the ledger activity ID.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
@@ -514,7 +967,7 @@ public final class LedgerActivity {
         }
 
         /**
-         * <p>Source of this ledger activity.</p>
+         * <p>Source of this ledger activity. Platform markup fees use object platform_fee and the ledger activity ID.</p>
          */
         @java.lang.Override
         @JsonSetter(value = "source", nulls = Nulls.SKIP)
@@ -560,6 +1013,222 @@ public final class LedgerActivity {
         }
 
         /**
+         * <p>Name of the product associated with the payment, when applicable.</p>
+         * @return Reference to {@code this} so that method calls can be chained together.
+         */
+        @java.lang.Override
+        public _FinalStage productName(Nullable<String> productName) {
+            if (productName.isNull()) {
+                this.productName = null;
+            } else if (productName.isEmpty()) {
+                this.productName = Optional.empty();
+            } else {
+                this.productName = Optional.of(productName.get());
+            }
+            return this;
+        }
+
+        /**
+         * <p>Name of the product associated with the payment, when applicable.</p>
+         * @return Reference to {@code this} so that method calls can be chained together.
+         */
+        @java.lang.Override
+        public _FinalStage productName(String productName) {
+            this.productName = Optional.ofNullable(productName);
+            return this;
+        }
+
+        /**
+         * <p>Name of the product associated with the payment, when applicable.</p>
+         */
+        @java.lang.Override
+        @JsonSetter(value = "product_name", nulls = Nulls.SKIP)
+        public _FinalStage productName(Optional<String> productName) {
+            this.productName = productName;
+            return this;
+        }
+
+        /**
+         * <p>ID of the product associated with the payment, when applicable.</p>
+         * @return Reference to {@code this} so that method calls can be chained together.
+         */
+        @java.lang.Override
+        public _FinalStage productId(Nullable<String> productId) {
+            if (productId.isNull()) {
+                this.productId = null;
+            } else if (productId.isEmpty()) {
+                this.productId = Optional.empty();
+            } else {
+                this.productId = Optional.of(productId.get());
+            }
+            return this;
+        }
+
+        /**
+         * <p>ID of the product associated with the payment, when applicable.</p>
+         * @return Reference to {@code this} so that method calls can be chained together.
+         */
+        @java.lang.Override
+        public _FinalStage productId(String productId) {
+            this.productId = Optional.ofNullable(productId);
+            return this;
+        }
+
+        /**
+         * <p>ID of the product associated with the payment, when applicable.</p>
+         */
+        @java.lang.Override
+        @JsonSetter(value = "product_id", nulls = Nulls.SKIP)
+        public _FinalStage productId(Optional<String> productId) {
+            this.productId = productId;
+            return this;
+        }
+
+        /**
+         * <p>Name of the variant associated with the payment, when applicable.</p>
+         * @return Reference to {@code this} so that method calls can be chained together.
+         */
+        @java.lang.Override
+        public _FinalStage planName(Nullable<String> planName) {
+            if (planName.isNull()) {
+                this.planName = null;
+            } else if (planName.isEmpty()) {
+                this.planName = Optional.empty();
+            } else {
+                this.planName = Optional.of(planName.get());
+            }
+            return this;
+        }
+
+        /**
+         * <p>Name of the variant associated with the payment, when applicable.</p>
+         * @return Reference to {@code this} so that method calls can be chained together.
+         */
+        @java.lang.Override
+        public _FinalStage planName(String planName) {
+            this.planName = Optional.ofNullable(planName);
+            return this;
+        }
+
+        /**
+         * <p>Name of the variant associated with the payment, when applicable.</p>
+         */
+        @java.lang.Override
+        @JsonSetter(value = "plan_name", nulls = Nulls.SKIP)
+        public _FinalStage planName(Optional<String> planName) {
+            this.planName = planName;
+            return this;
+        }
+
+        /**
+         * <p>ID of the variant associated with the payment, when applicable.</p>
+         * @return Reference to {@code this} so that method calls can be chained together.
+         */
+        @java.lang.Override
+        public _FinalStage planId(Nullable<String> planId) {
+            if (planId.isNull()) {
+                this.planId = null;
+            } else if (planId.isEmpty()) {
+                this.planId = Optional.empty();
+            } else {
+                this.planId = Optional.of(planId.get());
+            }
+            return this;
+        }
+
+        /**
+         * <p>ID of the variant associated with the payment, when applicable.</p>
+         * @return Reference to {@code this} so that method calls can be chained together.
+         */
+        @java.lang.Override
+        public _FinalStage planId(String planId) {
+            this.planId = Optional.ofNullable(planId);
+            return this;
+        }
+
+        /**
+         * <p>ID of the variant associated with the payment, when applicable.</p>
+         */
+        @java.lang.Override
+        @JsonSetter(value = "plan_id", nulls = Nulls.SKIP)
+        public _FinalStage planId(Optional<String> planId) {
+            this.planId = planId;
+            return this;
+        }
+
+        /**
+         * <p>Payment ID for any payment-related activity, including refunds and disputes.</p>
+         * @return Reference to {@code this} so that method calls can be chained together.
+         */
+        @java.lang.Override
+        public _FinalStage paymentId(Nullable<String> paymentId) {
+            if (paymentId.isNull()) {
+                this.paymentId = null;
+            } else if (paymentId.isEmpty()) {
+                this.paymentId = Optional.empty();
+            } else {
+                this.paymentId = Optional.of(paymentId.get());
+            }
+            return this;
+        }
+
+        /**
+         * <p>Payment ID for any payment-related activity, including refunds and disputes.</p>
+         * @return Reference to {@code this} so that method calls can be chained together.
+         */
+        @java.lang.Override
+        public _FinalStage paymentId(String paymentId) {
+            this.paymentId = Optional.ofNullable(paymentId);
+            return this;
+        }
+
+        /**
+         * <p>Payment ID for any payment-related activity, including refunds and disputes.</p>
+         */
+        @java.lang.Override
+        @JsonSetter(value = "payment_id", nulls = Nulls.SKIP)
+        public _FinalStage paymentId(Optional<String> paymentId) {
+            this.paymentId = paymentId;
+            return this;
+        }
+
+        /**
+         * <p>Payment related to this ledger activity. Included when rich resource hydration is enabled and the movement is tied to a payment.</p>
+         * @return Reference to {@code this} so that method calls can be chained together.
+         */
+        @java.lang.Override
+        public _FinalStage payment(Nullable<LedgerActivityPayment> payment) {
+            if (payment.isNull()) {
+                this.payment = null;
+            } else if (payment.isEmpty()) {
+                this.payment = Optional.empty();
+            } else {
+                this.payment = Optional.of(payment.get());
+            }
+            return this;
+        }
+
+        /**
+         * <p>Payment related to this ledger activity. Included when rich resource hydration is enabled and the movement is tied to a payment.</p>
+         * @return Reference to {@code this} so that method calls can be chained together.
+         */
+        @java.lang.Override
+        public _FinalStage payment(LedgerActivityPayment payment) {
+            this.payment = Optional.ofNullable(payment);
+            return this;
+        }
+
+        /**
+         * <p>Payment related to this ledger activity. Included when rich resource hydration is enabled and the movement is tied to a payment.</p>
+         */
+        @java.lang.Override
+        @JsonSetter(value = "payment", nulls = Nulls.SKIP)
+        public _FinalStage payment(Optional<LedgerActivityPayment> payment) {
+            this.payment = payment;
+            return this;
+        }
+
+        /**
          * <p>The ledger account (a ldgr_ identifier) this row belongs to. Present only when the response aggregates owned accounts (include_owned_accounts=true); omitted otherwise. Pair it with <code>account</code> to scope drawers and dashboard links to the owning business.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
@@ -596,43 +1265,7 @@ public final class LedgerActivity {
         }
 
         /**
-         * <p>When the activity record was created.</p>
-         * @return Reference to {@code this} so that method calls can be chained together.
-         */
-        @java.lang.Override
-        public _FinalStage createdAt(Nullable<OffsetDateTime> createdAt) {
-            if (createdAt.isNull()) {
-                this.createdAt = null;
-            } else if (createdAt.isEmpty()) {
-                this.createdAt = Optional.empty();
-            } else {
-                this.createdAt = Optional.of(createdAt.get());
-            }
-            return this;
-        }
-
-        /**
-         * <p>When the activity record was created.</p>
-         * @return Reference to {@code this} so that method calls can be chained together.
-         */
-        @java.lang.Override
-        public _FinalStage createdAt(OffsetDateTime createdAt) {
-            this.createdAt = Optional.ofNullable(createdAt);
-            return this;
-        }
-
-        /**
-         * <p>When the activity record was created.</p>
-         */
-        @java.lang.Override
-        @JsonSetter(value = "created_at", nulls = Nulls.SKIP)
-        public _FinalStage createdAt(Optional<OffsetDateTime> createdAt) {
-            this.createdAt = createdAt;
-            return this;
-        }
-
-        /**
-         * <p>ISO 8601 timestamp these funds became (or are scheduled to become) withdrawable: the posted time for already-settled funds, or 00:00:00 UTC on the scheduled release date for pending funds. Present only on inflows entering the balance (payments, top-ups, incoming transfers/affiliate); null on withdrawals, refunds, disputes and on-chain rows. The available_after/before filters window on its UTC settlement date.</p>
+         * <p>ISO 8601 timestamp when this activity affects available funds: 00:00:00 UTC on the scheduled release date for credits and debits in a pending good-funds release bucket; the posted time for credits and debits to settled available funds, including refunds, disputes and payouts. Null for activity outside these paths, including on-chain rows. The available_after/before filters use its UTC date; default activity excludes some movements, including opt-in reserves.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
@@ -648,7 +1281,7 @@ public final class LedgerActivity {
         }
 
         /**
-         * <p>ISO 8601 timestamp these funds became (or are scheduled to become) withdrawable: the posted time for already-settled funds, or 00:00:00 UTC on the scheduled release date for pending funds. Present only on inflows entering the balance (payments, top-ups, incoming transfers/affiliate); null on withdrawals, refunds, disputes and on-chain rows. The available_after/before filters window on its UTC settlement date.</p>
+         * <p>ISO 8601 timestamp when this activity affects available funds: 00:00:00 UTC on the scheduled release date for credits and debits in a pending good-funds release bucket; the posted time for credits and debits to settled available funds, including refunds, disputes and payouts. Null for activity outside these paths, including on-chain rows. The available_after/before filters use its UTC date; default activity excludes some movements, including opt-in reserves.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
@@ -658,7 +1291,7 @@ public final class LedgerActivity {
         }
 
         /**
-         * <p>ISO 8601 timestamp these funds became (or are scheduled to become) withdrawable: the posted time for already-settled funds, or 00:00:00 UTC on the scheduled release date for pending funds. Present only on inflows entering the balance (payments, top-ups, incoming transfers/affiliate); null on withdrawals, refunds, disputes and on-chain rows. The available_after/before filters window on its UTC settlement date.</p>
+         * <p>ISO 8601 timestamp when this activity affects available funds: 00:00:00 UTC on the scheduled release date for credits and debits in a pending good-funds release bucket; the posted time for credits and debits to settled available funds, including refunds, disputes and payouts. Null for activity outside these paths, including on-chain rows. The available_after/before filters use its UTC date; default activity excludes some movements, including opt-in reserves.</p>
          */
         @java.lang.Override
         @JsonSetter(value = "available_at", nulls = Nulls.SKIP)
@@ -693,16 +1326,53 @@ public final class LedgerActivity {
                     account,
                     amount,
                     availableAt,
-                    createdAt,
                     currency,
                     id,
                     ledgerAccountId,
                     lineType,
                     object,
+                    payment,
+                    paymentId,
+                    planId,
+                    planName,
                     postedAt,
+                    productId,
+                    productName,
                     resource,
                     source,
+                    usdAmount,
+                    userEmail,
+                    userId,
+                    userName,
                     additionalProperties);
+        }
+
+        @JsonAnySetter
+        private void putAdditionalPropertyFromJson(String key, Object value) {
+            if (key.equalsIgnoreCase("account")
+                    || key.equalsIgnoreCase("amount")
+                    || key.equalsIgnoreCase("available_at")
+                    || key.equalsIgnoreCase("currency")
+                    || key.equalsIgnoreCase("id")
+                    || key.equalsIgnoreCase("ledger_account_id")
+                    || key.equalsIgnoreCase("line_type")
+                    || key.equalsIgnoreCase("object")
+                    || key.equalsIgnoreCase("payment")
+                    || key.equalsIgnoreCase("payment_id")
+                    || key.equalsIgnoreCase("plan_id")
+                    || key.equalsIgnoreCase("plan_name")
+                    || key.equalsIgnoreCase("posted_at")
+                    || key.equalsIgnoreCase("product_id")
+                    || key.equalsIgnoreCase("product_name")
+                    || key.equalsIgnoreCase("resource")
+                    || key.equalsIgnoreCase("source")
+                    || key.equalsIgnoreCase("usd_amount")
+                    || key.equalsIgnoreCase("user_email")
+                    || key.equalsIgnoreCase("user_id")
+                    || key.equalsIgnoreCase("user_name")) {
+                return;
+            }
+            this.additionalProperties.put(key, value);
         }
 
         @java.lang.Override

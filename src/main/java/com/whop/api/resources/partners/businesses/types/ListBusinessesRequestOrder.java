@@ -16,6 +16,9 @@ public final class ListBusinessesRequestOrder {
     public static final ListBusinessesRequestOrder REFERRAL_STARTED_AT =
             new ListBusinessesRequestOrder(Value.REFERRAL_STARTED_AT, "referral_started_at");
 
+    public static final ListBusinessesRequestOrder VOLUME30D_USD =
+            new ListBusinessesRequestOrder(Value.VOLUME30D_USD, "volume_30d_usd");
+
     public static final ListBusinessesRequestOrder CREATED_AT =
             new ListBusinessesRequestOrder(Value.CREATED_AT, "created_at");
 
@@ -64,6 +67,8 @@ public final class ListBusinessesRequestOrder {
                 return visitor.visitPayoutPercentage();
             case REFERRAL_STARTED_AT:
                 return visitor.visitReferralStartedAt();
+            case VOLUME30D_USD:
+                return visitor.visitVolume30DUsd();
             case CREATED_AT:
                 return visitor.visitCreatedAt();
             case VOLUME_USD:
@@ -85,6 +90,8 @@ public final class ListBusinessesRequestOrder {
                 return PAYOUT_PERCENTAGE;
             case "referral_started_at":
                 return REFERRAL_STARTED_AT;
+            case "volume_30d_usd":
+                return VOLUME30D_USD;
             case "created_at":
                 return CREATED_AT;
             case "volume_usd":
@@ -107,6 +114,8 @@ public final class ListBusinessesRequestOrder {
 
         VOLUME_USD,
 
+        VOLUME30D_USD,
+
         EARNINGS_USD,
 
         UNKNOWN
@@ -122,6 +131,8 @@ public final class ListBusinessesRequestOrder {
         T visitPayoutPercentage();
 
         T visitVolumeUsd();
+
+        T visitVolume30DUsd();
 
         T visitEarningsUsd();
 

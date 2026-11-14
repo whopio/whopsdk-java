@@ -50,49 +50,31 @@ public final class CalculateTaxPlansResponse {
         this.additionalProperties = additionalProperties;
     }
 
-    /**
-     * @return Three-letter ISO 4217 currency code for the returned amounts.
-     */
     @JsonProperty("currency")
     public String getCurrency() {
         return currency;
     }
 
-    /**
-     * @return Whether Whop calculated tax for this preview. <code>not_calculated</code> means no tax could be determined, so <code>tax_amount</code> is 0 and <code>total</code> equals <code>subtotal</code>.
-     */
     @JsonProperty("status")
     public CalculateTaxPlansResponseStatus getStatus() {
         return status;
     }
 
-    /**
-     * @return Plan price in the currency's smallest unit, for example cents. For exclusive tax, this is the pre-tax amount; for inclusive tax, it already includes tax and equals the total.
-     */
     @JsonProperty("subtotal")
     public int getSubtotal() {
         return subtotal;
     }
 
-    /**
-     * @return Calculated tax amount in the currency's smallest unit. For exclusive tax, this is added on top of the subtotal; for inclusive tax, it is the portion of the subtotal that is tax.
-     */
     @JsonProperty("tax_amount")
     public int getTaxAmount() {
         return taxAmount;
     }
 
-    /**
-     * @return Whether tax is added on top of the plan price or already included in it for this buyer's location.
-     */
     @JsonProperty("tax_behavior")
     public CalculateTaxPlansResponseTaxBehavior getTaxBehavior() {
         return taxBehavior;
     }
 
-    /**
-     * @return Amount the buyer would pay in the currency's smallest unit.
-     */
     @JsonProperty("total")
     public int getTotal() {
         return total;
@@ -133,46 +115,28 @@ public final class CalculateTaxPlansResponse {
     }
 
     public interface CurrencyStage {
-        /**
-         * <p>Three-letter ISO 4217 currency code for the returned amounts.</p>
-         */
         StatusStage currency(@NotNull String currency);
 
         Builder from(CalculateTaxPlansResponse other);
     }
 
     public interface StatusStage {
-        /**
-         * <p>Whether Whop calculated tax for this preview. <code>not_calculated</code> means no tax could be determined, so <code>tax_amount</code> is 0 and <code>total</code> equals <code>subtotal</code>.</p>
-         */
         SubtotalStage status(@NotNull CalculateTaxPlansResponseStatus status);
     }
 
     public interface SubtotalStage {
-        /**
-         * <p>Plan price in the currency's smallest unit, for example cents. For exclusive tax, this is the pre-tax amount; for inclusive tax, it already includes tax and equals the total.</p>
-         */
         TaxAmountStage subtotal(int subtotal);
     }
 
     public interface TaxAmountStage {
-        /**
-         * <p>Calculated tax amount in the currency's smallest unit. For exclusive tax, this is added on top of the subtotal; for inclusive tax, it is the portion of the subtotal that is tax.</p>
-         */
         TaxBehaviorStage taxAmount(int taxAmount);
     }
 
     public interface TaxBehaviorStage {
-        /**
-         * <p>Whether tax is added on top of the plan price or already included in it for this buyer's location.</p>
-         */
         TotalStage taxBehavior(@NotNull CalculateTaxPlansResponseTaxBehavior taxBehavior);
     }
 
     public interface TotalStage {
-        /**
-         * <p>Amount the buyer would pay in the currency's smallest unit.</p>
-         */
         _FinalStage total(int total);
     }
 
@@ -205,7 +169,6 @@ public final class CalculateTaxPlansResponse {
 
         private int total;
 
-        @JsonAnySetter
         private Map<String, Object> additionalProperties = new HashMap<>();
 
         private Builder() {}
@@ -221,11 +184,6 @@ public final class CalculateTaxPlansResponse {
             return this;
         }
 
-        /**
-         * <p>Three-letter ISO 4217 currency code for the returned amounts.</p>
-         * <p>Three-letter ISO 4217 currency code for the returned amounts.</p>
-         * @return Reference to {@code this} so that method calls can be chained together.
-         */
         @java.lang.Override
         @JsonSetter("currency")
         public StatusStage currency(@NotNull String currency) {
@@ -233,11 +191,6 @@ public final class CalculateTaxPlansResponse {
             return this;
         }
 
-        /**
-         * <p>Whether Whop calculated tax for this preview. <code>not_calculated</code> means no tax could be determined, so <code>tax_amount</code> is 0 and <code>total</code> equals <code>subtotal</code>.</p>
-         * <p>Whether Whop calculated tax for this preview. <code>not_calculated</code> means no tax could be determined, so <code>tax_amount</code> is 0 and <code>total</code> equals <code>subtotal</code>.</p>
-         * @return Reference to {@code this} so that method calls can be chained together.
-         */
         @java.lang.Override
         @JsonSetter("status")
         public SubtotalStage status(@NotNull CalculateTaxPlansResponseStatus status) {
@@ -245,11 +198,6 @@ public final class CalculateTaxPlansResponse {
             return this;
         }
 
-        /**
-         * <p>Plan price in the currency's smallest unit, for example cents. For exclusive tax, this is the pre-tax amount; for inclusive tax, it already includes tax and equals the total.</p>
-         * <p>Plan price in the currency's smallest unit, for example cents. For exclusive tax, this is the pre-tax amount; for inclusive tax, it already includes tax and equals the total.</p>
-         * @return Reference to {@code this} so that method calls can be chained together.
-         */
         @java.lang.Override
         @JsonSetter("subtotal")
         public TaxAmountStage subtotal(int subtotal) {
@@ -257,11 +205,6 @@ public final class CalculateTaxPlansResponse {
             return this;
         }
 
-        /**
-         * <p>Calculated tax amount in the currency's smallest unit. For exclusive tax, this is added on top of the subtotal; for inclusive tax, it is the portion of the subtotal that is tax.</p>
-         * <p>Calculated tax amount in the currency's smallest unit. For exclusive tax, this is added on top of the subtotal; for inclusive tax, it is the portion of the subtotal that is tax.</p>
-         * @return Reference to {@code this} so that method calls can be chained together.
-         */
         @java.lang.Override
         @JsonSetter("tax_amount")
         public TaxBehaviorStage taxAmount(int taxAmount) {
@@ -269,11 +212,6 @@ public final class CalculateTaxPlansResponse {
             return this;
         }
 
-        /**
-         * <p>Whether tax is added on top of the plan price or already included in it for this buyer's location.</p>
-         * <p>Whether tax is added on top of the plan price or already included in it for this buyer's location.</p>
-         * @return Reference to {@code this} so that method calls can be chained together.
-         */
         @java.lang.Override
         @JsonSetter("tax_behavior")
         public TotalStage taxBehavior(@NotNull CalculateTaxPlansResponseTaxBehavior taxBehavior) {
@@ -281,11 +219,6 @@ public final class CalculateTaxPlansResponse {
             return this;
         }
 
-        /**
-         * <p>Amount the buyer would pay in the currency's smallest unit.</p>
-         * <p>Amount the buyer would pay in the currency's smallest unit.</p>
-         * @return Reference to {@code this} so that method calls can be chained together.
-         */
         @java.lang.Override
         @JsonSetter("total")
         public _FinalStage total(int total) {
@@ -297,6 +230,19 @@ public final class CalculateTaxPlansResponse {
         public CalculateTaxPlansResponse build() {
             return new CalculateTaxPlansResponse(
                     currency, status, subtotal, taxAmount, taxBehavior, total, additionalProperties);
+        }
+
+        @JsonAnySetter
+        private void putAdditionalPropertyFromJson(String key, Object value) {
+            if (key.equalsIgnoreCase("currency")
+                    || key.equalsIgnoreCase("status")
+                    || key.equalsIgnoreCase("subtotal")
+                    || key.equalsIgnoreCase("tax_amount")
+                    || key.equalsIgnoreCase("tax_behavior")
+                    || key.equalsIgnoreCase("total")) {
+                return;
+            }
+            this.additionalProperties.put(key, value);
         }
 
         @java.lang.Override

@@ -5,15 +5,20 @@ package com.whop.api.types;
 
 import com.fasterxml.jackson.annotation.JsonAnyGetter;
 import com.fasterxml.jackson.annotation.JsonAnySetter;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonSetter;
+import com.fasterxml.jackson.annotation.Nulls;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
+import com.whop.api.core.Nullable;
+import com.whop.api.core.NullableNonemptyFilter;
 import com.whop.api.core.ObjectMappers;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
+import java.util.Optional;
 import org.jetbrains.annotations.NotNull;
 
 @JsonInclude(JsonInclude.Include.NON_ABSENT)
@@ -21,14 +26,18 @@ import org.jetbrains.annotations.NotNull;
 public final class StorefrontAccount {
     private final String id;
 
+    private final Optional<String> logoUrl;
+
     private final String route;
 
     private final String title;
 
     private final Map<String, Object> additionalProperties;
 
-    private StorefrontAccount(String id, String route, String title, Map<String, Object> additionalProperties) {
+    private StorefrontAccount(
+            String id, Optional<String> logoUrl, String route, String title, Map<String, Object> additionalProperties) {
         this.id = id;
+        this.logoUrl = logoUrl;
         this.route = route;
         this.title = title;
         this.additionalProperties = additionalProperties;
@@ -40,6 +49,17 @@ public final class StorefrontAccount {
     @JsonProperty("id")
     public String getId() {
         return id;
+    }
+
+    /**
+     * @return Account logo image URL. <code>null</code> when the account has not set one.
+     */
+    @JsonIgnore
+    public Optional<String> getLogoUrl() {
+        if (logoUrl == null) {
+            return Optional.empty();
+        }
+        return logoUrl;
     }
 
     /**
@@ -58,6 +78,12 @@ public final class StorefrontAccount {
         return title;
     }
 
+    @JsonInclude(value = JsonInclude.Include.CUSTOM, valueFilter = NullableNonemptyFilter.class)
+    @JsonProperty("logo_url")
+    private Optional<String> _getLogoUrl() {
+        return logoUrl;
+    }
+
     @java.lang.Override
     public boolean equals(Object other) {
         if (this == other) return true;
@@ -70,12 +96,15 @@ public final class StorefrontAccount {
     }
 
     private boolean equalTo(StorefrontAccount other) {
-        return id.equals(other.id) && route.equals(other.route) && title.equals(other.title);
+        return id.equals(other.id)
+                && logoUrl.equals(other.logoUrl)
+                && route.equals(other.route)
+                && title.equals(other.title);
     }
 
     @java.lang.Override
     public int hashCode() {
-        return Objects.hash(this.id, this.route, this.title);
+        return Objects.hash(this.id, this.logoUrl, this.route, this.title);
     }
 
     @java.lang.Override
@@ -116,6 +145,15 @@ public final class StorefrontAccount {
         _FinalStage additionalProperty(String key, Object value);
 
         _FinalStage additionalProperties(Map<String, Object> additionalProperties);
+
+        /**
+         * <p>Account logo image URL. <code>null</code> when the account has not set one.</p>
+         */
+        _FinalStage logoUrl(Optional<String> logoUrl);
+
+        _FinalStage logoUrl(String logoUrl);
+
+        _FinalStage logoUrl(Nullable<String> logoUrl);
     }
 
     @JsonIgnoreProperties(ignoreUnknown = true)
@@ -126,7 +164,8 @@ public final class StorefrontAccount {
 
         private String title;
 
-        @JsonAnySetter
+        private Optional<String> logoUrl = Optional.empty();
+
         private Map<String, Object> additionalProperties = new HashMap<>();
 
         private Builder() {}
@@ -134,13 +173,13 @@ public final class StorefrontAccount {
         @java.lang.Override
         public Builder from(StorefrontAccount other) {
             id(other.getId());
+            logoUrl(other.getLogoUrl());
             route(other.getRoute());
             title(other.getTitle());
             return this;
         }
 
         /**
-         * <p>Account ID, prefixed <code>biz_</code>.</p>
          * <p>Account ID, prefixed <code>biz_</code>.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
@@ -153,7 +192,6 @@ public final class StorefrontAccount {
 
         /**
          * <p>Account public route identifier — the <code>whop.com/{route}</code> storefront path.</p>
-         * <p>Account public route identifier — the <code>whop.com/{route}</code> storefront path.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
@@ -165,7 +203,6 @@ public final class StorefrontAccount {
 
         /**
          * <p>Account display name.</p>
-         * <p>Account display name.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
@@ -175,9 +212,56 @@ public final class StorefrontAccount {
             return this;
         }
 
+        /**
+         * <p>Account logo image URL. <code>null</code> when the account has not set one.</p>
+         * @return Reference to {@code this} so that method calls can be chained together.
+         */
+        @java.lang.Override
+        public _FinalStage logoUrl(Nullable<String> logoUrl) {
+            if (logoUrl.isNull()) {
+                this.logoUrl = null;
+            } else if (logoUrl.isEmpty()) {
+                this.logoUrl = Optional.empty();
+            } else {
+                this.logoUrl = Optional.of(logoUrl.get());
+            }
+            return this;
+        }
+
+        /**
+         * <p>Account logo image URL. <code>null</code> when the account has not set one.</p>
+         * @return Reference to {@code this} so that method calls can be chained together.
+         */
+        @java.lang.Override
+        public _FinalStage logoUrl(String logoUrl) {
+            this.logoUrl = Optional.ofNullable(logoUrl);
+            return this;
+        }
+
+        /**
+         * <p>Account logo image URL. <code>null</code> when the account has not set one.</p>
+         */
+        @java.lang.Override
+        @JsonSetter(value = "logo_url", nulls = Nulls.SKIP)
+        public _FinalStage logoUrl(Optional<String> logoUrl) {
+            this.logoUrl = logoUrl;
+            return this;
+        }
+
         @java.lang.Override
         public StorefrontAccount build() {
-            return new StorefrontAccount(id, route, title, additionalProperties);
+            return new StorefrontAccount(id, logoUrl, route, title, additionalProperties);
+        }
+
+        @JsonAnySetter
+        private void putAdditionalPropertyFromJson(String key, Object value) {
+            if (key.equalsIgnoreCase("id")
+                    || key.equalsIgnoreCase("logo_url")
+                    || key.equalsIgnoreCase("route")
+                    || key.equalsIgnoreCase("title")) {
+                return;
+            }
+            this.additionalProperties.put(key, value);
         }
 
         @java.lang.Override

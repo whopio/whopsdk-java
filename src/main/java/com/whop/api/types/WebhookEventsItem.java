@@ -10,25 +10,16 @@ public final class WebhookEventsItem {
     public static final WebhookEventsItem RESOLUTION_CENTER_CASE_CREATED =
             new WebhookEventsItem(Value.RESOLUTION_CENTER_CASE_CREATED, "resolution_center_case.created");
 
-    public static final WebhookEventsItem PAYMENT_AFFILIATE_REWARD_CREATED =
-            new WebhookEventsItem(Value.PAYMENT_AFFILIATE_REWARD_CREATED, "payment.affiliate_reward_created");
+    public static final WebhookEventsItem AD_DELETED = new WebhookEventsItem(Value.AD_DELETED, "ad.deleted");
+
+    public static final WebhookEventsItem PAYOUT_CREATED =
+            new WebhookEventsItem(Value.PAYOUT_CREATED, "payout.created");
 
     public static final WebhookEventsItem APP_PAYMENT_CREATED =
             new WebhookEventsItem(Value.APP_PAYMENT_CREATED, "app_payment.created");
 
-    public static final WebhookEventsItem AD_CAMPAIGN_PAYMENT_FAILED =
-            new WebhookEventsItem(Value.AD_CAMPAIGN_PAYMENT_FAILED, "ad_campaign.payment_failed");
-
     public static final WebhookEventsItem IDENTITY_PROFILE_REJECTED =
             new WebhookEventsItem(Value.IDENTITY_PROFILE_REJECTED, "identity_profile.rejected");
-
-    public static final WebhookEventsItem PLAN_DELETED = new WebhookEventsItem(Value.PLAN_DELETED, "plan.deleted");
-
-    public static final WebhookEventsItem RESOLUTION_CREATED =
-            new WebhookEventsItem(Value.RESOLUTION_CREATED, "resolution.created");
-
-    public static final WebhookEventsItem PAYOUT_METHOD_CREATED =
-            new WebhookEventsItem(Value.PAYOUT_METHOD_CREATED, "payout_method.created");
 
     public static final WebhookEventsItem MEMBERSHIP_WENT_INVALID =
             new WebhookEventsItem(Value.MEMBERSHIP_WENT_INVALID, "membership.went_invalid");
@@ -50,33 +41,19 @@ public final class WebhookEventsItem {
 
     public static final WebhookEventsItem ENTRY_DENIED = new WebhookEventsItem(Value.ENTRY_DENIED, "entry.denied");
 
+    public static final WebhookEventsItem AD_CAMPAIGN_EVENTS =
+            new WebhookEventsItem(Value.AD_CAMPAIGN_EVENTS, "ad_campaign.events");
+
     public static final WebhookEventsItem TRANSFER_FAILED =
             new WebhookEventsItem(Value.TRANSFER_FAILED, "transfer.failed");
 
-    public static final WebhookEventsItem COURSE_LESSON_INTERACTION_COMPLETED =
-            new WebhookEventsItem(Value.COURSE_LESSON_INTERACTION_COMPLETED, "course_lesson_interaction.completed");
-
-    public static final WebhookEventsItem CARD_CANCELED = new WebhookEventsItem(Value.CARD_CANCELED, "card.canceled");
-
-    public static final WebhookEventsItem DEPOSIT_SUCCEEDED =
-            new WebhookEventsItem(Value.DEPOSIT_SUCCEEDED, "deposit.succeeded");
-
-    public static final WebhookEventsItem VERIFICATION_SUCCEEDED =
-            new WebhookEventsItem(Value.VERIFICATION_SUCCEEDED, "verification.succeeded");
-
     public static final WebhookEventsItem PLAN_UPDATED = new WebhookEventsItem(Value.PLAN_UPDATED, "plan.updated");
 
-    public static final WebhookEventsItem PRODUCT_CREATED =
-            new WebhookEventsItem(Value.PRODUCT_CREATED, "product.created");
-
-    public static final WebhookEventsItem MEMBER_CREATED =
-            new WebhookEventsItem(Value.MEMBER_CREATED, "member.created");
+    public static final WebhookEventsItem MEMBERSHIP_UPDATED =
+            new WebhookEventsItem(Value.MEMBERSHIP_UPDATED, "membership.updated");
 
     public static final WebhookEventsItem SETUP_INTENT_SUCCEEDED =
             new WebhookEventsItem(Value.SETUP_INTENT_SUCCEEDED, "setup_intent.succeeded");
-
-    public static final WebhookEventsItem CARD_TRANSACTION_COMPLETED =
-            new WebhookEventsItem(Value.CARD_TRANSACTION_COMPLETED, "card_transaction.completed");
 
     public static final WebhookEventsItem MEMBERSHIP_DEACTIVATED =
             new WebhookEventsItem(Value.MEMBERSHIP_DEACTIVATED, "membership.deactivated");
@@ -89,28 +66,23 @@ public final class WebhookEventsItem {
     public static final WebhookEventsItem WITHDRAWAL_UPDATED =
             new WebhookEventsItem(Value.WITHDRAWAL_UPDATED, "withdrawal.updated");
 
+    public static final WebhookEventsItem APP_INSTALLATION_CREATED =
+            new WebhookEventsItem(Value.APP_INSTALLATION_CREATED, "app_installation.created");
+
     public static final WebhookEventsItem SETUP_INTENT_CANCELED =
             new WebhookEventsItem(Value.SETUP_INTENT_CANCELED, "setup_intent.canceled");
 
     public static final WebhookEventsItem APP_PAYMENT_FAILED =
             new WebhookEventsItem(Value.APP_PAYMENT_FAILED, "app_payment.failed");
 
-    public static final WebhookEventsItem APP_MEMBERSHIP_CANCEL_AT_PERIOD_END_CHANGED = new WebhookEventsItem(
-            Value.APP_MEMBERSHIP_CANCEL_AT_PERIOD_END_CHANGED, "app_membership.cancel_at_period_end_changed");
-
-    public static final WebhookEventsItem APP_PAYMENT_SUCCEEDED =
-            new WebhookEventsItem(Value.APP_PAYMENT_SUCCEEDED, "app_payment.succeeded");
-
-    public static final WebhookEventsItem CARD_CREATED = new WebhookEventsItem(Value.CARD_CREATED, "card.created");
+    public static final WebhookEventsItem AD_GROUP_DELETED =
+            new WebhookEventsItem(Value.AD_GROUP_DELETED, "ad_group.deleted");
 
     public static final WebhookEventsItem RESOLUTION_CENTER_CASE_UPDATED =
             new WebhookEventsItem(Value.RESOLUTION_CENTER_CASE_UPDATED, "resolution_center_case.updated");
 
     public static final WebhookEventsItem PRODUCT_UNPUBLISHED =
             new WebhookEventsItem(Value.PRODUCT_UNPUBLISHED, "product.unpublished");
-
-    public static final WebhookEventsItem PAYMENT_FAILED =
-            new WebhookEventsItem(Value.PAYMENT_FAILED, "payment.failed");
 
     public static final WebhookEventsItem APP_PAYMENT_PENDING =
             new WebhookEventsItem(Value.APP_PAYMENT_PENDING, "app_payment.pending");
@@ -123,6 +95,9 @@ public final class WebhookEventsItem {
     public static final WebhookEventsItem ENTRY_APPROVED =
             new WebhookEventsItem(Value.ENTRY_APPROVED, "entry.approved");
 
+    public static final WebhookEventsItem FINANCIAL_ACTIVITY_FUNDS_AVAILABLE =
+            new WebhookEventsItem(Value.FINANCIAL_ACTIVITY_FUNDS_AVAILABLE, "financial_activity.funds_available");
+
     public static final WebhookEventsItem DISPUTE_ALERT_CREATED =
             new WebhookEventsItem(Value.DISPUTE_ALERT_CREATED, "dispute_alert.created");
 
@@ -132,23 +107,17 @@ public final class WebhookEventsItem {
     public static final WebhookEventsItem REFUND_UPDATED =
             new WebhookEventsItem(Value.REFUND_UPDATED, "refund.updated");
 
-    public static final WebhookEventsItem RESOLUTION_DECIDED =
-            new WebhookEventsItem(Value.RESOLUTION_DECIDED, "resolution.decided");
-
     public static final WebhookEventsItem WITHDRAWAL_REVERSED =
             new WebhookEventsItem(Value.WITHDRAWAL_REVERSED, "withdrawal.reversed");
+
+    public static final WebhookEventsItem EVENTS_CREATED =
+            new WebhookEventsItem(Value.EVENTS_CREATED, "events.created");
 
     public static final WebhookEventsItem PAYOUT_ACCOUNT_STATUS_UPDATED =
             new WebhookEventsItem(Value.PAYOUT_ACCOUNT_STATUS_UPDATED, "payout_account.status_updated");
 
-    public static final WebhookEventsItem IDENTITY_PROFILE_APPROVED =
-            new WebhookEventsItem(Value.IDENTITY_PROFILE_APPROVED, "identity_profile.approved");
-
-    public static final WebhookEventsItem SHIPMENT_CREATED =
-            new WebhookEventsItem(Value.SHIPMENT_CREATED, "shipment.created");
-
-    public static final WebhookEventsItem DISPUTE_UPDATED =
-            new WebhookEventsItem(Value.DISPUTE_UPDATED, "dispute.updated");
+    public static final WebhookEventsItem SHIPPING_ADDRESS_CHANGED =
+            new WebhookEventsItem(Value.SHIPPING_ADDRESS_CHANGED, "shipping_address.changed");
 
     public static final WebhookEventsItem ENTRY_CREATED = new WebhookEventsItem(Value.ENTRY_CREATED, "entry.created");
 
@@ -158,26 +127,23 @@ public final class WebhookEventsItem {
     public static final WebhookEventsItem PRODUCT_UPDATED =
             new WebhookEventsItem(Value.PRODUCT_UPDATED, "product.updated");
 
-    public static final WebhookEventsItem ACCOUNT_UPDATED =
-            new WebhookEventsItem(Value.ACCOUNT_UPDATED, "account.updated");
-
     public static final WebhookEventsItem WITHDRAWAL_CREATED =
             new WebhookEventsItem(Value.WITHDRAWAL_CREATED, "withdrawal.created");
 
     public static final WebhookEventsItem CHAT_MESSAGE_CREATED =
             new WebhookEventsItem(Value.CHAT_MESSAGE_CREATED, "chat.message.created");
 
-    public static final WebhookEventsItem LEDGER_ACCOUNT_FUNDS_AVAILABLE =
-            new WebhookEventsItem(Value.LEDGER_ACCOUNT_FUNDS_AVAILABLE, "ledger_account.funds_available");
+    public static final WebhookEventsItem PAYMENT_AUTHORIZED =
+            new WebhookEventsItem(Value.PAYMENT_AUTHORIZED, "payment.authorized");
+
+    public static final WebhookEventsItem ACCOUNT_FINANCING_DENIED =
+            new WebhookEventsItem(Value.ACCOUNT_FINANCING_DENIED, "account.financing_denied");
 
     public static final WebhookEventsItem MEMBERSHIP_ACTIVATED =
             new WebhookEventsItem(Value.MEMBERSHIP_ACTIVATED, "membership.activated");
 
-    public static final WebhookEventsItem PAYMENT_PENDING =
-            new WebhookEventsItem(Value.PAYMENT_PENDING, "payment.pending");
-
-    public static final WebhookEventsItem MEMBERSHIP_TRIAL_ENDING_SOON =
-            new WebhookEventsItem(Value.MEMBERSHIP_TRIAL_ENDING_SOON, "membership.trial_ending_soon");
+    public static final WebhookEventsItem PAYOUT_REVERSED =
+            new WebhookEventsItem(Value.PAYOUT_REVERSED, "payout.reversed");
 
     public static final WebhookEventsItem REFUND_CREATED =
             new WebhookEventsItem(Value.REFUND_CREATED, "refund.created");
@@ -196,31 +162,160 @@ public final class WebhookEventsItem {
     public static final WebhookEventsItem INVOICE_MARKED_UNCOLLECTIBLE =
             new WebhookEventsItem(Value.INVOICE_MARKED_UNCOLLECTIBLE, "invoice.marked_uncollectible");
 
+    public static final WebhookEventsItem EXPORT_COMPLETED =
+            new WebhookEventsItem(Value.EXPORT_COMPLETED, "export.completed");
+
+    public static final WebhookEventsItem CARD_APPLICATION_UPDATED =
+            new WebhookEventsItem(Value.CARD_APPLICATION_UPDATED, "card_application.updated");
+
+    public static final WebhookEventsItem PAYOUT_UPDATED =
+            new WebhookEventsItem(Value.PAYOUT_UPDATED, "payout.updated");
+
+    public static final WebhookEventsItem MEMBERSHIP_METADATA_UPDATED =
+            new WebhookEventsItem(Value.MEMBERSHIP_METADATA_UPDATED, "membership.metadata_updated");
+
+    public static final WebhookEventsItem ACCOUNT_FINANCING_DISABLED =
+            new WebhookEventsItem(Value.ACCOUNT_FINANCING_DISABLED, "account.financing_disabled");
+
+    public static final WebhookEventsItem CARD_TRANSACTION_UPDATED =
+            new WebhookEventsItem(Value.CARD_TRANSACTION_UPDATED, "card_transaction.updated");
+
+    public static final WebhookEventsItem INVOICE_PAST_DUE =
+            new WebhookEventsItem(Value.INVOICE_PAST_DUE, "invoice.past_due");
+
+    public static final WebhookEventsItem INVOICE_PAID = new WebhookEventsItem(Value.INVOICE_PAID, "invoice.paid");
+
+    public static final WebhookEventsItem PLAN_CREATED = new WebhookEventsItem(Value.PLAN_CREATED, "plan.created");
+
+    public static final WebhookEventsItem CARD_TRANSACTION_DECLINED =
+            new WebhookEventsItem(Value.CARD_TRANSACTION_DECLINED, "card_transaction.declined");
+
+    public static final WebhookEventsItem IDENTITY_PROFILE_UPDATED =
+            new WebhookEventsItem(Value.IDENTITY_PROFILE_UPDATED, "identity_profile.updated");
+
+    public static final WebhookEventsItem APP_MEMBERSHIP_WENT_INVALID =
+            new WebhookEventsItem(Value.APP_MEMBERSHIP_WENT_INVALID, "app_membership.went_invalid");
+
+    public static final WebhookEventsItem PAYMENT_AFFILIATE_REWARD_CREATED =
+            new WebhookEventsItem(Value.PAYMENT_AFFILIATE_REWARD_CREATED, "payment.affiliate_reward_created");
+
+    public static final WebhookEventsItem AD_CAMPAIGN_PAYMENT_FAILED =
+            new WebhookEventsItem(Value.AD_CAMPAIGN_PAYMENT_FAILED, "ad_campaign.payment_failed");
+
+    public static final WebhookEventsItem PLAN_DELETED = new WebhookEventsItem(Value.PLAN_DELETED, "plan.deleted");
+
+    public static final WebhookEventsItem RESOLUTION_CREATED =
+            new WebhookEventsItem(Value.RESOLUTION_CREATED, "resolution.created");
+
+    public static final WebhookEventsItem PAYOUT_METHOD_CREATED =
+            new WebhookEventsItem(Value.PAYOUT_METHOD_CREATED, "payout_method.created");
+
+    public static final WebhookEventsItem APP_PAYMENT_REQUIRES_ACTION =
+            new WebhookEventsItem(Value.APP_PAYMENT_REQUIRES_ACTION, "app_payment.requires_action");
+
+    public static final WebhookEventsItem MEMBER_UPDATED =
+            new WebhookEventsItem(Value.MEMBER_UPDATED, "member.updated");
+
+    public static final WebhookEventsItem PAYMENT_REQUIRES_ACTION =
+            new WebhookEventsItem(Value.PAYMENT_REQUIRES_ACTION, "payment.requires_action");
+
+    public static final WebhookEventsItem AD_CAMPAIGN_CREATED =
+            new WebhookEventsItem(Value.AD_CAMPAIGN_CREATED, "ad_campaign.created");
+
+    public static final WebhookEventsItem COURSE_LESSON_INTERACTION_COMPLETED =
+            new WebhookEventsItem(Value.COURSE_LESSON_INTERACTION_COMPLETED, "course_lesson_interaction.completed");
+
+    public static final WebhookEventsItem CARD_CANCELED = new WebhookEventsItem(Value.CARD_CANCELED, "card.canceled");
+
+    public static final WebhookEventsItem DEPOSIT_SUCCEEDED =
+            new WebhookEventsItem(Value.DEPOSIT_SUCCEEDED, "deposit.succeeded");
+
+    public static final WebhookEventsItem VERIFICATION_SUCCEEDED =
+            new WebhookEventsItem(Value.VERIFICATION_SUCCEEDED, "verification.succeeded");
+
+    public static final WebhookEventsItem PRODUCT_CREATED =
+            new WebhookEventsItem(Value.PRODUCT_CREATED, "product.created");
+
+    public static final WebhookEventsItem MEMBER_CREATED =
+            new WebhookEventsItem(Value.MEMBER_CREATED, "member.created");
+
+    public static final WebhookEventsItem CARD_TRANSACTION_COMPLETED =
+            new WebhookEventsItem(Value.CARD_TRANSACTION_COMPLETED, "card_transaction.completed");
+
+    public static final WebhookEventsItem AD_GROUP_UPDATED =
+            new WebhookEventsItem(Value.AD_GROUP_UPDATED, "ad_group.updated");
+
+    public static final WebhookEventsItem APP_INSTALLATION_DELETED =
+            new WebhookEventsItem(Value.APP_INSTALLATION_DELETED, "app_installation.deleted");
+
+    public static final WebhookEventsItem APP_MEMBERSHIP_CANCEL_AT_PERIOD_END_CHANGED = new WebhookEventsItem(
+            Value.APP_MEMBERSHIP_CANCEL_AT_PERIOD_END_CHANGED, "app_membership.cancel_at_period_end_changed");
+
+    public static final WebhookEventsItem APP_PAYMENT_SUCCEEDED =
+            new WebhookEventsItem(Value.APP_PAYMENT_SUCCEEDED, "app_payment.succeeded");
+
+    public static final WebhookEventsItem CARD_CREATED = new WebhookEventsItem(Value.CARD_CREATED, "card.created");
+
+    public static final WebhookEventsItem DOMAIN_UPDATED =
+            new WebhookEventsItem(Value.DOMAIN_UPDATED, "domain.updated");
+
+    public static final WebhookEventsItem PAYMENT_FAILED =
+            new WebhookEventsItem(Value.PAYMENT_FAILED, "payment.failed");
+
+    public static final WebhookEventsItem ACCOUNT_FINANCING_APPROVED =
+            new WebhookEventsItem(Value.ACCOUNT_FINANCING_APPROVED, "account.financing_approved");
+
+    public static final WebhookEventsItem RESOLUTION_DECIDED =
+            new WebhookEventsItem(Value.RESOLUTION_DECIDED, "resolution.decided");
+
+    public static final WebhookEventsItem AD_CAMPAIGN_DELETED =
+            new WebhookEventsItem(Value.AD_CAMPAIGN_DELETED, "ad_campaign.deleted");
+
+    public static final WebhookEventsItem IDENTITY_PROFILE_APPROVED =
+            new WebhookEventsItem(Value.IDENTITY_PROFILE_APPROVED, "identity_profile.approved");
+
+    public static final WebhookEventsItem SHIPMENT_CREATED =
+            new WebhookEventsItem(Value.SHIPMENT_CREATED, "shipment.created");
+
+    public static final WebhookEventsItem AD_GROUP_CREATED =
+            new WebhookEventsItem(Value.AD_GROUP_CREATED, "ad_group.created");
+
+    public static final WebhookEventsItem DISPUTE_UPDATED =
+            new WebhookEventsItem(Value.DISPUTE_UPDATED, "dispute.updated");
+
+    public static final WebhookEventsItem ACCOUNT_UPDATED =
+            new WebhookEventsItem(Value.ACCOUNT_UPDATED, "account.updated");
+
+    public static final WebhookEventsItem DOMAIN_DELETED =
+            new WebhookEventsItem(Value.DOMAIN_DELETED, "domain.deleted");
+
+    public static final WebhookEventsItem LEDGER_ACCOUNT_FUNDS_AVAILABLE =
+            new WebhookEventsItem(Value.LEDGER_ACCOUNT_FUNDS_AVAILABLE, "ledger_account.funds_available");
+
+    public static final WebhookEventsItem AD_CREATED = new WebhookEventsItem(Value.AD_CREATED, "ad.created");
+
+    public static final WebhookEventsItem PAYMENT_PENDING =
+            new WebhookEventsItem(Value.PAYMENT_PENDING, "payment.pending");
+
+    public static final WebhookEventsItem MEMBERSHIP_TRIAL_ENDING_SOON =
+            new WebhookEventsItem(Value.MEMBERSHIP_TRIAL_ENDING_SOON, "membership.trial_ending_soon");
+
     public static final WebhookEventsItem RESOLUTION_CENTER_CASE_DECIDED =
             new WebhookEventsItem(Value.RESOLUTION_CENTER_CASE_DECIDED, "resolution_center_case.decided");
+
+    public static final WebhookEventsItem DOMAIN_CREATED =
+            new WebhookEventsItem(Value.DOMAIN_CREATED, "domain.created");
 
     public static final WebhookEventsItem MEMBERSHIP_EXPERIENCE_CLAIMED =
             new WebhookEventsItem(Value.MEMBERSHIP_EXPERIENCE_CLAIMED, "membership.experience_claimed");
 
-    public static final WebhookEventsItem EXPORT_COMPLETED =
-            new WebhookEventsItem(Value.EXPORT_COMPLETED, "export.completed");
-
     public static final WebhookEventsItem PRODUCT_PUBLISHED =
             new WebhookEventsItem(Value.PRODUCT_PUBLISHED, "product.published");
-
-    public static final WebhookEventsItem CARD_APPLICATION_UPDATED =
-            new WebhookEventsItem(Value.CARD_APPLICATION_UPDATED, "card_application.updated");
 
     public static final WebhookEventsItem RESOLUTION_UPDATED =
             new WebhookEventsItem(Value.RESOLUTION_UPDATED, "resolution.updated");
 
     public static final WebhookEventsItem EXPORT_FAILED = new WebhookEventsItem(Value.EXPORT_FAILED, "export.failed");
-
-    public static final WebhookEventsItem MEMBERSHIP_METADATA_UPDATED =
-            new WebhookEventsItem(Value.MEMBERSHIP_METADATA_UPDATED, "membership.metadata_updated");
-
-    public static final WebhookEventsItem CARD_TRANSACTION_UPDATED =
-            new WebhookEventsItem(Value.CARD_TRANSACTION_UPDATED, "card_transaction.updated");
 
     public static final WebhookEventsItem CHAT_REACTION_CREATED =
             new WebhookEventsItem(Value.CHAT_REACTION_CREATED, "chat.reaction.created");
@@ -237,8 +332,8 @@ public final class WebhookEventsItem {
     public static final WebhookEventsItem INVOICE_CREATED =
             new WebhookEventsItem(Value.INVOICE_CREATED, "invoice.created");
 
-    public static final WebhookEventsItem INVOICE_PAST_DUE =
-            new WebhookEventsItem(Value.INVOICE_PAST_DUE, "invoice.past_due");
+    public static final WebhookEventsItem PAYMENT_CANCELED =
+            new WebhookEventsItem(Value.PAYMENT_CANCELED, "payment.canceled");
 
     public static final WebhookEventsItem MEMBERSHIP_WENT_VALID =
             new WebhookEventsItem(Value.MEMBERSHIP_WENT_VALID, "membership.went_valid");
@@ -246,9 +341,7 @@ public final class WebhookEventsItem {
     public static final WebhookEventsItem IDENTITY_PROFILE_NEEDS_ACTION =
             new WebhookEventsItem(Value.IDENTITY_PROFILE_NEEDS_ACTION, "identity_profile.needs_action");
 
-    public static final WebhookEventsItem INVOICE_PAID = new WebhookEventsItem(Value.INVOICE_PAID, "invoice.paid");
-
-    public static final WebhookEventsItem PLAN_CREATED = new WebhookEventsItem(Value.PLAN_CREATED, "plan.created");
+    public static final WebhookEventsItem AD_UPDATED = new WebhookEventsItem(Value.AD_UPDATED, "ad.updated");
 
     public static final WebhookEventsItem SETUP_INTENT_REQUIRES_ACTION =
             new WebhookEventsItem(Value.SETUP_INTENT_REQUIRES_ACTION, "setup_intent.requires_action");
@@ -256,14 +349,8 @@ public final class WebhookEventsItem {
     public static final WebhookEventsItem INVOICE_VOIDED =
             new WebhookEventsItem(Value.INVOICE_VOIDED, "invoice.voided");
 
-    public static final WebhookEventsItem CARD_TRANSACTION_DECLINED =
-            new WebhookEventsItem(Value.CARD_TRANSACTION_DECLINED, "card_transaction.declined");
-
-    public static final WebhookEventsItem IDENTITY_PROFILE_UPDATED =
-            new WebhookEventsItem(Value.IDENTITY_PROFILE_UPDATED, "identity_profile.updated");
-
-    public static final WebhookEventsItem APP_MEMBERSHIP_WENT_INVALID =
-            new WebhookEventsItem(Value.APP_MEMBERSHIP_WENT_INVALID, "app_membership.went_invalid");
+    public static final WebhookEventsItem AD_CAMPAIGN_UPDATED =
+            new WebhookEventsItem(Value.AD_CAMPAIGN_UPDATED, "ad_campaign.updated");
 
     private final Value value;
 
@@ -299,20 +386,14 @@ public final class WebhookEventsItem {
         switch (value) {
             case RESOLUTION_CENTER_CASE_CREATED:
                 return visitor.visitResolutionCenterCaseCreated();
-            case PAYMENT_AFFILIATE_REWARD_CREATED:
-                return visitor.visitPaymentAffiliateRewardCreated();
+            case AD_DELETED:
+                return visitor.visitAdDeleted();
+            case PAYOUT_CREATED:
+                return visitor.visitPayoutCreated();
             case APP_PAYMENT_CREATED:
                 return visitor.visitAppPaymentCreated();
-            case AD_CAMPAIGN_PAYMENT_FAILED:
-                return visitor.visitAdCampaignPaymentFailed();
             case IDENTITY_PROFILE_REJECTED:
                 return visitor.visitIdentityProfileRejected();
-            case PLAN_DELETED:
-                return visitor.visitPlanDeleted();
-            case RESOLUTION_CREATED:
-                return visitor.visitResolutionCreated();
-            case PAYOUT_METHOD_CREATED:
-                return visitor.visitPayoutMethodCreated();
             case MEMBERSHIP_WENT_INVALID:
                 return visitor.visitMembershipWentInvalid();
             case TRANSFER_COMPLETED:
@@ -327,26 +408,16 @@ public final class WebhookEventsItem {
                 return visitor.visitMembershipCancelAtPeriodEndChanged();
             case ENTRY_DENIED:
                 return visitor.visitEntryDenied();
+            case AD_CAMPAIGN_EVENTS:
+                return visitor.visitAdCampaignEvents();
             case TRANSFER_FAILED:
                 return visitor.visitTransferFailed();
-            case COURSE_LESSON_INTERACTION_COMPLETED:
-                return visitor.visitCourseLessonInteractionCompleted();
-            case CARD_CANCELED:
-                return visitor.visitCardCanceled();
-            case DEPOSIT_SUCCEEDED:
-                return visitor.visitDepositSucceeded();
-            case VERIFICATION_SUCCEEDED:
-                return visitor.visitVerificationSucceeded();
             case PLAN_UPDATED:
                 return visitor.visitPlanUpdated();
-            case PRODUCT_CREATED:
-                return visitor.visitProductCreated();
-            case MEMBER_CREATED:
-                return visitor.visitMemberCreated();
+            case MEMBERSHIP_UPDATED:
+                return visitor.visitMembershipUpdated();
             case SETUP_INTENT_SUCCEEDED:
                 return visitor.visitSetupIntentSucceeded();
-            case CARD_TRANSACTION_COMPLETED:
-                return visitor.visitCardTransactionCompleted();
             case MEMBERSHIP_DEACTIVATED:
                 return visitor.visitMembershipDeactivated();
             case CARD_TRANSACTION_REVERSED:
@@ -355,22 +426,18 @@ public final class WebhookEventsItem {
                 return visitor.visitCardFrozen();
             case WITHDRAWAL_UPDATED:
                 return visitor.visitWithdrawalUpdated();
+            case APP_INSTALLATION_CREATED:
+                return visitor.visitAppInstallationCreated();
             case SETUP_INTENT_CANCELED:
                 return visitor.visitSetupIntentCanceled();
             case APP_PAYMENT_FAILED:
                 return visitor.visitAppPaymentFailed();
-            case APP_MEMBERSHIP_CANCEL_AT_PERIOD_END_CHANGED:
-                return visitor.visitAppMembershipCancelAtPeriodEndChanged();
-            case APP_PAYMENT_SUCCEEDED:
-                return visitor.visitAppPaymentSucceeded();
-            case CARD_CREATED:
-                return visitor.visitCardCreated();
+            case AD_GROUP_DELETED:
+                return visitor.visitAdGroupDeleted();
             case RESOLUTION_CENTER_CASE_UPDATED:
                 return visitor.visitResolutionCenterCaseUpdated();
             case PRODUCT_UNPUBLISHED:
                 return visitor.visitProductUnpublished();
-            case PAYMENT_FAILED:
-                return visitor.visitPaymentFailed();
             case APP_PAYMENT_PENDING:
                 return visitor.visitAppPaymentPending();
             case ENTRY_DELETED:
@@ -379,44 +446,40 @@ public final class WebhookEventsItem {
                 return visitor.visitSwapCompleted();
             case ENTRY_APPROVED:
                 return visitor.visitEntryApproved();
+            case FINANCIAL_ACTIVITY_FUNDS_AVAILABLE:
+                return visitor.visitFinancialActivityFundsAvailable();
             case DISPUTE_ALERT_CREATED:
                 return visitor.visitDisputeAlertCreated();
             case CARD_TRANSACTION_CREATED:
                 return visitor.visitCardTransactionCreated();
             case REFUND_UPDATED:
                 return visitor.visitRefundUpdated();
-            case RESOLUTION_DECIDED:
-                return visitor.visitResolutionDecided();
             case WITHDRAWAL_REVERSED:
                 return visitor.visitWithdrawalReversed();
+            case EVENTS_CREATED:
+                return visitor.visitEventsCreated();
             case PAYOUT_ACCOUNT_STATUS_UPDATED:
                 return visitor.visitPayoutAccountStatusUpdated();
-            case IDENTITY_PROFILE_APPROVED:
-                return visitor.visitIdentityProfileApproved();
-            case SHIPMENT_CREATED:
-                return visitor.visitShipmentCreated();
-            case DISPUTE_UPDATED:
-                return visitor.visitDisputeUpdated();
+            case SHIPPING_ADDRESS_CHANGED:
+                return visitor.visitShippingAddressChanged();
             case ENTRY_CREATED:
                 return visitor.visitEntryCreated();
             case APP_MEMBERSHIP_WENT_VALID:
                 return visitor.visitAppMembershipWentValid();
             case PRODUCT_UPDATED:
                 return visitor.visitProductUpdated();
-            case ACCOUNT_UPDATED:
-                return visitor.visitAccountUpdated();
             case WITHDRAWAL_CREATED:
                 return visitor.visitWithdrawalCreated();
             case CHAT_MESSAGE_CREATED:
                 return visitor.visitChatMessageCreated();
-            case LEDGER_ACCOUNT_FUNDS_AVAILABLE:
-                return visitor.visitLedgerAccountFundsAvailable();
+            case PAYMENT_AUTHORIZED:
+                return visitor.visitPaymentAuthorized();
+            case ACCOUNT_FINANCING_DENIED:
+                return visitor.visitAccountFinancingDenied();
             case MEMBERSHIP_ACTIVATED:
                 return visitor.visitMembershipActivated();
-            case PAYMENT_PENDING:
-                return visitor.visitPaymentPending();
-            case MEMBERSHIP_TRIAL_ENDING_SOON:
-                return visitor.visitMembershipTrialEndingSoon();
+            case PAYOUT_REVERSED:
+                return visitor.visitPayoutReversed();
             case REFUND_CREATED:
                 return visitor.visitRefundCreated();
             case CARD_UPDATED:
@@ -429,24 +492,114 @@ public final class WebhookEventsItem {
                 return visitor.visitPaymentCreated();
             case INVOICE_MARKED_UNCOLLECTIBLE:
                 return visitor.visitInvoiceMarkedUncollectible();
-            case RESOLUTION_CENTER_CASE_DECIDED:
-                return visitor.visitResolutionCenterCaseDecided();
-            case MEMBERSHIP_EXPERIENCE_CLAIMED:
-                return visitor.visitMembershipExperienceClaimed();
             case EXPORT_COMPLETED:
                 return visitor.visitExportCompleted();
-            case PRODUCT_PUBLISHED:
-                return visitor.visitProductPublished();
             case CARD_APPLICATION_UPDATED:
                 return visitor.visitCardApplicationUpdated();
+            case PAYOUT_UPDATED:
+                return visitor.visitPayoutUpdated();
+            case MEMBERSHIP_METADATA_UPDATED:
+                return visitor.visitMembershipMetadataUpdated();
+            case ACCOUNT_FINANCING_DISABLED:
+                return visitor.visitAccountFinancingDisabled();
+            case CARD_TRANSACTION_UPDATED:
+                return visitor.visitCardTransactionUpdated();
+            case INVOICE_PAST_DUE:
+                return visitor.visitInvoicePastDue();
+            case INVOICE_PAID:
+                return visitor.visitInvoicePaid();
+            case PLAN_CREATED:
+                return visitor.visitPlanCreated();
+            case CARD_TRANSACTION_DECLINED:
+                return visitor.visitCardTransactionDeclined();
+            case IDENTITY_PROFILE_UPDATED:
+                return visitor.visitIdentityProfileUpdated();
+            case APP_MEMBERSHIP_WENT_INVALID:
+                return visitor.visitAppMembershipWentInvalid();
+            case PAYMENT_AFFILIATE_REWARD_CREATED:
+                return visitor.visitPaymentAffiliateRewardCreated();
+            case AD_CAMPAIGN_PAYMENT_FAILED:
+                return visitor.visitAdCampaignPaymentFailed();
+            case PLAN_DELETED:
+                return visitor.visitPlanDeleted();
+            case RESOLUTION_CREATED:
+                return visitor.visitResolutionCreated();
+            case PAYOUT_METHOD_CREATED:
+                return visitor.visitPayoutMethodCreated();
+            case APP_PAYMENT_REQUIRES_ACTION:
+                return visitor.visitAppPaymentRequiresAction();
+            case MEMBER_UPDATED:
+                return visitor.visitMemberUpdated();
+            case PAYMENT_REQUIRES_ACTION:
+                return visitor.visitPaymentRequiresAction();
+            case AD_CAMPAIGN_CREATED:
+                return visitor.visitAdCampaignCreated();
+            case COURSE_LESSON_INTERACTION_COMPLETED:
+                return visitor.visitCourseLessonInteractionCompleted();
+            case CARD_CANCELED:
+                return visitor.visitCardCanceled();
+            case DEPOSIT_SUCCEEDED:
+                return visitor.visitDepositSucceeded();
+            case VERIFICATION_SUCCEEDED:
+                return visitor.visitVerificationSucceeded();
+            case PRODUCT_CREATED:
+                return visitor.visitProductCreated();
+            case MEMBER_CREATED:
+                return visitor.visitMemberCreated();
+            case CARD_TRANSACTION_COMPLETED:
+                return visitor.visitCardTransactionCompleted();
+            case AD_GROUP_UPDATED:
+                return visitor.visitAdGroupUpdated();
+            case APP_INSTALLATION_DELETED:
+                return visitor.visitAppInstallationDeleted();
+            case APP_MEMBERSHIP_CANCEL_AT_PERIOD_END_CHANGED:
+                return visitor.visitAppMembershipCancelAtPeriodEndChanged();
+            case APP_PAYMENT_SUCCEEDED:
+                return visitor.visitAppPaymentSucceeded();
+            case CARD_CREATED:
+                return visitor.visitCardCreated();
+            case DOMAIN_UPDATED:
+                return visitor.visitDomainUpdated();
+            case PAYMENT_FAILED:
+                return visitor.visitPaymentFailed();
+            case ACCOUNT_FINANCING_APPROVED:
+                return visitor.visitAccountFinancingApproved();
+            case RESOLUTION_DECIDED:
+                return visitor.visitResolutionDecided();
+            case AD_CAMPAIGN_DELETED:
+                return visitor.visitAdCampaignDeleted();
+            case IDENTITY_PROFILE_APPROVED:
+                return visitor.visitIdentityProfileApproved();
+            case SHIPMENT_CREATED:
+                return visitor.visitShipmentCreated();
+            case AD_GROUP_CREATED:
+                return visitor.visitAdGroupCreated();
+            case DISPUTE_UPDATED:
+                return visitor.visitDisputeUpdated();
+            case ACCOUNT_UPDATED:
+                return visitor.visitAccountUpdated();
+            case DOMAIN_DELETED:
+                return visitor.visitDomainDeleted();
+            case LEDGER_ACCOUNT_FUNDS_AVAILABLE:
+                return visitor.visitLedgerAccountFundsAvailable();
+            case AD_CREATED:
+                return visitor.visitAdCreated();
+            case PAYMENT_PENDING:
+                return visitor.visitPaymentPending();
+            case MEMBERSHIP_TRIAL_ENDING_SOON:
+                return visitor.visitMembershipTrialEndingSoon();
+            case RESOLUTION_CENTER_CASE_DECIDED:
+                return visitor.visitResolutionCenterCaseDecided();
+            case DOMAIN_CREATED:
+                return visitor.visitDomainCreated();
+            case MEMBERSHIP_EXPERIENCE_CLAIMED:
+                return visitor.visitMembershipExperienceClaimed();
+            case PRODUCT_PUBLISHED:
+                return visitor.visitProductPublished();
             case RESOLUTION_UPDATED:
                 return visitor.visitResolutionUpdated();
             case EXPORT_FAILED:
                 return visitor.visitExportFailed();
-            case MEMBERSHIP_METADATA_UPDATED:
-                return visitor.visitMembershipMetadataUpdated();
-            case CARD_TRANSACTION_UPDATED:
-                return visitor.visitCardTransactionUpdated();
             case CHAT_REACTION_CREATED:
                 return visitor.visitChatReactionCreated();
             case PAYMENT_SUCCEEDED:
@@ -457,26 +610,20 @@ public final class WebhookEventsItem {
                 return visitor.visitDisputeCreated();
             case INVOICE_CREATED:
                 return visitor.visitInvoiceCreated();
-            case INVOICE_PAST_DUE:
-                return visitor.visitInvoicePastDue();
+            case PAYMENT_CANCELED:
+                return visitor.visitPaymentCanceled();
             case MEMBERSHIP_WENT_VALID:
                 return visitor.visitMembershipWentValid();
             case IDENTITY_PROFILE_NEEDS_ACTION:
                 return visitor.visitIdentityProfileNeedsAction();
-            case INVOICE_PAID:
-                return visitor.visitInvoicePaid();
-            case PLAN_CREATED:
-                return visitor.visitPlanCreated();
+            case AD_UPDATED:
+                return visitor.visitAdUpdated();
             case SETUP_INTENT_REQUIRES_ACTION:
                 return visitor.visitSetupIntentRequiresAction();
             case INVOICE_VOIDED:
                 return visitor.visitInvoiceVoided();
-            case CARD_TRANSACTION_DECLINED:
-                return visitor.visitCardTransactionDeclined();
-            case IDENTITY_PROFILE_UPDATED:
-                return visitor.visitIdentityProfileUpdated();
-            case APP_MEMBERSHIP_WENT_INVALID:
-                return visitor.visitAppMembershipWentInvalid();
+            case AD_CAMPAIGN_UPDATED:
+                return visitor.visitAdCampaignUpdated();
             case UNKNOWN:
             default:
                 return visitor.visitUnknown(string);
@@ -488,20 +635,14 @@ public final class WebhookEventsItem {
         switch (value) {
             case "resolution_center_case.created":
                 return RESOLUTION_CENTER_CASE_CREATED;
-            case "payment.affiliate_reward_created":
-                return PAYMENT_AFFILIATE_REWARD_CREATED;
+            case "ad.deleted":
+                return AD_DELETED;
+            case "payout.created":
+                return PAYOUT_CREATED;
             case "app_payment.created":
                 return APP_PAYMENT_CREATED;
-            case "ad_campaign.payment_failed":
-                return AD_CAMPAIGN_PAYMENT_FAILED;
             case "identity_profile.rejected":
                 return IDENTITY_PROFILE_REJECTED;
-            case "plan.deleted":
-                return PLAN_DELETED;
-            case "resolution.created":
-                return RESOLUTION_CREATED;
-            case "payout_method.created":
-                return PAYOUT_METHOD_CREATED;
             case "membership.went_invalid":
                 return MEMBERSHIP_WENT_INVALID;
             case "transfer.completed":
@@ -516,26 +657,16 @@ public final class WebhookEventsItem {
                 return MEMBERSHIP_CANCEL_AT_PERIOD_END_CHANGED;
             case "entry.denied":
                 return ENTRY_DENIED;
+            case "ad_campaign.events":
+                return AD_CAMPAIGN_EVENTS;
             case "transfer.failed":
                 return TRANSFER_FAILED;
-            case "course_lesson_interaction.completed":
-                return COURSE_LESSON_INTERACTION_COMPLETED;
-            case "card.canceled":
-                return CARD_CANCELED;
-            case "deposit.succeeded":
-                return DEPOSIT_SUCCEEDED;
-            case "verification.succeeded":
-                return VERIFICATION_SUCCEEDED;
             case "plan.updated":
                 return PLAN_UPDATED;
-            case "product.created":
-                return PRODUCT_CREATED;
-            case "member.created":
-                return MEMBER_CREATED;
+            case "membership.updated":
+                return MEMBERSHIP_UPDATED;
             case "setup_intent.succeeded":
                 return SETUP_INTENT_SUCCEEDED;
-            case "card_transaction.completed":
-                return CARD_TRANSACTION_COMPLETED;
             case "membership.deactivated":
                 return MEMBERSHIP_DEACTIVATED;
             case "card_transaction.reversed":
@@ -544,22 +675,18 @@ public final class WebhookEventsItem {
                 return CARD_FROZEN;
             case "withdrawal.updated":
                 return WITHDRAWAL_UPDATED;
+            case "app_installation.created":
+                return APP_INSTALLATION_CREATED;
             case "setup_intent.canceled":
                 return SETUP_INTENT_CANCELED;
             case "app_payment.failed":
                 return APP_PAYMENT_FAILED;
-            case "app_membership.cancel_at_period_end_changed":
-                return APP_MEMBERSHIP_CANCEL_AT_PERIOD_END_CHANGED;
-            case "app_payment.succeeded":
-                return APP_PAYMENT_SUCCEEDED;
-            case "card.created":
-                return CARD_CREATED;
+            case "ad_group.deleted":
+                return AD_GROUP_DELETED;
             case "resolution_center_case.updated":
                 return RESOLUTION_CENTER_CASE_UPDATED;
             case "product.unpublished":
                 return PRODUCT_UNPUBLISHED;
-            case "payment.failed":
-                return PAYMENT_FAILED;
             case "app_payment.pending":
                 return APP_PAYMENT_PENDING;
             case "entry.deleted":
@@ -568,44 +695,40 @@ public final class WebhookEventsItem {
                 return SWAP_COMPLETED;
             case "entry.approved":
                 return ENTRY_APPROVED;
+            case "financial_activity.funds_available":
+                return FINANCIAL_ACTIVITY_FUNDS_AVAILABLE;
             case "dispute_alert.created":
                 return DISPUTE_ALERT_CREATED;
             case "card_transaction.created":
                 return CARD_TRANSACTION_CREATED;
             case "refund.updated":
                 return REFUND_UPDATED;
-            case "resolution.decided":
-                return RESOLUTION_DECIDED;
             case "withdrawal.reversed":
                 return WITHDRAWAL_REVERSED;
+            case "events.created":
+                return EVENTS_CREATED;
             case "payout_account.status_updated":
                 return PAYOUT_ACCOUNT_STATUS_UPDATED;
-            case "identity_profile.approved":
-                return IDENTITY_PROFILE_APPROVED;
-            case "shipment.created":
-                return SHIPMENT_CREATED;
-            case "dispute.updated":
-                return DISPUTE_UPDATED;
+            case "shipping_address.changed":
+                return SHIPPING_ADDRESS_CHANGED;
             case "entry.created":
                 return ENTRY_CREATED;
             case "app_membership.went_valid":
                 return APP_MEMBERSHIP_WENT_VALID;
             case "product.updated":
                 return PRODUCT_UPDATED;
-            case "account.updated":
-                return ACCOUNT_UPDATED;
             case "withdrawal.created":
                 return WITHDRAWAL_CREATED;
             case "chat.message.created":
                 return CHAT_MESSAGE_CREATED;
-            case "ledger_account.funds_available":
-                return LEDGER_ACCOUNT_FUNDS_AVAILABLE;
+            case "payment.authorized":
+                return PAYMENT_AUTHORIZED;
+            case "account.financing_denied":
+                return ACCOUNT_FINANCING_DENIED;
             case "membership.activated":
                 return MEMBERSHIP_ACTIVATED;
-            case "payment.pending":
-                return PAYMENT_PENDING;
-            case "membership.trial_ending_soon":
-                return MEMBERSHIP_TRIAL_ENDING_SOON;
+            case "payout.reversed":
+                return PAYOUT_REVERSED;
             case "refund.created":
                 return REFUND_CREATED;
             case "card.updated":
@@ -618,24 +741,114 @@ public final class WebhookEventsItem {
                 return PAYMENT_CREATED;
             case "invoice.marked_uncollectible":
                 return INVOICE_MARKED_UNCOLLECTIBLE;
-            case "resolution_center_case.decided":
-                return RESOLUTION_CENTER_CASE_DECIDED;
-            case "membership.experience_claimed":
-                return MEMBERSHIP_EXPERIENCE_CLAIMED;
             case "export.completed":
                 return EXPORT_COMPLETED;
-            case "product.published":
-                return PRODUCT_PUBLISHED;
             case "card_application.updated":
                 return CARD_APPLICATION_UPDATED;
+            case "payout.updated":
+                return PAYOUT_UPDATED;
+            case "membership.metadata_updated":
+                return MEMBERSHIP_METADATA_UPDATED;
+            case "account.financing_disabled":
+                return ACCOUNT_FINANCING_DISABLED;
+            case "card_transaction.updated":
+                return CARD_TRANSACTION_UPDATED;
+            case "invoice.past_due":
+                return INVOICE_PAST_DUE;
+            case "invoice.paid":
+                return INVOICE_PAID;
+            case "plan.created":
+                return PLAN_CREATED;
+            case "card_transaction.declined":
+                return CARD_TRANSACTION_DECLINED;
+            case "identity_profile.updated":
+                return IDENTITY_PROFILE_UPDATED;
+            case "app_membership.went_invalid":
+                return APP_MEMBERSHIP_WENT_INVALID;
+            case "payment.affiliate_reward_created":
+                return PAYMENT_AFFILIATE_REWARD_CREATED;
+            case "ad_campaign.payment_failed":
+                return AD_CAMPAIGN_PAYMENT_FAILED;
+            case "plan.deleted":
+                return PLAN_DELETED;
+            case "resolution.created":
+                return RESOLUTION_CREATED;
+            case "payout_method.created":
+                return PAYOUT_METHOD_CREATED;
+            case "app_payment.requires_action":
+                return APP_PAYMENT_REQUIRES_ACTION;
+            case "member.updated":
+                return MEMBER_UPDATED;
+            case "payment.requires_action":
+                return PAYMENT_REQUIRES_ACTION;
+            case "ad_campaign.created":
+                return AD_CAMPAIGN_CREATED;
+            case "course_lesson_interaction.completed":
+                return COURSE_LESSON_INTERACTION_COMPLETED;
+            case "card.canceled":
+                return CARD_CANCELED;
+            case "deposit.succeeded":
+                return DEPOSIT_SUCCEEDED;
+            case "verification.succeeded":
+                return VERIFICATION_SUCCEEDED;
+            case "product.created":
+                return PRODUCT_CREATED;
+            case "member.created":
+                return MEMBER_CREATED;
+            case "card_transaction.completed":
+                return CARD_TRANSACTION_COMPLETED;
+            case "ad_group.updated":
+                return AD_GROUP_UPDATED;
+            case "app_installation.deleted":
+                return APP_INSTALLATION_DELETED;
+            case "app_membership.cancel_at_period_end_changed":
+                return APP_MEMBERSHIP_CANCEL_AT_PERIOD_END_CHANGED;
+            case "app_payment.succeeded":
+                return APP_PAYMENT_SUCCEEDED;
+            case "card.created":
+                return CARD_CREATED;
+            case "domain.updated":
+                return DOMAIN_UPDATED;
+            case "payment.failed":
+                return PAYMENT_FAILED;
+            case "account.financing_approved":
+                return ACCOUNT_FINANCING_APPROVED;
+            case "resolution.decided":
+                return RESOLUTION_DECIDED;
+            case "ad_campaign.deleted":
+                return AD_CAMPAIGN_DELETED;
+            case "identity_profile.approved":
+                return IDENTITY_PROFILE_APPROVED;
+            case "shipment.created":
+                return SHIPMENT_CREATED;
+            case "ad_group.created":
+                return AD_GROUP_CREATED;
+            case "dispute.updated":
+                return DISPUTE_UPDATED;
+            case "account.updated":
+                return ACCOUNT_UPDATED;
+            case "domain.deleted":
+                return DOMAIN_DELETED;
+            case "ledger_account.funds_available":
+                return LEDGER_ACCOUNT_FUNDS_AVAILABLE;
+            case "ad.created":
+                return AD_CREATED;
+            case "payment.pending":
+                return PAYMENT_PENDING;
+            case "membership.trial_ending_soon":
+                return MEMBERSHIP_TRIAL_ENDING_SOON;
+            case "resolution_center_case.decided":
+                return RESOLUTION_CENTER_CASE_DECIDED;
+            case "domain.created":
+                return DOMAIN_CREATED;
+            case "membership.experience_claimed":
+                return MEMBERSHIP_EXPERIENCE_CLAIMED;
+            case "product.published":
+                return PRODUCT_PUBLISHED;
             case "resolution.updated":
                 return RESOLUTION_UPDATED;
             case "export.failed":
                 return EXPORT_FAILED;
-            case "membership.metadata_updated":
-                return MEMBERSHIP_METADATA_UPDATED;
-            case "card_transaction.updated":
-                return CARD_TRANSACTION_UPDATED;
             case "chat.reaction.created":
                 return CHAT_REACTION_CREATED;
             case "payment.succeeded":
@@ -646,26 +859,20 @@ public final class WebhookEventsItem {
                 return DISPUTE_CREATED;
             case "invoice.created":
                 return INVOICE_CREATED;
-            case "invoice.past_due":
-                return INVOICE_PAST_DUE;
+            case "payment.canceled":
+                return PAYMENT_CANCELED;
             case "membership.went_valid":
                 return MEMBERSHIP_WENT_VALID;
             case "identity_profile.needs_action":
                 return IDENTITY_PROFILE_NEEDS_ACTION;
-            case "invoice.paid":
-                return INVOICE_PAID;
-            case "plan.created":
-                return PLAN_CREATED;
+            case "ad.updated":
+                return AD_UPDATED;
             case "setup_intent.requires_action":
                 return SETUP_INTENT_REQUIRES_ACTION;
             case "invoice.voided":
                 return INVOICE_VOIDED;
-            case "card_transaction.declined":
-                return CARD_TRANSACTION_DECLINED;
-            case "identity_profile.updated":
-                return IDENTITY_PROFILE_UPDATED;
-            case "app_membership.went_invalid":
-                return APP_MEMBERSHIP_WENT_INVALID;
+            case "ad_campaign.updated":
+                return AD_CAMPAIGN_UPDATED;
             default:
                 return new WebhookEventsItem(Value.UNKNOWN, value);
         }
@@ -673,6 +880,12 @@ public final class WebhookEventsItem {
 
     public enum Value {
         ACCOUNT_UPDATED,
+
+        ACCOUNT_FINANCING_APPROVED,
+
+        ACCOUNT_FINANCING_DENIED,
+
+        ACCOUNT_FINANCING_DISABLED,
 
         INVOICE_CREATED,
 
@@ -689,6 +902,8 @@ public final class WebhookEventsItem {
         MEMBERSHIP_DEACTIVATED,
 
         MEMBERSHIP_TRIAL_ENDING_SOON,
+
+        MEMBERSHIP_UPDATED,
 
         ENTRY_CREATED,
 
@@ -714,6 +929,8 @@ public final class WebhookEventsItem {
 
         DEPOSIT_SUCCEEDED,
 
+        FINANCIAL_ACTIVITY_FUNDS_AVAILABLE,
+
         TRANSFER_CREATED,
 
         TRANSFER_COMPLETED,
@@ -725,6 +942,12 @@ public final class WebhookEventsItem {
         WITHDRAWAL_UPDATED,
 
         WITHDRAWAL_REVERSED,
+
+        PAYOUT_CREATED,
+
+        PAYOUT_UPDATED,
+
+        PAYOUT_REVERSED,
 
         CARD_TRANSACTION_CREATED,
 
@@ -754,6 +977,12 @@ public final class WebhookEventsItem {
 
         COURSE_LESSON_INTERACTION_COMPLETED,
 
+        DOMAIN_CREATED,
+
+        DOMAIN_UPDATED,
+
+        DOMAIN_DELETED,
+
         PAYOUT_METHOD_CREATED,
 
         VERIFICATION_SUCCEEDED,
@@ -767,6 +996,10 @@ public final class WebhookEventsItem {
         IDENTITY_PROFILE_UPDATED,
 
         PAYOUT_ACCOUNT_STATUS_UPDATED,
+
+        PAYMENT_AUTHORIZED,
+
+        PAYMENT_CANCELED,
 
         RESOLUTION_CENTER_CASE_CREATED,
 
@@ -796,7 +1029,35 @@ public final class WebhookEventsItem {
 
         MEMBER_CREATED,
 
+        MEMBER_UPDATED,
+
+        AD_CAMPAIGN_CREATED,
+
         AD_CAMPAIGN_PAYMENT_FAILED,
+
+        AD_CAMPAIGN_UPDATED,
+
+        AD_CAMPAIGN_EVENTS,
+
+        AD_CAMPAIGN_DELETED,
+
+        AD_GROUP_CREATED,
+
+        AD_GROUP_UPDATED,
+
+        AD_GROUP_DELETED,
+
+        AD_CREATED,
+
+        AD_UPDATED,
+
+        AD_DELETED,
+
+        APP_INSTALLATION_CREATED,
+
+        APP_INSTALLATION_DELETED,
+
+        EVENTS_CREATED,
 
         CHAT_MESSAGE_CREATED,
 
@@ -809,6 +1070,8 @@ public final class WebhookEventsItem {
         PAYMENT_FAILED,
 
         PAYMENT_PENDING,
+
+        PAYMENT_REQUIRES_ACTION,
 
         DISPUTE_CREATED,
 
@@ -850,13 +1113,23 @@ public final class WebhookEventsItem {
 
         APP_PAYMENT_PENDING,
 
+        APP_PAYMENT_REQUIRES_ACTION,
+
         APP_MEMBERSHIP_CANCEL_AT_PERIOD_END_CHANGED,
+
+        SHIPPING_ADDRESS_CHANGED,
 
         UNKNOWN
     }
 
     public interface Visitor<T> {
         T visitAccountUpdated();
+
+        T visitAccountFinancingApproved();
+
+        T visitAccountFinancingDenied();
+
+        T visitAccountFinancingDisabled();
 
         T visitInvoiceCreated();
 
@@ -873,6 +1146,8 @@ public final class WebhookEventsItem {
         T visitMembershipDeactivated();
 
         T visitMembershipTrialEndingSoon();
+
+        T visitMembershipUpdated();
 
         T visitEntryCreated();
 
@@ -898,6 +1173,8 @@ public final class WebhookEventsItem {
 
         T visitDepositSucceeded();
 
+        T visitFinancialActivityFundsAvailable();
+
         T visitTransferCreated();
 
         T visitTransferCompleted();
@@ -909,6 +1186,12 @@ public final class WebhookEventsItem {
         T visitWithdrawalUpdated();
 
         T visitWithdrawalReversed();
+
+        T visitPayoutCreated();
+
+        T visitPayoutUpdated();
+
+        T visitPayoutReversed();
 
         T visitCardTransactionCreated();
 
@@ -938,6 +1221,12 @@ public final class WebhookEventsItem {
 
         T visitCourseLessonInteractionCompleted();
 
+        T visitDomainCreated();
+
+        T visitDomainUpdated();
+
+        T visitDomainDeleted();
+
         T visitPayoutMethodCreated();
 
         T visitVerificationSucceeded();
@@ -951,6 +1240,10 @@ public final class WebhookEventsItem {
         T visitIdentityProfileUpdated();
 
         T visitPayoutAccountStatusUpdated();
+
+        T visitPaymentAuthorized();
+
+        T visitPaymentCanceled();
 
         T visitResolutionCenterCaseCreated();
 
@@ -980,7 +1273,35 @@ public final class WebhookEventsItem {
 
         T visitMemberCreated();
 
+        T visitMemberUpdated();
+
+        T visitAdCampaignCreated();
+
         T visitAdCampaignPaymentFailed();
+
+        T visitAdCampaignUpdated();
+
+        T visitAdCampaignEvents();
+
+        T visitAdCampaignDeleted();
+
+        T visitAdGroupCreated();
+
+        T visitAdGroupUpdated();
+
+        T visitAdGroupDeleted();
+
+        T visitAdCreated();
+
+        T visitAdUpdated();
+
+        T visitAdDeleted();
+
+        T visitAppInstallationCreated();
+
+        T visitAppInstallationDeleted();
+
+        T visitEventsCreated();
 
         T visitChatMessageCreated();
 
@@ -993,6 +1314,8 @@ public final class WebhookEventsItem {
         T visitPaymentFailed();
 
         T visitPaymentPending();
+
+        T visitPaymentRequiresAction();
 
         T visitDisputeCreated();
 
@@ -1034,7 +1357,11 @@ public final class WebhookEventsItem {
 
         T visitAppPaymentPending();
 
+        T visitAppPaymentRequiresAction();
+
         T visitAppMembershipCancelAtPeriodEndChanged();
+
+        T visitShippingAddressChanged();
 
         T visitUnknown(String unknownType);
     }

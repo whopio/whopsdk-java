@@ -190,7 +190,6 @@ public final class CreateDepositsResponseMethodsCryptoItem {
 
         private Optional<String> depositAddress = Optional.empty();
 
-        @JsonAnySetter
         private Map<String, Object> additionalProperties = new HashMap<>();
 
         private Builder() {}
@@ -205,7 +204,6 @@ public final class CreateDepositsResponseMethodsCryptoItem {
         }
 
         /**
-         * <p>Network display name.</p>
          * <p>Network display name.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
@@ -330,6 +328,17 @@ public final class CreateDepositsResponseMethodsCryptoItem {
         public CreateDepositsResponseMethodsCryptoItem build() {
             return new CreateDepositsResponseMethodsCryptoItem(
                     depositAddress, iconUrl, name, supportedCurrencies, additionalProperties);
+        }
+
+        @JsonAnySetter
+        private void putAdditionalPropertyFromJson(String key, Object value) {
+            if (key.equalsIgnoreCase("deposit_address")
+                    || key.equalsIgnoreCase("icon_url")
+                    || key.equalsIgnoreCase("name")
+                    || key.equalsIgnoreCase("supported_currencies")) {
+                return;
+            }
+            this.additionalProperties.put(key, value);
         }
 
         @java.lang.Override

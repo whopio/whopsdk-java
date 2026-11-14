@@ -61,14 +61,14 @@ public class BountySubmissionsClient {
     }
 
     /**
-     * Creates a submission on a workforce bounty. Include a <code>deliverable</code> payload — any combination of links and uploaded files, with at least one of the two — and the submission goes straight to review; create is the only step. For <code>data_capture</code> bounties, omit the deliverable: this starts a claimed attempt whose proof accumulates server-side, and the separate submit endpoint sends it to review once complete. Requires a user credential — account API keys cannot author submissions.
+     * Creates a submission on a workforce bounty. Include a <code>deliverable</code> and the submission goes straight to review; create is the only step. For <code>data_capture</code> bounties, omit the deliverable: this starts a claimed attempt whose proof accumulates server-side, and <code>POST /bounty_submissions/:id/submit</code> sends it to review once complete. Requires a user credential — account API keys cannot author submissions.
      */
     public BountySubmission create(CreateBountySubmissionsRequest request) {
         return this.rawClient.create(request).body();
     }
 
     /**
-     * Creates a submission on a workforce bounty. Include a <code>deliverable</code> payload — any combination of links and uploaded files, with at least one of the two — and the submission goes straight to review; create is the only step. For <code>data_capture</code> bounties, omit the deliverable: this starts a claimed attempt whose proof accumulates server-side, and the separate submit endpoint sends it to review once complete. Requires a user credential — account API keys cannot author submissions.
+     * Creates a submission on a workforce bounty. Include a <code>deliverable</code> and the submission goes straight to review; create is the only step. For <code>data_capture</code> bounties, omit the deliverable: this starts a claimed attempt whose proof accumulates server-side, and <code>POST /bounty_submissions/:id/submit</code> sends it to review once complete. Requires a user credential — account API keys cannot author submissions.
      */
     public BountySubmission create(CreateBountySubmissionsRequest request, RequestOptions requestOptions) {
         return this.rawClient.create(request, requestOptions).body();
@@ -133,28 +133,28 @@ public class BountySubmissionsClient {
     }
 
     /**
-     * Submits a claimed attempt for review. A livestream attempt needs an ended proof stream and can attach an optional <code>deliverable</code> — links, files, and a caption in any combination; if the attempt already went to review when its stream ended, the payload attaches to it once, until reviewers start voting. A data capture attempt instead needs enough validated clip time and takes no payload. Only the worker who started the attempt can submit it — account API keys cannot.
+     * Submits a claimed attempt for review. A livestream attempt needs an ended proof stream and can attach a <code>deliverable</code>; a data capture attempt instead needs enough validated clip time and takes no payload. Only the worker who started the attempt can submit it — account API keys cannot.
      */
     public BountySubmission submit(String id) {
         return this.rawClient.submit(id).body();
     }
 
     /**
-     * Submits a claimed attempt for review. A livestream attempt needs an ended proof stream and can attach an optional <code>deliverable</code> — links, files, and a caption in any combination; if the attempt already went to review when its stream ended, the payload attaches to it once, until reviewers start voting. A data capture attempt instead needs enough validated clip time and takes no payload. Only the worker who started the attempt can submit it — account API keys cannot.
+     * Submits a claimed attempt for review. A livestream attempt needs an ended proof stream and can attach a <code>deliverable</code>; a data capture attempt instead needs enough validated clip time and takes no payload. Only the worker who started the attempt can submit it — account API keys cannot.
      */
     public BountySubmission submit(String id, RequestOptions requestOptions) {
         return this.rawClient.submit(id, requestOptions).body();
     }
 
     /**
-     * Submits a claimed attempt for review. A livestream attempt needs an ended proof stream and can attach an optional <code>deliverable</code> — links, files, and a caption in any combination; if the attempt already went to review when its stream ended, the payload attaches to it once, until reviewers start voting. A data capture attempt instead needs enough validated clip time and takes no payload. Only the worker who started the attempt can submit it — account API keys cannot.
+     * Submits a claimed attempt for review. A livestream attempt needs an ended proof stream and can attach a <code>deliverable</code>; a data capture attempt instead needs enough validated clip time and takes no payload. Only the worker who started the attempt can submit it — account API keys cannot.
      */
     public BountySubmission submit(String id, SubmitBountySubmissionsRequest request) {
         return this.rawClient.submit(id, request).body();
     }
 
     /**
-     * Submits a claimed attempt for review. A livestream attempt needs an ended proof stream and can attach an optional <code>deliverable</code> — links, files, and a caption in any combination; if the attempt already went to review when its stream ended, the payload attaches to it once, until reviewers start voting. A data capture attempt instead needs enough validated clip time and takes no payload. Only the worker who started the attempt can submit it — account API keys cannot.
+     * Submits a claimed attempt for review. A livestream attempt needs an ended proof stream and can attach a <code>deliverable</code>; a data capture attempt instead needs enough validated clip time and takes no payload. Only the worker who started the attempt can submit it — account API keys cannot.
      */
     public BountySubmission submit(String id, SubmitBountySubmissionsRequest request, RequestOptions requestOptions) {
         return this.rawClient.submit(id, request, requestOptions).body();

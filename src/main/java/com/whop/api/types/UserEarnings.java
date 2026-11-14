@@ -28,6 +28,8 @@ public final class UserEarnings {
 
     private final UserEarningsAmount ownedAccounts;
 
+    private final UserEarningsAmount partners;
+
     private final UserEarningsAmount personal;
 
     private final UserEarningsAmount total;
@@ -37,11 +39,13 @@ public final class UserEarnings {
     private UserEarnings(
             Optional<String> firstEarnedAt,
             UserEarningsAmount ownedAccounts,
+            UserEarningsAmount partners,
             UserEarningsAmount personal,
             UserEarningsAmount total,
             Map<String, Object> additionalProperties) {
         this.firstEarnedAt = firstEarnedAt;
         this.ownedAccounts = ownedAccounts;
+        this.partners = partners;
         this.personal = personal;
         this.total = total;
         this.additionalProperties = additionalProperties;
@@ -64,6 +68,14 @@ public final class UserEarnings {
     @JsonProperty("owned_accounts")
     public UserEarningsAmount getOwnedAccounts() {
         return ownedAccounts;
+    }
+
+    /**
+     * @return Partner commissions posted to the user's wallet. Pending Partner payouts are excluded until they post; later reversals do not reduce gross income.
+     */
+    @JsonProperty("partners")
+    public UserEarningsAmount getPartners() {
+        return partners;
     }
 
     /**
@@ -102,13 +114,14 @@ public final class UserEarnings {
     private boolean equalTo(UserEarnings other) {
         return firstEarnedAt.equals(other.firstEarnedAt)
                 && ownedAccounts.equals(other.ownedAccounts)
+                && partners.equals(other.partners)
                 && personal.equals(other.personal)
                 && total.equals(other.total);
     }
 
     @java.lang.Override
     public int hashCode() {
-        return Objects.hash(this.firstEarnedAt, this.ownedAccounts, this.personal, this.total);
+        return Objects.hash(this.firstEarnedAt, this.ownedAccounts, this.partners, this.personal, this.total);
     }
 
     @java.lang.Override
@@ -124,9 +137,16 @@ public final class UserEarnings {
         /**
          * <p>Gross income from accounts the user owns or is owner-authorized on.</p>
          */
-        PersonalStage ownedAccounts(@NotNull UserEarningsAmount ownedAccounts);
+        PartnersStage ownedAccounts(@NotNull UserEarningsAmount ownedAccounts);
 
         Builder from(UserEarnings other);
+    }
+
+    public interface PartnersStage {
+        /**
+         * <p>Partner commissions posted to the user's wallet. Pending Partner payouts are excluded until they post; later reversals do not reduce gross income.</p>
+         */
+        PersonalStage partners(@NotNull UserEarningsAmount partners);
     }
 
     public interface PersonalStage {
@@ -161,8 +181,11 @@ public final class UserEarnings {
     }
 
     @JsonIgnoreProperties(ignoreUnknown = true)
-    public static final class Builder implements OwnedAccountsStage, PersonalStage, TotalStage, _FinalStage {
+    public static final class Builder
+            implements OwnedAccountsStage, PartnersStage, PersonalStage, TotalStage, _FinalStage {
         private UserEarningsAmount ownedAccounts;
+
+        private UserEarningsAmount partners;
 
         private UserEarningsAmount personal;
 
@@ -170,7 +193,6 @@ public final class UserEarnings {
 
         private Optional<String> firstEarnedAt = Optional.empty();
 
-        @JsonAnySetter
         private Map<String, Object> additionalProperties = new HashMap<>();
 
         private Builder() {}
@@ -179,6 +201,7 @@ public final class UserEarnings {
         public Builder from(UserEarnings other) {
             firstEarnedAt(other.getFirstEarnedAt());
             ownedAccounts(other.getOwnedAccounts());
+            partners(other.getPartners());
             personal(other.getPersonal());
             total(other.getTotal());
             return this;
@@ -186,18 +209,27 @@ public final class UserEarnings {
 
         /**
          * <p>Gross income from accounts the user owns or is owner-authorized on.</p>
-         * <p>Gross income from accounts the user owns or is owner-authorized on.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
         @JsonSetter("owned_accounts")
-        public PersonalStage ownedAccounts(@NotNull UserEarningsAmount ownedAccounts) {
+        public PartnersStage ownedAccounts(@NotNull UserEarningsAmount ownedAccounts) {
             this.ownedAccounts = Objects.requireNonNull(ownedAccounts, "ownedAccounts must not be null");
             return this;
         }
 
         /**
-         * <p>Gross income from the user's personal wallet.</p>
+         * <p>Partner commissions posted to the user's wallet. Pending Partner payouts are excluded until they post; later reversals do not reduce gross income.</p>
+         * @return Reference to {@code this} so that method calls can be chained together.
+         */
+        @java.lang.Override
+        @JsonSetter("partners")
+        public PersonalStage partners(@NotNull UserEarningsAmount partners) {
+            this.partners = Objects.requireNonNull(partners, "partners must not be null");
+            return this;
+        }
+
+        /**
          * <p>Gross income from the user's personal wallet.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
@@ -209,7 +241,6 @@ public final class UserEarnings {
         }
 
         /**
-         * <p>Gross income from the user's personal wallet plus accounts they own or are owner-authorized on.</p>
          * <p>Gross income from the user's personal wallet plus accounts they own or are owner-authorized on.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
@@ -258,7 +289,19 @@ public final class UserEarnings {
 
         @java.lang.Override
         public UserEarnings build() {
-            return new UserEarnings(firstEarnedAt, ownedAccounts, personal, total, additionalProperties);
+            return new UserEarnings(firstEarnedAt, ownedAccounts, partners, personal, total, additionalProperties);
+        }
+
+        @JsonAnySetter
+        private void putAdditionalPropertyFromJson(String key, Object value) {
+            if (key.equalsIgnoreCase("first_earned_at")
+                    || key.equalsIgnoreCase("owned_accounts")
+                    || key.equalsIgnoreCase("partners")
+                    || key.equalsIgnoreCase("personal")
+                    || key.equalsIgnoreCase("total")) {
+                return;
+            }
+            this.additionalProperties.put(key, value);
         }
 
         @java.lang.Override

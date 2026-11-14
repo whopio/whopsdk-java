@@ -4,11 +4,14 @@
 package com.whop.api.resources.payouts.methods;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
+import com.whop.api.core.BodyProperties;
 import com.whop.api.core.ClientOptions;
 import com.whop.api.core.MediaTypes;
 import com.whop.api.core.ObjectMappers;
+import com.whop.api.core.PathSegments;
 import com.whop.api.core.QueryStringMapper;
 import com.whop.api.core.RequestOptions;
+import com.whop.api.core.RetryInterceptor;
 import com.whop.api.core.WhopApiApiException;
 import com.whop.api.core.WhopApiException;
 import com.whop.api.core.WhopApiHttpResponse;
@@ -27,7 +30,6 @@ import com.whop.api.resources.payouts.methods.types.DeleteMethodsResponse;
 import com.whop.api.resources.payouts.methods.types.ListMethodsResponse;
 import com.whop.api.resources.payouts.methods.types.ListMethodsResponseDataItem;
 import com.whop.api.resources.payouts.methods.types.UpdateMethodsResponse;
-import com.whop.api.types.V1ErrorResponse;
 import java.io.IOException;
 import java.util.List;
 import java.util.Optional;
@@ -52,14 +54,14 @@ public class AsyncRawMethodsClient {
     }
 
     /**
-     * Lists the bank accounts, wallets, and crypto addresses an account or user can withdraw to, newest first.
+     * Lists the bank accounts, wallets, and crypto addresses an account or user can pay out to, newest first.
      */
     public CompletableFuture<WhopApiHttpResponse<SyncPagingIterable<ListMethodsResponseDataItem>>> list() {
         return list(ListMethodsRequest.builder().build());
     }
 
     /**
-     * Lists the bank accounts, wallets, and crypto addresses an account or user can withdraw to, newest first.
+     * Lists the bank accounts, wallets, and crypto addresses an account or user can pay out to, newest first.
      */
     public CompletableFuture<WhopApiHttpResponse<SyncPagingIterable<ListMethodsResponseDataItem>>> list(
             RequestOptions requestOptions) {
@@ -67,7 +69,7 @@ public class AsyncRawMethodsClient {
     }
 
     /**
-     * Lists the bank accounts, wallets, and crypto addresses an account or user can withdraw to, newest first.
+     * Lists the bank accounts, wallets, and crypto addresses an account or user can pay out to, newest first.
      */
     public CompletableFuture<WhopApiHttpResponse<SyncPagingIterable<ListMethodsResponseDataItem>>> list(
             ListMethodsRequest request) {
@@ -75,11 +77,11 @@ public class AsyncRawMethodsClient {
     }
 
     /**
-     * Lists the bank accounts, wallets, and crypto addresses an account or user can withdraw to, newest first.
+     * Lists the bank accounts, wallets, and crypto addresses an account or user can pay out to, newest first.
      */
     public CompletableFuture<WhopApiHttpResponse<SyncPagingIterable<ListMethodsResponseDataItem>>> list(
             ListMethodsRequest request, RequestOptions requestOptions) {
-        HttpUrl.Builder httpUrl = HttpUrl.parse(this.clientOptions.environment().getUrl())
+        HttpUrl.Builder httpUrl = HttpUrl.parse(this.clientOptions.environment().getApiURL())
                 .newBuilder()
                 .addPathSegments("payouts/methods");
         if (request.getAccountId().isPresent()) {
@@ -101,6 +103,13 @@ public class AsyncRawMethodsClient {
         if (request.getCurrency().isPresent()) {
             QueryStringMapper.addQueryParameter(
                     httpUrl, "currency", request.getCurrency().get(), false);
+        }
+        if (request.getIncludeRecipients().isPresent()) {
+            QueryStringMapper.addQueryParameter(
+                    httpUrl,
+                    "include_recipients",
+                    request.getIncludeRecipients().get(),
+                    false);
         }
         if (request.getIncludeLimits().isPresent()) {
             QueryStringMapper.addQueryParameter(
@@ -137,9 +146,19 @@ public class AsyncRawMethodsClient {
         if (requestOptions != null && requestOptions.getTimeout().isPresent()) {
             client = clientOptions.httpClientWithTimeout(requestOptions);
         }
+        if (requestOptions != null && requestOptions.getMaxRetries().isPresent()) {
+            okhttpRequest = okhttpRequest
+                    .newBuilder()
+                    .tag(
+                            RetryInterceptor.MaxRetriesOverride.class,
+                            new RetryInterceptor.MaxRetriesOverride(
+                                    requestOptions.getMaxRetries().get()))
+                    .build();
+        }
         CompletableFuture<WhopApiHttpResponse<SyncPagingIterable<ListMethodsResponseDataItem>>> future =
                 new CompletableFuture<>();
-        client.newCall(okhttpRequest).enqueue(new Callback() {
+        RetryInterceptor.AsyncCall okhttpCall = RetryInterceptor.newAsyncCall(client, okhttpRequest);
+        okhttpCall.enqueue(new Callback() {
             @Override
             public void onResponse(@NotNull Call call, @NotNull Response response) throws IOException {
                 try (ResponseBody responseBody = response.body()) {
@@ -156,7 +175,11 @@ public class AsyncRawMethodsClient {
                         List<ListMethodsResponseDataItem> result = parsedResponse.getData();
                         future.complete(new WhopApiHttpResponse<>(
                                 new SyncPagingIterable<ListMethodsResponseDataItem>(
-                                        startingAfter != null, result, parsedResponse, () -> {
+                                        startingAfter.isPresent()
+                                                && !startingAfter.get().isEmpty(),
+                                        result,
+                                        parsedResponse,
+                                        () -> {
                                             try {
                                                 return list(nextRequest, requestOptions)
                                                         .get()
@@ -198,6 +221,9 @@ public class AsyncRawMethodsClient {
                     future.completeExceptionally(new WhopApiApiException(
                             "Error with status code " + response.code(), response.code(), errorBody, response));
                     return;
+                } catch (JsonProcessingException e) {
+                    future.completeExceptionally(
+                            new WhopApiException("Failed to deserialize response: " + e.getMessage(), e));
                 } catch (IOException e) {
                     future.completeExceptionally(new WhopApiException("Network error executing HTTP request", e));
                 }
@@ -208,22 +234,27 @@ public class AsyncRawMethodsClient {
                 future.completeExceptionally(new WhopApiException("Network error executing HTTP request", e));
             }
         });
+        future.whenComplete((result_, throwable_) -> {
+            if (future.isCancelled()) {
+                okhttpCall.cancel();
+            }
+        });
         return future;
     }
 
     /**
-     * Saves a new place an account or user can withdraw to. Sensitive details are vaulted in transit and never stored raw.
+     * Saves a bank account, wallet, or crypto address an account or user can pay out to, from a method listed by <code>GET /payouts/supported_methods</code>. Sensitive details are vaulted in transit and never stored raw.
      */
     public CompletableFuture<WhopApiHttpResponse<CreateMethodsResponse>> create(CreateMethodsRequest request) {
         return create(request, null);
     }
 
     /**
-     * Saves a new place an account or user can withdraw to. Sensitive details are vaulted in transit and never stored raw.
+     * Saves a bank account, wallet, or crypto address an account or user can pay out to, from a method listed by <code>GET /payouts/supported_methods</code>. Sensitive details are vaulted in transit and never stored raw.
      */
     public CompletableFuture<WhopApiHttpResponse<CreateMethodsResponse>> create(
             CreateMethodsRequest request, RequestOptions requestOptions) {
-        HttpUrl.Builder httpUrl = HttpUrl.parse(this.clientOptions.environment().getUrl())
+        HttpUrl.Builder httpUrl = HttpUrl.parse(this.clientOptions.environment().getApiURL())
                 .newBuilder()
                 .addPathSegments("payouts/methods");
         if (requestOptions != null) {
@@ -234,7 +265,9 @@ public class AsyncRawMethodsClient {
         RequestBody body;
         try {
             body = RequestBody.create(
-                    ObjectMappers.JSON_MAPPER.writeValueAsBytes(request), MediaTypes.APPLICATION_JSON);
+                    ObjectMappers.JSON_MAPPER.writeValueAsBytes(BodyProperties.merge(
+                            request, requestOptions != null ? requestOptions.getBodyProperties() : null)),
+                    MediaTypes.APPLICATION_JSON);
         } catch (JsonProcessingException e) {
             throw new WhopApiException("Failed to serialize request", e);
         }
@@ -249,8 +282,18 @@ public class AsyncRawMethodsClient {
         if (requestOptions != null && requestOptions.getTimeout().isPresent()) {
             client = clientOptions.httpClientWithTimeout(requestOptions);
         }
+        if (requestOptions != null && requestOptions.getMaxRetries().isPresent()) {
+            okhttpRequest = okhttpRequest
+                    .newBuilder()
+                    .tag(
+                            RetryInterceptor.MaxRetriesOverride.class,
+                            new RetryInterceptor.MaxRetriesOverride(
+                                    requestOptions.getMaxRetries().get()))
+                    .build();
+        }
         CompletableFuture<WhopApiHttpResponse<CreateMethodsResponse>> future = new CompletableFuture<>();
-        client.newCall(okhttpRequest).enqueue(new Callback() {
+        RetryInterceptor.AsyncCall okhttpCall = RetryInterceptor.newAsyncCall(client, okhttpRequest);
+        okhttpCall.enqueue(new Callback() {
             @Override
             public void onResponse(@NotNull Call call, @NotNull Response response) throws IOException {
                 try (ResponseBody responseBody = response.body()) {
@@ -285,7 +328,7 @@ public class AsyncRawMethodsClient {
                                 return;
                             case 409:
                                 future.completeExceptionally(new ConflictError(
-                                        ObjectMappers.JSON_MAPPER.readValue(responseBodyString, V1ErrorResponse.class),
+                                        ObjectMappers.JSON_MAPPER.readValue(responseBodyString, Object.class),
                                         response));
                                 return;
                         }
@@ -296,6 +339,9 @@ public class AsyncRawMethodsClient {
                     future.completeExceptionally(new WhopApiApiException(
                             "Error with status code " + response.code(), response.code(), errorBody, response));
                     return;
+                } catch (JsonProcessingException e) {
+                    future.completeExceptionally(
+                            new WhopApiException("Failed to deserialize response: " + e.getMessage(), e));
                 } catch (IOException e) {
                     future.completeExceptionally(new WhopApiException("Network error executing HTTP request", e));
                 }
@@ -304,6 +350,11 @@ public class AsyncRawMethodsClient {
             @Override
             public void onFailure(@NotNull Call call, @NotNull IOException e) {
                 future.completeExceptionally(new WhopApiException("Network error executing HTTP request", e));
+            }
+        });
+        future.whenComplete((result_, throwable_) -> {
+            if (future.isCancelled()) {
+                okhttpCall.cancel();
             }
         });
         return future;
@@ -337,10 +388,10 @@ public class AsyncRawMethodsClient {
      */
     public CompletableFuture<WhopApiHttpResponse<DeleteMethodsResponse>> delete(
             String id, DeleteMethodsRequest request, RequestOptions requestOptions) {
-        HttpUrl.Builder httpUrl = HttpUrl.parse(this.clientOptions.environment().getUrl())
+        HttpUrl.Builder httpUrl = HttpUrl.parse(this.clientOptions.environment().getApiURL())
                 .newBuilder()
                 .addPathSegments("payouts/methods")
-                .addPathSegment(id);
+                .addPathSegment(PathSegments.validate(id));
         if (requestOptions != null) {
             requestOptions.getQueryParameters().forEach((_key, _value) -> {
                 httpUrl.addQueryParameter(_key, _value);
@@ -348,7 +399,10 @@ public class AsyncRawMethodsClient {
         }
         Request.Builder _requestBuilder = new Request.Builder()
                 .url(httpUrl.build())
-                .method("DELETE", null)
+                .method(
+                        "DELETE",
+                        BodyProperties.toRequestBody(
+                                requestOptions != null ? requestOptions.getBodyProperties() : null, null))
                 .headers(Headers.of(clientOptions.headers(requestOptions)))
                 .addHeader("Accept", "application/json");
         Request okhttpRequest = _requestBuilder.build();
@@ -356,8 +410,18 @@ public class AsyncRawMethodsClient {
         if (requestOptions != null && requestOptions.getTimeout().isPresent()) {
             client = clientOptions.httpClientWithTimeout(requestOptions);
         }
+        if (requestOptions != null && requestOptions.getMaxRetries().isPresent()) {
+            okhttpRequest = okhttpRequest
+                    .newBuilder()
+                    .tag(
+                            RetryInterceptor.MaxRetriesOverride.class,
+                            new RetryInterceptor.MaxRetriesOverride(
+                                    requestOptions.getMaxRetries().get()))
+                    .build();
+        }
         CompletableFuture<WhopApiHttpResponse<DeleteMethodsResponse>> future = new CompletableFuture<>();
-        client.newCall(okhttpRequest).enqueue(new Callback() {
+        RetryInterceptor.AsyncCall okhttpCall = RetryInterceptor.newAsyncCall(client, okhttpRequest);
+        okhttpCall.enqueue(new Callback() {
             @Override
             public void onResponse(@NotNull Call call, @NotNull Response response) throws IOException {
                 try (ResponseBody responseBody = response.body()) {
@@ -393,6 +457,9 @@ public class AsyncRawMethodsClient {
                     future.completeExceptionally(new WhopApiApiException(
                             "Error with status code " + response.code(), response.code(), errorBody, response));
                     return;
+                } catch (JsonProcessingException e) {
+                    future.completeExceptionally(
+                            new WhopApiException("Failed to deserialize response: " + e.getMessage(), e));
                 } catch (IOException e) {
                     future.completeExceptionally(new WhopApiException("Network error executing HTTP request", e));
                 }
@@ -403,11 +470,31 @@ public class AsyncRawMethodsClient {
                 future.completeExceptionally(new WhopApiException("Network error executing HTTP request", e));
             }
         });
+        future.whenComplete((result_, throwable_) -> {
+            if (future.isCancelled()) {
+                okhttpCall.cancel();
+            }
+        });
         return future;
     }
 
     /**
-     * Changes the label used to identify a saved payout method.
+     * Changes the label used to identify a saved payout method, makes it the account's default payout method, or updates the payout address on file for it. Send <code>address</code> on its own: it cannot be combined with <code>nickname</code> or <code>is_default</code>. Address updates require the <code>payout:account:update</code> scope as well, on the same account, and are supported only for bank and wallet payout methods, not recipient payout methods.
+     */
+    public CompletableFuture<WhopApiHttpResponse<UpdateMethodsResponse>> update(String id) {
+        return update(id, UpdateMethodsRequest.builder().build());
+    }
+
+    /**
+     * Changes the label used to identify a saved payout method, makes it the account's default payout method, or updates the payout address on file for it. Send <code>address</code> on its own: it cannot be combined with <code>nickname</code> or <code>is_default</code>. Address updates require the <code>payout:account:update</code> scope as well, on the same account, and are supported only for bank and wallet payout methods, not recipient payout methods.
+     */
+    public CompletableFuture<WhopApiHttpResponse<UpdateMethodsResponse>> update(
+            String id, RequestOptions requestOptions) {
+        return update(id, UpdateMethodsRequest.builder().build(), requestOptions);
+    }
+
+    /**
+     * Changes the label used to identify a saved payout method, makes it the account's default payout method, or updates the payout address on file for it. Send <code>address</code> on its own: it cannot be combined with <code>nickname</code> or <code>is_default</code>. Address updates require the <code>payout:account:update</code> scope as well, on the same account, and are supported only for bank and wallet payout methods, not recipient payout methods.
      */
     public CompletableFuture<WhopApiHttpResponse<UpdateMethodsResponse>> update(
             String id, UpdateMethodsRequest request) {
@@ -415,14 +502,14 @@ public class AsyncRawMethodsClient {
     }
 
     /**
-     * Changes the label used to identify a saved payout method.
+     * Changes the label used to identify a saved payout method, makes it the account's default payout method, or updates the payout address on file for it. Send <code>address</code> on its own: it cannot be combined with <code>nickname</code> or <code>is_default</code>. Address updates require the <code>payout:account:update</code> scope as well, on the same account, and are supported only for bank and wallet payout methods, not recipient payout methods.
      */
     public CompletableFuture<WhopApiHttpResponse<UpdateMethodsResponse>> update(
             String id, UpdateMethodsRequest request, RequestOptions requestOptions) {
-        HttpUrl.Builder httpUrl = HttpUrl.parse(this.clientOptions.environment().getUrl())
+        HttpUrl.Builder httpUrl = HttpUrl.parse(this.clientOptions.environment().getApiURL())
                 .newBuilder()
                 .addPathSegments("payouts/methods")
-                .addPathSegment(id);
+                .addPathSegment(PathSegments.validate(id));
         if (requestOptions != null) {
             requestOptions.getQueryParameters().forEach((_key, _value) -> {
                 httpUrl.addQueryParameter(_key, _value);
@@ -431,7 +518,9 @@ public class AsyncRawMethodsClient {
         RequestBody body;
         try {
             body = RequestBody.create(
-                    ObjectMappers.JSON_MAPPER.writeValueAsBytes(request), MediaTypes.APPLICATION_JSON);
+                    ObjectMappers.JSON_MAPPER.writeValueAsBytes(BodyProperties.merge(
+                            request, requestOptions != null ? requestOptions.getBodyProperties() : null)),
+                    MediaTypes.APPLICATION_JSON);
         } catch (JsonProcessingException e) {
             throw new WhopApiException("Failed to serialize request", e);
         }
@@ -446,8 +535,18 @@ public class AsyncRawMethodsClient {
         if (requestOptions != null && requestOptions.getTimeout().isPresent()) {
             client = clientOptions.httpClientWithTimeout(requestOptions);
         }
+        if (requestOptions != null && requestOptions.getMaxRetries().isPresent()) {
+            okhttpRequest = okhttpRequest
+                    .newBuilder()
+                    .tag(
+                            RetryInterceptor.MaxRetriesOverride.class,
+                            new RetryInterceptor.MaxRetriesOverride(
+                                    requestOptions.getMaxRetries().get()))
+                    .build();
+        }
         CompletableFuture<WhopApiHttpResponse<UpdateMethodsResponse>> future = new CompletableFuture<>();
-        client.newCall(okhttpRequest).enqueue(new Callback() {
+        RetryInterceptor.AsyncCall okhttpCall = RetryInterceptor.newAsyncCall(client, okhttpRequest);
+        okhttpCall.enqueue(new Callback() {
             @Override
             public void onResponse(@NotNull Call call, @NotNull Response response) throws IOException {
                 try (ResponseBody responseBody = response.body()) {
@@ -488,6 +587,9 @@ public class AsyncRawMethodsClient {
                     future.completeExceptionally(new WhopApiApiException(
                             "Error with status code " + response.code(), response.code(), errorBody, response));
                     return;
+                } catch (JsonProcessingException e) {
+                    future.completeExceptionally(
+                            new WhopApiException("Failed to deserialize response: " + e.getMessage(), e));
                 } catch (IOException e) {
                     future.completeExceptionally(new WhopApiException("Network error executing HTTP request", e));
                 }
@@ -496,6 +598,11 @@ public class AsyncRawMethodsClient {
             @Override
             public void onFailure(@NotNull Call call, @NotNull IOException e) {
                 future.completeExceptionally(new WhopApiException("Network error executing HTTP request", e));
+            }
+        });
+        future.whenComplete((result_, throwable_) -> {
+            if (future.isCancelled()) {
+                okhttpCall.cancel();
             }
         });
         return future;

@@ -4,11 +4,14 @@
 package com.whop.api.resources.supportchannels;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
+import com.whop.api.core.BodyProperties;
 import com.whop.api.core.ClientOptions;
 import com.whop.api.core.MediaTypes;
 import com.whop.api.core.ObjectMappers;
+import com.whop.api.core.PathSegments;
 import com.whop.api.core.QueryStringMapper;
 import com.whop.api.core.RequestOptions;
+import com.whop.api.core.RetryInterceptor;
 import com.whop.api.core.WhopApiApiException;
 import com.whop.api.core.WhopApiException;
 import com.whop.api.core.WhopApiHttpResponse;
@@ -24,8 +27,10 @@ import com.whop.api.resources.supportchannels.requests.CreateSupportChannelsRequ
 import com.whop.api.resources.supportchannels.requests.ListSupportChannelsRequest;
 import com.whop.api.resources.supportchannels.requests.RetrieveSupportChannelsRequest;
 import com.whop.api.resources.supportchannels.types.ListSupportChannelsResponse;
+import com.whop.api.types.InternalServerErrorBody;
 import com.whop.api.types.SupportChannel;
 import com.whop.api.types.SupportChannelListItem;
+import com.whop.api.types.UnprocessableEntityErrorBody;
 import java.io.IOException;
 import java.util.List;
 import java.util.Optional;
@@ -50,7 +55,7 @@ public class AsyncRawSupportChannelsClient {
     }
 
     /**
-     * Returns a paginated list of support channels for a specific company, with optional filtering by resolution status and custom sorting.
+     * Lists support channels between an account's team and its customers, most recently active first by default. Pass <code>open=true</code> to find channels awaiting a support response.
      * <p>Required permissions:</p>
      * <ul>
      * <li><code>support_chat:read</code></li>
@@ -61,7 +66,7 @@ public class AsyncRawSupportChannelsClient {
     }
 
     /**
-     * Returns a paginated list of support channels for a specific company, with optional filtering by resolution status and custom sorting.
+     * Lists support channels between an account's team and its customers, most recently active first by default. Pass <code>open=true</code> to find channels awaiting a support response.
      * <p>Required permissions:</p>
      * <ul>
      * <li><code>support_chat:read</code></li>
@@ -73,7 +78,7 @@ public class AsyncRawSupportChannelsClient {
     }
 
     /**
-     * Returns a paginated list of support channels for a specific company, with optional filtering by resolution status and custom sorting.
+     * Lists support channels between an account's team and its customers, most recently active first by default. Pass <code>open=true</code> to find channels awaiting a support response.
      * <p>Required permissions:</p>
      * <ul>
      * <li><code>support_chat:read</code></li>
@@ -85,7 +90,7 @@ public class AsyncRawSupportChannelsClient {
     }
 
     /**
-     * Returns a paginated list of support channels for a specific company, with optional filtering by resolution status and custom sorting.
+     * Lists support channels between an account's team and its customers, most recently active first by default. Pass <code>open=true</code> to find channels awaiting a support response.
      * <p>Required permissions:</p>
      * <ul>
      * <li><code>support_chat:read</code></li>
@@ -93,7 +98,7 @@ public class AsyncRawSupportChannelsClient {
      */
     public CompletableFuture<WhopApiHttpResponse<SyncPagingIterable<SupportChannelListItem>>> list(
             ListSupportChannelsRequest request, RequestOptions requestOptions) {
-        HttpUrl.Builder httpUrl = HttpUrl.parse(this.clientOptions.environment().getUrl())
+        HttpUrl.Builder httpUrl = HttpUrl.parse(this.clientOptions.environment().getApiURL())
                 .newBuilder()
                 .addPathSegments("support_channels");
         if (request.getAfter().isPresent()) {
@@ -112,10 +117,6 @@ public class AsyncRawSupportChannelsClient {
             QueryStringMapper.addQueryParameter(
                     httpUrl, "last", request.getLast().get(), false);
         }
-        if (request.getCompanyId().isPresent()) {
-            QueryStringMapper.addQueryParameter(
-                    httpUrl, "company_id", request.getCompanyId().get(), false);
-        }
         if (request.getView().isPresent()) {
             QueryStringMapper.addQueryParameter(
                     httpUrl, "view", request.getView().get(), false);
@@ -124,6 +125,28 @@ public class AsyncRawSupportChannelsClient {
             QueryStringMapper.addQueryParameter(
                     httpUrl, "open", request.getOpen().get(), false);
         }
+        if (request.getCustomerUserId().isPresent()) {
+            QueryStringMapper.addQueryParameter(
+                    httpUrl, "customer_user_id", request.getCustomerUserId().get(), false);
+        }
+        if (request.getParticipated().isPresent()) {
+            QueryStringMapper.addQueryParameter(
+                    httpUrl, "participated", request.getParticipated().get(), false);
+        }
+        if (request.getIncludeLastMessage().isPresent()) {
+            QueryStringMapper.addQueryParameter(
+                    httpUrl,
+                    "include_last_message",
+                    request.getIncludeLastMessage().get(),
+                    false);
+        }
+        if (request.getIncludeParticipated().isPresent()) {
+            QueryStringMapper.addQueryParameter(
+                    httpUrl,
+                    "include_participated",
+                    request.getIncludeParticipated().get(),
+                    false);
+        }
         if (request.getDirection().isPresent()) {
             QueryStringMapper.addQueryParameter(
                     httpUrl, "direction", request.getDirection().get(), false);
@@ -131,6 +154,14 @@ public class AsyncRawSupportChannelsClient {
         if (request.getOrder().isPresent()) {
             QueryStringMapper.addQueryParameter(
                     httpUrl, "order", request.getOrder().get(), false);
+        }
+        if (request.getAccountId().isPresent()) {
+            QueryStringMapper.addQueryParameter(
+                    httpUrl, "account_id", request.getAccountId().get(), false);
+        }
+        if (request.getCustomerUserIds().isPresent()) {
+            QueryStringMapper.addQueryParameter(
+                    httpUrl, "customer_user_ids", request.getCustomerUserIds().get(), true);
         }
         if (requestOptions != null) {
             requestOptions.getQueryParameters().forEach((_key, _value) -> {
@@ -147,9 +178,19 @@ public class AsyncRawSupportChannelsClient {
         if (requestOptions != null && requestOptions.getTimeout().isPresent()) {
             client = clientOptions.httpClientWithTimeout(requestOptions);
         }
+        if (requestOptions != null && requestOptions.getMaxRetries().isPresent()) {
+            okhttpRequest = okhttpRequest
+                    .newBuilder()
+                    .tag(
+                            RetryInterceptor.MaxRetriesOverride.class,
+                            new RetryInterceptor.MaxRetriesOverride(
+                                    requestOptions.getMaxRetries().get()))
+                    .build();
+        }
         CompletableFuture<WhopApiHttpResponse<SyncPagingIterable<SupportChannelListItem>>> future =
                 new CompletableFuture<>();
-        client.newCall(okhttpRequest).enqueue(new Callback() {
+        RetryInterceptor.AsyncCall okhttpCall = RetryInterceptor.newAsyncCall(client, okhttpRequest);
+        okhttpCall.enqueue(new Callback() {
             @Override
             public void onResponse(@NotNull Call call, @NotNull Response response) throws IOException {
                 try (ResponseBody responseBody = response.body()) {
@@ -166,7 +207,11 @@ public class AsyncRawSupportChannelsClient {
                         List<SupportChannelListItem> result = parsedResponse.getData();
                         future.complete(new WhopApiHttpResponse<>(
                                 new SyncPagingIterable<SupportChannelListItem>(
-                                        startingAfter != null, result, parsedResponse, () -> {
+                                        startingAfter.isPresent()
+                                                && !startingAfter.get().isEmpty(),
+                                        result,
+                                        parsedResponse,
+                                        () -> {
                                             try {
                                                 return list(nextRequest, requestOptions)
                                                         .get()
@@ -202,7 +247,8 @@ public class AsyncRawSupportChannelsClient {
                                 return;
                             case 422:
                                 future.completeExceptionally(new UnprocessableEntityError(
-                                        ObjectMappers.JSON_MAPPER.readValue(responseBodyString, Object.class),
+                                        ObjectMappers.JSON_MAPPER.readValue(
+                                                responseBodyString, UnprocessableEntityErrorBody.class),
                                         response));
                                 return;
                             case 429:
@@ -212,7 +258,8 @@ public class AsyncRawSupportChannelsClient {
                                 return;
                             case 500:
                                 future.completeExceptionally(new InternalServerError(
-                                        ObjectMappers.JSON_MAPPER.readValue(responseBodyString, Object.class),
+                                        ObjectMappers.JSON_MAPPER.readValue(
+                                                responseBodyString, InternalServerErrorBody.class),
                                         response));
                                 return;
                         }
@@ -223,6 +270,9 @@ public class AsyncRawSupportChannelsClient {
                     future.completeExceptionally(new WhopApiApiException(
                             "Error with status code " + response.code(), response.code(), errorBody, response));
                     return;
+                } catch (JsonProcessingException e) {
+                    future.completeExceptionally(
+                            new WhopApiException("Failed to deserialize response: " + e.getMessage(), e));
                 } catch (IOException e) {
                     future.completeExceptionally(new WhopApiException("Network error executing HTTP request", e));
                 }
@@ -233,11 +283,16 @@ public class AsyncRawSupportChannelsClient {
                 future.completeExceptionally(new WhopApiException("Network error executing HTTP request", e));
             }
         });
+        future.whenComplete((result_, throwable_) -> {
+            if (future.isCancelled()) {
+                okhttpCall.cancel();
+            }
+        });
         return future;
     }
 
     /**
-     * Open a new support channel between a company team member and a customer. Returns the existing channel if one already exists for that user.
+     * Opens a support channel between an account's team and a customer. Returns the existing channel if that customer already has one.
      * <p>Required permissions:</p>
      * <ul>
      * <li><code>support_chat:create</code></li>
@@ -248,7 +303,7 @@ public class AsyncRawSupportChannelsClient {
     }
 
     /**
-     * Open a new support channel between a company team member and a customer. Returns the existing channel if one already exists for that user.
+     * Opens a support channel between an account's team and a customer. Returns the existing channel if that customer already has one.
      * <p>Required permissions:</p>
      * <ul>
      * <li><code>support_chat:create</code></li>
@@ -256,7 +311,7 @@ public class AsyncRawSupportChannelsClient {
      */
     public CompletableFuture<WhopApiHttpResponse<SupportChannel>> create(
             CreateSupportChannelsRequest request, RequestOptions requestOptions) {
-        HttpUrl.Builder httpUrl = HttpUrl.parse(this.clientOptions.environment().getUrl())
+        HttpUrl.Builder httpUrl = HttpUrl.parse(this.clientOptions.environment().getApiURL())
                 .newBuilder()
                 .addPathSegments("support_channels");
         if (requestOptions != null) {
@@ -267,7 +322,9 @@ public class AsyncRawSupportChannelsClient {
         RequestBody body;
         try {
             body = RequestBody.create(
-                    ObjectMappers.JSON_MAPPER.writeValueAsBytes(request), MediaTypes.APPLICATION_JSON);
+                    ObjectMappers.JSON_MAPPER.writeValueAsBytes(BodyProperties.merge(
+                            request, requestOptions != null ? requestOptions.getBodyProperties() : null)),
+                    MediaTypes.APPLICATION_JSON);
         } catch (JsonProcessingException e) {
             throw new WhopApiException("Failed to serialize request", e);
         }
@@ -282,8 +339,18 @@ public class AsyncRawSupportChannelsClient {
         if (requestOptions != null && requestOptions.getTimeout().isPresent()) {
             client = clientOptions.httpClientWithTimeout(requestOptions);
         }
+        if (requestOptions != null && requestOptions.getMaxRetries().isPresent()) {
+            okhttpRequest = okhttpRequest
+                    .newBuilder()
+                    .tag(
+                            RetryInterceptor.MaxRetriesOverride.class,
+                            new RetryInterceptor.MaxRetriesOverride(
+                                    requestOptions.getMaxRetries().get()))
+                    .build();
+        }
         CompletableFuture<WhopApiHttpResponse<SupportChannel>> future = new CompletableFuture<>();
-        client.newCall(okhttpRequest).enqueue(new Callback() {
+        RetryInterceptor.AsyncCall okhttpCall = RetryInterceptor.newAsyncCall(client, okhttpRequest);
+        okhttpCall.enqueue(new Callback() {
             @Override
             public void onResponse(@NotNull Call call, @NotNull Response response) throws IOException {
                 try (ResponseBody responseBody = response.body()) {
@@ -318,7 +385,8 @@ public class AsyncRawSupportChannelsClient {
                                 return;
                             case 422:
                                 future.completeExceptionally(new UnprocessableEntityError(
-                                        ObjectMappers.JSON_MAPPER.readValue(responseBodyString, Object.class),
+                                        ObjectMappers.JSON_MAPPER.readValue(
+                                                responseBodyString, UnprocessableEntityErrorBody.class),
                                         response));
                                 return;
                             case 429:
@@ -328,7 +396,8 @@ public class AsyncRawSupportChannelsClient {
                                 return;
                             case 500:
                                 future.completeExceptionally(new InternalServerError(
-                                        ObjectMappers.JSON_MAPPER.readValue(responseBodyString, Object.class),
+                                        ObjectMappers.JSON_MAPPER.readValue(
+                                                responseBodyString, InternalServerErrorBody.class),
                                         response));
                                 return;
                         }
@@ -339,6 +408,9 @@ public class AsyncRawSupportChannelsClient {
                     future.completeExceptionally(new WhopApiApiException(
                             "Error with status code " + response.code(), response.code(), errorBody, response));
                     return;
+                } catch (JsonProcessingException e) {
+                    future.completeExceptionally(
+                            new WhopApiException("Failed to deserialize response: " + e.getMessage(), e));
                 } catch (IOException e) {
                     future.completeExceptionally(new WhopApiException("Network error executing HTTP request", e));
                 }
@@ -347,6 +419,11 @@ public class AsyncRawSupportChannelsClient {
             @Override
             public void onFailure(@NotNull Call call, @NotNull IOException e) {
                 future.completeExceptionally(new WhopApiException("Network error executing HTTP request", e));
+            }
+        });
+        future.whenComplete((result_, throwable_) -> {
+            if (future.isCancelled()) {
+                okhttpCall.cancel();
             }
         });
         return future;
@@ -395,10 +472,10 @@ public class AsyncRawSupportChannelsClient {
      */
     public CompletableFuture<WhopApiHttpResponse<SupportChannel>> retrieve(
             String id, RetrieveSupportChannelsRequest request, RequestOptions requestOptions) {
-        HttpUrl.Builder httpUrl = HttpUrl.parse(this.clientOptions.environment().getUrl())
+        HttpUrl.Builder httpUrl = HttpUrl.parse(this.clientOptions.environment().getApiURL())
                 .newBuilder()
                 .addPathSegments("support_channels")
-                .addPathSegment(id);
+                .addPathSegment(PathSegments.validate(id));
         if (requestOptions != null) {
             requestOptions.getQueryParameters().forEach((_key, _value) -> {
                 httpUrl.addQueryParameter(_key, _value);
@@ -414,8 +491,18 @@ public class AsyncRawSupportChannelsClient {
         if (requestOptions != null && requestOptions.getTimeout().isPresent()) {
             client = clientOptions.httpClientWithTimeout(requestOptions);
         }
+        if (requestOptions != null && requestOptions.getMaxRetries().isPresent()) {
+            okhttpRequest = okhttpRequest
+                    .newBuilder()
+                    .tag(
+                            RetryInterceptor.MaxRetriesOverride.class,
+                            new RetryInterceptor.MaxRetriesOverride(
+                                    requestOptions.getMaxRetries().get()))
+                    .build();
+        }
         CompletableFuture<WhopApiHttpResponse<SupportChannel>> future = new CompletableFuture<>();
-        client.newCall(okhttpRequest).enqueue(new Callback() {
+        RetryInterceptor.AsyncCall okhttpCall = RetryInterceptor.newAsyncCall(client, okhttpRequest);
+        okhttpCall.enqueue(new Callback() {
             @Override
             public void onResponse(@NotNull Call call, @NotNull Response response) throws IOException {
                 try (ResponseBody responseBody = response.body()) {
@@ -450,7 +537,8 @@ public class AsyncRawSupportChannelsClient {
                                 return;
                             case 422:
                                 future.completeExceptionally(new UnprocessableEntityError(
-                                        ObjectMappers.JSON_MAPPER.readValue(responseBodyString, Object.class),
+                                        ObjectMappers.JSON_MAPPER.readValue(
+                                                responseBodyString, UnprocessableEntityErrorBody.class),
                                         response));
                                 return;
                             case 429:
@@ -460,7 +548,8 @@ public class AsyncRawSupportChannelsClient {
                                 return;
                             case 500:
                                 future.completeExceptionally(new InternalServerError(
-                                        ObjectMappers.JSON_MAPPER.readValue(responseBodyString, Object.class),
+                                        ObjectMappers.JSON_MAPPER.readValue(
+                                                responseBodyString, InternalServerErrorBody.class),
                                         response));
                                 return;
                         }
@@ -471,6 +560,9 @@ public class AsyncRawSupportChannelsClient {
                     future.completeExceptionally(new WhopApiApiException(
                             "Error with status code " + response.code(), response.code(), errorBody, response));
                     return;
+                } catch (JsonProcessingException e) {
+                    future.completeExceptionally(
+                            new WhopApiException("Failed to deserialize response: " + e.getMessage(), e));
                 } catch (IOException e) {
                     future.completeExceptionally(new WhopApiException("Network error executing HTTP request", e));
                 }
@@ -479,6 +571,11 @@ public class AsyncRawSupportChannelsClient {
             @Override
             public void onFailure(@NotNull Call call, @NotNull IOException e) {
                 future.completeExceptionally(new WhopApiException("Network error executing HTTP request", e));
+            }
+        });
+        future.whenComplete((result_, throwable_) -> {
+            if (future.isCancelled()) {
+                okhttpCall.cancel();
             }
         });
         return future;

@@ -29,7 +29,7 @@ public class CourseLessonInteractionsClient {
     }
 
     /**
-     * Returns a paginated list of lesson interactions, filtered by lesson, course, user, or completion status.
+     * Returns a paginated list of lesson interactions for a lesson or course. Callers without admin access to the course's experience see only their own interactions.
      * <p>Required permissions:</p>
      * <ul>
      * <li><code>courses:read</code></li>
@@ -41,7 +41,7 @@ public class CourseLessonInteractionsClient {
     }
 
     /**
-     * Returns a paginated list of lesson interactions, filtered by lesson, course, user, or completion status.
+     * Returns a paginated list of lesson interactions for a lesson or course. Callers without admin access to the course's experience see only their own interactions.
      * <p>Required permissions:</p>
      * <ul>
      * <li><code>courses:read</code></li>
@@ -53,7 +53,7 @@ public class CourseLessonInteractionsClient {
     }
 
     /**
-     * Returns a paginated list of lesson interactions, filtered by lesson, course, user, or completion status.
+     * Returns a paginated list of lesson interactions for a lesson or course. Callers without admin access to the course's experience see only their own interactions.
      * <p>Required permissions:</p>
      * <ul>
      * <li><code>courses:read</code></li>
@@ -65,7 +65,7 @@ public class CourseLessonInteractionsClient {
     }
 
     /**
-     * Returns a paginated list of lesson interactions, filtered by lesson, course, user, or completion status.
+     * Returns a paginated list of lesson interactions for a lesson or course. Callers without admin access to the course's experience see only their own interactions.
      * <p>Required permissions:</p>
      * <ul>
      * <li><code>courses:read</code></li>

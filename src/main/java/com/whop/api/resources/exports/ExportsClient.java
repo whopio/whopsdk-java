@@ -57,14 +57,14 @@ public class ExportsClient {
     }
 
     /**
-     * Starts an asynchronous CSV export of a resource for an account. Returns the export in <code>pending</code>; poll <code>GET /exports/{id}</code> until <code>download_url</code> is set.
+     * Starts an asynchronous export of a resource for an account. Returns the export in <code>pending</code>; poll <code>GET /exports/:id</code> until <code>download_url</code> is set.
      */
     public Export create(CreateExportsRequest request) {
         return this.rawClient.create(request).body();
     }
 
     /**
-     * Starts an asynchronous CSV export of a resource for an account. Returns the export in <code>pending</code>; poll <code>GET /exports/{id}</code> until <code>download_url</code> is set.
+     * Starts an asynchronous export of a resource for an account. Returns the export in <code>pending</code>; poll <code>GET /exports/:id</code> until <code>download_url</code> is set.
      */
     public Export create(CreateExportsRequest request, RequestOptions requestOptions) {
         return this.rawClient.create(request, requestOptions).body();

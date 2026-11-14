@@ -24,6 +24,8 @@ import org.jetbrains.annotations.NotNull;
 @JsonInclude(JsonInclude.Include.NON_ABSENT)
 @JsonDeserialize(builder = ListBusinessesResponseDataItemOwner.Builder.class)
 public final class ListBusinessesResponseDataItemOwner {
+    private final Optional<String> email;
+
     private final String id;
 
     private final Optional<String> name;
@@ -35,16 +37,29 @@ public final class ListBusinessesResponseDataItemOwner {
     private final Map<String, Object> additionalProperties;
 
     private ListBusinessesResponseDataItemOwner(
+            Optional<String> email,
             String id,
             Optional<String> name,
             ListBusinessesResponseDataItemOwnerProfilePicture profilePicture,
             String username,
             Map<String, Object> additionalProperties) {
+        this.email = email;
         this.id = id;
         this.name = name;
         this.profilePicture = profilePicture;
         this.username = username;
         this.additionalProperties = additionalProperties;
+    }
+
+    /**
+     * @return The business owner's email address, so a partner can follow up on a referral they made. Requires the <code>partner:email:read</code> scope; <code>null</code> without it, or while the account has no reachable address of its own.
+     */
+    @JsonIgnore
+    public Optional<String> getEmail() {
+        if (email == null) {
+            return Optional.empty();
+        }
+        return email;
     }
 
     /**
@@ -83,6 +98,12 @@ public final class ListBusinessesResponseDataItemOwner {
     }
 
     @JsonInclude(value = JsonInclude.Include.CUSTOM, valueFilter = NullableNonemptyFilter.class)
+    @JsonProperty("email")
+    private Optional<String> _getEmail() {
+        return email;
+    }
+
+    @JsonInclude(value = JsonInclude.Include.CUSTOM, valueFilter = NullableNonemptyFilter.class)
     @JsonProperty("name")
     private Optional<String> _getName() {
         return name;
@@ -101,7 +122,8 @@ public final class ListBusinessesResponseDataItemOwner {
     }
 
     private boolean equalTo(ListBusinessesResponseDataItemOwner other) {
-        return id.equals(other.id)
+        return email.equals(other.email)
+                && id.equals(other.id)
                 && name.equals(other.name)
                 && profilePicture.equals(other.profilePicture)
                 && username.equals(other.username);
@@ -109,7 +131,7 @@ public final class ListBusinessesResponseDataItemOwner {
 
     @java.lang.Override
     public int hashCode() {
-        return Objects.hash(this.id, this.name, this.profilePicture, this.username);
+        return Objects.hash(this.email, this.id, this.name, this.profilePicture, this.username);
     }
 
     @java.lang.Override
@@ -152,6 +174,15 @@ public final class ListBusinessesResponseDataItemOwner {
         _FinalStage additionalProperties(Map<String, Object> additionalProperties);
 
         /**
+         * <p>The business owner's email address, so a partner can follow up on a referral they made. Requires the <code>partner:email:read</code> scope; <code>null</code> without it, or while the account has no reachable address of its own.</p>
+         */
+        _FinalStage email(Optional<String> email);
+
+        _FinalStage email(String email);
+
+        _FinalStage email(Nullable<String> email);
+
+        /**
          * <p>The user's display name.</p>
          */
         _FinalStage name(Optional<String> name);
@@ -171,13 +202,15 @@ public final class ListBusinessesResponseDataItemOwner {
 
         private Optional<String> name = Optional.empty();
 
-        @JsonAnySetter
+        private Optional<String> email = Optional.empty();
+
         private Map<String, Object> additionalProperties = new HashMap<>();
 
         private Builder() {}
 
         @java.lang.Override
         public Builder from(ListBusinessesResponseDataItemOwner other) {
+            email(other.getEmail());
             id(other.getId());
             name(other.getName());
             profilePicture(other.getProfilePicture());
@@ -186,7 +219,6 @@ public final class ListBusinessesResponseDataItemOwner {
         }
 
         /**
-         * <p>User ID, prefixed <code>user_</code>.</p>
          * <p>User ID, prefixed <code>user_</code>.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
@@ -199,7 +231,6 @@ public final class ListBusinessesResponseDataItemOwner {
 
         /**
          * <p>The user's profile picture.</p>
-         * <p>The user's profile picture.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
@@ -210,7 +241,6 @@ public final class ListBusinessesResponseDataItemOwner {
         }
 
         /**
-         * <p>The user's unique username.</p>
          * <p>The user's unique username.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
@@ -257,9 +287,58 @@ public final class ListBusinessesResponseDataItemOwner {
             return this;
         }
 
+        /**
+         * <p>The business owner's email address, so a partner can follow up on a referral they made. Requires the <code>partner:email:read</code> scope; <code>null</code> without it, or while the account has no reachable address of its own.</p>
+         * @return Reference to {@code this} so that method calls can be chained together.
+         */
+        @java.lang.Override
+        public _FinalStage email(Nullable<String> email) {
+            if (email.isNull()) {
+                this.email = null;
+            } else if (email.isEmpty()) {
+                this.email = Optional.empty();
+            } else {
+                this.email = Optional.of(email.get());
+            }
+            return this;
+        }
+
+        /**
+         * <p>The business owner's email address, so a partner can follow up on a referral they made. Requires the <code>partner:email:read</code> scope; <code>null</code> without it, or while the account has no reachable address of its own.</p>
+         * @return Reference to {@code this} so that method calls can be chained together.
+         */
+        @java.lang.Override
+        public _FinalStage email(String email) {
+            this.email = Optional.ofNullable(email);
+            return this;
+        }
+
+        /**
+         * <p>The business owner's email address, so a partner can follow up on a referral they made. Requires the <code>partner:email:read</code> scope; <code>null</code> without it, or while the account has no reachable address of its own.</p>
+         */
+        @java.lang.Override
+        @JsonSetter(value = "email", nulls = Nulls.SKIP)
+        public _FinalStage email(Optional<String> email) {
+            this.email = email;
+            return this;
+        }
+
         @java.lang.Override
         public ListBusinessesResponseDataItemOwner build() {
-            return new ListBusinessesResponseDataItemOwner(id, name, profilePicture, username, additionalProperties);
+            return new ListBusinessesResponseDataItemOwner(
+                    email, id, name, profilePicture, username, additionalProperties);
+        }
+
+        @JsonAnySetter
+        private void putAdditionalPropertyFromJson(String key, Object value) {
+            if (key.equalsIgnoreCase("email")
+                    || key.equalsIgnoreCase("id")
+                    || key.equalsIgnoreCase("name")
+                    || key.equalsIgnoreCase("profile_picture")
+                    || key.equalsIgnoreCase("username")) {
+                return;
+            }
+            this.additionalProperties.put(key, value);
         }
 
         @java.lang.Override

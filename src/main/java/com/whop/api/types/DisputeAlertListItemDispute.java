@@ -86,7 +86,6 @@ public final class DisputeAlertListItemDispute {
     public static final class Builder implements IdStage, _FinalStage {
         private String id;
 
-        @JsonAnySetter
         private Map<String, Object> additionalProperties = new HashMap<>();
 
         private Builder() {}
@@ -98,7 +97,6 @@ public final class DisputeAlertListItemDispute {
         }
 
         /**
-         * <p>The unique identifier for the dispute.</p>
          * <p>The unique identifier for the dispute.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
@@ -112,6 +110,14 @@ public final class DisputeAlertListItemDispute {
         @java.lang.Override
         public DisputeAlertListItemDispute build() {
             return new DisputeAlertListItemDispute(id, additionalProperties);
+        }
+
+        @JsonAnySetter
+        private void putAdditionalPropertyFromJson(String key, Object value) {
+            if (key.equalsIgnoreCase("id")) {
+                return;
+            }
+            this.additionalProperties.put(key, value);
         }
 
         @java.lang.Override

@@ -11,6 +11,8 @@ public final class PaymentProviders {
 
     public static final PaymentProviders ADYEN = new PaymentProviders(Value.ADYEN, "adyen");
 
+    public static final PaymentProviders FLEX_PAY = new PaymentProviders(Value.FLEX_PAY, "flex_pay");
+
     public static final PaymentProviders APPLE = new PaymentProviders(Value.APPLE, "apple");
 
     public static final PaymentProviders CLARITYPAY = new PaymentProviders(Value.CLARITYPAY, "claritypay");
@@ -79,6 +81,8 @@ public final class PaymentProviders {
                 return visitor.visitCoinflow();
             case ADYEN:
                 return visitor.visitAdyen();
+            case FLEX_PAY:
+                return visitor.visitFlexPay();
             case APPLE:
                 return visitor.visitApple();
             case CLARITYPAY:
@@ -122,6 +126,8 @@ public final class PaymentProviders {
                 return COINFLOW;
             case "adyen":
                 return ADYEN;
+            case "flex_pay":
+                return FLEX_PAY;
             case "apple":
                 return APPLE;
             case "claritypay":
@@ -178,6 +184,8 @@ public final class PaymentProviders {
 
         CLARITYPAY,
 
+        FLEX_PAY,
+
         CHECKOUT_DOT_COM,
 
         AIRWALLEX,
@@ -215,6 +223,8 @@ public final class PaymentProviders {
         T visitAdyen();
 
         T visitClaritypay();
+
+        T visitFlexPay();
 
         T visitCheckoutDotCom();
 

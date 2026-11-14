@@ -192,7 +192,6 @@ public final class ResolutionAttachment {
 
         private Optional<String> contentType = Optional.empty();
 
-        @JsonAnySetter
         private Map<String, Object> additionalProperties = new HashMap<>();
 
         private Builder() {}
@@ -207,7 +206,6 @@ public final class ResolutionAttachment {
         }
 
         /**
-         * <p>Unique identifier for the attachment, prefixed <code>att_</code>.</p>
          * <p>Unique identifier for the attachment, prefixed <code>att_</code>.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
@@ -329,6 +327,17 @@ public final class ResolutionAttachment {
         @java.lang.Override
         public ResolutionAttachment build() {
             return new ResolutionAttachment(contentType, filename, id, url, additionalProperties);
+        }
+
+        @JsonAnySetter
+        private void putAdditionalPropertyFromJson(String key, Object value) {
+            if (key.equalsIgnoreCase("content_type")
+                    || key.equalsIgnoreCase("filename")
+                    || key.equalsIgnoreCase("id")
+                    || key.equalsIgnoreCase("url")) {
+                return;
+            }
+            this.additionalProperties.put(key, value);
         }
 
         @java.lang.Override

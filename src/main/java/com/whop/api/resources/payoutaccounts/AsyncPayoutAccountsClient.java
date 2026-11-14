@@ -5,6 +5,7 @@ package com.whop.api.resources.payoutaccounts;
 
 import com.whop.api.core.ClientOptions;
 import com.whop.api.core.RequestOptions;
+import com.whop.api.core.WhopApiHttpResponse;
 import com.whop.api.resources.payoutaccounts.requests.RetrievePayoutAccountsRequest;
 import com.whop.api.types.PayoutAccount;
 import java.util.concurrent.CompletableFuture;
@@ -34,7 +35,14 @@ public class AsyncPayoutAccountsClient {
      * </ul>
      */
     public CompletableFuture<PayoutAccount> retrieve(String id) {
-        return this.rawClient.retrieve(id).thenApply(response -> response.body());
+        CompletableFuture<WhopApiHttpResponse<PayoutAccount>> rawFuture = this.rawClient.retrieve(id);
+        CompletableFuture<PayoutAccount> future = rawFuture.thenApply(response -> response.body());
+        future.whenComplete((result_, throwable_) -> {
+            if (future.isCancelled()) {
+                rawFuture.cancel(true);
+            }
+        });
+        return future;
     }
 
     /**
@@ -45,7 +53,14 @@ public class AsyncPayoutAccountsClient {
      * </ul>
      */
     public CompletableFuture<PayoutAccount> retrieve(String id, RequestOptions requestOptions) {
-        return this.rawClient.retrieve(id, requestOptions).thenApply(response -> response.body());
+        CompletableFuture<WhopApiHttpResponse<PayoutAccount>> rawFuture = this.rawClient.retrieve(id, requestOptions);
+        CompletableFuture<PayoutAccount> future = rawFuture.thenApply(response -> response.body());
+        future.whenComplete((result_, throwable_) -> {
+            if (future.isCancelled()) {
+                rawFuture.cancel(true);
+            }
+        });
+        return future;
     }
 
     /**
@@ -56,7 +71,14 @@ public class AsyncPayoutAccountsClient {
      * </ul>
      */
     public CompletableFuture<PayoutAccount> retrieve(String id, RetrievePayoutAccountsRequest request) {
-        return this.rawClient.retrieve(id, request).thenApply(response -> response.body());
+        CompletableFuture<WhopApiHttpResponse<PayoutAccount>> rawFuture = this.rawClient.retrieve(id, request);
+        CompletableFuture<PayoutAccount> future = rawFuture.thenApply(response -> response.body());
+        future.whenComplete((result_, throwable_) -> {
+            if (future.isCancelled()) {
+                rawFuture.cancel(true);
+            }
+        });
+        return future;
     }
 
     /**
@@ -68,6 +90,14 @@ public class AsyncPayoutAccountsClient {
      */
     public CompletableFuture<PayoutAccount> retrieve(
             String id, RetrievePayoutAccountsRequest request, RequestOptions requestOptions) {
-        return this.rawClient.retrieve(id, request, requestOptions).thenApply(response -> response.body());
+        CompletableFuture<WhopApiHttpResponse<PayoutAccount>> rawFuture =
+                this.rawClient.retrieve(id, request, requestOptions);
+        CompletableFuture<PayoutAccount> future = rawFuture.thenApply(response -> response.body());
+        future.whenComplete((result_, throwable_) -> {
+            if (future.isCancelled()) {
+                rawFuture.cancel(true);
+            }
+        });
+        return future;
     }
 }

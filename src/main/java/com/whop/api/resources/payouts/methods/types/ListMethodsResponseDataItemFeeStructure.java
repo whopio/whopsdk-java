@@ -52,7 +52,7 @@ public final class ListMethodsResponseDataItemFeeStructure {
     }
 
     /**
-     * @return Percentage of the withdrawal amount charged as a fee.
+     * @return Percentage of the payout amount charged as a fee.
      */
     @JsonProperty("percentage")
     public float getPercentage() {
@@ -107,7 +107,7 @@ public final class ListMethodsResponseDataItemFeeStructure {
 
     public interface PercentageStage {
         /**
-         * <p>Percentage of the withdrawal amount charged as a fee.</p>
+         * <p>Percentage of the payout amount charged as a fee.</p>
          */
         _FinalStage percentage(float percentage);
     }
@@ -128,7 +128,6 @@ public final class ListMethodsResponseDataItemFeeStructure {
 
         private float percentage;
 
-        @JsonAnySetter
         private Map<String, Object> additionalProperties = new HashMap<>();
 
         private Builder() {}
@@ -143,7 +142,6 @@ public final class ListMethodsResponseDataItemFeeStructure {
 
         /**
          * <p>Currency code of fixed_amount.</p>
-         * <p>Currency code of fixed_amount.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
@@ -155,7 +153,6 @@ public final class ListMethodsResponseDataItemFeeStructure {
 
         /**
          * <p>Fixed fee charged, denominated in <code>currency</code>.</p>
-         * <p>Fixed fee charged, denominated in <code>currency</code>.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
@@ -166,8 +163,7 @@ public final class ListMethodsResponseDataItemFeeStructure {
         }
 
         /**
-         * <p>Percentage of the withdrawal amount charged as a fee.</p>
-         * <p>Percentage of the withdrawal amount charged as a fee.</p>
+         * <p>Percentage of the payout amount charged as a fee.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
@@ -180,6 +176,16 @@ public final class ListMethodsResponseDataItemFeeStructure {
         @java.lang.Override
         public ListMethodsResponseDataItemFeeStructure build() {
             return new ListMethodsResponseDataItemFeeStructure(currency, fixedAmount, percentage, additionalProperties);
+        }
+
+        @JsonAnySetter
+        private void putAdditionalPropertyFromJson(String key, Object value) {
+            if (key.equalsIgnoreCase("currency")
+                    || key.equalsIgnoreCase("fixed_amount")
+                    || key.equalsIgnoreCase("percentage")) {
+                return;
+            }
+            this.additionalProperties.put(key, value);
         }
 
         @java.lang.Override

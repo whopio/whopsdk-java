@@ -7,9 +7,9 @@ import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonValue;
 
 public final class UpdatePreferencesResponseAdsTripleWhaleIntegrationStatus {
-    public static final UpdatePreferencesResponseAdsTripleWhaleIntegrationStatus REQUIRES_SHOPIFY_STORE =
+    public static final UpdatePreferencesResponseAdsTripleWhaleIntegrationStatus REQUIRES_SHOP_DOMAIN =
             new UpdatePreferencesResponseAdsTripleWhaleIntegrationStatus(
-                    Value.REQUIRES_SHOPIFY_STORE, "requires_shopify_store");
+                    Value.REQUIRES_SHOP_DOMAIN, "requires_shop_domain");
 
     public static final UpdatePreferencesResponseAdsTripleWhaleIntegrationStatus CONNECTED =
             new UpdatePreferencesResponseAdsTripleWhaleIntegrationStatus(Value.CONNECTED, "connected");
@@ -51,8 +51,8 @@ public final class UpdatePreferencesResponseAdsTripleWhaleIntegrationStatus {
 
     public <T> T visit(Visitor<T> visitor) {
         switch (value) {
-            case REQUIRES_SHOPIFY_STORE:
-                return visitor.visitRequiresShopifyStore();
+            case REQUIRES_SHOP_DOMAIN:
+                return visitor.visitRequiresShopDomain();
             case CONNECTED:
                 return visitor.visitConnected();
             case NOT_CONNECTED:
@@ -66,8 +66,8 @@ public final class UpdatePreferencesResponseAdsTripleWhaleIntegrationStatus {
     @JsonCreator(mode = JsonCreator.Mode.DELEGATING)
     public static UpdatePreferencesResponseAdsTripleWhaleIntegrationStatus valueOf(String value) {
         switch (value) {
-            case "requires_shopify_store":
-                return REQUIRES_SHOPIFY_STORE;
+            case "requires_shop_domain":
+                return REQUIRES_SHOP_DOMAIN;
             case "connected":
                 return CONNECTED;
             case "not_connected":
@@ -82,7 +82,7 @@ public final class UpdatePreferencesResponseAdsTripleWhaleIntegrationStatus {
 
         NOT_CONNECTED,
 
-        REQUIRES_SHOPIFY_STORE,
+        REQUIRES_SHOP_DOMAIN,
 
         UNKNOWN
     }
@@ -92,7 +92,7 @@ public final class UpdatePreferencesResponseAdsTripleWhaleIntegrationStatus {
 
         T visitNotConnected();
 
-        T visitRequiresShopifyStore();
+        T visitRequiresShopDomain();
 
         T visitUnknown(String unknownType);
     }

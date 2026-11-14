@@ -5,31 +5,45 @@ package com.whop.api.resources.payments;
 
 import com.whop.api.core.ClientOptions;
 import com.whop.api.core.RequestOptions;
+import com.whop.api.core.Suppliers;
 import com.whop.api.core.pagination.SyncPagingIterable;
+import com.whop.api.resources.payments.direct.DirectClient;
+import com.whop.api.resources.payments.levelsrebate.LevelsRebateClient;
+import com.whop.api.resources.payments.requests.CapturePaymentsRequest;
+import com.whop.api.resources.payments.requests.CreatePaymentsRequest;
+import com.whop.api.resources.payments.requests.GeneratePdfPaymentsRequest;
 import com.whop.api.resources.payments.requests.ListFeesPaymentsRequest;
 import com.whop.api.resources.payments.requests.ListPaymentsRequest;
 import com.whop.api.resources.payments.requests.RefundPaymentsRequest;
+import com.whop.api.resources.payments.requests.ResumePaymentsRequest;
 import com.whop.api.resources.payments.requests.RetrievePaymentsRequest;
 import com.whop.api.resources.payments.requests.RetrieveStatusPaymentsRequest;
 import com.whop.api.resources.payments.requests.RetryPaymentsRequest;
+import com.whop.api.resources.payments.requests.SummaryPaymentsRequest;
+import com.whop.api.resources.payments.requests.UpdatePaymentsRequest;
 import com.whop.api.resources.payments.requests.UpdateReturnUrlPaymentsRequest;
 import com.whop.api.resources.payments.requests.VoidPaymentsRequest;
-import com.whop.api.resources.payments.types.CreatePaymentsRequest;
-import com.whop.api.resources.payments.types.CreatePaymentsResponse;
-import com.whop.api.resources.payments.types.ListFeesPaymentsResponseDataItem;
-import com.whop.api.resources.payments.types.RetrievePaymentsResponse;
+import com.whop.api.resources.payments.types.ListFeesPaymentsResponse;
+import com.whop.api.resources.payments.types.SummaryPaymentsResponse;
 import com.whop.api.types.Payment;
-import com.whop.api.types.PaymentListItem;
+import com.whop.api.types.PaymentPdf;
 import com.whop.api.types.PaymentStatus;
+import java.util.function.Supplier;
 
 public class PaymentsClient {
     protected final ClientOptions clientOptions;
 
     private final RawPaymentsClient rawClient;
 
+    protected final Supplier<DirectClient> directClient;
+
+    protected final Supplier<LevelsRebateClient> levelsRebateClient;
+
     public PaymentsClient(ClientOptions clientOptions) {
         this.clientOptions = clientOptions;
         this.rawClient = new RawPaymentsClient(clientOptions);
+        this.directClient = Suppliers.memoize(() -> new DirectClient(clientOptions));
+        this.levelsRebateClient = Suppliers.memoize(() -> new LevelsRebateClient(clientOptions));
     }
 
     /**
@@ -40,498 +54,337 @@ public class PaymentsClient {
     }
 
     /**
-     * Returns a paginated list of payments for the actor in context, with optional filtering by product, plan, status, billing reason, currency, and creation date.
-     * <p>Required permissions:</p>
-     * <ul>
-     * <li><code>payment:basic:read</code></li>
-     * <li><code>plan:basic:read</code></li>
-     * <li><code>access_pass:basic:read</code></li>
-     * <li><code>member:email:read</code></li>
-     * <li><code>member:basic:read</code></li>
-     * <li><code>member:phone:read</code></li>
-     * <li><code>promo_code:basic:read</code></li>
-     * <li><code>shipment:basic:read</code></li>
-     * </ul>
+     * Lists payments, newest first. By default, returns sales for the accounts your credential can read: an account credential's own account, or every account a user can read payments for. Set <code>mode</code> to <code>user_sales</code> to list the sales the signed-in user received personally, outside any account.
      */
-    public SyncPagingIterable<PaymentListItem> list() {
+    public SyncPagingIterable<Payment> list() {
         return this.rawClient.list().body();
     }
 
     /**
-     * Returns a paginated list of payments for the actor in context, with optional filtering by product, plan, status, billing reason, currency, and creation date.
-     * <p>Required permissions:</p>
-     * <ul>
-     * <li><code>payment:basic:read</code></li>
-     * <li><code>plan:basic:read</code></li>
-     * <li><code>access_pass:basic:read</code></li>
-     * <li><code>member:email:read</code></li>
-     * <li><code>member:basic:read</code></li>
-     * <li><code>member:phone:read</code></li>
-     * <li><code>promo_code:basic:read</code></li>
-     * <li><code>shipment:basic:read</code></li>
-     * </ul>
+     * Lists payments, newest first. By default, returns sales for the accounts your credential can read: an account credential's own account, or every account a user can read payments for. Set <code>mode</code> to <code>user_sales</code> to list the sales the signed-in user received personally, outside any account.
      */
-    public SyncPagingIterable<PaymentListItem> list(RequestOptions requestOptions) {
+    public SyncPagingIterable<Payment> list(RequestOptions requestOptions) {
         return this.rawClient.list(requestOptions).body();
     }
 
     /**
-     * Returns a paginated list of payments for the actor in context, with optional filtering by product, plan, status, billing reason, currency, and creation date.
-     * <p>Required permissions:</p>
-     * <ul>
-     * <li><code>payment:basic:read</code></li>
-     * <li><code>plan:basic:read</code></li>
-     * <li><code>access_pass:basic:read</code></li>
-     * <li><code>member:email:read</code></li>
-     * <li><code>member:basic:read</code></li>
-     * <li><code>member:phone:read</code></li>
-     * <li><code>promo_code:basic:read</code></li>
-     * <li><code>shipment:basic:read</code></li>
-     * </ul>
+     * Lists payments, newest first. By default, returns sales for the accounts your credential can read: an account credential's own account, or every account a user can read payments for. Set <code>mode</code> to <code>user_sales</code> to list the sales the signed-in user received personally, outside any account.
      */
-    public SyncPagingIterable<PaymentListItem> list(ListPaymentsRequest request) {
+    public SyncPagingIterable<Payment> list(ListPaymentsRequest request) {
         return this.rawClient.list(request).body();
     }
 
     /**
-     * Returns a paginated list of payments for the actor in context, with optional filtering by product, plan, status, billing reason, currency, and creation date.
-     * <p>Required permissions:</p>
-     * <ul>
-     * <li><code>payment:basic:read</code></li>
-     * <li><code>plan:basic:read</code></li>
-     * <li><code>access_pass:basic:read</code></li>
-     * <li><code>member:email:read</code></li>
-     * <li><code>member:basic:read</code></li>
-     * <li><code>member:phone:read</code></li>
-     * <li><code>promo_code:basic:read</code></li>
-     * <li><code>shipment:basic:read</code></li>
-     * </ul>
+     * Lists payments, newest first. By default, returns sales for the accounts your credential can read: an account credential's own account, or every account a user can read payments for. Set <code>mode</code> to <code>user_sales</code> to list the sales the signed-in user received personally, outside any account.
      */
-    public SyncPagingIterable<PaymentListItem> list(ListPaymentsRequest request, RequestOptions requestOptions) {
+    public SyncPagingIterable<Payment> list(ListPaymentsRequest request, RequestOptions requestOptions) {
         return this.rawClient.list(request, requestOptions).body();
     }
 
     /**
-     * Charge an existing member off-session using one of their stored payment methods. You can provide an existing plan, or create a new one in-line. This endpoint will respond with a payment object immediately, but the payment is processed asynchronously in the background. Use webhooks to be notified when the payment succeeds or fails.
-     * <p>Required permissions:</p>
-     * <ul>
-     * <li><code>payment:charge</code></li>
-     * <li><code>plan:create</code></li>
-     * <li><code>access_pass:create</code></li>
-     * <li><code>access_pass:update</code></li>
-     * <li><code>plan:basic:read</code></li>
-     * <li><code>access_pass:basic:read</code></li>
-     * <li><code>member:email:read</code></li>
-     * <li><code>member:basic:read</code></li>
-     * <li><code>member:phone:read</code></li>
-     * <li><code>promo_code:basic:read</code></li>
-     * <li><code>shipment:basic:read</code></li>
-     * <li><code>payment:dispute:read</code></li>
-     * <li><code>payment:resolution_center_case:read</code></li>
-     * </ul>
+     * Charges a buyer for one or more variants with a payment method already on file (<code>member_id</code> and <code>payment_method_id</code>), or with a <code>confirmation_token</code> for a method the buyer just supplied. Collection runs in the background, so the response is the payment as created, not its outcome: poll Retrieve payment status for how far it has got and what the buyer must still do.
      */
-    public CreatePaymentsResponse create(CreatePaymentsRequest request) {
+    public Payment create(CreatePaymentsRequest request) {
         return this.rawClient.create(request).body();
     }
 
     /**
-     * Charge an existing member off-session using one of their stored payment methods. You can provide an existing plan, or create a new one in-line. This endpoint will respond with a payment object immediately, but the payment is processed asynchronously in the background. Use webhooks to be notified when the payment succeeds or fails.
-     * <p>Required permissions:</p>
-     * <ul>
-     * <li><code>payment:charge</code></li>
-     * <li><code>plan:create</code></li>
-     * <li><code>access_pass:create</code></li>
-     * <li><code>access_pass:update</code></li>
-     * <li><code>plan:basic:read</code></li>
-     * <li><code>access_pass:basic:read</code></li>
-     * <li><code>member:email:read</code></li>
-     * <li><code>member:basic:read</code></li>
-     * <li><code>member:phone:read</code></li>
-     * <li><code>promo_code:basic:read</code></li>
-     * <li><code>shipment:basic:read</code></li>
-     * <li><code>payment:dispute:read</code></li>
-     * <li><code>payment:resolution_center_case:read</code></li>
-     * </ul>
+     * Charges a buyer for one or more variants with a payment method already on file (<code>member_id</code> and <code>payment_method_id</code>), or with a <code>confirmation_token</code> for a method the buyer just supplied. Collection runs in the background, so the response is the payment as created, not its outcome: poll Retrieve payment status for how far it has got and what the buyer must still do.
      */
-    public CreatePaymentsResponse create(CreatePaymentsRequest request, RequestOptions requestOptions) {
+    public Payment create(CreatePaymentsRequest request, RequestOptions requestOptions) {
         return this.rawClient.create(request, requestOptions).body();
     }
 
     /**
-     * Retrieves the details of an existing payment.
-     * <p>Required permissions:</p>
-     * <ul>
-     * <li><code>payment:basic:read</code></li>
-     * <li><code>plan:basic:read</code></li>
-     * <li><code>access_pass:basic:read</code></li>
-     * <li><code>member:email:read</code></li>
-     * <li><code>member:basic:read</code></li>
-     * <li><code>member:phone:read</code></li>
-     * <li><code>promo_code:basic:read</code></li>
-     * <li><code>shipment:basic:read</code></li>
-     * <li><code>payment:dispute:read</code></li>
-     * <li><code>payment:resolution_center_case:read</code></li>
-     * </ul>
+     * Totals up the same payments the list returns, so you can build status tabs and filter options without paging through them. Takes the same filters as List Payments.
      */
-    public RetrievePaymentsResponse retrieve(String id) {
+    public SummaryPaymentsResponse summary() {
+        return this.rawClient.summary().body();
+    }
+
+    /**
+     * Totals up the same payments the list returns, so you can build status tabs and filter options without paging through them. Takes the same filters as List Payments.
+     */
+    public SummaryPaymentsResponse summary(RequestOptions requestOptions) {
+        return this.rawClient.summary(requestOptions).body();
+    }
+
+    /**
+     * Totals up the same payments the list returns, so you can build status tabs and filter options without paging through them. Takes the same filters as List Payments.
+     */
+    public SummaryPaymentsResponse summary(SummaryPaymentsRequest request) {
+        return this.rawClient.summary(request).body();
+    }
+
+    /**
+     * Totals up the same payments the list returns, so you can build status tabs and filter options without paging through them. Takes the same filters as List Payments.
+     */
+    public SummaryPaymentsResponse summary(SummaryPaymentsRequest request, RequestOptions requestOptions) {
+        return this.rawClient.summary(request, requestOptions).body();
+    }
+
+    /**
+     * Returns one payment, including every purchased line item with its quantity and subtotal. Related records are ids — resolve a variant, membership, member or shipment on its own endpoint, and list this payment's refunds, disputes or Resolution Center cases with <code>?payment_id=</code>.
+     */
+    public Payment retrieve(String id) {
         return this.rawClient.retrieve(id).body();
     }
 
     /**
-     * Retrieves the details of an existing payment.
-     * <p>Required permissions:</p>
-     * <ul>
-     * <li><code>payment:basic:read</code></li>
-     * <li><code>plan:basic:read</code></li>
-     * <li><code>access_pass:basic:read</code></li>
-     * <li><code>member:email:read</code></li>
-     * <li><code>member:basic:read</code></li>
-     * <li><code>member:phone:read</code></li>
-     * <li><code>promo_code:basic:read</code></li>
-     * <li><code>shipment:basic:read</code></li>
-     * <li><code>payment:dispute:read</code></li>
-     * <li><code>payment:resolution_center_case:read</code></li>
-     * </ul>
+     * Returns one payment, including every purchased line item with its quantity and subtotal. Related records are ids — resolve a variant, membership, member or shipment on its own endpoint, and list this payment's refunds, disputes or Resolution Center cases with <code>?payment_id=</code>.
      */
-    public RetrievePaymentsResponse retrieve(String id, RequestOptions requestOptions) {
+    public Payment retrieve(String id, RequestOptions requestOptions) {
         return this.rawClient.retrieve(id, requestOptions).body();
     }
 
     /**
-     * Retrieves the details of an existing payment.
-     * <p>Required permissions:</p>
-     * <ul>
-     * <li><code>payment:basic:read</code></li>
-     * <li><code>plan:basic:read</code></li>
-     * <li><code>access_pass:basic:read</code></li>
-     * <li><code>member:email:read</code></li>
-     * <li><code>member:basic:read</code></li>
-     * <li><code>member:phone:read</code></li>
-     * <li><code>promo_code:basic:read</code></li>
-     * <li><code>shipment:basic:read</code></li>
-     * <li><code>payment:dispute:read</code></li>
-     * <li><code>payment:resolution_center_case:read</code></li>
-     * </ul>
+     * Returns one payment, including every purchased line item with its quantity and subtotal. Related records are ids — resolve a variant, membership, member or shipment on its own endpoint, and list this payment's refunds, disputes or Resolution Center cases with <code>?payment_id=</code>.
      */
-    public RetrievePaymentsResponse retrieve(String id, RetrievePaymentsRequest request) {
+    public Payment retrieve(String id, RetrievePaymentsRequest request) {
         return this.rawClient.retrieve(id, request).body();
     }
 
     /**
-     * Retrieves the details of an existing payment.
-     * <p>Required permissions:</p>
-     * <ul>
-     * <li><code>payment:basic:read</code></li>
-     * <li><code>plan:basic:read</code></li>
-     * <li><code>access_pass:basic:read</code></li>
-     * <li><code>member:email:read</code></li>
-     * <li><code>member:basic:read</code></li>
-     * <li><code>member:phone:read</code></li>
-     * <li><code>promo_code:basic:read</code></li>
-     * <li><code>shipment:basic:read</code></li>
-     * <li><code>payment:dispute:read</code></li>
-     * <li><code>payment:resolution_center_case:read</code></li>
-     * </ul>
+     * Returns one payment, including every purchased line item with its quantity and subtotal. Related records are ids — resolve a variant, membership, member or shipment on its own endpoint, and list this payment's refunds, disputes or Resolution Center cases with <code>?payment_id=</code>.
      */
-    public RetrievePaymentsResponse retrieve(
-            String id, RetrievePaymentsRequest request, RequestOptions requestOptions) {
+    public Payment retrieve(String id, RetrievePaymentsRequest request, RequestOptions requestOptions) {
         return this.rawClient.retrieve(id, request, requestOptions).body();
     }
 
     /**
-     * Returns the list of fees associated with a specific payment, including platform fees and processing fees.
-     * <p>Required permissions:</p>
-     * <ul>
-     * <li><code>payment:basic:read</code></li>
-     * </ul>
+     * Updates a payment's <code>shipping_address</code> or <code>return_url</code>.
      */
-    public SyncPagingIterable<ListFeesPaymentsResponseDataItem> listFees(String id) {
+    public Payment update(String id) {
+        return this.rawClient.update(id).body();
+    }
+
+    /**
+     * Updates a payment's <code>shipping_address</code> or <code>return_url</code>.
+     */
+    public Payment update(String id, RequestOptions requestOptions) {
+        return this.rawClient.update(id, requestOptions).body();
+    }
+
+    /**
+     * Updates a payment's <code>shipping_address</code> or <code>return_url</code>.
+     */
+    public Payment update(String id, UpdatePaymentsRequest request) {
+        return this.rawClient.update(id, request).body();
+    }
+
+    /**
+     * Updates a payment's <code>shipping_address</code> or <code>return_url</code>.
+     */
+    public Payment update(String id, UpdatePaymentsRequest request, RequestOptions requestOptions) {
+        return this.rawClient.update(id, request, requestOptions).body();
+    }
+
+    /**
+     * Captures the full amount of a card payment created with <code>capture: false</code>. The payment must still be in <code>requires_capture</code> before <code>capture_expires_at</code>. Partial capture, multiple captures, capturing more than the authorized amount, and tips are not supported.
+     */
+    public PaymentStatus capture(String id) {
+        return this.rawClient.capture(id).body();
+    }
+
+    /**
+     * Captures the full amount of a card payment created with <code>capture: false</code>. The payment must still be in <code>requires_capture</code> before <code>capture_expires_at</code>. Partial capture, multiple captures, capturing more than the authorized amount, and tips are not supported.
+     */
+    public PaymentStatus capture(String id, RequestOptions requestOptions) {
+        return this.rawClient.capture(id, requestOptions).body();
+    }
+
+    /**
+     * Captures the full amount of a card payment created with <code>capture: false</code>. The payment must still be in <code>requires_capture</code> before <code>capture_expires_at</code>. Partial capture, multiple captures, capturing more than the authorized amount, and tips are not supported.
+     */
+    public PaymentStatus capture(String id, CapturePaymentsRequest request) {
+        return this.rawClient.capture(id, request).body();
+    }
+
+    /**
+     * Captures the full amount of a card payment created with <code>capture: false</code>. The payment must still be in <code>requires_capture</code> before <code>capture_expires_at</code>. Partial capture, multiple captures, capturing more than the authorized amount, and tips are not supported.
+     */
+    public PaymentStatus capture(String id, CapturePaymentsRequest request, RequestOptions requestOptions) {
+        return this.rawClient.capture(id, request, requestOptions).body();
+    }
+
+    /**
+     * Returns the fee breakdown of one payment — Whop's fee, processing, affiliate and other lines — each in the currency it was collected in and converted to the payment's settlement currency. The list is complete in one page.
+     */
+    public ListFeesPaymentsResponse listFees(String id) {
         return this.rawClient.listFees(id).body();
     }
 
     /**
-     * Returns the list of fees associated with a specific payment, including platform fees and processing fees.
-     * <p>Required permissions:</p>
-     * <ul>
-     * <li><code>payment:basic:read</code></li>
-     * </ul>
+     * Returns the fee breakdown of one payment — Whop's fee, processing, affiliate and other lines — each in the currency it was collected in and converted to the payment's settlement currency. The list is complete in one page.
      */
-    public SyncPagingIterable<ListFeesPaymentsResponseDataItem> listFees(String id, RequestOptions requestOptions) {
+    public ListFeesPaymentsResponse listFees(String id, RequestOptions requestOptions) {
         return this.rawClient.listFees(id, requestOptions).body();
     }
 
     /**
-     * Returns the list of fees associated with a specific payment, including platform fees and processing fees.
-     * <p>Required permissions:</p>
-     * <ul>
-     * <li><code>payment:basic:read</code></li>
-     * </ul>
+     * Returns the fee breakdown of one payment — Whop's fee, processing, affiliate and other lines — each in the currency it was collected in and converted to the payment's settlement currency. The list is complete in one page.
      */
-    public SyncPagingIterable<ListFeesPaymentsResponseDataItem> listFees(String id, ListFeesPaymentsRequest request) {
+    public ListFeesPaymentsResponse listFees(String id, ListFeesPaymentsRequest request) {
         return this.rawClient.listFees(id, request).body();
     }
 
     /**
-     * Returns the list of fees associated with a specific payment, including platform fees and processing fees.
-     * <p>Required permissions:</p>
-     * <ul>
-     * <li><code>payment:basic:read</code></li>
-     * </ul>
+     * Returns the fee breakdown of one payment — Whop's fee, processing, affiliate and other lines — each in the currency it was collected in and converted to the payment's settlement currency. The list is complete in one page.
      */
-    public SyncPagingIterable<ListFeesPaymentsResponseDataItem> listFees(
+    public ListFeesPaymentsResponse listFees(
             String id, ListFeesPaymentsRequest request, RequestOptions requestOptions) {
         return this.rawClient.listFees(id, request, requestOptions).body();
     }
 
     /**
-     * Issue a full or partial refund for a payment. The refund is processed through the original payment processor and the membership status is updated accordingly.
-     * <p>Required permissions:</p>
-     * <ul>
-     * <li><code>payment:manage</code></li>
-     * <li><code>plan:basic:read</code></li>
-     * <li><code>access_pass:basic:read</code></li>
-     * <li><code>member:email:read</code></li>
-     * <li><code>member:basic:read</code></li>
-     * <li><code>member:phone:read</code></li>
-     * <li><code>promo_code:basic:read</code></li>
-     * <li><code>shipment:basic:read</code></li>
-     * <li><code>payment:dispute:read</code></li>
-     * <li><code>payment:resolution_center_case:read</code></li>
-     * </ul>
+     * Generates the payment's receipt (invoice) as a PDF and returns a short-lived link to download it. Each call generates a new file and link, so this endpoint does not replay <code>Idempotency-Key</code> responses.
+     */
+    public PaymentPdf generatePdf(String id) {
+        return this.rawClient.generatePdf(id).body();
+    }
+
+    /**
+     * Generates the payment's receipt (invoice) as a PDF and returns a short-lived link to download it. Each call generates a new file and link, so this endpoint does not replay <code>Idempotency-Key</code> responses.
+     */
+    public PaymentPdf generatePdf(String id, RequestOptions requestOptions) {
+        return this.rawClient.generatePdf(id, requestOptions).body();
+    }
+
+    /**
+     * Generates the payment's receipt (invoice) as a PDF and returns a short-lived link to download it. Each call generates a new file and link, so this endpoint does not replay <code>Idempotency-Key</code> responses.
+     */
+    public PaymentPdf generatePdf(String id, GeneratePdfPaymentsRequest request) {
+        return this.rawClient.generatePdf(id, request).body();
+    }
+
+    /**
+     * Generates the payment's receipt (invoice) as a PDF and returns a short-lived link to download it. Each call generates a new file and link, so this endpoint does not replay <code>Idempotency-Key</code> responses.
+     */
+    public PaymentPdf generatePdf(String id, GeneratePdfPaymentsRequest request, RequestOptions requestOptions) {
+        return this.rawClient.generatePdf(id, request, requestOptions).body();
+    }
+
+    /**
+     * Refunds all or part of a payment through the processor that charged it, and updates its membership to match. The buyer is emailed, the affiliate commission on the payment is clawed back, and any open Resolution Center case on the payment is closed.
      */
     public Payment refund(String id) {
         return this.rawClient.refund(id).body();
     }
 
     /**
-     * Issue a full or partial refund for a payment. The refund is processed through the original payment processor and the membership status is updated accordingly.
-     * <p>Required permissions:</p>
-     * <ul>
-     * <li><code>payment:manage</code></li>
-     * <li><code>plan:basic:read</code></li>
-     * <li><code>access_pass:basic:read</code></li>
-     * <li><code>member:email:read</code></li>
-     * <li><code>member:basic:read</code></li>
-     * <li><code>member:phone:read</code></li>
-     * <li><code>promo_code:basic:read</code></li>
-     * <li><code>shipment:basic:read</code></li>
-     * <li><code>payment:dispute:read</code></li>
-     * <li><code>payment:resolution_center_case:read</code></li>
-     * </ul>
+     * Refunds all or part of a payment through the processor that charged it, and updates its membership to match. The buyer is emailed, the affiliate commission on the payment is clawed back, and any open Resolution Center case on the payment is closed.
      */
     public Payment refund(String id, RequestOptions requestOptions) {
         return this.rawClient.refund(id, requestOptions).body();
     }
 
     /**
-     * Issue a full or partial refund for a payment. The refund is processed through the original payment processor and the membership status is updated accordingly.
-     * <p>Required permissions:</p>
-     * <ul>
-     * <li><code>payment:manage</code></li>
-     * <li><code>plan:basic:read</code></li>
-     * <li><code>access_pass:basic:read</code></li>
-     * <li><code>member:email:read</code></li>
-     * <li><code>member:basic:read</code></li>
-     * <li><code>member:phone:read</code></li>
-     * <li><code>promo_code:basic:read</code></li>
-     * <li><code>shipment:basic:read</code></li>
-     * <li><code>payment:dispute:read</code></li>
-     * <li><code>payment:resolution_center_case:read</code></li>
-     * </ul>
+     * Refunds all or part of a payment through the processor that charged it, and updates its membership to match. The buyer is emailed, the affiliate commission on the payment is clawed back, and any open Resolution Center case on the payment is closed.
      */
     public Payment refund(String id, RefundPaymentsRequest request) {
         return this.rawClient.refund(id, request).body();
     }
 
     /**
-     * Issue a full or partial refund for a payment. The refund is processed through the original payment processor and the membership status is updated accordingly.
-     * <p>Required permissions:</p>
-     * <ul>
-     * <li><code>payment:manage</code></li>
-     * <li><code>plan:basic:read</code></li>
-     * <li><code>access_pass:basic:read</code></li>
-     * <li><code>member:email:read</code></li>
-     * <li><code>member:basic:read</code></li>
-     * <li><code>member:phone:read</code></li>
-     * <li><code>promo_code:basic:read</code></li>
-     * <li><code>shipment:basic:read</code></li>
-     * <li><code>payment:dispute:read</code></li>
-     * <li><code>payment:resolution_center_case:read</code></li>
-     * </ul>
+     * Refunds all or part of a payment through the processor that charged it, and updates its membership to match. The buyer is emailed, the affiliate commission on the payment is clawed back, and any open Resolution Center case on the payment is closed.
      */
     public Payment refund(String id, RefundPaymentsRequest request, RequestOptions requestOptions) {
         return this.rawClient.refund(id, request, requestOptions).body();
     }
 
     /**
-     * Retry a failed or pending payment. This re-attempts the charge using the original payment method and plan details.
-     * <p>Required permissions:</p>
-     * <ul>
-     * <li><code>payment:manage</code></li>
-     * <li><code>plan:basic:read</code></li>
-     * <li><code>access_pass:basic:read</code></li>
-     * <li><code>member:email:read</code></li>
-     * <li><code>member:basic:read</code></li>
-     * <li><code>member:phone:read</code></li>
-     * <li><code>promo_code:basic:read</code></li>
-     * <li><code>shipment:basic:read</code></li>
-     * <li><code>payment:dispute:read</code></li>
-     * <li><code>payment:resolution_center_case:read</code></li>
-     * </ul>
+     * Charges an unpaid payment again with its original payment method and variant. A payment can typically be retried once, and only while its membership is active, trialing or past due, or when it is a membership's failed first payment.
      */
     public Payment retry(String id) {
         return this.rawClient.retry(id).body();
     }
 
     /**
-     * Retry a failed or pending payment. This re-attempts the charge using the original payment method and plan details.
-     * <p>Required permissions:</p>
-     * <ul>
-     * <li><code>payment:manage</code></li>
-     * <li><code>plan:basic:read</code></li>
-     * <li><code>access_pass:basic:read</code></li>
-     * <li><code>member:email:read</code></li>
-     * <li><code>member:basic:read</code></li>
-     * <li><code>member:phone:read</code></li>
-     * <li><code>promo_code:basic:read</code></li>
-     * <li><code>shipment:basic:read</code></li>
-     * <li><code>payment:dispute:read</code></li>
-     * <li><code>payment:resolution_center_case:read</code></li>
-     * </ul>
+     * Charges an unpaid payment again with its original payment method and variant. A payment can typically be retried once, and only while its membership is active, trialing or past due, or when it is a membership's failed first payment.
      */
     public Payment retry(String id, RequestOptions requestOptions) {
         return this.rawClient.retry(id, requestOptions).body();
     }
 
     /**
-     * Retry a failed or pending payment. This re-attempts the charge using the original payment method and plan details.
-     * <p>Required permissions:</p>
-     * <ul>
-     * <li><code>payment:manage</code></li>
-     * <li><code>plan:basic:read</code></li>
-     * <li><code>access_pass:basic:read</code></li>
-     * <li><code>member:email:read</code></li>
-     * <li><code>member:basic:read</code></li>
-     * <li><code>member:phone:read</code></li>
-     * <li><code>promo_code:basic:read</code></li>
-     * <li><code>shipment:basic:read</code></li>
-     * <li><code>payment:dispute:read</code></li>
-     * <li><code>payment:resolution_center_case:read</code></li>
-     * </ul>
+     * Charges an unpaid payment again with its original payment method and variant. A payment can typically be retried once, and only while its membership is active, trialing or past due, or when it is a membership's failed first payment.
      */
     public Payment retry(String id, RetryPaymentsRequest request) {
         return this.rawClient.retry(id, request).body();
     }
 
     /**
-     * Retry a failed or pending payment. This re-attempts the charge using the original payment method and plan details.
-     * <p>Required permissions:</p>
-     * <ul>
-     * <li><code>payment:manage</code></li>
-     * <li><code>plan:basic:read</code></li>
-     * <li><code>access_pass:basic:read</code></li>
-     * <li><code>member:email:read</code></li>
-     * <li><code>member:basic:read</code></li>
-     * <li><code>member:phone:read</code></li>
-     * <li><code>promo_code:basic:read</code></li>
-     * <li><code>shipment:basic:read</code></li>
-     * <li><code>payment:dispute:read</code></li>
-     * <li><code>payment:resolution_center_case:read</code></li>
-     * </ul>
+     * Charges an unpaid payment again with its original payment method and variant. A payment can typically be retried once, and only while its membership is active, trialing or past due, or when it is a membership's failed first payment.
      */
     public Payment retry(String id, RetryPaymentsRequest request, RequestOptions requestOptions) {
         return this.rawClient.retry(id, request, requestOptions).body();
     }
 
     /**
-     * Void a payment that has not yet been settled. Voiding cancels the payment before it is captured by the payment processor.
-     * <p>Required permissions:</p>
-     * <ul>
-     * <li><code>payment:manage</code></li>
-     * <li><code>plan:basic:read</code></li>
-     * <li><code>access_pass:basic:read</code></li>
-     * <li><code>member:email:read</code></li>
-     * <li><code>member:basic:read</code></li>
-     * <li><code>member:phone:read</code></li>
-     * <li><code>promo_code:basic:read</code></li>
-     * <li><code>shipment:basic:read</code></li>
-     * <li><code>payment:dispute:read</code></li>
-     * <li><code>payment:resolution_center_case:read</code></li>
-     * </ul>
+     * Voids or cancels an eligible payment. The request is rejected if the payment is no longer eligible. Some processors confirm the release of a card authorization asynchronously: the payment is then returned still <code>authorized</code>, and a <code>payment.canceled</code> webhook follows once the hold is released.
      */
     public Payment void_(String id) {
         return this.rawClient.void_(id).body();
     }
 
     /**
-     * Void a payment that has not yet been settled. Voiding cancels the payment before it is captured by the payment processor.
-     * <p>Required permissions:</p>
-     * <ul>
-     * <li><code>payment:manage</code></li>
-     * <li><code>plan:basic:read</code></li>
-     * <li><code>access_pass:basic:read</code></li>
-     * <li><code>member:email:read</code></li>
-     * <li><code>member:basic:read</code></li>
-     * <li><code>member:phone:read</code></li>
-     * <li><code>promo_code:basic:read</code></li>
-     * <li><code>shipment:basic:read</code></li>
-     * <li><code>payment:dispute:read</code></li>
-     * <li><code>payment:resolution_center_case:read</code></li>
-     * </ul>
+     * Voids or cancels an eligible payment. The request is rejected if the payment is no longer eligible. Some processors confirm the release of a card authorization asynchronously: the payment is then returned still <code>authorized</code>, and a <code>payment.canceled</code> webhook follows once the hold is released.
      */
     public Payment void_(String id, RequestOptions requestOptions) {
         return this.rawClient.void_(id, requestOptions).body();
     }
 
     /**
-     * Void a payment that has not yet been settled. Voiding cancels the payment before it is captured by the payment processor.
-     * <p>Required permissions:</p>
-     * <ul>
-     * <li><code>payment:manage</code></li>
-     * <li><code>plan:basic:read</code></li>
-     * <li><code>access_pass:basic:read</code></li>
-     * <li><code>member:email:read</code></li>
-     * <li><code>member:basic:read</code></li>
-     * <li><code>member:phone:read</code></li>
-     * <li><code>promo_code:basic:read</code></li>
-     * <li><code>shipment:basic:read</code></li>
-     * <li><code>payment:dispute:read</code></li>
-     * <li><code>payment:resolution_center_case:read</code></li>
-     * </ul>
+     * Voids or cancels an eligible payment. The request is rejected if the payment is no longer eligible. Some processors confirm the release of a card authorization asynchronously: the payment is then returned still <code>authorized</code>, and a <code>payment.canceled</code> webhook follows once the hold is released.
      */
     public Payment void_(String id, VoidPaymentsRequest request) {
         return this.rawClient.void_(id, request).body();
     }
 
     /**
-     * Void a payment that has not yet been settled. Voiding cancels the payment before it is captured by the payment processor.
-     * <p>Required permissions:</p>
-     * <ul>
-     * <li><code>payment:manage</code></li>
-     * <li><code>plan:basic:read</code></li>
-     * <li><code>access_pass:basic:read</code></li>
-     * <li><code>member:email:read</code></li>
-     * <li><code>member:basic:read</code></li>
-     * <li><code>member:phone:read</code></li>
-     * <li><code>promo_code:basic:read</code></li>
-     * <li><code>shipment:basic:read</code></li>
-     * <li><code>payment:dispute:read</code></li>
-     * <li><code>payment:resolution_center_case:read</code></li>
-     * </ul>
+     * Voids or cancels an eligible payment. The request is rejected if the payment is no longer eligible. Some processors confirm the release of a card authorization asynchronously: the payment is then returned still <code>authorized</code>, and a <code>payment.canceled</code> webhook follows once the hold is released.
      */
     public Payment void_(String id, VoidPaymentsRequest request, RequestOptions requestOptions) {
         return this.rawClient.void_(id, request, requestOptions).body();
     }
 
     /**
-     * Changes where the buyer lands after completing an off-site step, up until they return. Accepts either a secret key or the payment's own <code>client_secret</code>, so the surface that knows the final destination can set it.
+     * Charges the saved card again, with the buyer present, for a payment their bank declined until they authenticate (such as with 3DS). Retrieve the payment afterward to get the bank's challenge from <code>next_action</code>; once the buyer completes it, they land on <code>return_url</code>, or on Whop's hosted verification page if none was given. Only the buyer can call this, with the payment's <code>client_secret</code> in the body, an OAuth token for their own account with the <code>member:payment_methods:use</code> scope, or the token from a verified <code>payment</code> session intent. An API key gets a <code>403</code>. Has no effect on a payment that is not waiting on authentication.
+     */
+    public PaymentStatus resume(String paymentId) {
+        return this.rawClient.resume(paymentId).body();
+    }
+
+    /**
+     * Charges the saved card again, with the buyer present, for a payment their bank declined until they authenticate (such as with 3DS). Retrieve the payment afterward to get the bank's challenge from <code>next_action</code>; once the buyer completes it, they land on <code>return_url</code>, or on Whop's hosted verification page if none was given. Only the buyer can call this, with the payment's <code>client_secret</code> in the body, an OAuth token for their own account with the <code>member:payment_methods:use</code> scope, or the token from a verified <code>payment</code> session intent. An API key gets a <code>403</code>. Has no effect on a payment that is not waiting on authentication.
+     */
+    public PaymentStatus resume(String paymentId, RequestOptions requestOptions) {
+        return this.rawClient.resume(paymentId, requestOptions).body();
+    }
+
+    /**
+     * Charges the saved card again, with the buyer present, for a payment their bank declined until they authenticate (such as with 3DS). Retrieve the payment afterward to get the bank's challenge from <code>next_action</code>; once the buyer completes it, they land on <code>return_url</code>, or on Whop's hosted verification page if none was given. Only the buyer can call this, with the payment's <code>client_secret</code> in the body, an OAuth token for their own account with the <code>member:payment_methods:use</code> scope, or the token from a verified <code>payment</code> session intent. An API key gets a <code>403</code>. Has no effect on a payment that is not waiting on authentication.
+     */
+    public PaymentStatus resume(String paymentId, ResumePaymentsRequest request) {
+        return this.rawClient.resume(paymentId, request).body();
+    }
+
+    /**
+     * Charges the saved card again, with the buyer present, for a payment their bank declined until they authenticate (such as with 3DS). Retrieve the payment afterward to get the bank's challenge from <code>next_action</code>; once the buyer completes it, they land on <code>return_url</code>, or on Whop's hosted verification page if none was given. Only the buyer can call this, with the payment's <code>client_secret</code> in the body, an OAuth token for their own account with the <code>member:payment_methods:use</code> scope, or the token from a verified <code>payment</code> session intent. An API key gets a <code>403</code>. Has no effect on a payment that is not waiting on authentication.
+     */
+    public PaymentStatus resume(String paymentId, ResumePaymentsRequest request, RequestOptions requestOptions) {
+        return this.rawClient.resume(paymentId, request, requestOptions).body();
+    }
+
+    /**
+     * Changes where the buyer lands after completing an off-site step, up until they return. Accepts either a secret key or the payment's own <code>client_secret</code> in the body, so the surface that knows the final destination can set it.
      */
     public PaymentStatus updateReturnUrl(String paymentId, UpdateReturnUrlPaymentsRequest request) {
         return this.rawClient.updateReturnUrl(paymentId, request).body();
     }
 
     /**
-     * Changes where the buyer lands after completing an off-site step, up until they return. Accepts either a secret key or the payment's own <code>client_secret</code>, so the surface that knows the final destination can set it.
+     * Changes where the buyer lands after completing an off-site step, up until they return. Accepts either a secret key or the payment's own <code>client_secret</code> in the body, so the surface that knows the final destination can set it.
      */
     public PaymentStatus updateReturnUrl(
             String paymentId, UpdateReturnUrlPaymentsRequest request, RequestOptions requestOptions) {
@@ -541,31 +394,39 @@ public class PaymentsClient {
     }
 
     /**
-     * Retrieves how far a payment has got and what the buyer must do next, if anything. A payment is collected in the background, so poll this rather than reading the create response. Accepts either a secret key or the payment's own <code>client_secret</code>, so the surface collecting the payment can poll it directly.
+     * Retrieves how far a payment has got and what the buyer must do next, if anything. A payment is collected in the background, so poll this rather than reading the create response. Accepts either a secret key or the payment's own <code>client_secret</code> as a query parameter, so the surface collecting the payment can poll it directly.
      */
     public PaymentStatus retrieveStatus(String paymentId) {
         return this.rawClient.retrieveStatus(paymentId).body();
     }
 
     /**
-     * Retrieves how far a payment has got and what the buyer must do next, if anything. A payment is collected in the background, so poll this rather than reading the create response. Accepts either a secret key or the payment's own <code>client_secret</code>, so the surface collecting the payment can poll it directly.
+     * Retrieves how far a payment has got and what the buyer must do next, if anything. A payment is collected in the background, so poll this rather than reading the create response. Accepts either a secret key or the payment's own <code>client_secret</code> as a query parameter, so the surface collecting the payment can poll it directly.
      */
     public PaymentStatus retrieveStatus(String paymentId, RequestOptions requestOptions) {
         return this.rawClient.retrieveStatus(paymentId, requestOptions).body();
     }
 
     /**
-     * Retrieves how far a payment has got and what the buyer must do next, if anything. A payment is collected in the background, so poll this rather than reading the create response. Accepts either a secret key or the payment's own <code>client_secret</code>, so the surface collecting the payment can poll it directly.
+     * Retrieves how far a payment has got and what the buyer must do next, if anything. A payment is collected in the background, so poll this rather than reading the create response. Accepts either a secret key or the payment's own <code>client_secret</code> as a query parameter, so the surface collecting the payment can poll it directly.
      */
     public PaymentStatus retrieveStatus(String paymentId, RetrieveStatusPaymentsRequest request) {
         return this.rawClient.retrieveStatus(paymentId, request).body();
     }
 
     /**
-     * Retrieves how far a payment has got and what the buyer must do next, if anything. A payment is collected in the background, so poll this rather than reading the create response. Accepts either a secret key or the payment's own <code>client_secret</code>, so the surface collecting the payment can poll it directly.
+     * Retrieves how far a payment has got and what the buyer must do next, if anything. A payment is collected in the background, so poll this rather than reading the create response. Accepts either a secret key or the payment's own <code>client_secret</code> as a query parameter, so the surface collecting the payment can poll it directly.
      */
     public PaymentStatus retrieveStatus(
             String paymentId, RetrieveStatusPaymentsRequest request, RequestOptions requestOptions) {
         return this.rawClient.retrieveStatus(paymentId, request, requestOptions).body();
+    }
+
+    public DirectClient direct() {
+        return this.directClient.get();
+    }
+
+    public LevelsRebateClient levelsRebate() {
+        return this.levelsRebateClient.get();
     }
 }

@@ -625,7 +625,6 @@ public final class CardTransactionListItem {
 
         private Optional<String> authorizationMethod = Optional.empty();
 
-        @JsonAnySetter
         private Map<String, Object> additionalProperties = new HashMap<>();
 
         private Builder() {}
@@ -655,7 +654,6 @@ public final class CardTransactionListItem {
 
         /**
          * <p>Represents a unique identifier that is Base64 obfuscated. It is often used to refetch an object or as key for a cache. The ID type appears in a JSON response as a String; however, it is not intended to be human-readable. When expected as an input type, any string (such as <code>&quot;VXNlci0xMA==&quot;</code>) or integer (such as <code>4</code>) input value will be accepted as an ID.</p>
-         * <p>Represents a unique identifier that is Base64 obfuscated. It is often used to refetch an object or as key for a cache. The ID type appears in a JSON response as a String; however, it is not intended to be human-readable. When expected as an input type, any string (such as <code>&quot;VXNlci0xMA==&quot;</code>) or integer (such as <code>4</code>) input value will be accepted as an ID.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
@@ -666,7 +664,6 @@ public final class CardTransactionListItem {
         }
 
         /**
-         * <p>The datetime the card transaction was created.</p>
          * <p>The datetime the card transaction was created.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
@@ -679,7 +676,6 @@ public final class CardTransactionListItem {
 
         /**
          * <p>The unique identifier for the card transaction.</p>
-         * <p>The unique identifier for the card transaction.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
@@ -690,7 +686,6 @@ public final class CardTransactionListItem {
         }
 
         /**
-         * <p>Whether the transaction was made with a merchant outside the card's home country.</p>
          * <p>Whether the transaction was made with a merchant outside the card's home country.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
@@ -703,7 +698,6 @@ public final class CardTransactionListItem {
 
         /**
          * <p>The current lifecycle status of the transaction.</p>
-         * <p>The current lifecycle status of the transaction.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
@@ -714,7 +708,6 @@ public final class CardTransactionListItem {
         }
 
         /**
-         * <p>The type of transaction.</p>
          * <p>The type of transaction.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
@@ -1179,6 +1172,31 @@ public final class CardTransactionListItem {
                     transactionType,
                     usdAmount,
                     additionalProperties);
+        }
+
+        @JsonAnySetter
+        private void putAdditionalPropertyFromJson(String key, Object value) {
+            if (key.equalsIgnoreCase("authorization_method")
+                    || key.equalsIgnoreCase("card_id")
+                    || key.equalsIgnoreCase("cashback_usd_amount")
+                    || key.equalsIgnoreCase("created_at")
+                    || key.equalsIgnoreCase("currency")
+                    || key.equalsIgnoreCase("declined_reason")
+                    || key.equalsIgnoreCase("id")
+                    || key.equalsIgnoreCase("international")
+                    || key.equalsIgnoreCase("local_amount")
+                    || key.equalsIgnoreCase("memo")
+                    || key.equalsIgnoreCase("merchant_category")
+                    || key.equalsIgnoreCase("merchant_category_code")
+                    || key.equalsIgnoreCase("merchant_icon_url")
+                    || key.equalsIgnoreCase("merchant_name")
+                    || key.equalsIgnoreCase("posted_at")
+                    || key.equalsIgnoreCase("status")
+                    || key.equalsIgnoreCase("transaction_type")
+                    || key.equalsIgnoreCase("usd_amount")) {
+                return;
+            }
+            this.additionalProperties.put(key, value);
         }
 
         @java.lang.Override

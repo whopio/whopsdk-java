@@ -5,6 +5,7 @@ package com.whop.api.resources.supportchannels;
 
 import com.whop.api.core.ClientOptions;
 import com.whop.api.core.RequestOptions;
+import com.whop.api.core.WhopApiHttpResponse;
 import com.whop.api.core.pagination.SyncPagingIterable;
 import com.whop.api.resources.supportchannels.requests.CreateSupportChannelsRequest;
 import com.whop.api.resources.supportchannels.requests.ListSupportChannelsRequest;
@@ -31,40 +32,67 @@ public class AsyncSupportChannelsClient {
     }
 
     /**
-     * Returns a paginated list of support channels for a specific company, with optional filtering by resolution status and custom sorting.
+     * Lists support channels between an account's team and its customers, most recently active first by default. Pass <code>open=true</code> to find channels awaiting a support response.
      * <p>Required permissions:</p>
      * <ul>
      * <li><code>support_chat:read</code></li>
      * </ul>
      */
     public CompletableFuture<SyncPagingIterable<SupportChannelListItem>> list() {
-        return this.rawClient.list().thenApply(response -> response.body());
+        CompletableFuture<WhopApiHttpResponse<SyncPagingIterable<SupportChannelListItem>>> rawFuture =
+                this.rawClient.list();
+        CompletableFuture<SyncPagingIterable<SupportChannelListItem>> future =
+                rawFuture.thenApply(response -> response.body());
+        future.whenComplete((result_, throwable_) -> {
+            if (future.isCancelled()) {
+                rawFuture.cancel(true);
+            }
+        });
+        return future;
     }
 
     /**
-     * Returns a paginated list of support channels for a specific company, with optional filtering by resolution status and custom sorting.
+     * Lists support channels between an account's team and its customers, most recently active first by default. Pass <code>open=true</code> to find channels awaiting a support response.
      * <p>Required permissions:</p>
      * <ul>
      * <li><code>support_chat:read</code></li>
      * </ul>
      */
     public CompletableFuture<SyncPagingIterable<SupportChannelListItem>> list(RequestOptions requestOptions) {
-        return this.rawClient.list(requestOptions).thenApply(response -> response.body());
+        CompletableFuture<WhopApiHttpResponse<SyncPagingIterable<SupportChannelListItem>>> rawFuture =
+                this.rawClient.list(requestOptions);
+        CompletableFuture<SyncPagingIterable<SupportChannelListItem>> future =
+                rawFuture.thenApply(response -> response.body());
+        future.whenComplete((result_, throwable_) -> {
+            if (future.isCancelled()) {
+                rawFuture.cancel(true);
+            }
+        });
+        return future;
     }
 
     /**
-     * Returns a paginated list of support channels for a specific company, with optional filtering by resolution status and custom sorting.
+     * Lists support channels between an account's team and its customers, most recently active first by default. Pass <code>open=true</code> to find channels awaiting a support response.
      * <p>Required permissions:</p>
      * <ul>
      * <li><code>support_chat:read</code></li>
      * </ul>
      */
     public CompletableFuture<SyncPagingIterable<SupportChannelListItem>> list(ListSupportChannelsRequest request) {
-        return this.rawClient.list(request).thenApply(response -> response.body());
+        CompletableFuture<WhopApiHttpResponse<SyncPagingIterable<SupportChannelListItem>>> rawFuture =
+                this.rawClient.list(request);
+        CompletableFuture<SyncPagingIterable<SupportChannelListItem>> future =
+                rawFuture.thenApply(response -> response.body());
+        future.whenComplete((result_, throwable_) -> {
+            if (future.isCancelled()) {
+                rawFuture.cancel(true);
+            }
+        });
+        return future;
     }
 
     /**
-     * Returns a paginated list of support channels for a specific company, with optional filtering by resolution status and custom sorting.
+     * Lists support channels between an account's team and its customers, most recently active first by default. Pass <code>open=true</code> to find channels awaiting a support response.
      * <p>Required permissions:</p>
      * <ul>
      * <li><code>support_chat:read</code></li>
@@ -72,22 +100,38 @@ public class AsyncSupportChannelsClient {
      */
     public CompletableFuture<SyncPagingIterable<SupportChannelListItem>> list(
             ListSupportChannelsRequest request, RequestOptions requestOptions) {
-        return this.rawClient.list(request, requestOptions).thenApply(response -> response.body());
+        CompletableFuture<WhopApiHttpResponse<SyncPagingIterable<SupportChannelListItem>>> rawFuture =
+                this.rawClient.list(request, requestOptions);
+        CompletableFuture<SyncPagingIterable<SupportChannelListItem>> future =
+                rawFuture.thenApply(response -> response.body());
+        future.whenComplete((result_, throwable_) -> {
+            if (future.isCancelled()) {
+                rawFuture.cancel(true);
+            }
+        });
+        return future;
     }
 
     /**
-     * Open a new support channel between a company team member and a customer. Returns the existing channel if one already exists for that user.
+     * Opens a support channel between an account's team and a customer. Returns the existing channel if that customer already has one.
      * <p>Required permissions:</p>
      * <ul>
      * <li><code>support_chat:create</code></li>
      * </ul>
      */
     public CompletableFuture<SupportChannel> create(CreateSupportChannelsRequest request) {
-        return this.rawClient.create(request).thenApply(response -> response.body());
+        CompletableFuture<WhopApiHttpResponse<SupportChannel>> rawFuture = this.rawClient.create(request);
+        CompletableFuture<SupportChannel> future = rawFuture.thenApply(response -> response.body());
+        future.whenComplete((result_, throwable_) -> {
+            if (future.isCancelled()) {
+                rawFuture.cancel(true);
+            }
+        });
+        return future;
     }
 
     /**
-     * Open a new support channel between a company team member and a customer. Returns the existing channel if one already exists for that user.
+     * Opens a support channel between an account's team and a customer. Returns the existing channel if that customer already has one.
      * <p>Required permissions:</p>
      * <ul>
      * <li><code>support_chat:create</code></li>
@@ -95,7 +139,15 @@ public class AsyncSupportChannelsClient {
      */
     public CompletableFuture<SupportChannel> create(
             CreateSupportChannelsRequest request, RequestOptions requestOptions) {
-        return this.rawClient.create(request, requestOptions).thenApply(response -> response.body());
+        CompletableFuture<WhopApiHttpResponse<SupportChannel>> rawFuture =
+                this.rawClient.create(request, requestOptions);
+        CompletableFuture<SupportChannel> future = rawFuture.thenApply(response -> response.body());
+        future.whenComplete((result_, throwable_) -> {
+            if (future.isCancelled()) {
+                rawFuture.cancel(true);
+            }
+        });
+        return future;
     }
 
     /**
@@ -106,7 +158,14 @@ public class AsyncSupportChannelsClient {
      * </ul>
      */
     public CompletableFuture<SupportChannel> retrieve(String id) {
-        return this.rawClient.retrieve(id).thenApply(response -> response.body());
+        CompletableFuture<WhopApiHttpResponse<SupportChannel>> rawFuture = this.rawClient.retrieve(id);
+        CompletableFuture<SupportChannel> future = rawFuture.thenApply(response -> response.body());
+        future.whenComplete((result_, throwable_) -> {
+            if (future.isCancelled()) {
+                rawFuture.cancel(true);
+            }
+        });
+        return future;
     }
 
     /**
@@ -117,7 +176,14 @@ public class AsyncSupportChannelsClient {
      * </ul>
      */
     public CompletableFuture<SupportChannel> retrieve(String id, RequestOptions requestOptions) {
-        return this.rawClient.retrieve(id, requestOptions).thenApply(response -> response.body());
+        CompletableFuture<WhopApiHttpResponse<SupportChannel>> rawFuture = this.rawClient.retrieve(id, requestOptions);
+        CompletableFuture<SupportChannel> future = rawFuture.thenApply(response -> response.body());
+        future.whenComplete((result_, throwable_) -> {
+            if (future.isCancelled()) {
+                rawFuture.cancel(true);
+            }
+        });
+        return future;
     }
 
     /**
@@ -128,7 +194,14 @@ public class AsyncSupportChannelsClient {
      * </ul>
      */
     public CompletableFuture<SupportChannel> retrieve(String id, RetrieveSupportChannelsRequest request) {
-        return this.rawClient.retrieve(id, request).thenApply(response -> response.body());
+        CompletableFuture<WhopApiHttpResponse<SupportChannel>> rawFuture = this.rawClient.retrieve(id, request);
+        CompletableFuture<SupportChannel> future = rawFuture.thenApply(response -> response.body());
+        future.whenComplete((result_, throwable_) -> {
+            if (future.isCancelled()) {
+                rawFuture.cancel(true);
+            }
+        });
+        return future;
     }
 
     /**
@@ -140,6 +213,14 @@ public class AsyncSupportChannelsClient {
      */
     public CompletableFuture<SupportChannel> retrieve(
             String id, RetrieveSupportChannelsRequest request, RequestOptions requestOptions) {
-        return this.rawClient.retrieve(id, request, requestOptions).thenApply(response -> response.body());
+        CompletableFuture<WhopApiHttpResponse<SupportChannel>> rawFuture =
+                this.rawClient.retrieve(id, request, requestOptions);
+        CompletableFuture<SupportChannel> future = rawFuture.thenApply(response -> response.body());
+        future.whenComplete((result_, throwable_) -> {
+            if (future.isCancelled()) {
+                rawFuture.cancel(true);
+            }
+        });
+        return future;
     }
 }

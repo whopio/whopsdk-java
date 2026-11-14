@@ -29,7 +29,7 @@ public final class UserProfilePicture {
     }
 
     /**
-     * @return Avatar image URL. Always present — a generated placeholder when the user set no picture.
+     * @return Avatar image URL. Always present. It is a generated placeholder when the user set no picture.
      */
     @JsonProperty("url")
     public String getUrl() {
@@ -67,7 +67,7 @@ public final class UserProfilePicture {
 
     public interface UrlStage {
         /**
-         * <p>Avatar image URL. Always present — a generated placeholder when the user set no picture.</p>
+         * <p>Avatar image URL. Always present. It is a generated placeholder when the user set no picture.</p>
          */
         _FinalStage url(@NotNull String url);
 
@@ -86,7 +86,6 @@ public final class UserProfilePicture {
     public static final class Builder implements UrlStage, _FinalStage {
         private String url;
 
-        @JsonAnySetter
         private Map<String, Object> additionalProperties = new HashMap<>();
 
         private Builder() {}
@@ -98,8 +97,7 @@ public final class UserProfilePicture {
         }
 
         /**
-         * <p>Avatar image URL. Always present — a generated placeholder when the user set no picture.</p>
-         * <p>Avatar image URL. Always present — a generated placeholder when the user set no picture.</p>
+         * <p>Avatar image URL. Always present. It is a generated placeholder when the user set no picture.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
@@ -112,6 +110,14 @@ public final class UserProfilePicture {
         @java.lang.Override
         public UserProfilePicture build() {
             return new UserProfilePicture(url, additionalProperties);
+        }
+
+        @JsonAnySetter
+        private void putAdditionalPropertyFromJson(String key, Object value) {
+            if (key.equalsIgnoreCase("url")) {
+                return;
+            }
+            this.additionalProperties.put(key, value);
         }
 
         @java.lang.Override

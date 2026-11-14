@@ -16,9 +16,8 @@ import com.whop.api.core.Nullable;
 import com.whop.api.core.NullableNonemptyFilter;
 import com.whop.api.core.ObjectMappers;
 import com.whop.api.resources.invoices.types.UpdateInvoicesRequestBillingAddress;
-import com.whop.api.resources.invoices.types.UpdateInvoicesRequestLineItemsItem;
-import com.whop.api.resources.invoices.types.UpdateInvoicesRequestPlan;
-import com.whop.api.types.InvoiceCollectionMethods;
+import com.whop.api.resources.invoices.types.UpdateInvoicesRequestItemsItem;
+import com.whop.api.resources.invoices.types.UpdateInvoicesRequestPaymentMethodConfiguration;
 import java.time.OffsetDateTime;
 import java.util.HashMap;
 import java.util.List;
@@ -29,82 +28,59 @@ import java.util.Optional;
 @JsonInclude(JsonInclude.Include.NON_ABSENT)
 @JsonDeserialize(builder = UpdateInvoicesRequest.Builder.class)
 public final class UpdateInvoicesRequest {
-    private final Optional<OffsetDateTime> automaticallyFinalizesAt;
-
     private final Optional<UpdateInvoicesRequestBillingAddress> billingAddress;
 
-    private final Optional<Boolean> chargeBuyerFee;
+    private final Optional<Double> buyerFeePercentage;
 
-    private final Optional<InvoiceCollectionMethods> collectionMethod;
+    private final Optional<OffsetDateTime> dueAt;
 
-    private final Optional<String> customerName;
-
-    private final Optional<OffsetDateTime> dueDate;
-
-    private final Optional<String> emailAddress;
-
-    private final Optional<List<UpdateInvoicesRequestLineItemsItem>> lineItems;
+    private final Optional<List<UpdateInvoicesRequestItemsItem>> items;
 
     private final Optional<String> mailingAddressId;
 
     private final Optional<String> memberId;
 
+    private final Optional<String> memo;
+
+    private final Optional<Map<String, String>> metadata;
+
+    private final Optional<UpdateInvoicesRequestPaymentMethodConfiguration> paymentMethodConfiguration;
+
     private final Optional<String> paymentMethodId;
 
-    private final Optional<UpdateInvoicesRequestPlan> plan;
-
-    private final Optional<String> productId;
-
-    private final Optional<OffsetDateTime> subscriptionBillingAnchorAt;
+    private final Optional<List<String>> recipientEmails;
 
     private final Map<String, Object> additionalProperties;
 
     private UpdateInvoicesRequest(
-            Optional<OffsetDateTime> automaticallyFinalizesAt,
             Optional<UpdateInvoicesRequestBillingAddress> billingAddress,
-            Optional<Boolean> chargeBuyerFee,
-            Optional<InvoiceCollectionMethods> collectionMethod,
-            Optional<String> customerName,
-            Optional<OffsetDateTime> dueDate,
-            Optional<String> emailAddress,
-            Optional<List<UpdateInvoicesRequestLineItemsItem>> lineItems,
+            Optional<Double> buyerFeePercentage,
+            Optional<OffsetDateTime> dueAt,
+            Optional<List<UpdateInvoicesRequestItemsItem>> items,
             Optional<String> mailingAddressId,
             Optional<String> memberId,
+            Optional<String> memo,
+            Optional<Map<String, String>> metadata,
+            Optional<UpdateInvoicesRequestPaymentMethodConfiguration> paymentMethodConfiguration,
             Optional<String> paymentMethodId,
-            Optional<UpdateInvoicesRequestPlan> plan,
-            Optional<String> productId,
-            Optional<OffsetDateTime> subscriptionBillingAnchorAt,
+            Optional<List<String>> recipientEmails,
             Map<String, Object> additionalProperties) {
-        this.automaticallyFinalizesAt = automaticallyFinalizesAt;
         this.billingAddress = billingAddress;
-        this.chargeBuyerFee = chargeBuyerFee;
-        this.collectionMethod = collectionMethod;
-        this.customerName = customerName;
-        this.dueDate = dueDate;
-        this.emailAddress = emailAddress;
-        this.lineItems = lineItems;
+        this.buyerFeePercentage = buyerFeePercentage;
+        this.dueAt = dueAt;
+        this.items = items;
         this.mailingAddressId = mailingAddressId;
         this.memberId = memberId;
+        this.memo = memo;
+        this.metadata = metadata;
+        this.paymentMethodConfiguration = paymentMethodConfiguration;
         this.paymentMethodId = paymentMethodId;
-        this.plan = plan;
-        this.productId = productId;
-        this.subscriptionBillingAnchorAt = subscriptionBillingAnchorAt;
+        this.recipientEmails = recipientEmails;
         this.additionalProperties = additionalProperties;
     }
 
     /**
-     * @return The date and time when the invoice will be automatically finalized. For charge_automatically, triggers an automatic charge. For send_invoice, sends the invoice email at the specified time.
-     */
-    @JsonIgnore
-    public Optional<OffsetDateTime> getAutomaticallyFinalizesAt() {
-        if (automaticallyFinalizesAt == null) {
-            return Optional.empty();
-        }
-        return automaticallyFinalizesAt;
-    }
-
-    /**
-     * @return Inline billing address to create or update a mailing address for this invoice.
+     * @return Create a billing address linked to this member.
      */
     @JsonIgnore
     public Optional<UpdateInvoicesRequestBillingAddress> getBillingAddress() {
@@ -115,73 +91,34 @@ public final class UpdateInvoicesRequest {
     }
 
     /**
-     * @return Whether to charge the customer a buyer fee on this invoice.
+     * @return The buyer's adjustable fee in percentage points, with at most two decimal places: <code>0</code> for none, or between 5 and 100. The account keeps it, and Whop waives its take rate on the invoice.
      */
-    @JsonIgnore
-    public Optional<Boolean> getChargeBuyerFee() {
-        if (chargeBuyerFee == null) {
-            return Optional.empty();
-        }
-        return chargeBuyerFee;
+    @JsonProperty("buyer_fee_percentage")
+    public Optional<Double> getBuyerFeePercentage() {
+        return buyerFeePercentage;
     }
 
     /**
-     * @return How the invoice should be collected.
+     * @return When payment is due, as an ISO 8601 timestamp.
      */
     @JsonIgnore
-    public Optional<InvoiceCollectionMethods> getCollectionMethod() {
-        if (collectionMethod == null) {
+    public Optional<OffsetDateTime> getDueAt() {
+        if (dueAt == null) {
             return Optional.empty();
         }
-        return collectionMethod;
+        return dueAt;
     }
 
     /**
-     * @return The name of the customer.
+     * @return The variants being invoiced, all in the same currency. Each variant may appear once. Use quantity for multiple units. A recurring variant must belong to a product. Its first invoice charges <code>initial_price</code> plus <code>renewal_price</code>. Later invoices charge only <code>renewal_price</code>. Paying the first invoice starts a paid billing period immediately, without the variant's trial. The subscription uses the <code>collection_method</code> the invoice was sent or issued with. A finite payment count includes the first paid invoice. With several items, every item that has a product must be a regular product, and all items need compatible payment, tax, and access settings.
      */
-    @JsonIgnore
-    public Optional<String> getCustomerName() {
-        if (customerName == null) {
-            return Optional.empty();
-        }
-        return customerName;
+    @JsonProperty("items")
+    public Optional<List<UpdateInvoicesRequestItemsItem>> getItems() {
+        return items;
     }
 
     /**
-     * @return The date by which the invoice must be paid.
-     */
-    @JsonIgnore
-    public Optional<OffsetDateTime> getDueDate() {
-        if (dueDate == null) {
-            return Optional.empty();
-        }
-        return dueDate;
-    }
-
-    /**
-     * @return The email address of the customer.
-     */
-    @JsonIgnore
-    public Optional<String> getEmailAddress() {
-        if (emailAddress == null) {
-            return Optional.empty();
-        }
-        return emailAddress;
-    }
-
-    /**
-     * @return Line items that break down the invoice total.
-     */
-    @JsonIgnore
-    public Optional<List<UpdateInvoicesRequestLineItemsItem>> getLineItems() {
-        if (lineItems == null) {
-            return Optional.empty();
-        }
-        return lineItems;
-    }
-
-    /**
-     * @return The unique identifier of an existing mailing address to attach.
+     * @return An address associated with the member. Mutually exclusive with billing_address.
      */
     @JsonIgnore
     public Optional<String> getMailingAddressId() {
@@ -192,7 +129,7 @@ public final class UpdateInvoicesRequest {
     }
 
     /**
-     * @return The unique identifier of a member to assign as the customer.
+     * @return The billed customer, a member of the account, prefixed <code>mber_</code>. The customer is set when the draft is created and can't change, so pass the draft's current customer or omit this field. A draft saved without a customer can take one here. Changing email recipients does not change this buyer.
      */
     @JsonIgnore
     public Optional<String> getMemberId() {
@@ -203,7 +140,37 @@ public final class UpdateInvoicesRequest {
     }
 
     /**
-     * @return The unique identifier of the payment method to charge.
+     * @return A note to the customer, shown on the invoice email, PDF, and checkout page with its line breaks kept. Trimmed; <code>null</code> or blank clears it. Can be updated on draft, open, or uncollectible invoices.
+     */
+    @JsonIgnore
+    public Optional<String> getMemo() {
+        if (memo == null) {
+            return Optional.empty();
+        }
+        return memo;
+    }
+
+    /**
+     * @return Up to 50 caller-owned string key/value pairs. The <code>invoice_memo</code> key is reserved and ignored; set <code>memo</code> instead.
+     */
+    @JsonProperty("metadata")
+    public Optional<Map<String, String>> getMetadata() {
+        return metadata;
+    }
+
+    /**
+     * @return The payment methods the customer can choose from when paying through the invoice's checkout link, in the shape a variant or checkout configuration takes. It takes precedence over the invoice's variants and the account, and changes neither. Send both lists. <code>null</code> uses its variants' payment methods. Can be updated on drafts.
+     */
+    @JsonIgnore
+    public Optional<UpdateInvoicesRequestPaymentMethodConfiguration> getPaymentMethodConfiguration() {
+        if (paymentMethodConfiguration == null) {
+            return Optional.empty();
+        }
+        return paymentMethodConfiguration;
+    }
+
+    /**
+     * @return A saved payment method belonging to the member, prefixed <code>payt_</code>. Sending or issuing the invoice charges this method at the <code>charge_at</code> passed to that call, otherwise on <code>due_at</code>, or right away when there is no <code>due_at</code> or it has passed. Sending also emails the invoice now when the charge is later; issuing does not. Setting it needs <code>payment:charge</code>.
      */
     @JsonIgnore
     public Optional<String> getPaymentMethodId() {
@@ -214,42 +181,11 @@ public final class UpdateInvoicesRequest {
     }
 
     /**
-     * @return Updated plan attributes.
+     * @return Email addresses saved for invoice delivery, independent of the billed customer. Saving them sends no email. Defaults to the customer email when omitted on create. Can be updated on draft, open, or uncollectible invoices.
      */
-    @JsonIgnore
-    public Optional<UpdateInvoicesRequestPlan> getPlan() {
-        if (plan == null) {
-            return Optional.empty();
-        }
-        return plan;
-    }
-
-    /**
-     * @return The unique identifier of an existing product to attach to this invoice. Only allowed while the invoice is still a draft.
-     */
-    @JsonIgnore
-    public Optional<String> getProductId() {
-        if (productId == null) {
-            return Optional.empty();
-        }
-        return productId;
-    }
-
-    /**
-     * @return The date that defines when the subscription billing cycle should start.
-     */
-    @JsonIgnore
-    public Optional<OffsetDateTime> getSubscriptionBillingAnchorAt() {
-        if (subscriptionBillingAnchorAt == null) {
-            return Optional.empty();
-        }
-        return subscriptionBillingAnchorAt;
-    }
-
-    @JsonInclude(value = JsonInclude.Include.CUSTOM, valueFilter = NullableNonemptyFilter.class)
-    @JsonProperty("automatically_finalizes_at")
-    private Optional<OffsetDateTime> _getAutomaticallyFinalizesAt() {
-        return automaticallyFinalizesAt;
+    @JsonProperty("recipient_emails")
+    public Optional<List<String>> getRecipientEmails() {
+        return recipientEmails;
     }
 
     @JsonInclude(value = JsonInclude.Include.CUSTOM, valueFilter = NullableNonemptyFilter.class)
@@ -259,39 +195,9 @@ public final class UpdateInvoicesRequest {
     }
 
     @JsonInclude(value = JsonInclude.Include.CUSTOM, valueFilter = NullableNonemptyFilter.class)
-    @JsonProperty("charge_buyer_fee")
-    private Optional<Boolean> _getChargeBuyerFee() {
-        return chargeBuyerFee;
-    }
-
-    @JsonInclude(value = JsonInclude.Include.CUSTOM, valueFilter = NullableNonemptyFilter.class)
-    @JsonProperty("collection_method")
-    private Optional<InvoiceCollectionMethods> _getCollectionMethod() {
-        return collectionMethod;
-    }
-
-    @JsonInclude(value = JsonInclude.Include.CUSTOM, valueFilter = NullableNonemptyFilter.class)
-    @JsonProperty("customer_name")
-    private Optional<String> _getCustomerName() {
-        return customerName;
-    }
-
-    @JsonInclude(value = JsonInclude.Include.CUSTOM, valueFilter = NullableNonemptyFilter.class)
-    @JsonProperty("due_date")
-    private Optional<OffsetDateTime> _getDueDate() {
-        return dueDate;
-    }
-
-    @JsonInclude(value = JsonInclude.Include.CUSTOM, valueFilter = NullableNonemptyFilter.class)
-    @JsonProperty("email_address")
-    private Optional<String> _getEmailAddress() {
-        return emailAddress;
-    }
-
-    @JsonInclude(value = JsonInclude.Include.CUSTOM, valueFilter = NullableNonemptyFilter.class)
-    @JsonProperty("line_items")
-    private Optional<List<UpdateInvoicesRequestLineItemsItem>> _getLineItems() {
-        return lineItems;
+    @JsonProperty("due_at")
+    private Optional<OffsetDateTime> _getDueAt() {
+        return dueAt;
     }
 
     @JsonInclude(value = JsonInclude.Include.CUSTOM, valueFilter = NullableNonemptyFilter.class)
@@ -307,27 +213,21 @@ public final class UpdateInvoicesRequest {
     }
 
     @JsonInclude(value = JsonInclude.Include.CUSTOM, valueFilter = NullableNonemptyFilter.class)
+    @JsonProperty("memo")
+    private Optional<String> _getMemo() {
+        return memo;
+    }
+
+    @JsonInclude(value = JsonInclude.Include.CUSTOM, valueFilter = NullableNonemptyFilter.class)
+    @JsonProperty("payment_method_configuration")
+    private Optional<UpdateInvoicesRequestPaymentMethodConfiguration> _getPaymentMethodConfiguration() {
+        return paymentMethodConfiguration;
+    }
+
+    @JsonInclude(value = JsonInclude.Include.CUSTOM, valueFilter = NullableNonemptyFilter.class)
     @JsonProperty("payment_method_id")
     private Optional<String> _getPaymentMethodId() {
         return paymentMethodId;
-    }
-
-    @JsonInclude(value = JsonInclude.Include.CUSTOM, valueFilter = NullableNonemptyFilter.class)
-    @JsonProperty("plan")
-    private Optional<UpdateInvoicesRequestPlan> _getPlan() {
-        return plan;
-    }
-
-    @JsonInclude(value = JsonInclude.Include.CUSTOM, valueFilter = NullableNonemptyFilter.class)
-    @JsonProperty("product_id")
-    private Optional<String> _getProductId() {
-        return productId;
-    }
-
-    @JsonInclude(value = JsonInclude.Include.CUSTOM, valueFilter = NullableNonemptyFilter.class)
-    @JsonProperty("subscription_billing_anchor_at")
-    private Optional<OffsetDateTime> _getSubscriptionBillingAnchorAt() {
-        return subscriptionBillingAnchorAt;
     }
 
     @java.lang.Override
@@ -342,39 +242,33 @@ public final class UpdateInvoicesRequest {
     }
 
     private boolean equalTo(UpdateInvoicesRequest other) {
-        return automaticallyFinalizesAt.equals(other.automaticallyFinalizesAt)
-                && billingAddress.equals(other.billingAddress)
-                && chargeBuyerFee.equals(other.chargeBuyerFee)
-                && collectionMethod.equals(other.collectionMethod)
-                && customerName.equals(other.customerName)
-                && dueDate.equals(other.dueDate)
-                && emailAddress.equals(other.emailAddress)
-                && lineItems.equals(other.lineItems)
+        return billingAddress.equals(other.billingAddress)
+                && buyerFeePercentage.equals(other.buyerFeePercentage)
+                && dueAt.equals(other.dueAt)
+                && items.equals(other.items)
                 && mailingAddressId.equals(other.mailingAddressId)
                 && memberId.equals(other.memberId)
+                && memo.equals(other.memo)
+                && metadata.equals(other.metadata)
+                && paymentMethodConfiguration.equals(other.paymentMethodConfiguration)
                 && paymentMethodId.equals(other.paymentMethodId)
-                && plan.equals(other.plan)
-                && productId.equals(other.productId)
-                && subscriptionBillingAnchorAt.equals(other.subscriptionBillingAnchorAt);
+                && recipientEmails.equals(other.recipientEmails);
     }
 
     @java.lang.Override
     public int hashCode() {
         return Objects.hash(
-                this.automaticallyFinalizesAt,
                 this.billingAddress,
-                this.chargeBuyerFee,
-                this.collectionMethod,
-                this.customerName,
-                this.dueDate,
-                this.emailAddress,
-                this.lineItems,
+                this.buyerFeePercentage,
+                this.dueAt,
+                this.items,
                 this.mailingAddressId,
                 this.memberId,
+                this.memo,
+                this.metadata,
+                this.paymentMethodConfiguration,
                 this.paymentMethodId,
-                this.plan,
-                this.productId,
-                this.subscriptionBillingAnchorAt);
+                this.recipientEmails);
     }
 
     @java.lang.Override
@@ -388,84 +282,49 @@ public final class UpdateInvoicesRequest {
 
     @JsonIgnoreProperties(ignoreUnknown = true)
     public static final class Builder {
-        private Optional<OffsetDateTime> automaticallyFinalizesAt = Optional.empty();
-
         private Optional<UpdateInvoicesRequestBillingAddress> billingAddress = Optional.empty();
 
-        private Optional<Boolean> chargeBuyerFee = Optional.empty();
+        private Optional<Double> buyerFeePercentage = Optional.empty();
 
-        private Optional<InvoiceCollectionMethods> collectionMethod = Optional.empty();
+        private Optional<OffsetDateTime> dueAt = Optional.empty();
 
-        private Optional<String> customerName = Optional.empty();
-
-        private Optional<OffsetDateTime> dueDate = Optional.empty();
-
-        private Optional<String> emailAddress = Optional.empty();
-
-        private Optional<List<UpdateInvoicesRequestLineItemsItem>> lineItems = Optional.empty();
+        private Optional<List<UpdateInvoicesRequestItemsItem>> items = Optional.empty();
 
         private Optional<String> mailingAddressId = Optional.empty();
 
         private Optional<String> memberId = Optional.empty();
 
+        private Optional<String> memo = Optional.empty();
+
+        private Optional<Map<String, String>> metadata = Optional.empty();
+
+        private Optional<UpdateInvoicesRequestPaymentMethodConfiguration> paymentMethodConfiguration = Optional.empty();
+
         private Optional<String> paymentMethodId = Optional.empty();
 
-        private Optional<UpdateInvoicesRequestPlan> plan = Optional.empty();
+        private Optional<List<String>> recipientEmails = Optional.empty();
 
-        private Optional<String> productId = Optional.empty();
-
-        private Optional<OffsetDateTime> subscriptionBillingAnchorAt = Optional.empty();
-
-        @JsonAnySetter
         private Map<String, Object> additionalProperties = new HashMap<>();
 
         private Builder() {}
 
         public Builder from(UpdateInvoicesRequest other) {
-            automaticallyFinalizesAt(other.getAutomaticallyFinalizesAt());
             billingAddress(other.getBillingAddress());
-            chargeBuyerFee(other.getChargeBuyerFee());
-            collectionMethod(other.getCollectionMethod());
-            customerName(other.getCustomerName());
-            dueDate(other.getDueDate());
-            emailAddress(other.getEmailAddress());
-            lineItems(other.getLineItems());
+            buyerFeePercentage(other.getBuyerFeePercentage());
+            dueAt(other.getDueAt());
+            items(other.getItems());
             mailingAddressId(other.getMailingAddressId());
             memberId(other.getMemberId());
+            memo(other.getMemo());
+            metadata(other.getMetadata());
+            paymentMethodConfiguration(other.getPaymentMethodConfiguration());
             paymentMethodId(other.getPaymentMethodId());
-            plan(other.getPlan());
-            productId(other.getProductId());
-            subscriptionBillingAnchorAt(other.getSubscriptionBillingAnchorAt());
+            recipientEmails(other.getRecipientEmails());
             return this;
         }
 
         /**
-         * <p>The date and time when the invoice will be automatically finalized. For charge_automatically, triggers an automatic charge. For send_invoice, sends the invoice email at the specified time.</p>
-         */
-        @JsonSetter(value = "automatically_finalizes_at", nulls = Nulls.SKIP)
-        public Builder automaticallyFinalizesAt(Optional<OffsetDateTime> automaticallyFinalizesAt) {
-            this.automaticallyFinalizesAt = automaticallyFinalizesAt;
-            return this;
-        }
-
-        public Builder automaticallyFinalizesAt(OffsetDateTime automaticallyFinalizesAt) {
-            this.automaticallyFinalizesAt = Optional.ofNullable(automaticallyFinalizesAt);
-            return this;
-        }
-
-        public Builder automaticallyFinalizesAt(Nullable<OffsetDateTime> automaticallyFinalizesAt) {
-            if (automaticallyFinalizesAt.isNull()) {
-                this.automaticallyFinalizesAt = null;
-            } else if (automaticallyFinalizesAt.isEmpty()) {
-                this.automaticallyFinalizesAt = Optional.empty();
-            } else {
-                this.automaticallyFinalizesAt = Optional.of(automaticallyFinalizesAt.get());
-            }
-            return this;
-        }
-
-        /**
-         * <p>Inline billing address to create or update a mailing address for this invoice.</p>
+         * <p>Create a billing address linked to this member.</p>
          */
         @JsonSetter(value = "billing_address", nulls = Nulls.SKIP)
         public Builder billingAddress(Optional<UpdateInvoicesRequestBillingAddress> billingAddress) {
@@ -490,157 +349,60 @@ public final class UpdateInvoicesRequest {
         }
 
         /**
-         * <p>Whether to charge the customer a buyer fee on this invoice.</p>
+         * <p>The buyer's adjustable fee in percentage points, with at most two decimal places: <code>0</code> for none, or between 5 and 100. The account keeps it, and Whop waives its take rate on the invoice.</p>
          */
-        @JsonSetter(value = "charge_buyer_fee", nulls = Nulls.SKIP)
-        public Builder chargeBuyerFee(Optional<Boolean> chargeBuyerFee) {
-            this.chargeBuyerFee = chargeBuyerFee;
+        @JsonSetter(value = "buyer_fee_percentage", nulls = Nulls.SKIP)
+        public Builder buyerFeePercentage(Optional<Double> buyerFeePercentage) {
+            this.buyerFeePercentage = buyerFeePercentage;
             return this;
         }
 
-        public Builder chargeBuyerFee(Boolean chargeBuyerFee) {
-            this.chargeBuyerFee = Optional.ofNullable(chargeBuyerFee);
+        public Builder buyerFeePercentage(Double buyerFeePercentage) {
+            this.buyerFeePercentage = Optional.ofNullable(buyerFeePercentage);
             return this;
         }
 
-        public Builder chargeBuyerFee(Nullable<Boolean> chargeBuyerFee) {
-            if (chargeBuyerFee.isNull()) {
-                this.chargeBuyerFee = null;
-            } else if (chargeBuyerFee.isEmpty()) {
-                this.chargeBuyerFee = Optional.empty();
+        /**
+         * <p>When payment is due, as an ISO 8601 timestamp.</p>
+         */
+        @JsonSetter(value = "due_at", nulls = Nulls.SKIP)
+        public Builder dueAt(Optional<OffsetDateTime> dueAt) {
+            this.dueAt = dueAt;
+            return this;
+        }
+
+        public Builder dueAt(OffsetDateTime dueAt) {
+            this.dueAt = Optional.ofNullable(dueAt);
+            return this;
+        }
+
+        public Builder dueAt(Nullable<OffsetDateTime> dueAt) {
+            if (dueAt.isNull()) {
+                this.dueAt = null;
+            } else if (dueAt.isEmpty()) {
+                this.dueAt = Optional.empty();
             } else {
-                this.chargeBuyerFee = Optional.of(chargeBuyerFee.get());
+                this.dueAt = Optional.of(dueAt.get());
             }
             return this;
         }
 
         /**
-         * <p>How the invoice should be collected.</p>
+         * <p>The variants being invoiced, all in the same currency. Each variant may appear once. Use quantity for multiple units. A recurring variant must belong to a product. Its first invoice charges <code>initial_price</code> plus <code>renewal_price</code>. Later invoices charge only <code>renewal_price</code>. Paying the first invoice starts a paid billing period immediately, without the variant's trial. The subscription uses the <code>collection_method</code> the invoice was sent or issued with. A finite payment count includes the first paid invoice. With several items, every item that has a product must be a regular product, and all items need compatible payment, tax, and access settings.</p>
          */
-        @JsonSetter(value = "collection_method", nulls = Nulls.SKIP)
-        public Builder collectionMethod(Optional<InvoiceCollectionMethods> collectionMethod) {
-            this.collectionMethod = collectionMethod;
+        @JsonSetter(value = "items", nulls = Nulls.SKIP)
+        public Builder items(Optional<List<UpdateInvoicesRequestItemsItem>> items) {
+            this.items = items;
             return this;
         }
 
-        public Builder collectionMethod(InvoiceCollectionMethods collectionMethod) {
-            this.collectionMethod = Optional.ofNullable(collectionMethod);
-            return this;
-        }
-
-        public Builder collectionMethod(Nullable<InvoiceCollectionMethods> collectionMethod) {
-            if (collectionMethod.isNull()) {
-                this.collectionMethod = null;
-            } else if (collectionMethod.isEmpty()) {
-                this.collectionMethod = Optional.empty();
-            } else {
-                this.collectionMethod = Optional.of(collectionMethod.get());
-            }
+        public Builder items(List<UpdateInvoicesRequestItemsItem> items) {
+            this.items = Optional.ofNullable(items);
             return this;
         }
 
         /**
-         * <p>The name of the customer.</p>
-         */
-        @JsonSetter(value = "customer_name", nulls = Nulls.SKIP)
-        public Builder customerName(Optional<String> customerName) {
-            this.customerName = customerName;
-            return this;
-        }
-
-        public Builder customerName(String customerName) {
-            this.customerName = Optional.ofNullable(customerName);
-            return this;
-        }
-
-        public Builder customerName(Nullable<String> customerName) {
-            if (customerName.isNull()) {
-                this.customerName = null;
-            } else if (customerName.isEmpty()) {
-                this.customerName = Optional.empty();
-            } else {
-                this.customerName = Optional.of(customerName.get());
-            }
-            return this;
-        }
-
-        /**
-         * <p>The date by which the invoice must be paid.</p>
-         */
-        @JsonSetter(value = "due_date", nulls = Nulls.SKIP)
-        public Builder dueDate(Optional<OffsetDateTime> dueDate) {
-            this.dueDate = dueDate;
-            return this;
-        }
-
-        public Builder dueDate(OffsetDateTime dueDate) {
-            this.dueDate = Optional.ofNullable(dueDate);
-            return this;
-        }
-
-        public Builder dueDate(Nullable<OffsetDateTime> dueDate) {
-            if (dueDate.isNull()) {
-                this.dueDate = null;
-            } else if (dueDate.isEmpty()) {
-                this.dueDate = Optional.empty();
-            } else {
-                this.dueDate = Optional.of(dueDate.get());
-            }
-            return this;
-        }
-
-        /**
-         * <p>The email address of the customer.</p>
-         */
-        @JsonSetter(value = "email_address", nulls = Nulls.SKIP)
-        public Builder emailAddress(Optional<String> emailAddress) {
-            this.emailAddress = emailAddress;
-            return this;
-        }
-
-        public Builder emailAddress(String emailAddress) {
-            this.emailAddress = Optional.ofNullable(emailAddress);
-            return this;
-        }
-
-        public Builder emailAddress(Nullable<String> emailAddress) {
-            if (emailAddress.isNull()) {
-                this.emailAddress = null;
-            } else if (emailAddress.isEmpty()) {
-                this.emailAddress = Optional.empty();
-            } else {
-                this.emailAddress = Optional.of(emailAddress.get());
-            }
-            return this;
-        }
-
-        /**
-         * <p>Line items that break down the invoice total.</p>
-         */
-        @JsonSetter(value = "line_items", nulls = Nulls.SKIP)
-        public Builder lineItems(Optional<List<UpdateInvoicesRequestLineItemsItem>> lineItems) {
-            this.lineItems = lineItems;
-            return this;
-        }
-
-        public Builder lineItems(List<UpdateInvoicesRequestLineItemsItem> lineItems) {
-            this.lineItems = Optional.ofNullable(lineItems);
-            return this;
-        }
-
-        public Builder lineItems(Nullable<List<UpdateInvoicesRequestLineItemsItem>> lineItems) {
-            if (lineItems.isNull()) {
-                this.lineItems = null;
-            } else if (lineItems.isEmpty()) {
-                this.lineItems = Optional.empty();
-            } else {
-                this.lineItems = Optional.of(lineItems.get());
-            }
-            return this;
-        }
-
-        /**
-         * <p>The unique identifier of an existing mailing address to attach.</p>
+         * <p>An address associated with the member. Mutually exclusive with billing_address.</p>
          */
         @JsonSetter(value = "mailing_address_id", nulls = Nulls.SKIP)
         public Builder mailingAddressId(Optional<String> mailingAddressId) {
@@ -665,7 +427,7 @@ public final class UpdateInvoicesRequest {
         }
 
         /**
-         * <p>The unique identifier of a member to assign as the customer.</p>
+         * <p>The billed customer, a member of the account, prefixed <code>mber_</code>. The customer is set when the draft is created and can't change, so pass the draft's current customer or omit this field. A draft saved without a customer can take one here. Changing email recipients does not change this buyer.</p>
          */
         @JsonSetter(value = "member_id", nulls = Nulls.SKIP)
         public Builder memberId(Optional<String> memberId) {
@@ -690,7 +452,74 @@ public final class UpdateInvoicesRequest {
         }
 
         /**
-         * <p>The unique identifier of the payment method to charge.</p>
+         * <p>A note to the customer, shown on the invoice email, PDF, and checkout page with its line breaks kept. Trimmed; <code>null</code> or blank clears it. Can be updated on draft, open, or uncollectible invoices.</p>
+         */
+        @JsonSetter(value = "memo", nulls = Nulls.SKIP)
+        public Builder memo(Optional<String> memo) {
+            this.memo = memo;
+            return this;
+        }
+
+        public Builder memo(String memo) {
+            this.memo = Optional.ofNullable(memo);
+            return this;
+        }
+
+        public Builder memo(Nullable<String> memo) {
+            if (memo.isNull()) {
+                this.memo = null;
+            } else if (memo.isEmpty()) {
+                this.memo = Optional.empty();
+            } else {
+                this.memo = Optional.of(memo.get());
+            }
+            return this;
+        }
+
+        /**
+         * <p>Up to 50 caller-owned string key/value pairs. The <code>invoice_memo</code> key is reserved and ignored; set <code>memo</code> instead.</p>
+         */
+        @JsonSetter(value = "metadata", nulls = Nulls.SKIP)
+        public Builder metadata(Optional<Map<String, String>> metadata) {
+            this.metadata = metadata;
+            return this;
+        }
+
+        public Builder metadata(Map<String, String> metadata) {
+            this.metadata = Optional.ofNullable(metadata);
+            return this;
+        }
+
+        /**
+         * <p>The payment methods the customer can choose from when paying through the invoice's checkout link, in the shape a variant or checkout configuration takes. It takes precedence over the invoice's variants and the account, and changes neither. Send both lists. <code>null</code> uses its variants' payment methods. Can be updated on drafts.</p>
+         */
+        @JsonSetter(value = "payment_method_configuration", nulls = Nulls.SKIP)
+        public Builder paymentMethodConfiguration(
+                Optional<UpdateInvoicesRequestPaymentMethodConfiguration> paymentMethodConfiguration) {
+            this.paymentMethodConfiguration = paymentMethodConfiguration;
+            return this;
+        }
+
+        public Builder paymentMethodConfiguration(
+                UpdateInvoicesRequestPaymentMethodConfiguration paymentMethodConfiguration) {
+            this.paymentMethodConfiguration = Optional.ofNullable(paymentMethodConfiguration);
+            return this;
+        }
+
+        public Builder paymentMethodConfiguration(
+                Nullable<UpdateInvoicesRequestPaymentMethodConfiguration> paymentMethodConfiguration) {
+            if (paymentMethodConfiguration.isNull()) {
+                this.paymentMethodConfiguration = null;
+            } else if (paymentMethodConfiguration.isEmpty()) {
+                this.paymentMethodConfiguration = Optional.empty();
+            } else {
+                this.paymentMethodConfiguration = Optional.of(paymentMethodConfiguration.get());
+            }
+            return this;
+        }
+
+        /**
+         * <p>A saved payment method belonging to the member, prefixed <code>payt_</code>. Sending or issuing the invoice charges this method at the <code>charge_at</code> passed to that call, otherwise on <code>due_at</code>, or right away when there is no <code>due_at</code> or it has passed. Sending also emails the invoice now when the charge is later; issuing does not. Setting it needs <code>payment:charge</code>.</p>
          */
         @JsonSetter(value = "payment_method_id", nulls = Nulls.SKIP)
         public Builder paymentMethodId(Optional<String> paymentMethodId) {
@@ -715,97 +544,51 @@ public final class UpdateInvoicesRequest {
         }
 
         /**
-         * <p>Updated plan attributes.</p>
+         * <p>Email addresses saved for invoice delivery, independent of the billed customer. Saving them sends no email. Defaults to the customer email when omitted on create. Can be updated on draft, open, or uncollectible invoices.</p>
          */
-        @JsonSetter(value = "plan", nulls = Nulls.SKIP)
-        public Builder plan(Optional<UpdateInvoicesRequestPlan> plan) {
-            this.plan = plan;
+        @JsonSetter(value = "recipient_emails", nulls = Nulls.SKIP)
+        public Builder recipientEmails(Optional<List<String>> recipientEmails) {
+            this.recipientEmails = recipientEmails;
             return this;
         }
 
-        public Builder plan(UpdateInvoicesRequestPlan plan) {
-            this.plan = Optional.ofNullable(plan);
-            return this;
-        }
-
-        public Builder plan(Nullable<UpdateInvoicesRequestPlan> plan) {
-            if (plan.isNull()) {
-                this.plan = null;
-            } else if (plan.isEmpty()) {
-                this.plan = Optional.empty();
-            } else {
-                this.plan = Optional.of(plan.get());
-            }
-            return this;
-        }
-
-        /**
-         * <p>The unique identifier of an existing product to attach to this invoice. Only allowed while the invoice is still a draft.</p>
-         */
-        @JsonSetter(value = "product_id", nulls = Nulls.SKIP)
-        public Builder productId(Optional<String> productId) {
-            this.productId = productId;
-            return this;
-        }
-
-        public Builder productId(String productId) {
-            this.productId = Optional.ofNullable(productId);
-            return this;
-        }
-
-        public Builder productId(Nullable<String> productId) {
-            if (productId.isNull()) {
-                this.productId = null;
-            } else if (productId.isEmpty()) {
-                this.productId = Optional.empty();
-            } else {
-                this.productId = Optional.of(productId.get());
-            }
-            return this;
-        }
-
-        /**
-         * <p>The date that defines when the subscription billing cycle should start.</p>
-         */
-        @JsonSetter(value = "subscription_billing_anchor_at", nulls = Nulls.SKIP)
-        public Builder subscriptionBillingAnchorAt(Optional<OffsetDateTime> subscriptionBillingAnchorAt) {
-            this.subscriptionBillingAnchorAt = subscriptionBillingAnchorAt;
-            return this;
-        }
-
-        public Builder subscriptionBillingAnchorAt(OffsetDateTime subscriptionBillingAnchorAt) {
-            this.subscriptionBillingAnchorAt = Optional.ofNullable(subscriptionBillingAnchorAt);
-            return this;
-        }
-
-        public Builder subscriptionBillingAnchorAt(Nullable<OffsetDateTime> subscriptionBillingAnchorAt) {
-            if (subscriptionBillingAnchorAt.isNull()) {
-                this.subscriptionBillingAnchorAt = null;
-            } else if (subscriptionBillingAnchorAt.isEmpty()) {
-                this.subscriptionBillingAnchorAt = Optional.empty();
-            } else {
-                this.subscriptionBillingAnchorAt = Optional.of(subscriptionBillingAnchorAt.get());
-            }
+        public Builder recipientEmails(List<String> recipientEmails) {
+            this.recipientEmails = Optional.ofNullable(recipientEmails);
             return this;
         }
 
         public UpdateInvoicesRequest build() {
             return new UpdateInvoicesRequest(
-                    automaticallyFinalizesAt,
                     billingAddress,
-                    chargeBuyerFee,
-                    collectionMethod,
-                    customerName,
-                    dueDate,
-                    emailAddress,
-                    lineItems,
+                    buyerFeePercentage,
+                    dueAt,
+                    items,
                     mailingAddressId,
                     memberId,
+                    memo,
+                    metadata,
+                    paymentMethodConfiguration,
                     paymentMethodId,
-                    plan,
-                    productId,
-                    subscriptionBillingAnchorAt,
+                    recipientEmails,
                     additionalProperties);
+        }
+
+        @JsonAnySetter
+        private void putAdditionalPropertyFromJson(String key, Object value) {
+            if (key.equalsIgnoreCase("billing_address")
+                    || key.equalsIgnoreCase("buyer_fee_percentage")
+                    || key.equalsIgnoreCase("due_at")
+                    || key.equalsIgnoreCase("items")
+                    || key.equalsIgnoreCase("mailing_address_id")
+                    || key.equalsIgnoreCase("member_id")
+                    || key.equalsIgnoreCase("memo")
+                    || key.equalsIgnoreCase("metadata")
+                    || key.equalsIgnoreCase("payment_method_configuration")
+                    || key.equalsIgnoreCase("payment_method_id")
+                    || key.equalsIgnoreCase("recipient_emails")) {
+                return;
+            }
+            this.additionalProperties.put(key, value);
         }
 
         public Builder additionalProperty(String key, Object value) {

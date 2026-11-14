@@ -4,10 +4,12 @@
 package com.whop.api.resources.accesstokens;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
+import com.whop.api.core.BodyProperties;
 import com.whop.api.core.ClientOptions;
 import com.whop.api.core.MediaTypes;
 import com.whop.api.core.ObjectMappers;
 import com.whop.api.core.RequestOptions;
+import com.whop.api.core.RetryInterceptor;
 import com.whop.api.core.WhopApiApiException;
 import com.whop.api.core.WhopApiException;
 import com.whop.api.core.WhopApiHttpResponse;
@@ -20,6 +22,8 @@ import com.whop.api.errors.UnauthorizedError;
 import com.whop.api.errors.UnprocessableEntityError;
 import com.whop.api.resources.accesstokens.requests.CreateAccessTokensRequest;
 import com.whop.api.types.AccessToken;
+import com.whop.api.types.InternalServerErrorBody;
+import com.whop.api.types.UnprocessableEntityErrorBody;
 import java.io.IOException;
 import java.util.concurrent.CompletableFuture;
 import okhttp3.Call;
@@ -41,32 +45,32 @@ public class AsyncRawAccessTokensClient {
     }
 
     /**
-     * Create a short-lived access token for authenticating API requests. When using API key authentication, provide company_id or user_id. When using OAuth, the user is derived from the token. Use this token with Whop's web and mobile embedded components.
+     * Creates a short-lived access token for Whop's web and mobile embedded components. With API key authentication, pass <code>account_id</code> or <code>user_id</code>; with OAuth, the token is issued for the OAuth user.
      */
     public CompletableFuture<WhopApiHttpResponse<AccessToken>> create() {
         return create(CreateAccessTokensRequest.builder().build());
     }
 
     /**
-     * Create a short-lived access token for authenticating API requests. When using API key authentication, provide company_id or user_id. When using OAuth, the user is derived from the token. Use this token with Whop's web and mobile embedded components.
+     * Creates a short-lived access token for Whop's web and mobile embedded components. With API key authentication, pass <code>account_id</code> or <code>user_id</code>; with OAuth, the token is issued for the OAuth user.
      */
     public CompletableFuture<WhopApiHttpResponse<AccessToken>> create(RequestOptions requestOptions) {
         return create(CreateAccessTokensRequest.builder().build(), requestOptions);
     }
 
     /**
-     * Create a short-lived access token for authenticating API requests. When using API key authentication, provide company_id or user_id. When using OAuth, the user is derived from the token. Use this token with Whop's web and mobile embedded components.
+     * Creates a short-lived access token for Whop's web and mobile embedded components. With API key authentication, pass <code>account_id</code> or <code>user_id</code>; with OAuth, the token is issued for the OAuth user.
      */
     public CompletableFuture<WhopApiHttpResponse<AccessToken>> create(CreateAccessTokensRequest request) {
         return create(request, null);
     }
 
     /**
-     * Create a short-lived access token for authenticating API requests. When using API key authentication, provide company_id or user_id. When using OAuth, the user is derived from the token. Use this token with Whop's web and mobile embedded components.
+     * Creates a short-lived access token for Whop's web and mobile embedded components. With API key authentication, pass <code>account_id</code> or <code>user_id</code>; with OAuth, the token is issued for the OAuth user.
      */
     public CompletableFuture<WhopApiHttpResponse<AccessToken>> create(
             CreateAccessTokensRequest request, RequestOptions requestOptions) {
-        HttpUrl.Builder httpUrl = HttpUrl.parse(this.clientOptions.environment().getUrl())
+        HttpUrl.Builder httpUrl = HttpUrl.parse(this.clientOptions.environment().getApiURL())
                 .newBuilder()
                 .addPathSegments("access_tokens");
         if (requestOptions != null) {
@@ -77,7 +81,9 @@ public class AsyncRawAccessTokensClient {
         RequestBody body;
         try {
             body = RequestBody.create(
-                    ObjectMappers.JSON_MAPPER.writeValueAsBytes(request), MediaTypes.APPLICATION_JSON);
+                    ObjectMappers.JSON_MAPPER.writeValueAsBytes(BodyProperties.merge(
+                            request, requestOptions != null ? requestOptions.getBodyProperties() : null)),
+                    MediaTypes.APPLICATION_JSON);
         } catch (JsonProcessingException e) {
             throw new WhopApiException("Failed to serialize request", e);
         }
@@ -92,8 +98,18 @@ public class AsyncRawAccessTokensClient {
         if (requestOptions != null && requestOptions.getTimeout().isPresent()) {
             client = clientOptions.httpClientWithTimeout(requestOptions);
         }
+        if (requestOptions != null && requestOptions.getMaxRetries().isPresent()) {
+            okhttpRequest = okhttpRequest
+                    .newBuilder()
+                    .tag(
+                            RetryInterceptor.MaxRetriesOverride.class,
+                            new RetryInterceptor.MaxRetriesOverride(
+                                    requestOptions.getMaxRetries().get()))
+                    .build();
+        }
         CompletableFuture<WhopApiHttpResponse<AccessToken>> future = new CompletableFuture<>();
-        client.newCall(okhttpRequest).enqueue(new Callback() {
+        RetryInterceptor.AsyncCall okhttpCall = RetryInterceptor.newAsyncCall(client, okhttpRequest);
+        okhttpCall.enqueue(new Callback() {
             @Override
             public void onResponse(@NotNull Call call, @NotNull Response response) throws IOException {
                 try (ResponseBody responseBody = response.body()) {
@@ -127,7 +143,8 @@ public class AsyncRawAccessTokensClient {
                                 return;
                             case 422:
                                 future.completeExceptionally(new UnprocessableEntityError(
-                                        ObjectMappers.JSON_MAPPER.readValue(responseBodyString, Object.class),
+                                        ObjectMappers.JSON_MAPPER.readValue(
+                                                responseBodyString, UnprocessableEntityErrorBody.class),
                                         response));
                                 return;
                             case 429:
@@ -137,7 +154,8 @@ public class AsyncRawAccessTokensClient {
                                 return;
                             case 500:
                                 future.completeExceptionally(new InternalServerError(
-                                        ObjectMappers.JSON_MAPPER.readValue(responseBodyString, Object.class),
+                                        ObjectMappers.JSON_MAPPER.readValue(
+                                                responseBodyString, InternalServerErrorBody.class),
                                         response));
                                 return;
                         }
@@ -148,6 +166,9 @@ public class AsyncRawAccessTokensClient {
                     future.completeExceptionally(new WhopApiApiException(
                             "Error with status code " + response.code(), response.code(), errorBody, response));
                     return;
+                } catch (JsonProcessingException e) {
+                    future.completeExceptionally(
+                            new WhopApiException("Failed to deserialize response: " + e.getMessage(), e));
                 } catch (IOException e) {
                     future.completeExceptionally(new WhopApiException("Network error executing HTTP request", e));
                 }
@@ -156,6 +177,11 @@ public class AsyncRawAccessTokensClient {
             @Override
             public void onFailure(@NotNull Call call, @NotNull IOException e) {
                 future.completeExceptionally(new WhopApiException("Network error executing HTTP request", e));
+            }
+        });
+        future.whenComplete((result_, throwable_) -> {
+            if (future.isCancelled()) {
+                okhttpCall.cancel();
             }
         });
         return future;

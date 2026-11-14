@@ -66,7 +66,7 @@ public final class ListOauthGrantsRequest {
     }
 
     /**
-     * @return The number of grants to return (default 20, max 100).
+     * @return Number of results to return from the start of the range.
      */
     @JsonProperty("first")
     public Optional<Integer> getFirst() {
@@ -74,7 +74,7 @@ public final class ListOauthGrantsRequest {
     }
 
     /**
-     * @return A cursor; returns grants after this position.
+     * @return Return results after this cursor. Use <code>page_info.end_cursor</code> from the previous response to fetch the next page.
      */
     @JsonProperty("after")
     public Optional<String> getAfter() {
@@ -82,7 +82,7 @@ public final class ListOauthGrantsRequest {
     }
 
     /**
-     * @return The number of grants to return from the end of the range.
+     * @return Number of results to return from the end of the range.
      */
     @JsonProperty("last")
     public Optional<Integer> getLast() {
@@ -90,7 +90,7 @@ public final class ListOauthGrantsRequest {
     }
 
     /**
-     * @return A cursor; returns grants before this position.
+     * @return Return results before this cursor. Use <code>page_info.start_cursor</code> from the previous response to fetch the previous page.
      */
     @JsonProperty("before")
     public Optional<String> getBefore() {
@@ -164,7 +164,6 @@ public final class ListOauthGrantsRequest {
 
         private Optional<ListOauthGrantsRequestDirection> direction = Optional.empty();
 
-        @JsonAnySetter
         private Map<String, Object> additionalProperties = new HashMap<>();
 
         private Builder() {}
@@ -195,7 +194,7 @@ public final class ListOauthGrantsRequest {
         }
 
         /**
-         * <p>The number of grants to return (default 20, max 100).</p>
+         * <p>Number of results to return from the start of the range.</p>
          */
         @JsonSetter(value = "first", nulls = Nulls.SKIP)
         public Builder first(Optional<Integer> first) {
@@ -209,7 +208,7 @@ public final class ListOauthGrantsRequest {
         }
 
         /**
-         * <p>A cursor; returns grants after this position.</p>
+         * <p>Return results after this cursor. Use <code>page_info.end_cursor</code> from the previous response to fetch the next page.</p>
          */
         @JsonSetter(value = "after", nulls = Nulls.SKIP)
         public Builder after(Optional<String> after) {
@@ -223,7 +222,7 @@ public final class ListOauthGrantsRequest {
         }
 
         /**
-         * <p>The number of grants to return from the end of the range.</p>
+         * <p>Number of results to return from the end of the range.</p>
          */
         @JsonSetter(value = "last", nulls = Nulls.SKIP)
         public Builder last(Optional<Integer> last) {
@@ -237,7 +236,7 @@ public final class ListOauthGrantsRequest {
         }
 
         /**
-         * <p>A cursor; returns grants before this position.</p>
+         * <p>Return results before this cursor. Use <code>page_info.start_cursor</code> from the previous response to fetch the previous page.</p>
          */
         @JsonSetter(value = "before", nulls = Nulls.SKIP)
         public Builder before(Optional<String> before) {
@@ -281,6 +280,20 @@ public final class ListOauthGrantsRequest {
         public ListOauthGrantsRequest build() {
             return new ListOauthGrantsRequest(
                     appId, first, after, last, before, order, direction, additionalProperties);
+        }
+
+        @JsonAnySetter
+        private void putAdditionalPropertyFromJson(String key, Object value) {
+            if (key.equalsIgnoreCase("app_id")
+                    || key.equalsIgnoreCase("first")
+                    || key.equalsIgnoreCase("after")
+                    || key.equalsIgnoreCase("last")
+                    || key.equalsIgnoreCase("before")
+                    || key.equalsIgnoreCase("order")
+                    || key.equalsIgnoreCase("direction")) {
+                return;
+            }
+            this.additionalProperties.put(key, value);
         }
 
         public Builder additionalProperty(String key, Object value) {

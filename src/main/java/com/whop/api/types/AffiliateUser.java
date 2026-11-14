@@ -154,7 +154,6 @@ public final class AffiliateUser {
 
         private Optional<String> name = Optional.empty();
 
-        @JsonAnySetter
         private Map<String, Object> additionalProperties = new HashMap<>();
 
         private Builder() {}
@@ -168,7 +167,6 @@ public final class AffiliateUser {
         }
 
         /**
-         * <p>The unique identifier for the user.</p>
          * <p>The unique identifier for the user.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
@@ -254,6 +252,14 @@ public final class AffiliateUser {
         @java.lang.Override
         public AffiliateUser build() {
             return new AffiliateUser(id, name, username, additionalProperties);
+        }
+
+        @JsonAnySetter
+        private void putAdditionalPropertyFromJson(String key, Object value) {
+            if (key.equalsIgnoreCase("id") || key.equalsIgnoreCase("name") || key.equalsIgnoreCase("username")) {
+                return;
+            }
+            this.additionalProperties.put(key, value);
         }
 
         @java.lang.Override

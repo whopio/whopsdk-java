@@ -45,9 +45,6 @@ public final class CalculateTaxPlansRequest {
         this.additionalProperties = additionalProperties;
     }
 
-    /**
-     * @return Buyer billing address used for tax calculation. Provide either <code>address.country</code> or <code>ip_address</code>; include state and postal code when available for more accurate results.
-     */
     @JsonIgnore
     public Optional<CalculateTaxPlansRequestAddress> getAddress() {
         if (address == null) {
@@ -56,17 +53,11 @@ public final class CalculateTaxPlansRequest {
         return address;
     }
 
-    /**
-     * @return Buyer IP address used to infer location when no billing address is provided.
-     */
     @JsonProperty("ip_address")
     public Optional<String> getIpAddress() {
         return ipAddress;
     }
 
-    /**
-     * @return Optional buyer tax ID for B2B exemptions. At most one entry is supported.
-     */
     @JsonIgnore
     public Optional<List<CalculateTaxPlansRequestTaxIdsItem>> getTaxIds() {
         if (taxIds == null) {
@@ -124,7 +115,6 @@ public final class CalculateTaxPlansRequest {
 
         private Optional<List<CalculateTaxPlansRequestTaxIdsItem>> taxIds = Optional.empty();
 
-        @JsonAnySetter
         private Map<String, Object> additionalProperties = new HashMap<>();
 
         private Builder() {}
@@ -136,9 +126,6 @@ public final class CalculateTaxPlansRequest {
             return this;
         }
 
-        /**
-         * <p>Buyer billing address used for tax calculation. Provide either <code>address.country</code> or <code>ip_address</code>; include state and postal code when available for more accurate results.</p>
-         */
         @JsonSetter(value = "address", nulls = Nulls.SKIP)
         public Builder address(Optional<CalculateTaxPlansRequestAddress> address) {
             this.address = address;
@@ -161,9 +148,6 @@ public final class CalculateTaxPlansRequest {
             return this;
         }
 
-        /**
-         * <p>Buyer IP address used to infer location when no billing address is provided.</p>
-         */
         @JsonSetter(value = "ip_address", nulls = Nulls.SKIP)
         public Builder ipAddress(Optional<String> ipAddress) {
             this.ipAddress = ipAddress;
@@ -175,9 +159,6 @@ public final class CalculateTaxPlansRequest {
             return this;
         }
 
-        /**
-         * <p>Optional buyer tax ID for B2B exemptions. At most one entry is supported.</p>
-         */
         @JsonSetter(value = "tax_ids", nulls = Nulls.SKIP)
         public Builder taxIds(Optional<List<CalculateTaxPlansRequestTaxIdsItem>> taxIds) {
             this.taxIds = taxIds;
@@ -202,6 +183,16 @@ public final class CalculateTaxPlansRequest {
 
         public CalculateTaxPlansRequest build() {
             return new CalculateTaxPlansRequest(address, ipAddress, taxIds, additionalProperties);
+        }
+
+        @JsonAnySetter
+        private void putAdditionalPropertyFromJson(String key, Object value) {
+            if (key.equalsIgnoreCase("address")
+                    || key.equalsIgnoreCase("ip_address")
+                    || key.equalsIgnoreCase("tax_ids")) {
+                return;
+            }
+            this.additionalProperties.put(key, value);
         }
 
         public Builder additionalProperty(String key, Object value) {

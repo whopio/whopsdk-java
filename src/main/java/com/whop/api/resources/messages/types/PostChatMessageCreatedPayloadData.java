@@ -131,7 +131,6 @@ public final class PostChatMessageCreatedPayloadData {
 
         private String reason;
 
-        @JsonAnySetter
         private Map<String, Object> additionalProperties = new HashMap<>();
 
         private Builder() {}
@@ -176,6 +175,17 @@ public final class PostChatMessageCreatedPayloadData {
         @java.lang.Override
         public PostChatMessageCreatedPayloadData build() {
             return new PostChatMessageCreatedPayloadData(audience, channel, message, reason, additionalProperties);
+        }
+
+        @JsonAnySetter
+        private void putAdditionalPropertyFromJson(String key, Object value) {
+            if (key.equalsIgnoreCase("audience")
+                    || key.equalsIgnoreCase("channel")
+                    || key.equalsIgnoreCase("message")
+                    || key.equalsIgnoreCase("reason")) {
+                return;
+            }
+            this.additionalProperties.put(key, value);
         }
 
         @java.lang.Override

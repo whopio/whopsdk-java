@@ -12,6 +12,9 @@ public final class CreateApiKeysRequestResourceType {
     public static final CreateApiKeysRequestResourceType ACCOUNT =
             new CreateApiKeysRequestResourceType(Value.ACCOUNT, "account");
 
+    public static final CreateApiKeysRequestResourceType USER =
+            new CreateApiKeysRequestResourceType(Value.USER, "user");
+
     private final Value value;
 
     private final String string;
@@ -49,6 +52,8 @@ public final class CreateApiKeysRequestResourceType {
                 return visitor.visitApp();
             case ACCOUNT:
                 return visitor.visitAccount();
+            case USER:
+                return visitor.visitUser();
             case UNKNOWN:
             default:
                 return visitor.visitUnknown(string);
@@ -62,6 +67,8 @@ public final class CreateApiKeysRequestResourceType {
                 return APP;
             case "account":
                 return ACCOUNT;
+            case "user":
+                return USER;
             default:
                 return new CreateApiKeysRequestResourceType(Value.UNKNOWN, value);
         }
@@ -72,6 +79,8 @@ public final class CreateApiKeysRequestResourceType {
 
         APP,
 
+        USER,
+
         UNKNOWN
     }
 
@@ -79,6 +88,8 @@ public final class CreateApiKeysRequestResourceType {
         T visitAccount();
 
         T visitApp();
+
+        T visitUser();
 
         T visitUnknown(String unknownType);
     }

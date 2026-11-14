@@ -106,7 +106,6 @@ public final class DeleteWebhooksResponse {
 
         private String id;
 
-        @JsonAnySetter
         private Map<String, Object> additionalProperties = new HashMap<>();
 
         private Builder() {}
@@ -120,7 +119,6 @@ public final class DeleteWebhooksResponse {
 
         /**
          * <p>Always <code>true</code>: the resource was deleted.</p>
-         * <p>Always <code>true</code>: the resource was deleted.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
@@ -131,7 +129,6 @@ public final class DeleteWebhooksResponse {
         }
 
         /**
-         * <p>The ID of the deleted resource.</p>
          * <p>The ID of the deleted resource.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
@@ -145,6 +142,14 @@ public final class DeleteWebhooksResponse {
         @java.lang.Override
         public DeleteWebhooksResponse build() {
             return new DeleteWebhooksResponse(deleted, id, additionalProperties);
+        }
+
+        @JsonAnySetter
+        private void putAdditionalPropertyFromJson(String key, Object value) {
+            if (key.equalsIgnoreCase("deleted") || key.equalsIgnoreCase("id")) {
+                return;
+            }
+            this.additionalProperties.put(key, value);
         }
 
         @java.lang.Override

@@ -5,6 +5,7 @@ package com.whop.api.resources.partners.businesses.earnings;
 
 import com.whop.api.core.ClientOptions;
 import com.whop.api.core.RequestOptions;
+import com.whop.api.core.WhopApiHttpResponse;
 import com.whop.api.core.pagination.SyncPagingIterable;
 import com.whop.api.resources.partners.businesses.earnings.requests.ListEarningsRequest;
 import com.whop.api.resources.partners.businesses.earnings.types.ListEarningsResponseDataItem;
@@ -28,33 +29,69 @@ public class AsyncEarningsClient {
     }
 
     /**
-     * Lists the earnings Whop pays out for one referred business's activity, most recent first.
+     * Lists the earnings Whop pays out for one referred business's activity, most recent first. The original referrer or a caller with company:basic:read on the business credited for the referral can read them.
      */
     public CompletableFuture<SyncPagingIterable<ListEarningsResponseDataItem>> list(String id) {
-        return this.rawClient.list(id).thenApply(response -> response.body());
+        CompletableFuture<WhopApiHttpResponse<SyncPagingIterable<ListEarningsResponseDataItem>>> rawFuture =
+                this.rawClient.list(id);
+        CompletableFuture<SyncPagingIterable<ListEarningsResponseDataItem>> future =
+                rawFuture.thenApply(response -> response.body());
+        future.whenComplete((result_, throwable_) -> {
+            if (future.isCancelled()) {
+                rawFuture.cancel(true);
+            }
+        });
+        return future;
     }
 
     /**
-     * Lists the earnings Whop pays out for one referred business's activity, most recent first.
+     * Lists the earnings Whop pays out for one referred business's activity, most recent first. The original referrer or a caller with company:basic:read on the business credited for the referral can read them.
      */
     public CompletableFuture<SyncPagingIterable<ListEarningsResponseDataItem>> list(
             String id, RequestOptions requestOptions) {
-        return this.rawClient.list(id, requestOptions).thenApply(response -> response.body());
+        CompletableFuture<WhopApiHttpResponse<SyncPagingIterable<ListEarningsResponseDataItem>>> rawFuture =
+                this.rawClient.list(id, requestOptions);
+        CompletableFuture<SyncPagingIterable<ListEarningsResponseDataItem>> future =
+                rawFuture.thenApply(response -> response.body());
+        future.whenComplete((result_, throwable_) -> {
+            if (future.isCancelled()) {
+                rawFuture.cancel(true);
+            }
+        });
+        return future;
     }
 
     /**
-     * Lists the earnings Whop pays out for one referred business's activity, most recent first.
+     * Lists the earnings Whop pays out for one referred business's activity, most recent first. The original referrer or a caller with company:basic:read on the business credited for the referral can read them.
      */
     public CompletableFuture<SyncPagingIterable<ListEarningsResponseDataItem>> list(
             String id, ListEarningsRequest request) {
-        return this.rawClient.list(id, request).thenApply(response -> response.body());
+        CompletableFuture<WhopApiHttpResponse<SyncPagingIterable<ListEarningsResponseDataItem>>> rawFuture =
+                this.rawClient.list(id, request);
+        CompletableFuture<SyncPagingIterable<ListEarningsResponseDataItem>> future =
+                rawFuture.thenApply(response -> response.body());
+        future.whenComplete((result_, throwable_) -> {
+            if (future.isCancelled()) {
+                rawFuture.cancel(true);
+            }
+        });
+        return future;
     }
 
     /**
-     * Lists the earnings Whop pays out for one referred business's activity, most recent first.
+     * Lists the earnings Whop pays out for one referred business's activity, most recent first. The original referrer or a caller with company:basic:read on the business credited for the referral can read them.
      */
     public CompletableFuture<SyncPagingIterable<ListEarningsResponseDataItem>> list(
             String id, ListEarningsRequest request, RequestOptions requestOptions) {
-        return this.rawClient.list(id, request, requestOptions).thenApply(response -> response.body());
+        CompletableFuture<WhopApiHttpResponse<SyncPagingIterable<ListEarningsResponseDataItem>>> rawFuture =
+                this.rawClient.list(id, request, requestOptions);
+        CompletableFuture<SyncPagingIterable<ListEarningsResponseDataItem>> future =
+                rawFuture.thenApply(response -> response.body());
+        future.whenComplete((result_, throwable_) -> {
+            if (future.isCancelled()) {
+                rawFuture.cancel(true);
+            }
+        });
+        return future;
     }
 }

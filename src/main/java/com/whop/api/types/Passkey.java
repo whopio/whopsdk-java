@@ -193,7 +193,6 @@ public final class Passkey {
 
         private Optional<String> lastUsedAt = Optional.empty();
 
-        @JsonAnySetter
         private Map<String, Object> additionalProperties = new HashMap<>();
 
         private Builder() {}
@@ -210,7 +209,6 @@ public final class Passkey {
 
         /**
          * <p>When the user registered this passkey, as an ISO 8601 timestamp.</p>
-         * <p>When the user registered this passkey, as an ISO 8601 timestamp.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
@@ -221,7 +219,6 @@ public final class Passkey {
         }
 
         /**
-         * <p>The WebAuthn credential ID as a base64url string. Pass it in <code>allowCredentials</code> when you run a ceremony against this specific passkey.</p>
          * <p>The WebAuthn credential ID as a base64url string. Pass it in <code>allowCredentials</code> when you run a ceremony against this specific passkey.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
@@ -234,7 +231,6 @@ public final class Passkey {
 
         /**
          * <p>Passkey ID, prefixed <code>wcred_</code>. Use it to delete the passkey.</p>
-         * <p>Passkey ID, prefixed <code>wcred_</code>. Use it to delete the passkey.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
@@ -245,7 +241,6 @@ public final class Passkey {
         }
 
         /**
-         * <p>The name the user gave this passkey, usually the device it lives on.</p>
          * <p>The name the user gave this passkey, usually the device it lives on.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
@@ -295,6 +290,18 @@ public final class Passkey {
         @java.lang.Override
         public Passkey build() {
             return new Passkey(createdAt, credentialId, id, lastUsedAt, nickname, additionalProperties);
+        }
+
+        @JsonAnySetter
+        private void putAdditionalPropertyFromJson(String key, Object value) {
+            if (key.equalsIgnoreCase("created_at")
+                    || key.equalsIgnoreCase("credential_id")
+                    || key.equalsIgnoreCase("id")
+                    || key.equalsIgnoreCase("last_used_at")
+                    || key.equalsIgnoreCase("nickname")) {
+                return;
+            }
+            this.additionalProperties.put(key, value);
         }
 
         @java.lang.Override

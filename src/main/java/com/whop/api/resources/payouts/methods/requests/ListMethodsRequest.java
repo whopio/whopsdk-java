@@ -31,6 +31,8 @@ public final class ListMethodsRequest {
 
     private final Optional<String> currency;
 
+    private final Optional<Boolean> includeRecipients;
+
     private final Optional<Boolean> includeLimits;
 
     private final Optional<Integer> first;
@@ -49,6 +51,7 @@ public final class ListMethodsRequest {
             Optional<ListMethodsRequestStatus> status,
             Optional<Double> amount,
             Optional<String> currency,
+            Optional<Boolean> includeRecipients,
             Optional<Boolean> includeLimits,
             Optional<Integer> first,
             Optional<String> after,
@@ -60,6 +63,7 @@ public final class ListMethodsRequest {
         this.status = status;
         this.amount = amount;
         this.currency = currency;
+        this.includeRecipients = includeRecipients;
         this.includeLimits = includeLimits;
         this.first = first;
         this.after = after;
@@ -93,7 +97,7 @@ public final class ListMethodsRequest {
     }
 
     /**
-     * @return Optional withdrawal amount in whole currency units, for example <code>250.00</code>. When provided, each method includes a quote with the estimated fee, amount received, and delivery date for that amount.
+     * @return Optional payout amount in whole currency units, for example <code>250.00</code>. When provided, each method includes a quote with the estimated fee, amount received, and delivery date for that amount.
      */
     @JsonProperty("amount")
     public Optional<Double> getAmount() {
@@ -109,6 +113,14 @@ public final class ListMethodsRequest {
     }
 
     /**
+     * @return When true, also includes bill-pay recipient methods tied to this funding account. Defaults to false, returning only the account's own payout methods.
+     */
+    @JsonProperty("include_recipients")
+    public Optional<Boolean> getIncludeRecipients() {
+        return includeRecipients;
+    }
+
+    /**
      * @return When true, the response also carries limits — the live per-speed payout caps the account's payout requests are validated against, in the requested currency. Requires the payout:withdrawal:read scope.
      */
     @JsonProperty("include_limits")
@@ -117,7 +129,7 @@ public final class ListMethodsRequest {
     }
 
     /**
-     * @return Number of payout methods to return from the start of the window.
+     * @return Number of results to return from the start of the range.
      */
     @JsonProperty("first")
     public Optional<Integer> getFirst() {
@@ -125,7 +137,7 @@ public final class ListMethodsRequest {
     }
 
     /**
-     * @return Cursor to fetch the page after (from page_info.end_cursor).
+     * @return Return results after this cursor. Use <code>page_info.end_cursor</code> from the previous response to fetch the next page.
      */
     @JsonProperty("after")
     public Optional<String> getAfter() {
@@ -133,7 +145,7 @@ public final class ListMethodsRequest {
     }
 
     /**
-     * @return Number of payout methods to return from the end of the window.
+     * @return Number of results to return from the end of the range.
      */
     @JsonProperty("last")
     public Optional<Integer> getLast() {
@@ -141,7 +153,7 @@ public final class ListMethodsRequest {
     }
 
     /**
-     * @return Cursor to fetch the page before (from page_info.start_cursor).
+     * @return Return results before this cursor. Use <code>page_info.start_cursor</code> from the previous response to fetch the previous page.
      */
     @JsonProperty("before")
     public Optional<String> getBefore() {
@@ -165,6 +177,7 @@ public final class ListMethodsRequest {
                 && status.equals(other.status)
                 && amount.equals(other.amount)
                 && currency.equals(other.currency)
+                && includeRecipients.equals(other.includeRecipients)
                 && includeLimits.equals(other.includeLimits)
                 && first.equals(other.first)
                 && after.equals(other.after)
@@ -180,6 +193,7 @@ public final class ListMethodsRequest {
                 this.status,
                 this.amount,
                 this.currency,
+                this.includeRecipients,
                 this.includeLimits,
                 this.first,
                 this.after,
@@ -208,6 +222,8 @@ public final class ListMethodsRequest {
 
         private Optional<String> currency = Optional.empty();
 
+        private Optional<Boolean> includeRecipients = Optional.empty();
+
         private Optional<Boolean> includeLimits = Optional.empty();
 
         private Optional<Integer> first = Optional.empty();
@@ -218,7 +234,6 @@ public final class ListMethodsRequest {
 
         private Optional<String> before = Optional.empty();
 
-        @JsonAnySetter
         private Map<String, Object> additionalProperties = new HashMap<>();
 
         private Builder() {}
@@ -229,6 +244,7 @@ public final class ListMethodsRequest {
             status(other.getStatus());
             amount(other.getAmount());
             currency(other.getCurrency());
+            includeRecipients(other.getIncludeRecipients());
             includeLimits(other.getIncludeLimits());
             first(other.getFirst());
             after(other.getAfter());
@@ -280,7 +296,7 @@ public final class ListMethodsRequest {
         }
 
         /**
-         * <p>Optional withdrawal amount in whole currency units, for example <code>250.00</code>. When provided, each method includes a quote with the estimated fee, amount received, and delivery date for that amount.</p>
+         * <p>Optional payout amount in whole currency units, for example <code>250.00</code>. When provided, each method includes a quote with the estimated fee, amount received, and delivery date for that amount.</p>
          */
         @JsonSetter(value = "amount", nulls = Nulls.SKIP)
         public Builder amount(Optional<Double> amount) {
@@ -308,6 +324,20 @@ public final class ListMethodsRequest {
         }
 
         /**
+         * <p>When true, also includes bill-pay recipient methods tied to this funding account. Defaults to false, returning only the account's own payout methods.</p>
+         */
+        @JsonSetter(value = "include_recipients", nulls = Nulls.SKIP)
+        public Builder includeRecipients(Optional<Boolean> includeRecipients) {
+            this.includeRecipients = includeRecipients;
+            return this;
+        }
+
+        public Builder includeRecipients(Boolean includeRecipients) {
+            this.includeRecipients = Optional.ofNullable(includeRecipients);
+            return this;
+        }
+
+        /**
          * <p>When true, the response also carries limits — the live per-speed payout caps the account's payout requests are validated against, in the requested currency. Requires the payout:withdrawal:read scope.</p>
          */
         @JsonSetter(value = "include_limits", nulls = Nulls.SKIP)
@@ -322,7 +352,7 @@ public final class ListMethodsRequest {
         }
 
         /**
-         * <p>Number of payout methods to return from the start of the window.</p>
+         * <p>Number of results to return from the start of the range.</p>
          */
         @JsonSetter(value = "first", nulls = Nulls.SKIP)
         public Builder first(Optional<Integer> first) {
@@ -336,7 +366,7 @@ public final class ListMethodsRequest {
         }
 
         /**
-         * <p>Cursor to fetch the page after (from page_info.end_cursor).</p>
+         * <p>Return results after this cursor. Use <code>page_info.end_cursor</code> from the previous response to fetch the next page.</p>
          */
         @JsonSetter(value = "after", nulls = Nulls.SKIP)
         public Builder after(Optional<String> after) {
@@ -350,7 +380,7 @@ public final class ListMethodsRequest {
         }
 
         /**
-         * <p>Number of payout methods to return from the end of the window.</p>
+         * <p>Number of results to return from the end of the range.</p>
          */
         @JsonSetter(value = "last", nulls = Nulls.SKIP)
         public Builder last(Optional<Integer> last) {
@@ -364,7 +394,7 @@ public final class ListMethodsRequest {
         }
 
         /**
-         * <p>Cursor to fetch the page before (from page_info.start_cursor).</p>
+         * <p>Return results before this cursor. Use <code>page_info.start_cursor</code> from the previous response to fetch the previous page.</p>
          */
         @JsonSetter(value = "before", nulls = Nulls.SKIP)
         public Builder before(Optional<String> before) {
@@ -384,12 +414,31 @@ public final class ListMethodsRequest {
                     status,
                     amount,
                     currency,
+                    includeRecipients,
                     includeLimits,
                     first,
                     after,
                     last,
                     before,
                     additionalProperties);
+        }
+
+        @JsonAnySetter
+        private void putAdditionalPropertyFromJson(String key, Object value) {
+            if (key.equalsIgnoreCase("account_id")
+                    || key.equalsIgnoreCase("user_id")
+                    || key.equalsIgnoreCase("status")
+                    || key.equalsIgnoreCase("amount")
+                    || key.equalsIgnoreCase("currency")
+                    || key.equalsIgnoreCase("include_recipients")
+                    || key.equalsIgnoreCase("include_limits")
+                    || key.equalsIgnoreCase("first")
+                    || key.equalsIgnoreCase("after")
+                    || key.equalsIgnoreCase("last")
+                    || key.equalsIgnoreCase("before")) {
+                return;
+            }
+            this.additionalProperties.put(key, value);
         }
 
         public Builder additionalProperty(String key, Object value) {

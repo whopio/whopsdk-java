@@ -324,7 +324,6 @@ public final class CreateCourseLessonsRequest {
 
         private Optional<String> content = Optional.empty();
 
-        @JsonAnySetter
         private Map<String, Object> additionalProperties = new HashMap<>();
 
         private Builder() {}
@@ -344,7 +343,6 @@ public final class CreateCourseLessonsRequest {
 
         /**
          * <p>The unique identifier of the chapter to create the lesson in (e.g., &quot;chap_XXXXX&quot;).</p>
-         * <p>The unique identifier of the chapter to create the lesson in (e.g., &quot;chap_XXXXX&quot;).</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
@@ -355,7 +353,6 @@ public final class CreateCourseLessonsRequest {
         }
 
         /**
-         * <p>The content type of the lesson, such as video, text, quiz, or knowledge check.</p>
          * <p>The content type of the lesson, such as video, text, quiz, or knowledge check.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
@@ -594,6 +591,21 @@ public final class CreateCourseLessonsRequest {
                     thumbnail,
                     title,
                     additionalProperties);
+        }
+
+        @JsonAnySetter
+        private void putAdditionalPropertyFromJson(String key, Object value) {
+            if (key.equalsIgnoreCase("chapter_id")
+                    || key.equalsIgnoreCase("content")
+                    || key.equalsIgnoreCase("days_from_course_start_until_unlock")
+                    || key.equalsIgnoreCase("embed_id")
+                    || key.equalsIgnoreCase("embed_type")
+                    || key.equalsIgnoreCase("lesson_type")
+                    || key.equalsIgnoreCase("thumbnail")
+                    || key.equalsIgnoreCase("title")) {
+                return;
+            }
+            this.additionalProperties.put(key, value);
         }
 
         @java.lang.Override

@@ -25,7 +25,7 @@ import java.util.Optional;
 @JsonInclude(JsonInclude.Include.NON_ABSENT)
 @JsonDeserialize(builder = CreateAccessTokensRequest.Builder.class)
 public final class CreateAccessTokensRequest {
-    private final Optional<String> companyId;
+    private final Optional<String> accountId;
 
     private final Optional<OffsetDateTime> expiresAt;
 
@@ -36,12 +36,12 @@ public final class CreateAccessTokensRequest {
     private final Map<String, Object> additionalProperties;
 
     private CreateAccessTokensRequest(
-            Optional<String> companyId,
+            Optional<String> accountId,
             Optional<OffsetDateTime> expiresAt,
             Optional<List<String>> scopedActions,
             Optional<String> userId,
             Map<String, Object> additionalProperties) {
-        this.companyId = companyId;
+        this.accountId = accountId;
         this.expiresAt = expiresAt;
         this.scopedActions = scopedActions;
         this.userId = userId;
@@ -52,11 +52,11 @@ public final class CreateAccessTokensRequest {
      * @return The unique identifier of the company to generate the token for, starting with 'biz_'. The API key must have permission to access this company.
      */
     @JsonIgnore
-    public Optional<String> getCompanyId() {
-        if (companyId == null) {
+    public Optional<String> getAccountId() {
+        if (accountId == null) {
             return Optional.empty();
         }
-        return companyId;
+        return accountId;
     }
 
     /**
@@ -93,9 +93,9 @@ public final class CreateAccessTokensRequest {
     }
 
     @JsonInclude(value = JsonInclude.Include.CUSTOM, valueFilter = NullableNonemptyFilter.class)
-    @JsonProperty("company_id")
-    private Optional<String> _getCompanyId() {
-        return companyId;
+    @JsonProperty("account_id")
+    private Optional<String> _getAccountId() {
+        return accountId;
     }
 
     @JsonInclude(value = JsonInclude.Include.CUSTOM, valueFilter = NullableNonemptyFilter.class)
@@ -128,7 +128,7 @@ public final class CreateAccessTokensRequest {
     }
 
     private boolean equalTo(CreateAccessTokensRequest other) {
-        return companyId.equals(other.companyId)
+        return accountId.equals(other.accountId)
                 && expiresAt.equals(other.expiresAt)
                 && scopedActions.equals(other.scopedActions)
                 && userId.equals(other.userId);
@@ -136,7 +136,7 @@ public final class CreateAccessTokensRequest {
 
     @java.lang.Override
     public int hashCode() {
-        return Objects.hash(this.companyId, this.expiresAt, this.scopedActions, this.userId);
+        return Objects.hash(this.accountId, this.expiresAt, this.scopedActions, this.userId);
     }
 
     @java.lang.Override
@@ -150,7 +150,7 @@ public final class CreateAccessTokensRequest {
 
     @JsonIgnoreProperties(ignoreUnknown = true)
     public static final class Builder {
-        private Optional<String> companyId = Optional.empty();
+        private Optional<String> accountId = Optional.empty();
 
         private Optional<OffsetDateTime> expiresAt = Optional.empty();
 
@@ -158,13 +158,12 @@ public final class CreateAccessTokensRequest {
 
         private Optional<String> userId = Optional.empty();
 
-        @JsonAnySetter
         private Map<String, Object> additionalProperties = new HashMap<>();
 
         private Builder() {}
 
         public Builder from(CreateAccessTokensRequest other) {
-            companyId(other.getCompanyId());
+            accountId(other.getAccountId());
             expiresAt(other.getExpiresAt());
             scopedActions(other.getScopedActions());
             userId(other.getUserId());
@@ -174,24 +173,24 @@ public final class CreateAccessTokensRequest {
         /**
          * <p>The unique identifier of the company to generate the token for, starting with 'biz_'. The API key must have permission to access this company.</p>
          */
-        @JsonSetter(value = "company_id", nulls = Nulls.SKIP)
-        public Builder companyId(Optional<String> companyId) {
-            this.companyId = companyId;
+        @JsonSetter(value = "account_id", nulls = Nulls.SKIP)
+        public Builder accountId(Optional<String> accountId) {
+            this.accountId = accountId;
             return this;
         }
 
-        public Builder companyId(String companyId) {
-            this.companyId = Optional.ofNullable(companyId);
+        public Builder accountId(String accountId) {
+            this.accountId = Optional.ofNullable(accountId);
             return this;
         }
 
-        public Builder companyId(Nullable<String> companyId) {
-            if (companyId.isNull()) {
-                this.companyId = null;
-            } else if (companyId.isEmpty()) {
-                this.companyId = Optional.empty();
+        public Builder accountId(Nullable<String> accountId) {
+            if (accountId.isNull()) {
+                this.accountId = null;
+            } else if (accountId.isEmpty()) {
+                this.accountId = Optional.empty();
             } else {
-                this.companyId = Optional.of(companyId.get());
+                this.accountId = Optional.of(accountId.get());
             }
             return this;
         }
@@ -272,7 +271,18 @@ public final class CreateAccessTokensRequest {
         }
 
         public CreateAccessTokensRequest build() {
-            return new CreateAccessTokensRequest(companyId, expiresAt, scopedActions, userId, additionalProperties);
+            return new CreateAccessTokensRequest(accountId, expiresAt, scopedActions, userId, additionalProperties);
+        }
+
+        @JsonAnySetter
+        private void putAdditionalPropertyFromJson(String key, Object value) {
+            if (key.equalsIgnoreCase("account_id")
+                    || key.equalsIgnoreCase("expires_at")
+                    || key.equalsIgnoreCase("scoped_actions")
+                    || key.equalsIgnoreCase("user_id")) {
+                return;
+            }
+            this.additionalProperties.put(key, value);
         }
 
         public Builder additionalProperty(String key, Object value) {

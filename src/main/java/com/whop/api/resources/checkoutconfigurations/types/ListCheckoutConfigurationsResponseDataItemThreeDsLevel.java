@@ -10,8 +10,13 @@ public final class ListCheckoutConfigurationsResponseDataItemThreeDsLevel {
     public static final ListCheckoutConfigurationsResponseDataItemThreeDsLevel MANDATE_CHALLENGE =
             new ListCheckoutConfigurationsResponseDataItemThreeDsLevel(Value.MANDATE_CHALLENGE, "mandate_challenge");
 
-    public static final ListCheckoutConfigurationsResponseDataItemThreeDsLevel FRICTIONLESS =
-            new ListCheckoutConfigurationsResponseDataItemThreeDsLevel(Value.FRICTIONLESS, "frictionless");
+    public static final ListCheckoutConfigurationsResponseDataItemThreeDsLevel MANDATE_IF_REQUIRED =
+            new ListCheckoutConfigurationsResponseDataItemThreeDsLevel(
+                    Value.MANDATE_IF_REQUIRED, "mandate_if_required");
+
+    public static final ListCheckoutConfigurationsResponseDataItemThreeDsLevel FRICTIONLESS_IF_REQUIRED =
+            new ListCheckoutConfigurationsResponseDataItemThreeDsLevel(
+                    Value.FRICTIONLESS_IF_REQUIRED, "frictionless_if_required");
 
     private final Value value;
 
@@ -48,8 +53,10 @@ public final class ListCheckoutConfigurationsResponseDataItemThreeDsLevel {
         switch (value) {
             case MANDATE_CHALLENGE:
                 return visitor.visitMandateChallenge();
-            case FRICTIONLESS:
-                return visitor.visitFrictionless();
+            case MANDATE_IF_REQUIRED:
+                return visitor.visitMandateIfRequired();
+            case FRICTIONLESS_IF_REQUIRED:
+                return visitor.visitFrictionlessIfRequired();
             case UNKNOWN:
             default:
                 return visitor.visitUnknown(string);
@@ -61,8 +68,10 @@ public final class ListCheckoutConfigurationsResponseDataItemThreeDsLevel {
         switch (value) {
             case "mandate_challenge":
                 return MANDATE_CHALLENGE;
-            case "frictionless":
-                return FRICTIONLESS;
+            case "mandate_if_required":
+                return MANDATE_IF_REQUIRED;
+            case "frictionless_if_required":
+                return FRICTIONLESS_IF_REQUIRED;
             default:
                 return new ListCheckoutConfigurationsResponseDataItemThreeDsLevel(Value.UNKNOWN, value);
         }
@@ -71,7 +80,9 @@ public final class ListCheckoutConfigurationsResponseDataItemThreeDsLevel {
     public enum Value {
         MANDATE_CHALLENGE,
 
-        FRICTIONLESS,
+        MANDATE_IF_REQUIRED,
+
+        FRICTIONLESS_IF_REQUIRED,
 
         UNKNOWN
     }
@@ -79,7 +90,9 @@ public final class ListCheckoutConfigurationsResponseDataItemThreeDsLevel {
     public interface Visitor<T> {
         T visitMandateChallenge();
 
-        T visitFrictionless();
+        T visitMandateIfRequired();
+
+        T visitFrictionlessIfRequired();
 
         T visitUnknown(String unknownType);
     }

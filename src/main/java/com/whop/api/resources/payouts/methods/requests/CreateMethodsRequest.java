@@ -12,6 +12,7 @@ import com.fasterxml.jackson.annotation.JsonSetter;
 import com.fasterxml.jackson.annotation.Nulls;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.whop.api.core.ObjectMappers;
+import com.whop.api.resources.payouts.methods.types.CreateMethodsRequestRecipient;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
@@ -31,6 +32,10 @@ public final class CreateMethodsRequest {
 
     private final Optional<String> nickname;
 
+    private final Optional<String> paypalLinkToken;
+
+    private final Optional<CreateMethodsRequestRecipient> recipient;
+
     private final String supportedPayoutMethodId;
 
     private final Optional<String> userId;
@@ -43,6 +48,8 @@ public final class CreateMethodsRequest {
             Optional<Map<String, String>> fields,
             Optional<Boolean> isDefault,
             Optional<String> nickname,
+            Optional<String> paypalLinkToken,
+            Optional<CreateMethodsRequestRecipient> recipient,
             String supportedPayoutMethodId,
             Optional<String> userId,
             Map<String, Object> additionalProperties) {
@@ -51,6 +58,8 @@ public final class CreateMethodsRequest {
         this.fields = fields;
         this.isDefault = isDefault;
         this.nickname = nickname;
+        this.paypalLinkToken = paypalLinkToken;
+        this.recipient = recipient;
         this.supportedPayoutMethodId = supportedPayoutMethodId;
         this.userId = userId;
         this.additionalProperties = additionalProperties;
@@ -97,6 +106,22 @@ public final class CreateMethodsRequest {
     }
 
     /**
+     * @return The token your <code>return_url</code> received after a Log in with PayPal session started with <code>POST /payouts/paypal_link_sessions</code>. Use it for a PayPal supported payout method instead of <code>fields</code>. Sending <code>fields</code> or <code>plaid_public_token</code> alongside it is rejected, and <code>nickname</code> is ignored because Whop names the method after the PayPal email. The PayPal holder's name must match the name on the account's payout setup. An account PayPal reports as unverified, or with an unconfirmed email, is saved and flagged on the method's log rather than refused. Single use; expires 15 minutes after the login.
+     */
+    @JsonProperty("paypal_link_token")
+    public Optional<String> getPaypalLinkToken() {
+        return paypalLinkToken;
+    }
+
+    /**
+     * @return Creates a recipient payout account linked to the funding ledger as a non-default account, then saves the bank method on it. No Whop user, company, or recipient ledger is created. A valid recipient email is required. Recipient methods cannot be default or recurring methods and cannot use Plaid.
+     */
+    @JsonProperty("recipient")
+    public Optional<CreateMethodsRequestRecipient> getRecipient() {
+        return recipient;
+    }
+
+    /**
      * @return The supported payout method to save (a podst_ identifier from a previous listing).
      */
     @JsonProperty("supported_payout_method_id")
@@ -129,6 +154,8 @@ public final class CreateMethodsRequest {
                 && fields.equals(other.fields)
                 && isDefault.equals(other.isDefault)
                 && nickname.equals(other.nickname)
+                && paypalLinkToken.equals(other.paypalLinkToken)
+                && recipient.equals(other.recipient)
                 && supportedPayoutMethodId.equals(other.supportedPayoutMethodId)
                 && userId.equals(other.userId);
     }
@@ -141,6 +168,8 @@ public final class CreateMethodsRequest {
                 this.fields,
                 this.isDefault,
                 this.nickname,
+                this.paypalLinkToken,
+                this.recipient,
                 this.supportedPayoutMethodId,
                 this.userId);
     }
@@ -206,6 +235,20 @@ public final class CreateMethodsRequest {
         _FinalStage nickname(String nickname);
 
         /**
+         * <p>The token your <code>return_url</code> received after a Log in with PayPal session started with <code>POST /payouts/paypal_link_sessions</code>. Use it for a PayPal supported payout method instead of <code>fields</code>. Sending <code>fields</code> or <code>plaid_public_token</code> alongside it is rejected, and <code>nickname</code> is ignored because Whop names the method after the PayPal email. The PayPal holder's name must match the name on the account's payout setup. An account PayPal reports as unverified, or with an unconfirmed email, is saved and flagged on the method's log rather than refused. Single use; expires 15 minutes after the login.</p>
+         */
+        _FinalStage paypalLinkToken(Optional<String> paypalLinkToken);
+
+        _FinalStage paypalLinkToken(String paypalLinkToken);
+
+        /**
+         * <p>Creates a recipient payout account linked to the funding ledger as a non-default account, then saves the bank method on it. No Whop user, company, or recipient ledger is created. A valid recipient email is required. Recipient methods cannot be default or recurring methods and cannot use Plaid.</p>
+         */
+        _FinalStage recipient(Optional<CreateMethodsRequestRecipient> recipient);
+
+        _FinalStage recipient(CreateMethodsRequestRecipient recipient);
+
+        /**
          * <p>The user to add the payout method for, prefixed <code>user_</code>. Provide this or <code>account_id</code>.</p>
          */
         _FinalStage userId(Optional<String> userId);
@@ -219,6 +262,10 @@ public final class CreateMethodsRequest {
 
         private Optional<String> userId = Optional.empty();
 
+        private Optional<CreateMethodsRequestRecipient> recipient = Optional.empty();
+
+        private Optional<String> paypalLinkToken = Optional.empty();
+
         private Optional<String> nickname = Optional.empty();
 
         private Optional<Boolean> isDefault = Optional.empty();
@@ -229,7 +276,6 @@ public final class CreateMethodsRequest {
 
         private Optional<String> accountId = Optional.empty();
 
-        @JsonAnySetter
         private Map<String, Object> additionalProperties = new HashMap<>();
 
         private Builder() {}
@@ -241,13 +287,14 @@ public final class CreateMethodsRequest {
             fields(other.getFields());
             isDefault(other.getIsDefault());
             nickname(other.getNickname());
+            paypalLinkToken(other.getPaypalLinkToken());
+            recipient(other.getRecipient());
             supportedPayoutMethodId(other.getSupportedPayoutMethodId());
             userId(other.getUserId());
             return this;
         }
 
         /**
-         * <p>The supported payout method to save (a podst_ identifier from a previous listing).</p>
          * <p>The supported payout method to save (a podst_ identifier from a previous listing).</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
@@ -276,6 +323,46 @@ public final class CreateMethodsRequest {
         @JsonSetter(value = "user_id", nulls = Nulls.SKIP)
         public _FinalStage userId(Optional<String> userId) {
             this.userId = userId;
+            return this;
+        }
+
+        /**
+         * <p>Creates a recipient payout account linked to the funding ledger as a non-default account, then saves the bank method on it. No Whop user, company, or recipient ledger is created. A valid recipient email is required. Recipient methods cannot be default or recurring methods and cannot use Plaid.</p>
+         * @return Reference to {@code this} so that method calls can be chained together.
+         */
+        @java.lang.Override
+        public _FinalStage recipient(CreateMethodsRequestRecipient recipient) {
+            this.recipient = Optional.ofNullable(recipient);
+            return this;
+        }
+
+        /**
+         * <p>Creates a recipient payout account linked to the funding ledger as a non-default account, then saves the bank method on it. No Whop user, company, or recipient ledger is created. A valid recipient email is required. Recipient methods cannot be default or recurring methods and cannot use Plaid.</p>
+         */
+        @java.lang.Override
+        @JsonSetter(value = "recipient", nulls = Nulls.SKIP)
+        public _FinalStage recipient(Optional<CreateMethodsRequestRecipient> recipient) {
+            this.recipient = recipient;
+            return this;
+        }
+
+        /**
+         * <p>The token your <code>return_url</code> received after a Log in with PayPal session started with <code>POST /payouts/paypal_link_sessions</code>. Use it for a PayPal supported payout method instead of <code>fields</code>. Sending <code>fields</code> or <code>plaid_public_token</code> alongside it is rejected, and <code>nickname</code> is ignored because Whop names the method after the PayPal email. The PayPal holder's name must match the name on the account's payout setup. An account PayPal reports as unverified, or with an unconfirmed email, is saved and flagged on the method's log rather than refused. Single use; expires 15 minutes after the login.</p>
+         * @return Reference to {@code this} so that method calls can be chained together.
+         */
+        @java.lang.Override
+        public _FinalStage paypalLinkToken(String paypalLinkToken) {
+            this.paypalLinkToken = Optional.ofNullable(paypalLinkToken);
+            return this;
+        }
+
+        /**
+         * <p>The token your <code>return_url</code> received after a Log in with PayPal session started with <code>POST /payouts/paypal_link_sessions</code>. Use it for a PayPal supported payout method instead of <code>fields</code>. Sending <code>fields</code> or <code>plaid_public_token</code> alongside it is rejected, and <code>nickname</code> is ignored because Whop names the method after the PayPal email. The PayPal holder's name must match the name on the account's payout setup. An account PayPal reports as unverified, or with an unconfirmed email, is saved and flagged on the method's log rather than refused. Single use; expires 15 minutes after the login.</p>
+         */
+        @java.lang.Override
+        @JsonSetter(value = "paypal_link_token", nulls = Nulls.SKIP)
+        public _FinalStage paypalLinkToken(Optional<String> paypalLinkToken) {
+            this.paypalLinkToken = paypalLinkToken;
             return this;
         }
 
@@ -387,9 +474,27 @@ public final class CreateMethodsRequest {
                     fields,
                     isDefault,
                     nickname,
+                    paypalLinkToken,
+                    recipient,
                     supportedPayoutMethodId,
                     userId,
                     additionalProperties);
+        }
+
+        @JsonAnySetter
+        private void putAdditionalPropertyFromJson(String key, Object value) {
+            if (key.equalsIgnoreCase("account_id")
+                    || key.equalsIgnoreCase("destination_currency")
+                    || key.equalsIgnoreCase("fields")
+                    || key.equalsIgnoreCase("is_default")
+                    || key.equalsIgnoreCase("nickname")
+                    || key.equalsIgnoreCase("paypal_link_token")
+                    || key.equalsIgnoreCase("recipient")
+                    || key.equalsIgnoreCase("supported_payout_method_id")
+                    || key.equalsIgnoreCase("user_id")) {
+                return;
+            }
+            this.additionalProperties.put(key, value);
         }
 
         @java.lang.Override

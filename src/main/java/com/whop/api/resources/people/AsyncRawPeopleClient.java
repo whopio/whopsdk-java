@@ -6,8 +6,10 @@ package com.whop.api.resources.people;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.whop.api.core.ClientOptions;
 import com.whop.api.core.ObjectMappers;
+import com.whop.api.core.PathSegments;
 import com.whop.api.core.QueryStringMapper;
 import com.whop.api.core.RequestOptions;
+import com.whop.api.core.RetryInterceptor;
 import com.whop.api.core.WhopApiApiException;
 import com.whop.api.core.WhopApiException;
 import com.whop.api.core.WhopApiHttpResponse;
@@ -42,14 +44,14 @@ public class AsyncRawPeopleClient {
     }
 
     /**
-     * Lists the people (visitors and customers) of an account: the identity-linked person profiles aggregated from every pixel, payment, and platform event — identities, purchases and LTV, geo/device profile, traffic sources, and first/last marketing touches.
+     * Lists the people (visitors and customers) of an account: identity-linked profiles assembled from every pixel, payment, and platform event. Filter and sort them to segment an account's audience.
      */
     public CompletableFuture<WhopApiHttpResponse<SyncPagingIterable<ListPeopleResponseDataItem>>> list() {
         return list(ListPeopleRequest.builder().build());
     }
 
     /**
-     * Lists the people (visitors and customers) of an account: the identity-linked person profiles aggregated from every pixel, payment, and platform event — identities, purchases and LTV, geo/device profile, traffic sources, and first/last marketing touches.
+     * Lists the people (visitors and customers) of an account: identity-linked profiles assembled from every pixel, payment, and platform event. Filter and sort them to segment an account's audience.
      */
     public CompletableFuture<WhopApiHttpResponse<SyncPagingIterable<ListPeopleResponseDataItem>>> list(
             RequestOptions requestOptions) {
@@ -57,7 +59,7 @@ public class AsyncRawPeopleClient {
     }
 
     /**
-     * Lists the people (visitors and customers) of an account: the identity-linked person profiles aggregated from every pixel, payment, and platform event — identities, purchases and LTV, geo/device profile, traffic sources, and first/last marketing touches.
+     * Lists the people (visitors and customers) of an account: identity-linked profiles assembled from every pixel, payment, and platform event. Filter and sort them to segment an account's audience.
      */
     public CompletableFuture<WhopApiHttpResponse<SyncPagingIterable<ListPeopleResponseDataItem>>> list(
             ListPeopleRequest request) {
@@ -65,11 +67,11 @@ public class AsyncRawPeopleClient {
     }
 
     /**
-     * Lists the people (visitors and customers) of an account: the identity-linked person profiles aggregated from every pixel, payment, and platform event — identities, purchases and LTV, geo/device profile, traffic sources, and first/last marketing touches.
+     * Lists the people (visitors and customers) of an account: identity-linked profiles assembled from every pixel, payment, and platform event. Filter and sort them to segment an account's audience.
      */
     public CompletableFuture<WhopApiHttpResponse<SyncPagingIterable<ListPeopleResponseDataItem>>> list(
             ListPeopleRequest request, RequestOptions requestOptions) {
-        HttpUrl.Builder httpUrl = HttpUrl.parse(this.clientOptions.environment().getUrl())
+        HttpUrl.Builder httpUrl = HttpUrl.parse(this.clientOptions.environment().getApiURL())
                 .newBuilder()
                 .addPathSegments("people");
         if (request.getAccountId().isPresent()) {
@@ -87,6 +89,17 @@ public class AsyncRawPeopleClient {
         if (request.getCustomEvent().isPresent()) {
             QueryStringMapper.addQueryParameter(
                     httpUrl, "custom_event", request.getCustomEvent().get(), false);
+        }
+        if (request.getEventWithinDays().isPresent()) {
+            QueryStringMapper.addQueryParameter(
+                    httpUrl, "event_within_days", request.getEventWithinDays().get(), false);
+        }
+        if (request.getFrom().isPresent()) {
+            QueryStringMapper.addQueryParameter(
+                    httpUrl, "from", request.getFrom().get(), false);
+        }
+        if (request.getTo().isPresent()) {
+            QueryStringMapper.addQueryParameter(httpUrl, "to", request.getTo().get(), false);
         }
         if (request.getEventFrom().isPresent()) {
             QueryStringMapper.addQueryParameter(
@@ -154,6 +167,70 @@ public class AsyncRawPeopleClient {
             QueryStringMapper.addQueryParameter(
                     httpUrl, "last_seen_before", request.getLastSeenBefore().get(), false);
         }
+        if (request.getLtvGt().isPresent()) {
+            QueryStringMapper.addQueryParameter(
+                    httpUrl, "ltv_gt", request.getLtvGt().get(), false);
+        }
+        if (request.getLtvGte().isPresent()) {
+            QueryStringMapper.addQueryParameter(
+                    httpUrl, "ltv_gte", request.getLtvGte().get(), false);
+        }
+        if (request.getLtvLt().isPresent()) {
+            QueryStringMapper.addQueryParameter(
+                    httpUrl, "ltv_lt", request.getLtvLt().get(), false);
+        }
+        if (request.getLtvLte().isPresent()) {
+            QueryStringMapper.addQueryParameter(
+                    httpUrl, "ltv_lte", request.getLtvLte().get(), false);
+        }
+        if (request.getAovGt().isPresent()) {
+            QueryStringMapper.addQueryParameter(
+                    httpUrl, "aov_gt", request.getAovGt().get(), false);
+        }
+        if (request.getAovGte().isPresent()) {
+            QueryStringMapper.addQueryParameter(
+                    httpUrl, "aov_gte", request.getAovGte().get(), false);
+        }
+        if (request.getAovLt().isPresent()) {
+            QueryStringMapper.addQueryParameter(
+                    httpUrl, "aov_lt", request.getAovLt().get(), false);
+        }
+        if (request.getAovLte().isPresent()) {
+            QueryStringMapper.addQueryParameter(
+                    httpUrl, "aov_lte", request.getAovLte().get(), false);
+        }
+        if (request.getPurchaseCountGt().isPresent()) {
+            QueryStringMapper.addQueryParameter(
+                    httpUrl, "purchase_count_gt", request.getPurchaseCountGt().get(), false);
+        }
+        if (request.getPurchaseCountGte().isPresent()) {
+            QueryStringMapper.addQueryParameter(
+                    httpUrl, "purchase_count_gte", request.getPurchaseCountGte().get(), false);
+        }
+        if (request.getPurchaseCountLt().isPresent()) {
+            QueryStringMapper.addQueryParameter(
+                    httpUrl, "purchase_count_lt", request.getPurchaseCountLt().get(), false);
+        }
+        if (request.getPurchaseCountLte().isPresent()) {
+            QueryStringMapper.addQueryParameter(
+                    httpUrl, "purchase_count_lte", request.getPurchaseCountLte().get(), false);
+        }
+        if (request.getEventCountGt().isPresent()) {
+            QueryStringMapper.addQueryParameter(
+                    httpUrl, "event_count_gt", request.getEventCountGt().get(), false);
+        }
+        if (request.getEventCountGte().isPresent()) {
+            QueryStringMapper.addQueryParameter(
+                    httpUrl, "event_count_gte", request.getEventCountGte().get(), false);
+        }
+        if (request.getEventCountLt().isPresent()) {
+            QueryStringMapper.addQueryParameter(
+                    httpUrl, "event_count_lt", request.getEventCountLt().get(), false);
+        }
+        if (request.getEventCountLte().isPresent()) {
+            QueryStringMapper.addQueryParameter(
+                    httpUrl, "event_count_lte", request.getEventCountLte().get(), false);
+        }
         if (request.getFirst().isPresent()) {
             QueryStringMapper.addQueryParameter(
                     httpUrl, "first", request.getFirst().get(), false);
@@ -197,9 +274,19 @@ public class AsyncRawPeopleClient {
         if (requestOptions != null && requestOptions.getTimeout().isPresent()) {
             client = clientOptions.httpClientWithTimeout(requestOptions);
         }
+        if (requestOptions != null && requestOptions.getMaxRetries().isPresent()) {
+            okhttpRequest = okhttpRequest
+                    .newBuilder()
+                    .tag(
+                            RetryInterceptor.MaxRetriesOverride.class,
+                            new RetryInterceptor.MaxRetriesOverride(
+                                    requestOptions.getMaxRetries().get()))
+                    .build();
+        }
         CompletableFuture<WhopApiHttpResponse<SyncPagingIterable<ListPeopleResponseDataItem>>> future =
                 new CompletableFuture<>();
-        client.newCall(okhttpRequest).enqueue(new Callback() {
+        RetryInterceptor.AsyncCall okhttpCall = RetryInterceptor.newAsyncCall(client, okhttpRequest);
+        okhttpCall.enqueue(new Callback() {
             @Override
             public void onResponse(@NotNull Call call, @NotNull Response response) throws IOException {
                 try (ResponseBody responseBody = response.body()) {
@@ -248,6 +335,9 @@ public class AsyncRawPeopleClient {
                     future.completeExceptionally(new WhopApiApiException(
                             "Error with status code " + response.code(), response.code(), errorBody, response));
                     return;
+                } catch (JsonProcessingException e) {
+                    future.completeExceptionally(
+                            new WhopApiException("Failed to deserialize response: " + e.getMessage(), e));
                 } catch (IOException e) {
                     future.completeExceptionally(new WhopApiException("Network error executing HTTP request", e));
                 }
@@ -258,18 +348,23 @@ public class AsyncRawPeopleClient {
                 future.completeExceptionally(new WhopApiException("Network error executing HTTP request", e));
             }
         });
+        future.whenComplete((result_, throwable_) -> {
+            if (future.isCancelled()) {
+                okhttpCall.cancel();
+            }
+        });
         return future;
     }
 
     /**
-     * Retrieves one person for an account. The identifier can be a person ID (prefixed <code>prsn_</code>), a user ID (prefixed <code>user_</code>), an email address, or a phone number — merged people resolve to the surviving profile.
+     * Retrieves one person for an account, looked up by person ID, user ID, email address, or phone number.
      */
     public CompletableFuture<WhopApiHttpResponse<RetrievePeopleResponse>> retrieve(String id) {
         return retrieve(id, RetrievePeopleRequest.builder().build());
     }
 
     /**
-     * Retrieves one person for an account. The identifier can be a person ID (prefixed <code>prsn_</code>), a user ID (prefixed <code>user_</code>), an email address, or a phone number — merged people resolve to the surviving profile.
+     * Retrieves one person for an account, looked up by person ID, user ID, email address, or phone number.
      */
     public CompletableFuture<WhopApiHttpResponse<RetrievePeopleResponse>> retrieve(
             String id, RequestOptions requestOptions) {
@@ -277,7 +372,7 @@ public class AsyncRawPeopleClient {
     }
 
     /**
-     * Retrieves one person for an account. The identifier can be a person ID (prefixed <code>prsn_</code>), a user ID (prefixed <code>user_</code>), an email address, or a phone number — merged people resolve to the surviving profile.
+     * Retrieves one person for an account, looked up by person ID, user ID, email address, or phone number.
      */
     public CompletableFuture<WhopApiHttpResponse<RetrievePeopleResponse>> retrieve(
             String id, RetrievePeopleRequest request) {
@@ -285,14 +380,14 @@ public class AsyncRawPeopleClient {
     }
 
     /**
-     * Retrieves one person for an account. The identifier can be a person ID (prefixed <code>prsn_</code>), a user ID (prefixed <code>user_</code>), an email address, or a phone number — merged people resolve to the surviving profile.
+     * Retrieves one person for an account, looked up by person ID, user ID, email address, or phone number.
      */
     public CompletableFuture<WhopApiHttpResponse<RetrievePeopleResponse>> retrieve(
             String id, RetrievePeopleRequest request, RequestOptions requestOptions) {
-        HttpUrl.Builder httpUrl = HttpUrl.parse(this.clientOptions.environment().getUrl())
+        HttpUrl.Builder httpUrl = HttpUrl.parse(this.clientOptions.environment().getApiURL())
                 .newBuilder()
                 .addPathSegments("people")
-                .addPathSegment(id);
+                .addPathSegment(PathSegments.validate(id));
         if (request.getAccountId().isPresent()) {
             QueryStringMapper.addQueryParameter(
                     httpUrl, "account_id", request.getAccountId().get(), false);
@@ -312,8 +407,18 @@ public class AsyncRawPeopleClient {
         if (requestOptions != null && requestOptions.getTimeout().isPresent()) {
             client = clientOptions.httpClientWithTimeout(requestOptions);
         }
+        if (requestOptions != null && requestOptions.getMaxRetries().isPresent()) {
+            okhttpRequest = okhttpRequest
+                    .newBuilder()
+                    .tag(
+                            RetryInterceptor.MaxRetriesOverride.class,
+                            new RetryInterceptor.MaxRetriesOverride(
+                                    requestOptions.getMaxRetries().get()))
+                    .build();
+        }
         CompletableFuture<WhopApiHttpResponse<RetrievePeopleResponse>> future = new CompletableFuture<>();
-        client.newCall(okhttpRequest).enqueue(new Callback() {
+        RetryInterceptor.AsyncCall okhttpCall = RetryInterceptor.newAsyncCall(client, okhttpRequest);
+        okhttpCall.enqueue(new Callback() {
             @Override
             public void onResponse(@NotNull Call call, @NotNull Response response) throws IOException {
                 try (ResponseBody responseBody = response.body()) {
@@ -344,6 +449,9 @@ public class AsyncRawPeopleClient {
                     future.completeExceptionally(new WhopApiApiException(
                             "Error with status code " + response.code(), response.code(), errorBody, response));
                     return;
+                } catch (JsonProcessingException e) {
+                    future.completeExceptionally(
+                            new WhopApiException("Failed to deserialize response: " + e.getMessage(), e));
                 } catch (IOException e) {
                     future.completeExceptionally(new WhopApiException("Network error executing HTTP request", e));
                 }
@@ -352,6 +460,11 @@ public class AsyncRawPeopleClient {
             @Override
             public void onFailure(@NotNull Call call, @NotNull IOException e) {
                 future.completeExceptionally(new WhopApiException("Network error executing HTTP request", e));
+            }
+        });
+        future.whenComplete((result_, throwable_) -> {
+            if (future.isCancelled()) {
+                okhttpCall.cancel();
             }
         });
         return future;

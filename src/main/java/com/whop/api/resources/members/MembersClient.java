@@ -8,8 +8,12 @@ import com.whop.api.core.RequestOptions;
 import com.whop.api.core.Suppliers;
 import com.whop.api.core.pagination.SyncPagingIterable;
 import com.whop.api.resources.members.logs.LogsClient;
+import com.whop.api.resources.members.notes.NotesClient;
+import com.whop.api.resources.members.requests.CreateMembersRequest;
 import com.whop.api.resources.members.requests.ListMembersRequest;
 import com.whop.api.resources.members.requests.RetrieveMembersRequest;
+import com.whop.api.resources.members.requests.UnsubscribeMembersRequest;
+import com.whop.api.resources.members.requests.UpdateMembersRequest;
 import com.whop.api.types.Member;
 import java.util.function.Supplier;
 
@@ -20,10 +24,13 @@ public class MembersClient {
 
     protected final Supplier<LogsClient> logsClient;
 
+    protected final Supplier<NotesClient> notesClient;
+
     public MembersClient(ClientOptions clientOptions) {
         this.clientOptions = clientOptions;
         this.rawClient = new RawMembersClient(clientOptions);
         this.logsClient = Suppliers.memoize(() -> new LogsClient(clientOptions));
+        this.notesClient = Suppliers.memoize(() -> new NotesClient(clientOptions));
     }
 
     /**
@@ -62,6 +69,20 @@ public class MembersClient {
     }
 
     /**
+     * Adds a person to an account as a member. If the person is already a member of the account, that member is returned unchanged.
+     */
+    public Member create(CreateMembersRequest request) {
+        return this.rawClient.create(request).body();
+    }
+
+    /**
+     * Adds a person to an account as a member. If the person is already a member of the account, that member is returned unchanged.
+     */
+    public Member create(CreateMembersRequest request, RequestOptions requestOptions) {
+        return this.rawClient.create(request, requestOptions).body();
+    }
+
+    /**
      * Retrieves a member by ID. Accessible to the account and to the member's own user.
      */
     public Member retrieve(String id) {
@@ -89,7 +110,53 @@ public class MembersClient {
         return this.rawClient.retrieve(id, request, requestOptions).body();
     }
 
+    /**
+     * Updates a member.
+     */
+    public Member update(String id) {
+        return this.rawClient.update(id).body();
+    }
+
+    /**
+     * Updates a member.
+     */
+    public Member update(String id, RequestOptions requestOptions) {
+        return this.rawClient.update(id, requestOptions).body();
+    }
+
+    /**
+     * Updates a member.
+     */
+    public Member update(String id, UpdateMembersRequest request) {
+        return this.rawClient.update(id, request).body();
+    }
+
+    /**
+     * Updates a member.
+     */
+    public Member update(String id, UpdateMembersRequest request, RequestOptions requestOptions) {
+        return this.rawClient.update(id, request, requestOptions).body();
+    }
+
+    /**
+     * Unsubscribes a member from the account's marketing communications with the token from their unsubscribe link. Inboxes post here directly for one-click unsubscribe (RFC 8058).
+     */
+    public void unsubscribe(String id, UnsubscribeMembersRequest request) {
+        this.rawClient.unsubscribe(id, request).body();
+    }
+
+    /**
+     * Unsubscribes a member from the account's marketing communications with the token from their unsubscribe link. Inboxes post here directly for one-click unsubscribe (RFC 8058).
+     */
+    public void unsubscribe(String id, UnsubscribeMembersRequest request, RequestOptions requestOptions) {
+        this.rawClient.unsubscribe(id, request, requestOptions).body();
+    }
+
     public LogsClient logs() {
         return this.logsClient.get();
+    }
+
+    public NotesClient notes() {
+        return this.notesClient.get();
     }
 }

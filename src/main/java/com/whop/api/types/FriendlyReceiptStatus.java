@@ -25,6 +25,9 @@ public final class FriendlyReceiptStatus {
 
     public static final FriendlyReceiptStatus DRAFTED = new FriendlyReceiptStatus(Value.DRAFTED, "drafted");
 
+    public static final FriendlyReceiptStatus REQUIRES_CAPTURE =
+            new FriendlyReceiptStatus(Value.REQUIRES_CAPTURE, "requires_capture");
+
     public static final FriendlyReceiptStatus UNCOLLECTIBLE =
             new FriendlyReceiptStatus(Value.UNCOLLECTIBLE, "uncollectible");
 
@@ -53,6 +56,8 @@ public final class FriendlyReceiptStatus {
             new FriendlyReceiptStatus(Value.RESOLUTION_UNDER_REVIEW, "resolution_under_review");
 
     public static final FriendlyReceiptStatus UNRESOLVED = new FriendlyReceiptStatus(Value.UNRESOLVED, "unresolved");
+
+    public static final FriendlyReceiptStatus BLOCKED = new FriendlyReceiptStatus(Value.BLOCKED, "blocked");
 
     public static final FriendlyReceiptStatus OPEN_DISPUTE =
             new FriendlyReceiptStatus(Value.OPEN_DISPUTE, "open_dispute");
@@ -128,6 +133,8 @@ public final class FriendlyReceiptStatus {
                 return visitor.visitDisputeUnderReview();
             case DRAFTED:
                 return visitor.visitDrafted();
+            case REQUIRES_CAPTURE:
+                return visitor.visitRequiresCapture();
             case UNCOLLECTIBLE:
                 return visitor.visitUncollectible();
             case PENDING:
@@ -150,6 +157,8 @@ public final class FriendlyReceiptStatus {
                 return visitor.visitResolutionUnderReview();
             case UNRESOLVED:
                 return visitor.visitUnresolved();
+            case BLOCKED:
+                return visitor.visitBlocked();
             case OPEN_DISPUTE:
                 return visitor.visitOpenDispute();
             case PAST_DUE:
@@ -193,6 +202,8 @@ public final class FriendlyReceiptStatus {
                 return DISPUTE_UNDER_REVIEW;
             case "drafted":
                 return DRAFTED;
+            case "requires_capture":
+                return REQUIRES_CAPTURE;
             case "uncollectible":
                 return UNCOLLECTIBLE;
             case "pending":
@@ -215,6 +226,8 @@ public final class FriendlyReceiptStatus {
                 return RESOLUTION_UNDER_REVIEW;
             case "unresolved":
                 return UNRESOLVED;
+            case "blocked":
+                return BLOCKED;
             case "open_dispute":
                 return OPEN_DISPUTE;
             case "past_due":
@@ -243,9 +256,13 @@ public final class FriendlyReceiptStatus {
     public enum Value {
         SUCCEEDED,
 
+        REQUIRES_CAPTURE,
+
         PENDING,
 
         FAILED,
+
+        BLOCKED,
 
         PAST_DUE,
 
@@ -303,9 +320,13 @@ public final class FriendlyReceiptStatus {
     public interface Visitor<T> {
         T visitSucceeded();
 
+        T visitRequiresCapture();
+
         T visitPending();
 
         T visitFailed();
+
+        T visitBlocked();
 
         T visitPastDue();
 

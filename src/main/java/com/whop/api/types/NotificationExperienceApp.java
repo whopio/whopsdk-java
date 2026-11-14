@@ -106,7 +106,6 @@ public final class NotificationExperienceApp {
 
         private String id;
 
-        @JsonAnySetter
         private Map<String, Object> additionalProperties = new HashMap<>();
 
         private Builder() {}
@@ -120,7 +119,6 @@ public final class NotificationExperienceApp {
 
         /**
          * <p>Icon image URL. Always present — the default app icon when none is uploaded.</p>
-         * <p>Icon image URL. Always present — the default app icon when none is uploaded.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
@@ -131,7 +129,6 @@ public final class NotificationExperienceApp {
         }
 
         /**
-         * <p>App ID, prefixed <code>app_</code>.</p>
          * <p>App ID, prefixed <code>app_</code>.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
@@ -145,6 +142,14 @@ public final class NotificationExperienceApp {
         @java.lang.Override
         public NotificationExperienceApp build() {
             return new NotificationExperienceApp(iconUrl, id, additionalProperties);
+        }
+
+        @JsonAnySetter
+        private void putAdditionalPropertyFromJson(String key, Object value) {
+            if (key.equalsIgnoreCase("icon_url") || key.equalsIgnoreCase("id")) {
+                return;
+            }
+            this.additionalProperties.put(key, value);
         }
 
         @java.lang.Override

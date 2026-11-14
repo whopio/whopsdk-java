@@ -86,7 +86,6 @@ public final class AppBannerImage {
     public static final class Builder implements UrlStage, _FinalStage {
         private String url;
 
-        @JsonAnySetter
         private Map<String, Object> additionalProperties = new HashMap<>();
 
         private Builder() {}
@@ -98,7 +97,6 @@ public final class AppBannerImage {
         }
 
         /**
-         * <p>Banner image URL, taken from the app's product listing.</p>
          * <p>Banner image URL, taken from the app's product listing.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
@@ -112,6 +110,14 @@ public final class AppBannerImage {
         @java.lang.Override
         public AppBannerImage build() {
             return new AppBannerImage(url, additionalProperties);
+        }
+
+        @JsonAnySetter
+        private void putAdditionalPropertyFromJson(String key, Object value) {
+            if (key.equalsIgnoreCase("url")) {
+                return;
+            }
+            this.additionalProperties.put(key, value);
         }
 
         @java.lang.Override

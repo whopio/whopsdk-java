@@ -139,7 +139,6 @@ public final class CheckoutConfigurationListItemPaymentMethodConfiguration {
 
         private List<PaymentMethodTypes> disabled = new ArrayList<>();
 
-        @JsonAnySetter
         private Map<String, Object> additionalProperties = new HashMap<>();
 
         private Builder() {}
@@ -153,7 +152,6 @@ public final class CheckoutConfigurationListItemPaymentMethodConfiguration {
         }
 
         /**
-         * <p>Whether Whop's platform default payment method enablement settings are included in this configuration. The full list of default payment methods can be found in the documentation at docs.whop.com/payments.</p>
          * <p>Whether Whop's platform default payment method enablement settings are included in this configuration. The full list of default payment methods can be found in the documentation at docs.whop.com/payments.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
@@ -238,6 +236,16 @@ public final class CheckoutConfigurationListItemPaymentMethodConfiguration {
         public CheckoutConfigurationListItemPaymentMethodConfiguration build() {
             return new CheckoutConfigurationListItemPaymentMethodConfiguration(
                     disabled, enabled, includePlatformDefaults, additionalProperties);
+        }
+
+        @JsonAnySetter
+        private void putAdditionalPropertyFromJson(String key, Object value) {
+            if (key.equalsIgnoreCase("disabled")
+                    || key.equalsIgnoreCase("enabled")
+                    || key.equalsIgnoreCase("include_platform_defaults")) {
+                return;
+            }
+            this.additionalProperties.put(key, value);
         }
 
         @java.lang.Override

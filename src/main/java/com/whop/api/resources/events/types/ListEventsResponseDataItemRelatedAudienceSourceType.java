@@ -13,6 +13,9 @@ public final class ListEventsResponseDataItemRelatedAudienceSourceType {
     public static final ListEventsResponseDataItemRelatedAudienceSourceType PEOPLE_FILTER =
             new ListEventsResponseDataItemRelatedAudienceSourceType(Value.PEOPLE_FILTER, "people_filter");
 
+    public static final ListEventsResponseDataItemRelatedAudienceSourceType ENGAGEMENT =
+            new ListEventsResponseDataItemRelatedAudienceSourceType(Value.ENGAGEMENT, "engagement");
+
     private final Value value;
 
     private final String string;
@@ -50,6 +53,8 @@ public final class ListEventsResponseDataItemRelatedAudienceSourceType {
                 return visitor.visitCsvUpload();
             case PEOPLE_FILTER:
                 return visitor.visitPeopleFilter();
+            case ENGAGEMENT:
+                return visitor.visitEngagement();
             case UNKNOWN:
             default:
                 return visitor.visitUnknown(string);
@@ -63,6 +68,8 @@ public final class ListEventsResponseDataItemRelatedAudienceSourceType {
                 return CSV_UPLOAD;
             case "people_filter":
                 return PEOPLE_FILTER;
+            case "engagement":
+                return ENGAGEMENT;
             default:
                 return new ListEventsResponseDataItemRelatedAudienceSourceType(Value.UNKNOWN, value);
         }
@@ -73,6 +80,8 @@ public final class ListEventsResponseDataItemRelatedAudienceSourceType {
 
         PEOPLE_FILTER,
 
+        ENGAGEMENT,
+
         UNKNOWN
     }
 
@@ -80,6 +89,8 @@ public final class ListEventsResponseDataItemRelatedAudienceSourceType {
         T visitCsvUpload();
 
         T visitPeopleFilter();
+
+        T visitEngagement();
 
         T visitUnknown(String unknownType);
     }

@@ -8,6 +8,7 @@ import com.whop.api.core.ClientOptions;
 import com.whop.api.core.ObjectMappers;
 import com.whop.api.core.QueryStringMapper;
 import com.whop.api.core.RequestOptions;
+import com.whop.api.core.RetryInterceptor;
 import com.whop.api.core.WhopApiApiException;
 import com.whop.api.core.WhopApiException;
 import com.whop.api.core.WhopApiHttpResponse;
@@ -58,9 +59,9 @@ public class RawFinancialActivityClient {
      */
     public WhopApiHttpResponse<ListFinancialActivityResponse> list(
             ListFinancialActivityRequest request, RequestOptions requestOptions) {
-        HttpUrl.Builder httpUrl = HttpUrl.parse(this.clientOptions.environment().getUrl())
+        HttpUrl.Builder httpUrl = HttpUrl.parse(this.clientOptions.environment().getApiURL())
                 .newBuilder()
-                .addPathSegments("financial-activity");
+                .addPathSegments("financial_activity");
         if (request.getAccountId().isPresent()) {
             QueryStringMapper.addQueryParameter(
                     httpUrl, "account_id", request.getAccountId().get(), false);
@@ -79,6 +80,37 @@ public class RawFinancialActivityClient {
         if (request.getIncludeResource().isPresent()) {
             QueryStringMapper.addQueryParameter(
                     httpUrl, "include_resource", request.getIncludeResource().get(), false);
+        }
+        if (request.getDirection().isPresent()) {
+            QueryStringMapper.addQueryParameter(
+                    httpUrl, "direction", request.getDirection().get(), false);
+        }
+        if (request.getResourceId().isPresent()) {
+            QueryStringMapper.addQueryParameter(
+                    httpUrl, "resource_id", request.getResourceId().get(), false);
+        }
+        if (request.getPaymentId().isPresent()) {
+            QueryStringMapper.addQueryParameter(
+                    httpUrl, "payment_id", request.getPaymentId().get(), false);
+        }
+        if (request.getActivityId().isPresent()) {
+            QueryStringMapper.addQueryParameter(
+                    httpUrl, "activity_id", request.getActivityId().get(), false);
+        }
+        if (request.getExcludeInternalMovements().isPresent()) {
+            QueryStringMapper.addQueryParameter(
+                    httpUrl,
+                    "exclude_internal_movements",
+                    request.getExcludeInternalMovements().get(),
+                    false);
+        }
+        if (request.getBalanceType().isPresent()) {
+            QueryStringMapper.addQueryParameter(
+                    httpUrl, "balance_type", request.getBalanceType().get(), false);
+        }
+        if (request.getWithdrawalId().isPresent()) {
+            QueryStringMapper.addQueryParameter(
+                    httpUrl, "withdrawal_id", request.getWithdrawalId().get(), false);
         }
         if (request.getCurrency().isPresent()) {
             QueryStringMapper.addQueryParameter(
@@ -127,6 +159,15 @@ public class RawFinancialActivityClient {
         if (requestOptions != null && requestOptions.getTimeout().isPresent()) {
             client = clientOptions.httpClientWithTimeout(requestOptions);
         }
+        if (requestOptions != null && requestOptions.getMaxRetries().isPresent()) {
+            okhttpRequest = okhttpRequest
+                    .newBuilder()
+                    .tag(
+                            RetryInterceptor.MaxRetriesOverride.class,
+                            new RetryInterceptor.MaxRetriesOverride(
+                                    requestOptions.getMaxRetries().get()))
+                    .build();
+        }
         try (Response response = client.newCall(okhttpRequest).execute()) {
             ResponseBody responseBody = response.body();
             String responseBodyString = responseBody != null ? responseBody.string() : "{}";
@@ -156,6 +197,8 @@ public class RawFinancialActivityClient {
             Object errorBody = ObjectMappers.parseErrorBody(responseBodyString);
             throw new WhopApiApiException(
                     "Error with status code " + response.code(), response.code(), errorBody, response);
+        } catch (JsonProcessingException e) {
+            throw new WhopApiException("Failed to deserialize response: " + e.getMessage(), e);
         } catch (IOException e) {
             throw new WhopApiException("Network error executing HTTP request", e);
         }

@@ -31,6 +31,10 @@ public final class ListMembersResponsePageInfo {
 
     private final Optional<String> startCursor;
 
+    private final Optional<Integer> totalCount;
+
+    private final boolean totalCountCapped;
+
     private final Map<String, Object> additionalProperties;
 
     private ListMembersResponsePageInfo(
@@ -38,11 +42,15 @@ public final class ListMembersResponsePageInfo {
             boolean hasNextPage,
             boolean hasPreviousPage,
             Optional<String> startCursor,
+            Optional<Integer> totalCount,
+            boolean totalCountCapped,
             Map<String, Object> additionalProperties) {
         this.endCursor = endCursor;
         this.hasNextPage = hasNextPage;
         this.hasPreviousPage = hasPreviousPage;
         this.startCursor = startCursor;
+        this.totalCount = totalCount;
+        this.totalCountCapped = totalCountCapped;
         this.additionalProperties = additionalProperties;
     }
 
@@ -72,6 +80,25 @@ public final class ListMembersResponsePageInfo {
         return startCursor;
     }
 
+    /**
+     * @return Number of results matching the filters, across every page. Counting stops at 10,000. <code>null</code> when <code>include_total_count</code> isn't <code>true</code>, or when the count ran out of time.
+     */
+    @JsonIgnore
+    public Optional<Integer> getTotalCount() {
+        if (totalCount == null) {
+            return Optional.empty();
+        }
+        return totalCount;
+    }
+
+    /**
+     * @return Whether counting stopped at the limit. <code>true</code> means <code>total_count</code> is 10,000 or more.
+     */
+    @JsonProperty("total_count_capped")
+    public boolean getTotalCountCapped() {
+        return totalCountCapped;
+    }
+
     @JsonInclude(value = JsonInclude.Include.CUSTOM, valueFilter = NullableNonemptyFilter.class)
     @JsonProperty("end_cursor")
     private Optional<String> _getEndCursor() {
@@ -82,6 +109,12 @@ public final class ListMembersResponsePageInfo {
     @JsonProperty("start_cursor")
     private Optional<String> _getStartCursor() {
         return startCursor;
+    }
+
+    @JsonInclude(value = JsonInclude.Include.CUSTOM, valueFilter = NullableNonemptyFilter.class)
+    @JsonProperty("total_count")
+    private Optional<Integer> _getTotalCount() {
+        return totalCount;
     }
 
     @java.lang.Override
@@ -99,12 +132,20 @@ public final class ListMembersResponsePageInfo {
         return endCursor.equals(other.endCursor)
                 && hasNextPage == other.hasNextPage
                 && hasPreviousPage == other.hasPreviousPage
-                && startCursor.equals(other.startCursor);
+                && startCursor.equals(other.startCursor)
+                && totalCount.equals(other.totalCount)
+                && totalCountCapped == other.totalCountCapped;
     }
 
     @java.lang.Override
     public int hashCode() {
-        return Objects.hash(this.endCursor, this.hasNextPage, this.hasPreviousPage, this.startCursor);
+        return Objects.hash(
+                this.endCursor,
+                this.hasNextPage,
+                this.hasPreviousPage,
+                this.startCursor,
+                this.totalCount,
+                this.totalCountCapped);
     }
 
     @java.lang.Override
@@ -123,7 +164,14 @@ public final class ListMembersResponsePageInfo {
     }
 
     public interface HasPreviousPageStage {
-        _FinalStage hasPreviousPage(boolean hasPreviousPage);
+        TotalCountCappedStage hasPreviousPage(boolean hasPreviousPage);
+    }
+
+    public interface TotalCountCappedStage {
+        /**
+         * <p>Whether counting stopped at the limit. <code>true</code> means <code>total_count</code> is 10,000 or more.</p>
+         */
+        _FinalStage totalCountCapped(boolean totalCountCapped);
     }
 
     public interface _FinalStage {
@@ -144,19 +192,32 @@ public final class ListMembersResponsePageInfo {
         _FinalStage startCursor(String startCursor);
 
         _FinalStage startCursor(Nullable<String> startCursor);
+
+        /**
+         * <p>Number of results matching the filters, across every page. Counting stops at 10,000. <code>null</code> when <code>include_total_count</code> isn't <code>true</code>, or when the count ran out of time.</p>
+         */
+        _FinalStage totalCount(Optional<Integer> totalCount);
+
+        _FinalStage totalCount(Integer totalCount);
+
+        _FinalStage totalCount(Nullable<Integer> totalCount);
     }
 
     @JsonIgnoreProperties(ignoreUnknown = true)
-    public static final class Builder implements HasNextPageStage, HasPreviousPageStage, _FinalStage {
+    public static final class Builder
+            implements HasNextPageStage, HasPreviousPageStage, TotalCountCappedStage, _FinalStage {
         private boolean hasNextPage;
 
         private boolean hasPreviousPage;
+
+        private boolean totalCountCapped;
+
+        private Optional<Integer> totalCount = Optional.empty();
 
         private Optional<String> startCursor = Optional.empty();
 
         private Optional<String> endCursor = Optional.empty();
 
-        @JsonAnySetter
         private Map<String, Object> additionalProperties = new HashMap<>();
 
         private Builder() {}
@@ -167,6 +228,8 @@ public final class ListMembersResponsePageInfo {
             hasNextPage(other.getHasNextPage());
             hasPreviousPage(other.getHasPreviousPage());
             startCursor(other.getStartCursor());
+            totalCount(other.getTotalCount());
+            totalCountCapped(other.getTotalCountCapped());
             return this;
         }
 
@@ -179,8 +242,55 @@ public final class ListMembersResponsePageInfo {
 
         @java.lang.Override
         @JsonSetter("has_previous_page")
-        public _FinalStage hasPreviousPage(boolean hasPreviousPage) {
+        public TotalCountCappedStage hasPreviousPage(boolean hasPreviousPage) {
             this.hasPreviousPage = hasPreviousPage;
+            return this;
+        }
+
+        /**
+         * <p>Whether counting stopped at the limit. <code>true</code> means <code>total_count</code> is 10,000 or more.</p>
+         * @return Reference to {@code this} so that method calls can be chained together.
+         */
+        @java.lang.Override
+        @JsonSetter("total_count_capped")
+        public _FinalStage totalCountCapped(boolean totalCountCapped) {
+            this.totalCountCapped = totalCountCapped;
+            return this;
+        }
+
+        /**
+         * <p>Number of results matching the filters, across every page. Counting stops at 10,000. <code>null</code> when <code>include_total_count</code> isn't <code>true</code>, or when the count ran out of time.</p>
+         * @return Reference to {@code this} so that method calls can be chained together.
+         */
+        @java.lang.Override
+        public _FinalStage totalCount(Nullable<Integer> totalCount) {
+            if (totalCount.isNull()) {
+                this.totalCount = null;
+            } else if (totalCount.isEmpty()) {
+                this.totalCount = Optional.empty();
+            } else {
+                this.totalCount = Optional.of(totalCount.get());
+            }
+            return this;
+        }
+
+        /**
+         * <p>Number of results matching the filters, across every page. Counting stops at 10,000. <code>null</code> when <code>include_total_count</code> isn't <code>true</code>, or when the count ran out of time.</p>
+         * @return Reference to {@code this} so that method calls can be chained together.
+         */
+        @java.lang.Override
+        public _FinalStage totalCount(Integer totalCount) {
+            this.totalCount = Optional.ofNullable(totalCount);
+            return this;
+        }
+
+        /**
+         * <p>Number of results matching the filters, across every page. Counting stops at 10,000. <code>null</code> when <code>include_total_count</code> isn't <code>true</code>, or when the count ran out of time.</p>
+         */
+        @java.lang.Override
+        @JsonSetter(value = "total_count", nulls = Nulls.SKIP)
+        public _FinalStage totalCount(Optional<Integer> totalCount) {
+            this.totalCount = totalCount;
             return this;
         }
 
@@ -237,7 +347,26 @@ public final class ListMembersResponsePageInfo {
         @java.lang.Override
         public ListMembersResponsePageInfo build() {
             return new ListMembersResponsePageInfo(
-                    endCursor, hasNextPage, hasPreviousPage, startCursor, additionalProperties);
+                    endCursor,
+                    hasNextPage,
+                    hasPreviousPage,
+                    startCursor,
+                    totalCount,
+                    totalCountCapped,
+                    additionalProperties);
+        }
+
+        @JsonAnySetter
+        private void putAdditionalPropertyFromJson(String key, Object value) {
+            if (key.equalsIgnoreCase("end_cursor")
+                    || key.equalsIgnoreCase("has_next_page")
+                    || key.equalsIgnoreCase("has_previous_page")
+                    || key.equalsIgnoreCase("start_cursor")
+                    || key.equalsIgnoreCase("total_count")
+                    || key.equalsIgnoreCase("total_count_capped")) {
+                return;
+            }
+            this.additionalProperties.put(key, value);
         }
 
         @java.lang.Override

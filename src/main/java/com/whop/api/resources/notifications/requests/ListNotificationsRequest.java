@@ -84,7 +84,7 @@ public final class ListNotificationsRequest {
     }
 
     /**
-     * @return The number of notifications to return (default 20, max 100).
+     * @return Number of results to return from the start of the range.
      */
     @JsonProperty("first")
     public Optional<Integer> getFirst() {
@@ -92,7 +92,7 @@ public final class ListNotificationsRequest {
     }
 
     /**
-     * @return A cursor (a notification <code>id</code> from a previous page); returns notifications older than it.
+     * @return Return results after this cursor. Use <code>page_info.end_cursor</code> from the previous response to fetch the next page.
      */
     @JsonProperty("after")
     public Optional<String> getAfter() {
@@ -147,7 +147,6 @@ public final class ListNotificationsRequest {
 
         private Optional<String> after = Optional.empty();
 
-        @JsonAnySetter
         private Map<String, Object> additionalProperties = new HashMap<>();
 
         private Builder() {}
@@ -219,7 +218,7 @@ public final class ListNotificationsRequest {
         }
 
         /**
-         * <p>The number of notifications to return (default 20, max 100).</p>
+         * <p>Number of results to return from the start of the range.</p>
          */
         @JsonSetter(value = "first", nulls = Nulls.SKIP)
         public Builder first(Optional<Integer> first) {
@@ -233,7 +232,7 @@ public final class ListNotificationsRequest {
         }
 
         /**
-         * <p>A cursor (a notification <code>id</code> from a previous page); returns notifications older than it.</p>
+         * <p>Return results after this cursor. Use <code>page_info.end_cursor</code> from the previous response to fetch the next page.</p>
          */
         @JsonSetter(value = "after", nulls = Nulls.SKIP)
         public Builder after(Optional<String> after) {
@@ -249,6 +248,19 @@ public final class ListNotificationsRequest {
         public ListNotificationsRequest build() {
             return new ListNotificationsRequest(
                     unread, experienceId, accountId, mentions, first, after, additionalProperties);
+        }
+
+        @JsonAnySetter
+        private void putAdditionalPropertyFromJson(String key, Object value) {
+            if (key.equalsIgnoreCase("unread")
+                    || key.equalsIgnoreCase("experience_id")
+                    || key.equalsIgnoreCase("account_id")
+                    || key.equalsIgnoreCase("mentions")
+                    || key.equalsIgnoreCase("first")
+                    || key.equalsIgnoreCase("after")) {
+                return;
+            }
+            this.additionalProperties.put(key, value);
         }
 
         public Builder additionalProperty(String key, Object value) {

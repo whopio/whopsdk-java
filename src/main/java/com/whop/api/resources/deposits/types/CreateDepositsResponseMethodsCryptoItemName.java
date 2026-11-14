@@ -10,6 +10,9 @@ public final class CreateDepositsResponseMethodsCryptoItemName {
     public static final CreateDepositsResponseMethodsCryptoItemName PLASMA =
             new CreateDepositsResponseMethodsCryptoItemName(Value.PLASMA, "Plasma");
 
+    public static final CreateDepositsResponseMethodsCryptoItemName BITCOIN =
+            new CreateDepositsResponseMethodsCryptoItemName(Value.BITCOIN, "Bitcoin");
+
     public static final CreateDepositsResponseMethodsCryptoItemName MEGA_ETH =
             new CreateDepositsResponseMethodsCryptoItemName(Value.MEGA_ETH, "MegaETH");
 
@@ -72,6 +75,8 @@ public final class CreateDepositsResponseMethodsCryptoItemName {
         switch (value) {
             case PLASMA:
                 return visitor.visitPlasma();
+            case BITCOIN:
+                return visitor.visitBitcoin();
             case MEGA_ETH:
                 return visitor.visitMegaEth();
             case POLYGON:
@@ -101,6 +106,8 @@ public final class CreateDepositsResponseMethodsCryptoItemName {
         switch (value) {
             case "Plasma":
                 return PLASMA;
+            case "Bitcoin":
+                return BITCOIN;
             case "MegaETH":
                 return MEGA_ETH;
             case "Polygon":
@@ -129,6 +136,8 @@ public final class CreateDepositsResponseMethodsCryptoItemName {
 
         SOLANA,
 
+        BITCOIN,
+
         BASE,
 
         BNB_SMART_CHAIN,
@@ -152,6 +161,8 @@ public final class CreateDepositsResponseMethodsCryptoItemName {
         T visitEthereum();
 
         T visitSolana();
+
+        T visitBitcoin();
 
         T visitBase();
 

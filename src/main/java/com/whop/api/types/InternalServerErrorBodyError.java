@@ -169,7 +169,6 @@ public final class InternalServerErrorBodyError {
 
         private Optional<String> code = Optional.empty();
 
-        @JsonAnySetter
         private Map<String, Object> additionalProperties = new HashMap<>();
 
         private Builder() {}
@@ -272,6 +271,17 @@ public final class InternalServerErrorBodyError {
         @java.lang.Override
         public InternalServerErrorBodyError build() {
             return new InternalServerErrorBodyError(code, message, param, type, additionalProperties);
+        }
+
+        @JsonAnySetter
+        private void putAdditionalPropertyFromJson(String key, Object value) {
+            if (key.equalsIgnoreCase("code")
+                    || key.equalsIgnoreCase("message")
+                    || key.equalsIgnoreCase("param")
+                    || key.equalsIgnoreCase("type")) {
+                return;
+            }
+            this.additionalProperties.put(key, value);
         }
 
         @java.lang.Override

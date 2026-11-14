@@ -204,7 +204,6 @@ public final class IdentityProfileBusinessAddress {
 
         private Optional<String> state = Optional.empty();
 
-        @JsonAnySetter
         private Map<String, Object> additionalProperties = new HashMap<>();
 
         private Builder() {}
@@ -372,6 +371,19 @@ public final class IdentityProfileBusinessAddress {
         public IdentityProfileBusinessAddress build() {
             return new IdentityProfileBusinessAddress(
                     city, country, line1, line2, postalCode, state, additionalProperties);
+        }
+
+        @JsonAnySetter
+        private void putAdditionalPropertyFromJson(String key, Object value) {
+            if (key.equalsIgnoreCase("city")
+                    || key.equalsIgnoreCase("country")
+                    || key.equalsIgnoreCase("line1")
+                    || key.equalsIgnoreCase("line2")
+                    || key.equalsIgnoreCase("postal_code")
+                    || key.equalsIgnoreCase("state")) {
+                return;
+            }
+            this.additionalProperties.put(key, value);
         }
 
         public Builder additionalProperty(String key, Object value) {

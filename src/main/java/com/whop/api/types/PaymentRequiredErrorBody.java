@@ -80,7 +80,6 @@ public final class PaymentRequiredErrorBody {
     public static final class Builder implements ErrorStage, _FinalStage {
         private PaymentRequiredErrorBodyError error;
 
-        @JsonAnySetter
         private Map<String, Object> additionalProperties = new HashMap<>();
 
         private Builder() {}
@@ -101,6 +100,14 @@ public final class PaymentRequiredErrorBody {
         @java.lang.Override
         public PaymentRequiredErrorBody build() {
             return new PaymentRequiredErrorBody(error, additionalProperties);
+        }
+
+        @JsonAnySetter
+        private void putAdditionalPropertyFromJson(String key, Object value) {
+            if (key.equalsIgnoreCase("error")) {
+                return;
+            }
+            this.additionalProperties.put(key, value);
         }
 
         @java.lang.Override

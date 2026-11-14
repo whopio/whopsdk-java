@@ -97,7 +97,6 @@ public final class CheckAccessUsersResponse {
 
         private boolean hasAccess;
 
-        @JsonAnySetter
         private Map<String, Object> additionalProperties = new HashMap<>();
 
         private Builder() {}
@@ -126,6 +125,14 @@ public final class CheckAccessUsersResponse {
         @java.lang.Override
         public CheckAccessUsersResponse build() {
             return new CheckAccessUsersResponse(accessLevel, hasAccess, additionalProperties);
+        }
+
+        @JsonAnySetter
+        private void putAdditionalPropertyFromJson(String key, Object value) {
+            if (key.equalsIgnoreCase("access_level") || key.equalsIgnoreCase("has_access")) {
+                return;
+            }
+            this.additionalProperties.put(key, value);
         }
 
         @java.lang.Override

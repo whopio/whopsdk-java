@@ -17,6 +17,7 @@ import com.whop.api.core.NullableNonemptyFilter;
 import com.whop.api.core.ObjectMappers;
 import java.time.OffsetDateTime;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
@@ -31,11 +32,15 @@ public final class RetrieveCardsResponse {
 
     private final Optional<OffsetDateTime> createdAt;
 
+    private final Optional<List<RetrieveCardsResponseDigitalWalletsItem>> digitalWallets;
+
     private final Optional<String> expirationMonth;
 
     private final Optional<String> expirationYear;
 
     private final String id;
+
+    private final boolean issued;
 
     private final Optional<String> last4;
 
@@ -61,9 +66,11 @@ public final class RetrieveCardsResponse {
             Optional<RetrieveCardsResponseBilling> billing,
             Optional<OffsetDateTime> canceledAt,
             Optional<OffsetDateTime> createdAt,
+            Optional<List<RetrieveCardsResponseDigitalWalletsItem>> digitalWallets,
             Optional<String> expirationMonth,
             Optional<String> expirationYear,
             String id,
+            boolean issued,
             Optional<String> last4,
             Optional<RetrieveCardsResponseLimit> limit,
             Optional<String> name,
@@ -77,9 +84,11 @@ public final class RetrieveCardsResponse {
         this.billing = billing;
         this.canceledAt = canceledAt;
         this.createdAt = createdAt;
+        this.digitalWallets = digitalWallets;
         this.expirationMonth = expirationMonth;
         this.expirationYear = expirationYear;
         this.id = id;
+        this.issued = issued;
         this.last4 = last4;
         this.limit = limit;
         this.name = name;
@@ -126,6 +135,17 @@ public final class RetrieveCardsResponse {
     }
 
     /**
+     * @return The digital wallets the card has been added to. List Cards, Update Card, and webhook payloads return <code>null</code>, as does Retrieve Card when the wallets cannot be retrieved.
+     */
+    @JsonIgnore
+    public Optional<List<RetrieveCardsResponseDigitalWalletsItem>> getDigitalWallets() {
+        if (digitalWallets == null) {
+            return Optional.empty();
+        }
+        return digitalWallets;
+    }
+
+    /**
      * @return Card expiration month.
      */
     @JsonIgnore
@@ -153,6 +173,14 @@ public final class RetrieveCardsResponse {
     @JsonProperty("id")
     public String getId() {
         return id;
+    }
+
+    /**
+     * @return <code>true</code> once the issuer has issued the card. <code>false</code> for an invited card still waiting on its cardholder's onboarding or review, or one the issuer declined; it has no card number until it is issued.
+     */
+    @JsonProperty("issued")
+    public boolean getIssued() {
+        return issued;
     }
 
     /**
@@ -267,6 +295,12 @@ public final class RetrieveCardsResponse {
     }
 
     @JsonInclude(value = JsonInclude.Include.CUSTOM, valueFilter = NullableNonemptyFilter.class)
+    @JsonProperty("digital_wallets")
+    private Optional<List<RetrieveCardsResponseDigitalWalletsItem>> _getDigitalWallets() {
+        return digitalWallets;
+    }
+
+    @JsonInclude(value = JsonInclude.Include.CUSTOM, valueFilter = NullableNonemptyFilter.class)
     @JsonProperty("expiration_month")
     private Optional<String> _getExpirationMonth() {
         return expirationMonth;
@@ -341,9 +375,11 @@ public final class RetrieveCardsResponse {
         return billing.equals(other.billing)
                 && canceledAt.equals(other.canceledAt)
                 && createdAt.equals(other.createdAt)
+                && digitalWallets.equals(other.digitalWallets)
                 && expirationMonth.equals(other.expirationMonth)
                 && expirationYear.equals(other.expirationYear)
                 && id.equals(other.id)
+                && issued == other.issued
                 && last4.equals(other.last4)
                 && limit.equals(other.limit)
                 && name.equals(other.name)
@@ -361,9 +397,11 @@ public final class RetrieveCardsResponse {
                 this.billing,
                 this.canceledAt,
                 this.createdAt,
+                this.digitalWallets,
                 this.expirationMonth,
                 this.expirationYear,
                 this.id,
+                this.issued,
                 this.last4,
                 this.limit,
                 this.name,
@@ -388,9 +426,16 @@ public final class RetrieveCardsResponse {
         /**
          * <p>Card ID, prefixed <code>icrd_</code>.</p>
          */
-        ObjectStage id(@NotNull String id);
+        IssuedStage id(@NotNull String id);
 
         Builder from(RetrieveCardsResponse other);
+    }
+
+    public interface IssuedStage {
+        /**
+         * <p><code>true</code> once the issuer has issued the card. <code>false</code> for an invited card still waiting on its cardholder's onboarding or review, or one the issuer declined; it has no card number until it is issued.</p>
+         */
+        ObjectStage issued(boolean issued);
     }
 
     public interface ObjectStage {
@@ -430,6 +475,15 @@ public final class RetrieveCardsResponse {
         _FinalStage createdAt(OffsetDateTime createdAt);
 
         _FinalStage createdAt(Nullable<OffsetDateTime> createdAt);
+
+        /**
+         * <p>The digital wallets the card has been added to. List Cards, Update Card, and webhook payloads return <code>null</code>, as does Retrieve Card when the wallets cannot be retrieved.</p>
+         */
+        _FinalStage digitalWallets(Optional<List<RetrieveCardsResponseDigitalWalletsItem>> digitalWallets);
+
+        _FinalStage digitalWallets(List<RetrieveCardsResponseDigitalWalletsItem> digitalWallets);
+
+        _FinalStage digitalWallets(Nullable<List<RetrieveCardsResponseDigitalWalletsItem>> digitalWallets);
 
         /**
          * <p>Card expiration month.</p>
@@ -523,8 +577,10 @@ public final class RetrieveCardsResponse {
     }
 
     @JsonIgnoreProperties(ignoreUnknown = true)
-    public static final class Builder implements IdStage, ObjectStage, _FinalStage {
+    public static final class Builder implements IdStage, IssuedStage, ObjectStage, _FinalStage {
         private String id;
+
+        private boolean issued;
 
         private RetrieveCardsResponseObject object;
 
@@ -548,13 +604,14 @@ public final class RetrieveCardsResponse {
 
         private Optional<String> expirationMonth = Optional.empty();
 
+        private Optional<List<RetrieveCardsResponseDigitalWalletsItem>> digitalWallets = Optional.empty();
+
         private Optional<OffsetDateTime> createdAt = Optional.empty();
 
         private Optional<OffsetDateTime> canceledAt = Optional.empty();
 
         private Optional<RetrieveCardsResponseBilling> billing = Optional.empty();
 
-        @JsonAnySetter
         private Map<String, Object> additionalProperties = new HashMap<>();
 
         private Builder() {}
@@ -564,9 +621,11 @@ public final class RetrieveCardsResponse {
             billing(other.getBilling());
             canceledAt(other.getCanceledAt());
             createdAt(other.getCreatedAt());
+            digitalWallets(other.getDigitalWallets());
             expirationMonth(other.getExpirationMonth());
             expirationYear(other.getExpirationYear());
             id(other.getId());
+            issued(other.getIssued());
             last4(other.getLast4());
             limit(other.getLimit());
             name(other.getName());
@@ -581,13 +640,23 @@ public final class RetrieveCardsResponse {
 
         /**
          * <p>Card ID, prefixed <code>icrd_</code>.</p>
-         * <p>Card ID, prefixed <code>icrd_</code>.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
         @JsonSetter("id")
-        public ObjectStage id(@NotNull String id) {
+        public IssuedStage id(@NotNull String id) {
             this.id = Objects.requireNonNull(id, "id must not be null");
+            return this;
+        }
+
+        /**
+         * <p><code>true</code> once the issuer has issued the card. <code>false</code> for an invited card still waiting on its cardholder's onboarding or review, or one the issuer declined; it has no card number until it is issued.</p>
+         * @return Reference to {@code this} so that method calls can be chained together.
+         */
+        @java.lang.Override
+        @JsonSetter("issued")
+        public ObjectStage issued(boolean issued) {
+            this.issued = issued;
             return this;
         }
 
@@ -959,6 +1028,42 @@ public final class RetrieveCardsResponse {
         }
 
         /**
+         * <p>The digital wallets the card has been added to. List Cards, Update Card, and webhook payloads return <code>null</code>, as does Retrieve Card when the wallets cannot be retrieved.</p>
+         * @return Reference to {@code this} so that method calls can be chained together.
+         */
+        @java.lang.Override
+        public _FinalStage digitalWallets(Nullable<List<RetrieveCardsResponseDigitalWalletsItem>> digitalWallets) {
+            if (digitalWallets.isNull()) {
+                this.digitalWallets = null;
+            } else if (digitalWallets.isEmpty()) {
+                this.digitalWallets = Optional.empty();
+            } else {
+                this.digitalWallets = Optional.of(digitalWallets.get());
+            }
+            return this;
+        }
+
+        /**
+         * <p>The digital wallets the card has been added to. List Cards, Update Card, and webhook payloads return <code>null</code>, as does Retrieve Card when the wallets cannot be retrieved.</p>
+         * @return Reference to {@code this} so that method calls can be chained together.
+         */
+        @java.lang.Override
+        public _FinalStage digitalWallets(List<RetrieveCardsResponseDigitalWalletsItem> digitalWallets) {
+            this.digitalWallets = Optional.ofNullable(digitalWallets);
+            return this;
+        }
+
+        /**
+         * <p>The digital wallets the card has been added to. List Cards, Update Card, and webhook payloads return <code>null</code>, as does Retrieve Card when the wallets cannot be retrieved.</p>
+         */
+        @java.lang.Override
+        @JsonSetter(value = "digital_wallets", nulls = Nulls.SKIP)
+        public _FinalStage digitalWallets(Optional<List<RetrieveCardsResponseDigitalWalletsItem>> digitalWallets) {
+            this.digitalWallets = digitalWallets;
+            return this;
+        }
+
+        /**
          * <p>When the card was created.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
@@ -1072,9 +1177,11 @@ public final class RetrieveCardsResponse {
                     billing,
                     canceledAt,
                     createdAt,
+                    digitalWallets,
                     expirationMonth,
                     expirationYear,
                     id,
+                    issued,
                     last4,
                     limit,
                     name,
@@ -1085,6 +1192,30 @@ public final class RetrieveCardsResponse {
                     type,
                     userId,
                     additionalProperties);
+        }
+
+        @JsonAnySetter
+        private void putAdditionalPropertyFromJson(String key, Object value) {
+            if (key.equalsIgnoreCase("billing")
+                    || key.equalsIgnoreCase("canceled_at")
+                    || key.equalsIgnoreCase("created_at")
+                    || key.equalsIgnoreCase("digital_wallets")
+                    || key.equalsIgnoreCase("expiration_month")
+                    || key.equalsIgnoreCase("expiration_year")
+                    || key.equalsIgnoreCase("id")
+                    || key.equalsIgnoreCase("issued")
+                    || key.equalsIgnoreCase("last4")
+                    || key.equalsIgnoreCase("limit")
+                    || key.equalsIgnoreCase("name")
+                    || key.equalsIgnoreCase("object")
+                    || key.equalsIgnoreCase("secrets")
+                    || key.equalsIgnoreCase("spent_last_month")
+                    || key.equalsIgnoreCase("status")
+                    || key.equalsIgnoreCase("type")
+                    || key.equalsIgnoreCase("user_id")) {
+                return;
+            }
+            this.additionalProperties.put(key, value);
         }
 
         @java.lang.Override

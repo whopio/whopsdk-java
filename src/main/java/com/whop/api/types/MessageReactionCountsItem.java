@@ -121,7 +121,6 @@ public final class MessageReactionCountsItem {
 
         private Optional<String> emoji = Optional.empty();
 
-        @JsonAnySetter
         private Map<String, Object> additionalProperties = new HashMap<>();
 
         private Builder() {}
@@ -134,7 +133,6 @@ public final class MessageReactionCountsItem {
         }
 
         /**
-         * <p>The number of users who reacted</p>
          * <p>The number of users who reacted</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
@@ -184,6 +182,14 @@ public final class MessageReactionCountsItem {
         @java.lang.Override
         public MessageReactionCountsItem build() {
             return new MessageReactionCountsItem(count, emoji, additionalProperties);
+        }
+
+        @JsonAnySetter
+        private void putAdditionalPropertyFromJson(String key, Object value) {
+            if (key.equalsIgnoreCase("count") || key.equalsIgnoreCase("emoji")) {
+                return;
+            }
+            this.additionalProperties.put(key, value);
         }
 
         @java.lang.Override

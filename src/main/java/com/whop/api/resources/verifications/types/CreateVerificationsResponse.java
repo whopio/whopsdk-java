@@ -15,6 +15,7 @@ import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.whop.api.core.Nullable;
 import com.whop.api.core.NullableNonemptyFilter;
 import com.whop.api.core.ObjectMappers;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -24,6 +25,8 @@ import java.util.Optional;
 @JsonInclude(JsonInclude.Include.NON_ABSENT)
 @JsonDeserialize(builder = CreateVerificationsResponse.Builder.class)
 public final class CreateVerificationsResponse {
+    private final List<String> accountIds;
+
     private final Optional<CreateVerificationsResponseAddress> address;
 
     private final Optional<String> businessName;
@@ -42,11 +45,19 @@ public final class CreateVerificationsResponse {
 
     private final Optional<String> id;
 
+    private final Optional<String> incorporationDate;
+
     private final Optional<CreateVerificationsResponseKind> kind;
 
     private final Optional<String> lastName;
 
+    private final List<CreateVerificationsResponseOwnersItem> owners;
+
     private final Optional<String> phone;
+
+    private final Optional<String> placeOfIncorporation;
+
+    private final Optional<String> registrationNumber;
 
     private final Optional<List<CreateVerificationsResponseRequestedInformationItem>> requestedInformation;
 
@@ -61,6 +72,7 @@ public final class CreateVerificationsResponse {
     private final Map<String, Object> additionalProperties;
 
     private CreateVerificationsResponse(
+            List<String> accountIds,
             Optional<CreateVerificationsResponseAddress> address,
             Optional<String> businessName,
             Optional<String> businessStructure,
@@ -70,15 +82,20 @@ public final class CreateVerificationsResponse {
             Optional<String> email,
             Optional<String> firstName,
             Optional<String> id,
+            Optional<String> incorporationDate,
             Optional<CreateVerificationsResponseKind> kind,
             Optional<String> lastName,
+            List<CreateVerificationsResponseOwnersItem> owners,
             Optional<String> phone,
+            Optional<String> placeOfIncorporation,
+            Optional<String> registrationNumber,
             Optional<List<CreateVerificationsResponseRequestedInformationItem>> requestedInformation,
             Optional<List<CreateVerificationsResponseRequiredDocumentsItem>> requiredDocuments,
             Optional<String> sessionUrl,
             Optional<CreateVerificationsResponseStatus> status,
             Optional<String> updatedAt,
             Map<String, Object> additionalProperties) {
+        this.accountIds = accountIds;
         this.address = address;
         this.businessName = businessName;
         this.businessStructure = businessStructure;
@@ -88,15 +105,27 @@ public final class CreateVerificationsResponse {
         this.email = email;
         this.firstName = firstName;
         this.id = id;
+        this.incorporationDate = incorporationDate;
         this.kind = kind;
         this.lastName = lastName;
+        this.owners = owners;
         this.phone = phone;
+        this.placeOfIncorporation = placeOfIncorporation;
+        this.registrationNumber = registrationNumber;
         this.requestedInformation = requestedInformation;
         this.requiredDocuments = requiredDocuments;
         this.sessionUrl = sessionUrl;
         this.status = status;
         this.updatedAt = updatedAt;
         this.additionalProperties = additionalProperties;
+    }
+
+    /**
+     * @return Accounts this verification was read for, each prefixed <code>biz_</code>: the account you listed by, the account or subaccount it belongs to with <code>include_subaccounts</code>, or every account you can read that it belongs to when retrieved by ID. Usually one. Empty for a personal verification.
+     */
+    @JsonProperty("account_ids")
+    public List<String> getAccountIds() {
+        return accountIds;
     }
 
     /**
@@ -189,6 +218,17 @@ public final class CreateVerificationsResponse {
         return id;
     }
 
+    /**
+     * @return Date the business was incorporated, formatted as <code>YYYY-MM-DD</code>, as on file for the business verification. Business verifications only; <code>null</code> until it is sent.
+     */
+    @JsonIgnore
+    public Optional<String> getIncorporationDate() {
+        if (incorporationDate == null) {
+            return Optional.empty();
+        }
+        return incorporationDate;
+    }
+
     @JsonProperty("kind")
     public Optional<CreateVerificationsResponseKind> getKind() {
         return kind;
@@ -203,6 +243,14 @@ public final class CreateVerificationsResponse {
     }
 
     /**
+     * @return Owners of the business and the progress of each one's own verification. Empty for individual verifications.
+     */
+    @JsonProperty("owners")
+    public List<CreateVerificationsResponseOwnersItem> getOwners() {
+        return owners;
+    }
+
+    /**
      * @return Phone number on the verification profile.
      */
     @JsonIgnore
@@ -214,7 +262,29 @@ public final class CreateVerificationsResponse {
     }
 
     /**
-     * @return What Whop still needs before review can continue — one requirement per entry. Answer with Update Verification; nothing from the response is echoed back. Keys that don't apply are omitted.
+     * @return State or region where the business is incorporated, as on file for the business verification. Business verifications only; <code>null</code> until it is sent.
+     */
+    @JsonIgnore
+    public Optional<String> getPlaceOfIncorporation() {
+        if (placeOfIncorporation == null) {
+            return Optional.empty();
+        }
+        return placeOfIncorporation;
+    }
+
+    /**
+     * @return Number the business was registered under in its place of incorporation, such as a state file number in the US or a Company Number in the UK. Business verifications only; as on file for the business verification, or <code>null</code> until it is sent.
+     */
+    @JsonIgnore
+    public Optional<String> getRegistrationNumber() {
+        if (registrationNumber == null) {
+            return Optional.empty();
+        }
+        return registrationNumber;
+    }
+
+    /**
+     * @return What Whop still needs before review can continue — one requirement per entry. Answer with Update Verification; nothing from the response is echoed back. Keys that don't apply are omitted. For a business verification created with <code>documents</code> or <code>owners</code>, this includes the company details and documents still missing before it can be sent for review; each owner's documents are listed under that owner.
      */
     @JsonProperty("requested_information")
     public Optional<List<CreateVerificationsResponseRequestedInformationItem>> getRequestedInformation() {
@@ -222,7 +292,7 @@ public final class CreateVerificationsResponse {
     }
 
     /**
-     * @return Documents for a document-upload verification and their progress. Present only on verifications created by sending <code>documents</code>. <code>pending_upload</code> documents were not accepted yet — send the full set again with another Create Verification call.
+     * @return Documents for a document-upload verification and their progress. Present only on individual verifications created by sending <code>documents</code>. <code>pending_upload</code> documents were not accepted yet — send the full set again with another Create Verification call.
      */
     @JsonProperty("required_documents")
     public Optional<List<CreateVerificationsResponseRequiredDocumentsItem>> getRequiredDocuments() {
@@ -299,6 +369,12 @@ public final class CreateVerificationsResponse {
     }
 
     @JsonInclude(value = JsonInclude.Include.CUSTOM, valueFilter = NullableNonemptyFilter.class)
+    @JsonProperty("incorporation_date")
+    private Optional<String> _getIncorporationDate() {
+        return incorporationDate;
+    }
+
+    @JsonInclude(value = JsonInclude.Include.CUSTOM, valueFilter = NullableNonemptyFilter.class)
     @JsonProperty("last_name")
     private Optional<String> _getLastName() {
         return lastName;
@@ -308,6 +384,18 @@ public final class CreateVerificationsResponse {
     @JsonProperty("phone")
     private Optional<String> _getPhone() {
         return phone;
+    }
+
+    @JsonInclude(value = JsonInclude.Include.CUSTOM, valueFilter = NullableNonemptyFilter.class)
+    @JsonProperty("place_of_incorporation")
+    private Optional<String> _getPlaceOfIncorporation() {
+        return placeOfIncorporation;
+    }
+
+    @JsonInclude(value = JsonInclude.Include.CUSTOM, valueFilter = NullableNonemptyFilter.class)
+    @JsonProperty("registration_number")
+    private Optional<String> _getRegistrationNumber() {
+        return registrationNumber;
     }
 
     @JsonInclude(value = JsonInclude.Include.CUSTOM, valueFilter = NullableNonemptyFilter.class)
@@ -328,7 +416,8 @@ public final class CreateVerificationsResponse {
     }
 
     private boolean equalTo(CreateVerificationsResponse other) {
-        return address.equals(other.address)
+        return accountIds.equals(other.accountIds)
+                && address.equals(other.address)
                 && businessName.equals(other.businessName)
                 && businessStructure.equals(other.businessStructure)
                 && country.equals(other.country)
@@ -337,9 +426,13 @@ public final class CreateVerificationsResponse {
                 && email.equals(other.email)
                 && firstName.equals(other.firstName)
                 && id.equals(other.id)
+                && incorporationDate.equals(other.incorporationDate)
                 && kind.equals(other.kind)
                 && lastName.equals(other.lastName)
+                && owners.equals(other.owners)
                 && phone.equals(other.phone)
+                && placeOfIncorporation.equals(other.placeOfIncorporation)
+                && registrationNumber.equals(other.registrationNumber)
                 && requestedInformation.equals(other.requestedInformation)
                 && requiredDocuments.equals(other.requiredDocuments)
                 && sessionUrl.equals(other.sessionUrl)
@@ -350,6 +443,7 @@ public final class CreateVerificationsResponse {
     @java.lang.Override
     public int hashCode() {
         return Objects.hash(
+                this.accountIds,
                 this.address,
                 this.businessName,
                 this.businessStructure,
@@ -359,9 +453,13 @@ public final class CreateVerificationsResponse {
                 this.email,
                 this.firstName,
                 this.id,
+                this.incorporationDate,
                 this.kind,
                 this.lastName,
+                this.owners,
                 this.phone,
+                this.placeOfIncorporation,
+                this.registrationNumber,
                 this.requestedInformation,
                 this.requiredDocuments,
                 this.sessionUrl,
@@ -380,6 +478,8 @@ public final class CreateVerificationsResponse {
 
     @JsonIgnoreProperties(ignoreUnknown = true)
     public static final class Builder {
+        private List<String> accountIds = new ArrayList<>();
+
         private Optional<CreateVerificationsResponseAddress> address = Optional.empty();
 
         private Optional<String> businessName = Optional.empty();
@@ -398,11 +498,19 @@ public final class CreateVerificationsResponse {
 
         private Optional<String> id = Optional.empty();
 
+        private Optional<String> incorporationDate = Optional.empty();
+
         private Optional<CreateVerificationsResponseKind> kind = Optional.empty();
 
         private Optional<String> lastName = Optional.empty();
 
+        private List<CreateVerificationsResponseOwnersItem> owners = new ArrayList<>();
+
         private Optional<String> phone = Optional.empty();
+
+        private Optional<String> placeOfIncorporation = Optional.empty();
+
+        private Optional<String> registrationNumber = Optional.empty();
 
         private Optional<List<CreateVerificationsResponseRequestedInformationItem>> requestedInformation =
                 Optional.empty();
@@ -415,12 +523,12 @@ public final class CreateVerificationsResponse {
 
         private Optional<String> updatedAt = Optional.empty();
 
-        @JsonAnySetter
         private Map<String, Object> additionalProperties = new HashMap<>();
 
         private Builder() {}
 
         public Builder from(CreateVerificationsResponse other) {
+            accountIds(other.getAccountIds());
             address(other.getAddress());
             businessName(other.getBusinessName());
             businessStructure(other.getBusinessStructure());
@@ -430,14 +538,42 @@ public final class CreateVerificationsResponse {
             email(other.getEmail());
             firstName(other.getFirstName());
             id(other.getId());
+            incorporationDate(other.getIncorporationDate());
             kind(other.getKind());
             lastName(other.getLastName());
+            owners(other.getOwners());
             phone(other.getPhone());
+            placeOfIncorporation(other.getPlaceOfIncorporation());
+            registrationNumber(other.getRegistrationNumber());
             requestedInformation(other.getRequestedInformation());
             requiredDocuments(other.getRequiredDocuments());
             sessionUrl(other.getSessionUrl());
             status(other.getStatus());
             updatedAt(other.getUpdatedAt());
+            return this;
+        }
+
+        /**
+         * <p>Accounts this verification was read for, each prefixed <code>biz_</code>: the account you listed by, the account or subaccount it belongs to with <code>include_subaccounts</code>, or every account you can read that it belongs to when retrieved by ID. Usually one. Empty for a personal verification.</p>
+         */
+        @JsonSetter(value = "account_ids", nulls = Nulls.SKIP)
+        public Builder accountIds(List<String> accountIds) {
+            this.accountIds.clear();
+            if (accountIds != null) {
+                this.accountIds.addAll(accountIds);
+            }
+            return this;
+        }
+
+        public Builder addAccountIds(String accountIds) {
+            this.accountIds.add(accountIds);
+            return this;
+        }
+
+        public Builder addAllAccountIds(List<String> accountIds) {
+            if (accountIds != null) {
+                this.accountIds.addAll(accountIds);
+            }
             return this;
         }
 
@@ -641,6 +777,31 @@ public final class CreateVerificationsResponse {
             return this;
         }
 
+        /**
+         * <p>Date the business was incorporated, formatted as <code>YYYY-MM-DD</code>, as on file for the business verification. Business verifications only; <code>null</code> until it is sent.</p>
+         */
+        @JsonSetter(value = "incorporation_date", nulls = Nulls.SKIP)
+        public Builder incorporationDate(Optional<String> incorporationDate) {
+            this.incorporationDate = incorporationDate;
+            return this;
+        }
+
+        public Builder incorporationDate(String incorporationDate) {
+            this.incorporationDate = Optional.ofNullable(incorporationDate);
+            return this;
+        }
+
+        public Builder incorporationDate(Nullable<String> incorporationDate) {
+            if (incorporationDate.isNull()) {
+                this.incorporationDate = null;
+            } else if (incorporationDate.isEmpty()) {
+                this.incorporationDate = Optional.empty();
+            } else {
+                this.incorporationDate = Optional.of(incorporationDate.get());
+            }
+            return this;
+        }
+
         @JsonSetter(value = "kind", nulls = Nulls.SKIP)
         public Builder kind(Optional<CreateVerificationsResponseKind> kind) {
             this.kind = kind;
@@ -675,6 +836,30 @@ public final class CreateVerificationsResponse {
         }
 
         /**
+         * <p>Owners of the business and the progress of each one's own verification. Empty for individual verifications.</p>
+         */
+        @JsonSetter(value = "owners", nulls = Nulls.SKIP)
+        public Builder owners(List<CreateVerificationsResponseOwnersItem> owners) {
+            this.owners.clear();
+            if (owners != null) {
+                this.owners.addAll(owners);
+            }
+            return this;
+        }
+
+        public Builder addOwners(CreateVerificationsResponseOwnersItem owners) {
+            this.owners.add(owners);
+            return this;
+        }
+
+        public Builder addAllOwners(List<CreateVerificationsResponseOwnersItem> owners) {
+            if (owners != null) {
+                this.owners.addAll(owners);
+            }
+            return this;
+        }
+
+        /**
          * <p>Phone number on the verification profile.</p>
          */
         @JsonSetter(value = "phone", nulls = Nulls.SKIP)
@@ -700,7 +885,57 @@ public final class CreateVerificationsResponse {
         }
 
         /**
-         * <p>What Whop still needs before review can continue — one requirement per entry. Answer with Update Verification; nothing from the response is echoed back. Keys that don't apply are omitted.</p>
+         * <p>State or region where the business is incorporated, as on file for the business verification. Business verifications only; <code>null</code> until it is sent.</p>
+         */
+        @JsonSetter(value = "place_of_incorporation", nulls = Nulls.SKIP)
+        public Builder placeOfIncorporation(Optional<String> placeOfIncorporation) {
+            this.placeOfIncorporation = placeOfIncorporation;
+            return this;
+        }
+
+        public Builder placeOfIncorporation(String placeOfIncorporation) {
+            this.placeOfIncorporation = Optional.ofNullable(placeOfIncorporation);
+            return this;
+        }
+
+        public Builder placeOfIncorporation(Nullable<String> placeOfIncorporation) {
+            if (placeOfIncorporation.isNull()) {
+                this.placeOfIncorporation = null;
+            } else if (placeOfIncorporation.isEmpty()) {
+                this.placeOfIncorporation = Optional.empty();
+            } else {
+                this.placeOfIncorporation = Optional.of(placeOfIncorporation.get());
+            }
+            return this;
+        }
+
+        /**
+         * <p>Number the business was registered under in its place of incorporation, such as a state file number in the US or a Company Number in the UK. Business verifications only; as on file for the business verification, or <code>null</code> until it is sent.</p>
+         */
+        @JsonSetter(value = "registration_number", nulls = Nulls.SKIP)
+        public Builder registrationNumber(Optional<String> registrationNumber) {
+            this.registrationNumber = registrationNumber;
+            return this;
+        }
+
+        public Builder registrationNumber(String registrationNumber) {
+            this.registrationNumber = Optional.ofNullable(registrationNumber);
+            return this;
+        }
+
+        public Builder registrationNumber(Nullable<String> registrationNumber) {
+            if (registrationNumber.isNull()) {
+                this.registrationNumber = null;
+            } else if (registrationNumber.isEmpty()) {
+                this.registrationNumber = Optional.empty();
+            } else {
+                this.registrationNumber = Optional.of(registrationNumber.get());
+            }
+            return this;
+        }
+
+        /**
+         * <p>What Whop still needs before review can continue — one requirement per entry. Answer with Update Verification; nothing from the response is echoed back. Keys that don't apply are omitted. For a business verification created with <code>documents</code> or <code>owners</code>, this includes the company details and documents still missing before it can be sent for review; each owner's documents are listed under that owner.</p>
          */
         @JsonSetter(value = "requested_information", nulls = Nulls.SKIP)
         public Builder requestedInformation(
@@ -716,7 +951,7 @@ public final class CreateVerificationsResponse {
         }
 
         /**
-         * <p>Documents for a document-upload verification and their progress. Present only on verifications created by sending <code>documents</code>. <code>pending_upload</code> documents were not accepted yet — send the full set again with another Create Verification call.</p>
+         * <p>Documents for a document-upload verification and their progress. Present only on individual verifications created by sending <code>documents</code>. <code>pending_upload</code> documents were not accepted yet — send the full set again with another Create Verification call.</p>
          */
         @JsonSetter(value = "required_documents", nulls = Nulls.SKIP)
         public Builder requiredDocuments(
@@ -785,6 +1020,7 @@ public final class CreateVerificationsResponse {
 
         public CreateVerificationsResponse build() {
             return new CreateVerificationsResponse(
+                    accountIds,
                     address,
                     businessName,
                     businessStructure,
@@ -794,15 +1030,48 @@ public final class CreateVerificationsResponse {
                     email,
                     firstName,
                     id,
+                    incorporationDate,
                     kind,
                     lastName,
+                    owners,
                     phone,
+                    placeOfIncorporation,
+                    registrationNumber,
                     requestedInformation,
                     requiredDocuments,
                     sessionUrl,
                     status,
                     updatedAt,
                     additionalProperties);
+        }
+
+        @JsonAnySetter
+        private void putAdditionalPropertyFromJson(String key, Object value) {
+            if (key.equalsIgnoreCase("account_ids")
+                    || key.equalsIgnoreCase("address")
+                    || key.equalsIgnoreCase("business_name")
+                    || key.equalsIgnoreCase("business_structure")
+                    || key.equalsIgnoreCase("country")
+                    || key.equalsIgnoreCase("created_at")
+                    || key.equalsIgnoreCase("date_of_birth")
+                    || key.equalsIgnoreCase("email")
+                    || key.equalsIgnoreCase("first_name")
+                    || key.equalsIgnoreCase("id")
+                    || key.equalsIgnoreCase("incorporation_date")
+                    || key.equalsIgnoreCase("kind")
+                    || key.equalsIgnoreCase("last_name")
+                    || key.equalsIgnoreCase("owners")
+                    || key.equalsIgnoreCase("phone")
+                    || key.equalsIgnoreCase("place_of_incorporation")
+                    || key.equalsIgnoreCase("registration_number")
+                    || key.equalsIgnoreCase("requested_information")
+                    || key.equalsIgnoreCase("required_documents")
+                    || key.equalsIgnoreCase("session_url")
+                    || key.equalsIgnoreCase("status")
+                    || key.equalsIgnoreCase("updated_at")) {
+                return;
+            }
+            this.additionalProperties.put(key, value);
         }
 
         public Builder additionalProperty(String key, Object value) {

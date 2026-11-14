@@ -202,7 +202,6 @@ public final class Pagination {
 
         private Optional<Double> nextPage = Optional.empty();
 
-        @JsonAnySetter
         private Map<String, Object> additionalProperties = new HashMap<>();
 
         private Builder() {}
@@ -219,7 +218,6 @@ public final class Pagination {
 
         /**
          * <p>Current page number</p>
-         * <p>Current page number</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
@@ -231,7 +229,6 @@ public final class Pagination {
 
         /**
          * <p>Total number of records</p>
-         * <p>Total number of records</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
@@ -242,7 +239,6 @@ public final class Pagination {
         }
 
         /**
-         * <p>Total number of pages</p>
          * <p>Total number of pages</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
@@ -328,6 +324,18 @@ public final class Pagination {
         @java.lang.Override
         public Pagination build() {
             return new Pagination(currentPage, nextPage, prevPage, totalCount, totalPages, additionalProperties);
+        }
+
+        @JsonAnySetter
+        private void putAdditionalPropertyFromJson(String key, Object value) {
+            if (key.equalsIgnoreCase("current_page")
+                    || key.equalsIgnoreCase("next_page")
+                    || key.equalsIgnoreCase("prev_page")
+                    || key.equalsIgnoreCase("total_count")
+                    || key.equalsIgnoreCase("total_pages")) {
+                return;
+            }
+            this.additionalProperties.put(key, value);
         }
 
         @java.lang.Override

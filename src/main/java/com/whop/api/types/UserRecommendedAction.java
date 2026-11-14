@@ -93,7 +93,7 @@ public final class UserRecommendedAction {
     }
 
     /**
-     * @return The account's display name, or <code>null</code>
+     * @return The account's display name, or <code>null</code> for personal recommendations
      */
     @JsonIgnore
     public Optional<String> getAccountName() {
@@ -332,7 +332,7 @@ public final class UserRecommendedAction {
         _FinalStage accountId(Nullable<String> accountId);
 
         /**
-         * <p>The account's display name, or <code>null</code></p>
+         * <p>The account's display name, or <code>null</code> for personal recommendations</p>
          */
         _FinalStage accountName(Optional<String> accountName);
 
@@ -401,7 +401,6 @@ public final class UserRecommendedAction {
 
         private Optional<String> accountId = Optional.empty();
 
-        @JsonAnySetter
         private Map<String, Object> additionalProperties = new HashMap<>();
 
         private Builder() {}
@@ -425,7 +424,6 @@ public final class UserRecommendedAction {
 
         /**
          * <p>The recommendation; new values may be added, so handle unknown actions gracefully</p>
-         * <p>The recommendation; new values may be added, so handle unknown actions gracefully</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
@@ -436,7 +434,6 @@ public final class UserRecommendedAction {
         }
 
         /**
-         * <p>The URL the call-to-action links to</p>
          * <p>The URL the call-to-action links to</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
@@ -449,7 +446,6 @@ public final class UserRecommendedAction {
 
         /**
          * <p>Button label</p>
-         * <p>Button label</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
@@ -460,7 +456,6 @@ public final class UserRecommendedAction {
         }
 
         /**
-         * <p>Supporting copy, or empty</p>
          * <p>Supporting copy, or empty</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
@@ -473,7 +468,6 @@ public final class UserRecommendedAction {
 
         /**
          * <p>Always optional — never blocking</p>
-         * <p>Always optional — never blocking</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
@@ -484,7 +478,6 @@ public final class UserRecommendedAction {
         }
 
         /**
-         * <p>Headline for the recommendation</p>
          * <p>Headline for the recommendation</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
@@ -628,7 +621,7 @@ public final class UserRecommendedAction {
         }
 
         /**
-         * <p>The account's display name, or <code>null</code></p>
+         * <p>The account's display name, or <code>null</code> for personal recommendations</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
@@ -644,7 +637,7 @@ public final class UserRecommendedAction {
         }
 
         /**
-         * <p>The account's display name, or <code>null</code></p>
+         * <p>The account's display name, or <code>null</code> for personal recommendations</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
@@ -654,7 +647,7 @@ public final class UserRecommendedAction {
         }
 
         /**
-         * <p>The account's display name, or <code>null</code></p>
+         * <p>The account's display name, or <code>null</code> for personal recommendations</p>
          */
         @java.lang.Override
         @JsonSetter(value = "account_name", nulls = Nulls.SKIP)
@@ -715,6 +708,25 @@ public final class UserRecommendedAction {
                     status,
                     title,
                     additionalProperties);
+        }
+
+        @JsonAnySetter
+        private void putAdditionalPropertyFromJson(String key, Object value) {
+            if (key.equalsIgnoreCase("account_id")
+                    || key.equalsIgnoreCase("account_name")
+                    || key.equalsIgnoreCase("action")
+                    || key.equalsIgnoreCase("blocked_capabilities")
+                    || key.equalsIgnoreCase("cta")
+                    || key.equalsIgnoreCase("cta_label")
+                    || key.equalsIgnoreCase("description")
+                    || key.equalsIgnoreCase("icon_url")
+                    || key.equalsIgnoreCase("impact_score")
+                    || key.equalsIgnoreCase("reasoning")
+                    || key.equalsIgnoreCase("status")
+                    || key.equalsIgnoreCase("title")) {
+                return;
+            }
+            this.additionalProperties.put(key, value);
         }
 
         @java.lang.Override

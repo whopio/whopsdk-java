@@ -272,7 +272,6 @@ public final class ExperienceListItem {
 
         private Optional<ExperienceListItemImage> image = Optional.empty();
 
-        @JsonAnySetter
         private Map<String, Object> additionalProperties = new HashMap<>();
 
         private Builder() {}
@@ -292,7 +291,6 @@ public final class ExperienceListItem {
 
         /**
          * <p>The app that powers this experience, defining its interface and behavior.</p>
-         * <p>The app that powers this experience, defining its interface and behavior.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
@@ -303,7 +301,6 @@ public final class ExperienceListItem {
         }
 
         /**
-         * <p>The company that owns this experience.</p>
          * <p>The company that owns this experience.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
@@ -316,7 +313,6 @@ public final class ExperienceListItem {
 
         /**
          * <p>The datetime the experience was created.</p>
-         * <p>The datetime the experience was created.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
@@ -327,7 +323,6 @@ public final class ExperienceListItem {
         }
 
         /**
-         * <p>The unique identifier for the experience.</p>
          * <p>The unique identifier for the experience.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
@@ -340,7 +335,6 @@ public final class ExperienceListItem {
 
         /**
          * <p>Whether this experience is publicly visible to all users, including those without a membership.</p>
-         * <p>Whether this experience is publicly visible to all users, including those without a membership.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
@@ -351,7 +345,6 @@ public final class ExperienceListItem {
         }
 
         /**
-         * <p>The display name of this experience shown to users in the product navigation. Maximum 255 characters.</p>
          * <p>The display name of this experience shown to users in the product navigation. Maximum 255 characters.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
@@ -438,6 +431,21 @@ public final class ExperienceListItem {
         public ExperienceListItem build() {
             return new ExperienceListItem(
                     app, company, createdAt, id, image, isPublic, name, order, additionalProperties);
+        }
+
+        @JsonAnySetter
+        private void putAdditionalPropertyFromJson(String key, Object value) {
+            if (key.equalsIgnoreCase("app")
+                    || key.equalsIgnoreCase("company")
+                    || key.equalsIgnoreCase("created_at")
+                    || key.equalsIgnoreCase("id")
+                    || key.equalsIgnoreCase("image")
+                    || key.equalsIgnoreCase("is_public")
+                    || key.equalsIgnoreCase("name")
+                    || key.equalsIgnoreCase("order")) {
+                return;
+            }
+            this.additionalProperties.put(key, value);
         }
 
         @java.lang.Override

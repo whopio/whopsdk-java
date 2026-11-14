@@ -110,7 +110,6 @@ public final class ListEarningsResponseDataItemProduct {
 
         private String title;
 
-        @JsonAnySetter
         private Map<String, Object> additionalProperties = new HashMap<>();
 
         private Builder() {}
@@ -147,6 +146,14 @@ public final class ListEarningsResponseDataItemProduct {
         @java.lang.Override
         public ListEarningsResponseDataItemProduct build() {
             return new ListEarningsResponseDataItemProduct(id, route, title, additionalProperties);
+        }
+
+        @JsonAnySetter
+        private void putAdditionalPropertyFromJson(String key, Object value) {
+            if (key.equalsIgnoreCase("id") || key.equalsIgnoreCase("route") || key.equalsIgnoreCase("title")) {
+                return;
+            }
+            this.additionalProperties.put(key, value);
         }
 
         @java.lang.Override

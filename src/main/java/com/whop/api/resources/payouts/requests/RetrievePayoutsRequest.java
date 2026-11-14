@@ -34,7 +34,7 @@ public final class RetrievePayoutsRequest {
     }
 
     /**
-     * @return Owning account ID, prefixed <code>biz_</code>. Provide exactly one of <code>account_id</code> or <code>user_id</code>.
+     * @return Optional owning account ID, prefixed <code>biz_</code>. The payout ID identifies its ledger. If supplied, this must match the owner and cannot be combined with <code>user_id</code>.
      */
     @JsonProperty("account_id")
     public Optional<String> getAccountId() {
@@ -42,7 +42,7 @@ public final class RetrievePayoutsRequest {
     }
 
     /**
-     * @return Owning user ID, prefixed <code>user_</code>. Provide exactly one of <code>account_id</code> or <code>user_id</code>.
+     * @return Optional owning user ID, prefixed <code>user_</code>. The payout ID identifies its ledger. If supplied, this must match the owner and cannot be combined with <code>account_id</code>.
      */
     @JsonProperty("user_id")
     public Optional<String> getUserId() {
@@ -84,7 +84,6 @@ public final class RetrievePayoutsRequest {
 
         private Optional<String> userId = Optional.empty();
 
-        @JsonAnySetter
         private Map<String, Object> additionalProperties = new HashMap<>();
 
         private Builder() {}
@@ -96,7 +95,7 @@ public final class RetrievePayoutsRequest {
         }
 
         /**
-         * <p>Owning account ID, prefixed <code>biz_</code>. Provide exactly one of <code>account_id</code> or <code>user_id</code>.</p>
+         * <p>Optional owning account ID, prefixed <code>biz_</code>. The payout ID identifies its ledger. If supplied, this must match the owner and cannot be combined with <code>user_id</code>.</p>
          */
         @JsonSetter(value = "account_id", nulls = Nulls.SKIP)
         public Builder accountId(Optional<String> accountId) {
@@ -110,7 +109,7 @@ public final class RetrievePayoutsRequest {
         }
 
         /**
-         * <p>Owning user ID, prefixed <code>user_</code>. Provide exactly one of <code>account_id</code> or <code>user_id</code>.</p>
+         * <p>Optional owning user ID, prefixed <code>user_</code>. The payout ID identifies its ledger. If supplied, this must match the owner and cannot be combined with <code>account_id</code>.</p>
          */
         @JsonSetter(value = "user_id", nulls = Nulls.SKIP)
         public Builder userId(Optional<String> userId) {
@@ -125,6 +124,14 @@ public final class RetrievePayoutsRequest {
 
         public RetrievePayoutsRequest build() {
             return new RetrievePayoutsRequest(accountId, userId, additionalProperties);
+        }
+
+        @JsonAnySetter
+        private void putAdditionalPropertyFromJson(String key, Object value) {
+            if (key.equalsIgnoreCase("account_id") || key.equalsIgnoreCase("user_id")) {
+                return;
+            }
+            this.additionalProperties.put(key, value);
         }
 
         public Builder additionalProperty(String key, Object value) {

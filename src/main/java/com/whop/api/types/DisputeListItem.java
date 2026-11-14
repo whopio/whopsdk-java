@@ -494,7 +494,6 @@ public final class DisputeListItem {
 
         private Optional<DisputeListItemCompany> company = Optional.empty();
 
-        @JsonAnySetter
         private Map<String, Object> additionalProperties = new HashMap<>();
 
         private Builder() {}
@@ -520,7 +519,6 @@ public final class DisputeListItem {
 
         /**
          * <p>The disputed amount in the specified currency, formatted as a decimal.</p>
-         * <p>The disputed amount in the specified currency, formatted as a decimal.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
@@ -531,7 +529,6 @@ public final class DisputeListItem {
         }
 
         /**
-         * <p>The three-letter ISO currency code for the disputed amount.</p>
          * <p>The three-letter ISO currency code for the disputed amount.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
@@ -544,7 +541,6 @@ public final class DisputeListItem {
 
         /**
          * <p>The unique identifier for the dispute.</p>
-         * <p>The unique identifier for the dispute.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
@@ -556,7 +552,6 @@ public final class DisputeListItem {
 
         /**
          * <p>The current status of the dispute lifecycle, such as needs_response, under_review, won, or lost.</p>
-         * <p>The current status of the dispute lifecycle, such as needs_response, under_review, won, or lost.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
@@ -567,7 +562,6 @@ public final class DisputeListItem {
         }
 
         /**
-         * <p>Whether the dispute was automatically resolved through Visa Rapid Dispute Resolution (RDR).</p>
          * <p>Whether the dispute was automatically resolved through Visa Rapid Dispute Resolution (RDR).</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
@@ -920,6 +914,27 @@ public final class DisputeListItem {
                     status,
                     visaRdr,
                     additionalProperties);
+        }
+
+        @JsonAnySetter
+        private void putAdditionalPropertyFromJson(String key, Object value) {
+            if (key.equalsIgnoreCase("amount")
+                    || key.equalsIgnoreCase("company")
+                    || key.equalsIgnoreCase("created_at")
+                    || key.equalsIgnoreCase("currency")
+                    || key.equalsIgnoreCase("editable")
+                    || key.equalsIgnoreCase("id")
+                    || key.equalsIgnoreCase("needs_response_by")
+                    || key.equalsIgnoreCase("payment")
+                    || key.equalsIgnoreCase("plan")
+                    || key.equalsIgnoreCase("product")
+                    || key.equalsIgnoreCase("reason")
+                    || key.equalsIgnoreCase("reason_code")
+                    || key.equalsIgnoreCase("status")
+                    || key.equalsIgnoreCase("visa_rdr")) {
+                return;
+            }
+            this.additionalProperties.put(key, value);
         }
 
         @java.lang.Override

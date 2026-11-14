@@ -146,7 +146,6 @@ public final class NotificationPreferenceState {
 
         private Optional<NotificationPreferenceStateLevel> level = Optional.empty();
 
-        @JsonAnySetter
         private Map<String, Object> additionalProperties = new HashMap<>();
 
         private Builder() {}
@@ -161,7 +160,6 @@ public final class NotificationPreferenceState {
 
         /**
          * <p>Which kind of preference was written: <code>experience_notification_preference</code> for an experience level, <code>notification_preference</code> for a topic override.</p>
-         * <p>Which kind of preference was written: <code>experience_notification_preference</code> for an experience level, <code>notification_preference</code> for a topic override.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
@@ -172,7 +170,6 @@ public final class NotificationPreferenceState {
         }
 
         /**
-         * <p>The scope that was written, resolved. <code>null</code> on a dimension means the preference is not narrowed there.</p>
          * <p>The scope that was written, resolved. <code>null</code> on a dimension means the preference is not narrowed there.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
@@ -222,6 +219,14 @@ public final class NotificationPreferenceState {
         @java.lang.Override
         public NotificationPreferenceState build() {
             return new NotificationPreferenceState(level, object, scope, additionalProperties);
+        }
+
+        @JsonAnySetter
+        private void putAdditionalPropertyFromJson(String key, Object value) {
+            if (key.equalsIgnoreCase("level") || key.equalsIgnoreCase("object") || key.equalsIgnoreCase("scope")) {
+                return;
+            }
+            this.additionalProperties.put(key, value);
         }
 
         @java.lang.Override

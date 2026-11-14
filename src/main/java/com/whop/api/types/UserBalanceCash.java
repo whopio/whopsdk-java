@@ -274,7 +274,6 @@ public final class UserBalanceCash {
 
         private Optional<Double> priceUsd = Optional.empty();
 
-        @JsonAnySetter
         private Map<String, Object> additionalProperties = new HashMap<>();
 
         private Builder() {}
@@ -294,7 +293,6 @@ public final class UserBalanceCash {
 
         /**
          * <p>Available balance in the native currency.</p>
-         * <p>Available balance in the native currency.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
@@ -305,7 +303,6 @@ public final class UserBalanceCash {
         }
 
         /**
-         * <p>Available balance converted to USD.</p>
          * <p>Available balance converted to USD.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
@@ -318,7 +315,6 @@ public final class UserBalanceCash {
 
         /**
          * <p>Lowercase ISO currency code, such as <code>usd</code> or <code>eur</code>.</p>
-         * <p>Lowercase ISO currency code, such as <code>usd</code> or <code>eur</code>.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
@@ -329,7 +325,6 @@ public final class UserBalanceCash {
         }
 
         /**
-         * <p>Balance moving to the user's own wallet or card, converted to USD.</p>
          * <p>Balance moving to the user's own wallet or card, converted to USD.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
@@ -342,7 +337,6 @@ public final class UserBalanceCash {
 
         /**
          * <p>Pending balance converted to USD.</p>
-         * <p>Pending balance converted to USD.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
@@ -354,7 +348,6 @@ public final class UserBalanceCash {
 
         /**
          * <p>Reserved balance converted to USD.</p>
-         * <p>Reserved balance converted to USD.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
@@ -365,7 +358,6 @@ public final class UserBalanceCash {
         }
 
         /**
-         * <p>Withdrawable amount in the native currency.</p>
          * <p>Withdrawable amount in the native currency.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
@@ -424,6 +416,21 @@ public final class UserBalanceCash {
                     reserveBalanceUsd,
                     totalWithdrawableBalance,
                     additionalProperties);
+        }
+
+        @JsonAnySetter
+        private void putAdditionalPropertyFromJson(String key, Object value) {
+            if (key.equalsIgnoreCase("balance")
+                    || key.equalsIgnoreCase("balance_usd")
+                    || key.equalsIgnoreCase("currency")
+                    || key.equalsIgnoreCase("in_transit_balance_usd")
+                    || key.equalsIgnoreCase("pending_balance_usd")
+                    || key.equalsIgnoreCase("price_usd")
+                    || key.equalsIgnoreCase("reserve_balance_usd")
+                    || key.equalsIgnoreCase("total_withdrawable_balance")) {
+                return;
+            }
+            this.additionalProperties.put(key, value);
         }
 
         @java.lang.Override

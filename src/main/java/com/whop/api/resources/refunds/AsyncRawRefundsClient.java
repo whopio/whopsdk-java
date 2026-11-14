@@ -6,24 +6,22 @@ package com.whop.api.resources.refunds;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.whop.api.core.ClientOptions;
 import com.whop.api.core.ObjectMappers;
+import com.whop.api.core.PathSegments;
 import com.whop.api.core.QueryStringMapper;
 import com.whop.api.core.RequestOptions;
+import com.whop.api.core.RetryInterceptor;
 import com.whop.api.core.WhopApiApiException;
 import com.whop.api.core.WhopApiException;
 import com.whop.api.core.WhopApiHttpResponse;
 import com.whop.api.core.pagination.SyncPagingIterable;
 import com.whop.api.errors.BadRequestError;
 import com.whop.api.errors.ForbiddenError;
-import com.whop.api.errors.InternalServerError;
 import com.whop.api.errors.NotFoundError;
-import com.whop.api.errors.TooManyRequestsError;
 import com.whop.api.errors.UnauthorizedError;
-import com.whop.api.errors.UnprocessableEntityError;
 import com.whop.api.resources.refunds.requests.ListRefundsRequest;
 import com.whop.api.resources.refunds.requests.RetrieveRefundsRequest;
 import com.whop.api.resources.refunds.types.ListRefundsResponse;
 import com.whop.api.types.Refund;
-import com.whop.api.types.RefundListItem;
 import java.io.IOException;
 import java.util.List;
 import java.util.Optional;
@@ -47,82 +45,45 @@ public class AsyncRawRefundsClient {
     }
 
     /**
-     * Returns a paginated list of refunds, with optional filtering by payment, company, user, and creation date.
-     * <p>Required permissions:</p>
-     * <ul>
-     * <li><code>payment:basic:read</code></li>
-     * </ul>
+     * Lists refunds the caller can read, newest first. Filter by payment, account, or buyer to narrow the results.
      */
-    public CompletableFuture<WhopApiHttpResponse<SyncPagingIterable<RefundListItem>>> list() {
+    public CompletableFuture<WhopApiHttpResponse<SyncPagingIterable<Refund>>> list() {
         return list(ListRefundsRequest.builder().build());
     }
 
     /**
-     * Returns a paginated list of refunds, with optional filtering by payment, company, user, and creation date.
-     * <p>Required permissions:</p>
-     * <ul>
-     * <li><code>payment:basic:read</code></li>
-     * </ul>
+     * Lists refunds the caller can read, newest first. Filter by payment, account, or buyer to narrow the results.
      */
-    public CompletableFuture<WhopApiHttpResponse<SyncPagingIterable<RefundListItem>>> list(
-            RequestOptions requestOptions) {
+    public CompletableFuture<WhopApiHttpResponse<SyncPagingIterable<Refund>>> list(RequestOptions requestOptions) {
         return list(ListRefundsRequest.builder().build(), requestOptions);
     }
 
     /**
-     * Returns a paginated list of refunds, with optional filtering by payment, company, user, and creation date.
-     * <p>Required permissions:</p>
-     * <ul>
-     * <li><code>payment:basic:read</code></li>
-     * </ul>
+     * Lists refunds the caller can read, newest first. Filter by payment, account, or buyer to narrow the results.
      */
-    public CompletableFuture<WhopApiHttpResponse<SyncPagingIterable<RefundListItem>>> list(ListRefundsRequest request) {
+    public CompletableFuture<WhopApiHttpResponse<SyncPagingIterable<Refund>>> list(ListRefundsRequest request) {
         return list(request, null);
     }
 
     /**
-     * Returns a paginated list of refunds, with optional filtering by payment, company, user, and creation date.
-     * <p>Required permissions:</p>
-     * <ul>
-     * <li><code>payment:basic:read</code></li>
-     * </ul>
+     * Lists refunds the caller can read, newest first. Filter by payment, account, or buyer to narrow the results.
      */
-    public CompletableFuture<WhopApiHttpResponse<SyncPagingIterable<RefundListItem>>> list(
+    public CompletableFuture<WhopApiHttpResponse<SyncPagingIterable<Refund>>> list(
             ListRefundsRequest request, RequestOptions requestOptions) {
-        HttpUrl.Builder httpUrl = HttpUrl.parse(this.clientOptions.environment().getUrl())
+        HttpUrl.Builder httpUrl = HttpUrl.parse(this.clientOptions.environment().getApiURL())
                 .newBuilder()
                 .addPathSegments("refunds");
-        if (request.getAfter().isPresent()) {
+        if (request.getAccountId().isPresent()) {
             QueryStringMapper.addQueryParameter(
-                    httpUrl, "after", request.getAfter().get(), false);
-        }
-        if (request.getBefore().isPresent()) {
-            QueryStringMapper.addQueryParameter(
-                    httpUrl, "before", request.getBefore().get(), false);
-        }
-        if (request.getFirst().isPresent()) {
-            QueryStringMapper.addQueryParameter(
-                    httpUrl, "first", request.getFirst().get(), false);
-        }
-        if (request.getLast().isPresent()) {
-            QueryStringMapper.addQueryParameter(
-                    httpUrl, "last", request.getLast().get(), false);
+                    httpUrl, "account_id", request.getAccountId().get(), false);
         }
         if (request.getPaymentId().isPresent()) {
             QueryStringMapper.addQueryParameter(
                     httpUrl, "payment_id", request.getPaymentId().get(), false);
         }
-        if (request.getCompanyId().isPresent()) {
-            QueryStringMapper.addQueryParameter(
-                    httpUrl, "company_id", request.getCompanyId().get(), false);
-        }
         if (request.getUserId().isPresent()) {
             QueryStringMapper.addQueryParameter(
                     httpUrl, "user_id", request.getUserId().get(), false);
-        }
-        if (request.getDirection().isPresent()) {
-            QueryStringMapper.addQueryParameter(
-                    httpUrl, "direction", request.getDirection().get(), false);
         }
         if (request.getCreatedBefore().isPresent()) {
             QueryStringMapper.addQueryParameter(
@@ -131,6 +92,30 @@ public class AsyncRawRefundsClient {
         if (request.getCreatedAfter().isPresent()) {
             QueryStringMapper.addQueryParameter(
                     httpUrl, "created_after", request.getCreatedAfter().get(), false);
+        }
+        if (request.getOrder().isPresent()) {
+            QueryStringMapper.addQueryParameter(
+                    httpUrl, "order", request.getOrder().get(), false);
+        }
+        if (request.getDirection().isPresent()) {
+            QueryStringMapper.addQueryParameter(
+                    httpUrl, "direction", request.getDirection().get(), false);
+        }
+        if (request.getFirst().isPresent()) {
+            QueryStringMapper.addQueryParameter(
+                    httpUrl, "first", request.getFirst().get(), false);
+        }
+        if (request.getAfter().isPresent()) {
+            QueryStringMapper.addQueryParameter(
+                    httpUrl, "after", request.getAfter().get(), false);
+        }
+        if (request.getLast().isPresent()) {
+            QueryStringMapper.addQueryParameter(
+                    httpUrl, "last", request.getLast().get(), false);
+        }
+        if (request.getBefore().isPresent()) {
+            QueryStringMapper.addQueryParameter(
+                    httpUrl, "before", request.getBefore().get(), false);
         }
         if (requestOptions != null) {
             requestOptions.getQueryParameters().forEach((_key, _value) -> {
@@ -147,8 +132,18 @@ public class AsyncRawRefundsClient {
         if (requestOptions != null && requestOptions.getTimeout().isPresent()) {
             client = clientOptions.httpClientWithTimeout(requestOptions);
         }
-        CompletableFuture<WhopApiHttpResponse<SyncPagingIterable<RefundListItem>>> future = new CompletableFuture<>();
-        client.newCall(okhttpRequest).enqueue(new Callback() {
+        if (requestOptions != null && requestOptions.getMaxRetries().isPresent()) {
+            okhttpRequest = okhttpRequest
+                    .newBuilder()
+                    .tag(
+                            RetryInterceptor.MaxRetriesOverride.class,
+                            new RetryInterceptor.MaxRetriesOverride(
+                                    requestOptions.getMaxRetries().get()))
+                    .build();
+        }
+        CompletableFuture<WhopApiHttpResponse<SyncPagingIterable<Refund>>> future = new CompletableFuture<>();
+        RetryInterceptor.AsyncCall okhttpCall = RetryInterceptor.newAsyncCall(client, okhttpRequest);
+        okhttpCall.enqueue(new Callback() {
             @Override
             public void onResponse(@NotNull Call call, @NotNull Response response) throws IOException {
                 try (ResponseBody responseBody = response.body()) {
@@ -162,10 +157,14 @@ public class AsyncRawRefundsClient {
                                 .from(request)
                                 .after(startingAfter)
                                 .build();
-                        List<RefundListItem> result = parsedResponse.getData();
+                        List<Refund> result = parsedResponse.getData();
                         future.complete(new WhopApiHttpResponse<>(
-                                new SyncPagingIterable<RefundListItem>(
-                                        startingAfter != null, result, parsedResponse, () -> {
+                                new SyncPagingIterable<Refund>(
+                                        startingAfter.isPresent()
+                                                && !startingAfter.get().isEmpty(),
+                                        result,
+                                        parsedResponse,
+                                        () -> {
                                             try {
                                                 return list(nextRequest, requestOptions)
                                                         .get()
@@ -189,28 +188,8 @@ public class AsyncRawRefundsClient {
                                         ObjectMappers.JSON_MAPPER.readValue(responseBodyString, Object.class),
                                         response));
                                 return;
-                            case 403:
-                                future.completeExceptionally(new ForbiddenError(
-                                        ObjectMappers.JSON_MAPPER.readValue(responseBodyString, Object.class),
-                                        response));
-                                return;
                             case 404:
                                 future.completeExceptionally(new NotFoundError(
-                                        ObjectMappers.JSON_MAPPER.readValue(responseBodyString, Object.class),
-                                        response));
-                                return;
-                            case 422:
-                                future.completeExceptionally(new UnprocessableEntityError(
-                                        ObjectMappers.JSON_MAPPER.readValue(responseBodyString, Object.class),
-                                        response));
-                                return;
-                            case 429:
-                                future.completeExceptionally(new TooManyRequestsError(
-                                        ObjectMappers.JSON_MAPPER.readValue(responseBodyString, Object.class),
-                                        response));
-                                return;
-                            case 500:
-                                future.completeExceptionally(new InternalServerError(
                                         ObjectMappers.JSON_MAPPER.readValue(responseBodyString, Object.class),
                                         response));
                                 return;
@@ -222,6 +201,9 @@ public class AsyncRawRefundsClient {
                     future.completeExceptionally(new WhopApiApiException(
                             "Error with status code " + response.code(), response.code(), errorBody, response));
                     return;
+                } catch (JsonProcessingException e) {
+                    future.completeExceptionally(
+                            new WhopApiException("Failed to deserialize response: " + e.getMessage(), e));
                 } catch (IOException e) {
                     future.completeExceptionally(new WhopApiException("Network error executing HTTP request", e));
                 }
@@ -232,75 +214,44 @@ public class AsyncRawRefundsClient {
                 future.completeExceptionally(new WhopApiException("Network error executing HTTP request", e));
             }
         });
+        future.whenComplete((result_, throwable_) -> {
+            if (future.isCancelled()) {
+                okhttpCall.cancel();
+            }
+        });
         return future;
     }
 
     /**
-     * Retrieves the details of an existing refund.
-     * <p>Required permissions:</p>
-     * <ul>
-     * <li><code>payment:basic:read</code></li>
-     * <li><code>plan:basic:read</code></li>
-     * <li><code>access_pass:basic:read</code></li>
-     * <li><code>member:email:read</code></li>
-     * <li><code>member:basic:read</code></li>
-     * <li><code>member:phone:read</code></li>
-     * </ul>
+     * Returns one refund.
      */
     public CompletableFuture<WhopApiHttpResponse<Refund>> retrieve(String id) {
         return retrieve(id, RetrieveRefundsRequest.builder().build());
     }
 
     /**
-     * Retrieves the details of an existing refund.
-     * <p>Required permissions:</p>
-     * <ul>
-     * <li><code>payment:basic:read</code></li>
-     * <li><code>plan:basic:read</code></li>
-     * <li><code>access_pass:basic:read</code></li>
-     * <li><code>member:email:read</code></li>
-     * <li><code>member:basic:read</code></li>
-     * <li><code>member:phone:read</code></li>
-     * </ul>
+     * Returns one refund.
      */
     public CompletableFuture<WhopApiHttpResponse<Refund>> retrieve(String id, RequestOptions requestOptions) {
         return retrieve(id, RetrieveRefundsRequest.builder().build(), requestOptions);
     }
 
     /**
-     * Retrieves the details of an existing refund.
-     * <p>Required permissions:</p>
-     * <ul>
-     * <li><code>payment:basic:read</code></li>
-     * <li><code>plan:basic:read</code></li>
-     * <li><code>access_pass:basic:read</code></li>
-     * <li><code>member:email:read</code></li>
-     * <li><code>member:basic:read</code></li>
-     * <li><code>member:phone:read</code></li>
-     * </ul>
+     * Returns one refund.
      */
     public CompletableFuture<WhopApiHttpResponse<Refund>> retrieve(String id, RetrieveRefundsRequest request) {
         return retrieve(id, request, null);
     }
 
     /**
-     * Retrieves the details of an existing refund.
-     * <p>Required permissions:</p>
-     * <ul>
-     * <li><code>payment:basic:read</code></li>
-     * <li><code>plan:basic:read</code></li>
-     * <li><code>access_pass:basic:read</code></li>
-     * <li><code>member:email:read</code></li>
-     * <li><code>member:basic:read</code></li>
-     * <li><code>member:phone:read</code></li>
-     * </ul>
+     * Returns one refund.
      */
     public CompletableFuture<WhopApiHttpResponse<Refund>> retrieve(
             String id, RetrieveRefundsRequest request, RequestOptions requestOptions) {
-        HttpUrl.Builder httpUrl = HttpUrl.parse(this.clientOptions.environment().getUrl())
+        HttpUrl.Builder httpUrl = HttpUrl.parse(this.clientOptions.environment().getApiURL())
                 .newBuilder()
                 .addPathSegments("refunds")
-                .addPathSegment(id);
+                .addPathSegment(PathSegments.validate(id));
         if (requestOptions != null) {
             requestOptions.getQueryParameters().forEach((_key, _value) -> {
                 httpUrl.addQueryParameter(_key, _value);
@@ -316,8 +267,18 @@ public class AsyncRawRefundsClient {
         if (requestOptions != null && requestOptions.getTimeout().isPresent()) {
             client = clientOptions.httpClientWithTimeout(requestOptions);
         }
+        if (requestOptions != null && requestOptions.getMaxRetries().isPresent()) {
+            okhttpRequest = okhttpRequest
+                    .newBuilder()
+                    .tag(
+                            RetryInterceptor.MaxRetriesOverride.class,
+                            new RetryInterceptor.MaxRetriesOverride(
+                                    requestOptions.getMaxRetries().get()))
+                    .build();
+        }
         CompletableFuture<WhopApiHttpResponse<Refund>> future = new CompletableFuture<>();
-        client.newCall(okhttpRequest).enqueue(new Callback() {
+        RetryInterceptor.AsyncCall okhttpCall = RetryInterceptor.newAsyncCall(client, okhttpRequest);
+        okhttpCall.enqueue(new Callback() {
             @Override
             public void onResponse(@NotNull Call call, @NotNull Response response) throws IOException {
                 try (ResponseBody responseBody = response.body()) {
@@ -329,11 +290,6 @@ public class AsyncRawRefundsClient {
                     }
                     try {
                         switch (response.code()) {
-                            case 400:
-                                future.completeExceptionally(new BadRequestError(
-                                        ObjectMappers.JSON_MAPPER.readValue(responseBodyString, Object.class),
-                                        response));
-                                return;
                             case 401:
                                 future.completeExceptionally(new UnauthorizedError(
                                         ObjectMappers.JSON_MAPPER.readValue(responseBodyString, Object.class),
@@ -349,21 +305,6 @@ public class AsyncRawRefundsClient {
                                         ObjectMappers.JSON_MAPPER.readValue(responseBodyString, Object.class),
                                         response));
                                 return;
-                            case 422:
-                                future.completeExceptionally(new UnprocessableEntityError(
-                                        ObjectMappers.JSON_MAPPER.readValue(responseBodyString, Object.class),
-                                        response));
-                                return;
-                            case 429:
-                                future.completeExceptionally(new TooManyRequestsError(
-                                        ObjectMappers.JSON_MAPPER.readValue(responseBodyString, Object.class),
-                                        response));
-                                return;
-                            case 500:
-                                future.completeExceptionally(new InternalServerError(
-                                        ObjectMappers.JSON_MAPPER.readValue(responseBodyString, Object.class),
-                                        response));
-                                return;
                         }
                     } catch (JsonProcessingException ignored) {
                         // unable to map error response, throwing generic error
@@ -372,6 +313,9 @@ public class AsyncRawRefundsClient {
                     future.completeExceptionally(new WhopApiApiException(
                             "Error with status code " + response.code(), response.code(), errorBody, response));
                     return;
+                } catch (JsonProcessingException e) {
+                    future.completeExceptionally(
+                            new WhopApiException("Failed to deserialize response: " + e.getMessage(), e));
                 } catch (IOException e) {
                     future.completeExceptionally(new WhopApiException("Network error executing HTTP request", e));
                 }
@@ -380,6 +324,11 @@ public class AsyncRawRefundsClient {
             @Override
             public void onFailure(@NotNull Call call, @NotNull IOException e) {
                 future.completeExceptionally(new WhopApiException("Network error executing HTTP request", e));
+            }
+        });
+        future.whenComplete((result_, throwable_) -> {
+            if (future.isCancelled()) {
+                okhttpCall.cancel();
             }
         });
         return future;

@@ -80,7 +80,7 @@ public final class GenerateMediaRequest {
     }
 
     /**
-     * @return Optional reference image file IDs (<code>file_</code> prefixed), up to 4. For video, a single reference seeds the opening frame; multiple references guide subject and style instead.
+     * @return Optional reference file IDs (<code>file_</code> prefixed), up to 4. Images guide the output: for video, a single image seeds the opening frame; multiple images guide subject and style instead. Include one video to remake it: its motion and scene are kept and the images are swapped in. Video only; needs an image and can't be combined with <code>duration_seconds</code>. The output matches the video's length, up to 30 seconds, and is billed on it.
      */
     @JsonProperty("reference_media")
     public Optional<List<String>> getReferenceMedia() {
@@ -176,7 +176,7 @@ public final class GenerateMediaRequest {
         _FinalStage durationSeconds(Integer durationSeconds);
 
         /**
-         * <p>Optional reference image file IDs (<code>file_</code> prefixed), up to 4. For video, a single reference seeds the opening frame; multiple references guide subject and style instead.</p>
+         * <p>Optional reference file IDs (<code>file_</code> prefixed), up to 4. Images guide the output: for video, a single image seeds the opening frame; multiple images guide subject and style instead. Include one video to remake it: its motion and scene are kept and the images are swapped in. Video only; needs an image and can't be combined with <code>duration_seconds</code>. The output matches the video's length, up to 30 seconds, and is billed on it.</p>
          */
         _FinalStage referenceMedia(Optional<List<String>> referenceMedia);
 
@@ -204,7 +204,6 @@ public final class GenerateMediaRequest {
 
         private Optional<String> accountId = Optional.empty();
 
-        @JsonAnySetter
         private Map<String, Object> additionalProperties = new HashMap<>();
 
         private Builder() {}
@@ -222,7 +221,6 @@ public final class GenerateMediaRequest {
 
         /**
          * <p>What to generate. Up to 2,000 characters.</p>
-         * <p>What to generate. Up to 2,000 characters.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
@@ -233,7 +231,6 @@ public final class GenerateMediaRequest {
         }
 
         /**
-         * <p>The kind of media to generate.</p>
          * <p>The kind of media to generate.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
@@ -265,7 +262,7 @@ public final class GenerateMediaRequest {
         }
 
         /**
-         * <p>Optional reference image file IDs (<code>file_</code> prefixed), up to 4. For video, a single reference seeds the opening frame; multiple references guide subject and style instead.</p>
+         * <p>Optional reference file IDs (<code>file_</code> prefixed), up to 4. Images guide the output: for video, a single image seeds the opening frame; multiple images guide subject and style instead. Include one video to remake it: its motion and scene are kept and the images are swapped in. Video only; needs an image and can't be combined with <code>duration_seconds</code>. The output matches the video's length, up to 30 seconds, and is billed on it.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
@@ -275,7 +272,7 @@ public final class GenerateMediaRequest {
         }
 
         /**
-         * <p>Optional reference image file IDs (<code>file_</code> prefixed), up to 4. For video, a single reference seeds the opening frame; multiple references guide subject and style instead.</p>
+         * <p>Optional reference file IDs (<code>file_</code> prefixed), up to 4. Images guide the output: for video, a single image seeds the opening frame; multiple images guide subject and style instead. Include one video to remake it: its motion and scene are kept and the images are swapped in. Video only; needs an image and can't be combined with <code>duration_seconds</code>. The output matches the video's length, up to 30 seconds, and is billed on it.</p>
          */
         @java.lang.Override
         @JsonSetter(value = "reference_media", nulls = Nulls.SKIP)
@@ -328,6 +325,19 @@ public final class GenerateMediaRequest {
         public GenerateMediaRequest build() {
             return new GenerateMediaRequest(
                     accountId, durationSeconds, prompt, referenceMedia, resolution, type, additionalProperties);
+        }
+
+        @JsonAnySetter
+        private void putAdditionalPropertyFromJson(String key, Object value) {
+            if (key.equalsIgnoreCase("account_id")
+                    || key.equalsIgnoreCase("duration_seconds")
+                    || key.equalsIgnoreCase("prompt")
+                    || key.equalsIgnoreCase("reference_media")
+                    || key.equalsIgnoreCase("resolution")
+                    || key.equalsIgnoreCase("type")) {
+                return;
+            }
+            this.additionalProperties.put(key, value);
         }
 
         @java.lang.Override

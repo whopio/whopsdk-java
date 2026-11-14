@@ -170,7 +170,6 @@ public final class Reaction {
 
         private Optional<String> emoji = Optional.empty();
 
-        @JsonAnySetter
         private Map<String, Object> additionalProperties = new HashMap<>();
 
         private Builder() {}
@@ -186,7 +185,6 @@ public final class Reaction {
 
         /**
          * <p>The unique identifier for the entity</p>
-         * <p>The unique identifier for the entity</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
@@ -198,7 +196,6 @@ public final class Reaction {
 
         /**
          * <p>The unique identifier of the post this reaction was left on.</p>
-         * <p>The unique identifier of the post this reaction was left on.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
@@ -209,7 +206,6 @@ public final class Reaction {
         }
 
         /**
-         * <p>The user who left this reaction on the post.</p>
          * <p>The user who left this reaction on the post.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
@@ -259,6 +255,17 @@ public final class Reaction {
         @java.lang.Override
         public Reaction build() {
             return new Reaction(emoji, id, resourceId, user, additionalProperties);
+        }
+
+        @JsonAnySetter
+        private void putAdditionalPropertyFromJson(String key, Object value) {
+            if (key.equalsIgnoreCase("emoji")
+                    || key.equalsIgnoreCase("id")
+                    || key.equalsIgnoreCase("resource_id")
+                    || key.equalsIgnoreCase("user")) {
+                return;
+            }
+            this.additionalProperties.put(key, value);
         }
 
         @java.lang.Override

@@ -32,14 +32,14 @@ public class PreferencesClient {
     }
 
     /**
-     * Retrieves the authenticated user's settings document. Addressed only as <code>me</code> — the document always belongs to the session user.
+     * Retrieves the authenticated user's settings document.
      */
     public UserPreferences retrieve() {
         return this.rawClient.retrieve().body();
     }
 
     /**
-     * Retrieves the authenticated user's settings document. Addressed only as <code>me</code> — the document always belongs to the session user.
+     * Retrieves the authenticated user's settings document.
      */
     public UserPreferences retrieve(RequestOptions requestOptions) {
         return this.rawClient.retrieve(requestOptions).body();

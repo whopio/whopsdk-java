@@ -123,7 +123,6 @@ public final class AccountCards {
 
         private Optional<AccountCardsKind> kind = Optional.empty();
 
-        @JsonAnySetter
         private Map<String, Object> additionalProperties = new HashMap<>();
 
         private Builder() {}
@@ -136,7 +135,6 @@ public final class AccountCards {
         }
 
         /**
-         * <p>Where the card application stands. <code>approved</code> means cards can be issued. <code>needs_verification</code> means the applicant has not completed identity verification yet; <code>needs_information</code> means they did, but the documents were rejected for a fixable reason and must be resubmitted. <code>pending</code> and <code>manual_review</code> are in flight. <code>denied</code>, <code>locked</code>, and <code>canceled</code> are terminal.</p>
          * <p>Where the card application stands. <code>approved</code> means cards can be issued. <code>needs_verification</code> means the applicant has not completed identity verification yet; <code>needs_information</code> means they did, but the documents were rejected for a fixable reason and must be resubmitted. <code>pending</code> and <code>manual_review</code> are in flight. <code>denied</code>, <code>locked</code>, and <code>canceled</code> are terminal.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
@@ -186,6 +184,14 @@ public final class AccountCards {
         @java.lang.Override
         public AccountCards build() {
             return new AccountCards(kind, status, additionalProperties);
+        }
+
+        @JsonAnySetter
+        private void putAdditionalPropertyFromJson(String key, Object value) {
+            if (key.equalsIgnoreCase("kind") || key.equalsIgnoreCase("status")) {
+                return;
+            }
+            this.additionalProperties.put(key, value);
         }
 
         @java.lang.Override
